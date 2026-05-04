@@ -1,0 +1,35 @@
+import type { Block } from 'payload';
+
+import { linkField } from '../fields/link';
+
+export const FeatureGrid: Block = {
+  slug: 'featureGrid',
+  labels: { singular: 'Feature grid', plural: 'Feature grids' },
+  fields: [
+    { name: 'eyebrow', type: 'text' },
+    { name: 'heading', type: 'text' },
+    { name: 'sub', type: 'textarea' },
+    {
+      name: 'columns',
+      type: 'select',
+      defaultValue: '3',
+      options: [
+        { label: '2 columns', value: '2' },
+        { label: '3 columns', value: '3' },
+        { label: '4 columns', value: '4' },
+      ],
+    },
+    {
+      name: 'features',
+      type: 'array',
+      required: true,
+      labels: { singular: 'Feature', plural: 'Features' },
+      fields: [
+        { name: 'icon', type: 'upload', relationTo: 'media' },
+        { name: 'title', type: 'text', required: true },
+        { name: 'body', type: 'textarea' },
+        linkField({ name: 'link', withText: true }),
+      ],
+    },
+  ],
+};
