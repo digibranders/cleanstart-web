@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { buildTaxonomyFields } from '../lib/build-taxonomy-fields';
 
 export const Categories: CollectionConfig = {
@@ -18,6 +19,9 @@ export const Categories: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: buildTaxonomyFields('categories'),
+  hooks: {
+    afterChange: [slugChangeRedirectHook('categories')],
+  },
   versions: { drafts: true },
   timestamps: true,
 };

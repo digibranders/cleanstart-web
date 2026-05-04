@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 export const Resources: CollectionConfig = {
   slug: 'resources',
@@ -86,6 +87,9 @@ export const Resources: CollectionConfig = {
     },
     seoField,
   ],
+  hooks: {
+    afterChange: [slugChangeRedirectHook('resources')],
+  },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,
 };

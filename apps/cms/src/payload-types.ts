@@ -82,6 +82,8 @@ export interface Config {
     webinars: Webinar;
     jobs: Job;
     aboutGalleries: AboutGallery;
+    pages: Page;
+    redirects: Redirect;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -105,6 +107,8 @@ export interface Config {
     webinars: WebinarsSelect<false> | WebinarsSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
     aboutGalleries: AboutGalleriesSelect<false> | AboutGalleriesSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -1586,6 +1590,122 @@ export interface AboutGallery {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  /**
+   * Optional parent page. Builds nested URLs (e.g. /solutions/fips).
+   */
+  parent?: (number | null) | Page;
+  /**
+   * Computed full URL path. System-managed by the path-builder hook (Phase D).
+   */
+  path?: string | null;
+  /**
+   * Page-builder content. Block library lands in Phase C — Hero, FeatureGrid, FAQ, CTA, etc.
+   */
+  layout?: unknown[] | null;
+  /**
+   * Container width and chrome. Block picker filters by layout in Phase C.
+   */
+  pageLayout?: ('default' | 'narrow' | 'full-bleed') | null;
+  /**
+   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * Source path (e.g. /old-pricing). Read-only for system-managed redirects.
+   */
+  from: string;
+  status: '301' | '302' | '307' | '308' | '410';
+  /**
+   * Destination path or absolute URL. Required unless status=410. Read-only for slug-change rules.
+   */
+  to?: string | null;
+  /**
+   * Provenance. System-set on creation; never manually edited.
+   */
+  source: 'manual' | 'slug-change' | 'archive-with-redirect' | 'migration-seed';
+  /**
+   * Why this redirect exists. Future editors thank you.
+   */
+  notes?: string | null;
+  /**
+   * Incremented in apps/web middleware on every match (Phase E).
+   */
+  hitCount?: number | null;
+  lastHitAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1759,6 +1879,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'aboutGalleries';
         value: number | AboutGallery;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -2482,6 +2610,56 @@ export interface AboutGalleriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  parent?: T;
+  path?: T;
+  layout?: T | {};
+  pageLayout?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  status?: T;
+  to?: T;
+  source?: T;
+  notes?: T;
+  hitCount?: T;
+  lastHitAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -2597,6 +2775,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'jobs';
           value: number | Job;
+        } | null)
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
         } | null);
     global?: string | null;
     user?: (number | null) | User;

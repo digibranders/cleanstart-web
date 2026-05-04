@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 const ABSTRACT_CHAR_HINT = 160;
 
@@ -110,6 +111,9 @@ export const Blogs: CollectionConfig = {
     },
     seoField,
   ],
+  hooks: {
+    afterChange: [slugChangeRedirectHook('blogs')],
+  },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,
 };

@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 export const Authors: CollectionConfig = {
   slug: 'authors',
@@ -101,6 +102,9 @@ export const Authors: CollectionConfig = {
     },
     seoField,
   ],
+  hooks: {
+    afterChange: [slugChangeRedirectHook('authors')],
+  },
   versions: { drafts: true },
   timestamps: true,
 };

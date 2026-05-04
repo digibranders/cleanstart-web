@@ -18,6 +18,8 @@ import { Jobs } from './payload/collections/Jobs';
 import { Media } from './payload/collections/Media';
 import { News } from './payload/collections/News';
 import { NewsCategories } from './payload/collections/NewsCategories';
+import { Pages } from './payload/collections/Pages';
+import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
@@ -58,6 +60,8 @@ export default buildConfig({
     Webinars,
     Jobs,
     AboutGalleries,
+    Pages,
+    Redirects,
   ],
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),

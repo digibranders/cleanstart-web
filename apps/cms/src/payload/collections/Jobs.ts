@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 export const Jobs: CollectionConfig = {
   slug: 'jobs',
@@ -174,6 +175,9 @@ export const Jobs: CollectionConfig = {
     },
     seoField,
   ],
+  hooks: {
+    afterChange: [slugChangeRedirectHook('jobs')],
+  },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,
 };

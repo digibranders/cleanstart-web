@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 export const Webinars: CollectionConfig = {
   slug: 'webinars',
@@ -132,6 +133,9 @@ export const Webinars: CollectionConfig = {
     },
     seoField,
   ],
+  hooks: {
+    afterChange: [slugChangeRedirectHook('webinars')],
+  },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,
 };
