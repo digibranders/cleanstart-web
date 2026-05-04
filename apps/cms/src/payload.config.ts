@@ -10,6 +10,7 @@ import { Authors } from './payload/collections/Authors';
 import { Blogs } from './payload/collections/Blogs';
 import { Categories } from './payload/collections/Categories';
 import { Forms } from './payload/collections/Forms';
+import { Guides } from './payload/collections/Guides';
 import { JobLocations } from './payload/collections/JobLocations';
 import { Media } from './payload/collections/Media';
 import { News } from './payload/collections/News';
@@ -46,6 +47,7 @@ export default buildConfig({
     Forms,
     Blogs,
     News,
+    Guides,
   ],
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),
