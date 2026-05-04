@@ -6,6 +6,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
 
+import { Media } from './payload/collections/Media';
 import { Users } from './payload/collections/Users';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -28,7 +29,7 @@ export default buildConfig({
       titleSuffix: '— CleanStart CMS',
     },
   },
-  collections: [Users],
+  collections: [Users, Media],
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
