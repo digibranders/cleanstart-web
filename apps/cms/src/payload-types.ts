@@ -73,6 +73,7 @@ export interface Config {
     categories: Category;
     newsCategories: NewsCategory;
     jobLocations: JobLocation;
+    forms: Form;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +87,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
     jobLocations: JobLocationsSelect<false> | JobLocationsSelect<true>;
+    forms: FormsSelect<false> | FormsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -559,6 +561,124 @@ export interface JobLocation {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms".
+ */
+export interface Form {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  /**
+   * Internal notes for editors. Not shown to visitors.
+   */
+  description?: string | null;
+  /**
+   * Forms with more than 7 fields show measurably higher abandonment per Baymard — consider conditional logic or splitting into multiple steps.
+   */
+  fields: {
+    /**
+     * Machine name. Becomes the JSON key on the lead record.
+     */
+    name: string;
+    type: 'text' | 'email' | 'textarea' | 'select' | 'checkbox' | 'consent';
+    /**
+     * Visitor-facing label.
+     */
+    label?: string | null;
+    /**
+     * Consent fields are always required and cannot be unchecked here.
+     */
+    required?: boolean | null;
+    placeholder?: string | null;
+    helpText?: string | null;
+    defaultValue?: string | null;
+    options?:
+      | {
+          label: string;
+          value: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Exact text the visitor sees + agrees to. Snapshotted onto every lead record at submit time for GDPR audit defensibility.
+     */
+    consentText?: string | null;
+    /**
+     * Server-enforced via Zod at submit time.
+     */
+    validation?: {
+      minLength?: number | null;
+      maxLength?: number | null;
+      /**
+       * Regular expression source (no leading/trailing slashes).
+       */
+      pattern?: string | null;
+    };
+    /**
+     * Show this field only when the rules below match. Reduces form abandonment by 8–15% per Baymard research.
+     */
+    conditions?: {
+      mode?: ('all' | 'any') | null;
+      rules?:
+        | {
+            fieldName: string;
+            operator: 'equals' | 'notEquals' | 'contains';
+            value: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    /**
+     * Override the default validation error. Defaults are inlined per validation type in the form renderer.
+     */
+    errorMessage?: string | null;
+    id?: string | null;
+  }[];
+  submitLabel?: string | null;
+  postSubmit: {
+    kind: 'message' | 'redirect';
+    body?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    url?: string | null;
+  };
+  /**
+   * CRM handlers fan out in parallel to the DB write. Handler config (API keys, list IDs) lives in env. Adapter implementations land in Phase E.
+   */
+  crmHandlers?: ('hubspot' | 'salesforce')[] | null;
+  /**
+   * Email addresses that receive the new-lead notification.
+   */
+  notifyTo?:
+    | {
+        email: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * System-managed. Auto-increments when fields[] changes after the form has at least one submission.
+   */
+  schemaVersion?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -604,6 +724,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'jobLocations';
         value: number | JobLocation;
+      } | null)
+    | ({
+        relationTo: 'forms';
+        value: number | Form;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -895,6 +1019,75 @@ export interface JobLocationsSelect<T extends boolean = true> {
   isoCountry?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms_select".
+ */
+export interface FormsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  fields?:
+    | T
+    | {
+        name?: T;
+        type?: T;
+        label?: T;
+        required?: T;
+        placeholder?: T;
+        helpText?: T;
+        defaultValue?: T;
+        options?:
+          | T
+          | {
+              label?: T;
+              value?: T;
+              id?: T;
+            };
+        consentText?: T;
+        validation?:
+          | T
+          | {
+              minLength?: T;
+              maxLength?: T;
+              pattern?: T;
+            };
+        conditions?:
+          | T
+          | {
+              mode?: T;
+              rules?:
+                | T
+                | {
+                    fieldName?: T;
+                    operator?: T;
+                    value?: T;
+                    id?: T;
+                  };
+            };
+        errorMessage?: T;
+        id?: T;
+      };
+  submitLabel?: T;
+  postSubmit?:
+    | T
+    | {
+        kind?: T;
+        body?: T;
+        url?: T;
+      };
+  crmHandlers?: T;
+  notifyTo?:
+    | T
+    | {
+        email?: T;
+        id?: T;
+      };
+  schemaVersion?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
