@@ -6,6 +6,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
 
+import { AboutGalleries } from './payload/collections/AboutGalleries';
 import { Authors } from './payload/collections/Authors';
 import { Blogs } from './payload/collections/Blogs';
 import { Categories } from './payload/collections/Categories';
@@ -56,6 +57,7 @@ export default buildConfig({
     Events,
     Webinars,
     Jobs,
+    AboutGalleries,
   ],
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),

@@ -81,6 +81,7 @@ export interface Config {
     events: Event;
     webinars: Webinar;
     jobs: Job;
+    aboutGalleries: AboutGallery;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -103,6 +104,7 @@ export interface Config {
     events: EventsSelect<false> | EventsSelect<true>;
     webinars: WebinarsSelect<false> | WebinarsSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
+    aboutGalleries: AboutGalleriesSelect<false> | AboutGalleriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -1560,6 +1562,29 @@ export interface Job {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Image rows shown on /about-us. Each item is NOT URL-addressable — only /about-us reads this collection.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "aboutGalleries".
+ */
+export interface AboutGallery {
+  id: number;
+  name: string;
+  /**
+   * Internal-only slug. Not URL-addressable.
+   */
+  slug: string;
+  image: number | Media;
+  caption?: string | null;
+  /**
+   * Drag to reorder in the list view (Phase D admin UX).
+   */
+  displayOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1730,6 +1755,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'jobs';
         value: number | Job;
+      } | null)
+    | ({
+        relationTo: 'aboutGalleries';
+        value: number | AboutGallery;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -2433,6 +2462,20 @@ export interface JobsSelect<T extends boolean = true> {
               id?: T;
             };
       };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "aboutGalleries_select".
+ */
+export interface AboutGalleriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  image?: T;
+  caption?: T;
+  displayOrder?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
