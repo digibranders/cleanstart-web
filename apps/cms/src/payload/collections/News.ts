@@ -1,0 +1,76 @@
+import type { CollectionConfig } from 'payload';
+
+import { isAdminOrEditor } from '../access';
+import { seoField } from '../fields/seo';
+import { slugField } from '../fields/slug';
+
+export const News: CollectionConfig = {
+  slug: 'news',
+  labels: { singular: 'News article', plural: 'News' },
+  admin: {
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'newsCategories', 'publicationDate', '_status', 'updatedAt'],
+    group: 'Content',
+  },
+  access: {
+    read: () => true,
+    create: isAdminOrEditor,
+    update: isAdminOrEditor,
+    delete: isAdminOrEditor,
+  },
+  fields: [
+    { name: 'title', type: 'text', required: true },
+    slugField({ source: 'title' }),
+    { name: 'abstract', type: 'textarea' },
+    { name: 'heroImage', type: 'upload', relationTo: 'media' },
+    { name: 'body', type: 'richText' },
+    {
+      name: 'authors',
+      type: 'relationship',
+      relationTo: 'authors',
+      hasMany: true,
+    },
+    {
+      name: 'newsCategories',
+      type: 'relationship',
+      relationTo: 'newsCategories',
+      hasMany: true,
+    },
+    {
+      name: 'externalUrl',
+      type: 'text',
+      admin: {
+        description: 'Optional. For press pickups / coverage on external outlets.',
+      },
+    },
+    {
+      name: 'publicationDate',
+      type: 'date',
+      required: true,
+      admin: {
+        description: 'Defaults to now on first publish.',
+        date: { pickerAppearance: 'dayAndTime' },
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'relatedNews',
+      type: 'relationship',
+      relationTo: 'news',
+      hasMany: true,
+    },
+    {
+      name: 'readingMinutes',
+      type: 'number',
+      access: { update: () => false },
+      admin: {
+        readOnly: true,
+        description: 'Computed from body word count on save (Phase D hook).',
+        position: 'sidebar',
+      },
+    },
+    seoField,
+  ],
+  versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
+  timestamps: true,
+};

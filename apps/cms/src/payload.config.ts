@@ -7,10 +7,12 @@ import { buildConfig } from 'payload';
 import sharp from 'sharp';
 
 import { Authors } from './payload/collections/Authors';
+import { Blogs } from './payload/collections/Blogs';
 import { Categories } from './payload/collections/Categories';
 import { Forms } from './payload/collections/Forms';
 import { JobLocations } from './payload/collections/JobLocations';
 import { Media } from './payload/collections/Media';
+import { News } from './payload/collections/News';
 import { NewsCategories } from './payload/collections/NewsCategories';
 import { Users } from './payload/collections/Users';
 
@@ -34,7 +36,17 @@ export default buildConfig({
       titleSuffix: '— CleanStart CMS',
     },
   },
-  collections: [Users, Media, Authors, Categories, NewsCategories, JobLocations, Forms],
+  collections: [
+    Users,
+    Media,
+    Authors,
+    Categories,
+    NewsCategories,
+    JobLocations,
+    Forms,
+    Blogs,
+    News,
+  ],
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
