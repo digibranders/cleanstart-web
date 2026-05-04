@@ -10,7 +10,7 @@ export const Jobs: CollectionConfig = {
   labels: { singular: 'Job', plural: 'Jobs' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'department', 'employmentType', 'status', '_status', 'updatedAt'],
+    defaultColumns: ['title', 'department', 'employmentType', 'hiringStatus', '_status', 'updatedAt'],
     group: 'Content',
   },
   access: {
@@ -135,7 +135,7 @@ export const Jobs: CollectionConfig = {
       },
     },
     {
-      name: 'status',
+      name: 'hiringStatus',
       type: 'select',
       defaultValue: 'open',
       options: [
@@ -143,7 +143,11 @@ export const Jobs: CollectionConfig = {
         { label: 'Paused', value: 'paused' },
         { label: 'Closed', value: 'closed' },
       ],
-      admin: { position: 'sidebar' },
+      admin: {
+        position: 'sidebar',
+        description:
+          'Hiring lifecycle. Distinct from Payload _status (draft/published).',
+      },
     },
     {
       name: 'applicationDeadline',
@@ -151,7 +155,7 @@ export const Jobs: CollectionConfig = {
       admin: {
         date: { pickerAppearance: 'dayAndTime' },
         description: 'Defaults to publishedAt + 90 days on first publish (Phase D hook).',
-        condition: (_data, sibling) => sibling?.status === 'open',
+        condition: (_data, sibling) => sibling?.hiringStatus === 'open',
       },
     },
     {
@@ -160,7 +164,7 @@ export const Jobs: CollectionConfig = {
       admin: {
         date: { pickerAppearance: 'dayAndTime' },
         description: 'Default applicationDeadline + 7 days. Auto-close cron uses this.',
-        condition: (_data, sibling) => sibling?.status === 'open',
+        condition: (_data, sibling) => sibling?.hiringStatus === 'open',
       },
     },
     {
@@ -170,7 +174,7 @@ export const Jobs: CollectionConfig = {
       admin: {
         readOnly: true,
         date: { pickerAppearance: 'dayAndTime' },
-        condition: (_data, sibling) => sibling?.status === 'closed',
+        condition: (_data, sibling) => sibling?.hiringStatus === 'closed',
       },
     },
     seoField,

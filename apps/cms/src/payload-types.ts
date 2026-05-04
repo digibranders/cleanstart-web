@@ -1511,7 +1511,10 @@ export interface Job {
    * mailto:hire@cleanstart.com is acceptable.
    */
   applyUrl?: string | null;
-  status?: ('open' | 'paused' | 'closed') | null;
+  /**
+   * Hiring lifecycle. Distinct from Payload _status (draft/published).
+   */
+  hiringStatus?: ('open' | 'paused' | 'closed') | null;
   /**
    * Defaults to publishedAt + 90 days on first publish (Phase D hook).
    */
@@ -2580,7 +2583,7 @@ export interface JobsSelect<T extends boolean = true> {
   body?: T;
   descriptionPdf?: T;
   applyUrl?: T;
-  status?: T;
+  hiringStatus?: T;
   applicationDeadline?: T;
   expiresAt?: T;
   closedAt?: T;
