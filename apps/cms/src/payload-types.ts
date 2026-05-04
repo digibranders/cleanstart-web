@@ -77,6 +77,10 @@ export interface Config {
     blogs: Blog;
     news: News;
     guides: Guide;
+    resources: Resource;
+    events: Event;
+    webinars: Webinar;
+    jobs: Job;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -95,6 +99,10 @@ export interface Config {
     blogs: BlogsSelect<false> | BlogsSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     guides: GuidesSelect<false> | GuidesSelect<true>;
+    resources: ResourcesSelect<false> | ResourcesSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    webinars: WebinarsSelect<false> | WebinarsSelect<true>;
+    jobs: JobsSelect<false> | JobsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -1098,6 +1106,461 @@ export interface Guide {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resources".
+ */
+export interface Resource {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  type?: ('whitepaper' | 'report' | 'brief' | 'datasheet' | 'case-study') | null;
+  heroImage?: (number | null) | Media;
+  summary?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * PDF or other downloadable. Routed to web/resource/.
+   */
+  asset?: (number | null) | Media;
+  /**
+   * When enabled, the asset download requires a form submission. Sets accessLevel to lead-gated by default.
+   */
+  gated?: boolean | null;
+  /**
+   * Form the visitor fills to unlock the download.
+   */
+  gateForm?: (number | null) | Form;
+  accessLevel?: ('public' | 'lead-gated' | 'customer-only') | null;
+  /**
+   * Incremented on every successful download (Phase E hook).
+   */
+  downloadCount?: number | null;
+  /**
+   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  venue: string;
+  abstract?: string | null;
+  heroImage?: (number | null) | Media;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  /**
+   * IANA timezone string (e.g. Asia/Kolkata). Falls back to siteSettings.organizationTimezone.
+   */
+  timezone?: string | null;
+  /**
+   * Override for vague dates ("Q3 2026", "Spring 2027").
+   */
+  customDateLabel?: string | null;
+  /**
+   * Per-record switchable per locked schema decision.
+   */
+  registrationMode: 'internal' | 'external';
+  registrationUrl?: string | null;
+  registrationForm?: (number | null) | Form;
+  attendeesCap?: number | null;
+  /**
+   * Agenda PDF (routed to web/event/).
+   */
+  agendaPdf?: (number | null) | Media;
+  /**
+   * Post-event photos. Surface only after the event ends.
+   */
+  gallery?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "webinars".
+ */
+export interface Webinar {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  heroImage?: (number | null) | Media;
+  abstract?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  webinarType: 'live' | 'on-demand' | 'panel' | 'demo';
+  region: 'Americas' | 'EMEA' | 'APAC' | 'Global';
+  startsAt?: string | null;
+  endsAt?: string | null;
+  /**
+   * Falls back to siteSettings.organizationTimezone.
+   */
+  timezone?: string | null;
+  registrationMode: 'internal' | 'external';
+  registrationUrl?: string | null;
+  registrationForm?: (number | null) | Form;
+  attendeesCap?: number | null;
+  speakers?: (number | Author)[] | null;
+  /**
+   * Slides PDF (routed to web/webinar/).
+   */
+  pdf?: (number | null) | Media;
+  /**
+   * Post-event recording. Surfaces after endsAt < now.
+   */
+  recordingUrl?: string | null;
+  /**
+   * External slides link. Use the pdf field instead when hosting on R2.
+   */
+  slidesUrl?: string | null;
+  /**
+   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs".
+ */
+export interface Job {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  source: 'cms' | 'ats';
+  /**
+   * Deep link into the external ATS. Required when source=ats.
+   */
+  atsUrl?: string | null;
+  department?:
+    | ('engineering' | 'sales' | 'marketing' | 'customer-success' | 'operations' | 'finance' | 'legal' | 'people')
+    | null;
+  employmentType?: ('full-time' | 'part-time' | 'contract' | 'internship') | null;
+  experienceLevel?: ('entry' | 'mid' | 'senior' | 'staff' | 'principal') | null;
+  /**
+   * Optional when remote=true. Phase D hook auto-fills "Remote (Global)" sentinel.
+   */
+  locations?: (number | JobLocation)[] | null;
+  remote?: boolean | null;
+  salaryRange?: {
+    min?: number | null;
+    max?: number | null;
+    currency?: ('USD' | 'EUR' | 'GBP' | 'INR') | null;
+  };
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional JD PDF (routed to web/job/).
+   */
+  descriptionPdf?: (number | null) | Media;
+  /**
+   * mailto:hire@cleanstart.com is acceptable.
+   */
+  applyUrl?: string | null;
+  status?: ('open' | 'paused' | 'closed') | null;
+  /**
+   * Defaults to publishedAt + 90 days on first publish (Phase D hook).
+   */
+  applicationDeadline?: string | null;
+  /**
+   * Default applicationDeadline + 7 days. Auto-close cron uses this.
+   */
+  expiresAt?: string | null;
+  closedAt?: string | null;
+  /**
+   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1251,6 +1714,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'guides';
         value: number | Guide;
+      } | null)
+    | ({
+        relationTo: 'resources';
+        value: number | Resource;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'webinars';
+        value: number | Webinar;
+      } | null)
+    | ({
+        relationTo: 'jobs';
+        value: number | Job;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1770,6 +2249,196 @@ export interface GuidesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resources_select".
+ */
+export interface ResourcesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  type?: T;
+  heroImage?: T;
+  summary?: T;
+  body?: T;
+  asset?: T;
+  gated?: T;
+  gateForm?: T;
+  accessLevel?: T;
+  downloadCount?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  venue?: T;
+  abstract?: T;
+  heroImage?: T;
+  body?: T;
+  startsAt?: T;
+  endsAt?: T;
+  timezone?: T;
+  customDateLabel?: T;
+  registrationMode?: T;
+  registrationUrl?: T;
+  registrationForm?: T;
+  attendeesCap?: T;
+  agendaPdf?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "webinars_select".
+ */
+export interface WebinarsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  heroImage?: T;
+  abstract?: T;
+  body?: T;
+  webinarType?: T;
+  region?: T;
+  startsAt?: T;
+  endsAt?: T;
+  timezone?: T;
+  registrationMode?: T;
+  registrationUrl?: T;
+  registrationForm?: T;
+  attendeesCap?: T;
+  speakers?: T;
+  pdf?: T;
+  recordingUrl?: T;
+  slidesUrl?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs_select".
+ */
+export interface JobsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  source?: T;
+  atsUrl?: T;
+  department?: T;
+  employmentType?: T;
+  experienceLevel?: T;
+  locations?: T;
+  remote?: T;
+  salaryRange?:
+    | T
+    | {
+        min?: T;
+        max?: T;
+        currency?: T;
+      };
+  body?: T;
+  descriptionPdf?: T;
+  applyUrl?: T;
+  status?: T;
+  applicationDeadline?: T;
+  expiresAt?: T;
+  closedAt?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1869,6 +2538,22 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'guides';
           value: number | Guide;
+        } | null)
+      | ({
+          relationTo: 'resources';
+          value: number | Resource;
+        } | null)
+      | ({
+          relationTo: 'events';
+          value: number | Event;
+        } | null)
+      | ({
+          relationTo: 'webinars';
+          value: number | Webinar;
+        } | null)
+      | ({
+          relationTo: 'jobs';
+          value: number | Job;
         } | null);
     global?: string | null;
     user?: (number | null) | User;

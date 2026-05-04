@@ -9,13 +9,17 @@ import sharp from 'sharp';
 import { Authors } from './payload/collections/Authors';
 import { Blogs } from './payload/collections/Blogs';
 import { Categories } from './payload/collections/Categories';
+import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
 import { JobLocations } from './payload/collections/JobLocations';
+import { Jobs } from './payload/collections/Jobs';
 import { Media } from './payload/collections/Media';
 import { News } from './payload/collections/News';
 import { NewsCategories } from './payload/collections/NewsCategories';
+import { Resources } from './payload/collections/Resources';
 import { Users } from './payload/collections/Users';
+import { Webinars } from './payload/collections/Webinars';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -48,6 +52,10 @@ export default buildConfig({
     Blogs,
     News,
     Guides,
+    Resources,
+    Events,
+    Webinars,
+    Jobs,
   ],
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),
