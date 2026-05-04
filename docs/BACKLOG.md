@@ -12,7 +12,7 @@ Phase A–I sequence for `apps/cms` (Payload admin + REST API + hooks). Each tic
 | -------------------------------------------- | ------- | ------------------------ |
 | **A · Bootstrap**                     | ✅ Done | `c1317c7`              |
 | **B · Core schema**                   | ✅ Done | `3d2298e`–`c27c735` |
-| **C · Page-builder blocks**           | ⏳ Next | —                       |
+| **C · Page-builder blocks**           | ✅ Done | next commit              |
 | **D · Editor experience**             | —      | —                       |
 | **E · Forms + leads runtime**         | —      | —                       |
 | **F · Search + structured data**      | —      | —                       |
@@ -21,6 +21,8 @@ Phase A–I sequence for `apps/cms` (Payload admin + REST API + hooks). Each tic
 | **I · Hardening**                     | —      | —                       |
 
 Phase B verified end-to-end: DB drop+recreate, full schema push for all 17 collections + 6 globals, admin login, dashboard render with all groups visible.
+
+Phase C verified end-to-end: 18 blocks render in the Pages "Add Layout" picker (Section primitive + 17 content blocks), Section composes nested blocks (one-level nesting only by design), full schema push clean.
 
 ## Phase A · Bootstrap
 

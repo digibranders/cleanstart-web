@@ -1625,9 +1625,1590 @@ export interface Page {
    */
   path?: string | null;
   /**
-   * Page-builder content. Block library lands in Phase C — Hero, FeatureGrid, FAQ, CTA, etc.
+   * Compose the page from typed blocks. Section is a layout primitive — every other block is a content unit.
    */
-  layout?: unknown[] | null;
+  layout?:
+    | (
+        | {
+            variant: 'stack' | 'two-column';
+            gap?: ('sm' | 'md' | 'lg') | null;
+            alignment?: ('start' | 'center' | 'end') | null;
+            background?: ('none' | 'surface' | 'inverted') | null;
+            /**
+             * Nested blocks rendered in the chosen variant + gap + alignment.
+             */
+            children: (
+              | {
+                  /**
+                   * Optional small line above the headline (e.g. "New").
+                   */
+                  eyebrow?: string | null;
+                  headline: string;
+                  sub?: string | null;
+                  primaryCta?: {
+                    variant?: ('primary' | 'secondary' | 'ghost') | null;
+                    /**
+                     * Custom analytics event id emitted on click.
+                     */
+                    trackingId?: string | null;
+                    link?: {
+                      /**
+                       * Visible label. Falls back to the target page title.
+                       */
+                      text?: string | null;
+                      kind?: ('doc' | 'media' | 'url') | null;
+                      /**
+                       * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                       */
+                      target?:
+                        | ({
+                            relationTo: 'pages';
+                            value: number | Page;
+                          } | null)
+                        | ({
+                            relationTo: 'blogs';
+                            value: number | Blog;
+                          } | null)
+                        | ({
+                            relationTo: 'news';
+                            value: number | News;
+                          } | null)
+                        | ({
+                            relationTo: 'guides';
+                            value: number | Guide;
+                          } | null)
+                        | ({
+                            relationTo: 'resources';
+                            value: number | Resource;
+                          } | null)
+                        | ({
+                            relationTo: 'events';
+                            value: number | Event;
+                          } | null)
+                        | ({
+                            relationTo: 'webinars';
+                            value: number | Webinar;
+                          } | null)
+                        | ({
+                            relationTo: 'jobs';
+                            value: number | Job;
+                          } | null)
+                        | ({
+                            relationTo: 'authors';
+                            value: number | Author;
+                          } | null)
+                        | ({
+                            relationTo: 'categories';
+                            value: number | Category;
+                          } | null)
+                        | ({
+                            relationTo: 'newsCategories';
+                            value: number | NewsCategory;
+                          } | null);
+                      mediaTarget?: (number | null) | Media;
+                      /**
+                       * External URL. Validated at save (https?://).
+                       */
+                      url?: string | null;
+                      /**
+                       * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                       */
+                      newTab?: boolean | null;
+                    };
+                  };
+                  secondaryCta?: {
+                    variant?: ('primary' | 'secondary' | 'ghost') | null;
+                    /**
+                     * Custom analytics event id emitted on click.
+                     */
+                    trackingId?: string | null;
+                    link?: {
+                      /**
+                       * Visible label. Falls back to the target page title.
+                       */
+                      text?: string | null;
+                      kind?: ('doc' | 'media' | 'url') | null;
+                      /**
+                       * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                       */
+                      target?:
+                        | ({
+                            relationTo: 'pages';
+                            value: number | Page;
+                          } | null)
+                        | ({
+                            relationTo: 'blogs';
+                            value: number | Blog;
+                          } | null)
+                        | ({
+                            relationTo: 'news';
+                            value: number | News;
+                          } | null)
+                        | ({
+                            relationTo: 'guides';
+                            value: number | Guide;
+                          } | null)
+                        | ({
+                            relationTo: 'resources';
+                            value: number | Resource;
+                          } | null)
+                        | ({
+                            relationTo: 'events';
+                            value: number | Event;
+                          } | null)
+                        | ({
+                            relationTo: 'webinars';
+                            value: number | Webinar;
+                          } | null)
+                        | ({
+                            relationTo: 'jobs';
+                            value: number | Job;
+                          } | null)
+                        | ({
+                            relationTo: 'authors';
+                            value: number | Author;
+                          } | null)
+                        | ({
+                            relationTo: 'categories';
+                            value: number | Category;
+                          } | null)
+                        | ({
+                            relationTo: 'newsCategories';
+                            value: number | NewsCategory;
+                          } | null);
+                      mediaTarget?: (number | null) | Media;
+                      /**
+                       * External URL. Validated at save (https?://).
+                       */
+                      url?: string | null;
+                      /**
+                       * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                       */
+                      newTab?: boolean | null;
+                    };
+                  };
+                  background?: {
+                    kind?: ('none' | 'image' | 'video' | 'gradient') | null;
+                    media?: (number | null) | Media;
+                  };
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'hero';
+                }
+              | {
+                  headline: string;
+                  body?: string | null;
+                  primaryCta?: {
+                    variant?: ('primary' | 'secondary' | 'ghost') | null;
+                    /**
+                     * Custom analytics event id emitted on click.
+                     */
+                    trackingId?: string | null;
+                    link?: {
+                      /**
+                       * Visible label. Falls back to the target page title.
+                       */
+                      text?: string | null;
+                      kind?: ('doc' | 'media' | 'url') | null;
+                      /**
+                       * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                       */
+                      target?:
+                        | ({
+                            relationTo: 'pages';
+                            value: number | Page;
+                          } | null)
+                        | ({
+                            relationTo: 'blogs';
+                            value: number | Blog;
+                          } | null)
+                        | ({
+                            relationTo: 'news';
+                            value: number | News;
+                          } | null)
+                        | ({
+                            relationTo: 'guides';
+                            value: number | Guide;
+                          } | null)
+                        | ({
+                            relationTo: 'resources';
+                            value: number | Resource;
+                          } | null)
+                        | ({
+                            relationTo: 'events';
+                            value: number | Event;
+                          } | null)
+                        | ({
+                            relationTo: 'webinars';
+                            value: number | Webinar;
+                          } | null)
+                        | ({
+                            relationTo: 'jobs';
+                            value: number | Job;
+                          } | null)
+                        | ({
+                            relationTo: 'authors';
+                            value: number | Author;
+                          } | null)
+                        | ({
+                            relationTo: 'categories';
+                            value: number | Category;
+                          } | null)
+                        | ({
+                            relationTo: 'newsCategories';
+                            value: number | NewsCategory;
+                          } | null);
+                      mediaTarget?: (number | null) | Media;
+                      /**
+                       * External URL. Validated at save (https?://).
+                       */
+                      url?: string | null;
+                      /**
+                       * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                       */
+                      newTab?: boolean | null;
+                    };
+                  };
+                  secondaryCta?: {
+                    variant?: ('primary' | 'secondary' | 'ghost') | null;
+                    /**
+                     * Custom analytics event id emitted on click.
+                     */
+                    trackingId?: string | null;
+                    link?: {
+                      /**
+                       * Visible label. Falls back to the target page title.
+                       */
+                      text?: string | null;
+                      kind?: ('doc' | 'media' | 'url') | null;
+                      /**
+                       * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                       */
+                      target?:
+                        | ({
+                            relationTo: 'pages';
+                            value: number | Page;
+                          } | null)
+                        | ({
+                            relationTo: 'blogs';
+                            value: number | Blog;
+                          } | null)
+                        | ({
+                            relationTo: 'news';
+                            value: number | News;
+                          } | null)
+                        | ({
+                            relationTo: 'guides';
+                            value: number | Guide;
+                          } | null)
+                        | ({
+                            relationTo: 'resources';
+                            value: number | Resource;
+                          } | null)
+                        | ({
+                            relationTo: 'events';
+                            value: number | Event;
+                          } | null)
+                        | ({
+                            relationTo: 'webinars';
+                            value: number | Webinar;
+                          } | null)
+                        | ({
+                            relationTo: 'jobs';
+                            value: number | Job;
+                          } | null)
+                        | ({
+                            relationTo: 'authors';
+                            value: number | Author;
+                          } | null)
+                        | ({
+                            relationTo: 'categories';
+                            value: number | Category;
+                          } | null)
+                        | ({
+                            relationTo: 'newsCategories';
+                            value: number | NewsCategory;
+                          } | null);
+                      mediaTarget?: (number | null) | Media;
+                      /**
+                       * External URL. Validated at save (https?://).
+                       */
+                      url?: string | null;
+                      /**
+                       * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                       */
+                      newTab?: boolean | null;
+                    };
+                  };
+                  background?: ('surface' | 'inverted' | 'brand') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'cta';
+                }
+              | {
+                  body: {
+                    root: {
+                      type: string;
+                      children: {
+                        type: any;
+                        version: number;
+                        [k: string]: unknown;
+                      }[];
+                      direction: ('ltr' | 'rtl') | null;
+                      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                      indent: number;
+                      version: number;
+                    };
+                    [k: string]: unknown;
+                  };
+                  maxWidth?: ('prose' | 'wide') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'richText';
+                }
+              | {
+                  /**
+                   * Pick a form. Submissions flow through the same LeadHandler chain.
+                   */
+                  form: number | Form;
+                  headline?: string | null;
+                  description?: string | null;
+                  /**
+                   * Inherit the form's postSubmit unless overridden here. Useful when the same form lives on multiple pages.
+                   */
+                  overridePostSubmit?: boolean | null;
+                  postSubmit?: {
+                    kind?: ('message' | 'redirect') | null;
+                    body?: {
+                      root: {
+                        type: string;
+                        children: {
+                          type: any;
+                          version: number;
+                          [k: string]: unknown;
+                        }[];
+                        direction: ('ltr' | 'rtl') | null;
+                        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                        indent: number;
+                        version: number;
+                      };
+                      [k: string]: unknown;
+                    } | null;
+                    url?: string | null;
+                  };
+                  layout?: ('inline' | 'split') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'formBlock';
+                }
+              | {
+                  eyebrow?: string | null;
+                  heading?: string | null;
+                  sub?: string | null;
+                  columns?: ('2' | '3' | '4') | null;
+                  features: {
+                    icon?: (number | null) | Media;
+                    title: string;
+                    body?: string | null;
+                    link?: {
+                      /**
+                       * Visible label. Falls back to the target page title.
+                       */
+                      text?: string | null;
+                      kind?: ('doc' | 'media' | 'url') | null;
+                      /**
+                       * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                       */
+                      target?:
+                        | ({
+                            relationTo: 'pages';
+                            value: number | Page;
+                          } | null)
+                        | ({
+                            relationTo: 'blogs';
+                            value: number | Blog;
+                          } | null)
+                        | ({
+                            relationTo: 'news';
+                            value: number | News;
+                          } | null)
+                        | ({
+                            relationTo: 'guides';
+                            value: number | Guide;
+                          } | null)
+                        | ({
+                            relationTo: 'resources';
+                            value: number | Resource;
+                          } | null)
+                        | ({
+                            relationTo: 'events';
+                            value: number | Event;
+                          } | null)
+                        | ({
+                            relationTo: 'webinars';
+                            value: number | Webinar;
+                          } | null)
+                        | ({
+                            relationTo: 'jobs';
+                            value: number | Job;
+                          } | null)
+                        | ({
+                            relationTo: 'authors';
+                            value: number | Author;
+                          } | null)
+                        | ({
+                            relationTo: 'categories';
+                            value: number | Category;
+                          } | null)
+                        | ({
+                            relationTo: 'newsCategories';
+                            value: number | NewsCategory;
+                          } | null);
+                      mediaTarget?: (number | null) | Media;
+                      /**
+                       * External URL. Validated at save (https?://).
+                       */
+                      url?: string | null;
+                      /**
+                       * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                       */
+                      newTab?: boolean | null;
+                    };
+                    id?: string | null;
+                  }[];
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'featureGrid';
+                }
+              | {
+                  heading?: string | null;
+                  logos: {
+                    image: number | Media;
+                    alt: string;
+                    url?: string | null;
+                    id?: string | null;
+                  }[];
+                  /**
+                   * Render logos in a uniform single colour for visual rhythm.
+                   */
+                  monochrome?: boolean | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'logoCloud';
+                }
+              | {
+                  heading?: string | null;
+                  sub?: string | null;
+                  integrations: {
+                    name: string;
+                    logo: number | Media;
+                    category?:
+                      | ('ci-cd' | 'registry' | 'kubernetes' | 'cloud' | 'security' | 'observability' | 'other')
+                      | null;
+                    url?: string | null;
+                    id?: string | null;
+                  }[];
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'integrationLogos';
+                }
+              | {
+                  quote: string;
+                  person: string;
+                  role?: string | null;
+                  company?: string | null;
+                  companyLogo?: (number | null) | Media;
+                  avatar?: (number | null) | Media;
+                  variant?: ('card' | 'pull-quote') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'testimonial';
+                }
+              | {
+                  heading?: string | null;
+                  metrics: {
+                    /**
+                     * e.g. "10×" or "99.99%".
+                     */
+                    value: string;
+                    label: string;
+                    sublabel?: string | null;
+                    id?: string | null;
+                  }[];
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'stats';
+                }
+              | {
+                  metrics: {
+                    label: string;
+                    value: string;
+                    id?: string | null;
+                  }[];
+                  background?: ('inverted' | 'surface') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'metricsBar';
+                }
+              | {
+                  heading?: string | null;
+                  sub?: string | null;
+                  /**
+                   * Renders as Radix Accordion + emits FAQPage JSON-LD when non-empty.
+                   */
+                  items: {
+                    question: string;
+                    answer: {
+                      root: {
+                        type: string;
+                        children: {
+                          type: any;
+                          version: number;
+                          [k: string]: unknown;
+                        }[];
+                        direction: ('ltr' | 'rtl') | null;
+                        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                        indent: number;
+                        version: number;
+                      };
+                      [k: string]: unknown;
+                    };
+                    id?: string | null;
+                  }[];
+                  /**
+                   * When off, opening one row collapses others. Default off matches WAI-ARIA disclosure pattern.
+                   */
+                  allowMultipleOpen?: boolean | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'faq';
+                }
+              | {
+                  heading?: string | null;
+                  layout?: ('grid' | 'masonry' | 'carousel') | null;
+                  images: {
+                    media: number | Media;
+                    caption?: string | null;
+                    link?: string | null;
+                    id?: string | null;
+                  }[];
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'gallery';
+                }
+              | {
+                  provider: 'youtube' | 'vimeo' | 'loom';
+                  url: string;
+                  /**
+                   * iframe title for screen readers.
+                   */
+                  title?: string | null;
+                  aspectRatio?: ('16-9' | '4-3' | '1-1' | '9-16') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'embed';
+                }
+              | {
+                  language:
+                    | 'bash'
+                    | 'dockerfile'
+                    | 'yaml'
+                    | 'json'
+                    | 'typescript'
+                    | 'javascript'
+                    | 'python'
+                    | 'go'
+                    | 'rust'
+                    | 'sql'
+                    | 'hcl'
+                    | 'text';
+                  /**
+                   * Optional filename rendered as a tab above the code (e.g. Dockerfile).
+                   */
+                  filename?: string | null;
+                  content: string;
+                  showLineNumbers?: boolean | null;
+                  /**
+                   * Comma-separated line numbers / ranges (e.g. "1,3-5,8") to highlight.
+                   */
+                  highlightLines?: string | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'codeBlock';
+                }
+              | {
+                  eyebrow?: string | null;
+                  heading?: string | null;
+                  sub?: string | null;
+                  /**
+                   * Show a monthly / yearly toggle. When enabled, each tier needs both monthly and yearly prices.
+                   */
+                  billingToggle?: boolean | null;
+                  tiers: {
+                    name: string;
+                    price?: {
+                      /**
+                       * e.g. "$49" or "Custom" or "Free".
+                       */
+                      monthly?: string | null;
+                      /**
+                       * Per-month equivalent of the annual plan.
+                       */
+                      yearly?: string | null;
+                      currency?: ('USD' | 'EUR' | 'GBP' | 'INR') | null;
+                    };
+                    tagline?: string | null;
+                    features: {
+                      label: string;
+                      tooltip?: string | null;
+                      /**
+                       * Off renders the row struck-through (denoting "not included").
+                       */
+                      included?: boolean | null;
+                      id?: string | null;
+                    }[];
+                    cta?: {
+                      variant?: ('primary' | 'secondary' | 'ghost') | null;
+                      /**
+                       * Custom analytics event id emitted on click.
+                       */
+                      trackingId?: string | null;
+                      link?: {
+                        /**
+                         * Visible label. Falls back to the target page title.
+                         */
+                        text?: string | null;
+                        kind?: ('doc' | 'media' | 'url') | null;
+                        /**
+                         * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                         */
+                        target?:
+                          | ({
+                              relationTo: 'pages';
+                              value: number | Page;
+                            } | null)
+                          | ({
+                              relationTo: 'blogs';
+                              value: number | Blog;
+                            } | null)
+                          | ({
+                              relationTo: 'news';
+                              value: number | News;
+                            } | null)
+                          | ({
+                              relationTo: 'guides';
+                              value: number | Guide;
+                            } | null)
+                          | ({
+                              relationTo: 'resources';
+                              value: number | Resource;
+                            } | null)
+                          | ({
+                              relationTo: 'events';
+                              value: number | Event;
+                            } | null)
+                          | ({
+                              relationTo: 'webinars';
+                              value: number | Webinar;
+                            } | null)
+                          | ({
+                              relationTo: 'jobs';
+                              value: number | Job;
+                            } | null)
+                          | ({
+                              relationTo: 'authors';
+                              value: number | Author;
+                            } | null)
+                          | ({
+                              relationTo: 'categories';
+                              value: number | Category;
+                            } | null)
+                          | ({
+                              relationTo: 'newsCategories';
+                              value: number | NewsCategory;
+                            } | null);
+                        mediaTarget?: (number | null) | Media;
+                        /**
+                         * External URL. Validated at save (https?://).
+                         */
+                        url?: string | null;
+                        /**
+                         * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                         */
+                        newTab?: boolean | null;
+                      };
+                    };
+                    /**
+                     * Visually emphasises this tier as the recommended option.
+                     */
+                    highlight?: boolean | null;
+                    highlightLabel?: string | null;
+                    id?: string | null;
+                  }[];
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'pricing';
+                }
+              | {
+                  heading?: string | null;
+                  sub?: string | null;
+                  /**
+                   * When set, only matching jobs render. Leave all blank to render every open job.
+                   */
+                  filters?: {
+                    department?:
+                      | (
+                          | 'engineering'
+                          | 'sales'
+                          | 'marketing'
+                          | 'customer-success'
+                          | 'operations'
+                          | 'finance'
+                          | 'legal'
+                          | 'people'
+                        )
+                      | null;
+                    locations?: (number | JobLocation)[] | null;
+                    remoteOnly?: boolean | null;
+                  };
+                  /**
+                   * Show department / location filter chips above the list.
+                   */
+                  showFilters?: boolean | null;
+                  emptyMessage?: string | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'jobsList';
+                }
+              | {
+                  /**
+                   * Caption rendered as <caption> for screen readers + visible above the table.
+                   */
+                  caption?: string | null;
+                  headers: {
+                    label: string;
+                    /**
+                     * Visually emphasises this column (e.g. the "us" column on a comparison table).
+                     */
+                    highlight?: boolean | null;
+                    id?: string | null;
+                  }[];
+                  /**
+                   * Render the first cell of each row as <th scope="row"> for screen readers (default for comparison tables).
+                   */
+                  firstColIsHeader?: boolean | null;
+                  /**
+                   * Pin the first column when the table scrolls horizontally on narrow viewports.
+                   */
+                  stickyFirstColumn?: boolean | null;
+                  rows: {
+                    cells: {
+                      type?: ('text' | 'check' | 'cross' | 'partial') | null;
+                      /**
+                       * Text contents. Required for type=text; optional override caption for check/cross/partial cells.
+                       */
+                      value?: string | null;
+                      /**
+                       * Optional hover tooltip with extra context.
+                       */
+                      tooltip?: string | null;
+                      id?: string | null;
+                    }[];
+                    id?: string | null;
+                  }[];
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'table';
+                }
+            )[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'section';
+          }
+        | {
+            /**
+             * Optional small line above the headline (e.g. "New").
+             */
+            eyebrow?: string | null;
+            headline: string;
+            sub?: string | null;
+            primaryCta?: {
+              variant?: ('primary' | 'secondary' | 'ghost') | null;
+              /**
+               * Custom analytics event id emitted on click.
+               */
+              trackingId?: string | null;
+              link?: {
+                /**
+                 * Visible label. Falls back to the target page title.
+                 */
+                text?: string | null;
+                kind?: ('doc' | 'media' | 'url') | null;
+                /**
+                 * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                 */
+                target?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'blogs';
+                      value: number | Blog;
+                    } | null)
+                  | ({
+                      relationTo: 'news';
+                      value: number | News;
+                    } | null)
+                  | ({
+                      relationTo: 'guides';
+                      value: number | Guide;
+                    } | null)
+                  | ({
+                      relationTo: 'resources';
+                      value: number | Resource;
+                    } | null)
+                  | ({
+                      relationTo: 'events';
+                      value: number | Event;
+                    } | null)
+                  | ({
+                      relationTo: 'webinars';
+                      value: number | Webinar;
+                    } | null)
+                  | ({
+                      relationTo: 'jobs';
+                      value: number | Job;
+                    } | null)
+                  | ({
+                      relationTo: 'authors';
+                      value: number | Author;
+                    } | null)
+                  | ({
+                      relationTo: 'categories';
+                      value: number | Category;
+                    } | null)
+                  | ({
+                      relationTo: 'newsCategories';
+                      value: number | NewsCategory;
+                    } | null);
+                mediaTarget?: (number | null) | Media;
+                /**
+                 * External URL. Validated at save (https?://).
+                 */
+                url?: string | null;
+                /**
+                 * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                 */
+                newTab?: boolean | null;
+              };
+            };
+            secondaryCta?: {
+              variant?: ('primary' | 'secondary' | 'ghost') | null;
+              /**
+               * Custom analytics event id emitted on click.
+               */
+              trackingId?: string | null;
+              link?: {
+                /**
+                 * Visible label. Falls back to the target page title.
+                 */
+                text?: string | null;
+                kind?: ('doc' | 'media' | 'url') | null;
+                /**
+                 * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                 */
+                target?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'blogs';
+                      value: number | Blog;
+                    } | null)
+                  | ({
+                      relationTo: 'news';
+                      value: number | News;
+                    } | null)
+                  | ({
+                      relationTo: 'guides';
+                      value: number | Guide;
+                    } | null)
+                  | ({
+                      relationTo: 'resources';
+                      value: number | Resource;
+                    } | null)
+                  | ({
+                      relationTo: 'events';
+                      value: number | Event;
+                    } | null)
+                  | ({
+                      relationTo: 'webinars';
+                      value: number | Webinar;
+                    } | null)
+                  | ({
+                      relationTo: 'jobs';
+                      value: number | Job;
+                    } | null)
+                  | ({
+                      relationTo: 'authors';
+                      value: number | Author;
+                    } | null)
+                  | ({
+                      relationTo: 'categories';
+                      value: number | Category;
+                    } | null)
+                  | ({
+                      relationTo: 'newsCategories';
+                      value: number | NewsCategory;
+                    } | null);
+                mediaTarget?: (number | null) | Media;
+                /**
+                 * External URL. Validated at save (https?://).
+                 */
+                url?: string | null;
+                /**
+                 * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                 */
+                newTab?: boolean | null;
+              };
+            };
+            background?: {
+              kind?: ('none' | 'image' | 'video' | 'gradient') | null;
+              media?: (number | null) | Media;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            headline: string;
+            body?: string | null;
+            primaryCta?: {
+              variant?: ('primary' | 'secondary' | 'ghost') | null;
+              /**
+               * Custom analytics event id emitted on click.
+               */
+              trackingId?: string | null;
+              link?: {
+                /**
+                 * Visible label. Falls back to the target page title.
+                 */
+                text?: string | null;
+                kind?: ('doc' | 'media' | 'url') | null;
+                /**
+                 * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                 */
+                target?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'blogs';
+                      value: number | Blog;
+                    } | null)
+                  | ({
+                      relationTo: 'news';
+                      value: number | News;
+                    } | null)
+                  | ({
+                      relationTo: 'guides';
+                      value: number | Guide;
+                    } | null)
+                  | ({
+                      relationTo: 'resources';
+                      value: number | Resource;
+                    } | null)
+                  | ({
+                      relationTo: 'events';
+                      value: number | Event;
+                    } | null)
+                  | ({
+                      relationTo: 'webinars';
+                      value: number | Webinar;
+                    } | null)
+                  | ({
+                      relationTo: 'jobs';
+                      value: number | Job;
+                    } | null)
+                  | ({
+                      relationTo: 'authors';
+                      value: number | Author;
+                    } | null)
+                  | ({
+                      relationTo: 'categories';
+                      value: number | Category;
+                    } | null)
+                  | ({
+                      relationTo: 'newsCategories';
+                      value: number | NewsCategory;
+                    } | null);
+                mediaTarget?: (number | null) | Media;
+                /**
+                 * External URL. Validated at save (https?://).
+                 */
+                url?: string | null;
+                /**
+                 * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                 */
+                newTab?: boolean | null;
+              };
+            };
+            secondaryCta?: {
+              variant?: ('primary' | 'secondary' | 'ghost') | null;
+              /**
+               * Custom analytics event id emitted on click.
+               */
+              trackingId?: string | null;
+              link?: {
+                /**
+                 * Visible label. Falls back to the target page title.
+                 */
+                text?: string | null;
+                kind?: ('doc' | 'media' | 'url') | null;
+                /**
+                 * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                 */
+                target?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'blogs';
+                      value: number | Blog;
+                    } | null)
+                  | ({
+                      relationTo: 'news';
+                      value: number | News;
+                    } | null)
+                  | ({
+                      relationTo: 'guides';
+                      value: number | Guide;
+                    } | null)
+                  | ({
+                      relationTo: 'resources';
+                      value: number | Resource;
+                    } | null)
+                  | ({
+                      relationTo: 'events';
+                      value: number | Event;
+                    } | null)
+                  | ({
+                      relationTo: 'webinars';
+                      value: number | Webinar;
+                    } | null)
+                  | ({
+                      relationTo: 'jobs';
+                      value: number | Job;
+                    } | null)
+                  | ({
+                      relationTo: 'authors';
+                      value: number | Author;
+                    } | null)
+                  | ({
+                      relationTo: 'categories';
+                      value: number | Category;
+                    } | null)
+                  | ({
+                      relationTo: 'newsCategories';
+                      value: number | NewsCategory;
+                    } | null);
+                mediaTarget?: (number | null) | Media;
+                /**
+                 * External URL. Validated at save (https?://).
+                 */
+                url?: string | null;
+                /**
+                 * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                 */
+                newTab?: boolean | null;
+              };
+            };
+            background?: ('surface' | 'inverted' | 'brand') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+        | {
+            body: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            maxWidth?: ('prose' | 'wide') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            /**
+             * Pick a form. Submissions flow through the same LeadHandler chain.
+             */
+            form: number | Form;
+            headline?: string | null;
+            description?: string | null;
+            /**
+             * Inherit the form's postSubmit unless overridden here. Useful when the same form lives on multiple pages.
+             */
+            overridePostSubmit?: boolean | null;
+            postSubmit?: {
+              kind?: ('message' | 'redirect') | null;
+              body?: {
+                root: {
+                  type: string;
+                  children: {
+                    type: any;
+                    version: number;
+                    [k: string]: unknown;
+                  }[];
+                  direction: ('ltr' | 'rtl') | null;
+                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                  indent: number;
+                  version: number;
+                };
+                [k: string]: unknown;
+              } | null;
+              url?: string | null;
+            };
+            layout?: ('inline' | 'split') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'formBlock';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            sub?: string | null;
+            columns?: ('2' | '3' | '4') | null;
+            features: {
+              icon?: (number | null) | Media;
+              title: string;
+              body?: string | null;
+              link?: {
+                /**
+                 * Visible label. Falls back to the target page title.
+                 */
+                text?: string | null;
+                kind?: ('doc' | 'media' | 'url') | null;
+                /**
+                 * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                 */
+                target?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'blogs';
+                      value: number | Blog;
+                    } | null)
+                  | ({
+                      relationTo: 'news';
+                      value: number | News;
+                    } | null)
+                  | ({
+                      relationTo: 'guides';
+                      value: number | Guide;
+                    } | null)
+                  | ({
+                      relationTo: 'resources';
+                      value: number | Resource;
+                    } | null)
+                  | ({
+                      relationTo: 'events';
+                      value: number | Event;
+                    } | null)
+                  | ({
+                      relationTo: 'webinars';
+                      value: number | Webinar;
+                    } | null)
+                  | ({
+                      relationTo: 'jobs';
+                      value: number | Job;
+                    } | null)
+                  | ({
+                      relationTo: 'authors';
+                      value: number | Author;
+                    } | null)
+                  | ({
+                      relationTo: 'categories';
+                      value: number | Category;
+                    } | null)
+                  | ({
+                      relationTo: 'newsCategories';
+                      value: number | NewsCategory;
+                    } | null);
+                mediaTarget?: (number | null) | Media;
+                /**
+                 * External URL. Validated at save (https?://).
+                 */
+                url?: string | null;
+                /**
+                 * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                 */
+                newTab?: boolean | null;
+              };
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'featureGrid';
+          }
+        | {
+            heading?: string | null;
+            logos: {
+              image: number | Media;
+              alt: string;
+              url?: string | null;
+              id?: string | null;
+            }[];
+            /**
+             * Render logos in a uniform single colour for visual rhythm.
+             */
+            monochrome?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'logoCloud';
+          }
+        | {
+            heading?: string | null;
+            sub?: string | null;
+            integrations: {
+              name: string;
+              logo: number | Media;
+              category?:
+                | ('ci-cd' | 'registry' | 'kubernetes' | 'cloud' | 'security' | 'observability' | 'other')
+                | null;
+              url?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'integrationLogos';
+          }
+        | {
+            quote: string;
+            person: string;
+            role?: string | null;
+            company?: string | null;
+            companyLogo?: (number | null) | Media;
+            avatar?: (number | null) | Media;
+            variant?: ('card' | 'pull-quote') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'testimonial';
+          }
+        | {
+            heading?: string | null;
+            metrics: {
+              /**
+               * e.g. "10×" or "99.99%".
+               */
+              value: string;
+              label: string;
+              sublabel?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'stats';
+          }
+        | {
+            metrics: {
+              label: string;
+              value: string;
+              id?: string | null;
+            }[];
+            background?: ('inverted' | 'surface') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'metricsBar';
+          }
+        | {
+            heading?: string | null;
+            sub?: string | null;
+            /**
+             * Renders as Radix Accordion + emits FAQPage JSON-LD when non-empty.
+             */
+            items: {
+              question: string;
+              answer: {
+                root: {
+                  type: string;
+                  children: {
+                    type: any;
+                    version: number;
+                    [k: string]: unknown;
+                  }[];
+                  direction: ('ltr' | 'rtl') | null;
+                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                  indent: number;
+                  version: number;
+                };
+                [k: string]: unknown;
+              };
+              id?: string | null;
+            }[];
+            /**
+             * When off, opening one row collapses others. Default off matches WAI-ARIA disclosure pattern.
+             */
+            allowMultipleOpen?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faq';
+          }
+        | {
+            heading?: string | null;
+            layout?: ('grid' | 'masonry' | 'carousel') | null;
+            images: {
+              media: number | Media;
+              caption?: string | null;
+              link?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'gallery';
+          }
+        | {
+            provider: 'youtube' | 'vimeo' | 'loom';
+            url: string;
+            /**
+             * iframe title for screen readers.
+             */
+            title?: string | null;
+            aspectRatio?: ('16-9' | '4-3' | '1-1' | '9-16') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'embed';
+          }
+        | {
+            language:
+              | 'bash'
+              | 'dockerfile'
+              | 'yaml'
+              | 'json'
+              | 'typescript'
+              | 'javascript'
+              | 'python'
+              | 'go'
+              | 'rust'
+              | 'sql'
+              | 'hcl'
+              | 'text';
+            /**
+             * Optional filename rendered as a tab above the code (e.g. Dockerfile).
+             */
+            filename?: string | null;
+            content: string;
+            showLineNumbers?: boolean | null;
+            /**
+             * Comma-separated line numbers / ranges (e.g. "1,3-5,8") to highlight.
+             */
+            highlightLines?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'codeBlock';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            sub?: string | null;
+            /**
+             * Show a monthly / yearly toggle. When enabled, each tier needs both monthly and yearly prices.
+             */
+            billingToggle?: boolean | null;
+            tiers: {
+              name: string;
+              price?: {
+                /**
+                 * e.g. "$49" or "Custom" or "Free".
+                 */
+                monthly?: string | null;
+                /**
+                 * Per-month equivalent of the annual plan.
+                 */
+                yearly?: string | null;
+                currency?: ('USD' | 'EUR' | 'GBP' | 'INR') | null;
+              };
+              tagline?: string | null;
+              features: {
+                label: string;
+                tooltip?: string | null;
+                /**
+                 * Off renders the row struck-through (denoting "not included").
+                 */
+                included?: boolean | null;
+                id?: string | null;
+              }[];
+              cta?: {
+                variant?: ('primary' | 'secondary' | 'ghost') | null;
+                /**
+                 * Custom analytics event id emitted on click.
+                 */
+                trackingId?: string | null;
+                link?: {
+                  /**
+                   * Visible label. Falls back to the target page title.
+                   */
+                  text?: string | null;
+                  kind?: ('doc' | 'media' | 'url') | null;
+                  /**
+                   * Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.
+                   */
+                  target?:
+                    | ({
+                        relationTo: 'pages';
+                        value: number | Page;
+                      } | null)
+                    | ({
+                        relationTo: 'blogs';
+                        value: number | Blog;
+                      } | null)
+                    | ({
+                        relationTo: 'news';
+                        value: number | News;
+                      } | null)
+                    | ({
+                        relationTo: 'guides';
+                        value: number | Guide;
+                      } | null)
+                    | ({
+                        relationTo: 'resources';
+                        value: number | Resource;
+                      } | null)
+                    | ({
+                        relationTo: 'events';
+                        value: number | Event;
+                      } | null)
+                    | ({
+                        relationTo: 'webinars';
+                        value: number | Webinar;
+                      } | null)
+                    | ({
+                        relationTo: 'jobs';
+                        value: number | Job;
+                      } | null)
+                    | ({
+                        relationTo: 'authors';
+                        value: number | Author;
+                      } | null)
+                    | ({
+                        relationTo: 'categories';
+                        value: number | Category;
+                      } | null)
+                    | ({
+                        relationTo: 'newsCategories';
+                        value: number | NewsCategory;
+                      } | null);
+                  mediaTarget?: (number | null) | Media;
+                  /**
+                   * External URL. Validated at save (https?://).
+                   */
+                  url?: string | null;
+                  /**
+                   * Opens in a new tab. Auto-applies rel="noopener noreferrer".
+                   */
+                  newTab?: boolean | null;
+                };
+              };
+              /**
+               * Visually emphasises this tier as the recommended option.
+               */
+              highlight?: boolean | null;
+              highlightLabel?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'pricing';
+          }
+        | {
+            heading?: string | null;
+            sub?: string | null;
+            /**
+             * When set, only matching jobs render. Leave all blank to render every open job.
+             */
+            filters?: {
+              department?:
+                | (
+                    | 'engineering'
+                    | 'sales'
+                    | 'marketing'
+                    | 'customer-success'
+                    | 'operations'
+                    | 'finance'
+                    | 'legal'
+                    | 'people'
+                  )
+                | null;
+              locations?: (number | JobLocation)[] | null;
+              remoteOnly?: boolean | null;
+            };
+            /**
+             * Show department / location filter chips above the list.
+             */
+            showFilters?: boolean | null;
+            emptyMessage?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'jobsList';
+          }
+        | {
+            /**
+             * Caption rendered as <caption> for screen readers + visible above the table.
+             */
+            caption?: string | null;
+            headers: {
+              label: string;
+              /**
+               * Visually emphasises this column (e.g. the "us" column on a comparison table).
+               */
+              highlight?: boolean | null;
+              id?: string | null;
+            }[];
+            /**
+             * Render the first cell of each row as <th scope="row"> for screen readers (default for comparison tables).
+             */
+            firstColIsHeader?: boolean | null;
+            /**
+             * Pin the first column when the table scrolls horizontally on narrow viewports.
+             */
+            stickyFirstColumn?: boolean | null;
+            rows: {
+              cells: {
+                type?: ('text' | 'check' | 'cross' | 'partial') | null;
+                /**
+                 * Text contents. Required for type=text; optional override caption for check/cross/partial cells.
+                 */
+                value?: string | null;
+                /**
+                 * Optional hover tooltip with extra context.
+                 */
+                tooltip?: string | null;
+                id?: string | null;
+              }[];
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'table';
+          }
+      )[]
+    | null;
   /**
    * Container width and chrome. Block picker filters by layout in Phase C.
    */
@@ -2634,7 +4215,756 @@ export interface PagesSelect<T extends boolean = true> {
   slug?: T;
   parent?: T;
   path?: T;
-  layout?: T | {};
+  layout?:
+    | T
+    | {
+        section?:
+          | T
+          | {
+              variant?: T;
+              gap?: T;
+              alignment?: T;
+              background?: T;
+              children?:
+                | T
+                | {
+                    hero?:
+                      | T
+                      | {
+                          eyebrow?: T;
+                          headline?: T;
+                          sub?: T;
+                          primaryCta?:
+                            | T
+                            | {
+                                variant?: T;
+                                trackingId?: T;
+                                link?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      kind?: T;
+                                      target?: T;
+                                      mediaTarget?: T;
+                                      url?: T;
+                                      newTab?: T;
+                                    };
+                              };
+                          secondaryCta?:
+                            | T
+                            | {
+                                variant?: T;
+                                trackingId?: T;
+                                link?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      kind?: T;
+                                      target?: T;
+                                      mediaTarget?: T;
+                                      url?: T;
+                                      newTab?: T;
+                                    };
+                              };
+                          background?:
+                            | T
+                            | {
+                                kind?: T;
+                                media?: T;
+                              };
+                          id?: T;
+                          blockName?: T;
+                        };
+                    cta?:
+                      | T
+                      | {
+                          headline?: T;
+                          body?: T;
+                          primaryCta?:
+                            | T
+                            | {
+                                variant?: T;
+                                trackingId?: T;
+                                link?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      kind?: T;
+                                      target?: T;
+                                      mediaTarget?: T;
+                                      url?: T;
+                                      newTab?: T;
+                                    };
+                              };
+                          secondaryCta?:
+                            | T
+                            | {
+                                variant?: T;
+                                trackingId?: T;
+                                link?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      kind?: T;
+                                      target?: T;
+                                      mediaTarget?: T;
+                                      url?: T;
+                                      newTab?: T;
+                                    };
+                              };
+                          background?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    richText?:
+                      | T
+                      | {
+                          body?: T;
+                          maxWidth?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    formBlock?:
+                      | T
+                      | {
+                          form?: T;
+                          headline?: T;
+                          description?: T;
+                          overridePostSubmit?: T;
+                          postSubmit?:
+                            | T
+                            | {
+                                kind?: T;
+                                body?: T;
+                                url?: T;
+                              };
+                          layout?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    featureGrid?:
+                      | T
+                      | {
+                          eyebrow?: T;
+                          heading?: T;
+                          sub?: T;
+                          columns?: T;
+                          features?:
+                            | T
+                            | {
+                                icon?: T;
+                                title?: T;
+                                body?: T;
+                                link?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      kind?: T;
+                                      target?: T;
+                                      mediaTarget?: T;
+                                      url?: T;
+                                      newTab?: T;
+                                    };
+                                id?: T;
+                              };
+                          id?: T;
+                          blockName?: T;
+                        };
+                    logoCloud?:
+                      | T
+                      | {
+                          heading?: T;
+                          logos?:
+                            | T
+                            | {
+                                image?: T;
+                                alt?: T;
+                                url?: T;
+                                id?: T;
+                              };
+                          monochrome?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    integrationLogos?:
+                      | T
+                      | {
+                          heading?: T;
+                          sub?: T;
+                          integrations?:
+                            | T
+                            | {
+                                name?: T;
+                                logo?: T;
+                                category?: T;
+                                url?: T;
+                                id?: T;
+                              };
+                          id?: T;
+                          blockName?: T;
+                        };
+                    testimonial?:
+                      | T
+                      | {
+                          quote?: T;
+                          person?: T;
+                          role?: T;
+                          company?: T;
+                          companyLogo?: T;
+                          avatar?: T;
+                          variant?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    stats?:
+                      | T
+                      | {
+                          heading?: T;
+                          metrics?:
+                            | T
+                            | {
+                                value?: T;
+                                label?: T;
+                                sublabel?: T;
+                                id?: T;
+                              };
+                          id?: T;
+                          blockName?: T;
+                        };
+                    metricsBar?:
+                      | T
+                      | {
+                          metrics?:
+                            | T
+                            | {
+                                label?: T;
+                                value?: T;
+                                id?: T;
+                              };
+                          background?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    faq?:
+                      | T
+                      | {
+                          heading?: T;
+                          sub?: T;
+                          items?:
+                            | T
+                            | {
+                                question?: T;
+                                answer?: T;
+                                id?: T;
+                              };
+                          allowMultipleOpen?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    gallery?:
+                      | T
+                      | {
+                          heading?: T;
+                          layout?: T;
+                          images?:
+                            | T
+                            | {
+                                media?: T;
+                                caption?: T;
+                                link?: T;
+                                id?: T;
+                              };
+                          id?: T;
+                          blockName?: T;
+                        };
+                    embed?:
+                      | T
+                      | {
+                          provider?: T;
+                          url?: T;
+                          title?: T;
+                          aspectRatio?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    codeBlock?:
+                      | T
+                      | {
+                          language?: T;
+                          filename?: T;
+                          content?: T;
+                          showLineNumbers?: T;
+                          highlightLines?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    pricing?:
+                      | T
+                      | {
+                          eyebrow?: T;
+                          heading?: T;
+                          sub?: T;
+                          billingToggle?: T;
+                          tiers?:
+                            | T
+                            | {
+                                name?: T;
+                                price?:
+                                  | T
+                                  | {
+                                      monthly?: T;
+                                      yearly?: T;
+                                      currency?: T;
+                                    };
+                                tagline?: T;
+                                features?:
+                                  | T
+                                  | {
+                                      label?: T;
+                                      tooltip?: T;
+                                      included?: T;
+                                      id?: T;
+                                    };
+                                cta?:
+                                  | T
+                                  | {
+                                      variant?: T;
+                                      trackingId?: T;
+                                      link?:
+                                        | T
+                                        | {
+                                            text?: T;
+                                            kind?: T;
+                                            target?: T;
+                                            mediaTarget?: T;
+                                            url?: T;
+                                            newTab?: T;
+                                          };
+                                    };
+                                highlight?: T;
+                                highlightLabel?: T;
+                                id?: T;
+                              };
+                          id?: T;
+                          blockName?: T;
+                        };
+                    jobsList?:
+                      | T
+                      | {
+                          heading?: T;
+                          sub?: T;
+                          filters?:
+                            | T
+                            | {
+                                department?: T;
+                                locations?: T;
+                                remoteOnly?: T;
+                              };
+                          showFilters?: T;
+                          emptyMessage?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    table?:
+                      | T
+                      | {
+                          caption?: T;
+                          headers?:
+                            | T
+                            | {
+                                label?: T;
+                                highlight?: T;
+                                id?: T;
+                              };
+                          firstColIsHeader?: T;
+                          stickyFirstColumn?: T;
+                          rows?:
+                            | T
+                            | {
+                                cells?:
+                                  | T
+                                  | {
+                                      type?: T;
+                                      value?: T;
+                                      tooltip?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                              };
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              headline?: T;
+              sub?: T;
+              primaryCta?:
+                | T
+                | {
+                    variant?: T;
+                    trackingId?: T;
+                    link?:
+                      | T
+                      | {
+                          text?: T;
+                          kind?: T;
+                          target?: T;
+                          mediaTarget?: T;
+                          url?: T;
+                          newTab?: T;
+                        };
+                  };
+              secondaryCta?:
+                | T
+                | {
+                    variant?: T;
+                    trackingId?: T;
+                    link?:
+                      | T
+                      | {
+                          text?: T;
+                          kind?: T;
+                          target?: T;
+                          mediaTarget?: T;
+                          url?: T;
+                          newTab?: T;
+                        };
+                  };
+              background?:
+                | T
+                | {
+                    kind?: T;
+                    media?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              headline?: T;
+              body?: T;
+              primaryCta?:
+                | T
+                | {
+                    variant?: T;
+                    trackingId?: T;
+                    link?:
+                      | T
+                      | {
+                          text?: T;
+                          kind?: T;
+                          target?: T;
+                          mediaTarget?: T;
+                          url?: T;
+                          newTab?: T;
+                        };
+                  };
+              secondaryCta?:
+                | T
+                | {
+                    variant?: T;
+                    trackingId?: T;
+                    link?:
+                      | T
+                      | {
+                          text?: T;
+                          kind?: T;
+                          target?: T;
+                          mediaTarget?: T;
+                          url?: T;
+                          newTab?: T;
+                        };
+                  };
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              body?: T;
+              maxWidth?: T;
+              id?: T;
+              blockName?: T;
+            };
+        formBlock?:
+          | T
+          | {
+              form?: T;
+              headline?: T;
+              description?: T;
+              overridePostSubmit?: T;
+              postSubmit?:
+                | T
+                | {
+                    kind?: T;
+                    body?: T;
+                    url?: T;
+                  };
+              layout?: T;
+              id?: T;
+              blockName?: T;
+            };
+        featureGrid?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              sub?: T;
+              columns?: T;
+              features?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    body?: T;
+                    link?:
+                      | T
+                      | {
+                          text?: T;
+                          kind?: T;
+                          target?: T;
+                          mediaTarget?: T;
+                          url?: T;
+                          newTab?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        logoCloud?:
+          | T
+          | {
+              heading?: T;
+              logos?:
+                | T
+                | {
+                    image?: T;
+                    alt?: T;
+                    url?: T;
+                    id?: T;
+                  };
+              monochrome?: T;
+              id?: T;
+              blockName?: T;
+            };
+        integrationLogos?:
+          | T
+          | {
+              heading?: T;
+              sub?: T;
+              integrations?:
+                | T
+                | {
+                    name?: T;
+                    logo?: T;
+                    category?: T;
+                    url?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        testimonial?:
+          | T
+          | {
+              quote?: T;
+              person?: T;
+              role?: T;
+              company?: T;
+              companyLogo?: T;
+              avatar?: T;
+              variant?: T;
+              id?: T;
+              blockName?: T;
+            };
+        stats?:
+          | T
+          | {
+              heading?: T;
+              metrics?:
+                | T
+                | {
+                    value?: T;
+                    label?: T;
+                    sublabel?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        metricsBar?:
+          | T
+          | {
+              metrics?:
+                | T
+                | {
+                    label?: T;
+                    value?: T;
+                    id?: T;
+                  };
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faq?:
+          | T
+          | {
+              heading?: T;
+              sub?: T;
+              items?:
+                | T
+                | {
+                    question?: T;
+                    answer?: T;
+                    id?: T;
+                  };
+              allowMultipleOpen?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              heading?: T;
+              layout?: T;
+              images?:
+                | T
+                | {
+                    media?: T;
+                    caption?: T;
+                    link?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        embed?:
+          | T
+          | {
+              provider?: T;
+              url?: T;
+              title?: T;
+              aspectRatio?: T;
+              id?: T;
+              blockName?: T;
+            };
+        codeBlock?:
+          | T
+          | {
+              language?: T;
+              filename?: T;
+              content?: T;
+              showLineNumbers?: T;
+              highlightLines?: T;
+              id?: T;
+              blockName?: T;
+            };
+        pricing?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              sub?: T;
+              billingToggle?: T;
+              tiers?:
+                | T
+                | {
+                    name?: T;
+                    price?:
+                      | T
+                      | {
+                          monthly?: T;
+                          yearly?: T;
+                          currency?: T;
+                        };
+                    tagline?: T;
+                    features?:
+                      | T
+                      | {
+                          label?: T;
+                          tooltip?: T;
+                          included?: T;
+                          id?: T;
+                        };
+                    cta?:
+                      | T
+                      | {
+                          variant?: T;
+                          trackingId?: T;
+                          link?:
+                            | T
+                            | {
+                                text?: T;
+                                kind?: T;
+                                target?: T;
+                                mediaTarget?: T;
+                                url?: T;
+                                newTab?: T;
+                              };
+                        };
+                    highlight?: T;
+                    highlightLabel?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        jobsList?:
+          | T
+          | {
+              heading?: T;
+              sub?: T;
+              filters?:
+                | T
+                | {
+                    department?: T;
+                    locations?: T;
+                    remoteOnly?: T;
+                  };
+              showFilters?: T;
+              emptyMessage?: T;
+              id?: T;
+              blockName?: T;
+            };
+        table?:
+          | T
+          | {
+              caption?: T;
+              headers?:
+                | T
+                | {
+                    label?: T;
+                    highlight?: T;
+                    id?: T;
+                  };
+              firstColIsHeader?: T;
+              stickyFirstColumn?: T;
+              rows?:
+                | T
+                | {
+                    cells?:
+                      | T
+                      | {
+                          type?: T;
+                          value?: T;
+                          tooltip?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
   pageLayout?: T;
   seo?:
     | T

@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { pageBuilderBlocks } from '../blocks';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
 
@@ -46,10 +47,10 @@ export const Pages: CollectionConfig = {
     {
       name: 'layout',
       type: 'blocks',
-      blocks: [],
+      blocks: pageBuilderBlocks,
       admin: {
         description:
-          'Page-builder content. Block library lands in Phase C — Hero, FeatureGrid, FAQ, CTA, etc.',
+          'Compose the page from typed blocks. Section is a layout primitive — every other block is a content unit.',
       },
     },
     {
