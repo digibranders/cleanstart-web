@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 22
+  PNPM_VERSION: 10
+
+jobs:
+  cms:
+    name: apps/cms · lint · typecheck · test · types-drift · build
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: cleanstart
+          POSTGRES_PASSWORD: cleanstart
+          POSTGRES_DB: cleanstart
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cleanstart -d cleanstart"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URI: postgres://cleanstart:cleanstart@localhost:5432/cleanstart
+      PAYLOAD_SECRET: ci-only-not-a-real-secret
+      PAYLOAD_PUBLIC_SERVER_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm --filter @cleanstart/cms test
+
+      - name: Verify generated Payload types are not stale
+        run: pnpm --filter @cleanstart/cms verify:types
+
+      - name: Build
+        run: pnpm build
