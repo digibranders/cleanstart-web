@@ -23,6 +23,12 @@ import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
+import { Announcements } from './payload/globals/announcements';
+import { FooterNav } from './payload/globals/footerNav';
+import { Legal } from './payload/globals/legal';
+import { MainNav } from './payload/globals/mainNav';
+import { SeoDefaults } from './payload/globals/seoDefaults';
+import { SiteSettings } from './payload/globals/siteSettings';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -63,6 +69,7 @@ export default buildConfig({
     Pages,
     Redirects,
   ],
+  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements],
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
