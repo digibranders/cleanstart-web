@@ -69,6 +69,10 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    authors: Author;
+    categories: Category;
+    newsCategories: NewsCategory;
+    jobLocations: JobLocation;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +82,10 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    authors: AuthorsSelect<false> | AuthorsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
+    jobLocations: JobLocationsSelect<false> | JobLocationsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -234,6 +242,323 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors".
+ */
+export interface Author {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  photo?: (number | null) | Media;
+  /**
+   * Job title shown on the byline + Person JSON-LD.
+   */
+  role?: string | null;
+  location?: string | null;
+  /**
+   * One-line bio for cards and SERP snippets.
+   */
+  bioShort?: string | null;
+  /**
+   * Full bio shown on /author/[slug].
+   */
+  bioLong?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Topics this author covers. Powers Person JSON-LD knowsAbout and "more from this author on X" suggestions.
+   */
+  topicAreas?:
+    | {
+        topic: string;
+        id?: string | null;
+      }[]
+    | null;
+  social?: {
+    twitter?: string | null;
+    linkedin?: string | null;
+    github?: string | null;
+    website?: string | null;
+    email?: string | null;
+  };
+  education?:
+    | {
+        institution: string;
+        degree?: string | null;
+        year?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  experience?:
+    | {
+        company: string;
+        role?: string | null;
+        fromYear?: number | null;
+        toYear?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  skills?:
+    | {
+        skill: string;
+        id?: string | null;
+      }[]
+    | null;
+  awards?:
+    | {
+        title: string;
+        issuer?: string | null;
+        year?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Toggle off to hide this author from the byline picker on new drafts. Existing bylines stay intact.
+   */
+  acceptingNewBylines?: boolean | null;
+  /**
+   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
+  /**
+   * Optional parent category for hierarchical taxonomies.
+   */
+  parent?: (number | null) | Category;
+  /**
+   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsCategories".
+ */
+export interface NewsCategory {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
+  /**
+   * Optional parent category for hierarchical taxonomies.
+   */
+  parent?: (number | null) | NewsCategory;
+  /**
+   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobLocations".
+ */
+export interface JobLocation {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  type: 'country' | 'region' | 'city';
+  /**
+   * ISO 3166-1 alpha-2 country code (e.g. IN, US, GB). Two uppercase letters.
+   */
+  isoCountry: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -263,6 +588,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'authors';
+        value: number | Author;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'newsCategories';
+        value: number | NewsCategory;
+      } | null)
+    | ({
+        relationTo: 'jobLocations';
+        value: number | JobLocation;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -391,6 +732,169 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors_select".
+ */
+export interface AuthorsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  photo?: T;
+  role?: T;
+  location?: T;
+  bioShort?: T;
+  bioLong?: T;
+  topicAreas?:
+    | T
+    | {
+        topic?: T;
+        id?: T;
+      };
+  social?:
+    | T
+    | {
+        twitter?: T;
+        linkedin?: T;
+        github?: T;
+        website?: T;
+        email?: T;
+      };
+  education?:
+    | T
+    | {
+        institution?: T;
+        degree?: T;
+        year?: T;
+        id?: T;
+      };
+  experience?:
+    | T
+    | {
+        company?: T;
+        role?: T;
+        fromYear?: T;
+        toYear?: T;
+        id?: T;
+      };
+  skills?:
+    | T
+    | {
+        skill?: T;
+        id?: T;
+      };
+  awards?:
+    | T
+    | {
+        title?: T;
+        issuer?: T;
+        year?: T;
+        id?: T;
+      };
+  acceptingNewBylines?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  parent?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsCategories_select".
+ */
+export interface NewsCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  parent?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobLocations_select".
+ */
+export interface JobLocationsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  type?: T;
+  isoCountry?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
