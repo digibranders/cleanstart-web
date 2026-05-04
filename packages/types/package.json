@@ -1,0 +1,17 @@
+{
+  "name": "@cleanstart/types",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "biome lint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cleanstart/config": "workspace:*",
+    "typescript": "^5.7.3"
+  }
+}

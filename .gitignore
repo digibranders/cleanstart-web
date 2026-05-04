@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+.next/
+.turbo/
+dist/
+out/
+build/
+*.tsbuildinfo
+
+# Claude Code per-user settings (launch.json is committed; settings.local.json is per-user)
+.claude/settings.local.json
+
+# Generated types — Payload regenerates this; do not edit by hand
+# (still committed; ignore only local stale copies during regeneration)
+**/payload-types.bak.ts
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Migrations local artefacts (ETL outputs are gitignored; scripts are committed)
+migrations/webflow-export/
+migrations/webflow-import/.cache/
+
+# Payload local uploads (R2 in prod; local fallback during dev)
+apps/cms/media/
+
+# Sentry
+.sentryclirc

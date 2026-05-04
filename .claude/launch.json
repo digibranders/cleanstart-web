@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cms",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@cleanstart/cms", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8765"],
+      "port": 8765
+    }
+  ]
+}

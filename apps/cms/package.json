@@ -1,0 +1,41 @@
+{
+  "name": "@cleanstart/cms",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "pnpm run generate:importmap",
+    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --port 3000",
+    "prebuild": "pnpm run generate:importmap",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
+    "start": "cross-env NODE_OPTIONS=--no-deprecation next start --port 3000",
+    "lint": "biome lint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
+    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
+    "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
+    "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create"
+  },
+  "dependencies": {
+    "@cleanstart/types": "workspace:*",
+    "@payloadcms/db-postgres": "^3.81.0",
+    "@payloadcms/next": "^3.81.0",
+    "@payloadcms/richtext-lexical": "^3.81.0",
+    "cross-env": "^7.0.3",
+    "next": "^16.2.0",
+    "payload": "^3.81.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sharp": "^0.34.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@cleanstart/config": "workspace:*",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}
