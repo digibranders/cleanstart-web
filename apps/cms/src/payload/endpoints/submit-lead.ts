@@ -4,6 +4,7 @@ import { parkSubmission } from '../lib/lead-fallback-queue';
 import { submitLeadBodySchema } from '../lib/lead-handlers/payload-schema';
 import { submitLead } from '../lib/lead-handlers/registry';
 import type { LeadSubmission } from '../lib/lead-handlers/types';
+import { type FormFieldDef, validateFields } from '../lib/lead-handlers/validate-fields';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
 import { verifyTurnstileToken } from '../lib/turnstile';
 
@@ -79,6 +80,16 @@ export const submitLeadEndpoint: Endpoint = {
     const data = parsed.data;
     const userAgent = req.headers.get('user-agent') ?? undefined;
 
+    // Honeypot — silently swallow with 200 OK so bots don't learn they
+    // tripped the trap. Logged for spam analytics.
+    if (typeof data.website === 'string' && data.website.trim().length > 0) {
+      req.payload.logger.info(
+        { ip, userAgent: userAgent ?? null },
+        'Lead submission swallowed — honeypot tripped',
+      );
+      return json({ ok: true });
+    }
+
     const turnstile = await verifyTurnstileToken(data.turnstileToken, ip);
     if (!turnstile.ok) {
       return json(
@@ -95,6 +106,32 @@ export const submitLeadEndpoint: Endpoint = {
       typeof data.formId === 'number' ? data.formId : Number.parseInt(data.formId, 10);
     if (!Number.isInteger(numericFormId) || numericFormId <= 0) {
       return json({ ok: false, error: 'invalid_form_id' }, { status: 400 });
+    }
+
+    // Server-side re-application of forms.fields[].validation rules.
+    // The public form enforces these client-side; this stops a tampered
+    // DOM or hand-crafted POST from shipping junk into the leads table.
+    let formDoc: { fields?: FormFieldDef[] | null } | null;
+    try {
+      formDoc = (await req.payload.findByID({
+        collection: 'forms',
+        id: numericFormId,
+        depth: 0,
+        overrideAccess: true,
+      })) as { fields?: FormFieldDef[] | null } | null;
+    } catch {
+      return json({ ok: false, error: 'form_not_found' }, { status: 404 });
+    }
+
+    const fieldDefs = formDoc?.fields ?? [];
+    if (fieldDefs.length > 0) {
+      const validation = validateFields(fieldDefs, data.fields);
+      if (!validation.ok) {
+        return json(
+          { ok: false, error: 'invalid_fields', issues: validation.issues },
+          { status: 400 },
+        );
+      }
     }
 
     const submission: LeadSubmission = {
