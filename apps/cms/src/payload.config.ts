@@ -24,6 +24,7 @@ import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
+import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
@@ -89,6 +90,16 @@ export default buildConfig({
     Redirects,
   ],
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements],
+  jobs: {
+    tasks: [drainLeadQueueTask],
+    autoRun: [
+      {
+        cron: '*/5 * * * *', // every 5 minutes
+        queue: 'leadQueueDrain',
+      },
+    ],
+    shouldAutoRun: () => process.env.NODE_ENV !== 'test',
+  },
   onInit: () => {
     registerLeadHandlers();
   },
