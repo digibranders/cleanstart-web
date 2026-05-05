@@ -2,7 +2,7 @@
 
 This file tells Claude Code *how* to work in this repo. It does not duplicate the architecture doc, which tells you *what* to build.
 
-**Source of truth for *what*:** `cleanstart-cms-architecture.html` at repo root. Every ticket, every design call, every schema decision references an anchor in that file (e.g. `#new-fields`, `#blocks`, `#publishing-checklist`). If this CLAUDE.md and the arch doc disagree, the arch doc wins for product/architecture decisions; this file wins for code conventions.
+**Source of truth for *what*:** `docs/cleanstart-cms-architecture.html`. Every ticket, every design call, every schema decision references an anchor in that file (e.g. `#new-fields`, `#blocks`, `#publishing-checklist`). If this CLAUDE.md and the arch doc disagree, the arch doc wins for product/architecture decisions; this file wins for code conventions.
 
 **Plan of record:** `~/.claude/plans/lets-review-the-doc-curried-feigenbaum.md` (CMS-only Phase A–I sequence). The current backlog is at `docs/BACKLOG.md`.
 
@@ -31,8 +31,9 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 │   └── config/                      tsconfig · biome · eslint
 ├── migrations/webflow-import/       Phase H: ETL scripts
 ├── infra/                           docker-compose · Caddy · backup/restore scripts
-├── docs/                            BACKLOG, EDITOR-GUIDE, CONTENT-MODEL, RESTORE-LOG
-├── cleanstart-cms-architecture.html source of truth
+├── docs/                            BACKLOG, cleanstart-cms-architecture.html (source of truth),
+│                                    brand PDF, future EDITOR-GUIDE / CONTENT-MODEL / RESTORE-LOG
+├── cleanstart-logo.svg              brand mark — also embedded as JSX in apps/cms/src/payload/admin/
 └── CLAUDE.md                        this file
 ```
 

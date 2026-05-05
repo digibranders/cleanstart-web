@@ -1,6 +1,6 @@
 # CleanStart CMS — Build Backlog
 
-Phase A–I sequence for `apps/cms` (Payload admin + REST API + hooks). Each ticket links to an anchor in `cleanstart-cms-architecture.html` for the *what*; conventions live in `CLAUDE.md` for the *how*.
+Phase A–I sequence for `apps/cms` (Payload admin + REST API + hooks). Each ticket links to an anchor in `docs/cleanstart-cms-architecture.html` for the *what*; conventions live in `CLAUDE.md` for the *how*.
 
 **Hard rule:** a phase does not start until the previous phase's exit criteria are signed off.
 
