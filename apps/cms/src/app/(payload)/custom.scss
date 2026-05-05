@@ -1,3 +1,185 @@
-/* CleanStart admin theme overrides go here.
-   Brand tokens land in Phase B once Figma design system arrives.
-   For now, default Payload chrome. */
+// CleanStart admin theme.
+// Placeholder pass derived from `docs/Cleanstart - Brand Guidline.pdf`
+// + the cleanstart-logo.svg cyan mark. Swap to authoritative tokens
+// once new brand + Figma lands.
+//
+// Brand palette (from the brand guideline PDF):
+//   Primary cyan        #06c7f2
+//   Primary blue        #056bf1
+//   Secondary purple    #5d04d8
+//   Secondary deep      #270e59
+//   Near-black          #0e1125
+//
+// Type:
+//   Primary — Manrope (the logo's typeface, used everywhere)
+//   Secondary — Sora (specialised, sparingly)
+//
+// Self-hosted via Google's CSS API; works offline once the browser cache hits.
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap');
+
+:root {
+  // ─── Brand stops (full hue ramp; admin reaches for shades, not just one value)
+  --cs-cyan-50: #e6faff;
+  --cs-cyan-100: #c2f1ff;
+  --cs-cyan-200: #8be4fb;
+  --cs-cyan-300: #4dd5f7;
+  --cs-cyan-400: #06c7f2;
+  --cs-cyan-500: #06c7f2; // primary
+  --cs-cyan-600: #04a3c8;
+  --cs-cyan-700: #03819f;
+  --cs-cyan-800: #035e74;
+  --cs-cyan-900: #013f4f;
+
+  --cs-blue-500: #056bf1; // primary
+  --cs-blue-600: #0457c4;
+  --cs-blue-700: #033f8c;
+
+  --cs-purple-500: #5d04d8; // secondary
+  --cs-purple-700: #270e59; // secondary deep
+
+  --cs-ink-950: #0e1125; // near-black
+
+  // ─── Typography
+  --font-body: 'Manrope', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  --font-display: 'Sora', 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+// ─── Light theme ────────────────────────────────────────────────
+[data-theme='light'] {
+  // Surfaces
+  --theme-bg: #fafaf9;
+  --theme-input-bg: #ffffff;
+  --theme-elevation-0: #ffffff;
+  --theme-elevation-50: #fafaf9;
+  --theme-elevation-100: #f5f5f4;
+  --theme-elevation-150: #efeeec;
+  --theme-elevation-200: #e7e5e0;
+  --theme-elevation-250: #ddd9d2;
+  --theme-elevation-300: #d4d2cc;
+  --theme-elevation-400: #b8b6ae;
+  --theme-elevation-500: #9c998f;
+  --theme-elevation-600: #6f6c63;
+  --theme-elevation-700: #4a4f5c;
+  --theme-elevation-800: #2d3142;
+  --theme-elevation-900: #14171f;
+  --theme-elevation-1000: #0e1125;
+
+  // Text
+  --theme-text: #14171f;
+  --theme-text-soft: #4a4f5c;
+  --theme-text-disabled: #9c998f;
+
+  // Brand
+  --color-base-50: var(--cs-cyan-50);
+  --color-base-100: var(--cs-cyan-100);
+  --color-base-200: var(--cs-cyan-200);
+  --color-base-300: var(--cs-cyan-300);
+  --color-base-400: var(--cs-cyan-400);
+  --color-base-500: var(--cs-cyan-500);
+  --color-base-600: var(--cs-cyan-600);
+  --color-base-700: var(--cs-cyan-700);
+  --color-base-800: var(--cs-cyan-800);
+  --color-base-900: var(--cs-cyan-900);
+
+  // Status (kept on standard semantic hues — accessibility-first)
+  --color-success-500: #047857;
+  --color-warning-500: #b45309;
+  --color-error-500: #b91c1c;
+}
+
+// ─── Dark theme ─────────────────────────────────────────────────
+[data-theme='dark'] {
+  --theme-bg: var(--cs-ink-950);
+  --theme-input-bg: #1a1d33;
+  --theme-elevation-0: #14171f;
+  --theme-elevation-50: #1a1d33;
+  --theme-elevation-100: #1f2238;
+  --theme-elevation-150: #262a40;
+  --theme-elevation-200: #2d3148;
+  --theme-elevation-250: #353a52;
+  --theme-elevation-300: #3e4360;
+  --theme-elevation-400: #565b78;
+  --theme-elevation-500: #7a7f95;
+  --theme-elevation-600: #a3a7b8;
+  --theme-elevation-700: #c5c8d4;
+  --theme-elevation-800: #e1e2ea;
+  --theme-elevation-900: #f3f4f8;
+  --theme-elevation-1000: #ffffff;
+
+  --theme-text: #f3f4f8;
+  --theme-text-soft: #c5c8d4;
+  --theme-text-disabled: #7a7f95;
+
+  --color-base-50: var(--cs-cyan-900);
+  --color-base-100: var(--cs-cyan-800);
+  --color-base-200: var(--cs-cyan-700);
+  --color-base-300: var(--cs-cyan-600);
+  --color-base-400: var(--cs-cyan-500);
+  --color-base-500: var(--cs-cyan-400);
+  --color-base-600: var(--cs-cyan-300);
+  --color-base-700: var(--cs-cyan-200);
+  --color-base-800: var(--cs-cyan-100);
+  --color-base-900: var(--cs-cyan-50);
+
+  --color-success-500: #34d399;
+  --color-warning-500: #fbbf24;
+  --color-error-500: #f87171;
+}
+
+// ─── App-wide font swap
+html,
+body {
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+// ─── Login page polish
+.template-default,
+.template-minimal {
+  // Centre the brand mark above the form a bit more breathing room.
+  .render-icon,
+  .graphic-logo {
+    margin-bottom: 1.5rem;
+  }
+}
+
+// Subtle brand accent on the login + create-first-user gradient backdrop.
+.template-minimal::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(60% 50% at 80% 0%, var(--cs-cyan-100) 0%, transparent 60%),
+    radial-gradient(45% 45% at 0% 100%, rgba(93, 4, 216, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+[data-theme='dark'] .template-minimal::before {
+  background:
+    radial-gradient(60% 50% at 80% 0%, rgba(6, 199, 242, 0.15) 0%, transparent 60%),
+    radial-gradient(45% 45% at 0% 100%, rgba(93, 4, 216, 0.18) 0%, transparent 60%);
+}
+
+// ─── Brand-aware focus ring + selected-row tint
+:focus-visible {
+  outline: 2px solid var(--cs-cyan-500);
+  outline-offset: 2px;
+}
+
+// ─── Slightly tighter card radii to match the wordmark's geometry
+.dashboard__group .card {
+  border-radius: 10px;
+}

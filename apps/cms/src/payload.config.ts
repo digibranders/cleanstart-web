@@ -46,8 +46,24 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      graphics: {
+        Logo: './payload/admin/Logo.tsx#Logo',
+        Icon: './payload/admin/Icon.tsx#Icon',
+      },
+    },
     meta: {
-      titleSuffix: '— CleanStart CMS',
+      title: 'CleanStart CMS',
+      titleSuffix: ' — CleanStart CMS',
+      description:
+        'CleanStart CMS — content, leads, and publishing for cleanstart.com.',
+      icons: [
+        {
+          type: 'image/svg+xml',
+          rel: 'icon',
+          url: '/icon.svg',
+        },
+      ],
     },
   },
   collections: [
