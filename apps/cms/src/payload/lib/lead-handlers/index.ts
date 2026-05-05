@@ -1,10 +1,15 @@
 import { brevoHandler } from './brevo';
+import { companyFromDomainHandler } from './company-from-domain';
 import { registerSecondaryHandler } from './registry';
 
-// Day-1 secondary chain is Brevo-only. Microsoft Teams (and GA, GSC,
-// Slack, HubSpot, etc.) move to a later "Integrations" admin surface
-// where editors connect each channel from a CMS settings page, not env
-// vars. See docs/BACKLOG.md "Future — Integrations dashboard".
+// Day-1 secondary chain:
+//   - company-from-domain  (free enrichment, no env gate)
+//   - brevo                (template-based notification, env-gated)
+//
+// Microsoft Teams (and GA, GSC, Slack, HubSpot, etc.) move to a later
+// "Integrations" admin surface where editors connect each channel from
+// a CMS settings page, not env vars. See docs/BACKLOG.md
+// "Future — Integrations dashboard".
 
 let registered = false;
 
@@ -16,10 +21,11 @@ let registered = false;
 export const registerLeadHandlers = (): void => {
   if (registered) return;
   registered = true;
+  registerSecondaryHandler(companyFromDomainHandler);
   registerSecondaryHandler(brevoHandler);
 };
 
-export { brevoHandler };
+export { brevoHandler, companyFromDomainHandler };
 export {
   registerSecondaryHandler,
   listSecondaryHandlers,
