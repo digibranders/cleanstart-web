@@ -3,6 +3,7 @@ import type { Endpoint, PayloadRequest } from 'payload';
 import { submitLeadBodySchema } from '../lib/lead-handlers/payload-schema';
 import { submitLead } from '../lib/lead-handlers/registry';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
+import { verifyTurnstileToken } from '../lib/turnstile';
 
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
@@ -75,6 +76,18 @@ export const submitLeadEndpoint: Endpoint = {
 
     const data = parsed.data;
     const userAgent = req.headers.get('user-agent') ?? undefined;
+
+    const turnstile = await verifyTurnstileToken(data.turnstileToken, ip);
+    if (!turnstile.ok) {
+      return json(
+        {
+          ok: false,
+          error: 'turnstile_failed',
+          reason: turnstile.reason,
+        },
+        { status: 403 },
+      );
+    }
 
     const numericFormId =
       typeof data.formId === 'number' ? data.formId : Number.parseInt(data.formId, 10);

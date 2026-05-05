@@ -24,6 +24,7 @@ import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
+import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
 import { Legal } from './payload/globals/legal';
@@ -88,6 +89,9 @@ export default buildConfig({
     Redirects,
   ],
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements],
+  onInit: () => {
+    registerLeadHandlers();
+  },
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
