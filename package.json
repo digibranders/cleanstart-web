@@ -14,10 +14,12 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "format": "biome format --write .",
-    "format:check": "biome format ."
+    "format:check": "biome format .",
+    "figma:extract": "tsx --env-file=.env scripts/figma-extract.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "tsx": "^4.19.2",
     "turbo": "^2.3.3",
     "typescript": "^5.7.3"
   }

@@ -11,6 +11,9 @@ importers:
       '@biomejs/biome':
         specifier: ^1.9.4
         version: 1.9.4
+      tsx:
+        specifier: ^4.19.2
+        version: 4.21.0
       turbo:
         specifier: ^2.3.3
         version: 2.9.8
@@ -8955,7 +8958,7 @@ snapshots:
   tsx@4.21.0:
     dependencies:
       esbuild: 0.27.7
-      get-tsconfig: 4.8.1
+      get-tsconfig: 4.14.0
     optionalDependencies:
       fsevents: 2.3.3
 
