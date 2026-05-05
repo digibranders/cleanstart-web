@@ -56,8 +56,9 @@ export const Section = (nestableBlocks: Block[]): Block => ({
       type: 'blocks',
       blocks: nestableBlocks,
       required: true,
+      minRows: 1,
       admin: {
-        description: 'Nested blocks rendered in the chosen variant + gap + alignment.',
+        description: 'Nested blocks rendered in the chosen variant + gap + alignment. At least one child required.',
       },
     },
   ],

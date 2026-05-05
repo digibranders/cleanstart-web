@@ -9,6 +9,7 @@ export const Stats: Block = {
       name: 'metrics',
       type: 'array',
       required: true,
+      minRows: 1,
       labels: { singular: 'Metric', plural: 'Metrics' },
       fields: [
         { name: 'value', type: 'text', required: true, admin: { description: 'e.g. "10×" or "99.99%".' } },

@@ -8,6 +8,7 @@ export const MetricsBar: Block = {
       name: 'metrics',
       type: 'array',
       required: true,
+      minRows: 1,
       labels: { singular: 'Metric', plural: 'Metrics' },
       fields: [
         { name: 'label', type: 'text', required: true },

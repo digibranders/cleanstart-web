@@ -20,6 +20,7 @@ export const Table: Block = {
       name: 'headers',
       type: 'array',
       required: true,
+      minRows: 1,
       labels: { singular: 'Header', plural: 'Headers' },
       fields: [
         { name: 'label', type: 'text', required: true },
@@ -55,12 +56,14 @@ export const Table: Block = {
       name: 'rows',
       type: 'array',
       required: true,
+      minRows: 1,
       labels: { singular: 'Row', plural: 'Rows' },
       fields: [
         {
           name: 'cells',
           type: 'array',
           required: true,
+          minRows: 1,
           labels: { singular: 'Cell', plural: 'Cells' },
           fields: [
             {

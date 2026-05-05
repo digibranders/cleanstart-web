@@ -10,10 +10,11 @@ export const FAQ: Block = {
       name: 'items',
       type: 'array',
       required: true,
+      minRows: 1,
       labels: { singular: 'Question', plural: 'Questions' },
       admin: {
         description:
-          'Renders as Radix Accordion + emits FAQPage JSON-LD when non-empty.',
+          'Renders as Radix Accordion + emits FAQPage JSON-LD when non-empty. At least one Q+A required.',
       },
       fields: [
         { name: 'question', type: 'text', required: true },

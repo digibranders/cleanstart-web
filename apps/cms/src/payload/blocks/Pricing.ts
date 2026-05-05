@@ -22,6 +22,7 @@ export const Pricing: Block = {
       name: 'tiers',
       type: 'array',
       required: true,
+      minRows: 1,
       labels: { singular: 'Tier', plural: 'Tiers' },
       fields: [
         { name: 'name', type: 'text', required: true },
@@ -57,6 +58,7 @@ export const Pricing: Block = {
           name: 'features',
           type: 'array',
           required: true,
+          minRows: 1,
           labels: { singular: 'Feature', plural: 'Features' },
           fields: [
             { name: 'label', type: 'text', required: true },

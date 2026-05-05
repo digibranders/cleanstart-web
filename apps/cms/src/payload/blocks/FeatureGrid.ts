@@ -23,6 +23,7 @@ export const FeatureGrid: Block = {
       name: 'features',
       type: 'array',
       required: true,
+      minRows: 1,
       labels: { singular: 'Feature', plural: 'Features' },
       fields: [
         { name: 'icon', type: 'upload', relationTo: 'media' },

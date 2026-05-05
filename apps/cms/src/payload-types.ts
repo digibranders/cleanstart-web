@@ -1635,7 +1635,7 @@ export interface Page {
             alignment?: ('start' | 'center' | 'end') | null;
             background?: ('none' | 'surface' | 'inverted') | null;
             /**
-             * Nested blocks rendered in the chosen variant + gap + alignment.
+             * Nested blocks rendered in the chosen variant + gap + alignment. At least one child required.
              */
             children: (
               | {
@@ -2154,7 +2154,7 @@ export interface Page {
                   heading?: string | null;
                   sub?: string | null;
                   /**
-                   * Renders as Radix Accordion + emits FAQPage JSON-LD when non-empty.
+                   * Renders as Radix Accordion + emits FAQPage JSON-LD when non-empty. At least one Q+A required.
                    */
                   items: {
                     question: string;
@@ -2941,7 +2941,7 @@ export interface Page {
             heading?: string | null;
             sub?: string | null;
             /**
-             * Renders as Radix Accordion + emits FAQPage JSON-LD when non-empty.
+             * Renders as Radix Accordion + emits FAQPage JSON-LD when non-empty. At least one Q+A required.
              */
             items: {
               question: string;

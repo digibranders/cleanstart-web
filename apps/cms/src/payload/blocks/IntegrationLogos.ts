@@ -10,6 +10,7 @@ export const IntegrationLogos: Block = {
       name: 'integrations',
       type: 'array',
       required: true,
+      minRows: 1,
       labels: { singular: 'Integration', plural: 'Integrations' },
       fields: [
         { name: 'name', type: 'text', required: true },
