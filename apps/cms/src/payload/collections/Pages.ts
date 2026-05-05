@@ -4,17 +4,23 @@ import { isAdminOrEditor } from '../access';
 import { pageBuilderBlocks } from '../blocks';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { pagesPathBuilderHook } from '../hooks/pages-path-builder';
+import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 /**
- * Page-builder host collection. Block schemas are added in Phase C; for now
- * `layout` is an empty blocks array so the schema is valid and types compile.
+ * Page-builder host collection. The Pages tree is the only content
+ * collection where two siblings can share a slug — `pricing` under
+ * `/solutions/` and `pricing` under `/customers/` both resolve to
+ * different URLs. Slug uniqueness is therefore enforced as a composite
+ * `(slug, parent)` index plus a server-side `validate` rather than a
+ * column-level UNIQUE constraint.
  */
 export const Pages: CollectionConfig = {
   slug: 'pages',
   labels: { singular: 'Page', plural: 'Pages' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'parent', '_status', 'publishedAt', 'updatedAt'],
+    defaultColumns: ['title', 'path', 'parent', '_status', 'publishedAt', 'updatedAt'],
     group: 'Content',
   },
   access: {
@@ -23,9 +29,15 @@ export const Pages: CollectionConfig = {
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
   },
+  indexes: [
+    {
+      fields: ['slug', 'parent'],
+      unique: true,
+    },
+  ],
   fields: [
     { name: 'title', type: 'text', required: true },
-    slugField({ source: 'title' }),
+    slugField({ source: 'title', composite: true }),
     {
       name: 'parent',
       type: 'relationship',
@@ -33,14 +45,55 @@ export const Pages: CollectionConfig = {
       admin: {
         description: 'Optional parent page. Builds nested URLs (e.g. /solutions/fips).',
       },
+      validate: async (
+        value: unknown,
+        {
+          id,
+          req,
+        }: {
+          id?: string | number | undefined;
+          req?: { payload?: import('payload').Payload };
+        },
+      ): Promise<true | string> => {
+        // Cycle detection: walking parent chain, the current page must not
+        // appear as one of its own ancestors (and a page can't be its own
+        // parent).
+        if (value == null || id == null) return true;
+        if (value === id) return 'A page cannot be its own parent.';
+        const payload = req?.payload;
+        if (!payload) return true;
+        const seen = new Set<string | number>([id]);
+        let cursor: string | number | null = value as string | number;
+        while (cursor != null) {
+          if (seen.has(cursor)) {
+            return 'Parent chain creates a cycle.';
+          }
+          seen.add(cursor);
+          // eslint-disable-next-line no-await-in-loop -- chain depth is bounded
+          const node = (await payload.findByID({
+            collection: 'pages',
+            id: cursor,
+            depth: 0,
+            overrideAccess: true,
+          })) as { parent?: string | number | { id?: string | number } | null } | null;
+          const next = node?.parent ?? null;
+          cursor =
+            typeof next === 'object' && next !== null
+              ? (next as { id?: string | number }).id ?? null
+              : (next as string | number | null);
+        }
+        return true;
+      },
     },
     {
       name: 'path',
       type: 'text',
+      index: true,
       access: { update: () => false },
       admin: {
         readOnly: true,
-        description: 'Computed full URL path. System-managed by the path-builder hook (Phase D).',
+        description:
+          'Computed full URL path (e.g. /solutions/pricing). Maintained by the path-builder hook on every save.',
         position: 'sidebar',
       },
     },
@@ -63,12 +116,16 @@ export const Pages: CollectionConfig = {
         { label: 'Full-bleed', value: 'full-bleed' },
       ],
       admin: {
-        description: 'Container width and chrome. Block picker filters by layout in Phase C.',
+        description: 'Container width and chrome.',
         position: 'sidebar',
       },
     },
     seoField,
   ],
+  hooks: {
+    beforeChange: [pagesPathBuilderHook],
+    afterChange: [slugChangeRedirectHook('pages')],
+  },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,
 };

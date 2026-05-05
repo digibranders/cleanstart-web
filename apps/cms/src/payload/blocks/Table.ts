@@ -1,11 +1,11 @@
 import type { Block } from 'payload';
 
-const CELL_TYPES = [
+const CELL_TYPES: { label: string; value: string }[] = [
   { label: 'Text', value: 'text' },
   { label: 'Check (✓)', value: 'check' },
   { label: 'Cross (✗)', value: 'cross' },
   { label: 'Partial (~)', value: 'partial' },
-] as const;
+];
 
 export const Table: Block = {
   slug: 'table',
@@ -70,7 +70,7 @@ export const Table: Block = {
               name: 'type',
               type: 'select',
               defaultValue: 'text',
-              options: CELL_TYPES as unknown as { label: string; value: string }[],
+              options: CELL_TYPES,
             },
             {
               name: 'value',

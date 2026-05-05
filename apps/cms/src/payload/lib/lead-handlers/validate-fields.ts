@@ -11,6 +11,8 @@
  * can map them back onto fields.
  */
 
+import { compileSafe } from '../safe-regex';
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export type FormFieldDef = {
@@ -53,13 +55,13 @@ const stringLengthOk = (
 
 const patternOk = (value: string, rawPattern: string | null | undefined): true | string => {
   if (!rawPattern) return true;
-  try {
-    const re = new RegExp(rawPattern);
-    return re.test(value) ? true : 'does not match the required format';
-  } catch {
-    // Invalid stored pattern — treat as no rule rather than blocking the visitor.
-    return true;
-  }
+  // compileSafe rejects both invalid syntax AND catastrophic-backtracking
+  // patterns (defense-in-depth — the Forms beforeChange hook should also
+  // block them at save time). We treat any rejection as "no rule" rather
+  // than blocking the visitor for a Forms-side configuration mistake.
+  const re = compileSafe(rawPattern);
+  if (!re) return true;
+  return re.test(value) ? true : 'does not match the required format';
 };
 
 export const validateFields = (

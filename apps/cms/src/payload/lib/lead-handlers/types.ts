@@ -44,6 +44,13 @@ export type LeadHandlerContext = {
   primarySucceeded: boolean;
   /** Marks the submission as a duplicate of an earlier lead (set by primary). */
   duplicateOfLeadId: number | undefined;
+  /**
+   * Resolved form-field definitions for the submission's form. Populated
+   * by the endpoint before submitLead is invoked. Used by handlers via
+   * extract-fields helpers for deterministic email/name lookup
+   * (typed-field first, then @-heuristic fallback).
+   */
+  formFieldDefs?: import('./validate-fields').FormFieldDef[] | undefined;
 };
 
 export type LeadHandlerResult =

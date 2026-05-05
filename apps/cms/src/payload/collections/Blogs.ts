@@ -39,9 +39,14 @@ export const Blogs: CollectionConfig = {
       type: 'relationship',
       relationTo: 'authors',
       hasMany: true,
+      filterOptions: {
+        // Exclude authors who've toggled themselves out of the picker.
+        // Existing bylines stay intact (the saved relation still resolves).
+        acceptingNewBylines: { not_equals: false },
+      },
       admin: {
         description:
-          'Multi-author supported — every byline is credited in JSON-LD author[]. Defaults to current user on draft create (Phase D hook).',
+          'Multi-author supported — every byline is credited in JSON-LD author[]. Authors with "accepting new bylines" off are hidden from the picker.',
       },
     },
     {
@@ -111,6 +116,16 @@ export const Blogs: CollectionConfig = {
       },
     },
     {
+      name: 'wordCount',
+      type: 'number',
+      access: { update: () => false },
+      admin: {
+        readOnly: true,
+        description: 'Total words in the body. Computed on save.',
+        position: 'sidebar',
+      },
+    },
+    {
       name: 'tableOfContents',
       type: 'array',
       access: { update: () => false },
@@ -130,7 +145,11 @@ export const Blogs: CollectionConfig = {
   hooks: {
     beforeChange: [
       bodyStatsHook({
-        fields: { readingMinutes: 'readingMinutes', tableOfContents: 'tableOfContents' },
+        fields: {
+          readingMinutes: 'readingMinutes',
+          wordCount: 'wordCount',
+          tableOfContents: 'tableOfContents',
+        },
       }),
     ],
     afterChange: [slugChangeRedirectHook('blogs')],

@@ -249,6 +249,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -857,7 +858,7 @@ export interface Blog {
     [k: string]: unknown;
   } | null;
   /**
-   * Multi-author supported — every byline is credited in JSON-LD author[]. Defaults to current user on draft create (Phase D hook).
+   * Multi-author supported — every byline is credited in JSON-LD author[]. Authors with "accepting new bylines" off are hidden from the picker.
    */
   authors?: (number | Author)[] | null;
   /**
@@ -903,6 +904,10 @@ export interface Blog {
    * Computed from body word count on save.
    */
   readingMinutes?: number | null;
+  /**
+   * Total words in the body. Computed on save.
+   */
+  wordCount?: number | null;
   /**
    * Auto-built from H2/H3 headings in the body on save.
    */
@@ -1015,6 +1020,10 @@ export interface News {
    * Computed from body word count on save.
    */
   readingMinutes?: number | null;
+  /**
+   * Total words in the body. Computed on save.
+   */
+  wordCount?: number | null;
   /**
    * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
    */
@@ -1290,12 +1299,12 @@ export interface Resource {
    */
   gated?: boolean | null;
   /**
-   * Form the visitor fills to unlock the download.
+   * Form the visitor fills to unlock the download. Required when gated.
    */
   gateForm?: (number | null) | Form;
   accessLevel?: ('public' | 'lead-gated' | 'customer-only') | null;
   /**
-   * Incremented on every successful download (Phase E hook).
+   * Incremented by the resource-download endpoint when added (Phase F). Always 0 today.
    */
   downloadCount?: number | null;
   /**
@@ -1399,7 +1408,13 @@ export interface Event {
    * Per-record switchable per locked schema decision.
    */
   registrationMode: 'internal' | 'external';
+  /**
+   * Required when registrationMode is External URL.
+   */
   registrationUrl?: string | null;
+  /**
+   * Required when registrationMode is In-house form.
+   */
   registrationForm?: (number | null) | Form;
   attendeesCap?: number | null;
   /**
@@ -1511,7 +1526,13 @@ export interface Webinar {
    */
   timezone?: string | null;
   registrationMode: 'internal' | 'external';
+  /**
+   * Required when registrationMode is External URL.
+   */
   registrationUrl?: string | null;
+  /**
+   * Required when registrationMode is In-house form.
+   */
   registrationForm?: (number | null) | Form;
   attendeesCap?: number | null;
   speakers?: (number | Author)[] | null;
@@ -1607,7 +1628,7 @@ export interface Job {
   employmentType?: ('full-time' | 'part-time' | 'contract' | 'internship') | null;
   experienceLevel?: ('entry' | 'mid' | 'senior' | 'staff' | 'principal') | null;
   /**
-   * Optional when remote=true. Phase D hook auto-fills "Remote (Global)" sentinel.
+   * Optional when remote=true. Renderers can fall back to "Remote (Global)" when this is empty and remote is on.
    */
   locations?: (number | JobLocation)[] | null;
   remote?: boolean | null;
@@ -1644,11 +1665,11 @@ export interface Job {
    */
   hiringStatus?: ('open' | 'paused' | 'closed') | null;
   /**
-   * Defaults to publishedAt + 90 days on first publish (Phase D hook).
+   * When applications close. Editors set this when posting.
    */
   applicationDeadline?: string | null;
   /**
-   * Default applicationDeadline + 7 days. Auto-close cron uses this.
+   * When the listing should auto-close. The auto-close cron (Phase G) uses this.
    */
   expiresAt?: string | null;
   closedAt?: string | null;
@@ -1749,7 +1770,7 @@ export interface Page {
    */
   parent?: (number | null) | Page;
   /**
-   * Computed full URL path. System-managed by the path-builder hook (Phase D).
+   * Computed full URL path (e.g. /solutions/pricing). Maintained by the path-builder hook on every save.
    */
   path?: string | null;
   /**
@@ -3338,7 +3359,7 @@ export interface Page {
       )[]
     | null;
   /**
-   * Container width and chrome. Block picker filters by layout in Phase C.
+   * Container width and chrome.
    */
   pageLayout?: ('default' | 'narrow' | 'full-bleed') | null;
   /**
@@ -3406,12 +3427,12 @@ export interface Page {
 export interface Redirect {
   id: number;
   /**
-   * Source path (e.g. /old-pricing). Read-only for system-managed redirects.
+   * Source path (e.g. /old-pricing). System-managed rules (source=slug-change) are locked from manual edit.
    */
   from: string;
   status: '301' | '302' | '307' | '308' | '410';
   /**
-   * Destination path or absolute URL. Required unless status=410. Read-only for slug-change rules.
+   * Destination path or absolute URL. Required unless status=410. System-managed rules are locked.
    */
   to?: string | null;
   /**
@@ -3423,7 +3444,7 @@ export interface Redirect {
    */
   notes?: string | null;
   /**
-   * Incremented in apps/web middleware on every match (Phase E).
+   * Incremented in apps/web middleware on every match.
    */
   hitCount?: number | null;
   lastHitAt?: string | null;
@@ -3700,6 +3721,7 @@ export interface MediaSelect<T extends boolean = true> {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -4047,6 +4069,7 @@ export interface BlogsSelect<T extends boolean = true> {
   featured?: T;
   pinned?: T;
   readingMinutes?: T;
+  wordCount?: T;
   tableOfContents?:
     | T
     | {
@@ -4095,6 +4118,7 @@ export interface NewsSelect<T extends boolean = true> {
   publicationDate?: T;
   relatedNews?: T;
   readingMinutes?: T;
+  wordCount?: T;
   seo?:
     | T
     | {
@@ -5365,7 +5389,7 @@ export interface MainNav {
          */
         target?: (number | null) | Page;
         /**
-         * External URL. Validated against https?:// at save.
+         * External URL. Validated against the allowed link shapes at save.
          */
         href?: string | null;
         targetBlank?: boolean | null;
@@ -5391,7 +5415,7 @@ export interface MainNav {
                        */
                       target?: (number | null) | Page;
                       /**
-                       * External URL. Validated against https?:// at save.
+                       * External URL. Validated against the allowed link shapes at save.
                        */
                       href?: string | null;
                       targetBlank?: boolean | null;
@@ -5411,7 +5435,7 @@ export interface MainNav {
            */
           mobileGroupHint?: string | null;
           featuredCard?: {
-            kind?: ('doc' | 'external') | null;
+            kind?: ('internal-doc' | 'external-url') | null;
             target?: (number | null) | Page;
             href?: string | null;
             eyebrow?: string | null;
@@ -5444,7 +5468,7 @@ export interface FooterNav {
                */
               target?: (number | null) | Page;
               /**
-               * External URL. Validated against https?:// at save.
+               * External URL. Validated against the allowed link shapes at save.
                */
               href?: string | null;
               targetBlank?: boolean | null;

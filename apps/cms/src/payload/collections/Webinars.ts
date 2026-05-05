@@ -4,6 +4,7 @@ import { isAdminOrEditor } from '../access';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { validateOptionalUrl } from '../lib/url-shape';
 
 export const Webinars: CollectionConfig = {
   slug: 'webinars',
@@ -86,7 +87,18 @@ export const Webinars: CollectionConfig = {
       name: 'registrationUrl',
       type: 'text',
       admin: {
+        description: 'Required when registrationMode is External URL.',
         condition: (_data, sibling) => sibling?.registrationMode === 'external',
+      },
+      validate: (
+        value: string | string[] | null | undefined,
+        { siblingData }: { siblingData?: { registrationMode?: string } },
+      ): true | string => {
+        if (siblingData?.registrationMode !== 'external') return true;
+        if (typeof value !== 'string' || value.trim().length === 0) {
+          return 'Registration URL is required when registration mode is External URL.';
+        }
+        return true;
       },
     },
     {
@@ -94,13 +106,24 @@ export const Webinars: CollectionConfig = {
       type: 'relationship',
       relationTo: 'forms',
       admin: {
+        description: 'Required when registrationMode is In-house form.',
         condition: (_data, sibling) => sibling?.registrationMode === 'internal',
+      },
+      validate: (
+        value: unknown,
+        { siblingData }: { siblingData?: { registrationMode?: string } },
+      ): true | string => {
+        if (siblingData?.registrationMode !== 'internal') return true;
+        if (value == null) {
+          return 'Registration form is required when registration mode is In-house form.';
+        }
+        return true;
       },
     },
     {
       name: 'attendeesCap',
       type: 'number',
-      min: 0,
+      min: 1,
       admin: {
         condition: (_data, sibling) => sibling?.registrationMode === 'internal',
       },
@@ -110,6 +133,9 @@ export const Webinars: CollectionConfig = {
       type: 'relationship',
       relationTo: 'authors',
       hasMany: true,
+      filterOptions: {
+        acceptingNewBylines: { not_equals: false },
+      },
     },
     {
       name: 'pdf',
@@ -123,6 +149,7 @@ export const Webinars: CollectionConfig = {
       admin: {
         description: 'Post-event recording. Surfaces after endsAt < now.',
       },
+      validate: validateOptionalUrl,
     },
     {
       name: 'slidesUrl',
@@ -130,6 +157,7 @@ export const Webinars: CollectionConfig = {
       admin: {
         description: 'External slides link. Use the pdf field instead when hosting on R2.',
       },
+      validate: validateOptionalUrl,
     },
     seoField,
   ],

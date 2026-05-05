@@ -75,21 +75,23 @@ export const MainNav: GlobalConfig = {
                 {
                   name: 'kind',
                   type: 'select',
+                  // Match the nav-item kind values verbatim so renderers
+                  // can branch with one set of strings rather than two.
                   options: [
-                    { label: 'Internal doc', value: 'doc' },
-                    { label: 'External URL', value: 'external' },
+                    { label: 'Internal doc', value: 'internal-doc' },
+                    { label: 'External URL', value: 'external-url' },
                   ],
                 },
                 {
                   name: 'target',
                   type: 'relationship',
                   relationTo: 'pages',
-                  admin: { condition: (_data, sibling) => sibling?.kind === 'doc' },
+                  admin: { condition: (_data, sibling) => sibling?.kind === 'internal-doc' },
                 },
                 {
                   name: 'href',
                   type: 'text',
-                  admin: { condition: (_data, sibling) => sibling?.kind === 'external' },
+                  admin: { condition: (_data, sibling) => sibling?.kind === 'external-url' },
                 },
                 { name: 'eyebrow', type: 'text' },
                 { name: 'title', type: 'text' },

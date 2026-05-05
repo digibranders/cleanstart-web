@@ -1,3 +1,4 @@
+import { extractEmail, extractName } from './extract-fields';
 import type { LeadHandler, LeadSubmission } from './types';
 
 const BREVO_TRANSACTIONAL_ENDPOINT = 'https://api.brevo.com/v3/smtp/email';
@@ -5,20 +6,6 @@ const BREVO_TRANSACTIONAL_ENDPOINT = 'https://api.brevo.com/v3/smtp/email';
 type FormDoc = {
   name?: string | null;
   notifyTo?: { email: string }[] | null;
-};
-
-const findEmail = (fields: Record<string, unknown>): string | null => {
-  for (const value of Object.values(fields)) {
-    if (typeof value === 'string' && value.includes('@')) return value;
-  }
-  return null;
-};
-
-const findName = (fields: Record<string, unknown>): string | null => {
-  for (const [key, value] of Object.entries(fields)) {
-    if (/name/i.test(key) && typeof value === 'string') return value;
-  }
-  return null;
 };
 
 /**
@@ -84,8 +71,8 @@ export const brevoHandler: LeadHandler = {
       return { handler: 'brevo', status: 'skipped', reason: 'no-recipients' };
     }
 
-    const visitorEmail = findEmail(submission.fields);
-    const visitorName = findName(submission.fields);
+    const visitorEmail = extractEmail(ctx.formFieldDefs, submission.fields);
+    const visitorName = extractName(ctx.formFieldDefs, submission.fields);
 
     const body = {
       templateId,
@@ -101,15 +88,29 @@ export const brevoHandler: LeadHandler = {
       },
     };
 
-    const response = await fetch(BREVO_TRANSACTIONAL_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'api-key': apiKey,
-        'content-type': 'application/json',
-        accept: 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
+    let response: Response;
+    try {
+      response = await fetch(BREVO_TRANSACTIONAL_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'api-key': apiKey,
+          'content-type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify(body),
+        // 10s cap — Brevo's API is fast in practice; anything past 10s
+        // is a degraded upstream and we'd rather record a failed sync
+        // than hold the lead-handler chain open.
+        signal: AbortSignal.timeout(10_000),
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return {
+        handler: 'brevo',
+        status: 'failed',
+        error: /timeout|abort/i.test(message) ? 'timeout' : `network: ${message}`,
+      };
+    }
 
     if (!response.ok) {
       const text = await response.text().catch(() => '');

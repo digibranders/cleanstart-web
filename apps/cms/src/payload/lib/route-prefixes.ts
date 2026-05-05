@@ -24,3 +24,21 @@ export const collectionUrlFromSlug = (collection: string, slug: string): string 
   if (!prefix) return null;
   return `${prefix}/${slug}`;
 };
+
+/**
+ * URL resolver that prefers the doc-level `path` field for Pages
+ * (which encodes the full nested path) and falls back to
+ * `prefix + slug` for everything else.
+ */
+export const collectionUrlFromDoc = (
+  collection: string,
+  doc: { slug?: string | null; path?: string | null },
+): string | null => {
+  if (collection === 'pages') {
+    if (typeof doc.path === 'string' && doc.path.length > 0) return doc.path;
+    if (typeof doc.slug === 'string' && doc.slug.length > 0) return `/${doc.slug}`;
+    return null;
+  }
+  if (typeof doc.slug !== 'string' || doc.slug.length === 0) return null;
+  return collectionUrlFromSlug(collection, doc.slug);
+};

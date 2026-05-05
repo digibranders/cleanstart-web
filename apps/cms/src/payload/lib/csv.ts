@@ -3,9 +3,21 @@
  * shape of every row that gets serialised (lead JSON, not arbitrary
  * user input formatting), so a 30-line implementation is the right
  * size here.
+ *
+ * Two beyond-RFC additions:
+ *   - UTF-8 BOM at the start so Excel on Windows reads the file as
+ *     UTF-8 by default rather than the local code page.
+ *   - Formula-injection mitigation: any cell whose first non-whitespace
+ *     char is `=`, `+`, `-`, `@`, tab, or CR is prefixed with a single
+ *     quote so Excel/Sheets render it as text instead of evaluating it.
+ *     Visitor-supplied values flow through `toCsv`; without this an
+ *     attacker can plant `=cmd|'/c calc'!A1` in their lead and have it
+ *     execute when an admin opens the export in Excel.
  */
 
 const NEEDS_QUOTING = /[",\r\n]/;
+const FORMULA_TRIGGER = /^[\s ]*[=+\-@\t\r]/;
+const UTF8_BOM = '﻿';
 
 const stringify = (value: unknown): string => {
   if (value == null) return '';
@@ -19,9 +31,15 @@ const stringify = (value: unknown): string => {
   return String(value);
 };
 
+const neutraliseFormula = (raw: string): string => {
+  if (FORMULA_TRIGGER.test(raw)) return `'${raw}`;
+  return raw;
+};
+
 const escapeCell = (raw: string): string => {
-  if (!NEEDS_QUOTING.test(raw)) return raw;
-  return `"${raw.replaceAll('"', '""')}"`;
+  const safe = neutraliseFormula(raw);
+  if (!NEEDS_QUOTING.test(safe)) return safe;
+  return `"${safe.replaceAll('"', '""')}"`;
 };
 
 export const toCsv = (
@@ -33,5 +51,5 @@ export const toCsv = (
   for (const row of rows) {
     lines.push(headers.map((h) => escapeCell(stringify(row[h]))).join(','));
   }
-  return `${lines.join('\r\n')}\r\n`;
+  return `${UTF8_BOM}${lines.join('\r\n')}\r\n`;
 };

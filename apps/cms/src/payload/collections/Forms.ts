@@ -3,6 +3,8 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { slugField } from '../fields/slug';
 import { formSchemaVersionHook } from '../hooks/form-schema-version';
+import { formsCoerceHook } from '../hooks/forms-coerce';
+import { validateOptionalUrl } from '../lib/url-shape';
 
 const VISIBLE_LABEL_TYPES = ['text', 'email', 'textarea', 'select', 'checkbox', 'consent'];
 const PLACEHOLDER_TYPES = ['text', 'email', 'textarea'];
@@ -209,6 +211,7 @@ export const Forms: CollectionConfig = {
           admin: {
             condition: (_data, sibling) => sibling?.kind === 'redirect',
           },
+          validate: validateOptionalUrl,
         },
       ],
     },
@@ -251,7 +254,10 @@ export const Forms: CollectionConfig = {
     },
   ],
   hooks: {
-    beforeChange: [formSchemaVersionHook],
+    // formsCoerceHook runs first: enforces consent-required + rejects unsafe
+    // regex patterns. formSchemaVersionHook then bumps the schema version
+    // when the (now-coerced) field shape has changed since the last save.
+    beforeChange: [formsCoerceHook, formSchemaVersionHook],
   },
   versions: { drafts: true },
   timestamps: true,

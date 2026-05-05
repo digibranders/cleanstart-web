@@ -93,7 +93,7 @@ These are hard rules. Do not work around them — flag and stop instead.
 
 These resolved the open forks from arch doc §`#decisions`. Build accordingly:
 
-- **Webinar/Event registration:** per-record `registrationMode` discriminator (`'inHouse' | 'external'`); `inHouseForm` (relationship to `forms`) and `externalUrl` (URL string) are conditionally required based on the discriminator.
+- **Webinar/Event registration:** per-record `registrationMode` discriminator (`'internal' | 'external'`); `registrationForm` (relationship to `forms`) and `registrationUrl` (URL string) are conditionally required based on the discriminator. (Earlier drafts of this lock used the names `'inHouse'` / `'inHouseForm'` / `'externalUrl'`; the values were standardised to `'internal'` / `registrationForm` / `registrationUrl` at code time. Renaming to the `'inHouse'` shape would require a Payload migration to rewrite existing rows — keep the current values unless that cost is justified.)
 - **Resource gating:** `gateForm` is an optional relationship to `forms` on the `resources` collection. Presence gates the download; absence makes it public.
 - **Authors:** pure content collection. No `linkedUser` field at v1. If multi-author self-editing is ever needed, an additive migration adds an optional `linkedUser` relationship.
 - **Knowledge Hub** and **Guest Contributors:** still open per arch doc §`#decisions`. Do not pre-build either.

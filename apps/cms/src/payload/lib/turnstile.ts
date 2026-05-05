@@ -44,6 +44,9 @@ export const verifyTurnstileToken = async (
       method: 'POST',
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
       body,
+      // 5s cap — anything slower means Turnstile is degraded; block to keep
+      // the public submit endpoint from hanging on an upstream stall.
+      signal: AbortSignal.timeout(5_000),
     });
   } catch {
     return { ok: false, reason: 'network' };

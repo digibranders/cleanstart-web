@@ -1,8 +1,7 @@
 import type { Endpoint, Where } from 'payload';
 
+import { hasAnyRole } from '../access/typed-user';
 import { toCsv } from '../lib/csv';
-
-const ROLES_WITH_EXPORT = new Set(['admin', 'editor']);
 
 type LeadRow = {
   id: number;
@@ -84,7 +83,19 @@ const buildWhere = (params: URLSearchParams): Where => {
   const since = params.get('since');
   if (since) conditions.push({ createdAt: { greater_than_equal: since } });
   const until = params.get('until');
-  if (until) conditions.push({ createdAt: { less_than_equal: until } });
+  if (until) {
+    // Treat ?until=2026-04-15 as "include the full day". When the caller
+    // already passes a time-aware ISO string we pass it through. The
+    // detection: a 10-char YYYY-MM-DD adds 24h on the inclusive side and
+    // becomes a strict less-than the next day at 00:00 UTC.
+    const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(until);
+    if (isDateOnly) {
+      const next = new Date(`${until}T00:00:00Z`).getTime() + 24 * 60 * 60 * 1000;
+      conditions.push({ createdAt: { less_than: new Date(next).toISOString() } });
+    } else {
+      conditions.push({ createdAt: { less_than_equal: until } });
+    }
+  }
   if (conditions.length === 0) return {};
   if (conditions.length === 1) return conditions[0] as Where;
   return { and: conditions };
@@ -114,9 +125,7 @@ export const exportLeadsCsvEndpoint: Endpoint = {
   path: '/export-csv',
   method: 'get',
   handler: async (req) => {
-    const user = req.user as { roles?: string[] } | null | undefined;
-    const roles = user?.roles ?? [];
-    if (!roles.some((role) => ROLES_WITH_EXPORT.has(role))) {
+    if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return new Response(JSON.stringify({ ok: false, error: 'forbidden' }), {
         status: 403,
         headers: { 'content-type': 'application/json' },

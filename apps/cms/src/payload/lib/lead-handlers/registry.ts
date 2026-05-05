@@ -2,6 +2,7 @@ import type { Payload } from 'payload';
 
 import { dbPrimaryHandler } from './db-primary';
 import type { LeadHandler, LeadHandlerContext, LeadHandlerResult, LeadSubmission } from './types';
+import type { FormFieldDef } from './validate-fields';
 
 const secondaryHandlers: LeadHandler[] = [];
 
@@ -21,6 +22,11 @@ export const registerSecondaryHandler = (handler: LeadHandler): void => {
 };
 
 export const listSecondaryHandlers = (): readonly LeadHandler[] => secondaryHandlers;
+
+/** Test-only — clears the registered handlers between unit tests. */
+export const __resetSecondaryHandlers = (): void => {
+  secondaryHandlers.length = 0;
+};
 
 const safeRun = async (
   handler: LeadHandler,
@@ -82,12 +88,14 @@ export type SubmitResult = {
 export const submitLead = async (
   payload: Payload,
   submission: LeadSubmission,
+  options: { formFieldDefs?: FormFieldDef[] } = {},
 ): Promise<SubmitResult> => {
   const ctx: LeadHandlerContext = {
     payload,
     primarySucceeded: false,
     leadId: undefined,
     duplicateOfLeadId: undefined,
+    formFieldDefs: options.formFieldDefs,
   };
   const primary = await safeRun(dbPrimaryHandler, submission, ctx);
 

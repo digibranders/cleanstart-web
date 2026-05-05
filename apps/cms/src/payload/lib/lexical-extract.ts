@@ -26,7 +26,11 @@ const HEADING_TAGS: ReadonlySet<string> = new Set(['h2', 'h3', 'h4', 'h5', 'h6']
 const collectText = (node: LexicalNode): string => {
   if (typeof node.text === 'string') return node.text;
   if (!node.children) return '';
-  return node.children.map(collectText).join(' ');
+  // Inline runs (bold/italic spans inside a heading) concatenate without a
+  // separator — joining with a space would produce "Why  SBOM  matters"
+  // for a heading like "Why **SBOM** matters". Whitespace within the
+  // original text is preserved verbatim by the leaf nodes.
+  return node.children.map(collectText).join('');
 };
 
 const headingLevel = (tag: string): Heading['level'] | null => {

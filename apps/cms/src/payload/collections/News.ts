@@ -5,6 +5,7 @@ import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { validateOptionalUrl } from '../lib/url-shape';
 
 export const News: CollectionConfig = {
   slug: 'news',
@@ -31,6 +32,9 @@ export const News: CollectionConfig = {
       type: 'relationship',
       relationTo: 'authors',
       hasMany: true,
+      filterOptions: {
+        acceptingNewBylines: { not_equals: false },
+      },
     },
     {
       name: 'newsCategories',
@@ -44,6 +48,7 @@ export const News: CollectionConfig = {
       admin: {
         description: 'Optional. For press pickups / coverage on external outlets.',
       },
+      validate: validateOptionalUrl,
     },
     {
       name: 'publicationDate',
@@ -71,10 +76,24 @@ export const News: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'wordCount',
+      type: 'number',
+      access: { update: () => false },
+      admin: {
+        readOnly: true,
+        description: 'Total words in the body. Computed on save.',
+        position: 'sidebar',
+      },
+    },
     seoField,
   ],
   hooks: {
-    beforeChange: [bodyStatsHook({ fields: { readingMinutes: 'readingMinutes' } })],
+    beforeChange: [
+      bodyStatsHook({
+        fields: { readingMinutes: 'readingMinutes', wordCount: 'wordCount' },
+      }),
+    ],
     afterChange: [slugChangeRedirectHook('news')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },

@@ -4,6 +4,7 @@ import { isAdminOrEditor } from '../access';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { validateOptionalUrl } from '../lib/url-shape';
 
 export const Jobs: CollectionConfig = {
   slug: 'jobs',
@@ -38,6 +39,16 @@ export const Jobs: CollectionConfig = {
       admin: {
         description: 'Deep link into the external ATS. Required when source=ats.',
         condition: (_data, sibling) => sibling?.source === 'ats',
+      },
+      validate: (
+        value: string | string[] | null | undefined,
+        { siblingData }: { siblingData?: { source?: string } },
+      ): true | string => {
+        if (siblingData?.source !== 'ats') return true;
+        if (typeof value !== 'string' || value.trim().length === 0) {
+          return 'ATS URL is required when source is External ATS.';
+        }
+        return validateOptionalUrl(value);
       },
     },
     {
@@ -82,7 +93,8 @@ export const Jobs: CollectionConfig = {
       relationTo: 'jobLocations',
       hasMany: true,
       admin: {
-        description: 'Optional when remote=true. Phase D hook auto-fills "Remote (Global)" sentinel.',
+        description:
+          'Optional when remote=true. Renderers can fall back to "Remote (Global)" when this is empty and remote is on.',
       },
     },
     {
@@ -96,7 +108,22 @@ export const Jobs: CollectionConfig = {
       label: 'Salary range (optional)',
       fields: [
         { name: 'min', type: 'number', min: 0 },
-        { name: 'max', type: 'number', min: 0 },
+        {
+          name: 'max',
+          type: 'number',
+          min: 0,
+          validate: (
+            value: number | number[] | null | undefined,
+            { siblingData }: { siblingData?: { min?: number | null } },
+          ): true | string => {
+            if (typeof value !== 'number') return true;
+            const min = typeof siblingData?.min === 'number' ? siblingData.min : null;
+            if (min != null && value < min) {
+              return 'Maximum salary cannot be lower than minimum.';
+            }
+            return true;
+          },
+        },
         {
           name: 'currency',
           type: 'select',
@@ -133,6 +160,7 @@ export const Jobs: CollectionConfig = {
         description: 'mailto:hire@cleanstart.com is acceptable.',
         condition: (_data, sibling) => sibling?.source === 'cms',
       },
+      validate: validateOptionalUrl,
     },
     {
       name: 'hiringStatus',
@@ -154,7 +182,7 @@ export const Jobs: CollectionConfig = {
       type: 'date',
       admin: {
         date: { pickerAppearance: 'dayAndTime' },
-        description: 'Defaults to publishedAt + 90 days on first publish (Phase D hook).',
+        description: 'When applications close. Editors set this when posting.',
         condition: (_data, sibling) => sibling?.hiringStatus === 'open',
       },
     },
@@ -163,7 +191,8 @@ export const Jobs: CollectionConfig = {
       type: 'date',
       admin: {
         date: { pickerAppearance: 'dayAndTime' },
-        description: 'Default applicationDeadline + 7 days. Auto-close cron uses this.',
+        description:
+          'When the listing should auto-close. The auto-close cron (Phase G) uses this.',
         condition: (_data, sibling) => sibling?.hiringStatus === 'open',
       },
     },

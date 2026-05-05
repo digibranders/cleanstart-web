@@ -3,8 +3,9 @@ import { fileURLToPath } from 'node:url';
 
 import type { CollectionConfig } from 'payload';
 
-import { isAdminOrEditor, isAuthenticated } from '../access';
+import { isAdminOrEditor } from '../access';
 import { humaniseFilename } from '../lib/humanise-filename';
+import { sanitizeSvgBuffer } from '../lib/sanitize-svg';
 import { ALLOWED_MIME_TYPES, checkUploadSize } from '../lib/upload-limits';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -35,7 +36,9 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: isAuthenticated,
+    // Authors no longer upload directly — match the rest of the write
+    // surface so role escalation is the only path to add media.
+    create: isAdminOrEditor,
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
   },
@@ -139,6 +142,18 @@ export const Media: CollectionConfig = {
         const result = checkUploadSize(file.mimetype, file.size);
         if (!result.ok) {
           throw new Error(result.reason);
+        }
+        // Sanitize SVGs in place — DOMPurify-strip <script>, on* handlers,
+        // <foreignObject>, and javascript:/data:/vbscript: hrefs before the
+        // file is persisted. Without this, an uploaded SVG renders as XSS
+        // anywhere it's embedded inline.
+        if (file.mimetype === 'image/svg+xml' && file.data) {
+          const original = Buffer.isBuffer(file.data)
+            ? file.data
+            : Buffer.from(file.data as Uint8Array);
+          const cleaned = sanitizeSvgBuffer(original);
+          file.data = cleaned;
+          file.size = cleaned.byteLength;
         }
         return data;
       },

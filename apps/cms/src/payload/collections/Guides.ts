@@ -30,6 +30,9 @@ export const Guides: CollectionConfig = {
       type: 'relationship',
       relationTo: 'authors',
       hasMany: true,
+      filterOptions: {
+        acceptingNewBylines: { not_equals: false },
+      },
     },
     {
       name: 'reviewedBy',

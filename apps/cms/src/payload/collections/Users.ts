@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { ROLES } from '@cleanstart/types';
 
-import { isAdmin, isAdminFieldLevel, isAdminOrSelf } from '../access';
+import { isAdmin, isAdminFieldLevel, isAdminOrSelf, userRoles } from '../access';
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -27,8 +27,8 @@ export const Users: CollectionConfig = {
     update: isAdminOrSelf,
     delete: isAdmin,
     admin: ({ req: { user } }) => {
-      const roles = (user as { roles?: string[] } | null | undefined)?.roles;
-      return Boolean(roles?.includes('admin') || roles?.includes('editor') || roles?.includes('author'));
+      const roles = userRoles(user);
+      return roles.includes('admin') || roles.includes('editor') || roles.includes('author');
     },
   },
   fields: [

@@ -1,12 +1,6 @@
 import { companyFromEmailDomain } from './enrichment';
+import { extractEmail } from './extract-fields';
 import type { LeadHandler, LeadSubmission } from './types';
-
-const findEmail = (fields: Record<string, unknown>): string | null => {
-  for (const value of Object.values(fields)) {
-    if (typeof value === 'string' && value.includes('@')) return value;
-  }
-  return null;
-};
 
 /**
  * Free at-launch enrichment handler — derives company name from the
@@ -31,7 +25,7 @@ export const companyFromDomainHandler: LeadHandler = {
       };
     }
 
-    const email = findEmail(submission.fields);
+    const email = extractEmail(ctx.formFieldDefs, submission.fields);
     const enrichment = companyFromEmailDomain(email);
     if (!enrichment) {
       return {

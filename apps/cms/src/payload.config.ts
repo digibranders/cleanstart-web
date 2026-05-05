@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
+import { s3Storage } from '@payloadcms/storage-s3';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
 
@@ -42,6 +43,41 @@ const requireEnv = (name: string): string => {
   }
   return value;
 };
+
+const r2EnvComplete = (): boolean =>
+  Boolean(
+    process.env.R2_ENDPOINT &&
+      process.env.R2_ACCESS_KEY_ID &&
+      process.env.R2_SECRET_ACCESS_KEY &&
+      process.env.R2_BUCKET,
+  );
+
+// Storage plugin: enabled only when all four R2 env vars are set so dev
+// iteration without R2 still works (Media falls back to the local
+// staticDir on the collection). In production, the absence of any of
+// these is a misconfiguration we'd rather fail loudly on, so we only
+// guard the plugin construction — buildConfig itself still runs.
+const storagePlugins = r2EnvComplete()
+  ? [
+      s3Storage({
+        collections: {
+          media: {
+            prefix: 'media',
+          },
+        },
+        bucket: requireEnv('R2_BUCKET'),
+        config: {
+          endpoint: requireEnv('R2_ENDPOINT'),
+          credentials: {
+            accessKeyId: requireEnv('R2_ACCESS_KEY_ID'),
+            secretAccessKey: requireEnv('R2_SECRET_ACCESS_KEY'),
+          },
+          region: 'auto',
+          forcePathStyle: true,
+        },
+      }),
+    ]
+  : [];
 
 export default buildConfig({
   admin: {
@@ -100,6 +136,7 @@ export default buildConfig({
     ],
     shouldAutoRun: () => process.env.NODE_ENV !== 'test',
   },
+  plugins: storagePlugins,
   onInit: () => {
     registerLeadHandlers();
   },

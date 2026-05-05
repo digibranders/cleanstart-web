@@ -34,7 +34,7 @@ export const submitLeadBodySchema = z.object({
     .optional(),
   // Spam protection — verified server-side. Required at submit time even
   // when blank in dev, so the public site always posts the field.
-  turnstileToken: z.string().min(0).optional(),
+  turnstileToken: z.string().optional(),
   // Honeypot — invisible field on the rendered form. Bots fill it; humans
   // don't. The endpoint silently swallows any submission with a non-empty
   // value (returns 200 OK) so the bot doesn't learn it tripped the trap.

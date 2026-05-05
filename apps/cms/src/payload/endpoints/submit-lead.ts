@@ -1,5 +1,6 @@
-import type { Endpoint, PayloadRequest } from 'payload';
+import type { Endpoint } from 'payload';
 
+import { clientIpFromHeaders } from '../lib/client-ip';
 import { parkSubmission } from '../lib/lead-fallback-queue';
 import { submitLeadBodySchema } from '../lib/lead-handlers/payload-schema';
 import { submitLead } from '../lib/lead-handlers/registry';
@@ -17,16 +18,6 @@ const json = (data: unknown, init?: ResponseInit): Response =>
     },
   });
 
-const clientIp = (req: PayloadRequest): string => {
-  const headers = req.headers;
-  const forwarded = headers.get('x-forwarded-for');
-  if (forwarded) {
-    const first = forwarded.split(',')[0];
-    if (first) return first.trim();
-  }
-  return headers.get('x-real-ip') ?? 'unknown';
-};
-
 /**
  * POST /api/leads/submit
  *
@@ -42,7 +33,7 @@ export const submitLeadEndpoint: Endpoint = {
   path: '/submit',
   method: 'post',
   handler: async (req) => {
-    const ip = clientIp(req);
+    const ip = clientIpFromHeaders(req.headers);
     const limit = checkAndRecord(`leads:${ip}`, DEFAULT_RATE_LIMITS);
     if (!limit.ok) {
       return json(
@@ -104,23 +95,33 @@ export const submitLeadEndpoint: Endpoint = {
 
     const numericFormId =
       typeof data.formId === 'number' ? data.formId : Number.parseInt(data.formId, 10);
+    // Collapse "invalid id shape" and "form does not exist" into one
+    // generic 400 so an attacker can't enumerate valid form IDs by
+    // diffing 400 vs 404 response shapes.
+    const invalidFormResponse = json({ ok: false, error: 'invalid_form' }, { status: 400 });
     if (!Number.isInteger(numericFormId) || numericFormId <= 0) {
-      return json({ ok: false, error: 'invalid_form_id' }, { status: 400 });
+      return invalidFormResponse;
     }
 
     // Server-side re-application of forms.fields[].validation rules.
     // The public form enforces these client-side; this stops a tampered
     // DOM or hand-crafted POST from shipping junk into the leads table.
-    let formDoc: { fields?: FormFieldDef[] | null } | null;
+    let formDoc: { _status?: string | null; fields?: FormFieldDef[] | null } | null;
     try {
       formDoc = (await req.payload.findByID({
         collection: 'forms',
         id: numericFormId,
         depth: 0,
         overrideAccess: true,
-      })) as { fields?: FormFieldDef[] | null } | null;
+      })) as { _status?: string | null; fields?: FormFieldDef[] | null } | null;
     } catch {
-      return json({ ok: false, error: 'form_not_found' }, { status: 404 });
+      return invalidFormResponse;
+    }
+    if (!formDoc) return invalidFormResponse;
+    // Draft forms must not accept public submissions — an editor working
+    // on a new form shouldn't capture leads against it until they publish.
+    if (formDoc._status != null && formDoc._status !== 'published') {
+      return invalidFormResponse;
     }
 
     const fieldDefs = formDoc?.fields ?? [];
@@ -146,7 +147,7 @@ export const submitLeadEndpoint: Endpoint = {
     };
 
     try {
-      const result = await submitLead(req.payload, submission);
+      const result = await submitLead(req.payload, submission, { formFieldDefs: fieldDefs });
 
       if (!result.ok) {
         // Primary handler failed — park for the drain cron, return 202.

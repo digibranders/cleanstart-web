@@ -116,7 +116,7 @@ describe('extractFromLexical', () => {
     ]);
     const result = extractFromLexical(body);
     expect(result.headings).toEqual([
-      { level: 2, text: 'Why  SBOM  matters', anchor: 'why-sbom-matters' },
+      { level: 2, text: 'Why SBOM matters', anchor: 'why-sbom-matters' },
     ]);
   });
 });

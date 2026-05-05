@@ -35,6 +35,20 @@ export const Events: CollectionConfig = {
       name: 'endsAt',
       type: 'date',
       admin: { date: { pickerAppearance: 'dayAndTime' } },
+      validate: (
+        value: Date | string | null | undefined,
+        { siblingData }: { siblingData?: { startsAt?: Date | string | null } },
+      ): true | string => {
+        if (value == null || siblingData?.startsAt == null) return true;
+        const end = typeof value === 'string' ? Date.parse(value) : value.getTime();
+        const start =
+          typeof siblingData.startsAt === 'string'
+            ? Date.parse(siblingData.startsAt)
+            : siblingData.startsAt.getTime();
+        if (Number.isNaN(end) || Number.isNaN(start)) return true;
+        if (end < start) return 'End time cannot be before start time.';
+        return true;
+      },
     },
     {
       name: 'timezone',
@@ -66,7 +80,18 @@ export const Events: CollectionConfig = {
       name: 'registrationUrl',
       type: 'text',
       admin: {
+        description: 'Required when registrationMode is External URL.',
         condition: (_data, sibling) => sibling?.registrationMode === 'external',
+      },
+      validate: (
+        value: string | string[] | null | undefined,
+        { siblingData }: { siblingData?: { registrationMode?: string } },
+      ): true | string => {
+        if (siblingData?.registrationMode !== 'external') return true;
+        if (typeof value !== 'string' || value.trim().length === 0) {
+          return 'Registration URL is required when registration mode is External URL.';
+        }
+        return true;
       },
     },
     {
@@ -74,13 +99,24 @@ export const Events: CollectionConfig = {
       type: 'relationship',
       relationTo: 'forms',
       admin: {
+        description: 'Required when registrationMode is In-house form.',
         condition: (_data, sibling) => sibling?.registrationMode === 'internal',
+      },
+      validate: (
+        value: unknown,
+        { siblingData }: { siblingData?: { registrationMode?: string } },
+      ): true | string => {
+        if (siblingData?.registrationMode !== 'internal') return true;
+        if (value == null) {
+          return 'Registration form is required when registration mode is In-house form.';
+        }
+        return true;
       },
     },
     {
       name: 'attendeesCap',
       type: 'number',
-      min: 0,
+      min: 1,
       admin: {
         condition: (_data, sibling) => sibling?.registrationMode === 'internal',
       },

@@ -56,8 +56,18 @@ export const Resources: CollectionConfig = {
       type: 'relationship',
       relationTo: 'forms',
       admin: {
-        description: 'Form the visitor fills to unlock the download.',
+        description: 'Form the visitor fills to unlock the download. Required when gated.',
         condition: (_data, sibling) => sibling?.gated === true,
+      },
+      validate: (
+        value: unknown,
+        { siblingData }: { siblingData?: { gated?: boolean } },
+      ): true | string => {
+        if (siblingData?.gated !== true) return true;
+        if (value == null) {
+          return 'Gated resources need a gate form so visitors have something to fill.';
+        }
+        return true;
       },
     },
     {
@@ -80,7 +90,8 @@ export const Resources: CollectionConfig = {
       access: { update: () => false },
       admin: {
         readOnly: true,
-        description: 'Incremented on every successful download (Phase E hook).',
+        description:
+          'Incremented by the resource-download endpoint when added (Phase F). Always 0 today.',
         position: 'sidebar',
         condition: (_data, sibling) => sibling?.gated === true,
       },

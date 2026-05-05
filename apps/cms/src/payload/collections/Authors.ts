@@ -4,6 +4,7 @@ import { isAdminOrEditor } from '../access';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { validateOptionalUrl } from '../lib/url-shape';
 
 export const Authors: CollectionConfig = {
   slug: 'authors',
@@ -46,10 +47,10 @@ export const Authors: CollectionConfig = {
       name: 'social',
       label: 'Social',
       fields: [
-        { name: 'twitter', type: 'text' },
-        { name: 'linkedin', type: 'text' },
-        { name: 'github', type: 'text' },
-        { name: 'website', type: 'text' },
+        { name: 'twitter', type: 'text', validate: validateOptionalUrl },
+        { name: 'linkedin', type: 'text', validate: validateOptionalUrl },
+        { name: 'github', type: 'text', validate: validateOptionalUrl },
+        { name: 'website', type: 'text', validate: validateOptionalUrl },
         { name: 'email', type: 'email' },
       ],
     },

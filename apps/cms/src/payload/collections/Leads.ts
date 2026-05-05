@@ -4,12 +4,12 @@ import { isAdmin, isAdminOrEditor } from '../access';
 import { exportLeadsCsvEndpoint } from '../endpoints/export-leads-csv';
 import { submitLeadEndpoint } from '../endpoints/submit-lead';
 
-const SYNC_STATUSES = [
+const SYNC_STATUSES: { label: string; value: string }[] = [
   { label: 'Pending', value: 'pending' },
   { label: 'Synced', value: 'synced' },
   { label: 'Failed', value: 'failed' },
   { label: 'Skipped (duplicate)', value: 'skipped' },
-] as const;
+];
 
 /**
  * Append-only submission record. Every form submission lands here via the
@@ -159,7 +159,7 @@ export const Leads: CollectionConfig = {
           name: 'status',
           type: 'select',
           required: true,
-          options: SYNC_STATUSES as unknown as { label: string; value: string }[],
+          options: SYNC_STATUSES,
         },
         {
           name: 'syncedAt',

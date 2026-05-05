@@ -1,13 +1,7 @@
+import { extractEmail } from './extract-fields';
 import type { LeadHandler, LeadSubmission } from './types';
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-
-const findEmail = (fields: Record<string, unknown>): string | null => {
-  for (const value of Object.values(fields)) {
-    if (typeof value === 'string' && value.includes('@')) return value.toLowerCase();
-  }
-  return null;
-};
 
 /**
  * Primary handler — writes the lead row. Detects same-form same-email
@@ -19,7 +13,7 @@ export const dbPrimaryHandler: LeadHandler = {
   name: 'db-primary',
   kind: 'primary',
   async run(submission: LeadSubmission, ctx) {
-    const email = findEmail(submission.fields);
+    const email = extractEmail(ctx.formFieldDefs, submission.fields);
     let duplicateOf: number | undefined;
 
     if (email) {
@@ -36,9 +30,9 @@ export const dbPrimaryHandler: LeadHandler = {
         depth: 0,
       });
       for (const candidate of existing.docs) {
-        const candidateEmail = findEmail(
-          (candidate as { fields?: Record<string, unknown> }).fields ?? {},
-        );
+        const candidateFields =
+          (candidate as { fields?: Record<string, unknown> }).fields ?? {};
+        const candidateEmail = extractEmail(ctx.formFieldDefs, candidateFields);
         if (candidateEmail === email) {
           duplicateOf = (candidate as { id: number }).id;
           break;

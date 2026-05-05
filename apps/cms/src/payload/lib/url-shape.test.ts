@@ -26,6 +26,10 @@ describe('classifyUrlShape', () => {
     ['ftp://files.example.com', 'invalid'],
     ['mailto:notvalid', 'invalid'],
     ['mailto:hire@', 'invalid'],
+    // Protocol-relative URLs must NOT be classified as site paths — they'd
+    // navigate off-site to the named host as an open redirect.
+    ['//evil.com', 'invalid'],
+    ['//evil.com/foo', 'invalid'],
   ])('rejects %s', (input, expected) => {
     expect(classifyUrlShape(input as string | null | undefined)).toBe(expected);
   });
@@ -49,5 +53,10 @@ describe('isValidExternalLink', () => {
     expect(isValidExternalLink('not a url')).toBe(false);
     expect(isValidExternalLink('')).toBe(false);
     expect(isValidExternalLink(null)).toBe(false);
+  });
+
+  it('rejects protocol-relative URLs (open-redirect bypass)', () => {
+    expect(isValidExternalLink('//evil.com')).toBe(false);
+    expect(isValidExternalLink('//evil.com/path')).toBe(false);
   });
 });

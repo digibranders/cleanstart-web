@@ -1,63 +1,99 @@
 import type { CollectionAfterChangeHook } from 'payload';
 
-import { collectionUrlFromSlug } from '../lib/route-prefixes';
+import { collectionUrlFromDoc } from '../lib/route-prefixes';
 
 type SlugDoc = {
   slug?: string | null;
+  path?: string | null;
   _status?: 'draft' | 'published' | string | null;
 };
 
-/**
- * Returns the URL we'd redirect FROM, for a slug change on a published doc.
- * Returns null when no redirect should be created.
- */
 const computeRedirectSource = (
   collection: string,
   oldDoc: SlugDoc | undefined,
   nextDoc: SlugDoc,
 ): { from: string; to: string } | null => {
-  const oldSlug = oldDoc?.slug;
-  const newSlug = nextDoc.slug;
-  if (!oldSlug || !newSlug || oldSlug === newSlug) return null;
+  // For Pages, the URL change is captured by the `path` field (which folds
+  // in slug + parent chain). For everything else it's `prefix + slug`.
+  const oldUrl = oldDoc ? collectionUrlFromDoc(collection, oldDoc) : null;
+  const newUrl = collectionUrlFromDoc(collection, nextDoc);
+  if (!oldUrl || !newUrl || oldUrl === newUrl) return null;
 
   const wasPublished = oldDoc?._status === 'published';
   const isPublished = nextDoc._status === 'published';
   if (!wasPublished && !isPublished) return null;
 
-  const from = collectionUrlFromSlug(collection, oldSlug);
-  const to = collectionUrlFromSlug(collection, newSlug);
-  if (!from || !to) return null;
-  return { from, to };
+  return { from: oldUrl, to: newUrl };
 };
 
 /**
- * After-change hook for any publishable, slug-routed collection. Auto-creates
- * a redirects row when a document's slug changes and the document is/was
- * published. Idempotent: if a row already exists for `from`, the hook updates
- * it to point at the latest `to` so chains never form.
+ * After-change hook for any publishable, slug-routed collection.
+ *
+ * - Auto-creates a `redirects` row when a published doc's URL changes.
+ * - Idempotent: if a row already exists for the new `from`, the hook
+ *   updates its `to` instead of creating a duplicate.
+ * - Chain collapse: if other rows already point at the OLD URL as their
+ *   `to`, rewrite them to the NEW URL so we never form a redirect chain
+ *   (e.g. /a → /b → /c becomes /a → /c, /b → /c).
+ * - Self-cycle guard: refuses to write a row where `from === to`.
  */
 export const slugChangeRedirectHook =
   (collection: string): CollectionAfterChangeHook =>
   async ({ doc, previousDoc, req }) => {
-    const change = computeRedirectSource(collection, previousDoc, doc as SlugDoc);
+    const change = computeRedirectSource(collection, previousDoc as SlugDoc, doc as SlugDoc);
     if (!change) return doc;
+    if (change.from === change.to) return doc;
 
     const { payload } = req;
+
+    // Chain collapse: rewrite any existing `to === change.from` rows to
+    // point at the new destination directly.
+    const inboundChains = await payload.find({
+      collection: 'redirects',
+      where: { to: { equals: change.from } },
+      limit: 100,
+      req,
+      overrideAccess: true,
+    });
+    for (const existingRow of inboundChains.docs) {
+      const row = existingRow as { id?: string | number; from?: string };
+      if (row.id == null) continue;
+      if (row.from === change.to) {
+        // Reverse-direction would create a self-cycle; delete the stale row.
+        await payload.delete({
+          collection: 'redirects',
+          id: row.id,
+          req,
+          overrideAccess: true,
+        });
+        continue;
+      }
+      await payload.update({
+        collection: 'redirects',
+        id: row.id,
+        data: { to: change.to },
+        req,
+        overrideAccess: true,
+      });
+    }
+
     const existing = await payload.find({
       collection: 'redirects',
       where: { from: { equals: change.from } },
       limit: 1,
       req,
+      overrideAccess: true,
     });
 
     if (existing.docs.length > 0) {
-      const existingDoc = existing.docs[0];
+      const existingDoc = existing.docs[0] as { id?: string | number };
       if (existingDoc?.id != null) {
         await payload.update({
           collection: 'redirects',
           id: existingDoc.id,
           data: { to: change.to, status: '301', source: 'slug-change' },
           req,
+          overrideAccess: true,
         });
       }
     } else {
@@ -71,9 +107,9 @@ export const slugChangeRedirectHook =
           notes: `Auto-created when ${collection} slug changed.`,
         },
         req,
+        overrideAccess: true,
       });
     }
 
     return doc;
   };
-
