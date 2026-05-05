@@ -183,3 +183,24 @@ h6 {
 .dashboard__group .card {
   border-radius: 10px;
 }
+
+// ─── Header icon sizing — preserve the 28:32 aspect, cap at ~24px tall
+// Payload's default `.graphic-icon` slot renders at full SVG dims; we cap
+// height so the mark sits cleanly in the ~52px header without squishing.
+.graphic-icon,
+.nav__header .graphic-icon {
+  svg {
+    display: block;
+    height: 24px;
+    width: auto;
+  }
+}
+
+// Login + create-first-user logo — keep the wordmark at a comfortable
+// hero size, never stretching beyond its natural aspect.
+.template-minimal .graphic-logo svg {
+  display: block;
+  height: 44px;
+  width: auto;
+  margin: 0 auto;
+}

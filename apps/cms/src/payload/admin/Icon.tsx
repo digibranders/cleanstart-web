@@ -10,11 +10,13 @@ export const Icon = () => (
   <svg
     role="img"
     aria-label="CleanStart"
-    width="28"
-    height="28"
+    width="21"
+    height="24"
     viewBox="0 0 28 32"
     fill="none"
+    preserveAspectRatio="xMidYMid meet"
     xmlns="http://www.w3.org/2000/svg"
+    style={{ display: 'block' }}
   >
     <title>CleanStart</title>
     <path
