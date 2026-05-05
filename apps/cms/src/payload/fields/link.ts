@@ -1,5 +1,7 @@
 import type { Field, GroupField } from 'payload';
 
+import { isValidExternalLink } from '../lib/url-shape';
+
 const INTERNAL_DOC_TARGETS = [
   'pages',
   'blogs',
@@ -66,6 +68,16 @@ export const linkField = ({
           'Stored as a doc ID — slug changes auto-propagate. URL resolved at render time.',
         condition: (_data, sibling) => sibling?.kind === 'doc',
       },
+      validate: (
+        value: unknown,
+        { siblingData }: { siblingData?: { kind?: string } },
+      ): true | string => {
+        if (siblingData?.kind !== 'doc') return true;
+        if (value == null) {
+          return 'Pick an internal target document for an internal-doc link.';
+        }
+        return true;
+      },
     },
     {
       name: 'mediaTarget',
@@ -79,8 +91,22 @@ export const linkField = ({
       name: 'url',
       type: 'text',
       admin: {
-        description: 'External URL. Validated at save (https?://).',
+        description: 'External URL (https?://), site-relative path (/path), mailto:, or tel:.',
         condition: (_data, sibling) => sibling?.kind === 'url',
+      },
+      validate: (
+        value: string | string[] | null | undefined,
+        { siblingData }: { siblingData?: { kind?: string } },
+      ): true | string => {
+        if (siblingData?.kind !== 'url') return true;
+        if (value == null || (typeof value === 'string' && value.trim().length === 0)) {
+          return 'URL is required when link kind is set to External URL.';
+        }
+        if (typeof value !== 'string') return 'URL must be a string.';
+        if (!isValidExternalLink(value)) {
+          return 'URL must be a full https?:// URL, a site-relative path (/path), or a mailto:/tel: URI.';
+        }
+        return true;
       },
     },
     {

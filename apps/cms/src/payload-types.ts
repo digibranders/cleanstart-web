@@ -1729,7 +1729,7 @@ export interface Page {
                           } | null);
                       mediaTarget?: (number | null) | Media;
                       /**
-                       * External URL. Validated at save (https?://).
+                       * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                        */
                       url?: string | null;
                       /**
@@ -1800,7 +1800,7 @@ export interface Page {
                           } | null);
                       mediaTarget?: (number | null) | Media;
                       /**
-                       * External URL. Validated at save (https?://).
+                       * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                        */
                       url?: string | null;
                       /**
@@ -1882,7 +1882,7 @@ export interface Page {
                           } | null);
                       mediaTarget?: (number | null) | Media;
                       /**
-                       * External URL. Validated at save (https?://).
+                       * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                        */
                       url?: string | null;
                       /**
@@ -1953,7 +1953,7 @@ export interface Page {
                           } | null);
                       mediaTarget?: (number | null) | Media;
                       /**
-                       * External URL. Validated at save (https?://).
+                       * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                        */
                       url?: string | null;
                       /**
@@ -2088,7 +2088,7 @@ export interface Page {
                           } | null);
                       mediaTarget?: (number | null) | Media;
                       /**
-                       * External URL. Validated at save (https?://).
+                       * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                        */
                       url?: string | null;
                       /**
@@ -2351,7 +2351,7 @@ export interface Page {
                             } | null);
                         mediaTarget?: (number | null) | Media;
                         /**
-                         * External URL. Validated at save (https?://).
+                         * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                          */
                         url?: string | null;
                         /**
@@ -2516,7 +2516,7 @@ export interface Page {
                     } | null);
                 mediaTarget?: (number | null) | Media;
                 /**
-                 * External URL. Validated at save (https?://).
+                 * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                  */
                 url?: string | null;
                 /**
@@ -2587,7 +2587,7 @@ export interface Page {
                     } | null);
                 mediaTarget?: (number | null) | Media;
                 /**
-                 * External URL. Validated at save (https?://).
+                 * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                  */
                 url?: string | null;
                 /**
@@ -2669,7 +2669,7 @@ export interface Page {
                     } | null);
                 mediaTarget?: (number | null) | Media;
                 /**
-                 * External URL. Validated at save (https?://).
+                 * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                  */
                 url?: string | null;
                 /**
@@ -2740,7 +2740,7 @@ export interface Page {
                     } | null);
                 mediaTarget?: (number | null) | Media;
                 /**
-                 * External URL. Validated at save (https?://).
+                 * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                  */
                 url?: string | null;
                 /**
@@ -2875,7 +2875,7 @@ export interface Page {
                     } | null);
                 mediaTarget?: (number | null) | Media;
                 /**
-                 * External URL. Validated at save (https?://).
+                 * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                  */
                 url?: string | null;
                 /**
@@ -3138,7 +3138,7 @@ export interface Page {
                       } | null);
                   mediaTarget?: (number | null) | Media;
                   /**
-                   * External URL. Validated at save (https?://).
+                   * External URL (https?://), site-relative path (/path), mailto:, or tel:.
                    */
                   url?: string | null;
                   /**
