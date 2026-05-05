@@ -8,6 +8,7 @@ import { buildConfig } from 'payload';
 import sharp from 'sharp';
 
 import { AboutGalleries } from './payload/collections/AboutGalleries';
+import { AuditLog } from './payload/collections/audit-log';
 import { Authors } from './payload/collections/Authors';
 import { Blogs } from './payload/collections/Blogs';
 import { Categories } from './payload/collections/Categories';
@@ -124,6 +125,7 @@ export default buildConfig({
     AboutGalleries,
     Pages,
     Redirects,
+    AuditLog,
   ],
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements],
   jobs: {

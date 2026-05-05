@@ -1,8 +1,9 @@
-import type { CollectionConfig } from 'payload';
+import type { CollectionAfterDeleteHook, CollectionConfig } from 'payload';
 
 import { isAdmin, isAdminOrEditor } from '../access';
 import { exportLeadsCsvEndpoint } from '../endpoints/export-leads-csv';
-import { submitLeadEndpoint } from '../endpoints/submit-lead';
+import { submitLeadEndpoint, submitLeadOptionsEndpoint } from '../endpoints/submit-lead';
+import { extractRequestMeta } from '../lib/request-meta';
 
 const SYNC_STATUSES: { label: string; value: string }[] = [
   { label: 'Pending', value: 'pending' },
@@ -10,6 +11,60 @@ const SYNC_STATUSES: { label: string; value: string }[] = [
   { label: 'Failed', value: 'failed' },
   { label: 'Skipped (duplicate)', value: 'skipped' },
 ];
+
+/**
+ * Writes an audit-log row when a lead is deleted. GDPR Art. 15 needs
+ * the trail to defend against "did you actually erase the record?"
+ * subject requests. Audit failures are isolated — they log but never
+ * block the parent delete, otherwise a broken audit-log collection
+ * would lock admins out of legitimate erasures.
+ */
+const writeLeadDeletionAudit: CollectionAfterDeleteHook = async ({ req, doc, id }) => {
+  try {
+    const meta = extractRequestMeta(req.headers);
+    const rawActorId = req.user
+      ? (req.user as { id?: string | number }).id ?? null
+      : null;
+    const actorId =
+      typeof rawActorId === 'number'
+        ? rawActorId
+        : typeof rawActorId === 'string'
+          ? Number.parseInt(rawActorId, 10)
+          : null;
+    const actorUserId =
+      typeof actorId === 'number' && Number.isFinite(actorId) ? actorId : null;
+    await req.payload.create({
+      collection: 'audit-log',
+      data: {
+        timestamp: new Date().toISOString(),
+        action: 'lead_deleted',
+        targetCollection: 'leads',
+        targetId: String(id),
+        actorUserId,
+        requestIp: meta.ip,
+        userAgent: meta.userAgent ?? null,
+        acceptLanguage: meta.acceptLanguage ?? null,
+        proxyChainLength: meta.proxyChainLength,
+        metadata: {
+          formId:
+            typeof (doc as { form?: unknown }).form === 'number'
+              ? (doc as { form: number }).form
+              : null,
+          createdAt: (doc as { createdAt?: string }).createdAt ?? null,
+        },
+      },
+      overrideAccess: true,
+    });
+  } catch (error) {
+    req.payload.logger.error(
+      {
+        err: error instanceof Error ? error.message : String(error),
+        leadId: id,
+      },
+      'Failed to write audit-log row for lead deletion',
+    );
+  }
+};
 
 /**
  * Append-only submission record. Every form submission lands here via the
@@ -31,6 +86,11 @@ export const Leads: CollectionConfig = {
     group: 'Marketing',
     description:
       'Form submissions (append-only). Editing is disabled — leads are immutable once captured. Use the CSV export for bulk handoff.',
+    components: {
+      beforeListTable: [
+        '@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner',
+      ],
+    },
   },
   access: {
     read: isAdminOrEditor,
@@ -41,7 +101,10 @@ export const Leads: CollectionConfig = {
     update: () => false, // Append-only.
     delete: isAdmin,
   },
-  endpoints: [submitLeadEndpoint, exportLeadsCsvEndpoint],
+  endpoints: [submitLeadEndpoint, submitLeadOptionsEndpoint, exportLeadsCsvEndpoint],
+  hooks: {
+    afterDelete: [writeLeadDeletionAudit],
+  },
   fields: [
     {
       name: 'form',

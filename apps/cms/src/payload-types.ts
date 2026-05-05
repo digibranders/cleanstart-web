@@ -85,6 +85,7 @@ export interface Config {
     aboutGalleries: AboutGallery;
     pages: Page;
     redirects: Redirect;
+    'audit-log': AuditLog;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -111,6 +112,7 @@ export interface Config {
     aboutGalleries: AboutGalleriesSelect<false> | AboutGalleriesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -3452,6 +3454,44 @@ export interface Redirect {
   createdAt: string;
 }
 /**
+ * Append-only record of sensitive actions on leads + DSAR events. Read-only — entries are written by hooks, never via the admin UI.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  timestamp: string;
+  action: 'lead_deleted' | 'lead_exported' | 'dsar_export' | 'dsar_erasure';
+  targetCollection: string;
+  targetId: string;
+  /**
+   * Admin who performed the action. Null for system / cron writes.
+   */
+  actorUserId?: (number | null) | User;
+  requestIp?: string | null;
+  userAgent?: string | null;
+  acceptLanguage?: string | null;
+  /**
+   * Number of hops parsed from X-Forwarded-For at request time.
+   */
+  proxyChainLength?: number | null;
+  /**
+   * Per-action payload (e.g. row count for exports, deleted lead snapshot).
+   */
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -3638,6 +3678,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'audit-log';
+        value: number | AuditLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -5218,6 +5262,24 @@ export interface RedirectsSelect<T extends boolean = true> {
   notes?: T;
   hitCount?: T;
   lastHitAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  timestamp?: T;
+  action?: T;
+  targetCollection?: T;
+  targetId?: T;
+  actorUserId?: T;
+  requestIp?: T;
+  userAgent?: T;
+  acceptLanguage?: T;
+  proxyChainLength?: T;
+  metadata?: T;
   updatedAt?: T;
   createdAt?: T;
 }

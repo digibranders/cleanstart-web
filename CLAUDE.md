@@ -6,7 +6,7 @@ This file tells Claude Code *how* to work in this repo. It does not duplicate th
 
 **Plan of record:** `~/.claude/plans/lets-review-the-doc-curried-feigenbaum.md` (CMS-only Phase A–I sequence). The current backlog is at `docs/BACKLOG.md`.
 
-**Scope of this session:** `apps/cms` only (Payload admin + REST API + hooks). The public marketing site `apps/web` is out of scope until brand/Figma lands.
+**Currently active scope:** `apps/cms` only (Payload admin + REST API + hooks). The public marketing site `apps/web` was bootstrapped once and discarded; it will be reintroduced in a future wave. Until then, do not scaffold `apps/web` or recreate the deleted design/UI/Figma-extracted assets in `docs/web/`.
 
 ---
 
@@ -32,12 +32,12 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 ├── migrations/webflow-import/       Phase H: ETL scripts
 ├── infra/                           docker-compose · Caddy · backup/restore scripts
 ├── docs/                            BACKLOG, cleanstart-cms-architecture.html (source of truth),
-│                                    brand PDF, future EDITOR-GUIDE / CONTENT-MODEL / RESTORE-LOG
+│                                    INTEGRATIONS-RESEARCH, web/ (architecture+roadmap only)
 ├── cleanstart-logo.svg              brand mark — also embedded as JSX in apps/cms/src/payload/admin/
 └── CLAUDE.md                        this file
 ```
 
-`apps/web` and `packages/ui` are intentionally absent until the public-site planning session.
+`apps/web` is **deferred** — a previous bootstrap was discarded along with the design-system / brand / token / component-map docs. The surviving contracts in `docs/web/` are architecture- and roadmap-only ([`WEB-ARCHITECTURE.md`](docs/web/WEB-ARCHITECTURE.md), [`BACKLOG-WEB.md`](docs/web/BACKLOG-WEB.md), [`CONTENT-MODEL.md`](docs/web/CONTENT-MODEL.md), [`SEO-PLAYBOOK.md`](docs/web/SEO-PLAYBOOK.md)); the design-surface docs (DESIGN-SYSTEM, COMPONENT-MAP, BRAND-GUIDELINES, ACCESSIBILITY, FRONTEND-INTEGRATIONS) and the Figma-extracted assets (tokens.css/json, snapshots) will be reintroduced when web development restarts. `packages/ui` is intentionally absent.
 
 ---
 
@@ -97,6 +97,37 @@ These resolved the open forks from arch doc §`#decisions`. Build accordingly:
 - **Resource gating:** `gateForm` is an optional relationship to `forms` on the `resources` collection. Presence gates the download; absence makes it public.
 - **Authors:** pure content collection. No `linkedUser` field at v1. If multi-author self-editing is ever needed, an additive migration adds an optional `linkedUser` relationship.
 - **Knowledge Hub** and **Guest Contributors:** still open per arch doc §`#decisions`. Do not pre-build either.
+
+---
+
+## apps/web (public marketing site) — deferred
+
+`apps/web` does not currently exist. A previous scaffold was discarded; the design-system / component-map / brand / accessibility / frontend-integrations docs and Figma-extracted assets were removed alongside it.
+
+What survives and is still load-bearing:
+
+- [`docs/web/WEB-ARCHITECTURE.md`](docs/web/WEB-ARCHITECTURE.md) — stack, hosting split (Vercel Pro for web, Coolify for CMS), preview-JWT flow, lead-submit proxy contract.
+- [`docs/web/BACKLOG-WEB.md`](docs/web/BACKLOG-WEB.md) — the wave plan; W-A bootstrap is open again.
+- [`docs/web/CONTENT-MODEL.md`](docs/web/CONTENT-MODEL.md) — collection → URL → cache-tag → JSON-LD data contract.
+- [`docs/web/SEO-PLAYBOOK.md`](docs/web/SEO-PLAYBOOK.md) — JSON-LD recipes; drives Wave D Phase F server-side generators in `apps/cms`.
+- [`apps/cms/src/payload/lib/route-prefixes.ts`](apps/cms/src/payload/lib/route-prefixes.ts) — single source of truth for URL prefixes (singulars `/event`, `/webinar`, `/job`, `/guide`, `/author`; plural `/resources`).
+
+**Until web development restarts:** do not scaffold `apps/web/`, do not re-create the deleted design docs from memory, do not regenerate `docs/web/tokens.*` or `docs/web/figma-snapshots/`. When work resumes, this section will be rewritten with the active stack, hard rules, and pre-completion checks.
+
+The cross-cutting hard rules that *will* apply once web exists are already captured in [`docs/web/WEB-ARCHITECTURE.md`](docs/web/WEB-ARCHITECTURE.md) (LeadHandler proxy, preview JWT, route segment immutability, no `NEXT_PUBLIC_*` for secrets, consent-mode-v2 before third-party scripts) — they don't need to live in this file until then.
+
+---
+
+## Figma access — tooling preserved, extracted output deferred
+
+The design lives in the *CleanStart V4* Figma file (file key `doWR9Xbwgkz6dqR9n4m3BB`). The extraction tooling stays in place so it can be re-run when web development restarts; the previously extracted assets (`docs/web/tokens.css`, `tokens.json`, `figma-snapshots/`) were removed alongside `apps/web`.
+
+- **Auth:** a Figma PAT lives in `$FIGMA_TOKEN` (root [`.env`](#), gitignored). Never echo, log, or commit the token. [`.env.example`](.env.example) documents the variable names.
+- **File + node IDs:** `$FIGMA_FILE_KEY`, `$FIGMA_HOMEPAGE_NODE`.
+- **Extraction script:** `pnpm figma:extract` runs [`scripts/figma-extract.ts`](scripts/figma-extract.ts). When the web app restarts, re-running this regenerates `docs/web/tokens.json`, `tokens.css`, and `figma-snapshots/`. Do not run it before then — the output has no consumer.
+- **Plugin MCP** (`figma-console`): optional, not required for extraction.
+
+**Hard rule when web restarts:** never hand-edit the extractor's output. Re-run the script instead.
 
 ---
 
