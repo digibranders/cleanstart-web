@@ -12,8 +12,8 @@ Phase A–I sequence for `apps/cms` (Payload admin + REST API + hooks). Each tic
 | -------------------------------------------- | ------- | ------------------------ |
 | **A · Bootstrap**                     | ✅ Done | `c1317c7`              |
 | **B · Core schema**                   | ✅ Done | `3d2298e`–`c27c735` |
-| **C · Page-builder blocks**           | ✅ Done | next commit              |
-| **D · Editor experience**             | —      | —                       |
+| **C · Page-builder blocks**           | ✅ Done | `e19ce1c`–`0f04f87` |
+| **D · Editor experience (server-side validators)** | 🟡 Partial | `4665232`–`2c748b7` |
 | **E · Forms + leads runtime**         | —      | —                       |
 | **F · Search + structured data**      | —      | —                       |
 | **G · Webhooks, cron, observability** | —      | —                       |
@@ -23,6 +23,8 @@ Phase A–I sequence for `apps/cms` (Payload admin + REST API + hooks). Each tic
 Phase B verified end-to-end: DB drop+recreate, full schema push for all 17 collections + 6 globals, admin login, dashboard render with all groups visible.
 
 Phase C verified end-to-end: 18 blocks render in the Pages "Add Layout" picker (Section primitive + 17 content blocks), Section composes nested blocks (one-level nesting only by design), full schema push clean.
+
+Phase D **server-side** done in this session: block-level minRows validators (FAQ items, Pricing tiers, Section children, Table headers/rows, etc.), Lexical body-stats hook (readingMinutes/wordCount/tableOfContents on Blogs/News/Guides — 220 wpm, H2-H6 with disambiguated anchors), URL-shape and target validators on the typed-link field. **Client-side admin UX** (preview split-pane, custom React field components, publishing-checklist banner, lead-list CSV export) deferred — depends on either `apps/web` for the preview iframe or on the `leads` collection runtime which lands in Phase E.
 
 ## Phase A · Bootstrap
 
