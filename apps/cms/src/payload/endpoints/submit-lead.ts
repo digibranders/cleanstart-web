@@ -1,7 +1,9 @@
 import type { Endpoint, PayloadRequest } from 'payload';
 
+import { parkSubmission } from '../lib/lead-fallback-queue';
 import { submitLeadBodySchema } from '../lib/lead-handlers/payload-schema';
 import { submitLead } from '../lib/lead-handlers/registry';
+import type { LeadSubmission } from '../lib/lead-handlers/types';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
 import { verifyTurnstileToken } from '../lib/turnstile';
 
@@ -95,21 +97,35 @@ export const submitLeadEndpoint: Endpoint = {
       return json({ ok: false, error: 'invalid_form_id' }, { status: 400 });
     }
 
+    const submission: LeadSubmission = {
+      formId: numericFormId,
+      formSchemaVersion: data.formSchemaVersion,
+      fields: data.fields,
+      source: data.source,
+      utm: data.utm,
+      ip,
+      userAgent,
+      consent: data.consent,
+    };
+
     try {
-      const result = await submitLead(req.payload, {
-        formId: numericFormId,
-        formSchemaVersion: data.formSchemaVersion,
-        fields: data.fields,
-        source: data.source,
-        utm: data.utm,
-        ip,
-        userAgent,
-        consent: data.consent,
-      });
+      const result = await submitLead(req.payload, submission);
 
       if (!result.ok) {
+        // Primary handler failed — park for the drain cron, return 202.
+        const parked = await parkSubmission(
+          submission,
+          result.primary.status === 'failed' ? result.primary.error : 'capture_failed',
+        );
+        if (parked.ok) {
+          req.payload.logger.warn(
+            { key: parked.key, sink: parked.sink },
+            'Lead parked in fallback queue — primary handler failed',
+          );
+          return json({ ok: true, queued: true }, { status: 202 });
+        }
         return json(
-          { ok: false, error: 'capture_failed', reason: result.primary },
+          { ok: false, error: 'capture_failed', reason: parked.error },
           { status: 502 },
         );
       }
@@ -120,7 +136,15 @@ export const submitLeadEndpoint: Endpoint = {
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'unknown';
-      req.payload.logger.error({ err: message }, 'Lead submission failed');
+      const parked = await parkSubmission(submission, `endpoint-threw: ${message}`);
+      if (parked.ok) {
+        req.payload.logger.warn(
+          { err: message, key: parked.key, sink: parked.sink },
+          'Lead parked in fallback queue — endpoint threw',
+        );
+        return json({ ok: true, queued: true }, { status: 202 });
+      }
+      req.payload.logger.error({ err: message }, 'Lead submission failed and parking failed');
       return json({ ok: false, error: 'internal_error' }, { status: 500 });
     }
   },

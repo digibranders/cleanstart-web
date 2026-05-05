@@ -48,5 +48,8 @@ migrations/webflow-import/.cache/
 # Payload local uploads (R2 in prod; local fallback during dev)
 apps/cms/media/
 
+# Lead fallback queue (R2 in prod; local fs when R2 not configured)
+apps/cms/.lead-fallback-queue/
+
 # Sentry
 .sentryclirc
