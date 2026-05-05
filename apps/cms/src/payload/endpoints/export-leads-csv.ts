@@ -20,6 +20,14 @@ type LeadRow = {
   createdAt: string;
 };
 
+/** Page size + hard cap for the CSV export pagination loop. The product
+ * of these is the truncation point; anything beyond should use a
+ * scheduled job, not a synchronous endpoint. Exported so the admin
+ * truncation banner can render the same number the response advertises. */
+export const CSV_EXPORT_PAGE_SIZE = 200;
+export const CSV_EXPORT_HARD_CAP_PAGES = 100;
+export const CSV_EXPORT_HARD_CAP_ROWS = CSV_EXPORT_PAGE_SIZE * CSV_EXPORT_HARD_CAP_PAGES;
+
 const HEADERS = [
   'id',
   'createdAt',
@@ -135,14 +143,14 @@ export const exportLeadsCsvEndpoint: Endpoint = {
     const url = new URL(req.url ?? '', 'http://internal');
     const where = buildWhere(url.searchParams);
 
-    const PAGE_SIZE = 200;
     let page = 1;
+    let truncated = false;
     const flat: Record<string, unknown>[] = [];
     while (true) {
       const result = await req.payload.find({
         collection: 'leads',
         where,
-        limit: PAGE_SIZE,
+        limit: CSV_EXPORT_PAGE_SIZE,
         page,
         sort: '-createdAt',
         depth: 1,
@@ -151,17 +159,25 @@ export const exportLeadsCsvEndpoint: Endpoint = {
       for (const row of result.docs) flat.push(flatten(row as LeadRow));
       if (!result.hasNextPage) break;
       page += 1;
-      if (page > 100) break; // 20k cap — anything bigger should use scheduled jobs
+      if (page > CSV_EXPORT_HARD_CAP_PAGES) {
+        // 20k row cap — bigger exports should use a scheduled job. The
+        // X-Leads-Truncated headers signal the admin banner so the editor
+        // doesn't ship an incomplete CSV thinking it's complete.
+        truncated = true;
+        break;
+      }
     }
 
     const csv = toCsv(HEADERS, flat);
-    return new Response(csv, {
-      status: 200,
-      headers: {
-        'content-type': 'text/csv; charset=utf-8',
-        'content-disposition': `attachment; filename="leads-${todayStamp()}.csv"`,
-        'cache-control': 'no-store',
-      },
-    });
+    const headers: Record<string, string> = {
+      'content-type': 'text/csv; charset=utf-8',
+      'content-disposition': `attachment; filename="leads-${todayStamp()}.csv"`,
+      'cache-control': 'no-store',
+    };
+    if (truncated) {
+      headers['x-leads-truncated'] = 'true';
+      headers['x-leads-truncated-at'] = String(CSV_EXPORT_HARD_CAP_ROWS);
+    }
+    return new Response(csv, { status: 200, headers });
   },
 };

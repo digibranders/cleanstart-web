@@ -18,6 +18,51 @@ const json = (data: unknown, init?: ResponseInit): Response =>
     },
   });
 
+/** Maximum body size accepted on /api/leads/submit. Anything above this
+ * is rejected with 413 BEFORE the body is buffered or rate-limit consumed,
+ * so a header-only abuse can't penalise the IP or exhaust memory. */
+export const LEAD_SUBMIT_MAX_BYTES = 64 * 1024;
+
+const DEFAULT_ALLOWED_ORIGINS = ['https://cleanstart.com', 'https://www.cleanstart.com'];
+
+const allowedOrigins = (): string[] => {
+  const raw = process.env.LEAD_SUBMIT_ALLOWED_ORIGINS;
+  if (!raw || raw.trim().length === 0) return DEFAULT_ALLOWED_ORIGINS;
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+};
+
+const isAllowedOrigin = (origin: string | null): origin is string =>
+  origin != null && allowedOrigins().includes(origin);
+
+const corsHeaders = (origin: string): Record<string, string> => ({
+  'access-control-allow-origin': origin,
+  'access-control-allow-methods': 'POST, OPTIONS',
+  'access-control-allow-headers': 'content-type',
+  vary: 'Origin',
+});
+
+/**
+ * OPTIONS /api/leads/submit — CORS preflight.
+ *
+ * Echoes the Origin only when it matches the allow-list; never wildcards.
+ * Cross-origin browsers that aren't on cleanstart.com get a 403 here so
+ * the actual POST never fires from a disallowed page.
+ */
+export const submitLeadOptionsEndpoint: Endpoint = {
+  path: '/submit',
+  method: 'options',
+  handler: async (req) => {
+    const origin = req.headers.get('origin');
+    if (!isAllowedOrigin(origin)) {
+      return json({ ok: false, error: 'origin_forbidden' }, { status: 403 });
+    }
+    return new Response(null, { status: 204, headers: corsHeaders(origin) });
+  },
+};
+
 /**
  * POST /api/leads/submit
  *
@@ -26,13 +71,40 @@ const json = (data: unknown, init?: ResponseInit): Response =>
  * returns a thin OK envelope. Never exposes lead IDs or raw answers
  * back to the caller.
  *
- * Turnstile verification (E3) and R2 fallback queue (E4) wrap this
- * handler in subsequent commits.
+ * Order of operations is deliberate: origin → body-size → rate-limit →
+ * body parse. The 413 path runs before rate-limit so an attacker can't
+ * exhaust the per-IP quota by spamming oversized headers.
  */
 export const submitLeadEndpoint: Endpoint = {
   path: '/submit',
   method: 'post',
   handler: async (req) => {
+    const origin = req.headers.get('origin');
+    // Same-origin (admin UI, server-to-server) requests don't send an Origin
+    // header — those proceed. Browser cross-origin requests must match the
+    // allow-list.
+    if (origin != null && !isAllowedOrigin(origin)) {
+      return json({ ok: false, error: 'origin_forbidden' }, { status: 403 });
+    }
+    const responseCors = isAllowedOrigin(origin) ? corsHeaders(origin) : {};
+
+    const contentLengthRaw = req.headers.get('content-length');
+    if (contentLengthRaw != null) {
+      const contentLength = Number.parseInt(contentLengthRaw, 10);
+      if (!Number.isFinite(contentLength) || contentLength < 0) {
+        return json(
+          { ok: false, error: 'invalid_content_length' },
+          { status: 400, headers: responseCors },
+        );
+      }
+      if (contentLength > LEAD_SUBMIT_MAX_BYTES) {
+        return json(
+          { ok: false, error: 'payload_too_large', limit: LEAD_SUBMIT_MAX_BYTES },
+          { status: 413, headers: responseCors },
+        );
+      }
+    }
+
     const ip = clientIpFromHeaders(req.headers);
     const limit = checkAndRecord(`leads:${ip}`, DEFAULT_RATE_LIMITS);
     if (!limit.ok) {
@@ -42,15 +114,29 @@ export const submitLeadEndpoint: Endpoint = {
           error: 'rate_limited',
           retryAfterSeconds: Math.ceil(limit.retryAfterMs / 1000),
         },
-        { status: 429 },
+        { status: 429, headers: responseCors },
       );
     }
 
     let body: unknown;
     try {
-      body = req.json ? await req.json() : null;
+      // If Content-Length was absent, defend against chunked / unknown-length
+      // bodies by buffering through arrayBuffer() and bouncing on overflow.
+      if (contentLengthRaw == null && typeof req.arrayBuffer === 'function') {
+        const buffer = await req.arrayBuffer();
+        if (buffer.byteLength > LEAD_SUBMIT_MAX_BYTES) {
+          return json(
+            { ok: false, error: 'payload_too_large', limit: LEAD_SUBMIT_MAX_BYTES },
+            { status: 413, headers: responseCors },
+          );
+        }
+        const text = new TextDecoder().decode(buffer);
+        body = text.length === 0 ? null : JSON.parse(text);
+      } else {
+        body = req.json ? await req.json() : null;
+      }
     } catch {
-      return json({ ok: false, error: 'invalid_json' }, { status: 400 });
+      return json({ ok: false, error: 'invalid_json' }, { status: 400, headers: responseCors });
     }
 
     const parsed = submitLeadBodySchema.safeParse(body);
@@ -64,7 +150,7 @@ export const submitLeadEndpoint: Endpoint = {
             message: issue.message,
           })),
         },
-        { status: 400 },
+        { status: 400, headers: responseCors },
       );
     }
 
@@ -78,7 +164,7 @@ export const submitLeadEndpoint: Endpoint = {
         { ip, userAgent: userAgent ?? null },
         'Lead submission swallowed — honeypot tripped',
       );
-      return json({ ok: true });
+      return json({ ok: true }, { headers: responseCors });
     }
 
     const turnstile = await verifyTurnstileToken(data.turnstileToken, ip);
@@ -89,7 +175,7 @@ export const submitLeadEndpoint: Endpoint = {
           error: 'turnstile_failed',
           reason: turnstile.reason,
         },
-        { status: 403 },
+        { status: 403, headers: responseCors },
       );
     }
 
@@ -98,7 +184,10 @@ export const submitLeadEndpoint: Endpoint = {
     // Collapse "invalid id shape" and "form does not exist" into one
     // generic 400 so an attacker can't enumerate valid form IDs by
     // diffing 400 vs 404 response shapes.
-    const invalidFormResponse = json({ ok: false, error: 'invalid_form' }, { status: 400 });
+    const invalidFormResponse = json(
+      { ok: false, error: 'invalid_form' },
+      { status: 400, headers: responseCors },
+    );
     if (!Number.isInteger(numericFormId) || numericFormId <= 0) {
       return invalidFormResponse;
     }
@@ -130,7 +219,7 @@ export const submitLeadEndpoint: Endpoint = {
       if (!validation.ok) {
         return json(
           { ok: false, error: 'invalid_fields', issues: validation.issues },
-          { status: 400 },
+          { status: 400, headers: responseCors },
         );
       }
     }
@@ -160,18 +249,21 @@ export const submitLeadEndpoint: Endpoint = {
             { key: parked.key, sink: parked.sink },
             'Lead parked in fallback queue — primary handler failed',
           );
-          return json({ ok: true, queued: true }, { status: 202 });
+          return json({ ok: true, queued: true }, { status: 202, headers: responseCors });
         }
         return json(
           { ok: false, error: 'capture_failed', reason: parked.error },
-          { status: 502 },
+          { status: 502, headers: responseCors },
         );
       }
 
-      return json({
-        ok: true,
-        duplicate: result.duplicateOfLeadId != null,
-      });
+      return json(
+        {
+          ok: true,
+          duplicate: result.duplicateOfLeadId != null,
+        },
+        { headers: responseCors },
+      );
     } catch (error) {
       const message = error instanceof Error ? error.message : 'unknown';
       const parked = await parkSubmission(submission, `endpoint-threw: ${message}`);
@@ -180,10 +272,13 @@ export const submitLeadEndpoint: Endpoint = {
           { err: message, key: parked.key, sink: parked.sink },
           'Lead parked in fallback queue — endpoint threw',
         );
-        return json({ ok: true, queued: true }, { status: 202 });
+        return json({ ok: true, queued: true }, { status: 202, headers: responseCors });
       }
       req.payload.logger.error({ err: message }, 'Lead submission failed and parking failed');
-      return json({ ok: false, error: 'internal_error' }, { status: 500 });
+      return json(
+        { ok: false, error: 'internal_error' },
+        { status: 500, headers: responseCors },
+      );
     }
   },
 };

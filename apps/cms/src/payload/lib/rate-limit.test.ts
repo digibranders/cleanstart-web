@@ -2,9 +2,11 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   DEFAULT_RATE_LIMITS,
+  RateLimitMisconfigured,
   __rateLimitStoreSize,
   __resetRateLimitStore,
   checkAndRecord,
+  validateRateLimitBootConfig,
 } from './rate-limit';
 
 const now = Date.now();
@@ -67,6 +69,44 @@ describe('checkAndRecord', () => {
       expect(result.remaining.perMinute).toBe(9);
       expect(result.remaining.perDay).toBe(99);
     }
+  });
+
+  describe('validateRateLimitBootConfig', () => {
+    it('allows memory backend with single worker (concurrency unset)', () => {
+      expect(() =>
+        validateRateLimitBootConfig({ backend: undefined, concurrency: undefined }),
+      ).not.toThrow();
+    });
+
+    it('allows memory backend with WEB_CONCURRENCY=1', () => {
+      expect(() =>
+        validateRateLimitBootConfig({ backend: 'memory', concurrency: '1' }),
+      ).not.toThrow();
+    });
+
+    it('throws when memory backend pairs with multi-worker concurrency', () => {
+      expect(() =>
+        validateRateLimitBootConfig({ backend: undefined, concurrency: '4' }),
+      ).toThrow(RateLimitMisconfigured);
+      expect(() =>
+        validateRateLimitBootConfig({ backend: 'memory', concurrency: '4' }),
+      ).toThrow(RateLimitMisconfigured);
+    });
+
+    it('allows redis/postgres backends regardless of concurrency', () => {
+      expect(() =>
+        validateRateLimitBootConfig({ backend: 'redis', concurrency: '4' }),
+      ).not.toThrow();
+      expect(() =>
+        validateRateLimitBootConfig({ backend: 'postgres', concurrency: '8' }),
+      ).not.toThrow();
+    });
+
+    it('throws on non-numeric WEB_CONCURRENCY', () => {
+      expect(() =>
+        validateRateLimitBootConfig({ backend: 'memory', concurrency: 'auto' }),
+      ).toThrow(RateLimitMisconfigured);
+    });
   });
 
   it('janitor sweep evicts buckets that aged out of the day window', () => {
