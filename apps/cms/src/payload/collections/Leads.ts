@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdmin, isAdminOrEditor } from '../access';
+import { exportLeadsCsvEndpoint } from '../endpoints/export-leads-csv';
 import { submitLeadEndpoint } from '../endpoints/submit-lead';
 
 const SYNC_STATUSES = [
@@ -40,7 +41,7 @@ export const Leads: CollectionConfig = {
     update: () => false, // Append-only.
     delete: isAdmin,
   },
-  endpoints: [submitLeadEndpoint],
+  endpoints: [submitLeadEndpoint, exportLeadsCsvEndpoint],
   fields: [
     {
       name: 'form',

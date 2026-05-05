@@ -1,0 +1,158 @@
+import type { Endpoint, Where } from 'payload';
+
+import { toCsv } from '../lib/csv';
+
+const ROLES_WITH_EXPORT = new Set(['admin', 'editor']);
+
+type LeadRow = {
+  id: number;
+  form?: { id?: number; name?: string | null } | number | null;
+  formSchemaVersion?: number | null;
+  fields?: Record<string, unknown> | null;
+  source?: string | null;
+  utm?: Record<string, unknown> | null;
+  ip?: string | null;
+  userAgent?: string | null;
+  consentGivenAt?: string | null;
+  privacyPolicyVersion?: string | null;
+  enriched?: Record<string, unknown> | null;
+  syncedTo?: { handler?: string | null; status?: string | null }[] | null;
+  duplicateOf?: number | null;
+  createdAt: string;
+};
+
+const HEADERS = [
+  'id',
+  'createdAt',
+  'formId',
+  'formName',
+  'source',
+  'utm_campaign',
+  'utm_source',
+  'utm_medium',
+  'companyFromDomain',
+  'fields',
+  'consentGivenAt',
+  'privacyPolicyVersion',
+  'syncedTo',
+  'duplicateOf',
+] as const;
+
+const flatten = (row: LeadRow): Record<string, unknown> => {
+  const utm = row.utm ?? {};
+  const enriched = row.enriched ?? {};
+  const cfd = (enriched['company-from-domain'] ?? null) as
+    | { company?: string; domain?: string }
+    | null;
+  const formIdValue =
+    typeof row.form === 'number'
+      ? row.form
+      : typeof row.form === 'object' && row.form
+        ? (row.form.id ?? null)
+        : null;
+  const formName =
+    typeof row.form === 'object' && row.form ? (row.form.name ?? null) : null;
+  return {
+    id: row.id,
+    createdAt: row.createdAt,
+    formId: formIdValue,
+    formName,
+    source: row.source ?? '',
+    utm_campaign: (utm as Record<string, unknown>).campaign ?? '',
+    utm_source: (utm as Record<string, unknown>).source ?? '',
+    utm_medium: (utm as Record<string, unknown>).medium ?? '',
+    companyFromDomain: cfd?.company ?? '',
+    fields: row.fields ?? {},
+    consentGivenAt: row.consentGivenAt ?? '',
+    privacyPolicyVersion: row.privacyPolicyVersion ?? '',
+    syncedTo: (row.syncedTo ?? [])
+      .map((s) => `${s.handler ?? '?'}:${s.status ?? '?'}`)
+      .join('; '),
+    duplicateOf: row.duplicateOf ?? '',
+  };
+};
+
+const buildWhere = (params: URLSearchParams): Where => {
+  const conditions: Where[] = [];
+  const formId = params.get('formId');
+  if (formId) {
+    const numeric = Number.parseInt(formId, 10);
+    if (Number.isInteger(numeric) && numeric > 0) {
+      conditions.push({ form: { equals: numeric } });
+    }
+  }
+  const since = params.get('since');
+  if (since) conditions.push({ createdAt: { greater_than_equal: since } });
+  const until = params.get('until');
+  if (until) conditions.push({ createdAt: { less_than_equal: until } });
+  if (conditions.length === 0) return {};
+  if (conditions.length === 1) return conditions[0] as Where;
+  return { and: conditions };
+};
+
+const todayStamp = (): string => {
+  const d = new Date();
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(
+    d.getUTCDate(),
+  ).padStart(2, '0')}`;
+};
+
+/**
+ * GET /api/leads/export-csv
+ *
+ * Admin / editor only — paginates through every lead matching the
+ * optional `formId`, `since`, `until` query params and streams a flat
+ * CSV. Each row carries the deduped key columns (id / createdAt /
+ * form / utm / source / company-from-domain / consent metadata) plus
+ * the full visitor-answer JSON in the `fields` column.
+ *
+ * The PII fields ip + userAgent are intentionally NOT included in the
+ * export — they're auto-purged after retentionDays (Phase G) and don't
+ * belong in marketing CSVs anyway.
+ */
+export const exportLeadsCsvEndpoint: Endpoint = {
+  path: '/export-csv',
+  method: 'get',
+  handler: async (req) => {
+    const user = req.user as { roles?: string[] } | null | undefined;
+    const roles = user?.roles ?? [];
+    if (!roles.some((role) => ROLES_WITH_EXPORT.has(role))) {
+      return new Response(JSON.stringify({ ok: false, error: 'forbidden' }), {
+        status: 403,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+
+    const url = new URL(req.url ?? '', 'http://internal');
+    const where = buildWhere(url.searchParams);
+
+    const PAGE_SIZE = 200;
+    let page = 1;
+    const flat: Record<string, unknown>[] = [];
+    while (true) {
+      const result = await req.payload.find({
+        collection: 'leads',
+        where,
+        limit: PAGE_SIZE,
+        page,
+        sort: '-createdAt',
+        depth: 1,
+        overrideAccess: true,
+      });
+      for (const row of result.docs) flat.push(flatten(row as LeadRow));
+      if (!result.hasNextPage) break;
+      page += 1;
+      if (page > 100) break; // 20k cap — anything bigger should use scheduled jobs
+    }
+
+    const csv = toCsv(HEADERS, flat);
+    return new Response(csv, {
+      status: 200,
+      headers: {
+        'content-type': 'text/csv; charset=utf-8',
+        'content-disposition': `attachment; filename="leads-${todayStamp()}.csv"`,
+        'cache-control': 'no-store',
+      },
+    });
+  },
+};
