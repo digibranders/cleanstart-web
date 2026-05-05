@@ -21,38 +21,51 @@ const findName = (fields: Record<string, unknown>): string | null => {
   return null;
 };
 
-const renderFieldsTable = (fields: Record<string, unknown>): string =>
-  Object.entries(fields)
-    .map(
-      ([k, v]) =>
-        `<tr><td style="padding:6px 12px;border:1px solid #e5e7eb;font-weight:600">${k}</td><td style="padding:6px 12px;border:1px solid #e5e7eb">${
-          typeof v === 'string' ? v : JSON.stringify(v)
-        }</td></tr>`,
-    )
-    .join('');
-
 /**
- * Brevo handler — sends a transactional new-lead notification to the
- * recipients listed in `forms.notifyTo[]`. Skipped silently when no
- * recipients are configured. Authenticates via BREVO_API_KEY env var
- * and the Brevo-recommended sender pulled from BREVO_FROM_EMAIL.
+ * Brevo handler — sends a transactional new-lead notification using a
+ * template configured in the Brevo dashboard. Sender, subject, and
+ * email body all live in Brevo (the marketing team owns them); this
+ * code only ships the recipients + template params.
  *
- * No-op (skipped) when BREVO_API_KEY isn't set so local dev / CI don't
- * blow up. Production needs both env vars.
+ * Required env:
+ *   BREVO_API_KEY        — account API key
+ *   BREVO_TEMPLATE_ID    — id of the lead-notification template
  *
- * Failure on this handler is non-fatal — the LeadHandler chain records
- * the failure on `leads.syncedTo[]` and the lead row is still captured.
+ * Skipped when:
+ *   - either env var is missing (dev / unconfigured production)
+ *   - the matching form has no `notifyTo[]` recipients
+ *   - the submission is a duplicate of an earlier lead within 24h
+ *
+ * Failure here is non-fatal — the LeadHandler chain records it on
+ * leads.syncedTo[] and the lead row is still captured.
+ *
+ * Template parameter convention (use {{ params.X }} in the Brevo
+ * template):
+ *   - formName      — the form's `name` field
+ *   - visitorName   — first sibling field whose key matches /name/i
+ *   - visitorEmail  — first sibling value containing '@'
+ *   - sourceUrl     — the page the submission came from
+ *   - submittedAt   — ISO timestamp
+ *   - fields        — full object of visitor answers (use {{ params.fields.email }} etc.)
  */
 export const brevoHandler: LeadHandler = {
   name: 'brevo',
   kind: 'secondary',
   async run(submission: LeadSubmission, ctx) {
     const apiKey = process.env.BREVO_API_KEY;
-    const fromEmail = process.env.BREVO_FROM_EMAIL;
-    const fromName = process.env.BREVO_FROM_NAME ?? 'CleanStart';
+    const templateIdRaw = process.env.BREVO_TEMPLATE_ID;
 
-    if (!apiKey || !fromEmail) {
+    if (!apiKey || !templateIdRaw) {
       return { handler: 'brevo', status: 'skipped', reason: 'env-not-configured' };
+    }
+
+    const templateId = Number.parseInt(templateIdRaw, 10);
+    if (!Number.isInteger(templateId) || templateId <= 0) {
+      return {
+        handler: 'brevo',
+        status: 'failed',
+        error: `Invalid BREVO_TEMPLATE_ID: ${templateIdRaw}`,
+      };
     }
 
     if (ctx.duplicateOfLeadId != null) {
@@ -73,16 +86,20 @@ export const brevoHandler: LeadHandler = {
 
     const visitorEmail = findEmail(submission.fields);
     const visitorName = findName(submission.fields);
-    const formName = form?.name ?? 'a form';
-    const subject = `New ${formName} submission${visitorName ? ` from ${visitorName}` : ''}`;
 
-    const html = `
-      <p>A new lead has come in via <strong>${formName}</strong>.</p>
-      <table style="border-collapse:collapse;font-family:system-ui,sans-serif;font-size:14px">
-        ${renderFieldsTable(submission.fields)}
-      </table>
-      ${submission.source ? `<p style="color:#6b7280">Source page: ${submission.source}</p>` : ''}
-    `;
+    const body = {
+      templateId,
+      to: notifyTo.map((email) => ({ email })),
+      ...(visitorEmail ? { replyTo: { email: visitorEmail } } : {}),
+      params: {
+        formName: form?.name ?? null,
+        visitorName: visitorName ?? null,
+        visitorEmail: visitorEmail ?? null,
+        sourceUrl: submission.source ?? null,
+        submittedAt: new Date().toISOString(),
+        fields: submission.fields,
+      },
+    };
 
     const response = await fetch(BREVO_TRANSACTIONAL_ENDPOINT, {
       method: 'POST',
@@ -91,13 +108,7 @@ export const brevoHandler: LeadHandler = {
         'content-type': 'application/json',
         accept: 'application/json',
       },
-      body: JSON.stringify({
-        sender: { email: fromEmail, name: fromName },
-        to: notifyTo.map((email) => ({ email })),
-        replyTo: visitorEmail ? { email: visitorEmail } : undefined,
-        subject,
-        htmlContent: html,
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -113,7 +124,7 @@ export const brevoHandler: LeadHandler = {
     return {
       handler: 'brevo',
       status: 'synced',
-      externalId: data?.messageId ?? undefined,
+      ...(data?.messageId ? { externalId: data.messageId } : {}),
     };
   },
 };

@@ -1,6 +1,10 @@
 import { brevoHandler } from './brevo';
 import { registerSecondaryHandler } from './registry';
-import { teamsHandler } from './teams';
+
+// Day-1 secondary chain is Brevo-only. Microsoft Teams (and GA, GSC,
+// Slack, HubSpot, etc.) move to a later "Integrations" admin surface
+// where editors connect each channel from a CMS settings page, not env
+// vars. See docs/BACKLOG.md "Future — Integrations dashboard".
 
 let registered = false;
 
@@ -13,10 +17,9 @@ export const registerLeadHandlers = (): void => {
   if (registered) return;
   registered = true;
   registerSecondaryHandler(brevoHandler);
-  registerSecondaryHandler(teamsHandler);
 };
 
-export { brevoHandler, teamsHandler };
+export { brevoHandler };
 export {
   registerSecondaryHandler,
   listSecondaryHandlers,

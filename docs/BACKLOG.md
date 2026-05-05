@@ -179,7 +179,7 @@ Goal: forms render, leads land, no submission lost during a CMS outage.
 | E8 | Form rate-limit + retention defaults applied globally                            | §`#rate-limiting`, §`#privacy-gdpr` |
 | E9 | E2E test: submission with DB intentionally down → R2 queue → drain on recovery | §`#forms`                              |
 
-**Phase E exit criteria:**
+**[Phase E exit criteria:]()**
 
 - Form submission with CMS up: `leads` row created + Brevo email fired + Teams webhook delivered with valid signature
 - Form submission with DB injected-down: lead lands in R2 queue; cron drains it within 5 min; nothing lost
@@ -304,3 +304,40 @@ Goal: prod-quality posture; ready for cutover-day runbook.
 - Custom `/dashboard` route group — only added if Payload admin proves insufficient (per arch doc §`#decisions` custom-dashboard row)
 - ISR-revalidate handshake consumer side — lives in `apps/web`
 - Public-site sitemap.xml — lives in `apps/web`
+
+---
+
+## Future — Integrations dashboard
+
+Post-launch admin surface where editors connect external channels from a CMS settings page (no env-var edits, no code changes per channel). Each integration is a row in an encrypted `integrations` collection that registers a matching LeadHandler / observability-shipper / sitemap-pinger at runtime.
+
+Day-1 candidates to lift from env-only wiring → managed in admin:
+
+- **Microsoft Teams** — webhook URL + Standard Webhooks signing secret. Replaces the prototype Teams handler removed in this session; new leads + publish events fan out to the chosen channel.
+- **Google Analytics 4** — measurement ID + API secret for a server-side events pipeline so lead/publish events join the GA4 stream without depending on the public site's tag.
+- **Google Search Console** — service-account JSON. Powers IndexNow + Indexing-API submissions for new content; surfaces Search Console Coverage data on the dashboard.
+- **HubSpot / Salesforce** — OAuth tokens + list/owner mappings. Unlocks the CRM secondary handler stubbed in arch doc §`#forms` (multi-select on `forms.crmHandlers`).
+- **Slack** — webhook URL for editorial team notifications.
+
+Schema sketch (not built yet):
+
+```ts
+// collections/Integrations.ts
+{
+  slug: 'integrations',
+  access: { read: isAdmin, /* … */ },
+  fields: [
+    { name: 'kind', type: 'select', options: ['teams', 'ga4', 'gsc', 'hubspot', 'salesforce', 'slack'] },
+    { name: 'enabled', type: 'checkbox' },
+    { name: 'config', type: 'json' /* per-kind shape, encrypted at rest */ },
+  ],
+}
+```
+
+Trigger to start: when a real editor surfaces a need (e.g. "I want lead pings in #sales-eng"). Until then env-var-only flow + Brevo notifications cover launch volume.
+
+---
+
+## Phase G — Sentry project setup note
+
+When wiring Phase G observability, create a fresh Sentry project at <https://fynix-digital.sentry.io/projects/new/> for the Next.js + Payload runtime. Suggested project name: `cleanstart-cms`. DSN goes into `SENTRY_DSN` in `apps/cms/.env` for local; production DSN lives in the Coolify env-vars panel, never committed.
