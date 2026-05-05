@@ -6,7 +6,7 @@ This file tells Claude Code *how* to work in this repo. It does not duplicate th
 
 **Plan of record:** `~/.claude/plans/lets-review-the-doc-curried-feigenbaum.md` (CMS-only Phase A–I sequence). The current backlog is at `docs/BACKLOG.md`.
 
-**Scope of this session:** `apps/cms` only (Payload admin + REST API + hooks). The public marketing site `apps/web` is out of scope until brand/Figma lands.
+**Currently active scope:** `apps/cms` only (Payload admin + REST API + hooks). The public marketing site `apps/web` was bootstrapped once and discarded; it will be reintroduced in a future wave. Until then, do not scaffold `apps/web` or recreate the deleted design/UI/Figma-extracted assets in `docs/web/`.
 
 ---
 
@@ -32,12 +32,12 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 ├── migrations/webflow-import/       Phase H: ETL scripts
 ├── infra/                           docker-compose · Caddy · backup/restore scripts
 ├── docs/                            BACKLOG, cleanstart-cms-architecture.html (source of truth),
-│                                    brand PDF, future EDITOR-GUIDE / CONTENT-MODEL / RESTORE-LOG
+│                                    INTEGRATIONS-RESEARCH, web/ (architecture+roadmap only)
 ├── cleanstart-logo.svg              brand mark — also embedded as JSX in apps/cms/src/payload/admin/
 └── CLAUDE.md                        this file
 ```
 
-`apps/web` is **planned** — implementation kicks off W1 (Home page first). Documentation contracts ship in `docs/web/` ahead of code; see [`docs/web/WEB-ARCHITECTURE.md`](docs/web/WEB-ARCHITECTURE.md) and the **apps/web** section below. `packages/ui` remains intentionally absent — primitives live inside `apps/web/components/primitives/` until cross-app reuse demands extraction.
+`apps/web` is **deferred** — a previous bootstrap was discarded along with the design-system / brand / token / component-map docs. The surviving contracts in `docs/web/` are architecture- and roadmap-only ([`WEB-ARCHITECTURE.md`](docs/web/WEB-ARCHITECTURE.md), [`BACKLOG-WEB.md`](docs/web/BACKLOG-WEB.md), [`CONTENT-MODEL.md`](docs/web/CONTENT-MODEL.md), [`SEO-PLAYBOOK.md`](docs/web/SEO-PLAYBOOK.md)); the design-surface docs (DESIGN-SYSTEM, COMPONENT-MAP, BRAND-GUIDELINES, ACCESSIBILITY, FRONTEND-INTEGRATIONS) and the Figma-extracted assets (tokens.css/json, snapshots) will be reintroduced when web development restarts. `packages/ui` is intentionally absent.
 
 ---
 
@@ -100,62 +100,34 @@ These resolved the open forks from arch doc §`#decisions`. Build accordingly:
 
 ---
 
-## apps/web (public marketing site)
+## apps/web (public marketing site) — deferred
 
-**Source of truth for design + content surface:** [`docs/web/`](docs/web/). The arch doc ([`docs/cleanstart-cms-architecture.html`](docs/cleanstart-cms-architecture.html)) remains the source of truth for behavior; `docs/web/` translates that behavior into web-client contracts. If they disagree, arch doc wins for product decisions; `docs/web/` wins for code conventions inside `apps/web/`.
+`apps/web` does not currently exist. A previous scaffold was discarded; the design-system / component-map / brand / accessibility / frontend-integrations docs and Figma-extracted assets were removed alongside it.
 
-**Stack:** Next.js 16.2 App Router · Tailwind v4 (`@theme`) · shadcn/ui · TypeScript strict · Biome · Vitest + Playwright. Same Node 22 / pnpm 10 as `apps/cms`.
+What survives and is still load-bearing:
 
-**Hosting:** `apps/web` deploys to **Vercel Pro** (per arch doc §hosting); `apps/cms` stays on **Coolify+droplet**. Cloudflare WAF fronts both. The split is deliberate — see [`docs/web/WEB-ARCHITECTURE.md §15`](docs/web/WEB-ARCHITECTURE.md#15--deployment) for rationale.
+- [`docs/web/WEB-ARCHITECTURE.md`](docs/web/WEB-ARCHITECTURE.md) — stack, hosting split (Vercel Pro for web, Coolify for CMS), preview-JWT flow, lead-submit proxy contract.
+- [`docs/web/BACKLOG-WEB.md`](docs/web/BACKLOG-WEB.md) — the wave plan; W-A bootstrap is open again.
+- [`docs/web/CONTENT-MODEL.md`](docs/web/CONTENT-MODEL.md) — collection → URL → cache-tag → JSON-LD data contract.
+- [`docs/web/SEO-PLAYBOOK.md`](docs/web/SEO-PLAYBOOK.md) — JSON-LD recipes; drives Wave D Phase F server-side generators in `apps/cms`.
+- [`apps/cms/src/payload/lib/route-prefixes.ts`](apps/cms/src/payload/lib/route-prefixes.ts) — single source of truth for URL prefixes (singulars `/event`, `/webinar`, `/job`, `/guide`, `/author`; plural `/resources`).
 
-**URL parity is hard.** All URLs verified against the live `cleanstart.com` sitemap on 2026-05-05 — see [`docs/web/WEB-ARCHITECTURE.md §3`](docs/web/WEB-ARCHITECTURE.md#3--route-map-locked-against-live-cleanstartcom). Listings: `/blogs`, `/news`, `/events`, `/webinar` (singular!), `/careers`, `/resource-center`. Detail prefixes: `/blogs/[slug]`, `/news/[slug]`, `/event/[slug]`, `/webinar/[slug]`, `/job/[slug]`, `/resources/[slug]`, `/guide/[slug]`, `/author/[slug]` — all per [`apps/cms/src/payload/lib/route-prefixes.ts`](apps/cms/src/payload/lib/route-prefixes.ts).
+**Until web development restarts:** do not scaffold `apps/web/`, do not re-create the deleted design docs from memory, do not regenerate `docs/web/tokens.*` or `docs/web/figma-snapshots/`. When work resumes, this section will be rewritten with the active stack, hard rules, and pre-completion checks.
 
-**Hard rules** (in addition to the global Forbidden actions section):
-- **Never duplicate the LeadHandler chain in `apps/web`.** All form posts proxy to `https://admin.cleanstart.com/api/leads/submit` via a Server Action (`apps/web/app/api/leads/submit/route.ts`).
-- **Never expose `PAYLOAD_SECRET` to the browser** — no `NEXT_PUBLIC_*` prefix; preview-JWT verification is server-only.
-- **Never bypass the `/api/preview` JWT check.** Cookie tokens are re-verified on every page render.
-- **Never rename a Next.js route segment post-launch.** Already in Forbidden actions; re-stated for emphasis on `apps/web`.
-- **Never hard-code design tokens.** Consume from `docs/web/tokens.css` via the `@theme` import. No raw hex colors, no inline `box-shadow`/`filter`, no off-grid spacing.
-- **Never hand-edit `docs/web/tokens.json` or `docs/web/tokens.css`.** Re-run `pnpm figma:extract`.
-- **Never load third-party scripts before consent** unless strictly necessary (functional/security cookies excepted). Consent-mode v2 enforced via `lib/consent.ts`.
-- **Never change `apps/cms` to satisfy `apps/web`** without first ensuring `docs/cleanstart-cms-architecture.html` agrees.
-
-**Pre-completion checks (apps/web):**
-
-```bash
-pnpm --filter @cleanstart/web lint
-pnpm --filter @cleanstart/web typecheck
-pnpm --filter @cleanstart/web build
-pnpm --filter @cleanstart/web test
-```
-
-Same rule as the CMS: fix before reporting; report `lint ✓ · typecheck ✓ · build ✓`.
-
-**Reading order for new contributors:** [`README`](README.md) → this file → [`docs/web/WEB-ARCHITECTURE.md`](docs/web/WEB-ARCHITECTURE.md) → [`docs/web/CONTENT-MODEL.md`](docs/web/CONTENT-MODEL.md) → [`docs/web/COMPONENT-MAP.md`](docs/web/COMPONENT-MAP.md) → [`docs/web/DESIGN-SYSTEM.md`](docs/web/DESIGN-SYSTEM.md) → [`docs/web/BACKLOG-WEB.md`](docs/web/BACKLOG-WEB.md).
-
-A separate `apps/web/CLAUDE.md` ships in W-A bootstrap (template in [`docs/web/BACKLOG-WEB.md`](docs/web/BACKLOG-WEB.md) §apps/web/CLAUDE.md template).
+The cross-cutting hard rules that *will* apply once web exists are already captured in [`docs/web/WEB-ARCHITECTURE.md`](docs/web/WEB-ARCHITECTURE.md) (LeadHandler proxy, preview JWT, route segment immutability, no `NEXT_PUBLIC_*` for secrets, consent-mode-v2 before third-party scripts) — they don't need to live in this file until then.
 
 ---
 
-## Figma source of truth
+## Figma access — tooling preserved, extracted output deferred
 
-The design lives in the *CleanStart V4* Figma file (file key
-`doWR9Xbwgkz6dqR9n4m3BB`). The Home page (node `108:7624`) is the only
-design-complete artboard at start of W1; six more pages are in design.
-See [`docs/web/BACKLOG-WEB.md`](docs/web/BACKLOG-WEB.md) for the
-design-availability wave plan.
-
-### For Claude sessions doing design extraction or asset pulls
+The design lives in the *CleanStart V4* Figma file (file key `doWR9Xbwgkz6dqR9n4m3BB`). The extraction tooling stays in place so it can be re-run when web development restarts; the previously extracted assets (`docs/web/tokens.css`, `tokens.json`, `figma-snapshots/`) were removed alongside `apps/web`.
 
 - **Auth:** a Figma PAT lives in `$FIGMA_TOKEN` (root [`.env`](#), gitignored). Never echo, log, or commit the token. [`.env.example`](.env.example) documents the variable names.
-- **File + node IDs:** `$FIGMA_FILE_KEY` (default `doWR9Xbwgkz6dqR9n4m3BB`), `$FIGMA_HOMEPAGE_NODE` (default `108:7624`).
-- **Extraction script:** `pnpm figma:extract` runs [`scripts/figma-extract.ts`](scripts/figma-extract.ts). It re-derives [`docs/web/tokens.json`](docs/web/tokens.json), [`docs/web/tokens.css`](docs/web/tokens.css), and per-page snapshots in `docs/web/figma-snapshots/`. Re-run after any Figma update; commit the resulting `docs/web/` files (script output is tracked, the secret is not).
-- **Variables API:** requires `file_variables:read` PAT scope AND the file having published Figma Variables. Currently not used (file has no Variables); the layer-walk path in `figma-extract.ts` is the source of truth. If the designer later promotes layer styles to Variables, regenerate the PAT with that scope and the script auto-prefers it.
-- **Plugin MCP** (`figma-console`): optional. Useful for live design iteration; not required for extraction. REST API + `pnpm figma:extract` is sufficient.
+- **File + node IDs:** `$FIGMA_FILE_KEY`, `$FIGMA_HOMEPAGE_NODE`.
+- **Extraction script:** `pnpm figma:extract` runs [`scripts/figma-extract.ts`](scripts/figma-extract.ts). When the web app restarts, re-running this regenerates `docs/web/tokens.json`, `tokens.css`, and `figma-snapshots/`. Do not run it before then — the output has no consumer.
+- **Plugin MCP** (`figma-console`): optional, not required for extraction.
 
-**Hard rule:** if a token value disagrees between [`docs/web/tokens.json`](docs/web/tokens.json) and a hand-edited CSS variable in `apps/web/`, the JSON wins. Hand-edits to `tokens.css` are forbidden — re-run the extractor instead.
-
-**Snapshot caveat:** the Home artboard (1920×9276 px) exceeds Figma REST `/v1/images` render-service limits even at scale=1. The other six pages render fine. See [`docs/web/figma-snapshots/README.md`](docs/web/figma-snapshots/README.md) for workarounds.
+**Hard rule when web restarts:** never hand-edit the extractor's output. Re-run the script instead.
 
 ---
 
