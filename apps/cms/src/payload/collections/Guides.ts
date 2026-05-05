@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { bodyStatsHook } from '../hooks/body-stats';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 export const Guides: CollectionConfig = {
@@ -109,7 +110,7 @@ export const Guides: CollectionConfig = {
       access: { update: () => false },
       admin: {
         readOnly: true,
-        description: 'Computed from body word count on save (Phase D hook).',
+        description: 'Computed from body word count on save.',
         position: 'sidebar',
       },
     },
@@ -122,9 +123,33 @@ export const Guides: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'tableOfContents',
+      type: 'array',
+      access: { update: () => false },
+      labels: { singular: 'Heading', plural: 'Table of contents' },
+      admin: {
+        readOnly: true,
+        description: 'Auto-built from H2/H3 headings in the body on save.',
+      },
+      fields: [
+        { name: 'level', type: 'number' },
+        { name: 'text', type: 'text' },
+        { name: 'anchor', type: 'text' },
+      ],
+    },
     seoField,
   ],
   hooks: {
+    beforeChange: [
+      bodyStatsHook({
+        fields: {
+          readingMinutes: 'readingMinutes',
+          wordCount: 'wordCount',
+          tableOfContents: 'tableOfContents',
+        },
+      }),
+    ],
     afterChange: [slugChangeRedirectHook('guides')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },

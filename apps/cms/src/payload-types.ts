@@ -794,9 +794,20 @@ export interface Blog {
   featured?: boolean | null;
   pinned?: boolean | null;
   /**
-   * Computed from body word count on save (Phase D hook).
+   * Computed from body word count on save.
    */
   readingMinutes?: number | null;
+  /**
+   * Auto-built from H2/H3 headings in the body on save.
+   */
+  tableOfContents?:
+    | {
+        level?: number | null;
+        text?: string | null;
+        anchor?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
    */
@@ -895,7 +906,7 @@ export interface News {
   publicationDate: string;
   relatedNews?: (number | News)[] | null;
   /**
-   * Computed from body word count on save (Phase D hook).
+   * Computed from body word count on save.
    */
   readingMinutes?: number | null;
   /**
@@ -1062,10 +1073,21 @@ export interface Guide {
     | null;
   relatedGuides?: (number | Guide)[] | null;
   /**
-   * Computed from body word count on save (Phase D hook).
+   * Computed from body word count on save.
    */
   readingMinutes?: number | null;
   wordCount?: number | null;
+  /**
+   * Auto-built from H2/H3 headings in the body on save.
+   */
+  tableOfContents?:
+    | {
+        level?: number | null;
+        text?: string | null;
+        anchor?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
    */
@@ -3871,6 +3893,14 @@ export interface BlogsSelect<T extends boolean = true> {
   featured?: T;
   pinned?: T;
   readingMinutes?: T;
+  tableOfContents?:
+    | T
+    | {
+        level?: T;
+        text?: T;
+        anchor?: T;
+        id?: T;
+      };
   seo?:
     | T
     | {
@@ -3978,6 +4008,14 @@ export interface GuidesSelect<T extends boolean = true> {
   relatedGuides?: T;
   readingMinutes?: T;
   wordCount?: T;
+  tableOfContents?:
+    | T
+    | {
+        level?: T;
+        text?: T;
+        anchor?: T;
+        id?: T;
+      };
   seo?:
     | T
     | {

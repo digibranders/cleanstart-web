@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { bodyStatsHook } from '../hooks/body-stats';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 export const News: CollectionConfig = {
@@ -66,13 +67,14 @@ export const News: CollectionConfig = {
       access: { update: () => false },
       admin: {
         readOnly: true,
-        description: 'Computed from body word count on save (Phase D hook).',
+        description: 'Computed from body word count on save.',
         position: 'sidebar',
       },
     },
     seoField,
   ],
   hooks: {
+    beforeChange: [bodyStatsHook({ fields: { readingMinutes: 'readingMinutes' } })],
     afterChange: [slugChangeRedirectHook('news')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
