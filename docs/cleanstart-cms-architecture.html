@@ -691,7 +691,7 @@
         <li><strong>Hosting:</strong> single DO droplet preferred over multi-vendor managed services for simplicity.</li>
         <li><strong>Custom dashboard scope:</strong> extended Payload admin views + a separate marketing dashboard at <code>/dashboard</code>.</li>
         <li><strong>Ecommerce:</strong> none. Webflow's Ecom module was attempted, blocked by a naming conflict, and abandoned with zero data.</li>
-        <li><strong>CRM:</strong> none yet — leads to DB + email today; CRM-swappable adapter for HubSpot/Salesforce later.</li>
+        <li><strong>CRM:</strong> <strong>Zoho CRM</strong> (active). Leads land in DB + email at launch; the <code>LeadHandler</code> chain adds a Zoho secondary handler post-launch (OAuth 2.0 self-client, data-centre-scoped). HubSpot / Salesforce / Pipedrive remain pluggable through the same adapter shape if sales tooling ever changes.</li>
         <li><strong>Jobs source:</strong> schema must support both CMS-native and external ATS deep-link.</li>
       </ul>
     </section>
@@ -3540,7 +3540,7 @@ export default {
           <tr><td class="field-name">schemaVersion</td><td class="field-type">number · auto-incremented every time <code>fields[]</code> changes after the form has at least one published submission · captured into <code>leads.formSchemaVersion</code> at submit time so renaming a field doesn't silently break old <code>leads.fields</code> JSON keys</td><td><span class="pill auto">Auto</span></td><td><span class="pill computed">computed</span> <span class="pill new">NEW</span></td></tr>
           <tr><td class="field-name">submitLabel</td><td class="field-type">text · default <em>"Submit"</em></td><td><span class="pill autofill">Auto-fill</span></td><td></td></tr>
           <tr><td class="field-name">postSubmit</td><td class="field-type">discriminated union: <code>{kind: 'message', body: rich text}</code> or <code>{kind: 'redirect', url}</code> · <code>body</code> only shown when <code>kind=message</code>; <code>url</code> only shown when <code>kind=redirect</code></td><td><span class="pill cond">Cond.</span></td><td><span class="pill req">req</span></td></tr>
-          <tr><td class="field-name">crmHandlers</td><td class="field-type">multi-select: <code>hubspot</code> · <code>salesforce</code> · default <code>[]</code> · selecting a handler reveals its config block (API key reference, list ID, owner mapping). DB write always runs; CRM handlers are zero or more parallel secondaries</td><td><span class="pill cond">Cond. + Auto-fill</span></td><td><span class="pill new">NEW</span></td></tr>
+          <tr><td class="field-name">crmHandlers</td><td class="field-type">multi-select: <code>zohoCrm</code> (primary — active CRM) · <code>hubspot</code> · <code>salesforce</code> · <code>pipedrive</code> · default <code>[]</code> · selecting a handler reveals its config block (per-row Integrations dashboard credentials, target module/list, owner/field mapping). DB write always runs; CRM handlers are zero or more parallel secondaries.</td><td><span class="pill cond">Cond. + Auto-fill</span></td><td><span class="pill new">NEW</span></td></tr>
           <tr><td class="field-name">notifyTo</td><td class="field-type">array of email addresses · who gets the new-lead email</td><td><span class="pill manual">Manual</span></td><td></td></tr>
           <tr><td class="field-name">honeypot, turnstile</td><td class="field-type">boolean × 2 · default ON · honeypot adds an invisible field bots fill; turnstile adds Cloudflare Turnstile challenge · <strong>not editor-toggleable</strong> (always-on policy; lives in admin config, not the form schema)</td><td><span class="pill auto">Auto</span></td><td><span class="pill new">NEW</span></td></tr>
         </tbody>
@@ -3710,7 +3710,7 @@ export default {
 
 <pre><code>// src/payload/lib/leadHandlers/index.ts
 export interface LeadHandler {
-  name: 'db' | 'hubspot' | 'salesforce' | 'zapier' | 'n8n' | 'customWebhook';
+  name: 'db' | 'zohoCrm' | 'hubspot' | 'salesforce' | 'pipedrive' | 'zapier' | 'n8n' | 'customWebhook';
   submit(form: Form, payload: LeadPayload, ctx: SubmitContext): Promise&lt;LeadResult&gt;;
   // Optional — used by GDPR DSAR delete-by-email cascade
   deleteByEmail?(email: string, ctx: SubmitContext): Promise&lt;DeleteResult&gt;;
@@ -3743,8 +3743,9 @@ async function handleSubmission(form, payload, ctx) {
 // Shipped at launch
 class DbLeadHandler implements LeadHandler { /* Postgres + Brevo email */ }
 
-// Implementations built when each CRM is adopted; interface stable.
-// HubspotLeadHandler · SalesforceLeadHandler · ZapierLeadHandler · N8nLeadHandler · CustomWebhookLeadHandler</code></pre>
+// Implementations built when each CRM is wired; interface stable.
+// ZohoCrmLeadHandler (primary — active CRM) · HubspotLeadHandler · SalesforceLeadHandler ·
+// PipedriveLeadHandler · ZapierLeadHandler · N8nLeadHandler · CustomWebhookLeadHandler</code></pre>
 
       <h4 id="lead-durability">Lead durability — surviving CMS outage</h4>
       <p>
@@ -4768,22 +4769,35 @@ export async function POST(req: Request) {
       <h3 id="webhooks">Webhook surface</h3>
       <p>
         Outbound notifications from the CMS, configured in <code>siteSettings.webhooks[]</code>. Two events fire to
-        a single Microsoft Teams channel using a generic-JSON payload signed per the Standard Webhooks spec.
+        a Microsoft Teams channel using a generic-JSON payload signed per the Standard Webhooks spec.
         Per Sanity's official guidance, webhooks are scoped to the narrowest set of changes that produce
         signal — extra events are added only when a stakeholder asks for them.
+      </p>
+      <p class="small">
+        <strong>Teams transport:</strong> Office 365 Connectors (the legacy "Incoming Webhook" channel
+        connector) are retired by Microsoft on <strong>2026-05-18</strong>. New Teams destinations target
+        the <strong>Workflows</strong> app's Power Automate webhook URL
+        (<code>https://prod-XX.&lt;region&gt;.logic.azure.com:443/workflows/&hellip;</code>), accepting an
+        <strong>Adaptive Card</strong> payload — not the legacy <code>MessageCard</code> shape. Multi-channel
+        and multi-recipient routing, plus cross-tenant guest @mentions, are designed in the
+        post-launch <em>Integrations dashboard</em> (see <code>docs/INTEGRATIONS-RESEARCH.md</code>).
       </p>
 
       <h4>Event catalog</h4>
       <table>
         <thead><tr><th>Event</th><th>Trigger</th><th>Payload</th><th>Default consumer</th></tr></thead>
         <tbody>
-          <tr><td><code>document.published</code></td><td>Editor publishes a draft, <em>or</em> the scheduled-publish cron promotes <code>scheduled → published</code></td><td><code>{event, deliveryId, collection, id, slug, title, url, publishedAt, isScheduledRun, actor, deliveredAt}</code></td><td><em>#content-publishes</em> Teams channel — plain text + URL</td></tr>
-          <tr><td><code>lead.submitted</code></td><td>Form submission completes the DB primary write</td><td><code>{event, deliveryId, formSlug, leadId, source, utm, createdAt, deliveredAt}</code></td><td><em>#leads</em> Teams channel — plain text + admin link</td></tr>
+          <tr><td><code>document.published</code></td><td>Editor publishes a draft, <em>or</em> the scheduled-publish cron promotes <code>scheduled → published</code></td><td><code>{event, deliveryId, collection, id, slug, title, url, publishedAt, isScheduledRun, actor, deliveredAt}</code></td><td><em>#content-publishes</em> Teams channel — Workflows webhook → Adaptive Card with title + URL</td></tr>
+          <tr><td><code>lead.submitted</code></td><td>Form submission completes the DB primary write</td><td><code>{event, deliveryId, formSlug, leadId, source, utm, createdAt, deliveredAt}</code></td><td><em>#leads</em> Teams channel — Workflows webhook → Adaptive Card with admin link</td></tr>
         </tbody>
       </table>
       <p class="small">
-        Both events fire to a single Teams Incoming Webhook URL with <code>format: 'generic'</code> JSON.
-        Plain text + URL — no rich card formatting; the goal is signal, not visual polish in a chat channel.
+        Both events fire to a Teams Workflows webhook URL with an Adaptive Card body
+        (<code>{ "type": "message", "attachments": [{ "contentType": "application/vnd.microsoft.card.adaptive", &hellip; }] }</code>).
+        Adaptive Card text + URL — no rich card formatting beyond what Workflows renders by default; the
+        goal is signal, not visual polish in a chat channel. Workflows-posted messages always show the
+        default <em>Flow bot</em> as author (bot icon and name customisation that the legacy connector
+        supported is not carried forward).
       </p>
 
       <h4>Signing — Standard Webhooks format</h4>
@@ -5582,7 +5596,8 @@ sysctl --system</code></pre>
           <tr><td>Preview workflow</td><td>Admin split-pane + token-gated shareable preview URLs</td></tr>
           <tr><td>Custom dashboard</td><td>Payload admin only. A separate <code>/dashboard</code> route group is added if a marketer ever surfaces a workflow Payload can't handle.</td></tr>
           <tr><td>JSON-LD scope</td><td>Layer 1 (auto from typed fields) + Layer 2 catalog of 4 types (HowTo, SoftwareApplication, VideoObject, Review). Editors never write or paste JSON.</td></tr>
-          <tr><td>Webhook scope</td><td>2 events (<code>document.published</code>, <code>lead.submitted</code>) × 1 destination (Teams) × generic JSON × Standard Webhooks signing.</td></tr>
+          <tr><td>Webhook scope</td><td>2 events (<code>document.published</code>, <code>lead.submitted</code>) × N destinations × Standard Webhooks signing. Teams destinations target the Workflows app's Power Automate URL with an Adaptive Card body (legacy Office 365 Connectors retire 2026-05-18).</td></tr>
+          <tr><td>Integrations dashboard schema</td><td>Post-launch admin surface: per-row destination (each Teams channel / Slack channel / generic webhook is its own row) with an embedded <code>routing</code> predicate (<code>events[]</code>, <code>collections[]</code>, <code>formSlugs[]</code>, optional <code>minLeadScore</code>) and optional <code>mentions[]</code> (AAD Object ID + UPN for Teams; Slack member IDs for Slack). <code>config</code> JSON encrypted at rest. Reuses the <code>webhooks_dead_letter</code> table and "Failed webhooks" admin view — no forked retry/DLQ. See <code>docs/INTEGRATIONS-RESEARCH.md</code>.</td></tr>
           <tr><td>Form builder scope</td><td>6 field types (text · email · textarea · select · checkbox · consent). Global rate-limit + retention defaults. Conditional logic for fields ships day-1.</td></tr>
           <tr><td>Cache invalidation</td><td>Per-collection cache tags via Next.js 16 <code>revalidateTag()</code>.</td></tr>
           <tr><td>Alt-text assist</td><td>Humanized-filename starter — pre-fills the alt field on upload, editor confirms before publish. No external API call.</td></tr>

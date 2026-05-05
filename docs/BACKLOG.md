@@ -221,7 +221,7 @@ Goal: every operational signal arch doc requires is wired and verifiably firing.
 
 | #  | Ticket                                                                                                                             | Arch doc anchor                          |
 | -- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| G1 | Webhook emitter:`document.published` + `lead.submitted` to Teams                                                               | §`#webhooks`                          |
+| G1 | Webhook emitter:`document.published` + `lead.submitted` to Teams · target the **Workflows** webhook URL shape (Adaptive Card body), **not** the legacy Office 365 Connector — connector retires 2026-05-18. See `INTEGRATIONS-RESEARCH.md` §0. | §`#webhooks`                          |
 | G2 | Standard Webhooks signing on emit; verification fixture                                                                            | §`#webhooks`                          |
 | G3 | Cron catalog: backup heartbeat, lead-queue drain (E6), Meili reindex check, IndexNow ping, sitemap regen, scheduled-publish runner | §`#cron-jobs`                         |
 | G4 | Structured JSON logging to stdout · request-ID propagation                                                                        | §`#logging-alerting`                  |
@@ -311,17 +311,42 @@ Goal: prod-quality posture; ready for cutover-day runbook.
 
 ## Future — Integrations dashboard
 
-Post-launch admin surface where editors connect external channels from a CMS settings page (no env-var edits, no code changes per channel). Each integration is a row in an encrypted `integrations` collection that registers a matching LeadHandler / observability-shipper / sitemap-pinger at runtime.
+> Research: **`docs/INTEGRATIONS-RESEARCH.md`** is the authoritative scoping note for what this dashboard supports, why, and the open product questions still to resolve. Read it before scheduling any of the work below.
 
-Day-1 candidates to lift from env-only wiring → managed in admin:
+Post-launch admin surface where editors connect external channels from a CMS settings page (no env-var edits, no code changes per channel). Each row in an encrypted `integrations` collection registers a matching LeadHandler / observability-shipper / sitemap-pinger at runtime through the existing `registerSecondaryHandler()` pipeline.
 
-- **Microsoft Teams** — webhook URL + Standard Webhooks signing secret. Replaces the prototype Teams handler removed in this session; new leads + publish events fan out to the chosen channel.
-- **Google Analytics 4** — measurement ID + API secret for a server-side events pipeline so lead/publish events join the GA4 stream without depending on the public site's tag.
-- **Google Search Console** — service-account JSON. Powers IndexNow + Indexing-API submissions for new content; surfaces Search Console Coverage data on the dashboard.
-- **HubSpot / Salesforce** — OAuth tokens + list/owner mappings. Unlocks the CRM secondary handler stubbed in arch doc §`#forms` (multi-select on `forms.crmHandlers`).
-- **Slack** — webhook URL for editorial team notifications.
+### Tier 1 — day-1 of the dashboard
 
-Schema sketch (not built yet):
+Editor self-serve, low setup cost, covers the channel-notification use case in full:
+
+- **Microsoft Teams** — Workflows webhook URL (one row per channel), Adaptive Card body, optional `mentions[]` (AAD Object ID + UPN — same shape works for in-tenant users *and* `#EXT#` guest accounts). **Not** the legacy Office 365 Connector; that path retires 2026-05-18.
+- **Slack** — Incoming Webhook URL (per channel) or Slack App OAuth (`chat:write`). Block Kit message body, optional `<@user>` mentions resolved to Slack member IDs.
+- **Generic webhook** — catch-all for Zapier / n8n / Make / custom HTTPS endpoints. Standard Webhooks signing on emit; receivers handle dedup via `webhook-id`.
+
+### Tier 2 — primary CRM (Zoho — already in use) + future CRMs
+
+OAuth-based, deeper config surface; Zoho is the active CRM and the canonical adapter to build first. The arch-doc's historical `forms.crmHandlers[]` examples (`hubspot` / `salesforce`) are placeholder bets — Zoho leads.
+
+- **Zoho CRM** — Zoho OAuth 2.0 self-client → long-lived refresh token; **data-centre-scoped** (`zoho.com` / `.eu` / `.in` / `.com.au` / `.jp` — confirm CleanStart's DC before wiring). Maps `lead.submitted` → `Leads` (or `Contacts` + `Deals` for the deal-registration form). Editor-configurable field mapping (Zoho's API field names can be customized per org). `deleteByEmail()` cascade for GDPR Art. 17 — search-by-email then delete by returned record IDs.
+- **HubSpot / Salesforce / Pipedrive** — same shape as Zoho, different object models. Future / on-demand only — build when sales tooling actually changes.
+- **Google Sheets** — append-row sink via service-account JSON. Useful as an audit trail alongside Zoho or as a fallback during a Zoho outage.
+
+Settle on `/api/oauth/callback/[provider]` route shape on `admin.cleanstart.com` before the first row lands.
+
+### Tier 3 — server-side analytics / SEO
+
+- **GA4 (Measurement Protocol)** — measurement ID + API secret. Server-side `generate_lead` events join the GA4 stream without depending on the public site's tag. Complementary to the GTM-first matrix in arch doc §`#marketing-tags`, not a replacement.
+- **Google Search Console / Indexing API** — service-account JSON. IndexNow + Indexing-API submissions on slug change; GSC Coverage data surfaced on the dashboard.
+
+### Tier 4 — comms beyond chat
+
+- **Twilio SMS** — high-intent leads (deal-registration, demo request) ping a phone number; routed by `formSlugs[]` predicate.
+- **Discord** — same shape as Slack/Teams; relevant if a community Discord exists.
+- **Brevo email digest** — daily/weekly batched lead/publish digest for stakeholders not in chat. Reuses the existing Brevo API key.
+
+Booking widgets (Calendly, Chili Piper, HubSpot Meetings) and chat widgets (Intercom, Drift, Crisp) are **frontend** integrations — they live in `apps/web`, not the dashboard.
+
+### Schema sketch (not built yet)
 
 ```ts
 // collections/Integrations.ts
@@ -329,14 +354,36 @@ Schema sketch (not built yet):
   slug: 'integrations',
   access: { read: isAdmin, /* … */ },
   fields: [
-    { name: 'kind', type: 'select', options: ['teams', 'ga4', 'gsc', 'hubspot', 'salesforce', 'slack'] },
-    { name: 'enabled', type: 'checkbox' },
-    { name: 'config', type: 'json' /* per-kind shape, encrypted at rest */ },
+    { name: 'kind', type: 'select',
+      options: ['teams', 'slack', 'webhook',                         // Tier 1
+                'zohoCrm',                                           // Tier 2 — primary CRM (in use)
+                'hubspot', 'salesforce', 'pipedrive', 'sheets',      // Tier 2 — future CRMs
+                'ga4', 'gsc',                                        // Tier 3
+                'twilio', 'discord', 'brevoDigest'] },               // Tier 4
+    { name: 'label', type: 'text', required: true },                 // "Sales channel · #sales-eng-leads"
+    { name: 'enabled', type: 'checkbox', defaultValue: true },
+    { name: 'config', type: 'json' /* per-kind shape, encrypted at rest via pgcrypto */ },
+    { name: 'routing', type: 'group', fields: [
+      { name: 'events', type: 'select', hasMany: true,
+        options: ['document.published', 'lead.submitted'] },
+      { name: 'collections', type: 'text', hasMany: true },          // empty = all
+      { name: 'formSlugs', type: 'text', hasMany: true },            // lead.submitted only
+      { name: 'minLeadScore', type: 'number' },                      // optional predicate
+    ] },
+    { name: 'mentions', type: 'array', fields: [                     // teams + slack only
+      { name: 'displayName', type: 'text', required: true },
+      { name: 'externalId', type: 'text', required: true },          // AAD Object ID / Slack member ID
+      { name: 'upn', type: 'text' },                                 // teams only
+      { name: 'triggerOn', type: 'select', hasMany: true,
+        options: ['document.published', 'lead.submitted'] },
+    ] },
   ],
 }
 ```
 
-Trigger to start: when a real editor surfaces a need (e.g. "I want lead pings in #sales-eng"). Until then env-var-only flow + Brevo notifications cover launch volume.
+Per-row Test / Health / Pause / Audit affordances reuse the Phase G `webhooks_dead_letter` machinery — no forked retry/DLQ. See `INTEGRATIONS-RESEARCH.md` §3 for the dashboard wiring.
+
+Trigger to start: when a real editor surfaces a need (e.g. "I want lead pings in #sales-eng" or "ping `user@fynix.digital` on every demo request"). Until then env-var-only flow + Brevo notifications cover launch volume.
 
 ---
 
