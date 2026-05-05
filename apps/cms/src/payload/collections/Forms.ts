@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { slugField } from '../fields/slug';
+import { formSchemaVersionHook } from '../hooks/form-schema-version';
 
 const VISIBLE_LABEL_TYPES = ['text', 'email', 'textarea', 'select', 'checkbox', 'consent'];
 const PLACEHOLDER_TYPES = ['text', 'email', 'textarea'];
@@ -249,6 +250,9 @@ export const Forms: CollectionConfig = {
       },
     },
   ],
+  hooks: {
+    beforeChange: [formSchemaVersionHook],
+  },
   versions: { drafts: true },
   timestamps: true,
 };

@@ -1,6 +1,6 @@
 # CleanStart CMS — Build Backlog
 
-Phase A–I sequence for `apps/cms` (Payload admin + REST API + hooks). Each ticket links to an anchor in `docs/cleanstart-cms-architecture.html` for the *what*; conventions live in `CLAUDE.md` for the *how*.
+Phase A–I sequence for `apps/cms` (Payload admin + REST API + hooks). Each ticket links to an anchor in `cleanstart-cms-architecture.html` for the *what*; conventions live in `CLAUDE.md` for the *how*.
 
 **Hard rule:** a phase does not start until the previous phase's exit criteria are signed off.
 
@@ -8,17 +8,17 @@ Phase A–I sequence for `apps/cms` (Payload admin + REST API + hooks). Each tic
 
 ## Phase status at a glance
 
-| Phase                                        | Status  | Commit range             |
-| -------------------------------------------- | ------- | ------------------------ |
-| **A · Bootstrap**                     | ✅ Done | `c1317c7`              |
-| **B · Core schema**                   | ✅ Done | `3d2298e`–`c27c735` |
-| **C · Page-builder blocks**           | ✅ Done | `e19ce1c`–`0f04f87` |
+| Phase                                                     | Status     | Commit range             |
+| --------------------------------------------------------- | ---------- | ------------------------ |
+| **A · Bootstrap**                                  | ✅ Done    | `c1317c7`              |
+| **B · Core schema**                                | ✅ Done    | `3d2298e`–`c27c735` |
+| **C · Page-builder blocks**                        | ✅ Done    | `e19ce1c`–`0f04f87` |
 | **D · Editor experience (server-side validators)** | 🟡 Partial | `4665232`–`2c748b7` |
-| **E · Forms + leads runtime**         | —      | —                       |
-| **F · Search + structured data**      | —      | —                       |
-| **G · Webhooks, cron, observability** | —      | —                       |
-| **H · Migration ETL**                 | —      | —                       |
-| **I · Hardening**                     | —      | —                       |
+| **E · Forms + leads runtime**                      | —         | —                       |
+| **F · Search + structured data**                   | —         | —                       |
+| **G · Webhooks, cron, observability**              | —         | —                       |
+| **H · Migration ETL**                              | —         | —                       |
+| **I · Hardening**                                  | —         | —                       |
 
 Phase B verified end-to-end: DB drop+recreate, full schema push for all 17 collections + 6 globals, admin login, dashboard render with all groups visible.
 

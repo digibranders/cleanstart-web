@@ -74,6 +74,7 @@ export interface Config {
     newsCategories: NewsCategory;
     jobLocations: JobLocation;
     forms: Form;
+    leads: Lead;
     blogs: Blog;
     news: News;
     guides: Guide;
@@ -99,6 +100,7 @@ export interface Config {
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
     jobLocations: JobLocationsSelect<false> | JobLocationsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
+    leads: LeadsSelect<false> | LeadsSelect<true>;
     blogs: BlogsSelect<false> | BlogsSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     guides: GuidesSelect<false> | GuidesSelect<true>;
@@ -718,6 +720,109 @@ export interface Form {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * Form submissions (append-only). Editing is disabled — leads are immutable once captured. Use the CSV export for bulk handoff.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads".
+ */
+export interface Lead {
+  id: number;
+  /**
+   * Form the visitor submitted.
+   */
+  form: number | Form;
+  /**
+   * Captured at submit time — preserves this record's field key meaning even after the form's fields[] is renamed.
+   */
+  formSchemaVersion: number;
+  /**
+   * Visitor answers as a JSON map of {fieldName: value}.
+   */
+  fields:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * URL of the page the form was submitted from (referrer).
+   */
+  source?: string | null;
+  /**
+   * From the query string at submit time.
+   */
+  utm?: {
+    campaign?: string | null;
+    source?: string | null;
+    medium?: string | null;
+    term?: string | null;
+    content?: string | null;
+  };
+  /**
+   * Auto-purged after retention window. Never logged in raw form.
+   */
+  ip?: string | null;
+  /**
+   * Auto-purged after retention window.
+   */
+  userAgent?: string | null;
+  /**
+   * Timestamp of the GDPR consent checkbox tick (when present).
+   */
+  consentGivenAt?: string | null;
+  /**
+   * Exact consent text the visitor saw. Snapshotted from forms.fields[].consentText so it survives policy edits — required for GDPR audit defensibility.
+   */
+  consentSnapshot?: string | null;
+  /**
+   * siteSettings legal.policyVersion at submit time. Pairs with consentSnapshot for the full audit chain.
+   */
+  privacyPolicyVersion?: string | null;
+  /**
+   * Cookie-consent categories the visitor selected (empty until a CMP ships).
+   */
+  consentCategories?:
+    | {
+        category?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * One row per secondary handler (Brevo, Teams, future HubSpot/Salesforce). Failed rows are retryable.
+   */
+  syncedTo?:
+    | {
+        handler: string;
+        status: 'pending' | 'synced' | 'failed' | 'skipped';
+        syncedAt?: string | null;
+        externalId?: string | null;
+        error?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Map of {handler: enrichmentResult}. Free company-from-domain handler runs at launch; external (Clearbit/ZoomInfo) deferred.
+   */
+  enriched?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Set when a same-email same-form submission lands within 24h of the original. The duplicate row is kept for audit; CRM secondaries skip the resync.
+   */
+  duplicateOf?: (number | null) | Lead;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3469,6 +3574,10 @@ export interface PayloadLockedDocument {
         value: number | Form;
       } | null)
     | ({
+        relationTo: 'leads';
+        value: number | Lead;
+      } | null)
+    | ({
         relationTo: 'blogs';
         value: number | Blog;
       } | null)
@@ -3867,6 +3976,50 @@ export interface FormsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads_select".
+ */
+export interface LeadsSelect<T extends boolean = true> {
+  form?: T;
+  formSchemaVersion?: T;
+  fields?: T;
+  source?: T;
+  utm?:
+    | T
+    | {
+        campaign?: T;
+        source?: T;
+        medium?: T;
+        term?: T;
+        content?: T;
+      };
+  ip?: T;
+  userAgent?: T;
+  consentGivenAt?: T;
+  consentSnapshot?: T;
+  privacyPolicyVersion?: T;
+  consentCategories?:
+    | T
+    | {
+        category?: T;
+        id?: T;
+      };
+  syncedTo?:
+    | T
+    | {
+        handler?: T;
+        status?: T;
+        syncedAt?: T;
+        externalId?: T;
+        error?: T;
+        id?: T;
+      };
+  enriched?: T;
+  duplicateOf?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

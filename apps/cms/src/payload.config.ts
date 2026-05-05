@@ -15,6 +15,7 @@ import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
 import { JobLocations } from './payload/collections/JobLocations';
 import { Jobs } from './payload/collections/Jobs';
+import { Leads } from './payload/collections/Leads';
 import { Media } from './payload/collections/Media';
 import { News } from './payload/collections/News';
 import { NewsCategories } from './payload/collections/NewsCategories';
@@ -74,6 +75,7 @@ export default buildConfig({
     NewsCategories,
     JobLocations,
     Forms,
+    Leads,
     Blogs,
     News,
     Guides,
