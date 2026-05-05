@@ -14,7 +14,7 @@ Phase A–I sequence for `apps/cms` (Payload admin + REST API + hooks). Each tic
 | **B · Core schema**                                | ✅ Done    | `3d2298e`–`c27c735` |
 | **C · Page-builder blocks**                        | ✅ Done    | `e19ce1c`–`0f04f87` |
 | **D · Editor experience (server-side validators)** | 🟡 Partial | `4665232`–`2c748b7` |
-| **E · Forms + leads runtime**                      | —         | —                       |
+| **E · Forms + leads runtime**                      | ✅ Done    | `db0e880`–`2869d0c` |
 | **F · Search + structured data**                   | —         | —                       |
 | **G · Webhooks, cron, observability**              | —         | —                       |
 | **H · Migration ETL**                              | —         | —                       |
@@ -25,6 +25,8 @@ Phase B verified end-to-end: DB drop+recreate, full schema push for all 17 colle
 Phase C verified end-to-end: 18 blocks render in the Pages "Add Layout" picker (Section primitive + 17 content blocks), Section composes nested blocks (one-level nesting only by design), full schema push clean.
 
 Phase D **server-side** done in this session: block-level minRows validators (FAQ items, Pricing tiers, Section children, Table headers/rows, etc.), Lexical body-stats hook (readingMinutes/wordCount/tableOfContents on Blogs/News/Guides — 220 wpm, H2-H6 with disambiguated anchors), URL-shape and target validators on the typed-link field. **Client-side admin UX** (preview split-pane, custom React field components, publishing-checklist banner, lead-list CSV export) deferred — depends on either `apps/web` for the preview iframe or on the `leads` collection runtime which lands in Phase E.
+
+Phase E verified: Leads collection (append-only, GDPR consent snapshot + audit chain), `/api/leads/submit` custom endpoint with Zod validation + per-IP rate limit (5/min, 50/day) + Cloudflare Turnstile (env-gated), LeadHandler chain (db primary → Brevo + Teams secondaries fanned out in parallel — secondary failures never block primary), Standard-Webhooks-signed Teams payloads, R2 fallback queue with local-fs dev backstop, drainLeadQueueTask cron at `*/5 * * * *` with max 5 retry attempts. End-to-end "no lead lost during outage" path runs locally as long as Postgres is up; R2 + Brevo + Teams are env-gated so unconfigured handlers skip silently.
 
 ## Phase A · Bootstrap
 
