@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdmin, isAdminOrEditor } from '../access';
+import { submitLeadEndpoint } from '../endpoints/submit-lead';
 
 const SYNC_STATUSES = [
   { label: 'Pending', value: 'pending' },
@@ -32,10 +33,14 @@ export const Leads: CollectionConfig = {
   },
   access: {
     read: isAdminOrEditor,
-    create: () => true, // Public form posts come in via /api/leads which builds these records
+    // Public form posts go through the /api/leads/submit custom endpoint,
+    // which uses overrideAccess server-side. Direct REST POSTs to /api/leads
+    // are admin-only — closes the spam-via-CRUD vector.
+    create: isAdmin,
     update: () => false, // Append-only.
     delete: isAdmin,
   },
+  endpoints: [submitLeadEndpoint],
   fields: [
     {
       name: 'form',

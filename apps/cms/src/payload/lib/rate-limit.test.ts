@@ -1,0 +1,66 @@
+import { afterEach, describe, expect, it } from 'vitest';
+
+import { DEFAULT_RATE_LIMITS, __resetRateLimitStore, checkAndRecord } from './rate-limit';
+
+const now = Date.now();
+const MINUTE = 60 * 1000;
+
+afterEach(() => {
+  __resetRateLimitStore();
+});
+
+describe('checkAndRecord', () => {
+  it('allows submissions within the per-minute window', () => {
+    for (let i = 0; i < DEFAULT_RATE_LIMITS.perMinute; i++) {
+      const result = checkAndRecord('1.1.1.1', DEFAULT_RATE_LIMITS, now + i * 100);
+      expect(result.ok).toBe(true);
+    }
+  });
+
+  it('blocks the (perMinute + 1)th submission inside one minute', () => {
+    for (let i = 0; i < DEFAULT_RATE_LIMITS.perMinute; i++) {
+      checkAndRecord('1.1.1.1', DEFAULT_RATE_LIMITS, now + i * 100);
+    }
+    const result = checkAndRecord('1.1.1.1', DEFAULT_RATE_LIMITS, now + 1000);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.reason).toBe('per-minute');
+      expect(result.retryAfterMs).toBeGreaterThan(0);
+    }
+  });
+
+  it('allows submissions after the per-minute window passes', () => {
+    for (let i = 0; i < DEFAULT_RATE_LIMITS.perMinute; i++) {
+      checkAndRecord('1.1.1.1', DEFAULT_RATE_LIMITS, now + i * 100);
+    }
+    const result = checkAndRecord('1.1.1.1', DEFAULT_RATE_LIMITS, now + 2 * MINUTE);
+    expect(result.ok).toBe(true);
+  });
+
+  it('blocks at the per-day cap even when minute window is fresh', () => {
+    const config = { perMinute: 1000, perDay: 3 };
+    checkAndRecord('1.1.1.1', config, now);
+    checkAndRecord('1.1.1.1', config, now + 5 * MINUTE);
+    checkAndRecord('1.1.1.1', config, now + 10 * MINUTE);
+    const result = checkAndRecord('1.1.1.1', config, now + 60 * MINUTE);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toBe('per-day');
+  });
+
+  it('isolates buckets per key', () => {
+    for (let i = 0; i < DEFAULT_RATE_LIMITS.perMinute; i++) {
+      checkAndRecord('1.1.1.1', DEFAULT_RATE_LIMITS, now + i * 100);
+    }
+    const otherKey = checkAndRecord('2.2.2.2', DEFAULT_RATE_LIMITS, now + 1000);
+    expect(otherKey.ok).toBe(true);
+  });
+
+  it('returns remaining counts on success', () => {
+    const result = checkAndRecord('3.3.3.3', { perMinute: 10, perDay: 100 }, now);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.remaining.perMinute).toBe(9);
+      expect(result.remaining.perDay).toBe(99);
+    }
+  });
+});
