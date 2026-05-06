@@ -6,7 +6,7 @@ This file tells Claude Code *how* to work in this repo. It does not duplicate th
 
 **Plan of record:** `~/.claude/plans/lets-review-the-doc-curried-feigenbaum.md` (CMS-only Phase A–I sequence). The current backlog is at `docs/BACKLOG.md`.
 
-**Currently active scope:** `apps/cms` only (Payload admin + REST API + hooks). The public marketing site `apps/web` was bootstrapped once and discarded; it will be reintroduced in a future wave. Until then, do not scaffold `apps/web` or recreate the deleted design/UI/Figma-extracted assets in `docs/web/`.
+**Currently active scope:** `apps/cms` only (Payload admin + REST API + hooks). The public marketing site `apps/web` was bootstrapped once and discarded; it will be reintroduced in a future wave. Until then, do not scaffold `apps/web` or recreate the discarded design / UI / Figma-extracted assets.
 
 ---
 
@@ -31,13 +31,12 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 │   └── config/                      tsconfig · biome · eslint
 ├── migrations/webflow-import/       Phase H: ETL scripts
 ├── infra/                           docker-compose · Caddy · backup/restore scripts
-├── docs/                            BACKLOG, cleanstart-cms-architecture.html (source of truth),
-│                                    INTEGRATIONS-RESEARCH, web/ (architecture+roadmap only)
+├── docs/                            BACKLOG, cleanstart-cms-architecture.html (source of truth), INTEGRATIONS-RESEARCH
 ├── cleanstart-logo.svg              brand mark — also embedded as JSX in apps/cms/src/payload/admin/
 └── CLAUDE.md                        this file
 ```
 
-`apps/web` is **deferred** — a previous bootstrap was discarded along with the design-system / brand / token / component-map docs. The surviving contracts in `docs/web/` are architecture- and roadmap-only ([`WEB-ARCHITECTURE.md`](docs/web/WEB-ARCHITECTURE.md), [`BACKLOG-WEB.md`](docs/web/BACKLOG-WEB.md), [`CONTENT-MODEL.md`](docs/web/CONTENT-MODEL.md), [`SEO-PLAYBOOK.md`](docs/web/SEO-PLAYBOOK.md)); the design-surface docs (DESIGN-SYSTEM, COMPONENT-MAP, BRAND-GUIDELINES, ACCESSIBILITY, FRONTEND-INTEGRATIONS) and the Figma-extracted assets (tokens.css/json, snapshots) will be reintroduced when web development restarts. `packages/ui` is intentionally absent.
+`apps/web` is **deferred** — the previous bootstrap was discarded along with all design / UI / brand / token / component-map / Figma-extracted assets and the four routing+SEO contracts (`WEB-ARCHITECTURE`, `BACKLOG-WEB`, `CONTENT-MODEL`, `SEO-PLAYBOOK`). Nothing in `docs/web/` survives. Reintroduction is a future wave; `packages/ui` is intentionally absent.
 
 ---
 
