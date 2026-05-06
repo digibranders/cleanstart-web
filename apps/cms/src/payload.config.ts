@@ -30,6 +30,7 @@ import { Resources } from './payload/collections/Resources';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
 import { jsonLdEndpoint } from './payload/endpoints/jsonld';
+import { newsSitemapEndpoint, sitemapEndpoint } from './payload/endpoints/sitemap';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { Announcements } from './payload/globals/announcements';
@@ -134,7 +135,7 @@ export default buildConfig({
     AuditLog,
   ],
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements],
-  endpoints: [jsonLdEndpoint],
+  endpoints: [jsonLdEndpoint, sitemapEndpoint, newsSitemapEndpoint],
   jobs: {
     tasks: [drainLeadQueueTask],
     autoRun: [
