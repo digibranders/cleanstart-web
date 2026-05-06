@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { pageBuilderBlocks } from '../blocks';
-import { seoField } from '../fields/seo';
+import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { pagesPathBuilderHook } from '../hooks/pages-path-builder';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
@@ -120,6 +120,11 @@ export const Pages: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    // Pages use a `path` field rather than `slug`, so the SerpPreview
+    // (which reads slug) shows the empty-state until path-aware support
+    // lands. Title / Description / Indexable still surface as sidebar
+    // controls — those just read seo.* directly and work fine here.
+    ...seoSidebarFields({ pathPrefix: '', descriptionSource: 'abstract' }),
     seoField,
   ],
   hooks: {

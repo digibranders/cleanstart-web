@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
-import { seoField } from '../fields/seo';
+import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
@@ -53,16 +53,34 @@ export const Guides: CollectionConfig = {
       },
     },
     {
+      name: 'faqsBulkPaste',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste',
+            clientProps: { targetField: 'faqs' },
+          },
+        },
+      },
+    },
+    {
       name: 'faqs',
       type: 'array',
       labels: { singular: 'FAQ', plural: 'FAQs' },
       admin: {
         description:
           'Replaces Webflow Q1…Q5 / Ans1…Ans5. Drives FAQPage JSON-LD when non-empty.',
+        components: {
+          RowLabel: '@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel',
+        },
       },
       fields: [
         { name: 'question', type: 'text', required: true },
-        { name: 'answer', type: 'richText', required: true },
+        // Plain-text answer — matches Schema.org `acceptedAnswer.text`
+        // and keeps each FAQ row compact. Multiple paragraphs via
+        // line breaks.
+        { name: 'answer', type: 'textarea', required: true },
       ],
     },
     {
@@ -108,6 +126,20 @@ export const Guides: CollectionConfig = {
       hasMany: true,
     },
     {
+      name: 'permalink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            clientProps: { pathPrefix: '/guides' },
+          },
+        },
+      },
+    },
+    ...seoSidebarFields({ pathPrefix: '/guides', descriptionSource: 'abstract' }),
+    {
       name: 'readingMinutes',
       type: 'number',
       access: { update: () => false },
@@ -134,6 +166,9 @@ export const Guides: CollectionConfig = {
       admin: {
         readOnly: true,
         description: 'Auto-built from H2/H3 headings in the body on save.',
+        components: {
+          RowLabel: '@/payload/admin/components/TocRowLabel.tsx#TocRowLabel',
+        },
       },
       fields: [
         { name: 'level', type: 'number' },

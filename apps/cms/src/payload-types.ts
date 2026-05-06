@@ -381,7 +381,7 @@ export interface Author {
    */
   acceptingNewBylines?: boolean | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -456,7 +456,7 @@ export interface Category {
    */
   parent?: (number | null) | Category;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -531,7 +531,7 @@ export interface NewsCategory {
    */
   parent?: (number | null) | NewsCategory;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -878,21 +878,7 @@ export interface Blog {
   faqs?:
     | {
         question: string;
-        answer: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
+        answer: string;
         id?: string | null;
       }[]
     | null;
@@ -922,7 +908,7 @@ export interface Blog {
       }[]
     | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1027,7 +1013,7 @@ export interface News {
    */
   wordCount?: number | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1126,21 +1112,7 @@ export interface Guide {
   faqs?:
     | {
         question: string;
-        answer: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
+        answer: string;
         id?: string | null;
       }[]
     | null;
@@ -1206,7 +1178,7 @@ export interface Guide {
       }[]
     | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1310,7 +1282,7 @@ export interface Resource {
    */
   downloadCount?: number | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1434,7 +1406,7 @@ export interface Event {
       }[]
     | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1551,7 +1523,7 @@ export interface Webinar {
    */
   slidesUrl?: string | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1676,7 +1648,7 @@ export interface Job {
   expiresAt?: string | null;
   closedAt?: string | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -2309,21 +2281,7 @@ export interface Page {
                    */
                   items: {
                     question: string;
-                    answer: {
-                      root: {
-                        type: string;
-                        children: {
-                          type: any;
-                          version: number;
-                          [k: string]: unknown;
-                        }[];
-                        direction: ('ltr' | 'rtl') | null;
-                        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-                        indent: number;
-                        version: number;
-                      };
-                      [k: string]: unknown;
-                    };
+                    answer: string;
                     id?: string | null;
                   }[];
                   /**
@@ -3096,21 +3054,7 @@ export interface Page {
              */
             items: {
               question: string;
-              answer: {
-                root: {
-                  type: string;
-                  children: {
-                    type: any;
-                    version: number;
-                    [k: string]: unknown;
-                  }[];
-                  direction: ('ltr' | 'rtl') | null;
-                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-                  indent: number;
-                  version: number;
-                };
-                [k: string]: unknown;
-              };
+              answer: string;
               id?: string | null;
             }[];
             /**
@@ -3365,7 +3309,7 @@ export interface Page {
    */
   pageLayout?: ('default' | 'narrow' | 'full-bleed') | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**

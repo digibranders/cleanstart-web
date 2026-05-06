@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
-import { seoField } from '../fields/seo';
+import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
@@ -83,6 +83,20 @@ export const Resources: CollectionConfig = {
         condition: (_data, sibling) => sibling?.gated === true,
       },
     },
+    {
+      name: 'permalink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            clientProps: { pathPrefix: '/resources' },
+          },
+        },
+      },
+    },
+    ...seoSidebarFields({ pathPrefix: '/resources', descriptionSource: 'summary' }),
     {
       name: 'downloadCount',
       type: 'number',
