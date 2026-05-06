@@ -321,3 +321,19 @@
   }
 }
 
+// ─── Hide the breadcrumb on the dashboard view ────────────────────
+//
+// Payload's dashboard view calls `SetStepNav({ nav: [] })` so the
+// crumb list is empty, but the surrounding `.step-nav` chrome (the
+// brand icon + slash separator) still renders. There's no meaningful
+// route to surface above the dashboard — it IS the root — so hide
+// the whole step-nav whenever our custom Dashboard is mounted.
+//
+// Scoped via :has() so this only fires on the dashboard route. Every
+// other view (collection list, document edit, globals) keeps the
+// breadcrumb intact.
+body:has(.cs-dashboard) .step-nav,
+:has(> .cs-dashboard) > .step-nav {
+  display: none;
+}
+
