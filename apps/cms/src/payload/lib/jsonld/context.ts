@@ -32,6 +32,27 @@ export interface OrganizationSource {
   readonly sameAs?: readonly JsonLdSameAs[];
 }
 
+/**
+ * Sub-shape of `seoDefaults.newsMediaOrganization`. When `enabled`
+ * is true and at least one policy URL is set, the site-wide
+ * Organization blob upgrades to a NewsMediaOrganization carrying
+ * these fields. Mirrors the editor group exactly.
+ */
+export interface NewsMediaOrganizationSource {
+  readonly enabled?: boolean;
+  readonly foundingDate?: string | null;
+  readonly slogan?: string | null;
+  readonly masthead?: string | null;
+  readonly ethicsPolicy?: string | null;
+  readonly correctionsPolicy?: string | null;
+  readonly verificationFactCheckingPolicy?: string | null;
+  readonly actionableFeedbackPolicy?: string | null;
+  readonly unnamedSourcesPolicy?: string | null;
+  readonly diversityPolicy?: string | null;
+  readonly ownershipFundingInfo?: string | null;
+  readonly missionCoveragePrioritiesPolicy?: string | null;
+}
+
 export interface SiteSnapshot {
   readonly siteName: string;
   readonly baseUrl: string;
@@ -41,6 +62,7 @@ export interface SiteSnapshot {
 export interface JsonLdContext {
   readonly site: SiteSnapshot;
   readonly organization: OrganizationSource;
+  readonly newsOrganization: NewsMediaOrganizationSource;
   /**
    * Stable canonical `@id` for the Organization. Used as a reference
    * (`{ '@id': orgId }`) from publisher / worksFor links so the
@@ -57,13 +79,18 @@ export interface JsonLdContext {
  */
 export const buildJsonLdContext = (args: {
   siteSettings: SiteSnapshot;
-  seoDefaults: { organizationJsonLd?: OrganizationSource | null };
+  seoDefaults: {
+    organizationJsonLd?: OrganizationSource | null;
+    newsMediaOrganization?: NewsMediaOrganizationSource | null;
+  };
 }): JsonLdContext => {
   const org = args.seoDefaults.organizationJsonLd ?? {};
+  const newsOrg = args.seoDefaults.newsMediaOrganization ?? {};
   const baseUrl = args.siteSettings.baseUrl.replace(/\/+$/, '');
   return {
     site: { ...args.siteSettings, baseUrl },
     organization: org,
+    newsOrganization: newsOrg,
     organizationId: `${baseUrl}/#organization`,
   };
 };

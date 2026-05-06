@@ -2,7 +2,12 @@ export type { ArticleSource, ArticleVariant, ArticleAboutEntry } from './article
 export { buildArticleBlob, inlineByline } from './article';
 export type { BreadcrumbCrumb } from './breadcrumb';
 export { buildBreadcrumbBlob } from './breadcrumb';
-export type { JsonLdContext, OrganizationSource, SiteSnapshot } from './context';
+export type {
+  JsonLdContext,
+  NewsMediaOrganizationSource,
+  OrganizationSource,
+  SiteSnapshot,
+} from './context';
 export { buildJsonLdContext } from './context';
 export type { EmittableCollection } from './dispatch';
 export { buildJsonLdBlobs } from './dispatch';

@@ -69,6 +69,8 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    redirects: Redirect;
+    'audit-log': AuditLog;
     authors: Author;
     categories: Category;
     newsCategories: NewsCategory;
@@ -86,8 +88,6 @@ export interface Config {
     jobs: Job;
     aboutGalleries: AboutGallery;
     pages: Page;
-    redirects: Redirect;
-    'audit-log': AuditLog;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -98,6 +98,8 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
@@ -115,8 +117,6 @@ export interface Config {
     jobs: JobsSelect<false> | JobsSelect<true>;
     aboutGalleries: AboutGalleriesSelect<false> | AboutGalleriesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
-    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
-    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -293,6 +293,75 @@ export interface Media {
       filename?: string | null;
     };
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * Source path (e.g. /old-pricing). System-managed rules (source=slug-change) are locked from manual edit.
+   */
+  from: string;
+  status: '301' | '302' | '307' | '308' | '410';
+  /**
+   * Destination path or absolute URL. Required unless status=410. System-managed rules are locked.
+   */
+  to?: string | null;
+  /**
+   * Provenance. System-set on creation; never manually edited.
+   */
+  source: 'manual' | 'slug-change' | 'archive-with-redirect' | 'migration-seed';
+  /**
+   * Why this redirect exists. Future editors thank you.
+   */
+  notes?: string | null;
+  /**
+   * Incremented in apps/web middleware on every match.
+   */
+  hitCount?: number | null;
+  lastHitAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Append-only record of sensitive actions on leads + DSAR events. Read-only — entries are written by hooks, never via the admin UI.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  timestamp: string;
+  action: 'lead_deleted' | 'lead_exported' | 'dsar_export' | 'dsar_erasure';
+  targetCollection: string;
+  targetId: string;
+  /**
+   * Admin who performed the action. Null for system / cron writes.
+   */
+  actorUserId?: (number | null) | User;
+  requestIp?: string | null;
+  userAgent?: string | null;
+  acceptLanguage?: string | null;
+  /**
+   * Number of hops parsed from X-Forwarded-For at request time.
+   */
+  proxyChainLength?: number | null;
+  /**
+   * Per-action payload (e.g. row count for exports, deleted lead snapshot).
+   */
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -967,13 +1036,7 @@ export interface Blog {
   relatedPosts?: (number | Blog)[] | null;
   featured?: boolean | null;
   pinned?: boolean | null;
-  /**
-   * Computed from body word count on save.
-   */
   readingMinutes?: number | null;
-  /**
-   * Total words in the body. Computed on save.
-   */
   wordCount?: number | null;
   /**
    * Auto-built from H2/H3 headings in the body on save.
@@ -1083,13 +1146,7 @@ export interface News {
    */
   publicationDate: string;
   relatedNews?: (number | News)[] | null;
-  /**
-   * Computed from body word count on save.
-   */
   readingMinutes?: number | null;
-  /**
-   * Total words in the body. Computed on save.
-   */
   wordCount?: number | null;
   /**
    * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
@@ -1240,9 +1297,6 @@ export interface Guide {
       }[]
     | null;
   relatedGuides?: (number | Guide)[] | null;
-  /**
-   * Computed from body word count on save.
-   */
   readingMinutes?: number | null;
   wordCount?: number | null;
   /**
@@ -1477,9 +1531,6 @@ export interface KnowledgeBase {
    * Manually curated. Empty = listing component picks by category.
    */
   relatedArticles?: (number | KnowledgeBase)[] | null;
-  /**
-   * Computed from body word count on save.
-   */
   readingMinutes?: number | null;
   wordCount?: number | null;
   /**
@@ -3580,75 +3631,6 @@ export interface Page {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects".
- */
-export interface Redirect {
-  id: number;
-  /**
-   * Source path (e.g. /old-pricing). System-managed rules (source=slug-change) are locked from manual edit.
-   */
-  from: string;
-  status: '301' | '302' | '307' | '308' | '410';
-  /**
-   * Destination path or absolute URL. Required unless status=410. System-managed rules are locked.
-   */
-  to?: string | null;
-  /**
-   * Provenance. System-set on creation; never manually edited.
-   */
-  source: 'manual' | 'slug-change' | 'archive-with-redirect' | 'migration-seed';
-  /**
-   * Why this redirect exists. Future editors thank you.
-   */
-  notes?: string | null;
-  /**
-   * Incremented in apps/web middleware on every match.
-   */
-  hitCount?: number | null;
-  lastHitAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Append-only record of sensitive actions on leads + DSAR events. Read-only — entries are written by hooks, never via the admin UI.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "audit-log".
- */
-export interface AuditLog {
-  id: number;
-  timestamp: string;
-  action: 'lead_deleted' | 'lead_exported' | 'dsar_export' | 'dsar_erasure';
-  targetCollection: string;
-  targetId: string;
-  /**
-   * Admin who performed the action. Null for system / cron writes.
-   */
-  actorUserId?: (number | null) | User;
-  requestIp?: string | null;
-  userAgent?: string | null;
-  acceptLanguage?: string | null;
-  /**
-   * Number of hops parsed from X-Forwarded-For at request time.
-   */
-  proxyChainLength?: number | null;
-  /**
-   * Per-action payload (e.g. row count for exports, deleted lead snapshot).
-   */
-  metadata?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -3772,6 +3754,14 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'audit-log';
+        value: number | AuditLog;
+      } | null)
+    | ({
         relationTo: 'authors';
         value: number | Author;
       } | null)
@@ -3838,14 +3828,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: number | Page;
-      } | null)
-    | ({
-        relationTo: 'redirects';
-        value: number | Redirect;
-      } | null)
-    | ({
-        relationTo: 'audit-log';
-        value: number | AuditLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -3975,6 +3957,39 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  status?: T;
+  to?: T;
+  source?: T;
+  notes?: T;
+  hitCount?: T;
+  lastHitAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  timestamp?: T;
+  action?: T;
+  targetCollection?: T;
+  targetId?: T;
+  actorUserId?: T;
+  requestIp?: T;
+  userAgent?: T;
+  acceptLanguage?: T;
+  proxyChainLength?: T;
+  metadata?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -5505,39 +5520,6 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects_select".
- */
-export interface RedirectsSelect<T extends boolean = true> {
-  from?: T;
-  status?: T;
-  to?: T;
-  source?: T;
-  notes?: T;
-  hitCount?: T;
-  lastHitAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "audit-log_select".
- */
-export interface AuditLogSelect<T extends boolean = true> {
-  timestamp?: T;
-  action?: T;
-  targetCollection?: T;
-  targetId?: T;
-  actorUserId?: T;
-  requestIp?: T;
-  userAgent?: T;
-  acceptLanguage?: T;
-  proxyChainLength?: T;
-  metadata?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -5682,6 +5664,59 @@ export interface SeoDefault {
           id?: string | null;
         }[]
       | null;
+  };
+  /**
+   * When enabled, the site-wide Organization blob upgrades to a NewsMediaOrganization. Pairs with NewsArticle JSON-LD (isAccessibleForFree: true) and /sitemap-news.xml to satisfy Google News eligibility (signals-based since October 2025). Leave disabled until the policy URLs below are real, published pages — Google penalises NewsMediaOrganization claims that point at empty or missing policies.
+   */
+  newsMediaOrganization?: {
+    /**
+     * Toggle on once the policy pages below exist and link from the site footer.
+     */
+    enabled?: boolean | null;
+    /**
+     * ISO 8601 date (e.g. 2024-01-15). Surfaced as Schema.org foundingDate.
+     */
+    foundingDate?: string | null;
+    /**
+     * One-line tagline. Surfaced as Schema.org slogan.
+     */
+    slogan?: string | null;
+    /**
+     * URL of the masthead / about-us page that lists editorial leadership. Surfaced as Schema.org masthead.
+     */
+    masthead?: string | null;
+    /**
+     * URL of the editorial-ethics policy page.
+     */
+    ethicsPolicy?: string | null;
+    /**
+     * URL of the corrections / retractions policy page.
+     */
+    correctionsPolicy?: string | null;
+    /**
+     * URL of the fact-checking / verification policy page.
+     */
+    verificationFactCheckingPolicy?: string | null;
+    /**
+     * URL of the page describing how readers submit feedback / complaints.
+     */
+    actionableFeedbackPolicy?: string | null;
+    /**
+     * URL of the policy page on use of anonymous / unnamed sources.
+     */
+    unnamedSourcesPolicy?: string | null;
+    /**
+     * URL of the diversity / inclusion policy page.
+     */
+    diversityPolicy?: string | null;
+    /**
+     * URL of the page disclosing ownership / funding sources.
+     */
+    ownershipFundingInfo?: string | null;
+    /**
+     * URL of the page describing editorial mission and coverage priorities.
+     */
+    missionCoveragePrioritiesPolicy?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -5984,6 +6019,22 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
               url?: T;
               id?: T;
             };
+      };
+  newsMediaOrganization?:
+    | T
+    | {
+        enabled?: T;
+        foundingDate?: T;
+        slogan?: T;
+        masthead?: T;
+        ethicsPolicy?: T;
+        correctionsPolicy?: T;
+        verificationFactCheckingPolicy?: T;
+        actionableFeedbackPolicy?: T;
+        unnamedSourcesPolicy?: T;
+        diversityPolicy?: T;
+        ownershipFundingInfo?: T;
+        missionCoveragePrioritiesPolicy?: T;
       };
   updatedAt?: T;
   createdAt?: T;
