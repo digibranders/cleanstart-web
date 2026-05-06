@@ -1584,6 +1584,33 @@ kbd {
   border-radius: var(--cs-radius-input);
 }
 
+// Inputs that already have their own focus chrome (the parent
+// container draws the brand-cyan border + halo) shouldn't ALSO get
+// the global focus-visible outline — otherwise an empty react-select
+// search input renders as a tiny brand-cyan box next to its chip,
+// which reads visually as a stray "[" bracket. Scope the outline off
+// for these inner inputs so only the cursor caret is visible.
+.rs__input,
+.rs__input:focus,
+.rs__input:focus-visible,
+.react-select__input,
+.react-select__input:focus,
+.react-select__input:focus-visible,
+.field-type.select input:focus-visible,
+.field-type.relationship input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+// Same for Lexical contentEditables — the bordered shell wrap shows
+// the focus state via :focus-within (3px brand halo). The inner
+// element shouldn't ALSO render its own outline.
+[contenteditable='true'][data-lexical-editor='true']:focus-visible,
+[contenteditable='true'][data-lexical-editor='true']:focus {
+  outline: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1734,6 +1761,26 @@ kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+// ─── Hide array-field + per-row kebabs (Copy Field / Paste Field /
+// Copy Row / Paste Row). Payload's cross-form clipboard import is
+// brittle — fails silently on any schema drift between source and
+// destination. Editors barely use it; the kebab adds visual noise +
+// lots of "what does this do" support questions. Drag-handle +
+// chevron + our injected "Clear all" cover the real workflows.
+//
+// Scoped to ARRAY fields and collapsible rows only — the doc-controls
+// top-right kebab (Create New / Duplicate / Delete) stays visible.
+//
+// The actual class is `.clipboard-action__popup` (verified from
+// rendered DOM). Hide both the popup itself AND its wrapping <li>
+// so we don't leave an empty list item in the actions row.
+.array-field__header-actions .clipboard-action__popup,
+.array-field__header-actions > li:has(> .clipboard-action__popup),
+.collapsible .clipboard-action__popup,
+.collapsible__actions .clipboard-action__popup {
+  display: none !important;
 }
 
 // ─── Doc-controls split-button chevron — was rendering at 51px tall

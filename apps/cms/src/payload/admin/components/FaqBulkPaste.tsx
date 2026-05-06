@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from '@payloadcms/ui';
+import { useField, useForm } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -59,6 +59,17 @@ export const FaqBulkPaste = (props: FaqBulkPasteProps): ReactElement | null => {
   const { path, schemaPath, targetField = 'items' } = props;
   const { addFieldRow, replaceFieldRow, removeFieldRow, getDataByPath } = useForm();
   const [portalHost, setPortalHost] = useState<HTMLElement | null>(null);
+
+  // Subscribe to the array's value reactively so Clear all hides the
+  // moment the array goes empty (and shows back as soon as rows
+  // exist) without waiting for a full form re-render.
+  const { value: arrayValue } = useField<unknown[]>({
+    path: useMemo(
+      () => replaceLastSegment(path, targetField),
+      [path, targetField],
+    ),
+  });
+  const rowCount = Array.isArray(arrayValue) ? arrayValue.length : 0;
 
   const arrayPath = useMemo(
     () => replaceLastSegment(path, targetField),
@@ -204,7 +215,8 @@ export const FaqBulkPaste = (props: FaqBulkPasteProps): ReactElement | null => {
     }
   }, [arrayPath, getDataByPath, removeFieldRow]);
 
-  if (!portalHost) return null;
+  // Hide entirely when the array is empty — there's nothing to clear.
+  if (!portalHost || rowCount === 0) return null;
 
   return createPortal(
     <button
