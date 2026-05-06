@@ -4,10 +4,13 @@ import { seoField } from '../fields/seo';
 import { slugField } from '../fields/slug';
 
 /**
- * Shared field definition for taxonomy collections (categories, newsCategories).
- * Same shape, kept as separate collections for URL parity per arch doc §03.
+ * Shared field definition for taxonomy collections (categories,
+ * newsCategories, knowledgeCategories). Same shape, kept as separate
+ * collections for URL parity per arch doc §03.
  */
-export const buildTaxonomyFields = (selfSlug: 'categories' | 'newsCategories'): Field[] => [
+export const buildTaxonomyFields = (
+  selfSlug: 'categories' | 'newsCategories' | 'knowledgeCategories',
+): Field[] => [
   { name: 'name', type: 'text', required: true },
   slugField({ source: 'name' }),
   { name: 'description', type: 'textarea' },

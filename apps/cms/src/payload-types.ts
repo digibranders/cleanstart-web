@@ -72,6 +72,7 @@ export interface Config {
     authors: Author;
     categories: Category;
     newsCategories: NewsCategory;
+    knowledgeCategories: KnowledgeCategory;
     jobLocations: JobLocation;
     forms: Form;
     leads: Lead;
@@ -79,6 +80,7 @@ export interface Config {
     news: News;
     guides: Guide;
     resources: Resource;
+    knowledgeBase: KnowledgeBase;
     events: Event;
     webinars: Webinar;
     jobs: Job;
@@ -99,6 +101,7 @@ export interface Config {
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
+    knowledgeCategories: KnowledgeCategoriesSelect<false> | KnowledgeCategoriesSelect<true>;
     jobLocations: JobLocationsSelect<false> | JobLocationsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
@@ -106,6 +109,7 @@ export interface Config {
     news: NewsSelect<false> | NewsSelect<true>;
     guides: GuidesSelect<false> | GuidesSelect<true>;
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
+    knowledgeBase: KnowledgeBaseSelect<false> | KnowledgeBaseSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     webinars: WebinarsSelect<false> | WebinarsSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
@@ -530,6 +534,81 @@ export interface NewsCategory {
    * Optional parent category for hierarchical taxonomies.
    */
   parent?: (number | null) | NewsCategory;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledgeCategories".
+ */
+export interface KnowledgeCategory {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
+  /**
+   * Optional parent category for hierarchical taxonomies.
+   */
+  parent?: (number | null) | KnowledgeCategory;
   /**
    * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
@@ -1281,6 +1360,139 @@ export interface Resource {
    * Incremented by the resource-download endpoint when added (Phase F). Always 0 today.
    */
   downloadCount?: number | null;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Technical knowledge-base articles surfaced under /knowledge-hub. Each article gets its own indexable URL — replaces the single-page Webflow KB.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledgeBase".
+ */
+export interface KnowledgeBase {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  /**
+   * Drives the SEO description fallback and the listing-card lede. Aim for ≤ 160 characters.
+   */
+  abstract?: string | null;
+  heroImage?: (number | null) | Media;
+  /**
+   * Editorial taxonomy — drives the sidebar grouping on /knowledge-hub. Pick the most-specific leaf category; ancestors are inferred via the category parent chain.
+   */
+  category: number | KnowledgeCategory;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Author who reviewed this article for technical accuracy. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal for KB content.
+   */
+  reviewedBy?: (number | null) | Author;
+  /**
+   * Date of the most recent technical review. Surfaced as Schema.org dateReviewed.
+   */
+  lastReviewedAt?: string | null;
+  /**
+   * Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.
+   */
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Manually curated. Empty = listing component picks by category.
+   */
+  relatedArticles?: (number | KnowledgeBase)[] | null;
+  /**
+   * Computed from body word count on save.
+   */
+  readingMinutes?: number | null;
+  wordCount?: number | null;
+  /**
+   * Auto-built from H2/H3 headings in the body on save.
+   */
+  tableOfContents?:
+    | {
+        level?: number | null;
+        text?: string | null;
+        anchor?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
@@ -3572,6 +3784,10 @@ export interface PayloadLockedDocument {
         value: number | NewsCategory;
       } | null)
     | ({
+        relationTo: 'knowledgeCategories';
+        value: number | KnowledgeCategory;
+      } | null)
+    | ({
         relationTo: 'jobLocations';
         value: number | JobLocation;
       } | null)
@@ -3598,6 +3814,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'resources';
         value: number | Resource;
+      } | null)
+    | ({
+        relationTo: 'knowledgeBase';
+        value: number | KnowledgeBase;
       } | null)
     | ({
         relationTo: 'events';
@@ -3878,6 +4098,40 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "newsCategories_select".
  */
 export interface NewsCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  parent?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledgeCategories_select".
+ */
+export interface KnowledgeCategoriesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   description?: T;
@@ -4222,6 +4476,61 @@ export interface ResourcesSelect<T extends boolean = true> {
   gateForm?: T;
   accessLevel?: T;
   downloadCount?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledgeBase_select".
+ */
+export interface KnowledgeBaseSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  abstract?: T;
+  heroImage?: T;
+  category?: T;
+  body?: T;
+  reviewedBy?: T;
+  lastReviewedAt?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  relatedArticles?: T;
+  readingMinutes?: T;
+  wordCount?: T;
+  tableOfContents?:
+    | T
+    | {
+        level?: T;
+        text?: T;
+        anchor?: T;
+        id?: T;
+      };
   seo?:
     | T
     | {
@@ -5864,6 +6173,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'resources';
           value: number | Resource;
+        } | null)
+      | ({
+          relationTo: 'knowledgeBase';
+          value: number | KnowledgeBase;
         } | null)
       | ({
           relationTo: 'events';

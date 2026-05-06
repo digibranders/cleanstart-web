@@ -18,6 +18,8 @@ import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
 import { JobLocations } from './payload/collections/JobLocations';
 import { Jobs } from './payload/collections/Jobs';
+import { KnowledgeBase } from './payload/collections/KnowledgeBase';
+import { KnowledgeCategories } from './payload/collections/KnowledgeCategories';
 import { Leads } from './payload/collections/Leads';
 import { Media } from './payload/collections/Media';
 import { News } from './payload/collections/News';
@@ -113,6 +115,7 @@ export default buildConfig({
     Authors,
     Categories,
     NewsCategories,
+    KnowledgeCategories,
     JobLocations,
     Forms,
     Leads,
@@ -120,6 +123,7 @@ export default buildConfig({
     News,
     Guides,
     Resources,
+    KnowledgeBase,
     Events,
     Webinars,
     Jobs,

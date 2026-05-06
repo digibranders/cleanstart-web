@@ -1,0 +1,172 @@
+import type { CollectionConfig } from 'payload';
+
+import { isAdminOrEditor } from '../access';
+import { seoField, seoSidebarFields } from '../fields/seo';
+import { slugField } from '../fields/slug';
+import { bodyStatsHook } from '../hooks/body-stats';
+import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+
+const ABSTRACT_CHAR_HINT = 160;
+
+export const KnowledgeBase: CollectionConfig = {
+  slug: 'knowledgeBase',
+  labels: { singular: 'Knowledge article', plural: 'Knowledge Hub' },
+  admin: {
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'category', '_status', 'lastReviewedAt', 'updatedAt'],
+    group: 'Content',
+    description:
+      'Technical knowledge-base articles surfaced under /knowledge-hub. Each article gets its own indexable URL — replaces the single-page Webflow KB.',
+  },
+  access: {
+    read: () => true,
+    create: isAdminOrEditor,
+    update: isAdminOrEditor,
+    delete: isAdminOrEditor,
+  },
+  fields: [
+    { name: 'title', type: 'text', required: true },
+    slugField({ source: 'title' }),
+    {
+      name: 'abstract',
+      type: 'textarea',
+      admin: {
+        description: `Drives the SEO description fallback and the listing-card lede. Aim for ≤ ${ABSTRACT_CHAR_HINT} characters.`,
+      },
+    },
+    { name: 'heroImage', type: 'upload', relationTo: 'media' },
+    {
+      name: 'category',
+      type: 'relationship',
+      relationTo: 'knowledgeCategories',
+      required: true,
+      admin: {
+        description:
+          'Editorial taxonomy — drives the sidebar grouping on /knowledge-hub. Pick the most-specific leaf category; ancestors are inferred via the category parent chain.',
+      },
+    },
+    { name: 'body', type: 'richText' },
+    {
+      name: 'reviewedBy',
+      type: 'relationship',
+      relationTo: 'authors',
+      admin: {
+        description:
+          'Author who reviewed this article for technical accuracy. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal for KB content.',
+      },
+    },
+    {
+      name: 'lastReviewedAt',
+      type: 'date',
+      admin: {
+        description:
+          'Date of the most recent technical review. Surfaced as Schema.org dateReviewed.',
+        date: { pickerAppearance: 'dayAndTime' },
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'faqsBulkPaste',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste',
+            clientProps: { targetField: 'faqs' },
+          },
+        },
+      },
+    },
+    {
+      name: 'faqs',
+      type: 'array',
+      labels: { singular: 'FAQ', plural: 'FAQs' },
+      admin: {
+        description:
+          'Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.',
+        components: {
+          RowLabel: '@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel',
+        },
+      },
+      fields: [
+        { name: 'question', type: 'text', required: true },
+        { name: 'answer', type: 'textarea', required: true },
+      ],
+    },
+    {
+      name: 'relatedArticles',
+      type: 'relationship',
+      relationTo: 'knowledgeBase',
+      hasMany: true,
+      admin: {
+        description: 'Manually curated. Empty = listing component picks by category.',
+      },
+    },
+    {
+      name: 'permalink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            clientProps: { pathPrefix: '/knowledge-hub' },
+          },
+        },
+      },
+    },
+    ...seoSidebarFields({ pathPrefix: '/knowledge-hub', descriptionSource: 'abstract' }),
+    {
+      name: 'readingMinutes',
+      type: 'number',
+      access: { update: () => false },
+      admin: {
+        readOnly: true,
+        description: 'Computed from body word count on save.',
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'wordCount',
+      type: 'number',
+      access: { update: () => false },
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'tableOfContents',
+      type: 'array',
+      access: { update: () => false },
+      labels: { singular: 'Heading', plural: 'Table of contents' },
+      admin: {
+        readOnly: true,
+        description: 'Auto-built from H2/H3 headings in the body on save.',
+        components: {
+          RowLabel: '@/payload/admin/components/TocRowLabel.tsx#TocRowLabel',
+        },
+      },
+      fields: [
+        { name: 'level', type: 'number' },
+        { name: 'text', type: 'text' },
+        { name: 'anchor', type: 'text' },
+      ],
+    },
+    seoField,
+  ],
+  hooks: {
+    beforeChange: [
+      bodyStatsHook({
+        fields: {
+          readingMinutes: 'readingMinutes',
+          wordCount: 'wordCount',
+          tableOfContents: 'tableOfContents',
+        },
+      }),
+    ],
+    afterChange: [slugChangeRedirectHook('knowledgeBase')],
+  },
+  versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
+  timestamps: true,
+};
