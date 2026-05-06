@@ -27,9 +27,11 @@ import { NewsCategories } from './payload/collections/NewsCategories';
 import { Pages } from './payload/collections/Pages';
 import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
+import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
 import { jsonLdEndpoint } from './payload/endpoints/jsonld';
+import { searchAnalyticsEndpoint } from './payload/endpoints/search-analytics';
 import { newsSitemapEndpoint, sitemapEndpoint } from './payload/endpoints/sitemap';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
@@ -128,6 +130,7 @@ export default buildConfig({
     Media,
     Redirects,
     AuditLog,
+    SearchLog,
     Authors,
     Categories,
     NewsCategories,
@@ -147,7 +150,7 @@ export default buildConfig({
     Pages,
   ],
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements],
-  endpoints: [jsonLdEndpoint, sitemapEndpoint, newsSitemapEndpoint],
+  endpoints: [jsonLdEndpoint, sitemapEndpoint, newsSitemapEndpoint, searchAnalyticsEndpoint],
   jobs: {
     tasks: [drainLeadQueueTask],
     autoRun: [
