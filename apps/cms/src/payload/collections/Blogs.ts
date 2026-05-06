@@ -10,6 +10,7 @@ import {
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 const ABSTRACT_CHAR_HINT = 160;
 
@@ -200,7 +201,11 @@ export const Blogs: CollectionConfig = {
         },
       }),
     ],
-    afterChange: [slugChangeRedirectHook('blogs'), searchSyncAfterChangeHook('blogs')],
+    afterChange: [
+      slugChangeRedirectHook('blogs'),
+      searchSyncAfterChangeHook('blogs'),
+      webhooksPublishAfterChangeHook('blogs'),
+    ],
     afterDelete: [searchSyncAfterDeleteHook('blogs')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },

@@ -8,6 +8,7 @@ import type { LeadSubmission } from '../lib/lead-handlers/types';
 import { type FormFieldDef, validateFields } from '../lib/lead-handlers/validate-fields';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
 import { verifyTurnstileToken } from '../lib/turnstile';
+import { dispatchEvent } from '../lib/webhooks/dispatch';
 
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
@@ -254,6 +255,29 @@ export const submitLeadEndpoint: Endpoint = {
         return json(
           { ok: false, error: 'capture_failed', reason: parked.error },
           { status: 502, headers: responseCors },
+        );
+      }
+
+      // Fire `lead.submitted` to subscribed webhook destinations.
+      // Payload is metadata-only: formId, dedupe flag, source — never
+      // the field values (those may carry PII). Failure is logged
+      // but never blocks the 200 response to the form submitter.
+      try {
+        await dispatchEvent(
+          {
+            event: 'lead.submitted',
+            data: {
+              formId: numericFormId,
+              duplicate: result.duplicateOfLeadId != null,
+              ...(submission.source ? { source: submission.source } : {}),
+            },
+          },
+          { logger: req.payload.logger },
+        );
+      } catch (webhookErr) {
+        req.payload.logger.warn(
+          { error: webhookErr instanceof Error ? webhookErr.message : String(webhookErr) },
+          'lead.submitted webhook dispatch threw',
         );
       }
 

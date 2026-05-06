@@ -10,6 +10,7 @@ import {
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { validateOptionalUrl } from '../lib/url-shape';
 
 export const News: CollectionConfig = {
@@ -117,7 +118,11 @@ export const News: CollectionConfig = {
         fields: { readingMinutes: 'readingMinutes', wordCount: 'wordCount' },
       }),
     ],
-    afterChange: [slugChangeRedirectHook('news'), searchSyncAfterChangeHook('news')],
+    afterChange: [
+      slugChangeRedirectHook('news'),
+      searchSyncAfterChangeHook('news'),
+      webhooksPublishAfterChangeHook('news'),
+    ],
     afterDelete: [searchSyncAfterDeleteHook('news')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },

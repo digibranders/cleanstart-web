@@ -9,6 +9,7 @@ import {
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 export const Resources: CollectionConfig = {
   slug: 'resources',
@@ -117,7 +118,11 @@ export const Resources: CollectionConfig = {
     seoField,
   ],
   hooks: {
-    afterChange: [slugChangeRedirectHook('resources'), searchSyncAfterChangeHook('resources')],
+    afterChange: [
+      slugChangeRedirectHook('resources'),
+      searchSyncAfterChangeHook('resources'),
+      webhooksPublishAfterChangeHook('resources'),
+    ],
     afterDelete: [searchSyncAfterDeleteHook('resources')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },

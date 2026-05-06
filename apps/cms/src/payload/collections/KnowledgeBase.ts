@@ -10,6 +10,7 @@ import {
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 const ABSTRACT_CHAR_HINT = 160;
 
@@ -178,6 +179,7 @@ export const KnowledgeBase: CollectionConfig = {
     afterChange: [
       slugChangeRedirectHook('knowledgeBase'),
       searchSyncAfterChangeHook('knowledgeBase'),
+      webhooksPublishAfterChangeHook('knowledgeBase'),
     ],
     afterDelete: [searchSyncAfterDeleteHook('knowledgeBase')],
   },

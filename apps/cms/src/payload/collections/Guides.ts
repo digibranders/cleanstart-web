@@ -10,6 +10,7 @@ import {
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 export const Guides: CollectionConfig = {
   slug: 'guides',
@@ -198,7 +199,11 @@ export const Guides: CollectionConfig = {
         },
       }),
     ],
-    afterChange: [slugChangeRedirectHook('guides'), searchSyncAfterChangeHook('guides')],
+    afterChange: [
+      slugChangeRedirectHook('guides'),
+      searchSyncAfterChangeHook('guides'),
+      webhooksPublishAfterChangeHook('guides'),
+    ],
     afterDelete: [searchSyncAfterDeleteHook('guides')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },

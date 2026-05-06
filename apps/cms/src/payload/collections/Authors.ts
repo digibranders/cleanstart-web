@@ -9,6 +9,7 @@ import {
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { validateOptionalUrl } from '../lib/url-shape';
 
 export const Authors: CollectionConfig = {
@@ -123,7 +124,11 @@ export const Authors: CollectionConfig = {
     seoField,
   ],
   hooks: {
-    afterChange: [slugChangeRedirectHook('authors'), searchSyncAfterChangeHook('authors')],
+    afterChange: [
+      slugChangeRedirectHook('authors'),
+      searchSyncAfterChangeHook('authors'),
+      webhooksPublishAfterChangeHook('authors'),
+    ],
     afterDelete: [searchSyncAfterDeleteHook('authors')],
   },
   versions: { drafts: true },

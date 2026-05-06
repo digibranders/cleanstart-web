@@ -10,6 +10,7 @@ import {
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 /**
  * Page-builder host collection. The Pages tree is the only content
@@ -146,7 +147,11 @@ export const Pages: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [pagesPathBuilderHook],
-    afterChange: [slugChangeRedirectHook('pages'), searchSyncAfterChangeHook('pages')],
+    afterChange: [
+      slugChangeRedirectHook('pages'),
+      searchSyncAfterChangeHook('pages'),
+      webhooksPublishAfterChangeHook('pages'),
+    ],
     afterDelete: [searchSyncAfterDeleteHook('pages')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
