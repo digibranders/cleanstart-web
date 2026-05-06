@@ -1,0 +1,119 @@
+// =============================================================================
+// 6. Buttons — primary, secondary, subtle
+// =============================================================================
+
+.btn {
+  border-radius: var(--cs-radius-input);
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.005em;
+  padding-inline: var(--cs-space-4);
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro),
+    transform var(--cs-motion-micro);
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+
+  &:active:not([disabled]) {
+    transform: translateY(1px);
+  }
+}
+
+// Primary action — `.btn--style-primary` is sometimes the button itself
+// (when standalone) and sometimes a wrapping `<div>` containing
+// `<button id="action-save">` plus a popup chevron (when wrapped with a
+// dropdown). Style only the actual <button> inside, leaving the wrapper
+// transparent so it doesn't double-up the cyan rectangle.
+button.btn--style-primary,
+button.btn--style-pill-primary,
+.btn--style-primary > button.btn,
+.btn--style-pill-primary > button.btn,
+.btn--style-primary[type='button'],
+.btn--style-pill-primary[type='button'] {
+  background: var(--cs-cyan-500);
+  color: #04212a;
+  border: 1px solid transparent;
+  border-radius: var(--cs-radius-input);
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.005em;
+  padding-inline: var(--cs-space-4);
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cs-space-2);
+  white-space: nowrap;
+
+  &:hover:not([disabled]) {
+    background: var(--cs-cyan-400);
+    box-shadow: 0 1px 0 0 rgba(6, 199, 242, 0.25), 0 6px 16px -8px rgba(6, 199, 242, 0.4);
+  }
+
+  &:active:not([disabled]) {
+    background: var(--cs-cyan-600);
+  }
+
+  .btn__label {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+}
+
+// When `.btn--style-primary` is itself a wrapper <div>, it must NOT carry
+// any background or sizing — the inner <button> owns the cyan look. The
+// wrapper just lets the chevron sit beside the button.
+div.btn--style-primary,
+div.btn--style-pill-primary {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  height: auto;
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.btn--style-secondary {
+  background: transparent;
+  color: var(--theme-text);
+  border: 1px solid var(--theme-elevation-250);
+
+  &:hover:not([disabled]) {
+    border-color: var(--cs-cyan-500);
+    color: var(--theme-text);
+  }
+}
+
+.btn--style-subtle {
+  background: var(--theme-elevation-100);
+  color: var(--theme-text);
+  border: 1px solid transparent;
+
+  &:hover:not([disabled]) {
+    background: var(--theme-elevation-150);
+  }
+}
+
+// Destructive actions — confirm dialogs, "Delete row" buttons
+.btn--style-error,
+[data-error-button='true'] {
+  background: var(--color-error-500);
+  color: #fff;
+  border: 1px solid transparent;
+
+  &:hover:not([disabled]) {
+    filter: brightness(1.05);
+  }
+}

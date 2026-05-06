@@ -1,0 +1,133 @@
+// =============================================================================
+// 5. Forms — labels, inputs, helpers, focus
+// =============================================================================
+
+// Labels — quieter, weight-500, slight tracking
+.field-label,
+.field-type__label,
+.field-type label {
+  color: var(--theme-text-soft);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  margin-bottom: 4px;
+}
+
+// Helper / description text under fields
+.field-description {
+  color: var(--theme-text-soft);
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+// Required asterisk — gentle red, never alarming
+.field-label .required,
+.field-label__required {
+  color: var(--color-error-500);
+  opacity: 0.7;
+  margin-inline-start: 0.15em;
+}
+
+// Pressed-in inputs — Webflow's "hole punched into the panel" treatment
+.field-type {
+  margin-bottom: var(--cs-space-3);
+
+  &.text input,
+  &.textarea textarea,
+  &.email input,
+  &.number input,
+  &.password input,
+  &.code .CodeMirror,
+  &.json .CodeMirror {
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    padding: 0.55rem 0.75rem;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--theme-text);
+    transition:
+      border-color var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &::placeholder {
+      color: var(--theme-text-disabled);
+    }
+
+    &:hover:not([disabled]):not(:focus):not(:focus-visible) {
+      border-color: var(--theme-elevation-300);
+    }
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+
+    &[disabled],
+    &[readonly] {
+      background: var(--theme-elevation-50);
+      color: var(--theme-text-disabled);
+      cursor: not-allowed;
+    }
+  }
+
+  // Select / react-select
+  &.select .rs__control,
+  &.select .react-select__control {
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    min-height: 38px;
+    transition: border-color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--theme-elevation-300);
+    }
+
+    &--is-focused {
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+  }
+
+  // Checkbox + radio — slightly tighter
+  &.checkbox .checkbox-input,
+  &.radio .radio-input {
+    border-radius: var(--cs-radius-chip);
+  }
+}
+
+// Group fields — a clear hairline divider between groups
+.group-field {
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3);
+
+  &__label {
+    color: var(--theme-text);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: var(--cs-space-2);
+  }
+}
+
+// Top-level group fields — Payload styles every `.group-field--top-level`
+// (SEO on Blogs/Guides, Social on Authors, and any other top-level group
+// across collections + drawers) with hardcoded `-60px left / -40px right`
+// margins so the card visually pops out 100px wider than sibling fields.
+// That breaks column alignment everywhere. Pin every top-level group
+// flush with its sibling fields, both on edit pages AND inside drawers.
+.group-field--top-level,
+.group-field.group-field--top-level,
+.drawer .group-field--top-level,
+.doc-drawer .group-field--top-level,
+.list-drawer .group-field--top-level {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}

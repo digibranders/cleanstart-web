@@ -1,0 +1,795 @@
+// 19. MediaField — direct-upload custom Field (replaces Payload upload UI)
+// =============================================================================
+
+// =============================================================================
+// 19a. BodyStatsField — compact word-count + reading-minutes pill row
+// =============================================================================
+//
+// Lives at the top of the sidebar in versioned content collections (Blogs,
+// News, Guides, KnowledgeBase). Replaces two full-width read-only number
+// inputs with one glanceable line. Underlying number fields are still
+// written by `bodyStatsHook` on save — this is a presentation swap only.
+
+.cs-body-stats {
+  margin-bottom: var(--cs-space-3);
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--cs-space-2);
+  }
+
+  &__pill {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 8px 10px;
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    cursor: default;
+    transition: border-color var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--theme-elevation-200);
+    }
+  }
+
+  &__value {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--theme-text);
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: -0.01em;
+  }
+
+  &__label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+  }
+
+  &__hint {
+    margin: 6px 0 0 0;
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--theme-text-disabled);
+  }
+}
+
+// Visually-hidden helper used inside icon-only links/buttons that supply
+// their own accessible name via a hidden span (biome's a11y rules want
+// real text content even when aria-label is present).
+.cs-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cs-media-field {
+  margin-bottom: var(--cs-space-3);
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--theme-text-soft);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    margin-bottom: 4px;
+  }
+
+  &__required {
+    color: var(--color-error-500);
+    font-weight: 700;
+  }
+
+  // ─── Empty-state dropzone ───────────────────────────────────────
+  &__dropzone {
+    background: var(--theme-elevation-50);
+    border: 1.5px dashed var(--theme-elevation-200);
+    border-radius: var(--cs-radius-card);
+    padding: var(--cs-space-6) var(--cs-space-4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cs-space-2);
+    text-align: center;
+    cursor: pointer;
+    transition:
+      border-color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--theme-elevation-300);
+      background: var(--theme-elevation-100);
+    }
+
+    &--dragover {
+      border-color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--cs-cyan-500);
+      outline-offset: 2px;
+    }
+  }
+
+  &__dropzone-glyph {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--cs-tint-brand-soft);
+    color: var(--cs-cyan-500);
+  }
+
+  &__dropzone-actions {
+    display: flex;
+    gap: var(--cs-space-2);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  &__help {
+    margin: 0;
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    line-height: 1.45;
+    max-width: 56ch;
+  }
+
+  // ─── Filled / loading card ──────────────────────────────────────
+  &__card {
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    gap: var(--cs-space-3);
+    align-items: flex-start;
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    padding: var(--cs-space-3);
+    transition: border-color var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--theme-elevation-200);
+    }
+
+    @media (max-width: 720px) {
+      grid-template-columns: 80px 1fr;
+      &__actions {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+
+  &__thumb {
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-input);
+    overflow: hidden;
+    cursor: zoom-in;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color var(--cs-motion-micro);
+
+    &:hover:not([disabled]) {
+      border-color: var(--cs-cyan-500);
+    }
+
+    &[disabled] {
+      cursor: default;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    &--skeleton {
+      background: linear-gradient(
+        90deg,
+        var(--theme-elevation-100) 0%,
+        var(--theme-elevation-150) 50%,
+        var(--theme-elevation-100) 100%
+      );
+      background-size: 200% 100%;
+      animation: cs-skeleton 1.4s ease-in-out infinite;
+    }
+  }
+
+  &__thumb-fallback {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--theme-text-soft);
+    padding: 0 4px;
+    text-align: center;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  &__filename-row {
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    min-width: 0;
+  }
+
+  // Filename rendered as a clickable button so it visibly invites a
+  // rename. Hover surfaces the cyan accent + an inline "rename" hint.
+  &__filename {
+    color: var(--theme-text);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: transparent;
+    border: 1px dashed transparent;
+    border-radius: var(--cs-radius-input);
+    padding: 2px 6px;
+    margin-inline-start: -6px;
+    cursor: text;
+    text-align: left;
+    min-width: 0;
+    flex: 0 1 auto;
+    max-width: 100%;
+    transition:
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &:hover:not([disabled]) {
+      border-color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+    }
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+
+    &[disabled] {
+      cursor: default;
+      opacity: 0.7;
+    }
+  }
+
+  &__rename-hint {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--theme-text-disabled);
+    opacity: 0;
+    transition: opacity var(--cs-motion-micro);
+  }
+
+  &__filename-row:hover &__rename-hint {
+    opacity: 1;
+  }
+
+  // Filename + locked extension live inside one bordered shell. The
+  // shell carries the focus halo so visually it reads as a single
+  // rename input — the extension chip is just an inert label glued
+  // to the right side.
+  &__filename-edit {
+    display: inline-flex;
+    align-items: stretch;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 32px;
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    overflow: hidden;
+    transition:
+      border-color var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro);
+
+    &:focus-within {
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__filename-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    background: transparent;
+    border: none;
+    padding: 0 var(--cs-space-2);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--theme-text);
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+    }
+  }
+
+  &__filename-ext {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 var(--cs-space-2);
+    background: var(--theme-elevation-100);
+    border-left: 1px solid var(--theme-elevation-150);
+    color: var(--theme-text-soft);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 500;
+    user-select: none;
+    cursor: not-allowed;
+  }
+
+  &__meta {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    font-feature-settings: 'tnum' 1;
+    line-height: 1.4;
+  }
+
+  // ─── URL row ────────────────────────────────────────────────────
+  &__url-row {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  &__url {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 30px;
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    padding: 0 var(--cs-space-2);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--theme-text-soft);
+    cursor: text;
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+      color: var(--theme-text);
+    }
+  }
+
+  // ─── Alt-text inline edit ───────────────────────────────────────
+  &__alt-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  &__alt-label {
+    font-weight: 600;
+    color: var(--theme-text);
+  }
+
+  &__alt-value {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__alt-empty {
+    color: var(--theme-text-disabled);
+    font-style: italic;
+  }
+
+  &__alt-input {
+    flex: 1 1 220px;
+    min-width: 0;
+    height: 30px;
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    padding: 0 var(--cs-space-2);
+    font-size: 13px;
+    color: var(--theme-text);
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+  }
+
+  // ─── Action column ──────────────────────────────────────────────
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-1);
+    align-items: stretch;
+  }
+
+  // ─── Buttons used inside the field (self-contained) ────────────
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 32px;
+    padding-inline: var(--cs-space-3);
+    border-radius: var(--cs-radius-input);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    border: 1px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color var(--cs-motion-micro),
+      color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro);
+
+    &[disabled] {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+
+    &--small {
+      height: 28px;
+      font-size: 12px;
+      padding-inline: var(--cs-space-2);
+    }
+
+    &--primary {
+      background: var(--cs-cyan-500);
+      color: #04212a;
+
+      &:hover:not([disabled]) {
+        background: var(--cs-cyan-400);
+        box-shadow: 0 1px 0 0 rgba(6, 199, 242, 0.25),
+          0 6px 16px -8px rgba(6, 199, 242, 0.4);
+      }
+
+      &:active:not([disabled]) {
+        background: var(--cs-cyan-600);
+      }
+    }
+
+    &--secondary {
+      background: var(--theme-input-bg);
+      border-color: var(--theme-elevation-250);
+      color: var(--theme-text);
+
+      &:hover:not([disabled]) {
+        border-color: var(--cs-cyan-500);
+        color: var(--cs-cyan-500);
+      }
+    }
+
+    &--subtle {
+      background: transparent;
+      color: var(--theme-text-soft);
+
+      &:hover:not([disabled]) {
+        color: var(--cs-cyan-500);
+        background: var(--cs-tint-brand-soft);
+      }
+    }
+
+    &--destructive {
+      background: var(--theme-input-bg);
+      border-color: var(--theme-elevation-250);
+      color: var(--theme-text);
+
+      &:hover:not([disabled]) {
+        border-color: var(--color-error-500);
+        color: var(--color-error-500);
+        background: rgba(220, 38, 38, 0.06);
+      }
+    }
+  }
+
+  &__icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    color: var(--theme-text-soft);
+    cursor: pointer;
+    transition:
+      color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--cs-cyan-500);
+      border-color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--cs-cyan-500);
+      outline-offset: 1px;
+    }
+  }
+
+  // ─── Progress bar (during upload) ──────────────────────────────
+  &__progress {
+    height: 4px;
+    background: var(--theme-elevation-150);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  &__progress-bar {
+    height: 100%;
+    background: var(--cs-cyan-500);
+    transition: width 120ms linear;
+  }
+
+  // ─── Error banner ──────────────────────────────────────────────
+  &__error {
+    margin-top: var(--cs-space-2);
+    padding: var(--cs-space-2) var(--cs-space-3);
+    background: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.4);
+    border-radius: var(--cs-radius-input);
+    color: var(--color-error-500);
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+
+  // ─── Browse-existing dialog + grid ──────────────────────────────
+  &__browse-dialog {
+    border: 1px solid var(--theme-elevation-200);
+    background: var(--theme-elevation-50);
+    border-radius: var(--cs-radius-modal);
+    width: min(720px, 100%);
+    max-width: 100%;
+    max-height: min(720px, 90vh);
+    padding: 0;
+    color: var(--theme-text);
+    box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+
+    &::backdrop {
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(2px);
+    }
+
+    &:not([open]) {
+      display: none;
+    }
+  }
+
+  &__browse {
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+  }
+
+  &__browse-head {
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    padding: var(--cs-space-3);
+    border-bottom: 1px solid var(--theme-elevation-150);
+  }
+
+  &__browse-search {
+    flex: 1;
+    height: 36px;
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    padding: 0 var(--cs-space-3);
+    font-size: 14px;
+    color: var(--theme-text);
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__browse-grid {
+    padding: var(--cs-space-3);
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--cs-space-2);
+  }
+
+  &__browse-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--theme-text-soft);
+    font-size: 13px;
+    padding: var(--cs-space-8) 0;
+  }
+
+  &__browse-tile {
+    display: flex;
+    flex-direction: column;
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-input);
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0;
+    transition:
+      border-color var(--cs-motion-micro),
+      transform var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--cs-cyan-500);
+      transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--cs-cyan-500);
+      outline-offset: 2px;
+    }
+
+    img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  &__browse-tile-fallback {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--theme-elevation-100);
+    color: var(--theme-text-soft);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  &__browse-tile-name {
+    padding: 6px 8px;
+    font-size: 12px;
+    color: var(--theme-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+  }
+
+  // ─── Preview dialog ─────────────────────────────────────────────
+  &__preview-dialog {
+    background: transparent;
+    border: none;
+    padding: var(--cs-space-4);
+    color: var(--theme-text);
+    max-width: 100vw;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+
+    &::backdrop {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+    }
+
+    &:not([open]) {
+      display: none;
+    }
+  }
+
+  &__preview {
+    position: relative;
+    background: var(--theme-elevation-0);
+    border-radius: var(--cs-radius-modal);
+    overflow: hidden;
+    max-width: min(900px, 100%);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.6);
+
+    img {
+      max-width: 100%;
+      max-height: calc(90vh - 56px);
+      object-fit: contain;
+      display: block;
+      background: var(--theme-elevation-50);
+    }
+  }
+
+  &__preview-caption {
+    padding: var(--cs-space-2) var(--cs-space-3);
+    color: var(--theme-text);
+    font-size: 13px;
+    border-top: 1px solid var(--theme-elevation-150);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__preview-close {
+    position: absolute;
+    top: var(--cs-space-2);
+    right: var(--cs-space-2);
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--cs-radius-input);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.78);
+    }
+  }
+}
+
+@keyframes cs-skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+

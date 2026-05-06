@@ -1,0 +1,84 @@
+// =============================================================================
+// 7. Tabs — pill underline
+// =============================================================================
+
+.tabs-field {
+  &__tabs {
+    border-bottom: 1px solid var(--theme-elevation-150);
+    gap: 0;
+  }
+
+  &__tab-button {
+    color: var(--theme-text-soft);
+    font-size: 13px;
+    font-weight: 500;
+    padding-inline: var(--cs-space-3);
+    height: 36px;
+    border-radius: 0;
+    transition: color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--theme-text);
+    }
+
+    &--active {
+      color: var(--theme-text);
+      font-weight: 600;
+      box-shadow: inset 0 -2px 0 0 var(--cs-cyan-500);
+    }
+
+    &--has-error {
+      color: var(--color-error-500);
+    }
+  }
+}
+
+// =============================================================================
+// 8. Lists — collection table rows, hover, selected, density
+// =============================================================================
+
+.table {
+  font-size: 13.5px;
+
+  thead th {
+    color: var(--theme-text-soft);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: var(--cs-space-2) var(--cs-space-3);
+  }
+
+  tbody tr {
+    transition: background-color var(--cs-motion-micro);
+    height: 48px;
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    // Active / current row (Next router supplies aria-current on links)
+    &[aria-current='true'],
+    &.is-active {
+      background: var(--cs-tint-brand-soft);
+      box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
+    }
+  }
+
+  td {
+    padding: var(--cs-space-2) var(--cs-space-3);
+    color: var(--theme-text);
+    border-top: 1px solid var(--theme-elevation-150);
+  }
+
+  &--appearance-condensed {
+    tbody tr {
+      height: 40px;
+    }
+  }
+}
+
+// List controls strip — toolbar above the table
+.list-controls {
+  margin-bottom: var(--cs-space-4);
+}

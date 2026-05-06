@@ -1,0 +1,75 @@
+// 24. Empty list states — collection list with zero rows
+// =============================================================================
+//
+// Payload's stock empty state is a small left-aligned text line. Promote
+// it to a centred card with breathing room so editors visually understand
+// "this collection has no rows yet" rather than wondering if the table
+// failed to load.
+
+.collection-list__no-results,
+.list-controls + .no-results,
+.no-results,
+.collection-list .empty-state {
+  margin: var(--cs-space-6) auto;
+  padding: var(--cs-space-12) var(--cs-space-6);
+  max-width: 560px;
+  text-align: center;
+  background: var(--theme-elevation-50);
+  border: 1.5px dashed var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  color: var(--theme-text-soft);
+  font-size: 14px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cs-space-3);
+
+  // Generic empty-folder glyph rendered before the text. The default
+  // empty state is plain text — adding this glyph via ::before gives the
+  // card visual weight without needing per-collection components.
+  &::before {
+    content: '';
+    width: 48px;
+    height: 48px;
+    display: inline-block;
+    background-color: var(--theme-text-disabled);
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none'><rect x='3' y='5' width='18' height='14' rx='2' stroke='black' stroke-width='1.4'/><path d='M3 10h18' stroke='black' stroke-width='1.4'/><path d='M9 14l6 0' stroke='black' stroke-width='1.4' stroke-linecap='round'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none'><rect x='3' y='5' width='18' height='14' rx='2' stroke='black' stroke-width='1.4'/><path d='M3 10h18' stroke='black' stroke-width='1.4'/><path d='M9 14l6 0' stroke='black' stroke-width='1.4' stroke-linecap='round'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 48px 48px;
+    mask-size: 48px 48px;
+    opacity: 0.55;
+  }
+
+  // The "Create a new {label}" link Payload renders gets a primary-button
+  // appearance so editors notice it.
+  a,
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--cs-radius-input);
+    background: var(--cs-cyan-500);
+    color: #04212a;
+    font-weight: 600;
+    font-size: 13.5px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition:
+      background-color var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--cs-cyan-400);
+      box-shadow:
+        0 1px 0 0 rgba(6, 199, 242, 0.25),
+        0 6px 16px -8px rgba(6, 199, 242, 0.4);
+    }
+  }
+}
+

@@ -1,0 +1,323 @@
+// 22. Dashboard — editorial landing view (replaces default Payload dashboard)
+// =============================================================================
+
+.cs-dashboard {
+  // Header
+  &__header {
+    margin-bottom: var(--cs-space-6);
+    padding-bottom: var(--cs-space-4);
+    border-bottom: 1px solid var(--theme-elevation-150);
+  }
+
+  &__title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.018em;
+    color: var(--theme-text);
+    margin: 0 0 4px 0;
+  }
+
+  &__title-name {
+    color: var(--cs-cyan-500);
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: var(--theme-text-soft);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  // Pulse cards
+  &__pulse-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--cs-space-3);
+    margin-bottom: var(--cs-space-8);
+
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__pulse {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--cs-space-4);
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    text-decoration: none;
+    color: inherit;
+    cursor: default;
+    transition:
+      border-color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro),
+      transform var(--cs-motion-micro);
+
+    &[href] {
+      cursor: pointer;
+
+      &:hover {
+        border-color: var(--cs-cyan-500);
+        background: var(--theme-elevation-50);
+        transform: translateY(-1px);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--cs-cyan-500);
+        outline-offset: 2px;
+      }
+    }
+
+    &--cyan .cs-dashboard__pulse-value {
+      color: var(--cs-cyan-500);
+    }
+
+    &--amber .cs-dashboard__pulse-value {
+      color: var(--color-warning-500);
+    }
+  }
+
+  &__pulse-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+  }
+
+  &__pulse-value {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--theme-text);
+    font-feature-settings: 'tnum' 1;
+  }
+
+  &__pulse-caption {
+    font-size: 12.5px;
+    color: var(--theme-text-soft);
+    line-height: 1.4;
+  }
+
+  // Sections
+  &__section {
+    margin-bottom: var(--cs-space-8);
+  }
+
+  &__section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--cs-space-3);
+    margin-bottom: var(--cs-space-3);
+  }
+
+  &__section-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--theme-text);
+    margin: 0;
+  }
+
+  &__section-meta {
+    font-size: 12px;
+    color: var(--theme-text-disabled);
+  }
+
+  // Recent-edits table
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    overflow: hidden;
+
+    thead {
+      background: var(--theme-elevation-50);
+    }
+
+    th {
+      padding: var(--cs-space-2) var(--cs-space-3);
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--theme-text-soft);
+    }
+
+    td {
+      padding: var(--cs-space-3);
+      font-size: 13.5px;
+      color: var(--theme-text);
+      border-top: 1px solid var(--theme-elevation-150);
+      vertical-align: middle;
+    }
+
+    tbody tr {
+      transition: background-color var(--cs-motion-micro);
+
+      &:hover {
+        background: var(--theme-elevation-50);
+      }
+    }
+  }
+
+  &__title-link {
+    color: var(--theme-text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--cs-cyan-500);
+    }
+  }
+
+  &__type-cell {
+    color: var(--theme-text-soft);
+    font-size: 12.5px;
+  }
+
+  &__time-cell {
+    color: var(--theme-text-soft);
+    font-feature-settings: 'tnum' 1;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+
+  // Status pills (Live / Draft / Scheduled)
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  &__status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &__status--live {
+    color: var(--color-success-500);
+    background: rgba(0, 196, 106, 0.14);
+  }
+
+  &__status--draft {
+    color: var(--theme-text-soft);
+    background: var(--theme-elevation-150);
+  }
+
+  &__status--unknown {
+    color: var(--theme-text-disabled);
+    background: var(--theme-elevation-100);
+  }
+
+  // Empty state
+  &__empty {
+    padding: var(--cs-space-8);
+    text-align: center;
+    color: var(--theme-text-soft);
+    font-size: 13px;
+    background: var(--theme-elevation-100);
+    border: 1px dashed var(--theme-elevation-200);
+    border-radius: var(--cs-radius-card);
+  }
+
+  // Quick links grid
+  &__quick {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--cs-space-3);
+
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__quick-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--cs-space-4);
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition:
+      border-color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro),
+      transform var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--cs-cyan-500);
+      background: var(--theme-elevation-50);
+      transform: translateY(-1px);
+
+      .cs-dashboard__quick-arrow {
+        color: var(--cs-cyan-500);
+        transform: translateX(2px);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--cs-cyan-500);
+      outline-offset: 2px;
+    }
+  }
+
+  &__quick-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--theme-text);
+  }
+
+  &__quick-desc {
+    font-size: 12.5px;
+    color: var(--theme-text-soft);
+    line-height: 1.45;
+  }
+
+  &__quick-arrow {
+    position: absolute;
+    top: var(--cs-space-3);
+    right: var(--cs-space-3);
+    color: var(--theme-text-disabled);
+    font-size: 16px;
+    line-height: 1;
+    transition:
+      color var(--cs-motion-micro),
+      transform var(--cs-motion-micro);
+  }
+}
+

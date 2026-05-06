@@ -1,0 +1,52 @@
+// =============================================================================
+// 3. Typography — base, scale, headings, numerics
+// =============================================================================
+html,
+body {
+  font-family: var(--font-body);
+  font-feature-settings: 'cv11' 1, 'ss01' 1; // tabular-friendly cuts
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+  font-weight: 700;
+}
+
+// Tabular numerics — ID columns, timestamps, page counters, version numbers
+.cell-updatedAt,
+.cell-createdAt,
+.cell-id,
+.step-nav,
+.payload-pagination,
+.doc-controls__meta,
+.versions-count,
+.cell-_status,
+time {
+  font-feature-settings: 'tnum' 1, 'cv11' 1;
+}
+
+// Mono everywhere code or anchor slugs render
+code,
+pre,
+kbd,
+.cell-slug,
+.field-type.code .CodeMirror,
+.field-type.json .CodeMirror {
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum' 1;
+}

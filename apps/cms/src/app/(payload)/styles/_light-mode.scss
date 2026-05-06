@@ -1,0 +1,19 @@
+// 17. Light-mode contrast safety net
+// =============================================================================
+[data-theme='light'] {
+  .pill {
+    --pill-text-default: var(--theme-text);
+  }
+
+  .table tbody tr:hover {
+    background: var(--theme-elevation-100);
+  }
+
+  // Glass / transparent overlays must remain readable in light mode
+  .tooltip,
+  .popup,
+  .popup__content {
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.12);
+  }
+}
+

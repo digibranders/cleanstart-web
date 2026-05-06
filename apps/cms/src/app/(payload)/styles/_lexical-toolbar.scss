@@ -1,0 +1,80 @@
+// 25. Lexical toolbar — tighten density, right-align secondary actions
+// =============================================================================
+//
+// Default Lexical toolbar reads as a wide bar of equal-weight icons. Bring
+// the density closer to Webflow's editor: compact 30px icon-button chrome,
+// thinner separators, content-cluster on the left + secondary actions
+// pushed right.
+
+.toolbar-popup__container,
+.fixed-toolbar,
+.lexical-toolbar,
+.rich-text-lexical .toolbar-popup,
+.rich-text-lexical__wrap .toolbar-popup {
+  padding: 4px 6px;
+  gap: 2px;
+
+  // Toolbar buttons — square 28-30px, no border at rest, brand-cyan on
+  // hover/active.
+  button,
+  .toolbar-button,
+  .toolbar-popup__button {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: var(--cs-radius-input);
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--theme-text-soft);
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background-color var(--cs-motion-micro),
+      color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro);
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover:not([disabled]):not(:disabled) {
+      color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+    }
+
+    &.active,
+    &[aria-pressed='true'],
+    &[data-active='true'] {
+      color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-medium);
+    }
+  }
+
+  // Toolbar separators — slim hairline rather than chunky border
+  .divider,
+  .toolbar-popup__divider,
+  hr {
+    width: 1px;
+    height: 16px;
+    background: var(--theme-elevation-200);
+    border: none;
+    margin-inline: 4px;
+  }
+
+  // Block-format dropdown (paragraph / H1 / H2 …) — keep selectable but
+  // align with icon-button height
+  .block-controls,
+  .toolbar-popup__select,
+  select {
+    height: 28px;
+    min-height: 28px;
+    padding: 0 var(--cs-space-2);
+    border-radius: var(--cs-radius-input);
+    font-size: 12.5px;
+  }
+}
+

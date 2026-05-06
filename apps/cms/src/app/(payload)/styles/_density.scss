@@ -1,0 +1,291 @@
+// 16b. Sizes & rhythm audit — uniform heights + density tokens
+// =============================================================================
+//
+// Across every section the admin uses a single 4-pt rhythm. Heights line up
+// (input, select, button = 36-40px), row heights line up (table 48 / row 48
+// / sidebar link 36), and density inside collapsibles tightens by one step
+// (16 → 12) so deeply nested forms don't feel airy and unfocused.
+
+// ─── Input + control heights — locked to a 38-40px family.
+// Upload fields are intentionally excluded — they wrap an 80px image
+// thumbnail and need to size to content. Pinning their row height
+// caused the image to bleed above/below the rounded card.
+.field-type {
+  &.text input,
+  &.email input,
+  &.number input,
+  &.password input,
+  &.date input {
+    min-height: 38px;
+    height: 38px;
+  }
+
+  &.textarea textarea {
+    min-height: 84px;
+  }
+
+  // Number fields with bounded ranges (level 1-6, etc.) shouldn't stretch
+  // full-width — cap them to a sensible ~120px so they read as numeric.
+  &.number input {
+    max-width: 120px;
+  }
+
+  // Select / react-select control — match input height
+  &.select .rs__control,
+  &.select .react-select__control {
+    min-height: 38px;
+  }
+
+  // ReadOnly slug-style fields — communicate "auto-generated" with mono +
+  // muted color. Anchor on TOC, slug field on docs, IDs.
+  &.text input[readonly],
+  &[data-readonly='true'] input,
+  input[name='slug'][readonly],
+  input[name='anchor'][readonly] {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--theme-text-soft);
+    background: var(--theme-elevation-50);
+  }
+}
+
+// Row labels across the admin (TOC, FAQ, blocks, etc.) align at 36px
+.row-label,
+.collapsible__toggle,
+.array-field__row-header {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+}
+
+// ─── Density inside collapsibles + array rows — tight Webflow-style
+// Nested fields use `--cs-space-2` (8px) margin-bottom and the
+// collapsible content area gets reduced padding so a 2-field FAQ row
+// reads as ~150px expanded, not ~250px.
+.collapsible__content {
+  padding: var(--cs-space-3) var(--cs-space-3) !important;
+}
+
+.collapsible__content,
+.array-field__row,
+.blocks-field__row,
+.tabs-field__content-wrap {
+  .field-type {
+    margin-bottom: var(--cs-space-2);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Inside nested editor wraps, kill the bundled Lexical wrap padding
+// so the cyan-bordered card hugs the content tightly. Body editor
+// (top-level, --show-gutter outside any array row) keeps its wider feel.
+.array-field__row .rich-text-lexical__wrap,
+.collapsible__content .rich-text-lexical__wrap,
+.blocks-field__row .rich-text-lexical__wrap {
+  .editor-container,
+  .editor-scroller {
+    padding: 0;
+  }
+}
+
+// Group label margin — keep tight to its first child
+.group-field__label {
+  margin-bottom: var(--cs-space-3);
+}
+
+// ─── Sidebar nav rhythm — predictable link height and gap
+.nav .nav-group__content a {
+  min-height: 36px;
+}
+
+// ─── Doc controls strip — keep Payload's two-row layout (title row + meta
+// row); just lock min-height + ensure controls cluster on the right.
+.doc-controls__controls-wrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+}
+
+// Every actionable element in the doc-controls strip — Save Draft,
+// Publish changes wrapper, the chevron split button, and the 3-dots
+// kebab — must share the same 36px height so the row doesn't look
+// uneven (kebab visibly taller than the cyan button = bug).
+.doc-controls .btn,
+.doc-controls__dots,
+.doc-controls__dots > button,
+.doc-controls .btn--icon-only,
+.doc-controls__list-item,
+.doc-controls__locked-controls > * {
+  height: 36px;
+  min-height: 36px;
+}
+
+// 3-dots kebab specifically — square 36px, secondary-button outline.
+.doc-controls__dots,
+.doc-controls__dots > button {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--cs-radius-input);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ─── Hide array-field + per-row kebabs (Copy Field / Paste Field /
+// Copy Row / Paste Row). Payload's cross-form clipboard import is
+// brittle — fails silently on any schema drift between source and
+// destination. Editors barely use it; the kebab adds visual noise +
+// lots of "what does this do" support questions. Drag-handle +
+// chevron + our injected "Clear all" cover the real workflows.
+//
+// Scoped to ARRAY fields and collapsible rows only — the doc-controls
+// top-right kebab (Create New / Duplicate / Delete) stays visible.
+//
+// The actual class is `.clipboard-action__popup` (verified from
+// rendered DOM). Hide both the popup itself AND its wrapping <li>
+// so we don't leave an empty list item in the actions row.
+.array-field__header-actions .clipboard-action__popup,
+.array-field__header-actions > li:has(> .clipboard-action__popup),
+.collapsible .clipboard-action__popup,
+.collapsible__actions .clipboard-action__popup {
+  display: none !important;
+}
+
+// ─── Doc-controls split-button chevron — was rendering at 51px tall
+// with panel-color bg and a visible border, making the chevron look
+// like a foreign light box wedged between Publish and the kebab.
+// Make the wrapper invisible (transparent, no border) and let the
+// inner `.popup-button` carry the secondary-button look.
+.doc-controls__popup,
+.doc-controls .popup,
+.form-submit .popup {
+  background: transparent !important;
+  border: none !important;
+  height: 36px !important;
+  width: auto !important;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+}
+
+// The actual chevron button inside the popup wrapper — secondary-style
+// outlined, 36px square, brand-cyan on hover.
+.doc-controls__popup .popup-button,
+.doc-controls .popup .popup-button,
+.form-submit .popup .popup-button {
+  background: transparent;
+  border: 1px solid var(--theme-elevation-250);
+  border-radius: var(--cs-radius-input);
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--theme-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--cs-cyan-500);
+    color: var(--cs-cyan-500);
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// Save Draft button — explicit outlined treatment (Payload's stock class
+// `.btn--style-secondary` covers most of this, but the doc-controls'
+// version of Save Draft uses `.save-draft` plus other modifiers and
+// needs an explicit pin so it matches the chevron + kebab.
+.doc-controls .btn.save-draft,
+.doc-controls .btn--style-secondary {
+  background: transparent;
+  border: 1px solid var(--theme-elevation-250);
+  color: var(--theme-text);
+  height: 36px;
+  border-radius: var(--cs-radius-input);
+  padding-inline: var(--cs-space-4);
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.005em;
+  transition:
+    background-color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    color var(--cs-motion-micro);
+
+  &:hover:not([disabled]) {
+    border-color: var(--cs-cyan-500);
+    color: var(--cs-cyan-500);
+  }
+}
+
+// ─── Tabs strip — uniform 40px tab height
+.tabs-field__tab-button {
+  min-height: 40px;
+}
+
+// ─── Buttons across the app — three height tiers
+.btn--size-small,
+.btn--size-sm {
+  height: 30px;
+  font-size: 12.5px;
+  padding-inline: var(--cs-space-3);
+}
+
+.btn--size-large,
+.btn--size-lg {
+  height: 44px;
+  font-size: 14px;
+  padding-inline: var(--cs-space-6);
+}
+
+// Icon-only buttons in toolbars — square 30px. Only target the dedicated
+// "icon-only" modifier class — earlier I targeted `.btn--icon-style-without-border`
+// which Payload also applies to LABELED buttons (Save Draft / Publish), clipping
+// their text. Verified live: `.btn--icon-only` is the correct class.
+.btn--icon-only {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  padding: 0;
+}
+
+// ─── Pills — uniform 22px height across statuses
+.pill {
+  min-height: 22px;
+  height: 22px;
+
+  &--size-medium {
+    height: 26px;
+    font-size: 12.5px;
+  }
+}
+
+// ─── Cards — generous but bounded padding
+.card {
+  padding: var(--cs-space-4);
+
+  &__title {
+    margin-bottom: var(--cs-space-2);
+  }
+
+  &__actions {
+    margin-top: var(--cs-space-3);
+  }
+}
+

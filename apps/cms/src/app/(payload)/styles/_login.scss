@@ -1,0 +1,61 @@
+// 13. Login + create-first-user — refined hero
+// =============================================================================
+.template-default,
+.template-minimal {
+  .render-icon,
+  .graphic-logo {
+    margin-bottom: var(--cs-space-6);
+  }
+}
+
+// Subtle brand-aware gradient backdrop
+.template-minimal::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(60% 50% at 80% 0%, var(--cs-cyan-100) 0%, transparent 60%),
+    radial-gradient(45% 45% at 0% 100%, rgba(93, 4, 216, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+[data-theme='dark'] .template-minimal::before {
+  background:
+    radial-gradient(60% 50% at 80% 0%, rgba(6, 199, 242, 0.15) 0%, transparent 60%),
+    radial-gradient(45% 45% at 0% 100%, rgba(93, 4, 216, 0.18) 0%, transparent 60%);
+}
+
+// Login card — soft elevation shadow, rounder, never garish
+.template-minimal .form-wrap,
+.template-minimal form {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-modal);
+  padding: var(--cs-space-8);
+  box-shadow: 0 12px 40px -16px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme='dark'] .template-minimal .form-wrap,
+[data-theme='dark'] .template-minimal form {
+  box-shadow: 0 12px 40px -16px rgba(0, 0, 0, 0.55);
+}
+
+// Login + create-first-user logo — keep at hero size, never stretching
+.template-minimal .graphic-logo svg {
+  display: block;
+  height: 44px;
+  width: auto;
+  margin: 0 auto;
+}
+
+// Header logo — preserve the 28:32 aspect, cap at ~24px
+.graphic-icon,
+.nav__header .graphic-icon {
+  svg {
+    display: block;
+    height: 24px;
+    width: auto;
+  }
+}
+

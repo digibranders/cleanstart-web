@@ -1,0 +1,149 @@
+// 23. Paper-cut polish — status pills, toast stacking, breadcrumb home icon
+// =============================================================================
+
+// ─── Status pill polish across versioned list views ───────────────
+//
+// Payload renders `.cell-_status` as a plain text "draft" / "published"
+// label. Promote each value to a coloured chip with a leading dot so the
+// status reads at a glance from the table.
+.cell-_status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+}
+
+// Map Payload's status values via :has() — match by text content fallback.
+// Payload doesn't add status-specific class modifiers; we colour by value
+// using cell content + collection-list rendering attributes. The pill
+// classes Payload exposes inside cells (.pill, .pill--has-color) carry
+// the actual semantic — surface our chip styling on those.
+.cell-_status .pill,
+.cell-_status .pill--has-color {
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+}
+
+// Published / Live — cyan
+.cell-_status .pill--style-success,
+.cell-_status .pill[class*='published'] {
+  color: var(--cs-cyan-500);
+  background: var(--cs-tint-brand-soft);
+}
+
+// Draft — neutral
+.cell-_status .pill--style-warning,
+.cell-_status .pill[class*='draft'] {
+  color: var(--theme-text-soft);
+  background: var(--theme-elevation-150);
+}
+
+// Scheduled — amber
+.cell-_status .pill--style-info,
+.cell-_status .pill[class*='scheduled'] {
+  color: var(--color-warning-500);
+  background: rgba(217, 119, 6, 0.14);
+}
+
+// ─── Toast stacking — keep multiple toasts readable ────────────────
+//
+// Payload's stock toast container stacks tightly without spacing; multiple
+// toasts overlap. Add a min-gap and a subtle scale for the last toast.
+.payload-toast-container,
+[role='status'][data-payload-toast='container'],
+[data-sonner-toaster] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-2);
+  z-index: 80;
+}
+
+.payload-toast,
+[data-sonner-toast] {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3) var(--cs-space-4);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+  font-size: 13.5px;
+  color: var(--theme-text);
+  min-height: 44px;
+  max-width: 420px;
+  transition:
+    transform var(--cs-motion-macro),
+    opacity var(--cs-motion-macro);
+
+  &[data-type='success'] {
+    border-left: 3px solid var(--color-success-500);
+  }
+
+  &[data-type='error'] {
+    border-left: 3px solid var(--color-error-500);
+  }
+
+  &[data-type='warning'] {
+    border-left: 3px solid var(--color-warning-500);
+  }
+
+  &[data-type='info'] {
+    border-left: 3px solid var(--cs-cyan-500);
+  }
+}
+
+// (Removed: previous `.step-nav::before` home icon. The breadcrumb
+//  identity is provided entirely by the Icon graphic now styled as a
+//  "CleanStart" wordmark in `Icon.tsx` — a duplicate home glyph here
+//  read as visual noise.)
+
+// ─── Field description callout — italic, left-bordered ─────────────
+//
+// Make `admin.description` strings stand out as guidance rather than
+// blending with the field label.
+.field-description {
+  font-style: italic;
+}
+
+// ─── Required asterisk emphasis ────────────────────────────────────
+//
+// Boost the required marker so it doesn't blend into the label.
+.field-label .required,
+.field-label__required {
+  color: var(--color-error-500);
+  opacity: 1;
+  font-weight: 700;
+  font-size: 13px;
+  margin-inline-start: 0.2em;
+}
+

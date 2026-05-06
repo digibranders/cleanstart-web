@@ -1,0 +1,204 @@
+// 12. Body editor (Lexical) — readable rhythm + heading anchors
+// =============================================================================
+
+.rich-text-lexical,
+.LexicalEditorTheme__paragraph,
+.editor-shell {
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.LexicalEditorTheme__paragraph {
+  margin: 0 0 var(--cs-space-3) 0;
+}
+
+.LexicalEditorTheme__h1,
+.LexicalEditorTheme__h2,
+.LexicalEditorTheme__h3,
+.LexicalEditorTheme__h4,
+.LexicalEditorTheme__h5,
+.LexicalEditorTheme__h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: var(--cs-space-6) 0 var(--cs-space-3) 0;
+  color: var(--theme-text);
+}
+
+.LexicalEditorTheme__h1 {
+  font-size: 28px;
+  letter-spacing: -0.02em;
+}
+.LexicalEditorTheme__h2 {
+  font-size: 22px;
+}
+.LexicalEditorTheme__h3 {
+  font-size: 18px;
+}
+.LexicalEditorTheme__h4 {
+  font-size: 16px;
+}
+
+.LexicalEditorTheme__ul,
+.LexicalEditorTheme__ol {
+  padding-inline-start: var(--cs-space-6);
+  margin: 0 0 var(--cs-space-3) 0;
+
+  li {
+    margin-bottom: var(--cs-space-1);
+  }
+}
+
+.LexicalEditorTheme__textBold {
+  font-weight: 700;
+}
+
+.LexicalEditorTheme__textItalic {
+  font-style: italic;
+}
+
+.LexicalEditorTheme__textUnderline {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+}
+
+.LexicalEditorTheme__link {
+  color: var(--cs-cyan-500);
+  text-decoration: underline;
+  text-decoration-color: rgba(6, 199, 242, 0.4);
+  text-underline-offset: 2px;
+  transition: text-decoration-color var(--cs-motion-micro);
+
+  &:hover {
+    text-decoration-color: var(--cs-cyan-500);
+  }
+}
+
+.LexicalEditorTheme__quote {
+  border-inline-start: 3px solid var(--cs-cyan-500);
+  padding-inline-start: var(--cs-space-4);
+  color: var(--theme-text-soft);
+  font-style: italic;
+  margin: var(--cs-space-4) 0;
+}
+
+.LexicalEditorTheme__code {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-input);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: var(--cs-space-3);
+  display: block;
+  margin: var(--cs-space-3) 0;
+  overflow-x: auto;
+}
+
+// =============================================================================
+// 12b. Lexical editor — branded shell + content typography
+// =============================================================================
+//
+// We avoid styling Payload's internal Lexical chrome (toolbars, inline
+// popups, slash menu, link editor, gutter) — Payload ships its own CSS
+// for those and our overrides were causing off-by-one alignment.
+// What we DO style: the outer card (so the body field reads as a
+// pressed-in well), a max-height with internal scroll so the body
+// doesn't push every other field 8000px below, and the contentEditable
+// text/selection/caret to match brand.
+
+// Shell — scoped to the editor's WRAP element, NOT the outer field.
+// If we border the field itself, Payload's label sits inside the box
+// (visible bug: "Bio Long" rendered inside the editor card).
+// `.rich-text-lexical__wrap` contains only the editor surface.
+.rich-text-lexical--show-gutter .rich-text-lexical__wrap {
+  background: var(--theme-input-bg);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  transition: border-color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
+
+  &:focus-within {
+    border-color: var(--cs-cyan-500);
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+
+  // Cap the body editor at 85vh with internal scroll so SEO + sidebar
+  // fields below it remain reachable without endless scrolling.
+  .editor-scroller {
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+}
+
+.ContentEditable__root {
+  caret-color: var(--cs-cyan-500);
+  // Default minimum for the top-level body editor — generous writing
+  // canvas. Nested editors (inside array rows / collapsibles / tabs)
+  // override below so short answers don't get padded with empty space.
+  min-height: 320px;
+  outline: none;
+  // Lexical's bundled stylesheet sets a serif fallback on the contentEditable.
+  // Force the admin font through here so body content matches the rest
+  // of the chrome — verified via runtime audit.
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+
+  // Branded text selection — visible without overpowering
+  &::selection,
+  *::selection {
+    background: var(--cs-tint-brand-medium);
+    color: var(--theme-text);
+  }
+}
+
+// Nested richtext editors (FAQ answers, article-section bodies, anything
+// inside an array row / collapsible / tabs panel) — single-line min so
+// short answers don't carry an empty 80px whitespace tail. The editor
+// grows naturally as content is typed.
+.array-field__row .ContentEditable__root,
+.collapsible__content .ContentEditable__root,
+.blocks-field__row .ContentEditable__root {
+  min-height: 48px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+// Nested wrap shell — render as a flat textarea-style surface so the
+// FAQ answer / nested richtext doesn't carry double chrome (bordered
+// row card + bordered editor card). Just an input-bg fill with a
+// 1px border, hugging its content.
+.array-field__row .rich-text-lexical__wrap,
+.collapsible__content .rich-text-lexical__wrap,
+.blocks-field__row .rich-text-lexical__wrap {
+  min-height: 0;
+  background: var(--theme-input-bg);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-input);
+  padding: 0;
+
+  .editor-scroller,
+  .editor-container,
+  .editor {
+    padding: 0;
+    background: transparent;
+    border: none;
+    max-height: none;
+  }
+
+  .ContentEditable__root {
+    padding: 6px 10px;
+  }
+
+  &:focus-within {
+    border-color: var(--cs-cyan-500);
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+}
+
+// (Removed: fixed-toolbar, inline-toolbar-popup, slash-menu-popup,
+// link-editor, table cells, upload card, embedded block, character
+// count, heading anchor `::before`, block cursor, placeholder. Payload's
+// own CSS handles these — our overrides were too broad and surfaced
+// as off-by-one borders/lines across nested editors.)
+

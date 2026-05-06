@@ -1,0 +1,47 @@
+// 16. Accessibility — focus, reduced motion
+// =============================================================================
+
+:focus-visible {
+  outline: 2px solid var(--cs-cyan-500);
+  outline-offset: 2px;
+  border-radius: var(--cs-radius-input);
+}
+
+// Inputs that already have their own focus chrome (the parent
+// container draws the brand-cyan border + halo) shouldn't ALSO get
+// the global focus-visible outline — otherwise an empty react-select
+// search input renders as a tiny brand-cyan box next to its chip,
+// which reads visually as a stray "[" bracket. Scope the outline off
+// for these inner inputs so only the cursor caret is visible.
+.rs__input,
+.rs__input:focus,
+.rs__input:focus-visible,
+.react-select__input,
+.react-select__input:focus,
+.react-select__input:focus-visible,
+.field-type.select input:focus-visible,
+.field-type.relationship input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+// Same for Lexical contentEditables — the bordered shell wrap shows
+// the focus state via :focus-within (3px brand halo). The inner
+// element shouldn't ALSO render its own outline.
+[contenteditable='true'][data-lexical-editor='true']:focus-visible,
+[contenteditable='true'][data-lexical-editor='true']:focus {
+  outline: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

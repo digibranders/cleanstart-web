@@ -1,0 +1,94 @@
+// =============================================================================
+// 10. Cards & arrays — array-field rows, collapsibles, dashboard cards
+// =============================================================================
+
+// Dashboard cards
+.card {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3);
+  transition:
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro),
+    transform var(--cs-motion-micro);
+
+  &--has-onclick:hover {
+    border-color: var(--cs-cyan-500);
+    background: var(--theme-elevation-50);
+    cursor: pointer;
+  }
+
+  &__title {
+    color: var(--theme-text);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+}
+
+// Array field rows + collapsibles — quieter chrome until interacted with
+.array-field__row,
+.collapsible {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  margin-bottom: var(--cs-space-2);
+  transition:
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--theme-elevation-200);
+  }
+}
+
+// Collapsible / array-row header — pinned at 38px slim. The drag
+// handle, number prefix, label, kebab, and chevron all sit in the
+// row; reducing padding here is the highest-leverage way to make
+// long lists of FAQ / TOC rows scan compactly.
+.collapsible__header-wrap,
+.array-field__row-header {
+  padding: 3px var(--cs-space-2);
+  gap: var(--cs-space-2);
+  min-height: 38px;
+}
+
+.collapsible__toggle {
+  min-height: 30px;
+  padding-block: 0;
+  font-size: 13px;
+}
+
+// Also tighten the row-label component height so it doesn't expand
+// the header beyond what padding allows.
+.row-label {
+  min-height: 30px;
+  font-size: 13px;
+}
+
+// Drag handle — invisible until hover
+.collapsible__drag,
+.array-field__row-drag {
+  opacity: 0.35;
+  transition: opacity var(--cs-motion-micro);
+}
+
+.array-field__row:hover .collapsible__drag,
+.array-field__row:hover .array-field__row-drag,
+.collapsible:hover .collapsible__drag {
+  opacity: 1;
+}
+
+// Row label — hierarchy for our FAQ/TOC custom labels
+.row-label {
+  color: var(--theme-text);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+// Add-row button at the bottom of an array field
+.array-field__add-row {
+  margin-top: var(--cs-space-2);
+}
+

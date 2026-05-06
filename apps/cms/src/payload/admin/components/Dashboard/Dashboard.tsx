@@ -1,4 +1,3 @@
-import { DefaultTemplate } from '@payloadcms/next/templates';
 import { Gutter } from '@payloadcms/ui';
 import type { AdminViewServerProps, Payload, Where } from 'payload';
 import type { ReactElement, ReactNode } from 'react';
@@ -356,16 +355,18 @@ const userDisplayName = (
  * 1)` and `result.totalDocs` so we never hydrate full documents just to
  * count them. Recent edits fetch 5 docs per content collection in
  * parallel and merge in JS — bounded fanout (~9 queries × 5 rows).
+ *
+ * NOTE on chrome: Payload's outer admin route already wraps every view
+ * in the standard template (sidebar nav + app header). Wrapping again
+ * in DefaultTemplate here would duplicate the sidebar — match Payload's
+ * own DefaultDashboard and just render `<Gutter>` + content.
  */
 export const Dashboard = async (
   props: AdminViewServerProps,
 ): Promise<ReactElement> => {
-  const { initPageResult, params, searchParams } = props;
+  const { initPageResult } = props;
   const {
-    permissions,
-    locale,
-    visibleEntities,
-    req: { i18n, payload, user },
+    req: { payload, user },
   } = initPageResult;
 
   const [pulse, recent] = await Promise.all([
@@ -373,92 +374,69 @@ export const Dashboard = async (
     fetchRecentEdits(payload),
   ]);
 
-  // exactOptionalPropertyTypes: only spread the optional props when defined
-  // so we don't widen the prop types with `undefined`.
-  const optional = {
-    ...(locale ? { locale } : {}),
-    ...(params ? { params } : {}),
-    ...(searchParams ? { searchParams } : {}),
-    ...(user ? { user } : {}),
-  };
-
   return (
-    <DefaultTemplate
-      i18n={i18n}
-      payload={payload}
-      permissions={permissions}
-      visibleEntities={visibleEntities}
-      {...optional}
-    >
-      <Gutter className="cs-dashboard">
-        <header className="cs-dashboard__header">
-          <h1 className="cs-dashboard__title">
-            {greetingFor()},{' '}
-            <span className="cs-dashboard__title-name">
-              {userDisplayName(user)}
-            </span>
-          </h1>
-          <p className="cs-dashboard__subtitle">
-            Here's what's happening on {PROJECT_NAME} today.
-          </p>
-        </header>
+    <Gutter className="cs-dashboard">
+      <header className="cs-dashboard__header">
+        <h1 className="cs-dashboard__title">
+          {greetingFor()},{' '}
+          <span className="cs-dashboard__title-name">
+            {userDisplayName(user)}
+          </span>
+        </h1>
+        <p className="cs-dashboard__subtitle">
+          Here's what's happening on {PROJECT_NAME} today.
+        </p>
+      </header>
 
-        <section
-          aria-label="Editorial pulse"
-          className="cs-dashboard__pulse-grid"
-        >
-          <PulseCard
-            label="Drafts pending"
-            value={pulse.draftsPending}
-            caption="Across all content collections"
-            href="/admin/collections/blogs?where[_status][equals]=draft"
-            tone={pulse.draftsPending > 0 ? 'amber' : 'neutral'}
-          />
-          <PulseCard
-            label="Published · 7d"
-            value={pulse.publishedThisWeek}
-            caption="Live changes in the last week"
-            tone="cyan"
-          />
-          <PulseCard
-            label="Leads · 24h"
-            value={pulse.leadsToday}
-            caption="Form submissions in the last day"
-            href="/admin/collections/leads"
-            tone={pulse.leadsToday > 0 ? 'cyan' : 'neutral'}
-          />
-          <PulseCard
-            label="Redirects"
-            value={pulse.redirectsActive}
-            caption="Active URL redirects"
-            href="/admin/collections/redirects"
-          />
-        </section>
+      <section
+        aria-label="Editorial pulse"
+        className="cs-dashboard__pulse-grid"
+      >
+        <PulseCard
+          label="Drafts pending"
+          value={pulse.draftsPending}
+          caption="Across all content collections"
+          href="/admin/collections/blogs?where[_status][equals]=draft"
+          tone={pulse.draftsPending > 0 ? 'amber' : 'neutral'}
+        />
+        <PulseCard
+          label="Published · 7d"
+          value={pulse.publishedThisWeek}
+          caption="Live changes in the last week"
+          tone="cyan"
+        />
+        <PulseCard
+          label="Leads · 24h"
+          value={pulse.leadsToday}
+          caption="Form submissions in the last day"
+          href="/admin/collections/leads"
+          tone={pulse.leadsToday > 0 ? 'cyan' : 'neutral'}
+        />
+        <PulseCard
+          label="Redirects"
+          value={pulse.redirectsActive}
+          caption="Active URL redirects"
+          href="/admin/collections/redirects"
+        />
+      </section>
 
-        <section
-          aria-label="Recent edits"
-          className="cs-dashboard__section"
-        >
-          <div className="cs-dashboard__section-head">
-            <h2 className="cs-dashboard__section-title">Recent edits</h2>
-            <span className="cs-dashboard__section-meta">
-              Last 10 across content collections
-            </span>
-          </div>
-          <RecentEditsTable items={recent} />
-        </section>
+      <section aria-label="Recent edits" className="cs-dashboard__section">
+        <div className="cs-dashboard__section-head">
+          <h2 className="cs-dashboard__section-title">Recent edits</h2>
+          <span className="cs-dashboard__section-meta">
+            Last 10 across content collections
+          </span>
+        </div>
+        <RecentEditsTable items={recent} />
+      </section>
 
-        <section
-          aria-label="Quick links"
-          className="cs-dashboard__section"
-        >
-          <div className="cs-dashboard__section-head">
-            <h2 className="cs-dashboard__section-title">Quick actions</h2>
-          </div>
-          <QuickLinks />
-        </section>
-      </Gutter>
-    </DefaultTemplate>
+      <section aria-label="Quick links" className="cs-dashboard__section">
+        <div className="cs-dashboard__section-head">
+          <h2 className="cs-dashboard__section-title">Quick actions</h2>
+        </div>
+        <QuickLinks />
+      </section>
+    </Gutter>
   );
 };
 
