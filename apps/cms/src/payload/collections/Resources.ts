@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { mediaUploadField } from '../fields/media-upload';
 import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
@@ -33,15 +34,14 @@ export const Resources: CollectionConfig = {
         { label: 'Case study', value: 'case-study' },
       ],
     },
-    { name: 'heroImage', type: 'upload', relationTo: 'media' },
+    mediaUploadField({ name: 'heroImage', folderHint: 'web/resource' }),
     { name: 'summary', type: 'textarea' },
     { name: 'body', type: 'richText' },
-    {
+    mediaUploadField({
       name: 'asset',
-      type: 'upload',
-      relationTo: 'media',
-      admin: { description: 'PDF or other downloadable. Routed to web/resource/.' },
-    },
+      folderHint: 'web/resource',
+      description: 'PDF or other downloadable. Routed to web/resource/.',
+    }),
     {
       name: 'gated',
       type: 'checkbox',

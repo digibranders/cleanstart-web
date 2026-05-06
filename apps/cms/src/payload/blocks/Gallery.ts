@@ -1,5 +1,7 @@
 import type { Block } from 'payload';
 
+import { mediaUploadField } from '../fields/media-upload';
+
 export const Gallery: Block = {
   slug: 'gallery',
   labels: { singular: 'Gallery', plural: 'Galleries' },
@@ -22,7 +24,7 @@ export const Gallery: Block = {
       minRows: 1,
       labels: { singular: 'Image', plural: 'Images' },
       fields: [
-        { name: 'media', type: 'upload', relationTo: 'media', required: true },
+        mediaUploadField({ name: 'media', required: true, folderHint: 'web/page' }),
         { name: 'caption', type: 'text' },
         { name: 'link', type: 'text' },
       ],

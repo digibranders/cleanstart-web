@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { mediaUploadField } from '../fields/media-upload';
 import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
@@ -23,7 +24,7 @@ export const Webinars: CollectionConfig = {
   fields: [
     { name: 'title', type: 'text', required: true },
     slugField({ source: 'title' }),
-    { name: 'heroImage', type: 'upload', relationTo: 'media' },
+    mediaUploadField({ name: 'heroImage', folderHint: 'web/webinar' }),
     { name: 'abstract', type: 'textarea' },
     { name: 'body', type: 'richText' },
     {
@@ -137,12 +138,11 @@ export const Webinars: CollectionConfig = {
         acceptingNewBylines: { not_equals: false },
       },
     },
-    {
+    mediaUploadField({
       name: 'pdf',
-      type: 'upload',
-      relationTo: 'media',
-      admin: { description: 'Slides PDF (routed to web/webinar/).' },
-    },
+      folderHint: 'web/webinar',
+      description: 'Slides PDF (routed to web/webinar/).',
+    }),
     {
       name: 'recordingUrl',
       type: 'text',

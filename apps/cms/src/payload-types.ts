@@ -5693,7 +5693,7 @@ export interface SeoDefault {
     /**
      * URL of the fact-checking / verification policy page.
      */
-    factCheckingPolicy?: string | null;
+    verificationFactCheckingPolicy?: string | null;
     /**
      * URL of the page describing how readers submit feedback / complaints.
      */
@@ -5713,7 +5713,7 @@ export interface SeoDefault {
     /**
      * URL of the page describing editorial mission and coverage priorities.
      */
-    coveragePolicy?: string | null;
+    missionCoveragePrioritiesPolicy?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -6026,12 +6026,12 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
         masthead?: T;
         ethicsPolicy?: T;
         correctionsPolicy?: T;
-        factCheckingPolicy?: T;
+        verificationFactCheckingPolicy?: T;
         actionableFeedbackPolicy?: T;
         unnamedSourcesPolicy?: T;
         diversityPolicy?: T;
         ownershipFundingInfo?: T;
-        coveragePolicy?: T;
+        missionCoveragePrioritiesPolicy?: T;
       };
   updatedAt?: T;
   createdAt?: T;

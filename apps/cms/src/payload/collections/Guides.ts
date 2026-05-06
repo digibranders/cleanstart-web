@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { mediaUploadField } from '../fields/media-upload';
 import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
@@ -23,7 +24,7 @@ export const Guides: CollectionConfig = {
   fields: [
     { name: 'title', type: 'text', required: true },
     slugField({ source: 'title' }),
-    { name: 'heroImage', type: 'upload', relationTo: 'media' },
+    mediaUploadField({ name: 'heroImage', folderHint: 'web/guide' }),
     { name: 'body', type: 'richText' },
     {
       name: 'authors',
@@ -126,6 +127,16 @@ export const Guides: CollectionConfig = {
       hasMany: true,
     },
     {
+      name: 'bodyStats',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/payload/admin/components/BodyStatsField.tsx#BodyStatsField',
+        },
+      },
+    },
+    {
       name: 'permalink',
       type: 'ui',
       admin: {
@@ -140,23 +151,18 @@ export const Guides: CollectionConfig = {
     },
     ...seoSidebarFields({ pathPrefix: '/guides', descriptionSource: 'abstract' }),
     {
+      // Data-only — surfaced via the `bodyStats` pill at the top of the
+      // sidebar. Hidden here so the form doesn't double-render.
       name: 'readingMinutes',
       type: 'number',
       access: { update: () => false },
-      admin: {
-        readOnly: true,
-        description: 'Computed from body word count on save.',
-        position: 'sidebar',
-      },
+      admin: { readOnly: true, hidden: true },
     },
     {
       name: 'wordCount',
       type: 'number',
       access: { update: () => false },
-      admin: {
-        readOnly: true,
-        position: 'sidebar',
-      },
+      admin: { readOnly: true, hidden: true },
     },
     {
       name: 'tableOfContents',

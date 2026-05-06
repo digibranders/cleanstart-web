@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload';
 
 import { isAdmin, isAuthenticated } from '../access';
+import { mediaUploadField } from '../fields/media-upload';
 import { validateOptionalUrl } from '../lib/url-shape';
 
 export const SeoDefaults: GlobalConfig = {
@@ -29,15 +30,12 @@ export const SeoDefaults: GlobalConfig = {
         description: 'Site-wide fallback for seo.description when nothing else is set.',
       },
     },
-    {
+    mediaUploadField({
       name: 'defaultOgImage',
-      type: 'upload',
-      relationTo: 'media',
-      admin: {
-        description:
-          'Site-wide fallback when seo.ogImage and the page hero are both empty.',
-      },
-    },
+      folderHint: 'web/general',
+      description:
+        'Site-wide fallback when seo.ogImage and the page hero are both empty.',
+    }),
     {
       name: 'twitterHandle',
       type: 'text',
@@ -55,7 +53,7 @@ export const SeoDefaults: GlobalConfig = {
         { name: 'name', type: 'text', defaultValue: 'CleanStart, Inc.' },
         { name: 'legalName', type: 'text' },
         { name: 'url', type: 'text', defaultValue: 'https://cleanstart.com' },
-        { name: 'logo', type: 'upload', relationTo: 'media' },
+        mediaUploadField({ name: 'logo', folderHint: 'web/general' }),
         {
           name: 'sameAs',
           type: 'array',
@@ -130,12 +128,7 @@ export const SeoDefaults: GlobalConfig = {
           },
         },
         {
-          // Field name shortened to keep the Postgres column under the
-          // 63-char identifier limit once Payload's `version_` prefix is
-          // applied to the version-table copy. Surfaced in JSON-LD as
-          // `verificationFactCheckingPolicy` (the Schema.org property
-          // name) via the emitter — the DB column name is internal.
-          name: 'factCheckingPolicy',
+          name: 'verificationFactCheckingPolicy',
           type: 'text',
           validate: validateOptionalUrl,
           admin: {
@@ -180,10 +173,7 @@ export const SeoDefaults: GlobalConfig = {
           },
         },
         {
-          // Field name shortened for the same Postgres-identifier-limit
-          // reason as `factCheckingPolicy` above. Surfaced in JSON-LD
-          // as `missionCoveragePrioritiesPolicy` (Schema.org name).
-          name: 'coveragePolicy',
+          name: 'missionCoveragePrioritiesPolicy',
           type: 'text',
           validate: validateOptionalUrl,
           admin: {

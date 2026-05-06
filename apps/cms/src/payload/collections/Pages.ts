@@ -86,15 +86,28 @@ export const Pages: CollectionConfig = {
       },
     },
     {
+      // The compact PermalinkField (sidebar UI below) renders the live URL
+      // built from this value. Hidden here so the form doesn't double-render
+      // a full-width read-only text input next to the chip.
       name: 'path',
       type: 'text',
       index: true,
       access: { update: () => false },
+      admin: { readOnly: true, hidden: true },
+    },
+    {
+      name: 'permalink',
+      type: 'ui',
       admin: {
-        readOnly: true,
-        description:
-          'Computed full URL path (e.g. /solutions/pricing). Maintained by the path-builder hook on every save.',
         position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            // Pages compute a full nested path (e.g. `/solutions/pricing`)
+            // on save — surface it as the link source with no prefix.
+            clientProps: { pathPrefix: '', sourceField: 'path' },
+          },
+        },
       },
     },
     {

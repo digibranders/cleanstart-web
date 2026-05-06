@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { mediaUploadField } from '../fields/media-upload';
 import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
@@ -144,15 +145,13 @@ export const Jobs: CollectionConfig = {
         condition: (_data, sibling) => sibling?.source === 'cms',
       },
     },
-    {
+    mediaUploadField({
       name: 'descriptionPdf',
-      type: 'upload',
-      relationTo: 'media',
-      admin: {
-        description: 'Optional JD PDF (routed to web/job/).',
-        condition: (_data, sibling) => sibling?.source === 'cms',
-      },
-    },
+      folderHint: 'web/job',
+      description: 'Optional JD PDF (routed to web/job/).',
+      condition: (_data, sibling) =>
+        (sibling as { source?: string } | undefined)?.source === 'cms',
+    }),
     {
       name: 'applyUrl',
       type: 'text',

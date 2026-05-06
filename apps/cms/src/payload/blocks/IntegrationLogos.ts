@@ -1,5 +1,7 @@
 import type { Block } from 'payload';
 
+import { mediaUploadField } from '../fields/media-upload';
+
 export const IntegrationLogos: Block = {
   slug: 'integrationLogos',
   labels: { singular: 'Integration logos', plural: 'Integration logos' },
@@ -14,7 +16,7 @@ export const IntegrationLogos: Block = {
       labels: { singular: 'Integration', plural: 'Integrations' },
       fields: [
         { name: 'name', type: 'text', required: true },
-        { name: 'logo', type: 'upload', relationTo: 'media', required: true },
+        mediaUploadField({ name: 'logo', required: true, folderHint: 'web/general' }),
         {
           name: 'category',
           type: 'select',

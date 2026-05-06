@@ -1,5 +1,7 @@
 import type { Block } from 'payload';
 
+import { mediaUploadField } from '../fields/media-upload';
+
 import { ctaButtonFields } from './cta-button';
 
 export const Hero: Block = {
@@ -37,14 +39,14 @@ export const Hero: Block = {
             { label: 'Gradient', value: 'gradient' },
           ],
         },
-        {
+        mediaUploadField({
           name: 'media',
-          type: 'upload',
-          relationTo: 'media',
-          admin: {
-            condition: (_data, sibling) => sibling?.kind === 'image' || sibling?.kind === 'video',
+          folderHint: 'web/page',
+          condition: (_data, sibling) => {
+            const k = (sibling as { kind?: string } | undefined)?.kind;
+            return k === 'image' || k === 'video';
           },
-        },
+        }),
       ],
     },
   ],

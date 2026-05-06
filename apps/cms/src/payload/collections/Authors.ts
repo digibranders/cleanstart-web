@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { mediaUploadField } from '../fields/media-upload';
 import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
@@ -23,7 +24,7 @@ export const Authors: CollectionConfig = {
   fields: [
     { name: 'name', type: 'text', required: true },
     slugField({ source: 'name' }),
-    { name: 'photo', type: 'upload', relationTo: 'media' },
+    mediaUploadField({ name: 'photo', folderHint: 'web/author' }),
     { name: 'role', type: 'text', admin: { description: 'Job title shown on the byline + Person JSON-LD.' } },
     { name: 'location', type: 'text' },
     { name: 'bioShort', type: 'textarea', admin: { description: 'One-line bio for cards and SERP snippets.' } },

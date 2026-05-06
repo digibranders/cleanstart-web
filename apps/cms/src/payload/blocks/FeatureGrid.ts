@@ -1,6 +1,7 @@
 import type { Block } from 'payload';
 
 import { linkField } from '../fields/link';
+import { mediaUploadField } from '../fields/media-upload';
 
 export const FeatureGrid: Block = {
   slug: 'featureGrid',
@@ -26,7 +27,7 @@ export const FeatureGrid: Block = {
       minRows: 1,
       labels: { singular: 'Feature', plural: 'Features' },
       fields: [
-        { name: 'icon', type: 'upload', relationTo: 'media' },
+        mediaUploadField({ name: 'icon', folderHint: 'web/general' }),
         { name: 'title', type: 'text', required: true },
         { name: 'body', type: 'textarea' },
         linkField({ name: 'link', withText: true }),

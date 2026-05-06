@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload';
 
 import { isAdminOrEditor, isAuthenticated } from '../access';
+import { mediaUploadField } from '../fields/media-upload';
 
 import { navItemFields } from './_navItem';
 
@@ -96,7 +97,7 @@ export const MainNav: GlobalConfig = {
                 { name: 'eyebrow', type: 'text' },
                 { name: 'title', type: 'text' },
                 { name: 'description', type: 'textarea' },
-                { name: 'image', type: 'upload', relationTo: 'media' },
+                mediaUploadField({ name: 'image', folderHint: 'web/general' }),
               ],
             },
           ],

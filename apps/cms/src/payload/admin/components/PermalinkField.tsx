@@ -8,7 +8,9 @@ type PermalinkFieldProps = {
   /**
    * URL path prefix for this collection's public route on the marketing
    * site, e.g. `/blog`, `/webinar`, `/guides`. The component composes
-   * `<siteUrl><pathPrefix>/<slug>` to build the live page URL.
+   * `<siteUrl><pathPrefix>/<slug>` to build the live page URL. Pass an
+   * empty string when `sourceField` already carries a full path (e.g.
+   * Pages.path = `/solutions/pricing`).
    */
   pathPrefix?: string;
   /**
@@ -17,6 +19,12 @@ type PermalinkFieldProps = {
    * `https://cleanstart.com`.
    */
   siteUrl?: string;
+  /**
+   * Field to read the URL part from. Defaults to `slug` (single segment
+   * concatenated under `pathPrefix`); pass `'path'` for collections like
+   * Pages whose hook computes the full nested path.
+   */
+  sourceField?: string;
 };
 
 const DEFAULT_SITE_URL =
@@ -47,17 +55,17 @@ const trimSlash = (s: string): string => s.replace(/^\/+|\/+$/g, '');
  *   },
  */
 export const PermalinkField = (props: PermalinkFieldProps): ReactElement => {
-  const { pathPrefix = '', siteUrl = DEFAULT_SITE_URL } = props;
-  const { value: slugValue } = useField<string>({ path: 'slug' });
+  const { pathPrefix = '', siteUrl = DEFAULT_SITE_URL, sourceField = 'slug' } = props;
+  const { value: sourceValue } = useField<string>({ path: sourceField });
   const { value: statusValue } = useField<string>({ path: '_status' });
   const [copied, setCopied] = useState(false);
 
   const fullUrl = useMemo(() => {
-    if (!slugValue) return '';
+    if (!sourceValue) return '';
     const root = siteUrl.replace(/\/+$/, '');
     const prefix = pathPrefix ? `/${trimSlash(pathPrefix)}` : '';
-    return `${root}${prefix}/${trimSlash(slugValue)}`;
-  }, [slugValue, pathPrefix, siteUrl]);
+    return `${root}${prefix}/${trimSlash(sourceValue)}`;
+  }, [sourceValue, pathPrefix, siteUrl]);
 
   const isLive = statusValue === 'published';
 
@@ -69,7 +77,7 @@ export const PermalinkField = (props: PermalinkFieldProps): ReactElement => {
     window.setTimeout(() => setCopied(false), 1500);
   }, [fullUrl]);
 
-  if (!slugValue) {
+  if (!sourceValue) {
     return (
       <div
         style={{
@@ -82,7 +90,9 @@ export const PermalinkField = (props: PermalinkFieldProps): ReactElement => {
           fontSize: '12px',
         }}
       >
-        Permalink will appear once a slug is set.
+        {sourceField === 'path'
+          ? 'URL will appear once the page is saved.'
+          : 'Permalink will appear once a slug is set.'}
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import type { Field, GroupField } from 'payload';
 
 import { isValidExternalLink } from '../lib/url-shape';
+import { mediaUploadField } from './media-upload';
 
 const INTERNAL_DOC_TARGETS = [
   'pages',
@@ -79,14 +80,12 @@ export const linkField = ({
         return true;
       },
     },
-    {
+    mediaUploadField({
       name: 'mediaTarget',
-      type: 'upload',
-      relationTo: 'media',
-      admin: {
-        condition: (_data, sibling) => sibling?.kind === 'media',
-      },
-    },
+      folderHint: 'web/general',
+      condition: (_data, sibling) =>
+        (sibling as { kind?: string } | undefined)?.kind === 'media',
+    }),
     {
       name: 'url',
       type: 'text',

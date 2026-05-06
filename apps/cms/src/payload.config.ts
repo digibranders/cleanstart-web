@@ -92,6 +92,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
+      beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
       graphics: {
         Logo: './payload/admin/Logo.tsx#Logo',
         Icon: './payload/admin/Icon.tsx#Icon',
@@ -112,8 +113,14 @@ export default buildConfig({
     },
   },
   collections: [
+    // Order tracks the editorial mental model surfaced in the sidebar:
+    //   System → People → Taxonomies → Marketing → Content
+    // Group strings on each collection drive the sidebar grouping; this
+    // array order drives the order *within* each group.
     Users,
     Media,
+    Redirects,
+    AuditLog,
     Authors,
     Categories,
     NewsCategories,
@@ -131,8 +138,6 @@ export default buildConfig({
     Jobs,
     AboutGalleries,
     Pages,
-    Redirects,
-    AuditLog,
   ],
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements],
   endpoints: [jsonLdEndpoint, sitemapEndpoint, newsSitemapEndpoint],

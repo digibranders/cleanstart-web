@@ -1,6 +1,7 @@
 import type { Field, GroupField } from 'payload';
 
 import { validateCanonicalOverride } from '../lib/canonical';
+import { mediaUploadField } from './media-upload';
 
 const TITLE_CHAR_HINT = 60;
 const DESCRIPTION_CHAR_HINT = 160;
@@ -47,15 +48,12 @@ const descriptionField: Field = {
 };
 
 const ogImageFields: Field[] = [
-  {
+  mediaUploadField({
     name: 'ogImage',
-    type: 'upload',
-    relationTo: 'media',
-    admin: {
-      description:
-        'Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).',
-    },
-  },
+    folderHint: 'web/general',
+    description:
+      'Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).',
+  }),
   {
     name: 'ogImageAlt',
     type: 'text',
