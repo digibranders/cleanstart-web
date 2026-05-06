@@ -92,10 +92,17 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
+      actions: ['./payload/admin/components/SaveShortcut.tsx#SaveShortcut'],
       beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
       graphics: {
         Logo: './payload/admin/Logo.tsx#Logo',
         Icon: './payload/admin/Icon.tsx#Icon',
+      },
+      views: {
+        dashboard: {
+          Component:
+            './payload/admin/components/Dashboard/Dashboard.tsx#Dashboard',
+        },
       },
     },
     meta: {

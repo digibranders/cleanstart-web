@@ -3075,3 +3075,500 @@ a[role='button']:focus-visible,
     cursor: grabbing;
   }
 }
+
+// =============================================================================
+// 22. Dashboard — editorial landing view (replaces default Payload dashboard)
+// =============================================================================
+
+.cs-dashboard {
+  // Header
+  &__header {
+    margin-bottom: var(--cs-space-6);
+    padding-bottom: var(--cs-space-4);
+    border-bottom: 1px solid var(--theme-elevation-150);
+  }
+
+  &__title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.018em;
+    color: var(--theme-text);
+    margin: 0 0 4px 0;
+  }
+
+  &__title-name {
+    color: var(--cs-cyan-500);
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: var(--theme-text-soft);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  // Pulse cards
+  &__pulse-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--cs-space-3);
+    margin-bottom: var(--cs-space-8);
+
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__pulse {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--cs-space-4);
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    text-decoration: none;
+    color: inherit;
+    cursor: default;
+    transition:
+      border-color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro),
+      transform var(--cs-motion-micro);
+
+    &[href] {
+      cursor: pointer;
+
+      &:hover {
+        border-color: var(--cs-cyan-500);
+        background: var(--theme-elevation-50);
+        transform: translateY(-1px);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--cs-cyan-500);
+        outline-offset: 2px;
+      }
+    }
+
+    &--cyan .cs-dashboard__pulse-value {
+      color: var(--cs-cyan-500);
+    }
+
+    &--amber .cs-dashboard__pulse-value {
+      color: var(--color-warning-500);
+    }
+  }
+
+  &__pulse-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+  }
+
+  &__pulse-value {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--theme-text);
+    font-feature-settings: 'tnum' 1;
+  }
+
+  &__pulse-caption {
+    font-size: 12.5px;
+    color: var(--theme-text-soft);
+    line-height: 1.4;
+  }
+
+  // Sections
+  &__section {
+    margin-bottom: var(--cs-space-8);
+  }
+
+  &__section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--cs-space-3);
+    margin-bottom: var(--cs-space-3);
+  }
+
+  &__section-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--theme-text);
+    margin: 0;
+  }
+
+  &__section-meta {
+    font-size: 12px;
+    color: var(--theme-text-disabled);
+  }
+
+  // Recent-edits table
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    overflow: hidden;
+
+    thead {
+      background: var(--theme-elevation-50);
+    }
+
+    th {
+      padding: var(--cs-space-2) var(--cs-space-3);
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--theme-text-soft);
+    }
+
+    td {
+      padding: var(--cs-space-3);
+      font-size: 13.5px;
+      color: var(--theme-text);
+      border-top: 1px solid var(--theme-elevation-150);
+      vertical-align: middle;
+    }
+
+    tbody tr {
+      transition: background-color var(--cs-motion-micro);
+
+      &:hover {
+        background: var(--theme-elevation-50);
+      }
+    }
+  }
+
+  &__title-link {
+    color: var(--theme-text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--cs-cyan-500);
+    }
+  }
+
+  &__type-cell {
+    color: var(--theme-text-soft);
+    font-size: 12.5px;
+  }
+
+  &__time-cell {
+    color: var(--theme-text-soft);
+    font-feature-settings: 'tnum' 1;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+
+  // Status pills (Live / Draft / Scheduled)
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  &__status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &__status--live {
+    color: var(--color-success-500);
+    background: rgba(0, 196, 106, 0.14);
+  }
+
+  &__status--draft {
+    color: var(--theme-text-soft);
+    background: var(--theme-elevation-150);
+  }
+
+  &__status--unknown {
+    color: var(--theme-text-disabled);
+    background: var(--theme-elevation-100);
+  }
+
+  // Empty state
+  &__empty {
+    padding: var(--cs-space-8);
+    text-align: center;
+    color: var(--theme-text-soft);
+    font-size: 13px;
+    background: var(--theme-elevation-100);
+    border: 1px dashed var(--theme-elevation-200);
+    border-radius: var(--cs-radius-card);
+  }
+
+  // Quick links grid
+  &__quick {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--cs-space-3);
+
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__quick-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--cs-space-4);
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition:
+      border-color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro),
+      transform var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--cs-cyan-500);
+      background: var(--theme-elevation-50);
+      transform: translateY(-1px);
+
+      .cs-dashboard__quick-arrow {
+        color: var(--cs-cyan-500);
+        transform: translateX(2px);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--cs-cyan-500);
+      outline-offset: 2px;
+    }
+  }
+
+  &__quick-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--theme-text);
+  }
+
+  &__quick-desc {
+    font-size: 12.5px;
+    color: var(--theme-text-soft);
+    line-height: 1.45;
+  }
+
+  &__quick-arrow {
+    position: absolute;
+    top: var(--cs-space-3);
+    right: var(--cs-space-3);
+    color: var(--theme-text-disabled);
+    font-size: 16px;
+    line-height: 1;
+    transition:
+      color var(--cs-motion-micro),
+      transform var(--cs-motion-micro);
+  }
+}
+
+// =============================================================================
+// 23. Paper-cut polish — status pills, toast stacking, breadcrumb home icon
+// =============================================================================
+
+// ─── Status pill polish across versioned list views ───────────────
+//
+// Payload renders `.cell-_status` as a plain text "draft" / "published"
+// label. Promote each value to a coloured chip with a leading dot so the
+// status reads at a glance from the table.
+.cell-_status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+}
+
+// Map Payload's status values via :has() — match by text content fallback.
+// Payload doesn't add status-specific class modifiers; we colour by value
+// using cell content + collection-list rendering attributes. The pill
+// classes Payload exposes inside cells (.pill, .pill--has-color) carry
+// the actual semantic — surface our chip styling on those.
+.cell-_status .pill,
+.cell-_status .pill--has-color {
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+}
+
+// Published / Live — cyan
+.cell-_status .pill--style-success,
+.cell-_status .pill[class*='published'] {
+  color: var(--cs-cyan-500);
+  background: var(--cs-tint-brand-soft);
+}
+
+// Draft — neutral
+.cell-_status .pill--style-warning,
+.cell-_status .pill[class*='draft'] {
+  color: var(--theme-text-soft);
+  background: var(--theme-elevation-150);
+}
+
+// Scheduled — amber
+.cell-_status .pill--style-info,
+.cell-_status .pill[class*='scheduled'] {
+  color: var(--color-warning-500);
+  background: rgba(217, 119, 6, 0.14);
+}
+
+// ─── Toast stacking — keep multiple toasts readable ────────────────
+//
+// Payload's stock toast container stacks tightly without spacing; multiple
+// toasts overlap. Add a min-gap and a subtle scale for the last toast.
+.payload-toast-container,
+[role='status'][data-payload-toast='container'],
+[data-sonner-toaster] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-2);
+  z-index: 80;
+}
+
+.payload-toast,
+[data-sonner-toast] {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3) var(--cs-space-4);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+  font-size: 13.5px;
+  color: var(--theme-text);
+  min-height: 44px;
+  max-width: 420px;
+  transition:
+    transform var(--cs-motion-macro),
+    opacity var(--cs-motion-macro);
+
+  &[data-type='success'] {
+    border-left: 3px solid var(--color-success-500);
+  }
+
+  &[data-type='error'] {
+    border-left: 3px solid var(--color-error-500);
+  }
+
+  &[data-type='warning'] {
+    border-left: 3px solid var(--color-warning-500);
+  }
+
+  &[data-type='info'] {
+    border-left: 3px solid var(--cs-cyan-500);
+  }
+}
+
+// ─── Breadcrumb home icon — anchor the step-nav with a visible home ──
+//
+// Payload's `.step-nav` starts straight with the collection name. Inject
+// a Home-glyph link before the first crumb so editors always have a
+// visible route back to the dashboard.
+.step-nav {
+  &::before {
+    content: '';
+    display: inline-flex;
+    width: 14px;
+    height: 14px;
+    margin-inline-end: var(--cs-space-2);
+    flex-shrink: 0;
+    background-color: currentColor;
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16' fill='none'><path d='M2 8.5L8 3l6 5.5V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8.5Z' stroke='black' stroke-width='1.4' stroke-linejoin='round'/><path d='M6.5 15v-4a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v4' stroke='black' stroke-width='1.4' stroke-linejoin='round'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16' fill='none'><path d='M2 8.5L8 3l6 5.5V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8.5Z' stroke='black' stroke-width='1.4' stroke-linejoin='round'/><path d='M6.5 15v-4a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v4' stroke='black' stroke-width='1.4' stroke-linejoin='round'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 14px 14px;
+    mask-size: 14px 14px;
+    opacity: 0.7;
+    vertical-align: middle;
+    transform: translateY(-1px);
+  }
+}
+
+// ─── Field description callout — italic, left-bordered ─────────────
+//
+// Make `admin.description` strings stand out as guidance rather than
+// blending with the field label.
+.field-description {
+  font-style: italic;
+}
+
+// ─── Required asterisk emphasis ────────────────────────────────────
+//
+// Boost the required marker so it doesn't blend into the label.
+.field-label .required,
+.field-label__required {
+  color: var(--color-error-500);
+  opacity: 1;
+  font-weight: 700;
+  font-size: 13px;
+  margin-inline-start: 0.2em;
+}

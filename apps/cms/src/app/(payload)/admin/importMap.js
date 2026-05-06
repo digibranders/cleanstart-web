@@ -36,8 +36,10 @@ import { BodyStatsField as BodyStatsField_1808f49e77588f0a78a60853e6ace967 } fro
 import { TocRowLabel as TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b } from '@/payload/admin/components/TocRowLabel.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
+import { SaveShortcut as SaveShortcut_add5731a604e577762f1b0196113538b } from '../../../payload/admin/components/SaveShortcut.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
+import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -80,7 +82,9 @@ export const importMap = {
   "@/payload/admin/components/TocRowLabel.tsx#TocRowLabel": TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,
+  "./payload/admin/components/SaveShortcut.tsx#SaveShortcut": SaveShortcut_add5731a604e577762f1b0196113538b,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
+  "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
