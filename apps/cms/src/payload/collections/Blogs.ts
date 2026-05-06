@@ -5,6 +5,10 @@ import { mediaUploadField } from '../fields/media-upload';
 import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 const ABSTRACT_CHAR_HINT = 160;
@@ -196,7 +200,8 @@ export const Blogs: CollectionConfig = {
         },
       }),
     ],
-    afterChange: [slugChangeRedirectHook('blogs')],
+    afterChange: [slugChangeRedirectHook('blogs'), searchSyncAfterChangeHook('blogs')],
+    afterDelete: [searchSyncAfterDeleteHook('blogs')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

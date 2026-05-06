@@ -5,6 +5,10 @@ import { mediaUploadField } from '../fields/media-upload';
 import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 export const Guides: CollectionConfig = {
@@ -194,7 +198,8 @@ export const Guides: CollectionConfig = {
         },
       }),
     ],
-    afterChange: [slugChangeRedirectHook('guides')],
+    afterChange: [slugChangeRedirectHook('guides'), searchSyncAfterChangeHook('guides')],
+    afterDelete: [searchSyncAfterDeleteHook('guides')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

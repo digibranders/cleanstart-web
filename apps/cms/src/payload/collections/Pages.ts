@@ -5,6 +5,10 @@ import { pageBuilderBlocks } from '../blocks';
 import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { pagesPathBuilderHook } from '../hooks/pages-path-builder';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 /**
@@ -142,7 +146,8 @@ export const Pages: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [pagesPathBuilderHook],
-    afterChange: [slugChangeRedirectHook('pages')],
+    afterChange: [slugChangeRedirectHook('pages'), searchSyncAfterChangeHook('pages')],
+    afterDelete: [searchSyncAfterDeleteHook('pages')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

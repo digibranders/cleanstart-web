@@ -4,6 +4,10 @@ import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
 import { seoField, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { validateOptionalUrl } from '../lib/url-shape';
 
@@ -119,7 +123,8 @@ export const Authors: CollectionConfig = {
     seoField,
   ],
   hooks: {
-    afterChange: [slugChangeRedirectHook('authors')],
+    afterChange: [slugChangeRedirectHook('authors'), searchSyncAfterChangeHook('authors')],
+    afterDelete: [searchSyncAfterDeleteHook('authors')],
   },
   versions: { drafts: true },
   timestamps: true,
