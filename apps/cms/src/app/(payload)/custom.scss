@@ -1,78 +1,115 @@
-// CleanStart admin theme.
-// Placeholder pass derived from `docs/Cleanstart - Brand Guidline.pdf`
-// + the cleanstart-logo.svg cyan mark. Swap to authoritative tokens
-// once new brand + Figma lands.
+// CleanStart CMS — Admin theme v2
+// =============================================================================
+// Senior-designer pass over the Payload admin shell, modeled on the Webflow
+// Designer's CMS chrome but tuned to CleanStart brand cyan.
 //
-// Brand palette (from the brand guideline PDF):
+// Foundations:
+//   - Palette: three-tier surfaces (page → card → input well) for Webflow-style
+//     pressed-in fields. Brand cyan is reserved for action/focus only.
+//   - Typography: Plus Jakarta Sans (UI), Manrope fallback, Sora display, JetBrains
+//     Mono for code. Tabular figures on numeric chrome (timestamps, IDs).
+//   - Type scale: 12 / 13 / 14 / 16 / 18 / 22 / 28 / 36. No random sizes.
+//   - Spacing: 4-pt grid (4 / 8 / 12 / 16 / 24 / 32 / 48 / 64).
+//   - Radius: 4 chip · 6 input/button · 8 card/row · 12 modal.
+//   - Motion: 120 ms ease-out micro, 200 ms cubic-bezier(.4,0,.2,1) macro,
+//     honors prefers-reduced-motion.
+//
+// Brand palette (sourced from `docs/Cleanstart - Brand Guidline.pdf`):
 //   Primary cyan        #06c7f2
 //   Primary blue        #056bf1
 //   Secondary purple    #5d04d8
 //   Secondary deep      #270e59
 //   Near-black          #0e1125
-//
-// Type:
-//   Primary — Manrope (the logo's typeface, used everywhere)
-//   Secondary — Sora (specialised, sparingly)
-//
-// Self-hosted via Google's CSS API; works offline once the browser cache hits.
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+// =============================================================================
+// 1. Tokens — colors, spacing, motion, radius
+// =============================================================================
 :root {
-  // ─── Brand stops (full hue ramp; admin reaches for shades, not just one value)
+  // Brand ramps (admin shades, not just one value)
   --cs-cyan-50: #e6faff;
   --cs-cyan-100: #c2f1ff;
   --cs-cyan-200: #8be4fb;
   --cs-cyan-300: #4dd5f7;
   --cs-cyan-400: #06c7f2;
-  --cs-cyan-500: #06c7f2; // primary
+  --cs-cyan-500: #06c7f2;
   --cs-cyan-600: #04a3c8;
   --cs-cyan-700: #03819f;
   --cs-cyan-800: #035e74;
   --cs-cyan-900: #013f4f;
 
-  --cs-blue-500: #056bf1; // primary
+  --cs-blue-500: #056bf1;
   --cs-blue-600: #0457c4;
   --cs-blue-700: #033f8c;
 
-  --cs-purple-500: #5d04d8; // secondary
-  --cs-purple-700: #270e59; // secondary deep
+  --cs-purple-500: #5d04d8;
+  --cs-purple-700: #270e59;
 
-  --cs-ink-950: #0e1125; // near-black
+  --cs-ink-950: #0e1125;
 
-  // ─── Typography
-  --font-body: 'Manrope', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    'Segoe UI', sans-serif;
-  --font-display: 'Sora', 'Manrope', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  // Typography stacks
+  --font-body:
+    'Plus Jakarta Sans', 'Manrope', ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Sora', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+    Consolas, monospace;
+
+  // Spacing scale (4-pt grid)
+  --cs-space-1: 0.25rem; //  4px
+  --cs-space-2: 0.5rem; //   8px
+  --cs-space-3: 0.75rem; // 12px
+  --cs-space-4: 1rem; //    16px
+  --cs-space-6: 1.5rem; //  24px
+  --cs-space-8: 2rem; //    32px
+  --cs-space-12: 3rem; //   48px
+  --cs-space-16: 4rem; //   64px
+
+  // Radius
+  --cs-radius-chip: 4px;
+  --cs-radius-input: 6px;
+  --cs-radius-card: 8px;
+  --cs-radius-modal: 12px;
+
+  // Motion
+  --cs-motion-micro: 120ms ease-out;
+  --cs-motion-macro: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --cs-motion-modal: 240ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  // Brand-tinted overlays (used for hover/selected states)
+  --cs-tint-brand-soft: rgba(6, 199, 242, 0.08);
+  --cs-tint-brand-medium: rgba(6, 199, 242, 0.14);
+  --cs-tint-focus-ring: rgba(6, 199, 242, 0.22);
 }
+
+// =============================================================================
+// 2. Themes — light and dark surface tiers (Webflow-derived)
+// =============================================================================
 
 // ─── Light theme ────────────────────────────────────────────────
 [data-theme='light'] {
-  // Surfaces
-  --theme-bg: #fafaf9;
+  --theme-bg: #f7f8fa;
   --theme-input-bg: #ffffff;
   --theme-elevation-0: #ffffff;
-  --theme-elevation-50: #fafaf9;
-  --theme-elevation-100: #f5f5f4;
-  --theme-elevation-150: #efeeec;
-  --theme-elevation-200: #e7e5e0;
-  --theme-elevation-250: #ddd9d2;
-  --theme-elevation-300: #d4d2cc;
-  --theme-elevation-400: #b8b6ae;
-  --theme-elevation-500: #9c998f;
-  --theme-elevation-600: #6f6c63;
-  --theme-elevation-700: #4a4f5c;
-  --theme-elevation-800: #2d3142;
-  --theme-elevation-900: #14171f;
-  --theme-elevation-1000: #0e1125;
+  --theme-elevation-50: #f7f8fa;
+  --theme-elevation-100: #eef0f3;
+  --theme-elevation-150: #e5e7eb;
+  --theme-elevation-200: #d8dbe0;
+  --theme-elevation-250: #c8ccd2;
+  --theme-elevation-300: #b3b7bd;
+  --theme-elevation-400: #8b8f96;
+  --theme-elevation-500: #6b6e76;
+  --theme-elevation-600: #4a4d54;
+  --theme-elevation-700: #34363c;
+  --theme-elevation-800: #232428;
+  --theme-elevation-900: #131418;
+  --theme-elevation-1000: #0a0b0e;
 
-  // Text
-  --theme-text: #14171f;
-  --theme-text-soft: #4a4f5c;
-  --theme-text-disabled: #9c998f;
+  --theme-text: #131418;
+  --theme-text-soft: #4a4d54;
+  --theme-text-disabled: #8b8f96;
 
-  // Brand
   --color-base-50: var(--cs-cyan-50);
   --color-base-100: var(--cs-cyan-100);
   --color-base-200: var(--cs-cyan-200);
@@ -84,34 +121,33 @@
   --color-base-800: var(--cs-cyan-800);
   --color-base-900: var(--cs-cyan-900);
 
-  // Status (kept on standard semantic hues — accessibility-first)
-  --color-success-500: #047857;
-  --color-warning-500: #b45309;
-  --color-error-500: #b91c1c;
+  --color-success-500: #00a76f;
+  --color-warning-500: #d97706;
+  --color-error-500: #dc2626;
 }
 
 // ─── Dark theme ─────────────────────────────────────────────────
 [data-theme='dark'] {
-  --theme-bg: var(--cs-ink-950);
-  --theme-input-bg: #1a1d33;
-  --theme-elevation-0: #14171f;
-  --theme-elevation-50: #1a1d33;
-  --theme-elevation-100: #1f2238;
-  --theme-elevation-150: #262a40;
-  --theme-elevation-200: #2d3148;
-  --theme-elevation-250: #353a52;
-  --theme-elevation-300: #3e4360;
-  --theme-elevation-400: #565b78;
-  --theme-elevation-500: #7a7f95;
-  --theme-elevation-600: #a3a7b8;
-  --theme-elevation-700: #c5c8d4;
-  --theme-elevation-800: #e1e2ea;
-  --theme-elevation-900: #f3f4f8;
+  --theme-bg: #1c1d21;
+  --theme-input-bg: #14151a;
+  --theme-elevation-0: #14151a;
+  --theme-elevation-50: #1c1d21;
+  --theme-elevation-100: #23242a;
+  --theme-elevation-150: #2a2c33;
+  --theme-elevation-200: #34363d;
+  --theme-elevation-250: #3e4048;
+  --theme-elevation-300: #4a4d55;
+  --theme-elevation-400: #6b6e77;
+  --theme-elevation-500: #888c95;
+  --theme-elevation-600: #a4a7af;
+  --theme-elevation-700: #c5c8ce;
+  --theme-elevation-800: #dcdee2;
+  --theme-elevation-900: #ecedf0;
   --theme-elevation-1000: #ffffff;
 
-  --theme-text: #f3f4f8;
-  --theme-text-soft: #c5c8d4;
-  --theme-text-disabled: #7a7f95;
+  --theme-text: #e8e9eb;
+  --theme-text-soft: #a4a7af;
+  --theme-text-disabled: #6b6e77;
 
   --color-base-50: var(--cs-cyan-900);
   --color-base-100: var(--cs-cyan-800);
@@ -124,15 +160,27 @@
   --color-base-800: var(--cs-cyan-100);
   --color-base-900: var(--cs-cyan-50);
 
-  --color-success-500: #34d399;
+  --color-success-500: #00c46a;
   --color-warning-500: #fbbf24;
-  --color-error-500: #f87171;
+  --color-error-500: #ff5c5c;
 }
 
-// ─── App-wide font swap
+// =============================================================================
+// 3. Typography — base, scale, headings, numerics
+// =============================================================================
 html,
 body {
   font-family: var(--font-body);
+  font-feature-settings: 'cv11' 1, 'ss01' 1; // tabular-friendly cuts
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
 }
 
 h1,
@@ -142,20 +190,851 @@ h4,
 h5,
 h6 {
   font-family: var(--font-display);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  font-weight: 700;
 }
 
-// ─── Login page polish
-.template-default,
-.template-minimal {
-  // Centre the brand mark above the form a bit more breathing room.
-  .render-icon,
-  .graphic-logo {
-    margin-bottom: 1.5rem;
+// Tabular numerics — ID columns, timestamps, page counters, version numbers
+.cell-updatedAt,
+.cell-createdAt,
+.cell-id,
+.step-nav,
+.payload-pagination,
+.doc-controls__meta,
+.versions-count,
+.cell-_status,
+time {
+  font-feature-settings: 'tnum' 1, 'cv11' 1;
+}
+
+// Mono everywhere code or anchor slugs render
+code,
+pre,
+kbd,
+.cell-slug,
+.field-type.code .CodeMirror,
+.field-type.json .CodeMirror {
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum' 1;
+}
+
+// =============================================================================
+// 4. Page chrome — doc-controls (sticky), step-nav (breadcrumb)
+// =============================================================================
+
+// Step nav (breadcrumb) — quieter, with slight wordmark tracking
+.step-nav {
+  font-size: 13px;
+  letter-spacing: 0.005em;
+  color: var(--theme-text-soft);
+
+  a {
+    color: var(--theme-text-soft);
+    transition: color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--cs-cyan-500);
+    }
   }
 }
 
-// Subtle brand accent on the login + create-first-user gradient backdrop.
+// Sticky doc controls — Webflow's editor strip stays visible while scrolling.
+// Add a low-opacity shadow when scrolled past the top so the strip lifts.
+.doc-controls {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--theme-bg);
+  border-bottom: 1px solid var(--theme-elevation-150);
+  padding-top: var(--cs-space-2);
+  padding-bottom: var(--cs-space-2);
+  backdrop-filter: saturate(140%) blur(6px);
+  transition: box-shadow var(--cs-motion-macro);
+
+  &__content {
+    gap: var(--cs-space-4);
+  }
+
+  &__meta {
+    color: var(--theme-text-soft);
+    font-size: 13px;
+  }
+
+  &__divider {
+    background: var(--theme-elevation-200);
+    width: 1px;
+    height: 18px;
+    margin-inline: var(--cs-space-2);
+  }
+
+  &__controls-wrapper {
+    gap: var(--cs-space-2);
+  }
+}
+
+// Subtle drop-shadow on the doc-controls only when the page has scrolled.
+// Implemented via @supports for pages where the body scroll is the host.
+@supports (animation-timeline: scroll()) {
+  .doc-controls {
+    animation: cms-doc-shadow-on-scroll linear both;
+    animation-timeline: scroll();
+    animation-range: 0 60px;
+  }
+
+  @keyframes cms-doc-shadow-on-scroll {
+    from {
+      box-shadow: 0 0 0 0 transparent;
+    }
+    to {
+      box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.18);
+    }
+  }
+}
+
+// =============================================================================
+// 5. Forms — labels, inputs, helpers, focus
+// =============================================================================
+
+// Labels — quieter, weight-500, slight tracking
+.field-label,
+.field-type__label,
+.field-type label {
+  color: var(--theme-text-soft);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  margin-bottom: 4px;
+}
+
+// Helper / description text under fields
+.field-description {
+  color: var(--theme-text-soft);
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+// Required asterisk — gentle red, never alarming
+.field-label .required,
+.field-label__required {
+  color: var(--color-error-500);
+  opacity: 0.7;
+  margin-inline-start: 0.15em;
+}
+
+// Pressed-in inputs — Webflow's "hole punched into the panel" treatment
+.field-type {
+  margin-bottom: var(--cs-space-3);
+
+  &.text input,
+  &.textarea textarea,
+  &.email input,
+  &.number input,
+  &.password input,
+  &.code .CodeMirror,
+  &.json .CodeMirror {
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    padding: 0.55rem 0.75rem;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--theme-text);
+    transition:
+      border-color var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &::placeholder {
+      color: var(--theme-text-disabled);
+    }
+
+    &:hover:not([disabled]):not(:focus):not(:focus-visible) {
+      border-color: var(--theme-elevation-300);
+    }
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+
+    &[disabled],
+    &[readonly] {
+      background: var(--theme-elevation-50);
+      color: var(--theme-text-disabled);
+      cursor: not-allowed;
+    }
+  }
+
+  // Select / react-select
+  &.select .rs__control,
+  &.select .react-select__control {
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    min-height: 38px;
+    transition: border-color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--theme-elevation-300);
+    }
+
+    &--is-focused {
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+  }
+
+  // Checkbox + radio — slightly tighter
+  &.checkbox .checkbox-input,
+  &.radio .radio-input {
+    border-radius: var(--cs-radius-chip);
+  }
+}
+
+// Group fields — a clear hairline divider between groups
+.group-field {
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3);
+
+  &__label {
+    color: var(--theme-text);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: var(--cs-space-2);
+  }
+}
+
+// Top-level group fields — Payload styles every `.group-field--top-level`
+// (SEO on Blogs/Guides, Social on Authors, and any other top-level group
+// across collections + drawers) with hardcoded `-60px left / -40px right`
+// margins so the card visually pops out 100px wider than sibling fields.
+// That breaks column alignment everywhere. Pin every top-level group
+// flush with its sibling fields, both on edit pages AND inside drawers.
+.group-field--top-level,
+.group-field.group-field--top-level,
+.drawer .group-field--top-level,
+.doc-drawer .group-field--top-level,
+.list-drawer .group-field--top-level {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+// =============================================================================
+// 6. Buttons — primary, secondary, subtle
+// =============================================================================
+
+.btn {
+  border-radius: var(--cs-radius-input);
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.005em;
+  padding-inline: var(--cs-space-4);
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro),
+    transform var(--cs-motion-micro);
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+
+  &:active:not([disabled]) {
+    transform: translateY(1px);
+  }
+}
+
+// Primary action — `.btn--style-primary` is sometimes the button itself
+// (when standalone) and sometimes a wrapping `<div>` containing
+// `<button id="action-save">` plus a popup chevron (when wrapped with a
+// dropdown). Style only the actual <button> inside, leaving the wrapper
+// transparent so it doesn't double-up the cyan rectangle.
+button.btn--style-primary,
+button.btn--style-pill-primary,
+.btn--style-primary > button.btn,
+.btn--style-pill-primary > button.btn,
+.btn--style-primary[type='button'],
+.btn--style-pill-primary[type='button'] {
+  background: var(--cs-cyan-500);
+  color: #04212a;
+  border: 1px solid transparent;
+  border-radius: var(--cs-radius-input);
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.005em;
+  padding-inline: var(--cs-space-4);
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cs-space-2);
+  white-space: nowrap;
+
+  &:hover:not([disabled]) {
+    background: var(--cs-cyan-400);
+    box-shadow: 0 1px 0 0 rgba(6, 199, 242, 0.25), 0 6px 16px -8px rgba(6, 199, 242, 0.4);
+  }
+
+  &:active:not([disabled]) {
+    background: var(--cs-cyan-600);
+  }
+
+  .btn__label {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+}
+
+// When `.btn--style-primary` is itself a wrapper <div>, it must NOT carry
+// any background or sizing — the inner <button> owns the cyan look. The
+// wrapper just lets the chevron sit beside the button.
+div.btn--style-primary,
+div.btn--style-pill-primary {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  height: auto;
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.btn--style-secondary {
+  background: transparent;
+  color: var(--theme-text);
+  border: 1px solid var(--theme-elevation-250);
+
+  &:hover:not([disabled]) {
+    border-color: var(--cs-cyan-500);
+    color: var(--theme-text);
+  }
+}
+
+.btn--style-subtle {
+  background: var(--theme-elevation-100);
+  color: var(--theme-text);
+  border: 1px solid transparent;
+
+  &:hover:not([disabled]) {
+    background: var(--theme-elevation-150);
+  }
+}
+
+// Destructive actions — confirm dialogs, "Delete row" buttons
+.btn--style-error,
+[data-error-button='true'] {
+  background: var(--color-error-500);
+  color: #fff;
+  border: 1px solid transparent;
+
+  &:hover:not([disabled]) {
+    filter: brightness(1.05);
+  }
+}
+
+// =============================================================================
+// 7. Tabs — pill underline
+// =============================================================================
+
+.tabs-field {
+  &__tabs {
+    border-bottom: 1px solid var(--theme-elevation-150);
+    gap: 0;
+  }
+
+  &__tab-button {
+    color: var(--theme-text-soft);
+    font-size: 13px;
+    font-weight: 500;
+    padding-inline: var(--cs-space-3);
+    height: 36px;
+    border-radius: 0;
+    transition: color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--theme-text);
+    }
+
+    &--active {
+      color: var(--theme-text);
+      font-weight: 600;
+      box-shadow: inset 0 -2px 0 0 var(--cs-cyan-500);
+    }
+
+    &--has-error {
+      color: var(--color-error-500);
+    }
+  }
+}
+
+// =============================================================================
+// 8. Lists — collection table rows, hover, selected, density
+// =============================================================================
+
+.table {
+  font-size: 13.5px;
+
+  thead th {
+    color: var(--theme-text-soft);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: var(--cs-space-2) var(--cs-space-3);
+  }
+
+  tbody tr {
+    transition: background-color var(--cs-motion-micro);
+    height: 48px;
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    // Active / current row (Next router supplies aria-current on links)
+    &[aria-current='true'],
+    &.is-active {
+      background: var(--cs-tint-brand-soft);
+      box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
+    }
+  }
+
+  td {
+    padding: var(--cs-space-2) var(--cs-space-3);
+    color: var(--theme-text);
+    border-top: 1px solid var(--theme-elevation-150);
+  }
+
+  &--appearance-condensed {
+    tbody tr {
+      height: 40px;
+    }
+  }
+}
+
+// List controls strip — toolbar above the table
+.list-controls {
+  margin-bottom: var(--cs-space-4);
+}
+
+// =============================================================================
+// 9. Sidebar nav — group titles, link active state, count
+// =============================================================================
+
+.nav-group {
+  &__toggle {
+    color: var(--theme-text-soft);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: var(--cs-space-2) var(--cs-space-3);
+    transition: color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--theme-text);
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: var(--cs-space-1) 0;
+  }
+}
+
+// Sidebar link — Payload uses `.nav__link` (verified from rendered DOM)
+.nav__link {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+  padding: 0.5rem 0.75rem;
+  color: var(--theme-text-soft);
+  font-size: 13.5px;
+  font-weight: 500;
+  border-radius: var(--cs-radius-input);
+  margin-inline: var(--cs-space-1);
+  text-decoration: none;
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro);
+
+  &:hover {
+    color: var(--theme-text);
+    background: var(--theme-elevation-100);
+  }
+
+  // Payload sets `.nav__link--active` on the current section's link.
+  &--active,
+  &.active,
+  &[aria-current='page'] {
+    color: var(--theme-text);
+    background: var(--cs-tint-brand-soft);
+    box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
+  }
+}
+
+// =============================================================================
+// 10. Cards & arrays — array-field rows, collapsibles, dashboard cards
+// =============================================================================
+
+// Dashboard cards
+.card {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3);
+  transition:
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro),
+    transform var(--cs-motion-micro);
+
+  &--has-onclick:hover {
+    border-color: var(--cs-cyan-500);
+    background: var(--theme-elevation-50);
+    cursor: pointer;
+  }
+
+  &__title {
+    color: var(--theme-text);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+}
+
+// Array field rows + collapsibles — quieter chrome until interacted with
+.array-field__row,
+.collapsible {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  margin-bottom: var(--cs-space-2);
+  transition:
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--theme-elevation-200);
+  }
+}
+
+// Collapsible / array-row header — pinned at 38px slim. The drag
+// handle, number prefix, label, kebab, and chevron all sit in the
+// row; reducing padding here is the highest-leverage way to make
+// long lists of FAQ / TOC rows scan compactly.
+.collapsible__header-wrap,
+.array-field__row-header {
+  padding: 3px var(--cs-space-2);
+  gap: var(--cs-space-2);
+  min-height: 38px;
+}
+
+.collapsible__toggle {
+  min-height: 30px;
+  padding-block: 0;
+  font-size: 13px;
+}
+
+// Also tighten the row-label component height so it doesn't expand
+// the header beyond what padding allows.
+.row-label {
+  min-height: 30px;
+  font-size: 13px;
+}
+
+// Drag handle — invisible until hover
+.collapsible__drag,
+.array-field__row-drag {
+  opacity: 0.35;
+  transition: opacity var(--cs-motion-micro);
+}
+
+.array-field__row:hover .collapsible__drag,
+.array-field__row:hover .array-field__row-drag,
+.collapsible:hover .collapsible__drag {
+  opacity: 1;
+}
+
+// Row label — hierarchy for our FAQ/TOC custom labels
+.row-label {
+  color: var(--theme-text);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+// Add-row button at the bottom of an array field
+.array-field__add-row {
+  margin-top: var(--cs-space-2);
+}
+
+// =============================================================================
+// 11. Pills & status indicators — colored dot + label
+// =============================================================================
+
+.pill {
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.15rem 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 22px;
+
+  // Status dot — color-blind-safe pattern: dot + label, never color alone
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  &--has-icon::before,
+  &--has-action::before {
+    display: none;
+  }
+
+  &--rounded {
+    border-radius: 999px;
+  }
+}
+
+// =============================================================================
+// 12. Body editor (Lexical) — readable rhythm + heading anchors
+// =============================================================================
+
+.rich-text-lexical,
+.LexicalEditorTheme__paragraph,
+.editor-shell {
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.LexicalEditorTheme__paragraph {
+  margin: 0 0 var(--cs-space-3) 0;
+}
+
+.LexicalEditorTheme__h1,
+.LexicalEditorTheme__h2,
+.LexicalEditorTheme__h3,
+.LexicalEditorTheme__h4,
+.LexicalEditorTheme__h5,
+.LexicalEditorTheme__h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: var(--cs-space-6) 0 var(--cs-space-3) 0;
+  color: var(--theme-text);
+}
+
+.LexicalEditorTheme__h1 {
+  font-size: 28px;
+  letter-spacing: -0.02em;
+}
+.LexicalEditorTheme__h2 {
+  font-size: 22px;
+}
+.LexicalEditorTheme__h3 {
+  font-size: 18px;
+}
+.LexicalEditorTheme__h4 {
+  font-size: 16px;
+}
+
+.LexicalEditorTheme__ul,
+.LexicalEditorTheme__ol {
+  padding-inline-start: var(--cs-space-6);
+  margin: 0 0 var(--cs-space-3) 0;
+
+  li {
+    margin-bottom: var(--cs-space-1);
+  }
+}
+
+.LexicalEditorTheme__textBold {
+  font-weight: 700;
+}
+
+.LexicalEditorTheme__textItalic {
+  font-style: italic;
+}
+
+.LexicalEditorTheme__textUnderline {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+}
+
+.LexicalEditorTheme__link {
+  color: var(--cs-cyan-500);
+  text-decoration: underline;
+  text-decoration-color: rgba(6, 199, 242, 0.4);
+  text-underline-offset: 2px;
+  transition: text-decoration-color var(--cs-motion-micro);
+
+  &:hover {
+    text-decoration-color: var(--cs-cyan-500);
+  }
+}
+
+.LexicalEditorTheme__quote {
+  border-inline-start: 3px solid var(--cs-cyan-500);
+  padding-inline-start: var(--cs-space-4);
+  color: var(--theme-text-soft);
+  font-style: italic;
+  margin: var(--cs-space-4) 0;
+}
+
+.LexicalEditorTheme__code {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-input);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: var(--cs-space-3);
+  display: block;
+  margin: var(--cs-space-3) 0;
+  overflow-x: auto;
+}
+
+// =============================================================================
+// 12b. Lexical editor — branded shell + content typography
+// =============================================================================
+//
+// We avoid styling Payload's internal Lexical chrome (toolbars, inline
+// popups, slash menu, link editor, gutter) — Payload ships its own CSS
+// for those and our overrides were causing off-by-one alignment.
+// What we DO style: the outer card (so the body field reads as a
+// pressed-in well), a max-height with internal scroll so the body
+// doesn't push every other field 8000px below, and the contentEditable
+// text/selection/caret to match brand.
+
+// Shell — scoped to the editor's WRAP element, NOT the outer field.
+// If we border the field itself, Payload's label sits inside the box
+// (visible bug: "Bio Long" rendered inside the editor card).
+// `.rich-text-lexical__wrap` contains only the editor surface.
+.rich-text-lexical--show-gutter .rich-text-lexical__wrap {
+  background: var(--theme-input-bg);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  transition: border-color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
+
+  &:focus-within {
+    border-color: var(--cs-cyan-500);
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+
+  // Cap the body editor at 85vh with internal scroll so SEO + sidebar
+  // fields below it remain reachable without endless scrolling.
+  .editor-scroller {
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+}
+
+.ContentEditable__root {
+  caret-color: var(--cs-cyan-500);
+  // Default minimum for the top-level body editor — generous writing
+  // canvas. Nested editors (inside array rows / collapsibles / tabs)
+  // override below so short answers don't get padded with empty space.
+  min-height: 320px;
+  outline: none;
+  // Lexical's bundled stylesheet sets a serif fallback on the contentEditable.
+  // Force the admin font through here so body content matches the rest
+  // of the chrome — verified via runtime audit.
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+
+  // Branded text selection — visible without overpowering
+  &::selection,
+  *::selection {
+    background: var(--cs-tint-brand-medium);
+    color: var(--theme-text);
+  }
+}
+
+// Nested richtext editors (FAQ answers, article-section bodies, anything
+// inside an array row / collapsible / tabs panel) — single-line min so
+// short answers don't carry an empty 80px whitespace tail. The editor
+// grows naturally as content is typed.
+.array-field__row .ContentEditable__root,
+.collapsible__content .ContentEditable__root,
+.blocks-field__row .ContentEditable__root {
+  min-height: 48px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+// Nested wrap shell — render as a flat textarea-style surface so the
+// FAQ answer / nested richtext doesn't carry double chrome (bordered
+// row card + bordered editor card). Just an input-bg fill with a
+// 1px border, hugging its content.
+.array-field__row .rich-text-lexical__wrap,
+.collapsible__content .rich-text-lexical__wrap,
+.blocks-field__row .rich-text-lexical__wrap {
+  min-height: 0;
+  background: var(--theme-input-bg);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-input);
+  padding: 0;
+
+  .editor-scroller,
+  .editor-container,
+  .editor {
+    padding: 0;
+    background: transparent;
+    border: none;
+    max-height: none;
+  }
+
+  .ContentEditable__root {
+    padding: 6px 10px;
+  }
+
+  &:focus-within {
+    border-color: var(--cs-cyan-500);
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+}
+
+// (Removed: fixed-toolbar, inline-toolbar-popup, slash-menu-popup,
+// link-editor, table cells, upload card, embedded block, character
+// count, heading anchor `::before`, block cursor, placeholder. Payload's
+// own CSS handles these — our overrides were too broad and surfaced
+// as off-by-one borders/lines across nested editors.)
+
+// =============================================================================
+// 13. Login + create-first-user — refined hero
+// =============================================================================
+.template-default,
+.template-minimal {
+  .render-icon,
+  .graphic-logo {
+    margin-bottom: var(--cs-space-6);
+  }
+}
+
+// Subtle brand-aware gradient backdrop
 .template-minimal::before {
   content: '';
   position: fixed;
@@ -173,20 +1052,30 @@ h6 {
     radial-gradient(45% 45% at 0% 100%, rgba(93, 4, 216, 0.18) 0%, transparent 60%);
 }
 
-// ─── Brand-aware focus ring + selected-row tint
-:focus-visible {
-  outline: 2px solid var(--cs-cyan-500);
-  outline-offset: 2px;
+// Login card — soft elevation shadow, rounder, never garish
+.template-minimal .form-wrap,
+.template-minimal form {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-modal);
+  padding: var(--cs-space-8);
+  box-shadow: 0 12px 40px -16px rgba(0, 0, 0, 0.18);
 }
 
-// ─── Slightly tighter card radii to match the wordmark's geometry
-.dashboard__group .card {
-  border-radius: 10px;
+[data-theme='dark'] .template-minimal .form-wrap,
+[data-theme='dark'] .template-minimal form {
+  box-shadow: 0 12px 40px -16px rgba(0, 0, 0, 0.55);
 }
 
-// ─── Header icon sizing — preserve the 28:32 aspect, cap at ~24px tall
-// Payload's default `.graphic-icon` slot renders at full SVG dims; we cap
-// height so the mark sits cleanly in the ~52px header without squishing.
+// Login + create-first-user logo — keep at hero size, never stretching
+.template-minimal .graphic-logo svg {
+  display: block;
+  height: 44px;
+  width: auto;
+  margin: 0 auto;
+}
+
+// Header logo — preserve the 28:32 aspect, cap at ~24px
 .graphic-icon,
 .nav__header .graphic-icon {
   svg {
@@ -196,11 +1085,804 @@ h6 {
   }
 }
 
-// Login + create-first-user logo — keep the wordmark at a comfortable
-// hero size, never stretching beyond its natural aspect.
-.template-minimal .graphic-logo svg {
-  display: block;
+// =============================================================================
+// 14. Tooltips, popovers, drawers, modals, toasts — premium chrome
+// =============================================================================
+//
+// Premium-editor philosophy: prefer popovers anchored to the trigger over
+// full-screen drawers. Where Payload still ships a drawer (relationship,
+// upload, blocks picker), shrink it to a calm side panel — never a takeover.
+
+// ─── Tooltips & popovers — refined elevation
+.tooltip,
+.popup,
+.popup__content {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+  padding: var(--cs-space-2);
+  animation: cms-popup-in var(--cs-motion-micro);
+}
+
+.tooltip {
+  background: var(--theme-elevation-800);
+  color: var(--theme-elevation-50);
+  font-size: 12px;
+  padding: 0.3rem 0.6rem;
+  border: none;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
+}
+
+// kbd shortcuts inside tooltips & menus — mac-style key caps
+kbd {
+  background: var(--theme-elevation-150);
+  border: 1px solid var(--theme-elevation-250);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  color: var(--theme-text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 0.05rem 0.35rem;
+  margin: 0 0.15rem;
+  display: inline-flex;
+  align-items: center;
+  min-width: 18px;
+  justify-content: center;
+}
+
+// ─── Drawers — keep Payload's default sizing/animation; only retint
+// the divider colors so they pick up the new palette. (Earlier width
+// caps + slide animation made the drawer feel cramped — reverted.)
+.drawer__header,
+.doc-drawer__header,
+.list-drawer__header,
+.drawer__content,
+.doc-drawer__content {
+  border-color: var(--theme-elevation-150);
+}
+
+// Drawer close button — Payload's default has no contrast against our
+// theme; surfaces invisible. Make it a clearly visible 32px circle
+// with hover affordance, regardless of which drawer flavor it lives in.
+.drawer-close-button,
+.drawer__close,
+.drawer__header__close,
+.doc-drawer__header-close,
+.edit-many__header__close,
+.edit-many-bulk-uploads__header__close {
+  background: transparent;
+  border: 1px solid var(--theme-elevation-250);
+  border-radius: 50%;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--theme-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition:
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  svg {
+    width: 14px;
+    height: 14px;
+    color: currentColor;
+    opacity: 1;
+  }
+
+  &:hover {
+    color: var(--color-error-500);
+    border-color: var(--color-error-500);
+    background: rgba(220, 38, 38, 0.08);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    border-color: var(--cs-cyan-500);
+  }
+}
+
+// ─── Modals — capped width, refined entry, calm header
+.confirmation-modal__wrapper {
+  max-width: 540px;
+  width: min(540px, 92vw);
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-modal);
+  box-shadow: 0 24px 56px -16px rgba(0, 0, 0, 0.55);
+  animation: cms-modal-in var(--cs-motion-modal);
+}
+
+.confirmation-modal__content {
+  padding: var(--cs-space-6);
+}
+
+.confirmation-modal__controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--cs-space-2);
+  padding: var(--cs-space-3) var(--cs-space-6);
+  border-top: 1px solid var(--theme-elevation-150);
+}
+
+@keyframes cms-modal-in {
+  from {
+    transform: translateY(8px) scale(0.99);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+// Close button — calm circle that lights up brand cyan on hover
+.close-modal-button {
+  background: transparent;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-text-soft);
+  cursor: pointer;
+  transition:
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro);
+
+  &:hover {
+    color: var(--cs-cyan-500);
+    border-color: var(--cs-cyan-500);
+  }
+}
+
+// ─── Toasts — top-right, branded by status, refined enter/exit
+.payload-toast-container,
+[class*='Toastify__toast-container'],
+.Toastify__toast-container {
+  --toastify-toast-min-height: 44px;
+  --toastify-toast-padding: 12px;
+  font-family: var(--font-body);
+}
+
+[class*='Toastify__toast'],
+.Toastify__toast {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  color: var(--theme-text);
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.45);
+  padding: var(--cs-space-3);
+  min-height: 44px;
+}
+
+[class*='Toastify__toast--success'],
+.Toastify__toast--success {
+  border-left: 3px solid var(--color-success-500);
+}
+
+[class*='Toastify__toast--error'],
+.Toastify__toast--error {
+  border-left: 3px solid var(--color-error-500);
+}
+
+[class*='Toastify__toast--warning'],
+.Toastify__toast--warning {
+  border-left: 3px solid var(--color-warning-500);
+}
+
+// ─── Upload dropzone — drag-affordance + brand outline
+//
+// When the editor is empty (or the upload field is idle), the dropzone
+// reads as a quiet placeholder. On dragover, it springs to brand-cyan,
+// inviting the editor to drop.
+.upload__dropzoneAndUpload,
+.file-field__dropzoneContent,
+.upload__dropzoneContent {
+  background: var(--theme-elevation-50);
+  border: 1.5px dashed var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-6);
+  text-align: center;
+  transition:
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--theme-elevation-300);
+  }
+
+  &.is-dragover,
+  &[data-dragover='true'],
+  &--is-dragover {
+    border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+}
+
+.upload__dropzoneContent__orText,
+.file-field__dropzoneContent__orText {
+  color: var(--theme-text-disabled);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: var(--cs-space-2) 0;
+}
+
+// Thumbnails — uniform corners, hover lift
+.file__thumbnail,
+.thumbnail-card__thumbnail,
+.file-selections__thumbnail,
+.upload-relationship-details__thumbnail,
+.file-details-draggable__thumbnail {
+  border-radius: var(--cs-radius-input);
+  overflow: hidden;
+  background: var(--theme-elevation-100);
+}
+
+// ─── Image / upload picker — the highest-value asset surface in the admin
+//
+// Default Payload renders an image upload field as a 40px thumbnail next
+// to a filename + tiny meta line + two icon-only buttons (Edit / Remove)
+// with no labels. We rebuild it as a real card: 80px hero thumbnail, a
+// readable filename, dimension chip, and labeled action buttons.
+
+// Card around the whole upload field (when an image is selected)
+.upload-field-card {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3);
+  // Card grows to wrap its content (80px thumbnail + side actions).
+  // No fixed height — lets the inner flex row dictate height.
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  transition: border-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--theme-elevation-200);
+  }
+}
+
+// Selected file row — image left, info middle, actions right
+.upload-relationship-details {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-4);
+  width: 100%;
+  min-height: 80px;
+
+  &__imageAndDetails {
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-3);
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__filename {
+    color: var(--theme-text);
+    font-size: 14px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    // Surface the file's public URL beneath the filename. Uses
+    // `attr(href)` to read the underlying anchor's href and render
+    // it as monospace caption text — clickable text stays the
+    // filename so existing UX is preserved. The URL itself remains
+    // selectable so editors can copy it. Truly editable URL would
+    // require overriding Payload's UploadRelationshipDetails React
+    // component (out of scope for a CSS-only pass).
+    a[href] {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      &::after {
+        content: attr(href);
+        display: block;
+        margin-top: 2px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 400;
+        color: var(--theme-text-soft);
+        letter-spacing: 0;
+        user-select: text;
+        cursor: text;
+      }
+    }
+  }
+
+  &__meta {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: 0.005em;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    flex-shrink: 0;
+  }
+
+  // The current 40x40 thumbnail is too small to read at a glance — bump
+  // to 80x80 with a soft inner border so it reads as an image card.
+  // Use !important on the dimensional + clipping rules because Payload's
+  // bundled .thumbnail styles + the inner <img>'s natural attributes
+  // (width=948 height=1193 etc.) win on specificity and let portrait
+  // images bleed above/below the row otherwise.
+  &__thumbnail,
+  .thumbnail--size-small.upload-relationship-details__thumbnail {
+    width: 80px !important;
+    height: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+    max-height: 80px !important;
+    border-radius: var(--cs-radius-input);
+    overflow: hidden !important;
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    flex-shrink: 0;
+    position: relative;
+
+    img,
+    & > img,
+    picture img {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      object-fit: cover !important;
+      object-position: center !important;
+      display: block;
+    }
+  }
+
+  // Action buttons (Edit / Remove) — icon-only buttons get accessible labels
+  // via ::after content. We can't add a real <span> from CSS, but we can
+  // surface their function with a tooltip that's always visible on hover
+  // and a soft border that grows on hover.
+  &__edit,
+  &__remove {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    width: 32px;
+    height: 32px;
+    color: var(--theme-text-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      color: var(--cs-cyan-500);
+      border-color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+    }
+  }
+
+  &__remove:hover {
+    color: var(--color-error-500);
+    border-color: var(--color-error-500);
+    background: rgba(220, 38, 38, 0.08);
+  }
+}
+
+// Empty-state dropzone (no image selected yet) — generous, branded on hover
+.upload__dropzoneAndUpload {
+  background: var(--theme-elevation-50);
+  border: 1.5px dashed var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-8) var(--cs-space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cs-space-2);
+  text-align: center;
+  transition:
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  // When a real upload field already shows the file card, the dropzone
+  // wrapper just acts as a passthrough — kill its dashed border.
+  &:has(.upload-field-card) {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+}
+
+.upload__dropzoneContent__buttons {
+  display: flex;
+  gap: var(--cs-space-2);
+}
+
+// (Removed: list-drawer / file-selections grid / blocks-drawer width
+// overrides — Payload's own picker layout was already correct, our grid
+// reflow was breaking the gallery thumbnails.)
+
+// =============================================================================
+// 15. Scrollbars — Webflow-thin themed (Chromium / WebKit)
+// =============================================================================
+
+* {
+  scrollbar-color: var(--theme-elevation-200) transparent;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--theme-elevation-200);
+  border: 2px solid var(--theme-bg);
+  border-radius: 999px;
+
+  &:hover {
+    background: var(--theme-elevation-300);
+  }
+}
+
+// =============================================================================
+// 16. Accessibility — focus, reduced motion
+// =============================================================================
+
+:focus-visible {
+  outline: 2px solid var(--cs-cyan-500);
+  outline-offset: 2px;
+  border-radius: var(--cs-radius-input);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// =============================================================================
+// 16b. Sizes & rhythm audit — uniform heights + density tokens
+// =============================================================================
+//
+// Across every section the admin uses a single 4-pt rhythm. Heights line up
+// (input, select, button = 36-40px), row heights line up (table 48 / row 48
+// / sidebar link 36), and density inside collapsibles tightens by one step
+// (16 → 12) so deeply nested forms don't feel airy and unfocused.
+
+// ─── Input + control heights — locked to a 38-40px family.
+// Upload fields are intentionally excluded — they wrap an 80px image
+// thumbnail and need to size to content. Pinning their row height
+// caused the image to bleed above/below the rounded card.
+.field-type {
+  &.text input,
+  &.email input,
+  &.number input,
+  &.password input,
+  &.date input {
+    min-height: 38px;
+    height: 38px;
+  }
+
+  &.textarea textarea {
+    min-height: 84px;
+  }
+
+  // Number fields with bounded ranges (level 1-6, etc.) shouldn't stretch
+  // full-width — cap them to a sensible ~120px so they read as numeric.
+  &.number input {
+    max-width: 120px;
+  }
+
+  // Select / react-select control — match input height
+  &.select .rs__control,
+  &.select .react-select__control {
+    min-height: 38px;
+  }
+
+  // ReadOnly slug-style fields — communicate "auto-generated" with mono +
+  // muted color. Anchor on TOC, slug field on docs, IDs.
+  &.text input[readonly],
+  &[data-readonly='true'] input,
+  input[name='slug'][readonly],
+  input[name='anchor'][readonly] {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--theme-text-soft);
+    background: var(--theme-elevation-50);
+  }
+}
+
+// Row labels across the admin (TOC, FAQ, blocks, etc.) align at 36px
+.row-label,
+.collapsible__toggle,
+.array-field__row-header {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+}
+
+// ─── Density inside collapsibles + array rows — tight Webflow-style
+// Nested fields use `--cs-space-2` (8px) margin-bottom and the
+// collapsible content area gets reduced padding so a 2-field FAQ row
+// reads as ~150px expanded, not ~250px.
+.collapsible__content {
+  padding: var(--cs-space-3) var(--cs-space-3) !important;
+}
+
+.collapsible__content,
+.array-field__row,
+.blocks-field__row,
+.tabs-field__content-wrap {
+  .field-type {
+    margin-bottom: var(--cs-space-2);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Inside nested editor wraps, kill the bundled Lexical wrap padding
+// so the cyan-bordered card hugs the content tightly. Body editor
+// (top-level, --show-gutter outside any array row) keeps its wider feel.
+.array-field__row .rich-text-lexical__wrap,
+.collapsible__content .rich-text-lexical__wrap,
+.blocks-field__row .rich-text-lexical__wrap {
+  .editor-container,
+  .editor-scroller {
+    padding: 0;
+  }
+}
+
+// Group label margin — keep tight to its first child
+.group-field__label {
+  margin-bottom: var(--cs-space-3);
+}
+
+// ─── Sidebar nav rhythm — predictable link height and gap
+.nav .nav-group__content a {
+  min-height: 36px;
+}
+
+// ─── Doc controls strip — keep Payload's two-row layout (title row + meta
+// row); just lock min-height + ensure controls cluster on the right.
+.doc-controls__controls-wrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+}
+
+// Every actionable element in the doc-controls strip — Save Draft,
+// Publish changes wrapper, the chevron split button, and the 3-dots
+// kebab — must share the same 36px height so the row doesn't look
+// uneven (kebab visibly taller than the cyan button = bug).
+.doc-controls .btn,
+.doc-controls__dots,
+.doc-controls__dots > button,
+.doc-controls .btn--icon-only,
+.doc-controls__list-item,
+.doc-controls__locked-controls > * {
+  height: 36px;
+  min-height: 36px;
+}
+
+// 3-dots kebab specifically — square 36px, secondary-button outline.
+.doc-controls__dots,
+.doc-controls__dots > button {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--cs-radius-input);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ─── Doc-controls split-button chevron — was rendering at 51px tall
+// with panel-color bg and a visible border, making the chevron look
+// like a foreign light box wedged between Publish and the kebab.
+// Make the wrapper invisible (transparent, no border) and let the
+// inner `.popup-button` carry the secondary-button look.
+.doc-controls__popup,
+.doc-controls .popup,
+.form-submit .popup {
+  background: transparent !important;
+  border: none !important;
+  height: 36px !important;
+  width: auto !important;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+}
+
+// The actual chevron button inside the popup wrapper — secondary-style
+// outlined, 36px square, brand-cyan on hover.
+.doc-controls__popup .popup-button,
+.doc-controls .popup .popup-button,
+.form-submit .popup .popup-button {
+  background: transparent;
+  border: 1px solid var(--theme-elevation-250);
+  border-radius: var(--cs-radius-input);
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--theme-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--cs-cyan-500);
+    color: var(--cs-cyan-500);
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// Save Draft button — explicit outlined treatment (Payload's stock class
+// `.btn--style-secondary` covers most of this, but the doc-controls'
+// version of Save Draft uses `.save-draft` plus other modifiers and
+// needs an explicit pin so it matches the chevron + kebab.
+.doc-controls .btn.save-draft,
+.doc-controls .btn--style-secondary {
+  background: transparent;
+  border: 1px solid var(--theme-elevation-250);
+  color: var(--theme-text);
+  height: 36px;
+  border-radius: var(--cs-radius-input);
+  padding-inline: var(--cs-space-4);
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.005em;
+  transition:
+    background-color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    color var(--cs-motion-micro);
+
+  &:hover:not([disabled]) {
+    border-color: var(--cs-cyan-500);
+    color: var(--cs-cyan-500);
+  }
+}
+
+// ─── Tabs strip — uniform 40px tab height
+.tabs-field__tab-button {
+  min-height: 40px;
+}
+
+// ─── Buttons across the app — three height tiers
+.btn--size-small,
+.btn--size-sm {
+  height: 30px;
+  font-size: 12.5px;
+  padding-inline: var(--cs-space-3);
+}
+
+.btn--size-large,
+.btn--size-lg {
   height: 44px;
-  width: auto;
-  margin: 0 auto;
+  font-size: 14px;
+  padding-inline: var(--cs-space-6);
+}
+
+// Icon-only buttons in toolbars — square 30px. Only target the dedicated
+// "icon-only" modifier class — earlier I targeted `.btn--icon-style-without-border`
+// which Payload also applies to LABELED buttons (Save Draft / Publish), clipping
+// their text. Verified live: `.btn--icon-only` is the correct class.
+.btn--icon-only {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  padding: 0;
+}
+
+// ─── Pills — uniform 22px height across statuses
+.pill {
+  min-height: 22px;
+  height: 22px;
+
+  &--size-medium {
+    height: 26px;
+    font-size: 12.5px;
+  }
+}
+
+// ─── Cards — generous but bounded padding
+.card {
+  padding: var(--cs-space-4);
+
+  &__title {
+    margin-bottom: var(--cs-space-2);
+  }
+
+  &__actions {
+    margin-top: var(--cs-space-3);
+  }
+}
+
+// =============================================================================
+// 17. Light-mode contrast safety net
+// =============================================================================
+[data-theme='light'] {
+  .pill {
+    --pill-text-default: var(--theme-text);
+  }
+
+  .table tbody tr:hover {
+    background: var(--theme-elevation-100);
+  }
+
+  // Glass / transparent overlays must remain readable in light mode
+  .tooltip,
+  .popup,
+  .popup__content {
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.12);
+  }
 }
