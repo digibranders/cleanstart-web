@@ -1,62 +1,72 @@
 // 18. Sidebar header — branded anchor + Dashboard link (BeforeNavLinks slot)
 // =============================================================================
 //
-// Renders below Payload's default top header (which carries the Icon graphic)
-// and above the first nav group. Anchors the sidebar with the CleanStart
-// wordmark and gives every editor a single-click route back to the dashboard.
+// Lays out the top of the nav as a single integrated block:
+//
+//   ┌────────────────────────────────────────┐
+//   │ [<]   CleanStart  CMS                  │   ← brand row
+//   │ ▸ Dashboard                            │   ← dashboard nav row
+//   └────────────────────────────────────────┘
+//
+// Payload's NavToggler ("<" collapse arrow) is rendered outside the Nav by
+// the Default template; we pull it back into the brand row visually using
+// position: absolute so the editor reads the whole top as one header.
+// All spacing is kept tight so the nav groups below read as siblings of
+// the dashboard row rather than as a second tier of UI.
 
 .cs-sidebar-header {
   display: flex;
   flex-direction: column;
-  gap: var(--cs-space-1);
-  padding: var(--cs-space-3) var(--cs-space-3) var(--cs-space-2);
-  margin-bottom: var(--cs-space-2);
-  border-bottom: 1px solid var(--theme-elevation-150);
+  gap: 4px;
+  padding: 12px 12px 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--cs-border-subtle);
 
+  // Brand row: logo wordmark + cyan "CMS" pill, click anywhere routes to /admin.
   &__brand {
     display: flex;
     align-items: center;
-    gap: var(--cs-space-2);
-    padding: var(--cs-space-2) var(--cs-space-2);
+    gap: 8px;
+    padding: 6px 8px 6px 36px; // left padding leaves room for the toggler
     border-radius: var(--cs-radius-input);
-    color: var(--theme-text);
+    color: var(--cs-text-primary);
     text-decoration: none;
     cursor: pointer;
+    min-height: 32px;
     transition: background-color var(--cs-motion-micro);
 
     &:hover {
-      background: var(--theme-elevation-100);
+      background: var(--cs-surface-raised);
     }
 
     &:focus-visible {
-      outline: 2px solid var(--cs-cyan-500);
+      outline: var(--cs-focus-outline);
       outline-offset: 2px;
     }
   }
 
-  // Size the embedded CleanStart Logo SVG to fit the sidebar (~220px nav).
-  // The Logo's intrinsic size is 220×46; constrain it to the column width so
-  // it never overflows. `currentColor` on the wordmark glyphs ensures it
-  // inverts cleanly between light and dark themes.
+  // CleanStart wordmark SVG — sized for the nav column. `currentColor`
+  // glyphs invert between light/dark themes automatically.
   &__logo {
     display: inline-flex;
     align-items: center;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
-    color: var(--theme-text);
+    color: var(--cs-text-primary);
 
     svg {
       display: block;
       width: 100%;
-      max-width: 168px;
+      max-width: 124px;
       height: auto;
       margin: 0;
     }
   }
 
+  // "CMS" pill — small cyan chip after the wordmark
   &__eyebrow {
     flex-shrink: 0;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -68,19 +78,23 @@
   }
 }
 
+// Dashboard link — sits inside the header block as a sibling of the
+// brand row. Same horizontal margin as nav links below so they share a
+// visual rhythm, but lives above the category headers as the editor's
+// first-class destination.
 .cs-sidebar-dashboard {
   display: flex;
   align-items: center;
-  gap: var(--cs-space-2);
-  padding: 0.5rem 0.75rem;
-  margin: 2px var(--cs-space-1) 0;
+  gap: 8px;
+  padding: 7px 10px;
+  margin: 2px 0 0;
   border-radius: var(--cs-radius-input);
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--theme-text-soft);
+  color: var(--cs-text-secondary);
   text-decoration: none;
   cursor: pointer;
-  min-height: 36px;
+  min-height: 32px;
   transition:
     background-color var(--cs-motion-micro),
     color var(--cs-motion-micro),
@@ -92,19 +106,74 @@
   }
 
   &:hover {
-    color: var(--theme-text);
-    background: var(--theme-elevation-100);
+    color: var(--cs-text-primary);
+    background: var(--cs-surface-raised);
   }
 
   &--active {
-    color: var(--theme-text);
+    color: var(--cs-text-primary);
+    font-weight: 600;
     background: var(--cs-tint-brand-soft);
     box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--cs-cyan-500);
+    outline: var(--cs-focus-outline);
     outline-offset: 1px;
   }
 }
 
+// ─── NavToggler integration ──────────────────────────────────────
+//
+// Payload renders the collapse "<" arrow at `.template-default__nav-toggler-wrapper`
+// outside the Nav. We don't replace it (NavContext wires the collapse
+// state for mobile + persistent layouts) — instead pull it visually into
+// the corner of the SidebarHeader so all three header elements
+// (toggler · logo · CMS pill) read as one row. The Dashboard row sits
+// directly underneath.
+//
+// On the desktop nav-open layout the toggler is decorative; on the
+// collapsed layout it expands the rail. Either way, putting it at the
+// top-left of the brand row gives editors a stable place to find it.
+.template-default__nav-toggler-wrapper {
+  position: absolute;
+  top: 14px;
+  left: 8px;
+  z-index: 5;
+  background: transparent;
+  border: none;
+
+  // Tighten the toggler button itself — Payload paints it as a 28-32px
+  // bordered square; we want a 24px square that reads as a quiet icon
+  // button matching the rest of the admin chrome.
+  .template-default__nav-toggler,
+  > div,
+  button {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: var(--cs-radius-input);
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--cs-text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background-color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--cs-cyan-500);
+      border-color: var(--cs-border-subtle);
+      background: var(--cs-tint-brand-soft);
+    }
+  }
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}

@@ -1,58 +1,117 @@
 // =============================================================================
-// 9. Sidebar nav — group titles, link active state, count
+// 9. Sidebar nav — clear category > indented-item hierarchy
 // =============================================================================
+//
+// Visual model:
+//
+//   GLOBALS                     ← category eyebrow: 10.5px / 700 / muted /
+//                                   uppercase / generous top spacing
+//     Site settings             ← item: 13px / 400 / secondary text
+//     SEO defaults                  + indented from category by 12px
+//     ...
+//
+// Categories are quiet, item rows are scannable, and the active item
+// reads with a 2px cyan left-stripe + brand-tinted background so the
+// editor's current location is obvious at a glance.
 
 .nav-group {
+  // Breathing room between groups so categories register as section
+  // dividers, not adjacent rows.
+  margin-bottom: 4px;
+  padding-top: 12px;
+
+  // First group sits under the SidebarHeader divider — kill its top
+  // padding so the GLOBALS eyebrow doesn't double-space.
+  &:first-of-type {
+    padding-top: 4px;
+  }
+
   &__toggle {
-    color: var(--theme-text-soft);
-    font-size: 11px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    color: var(--cs-text-muted);
+    font-size: 10.5px;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: var(--cs-space-2) var(--cs-space-3);
+    cursor: pointer;
+    text-align: left;
+    line-height: 1.2;
     transition: color var(--cs-motion-micro);
 
     &:hover {
-      color: var(--theme-text);
+      color: var(--cs-text-secondary);
+    }
+
+    // Chevron Payload appends to the toggle when the group is
+    // collapsible. Quieter chrome so it doesn't compete with the eyebrow.
+    svg {
+      width: 10px;
+      height: 10px;
+      margin-left: auto;
+      opacity: 0.5;
+      transition: opacity var(--cs-motion-micro);
+    }
+
+    &:hover svg {
+      opacity: 1;
     }
   }
 
+  // Item container — indents every nav link inside the group so the
+  // category > item hierarchy reads visually.
   &__content {
     display: flex;
     flex-direction: column;
     gap: 1px;
-    padding: var(--cs-space-1) 0;
+    padding: 2px 0 4px;
   }
 }
 
-// Sidebar link — Payload uses `.nav__link` (verified from rendered DOM)
+// Sidebar item — Payload renders these as `.nav__link`. Indented under
+// the category header, lighter weight, brand-cyan active state.
 .nav__link {
   display: flex;
   align-items: center;
-  gap: var(--cs-space-2);
-  padding: 0.5rem 0.75rem;
-  color: var(--theme-text-soft);
-  font-size: 13.5px;
-  font-weight: 500;
+  gap: 8px;
+  // 24px left = 12px (group padding) + 12px (item indent)
+  padding: 6px 12px 6px 24px;
+  margin: 0 4px;
+  color: var(--cs-text-secondary);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.3;
   border-radius: var(--cs-radius-input);
-  margin-inline: var(--cs-space-1);
   text-decoration: none;
+  min-height: 30px;
   transition:
     background-color var(--cs-motion-micro),
     color var(--cs-motion-micro),
     box-shadow var(--cs-motion-micro);
 
   &:hover {
-    color: var(--theme-text);
-    background: var(--theme-elevation-100);
+    color: var(--cs-text-primary);
+    background: var(--cs-surface-raised);
   }
 
-  // Payload sets `.nav__link--active` on the current section's link.
+  // Active item — Payload sets `.nav__link--active`. Brand stripe + tint
+  // + slightly bolder weight so it reads as the current location even
+  // at peripheral-vision distance.
   &--active,
   &.active,
   &[aria-current='page'] {
-    color: var(--theme-text);
+    color: var(--cs-text-primary);
+    font-weight: 600;
     background: var(--cs-tint-brand-soft);
     box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
+  }
+
+  &:focus-visible {
+    outline: var(--cs-focus-outline);
+    outline-offset: -2px;
   }
 }
