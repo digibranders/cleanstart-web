@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     redirects: Redirect;
     'audit-log': AuditLog;
+    searchLog: SearchLog;
     authors: Author;
     categories: Category;
     newsCategories: NewsCategory;
@@ -100,6 +101,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
+    searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
@@ -134,6 +136,7 @@ export interface Config {
     footerNav: FooterNav;
     legal: Legal;
     announcements: Announcement;
+    'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
@@ -142,6 +145,7 @@ export interface Config {
     footerNav: FooterNavSelect<false> | FooterNavSelect<true>;
     legal: LegalSelect<false> | LegalSelect<true>;
     announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
+    'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -151,6 +155,8 @@ export interface Config {
   jobs: {
     tasks: {
       drainLeadQueue: TaskDrainLeadQueue;
+      purgeSearchLog: TaskPurgeSearchLog;
+      purgeLeadsPii: TaskPurgeLeadsPii;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -360,6 +366,34 @@ export interface AuditLog {
     | number
     | boolean
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Public-site search queries logged via /api/search/analytics. Filter resultsCount=0 to find content gaps.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "searchLog".
+ */
+export interface SearchLog {
+  id: number;
+  query: string;
+  /**
+   * Number of hits the search returned. Zero = content gap signal.
+   */
+  resultsCount: number;
+  /**
+   * Optional locale tag (e.g. en-US). Used to filter analytics later.
+   */
+  locale?: string | null;
+  /**
+   * Client IP — used for abuse detection. Auto-purged at the same cadence as leads.
+   */
+  ip?: string | null;
+  /**
+   * User-Agent header. Trimmed at 200 chars.
+   */
+  userAgent?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -3695,7 +3729,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'drainLeadQueue' | 'schedulePublish';
+        taskSlug: 'inline' | 'drainLeadQueue' | 'purgeSearchLog' | 'purgeLeadsPii' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -3728,10 +3762,19 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'drainLeadQueue' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'drainLeadQueue' | 'purgeSearchLog' | 'purgeLeadsPii' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
+  meta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -3757,6 +3800,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'audit-log';
         value: number | AuditLog;
+      } | null)
+    | ({
+        relationTo: 'searchLog';
+        value: number | SearchLog;
       } | null)
     | ({
         relationTo: 'authors';
@@ -3985,6 +4032,19 @@ export interface AuditLogSelect<T extends boolean = true> {
   acceptLanguage?: T;
   proxyChainLength?: T;
   metadata?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "searchLog_select".
+ */
+export interface SearchLogSelect<T extends boolean = true> {
+  query?: T;
+  resultsCount?: T;
+  locale?: T;
+  ip?: T;
+  userAgent?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -5551,6 +5611,7 @@ export interface PayloadJobsSelect<T extends boolean = true> {
   queue?: T;
   waitUntil?: T;
   processing?: T;
+  meta?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -5693,7 +5754,7 @@ export interface SeoDefault {
     /**
      * URL of the fact-checking / verification policy page.
      */
-    verificationFactCheckingPolicy?: string | null;
+    factCheckingPolicy?: string | null;
     /**
      * URL of the page describing how readers submit feedback / complaints.
      */
@@ -5713,7 +5774,7 @@ export interface SeoDefault {
     /**
      * URL of the page describing editorial mission and coverage priorities.
      */
-    missionCoveragePrioritiesPolicy?: string | null;
+    coveragePolicy?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -5966,6 +6027,24 @@ export interface Announcement {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats".
+ */
+export interface PayloadJobsStat {
+  id: number;
+  stats?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "siteSettings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
@@ -6026,12 +6105,12 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
         masthead?: T;
         ethicsPolicy?: T;
         correctionsPolicy?: T;
-        verificationFactCheckingPolicy?: T;
+        factCheckingPolicy?: T;
         actionableFeedbackPolicy?: T;
         unnamedSourcesPolicy?: T;
         diversityPolicy?: T;
         ownershipFundingInfo?: T;
-        missionCoveragePrioritiesPolicy?: T;
+        coveragePolicy?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -6181,6 +6260,16 @@ export interface AnnouncementsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats_select".
+ */
+export interface PayloadJobsStatsSelect<T extends boolean = true> {
+  stats?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -6194,6 +6283,22 @@ export interface CollectionsWidget {
  * via the `definition` "TaskDrainLeadQueue".
  */
 export interface TaskDrainLeadQueue {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPurgeSearchLog".
+ */
+export interface TaskPurgeSearchLog {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPurgeLeadsPii".
+ */
+export interface TaskPurgeLeadsPii {
   input?: unknown;
   output?: unknown;
 }

@@ -34,6 +34,8 @@ import { jsonLdEndpoint } from './payload/endpoints/jsonld';
 import { searchAnalyticsEndpoint } from './payload/endpoints/search-analytics';
 import { newsSitemapEndpoint, sitemapEndpoint } from './payload/endpoints/sitemap';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
+import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
+import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
@@ -152,11 +154,19 @@ export default buildConfig({
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements],
   endpoints: [jsonLdEndpoint, sitemapEndpoint, newsSitemapEndpoint, searchAnalyticsEndpoint],
   jobs: {
-    tasks: [drainLeadQueueTask],
+    tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask],
     autoRun: [
       {
         cron: '*/5 * * * *', // every 5 minutes
         queue: 'leadQueueDrain',
+      },
+      {
+        cron: '0 3 * * *', // daily at 03:00 UTC — searchLog 90-day retention
+        queue: 'searchLogPurge',
+      },
+      {
+        cron: '15 3 * * *', // daily at 03:15 UTC — leads PII 365-day redaction
+        queue: 'leadsPiiPurge',
       },
     ],
     shouldAutoRun: () => process.env.NODE_ENV !== 'test',
