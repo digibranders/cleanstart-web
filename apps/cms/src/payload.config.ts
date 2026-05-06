@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
+import { RichPasteFeature } from './payload/lib/lexical/rich-paste-feature';
 import { s3Storage } from '@payloadcms/storage-s3';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
@@ -142,7 +143,9 @@ export default buildConfig({
   onInit: () => {
     registerLeadHandlers();
   },
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [...defaultFeatures, RichPasteFeature()],
+  }),
   secret: requireEnv('PAYLOAD_SECRET'),
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
   typescript: {
