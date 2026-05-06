@@ -100,36 +100,7 @@ These resolved the open forks from arch doc §`#decisions`. Build accordingly:
 
 ---
 
-## apps/web (public marketing site) — deferred
 
-`apps/web` does not currently exist. A previous scaffold was discarded; the design-system / component-map / brand / accessibility / frontend-integrations docs and Figma-extracted assets were removed alongside it.
-
-What survives and is still load-bearing:
-
-- [`docs/web/WEB-ARCHITECTURE.md`](docs/web/WEB-ARCHITECTURE.md) — stack, hosting split (Vercel Pro for web, Coolify for CMS), preview-JWT flow, lead-submit proxy contract.
-- [`docs/web/BACKLOG-WEB.md`](docs/web/BACKLOG-WEB.md) — the wave plan; W-A bootstrap is open again.
-- [`docs/web/CONTENT-MODEL.md`](docs/web/CONTENT-MODEL.md) — collection → URL → cache-tag → JSON-LD data contract.
-- [`docs/web/SEO-PLAYBOOK.md`](docs/web/SEO-PLAYBOOK.md) — JSON-LD recipes; drives Wave D Phase F server-side generators in `apps/cms`.
-- [`apps/cms/src/payload/lib/route-prefixes.ts`](apps/cms/src/payload/lib/route-prefixes.ts) — single source of truth for URL prefixes (singulars `/event`, `/webinar`, `/job`, `/guide`, `/author`; plural `/resources`).
-
-**Until web development restarts:** do not scaffold `apps/web/`, do not re-create the deleted design docs from memory, do not regenerate `docs/web/tokens.*` or `docs/web/figma-snapshots/`. When work resumes, this section will be rewritten with the active stack, hard rules, and pre-completion checks.
-
-The cross-cutting hard rules that *will* apply once web exists are already captured in [`docs/web/WEB-ARCHITECTURE.md`](docs/web/WEB-ARCHITECTURE.md) (LeadHandler proxy, preview JWT, route segment immutability, no `NEXT_PUBLIC_*` for secrets, consent-mode-v2 before third-party scripts) — they don't need to live in this file until then.
-
----
-
-## Figma access — tooling preserved, extracted output deferred
-
-The design lives in the *CleanStart V4* Figma file (file key `doWR9Xbwgkz6dqR9n4m3BB`). The extraction tooling stays in place so it can be re-run when web development restarts; the previously extracted assets (`docs/web/tokens.css`, `tokens.json`, `figma-snapshots/`) were removed alongside `apps/web`.
-
-- **Auth:** a Figma PAT lives in `$FIGMA_TOKEN` (root [`.env`](#), gitignored). Never echo, log, or commit the token. [`.env.example`](.env.example) documents the variable names.
-- **File + node IDs:** `$FIGMA_FILE_KEY`, `$FIGMA_HOMEPAGE_NODE`.
-- **Extraction script:** `pnpm figma:extract` runs [`scripts/figma-extract.ts`](scripts/figma-extract.ts). When the web app restarts, re-running this regenerates `docs/web/tokens.json`, `tokens.css`, and `figma-snapshots/`. Do not run it before then — the output has no consumer.
-- **Plugin MCP** (`figma-console`): optional, not required for extraction.
-
-**Hard rule when web restarts:** never hand-edit the extractor's output. Re-run the script instead.
-
----
 
 ## Test conventions
 
