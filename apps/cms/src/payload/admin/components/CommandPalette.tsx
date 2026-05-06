@@ -14,8 +14,8 @@ type Action = {
   label: string;
   hint?: string;
   href: string;
-  group: 'navigate' | 'create' | 'document';
-  icon?: 'home' | 'collection' | 'plus' | 'doc';
+  group: 'navigate' | 'create' | 'document' | 'recent';
+  icon?: 'home' | 'collection' | 'plus' | 'doc' | 'clock';
 };
 
 type DocHit = {
@@ -108,6 +108,14 @@ const Glyph = ({ kind }: { kind: Action['icon'] }): ReactElement => {
       </svg>
     );
   }
+  if (kind === 'clock') {
+    return (
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+        <circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.4" />
+        <path d="M8 5v3l2 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
       <rect x="3" y="3" width="10" height="10" rx="1.4" stroke="currentColor" strokeWidth="1.4" />
@@ -122,6 +130,56 @@ const fuzzyMatches = (label: string, q: string): boolean => {
   if (query.length === 0) return true;
   // Each query token must appear as a substring (in any order).
   return query.split(/\s+/).every((token) => target.includes(token));
+};
+
+// ─── Recent-history persistence ─────────────────────────────────
+//
+// We track the last N actions the editor activated (collection list
+// jumps + opened documents) in `localStorage`. When the palette opens
+// with an empty query we surface them as a "Recent" group at the top
+// so the most-frequent navigation is one keystroke away.
+//
+// Skip 'create' actions — they don't correspond to a stable destination
+// (each invocation creates a fresh doc with a new id).
+const RECENT_KEY = 'cs-cmdk:recent';
+const RECENT_LIMIT = 8;
+
+const loadRecent = (): Action[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(RECENT_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (item): item is Action =>
+          item != null &&
+          typeof item === 'object' &&
+          typeof (item as Action).id === 'string' &&
+          typeof (item as Action).label === 'string' &&
+          typeof (item as Action).href === 'string',
+      )
+      .slice(0, RECENT_LIMIT);
+  } catch {
+    return [];
+  }
+};
+
+const saveRecent = (action: Action): void => {
+  if (typeof window === 'undefined') return;
+  if (action.group === 'create') return;
+  try {
+    const list = loadRecent().filter((a) => a.id !== action.id);
+    list.unshift({ ...action, group: 'recent' as const } as Action);
+    window.localStorage.setItem(
+      RECENT_KEY,
+      JSON.stringify(list.slice(0, RECENT_LIMIT)),
+    );
+  } catch {
+    // localStorage may be disabled (private mode, quota exceeded) — silently
+    // skip; recent history is best-effort.
+  }
 };
 
 const stripHashFromTitle = (raw: unknown): string => {
@@ -155,6 +213,7 @@ export const CommandPalette = (): ReactElement | null => {
   const [docHits, setDocHits] = useState<DocHit[]>([]);
   const [searching, setSearching] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [recent, setRecent] = useState<Action[]>([]);
 
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -167,7 +226,18 @@ export const CommandPalette = (): ReactElement | null => {
     setActiveIndex(0);
   }, []);
 
-  // Global Cmd+K listener.
+  const activate = useCallback(
+    (action: Action): void => {
+      saveRecent(action);
+      window.location.href = action.href;
+      close();
+    },
+    [close],
+  );
+
+  // Global Cmd+K listener + custom-event opener (the SidebarHeader
+  // search button dispatches `cs-cmdk:open` so the palette can be
+  // opened by mouse without bypassing this single source of truth).
   useEffect(() => {
     const onKey = (e: KeyboardEvent): void => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -178,9 +248,20 @@ export const CommandPalette = (): ReactElement | null => {
         close();
       }
     };
+    const onOpenEvent = (): void => setOpen(true);
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    document.addEventListener('cs-cmdk:open', onOpenEvent);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('cs-cmdk:open', onOpenEvent);
+    };
   }, [open, close]);
+
+  // Refresh recent list on every open so a destination opened in the
+  // current session shows up next time without remounting the component.
+  useEffect(() => {
+    if (open) setRecent(loadRecent());
+  }, [open]);
 
   // Open / close native <dialog>.
   useEffect(() => {
@@ -286,9 +367,25 @@ export const CommandPalette = (): ReactElement | null => {
     [docHits],
   );
 
+  // Recent-history group — only surfaces when the query is empty so it
+  // doesn't compete with active filtering. Stamped with `group:'recent'`
+  // and the doc icon so it reads as past navigation rather than a
+  // first-class destination.
+  const recentActions = useMemo<Action[]>(
+    () =>
+      query.trim().length > 0
+        ? []
+        : recent.map((r): Action => ({
+            ...r,
+            group: 'recent',
+            icon: r.icon ?? 'doc',
+          })),
+    [query, recent],
+  );
+
   const allActions = useMemo<Action[]>(
-    () => [...filteredNav, ...filteredCreate, ...docActions],
-    [filteredNav, filteredCreate, docActions],
+    () => [...recentActions, ...filteredNav, ...filteredCreate, ...docActions],
+    [recentActions, filteredNav, filteredCreate, docActions],
   );
 
   // Reset selection whenever the result set actually changes. The deps
@@ -324,13 +421,10 @@ export const CommandPalette = (): ReactElement | null => {
       } else if (e.key === 'Enter') {
         e.preventDefault();
         const action = allActions[activeIndex];
-        if (action) {
-          window.location.href = action.href;
-          close();
-        }
+        if (action) activate(action);
       }
     },
-    [allActions, activeIndex, close],
+    [allActions, activeIndex, activate],
   );
 
   if (typeof window === 'undefined') return null;
@@ -377,6 +471,22 @@ export const CommandPalette = (): ReactElement | null => {
         </div>
 
         <div className="cs-cmdk__list" ref={listRef}>
+          {recentActions.length > 0 && (
+            <div className="cs-cmdk__group">
+              <div className="cs-cmdk__group-label">Recent</div>
+              {recentActions.map((a) => (
+                <ActionRow
+                  key={`recent-${a.id}`}
+                  action={{ ...a, icon: 'clock' }}
+                  index={allActions.indexOf(a)}
+                  active={allActions.indexOf(a) === activeIndex}
+                  onActivate={() => activate(a)}
+                  onHover={() => setActiveIndex(allActions.indexOf(a))}
+                />
+              ))}
+            </div>
+          )}
+
           {filteredNav.length > 0 && (
             <div className="cs-cmdk__group">
               <div className="cs-cmdk__group-label">Jump to</div>
@@ -386,10 +496,7 @@ export const CommandPalette = (): ReactElement | null => {
                   action={a}
                   index={allActions.indexOf(a)}
                   active={allActions.indexOf(a) === activeIndex}
-                  onActivate={() => {
-                    window.location.href = a.href;
-                    close();
-                  }}
+                  onActivate={() => activate(a)}
                   onHover={() => setActiveIndex(allActions.indexOf(a))}
                 />
               ))}
@@ -405,10 +512,7 @@ export const CommandPalette = (): ReactElement | null => {
                   action={a}
                   index={allActions.indexOf(a)}
                   active={allActions.indexOf(a) === activeIndex}
-                  onActivate={() => {
-                    window.location.href = a.href;
-                    close();
-                  }}
+                  onActivate={() => activate(a)}
                   onHover={() => setActiveIndex(allActions.indexOf(a))}
                 />
               ))}
@@ -426,10 +530,7 @@ export const CommandPalette = (): ReactElement | null => {
                   action={a}
                   index={allActions.indexOf(a)}
                   active={allActions.indexOf(a) === activeIndex}
-                  onActivate={() => {
-                    window.location.href = a.href;
-                    close();
-                  }}
+                  onActivate={() => activate(a)}
                   onHover={() => setActiveIndex(allActions.indexOf(a))}
                 />
               ))}

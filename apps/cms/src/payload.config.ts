@@ -96,7 +96,12 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
-      actions: ['./payload/admin/components/SaveShortcut.tsx#SaveShortcut'],
+      actions: [
+        './payload/admin/components/SaveShortcut.tsx#SaveShortcut',
+        './payload/admin/components/CommandPalette.tsx#CommandPalette',
+        './payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator',
+        './payload/admin/components/NavBadges.tsx#NavBadges',
+      ],
       beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
       graphics: {
         Logo: './payload/admin/Logo.tsx#Logo',

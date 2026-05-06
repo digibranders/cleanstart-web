@@ -321,19 +321,50 @@
   }
 }
 
-// ─── Hide the breadcrumb on the dashboard view ────────────────────
+// ─── Hide the breadcrumb on the dashboard view + tighten chrome ──
 //
 // Payload's dashboard view calls `SetStepNav({ nav: [] })` so the
 // crumb list is empty, but the surrounding `.step-nav` chrome (the
-// brand icon + slash separator) still renders. There's no meaningful
-// route to surface above the dashboard — it IS the root — so hide
-// the whole step-nav whenever our custom Dashboard is mounted.
+// brand icon + slash separator) still renders. Hide it so the dashboard
+// — which IS the root — doesn't show a meaningless route above it.
 //
-// Scoped via :has() so this only fires on the dashboard route. Every
-// other view (collection list, document edit, globals) keeps the
-// breadcrumb intact.
-body:has(.cs-dashboard) .step-nav,
-:has(> .cs-dashboard) > .step-nav {
-  display: none;
+// Hiding the step-nav alone leaves the `.app-header` allocating its
+// full height for the avatar row + (now-empty) breadcrumb row. On the
+// dashboard route there's no breadcrumb to host, so collapse the
+// header padding too. The avatar bar still renders for logout/account
+// access; it just hugs the top of the viewport.
+//
+// All scoped via `:has()` so the rest of the admin (collection lists,
+// document edits, globals) keeps full breadcrumb chrome.
+body:has(.cs-dashboard) {
+  .step-nav,
+  :has(> .cs-dashboard) > .step-nav {
+    display: none;
+  }
+
+  // App-header (avatar + step-nav row) — tighten when the breadcrumb
+  // is hidden. The double-row spacing Payload uses to leave room for
+  // the breadcrumb collapses to a single 40px row.
+  .app-header,
+  .template-default__app-header {
+    min-height: 40px;
+    padding-block: 6px;
+    border-bottom: 0;
+  }
+
+  // Gutter top padding — Payload gives the content well 24-32px of
+  // top breathing room. With the avatar bar shrunk above it, that
+  // becomes excess. Pull the greeting up flush.
+  .cs-dashboard {
+    padding-top: var(--cs-space-3);
+  }
+
+  // Header block sits directly under the avatar bar; drop its top
+  // margin so it hugs the chrome above.
+  .cs-dashboard__header {
+    margin-top: 0;
+    margin-bottom: var(--cs-space-5);
+    padding-bottom: var(--cs-space-3);
+  }
 }
 

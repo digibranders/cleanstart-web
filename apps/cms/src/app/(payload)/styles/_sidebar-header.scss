@@ -176,14 +176,146 @@
   }
 }
 
-// ─── Hide Payload's outer NavToggler wrapper ─────────────────────
+// ─── Sidebar Search trigger (Cmd+K palette) ──────────────────────
+//
+// Sits between the brand row and the Dashboard link so the editor can
+// always reach the command palette by mouse, not only Cmd+K. Clicking
+// dispatches `cs-cmdk:open`, which CommandPalette listens for.
+.cs-sidebar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 6px 0 0;
+  padding: 6px 8px 6px 10px;
+  background: var(--cs-surface-canvas);
+  border: 1px solid var(--cs-border-subtle);
+  border-radius: var(--cs-radius-input);
+  color: var(--cs-text-muted);
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+  min-height: 30px;
+  transition:
+    border-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    color: var(--cs-text-primary);
+    border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  &:focus-visible {
+    outline: var(--cs-focus-outline);
+    outline-offset: 1px;
+  }
+
+  svg {
+    flex-shrink: 0;
+    color: currentColor;
+  }
+
+  &__label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__kbd {
+    flex-shrink: 0;
+    display: inline-flex;
+    gap: 2px;
+
+    kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      background: var(--cs-surface-raised);
+      border: 1px solid var(--cs-border-subtle);
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1;
+      color: var(--cs-text-secondary);
+    }
+  }
+}
+
+// ─── Outer NavToggler — visible only when the nav is COLLAPSED ───
 //
 // Payload's Default template renders a NavToggler outside the Nav, in
 // `.template-default__nav-toggler-wrapper`. We embed our own toggler
-// inside the SidebarHeader (driving the same NavContext), so the outer
-// one becomes a duplicate. Hide it. The mobile NavHamburger icon is
-// also rendered inside that wrapper — on mobile the embedded toggler
-// covers the same affordance.
+// inside the SidebarHeader so the editor sees one integrated header
+// when the nav is open. But the embedded one disappears together with
+// the nav when collapsed — leaving no way to expand again.
+//
+// Show the outer toggler ONLY when the nav is collapsed (i.e. the
+// sibling Wrapper does NOT carry `template-default--nav-open`). When
+// the nav opens, our embedded toggler takes over.
+//
+// Wrapper structure (Payload):
+//   <div style="position:relative">
+//     <div class="template-default__nav-toggler-wrapper"> ← outer
+//     <div class="template-default[ template-default--nav-open]"> ← Wrapper
+//
+// The `:has(~)` selector catches the open-state Wrapper as a general
+// sibling of the outer toggler.
+.template-default__nav-toggler-wrapper:has(~ .template-default--nav-open) {
+  display: none;
+}
+
+// Style the outer toggler for the collapsed state — small floating
+// pill at top-left so the user has a clear, always-reachable
+// affordance to expand the nav. `position: fixed` keeps it stuck to
+// the viewport regardless of scroll.
 .template-default__nav-toggler-wrapper {
-  display: none !important;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 50;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  .template-default__nav-toggler,
+  .template-default__nav-toggler-container,
+  > div,
+  button {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: var(--cs-radius-input);
+    background: var(--cs-surface-raised);
+    border: 1px solid var(--cs-border-subtle);
+    color: var(--cs-text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.4);
+    transition:
+      background-color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--cs-cyan-500);
+      border-color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+    }
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 }

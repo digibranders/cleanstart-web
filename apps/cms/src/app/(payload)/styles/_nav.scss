@@ -115,3 +115,32 @@
     outline-offset: -2px;
   }
 }
+
+// ─── Draft-count badges injected by NavBadges ────────────────────
+//
+// Client component DOM-injects `<span class="cs-nav-badge">N</span>`
+// into nav links for collections with pending drafts. Pushes to the
+// right of the link via `margin-left: auto`.
+.nav__link .cs-nav-badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--cs-tint-brand-soft);
+  color: var(--cs-cyan-500);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  font-feature-settings: 'tnum' 1;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.nav__link--active .cs-nav-badge,
+.nav__link.active .cs-nav-badge {
+  background: var(--cs-tint-brand-medium);
+}

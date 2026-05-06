@@ -3,9 +3,22 @@
 import { NavToggler } from '@payloadcms/ui';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { ReactElement } from 'react';
+import { useCallback, useEffect, useState, type ReactElement } from 'react';
 
 import { Logo } from '../Logo';
+
+// Detect Mac so we render the right shortcut glyph in the search hint.
+const useIsMac = (): boolean => {
+  const [isMac, setIsMac] = useState(false);
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+    const platform =
+      ((navigator as Navigator & { userAgentData?: { platform?: string } })
+        .userAgentData?.platform ?? navigator.platform ?? '').toLowerCase();
+    setIsMac(platform.includes('mac'));
+  }, []);
+  return isMac;
+};
 
 /**
  * Sidebar header — anchors the nav as one integrated block:
@@ -24,6 +37,15 @@ import { Logo } from '../Logo';
 export const SidebarHeader = (): ReactElement => {
   const pathname = usePathname() ?? '';
   const isDashboard = pathname === '/admin' || pathname === '/admin/';
+  const isMac = useIsMac();
+
+  // Open the Cmd+K palette on click. CommandPalette listens for the
+  // `cs-cmdk:open` event on the document so we don't need a shared
+  // store or an explicit handle to its setOpen.
+  const onSearchClick = useCallback(() => {
+    if (typeof document === 'undefined') return;
+    document.dispatchEvent(new CustomEvent('cs-cmdk:open'));
+  }, []);
 
   return (
     <div className="cs-sidebar-header" data-cs-sidebar-header>
@@ -63,6 +85,35 @@ export const SidebarHeader = (): ReactElement => {
           </span>
         </Link>
       </div>
+
+      <button
+        type="button"
+        className="cs-sidebar-search"
+        onClick={onSearchClick}
+        aria-label="Open command palette"
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.4" />
+          <path
+            d="M11 11l3 3"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+        </svg>
+        <span className="cs-sidebar-search__label">Search…</span>
+        <span className="cs-sidebar-search__kbd" aria-hidden="true">
+          <kbd>{isMac ? '⌘' : 'Ctrl'}</kbd>
+          <kbd>K</kbd>
+        </span>
+      </button>
 
       <Link
         href="/admin"

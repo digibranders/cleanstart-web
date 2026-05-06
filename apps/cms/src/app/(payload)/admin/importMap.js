@@ -37,6 +37,9 @@ import { TocRowLabel as TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b } from '@/p
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
 import { SaveShortcut as SaveShortcut_add5731a604e577762f1b0196113538b } from '../../../payload/admin/components/SaveShortcut.tsx'
+import { CommandPalette as CommandPalette_9e72795c48aa56bf099ac6d02eb8124e } from '../../../payload/admin/components/CommandPalette.tsx'
+import { SavedStateIndicator as SavedStateIndicator_8bd5434f7092ab63abeb348597344486 } from '../../../payload/admin/components/SavedStateIndicator.tsx'
+import { NavBadges as NavBadges_208a0014b2eb9ce6cf95af7e4047b13a } from '../../../payload/admin/components/NavBadges.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
@@ -83,6 +86,9 @@ export const importMap = {
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,
   "./payload/admin/components/SaveShortcut.tsx#SaveShortcut": SaveShortcut_add5731a604e577762f1b0196113538b,
+  "./payload/admin/components/CommandPalette.tsx#CommandPalette": CommandPalette_9e72795c48aa56bf099ac6d02eb8124e,
+  "./payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator": SavedStateIndicator_8bd5434f7092ab63abeb348597344486,
+  "./payload/admin/components/NavBadges.tsx#NavBadges": NavBadges_208a0014b2eb9ce6cf95af7e4047b13a,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
