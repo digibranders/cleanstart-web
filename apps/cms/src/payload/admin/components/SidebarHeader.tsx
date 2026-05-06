@@ -1,5 +1,6 @@
 'use client';
 
+import { NavToggler } from '@payloadcms/ui';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactElement } from 'react';
@@ -7,14 +8,18 @@ import type { ReactElement } from 'react';
 import { Logo } from '../Logo';
 
 /**
- * Sidebar header — anchors the nav with the actual CleanStart logo and an
- * always-visible "Dashboard" link. Wired via `admin.components.beforeNavLinks`
- * so it renders below Payload's default top header (which already shows the
- * Icon graphic) and above the first nav group.
+ * Sidebar header — anchors the nav as one integrated block:
  *
- * Both the wordmark and the dashboard row route to `/admin`. The dashboard
- * row carries the same `--active` chrome as collection links when the user
- * is on the dashboard view.
+ *   ┌──────────────────────────────────────┐
+ *   │ [<]   CleanStart   [CMS]             │  ← brand row + toggler
+ *   │  ▸ Dashboard                         │  ← dashboard nav row
+ *   └──────────────────────────────────────┘
+ *
+ * The collapse toggler is the same `NavToggler` Payload exports for its
+ * Default template — embedding it here drives the same NavContext, so
+ * the collapsed/expanded sidebar state still works for keyboard users
+ * and the mobile breakpoint. Payload's outer toggler-wrapper is hidden
+ * via CSS (`_sidebar-header.scss`) so we render only one.
  */
 export const SidebarHeader = (): ReactElement => {
   const pathname = usePathname() ?? '';
@@ -22,18 +27,43 @@ export const SidebarHeader = (): ReactElement => {
 
   return (
     <div className="cs-sidebar-header" data-cs-sidebar-header>
-      <Link
-        href="/admin"
-        className="cs-sidebar-header__brand"
-        aria-label="CleanStart CMS — go to dashboard"
-      >
-        <span className="cs-sidebar-header__logo">
-          <Logo />
-        </span>
-        <span className="cs-sidebar-header__eyebrow" aria-hidden="true">
-          CMS
-        </span>
-      </Link>
+      <div className="cs-sidebar-header__brand-row">
+        <NavToggler className="cs-sidebar-header__toggle">
+          <span className="cs-sidebar-header__toggle-glyph" aria-hidden="true">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 16 16"
+              fill="none"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                d="M10 3L5 8l5 5"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <span className="cs-sr-only">Toggle sidebar</span>
+        </NavToggler>
+
+        <Link
+          href="/admin"
+          className="cs-sidebar-header__brand"
+          aria-label="CleanStart CMS — go to dashboard"
+        >
+          <span className="cs-sidebar-header__logo">
+            <Logo />
+          </span>
+          <span className="cs-sidebar-header__eyebrow" aria-hidden="true">
+            CMS
+          </span>
+        </Link>
+      </div>
+
       <Link
         href="/admin"
         className={

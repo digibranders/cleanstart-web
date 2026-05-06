@@ -8,11 +8,10 @@
 //   │ ▸ Dashboard                            │   ← dashboard nav row
 //   └────────────────────────────────────────┘
 //
-// Payload's NavToggler ("<" collapse arrow) is rendered outside the Nav by
-// the Default template; we pull it back into the brand row visually using
-// position: absolute so the editor reads the whole top as one header.
-// All spacing is kept tight so the nav groups below read as siblings of
-// the dashboard row rather than as a second tier of UI.
+// The collapse toggler embedded in the brand row uses Payload's own
+// `NavToggler` element, so the NavContext collapse state still works for
+// keyboard users and the mobile breakpoint. Payload's outer
+// toggler-wrapper is hidden so we render only one.
 
 .cs-sidebar-header {
   display: flex;
@@ -22,17 +21,71 @@
   margin-bottom: 8px;
   border-bottom: 1px solid var(--cs-border-subtle);
 
-  // Brand row: logo wordmark + cyan "CMS" pill, click anywhere routes to /admin.
-  &__brand {
+  // Brand row hosts the toggler + the brand link side-by-side.
+  &__brand-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 8px 6px 36px; // left padding leaves room for the toggler
+    min-height: 32px;
+  }
+
+  // Embedded NavToggler — render as a 26px square icon button so it
+  // sits flush with the wordmark height. NavToggler renders a
+  // <button>/<div> internally; we target both via descendant + the
+  // class we set so styling applies regardless of Payload's underlying
+  // tag choice.
+  &__toggle {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: var(--cs-radius-input);
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--cs-text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition:
+      background-color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--cs-cyan-500);
+      border-color: var(--cs-border-subtle);
+      background: var(--cs-tint-brand-soft);
+    }
+
+    &:focus-visible {
+      outline: var(--cs-focus-outline);
+      outline-offset: 1px;
+    }
+  }
+
+  &__toggle-glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    color: currentColor;
+  }
+
+  // Brand link (logo + CMS pill). Click anywhere routes to /admin.
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 4px 6px;
     border-radius: var(--cs-radius-input);
     color: var(--cs-text-primary);
     text-decoration: none;
     cursor: pointer;
-    min-height: 32px;
     transition: background-color var(--cs-motion-micro);
 
     &:hover {
@@ -57,7 +110,7 @@
     svg {
       display: block;
       width: 100%;
-      max-width: 124px;
+      max-width: 116px;
       height: auto;
       margin: 0;
     }
@@ -123,57 +176,14 @@
   }
 }
 
-// ─── NavToggler integration ──────────────────────────────────────
+// ─── Hide Payload's outer NavToggler wrapper ─────────────────────
 //
-// Payload renders the collapse "<" arrow at `.template-default__nav-toggler-wrapper`
-// outside the Nav. We don't replace it (NavContext wires the collapse
-// state for mobile + persistent layouts) — instead pull it visually into
-// the corner of the SidebarHeader so all three header elements
-// (toggler · logo · CMS pill) read as one row. The Dashboard row sits
-// directly underneath.
-//
-// On the desktop nav-open layout the toggler is decorative; on the
-// collapsed layout it expands the rail. Either way, putting it at the
-// top-left of the brand row gives editors a stable place to find it.
+// Payload's Default template renders a NavToggler outside the Nav, in
+// `.template-default__nav-toggler-wrapper`. We embed our own toggler
+// inside the SidebarHeader (driving the same NavContext), so the outer
+// one becomes a duplicate. Hide it. The mobile NavHamburger icon is
+// also rendered inside that wrapper — on mobile the embedded toggler
+// covers the same affordance.
 .template-default__nav-toggler-wrapper {
-  position: absolute;
-  top: 14px;
-  left: 8px;
-  z-index: 5;
-  background: transparent;
-  border: none;
-
-  // Tighten the toggler button itself — Payload paints it as a 28-32px
-  // bordered square; we want a 24px square that reads as a quiet icon
-  // button matching the rest of the admin chrome.
-  .template-default__nav-toggler,
-  > div,
-  button {
-    width: 26px;
-    height: 26px;
-    min-width: 26px;
-    border-radius: var(--cs-radius-input);
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--cs-text-secondary);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition:
-      background-color var(--cs-motion-micro),
-      border-color var(--cs-motion-micro),
-      color var(--cs-motion-micro);
-
-    &:hover {
-      color: var(--cs-cyan-500);
-      border-color: var(--cs-border-subtle);
-      background: var(--cs-tint-brand-soft);
-    }
-  }
-
-  svg {
-    width: 12px;
-    height: 12px;
-  }
+  display: none !important;
 }
