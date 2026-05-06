@@ -1,17 +1,27 @@
 import type { JsonLdContext, NewsMediaOrganizationSource } from './context';
 import type { JsonLdBlob } from './types';
 
-const NEWS_POLICY_KEYS = [
-  'masthead',
-  'ethicsPolicy',
-  'correctionsPolicy',
-  'verificationFactCheckingPolicy',
-  'actionableFeedbackPolicy',
-  'unnamedSourcesPolicy',
-  'diversityPolicy',
-  'ownershipFundingInfo',
-  'missionCoveragePrioritiesPolicy',
-] as const;
+/**
+ * Map of Payload field name → Schema.org property name. Two fields
+ * use shortened Payload names (factCheckingPolicy, coveragePolicy)
+ * to stay under the 63-char Postgres identifier limit; everything
+ * else maps 1:1.
+ */
+const NEWS_POLICY_FIELD_MAP = {
+  masthead: 'masthead',
+  ethicsPolicy: 'ethicsPolicy',
+  correctionsPolicy: 'correctionsPolicy',
+  factCheckingPolicy: 'verificationFactCheckingPolicy',
+  actionableFeedbackPolicy: 'actionableFeedbackPolicy',
+  unnamedSourcesPolicy: 'unnamedSourcesPolicy',
+  diversityPolicy: 'diversityPolicy',
+  ownershipFundingInfo: 'ownershipFundingInfo',
+  coveragePolicy: 'missionCoveragePrioritiesPolicy',
+} as const satisfies Record<string, string>;
+
+type NewsPolicyKey = keyof typeof NEWS_POLICY_FIELD_MAP;
+
+const NEWS_POLICY_KEYS = Object.keys(NEWS_POLICY_FIELD_MAP) as readonly NewsPolicyKey[];
 
 const hasAnyNewsField = (news: NewsMediaOrganizationSource): boolean => {
   if (news.foundingDate || news.slogan) return true;
@@ -40,7 +50,7 @@ const attachNewsFields = (
   for (const key of NEWS_POLICY_KEYS) {
     const value = news[key];
     if (typeof value === 'string' && value.length > 0) {
-      blob[key] = value;
+      blob[NEWS_POLICY_FIELD_MAP[key]] = value;
     }
   }
 };

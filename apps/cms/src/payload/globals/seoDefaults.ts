@@ -130,7 +130,12 @@ export const SeoDefaults: GlobalConfig = {
           },
         },
         {
-          name: 'verificationFactCheckingPolicy',
+          // Field name shortened to keep the Postgres column under the
+          // 63-char identifier limit once Payload's `version_` prefix is
+          // applied to the version-table copy. Surfaced in JSON-LD as
+          // `verificationFactCheckingPolicy` (the Schema.org property
+          // name) via the emitter — the DB column name is internal.
+          name: 'factCheckingPolicy',
           type: 'text',
           validate: validateOptionalUrl,
           admin: {
@@ -175,7 +180,10 @@ export const SeoDefaults: GlobalConfig = {
           },
         },
         {
-          name: 'missionCoveragePrioritiesPolicy',
+          // Field name shortened for the same Postgres-identifier-limit
+          // reason as `factCheckingPolicy` above. Surfaced in JSON-LD
+          // as `missionCoveragePrioritiesPolicy` (Schema.org name).
+          name: 'coveragePolicy',
           type: 'text',
           validate: validateOptionalUrl,
           admin: {

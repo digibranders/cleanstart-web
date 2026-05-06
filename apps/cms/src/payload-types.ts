@@ -2006,9 +2006,6 @@ export interface Page {
    * Optional parent page. Builds nested URLs (e.g. /solutions/fips).
    */
   parent?: (number | null) | Page;
-  /**
-   * Computed full URL path (e.g. /solutions/pricing). Maintained by the path-builder hook on every save.
-   */
   path?: string | null;
   /**
    * Compose the page from typed blocks. Section is a layout primitive — every other block is a content unit.
@@ -5696,7 +5693,7 @@ export interface SeoDefault {
     /**
      * URL of the fact-checking / verification policy page.
      */
-    verificationFactCheckingPolicy?: string | null;
+    factCheckingPolicy?: string | null;
     /**
      * URL of the page describing how readers submit feedback / complaints.
      */
@@ -5716,7 +5713,7 @@ export interface SeoDefault {
     /**
      * URL of the page describing editorial mission and coverage priorities.
      */
-    missionCoveragePrioritiesPolicy?: string | null;
+    coveragePolicy?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -6029,12 +6026,12 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
         masthead?: T;
         ethicsPolicy?: T;
         correctionsPolicy?: T;
-        verificationFactCheckingPolicy?: T;
+        factCheckingPolicy?: T;
         actionableFeedbackPolicy?: T;
         unnamedSourcesPolicy?: T;
         diversityPolicy?: T;
         ownershipFundingInfo?: T;
-        missionCoveragePrioritiesPolicy?: T;
+        coveragePolicy?: T;
       };
   updatedAt?: T;
   createdAt?: T;

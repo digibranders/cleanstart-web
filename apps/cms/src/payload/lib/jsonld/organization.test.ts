@@ -141,16 +141,18 @@ describe('buildOrganizationBlob — NewsMediaOrganization upgrade', () => {
           masthead: 'https://cleanstart.com/about',
           ethicsPolicy: 'https://cleanstart.com/ethics',
           correctionsPolicy: 'https://cleanstart.com/corrections',
-          verificationFactCheckingPolicy: 'https://cleanstart.com/fact-check',
+          factCheckingPolicy: 'https://cleanstart.com/fact-check',
           actionableFeedbackPolicy: '',
           unnamedSourcesPolicy: null,
           diversityPolicy: 'https://cleanstart.com/diversity',
           ownershipFundingInfo: 'https://cleanstart.com/ownership',
-          missionCoveragePrioritiesPolicy: 'https://cleanstart.com/mission',
+          coveragePolicy: 'https://cleanstart.com/mission',
         },
       ),
     );
     expect(blob['@type']).toBe('NewsMediaOrganization');
+    // Output uses the canonical Schema.org property names regardless
+    // of the shorter Payload field names on input.
     expect(blob).toMatchObject({
       foundingDate: '2024-01-15',
       slogan: 'Tagline',

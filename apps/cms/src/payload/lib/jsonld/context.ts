@@ -37,6 +37,13 @@ export interface OrganizationSource {
  * is true and at least one policy URL is set, the site-wide
  * Organization blob upgrades to a NewsMediaOrganization carrying
  * these fields. Mirrors the editor group exactly.
+ *
+ * Two field names are intentionally shorter than their Schema.org
+ * equivalents (`factCheckingPolicy`, `coveragePolicy`) so the
+ * Postgres column names stay under the 63-character identifier
+ * limit once Payload's `version_` prefix is applied. The emitter
+ * surfaces them as `verificationFactCheckingPolicy` and
+ * `missionCoveragePrioritiesPolicy` in JSON-LD output.
  */
 export interface NewsMediaOrganizationSource {
   readonly enabled?: boolean;
@@ -45,12 +52,12 @@ export interface NewsMediaOrganizationSource {
   readonly masthead?: string | null;
   readonly ethicsPolicy?: string | null;
   readonly correctionsPolicy?: string | null;
-  readonly verificationFactCheckingPolicy?: string | null;
+  readonly factCheckingPolicy?: string | null;
   readonly actionableFeedbackPolicy?: string | null;
   readonly unnamedSourcesPolicy?: string | null;
   readonly diversityPolicy?: string | null;
   readonly ownershipFundingInfo?: string | null;
-  readonly missionCoveragePrioritiesPolicy?: string | null;
+  readonly coveragePolicy?: string | null;
 }
 
 export interface SiteSnapshot {
