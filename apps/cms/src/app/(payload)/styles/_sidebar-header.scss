@@ -18,10 +18,18 @@
 
 // Tight top inset: layout breathes against the viewport without
 // reintroducing the empty chrome band we just removed.
-.template-default__nav,
+//
+// Payload's `.nav__scroll` ships with `padding-top: 56px` to reserve
+// room for the avatar bar — which we've moved to the sidebar UserMenu.
+// Zero it out and let the surrounding `.nav` aside provide a small
+// 12px buffer instead.
 .template-default__wrap,
 .nav {
   padding-top: 12px;
+}
+
+.nav__scroll {
+  padding-top: 0 !important;
 }
 
 .cs-sidebar-header {
@@ -221,44 +229,59 @@
 // 12px wrap padding; `left: 14px` clears the sidebar's left edge.
 .template-default__nav-toggler-wrapper {
   position: fixed;
-  top: 18px;
+  top: 16px;
   left: 14px;
   z-index: 50;
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 
+  // Strip Payload's chrome on every nested element down to the actual
+  // button — the wrapper, the container, and the NavToggler all carry
+  // their own padding/background out of the box.
+  *,
+  > div,
+  > div > div {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  // The clickable element itself — Payload renders NavToggler as a
+  // <div>, with NavHamburger inside. Style the innermost element to a
+  // 26px square that hovers cyan to match the rest of the chrome.
   .template-default__nav-toggler,
   .template-default__nav-toggler-container,
   > div,
+  > div > div,
   button {
-    width: 26px;
-    height: 26px;
+    width: 26px !important;
+    height: 26px !important;
     min-width: 26px;
-    border-radius: var(--cs-radius-input);
-    background: transparent;
-    border: 1px solid transparent;
+    border-radius: var(--cs-radius-input) !important;
+    border: 1px solid transparent !important;
     color: var(--cs-text-secondary);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
     transition:
       background-color var(--cs-motion-micro),
       border-color var(--cs-motion-micro),
       color var(--cs-motion-micro);
 
     &:hover {
-      color: var(--cs-cyan-500);
-      border-color: var(--cs-border-subtle);
-      background: var(--cs-tint-brand-soft);
+      color: var(--cs-cyan-500) !important;
+      border-color: var(--cs-border-subtle) !important;
+      background: var(--cs-tint-brand-soft) !important;
     }
   }
 
   svg {
-    width: 14px;
-    height: 14px;
+    width: 14px !important;
+    height: 14px !important;
   }
 }
