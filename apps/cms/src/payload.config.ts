@@ -2,8 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { postgresAdapter } from '@payloadcms/db-postgres';
-import { lexicalEditor } from '@payloadcms/richtext-lexical';
-import { RichPasteFeature } from './payload/lib/lexical/rich-paste-feature';
+import { cleanstartLexicalEditor } from './payload/lib/lexical/editor-config';
 import { s3Storage } from '@payloadcms/storage-s3';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
@@ -106,7 +105,6 @@ export default buildConfig({
         './payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle',
         './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
         './payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer',
-        './payload/admin/components/MediaEditEnhancer.tsx#MediaEditEnhancer',
         './payload/admin/components/ToastBus.tsx#ToastBus',
       ],
       afterNavLinks: [
@@ -190,9 +188,7 @@ export default buildConfig({
   onInit: () => {
     registerLeadHandlers();
   },
-  editor: lexicalEditor({
-    features: ({ defaultFeatures }) => [...defaultFeatures, RichPasteFeature()],
-  }),
+  editor: cleanstartLexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
   typescript: {

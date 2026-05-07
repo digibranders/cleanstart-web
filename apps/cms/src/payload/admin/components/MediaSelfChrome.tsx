@@ -190,6 +190,58 @@ export const MediaSelfChrome = (): ReactElement | null => {
     if (btn) btn.click();
   }, []);
 
+  // "Replace" — file picker that PATCHes the existing media doc with
+  // the new file. Reuses one hidden `<input type="file">` mounted on
+  // first click so consecutive replaces don't leak DOM.
+  const replaceInputRef = useRef<HTMLInputElement | null>(null);
+  const [replacing, setReplacing] = useState(false);
+  const onReplace = useCallback(() => {
+    if (!id) return;
+    let input = replaceInputRef.current;
+    if (!input) {
+      input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*,application/pdf';
+      input.style.display = 'none';
+      input.addEventListener('change', () => {
+        const file = input?.files?.[0];
+        if (!file) return;
+        setReplacing(true);
+        const fd = new FormData();
+        fd.append('file', file);
+        fetch(`/api/media/${encodeURIComponent(String(id))}`, {
+          method: 'PATCH',
+          credentials: 'include',
+          body: fd,
+        })
+          .then(async (res) => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            try {
+              window.dispatchEvent(
+                new CustomEvent('cs-cms:toast', {
+                  detail: { message: 'File replaced.', type: 'success' },
+                }),
+              );
+            } catch {
+              // ignore
+            }
+            // Hard reload so thumbnail / size / dimensions all refresh.
+            window.location.reload();
+          })
+          .catch(() => {
+            setError('Replace failed — file may be too large or wrong type.');
+          })
+          .finally(() => {
+            setReplacing(false);
+            if (input) input.value = '';
+          });
+      });
+      document.body.appendChild(input);
+      replaceInputRef.current = input;
+    }
+    input.click();
+  }, [id]);
+
   // Show the Edit Image button only for raster images (the editor
   // doesn't apply to SVG / PDF / etc.).
   const isRaster = useMemo(() => {
@@ -321,6 +373,16 @@ export const MediaSelfChrome = (): ReactElement | null => {
             >
               ↗
             </a>
+            <button
+              type="button"
+              onClick={onReplace}
+              disabled={replacing}
+              className="cs-media-self__url-action cs-media-self__url-action--text"
+              title="Replace this file with a new upload"
+              aria-label="Replace file"
+            >
+              {replacing ? '…' : 'Replace'}
+            </button>
             {isRaster && (
               <button
                 type="button"

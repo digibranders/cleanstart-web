@@ -23,6 +23,11 @@
 
   --cs-ink-950: #0e1125;
 
+  // Editor link — readable on white at WCAG AA (≈ 5.4:1) without the
+  // electric pull of --cs-cyan-500. Used by the Lexical link node.
+  --cs-text-link: #0b6ec7;
+  --cs-text-link-hover: #084e8e;
+
   // Typography stacks
   --font-body:
     'Plus Jakarta Sans', 'Manrope', ui-sans-serif, system-ui, -apple-system,
