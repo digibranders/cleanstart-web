@@ -59,3 +59,38 @@
   }
 }
 
+// Login error banner — Payload renders auth errors as plain red text
+// inside the form. Promote the message to a tinted callout with a
+// left border + icon so editors don't miss it.
+.template-minimal {
+  .form-wrap .errors,
+  .form-wrap .error,
+  form .errors,
+  form .error {
+    background: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-left-width: 3px;
+    border-radius: var(--cs-radius-card);
+    padding: var(--cs-space-3);
+    margin-bottom: var(--cs-space-3);
+    color: var(--color-error-500);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  // "Forgot password?" link — tone it down to brand cyan and add a
+  // discrete underline.
+  a[href*='forgot'],
+  a[href*='reset'] {
+    color: var(--cs-cyan-500);
+    text-decoration: underline;
+    text-decoration-color: rgba(6, 199, 242, 0.4);
+    text-underline-offset: 2px;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration-color: var(--cs-cyan-500);
+    }
+  }
+}
+

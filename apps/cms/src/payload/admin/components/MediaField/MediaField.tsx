@@ -369,6 +369,45 @@ export const MediaField = (props: Props): ReactElement => {
     [props.readOnly, startUpload, uploading],
   );
 
+  // Clipboard-paste support — listens at document level when the
+  // field is empty + idle. Cmd+V on a screenshot or copied image
+  // anywhere on an edit-view that has an empty media field will
+  // upload it directly. Skipped when the active element is a
+  // text input/textarea (so plain text-paste into the title /
+  // abstract still works).
+  const isPasteEligible = !value && !doc && !uploading;
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    if (props.readOnly || !isPasteEligible) return undefined;
+
+    const onPaste = (e: globalThis.ClipboardEvent): void => {
+      const target = e.target as HTMLElement | null;
+      if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable) {
+        return;
+      }
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of Array.from(items)) {
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) {
+            e.preventDefault();
+            const named =
+              file.name && file.name !== 'image.png'
+                ? file
+                : new File([file], `pasted-${Date.now()}.${file.type.split('/')[1] ?? 'png'}`, {
+                    type: file.type,
+                  });
+            startUpload(named);
+            return;
+          }
+        }
+      }
+    };
+    document.addEventListener('paste', onPaste);
+    return () => document.removeEventListener('paste', onPaste);
+  }, [isPasteEligible, props.readOnly, startUpload]);
+
   const onDetach = useCallback(() => {
     setValue(null);
     setDoc(null);

@@ -44,6 +44,7 @@ import { SaveShortcut as SaveShortcut_add5731a604e577762f1b0196113538b } from '.
 import { CommandPalette as CommandPalette_9e72795c48aa56bf099ac6d02eb8124e } from '../../../payload/admin/components/CommandPalette.tsx'
 import { SavedStateIndicator as SavedStateIndicator_8bd5434f7092ab63abeb348597344486 } from '../../../payload/admin/components/SavedStateIndicator.tsx'
 import { NavBadges as NavBadges_208a0014b2eb9ce6cf95af7e4047b13a } from '../../../payload/admin/components/NavBadges.tsx'
+import { NavGroupPersistence as NavGroupPersistence_41d8a055ad6ff26bcaace971cec779b5 } from '../../../payload/admin/components/NavGroupPersistence.tsx'
 import { EditorFullscreenToggle as EditorFullscreenToggle_a4cffb491dda4a682b514cfa7e26d00f } from '../../../payload/admin/components/EditorFullscreenToggle.tsx'
 import { ShortcutHelpDialog as ShortcutHelpDialog_988ed8f20aac11621cac715bd9040a9f } from '../../../payload/admin/components/ShortcutHelpDialog.tsx'
 import { ToastBus as ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4 } from '../../../payload/admin/components/ToastBus.tsx'
@@ -101,6 +102,7 @@ export const importMap = {
   "./payload/admin/components/CommandPalette.tsx#CommandPalette": CommandPalette_9e72795c48aa56bf099ac6d02eb8124e,
   "./payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator": SavedStateIndicator_8bd5434f7092ab63abeb348597344486,
   "./payload/admin/components/NavBadges.tsx#NavBadges": NavBadges_208a0014b2eb9ce6cf95af7e4047b13a,
+  "./payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence": NavGroupPersistence_41d8a055ad6ff26bcaace971cec779b5,
   "./payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle": EditorFullscreenToggle_a4cffb491dda4a682b514cfa7e26d00f,
   "./payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog": ShortcutHelpDialog_988ed8f20aac11621cac715bd9040a9f,
   "./payload/admin/components/ToastBus.tsx#ToastBus": ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4,
