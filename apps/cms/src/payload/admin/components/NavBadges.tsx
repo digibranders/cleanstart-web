@@ -17,6 +17,23 @@ const VERSIONED_CONTENT = [
 const POLL_INTERVAL_MS = 60_000;
 const INJECT_INTERVAL_MS = 3_000;
 
+// Map from sidebar label → collection slug. The active sidebar link
+// renders as `<div class="nav__link">` (no href) on its own collection
+// page, so when href-based slug lookup fails we fall back to
+// matching the inner `.nav__link-label` text against this map.
+const SLUG_BY_LABEL: Record<string, (typeof VERSIONED_CONTENT)[number]> = {
+  Blogs: 'blogs',
+  News: 'news',
+  Guides: 'guides',
+  Resources: 'resources',
+  'Knowledge Hub': 'knowledgeBase',
+  'Knowledge base': 'knowledgeBase',
+  Events: 'events',
+  Webinars: 'webinars',
+  Jobs: 'jobs',
+  Pages: 'pages',
+};
+
 const collectionFromHref = (href: string): string | null => {
   const m = href.match(/\/admin\/collections\/([^/?#]+)/);
   return m?.[1] ?? null;
@@ -25,9 +42,15 @@ const collectionFromHref = (href: string): string | null => {
 /**
  * Mounts globally via `admin.components.actions` and renders nothing.
  * On mount + every 60s it fetches draft counts for every versioned
- * content collection, then DOM-injects a `.cs-nav-badge` span into the
- * matching `.nav__link` so the editor sees a live draft tally next to
- * each collection in the sidebar without forking Payload's Nav.
+ * content collection, then DOM-injects:
+ *
+ *   1. a `.cs-nav-badge` span into the matching sidebar `.nav__link`
+ *      (live tally next to each collection — survives the active
+ *      link being a `<div>` with no href, fallback resolves slug
+ *      from the `.nav__link-label` text);
+ *   2. a `.cs-list-badge` chip into the collection list page's
+ *      header so the same draft count is visible on-page, not just
+ *      glance-able via the sidebar.
  *
  * The injection is idempotent: a `setInterval` re-runs every few
  * seconds with the cached counts so the badges survive Payload's
@@ -41,14 +64,58 @@ export const NavBadges = (): ReactElement | null => {
     let counts: Record<string, number> = {};
     let cancelled = false;
 
+    const slugForLink = (link: Element): string | null => {
+      // <a> with href — derive slug from URL
+      const href = link.getAttribute('href');
+      if (href) return collectionFromHref(href);
+      // <div> active link (current page has no href) — match inner label
+      const label = link
+        .querySelector('.nav__link-label')
+        ?.textContent?.trim();
+      if (label && label in SLUG_BY_LABEL) {
+        return SLUG_BY_LABEL[label] ?? null;
+      }
+      return null;
+    };
+
+    const injectListBadge = (): void => {
+      if (cancelled) return;
+      const m = window.location.pathname.match(/^\/admin\/collections\/([^/?#]+)\/?$/);
+      const slug = m?.[1] ?? null;
+      // Strip any stale list badge first — covers route changes off a
+      // collection list onto an edit / dashboard / global view.
+      for (const stale of Array.from(document.querySelectorAll('.cs-list-badge'))) {
+        stale.remove();
+      }
+      if (!slug || !(slug in counts)) return;
+      const count = counts[slug];
+      if (typeof count !== 'number' || count <= 0) return;
+
+      // Mount next to the list page's h1 title. Payload's structure is
+      // `.collection-list h1` or `.list-header h1`; we mount inside
+      // the closest header container so flex / wrap behaviour stays
+      // sane. Skip if a badge is already there (idempotent).
+      const titleHost =
+        document.querySelector('.collection-list h1') ||
+        document.querySelector('.list-header h1') ||
+        document.querySelector('.gutter h1');
+      if (!titleHost || titleHost.parentElement?.querySelector('.cs-list-badge')) {
+        return;
+      }
+      const badge = document.createElement('span');
+      badge.className = 'cs-list-badge';
+      const href = `/admin/collections/${slug}?where[_status][equals]=draft`;
+      badge.innerHTML = `<a href="${href}" title="Show drafts only">${count} draft${count === 1 ? '' : 's'}</a>`;
+      titleHost.parentElement?.insertBefore(badge, titleHost.nextSibling);
+    };
+
     const inject = (): void => {
       if (cancelled) return;
-      const links = Array.from(
-        document.querySelectorAll<HTMLAnchorElement>('.nav__link[href]'),
-      );
+      // Match every `.nav__link`, not just `<a>` — Payload renders the
+      // active link as a `<div class="nav__link">` with no href.
+      const links = Array.from(document.querySelectorAll<HTMLElement>('.nav__link'));
       for (const link of links) {
-        const href = link.getAttribute('href') ?? '';
-        const slug = collectionFromHref(href);
+        const slug = slugForLink(link);
         if (!slug) continue;
         const count = counts[slug] ?? 0;
         let badge = link.querySelector<HTMLSpanElement>(':scope > .cs-nav-badge');
@@ -65,6 +132,7 @@ export const NavBadges = (): ReactElement | null => {
           badge.remove();
         }
       }
+      injectListBadge();
     };
 
     const fetchAndInject = async (): Promise<void> => {
@@ -110,7 +178,9 @@ export const NavBadges = (): ReactElement | null => {
       window.clearInterval(injectTimer);
       // Strip any badges we left behind so a hot-module-reload doesn't
       // duplicate them on remount.
-      for (const el of Array.from(document.querySelectorAll('.cs-nav-badge'))) {
+      for (const el of Array.from(
+        document.querySelectorAll('.cs-nav-badge, .cs-list-badge'),
+      )) {
         el.remove();
       }
     };
