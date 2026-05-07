@@ -47,6 +47,7 @@ import { NavBadges as NavBadges_208a0014b2eb9ce6cf95af7e4047b13a } from '../../.
 import { NavGroupPersistence as NavGroupPersistence_41d8a055ad6ff26bcaace971cec779b5 } from '../../../payload/admin/components/NavGroupPersistence.tsx'
 import { EditorFullscreenToggle as EditorFullscreenToggle_a4cffb491dda4a682b514cfa7e26d00f } from '../../../payload/admin/components/EditorFullscreenToggle.tsx'
 import { ShortcutHelpDialog as ShortcutHelpDialog_988ed8f20aac11621cac715bd9040a9f } from '../../../payload/admin/components/ShortcutHelpDialog.tsx'
+import { ListCellEnhancer as ListCellEnhancer_edd569c3aa02f3de17c22f7695d981ee } from '../../../payload/admin/components/ListCellEnhancer.tsx'
 import { ToastBus as ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4 } from '../../../payload/admin/components/ToastBus.tsx'
 import { UserMenu as UserMenu_8a2f404b3fa17e34974bf49ed5367371 } from '../../../payload/admin/components/UserMenu.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
@@ -105,6 +106,7 @@ export const importMap = {
   "./payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence": NavGroupPersistence_41d8a055ad6ff26bcaace971cec779b5,
   "./payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle": EditorFullscreenToggle_a4cffb491dda4a682b514cfa7e26d00f,
   "./payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog": ShortcutHelpDialog_988ed8f20aac11621cac715bd9040a9f,
+  "./payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer": ListCellEnhancer_edd569c3aa02f3de17c22f7695d981ee,
   "./payload/admin/components/ToastBus.tsx#ToastBus": ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4,
   "./payload/admin/components/UserMenu.tsx#UserMenu": UserMenu_8a2f404b3fa17e34974bf49ed5367371,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,

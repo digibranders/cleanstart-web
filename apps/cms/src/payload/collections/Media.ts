@@ -123,6 +123,7 @@ export const Media: CollectionConfig = {
           defaultValue: 50,
           min: 0,
           max: 100,
+          admin: { width: '50%' },
         },
         {
           name: 'y',
@@ -130,6 +131,7 @@ export const Media: CollectionConfig = {
           defaultValue: 50,
           min: 0,
           max: 100,
+          admin: { width: '50%' },
         },
       ],
     },

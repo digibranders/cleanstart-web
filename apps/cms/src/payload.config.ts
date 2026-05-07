@@ -105,6 +105,7 @@ export default buildConfig({
         './payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence',
         './payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle',
         './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
+        './payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer',
         './payload/admin/components/ToastBus.tsx#ToastBus',
       ],
       afterNavLinks: [
