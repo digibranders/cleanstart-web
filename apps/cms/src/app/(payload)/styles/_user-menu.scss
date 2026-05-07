@@ -13,11 +13,60 @@
 //   - Hide Payload's default `.nav__log-out` icon button at the
 //     bottom-left of the sidebar (the redundant power glyph).
 
+// Pin the UserMenu to the bottom of the nav column. The nav__scroll +
+// nav__wrap flex chain (declared below) lets `margin-top: auto`
+// claim the empty space below the last nav-group, so the UserMenu
+// always reads as anchored to the sidebar floor — even when every
+// collection group is collapsed.
 .cs-user-menu {
-  position: relative;
-  margin: var(--cs-space-3) var(--cs-space-2) var(--cs-space-2);
+  position: sticky;
+  bottom: 0;
+  margin: auto var(--cs-space-2) var(--cs-space-2);
+  margin-top: auto;
   padding-top: var(--cs-space-2);
   border-top: 1px solid var(--cs-border-subtle);
+  background: var(--cs-surface-canvas);
+  z-index: 5;
+}
+
+// Make the surrounding Payload nav containers a flex column so the
+// `margin-top: auto` above can push the UserMenu to the bottom.
+//
+// Two extra things conspire to break the bottom-pin without these
+// overrides:
+//   1) `.nav__scroll` ships with `padding-bottom: 40px` — kills it,
+//      we don't need the legacy bottom inset.
+//   2) `.nav__controls` (the wrapper around Payload's default Logout
+//      link, which we already hide with `.nav__log-out { display:
+//      none }`) is rendered AS A SIBLING after the UserMenu inside
+//      `.nav__wrap`, with its own `margin-top: auto`. Two auto-top
+//      siblings split the available space between them — UserMenu
+//      ended up floating mid-column. Hide the wrapper entirely.
+.nav__scroll {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100% !important;
+  padding-bottom: 0 !important;
+}
+
+.nav__wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0;
+}
+
+.nav__controls,
+[class*='nav__controls'] {
+  display: none !important;
+}
+
+// Make `.nav` itself a viewport-tall column so its scrollable child
+// (.nav__scroll) has a definite height to stretch into. Without this
+// the column collapses to content height and the bottom-pin is moot.
+aside.nav,
+.nav {
+  min-height: 100vh;
 }
 
 .cs-user-menu__trigger {
