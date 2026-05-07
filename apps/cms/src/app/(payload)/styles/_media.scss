@@ -98,6 +98,317 @@
   background-position: 0 0, 0 4px, 4px -4px, -4px 0;
 }
 
+// ─── Edit-media: hide Payload's default .file-field chrome ────────
+//
+// MediaSelfChrome (mounted as the first field in `Media.ts`) renders
+// our own bordered card with rename / copy URL / open-in-tab inline
+// controls — same shape as the blog editor's MediaField. Hide the
+// stock `.file-field` so the two components don't render side-by-side.
+.collection-edit--media .field-type.file-field {
+  display: none !important;
+}
+
+// ─── MediaSelfChrome card ─────────────────────────────────────────
+.cs-media-self {
+  margin-bottom: var(--cs-space-4);
+}
+
+.cs-media-self__card {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: var(--cs-space-3);
+  align-items: flex-start;
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3);
+  box-shadow: var(--cs-shadow-input-rest);
+  transition: border-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--theme-elevation-200);
+  }
+
+  @media (max-width: 720px) {
+    grid-template-columns: 80px 1fr;
+  }
+}
+
+.cs-media-self__thumb {
+  width: 96px;
+  height: 96px;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-input);
+  overflow: hidden;
+  cursor: zoom-in;
+  padding: 0;
+  background:
+    linear-gradient(45deg, var(--theme-elevation-100) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--theme-elevation-100) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--theme-elevation-100) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--theme-elevation-100) 75%),
+    var(--theme-elevation-50);
+  background-size: 12px 12px, 12px 12px, 12px 12px, 12px 12px, auto;
+  background-position: 0 0, 0 6px, 6px -6px, -6px 0, 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro),
+    transform var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--cs-cyan-500);
+    box-shadow: var(--cs-shadow-lift-md);
+    transform: translateY(-1px);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.cs-media-self__thumb-fallback {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--theme-text-soft);
+  padding: 0 4px;
+  text-align: center;
+}
+
+.cs-media-self__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cs-media-self__filename-row {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.cs-media-self__filename {
+  background: transparent;
+  border: 1px dashed transparent;
+  border-radius: var(--cs-radius-input);
+  padding: 2px 8px;
+  margin-inline-start: -8px;
+  color: var(--theme-text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  cursor: text;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 420px;
+  transition:
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--cs-cyan-500);
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+}
+
+.cs-media-self__rename-hint {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--theme-text-disabled);
+  opacity: 0;
+  transition: opacity var(--cs-motion-micro);
+}
+
+.cs-media-self__filename-row:hover .cs-media-self__rename-hint {
+  opacity: 1;
+}
+
+.cs-media-self__filename-input {
+  flex: 1 1 240px;
+  min-width: 200px;
+  height: 32px;
+  padding: 0 var(--cs-space-2);
+  background: var(--theme-input-bg);
+  border: 1px solid var(--cs-cyan-500);
+  border-radius: var(--cs-radius-input);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--theme-text);
+  box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.cs-media-self__filename-ext {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--theme-text-soft);
+  padding-inline-start: 0;
+}
+
+.cs-media-self__filename-save,
+.cs-media-self__filename-cancel {
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 var(--cs-space-3);
+  border-radius: var(--cs-radius-input);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro);
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.cs-media-self__filename-save {
+  background: var(--cs-cyan-500);
+  color: #04212a;
+  border: 1px solid transparent;
+
+  &:hover:not([disabled]) {
+    background: var(--cs-cyan-400);
+  }
+}
+
+.cs-media-self__filename-cancel {
+  background: transparent;
+  color: var(--theme-text-soft);
+  border: 1px solid transparent;
+
+  &:hover:not([disabled]) {
+    color: var(--theme-text);
+    background: var(--theme-elevation-150);
+  }
+}
+
+.cs-media-self__meta {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--theme-text-soft);
+  font-feature-settings: 'tnum' 1;
+}
+
+.cs-media-self__url-row {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  margin-top: var(--cs-space-1);
+}
+
+.cs-media-self__url-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 32px;
+  padding: 0 var(--cs-space-2);
+  background: var(--theme-input-bg);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-input);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--theme-text-soft);
+  box-shadow: var(--cs-shadow-input-rest);
+
+  &:hover {
+    border-color: var(--theme-elevation-300);
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    border-color: var(--cs-cyan-500);
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+}
+
+.cs-media-self__url-action {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--cs-radius-input);
+  background: var(--theme-elevation-150);
+  border: 1px solid transparent;
+  color: var(--theme-text);
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro);
+
+  &:hover {
+    background: var(--theme-elevation-200);
+    border-color: var(--cs-cyan-500);
+    color: var(--cs-cyan-500);
+  }
+
+  &--copied {
+    background: rgba(0, 196, 106, 0.14);
+    border-color: var(--color-success-500, #00c46a);
+    color: var(--color-success-500, #00c46a);
+  }
+}
+
+.cs-media-self__alt {
+  margin: var(--cs-space-1) 0 0;
+  font-size: 13px;
+  color: var(--theme-text);
+}
+
+.cs-media-self__alt-label {
+  font-weight: 600;
+  color: var(--theme-text-soft);
+  margin-right: 4px;
+}
+
+.cs-media-self__alt-value {
+  color: var(--theme-text);
+}
+
+.cs-media-self__error {
+  margin: var(--cs-space-1) 0 0;
+  padding: 6px var(--cs-space-2);
+  background: rgba(220, 38, 38, 0.08);
+  border-left: 3px solid var(--color-error-500);
+  border-radius: var(--cs-radius-chip);
+  color: var(--color-error-500);
+  font-size: 12px;
+  font-weight: 500;
+}
+
 // ─── Edit-media: file-details card (the upload preview header) ─────
 //
 // Payload renders the upload preview header as

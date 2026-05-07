@@ -56,21 +56,38 @@ kbd {
   border-color: var(--theme-elevation-150);
 }
 
-// Drawer close button — Payload's default has no contrast against our
-// theme; surfaces invisible. Make it a clearly visible 32px circle
-// with hover affordance, regardless of which drawer flavor it lives in.
+// =============================================================================
+// Drawer system — unified close button, backdrop, header, sizing
+// =============================================================================
+//
+// Payload v3 ships several drawer flavors (`doc-drawer`, `list-drawer`,
+// `edit-many`, `edit-many-bulk-uploads`) that all share the
+// `.drawer--is-open` modifier. Each renders a stock close button that
+// is EMPTY in the DOM (`<button class="drawer__close"></button>`) so
+// our previous round-circle styling produced a hollow oval at the
+// top-left with no glyph inside. This block injects an X glyph via a
+// CSS-mask pseudo-element, bumps the touch target to 36×36 (close to
+// the 44px WCAG floor — Payload's container forces a 32px outer cap),
+// and fixes the cross-drawer inconsistencies.
+//
+// Why a CSS-mask glyph instead of `content: '×'`? The Unicode "×"
+// renders at the host font's weight + caret-style, which is
+// inconsistent across themes. A masked SVG renders identically and
+// scales with `currentColor` for the hover-red transition.
+
 .drawer-close-button,
 .drawer__close,
 .drawer__header__close,
 .doc-drawer__header-close,
 .edit-many__header__close,
 .edit-many-bulk-uploads__header__close {
+  position: relative;
   background: transparent;
   border: 1px solid var(--theme-elevation-250);
   border-radius: 50%;
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
   padding: 0;
   color: var(--theme-text);
   display: inline-flex;
@@ -85,11 +102,26 @@ kbd {
     border-color var(--cs-motion-micro),
     background-color var(--cs-motion-micro);
 
+  // SVG slot — used when Payload does ship an icon (some flavors do).
   svg {
     width: 14px;
     height: 14px;
     color: currentColor;
     opacity: 1;
+    z-index: 1;
+  }
+
+  // Glyph injection — only fires when the button is otherwise empty.
+  // `:empty` matches `<button></button>` exactly. The mask is the same
+  // X used by the focus-mode exit cluster so iconography stays
+  // consistent across drawer chrome.
+  &:empty::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' d='M4 4l8 8M12 4l-8 8'/></svg>") no-repeat center / contain;
+    mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' d='M4 4l8 8M12 4l-8 8'/></svg>") no-repeat center / contain;
   }
 
   &:hover {
@@ -103,6 +135,126 @@ kbd {
     box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
     border-color: var(--cs-cyan-500);
   }
+}
+
+// ─── Drawer backdrop — dim the underlying page so it reads as ─────
+// ─── modal context, not a layout collision ────────────────────────
+//
+// Payload's drawer slides to cover ~70% of the viewport from the
+// left, leaving the right ~30% showing the underlying edit view at
+// full saturation — visually broken. Add a backdrop layer via
+// `body:has(.drawer--is-open)::after` so the uncovered area dims to
+// a calm overlay and clicks there close the drawer (handled by
+// Payload). `:has()` is supported in Chrome 105+ / Safari 15.4+ /
+// Firefox 121+ — well within Payload v3's browser baseline.
+body:has(.drawer--is-open)::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 100; // below `.drawer` (101) but above the nav (50)
+  pointer-events: none;
+}
+
+// ─── Hide the page's nav-toggler when a drawer is open ────────────
+//
+// The mobile/desktop nav-toggler hamburger button (`.nav-toggler`)
+// renders at viewport-fixed (31, 19) and pokes through the top-left
+// of any open drawer because it's outside the drawer's stacking
+// context. Hide it whenever a drawer is open so the drawer's own
+// close button is the only top-left affordance.
+body:has(.drawer--is-open) .template-default__nav-toggler-wrapper,
+body:has(.drawer--is-open) .nav-toggler {
+  display: none !important;
+}
+
+// ─── Drawer header — unified band across doc / list / edit-many ───
+//
+// All drawer flavors render their header as a flex row with a title
+// + actions cluster + close. The layout was breaking because some
+// renderers add a wrapping `.gutter` inside the header, throwing
+// alignment off. Normalise.
+.drawer__header,
+.doc-drawer__header,
+.list-drawer__header {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+  padding: var(--cs-space-3) var(--cs-space-4);
+  border-bottom: 1px solid var(--theme-elevation-150);
+  background: var(--theme-elevation-100);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+// Drawer title — same 22px cap as the document header so a
+// long-named record doesn't overrun the close button.
+.drawer__header h1,
+.drawer__header h2,
+.doc-drawer__header h1,
+.doc-drawer__header h2,
+.list-drawer__header h1,
+.list-drawer__header h2 {
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ─── Drawer width caps — premium feel without crowding ────────────
+//
+// Payload's stock drawer widths feel cramped on wide displays and
+// over-wide on small ones. Cap doc-drawer at 80%/1080px and
+// list-drawer at 70%/960px (list views are denser). The
+// `payload__modal-container` flex parent honours these caps.
+.payload__modal-item.doc-drawer {
+  width: min(1080px, 80vw);
+}
+
+.payload__modal-item.list-drawer {
+  width: min(960px, 75vw);
+}
+
+// On small screens both drawers go full-bleed.
+@media (max-width: 768px) {
+  .payload__modal-item.doc-drawer,
+  .payload__modal-item.list-drawer {
+    width: 100vw;
+  }
+}
+
+// ─── Inputs / cards inside drawers — match the host edit view ─────
+//
+// All field-type styling we apply on the main edit views also fires
+// inside `.drawer` because the field component is identical. Make
+// sure no specificity collision dulls the chrome by promoting a few
+// rules.
+.drawer .field-type input,
+.drawer .field-type textarea,
+.doc-drawer .field-type input,
+.doc-drawer .field-type textarea {
+  background: var(--theme-input-bg);
+}
+
+// Form sticky save bar inside drawers — the doc-controls strip we
+// hide in fullscreen we KEEP here, but pin it to the drawer's bottom
+// so Save / Publish are reachable on long forms.
+.drawer .doc-controls,
+.doc-drawer .doc-controls {
+  position: sticky;
+  bottom: 0;
+  background: var(--theme-elevation-100);
+  border-top: 1px solid var(--theme-elevation-150);
+  z-index: 3;
 }
 
 // ─── Modals — capped width, refined entry, calm header

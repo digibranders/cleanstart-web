@@ -60,6 +60,21 @@ export const Media: CollectionConfig = {
     ],
   },
   fields: [
+    // Custom chrome — mirrors the blog editor's MediaField card with
+    // inline filename rename + copy URL + open-in-tab + alt readout.
+    // The default Payload `.file-field` is hidden via CSS in
+    // `_media.scss` so this component owns the file header surface.
+    {
+      name: '_chrome',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/MediaSelfChrome.tsx#MediaSelfChrome',
+          },
+        },
+      },
+    },
     {
       name: 'folder',
       type: 'select',

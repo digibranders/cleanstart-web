@@ -1,3 +1,4 @@
+import { MediaSelfChrome as MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56 } from '@/payload/admin/components/MediaSelfChrome.tsx'
 import { SlugField as SlugField_72967e7957358d52051eede57fbdd787 } from '@/payload/admin/components/SlugField.tsx'
 import { MediaCell as MediaCell_04413d560c21645b4689092eae86b482 } from '@/payload/admin/components/MediaField/MediaCell.tsx'
 import { MediaField as MediaField_1167cf2070c08e9bc2c7602fa9c85984 } from '@/payload/admin/components/MediaField/MediaField.tsx'
@@ -58,6 +59,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "@/payload/admin/components/MediaSelfChrome.tsx#MediaSelfChrome": MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56,
   "@/payload/admin/components/SlugField.tsx#SlugField": SlugField_72967e7957358d52051eede57fbdd787,
   "@/payload/admin/components/MediaField/MediaCell.tsx#MediaCell": MediaCell_04413d560c21645b4689092eae86b482,
   "@/payload/admin/components/MediaField/MediaField.tsx#MediaField": MediaField_1167cf2070c08e9bc2c7602fa9c85984,
