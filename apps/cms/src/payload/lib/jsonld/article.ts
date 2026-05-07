@@ -100,7 +100,17 @@ export const buildArticleBlob = (
   if (source.dateModified) blob.dateModified = source.dateModified;
 
   const authors = buildAuthorReferences(ctx, source.authors);
-  if (authors.length > 0) blob.author = authors;
+  if (authors.length > 0) {
+    blob.author = authors;
+  } else {
+    // Schema.org requires `author` for every Article variant. When the
+    // doc has no resolved Person authors (staff-written posts where the
+    // editor didn't pick a byline, or unresolved relationships at this
+    // depth), fall back to the publishing Organization. This is the
+    // pattern used by major news sites for unbylined posts and keeps
+    // Google Rich Results eligibility intact.
+    blob.author = { '@id': ctx.organizationId };
+  }
 
   if (isResolvedAuthor(source.reviewedBy)) {
     const id = personRefId(ctx, source.reviewedBy);
