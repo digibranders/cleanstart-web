@@ -72,6 +72,54 @@
   border-color: var(--cs-tint-brand-medium);
 }
 
+// ─── Boolean chips (`<code class="bool-cell">true|false</code>`) ──
+//
+// Payload renders boolean fields in list views as a `<code>` block
+// with raw "true" / "false" text — reads like a debug log. Promote
+// to a coloured chip: green for true, neutral for false. The `data-
+// bool` attr is added by `ListCellEnhancer` (CSS can't match by
+// text content alone).
+.bool-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  > span {
+    display: inline;
+  }
+
+  &[data-bool='true'] {
+    color: var(--color-success-500, #00c46a);
+    background: rgba(0, 196, 106, 0.14);
+    border-color: rgba(0, 196, 106, 0.28);
+  }
+
+  &[data-bool='false'] {
+    color: var(--theme-text-soft);
+    background: var(--theme-elevation-150);
+    border-color: var(--theme-elevation-200);
+  }
+}
+
 // ─── Toast stacking — keep multiple toasts readable ────────────────
 //
 // Payload's stock toast container stacks tightly without spacing; multiple

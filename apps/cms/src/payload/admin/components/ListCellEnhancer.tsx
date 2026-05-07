@@ -88,6 +88,18 @@ export const ListCellEnhancer = (): ReactElement | null => {
         }
         cell.setAttribute(ATTR, '1');
       }
+      // Boolean cells (`<code class="bool-cell"><span>true|false</span></code>`).
+      // Tag with `data-bool="true|false"` so CSS can paint a coloured
+      // chip — green for truthy, neutral-red for falsy — without
+      // having to match by text content (CSS has no such selector).
+      for (const cell of document.querySelectorAll<HTMLElement>('.bool-cell')) {
+        const text = (cell.textContent ?? '').trim().toLowerCase();
+        if (text === 'true' || text === 'yes' || text === '1') {
+          cell.setAttribute('data-bool', 'true');
+        } else if (text === 'false' || text === 'no' || text === '0') {
+          cell.setAttribute('data-bool', 'false');
+        }
+      }
     };
 
     enhance();
