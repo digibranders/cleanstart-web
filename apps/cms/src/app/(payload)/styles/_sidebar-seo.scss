@@ -284,3 +284,737 @@
     }
   }
 }
+
+// =============================================================================
+// Schema (JSON-LD) preview card — sits in the SEO sidebar above the
+// SeoAdvancedPanel. Read-only viewer with a spec-compliance badge,
+// per-blob audit list, copy button, and Rich Results deep-link.
+// =============================================================================
+
+.cs-schema-preview {
+  margin: var(--cs-space-3) 0;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  background: var(--theme-elevation-50);
+  box-shadow: var(--cs-shadow-input-rest);
+  overflow: hidden;
+
+  &__header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    padding: var(--cs-space-2) var(--cs-space-3);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    color: var(--theme-text);
+    font-size: 13px;
+    line-height: 1.3;
+    transition: background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__title {
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  &__chip {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-200);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  &__chevron {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-text-soft);
+    font-size: 10px;
+    transition: transform var(--cs-motion-micro);
+    flex-shrink: 0;
+  }
+
+  &[data-expanded='true'] &__chevron {
+    transform: rotate(-180deg);
+  }
+
+  &__body {
+    padding: var(--cs-space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
+    border-top: 1px solid var(--theme-elevation-150);
+    background: var(--theme-bg);
+  }
+
+  &__hint {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--theme-text-soft);
+    margin: 0;
+  }
+
+  &__blob {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-2);
+    padding: var(--cs-space-2) var(--cs-space-3);
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-input);
+  }
+
+  &__blob-header {
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+
+    code {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--theme-text);
+      background: transparent;
+      padding: 0;
+    }
+  }
+
+  &__issues {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11.5px;
+    line-height: 1.4;
+
+    li {
+      color: var(--theme-text-soft);
+
+      strong {
+        font-weight: 600;
+      }
+
+      code {
+        font-family: var(--font-mono);
+        font-size: 11px;
+      }
+
+      &[data-severity='red'] strong {
+        color: var(--color-error-500);
+      }
+
+      &[data-severity='amber'] {
+        color: var(--theme-text);
+      }
+    }
+  }
+
+  &__raw {
+    summary {
+      font-size: 12px;
+      color: var(--theme-text-soft);
+      cursor: pointer;
+      padding: 4px 0;
+      user-select: none;
+
+      &:hover {
+        color: var(--theme-text);
+      }
+    }
+
+    pre {
+      max-height: 280px;
+      overflow: auto;
+      margin: var(--cs-space-2) 0 0 0;
+      padding: var(--cs-space-2);
+      background: var(--theme-input-bg);
+      border: 1px solid var(--theme-elevation-200);
+      border-radius: var(--cs-radius-input);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--theme-text);
+      scrollbar-width: thin;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--cs-space-2);
+  }
+
+  &__btn {
+    flex: 1;
+    padding: 0.4rem 0.65rem;
+    border-radius: var(--cs-radius-input);
+    font-size: 12.5px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid var(--theme-elevation-250);
+    background: transparent;
+    color: var(--theme-text);
+    transition:
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+    }
+
+    &[data-tone='success'] {
+      color: var(--color-success-500);
+      border-color: var(--color-success-500);
+    }
+  }
+}
+
+// =============================================================================
+// Inbound Redirects card — read-only list of Redirects rows whose `to`
+// resolves to the current doc URL, plus a deep-link "+ Add" affordance.
+// =============================================================================
+
+.cs-inbound-redirects {
+  margin: var(--cs-space-3) 0;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  background: var(--theme-elevation-50);
+  box-shadow: var(--cs-shadow-input-rest);
+  overflow: hidden;
+
+  &__header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    padding: var(--cs-space-2) var(--cs-space-3);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    color: var(--theme-text);
+    font-size: 13px;
+    line-height: 1.3;
+    transition: background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__title {
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  &__summary {
+    flex: 1;
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &[data-tone='active'] {
+      color: var(--cs-cyan-700);
+      font-weight: 500;
+    }
+
+    &[data-tone='error'] {
+      color: var(--color-error-500);
+    }
+  }
+
+  &__chevron {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-text-soft);
+    font-size: 10px;
+    transition: transform var(--cs-motion-micro);
+    flex-shrink: 0;
+  }
+
+  &[data-expanded='true'] &__chevron {
+    transform: rotate(-180deg);
+  }
+
+  &__body {
+    padding: var(--cs-space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
+    border-top: 1px solid var(--theme-elevation-150);
+    background: var(--theme-bg);
+  }
+
+  &__hint {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--theme-text-soft);
+    margin: 0;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-2);
+  }
+
+  &__row {
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-input);
+    background: var(--theme-elevation-50);
+    transition:
+      border-color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+    }
+  }
+
+  &__row-link {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--cs-space-2) var(--cs-space-3);
+    text-decoration: none;
+    color: inherit;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+      border-radius: var(--cs-radius-input);
+    }
+  }
+
+  &__row-top {
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    flex-wrap: wrap;
+  }
+
+  &__from {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--theme-text);
+    background: transparent;
+    padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  &__arrow {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: var(--cs-radius-chip);
+    background: var(--cs-tint-brand-medium);
+    color: var(--cs-cyan-700);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  &__hot {
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  &__row-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    color: var(--theme-text-soft);
+  }
+
+  &__add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 0.65rem;
+    border-radius: var(--cs-radius-input);
+    border: 1px dashed var(--theme-elevation-250);
+    background: transparent;
+    color: var(--theme-text);
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--cs-cyan-500);
+      color: var(--cs-cyan-700);
+      background: var(--cs-tint-brand-soft);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+  }
+}
+
+// =============================================================================
+// Schema override (admin-only Tier 3) — JSON editor with live Zod feedback.
+// Sits inside the SEO advanced panel. Field-level access strips the field
+// from the form payload entirely for non-admins, so this CSS only ever
+// applies to admin users.
+// =============================================================================
+
+.cs-schema-override {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-2);
+  padding: var(--cs-space-3);
+  border: 1px solid var(--theme-elevation-200);
+  border-left-width: 3px;
+  border-radius: var(--cs-radius-card);
+  background: var(--theme-elevation-50);
+  box-shadow: var(--cs-shadow-input-rest);
+
+  &[data-status='valid'] {
+    border-left-color: var(--color-success-500);
+  }
+
+  &[data-status='invalid'],
+  &[data-status='parse-error'] {
+    border-left-color: var(--color-error-500);
+  }
+
+  &[data-status='empty'] {
+    border-left-color: var(--theme-elevation-250);
+  }
+
+  &__label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--theme-text);
+    letter-spacing: 0.01em;
+  }
+
+  &__hint {
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--theme-text-soft);
+    margin: 0;
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--theme-elevation-100);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+  }
+
+  &__textarea {
+    width: 100%;
+    min-height: 220px;
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    padding: var(--cs-space-2) var(--cs-space-3);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--theme-text);
+    resize: vertical;
+    transition:
+      border-color var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro);
+
+    &::placeholder {
+      color: var(--theme-text-disabled);
+    }
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow:
+        0 0 0 3px var(--cs-tint-focus-ring),
+        var(--cs-shadow-input-focus);
+    }
+  }
+
+  &__feedback {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    line-height: 1.45;
+    min-height: 1.5em;
+  }
+
+  &__error {
+    color: var(--color-error-500);
+    margin: 0;
+  }
+
+  &__ok {
+    color: var(--color-success-500);
+    margin: 0;
+  }
+
+  &__issues {
+    list-style: disc;
+    padding-inline-start: var(--cs-space-4);
+    margin: 0;
+    color: var(--theme-text-soft);
+
+    li {
+      font-size: 11.5px;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+  }
+
+  &__clear {
+    align-self: flex-start;
+    background: transparent;
+    border: 1px solid var(--theme-elevation-250);
+    border-radius: var(--cs-radius-input);
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--theme-text);
+    cursor: pointer;
+    transition:
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--color-error-500);
+      color: var(--color-error-500);
+      background: var(--theme-elevation-100);
+    }
+  }
+}
+
+// =============================================================================
+// Inbound redirects — inline edit / create form. Drawer-free, no
+// navigation. All CRUD happens inside the SEO sidebar.
+// =============================================================================
+
+.cs-inbound-redirects {
+  &__row--editing {
+    background: var(--theme-elevation-0);
+    border-color: var(--cs-cyan-500);
+    box-shadow: inset 0 0 0 1px var(--cs-cyan-500);
+  }
+
+  &__create {
+    margin-top: var(--cs-space-2);
+    padding: var(--cs-space-3);
+    background: var(--theme-elevation-50);
+    border: 1px dashed var(--cs-cyan-500);
+    border-radius: var(--cs-radius-input);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: var(--cs-space-3);
+  }
+
+  &__form-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--theme-text-soft);
+    letter-spacing: 0.02em;
+    margin-top: 4px;
+  }
+
+  &__form-label-soft {
+    font-weight: 400;
+    color: var(--theme-text-disabled);
+  }
+
+  &__form-hint {
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--theme-text-soft);
+    margin: 0 0 4px 0;
+    font-style: italic;
+  }
+
+  &__lock-hint {
+    font-size: 11.5px;
+    color: var(--theme-text-soft);
+    background: var(--theme-elevation-100);
+    border-radius: var(--cs-radius-input);
+    padding: 6px 8px;
+    margin: 0 0 var(--cs-space-2) 0;
+  }
+
+  &__input,
+  &__select,
+  &__textarea {
+    width: 100%;
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    padding: 6px 10px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--theme-text);
+    font-family: inherit;
+    transition:
+      border-color var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro);
+
+    &::placeholder {
+      color: var(--theme-text-disabled);
+    }
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+
+    &:read-only,
+    &:disabled {
+      background: var(--theme-elevation-100);
+      color: var(--theme-text-soft);
+      cursor: not-allowed;
+    }
+  }
+
+  &__input {
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  &__textarea {
+    resize: vertical;
+    min-height: 56px;
+  }
+
+  &__form-error {
+    margin: 4px 0 0 0;
+    font-size: 11.5px;
+    color: var(--color-error-500);
+    line-height: 1.4;
+  }
+
+  &__form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: var(--cs-space-2);
+  }
+
+  &__btn {
+    flex: 1;
+    min-width: 64px;
+    padding: 6px 10px;
+    border: 1px solid var(--theme-elevation-250);
+    border-radius: var(--cs-radius-input);
+    background: transparent;
+    color: var(--theme-text);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover:not([disabled]) {
+      background: var(--theme-elevation-100);
+      border-color: var(--cs-cyan-500);
+    }
+
+    &[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__btn--primary {
+    background: var(--cs-tint-brand-soft);
+    border-color: var(--cs-cyan-500);
+    color: var(--cs-cyan-700);
+
+    &:hover:not([disabled]) {
+      background: var(--cs-tint-brand-medium);
+    }
+  }
+
+  &__btn--danger {
+    color: var(--color-error-500);
+    border-color: var(--theme-elevation-250);
+    flex: 0 0 auto;
+    min-width: 0;
+    padding: 6px 10px;
+
+    &:hover:not([disabled]) {
+      background: rgba(255, 92, 92, 0.08);
+      border-color: var(--color-error-500);
+    }
+  }
+}
