@@ -58,3 +58,4 @@ apps/cms/.lead-fallback-queue/
 
 # Sentry
 .sentryclirc
+.gstack/

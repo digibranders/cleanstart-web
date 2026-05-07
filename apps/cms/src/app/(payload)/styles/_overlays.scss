@@ -170,6 +170,24 @@ body:has(.drawer--is-open) .nav-toggler {
   display: none !important;
 }
 
+// ─── One close affordance per drawer ──────────────────────────────
+//
+// Payload v3 ships TWO close buttons on doc-drawers:
+//   1. `.drawer__close` — sits at top-LEFT of the drawer panel (a
+//      "back arrow" affordance, but renders as an empty button).
+//   2. `.doc-drawer__header-close` — sits at top-RIGHT of the drawer
+//      header (the conventional close X).
+//
+// Two close buttons in the same drawer is redundant + confusing.
+// Hide the top-left one across all flavors and let the header X own
+// the close affordance. Backdrop click + Esc still close the drawer.
+.doc-drawer .drawer__close,
+.list-drawer .drawer__close,
+.edit-many .drawer__close,
+.edit-many-bulk-uploads .drawer__close {
+  display: none !important;
+}
+
 // ─── Drawer header — unified band across doc / list / edit-many ───
 //
 // All drawer flavors render their header as a flex row with a title
@@ -213,9 +231,17 @@ body:has(.drawer--is-open) .nav-toggler {
 // ─── Drawer width caps — premium feel without crowding ────────────
 //
 // Payload's stock drawer widths feel cramped on wide displays and
-// over-wide on small ones. Cap doc-drawer at 80%/1080px and
-// list-drawer at 70%/960px (list views are denser). The
-// `payload__modal-container` flex parent honours these caps.
+// over-wide on small ones. Cap each flavor to a sensible width:
+//
+//   doc-drawer       → min(1080px, 80vw)  — full doc edit, sidebar fits
+//   list-drawer      → min(960px, 75vw)   — denser table view
+//   edit-many        → min(720px, 70vw)   — small form, lots of empty
+//                                            space at full-bleed
+//   bulk-uploads     → min(720px, 70vw)   — same shape as edit-many
+//
+// `[class*="--slug-edit-"]` matches the per-collection slugs Payload
+// generates (edit-blogs, edit-news, etc.) so we don't have to enumerate
+// every collection.
 .payload__modal-item.doc-drawer {
   width: min(1080px, 80vw);
 }
@@ -224,10 +250,19 @@ body:has(.drawer--is-open) .nav-toggler {
   width: min(960px, 75vw);
 }
 
-// On small screens both drawers go full-bleed.
+.payload__modal-item[class*='--slug-edit-'],
+.payload__modal-item[class*='--slug-bulk-upload'],
+.payload__modal-item[class*='--slug-edit-many'],
+.payload__modal-item[class*='--slug-edit-many-bulk-uploads'] {
+  width: min(720px, 70vw);
+}
+
+// On small screens all drawer flavors go full-bleed.
 @media (max-width: 768px) {
   .payload__modal-item.doc-drawer,
-  .payload__modal-item.list-drawer {
+  .payload__modal-item.list-drawer,
+  .payload__modal-item[class*='--slug-edit-'],
+  .payload__modal-item[class*='--slug-bulk-upload'] {
     width: 100vw;
   }
 }
