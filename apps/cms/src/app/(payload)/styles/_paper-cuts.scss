@@ -3,49 +3,37 @@
 
 // ─── Status pill polish across versioned list views ───────────────
 //
-// Payload renders `.cell-_status` as a plain text "draft" / "published"
-// label. Promote each value to a coloured chip with a leading dot so the
-// status reads at a glance from the table.
+// Actual Payload v3 DOM for the status cell:
+//
+//   <td class="cell cell-_status">
+//     <span class="selected--draft">      <-- chip target
+//       <span>Draft</span>                <-- visible label
+//     </span>
+//   </td>
+//
+// We style ONLY the inner `.selected--{state}` span as a chip — never
+// the `<td class="cell-_status">` itself, since chip-styling the cell
+// breaks row vertical alignment and stacks doubled chrome.
 .cell-_status {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+// Inner chip — applied to every state variant.
+.cell-_status [class^='selected--'],
+.cell-_status [class*=' selected--'] {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-
-  &::before {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-  }
-}
-
-// Map Payload's status values via class fallback. Payload's
-// `.cell-_status .pill` is the actual chip; we paint a coloured chip
-// per state — green for live, amber for draft, cyan for scheduled.
-// (Brand cyan stays brand cyan; PUBLISHED uses success-green so the
-// two semantics don't collide.)
-.cell-_status .pill,
-.cell-_status .pill--has-color {
-  border-radius: 999px;
   padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid transparent;
   font-feature-settings: 'tnum' 1;
+  line-height: 1.2;
 
   &::before {
     content: '';
@@ -56,27 +44,29 @@
     display: inline-block;
     flex-shrink: 0;
   }
+
+  // Inner label span — already in the DOM, just keep it inline.
+  > span {
+    display: inline;
+  }
 }
 
 // Published / Live — green (positive, real-world live).
-.cell-_status .pill--style-success,
-.cell-_status .pill[class*='published'] {
+.cell-_status .selected--published {
   color: var(--color-success-500, #00c46a);
   background: rgba(0, 196, 106, 0.14);
   border-color: rgba(0, 196, 106, 0.28);
 }
 
 // Draft — amber (in-progress, not live).
-.cell-_status .pill--style-warning,
-.cell-_status .pill[class*='draft'] {
+.cell-_status .selected--draft {
   color: var(--color-warning-500, #fbbf24);
   background: rgba(251, 191, 36, 0.14);
   border-color: rgba(251, 191, 36, 0.30);
 }
 
 // Scheduled — cyan (planned, future).
-.cell-_status .pill--style-info,
-.cell-_status .pill[class*='scheduled'] {
+.cell-_status .selected--scheduled {
   color: var(--cs-cyan-500);
   background: var(--cs-tint-brand-soft);
   border-color: var(--cs-tint-brand-medium);
