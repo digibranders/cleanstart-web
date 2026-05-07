@@ -263,6 +263,103 @@
   color: var(--color-success-500, #00c46a);
 }
 
+// ─── MediaEditEnhancer-injected URL row ─────────────────────────────
+//
+// The enhancer DOM-injects a code-styled URL strip with inline Copy +
+// Open-in-new-tab icons, mirroring the blog editor's MediaField card.
+.cs-media-edit__url-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-input);
+  padding: 4px 6px 4px 10px;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--theme-text-soft);
+  min-width: 0;
+}
+
+.cs-media-edit__url-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--theme-text);
+}
+
+.cs-media-edit__url-icon {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--cs-radius-chip);
+  background: transparent;
+  border: 0;
+  color: var(--theme-text-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
+  }
+
+  &[data-copied='true'] {
+    color: var(--color-success-500, #00c46a);
+    background: rgba(0, 196, 106, 0.14);
+  }
+}
+
+// Filename row no longer needs the trailing `↗` since we now have a
+// dedicated open-tab icon in the URL row.
+.collection-edit--media .file-meta__url a::after {
+  content: none;
+}
+
+// ─── Replace button ────────────────────────────────────────────────
+//
+// Mirror the Preview Sizes / Edit Image button rhythm. Sits on the
+// same action row, just before Preview Sizes.
+.cs-media-edit__replace {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--cs-radius-input);
+  background: var(--cs-cyan-500);
+  border: 1px solid transparent;
+  color: #04212a;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition:
+    background-color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro);
+
+  &:hover {
+    background: var(--cs-cyan-400);
+    box-shadow: 0 1px 0 0 rgba(6, 199, 242, 0.25), 0 6px 16px -8px rgba(6, 199, 242, 0.4);
+  }
+
+  &:active {
+    background: var(--cs-cyan-600);
+  }
+}
+
 // "Remove image" × — round, muted, red on hover. Pulls right via a
 // flex sibling spacer in `.file-details > header`.
 .collection-edit--media .file-details__remove,
