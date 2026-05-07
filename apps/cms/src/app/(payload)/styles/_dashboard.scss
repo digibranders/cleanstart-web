@@ -344,13 +344,32 @@ body:has(.cs-dashboard) {
     display: none;
   }
 
-  // 2) Drop the entire .app-header on the dashboard. With the avatar
-  //    moved to the sidebar UserMenu and the breadcrumb empty, the
-  //    header has no content to host — leaving its row visible just
-  //    pads ~40px of empty space above the greeting. `display: none`
-  //    fully reclaims that band.
+  // 2) Collapse the .app-header to ZERO height instead of `display:
+  //    none`. The header hosts Payload's `actions` slot — that's
+  //    where our CommandPalette `<dialog>` gets mounted. Hiding the
+  //    parent with display:none collapses every descendant in the
+  //    top layer too, so the palette would open with state but
+  //    render at 0×0 (visually invisible). Zero-height + visible
+  //    overflow keeps the actions slot mountable while reclaiming
+  //    the empty band above the greeting.
   .app-header,
   .template-default__app-header {
+    min-height: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    overflow: visible !important;
+  }
+
+  // Hide the visible chrome that lived inside the app-header (step-
+  // nav was already hidden above; the avatar/user-controls are
+  // already hidden globally because we moved them to the sidebar
+  // UserMenu). This is a belt-and-braces guard for any other
+  // bordered children Payload might add later.
+  .app-header__step-nav,
+  .app-header__user-controls,
+  .app-header__avatar {
     display: none !important;
   }
 

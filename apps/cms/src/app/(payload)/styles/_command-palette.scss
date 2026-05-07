@@ -9,21 +9,25 @@
 
 .cs-cmdk {
   // Reset the default <dialog> chrome so we can paint our own.
-  // Native <dialog>'s built-in centering doesn't compose with our
-  // `top-offset + horizontal-center` requirement, and `margin: auto`
-  // misbehaves once you set `max-width: 100vw`. Position the dialog
-  // explicitly: pinned 12vh from the top, horizontally centered via
-  // the standard left-50% / translateX(-50%) trick. The dialog sizes
-  // to its panel content, so the backdrop click-target is the
-  // backdrop pseudo-element, not a stretched dialog body.
-  position: fixed;
-  top: 12vh;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
+  //
+  // Native <dialog> ships with `inset: 0` (top/right/bottom/left all
+  // 0) plus `margin: auto` for centering. We need a fixed-width
+  // panel pinned 12vh from the top and horizontally centered, which
+  // requires explicitly releasing right/bottom AND keeping the
+  // transform-based centering — `!important` overrides the
+  // user-agent + Payload CSS resets that were dropping our values
+  // (we observed `width: 0`, `transform: none` without these).
+  position: fixed !important;
+  top: 12vh !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
   padding: 0;
-  width: min(640px, calc(100vw - 32px));
+  width: min(640px, calc(100vw - 32px)) !important;
   max-width: none;
+  height: auto !important;
   max-height: min(560px, 76vh);
   border: none;
   background: transparent;
