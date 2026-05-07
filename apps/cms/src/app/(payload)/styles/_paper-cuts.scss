@@ -1,27 +1,28 @@
 // 23. Paper-cut polish — status pills, toast stacking, breadcrumb home icon
 // =============================================================================
 
-// ─── Status pill polish across versioned list views ───────────────
+// ─── Universal chip polish for every select-field cell ───────────
 //
-// Actual Payload v3 DOM for the status cell:
-//
-//   <td class="cell cell-_status">
-//     <span class="selected--draft">      <-- chip target
-//       <span>Draft</span>                <-- visible label
+// Payload renders any select field in a list view as
+//   <td class="cell-{name}">
+//     <span class="selected--{value}">
+//       <span>Visible label</span>
 //     </span>
 //   </td>
 //
-// We style ONLY the inner `.selected--{state}` span as a chip — never
-// the `<td class="cell-_status">` itself, since chip-styling the cell
-// breaks row vertical alignment and stacks doubled chrome.
-.cell-_status {
-  white-space: nowrap;
-  vertical-align: middle;
-}
+// Examples:
+//   _status:  selected--draft / selected--published / selected--scheduled
+//   status:   selected--301 / selected--302 / selected--410          (redirects)
+//   source:   selected--slug-change / selected--manual / selected--import (redirects)
+//   indexable: selected--index / selected--noindex                   (seo)
+//
+// We style EVERY `[class^='selected--']` span as a chip with a
+// neutral default, then apply semantic colours for known values.
+// The `<td>` parent stays a regular table cell — never apply chip
+// styling there or row alignment breaks.
 
-// Inner chip — applied to every state variant.
-.cell-_status [class^='selected--'],
-.cell-_status [class*=' selected--'] {
+[class^='cell-'] [class^='selected--'],
+[class^='cell-'] [class*=' selected--'] {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -34,6 +35,10 @@
   text-transform: uppercase;
   font-feature-settings: 'tnum' 1;
   line-height: 1.2;
+  // Neutral default — gets coloured below if the value is recognised.
+  color: var(--theme-text-soft);
+  background: var(--theme-elevation-150);
+  border-color: var(--theme-elevation-200);
 
   &::before {
     content: '';
@@ -45,31 +50,79 @@
     flex-shrink: 0;
   }
 
-  // Inner label span — already in the DOM, just keep it inline.
   > span {
     display: inline;
   }
 }
 
-// Published / Live — green (positive, real-world live).
+[class^='cell-'] {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+// ─── Lifecycle status (`_status`): draft / published / scheduled ─
 .cell-_status .selected--published {
   color: var(--color-success-500, #00c46a);
   background: rgba(0, 196, 106, 0.14);
   border-color: rgba(0, 196, 106, 0.28);
 }
 
-// Draft — amber (in-progress, not live).
 .cell-_status .selected--draft {
   color: var(--color-warning-500, #fbbf24);
   background: rgba(251, 191, 36, 0.14);
   border-color: rgba(251, 191, 36, 0.30);
 }
 
-// Scheduled — cyan (planned, future).
 .cell-_status .selected--scheduled {
   color: var(--cs-cyan-500);
   background: var(--cs-tint-brand-soft);
   border-color: var(--cs-tint-brand-medium);
+}
+
+// ─── Redirect HTTP-status codes ──────────────────────────────────
+//
+// Semantic colour by class:
+//   2xx → green   (success — rare for redirects)
+//   3xx → cyan    (redirect — the normal happy path)
+//   4xx → amber   (warning — gone / not found)
+//   5xx → red     (error)
+.cell-status [class^='selected--2'] {
+  color: var(--color-success-500, #00c46a);
+  background: rgba(0, 196, 106, 0.14);
+  border-color: rgba(0, 196, 106, 0.28);
+}
+
+.cell-status [class^='selected--3'] {
+  color: var(--cs-cyan-500);
+  background: var(--cs-tint-brand-soft);
+  border-color: var(--cs-tint-brand-medium);
+}
+
+.cell-status .selected--410,
+.cell-status [class^='selected--4'] {
+  color: var(--color-warning-500, #fbbf24);
+  background: rgba(251, 191, 36, 0.14);
+  border-color: rgba(251, 191, 36, 0.30);
+}
+
+.cell-status [class^='selected--5'] {
+  color: var(--color-error-500, #ff5c5c);
+  background: rgba(220, 38, 38, 0.14);
+  border-color: rgba(220, 38, 38, 0.28);
+}
+
+// ─── SEO indexable (`indexable`): index / noindex ────────────────
+.cell-indexable .selected--index {
+  color: var(--color-success-500, #00c46a);
+  background: rgba(0, 196, 106, 0.14);
+  border-color: rgba(0, 196, 106, 0.28);
+}
+
+.cell-indexable .selected--noindex,
+.cell-indexable [class*='selected--noindex'] {
+  color: var(--color-error-500, #ff5c5c);
+  background: rgba(220, 38, 38, 0.14);
+  border-color: rgba(220, 38, 38, 0.28);
 }
 
 // ─── Boolean chips (`<code class="bool-cell">true|false</code>`) ──

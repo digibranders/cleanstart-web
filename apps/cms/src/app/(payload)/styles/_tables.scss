@@ -168,6 +168,46 @@
   padding-inline: var(--cs-space-3);
 }
 
+// ─── Number cells: tabular figures so digits don't wobble ────────
+//
+// Any cell containing a number-only value (hitCount, filesize before
+// reformat, etc.) gets `tabular-nums` so columns of digits align.
+.cell-hitCount,
+.cell-readingMinutes,
+.cell-wordCount,
+.cell-filesize,
+.cell-width,
+.cell-height,
+[class^='cell-'][class*='count'],
+[class^='cell-'][class*='Count'] {
+  font-feature-settings: 'tnum' 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// ─── Array-of-strings cells (e.g. users.roles) — comma-separated ─
+//
+// Payload renders `roles: ['admin', 'editor']` as `admin, editor`.
+// Promote to a row of small chips for at-a-glance scanning. Pattern
+// targets the inner label spans Payload emits, falling back to the
+// raw text when the structure is plain.
+.cell-roles,
+[class^='cell-roles'] {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--theme-text);
+  letter-spacing: 0.005em;
+}
+
+// ─── Empty cell ('—' fallback) — soft and centered tone ──────────
+//
+// Payload prints "—" when a column has no value. Tone it down so it
+// reads as "absent" rather than competing with real values.
+[class^='cell-']:empty,
+[class^='cell-']:has(> span:only-child:empty) {
+  color: var(--theme-text-disabled);
+}
+
 // List controls strip — toolbar above the table
 .list-controls {
   margin-bottom: var(--cs-space-4);
