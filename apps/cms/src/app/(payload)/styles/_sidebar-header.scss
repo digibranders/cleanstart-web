@@ -16,16 +16,16 @@
 // keeps a 36px left padding so the toggler has its own seat without
 // covering the wordmark.
 
-// Tight top inset: layout breathes against the viewport without
-// reintroducing the empty chrome band we just removed.
+// 16px top inset on both columns so the SidebarHeader brand row and
+// the dashboard greeting share the same horizontal baseline against
+// the browser frame.
 //
 // Payload's `.nav__scroll` ships with `padding-top: 56px` to reserve
 // room for the avatar bar — which we've moved to the sidebar UserMenu.
-// Zero it out and let the surrounding `.nav` aside provide a small
-// 12px buffer instead.
+// Zero it out so only the surrounding `.nav` 16px buffer counts.
 .template-default__wrap,
 .nav {
-  padding-top: 12px;
+  padding-top: 16px;
 }
 
 .nav__scroll {
@@ -41,14 +41,16 @@
   border-bottom: 1px solid var(--cs-border-subtle);
 
   // Brand link (logo + CMS pill). Left padding leaves a 36px seat for
-  // the overlay toggler positioned via fixed below.
+  // the overlay toggler. Top/bottom padding is 0 so the wordmark's
+  // top edge sits at exactly the wrap's top inset — matching the
+  // dashboard greeting on the right column horizontally.
   &__brand {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     flex: 1 1 auto;
     min-width: 0;
-    padding: 4px 6px 4px 36px;
+    padding: 0 6px 0 36px;
     min-height: 32px;
     border-radius: var(--cs-radius-input);
     color: var(--cs-text-primary);
@@ -229,7 +231,7 @@
 // 12px wrap padding; `left: 14px` clears the sidebar's left edge.
 .template-default__nav-toggler-wrapper {
   position: fixed;
-  top: 16px;
+  top: 19px;
   left: 14px;
   z-index: 50;
   background: transparent !important;
