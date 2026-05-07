@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { mediaUploadField } from '../fields/media-upload';
 import { slugify } from '../lib/slugify';
 
 export const AboutGalleries: CollectionConfig = {
@@ -43,12 +44,7 @@ export const AboutGalleries: CollectionConfig = {
         ],
       },
     },
-    {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
-      required: true,
-    },
+    mediaUploadField({ name: 'image', required: true, folderHint: 'web/about' }),
     { name: 'caption', type: 'text' },
     {
       name: 'displayOrder',

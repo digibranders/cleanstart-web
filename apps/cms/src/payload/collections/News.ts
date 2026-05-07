@@ -1,10 +1,16 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
-import { seoField } from '../fields/seo';
+import { mediaUploadField } from '../fields/media-upload';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { validateOptionalUrl } from '../lib/url-shape';
 
 export const News: CollectionConfig = {
@@ -25,7 +31,7 @@ export const News: CollectionConfig = {
     { name: 'title', type: 'text', required: true },
     slugField({ source: 'title' }),
     { name: 'abstract', type: 'textarea' },
-    { name: 'heroImage', type: 'upload', relationTo: 'media' },
+    mediaUploadField({ name: 'heroImage', folderHint: 'web/news' }),
     { name: 'body', type: 'richText' },
     {
       name: 'authors',
@@ -51,6 +57,30 @@ export const News: CollectionConfig = {
       validate: validateOptionalUrl,
     },
     {
+      name: 'bodyStats',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/payload/admin/components/BodyStatsField.tsx#BodyStatsField',
+        },
+      },
+    },
+    {
+      name: 'permalink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            clientProps: { pathPrefix: '/news' },
+          },
+        },
+      },
+    },
+    ...seoSidebarFields({ pathPrefix: '/news', descriptionSource: 'abstract' }),
+    {
       name: 'publicationDate',
       type: 'date',
       required: true,
@@ -67,26 +97,20 @@ export const News: CollectionConfig = {
       hasMany: true,
     },
     {
+      // Data-only — surfaced via the `bodyStats` pill at the top of the
+      // sidebar. Hidden here so the form doesn't double-render.
       name: 'readingMinutes',
       type: 'number',
       access: { update: () => false },
-      admin: {
-        readOnly: true,
-        description: 'Computed from body word count on save.',
-        position: 'sidebar',
-      },
+      admin: { readOnly: true, hidden: true },
     },
     {
       name: 'wordCount',
       type: 'number',
       access: { update: () => false },
-      admin: {
-        readOnly: true,
-        description: 'Total words in the body. Computed on save.',
-        position: 'sidebar',
-      },
+      admin: { readOnly: true, hidden: true },
     },
-    seoField,
+    ...seoFieldsForSidebar('news'),
   ],
   hooks: {
     beforeChange: [
@@ -94,7 +118,12 @@ export const News: CollectionConfig = {
         fields: { readingMinutes: 'readingMinutes', wordCount: 'wordCount' },
       }),
     ],
-    afterChange: [slugChangeRedirectHook('news')],
+    afterChange: [
+      slugChangeRedirectHook('news'),
+      searchSyncAfterChangeHook('news'),
+      webhooksPublishAfterChangeHook('news'),
+    ],
+    afterDelete: [searchSyncAfterDeleteHook('news')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

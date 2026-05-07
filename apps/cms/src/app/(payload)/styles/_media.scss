@@ -1,0 +1,744 @@
+// =============================================================================
+// Media collection — list-view + edit-media polish
+// =============================================================================
+//
+// Two surfaces this partial covers:
+//
+//   1. List view (`/admin/collections/media`) — header buttons, file
+//      thumbnails, dense column treatment for filename / dates / size.
+//   2. Edit-media (`/admin/collections/media/[id]`) — calmer h1, sleek
+//      preview card with checkered background for transparent images,
+//      grid layout for focal-point x/y.
+
+// ─── Document-level title size cap (all edit views) ───────────────
+//
+// Payload renders `.doc-header__title.render-title` (the document
+// `useAsTitle` value) as a 32-40px h1 that wraps awkwardly for long
+// titles like `ChatGPT Image May 5, 2026, 06_28_17 PM.webp` or
+// long blog headlines. The h1 lives in `.doc-header` which is a
+// sibling of the `.collection-edit--media` main, so we can't scope
+// by collection class. Cap it globally — applies to every edit view.
+.doc-header__title,
+.doc-header .render-title,
+.list-header__title {
+  font-size: 22px;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  font-weight: 600;
+  word-break: break-word;
+  max-width: 64ch;
+  margin-bottom: var(--cs-space-1);
+}
+
+// ─── Media list-view header buttons ────────────────────────────────
+.collection-list--media .list-header,
+.collection-list--media .collection-list__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cs-space-3);
+
+  // "Create New" + "Bulk Upload" buttons get the brand button rhythm.
+  .btn,
+  button {
+    height: 32px;
+    font-size: 12.5px;
+  }
+}
+
+// ─── List-view filename column — break long filenames sensibly ────
+.collection-list--media .cell-filename {
+  word-break: break-all;
+  max-width: 320px;
+
+  a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
+
+// Date columns no longer wrap (ListCellEnhancer compresses to "2h ago"
+// / "May 7, 2026"). White-space nowrap hardens the layout against the
+// long-form fallback for unparseable dates.
+.collection-list--media .cell-updatedAt,
+.collection-list--media .cell-createdAt,
+.collection-list--media .cell-publishedAt {
+  white-space: nowrap;
+  font-feature-settings: 'tnum' 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.collection-list--media .cell-filesize {
+  white-space: nowrap;
+  font-feature-settings: 'tnum' 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--theme-text-soft);
+}
+
+// ─── Media list-view thumbnails ────────────────────────────────────
+//
+// MediaCell renders a 24×24 thumbnail. Bump it to 32×32 with a subtle
+// border + radius so it reads as a clear preview, not a dot.
+.collection-list--media .cs-media-cell__thumb,
+.collection-list--media .file-cell__thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--cs-radius-input);
+  border: 1px solid var(--theme-elevation-200);
+  background:
+    linear-gradient(45deg, var(--theme-elevation-100) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--theme-elevation-100) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--theme-elevation-100) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--theme-elevation-100) 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+}
+
+// ─── Edit-media: hide Payload's default .file-field chrome ────────
+//
+// MediaSelfChrome (mounted as the first field in `Media.ts`) renders
+// our own bordered card with rename / copy URL / open-in-tab inline
+// controls — same shape as the blog editor's MediaField. Hide the
+// stock `.file-field` so the two components don't render side-by-side.
+.collection-edit--media .field-type.file-field {
+  display: none !important;
+}
+
+// ─── MediaSelfChrome card ─────────────────────────────────────────
+.cs-media-self {
+  margin-bottom: var(--cs-space-4);
+}
+
+.cs-media-self__card {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: var(--cs-space-3);
+  align-items: flex-start;
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3);
+  box-shadow: var(--cs-shadow-input-rest);
+  transition: border-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--theme-elevation-200);
+  }
+
+  @media (max-width: 720px) {
+    grid-template-columns: 80px 1fr;
+  }
+}
+
+.cs-media-self__thumb {
+  width: 96px;
+  height: 96px;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-input);
+  overflow: hidden;
+  cursor: zoom-in;
+  padding: 0;
+  background:
+    linear-gradient(45deg, var(--theme-elevation-100) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--theme-elevation-100) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--theme-elevation-100) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--theme-elevation-100) 75%),
+    var(--theme-elevation-50);
+  background-size: 12px 12px, 12px 12px, 12px 12px, 12px 12px, auto;
+  background-position: 0 0, 0 6px, 6px -6px, -6px 0, 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro),
+    transform var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--cs-cyan-500);
+    box-shadow: var(--cs-shadow-lift-md);
+    transform: translateY(-1px);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.cs-media-self__thumb-fallback {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--theme-text-soft);
+  padding: 0 4px;
+  text-align: center;
+}
+
+.cs-media-self__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cs-media-self__filename-row {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.cs-media-self__filename {
+  background: transparent;
+  border: 1px dashed transparent;
+  border-radius: var(--cs-radius-input);
+  padding: 2px 8px;
+  margin-inline-start: -8px;
+  color: var(--theme-text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  cursor: text;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 420px;
+  transition:
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--cs-cyan-500);
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+}
+
+.cs-media-self__rename-hint {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--theme-text-disabled);
+  opacity: 0;
+  transition: opacity var(--cs-motion-micro);
+}
+
+.cs-media-self__filename-row:hover .cs-media-self__rename-hint {
+  opacity: 1;
+}
+
+.cs-media-self__filename-input {
+  flex: 1 1 240px;
+  min-width: 200px;
+  height: 32px;
+  padding: 0 var(--cs-space-2);
+  background: var(--theme-input-bg);
+  border: 1px solid var(--cs-cyan-500);
+  border-radius: var(--cs-radius-input);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--theme-text);
+  box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.cs-media-self__filename-ext {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--theme-text-soft);
+  padding-inline-start: 0;
+}
+
+.cs-media-self__filename-save,
+.cs-media-self__filename-cancel {
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 var(--cs-space-3);
+  border-radius: var(--cs-radius-input);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro);
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.cs-media-self__filename-save {
+  background: var(--cs-cyan-500);
+  color: #04212a;
+  border: 1px solid transparent;
+
+  &:hover:not([disabled]) {
+    background: var(--cs-cyan-400);
+  }
+}
+
+.cs-media-self__filename-cancel {
+  background: transparent;
+  color: var(--theme-text-soft);
+  border: 1px solid transparent;
+
+  &:hover:not([disabled]) {
+    color: var(--theme-text);
+    background: var(--theme-elevation-150);
+  }
+}
+
+.cs-media-self__meta {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--theme-text-soft);
+  font-feature-settings: 'tnum' 1;
+}
+
+.cs-media-self__url-row {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  margin-top: var(--cs-space-1);
+}
+
+.cs-media-self__url-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 32px;
+  padding: 0 var(--cs-space-2);
+  background: var(--theme-input-bg);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-input);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--theme-text-soft);
+  box-shadow: var(--cs-shadow-input-rest);
+
+  &:hover {
+    border-color: var(--theme-elevation-300);
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    border-color: var(--cs-cyan-500);
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+}
+
+.cs-media-self__url-action {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--cs-radius-input);
+  background: var(--theme-elevation-150);
+  border: 1px solid transparent;
+  color: var(--theme-text);
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro);
+
+  &:hover {
+    background: var(--theme-elevation-200);
+    border-color: var(--cs-cyan-500);
+    color: var(--cs-cyan-500);
+  }
+
+  &--copied {
+    background: rgba(0, 196, 106, 0.14);
+    border-color: var(--color-success-500, #00c46a);
+    color: var(--color-success-500, #00c46a);
+  }
+}
+
+.cs-media-self__alt {
+  margin: var(--cs-space-1) 0 0;
+  font-size: 13px;
+  color: var(--theme-text);
+}
+
+.cs-media-self__alt-label {
+  font-weight: 600;
+  color: var(--theme-text-soft);
+  margin-right: 4px;
+}
+
+.cs-media-self__alt-value {
+  color: var(--theme-text);
+}
+
+.cs-media-self__error {
+  margin: var(--cs-space-1) 0 0;
+  padding: 6px var(--cs-space-2);
+  background: rgba(220, 38, 38, 0.08);
+  border-left: 3px solid var(--color-error-500);
+  border-radius: var(--cs-radius-chip);
+  color: var(--color-error-500);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+// ─── Edit-media: file-details card (the upload preview header) ─────
+//
+// Payload renders the upload preview header as
+// `.field-type.file-field > .file-details > header` containing a
+// thumbnail + `.file-meta` (URL link + size text + Copy URL +
+// Preview Sizes + Edit Image + Remove ×). We re-skin the entire
+// header to match the blog editor's MediaField card so the two
+// surfaces feel like the same component.
+.collection-edit--media .field-type.file-field {
+  margin-bottom: var(--cs-space-4);
+}
+
+.collection-edit--media .file-details {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3);
+  box-shadow: var(--cs-shadow-input-rest);
+  transition: border-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--theme-elevation-200);
+  }
+
+  > header {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: var(--cs-space-3);
+    align-items: flex-start;
+
+    @media (max-width: 720px) {
+      grid-template-columns: 80px 1fr;
+    }
+  }
+}
+
+// Checkered background on the thumbnail — makes transparent PNG /
+// SVG bounds obvious, matches the blog editor's MediaField card.
+.collection-edit--media .file-details__thumbnail,
+.collection-edit--media .thumbnail--size-medium {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-input);
+  overflow: hidden;
+  background:
+    linear-gradient(45deg, var(--theme-elevation-100) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--theme-elevation-100) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--theme-elevation-100) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--theme-elevation-100) 75%),
+    var(--theme-elevation-50);
+  background-size: 12px 12px, 12px 12px, 12px 12px, 12px 12px, auto;
+  background-position: 0 0, 0 6px, 6px -6px, -6px 0, 0 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+// File meta column — filename is the prominent line, size/dimensions/
+// mimetype the secondary line, then a tight inline action row.
+.collection-edit--media .file-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+// Filename + URL — promote to a clear primary text; the link's
+// underline is removed in favour of cyan-on-hover and an external
+// "↗" affordance.
+.collection-edit--media .file-meta__url {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--theme-text);
+  word-break: break-all;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  a {
+    color: var(--theme-text);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover {
+      color: var(--cs-cyan-500);
+    }
+
+    &::after {
+      content: '↗';
+      display: inline-block;
+      margin-left: 6px;
+      font-size: 11px;
+      color: var(--theme-text-disabled);
+      transition: color var(--cs-motion-micro);
+    }
+
+    &:hover::after {
+      color: var(--cs-cyan-500);
+    }
+  }
+}
+
+// "54 KB · 1024×1024 · image/webp" line — soft secondary text.
+.collection-edit--media .file-meta .meta,
+.collection-edit--media .file-meta__size,
+.collection-edit--media .file-meta__sizing {
+  font-size: 12px;
+  color: var(--theme-text-soft);
+  font-feature-settings: 'tnum' 1;
+}
+
+// Action row — Copy URL · Preview Sizes · Edit Image · Remove ×.
+// Pack into a single inline-flex row, all 30px tall, all
+// `cs-radius-input` rounding, neutral chrome.
+.collection-edit--media .file-details .copy-to-clipboard,
+.collection-edit--media .file-field__previewSizes,
+.collection-edit--media .file-field__edit {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--cs-radius-input);
+  background: var(--theme-elevation-150);
+  border: 1px solid transparent;
+  color: var(--theme-text);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition:
+    background-color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    color var(--cs-motion-micro);
+
+  &:hover {
+    background: var(--theme-elevation-200);
+    border-color: var(--cs-cyan-500);
+    color: var(--cs-cyan-500);
+  }
+
+  // Payload's `.copy-to-clipboard` button doubles up label + sr-only
+  // span ("Copy URLCopy URL"). Hide the duplicate via :nth-of-type
+  // wrapper trick — the inner sr-only span is `aria-hidden=false`,
+  // so we can target it.
+  & > span[aria-hidden='true'] {
+    display: none;
+  }
+}
+
+// "Copied!" confirmation state — fade the button green for 1.4s.
+.collection-edit--media .file-details .copy-to-clipboard--copied,
+.collection-edit--media .file-details .copy-to-clipboard[data-copied='true'] {
+  background: rgba(0, 196, 106, 0.14);
+  border-color: var(--color-success-500, #00c46a);
+  color: var(--color-success-500, #00c46a);
+}
+
+// ─── MediaEditEnhancer-injected URL row ─────────────────────────────
+//
+// The enhancer DOM-injects a code-styled URL strip with inline Copy +
+// Open-in-new-tab icons, mirroring the blog editor's MediaField card.
+.cs-media-edit__url-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-input);
+  padding: 4px 6px 4px 10px;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--theme-text-soft);
+  min-width: 0;
+}
+
+.cs-media-edit__url-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--theme-text);
+}
+
+.cs-media-edit__url-icon {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--cs-radius-chip);
+  background: transparent;
+  border: 0;
+  color: var(--theme-text-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
+  }
+
+  &[data-copied='true'] {
+    color: var(--color-success-500, #00c46a);
+    background: rgba(0, 196, 106, 0.14);
+  }
+}
+
+// Filename row no longer needs the trailing `↗` since we now have a
+// dedicated open-tab icon in the URL row.
+.collection-edit--media .file-meta__url a::after {
+  content: none;
+}
+
+// ─── Replace button ────────────────────────────────────────────────
+//
+// Mirror the Preview Sizes / Edit Image button rhythm. Sits on the
+// same action row, just before Preview Sizes.
+.cs-media-edit__replace {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--cs-radius-input);
+  background: var(--cs-cyan-500);
+  border: 1px solid transparent;
+  color: #04212a;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition:
+    background-color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro);
+
+  &:hover {
+    background: var(--cs-cyan-400);
+    box-shadow: 0 1px 0 0 rgba(6, 199, 242, 0.25), 0 6px 16px -8px rgba(6, 199, 242, 0.4);
+  }
+
+  &:active {
+    background: var(--cs-cyan-600);
+  }
+}
+
+// "Remove image" × — round, muted, red on hover. Pulls right via a
+// flex sibling spacer in `.file-details > header`.
+.collection-edit--media .file-details__remove,
+.collection-edit--media .upload__remove,
+.collection-edit--media [class*='remove-image'] {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--theme-elevation-250);
+  color: var(--theme-text-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  cursor: pointer;
+  transition:
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    color: var(--color-error-500);
+    border-color: var(--color-error-500);
+    background: rgba(220, 38, 38, 0.08);
+  }
+}
+
+// ─── Edit-media: focal-point grid ──────────────────────────────────
+//
+// Payload renders `focalPoint.x` / `focalPoint.y` as two stacked
+// number inputs by default. Grid them side-by-side so the editor
+// reads the X/Y as one coordinate, not two unrelated numbers.
+// (We set `admin.width: '50%'` on each in `Media.ts`; this rule
+// makes the wrapper a flex row so the widths apply side-by-side.)
+.collection-edit--media .field-type.group-field .render-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cs-space-3);
+}
+
+.collection-edit--media .field-type.group-field .render-fields > * {
+  flex: 1 1 calc(50% - var(--cs-space-3));
+  min-width: 140px;
+}
+
+// Decorative checkbox row — give the label more breathing room.
+.collection-edit--media .field-type.checkbox {
+  margin-top: var(--cs-space-3);
+}
+
+// ─── Folder select — clear-button polish ───────────────────────────
+//
+// react-select's clear (`×`) at the right end of the Folder select
+// gets the same outlined-circle treatment as other secondary close
+// buttons so it doesn't visually compete with the chevron.
+.collection-edit--media .field-type.select .rs__indicators {
+  gap: 2px;
+}
+
+.collection-edit--media .field-type.select .rs__clear-indicator {
+  color: var(--theme-text-soft);
+  padding: 2px 4px;
+  border-radius: var(--cs-radius-chip);
+
+  &:hover {
+    color: var(--color-error-500);
+    background: rgba(220, 38, 38, 0.08);
+  }
+}

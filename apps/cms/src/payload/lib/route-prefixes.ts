@@ -17,6 +17,8 @@ export const ROUTE_PREFIX: Record<string, string> = {
   authors: '/author',
   categories: '/category',
   newsCategories: '/news-categories',
+  knowledgeBase: '/knowledge-hub',
+  knowledgeCategories: '/knowledge-hub/category',
 };
 
 export const collectionUrlFromSlug = (collection: string, slug: string): string | null => {

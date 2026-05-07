@@ -1,10 +1,16 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
-import { seoField } from '../fields/seo';
+import { mediaUploadField } from '../fields/media-upload';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 const ABSTRACT_CHAR_HINT = 160;
 
@@ -32,7 +38,7 @@ export const Blogs: CollectionConfig = {
         description: `Drives the SEO description fallback. Aim for ≤ ${ABSTRACT_CHAR_HINT} characters.`,
       },
     },
-    { name: 'heroImage', type: 'upload', relationTo: 'media' },
+    mediaUploadField({ name: 'heroImage', folderHint: 'web/blog' }),
     { name: 'body', type: 'richText' },
     {
       name: 'authors',
@@ -47,6 +53,12 @@ export const Blogs: CollectionConfig = {
       admin: {
         description:
           'Multi-author supported — every byline is credited in JSON-LD author[]. Authors with "accepting new bylines" off are hidden from the picker.',
+        components: {
+          Cell: {
+            path: '@/payload/admin/components/RelationshipCell.tsx#RelationshipCell',
+            clientProps: { collectionSlug: 'authors' },
+          },
+        },
       },
     },
     {
@@ -72,6 +84,26 @@ export const Blogs: CollectionConfig = {
       type: 'relationship',
       relationTo: 'categories',
       hasMany: true,
+      admin: {
+        components: {
+          Cell: {
+            path: '@/payload/admin/components/RelationshipCell.tsx#RelationshipCell',
+            clientProps: { collectionSlug: 'categories' },
+          },
+        },
+      },
+    },
+    {
+      name: 'faqsBulkPaste',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste',
+            clientProps: { targetField: 'faqs' },
+          },
+        },
+      },
     },
     {
       name: 'faqs',
@@ -80,10 +112,16 @@ export const Blogs: CollectionConfig = {
       admin: {
         description:
           'Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.',
+        components: {
+          RowLabel: '@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel',
+        },
       },
       fields: [
         { name: 'question', type: 'text', required: true },
-        { name: 'answer', type: 'richText', required: true },
+        // Plain-text answer — matches Schema.org `acceptedAnswer.text`
+        // and keeps each FAQ row compact. Multiple paragraphs via
+        // line breaks.
+        { name: 'answer', type: 'textarea', required: true },
       ],
     },
     {
@@ -93,6 +131,33 @@ export const Blogs: CollectionConfig = {
       hasMany: true,
       admin: { description: 'Manually curated. Empty = listing component picks by category.' },
     },
+    {
+      // Glanceable stats at the very top of the sidebar — editors check
+      // word count + reading minutes constantly while drafting. Compact
+      // pill row replaces the two full-width read-only number fields.
+      name: 'bodyStats',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/payload/admin/components/BodyStatsField.tsx#BodyStatsField',
+        },
+      },
+    },
+    {
+      name: 'permalink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            clientProps: { pathPrefix: '/blog' },
+          },
+        },
+      },
+    },
+    ...seoSidebarFields({ pathPrefix: '/blog', descriptionSource: 'abstract' }),
     {
       name: 'featured',
       type: 'checkbox',
@@ -106,24 +171,19 @@ export const Blogs: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
     {
+      // Data-only — surfaced as a compact pill at the top of the sidebar
+      // via `bodyStats` (BodyStatsField). Hidden here so the form doesn't
+      // double-render the value as a full-size number input.
       name: 'readingMinutes',
       type: 'number',
       access: { update: () => false },
-      admin: {
-        readOnly: true,
-        description: 'Computed from body word count on save.',
-        position: 'sidebar',
-      },
+      admin: { readOnly: true, hidden: true },
     },
     {
       name: 'wordCount',
       type: 'number',
       access: { update: () => false },
-      admin: {
-        readOnly: true,
-        description: 'Total words in the body. Computed on save.',
-        position: 'sidebar',
-      },
+      admin: { readOnly: true, hidden: true },
     },
     {
       name: 'tableOfContents',
@@ -133,6 +193,9 @@ export const Blogs: CollectionConfig = {
       admin: {
         readOnly: true,
         description: 'Auto-built from H2/H3 headings in the body on save.',
+        components: {
+          RowLabel: '@/payload/admin/components/TocRowLabel.tsx#TocRowLabel',
+        },
       },
       fields: [
         { name: 'level', type: 'number' },
@@ -140,7 +203,7 @@ export const Blogs: CollectionConfig = {
         { name: 'anchor', type: 'text' },
       ],
     },
-    seoField,
+    ...seoFieldsForSidebar('blogs'),
   ],
   hooks: {
     beforeChange: [
@@ -152,7 +215,12 @@ export const Blogs: CollectionConfig = {
         },
       }),
     ],
-    afterChange: [slugChangeRedirectHook('blogs')],
+    afterChange: [
+      slugChangeRedirectHook('blogs'),
+      searchSyncAfterChangeHook('blogs'),
+      webhooksPublishAfterChangeHook('blogs'),
+    ],
+    afterDelete: [searchSyncAfterDeleteHook('blogs')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

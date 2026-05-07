@@ -7,6 +7,15 @@ export const FAQ: Block = {
     { name: 'heading', type: 'text' },
     { name: 'sub', type: 'textarea' },
     {
+      name: 'bulkPaste',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste',
+        },
+      },
+    },
+    {
       name: 'items',
       type: 'array',
       required: true,
@@ -15,10 +24,17 @@ export const FAQ: Block = {
       admin: {
         description:
           'Renders as Radix Accordion + emits FAQPage JSON-LD when non-empty. At least one Q+A required.',
+        components: {
+          RowLabel: '@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel',
+        },
       },
       fields: [
         { name: 'question', type: 'text', required: true },
-        { name: 'answer', type: 'richText', required: true },
+        // Plain-text answer — matches Schema.org `acceptedAnswer.text`
+        // (which expects a string), keeps each row compact, and lines
+        // up with how `parseFaqBulk` already produces plain paragraphs.
+        // Multiple paragraphs supported via line breaks.
+        { name: 'answer', type: 'textarea', required: true },
       ],
     },
     {

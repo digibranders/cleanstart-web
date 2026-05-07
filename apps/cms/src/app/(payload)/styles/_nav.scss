@@ -1,0 +1,173 @@
+// =============================================================================
+// 9. Sidebar nav — clear category > indented-item hierarchy
+// =============================================================================
+//
+// Visual model:
+//
+//   GLOBALS                     ← category eyebrow: 10.5px / 700 / muted /
+//                                   uppercase / generous top spacing
+//     Site settings             ← item: 13px / 400 / secondary text
+//     SEO defaults                  + indented from category by 12px
+//     ...
+//
+// Categories are quiet, item rows are scannable, and the active item
+// reads with a 2px cyan left-stripe + brand-tinted background so the
+// editor's current location is obvious at a glance.
+
+// ─── Visual order of nav-groups ──────────────────────────────────
+//
+// Payload renders groups in declaration order (which is driven by the
+// `collections: [...]` array in payload.config.ts). The editorial
+// priority we want for the sidebar is content-first, ops-last:
+//
+//   Content       — what editors touch every day
+//   Globals       — site-wide settings (always near the top)
+//   Taxonomies    — categories the content references
+//   People        — author records
+//   System        — user accounts, media, redirects, audit
+//   Marketing     — forms, leads (occasional admin)
+//
+// `.nav__wrap` is `display: flex; flex-direction: column` (see
+// _user-menu.scss), so flex `order` reshuffles the rendered sequence
+// without forcing a payload.config.ts collection-array reshuffle.
+.cs-sidebar-header { order: 0; }
+.nav-group {
+  &.Content    { order: 1; }
+  &.Globals    { order: 2; }
+  &.Taxonomies { order: 3; }
+  &.People     { order: 4; }
+  &.System     { order: 5; }
+  &.Marketing  { order: 6; }
+}
+.cs-user-menu { order: 100; }
+
+.nav-group {
+  // Breathing room between groups so categories register as section
+  // dividers, not adjacent rows.
+  margin-bottom: 4px;
+  padding-top: 12px;
+
+  // First group sits under the SidebarHeader divider — kill its top
+  // padding so the GLOBALS eyebrow doesn't double-space.
+  &:first-of-type {
+    padding-top: 4px;
+  }
+
+  &__toggle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    color: var(--cs-text-muted);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: left;
+    line-height: 1.2;
+    transition: color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--cs-text-secondary);
+    }
+
+    // Chevron Payload appends to the toggle when the group is
+    // collapsible. Quieter chrome so it doesn't compete with the eyebrow.
+    svg {
+      width: 10px;
+      height: 10px;
+      margin-left: auto;
+      opacity: 0.5;
+      transition: opacity var(--cs-motion-micro);
+    }
+
+    &:hover svg {
+      opacity: 1;
+    }
+  }
+
+  // Item container — indents every nav link inside the group so the
+  // category > item hierarchy reads visually.
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 2px 0 4px;
+  }
+}
+
+// Sidebar item — Payload renders these as `.nav__link`. Indented under
+// the category header, lighter weight, brand-cyan active state.
+.nav__link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  // 24px left = 12px (group padding) + 12px (item indent)
+  padding: 6px 12px 6px 24px;
+  margin: 0 4px;
+  color: var(--cs-text-secondary);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.3;
+  border-radius: var(--cs-radius-input);
+  text-decoration: none;
+  min-height: 30px;
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro);
+
+  &:hover {
+    color: var(--cs-text-primary);
+    background: var(--cs-surface-raised);
+  }
+
+  // Active item — Payload sets `.nav__link--active`. Brand stripe + tint
+  // + slightly bolder weight so it reads as the current location even
+  // at peripheral-vision distance.
+  &--active,
+  &.active,
+  &[aria-current='page'] {
+    color: var(--cs-text-primary);
+    font-weight: 600;
+    background: var(--cs-tint-brand-soft);
+    box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
+  }
+
+  &:focus-visible {
+    outline: var(--cs-focus-outline);
+    outline-offset: -2px;
+  }
+}
+
+// ─── Draft-count badges injected by NavBadges ────────────────────
+//
+// Client component DOM-injects `<span class="cs-nav-badge">N</span>`
+// into nav links for collections with pending drafts. Pushes to the
+// right of the link via `margin-left: auto`.
+.nav__link .cs-nav-badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--cs-tint-brand-soft);
+  color: var(--cs-cyan-500);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  font-feature-settings: 'tnum' 1;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.nav__link--active .cs-nav-badge,
+.nav__link.active .cs-nav-badge {
+  background: var(--cs-tint-brand-medium);
+}

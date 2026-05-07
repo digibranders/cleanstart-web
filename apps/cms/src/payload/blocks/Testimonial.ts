@@ -1,5 +1,7 @@
 import type { Block } from 'payload';
 
+import { mediaUploadField } from '../fields/media-upload';
+
 export const Testimonial: Block = {
   slug: 'testimonial',
   labels: { singular: 'Testimonial', plural: 'Testimonials' },
@@ -8,8 +10,8 @@ export const Testimonial: Block = {
     { name: 'person', type: 'text', required: true },
     { name: 'role', type: 'text' },
     { name: 'company', type: 'text' },
-    { name: 'companyLogo', type: 'upload', relationTo: 'media' },
-    { name: 'avatar', type: 'upload', relationTo: 'media' },
+    mediaUploadField({ name: 'companyLogo', folderHint: 'web/general' }),
+    mediaUploadField({ name: 'avatar', folderHint: 'web/general' }),
     {
       name: 'variant',
       type: 'select',

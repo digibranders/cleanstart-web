@@ -1,0 +1,253 @@
+// 23. Paper-cut polish — status pills, toast stacking, breadcrumb home icon
+// =============================================================================
+
+// ─── Status pill polish across versioned list views ───────────────
+//
+// Payload renders `.cell-_status` as a plain text "draft" / "published"
+// label. Promote each value to a coloured chip with a leading dot so the
+// status reads at a glance from the table.
+.cell-_status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+}
+
+// Map Payload's status values via :has() — match by text content fallback.
+// Payload doesn't add status-specific class modifiers; we colour by value
+// using cell content + collection-list rendering attributes. The pill
+// classes Payload exposes inside cells (.pill, .pill--has-color) carry
+// the actual semantic — surface our chip styling on those.
+.cell-_status .pill,
+.cell-_status .pill--has-color {
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+}
+
+// Published / Live — cyan
+.cell-_status .pill--style-success,
+.cell-_status .pill[class*='published'] {
+  color: var(--cs-cyan-500);
+  background: var(--cs-tint-brand-soft);
+}
+
+// Draft — neutral
+.cell-_status .pill--style-warning,
+.cell-_status .pill[class*='draft'] {
+  color: var(--theme-text-soft);
+  background: var(--theme-elevation-150);
+}
+
+// Scheduled — amber
+.cell-_status .pill--style-info,
+.cell-_status .pill[class*='scheduled'] {
+  color: var(--color-warning-500);
+  background: rgba(217, 119, 6, 0.14);
+}
+
+// ─── Toast stacking — keep multiple toasts readable ────────────────
+//
+// Payload's stock toast container stacks tightly without spacing; multiple
+// toasts overlap. Add a min-gap and a subtle scale for the last toast.
+.payload-toast-container,
+[role='status'][data-payload-toast='container'],
+[data-sonner-toaster] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-2);
+  z-index: 80;
+}
+
+.payload-toast,
+[data-sonner-toast] {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3) var(--cs-space-4);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+  font-size: 13.5px;
+  color: var(--theme-text);
+  min-height: 44px;
+  max-width: 420px;
+  transition:
+    transform var(--cs-motion-macro),
+    opacity var(--cs-motion-macro);
+
+  &[data-type='success'] {
+    border-left: 3px solid var(--color-success-500);
+  }
+
+  &[data-type='error'] {
+    border-left: 3px solid var(--color-error-500);
+  }
+
+  &[data-type='warning'] {
+    border-left: 3px solid var(--color-warning-500);
+  }
+
+  &[data-type='info'] {
+    border-left: 3px solid var(--cs-cyan-500);
+  }
+}
+
+// (Removed: previous `.step-nav::before` home icon. The breadcrumb
+//  identity is provided entirely by the Icon graphic now styled as a
+//  "CleanStart" wordmark in `Icon.tsx` — a duplicate home glyph here
+//  read as visual noise.)
+
+// ─── Field description callout — italic, left-bordered ─────────────
+//
+// Make `admin.description` strings stand out as guidance rather than
+// blending with the field label.
+.field-description {
+  font-style: italic;
+}
+
+// ─── Required asterisk emphasis ────────────────────────────────────
+//
+// Boost the required marker so it doesn't blend into the label.
+.field-label .required,
+.field-label__required {
+  color: var(--color-error-500);
+  opacity: 1;
+  font-weight: 700;
+  font-size: 13px;
+  margin-inline-start: 0.2em;
+}
+
+// ─── Tab strip harmony with sidebar nav (36px row height) ──────────
+//
+// Payload's edit-view tab strip (`.tabs-field__tabs`) defaults to ~40px,
+// half a beat off from the sidebar nav's 36px rhythm. Drop it back to
+// 36px so the chrome locks to a single height across surfaces.
+.tabs-field__tabs,
+.tabs-field__tabs-wrap {
+  .tabs-field__tab-button {
+    height: 36px;
+    padding-inline: var(--cs-space-3);
+    font-size: 13.5px;
+  }
+}
+
+// ─── Sidebar nav active rail — guarantee 2px cyan stripe ───────────
+//
+// Belt-and-braces in case a downstream rule erases the active rail on
+// nested groups. Active link rendering already exists in _nav.scss but
+// some Payload route patterns lose the modifier on first paint.
+.nav__link--active,
+.nav__link[aria-current='page'] {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-block: 6px;
+    inset-inline-start: 0;
+    width: 2px;
+    border-radius: 0 2px 2px 0;
+    background: var(--cs-cyan-500);
+  }
+}
+
+// ─── Tooltip max-width + sentence-case — calmer at a glance ────────
+.payload-tooltip,
+[data-payload-tooltip],
+[role='tooltip'] {
+  max-width: 280px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+  text-transform: none;
+}
+
+// ─── Conditional-field reveal transition ───────────────────────────
+//
+// Payload toggles `admin.condition` fields by re-rendering with no
+// transition, so a checkbox click snaps dependent fields in/out —
+// visible jank on tall forms (Webinar registrationMode is the
+// canonical case). Animate the entry. Respects prefers-reduced-motion
+// via the global rule in `_a11y.scss`.
+@keyframes cs-field-reveal {
+  0%   { opacity: 0; transform: translateY(-4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.array-field__row .field-type,
+.collapsible__content .field-type,
+.tabs-field__tab-pane .field-type {
+  animation: cs-field-reveal 150ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+// ─── Sticky add-row button on long array fields ────────────────────
+//
+// Payload's `.array-field__add-row` button sits at the bottom of the
+// array container. On long FAQ / TOC arrays it scrolls past the
+// viewport — editors lose sight of it. Make it stick to the bottom
+// of the array with a subtle shadow on scroll-overlay.
+.array-field__add-row,
+.array-field__add-row-wrapper {
+  position: sticky;
+  bottom: var(--cs-space-2);
+  z-index: 2;
+  background: var(--theme-bg);
+  padding-block: var(--cs-space-1);
+}
+
+// ─── Skeleton shimmer for first-paint loading state ────────────────
+//
+// Default Payload list/edit views render an empty white panel while
+// data fetches. Surface a shimmer on `.skeleton`, `.is-loading`, and
+// `[data-loading='true']` so editors get instant feedback the page is
+// alive.
+@keyframes cs-skeleton-shimmer {
+  0%   { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton,
+.is-loading-skeleton,
+[data-loading='true'] {
+  background: linear-gradient(
+    90deg,
+    var(--theme-elevation-100) 0%,
+    var(--theme-elevation-150) 50%,
+    var(--theme-elevation-100) 100%
+  );
+  background-size: 200px 100%;
+  background-repeat: no-repeat;
+  animation: cs-skeleton-shimmer 1200ms linear infinite;
+  border-radius: var(--cs-radius-input);
+}
+

@@ -17,6 +17,32 @@ services:
       timeout: 5s
       retries: 10
 
+  # Meilisearch — self-hosted search backend per arch doc §search.
+  # Localhost-bound; the CMS reaches it over the docker network in
+  # production, over loopback in staging/dev. The master key bootstraps
+  # the cluster once; per-environment API keys (admin for the CMS,
+  # search-only for the public site) are issued via the master key on
+  # first run.
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    container_name: cleanstart-meilisearch
+    restart: unless-stopped
+    environment:
+      MEILI_ENV: production
+      MEILI_MASTER_KEY: ${MEILISEARCH_MASTER_KEY:?master key required}
+      MEILI_NO_ANALYTICS: "true"
+    ports:
+      - "127.0.0.1:7700:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:7700/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
 volumes:
   postgres_data:
+    driver: local
+  meilisearch_data:
     driver: local

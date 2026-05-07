@@ -1,0 +1,63 @@
+'use client';
+
+import { useRowLabel } from '@payloadcms/ui';
+import type { ReactElement } from 'react';
+
+type FaqRowData = {
+  question?: string | null;
+  answer?: string | null;
+};
+
+const truncate = (input: string, max: number): string =>
+  input.length > max ? `${input.slice(0, max - 1).trimEnd()}…` : input;
+
+/**
+ * Row label for FAQ array fields. Shows the question text on the
+ * collapsed row instead of the default `FAQ 01`/`FAQ 02` so editors
+ * can scan the list without opening every row. Falls back to the
+ * numeric label when a row hasn't had its question filled in yet.
+ *
+ * Trailing badge surfaces whether the answer is filled — lets editors
+ * spot empty rows without expanding each one.
+ */
+export const FaqRowLabel = (): ReactElement => {
+  const { data, rowNumber } = useRowLabel<FaqRowData>();
+  const number = (rowNumber ?? 0) + 1;
+  const question = (data?.question ?? '').trim();
+  const answered = (data?.answer ?? '').trim() !== '';
+  const numLabel = String(number).padStart(2, '0');
+
+  if (!question) {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, opacity: 0.6 }}>{numLabel}</span>
+        <span style={{ opacity: 0.6 }}>Empty FAQ</span>
+      </span>
+    );
+  }
+
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, opacity: 0.6 }}>{numLabel}</span>
+      <span>{truncate(question, 100)}</span>
+      <span
+        aria-label={answered ? 'Answer filled' : 'Answer empty'}
+        title={answered ? 'Answer filled' : 'Answer empty'}
+        style={{
+          fontSize: 10,
+          fontWeight: 600,
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+          padding: '2px 6px',
+          borderRadius: 999,
+          color: answered ? 'var(--cs-cyan-500, #06c7f2)' : 'var(--theme-text-disabled)',
+          background: answered
+            ? 'var(--cs-tint-brand-soft, rgba(6,199,242,0.08))'
+            : 'var(--theme-elevation-150, rgba(0,0,0,0.04))',
+        }}
+      >
+        {answered ? '· answered' : '· empty'}
+      </span>
+    </span>
+  );
+};

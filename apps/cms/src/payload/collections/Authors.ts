@@ -1,9 +1,15 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
-import { seoField } from '../fields/seo';
+import { mediaUploadField } from '../fields/media-upload';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { validateOptionalUrl } from '../lib/url-shape';
 
 export const Authors: CollectionConfig = {
@@ -23,7 +29,7 @@ export const Authors: CollectionConfig = {
   fields: [
     { name: 'name', type: 'text', required: true },
     slugField({ source: 'name' }),
-    { name: 'photo', type: 'upload', relationTo: 'media' },
+    mediaUploadField({ name: 'photo', folderHint: 'web/author' }),
     { name: 'role', type: 'text', admin: { description: 'Job title shown on the byline + Person JSON-LD.' } },
     { name: 'location', type: 'text' },
     { name: 'bioShort', type: 'textarea', admin: { description: 'One-line bio for cards and SERP snippets.' } },
@@ -101,10 +107,29 @@ export const Authors: CollectionConfig = {
         position: 'sidebar',
       },
     },
-    seoField,
+    {
+      name: 'permalink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            clientProps: { pathPrefix: '/authors' },
+          },
+        },
+      },
+    },
+    ...seoSidebarFields({ pathPrefix: '/authors', descriptionSource: 'bioShort' }),
+    ...seoFieldsForSidebar('authors'),
   ],
   hooks: {
-    afterChange: [slugChangeRedirectHook('authors')],
+    afterChange: [
+      slugChangeRedirectHook('authors'),
+      searchSyncAfterChangeHook('authors'),
+      webhooksPublishAfterChangeHook('authors'),
+    ],
+    afterDelete: [searchSyncAfterDeleteHook('authors')],
   },
   versions: { drafts: true },
   timestamps: true,

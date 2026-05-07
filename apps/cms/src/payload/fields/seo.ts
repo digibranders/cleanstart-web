@@ -1,6 +1,7 @@
 import type { Field, GroupField } from 'payload';
 
 import { validateCanonicalOverride } from '../lib/canonical';
+import { mediaUploadField } from './media-upload';
 
 const TITLE_CHAR_HINT = 60;
 const DESCRIPTION_CHAR_HINT = 160;
@@ -17,6 +18,10 @@ const indexableField: Field = {
   admin: {
     description:
       "When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.",
+    // Hidden from the in-form group renderer — the editor edits this
+    // via the `seoIndexable` sidebar UI field instead. Data still
+    // persists at `seo.indexable`.
+    hidden: true,
   },
 };
 
@@ -25,6 +30,9 @@ const titleField: Field = {
   type: 'text',
   admin: {
     description: `SEO title. Falls back to the document title + site default. Aim for ≤ ${TITLE_CHAR_HINT} characters.`,
+    // Hidden from the in-form group renderer — the editor edits this
+    // via the `seoTitle` sidebar UI field instead.
+    hidden: true,
   },
 };
 
@@ -33,19 +41,19 @@ const descriptionField: Field = {
   type: 'textarea',
   admin: {
     description: `SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ ${DESCRIPTION_CHAR_HINT} characters.`,
+    // Hidden from the in-form group renderer — the editor edits this
+    // via the `seoDescription` sidebar UI field instead.
+    hidden: true,
   },
 };
 
 const ogImageFields: Field[] = [
-  {
+  mediaUploadField({
     name: 'ogImage',
-    type: 'upload',
-    relationTo: 'media',
-    admin: {
-      description:
-        'Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).',
-    },
-  },
+    folderHint: 'web/general',
+    description:
+      'Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).',
+  }),
   {
     name: 'ogImageAlt',
     type: 'text',
@@ -136,13 +144,23 @@ const speakablePathField: Field = {
   ],
 };
 
+/**
+ * Top-level SEO group. Title / Description / Indexable still live
+ * here in the data shape (`seo.title`, `seo.description`,
+ * `seo.indexable`) but are `admin.hidden: true` so the in-form group
+ * renderer skips them. Editors edit those three via the sidebar UI
+ * fields exported as `seoSidebarFields()` below — which keeps the
+ * highest-traffic, highest-impact SEO controls glanceable while
+ * writing, and pushes advanced og/canonical/speakable controls into
+ * a calmer, less-frequently visited section of the form.
+ */
 export const seoField: GroupField = {
   name: 'seo',
   type: 'group',
-  label: 'SEO',
+  label: 'SEO advanced',
   admin: {
     description:
-      'On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.',
+      'Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.',
   },
   fields: [
     titleField,
@@ -155,4 +173,124 @@ export const seoField: GroupField = {
     canonicalOverrideField,
     speakablePathField,
   ],
+};
+
+/**
+ * Hidden variant of `seoField` — same data shape, but the group itself
+ * is skipped by the in-form renderer. Used by collections that surface
+ * the advanced SEO controls (OG image, advanced OG copy, custom
+ * canonical, speakable selectors) via the right-rail
+ * `SeoAdvancedPanel` instead of as a bottom-of-form group.
+ *
+ * Schema, validators, hooks, and audit logic are untouched — only the
+ * render surface moves.
+ */
+export const seoFieldHidden: GroupField = {
+  ...seoField,
+  admin: {
+    ...(seoField.admin ?? {}),
+    hidden: true,
+  },
+};
+
+/**
+ * Sidebar UI field that mounts the `SeoAdvancedPanel` collapsible card.
+ * Pass the collection slug as `storageKey` so each collection remembers
+ * its own expanded/collapsed state per editor.
+ */
+export const seoAdvancedSidebarField = (args: { storageKey: string }): Field => ({
+  name: 'seoAdvanced',
+  type: 'ui',
+  admin: {
+    position: 'sidebar',
+    components: {
+      Field: {
+        path: '@/payload/admin/components/SeoAdvancedPanel.tsx#SeoAdvancedPanel',
+        clientProps: { storageKey: args.storageKey },
+      },
+    },
+  },
+});
+
+/**
+ * One-call helper a collection can use to install both the hidden
+ * `seoField` data group and the sidebar `SeoAdvancedPanel` UI in a
+ * single spread. Each collection's diff for the SEO consolidation is
+ * one line: replace `seoField` with `...seoFieldsForSidebar(slug)`.
+ */
+export const seoFieldsForSidebar = (storageKey: string): Field[] => [
+  seoFieldHidden,
+  seoAdvancedSidebarField({ storageKey }),
+];
+
+/**
+ * Returns the three sidebar UI fields a content collection should
+ * splice into its sidebar above `Featured` / `Pinned`:
+ *   - SEO Title (auto-synced from `title`, char counter)
+ *   - SEO Description (auto-synced from a configurable source field)
+ *   - SEO Indexable (3-chip segmented control)
+ *   - SERP Preview (Google snippet mockup)
+ *
+ * `pathPrefix` and `descriptionSource` let each collection wire its
+ * own URL prefix and lead-text field name.
+ */
+export const seoSidebarFields = (args: {
+  pathPrefix: string;
+  descriptionSource?: string;
+}): Field[] => {
+  const { pathPrefix, descriptionSource = 'abstract' } = args;
+  return [
+    {
+      name: 'seoTitle',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/SeoTitleField.tsx#SeoTitleField',
+            clientProps: { path: 'seo.title' },
+          },
+        },
+      },
+    },
+    {
+      name: 'seoDescription',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/SeoDescriptionField.tsx#SeoDescriptionField',
+            clientProps: { path: 'seo.description', sourceField: descriptionSource },
+          },
+        },
+      },
+    },
+    {
+      name: 'seoIndexable',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/SeoIndexableField.tsx#SeoIndexableField',
+            clientProps: { path: 'seo.indexable' },
+          },
+        },
+      },
+    },
+    {
+      name: 'serpPreview',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/SerpPreviewField.tsx#SerpPreviewField',
+            clientProps: { pathPrefix, descriptionSource },
+          },
+        },
+      },
+    },
+  ];
 };

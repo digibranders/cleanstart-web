@@ -1,5 +1,7 @@
 import type { Block } from 'payload';
 
+import { mediaUploadField } from '../fields/media-upload';
+
 export const LogoCloud: Block = {
   slug: 'logoCloud',
   labels: { singular: 'Logo cloud', plural: 'Logo clouds' },
@@ -12,7 +14,7 @@ export const LogoCloud: Block = {
       minRows: 1,
       labels: { singular: 'Logo', plural: 'Logos' },
       fields: [
-        { name: 'image', type: 'upload', relationTo: 'media', required: true },
+        mediaUploadField({ name: 'image', required: true, folderHint: 'web/general' }),
         { name: 'alt', type: 'text', required: true },
         { name: 'url', type: 'text' },
       ],

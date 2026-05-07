@@ -1,0 +1,183 @@
+// 21. Button & cursor consistency audit (cross-cutting)
+// =============================================================================
+//
+// Sweep across every button-like element so the admin looks coherent:
+//   - cursor: pointer on every actionable control
+//   - cursor: not-allowed on disabled controls
+//   - 36px is the canonical row height (already locked in §16b),
+//     30px for icon-only / .btn--size-small, 44px for .btn--size-large
+//   - hover never changes layout (no margin/padding tweaks); only color,
+//     background, border-color, and box-shadow transitions
+//   - focus-visible always shows a 3px brand-cyan halo
+//
+// Use the broadest possible selector list so this catches Payload's stock
+// button + the admin's custom controls without per-component overrides.
+
+// ─── Cursor pointers on all interactive controls
+button:not([disabled]),
+a[role='button']:not([disabled]),
+.btn:not([disabled]),
+[role='button']:not([disabled]),
+.payload__btn:not([disabled]),
+input[type='button']:not([disabled]),
+input[type='submit']:not([disabled]),
+.popup-button:not([disabled]),
+.list-controls__buttons button:not([disabled]),
+.tabs-field__tab-button:not([disabled]),
+.collapsible__toggle,
+.array-field__row-header,
+.row-label,
+[data-clickable='true'],
+.card--has-onclick,
+.thumbnail--has-thumbnail,
+.upload-relationship-details__edit,
+.upload-relationship-details__remove {
+  cursor: pointer;
+}
+
+button[disabled],
+a[role='button'][aria-disabled='true'],
+.btn[disabled],
+.btn--disabled,
+[role='button'][aria-disabled='true'],
+input[type='button'][disabled],
+input[type='submit'][disabled],
+.popup-button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+// ─── Unify focus rings on all button-like controls (3px brand halo)
+button:focus-visible,
+a[role='button']:focus-visible,
+.btn:focus-visible,
+[role='button']:focus-visible,
+.popup-button:focus-visible,
+.tabs-field__tab-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+}
+
+// ─── Hover transitions — coherent across every button class
+.btn,
+.popup-button,
+.tabs-field__tab-button,
+.upload-relationship-details__edit,
+.upload-relationship-details__remove {
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro),
+    transform var(--cs-motion-micro);
+}
+
+// ─── Secondary-style buttons everywhere — outlined with brand-cyan hover
+.btn--style-secondary:not(.btn--icon-only),
+.btn--style-pill-secondary:not(.btn--icon-only) {
+  background: var(--theme-input-bg);
+  border: 1px solid var(--theme-elevation-250);
+  color: var(--theme-text);
+  border-radius: var(--cs-radius-input);
+  height: 36px;
+  padding-inline: var(--cs-space-4);
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.005em;
+
+  &:hover:not([disabled]) {
+    border-color: var(--cs-cyan-500);
+    color: var(--cs-cyan-500);
+  }
+}
+
+// ─── Subtle / ghost buttons — transparent, soft brand hover
+.btn--style-subtle:not(.btn--icon-only),
+.btn--style-none:not(.btn--icon-only) {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--theme-text-soft);
+  height: 36px;
+  padding-inline: var(--cs-space-3);
+  border-radius: var(--cs-radius-input);
+  font-weight: 600;
+  font-size: 13.5px;
+
+  &:hover:not([disabled]) {
+    color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+}
+
+// ─── Destructive buttons — red border on hover, never red bg by default
+.btn--style-error:not(.btn--icon-only),
+.btn--destructive:not(.btn--icon-only) {
+  background: var(--theme-input-bg);
+  border: 1px solid var(--theme-elevation-250);
+  color: var(--theme-text);
+  height: 36px;
+  border-radius: var(--cs-radius-input);
+  padding-inline: var(--cs-space-4);
+  font-weight: 600;
+  font-size: 13.5px;
+
+  &:hover:not([disabled]) {
+    border-color: var(--color-error-500);
+    color: var(--color-error-500);
+    background: rgba(220, 38, 38, 0.06);
+  }
+}
+
+// ─── Icon-only buttons everywhere — square 30px, brand-cyan on hover
+.btn--icon-only,
+.btn[aria-label][data-icon-only='true'] {
+  cursor: pointer;
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--cs-radius-input);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--theme-text-soft);
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover:not([disabled]) {
+    color: var(--cs-cyan-500);
+    border-color: var(--theme-elevation-200);
+    background: var(--cs-tint-brand-soft);
+  }
+}
+
+// ─── Pagination buttons — match the icon-only spec
+.payload-pagination button,
+.payload-pagination a {
+  cursor: pointer;
+  min-width: 30px;
+  height: 30px;
+  border-radius: var(--cs-radius-input);
+
+  &:hover:not([disabled]) {
+    color: var(--cs-cyan-500);
+  }
+}
+
+// ─── Drag handles — grab/grabbing cursor
+.array-field__draggable,
+.array-field__row-drag,
+.collapsible__drag,
+[draggable='true'] {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+

@@ -1,7 +1,8 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
-import { seoField } from '../fields/seo';
+import { mediaUploadField } from '../fields/media-upload';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { validateOptionalUrl } from '../lib/url-shape';
@@ -144,15 +145,13 @@ export const Jobs: CollectionConfig = {
         condition: (_data, sibling) => sibling?.source === 'cms',
       },
     },
-    {
+    mediaUploadField({
       name: 'descriptionPdf',
-      type: 'upload',
-      relationTo: 'media',
-      admin: {
-        description: 'Optional JD PDF (routed to web/job/).',
-        condition: (_data, sibling) => sibling?.source === 'cms',
-      },
-    },
+      folderHint: 'web/job',
+      description: 'Optional JD PDF (routed to web/job/).',
+      condition: (_data, sibling) =>
+        (sibling as { source?: string } | undefined)?.source === 'cms',
+    }),
     {
       name: 'applyUrl',
       type: 'text',
@@ -206,7 +205,21 @@ export const Jobs: CollectionConfig = {
         condition: (_data, sibling) => sibling?.hiringStatus === 'closed',
       },
     },
-    seoField,
+    {
+      name: 'permalink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            clientProps: { pathPrefix: '/jobs' },
+          },
+        },
+      },
+    },
+    ...seoSidebarFields({ pathPrefix: '/jobs', descriptionSource: 'abstract' }),
+    ...seoFieldsForSidebar('jobs'),
   ],
   hooks: {
     afterChange: [slugChangeRedirectHook('jobs')],

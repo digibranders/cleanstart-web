@@ -23,12 +23,32 @@ execFileSync('pnpm', ['--filter', '@cleanstart/cms', 'run', 'generate:types'], {
 const after = readFileSync(typesFile, 'utf8');
 
 if (before !== after) {
+  // Surface the actual line-level diff so opaque drift (CI sees a
+  // change that local doesn't) can be diagnosed without manually
+  // diffing CI artifacts.
+  const beforeLines = before.split('\n');
+  const afterLines = after.split('\n');
+  const max = Math.max(beforeLines.length, afterLines.length);
+  const diffLines: string[] = [];
+  let diffCount = 0;
+  for (let i = 0; i < max; i++) {
+    if (beforeLines[i] !== afterLines[i]) {
+      diffCount++;
+      if (diffLines.length < 90) {
+        diffLines.push(`  L${i + 1}:`);
+        diffLines.push(`    - ${(beforeLines[i] ?? '').slice(0, 220)}`);
+        diffLines.push(`    + ${(afterLines[i] ?? '').slice(0, 220)}`);
+      }
+    }
+  }
+
   process.stderr.write(
     [
       '',
       '✖ Payload types drift detected.',
       `  ${typesFile}`,
-      '  was out of date with the current collection/global/block schemas.',
+      `  ${diffCount} line(s) differ between committed file and freshly generated output.`,
+      ...diffLines,
       '  Run `pnpm --filter @cleanstart/cms generate:types` locally and commit the updated file.',
       '',
     ].join('\n'),

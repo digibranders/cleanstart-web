@@ -1,7 +1,8 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
-import { seoField } from '../fields/seo';
+import { mediaUploadField } from '../fields/media-upload';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
@@ -24,7 +25,7 @@ export const Events: CollectionConfig = {
     slugField({ source: 'title' }),
     { name: 'venue', type: 'text', required: true },
     { name: 'abstract', type: 'textarea' },
-    { name: 'heroImage', type: 'upload', relationTo: 'media' },
+    mediaUploadField({ name: 'heroImage', folderHint: 'web/event' }),
     { name: 'body', type: 'richText' },
     {
       name: 'startsAt',
@@ -121,23 +122,36 @@ export const Events: CollectionConfig = {
         condition: (_data, sibling) => sibling?.registrationMode === 'internal',
       },
     },
-    {
+    mediaUploadField({
       name: 'agendaPdf',
-      type: 'upload',
-      relationTo: 'media',
-      admin: { description: 'Agenda PDF (routed to web/event/).' },
-    },
+      folderHint: 'web/event',
+      description: 'Agenda PDF (routed to web/event/).',
+    }),
     {
       name: 'gallery',
       type: 'array',
       labels: { singular: 'Photo', plural: 'Photos' },
       admin: { description: 'Post-event photos. Surface only after the event ends.' },
       fields: [
-        { name: 'image', type: 'upload', relationTo: 'media', required: true },
+        mediaUploadField({ name: 'image', required: true, folderHint: 'web/event' }),
         { name: 'caption', type: 'text' },
       ],
     },
-    seoField,
+    {
+      name: 'permalink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            clientProps: { pathPrefix: '/events' },
+          },
+        },
+      },
+    },
+    ...seoSidebarFields({ pathPrefix: '/events', descriptionSource: 'abstract' }),
+    ...seoFieldsForSidebar('events'),
   ],
   hooks: {
     afterChange: [slugChangeRedirectHook('events')],

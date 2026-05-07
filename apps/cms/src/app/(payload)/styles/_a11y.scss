@@ -1,0 +1,118 @@
+// 16. Accessibility — focus, reduced motion
+// =============================================================================
+
+:focus-visible {
+  outline: 2px solid var(--cs-cyan-500);
+  outline-offset: 2px;
+  border-radius: var(--cs-radius-input);
+}
+
+// Inputs that already have their own focus chrome (the parent
+// container draws the brand-cyan border + halo) shouldn't ALSO get
+// the global focus-visible outline — otherwise an empty react-select
+// search input renders as a tiny brand-cyan box next to its chip,
+// which reads visually as a stray "[" bracket. Scope the outline off
+// for these inner inputs so only the cursor caret is visible.
+.rs__input,
+.rs__input:focus,
+.rs__input:focus-visible,
+.react-select__input,
+.react-select__input:focus,
+.react-select__input:focus-visible,
+.field-type.select input:focus-visible,
+.field-type.relationship input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+// Same for Lexical contentEditables — the bordered shell wrap shows
+// the focus state via :focus-within (3px brand halo). The inner
+// element shouldn't ALSO render its own outline.
+[contenteditable='true'][data-lexical-editor='true']:focus-visible,
+[contenteditable='true'][data-lexical-editor='true']:focus {
+  outline: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// ─── High contrast (prefers-contrast: more) ───────────────────────
+//
+// Stronger borders, full-strength focus rings, no opacity dimming on
+// labels, status pills get borders. Layered on top of the normal
+// theme so it works in both light and dark.
+@media (prefers-contrast: more) {
+  :root {
+    --theme-elevation-150: var(--theme-text-soft);
+    --theme-elevation-200: var(--theme-text-soft);
+    --theme-elevation-250: var(--theme-text);
+    --cs-tint-focus-ring: var(--cs-cyan-500);
+  }
+
+  .field-label,
+  .field-description {
+    opacity: 1 !important;
+  }
+
+  .field-type input,
+  .field-type textarea,
+  .field-type select,
+  .rs__control,
+  .react-select__control {
+    border-width: 1.5px !important;
+  }
+
+  :focus-visible {
+    outline-width: 3px;
+    outline-color: var(--cs-cyan-500);
+  }
+}
+
+// ─── Skip link to main content (keyboard users) ───────────────────
+.cs-skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  padding: 8px 16px;
+  background: var(--cs-cyan-500);
+  color: #04212a;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 0 0 var(--cs-radius-input) 0;
+  z-index: 9999;
+  text-decoration: none;
+  transition: top var(--cs-motion-micro);
+
+  &:focus,
+  &:focus-visible {
+    top: 0;
+    outline: none;
+  }
+}
+
+// ─── Mobile collapse — sidebar shrinks to icon rail under 768px ───
+@media (max-width: 768px) {
+  .nav__link {
+    min-height: 44px; // touch-target floor
+  }
+
+  .doc-controls {
+    flex-wrap: wrap;
+    gap: var(--cs-space-2);
+  }
+
+  .modal,
+  .drawer {
+    border-radius: var(--cs-radius-card) var(--cs-radius-card) 0 0;
+  }
+}
+

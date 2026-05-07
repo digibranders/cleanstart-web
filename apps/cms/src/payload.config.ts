@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
+import { RichPasteFeature } from './payload/lib/lexical/rich-paste-feature';
 import { s3Storage } from '@payloadcms/storage-s3';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
@@ -17,6 +18,8 @@ import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
 import { JobLocations } from './payload/collections/JobLocations';
 import { Jobs } from './payload/collections/Jobs';
+import { KnowledgeBase } from './payload/collections/KnowledgeBase';
+import { KnowledgeCategories } from './payload/collections/KnowledgeCategories';
 import { Leads } from './payload/collections/Leads';
 import { Media } from './payload/collections/Media';
 import { News } from './payload/collections/News';
@@ -24,9 +27,15 @@ import { NewsCategories } from './payload/collections/NewsCategories';
 import { Pages } from './payload/collections/Pages';
 import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
+import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
+import { jsonLdEndpoint } from './payload/endpoints/jsonld';
+import { searchAnalyticsEndpoint } from './payload/endpoints/search-analytics';
+import { newsSitemapEndpoint, sitemapEndpoint } from './payload/endpoints/sitemap';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
+import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
+import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
@@ -87,9 +96,32 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
+      actions: [
+        './payload/admin/components/SkipLink.tsx#SkipLink',
+        './payload/admin/components/SaveShortcut.tsx#SaveShortcut',
+        './payload/admin/components/CommandPalette.tsx#CommandPalette',
+        './payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator',
+        './payload/admin/components/NavBadges.tsx#NavBadges',
+        './payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence',
+        './payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle',
+        './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
+        './payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer',
+        './payload/admin/components/MediaEditEnhancer.tsx#MediaEditEnhancer',
+        './payload/admin/components/ToastBus.tsx#ToastBus',
+      ],
+      afterNavLinks: [
+        './payload/admin/components/UserMenu.tsx#UserMenu',
+      ],
+      beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
       graphics: {
         Logo: './payload/admin/Logo.tsx#Logo',
         Icon: './payload/admin/Icon.tsx#Icon',
+      },
+      views: {
+        dashboard: {
+          Component:
+            './payload/admin/components/Dashboard/Dashboard.tsx#Dashboard',
+        },
       },
     },
     meta: {
@@ -107,11 +139,19 @@ export default buildConfig({
     },
   },
   collections: [
+    // Order tracks the editorial mental model surfaced in the sidebar:
+    //   System → People → Taxonomies → Marketing → Content
+    // Group strings on each collection drive the sidebar grouping; this
+    // array order drives the order *within* each group.
     Users,
     Media,
+    Redirects,
+    AuditLog,
+    SearchLog,
     Authors,
     Categories,
     NewsCategories,
+    KnowledgeCategories,
     JobLocations,
     Forms,
     Leads,
@@ -119,21 +159,29 @@ export default buildConfig({
     News,
     Guides,
     Resources,
+    KnowledgeBase,
     Events,
     Webinars,
     Jobs,
     AboutGalleries,
     Pages,
-    Redirects,
-    AuditLog,
   ],
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements],
+  endpoints: [jsonLdEndpoint, sitemapEndpoint, newsSitemapEndpoint, searchAnalyticsEndpoint],
   jobs: {
-    tasks: [drainLeadQueueTask],
+    tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask],
     autoRun: [
       {
         cron: '*/5 * * * *', // every 5 minutes
         queue: 'leadQueueDrain',
+      },
+      {
+        cron: '0 3 * * *', // daily at 03:00 UTC — searchLog 90-day retention
+        queue: 'searchLogPurge',
+      },
+      {
+        cron: '15 3 * * *', // daily at 03:15 UTC — leads PII 365-day redaction
+        queue: 'leadsPiiPurge',
       },
     ],
     shouldAutoRun: () => process.env.NODE_ENV !== 'test',
@@ -142,7 +190,9 @@ export default buildConfig({
   onInit: () => {
     registerLeadHandlers();
   },
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [...defaultFeatures, RichPasteFeature()],
+  }),
   secret: requireEnv('PAYLOAD_SECRET'),
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
   typescript: {

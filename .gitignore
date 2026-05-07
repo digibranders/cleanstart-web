@@ -10,6 +10,11 @@ out/
 build/
 *.tsbuildinfo
 
+# Next.js auto-generates `next-env.d.ts` on every dev/build and rewrites
+# its import target each time — keeping it tracked surfaces noisy
+# false-positive diffs every session. Next regenerates it as needed.
+next-env.d.ts
+
 # Claude Code per-user settings (launch.json is committed; settings.local.json is per-user)
 .claude/settings.local.json
 
@@ -53,3 +58,4 @@ apps/cms/.lead-fallback-queue/
 
 # Sentry
 .sentryclirc
+.gstack/

@@ -1,0 +1,232 @@
+// =============================================================================
+// 5. Forms — labels, inputs, helpers, focus
+// =============================================================================
+
+// Labels — quieter, weight-500, slight tracking
+.field-label,
+.field-type__label,
+.field-type label {
+  color: var(--theme-text-soft);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  margin-bottom: 4px;
+}
+
+// Helper / description text under fields
+.field-description {
+  color: var(--theme-text-soft);
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+// Required asterisk — gentle red, never alarming
+.field-label .required,
+.field-label__required {
+  color: var(--color-error-500);
+  opacity: 0.7;
+  margin-inline-start: 0.15em;
+}
+
+// Pressed-in inputs — Webflow's "hole punched into the panel" treatment
+.field-type {
+  margin-bottom: var(--cs-space-3);
+
+  &.text input,
+  &.textarea textarea,
+  &.email input,
+  &.number input,
+  &.password input,
+  &.code .CodeMirror,
+  &.json .CodeMirror {
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    padding: 0.5rem 0.75rem;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--theme-text);
+    box-shadow: var(--cs-shadow-input-rest);
+    transition:
+      border-color var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &::placeholder {
+      color: var(--theme-text-disabled);
+    }
+
+    &:hover:not([disabled]):not(:focus):not(:focus-visible) {
+      border-color: var(--theme-elevation-300);
+    }
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow:
+        0 0 0 3px var(--cs-tint-focus-ring),
+        var(--cs-shadow-input-focus);
+    }
+
+    &[disabled],
+    &[readonly] {
+      background: var(--theme-elevation-50);
+      color: var(--theme-text-disabled);
+      cursor: not-allowed;
+    }
+  }
+
+  // Select / react-select
+  &.select .rs__control,
+  &.select .react-select__control {
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    min-height: 38px;
+    box-shadow: var(--cs-shadow-input-rest);
+    transition: border-color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--theme-elevation-300);
+    }
+
+    &--is-focused {
+      border-color: var(--cs-cyan-500);
+      box-shadow:
+        0 0 0 3px var(--cs-tint-focus-ring),
+        var(--cs-shadow-input-focus);
+    }
+  }
+
+  // Checkbox + radio — slightly tighter
+  &.checkbox .checkbox-input,
+  &.radio .radio-input {
+    border-radius: var(--cs-radius-chip);
+  }
+}
+
+// Group fields — single hairline divider, no double-card weight inside tabs
+.group-field {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--theme-elevation-150);
+  border-radius: 0;
+  padding: var(--cs-space-2) 0 0;
+  margin-top: var(--cs-space-3);
+
+  &__label {
+    color: var(--theme-text);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    text-transform: none;
+    margin-bottom: var(--cs-space-2);
+  }
+}
+
+// Top-level group fields — Payload styles every `.group-field--top-level`
+// (SEO on Blogs/Guides, Social on Authors, and any other top-level group
+// across collections + drawers) with hardcoded `-60px left / -40px right`
+// margins so the card visually pops out 100px wider than sibling fields.
+// That breaks column alignment everywhere. Pin every top-level group
+// flush with its sibling fields, both on edit pages AND inside drawers.
+.group-field--top-level,
+.group-field.group-field--top-level,
+.drawer .group-field--top-level,
+.doc-drawer .group-field--top-level,
+.list-drawer .group-field--top-level {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+// =============================================================================
+// Validation error states — make field errors unmissable
+// =============================================================================
+//
+// Default Payload error rendering paints the input border red but the
+// supporting message reads as plain text below the field. Strengthen
+// the signal: pulse the border once when the error first appears, tint
+// the field background, and style the message as a callout with a left
+// border so it reads as guidance, not flow content.
+
+.field-type {
+  &.error,
+  &--has-error,
+  &[data-invalid='true'] {
+    > label,
+    > .field-label,
+    > .field-type__label {
+      color: var(--color-error-500);
+    }
+
+    input,
+    textarea,
+    select,
+    .rs__control,
+    .react-select__control,
+    .CodeMirror,
+    [contenteditable='true'] {
+      border-color: var(--color-error-500) !important;
+      background: rgba(220, 38, 38, 0.06);
+      animation: cs-field-error-pulse 600ms cubic-bezier(0.4, 0, 0.2, 1) 1;
+    }
+
+    input:focus,
+    input:focus-visible,
+    textarea:focus,
+    textarea:focus-visible,
+    select:focus,
+    .rs__control--is-focused,
+    .react-select__control--is-focused {
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important;
+    }
+  }
+}
+
+// Inline error message under the field — callout with a left border so
+// editors spot it without scanning back to the label.
+.field-error,
+.field-type__error,
+.input-error-message,
+[data-field-error='true'] {
+  display: block;
+  margin-top: 4px;
+  padding: 6px var(--cs-space-2);
+  background: rgba(220, 38, 38, 0.08);
+  border-left: 3px solid var(--color-error-500);
+  border-radius: var(--cs-radius-chip);
+  color: var(--color-error-500);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@keyframes cs-field-error-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.45); }
+  60%  { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+// Top-of-form / bulk error summary banners.
+.error-pill,
+.field-error__list,
+.errors-summary {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3);
+  color: var(--color-error-500);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: var(--cs-space-3);
+
+  a,
+  button {
+    color: var(--color-error-500);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}

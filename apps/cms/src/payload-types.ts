@@ -69,9 +69,13 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    redirects: Redirect;
+    'audit-log': AuditLog;
+    searchLog: SearchLog;
     authors: Author;
     categories: Category;
     newsCategories: NewsCategory;
+    knowledgeCategories: KnowledgeCategory;
     jobLocations: JobLocation;
     forms: Form;
     leads: Lead;
@@ -79,13 +83,12 @@ export interface Config {
     news: News;
     guides: Guide;
     resources: Resource;
+    knowledgeBase: KnowledgeBase;
     events: Event;
     webinars: Webinar;
     jobs: Job;
     aboutGalleries: AboutGallery;
     pages: Page;
-    redirects: Redirect;
-    'audit-log': AuditLog;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -96,9 +99,13 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
+    searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
+    knowledgeCategories: KnowledgeCategoriesSelect<false> | KnowledgeCategoriesSelect<true>;
     jobLocations: JobLocationsSelect<false> | JobLocationsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
@@ -106,13 +113,12 @@ export interface Config {
     news: NewsSelect<false> | NewsSelect<true>;
     guides: GuidesSelect<false> | GuidesSelect<true>;
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
+    knowledgeBase: KnowledgeBaseSelect<false> | KnowledgeBaseSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     webinars: WebinarsSelect<false> | WebinarsSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
     aboutGalleries: AboutGalleriesSelect<false> | AboutGalleriesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
-    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
-    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -130,6 +136,7 @@ export interface Config {
     footerNav: FooterNav;
     legal: Legal;
     announcements: Announcement;
+    'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
@@ -138,6 +145,7 @@ export interface Config {
     footerNav: FooterNavSelect<false> | FooterNavSelect<true>;
     legal: LegalSelect<false> | LegalSelect<true>;
     announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
+    'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -147,6 +155,8 @@ export interface Config {
   jobs: {
     tasks: {
       drainLeadQueue: TaskDrainLeadQueue;
+      purgeSearchLog: TaskPurgeSearchLog;
+      purgeLeadsPii: TaskPurgeLeadsPii;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -251,7 +261,6 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -289,6 +298,103 @@ export interface Media {
       filename?: string | null;
     };
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * Source path (e.g. /old-pricing). System-managed rules (source=slug-change) are locked from manual edit.
+   */
+  from: string;
+  status: '301' | '302' | '307' | '308' | '410';
+  /**
+   * Destination path or absolute URL. Required unless status=410. System-managed rules are locked.
+   */
+  to?: string | null;
+  /**
+   * Provenance. System-set on creation; never manually edited.
+   */
+  source: 'manual' | 'slug-change' | 'archive-with-redirect' | 'migration-seed';
+  /**
+   * Why this redirect exists. Future editors thank you.
+   */
+  notes?: string | null;
+  /**
+   * Incremented in apps/web middleware on every match.
+   */
+  hitCount?: number | null;
+  lastHitAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Append-only record of sensitive actions on leads + DSAR events. Read-only — entries are written by hooks, never via the admin UI.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  timestamp: string;
+  action: 'lead_deleted' | 'lead_exported' | 'dsar_export' | 'dsar_erasure';
+  targetCollection: string;
+  targetId: string;
+  /**
+   * Admin who performed the action. Null for system / cron writes.
+   */
+  actorUserId?: (number | null) | User;
+  requestIp?: string | null;
+  userAgent?: string | null;
+  acceptLanguage?: string | null;
+  /**
+   * Number of hops parsed from X-Forwarded-For at request time.
+   */
+  proxyChainLength?: number | null;
+  /**
+   * Per-action payload (e.g. row count for exports, deleted lead snapshot).
+   */
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Public-site search queries logged via /api/search/analytics. Filter resultsCount=0 to find content gaps.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "searchLog".
+ */
+export interface SearchLog {
+  id: number;
+  query: string;
+  /**
+   * Number of hits the search returned. Zero = content gap signal.
+   */
+  resultsCount: number;
+  /**
+   * Optional locale tag (e.g. en-US). Used to filter analytics later.
+   */
+  locale?: string | null;
+  /**
+   * Client IP — used for abuse detection. Auto-purged at the same cadence as leads.
+   */
+  ip?: string | null;
+  /**
+   * User-Agent header. Trimmed at 200 chars.
+   */
+  userAgent?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -381,7 +487,7 @@ export interface Author {
    */
   acceptingNewBylines?: boolean | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -456,7 +562,7 @@ export interface Category {
    */
   parent?: (number | null) | Category;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -531,7 +637,82 @@ export interface NewsCategory {
    */
   parent?: (number | null) | NewsCategory;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledgeCategories".
+ */
+export interface KnowledgeCategory {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
+  /**
+   * Optional parent category for hierarchical taxonomies.
+   */
+  parent?: (number | null) | KnowledgeCategory;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -878,21 +1059,7 @@ export interface Blog {
   faqs?:
     | {
         question: string;
-        answer: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
+        answer: string;
         id?: string | null;
       }[]
     | null;
@@ -902,13 +1069,7 @@ export interface Blog {
   relatedPosts?: (number | Blog)[] | null;
   featured?: boolean | null;
   pinned?: boolean | null;
-  /**
-   * Computed from body word count on save.
-   */
   readingMinutes?: number | null;
-  /**
-   * Total words in the body. Computed on save.
-   */
   wordCount?: number | null;
   /**
    * Auto-built from H2/H3 headings in the body on save.
@@ -922,7 +1083,7 @@ export interface Blog {
       }[]
     | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1018,16 +1179,10 @@ export interface News {
    */
   publicationDate: string;
   relatedNews?: (number | News)[] | null;
-  /**
-   * Computed from body word count on save.
-   */
   readingMinutes?: number | null;
-  /**
-   * Total words in the body. Computed on save.
-   */
   wordCount?: number | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1126,21 +1281,7 @@ export interface Guide {
   faqs?:
     | {
         question: string;
-        answer: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
+        answer: string;
         id?: string | null;
       }[]
     | null;
@@ -1189,9 +1330,6 @@ export interface Guide {
       }[]
     | null;
   relatedGuides?: (number | Guide)[] | null;
-  /**
-   * Computed from body word count on save.
-   */
   readingMinutes?: number | null;
   wordCount?: number | null;
   /**
@@ -1206,7 +1344,7 @@ export interface Guide {
       }[]
     | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1310,7 +1448,137 @@ export interface Resource {
    */
   downloadCount?: number | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
+     */
+    useCustomCanonical?: boolean | null;
+    /**
+     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
+     */
+    canonicalOverride?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Technical knowledge-base articles surfaced under /knowledge-hub. Each article gets its own indexable URL — replaces the single-page Webflow KB.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledgeBase".
+ */
+export interface KnowledgeBase {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   */
+  slug: string;
+  /**
+   * Drives the SEO description fallback and the listing-card lede. Aim for ≤ 160 characters.
+   */
+  abstract?: string | null;
+  heroImage?: (number | null) | Media;
+  /**
+   * Editorial taxonomy — drives the sidebar grouping on /knowledge-hub. Pick the most-specific leaf category; ancestors are inferred via the category parent chain.
+   */
+  category: number | KnowledgeCategory;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Author who reviewed this article for technical accuracy. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal for KB content.
+   */
+  reviewedBy?: (number | null) | Author;
+  /**
+   * Date of the most recent technical review. Surfaced as Schema.org dateReviewed.
+   */
+  lastReviewedAt?: string | null;
+  /**
+   * Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.
+   */
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Manually curated. Empty = listing component picks by category.
+   */
+  relatedArticles?: (number | KnowledgeBase)[] | null;
+  readingMinutes?: number | null;
+  wordCount?: number | null;
+  /**
+   * Auto-built from H2/H3 headings in the body on save.
+   */
+  tableOfContents?:
+    | {
+        level?: number | null;
+        text?: string | null;
+        anchor?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1434,7 +1702,7 @@ export interface Event {
       }[]
     | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1551,7 +1819,7 @@ export interface Webinar {
    */
   slidesUrl?: string | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1676,7 +1944,7 @@ export interface Job {
   expiresAt?: string | null;
   closedAt?: string | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -1771,9 +2039,6 @@ export interface Page {
    * Optional parent page. Builds nested URLs (e.g. /solutions/fips).
    */
   parent?: (number | null) | Page;
-  /**
-   * Computed full URL path (e.g. /solutions/pricing). Maintained by the path-builder hook on every save.
-   */
   path?: string | null;
   /**
    * Compose the page from typed blocks. Section is a layout primitive — every other block is a content unit.
@@ -2309,21 +2574,7 @@ export interface Page {
                    */
                   items: {
                     question: string;
-                    answer: {
-                      root: {
-                        type: string;
-                        children: {
-                          type: any;
-                          version: number;
-                          [k: string]: unknown;
-                        }[];
-                        direction: ('ltr' | 'rtl') | null;
-                        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-                        indent: number;
-                        version: number;
-                      };
-                      [k: string]: unknown;
-                    };
+                    answer: string;
                     id?: string | null;
                   }[];
                   /**
@@ -3096,21 +3347,7 @@ export interface Page {
              */
             items: {
               question: string;
-              answer: {
-                root: {
-                  type: string;
-                  children: {
-                    type: any;
-                    version: number;
-                    [k: string]: unknown;
-                  }[];
-                  direction: ('ltr' | 'rtl') | null;
-                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-                  indent: number;
-                  version: number;
-                };
-                [k: string]: unknown;
-              };
+              answer: string;
               id?: string | null;
             }[];
             /**
@@ -3365,7 +3602,7 @@ export interface Page {
    */
   pageLayout?: ('default' | 'narrow' | 'full-bleed') | null;
   /**
-   * On-page SEO surface. Most fields auto-fall-back from typed document fields and site defaults; only override when you have a specific reason.
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
     /**
@@ -3421,75 +3658,6 @@ export interface Page {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects".
- */
-export interface Redirect {
-  id: number;
-  /**
-   * Source path (e.g. /old-pricing). System-managed rules (source=slug-change) are locked from manual edit.
-   */
-  from: string;
-  status: '301' | '302' | '307' | '308' | '410';
-  /**
-   * Destination path or absolute URL. Required unless status=410. System-managed rules are locked.
-   */
-  to?: string | null;
-  /**
-   * Provenance. System-set on creation; never manually edited.
-   */
-  source: 'manual' | 'slug-change' | 'archive-with-redirect' | 'migration-seed';
-  /**
-   * Why this redirect exists. Future editors thank you.
-   */
-  notes?: string | null;
-  /**
-   * Incremented in apps/web middleware on every match.
-   */
-  hitCount?: number | null;
-  lastHitAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Append-only record of sensitive actions on leads + DSAR events. Read-only — entries are written by hooks, never via the admin UI.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "audit-log".
- */
-export interface AuditLog {
-  id: number;
-  timestamp: string;
-  action: 'lead_deleted' | 'lead_exported' | 'dsar_export' | 'dsar_erasure';
-  targetCollection: string;
-  targetId: string;
-  /**
-   * Admin who performed the action. Null for system / cron writes.
-   */
-  actorUserId?: (number | null) | User;
-  requestIp?: string | null;
-  userAgent?: string | null;
-  acceptLanguage?: string | null;
-  /**
-   * Number of hops parsed from X-Forwarded-For at request time.
-   */
-  proxyChainLength?: number | null;
-  /**
-   * Per-action payload (e.g. row count for exports, deleted lead snapshot).
-   */
-  metadata?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3560,7 +3728,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'drainLeadQueue' | 'schedulePublish';
+        taskSlug: 'inline' | 'drainLeadQueue' | 'purgeSearchLog' | 'purgeLeadsPii' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -3593,10 +3761,19 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'drainLeadQueue' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'drainLeadQueue' | 'purgeSearchLog' | 'purgeLeadsPii' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
+  meta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -3616,6 +3793,18 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'audit-log';
+        value: number | AuditLog;
+      } | null)
+    | ({
+        relationTo: 'searchLog';
+        value: number | SearchLog;
+      } | null)
+    | ({
         relationTo: 'authors';
         value: number | Author;
       } | null)
@@ -3626,6 +3815,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'newsCategories';
         value: number | NewsCategory;
+      } | null)
+    | ({
+        relationTo: 'knowledgeCategories';
+        value: number | KnowledgeCategory;
       } | null)
     | ({
         relationTo: 'jobLocations';
@@ -3656,6 +3849,10 @@ export interface PayloadLockedDocument {
         value: number | Resource;
       } | null)
     | ({
+        relationTo: 'knowledgeBase';
+        value: number | KnowledgeBase;
+      } | null)
+    | ({
         relationTo: 'events';
         value: number | Event;
       } | null)
@@ -3674,14 +3871,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: number | Page;
-      } | null)
-    | ({
-        relationTo: 'redirects';
-        value: number | Redirect;
-      } | null)
-    | ({
-        relationTo: 'audit-log';
-        value: number | AuditLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -3765,7 +3954,6 @@ export interface MediaSelect<T extends boolean = true> {
         x?: T;
         y?: T;
       };
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -3811,6 +3999,52 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  status?: T;
+  to?: T;
+  source?: T;
+  notes?: T;
+  hitCount?: T;
+  lastHitAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  timestamp?: T;
+  action?: T;
+  targetCollection?: T;
+  targetId?: T;
+  actorUserId?: T;
+  requestIp?: T;
+  userAgent?: T;
+  acceptLanguage?: T;
+  proxyChainLength?: T;
+  metadata?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "searchLog_select".
+ */
+export interface SearchLogSelect<T extends boolean = true> {
+  query?: T;
+  resultsCount?: T;
+  locale?: T;
+  ip?: T;
+  userAgent?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3934,6 +4168,40 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "newsCategories_select".
  */
 export interface NewsCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  parent?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledgeCategories_select".
+ */
+export interface KnowledgeCategoriesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   description?: T;
@@ -4278,6 +4546,61 @@ export interface ResourcesSelect<T extends boolean = true> {
   gateForm?: T;
   accessLevel?: T;
   downloadCount?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledgeBase_select".
+ */
+export interface KnowledgeBaseSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  abstract?: T;
+  heroImage?: T;
+  category?: T;
+  body?: T;
+  reviewedBy?: T;
+  lastReviewedAt?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  relatedArticles?: T;
+  readingMinutes?: T;
+  wordCount?: T;
+  tableOfContents?:
+    | T
+    | {
+        level?: T;
+        text?: T;
+        anchor?: T;
+        id?: T;
+      };
   seo?:
     | T
     | {
@@ -5252,39 +5575,6 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects_select".
- */
-export interface RedirectsSelect<T extends boolean = true> {
-  from?: T;
-  status?: T;
-  to?: T;
-  source?: T;
-  notes?: T;
-  hitCount?: T;
-  lastHitAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "audit-log_select".
- */
-export interface AuditLogSelect<T extends boolean = true> {
-  timestamp?: T;
-  action?: T;
-  targetCollection?: T;
-  targetId?: T;
-  actorUserId?: T;
-  requestIp?: T;
-  userAgent?: T;
-  acceptLanguage?: T;
-  proxyChainLength?: T;
-  metadata?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -5319,6 +5609,7 @@ export interface PayloadJobsSelect<T extends boolean = true> {
   queue?: T;
   waitUntil?: T;
   processing?: T;
+  meta?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -5429,6 +5720,59 @@ export interface SeoDefault {
           id?: string | null;
         }[]
       | null;
+  };
+  /**
+   * When enabled, the site-wide Organization blob upgrades to a NewsMediaOrganization. Pairs with NewsArticle JSON-LD (isAccessibleForFree: true) and /sitemap-news.xml to satisfy Google News eligibility (signals-based since October 2025). Leave disabled until the policy URLs below are real, published pages — Google penalises NewsMediaOrganization claims that point at empty or missing policies.
+   */
+  newsMediaOrganization?: {
+    /**
+     * Toggle on once the policy pages below exist and link from the site footer.
+     */
+    enabled?: boolean | null;
+    /**
+     * ISO 8601 date (e.g. 2024-01-15). Surfaced as Schema.org foundingDate.
+     */
+    foundingDate?: string | null;
+    /**
+     * One-line tagline. Surfaced as Schema.org slogan.
+     */
+    slogan?: string | null;
+    /**
+     * URL of the masthead / about-us page that lists editorial leadership. Surfaced as Schema.org masthead.
+     */
+    masthead?: string | null;
+    /**
+     * URL of the editorial-ethics policy page.
+     */
+    ethicsPolicy?: string | null;
+    /**
+     * URL of the corrections / retractions policy page.
+     */
+    correctionsPolicy?: string | null;
+    /**
+     * URL of the fact-checking / verification policy page.
+     */
+    factCheckingPolicy?: string | null;
+    /**
+     * URL of the page describing how readers submit feedback / complaints.
+     */
+    actionableFeedbackPolicy?: string | null;
+    /**
+     * URL of the policy page on use of anonymous / unnamed sources.
+     */
+    unnamedSourcesPolicy?: string | null;
+    /**
+     * URL of the diversity / inclusion policy page.
+     */
+    diversityPolicy?: string | null;
+    /**
+     * URL of the page disclosing ownership / funding sources.
+     */
+    ownershipFundingInfo?: string | null;
+    /**
+     * URL of the page describing editorial mission and coverage priorities.
+     */
+    coveragePolicy?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -5681,6 +6025,24 @@ export interface Announcement {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats".
+ */
+export interface PayloadJobsStat {
+  id: number;
+  stats?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "siteSettings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
@@ -5731,6 +6093,22 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
               url?: T;
               id?: T;
             };
+      };
+  newsMediaOrganization?:
+    | T
+    | {
+        enabled?: T;
+        foundingDate?: T;
+        slogan?: T;
+        masthead?: T;
+        ethicsPolicy?: T;
+        correctionsPolicy?: T;
+        factCheckingPolicy?: T;
+        actionableFeedbackPolicy?: T;
+        unnamedSourcesPolicy?: T;
+        diversityPolicy?: T;
+        ownershipFundingInfo?: T;
+        coveragePolicy?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -5880,6 +6258,16 @@ export interface AnnouncementsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs-stats_select".
+ */
+export interface PayloadJobsStatsSelect<T extends boolean = true> {
+  stats?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -5893,6 +6281,22 @@ export interface CollectionsWidget {
  * via the `definition` "TaskDrainLeadQueue".
  */
 export interface TaskDrainLeadQueue {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPurgeSearchLog".
+ */
+export interface TaskPurgeSearchLog {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPurgeLeadsPii".
+ */
+export interface TaskPurgeLeadsPii {
   input?: unknown;
   output?: unknown;
 }
@@ -5920,6 +6324,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'resources';
           value: number | Resource;
+        } | null)
+      | ({
+          relationTo: 'knowledgeBase';
+          value: number | KnowledgeBase;
         } | null)
       | ({
           relationTo: 'events';

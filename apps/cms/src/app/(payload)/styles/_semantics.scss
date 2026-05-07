@@ -1,0 +1,71 @@
+// =============================================================================
+// Semantic tokens — explicit names layered on the primitive ramps
+// =============================================================================
+//
+// Primitives (`--theme-elevation-*`, `--cs-cyan-*`) describe *position
+// in a ramp*. Semantic tokens describe *intent*: what surface this is,
+// what role this colour plays, how strong this border should read.
+//
+// Selectors should reference semantic tokens whenever the intent is
+// clear (canvas, raised surface, subtle border, primary text). Drop
+// down to primitives only when the design genuinely needs a specific
+// step in the ramp.
+//
+// Both light and dark themes already remap the elevation ramp via the
+// `[data-theme]` blocks in `_themes.scss`, so semantic tokens defined
+// in terms of primitives invert automatically — no per-theme override
+// needed below.
+//
+// Contrast notes (WCAG 2.2 AA):
+//   - text-primary  on surface-canvas / surface-raised ≥ 4.5:1 (body)
+//   - text-secondary on surface-canvas               ≥ 4.5:1 (body)
+//   - text-muted    on surface-canvas               ≥ 3:1   (large UI only)
+//   - status colours on their tinted backgrounds    ≥ 4.5:1
+// Re-verify with browser devtools when adjusting any primitive.
+
+:root {
+  // ─── Surfaces ──────────────────────────────────────────────────
+  // canvas: the page background editors look at (full app)
+  // raised: cards, panels, drawers (one step above canvas)
+  // overlay: sticky toolbars + modals (two steps above)
+  // sunken: pressed-in inputs, code blocks (one step below canvas)
+  --cs-surface-canvas: var(--theme-bg);
+  --cs-surface-raised: var(--theme-elevation-100);
+  --cs-surface-overlay: var(--theme-elevation-50);
+  --cs-surface-sunken: var(--theme-input-bg);
+
+  // ─── Borders ──────────────────────────────────────────────────
+  // subtle: hairline dividers, card borders at rest
+  // strong: focused inputs, active rows
+  // accent: brand-coloured accents (focus halos, selected items)
+  --cs-border-subtle: var(--theme-elevation-150);
+  --cs-border-strong: var(--theme-elevation-250);
+  --cs-border-accent: var(--cs-cyan-500);
+
+  // ─── Text ─────────────────────────────────────────────────────
+  // primary: body copy, field values
+  // secondary: labels, captions, helper text
+  // muted: timestamps, IDs, disabled state
+  // accent: brand-coloured links / actions
+  --cs-text-primary: var(--theme-text);
+  --cs-text-secondary: var(--theme-text-soft);
+  --cs-text-muted: var(--theme-text-disabled);
+  --cs-text-accent: var(--cs-cyan-500);
+  --cs-text-on-accent: #04212a;
+
+  // ─── Status ───────────────────────────────────────────────────
+  // Match the four Payload status flavours used in admin chrome.
+  --cs-status-success: var(--color-success-500);
+  --cs-status-warning: var(--color-warning-500);
+  --cs-status-error: var(--color-error-500);
+  --cs-status-info: var(--cs-cyan-500);
+
+  --cs-status-success-bg: rgba(0, 196, 106, 0.14);
+  --cs-status-warning-bg: rgba(217, 119, 6, 0.14);
+  --cs-status-error-bg: rgba(220, 38, 38, 0.12);
+  --cs-status-info-bg: var(--cs-tint-brand-soft);
+
+  // ─── Focus / interaction ──────────────────────────────────────
+  --cs-focus-ring: 0 0 0 3px var(--cs-tint-focus-ring);
+  --cs-focus-outline: 2px solid var(--cs-cyan-500);
+}

@@ -1,0 +1,227 @@
+// =============================================================================
+// Body editor fullscreen / focus mode — toggled via the rich-text toolbar.
+// On activate the toggle component sets `data-cs-fullscreen` on <html>;
+// these rules promote the active body field to a fixed full-viewport
+// surface and hide surrounding chrome.
+// =============================================================================
+
+html[data-cs-fullscreen='true'] {
+  // Don't hide ancestors via `display: none` — that breaks layout for
+  // the wrap inside them. Instead: promote the wrap to fixed full
+  // viewport with its own background, painting over the chrome behind
+  // it. Lock body scroll so background scroll wheel doesn't bleed
+  // through into the page underneath.
+  body {
+    overflow: hidden;
+  }
+
+  // Promote the flagged wrap to fill the viewport and paint solid bg
+  // so the chrome behind it is visually masked.
+  .rich-text-lexical__wrap.cs-fullscreen-host {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 9000;
+    background: var(--theme-bg) !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  // The flex chain: wrap → editor-container → editor-scroller. Each
+  // link must be `display: flex; min-height: 0` so the scroll boundary
+  // lands on `.editor-scroller` rather than an inner element growing
+  // to fit content (which would push it past the viewport and lock
+  // out scroll entirely).
+  .rich-text-lexical__wrap.cs-fullscreen-host > .editor-container {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden;
+  }
+
+  .rich-text-lexical__wrap.cs-fullscreen-host .editor-scroller {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+  }
+
+  // Reading-measure: cap the editable text width and centre it.
+  .rich-text-lexical__wrap.cs-fullscreen-host .ContentEditable__root {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--cs-space-12) var(--cs-space-6) var(--cs-space-16);
+    min-height: 0;
+  }
+
+  // The fullscreen wrap sits above everything — keep popovers
+  // (toolbar floaters, slash-menu, link editor) above the wrap so
+  // formatting interactions work in focus mode.
+  .floating-text-format-popup,
+  .toolbar,
+  .editor-shell .toolbar,
+  .slash-menu-popup,
+  .link-editor,
+  .typeahead-popover,
+  .draggable-block-menu,
+  .floating-link-editor {
+    z-index: 9200 !important;
+  }
+}
+
+// Inline variant — portaled INTO the body editor's wrap (the bordered
+// shell) and positioned absolutely at the top-right corner so it
+// visually belongs to the editor itself.
+.rich-text-lexical__wrap {
+  position: relative;
+}
+
+.cs-fullscreen-toggle--inline {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  // Above Payload's doc-controls strip (z:30) but below modals/drawers.
+  z-index: 35;
+  height: 32px;
+  padding: 0 12px 0 10px;
+  border-radius: 999px;
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  box-shadow: var(--cs-shadow-lift-sm);
+  color: var(--theme-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro);
+
+  &:hover {
+    background: var(--cs-cyan-500);
+    color: #04212a;
+    border-color: transparent;
+    box-shadow: var(--cs-shadow-lift-md);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+
+  svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  @media (max-width: 600px) {
+    padding: 0;
+    width: 32px;
+    justify-content: center;
+
+    .cs-fullscreen-toggle__label {
+      display: none;
+    }
+  }
+}
+
+.cs-fullscreen-toggle__label {
+  white-space: nowrap;
+}
+
+// Fullscreen-active state — the wrap is now full-viewport, so the
+// inline toggle is naturally pinned to the viewport's top-right.
+html[data-cs-fullscreen='true'] .cs-fullscreen-toggle--inline {
+  z-index: 9100;
+  background: var(--theme-elevation-150);
+}
+
+// The toggle button base — applied to the small icon-only variant
+// inside the fullscreen exit cluster only. The inline + floating pill
+// variants own their own dimensions; we exclude them explicitly so
+// neither gets stomped by this declaration.
+.cs-fullscreen-toggle:not(.cs-fullscreen-toggle--floating):not(.cs-fullscreen-toggle--inline) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--cs-radius-input);
+  background: transparent;
+  border: 0;
+  color: var(--theme-text-soft);
+  cursor: pointer;
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro);
+
+  &:hover {
+    background: var(--cs-tint-brand-soft);
+    color: var(--cs-cyan-500);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
+  }
+
+  &[data-active='true'] {
+    background: var(--cs-tint-brand-medium);
+    color: var(--cs-cyan-500);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Floating exit cluster shown only while in fullscreen.
+.cs-fullscreen-cluster {
+  position: fixed;
+  top: var(--cs-space-3);
+  right: var(--cs-space-3);
+  z-index: 9100;
+  display: none;
+  align-items: center;
+  gap: var(--cs-space-2);
+  padding: 6px 10px;
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 999px;
+  box-shadow: var(--cs-shadow-lift-md);
+}
+
+html[data-cs-fullscreen='true'] .cs-fullscreen-cluster {
+  display: inline-flex;
+}
+
+.cs-fullscreen-cluster kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--theme-elevation-150);
+  border: 1px solid var(--theme-elevation-250);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-fullscreen-toggle,
+  .cs-fullscreen-cluster {
+    transition: none;
+  }
+}

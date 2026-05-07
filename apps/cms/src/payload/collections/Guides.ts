@@ -1,10 +1,16 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
-import { seoField } from '../fields/seo';
+import { mediaUploadField } from '../fields/media-upload';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 export const Guides: CollectionConfig = {
   slug: 'guides',
@@ -23,7 +29,7 @@ export const Guides: CollectionConfig = {
   fields: [
     { name: 'title', type: 'text', required: true },
     slugField({ source: 'title' }),
-    { name: 'heroImage', type: 'upload', relationTo: 'media' },
+    mediaUploadField({ name: 'heroImage', folderHint: 'web/guide' }),
     { name: 'body', type: 'richText' },
     {
       name: 'authors',
@@ -53,16 +59,34 @@ export const Guides: CollectionConfig = {
       },
     },
     {
+      name: 'faqsBulkPaste',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste',
+            clientProps: { targetField: 'faqs' },
+          },
+        },
+      },
+    },
+    {
       name: 'faqs',
       type: 'array',
       labels: { singular: 'FAQ', plural: 'FAQs' },
       admin: {
         description:
           'Replaces Webflow Q1…Q5 / Ans1…Ans5. Drives FAQPage JSON-LD when non-empty.',
+        components: {
+          RowLabel: '@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel',
+        },
       },
       fields: [
         { name: 'question', type: 'text', required: true },
-        { name: 'answer', type: 'richText', required: true },
+        // Plain-text answer — matches Schema.org `acceptedAnswer.text`
+        // and keeps each FAQ row compact. Multiple paragraphs via
+        // line breaks.
+        { name: 'answer', type: 'textarea', required: true },
       ],
     },
     {
@@ -108,23 +132,42 @@ export const Guides: CollectionConfig = {
       hasMany: true,
     },
     {
+      name: 'bodyStats',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/payload/admin/components/BodyStatsField.tsx#BodyStatsField',
+        },
+      },
+    },
+    {
+      name: 'permalink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            clientProps: { pathPrefix: '/guides' },
+          },
+        },
+      },
+    },
+    ...seoSidebarFields({ pathPrefix: '/guides', descriptionSource: 'abstract' }),
+    {
+      // Data-only — surfaced via the `bodyStats` pill at the top of the
+      // sidebar. Hidden here so the form doesn't double-render.
       name: 'readingMinutes',
       type: 'number',
       access: { update: () => false },
-      admin: {
-        readOnly: true,
-        description: 'Computed from body word count on save.',
-        position: 'sidebar',
-      },
+      admin: { readOnly: true, hidden: true },
     },
     {
       name: 'wordCount',
       type: 'number',
       access: { update: () => false },
-      admin: {
-        readOnly: true,
-        position: 'sidebar',
-      },
+      admin: { readOnly: true, hidden: true },
     },
     {
       name: 'tableOfContents',
@@ -134,6 +177,9 @@ export const Guides: CollectionConfig = {
       admin: {
         readOnly: true,
         description: 'Auto-built from H2/H3 headings in the body on save.',
+        components: {
+          RowLabel: '@/payload/admin/components/TocRowLabel.tsx#TocRowLabel',
+        },
       },
       fields: [
         { name: 'level', type: 'number' },
@@ -141,7 +187,7 @@ export const Guides: CollectionConfig = {
         { name: 'anchor', type: 'text' },
       ],
     },
-    seoField,
+    ...seoFieldsForSidebar('guides'),
   ],
   hooks: {
     beforeChange: [
@@ -153,7 +199,12 @@ export const Guides: CollectionConfig = {
         },
       }),
     ],
-    afterChange: [slugChangeRedirectHook('guides')],
+    afterChange: [
+      slugChangeRedirectHook('guides'),
+      searchSyncAfterChangeHook('guides'),
+      webhooksPublishAfterChangeHook('guides'),
+    ],
+    afterDelete: [searchSyncAfterDeleteHook('guides')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

@@ -1,0 +1,647 @@
+// 14. Tooltips, popovers, drawers, modals, toasts — premium chrome
+// =============================================================================
+//
+// Premium-editor philosophy: prefer popovers anchored to the trigger over
+// full-screen drawers. Where Payload still ships a drawer (relationship,
+// upload, blocks picker), shrink it to a calm side panel — never a takeover.
+
+// ─── Tooltips & popovers — refined elevation
+.tooltip,
+.popup,
+.popup__content {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+  padding: var(--cs-space-2);
+  animation: cms-popup-in var(--cs-motion-micro);
+}
+
+.tooltip {
+  background: var(--theme-elevation-800);
+  color: var(--theme-elevation-50);
+  font-size: 12px;
+  padding: 0.3rem 0.6rem;
+  border: none;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
+}
+
+// kbd shortcuts inside tooltips & menus — mac-style key caps
+kbd {
+  background: var(--theme-elevation-150);
+  border: 1px solid var(--theme-elevation-250);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  color: var(--theme-text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 0.05rem 0.35rem;
+  margin: 0 0.15rem;
+  display: inline-flex;
+  align-items: center;
+  min-width: 18px;
+  justify-content: center;
+}
+
+// ─── Drawers — keep Payload's default sizing/animation; only retint
+// the divider colors so they pick up the new palette. (Earlier width
+// caps + slide animation made the drawer feel cramped — reverted.)
+.drawer__header,
+.doc-drawer__header,
+.list-drawer__header,
+.drawer__content,
+.doc-drawer__content {
+  border-color: var(--theme-elevation-150);
+}
+
+// =============================================================================
+// Drawer system — unified close button, backdrop, header, sizing
+// =============================================================================
+//
+// Payload v3 ships several drawer flavors (`doc-drawer`, `list-drawer`,
+// `edit-many`, `edit-many-bulk-uploads`) that all share the
+// `.drawer--is-open` modifier. Each renders a stock close button that
+// is EMPTY in the DOM (`<button class="drawer__close"></button>`) so
+// our previous round-circle styling produced a hollow oval at the
+// top-left with no glyph inside. This block injects an X glyph via a
+// CSS-mask pseudo-element, bumps the touch target to 36×36 (close to
+// the 44px WCAG floor — Payload's container forces a 32px outer cap),
+// and fixes the cross-drawer inconsistencies.
+//
+// Why a CSS-mask glyph instead of `content: '×'`? The Unicode "×"
+// renders at the host font's weight + caret-style, which is
+// inconsistent across themes. A masked SVG renders identically and
+// scales with `currentColor` for the hover-red transition.
+
+.drawer-close-button,
+.drawer__close,
+.drawer__header__close,
+.doc-drawer__header-close,
+.edit-many__header__close,
+.edit-many-bulk-uploads__header__close {
+  position: relative;
+  background: transparent;
+  border: 1px solid var(--theme-elevation-250);
+  border-radius: 50%;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--theme-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition:
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  // SVG slot — used when Payload does ship an icon (some flavors do).
+  svg {
+    width: 14px;
+    height: 14px;
+    color: currentColor;
+    opacity: 1;
+    z-index: 1;
+  }
+
+  // Glyph injection — only fires when the button is otherwise empty.
+  // `:empty` matches `<button></button>` exactly. The mask is the same
+  // X used by the focus-mode exit cluster so iconography stays
+  // consistent across drawer chrome.
+  &:empty::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' d='M4 4l8 8M12 4l-8 8'/></svg>") no-repeat center / contain;
+    mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' d='M4 4l8 8M12 4l-8 8'/></svg>") no-repeat center / contain;
+  }
+
+  &:hover {
+    color: var(--color-error-500);
+    border-color: var(--color-error-500);
+    background: rgba(220, 38, 38, 0.08);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    border-color: var(--cs-cyan-500);
+  }
+}
+
+// ─── Drawer backdrop — dim the underlying page so it reads as ─────
+// ─── modal context, not a layout collision ────────────────────────
+//
+// Payload's drawer slides to cover ~70% of the viewport from the
+// left, leaving the right ~30% showing the underlying edit view at
+// full saturation — visually broken. Add a backdrop layer via
+// `body:has(.drawer--is-open)::after` so the uncovered area dims to
+// a calm overlay and clicks there close the drawer (handled by
+// Payload). `:has()` is supported in Chrome 105+ / Safari 15.4+ /
+// Firefox 121+ — well within Payload v3's browser baseline.
+body:has(.drawer--is-open)::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 100; // below `.drawer` (101) but above the nav (50)
+  pointer-events: none;
+}
+
+// ─── Hide the page's nav-toggler when a drawer is open ────────────
+//
+// The mobile/desktop nav-toggler hamburger button (`.nav-toggler`)
+// renders at viewport-fixed (31, 19) and pokes through the top-left
+// of any open drawer because it's outside the drawer's stacking
+// context. Hide it whenever a drawer is open so the drawer's own
+// close button is the only top-left affordance.
+body:has(.drawer--is-open) .template-default__nav-toggler-wrapper,
+body:has(.drawer--is-open) .nav-toggler {
+  display: none !important;
+}
+
+// ─── One close affordance per drawer ──────────────────────────────
+//
+// Payload v3 ships TWO close buttons on doc-drawers:
+//   1. `.drawer__close` — sits at top-LEFT of the drawer panel (a
+//      "back arrow" affordance, but renders as an empty button).
+//   2. `.doc-drawer__header-close` — sits at top-RIGHT of the drawer
+//      header (the conventional close X).
+//
+// Two close buttons in the same drawer is redundant + confusing.
+// Hide the top-left one across all flavors and let the header X own
+// the close affordance. Backdrop click + Esc still close the drawer.
+.doc-drawer .drawer__close,
+.list-drawer .drawer__close,
+.edit-many .drawer__close,
+.edit-many-bulk-uploads .drawer__close {
+  display: none !important;
+}
+
+// ─── Drawer header — unified band across doc / list / edit-many ───
+//
+// All drawer flavors render their header as a flex row with a title
+// + actions cluster + close. The layout was breaking because some
+// renderers add a wrapping `.gutter` inside the header, throwing
+// alignment off. Normalise.
+.drawer__header,
+.doc-drawer__header,
+.list-drawer__header {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+  padding: var(--cs-space-3) var(--cs-space-4);
+  border-bottom: 1px solid var(--theme-elevation-150);
+  background: var(--theme-elevation-100);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+// Drawer title — same 22px cap as the document header so a
+// long-named record doesn't overrun the close button.
+.drawer__header h1,
+.drawer__header h2,
+.doc-drawer__header h1,
+.doc-drawer__header h2,
+.list-drawer__header h1,
+.list-drawer__header h2 {
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ─── Drawer width caps — premium feel without crowding ────────────
+//
+// Payload's stock drawer widths feel cramped on wide displays and
+// over-wide on small ones. Cap each flavor to a sensible width:
+//
+//   doc-drawer       → min(1080px, 80vw)  — full doc edit, sidebar fits
+//   list-drawer      → min(960px, 75vw)   — denser table view
+//   edit-many        → min(720px, 70vw)   — small form, lots of empty
+//                                            space at full-bleed
+//   bulk-uploads     → min(720px, 70vw)   — same shape as edit-many
+//
+// `[class*="--slug-edit-"]` matches the per-collection slugs Payload
+// generates (edit-blogs, edit-news, etc.) so we don't have to enumerate
+// every collection.
+.payload__modal-item.doc-drawer {
+  width: min(1080px, 80vw);
+}
+
+.payload__modal-item.list-drawer {
+  width: min(960px, 75vw);
+}
+
+.payload__modal-item[class*='--slug-edit-'],
+.payload__modal-item[class*='--slug-bulk-upload'],
+.payload__modal-item[class*='--slug-edit-many'],
+.payload__modal-item[class*='--slug-edit-many-bulk-uploads'] {
+  width: min(720px, 70vw);
+}
+
+// On small screens all drawer flavors go full-bleed.
+@media (max-width: 768px) {
+  .payload__modal-item.doc-drawer,
+  .payload__modal-item.list-drawer,
+  .payload__modal-item[class*='--slug-edit-'],
+  .payload__modal-item[class*='--slug-bulk-upload'] {
+    width: 100vw;
+  }
+}
+
+// ─── Inputs / cards inside drawers — match the host edit view ─────
+//
+// All field-type styling we apply on the main edit views also fires
+// inside `.drawer` because the field component is identical. Make
+// sure no specificity collision dulls the chrome by promoting a few
+// rules.
+.drawer .field-type input,
+.drawer .field-type textarea,
+.doc-drawer .field-type input,
+.doc-drawer .field-type textarea {
+  background: var(--theme-input-bg);
+}
+
+// Form sticky save bar inside drawers — the doc-controls strip we
+// hide in fullscreen we KEEP here, but pin it to the drawer's bottom
+// so Save / Publish are reachable on long forms.
+.drawer .doc-controls,
+.doc-drawer .doc-controls {
+  position: sticky;
+  bottom: 0;
+  background: var(--theme-elevation-100);
+  border-top: 1px solid var(--theme-elevation-150);
+  z-index: 3;
+}
+
+// ─── Modals — capped width, refined entry, calm header
+.confirmation-modal__wrapper {
+  max-width: 540px;
+  width: min(540px, 92vw);
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-modal);
+  box-shadow: 0 24px 56px -16px rgba(0, 0, 0, 0.55);
+  animation: cms-modal-in var(--cs-motion-modal);
+}
+
+.confirmation-modal__content {
+  padding: var(--cs-space-6);
+}
+
+.confirmation-modal__controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--cs-space-2);
+  padding: var(--cs-space-3) var(--cs-space-6);
+  border-top: 1px solid var(--theme-elevation-150);
+}
+
+@keyframes cms-modal-in {
+  from {
+    transform: translateY(8px) scale(0.99);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+// Close button — calm circle that lights up brand cyan on hover
+.close-modal-button {
+  background: transparent;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-text-soft);
+  cursor: pointer;
+  transition:
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro);
+
+  &:hover {
+    color: var(--cs-cyan-500);
+    border-color: var(--cs-cyan-500);
+  }
+}
+
+// ─── Toasts — top-right, branded by status, refined enter/exit
+.payload-toast-container,
+[class*='Toastify__toast-container'],
+.Toastify__toast-container {
+  --toastify-toast-min-height: 44px;
+  --toastify-toast-padding: 12px;
+  font-family: var(--font-body);
+}
+
+[class*='Toastify__toast'],
+.Toastify__toast {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  color: var(--theme-text);
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.45);
+  padding: var(--cs-space-3);
+  min-height: 44px;
+}
+
+[class*='Toastify__toast--success'],
+.Toastify__toast--success {
+  border-left: 3px solid var(--color-success-500);
+}
+
+[class*='Toastify__toast--error'],
+.Toastify__toast--error {
+  border-left: 3px solid var(--color-error-500);
+}
+
+[class*='Toastify__toast--warning'],
+.Toastify__toast--warning {
+  border-left: 3px solid var(--color-warning-500);
+}
+
+// ─── Upload dropzone — drag-affordance + brand outline
+//
+// When the editor is empty (or the upload field is idle), the dropzone
+// reads as a quiet placeholder. On dragover, it springs to brand-cyan,
+// inviting the editor to drop.
+.upload__dropzoneAndUpload,
+.file-field__dropzoneContent,
+.upload__dropzoneContent {
+  background: var(--theme-elevation-50);
+  border: 1.5px dashed var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-6);
+  text-align: center;
+  transition:
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--theme-elevation-300);
+  }
+
+  &.is-dragover,
+  &[data-dragover='true'],
+  &--is-dragover {
+    border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+}
+
+.upload__dropzoneContent__orText,
+.file-field__dropzoneContent__orText {
+  color: var(--theme-text-disabled);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: var(--cs-space-2) 0;
+}
+
+// Thumbnails — uniform corners, hover lift
+.file__thumbnail,
+.thumbnail-card__thumbnail,
+.file-selections__thumbnail,
+.upload-relationship-details__thumbnail,
+.file-details-draggable__thumbnail {
+  border-radius: var(--cs-radius-input);
+  overflow: hidden;
+  background: var(--theme-elevation-100);
+}
+
+// ─── Image / upload picker — the highest-value asset surface in the admin
+//
+// Default Payload renders an image upload field as a 40px thumbnail next
+// to a filename + tiny meta line + two icon-only buttons (Edit / Remove)
+// with no labels. We rebuild it as a real card: 80px hero thumbnail, a
+// readable filename, dimension chip, and labeled action buttons.
+
+// Card around the whole upload field (when an image is selected)
+.upload-field-card {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-3);
+  // Card grows to wrap its content (80px thumbnail + side actions).
+  // No fixed height — lets the inner flex row dictate height.
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  transition: border-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--theme-elevation-200);
+  }
+}
+
+// Selected file row — image left, info middle, actions right
+.upload-relationship-details {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-4);
+  width: 100%;
+  min-height: 80px;
+
+  &__imageAndDetails {
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-3);
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__filename {
+    color: var(--theme-text);
+    font-size: 14px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    // Surface the file's public URL beneath the filename. Uses
+    // `attr(href)` to read the underlying anchor's href and render
+    // it as monospace caption text — clickable text stays the
+    // filename so existing UX is preserved. The URL itself remains
+    // selectable so editors can copy it. Truly editable URL would
+    // require overriding Payload's UploadRelationshipDetails React
+    // component (out of scope for a CSS-only pass).
+    a[href] {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      &::after {
+        content: attr(href);
+        display: block;
+        margin-top: 2px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 400;
+        color: var(--theme-text-soft);
+        letter-spacing: 0;
+        user-select: text;
+        cursor: text;
+      }
+    }
+  }
+
+  &__meta {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: 0.005em;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    flex-shrink: 0;
+  }
+
+  // The current 40x40 thumbnail is too small to read at a glance — bump
+  // to 80x80 with a soft inner border so it reads as an image card.
+  // Use !important on the dimensional + clipping rules because Payload's
+  // bundled .thumbnail styles + the inner <img>'s natural attributes
+  // (width=948 height=1193 etc.) win on specificity and let portrait
+  // images bleed above/below the row otherwise.
+  &__thumbnail,
+  .thumbnail--size-small.upload-relationship-details__thumbnail {
+    width: 80px !important;
+    height: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+    max-height: 80px !important;
+    border-radius: var(--cs-radius-input);
+    overflow: hidden !important;
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    flex-shrink: 0;
+    position: relative;
+
+    img,
+    & > img,
+    picture img {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      object-fit: cover !important;
+      object-position: center !important;
+      display: block;
+    }
+  }
+
+  // Action buttons (Edit / Remove) — icon-only buttons get accessible labels
+  // via ::after content. We can't add a real <span> from CSS, but we can
+  // surface their function with a tooltip that's always visible on hover
+  // and a soft border that grows on hover.
+  &__edit,
+  &__remove {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    width: 32px;
+    height: 32px;
+    color: var(--theme-text-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      color: var(--cs-cyan-500);
+      border-color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+    }
+  }
+
+  &__remove:hover {
+    color: var(--color-error-500);
+    border-color: var(--color-error-500);
+    background: rgba(220, 38, 38, 0.08);
+  }
+}
+
+// Empty-state dropzone (no image selected yet) — generous, branded on hover
+.upload__dropzoneAndUpload {
+  background: var(--theme-elevation-50);
+  border: 1.5px dashed var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  padding: var(--cs-space-8) var(--cs-space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cs-space-2);
+  text-align: center;
+  transition:
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  // When a real upload field already shows the file card, the dropzone
+  // wrapper just acts as a passthrough — kill its dashed border.
+  &:has(.upload-field-card) {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+}
+
+.upload__dropzoneContent__buttons {
+  display: flex;
+  gap: var(--cs-space-2);
+}
+
+// (Removed: list-drawer / file-selections grid / blocks-drawer width
+// overrides — Payload's own picker layout was already correct, our grid
+// reflow was breaking the gallery thumbnails.)
+

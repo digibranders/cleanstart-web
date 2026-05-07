@@ -1,0 +1,96 @@
+// 13. Login + create-first-user — refined hero
+// =============================================================================
+.template-default,
+.template-minimal {
+  .render-icon,
+  .graphic-logo {
+    margin-bottom: var(--cs-space-6);
+  }
+}
+
+// Subtle brand-aware gradient backdrop
+.template-minimal::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(60% 50% at 80% 0%, var(--cs-cyan-100) 0%, transparent 60%),
+    radial-gradient(45% 45% at 0% 100%, rgba(93, 4, 216, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+[data-theme='dark'] .template-minimal::before {
+  background:
+    radial-gradient(60% 50% at 80% 0%, rgba(6, 199, 242, 0.15) 0%, transparent 60%),
+    radial-gradient(45% 45% at 0% 100%, rgba(93, 4, 216, 0.18) 0%, transparent 60%);
+}
+
+// Login card — soft elevation shadow, rounder, never garish
+.template-minimal .form-wrap,
+.template-minimal form {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-modal);
+  padding: var(--cs-space-8);
+  box-shadow: 0 12px 40px -16px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme='dark'] .template-minimal .form-wrap,
+[data-theme='dark'] .template-minimal form {
+  box-shadow: 0 12px 40px -16px rgba(0, 0, 0, 0.55);
+}
+
+// Login + create-first-user logo — keep at hero size, never stretching
+.template-minimal .graphic-logo svg {
+  display: block;
+  height: 44px;
+  width: auto;
+  margin: 0 auto;
+}
+
+// Header logo — preserve the 28:32 aspect, cap at ~24px
+.graphic-icon,
+.nav__header .graphic-icon {
+  svg {
+    display: block;
+    height: 24px;
+    width: auto;
+  }
+}
+
+// Login error banner — Payload renders auth errors as plain red text
+// inside the form. Promote the message to a tinted callout with a
+// left border + icon so editors don't miss it.
+.template-minimal {
+  .form-wrap .errors,
+  .form-wrap .error,
+  form .errors,
+  form .error {
+    background: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-left-width: 3px;
+    border-radius: var(--cs-radius-card);
+    padding: var(--cs-space-3);
+    margin-bottom: var(--cs-space-3);
+    color: var(--color-error-500);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  // "Forgot password?" link — tone it down to brand cyan and add a
+  // discrete underline.
+  a[href*='forgot'],
+  a[href*='reset'] {
+    color: var(--cs-cyan-500);
+    text-decoration: underline;
+    text-decoration-color: rgba(6, 199, 242, 0.4);
+    text-underline-offset: 2px;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration-color: var(--cs-cyan-500);
+    }
+  }
+}
+

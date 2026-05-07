@@ -1,0 +1,227 @@
+// =============================================================================
+// List-view controls — search input polish, sort indicators, pagination,
+// bulk-actions footer, smart cells (relationship & date).
+// =============================================================================
+
+// ─── List header search input ──────────────────────────────────────
+//
+// Payload's stock `.search-filter` wraps its input in a ~50px-tall
+// shell with extra outer padding. Tighten it to the 38px input rhythm
+// we use everywhere else, and let Payload's native magnifier sit
+// quietly inside as a hint — no decorative ::before from us.
+.list-header,
+.list-controls {
+  .search-filter,
+  .where-filter {
+    // The wrapping container — kill any double-padding / minimum height.
+    min-height: 0;
+
+    svg {
+      color: var(--theme-text-soft);
+      opacity: 0.8;
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  // Constrain the input itself to the same 38px height + 6px radius +
+  // 14px font we use across forms. Payload sets these tall (>=44px)
+  // by default which reads as bulky on dense list views.
+  .search-filter input,
+  .search-filter input[type='text'],
+  .search-filter input[type='search'],
+  .where-filter input,
+  .where-filter input[type='text'] {
+    height: 38px;
+    min-height: 38px;
+    line-height: 1.2;
+    font-size: 13.5px;
+    padding-block: 0;
+  }
+
+  // The wrapping flex row that holds the magnifier + input — no
+  // duplicate borders. Payload sometimes renders both the wrapper AND
+  // the input with their own borders, doubling the visible chrome.
+  .search-filter > div,
+  .search-filter > label,
+  .where-filter > div {
+    min-height: 38px;
+  }
+}
+
+// ─── Sort indicators on table headers ──────────────────────────────
+.sort-column__buttons,
+.list-table thead th[data-sortable='true'] {
+  .sort-column__asc,
+  .sort-column__desc {
+    color: var(--theme-text-disabled);
+    transition: color var(--cs-motion-micro);
+  }
+
+  .sort-column__asc--active,
+  .sort-column__desc--active {
+    color: var(--cs-cyan-500);
+  }
+}
+
+.list-table thead th[aria-sort='ascending'],
+.list-table thead th[aria-sort='descending'] {
+  position: relative;
+  color: var(--theme-text);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 2px;
+    background: var(--cs-cyan-500);
+    border-radius: 0 0 2px 2px;
+  }
+}
+
+// ─── Pagination — centred with tabular numerals ────────────────────
+.paginator,
+.list-pagination,
+.collection-list__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cs-space-2);
+  padding-block: var(--cs-space-3);
+  font-feature-settings: 'tnum' 1;
+
+  button,
+  a {
+    min-width: 32px;
+    height: 32px;
+    border-radius: var(--cs-radius-input);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--theme-text-soft);
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    transition:
+      background-color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover:not([disabled]):not([aria-disabled='true']) {
+      background: var(--theme-elevation-100);
+      color: var(--theme-text);
+    }
+
+    &[aria-current='page'],
+    &.active {
+      background: var(--cs-tint-brand-soft);
+      color: var(--cs-cyan-500);
+      border-color: var(--cs-tint-brand-medium);
+    }
+
+    &[disabled],
+    &[aria-disabled='true'] {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.per-page-selector,
+.list-controls__per-page {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+  font-size: 12.5px;
+  color: var(--theme-text-soft);
+  font-feature-settings: 'tnum' 1;
+}
+
+// ─── Smart relationship & date cells ───────────────────────────────
+.cs-relationship-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  max-width: 280px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  &__title {
+    color: var(--theme-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__sub {
+    color: var(--theme-text-soft);
+    font-size: 11.5px;
+  }
+
+  &__missing {
+    color: var(--theme-text-disabled);
+    font-style: italic;
+  }
+}
+
+.cs-date-cell {
+  font-feature-settings: 'tnum' 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--theme-text);
+  font-size: 13px;
+
+  &--relative {
+    color: var(--theme-text-soft);
+  }
+}
+
+// ─── Sticky bulk-actions bar — appears when ≥1 row selected ────────
+.cs-bulk-actions {
+  position: sticky;
+  bottom: var(--cs-space-3);
+  margin-inline: var(--cs-space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+  padding: var(--cs-space-2) var(--cs-space-3);
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  box-shadow: var(--cs-shadow-lift-md);
+  z-index: 40;
+
+  &__count {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--theme-text);
+  }
+
+  &__spacer {
+    flex: 1;
+  }
+}
+
+// Payload's existing list-selection footer — apply the bulk-actions
+// styling so existing behaviour gets the premium chrome without a
+// component swap.
+.list-selection,
+.collection-list__bulk-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--theme-elevation-100);
+  border-top: 1px solid var(--theme-elevation-200);
+  padding: var(--cs-space-2) var(--cs-space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+  z-index: 40;
+
+  .btn,
+  button {
+    min-height: 32px;
+  }
+}

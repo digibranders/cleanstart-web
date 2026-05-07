@@ -1,0 +1,81 @@
+// =============================================================================
+// 2. Themes — light and dark surface tiers (Webflow-derived)
+// =============================================================================
+
+// ─── Light theme ────────────────────────────────────────────────
+[data-theme='light'] {
+  --theme-bg: #f7f8fa;
+  --theme-input-bg: #ffffff;
+  --theme-elevation-0: #ffffff;
+  --theme-elevation-50: #f7f8fa;
+  --theme-elevation-100: #eef0f3;
+  --theme-elevation-150: #e5e7eb;
+  --theme-elevation-200: #d8dbe0;
+  --theme-elevation-250: #c8ccd2;
+  --theme-elevation-300: #b3b7bd;
+  --theme-elevation-400: #8b8f96;
+  --theme-elevation-500: #6b6e76;
+  --theme-elevation-600: #4a4d54;
+  --theme-elevation-700: #34363c;
+  --theme-elevation-800: #232428;
+  --theme-elevation-900: #131418;
+  --theme-elevation-1000: #0a0b0e;
+
+  --theme-text: #131418;
+  --theme-text-soft: #4a4d54;
+  --theme-text-disabled: #8b8f96;
+
+  --color-base-50: var(--cs-cyan-50);
+  --color-base-100: var(--cs-cyan-100);
+  --color-base-200: var(--cs-cyan-200);
+  --color-base-300: var(--cs-cyan-300);
+  --color-base-400: var(--cs-cyan-400);
+  --color-base-500: var(--cs-cyan-500);
+  --color-base-600: var(--cs-cyan-600);
+  --color-base-700: var(--cs-cyan-700);
+  --color-base-800: var(--cs-cyan-800);
+  --color-base-900: var(--cs-cyan-900);
+
+  --color-success-500: #00a76f;
+  --color-warning-500: #d97706;
+  --color-error-500: #dc2626;
+}
+
+// ─── Dark theme ─────────────────────────────────────────────────
+[data-theme='dark'] {
+  --theme-bg: #1c1d21;
+  --theme-input-bg: #14151a;
+  --theme-elevation-0: #14151a;
+  --theme-elevation-50: #1c1d21;
+  --theme-elevation-100: #23242a;
+  --theme-elevation-150: #2a2c33;
+  --theme-elevation-200: #34363d;
+  --theme-elevation-250: #3e4048;
+  --theme-elevation-300: #4a4d55;
+  --theme-elevation-400: #6b6e77;
+  --theme-elevation-500: #888c95;
+  --theme-elevation-600: #a4a7af;
+  --theme-elevation-700: #c5c8ce;
+  --theme-elevation-800: #dcdee2;
+  --theme-elevation-900: #ecedf0;
+  --theme-elevation-1000: #ffffff;
+
+  --theme-text: #e8e9eb;
+  --theme-text-soft: #a4a7af;
+  --theme-text-disabled: #6b6e77;
+
+  --color-base-50: var(--cs-cyan-900);
+  --color-base-100: var(--cs-cyan-800);
+  --color-base-200: var(--cs-cyan-700);
+  --color-base-300: var(--cs-cyan-600);
+  --color-base-400: var(--cs-cyan-500);
+  --color-base-500: var(--cs-cyan-400);
+  --color-base-600: var(--cs-cyan-300);
+  --color-base-700: var(--cs-cyan-200);
+  --color-base-800: var(--cs-cyan-100);
+  --color-base-900: var(--cs-cyan-50);
+
+  --color-success-500: #00c46a;
+  --color-warning-500: #fbbf24;
+  --color-error-500: #ff5c5c;
+}

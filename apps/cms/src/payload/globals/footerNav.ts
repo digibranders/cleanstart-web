@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload';
 
 import { isAdminOrEditor, isAuthenticated } from '../access';
+import { mediaUploadField } from '../fields/media-upload';
 
 import { navItemFields } from './_navItem';
 
@@ -85,7 +86,7 @@ export const FooterNav: GlobalConfig = {
           'Trust badges (SOC 2, FIPS-validated, ISO 27001) shown above the legal strip.',
       },
       fields: [
-        { name: 'image', type: 'upload', relationTo: 'media', required: true },
+        mediaUploadField({ name: 'image', required: true, folderHint: 'web/general' }),
         { name: 'alt', type: 'text', required: true },
         { name: 'href', type: 'text' },
       ],

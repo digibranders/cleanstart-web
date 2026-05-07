@@ -1,0 +1,526 @@
+// 22. Dashboard — editorial landing view (replaces default Payload dashboard)
+// =============================================================================
+
+.cs-dashboard {
+  // Header — no horizontal rule under the greeting; the gap to the
+  // KPI cards reads cleanly as whitespace alone.
+  &__header {
+    margin-bottom: var(--cs-space-5);
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  &__title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.018em;
+    color: var(--theme-text);
+    margin: 0 0 4px 0;
+  }
+
+  &__title-name {
+    color: var(--cs-cyan-500);
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: var(--theme-text-soft);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  // Pulse cards
+  &__pulse-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--cs-space-3);
+    margin-bottom: var(--cs-space-8);
+
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__pulse {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--cs-space-4);
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    text-decoration: none;
+    color: inherit;
+    cursor: default;
+    transition:
+      border-color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro),
+      transform var(--cs-motion-micro);
+
+    &[href] {
+      cursor: pointer;
+
+      &:hover {
+        border-color: var(--cs-cyan-500);
+        background: var(--theme-elevation-50);
+        transform: translateY(-1px);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--cs-cyan-500);
+        outline-offset: 2px;
+      }
+    }
+
+    &--cyan .cs-dashboard__pulse-value {
+      color: var(--cs-cyan-500);
+    }
+
+    &--amber .cs-dashboard__pulse-value {
+      color: var(--color-warning-500);
+    }
+  }
+
+  &__pulse-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+  }
+
+  &__pulse-value {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--theme-text);
+    font-feature-settings: 'tnum' 1;
+  }
+
+  &__pulse-caption {
+    font-size: 12.5px;
+    color: var(--theme-text-soft);
+    line-height: 1.4;
+  }
+
+  // Sections
+  &__section {
+    margin-bottom: var(--cs-space-8);
+  }
+
+  &__section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--cs-space-3);
+    margin-bottom: var(--cs-space-3);
+  }
+
+  &__section-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--theme-text);
+    margin: 0;
+  }
+
+  &__section-meta {
+    font-size: 12px;
+    color: var(--theme-text-disabled);
+  }
+
+  // Recent-edits table
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    overflow: hidden;
+
+    thead {
+      background: var(--theme-elevation-50);
+    }
+
+    th {
+      padding: var(--cs-space-2) var(--cs-space-3);
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--theme-text-soft);
+    }
+
+    td {
+      padding: var(--cs-space-3);
+      font-size: 13.5px;
+      color: var(--theme-text);
+      border-top: 1px solid var(--theme-elevation-150);
+      vertical-align: middle;
+    }
+
+    tbody tr {
+      transition: background-color var(--cs-motion-micro);
+
+      &:hover {
+        background: var(--theme-elevation-50);
+      }
+    }
+  }
+
+  &__title-link {
+    color: var(--theme-text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--cs-cyan-500);
+    }
+  }
+
+  &__type-cell {
+    color: var(--theme-text-soft);
+    font-size: 12.5px;
+  }
+
+  &__time-cell {
+    color: var(--theme-text-soft);
+    font-feature-settings: 'tnum' 1;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+
+  // Status pills (Live / Draft / Scheduled)
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  &__status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &__status--live {
+    color: var(--color-success-500);
+    background: rgba(0, 196, 106, 0.14);
+  }
+
+  &__status--draft {
+    color: var(--theme-text-soft);
+    background: var(--theme-elevation-150);
+  }
+
+  &__status--unknown {
+    color: var(--theme-text-disabled);
+    background: var(--theme-elevation-100);
+  }
+
+  // Empty state
+  &__empty {
+    padding: var(--cs-space-8);
+    text-align: center;
+    color: var(--theme-text-soft);
+    font-size: 13px;
+    background: var(--theme-elevation-100);
+    border: 1px dashed var(--theme-elevation-200);
+    border-radius: var(--cs-radius-card);
+  }
+
+  // ─── Activity timeline ─────────────────────────────────────────
+  //
+  // Replaces the static recent-edits table. Day-grouped rows under
+  // "Today / Yesterday / Earlier this week / Older". The vertical
+  // hairline through the status dots reads as a true timeline.
+  &__timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-5, var(--cs-space-4));
+  }
+
+  &__timeline-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-2);
+  }
+
+  &__timeline-heading {
+    margin: 0 0 var(--cs-space-1);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+  }
+
+  &__timeline-rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+
+    // Vertical hairline that runs through the status dots — this is
+    // what makes the list read as a timeline rather than a flat
+    // bulleted list. Fades to transparent at top + bottom so the
+    // line doesn't visually overshoot the first/last row.
+    &::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      left: 5px;
+      width: 1px;
+      background: linear-gradient(
+        to bottom,
+        transparent 0,
+        var(--theme-elevation-200) 12px,
+        var(--theme-elevation-200) calc(100% - 12px),
+        transparent 100%
+      );
+      pointer-events: none;
+    }
+  }
+
+  &__timeline-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 16px 1fr auto;
+    align-items: center;
+    gap: var(--cs-space-3);
+    padding: 6px 0;
+    font-size: 13px;
+  }
+
+  &__timeline-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--theme-elevation-200);
+    border: 2px solid var(--theme-bg);
+    margin-inline-start: 1px;
+    box-shadow: 0 0 0 1px var(--theme-elevation-200);
+    z-index: 1;
+
+    &--live {
+      background: var(--cs-cyan-500);
+      box-shadow: 0 0 0 1px var(--cs-cyan-500), 0 0 0 4px var(--cs-tint-brand-soft);
+    }
+
+    &--draft {
+      background: var(--theme-elevation-300);
+      box-shadow: 0 0 0 1px var(--theme-elevation-300);
+    }
+
+    &--unknown {
+      background: var(--theme-elevation-200);
+    }
+  }
+
+  &__timeline-title {
+    color: var(--theme-text);
+    text-decoration: none;
+    overflow: hidden;
+    display: flex;
+    align-items: baseline;
+    gap: var(--cs-space-2);
+    min-width: 0;
+
+    &:hover {
+      color: var(--cs-cyan-500);
+    }
+  }
+
+  &__timeline-type {
+    flex-shrink: 0;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+  }
+
+  &__timeline-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  &__timeline-time {
+    flex-shrink: 0;
+    font-size: 11.5px;
+    color: var(--theme-text-soft);
+    font-feature-settings: 'tnum' 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // Quick links grid
+  &__quick {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--cs-space-3);
+
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__quick-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--cs-space-4);
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition:
+      border-color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro),
+      transform var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--cs-cyan-500);
+      background: var(--theme-elevation-50);
+      transform: translateY(-1px);
+
+      .cs-dashboard__quick-arrow {
+        color: var(--cs-cyan-500);
+        transform: translateX(2px);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--cs-cyan-500);
+      outline-offset: 2px;
+    }
+  }
+
+  &__quick-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--theme-text);
+  }
+
+  &__quick-desc {
+    font-size: 12.5px;
+    color: var(--theme-text-soft);
+    line-height: 1.45;
+  }
+
+  &__quick-arrow {
+    position: absolute;
+    top: var(--cs-space-3);
+    right: var(--cs-space-3);
+    color: var(--theme-text-disabled);
+    font-size: 16px;
+    line-height: 1;
+    transition:
+      color var(--cs-motion-micro),
+      transform var(--cs-motion-micro);
+  }
+}
+
+// ─── Hide the breadcrumb on the dashboard view + tighten chrome ──
+//
+// Payload's dashboard view calls `SetStepNav({ nav: [] })` so the
+// crumb list is empty, but the surrounding `.step-nav` chrome (the
+// brand icon + slash separator) still renders. Hide it so the dashboard
+// — which IS the root — doesn't show a meaningless route above it.
+//
+// Hiding the step-nav alone leaves the `.app-header` allocating its
+// full height for the avatar row + (now-empty) breadcrumb row. On the
+// dashboard route there's no breadcrumb to host, so collapse the
+// header padding too. The avatar bar still renders for logout/account
+// access; it just hugs the top of the viewport.
+//
+// All scoped via `:has()` so the rest of the admin (collection lists,
+// document edits, globals) keeps full breadcrumb chrome.
+body:has(.cs-dashboard) {
+  // 1) The breadcrumb step-nav is empty on the dashboard route — hide it.
+  .step-nav,
+  :has(> .cs-dashboard) > .step-nav {
+    display: none;
+  }
+
+  // 2) Collapse the .app-header to ZERO height instead of `display:
+  //    none`. The header hosts Payload's `actions` slot — that's
+  //    where our CommandPalette `<dialog>` gets mounted. Hiding the
+  //    parent with display:none collapses every descendant in the
+  //    top layer too, so the palette would open with state but
+  //    render at 0×0 (visually invisible). Zero-height + visible
+  //    overflow keeps the actions slot mountable while reclaiming
+  //    the empty band above the greeting.
+  .app-header,
+  .template-default__app-header {
+    min-height: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    overflow: visible !important;
+  }
+
+  // Hide the visible chrome that lived inside the app-header (step-
+  // nav was already hidden above; the avatar/user-controls are
+  // already hidden globally because we moved them to the sidebar
+  // UserMenu). This is a belt-and-braces guard for any other
+  // bordered children Payload might add later.
+  .app-header__step-nav,
+  .app-header__user-controls,
+  .app-header__avatar {
+    display: none !important;
+  }
+
+  // 3) Greeting top-edge aligns with the SidebarHeader brand row on
+  //    the left column — both start at exactly the wrap's 12px top
+  //    inset. No extra dashboard top padding here, no header top
+  //    margin: the greeting sits flush with the wordmark across the
+  //    horizontal axis, which reads as one editor-canvas line.
+  .cs-dashboard {
+    padding-top: 0;
+  }
+
+  .cs-dashboard__header {
+    margin-top: 0;
+    margin-bottom: var(--cs-space-6);
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .cs-dashboard__title {
+    margin-top: 0;
+  }
+}
+

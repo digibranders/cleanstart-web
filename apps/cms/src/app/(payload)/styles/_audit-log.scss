@@ -1,0 +1,72 @@
+// 26. Audit Log readability — monospace timestamps, status pill on action
+// =============================================================================
+//
+// AuditLog rows show actor, action, target, createdAt as left-aligned plain
+// text — hard to scan. Promote them to a coherent monospace + chip layout.
+
+.cell-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--theme-elevation-150);
+  color: var(--theme-text);
+  white-space: nowrap;
+
+  // Map known action verbs to colour by string-match. Payload renders the
+  // raw value into the cell, so we use [class*='create'] etc. — but since
+  // class names don't carry the value, we fall back to attribute-equals
+  // selectors on a wrapping element when present, or default to neutral.
+  &[data-action='create'],
+  &[data-action='created'] {
+    color: var(--color-success-500);
+    background: rgba(0, 196, 106, 0.14);
+  }
+
+  &[data-action='update'],
+  &[data-action='updated'] {
+    color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  &[data-action='delete'],
+  &[data-action='deleted'] {
+    color: var(--color-error-500);
+    background: rgba(220, 38, 38, 0.12);
+  }
+}
+
+.cell-actor,
+.cell-target {
+  font-size: 13px;
+  color: var(--theme-text);
+}
+
+.cell-actor {
+  font-weight: 500;
+}
+
+.cell-target {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--theme-text-soft);
+}
+
+// Tighter, right-aligned timestamps in audit-log specifically — easier to
+// scan as a vertical column of monospace times.
+.collection-list--audit-log .cell-createdAt,
+.collection-list--audit-log .cell-updatedAt,
+.collection-list[data-collection='audit-log'] .cell-createdAt,
+.collection-list[data-collection='audit-log'] .cell-updatedAt {
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum' 1;
+  font-size: 12.5px;
+  color: var(--theme-text-soft);
+  text-align: right;
+  white-space: nowrap;
+}

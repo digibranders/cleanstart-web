@@ -1,0 +1,86 @@
+// =============================================================================
+// SavedStateIndicator — floating "Saved X ago" chip on edit views
+// =============================================================================
+//
+// Mounted globally; renders nothing on non-edit routes. Position fixed
+// at the bottom-right corner so it stays out of the form chrome path
+// regardless of scroll position. The dot is a calm green pulse to
+// signal "alive / OK"; chip text uses the secondary text colour so it
+// reads as a passive status, not a control.
+
+.cs-saved-indicator {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--cs-surface-overlay);
+  border: 1px solid var(--cs-border-subtle);
+  border-radius: 999px;
+  color: var(--cs-text-secondary);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1;
+  font-feature-settings: 'tnum' 1;
+  box-shadow: 0 4px 16px -6px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+  user-select: none;
+  cursor: default;
+  transition:
+    background-color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--cs-border-strong);
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cs-status-success);
+    flex-shrink: 0;
+    animation: cs-saved-dot-pulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  &__text {
+    white-space: nowrap;
+  }
+}
+
+@keyframes cs-saved-dot-pulse {
+  0%, 70%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 196, 106, 0.5);
+  }
+  35% {
+    box-shadow: 0 0 0 4px rgba(0, 196, 106, 0);
+  }
+}
+
+// "Saving…" transient state — fired by SaveShortcut on Cmd+S.
+.cs-saved-indicator--saving {
+  border-color: var(--cs-cyan-500);
+  color: var(--cs-cyan-500);
+}
+
+.cs-saved-indicator__dot--saving {
+  background: var(--cs-cyan-500);
+  animation: cs-saved-dot-spin 800ms linear infinite;
+}
+
+@keyframes cs-saved-dot-spin {
+  0%   { box-shadow: 0 0 0 0 rgba(6, 199, 242, 0.5); transform: scale(1); }
+  50%  { box-shadow: 0 0 0 4px rgba(6, 199, 242, 0); transform: scale(1.3); }
+  100% { box-shadow: 0 0 0 0 rgba(6, 199, 242, 0); transform: scale(1); }
+}
+
+// Respect prefers-reduced-motion — drop the pulse, keep the chip.
+@media (prefers-reduced-motion: reduce) {
+  .cs-saved-indicator__dot,
+  .cs-saved-indicator__dot--saving {
+    animation: none;
+  }
+}

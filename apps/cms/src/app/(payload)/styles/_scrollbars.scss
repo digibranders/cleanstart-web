@@ -1,0 +1,27 @@
+// 15. Scrollbars — Webflow-thin themed (Chromium / WebKit)
+// =============================================================================
+
+* {
+  scrollbar-color: var(--theme-elevation-200) transparent;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--theme-elevation-200);
+  border: 2px solid var(--theme-bg);
+  border-radius: 999px;
+
+  &:hover {
+    background: var(--theme-elevation-300);
+  }
+}
+

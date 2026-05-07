@@ -1,16 +1,20 @@
+import type { ReactElement } from 'react';
+
 /**
- * CleanStart icon-only mark — used in the admin top-left header
- * (`admin.components.graphics.Icon`). Just the geometric chevron
- * without the wordmark, viewBox cropped to the mark's bounding box.
+ * Admin top-left "icon" slot. Payload renders this in the breadcrumb
+ * area before the step-nav crumbs. The slot is sized for an icon (~24
+ * px square), so a text wordmark is clipped to "Cl…" — render the
+ * brand mark instead and let the wordmark live in the sidebar header
+ * where it has the column width to breathe.
  *
  * The outer shape uses `currentColor` so it inverts cleanly between
- * light and dark themes; the inner chevron stays brand-cyan.
+ * light and dark themes; the inner chevron stays brand-cyan in both.
  */
-export const Icon = () => (
+export const Icon = (): ReactElement => (
   <svg
     role="img"
     aria-label="CleanStart"
-    width="21"
+    width="22"
     height="24"
     viewBox="0 0 28 32"
     fill="none"

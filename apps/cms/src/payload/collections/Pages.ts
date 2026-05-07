@@ -2,10 +2,15 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { pageBuilderBlocks } from '../blocks';
-import { seoField } from '../fields/seo';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { pagesPathBuilderHook } from '../hooks/pages-path-builder';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 /**
  * Page-builder host collection. The Pages tree is the only content
@@ -86,15 +91,28 @@ export const Pages: CollectionConfig = {
       },
     },
     {
+      // The compact PermalinkField (sidebar UI below) renders the live URL
+      // built from this value. Hidden here so the form doesn't double-render
+      // a full-width read-only text input next to the chip.
       name: 'path',
       type: 'text',
       index: true,
       access: { update: () => false },
+      admin: { readOnly: true, hidden: true },
+    },
+    {
+      name: 'permalink',
+      type: 'ui',
       admin: {
-        readOnly: true,
-        description:
-          'Computed full URL path (e.g. /solutions/pricing). Maintained by the path-builder hook on every save.',
         position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            // Pages compute a full nested path (e.g. `/solutions/pricing`)
+            // on save — surface it as the link source with no prefix.
+            clientProps: { pathPrefix: '', sourceField: 'path' },
+          },
+        },
       },
     },
     {
@@ -120,11 +138,21 @@ export const Pages: CollectionConfig = {
         position: 'sidebar',
       },
     },
-    seoField,
+    // Pages use a `path` field rather than `slug`, so the SerpPreview
+    // (which reads slug) shows the empty-state until path-aware support
+    // lands. Title / Description / Indexable still surface as sidebar
+    // controls — those just read seo.* directly and work fine here.
+    ...seoSidebarFields({ pathPrefix: '', descriptionSource: 'abstract' }),
+    ...seoFieldsForSidebar('pages'),
   ],
   hooks: {
     beforeChange: [pagesPathBuilderHook],
-    afterChange: [slugChangeRedirectHook('pages')],
+    afterChange: [
+      slugChangeRedirectHook('pages'),
+      searchSyncAfterChangeHook('pages'),
+      webhooksPublishAfterChangeHook('pages'),
+    ],
+    afterDelete: [searchSyncAfterDeleteHook('pages')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

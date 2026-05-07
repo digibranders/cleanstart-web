@@ -1,0 +1,289 @@
+// 18. Sidebar header — branded anchor + Dashboard link (BeforeNavLinks slot)
+// =============================================================================
+//
+// Lays out the top of the nav as a single integrated row:
+//
+//   ┌────────────────────────────────────────┐
+//   │ [<]   CleanStart  CMS                  │   ← brand row + overlay toggler
+//   │  Search…                ⌘K             │
+//   │ ▸ Dashboard                            │
+//   └────────────────────────────────────────┘
+//
+// Payload's outer NavToggler stays — we don't render an embedded one.
+// Instead we position the outer toggler as a `position: fixed` overlay
+// at the top-left of the viewport so it visually sits *inside* the
+// brand row in both open and collapsed nav states. The brand link
+// keeps a 36px left padding so the toggler has its own seat without
+// covering the wordmark.
+
+// 16px top inset on both columns so the SidebarHeader brand row and
+// the dashboard greeting share the same horizontal baseline against
+// the browser frame.
+//
+// Payload's `.nav__scroll` ships with `padding-top: 56px` to reserve
+// room for the avatar bar — which we've moved to the sidebar UserMenu.
+// Zero it out so only the surrounding `.nav` 16px buffer counts.
+.template-default__wrap,
+.nav {
+  padding-top: 16px;
+}
+
+.nav__scroll {
+  padding-top: 0 !important;
+}
+
+.cs-sidebar-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 12px 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--cs-border-subtle);
+
+  // Brand link (logo + CMS pill). Left padding leaves a 36px seat for
+  // the overlay toggler. Top/bottom padding is 0 so the wordmark's
+  // top edge sits at exactly the wrap's top inset — matching the
+  // dashboard greeting on the right column horizontally.
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 6px 0 36px;
+    min-height: 32px;
+    border-radius: var(--cs-radius-input);
+    color: var(--cs-text-primary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--cs-surface-raised);
+    }
+
+    &:focus-visible {
+      outline: var(--cs-focus-outline);
+      outline-offset: 2px;
+    }
+  }
+
+  // CleanStart wordmark SVG — sized for the nav column. `currentColor`
+  // glyphs invert between light/dark themes automatically.
+  &__logo {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 1 auto;
+    min-width: 0;
+    color: var(--cs-text-primary);
+
+    svg {
+      display: block;
+      width: 100%;
+      max-width: 116px;
+      height: auto;
+      margin: 0;
+    }
+  }
+
+  // "CMS" pill — small cyan chip after the wordmark
+  &__eyebrow {
+    flex-shrink: 0;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cs-cyan-500);
+    padding: 2px 6px;
+    border: 1px solid var(--cs-cyan-500);
+    border-radius: var(--cs-radius-chip);
+    line-height: 1;
+  }
+}
+
+// Dashboard link — sits inside the header block as a sibling of the
+// brand row. Same horizontal margin as nav links below so they share a
+// visual rhythm, but lives above the category headers as the editor's
+// first-class destination.
+.cs-sidebar-dashboard {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  margin: 2px 0 0;
+  border-radius: var(--cs-radius-input);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cs-text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  min-height: 32px;
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro);
+
+  svg {
+    flex-shrink: 0;
+    color: currentColor;
+  }
+
+  &:hover {
+    color: var(--cs-text-primary);
+    background: var(--cs-surface-raised);
+  }
+
+  &--active {
+    color: var(--cs-text-primary);
+    font-weight: 600;
+    background: var(--cs-tint-brand-soft);
+    box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
+  }
+
+  &:focus-visible {
+    outline: var(--cs-focus-outline);
+    outline-offset: 1px;
+  }
+}
+
+// ─── Sidebar Search trigger (Cmd+K palette) ──────────────────────
+//
+// Sits between the brand row and the Dashboard link so the editor can
+// always reach the command palette by mouse, not only Cmd+K. Clicking
+// dispatches `cs-cmdk:open`, which CommandPalette listens for.
+.cs-sidebar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 6px 0 0;
+  padding: 6px 8px 6px 10px;
+  background: var(--cs-surface-canvas);
+  border: 1px solid var(--cs-border-subtle);
+  border-radius: var(--cs-radius-input);
+  color: var(--cs-text-muted);
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+  min-height: 30px;
+  transition:
+    border-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    color: var(--cs-text-primary);
+    border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  &:focus-visible {
+    outline: var(--cs-focus-outline);
+    outline-offset: 1px;
+  }
+
+  svg {
+    flex-shrink: 0;
+    color: currentColor;
+  }
+
+  &__label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__kbd {
+    flex-shrink: 0;
+    display: inline-flex;
+    gap: 2px;
+
+    kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      background: var(--cs-surface-raised);
+      border: 1px solid var(--cs-border-subtle);
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1;
+      color: var(--cs-text-secondary);
+    }
+  }
+}
+
+// ─── Outer NavToggler — overlay positioned to sit inside the brand row
+//
+// Payload's Default template renders a NavToggler outside the Nav, in
+// `.template-default__nav-toggler-wrapper`. We render NO embedded
+// toggler — instead the outer one is `position: fixed` at the top-left
+// of the viewport, sized to sit visually inside the SidebarHeader
+// brand row (the brand link reserves a 36px left seat for it). One
+// toggler in both open and collapsed states.
+//
+// `top: 18px` lines up with the brand row's vertical centre after the
+// 12px wrap padding; `left: 14px` clears the sidebar's left edge.
+.template-default__nav-toggler-wrapper {
+  position: fixed;
+  top: 19px;
+  left: 14px;
+  z-index: 50;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+
+  // Strip Payload's chrome on every nested element down to the actual
+  // button — the wrapper, the container, and the NavToggler all carry
+  // their own padding/background out of the box.
+  *,
+  > div,
+  > div > div {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  // The clickable element itself — Payload renders NavToggler as a
+  // <div>, with NavHamburger inside. Style the innermost element to a
+  // 26px square that hovers cyan to match the rest of the chrome.
+  .template-default__nav-toggler,
+  .template-default__nav-toggler-container,
+  > div,
+  > div > div,
+  button {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px;
+    border-radius: var(--cs-radius-input) !important;
+    border: 1px solid transparent !important;
+    color: var(--cs-text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background-color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--cs-cyan-500) !important;
+      border-color: var(--cs-border-subtle) !important;
+      background: var(--cs-tint-brand-soft) !important;
+    }
+  }
+
+  svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}

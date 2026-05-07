@@ -1,0 +1,72 @@
+// =============================================================================
+// 4. Page chrome — doc-controls (sticky), step-nav (breadcrumb)
+// =============================================================================
+
+// Step nav (breadcrumb) — quieter, with slight wordmark tracking
+.step-nav {
+  font-size: 13px;
+  letter-spacing: 0.005em;
+  color: var(--theme-text-soft);
+
+  a {
+    color: var(--theme-text-soft);
+    transition: color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--cs-cyan-500);
+    }
+  }
+}
+
+// Sticky doc controls — Webflow's editor strip stays visible while scrolling.
+// Add a low-opacity shadow when scrolled past the top so the strip lifts.
+.doc-controls {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--theme-bg);
+  border-bottom: 1px solid var(--theme-elevation-150);
+  padding-top: var(--cs-space-2);
+  padding-bottom: var(--cs-space-2);
+  backdrop-filter: saturate(140%) blur(6px);
+  transition: box-shadow var(--cs-motion-macro);
+
+  &__content {
+    gap: var(--cs-space-4);
+  }
+
+  &__meta {
+    color: var(--theme-text-soft);
+    font-size: 13px;
+  }
+
+  &__divider {
+    background: var(--theme-elevation-200);
+    width: 1px;
+    height: 18px;
+    margin-inline: var(--cs-space-2);
+  }
+
+  &__controls-wrapper {
+    gap: var(--cs-space-2);
+  }
+}
+
+// Subtle drop-shadow on the doc-controls only when the page has scrolled.
+// Implemented via @supports for pages where the body scroll is the host.
+@supports (animation-timeline: scroll()) {
+  .doc-controls {
+    animation: cms-doc-shadow-on-scroll linear both;
+    animation-timeline: scroll();
+    animation-range: 0 60px;
+  }
+
+  @keyframes cms-doc-shadow-on-scroll {
+    from {
+      box-shadow: 0 0 0 0 transparent;
+    }
+    to {
+      box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.18);
+    }
+  }
+}

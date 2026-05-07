@@ -1,9 +1,15 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
-import { seoField } from '../fields/seo';
+import { mediaUploadField } from '../fields/media-upload';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 export const Resources: CollectionConfig = {
   slug: 'resources',
@@ -33,15 +39,14 @@ export const Resources: CollectionConfig = {
         { label: 'Case study', value: 'case-study' },
       ],
     },
-    { name: 'heroImage', type: 'upload', relationTo: 'media' },
+    mediaUploadField({ name: 'heroImage', folderHint: 'web/resource' }),
     { name: 'summary', type: 'textarea' },
     { name: 'body', type: 'richText' },
-    {
+    mediaUploadField({
       name: 'asset',
-      type: 'upload',
-      relationTo: 'media',
-      admin: { description: 'PDF or other downloadable. Routed to web/resource/.' },
-    },
+      folderHint: 'web/resource',
+      description: 'PDF or other downloadable. Routed to web/resource/.',
+    }),
     {
       name: 'gated',
       type: 'checkbox',
@@ -84,6 +89,20 @@ export const Resources: CollectionConfig = {
       },
     },
     {
+      name: 'permalink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            clientProps: { pathPrefix: '/resources' },
+          },
+        },
+      },
+    },
+    ...seoSidebarFields({ pathPrefix: '/resources', descriptionSource: 'summary' }),
+    {
       name: 'downloadCount',
       type: 'number',
       defaultValue: 0,
@@ -96,10 +115,15 @@ export const Resources: CollectionConfig = {
         condition: (_data, sibling) => sibling?.gated === true,
       },
     },
-    seoField,
+    ...seoFieldsForSidebar('resources'),
   ],
   hooks: {
-    afterChange: [slugChangeRedirectHook('resources')],
+    afterChange: [
+      slugChangeRedirectHook('resources'),
+      searchSyncAfterChangeHook('resources'),
+      webhooksPublishAfterChangeHook('resources'),
+    ],
+    afterDelete: [searchSyncAfterDeleteHook('resources')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,
