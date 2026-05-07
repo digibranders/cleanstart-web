@@ -13,6 +13,15 @@
 // keyboard users and the mobile breakpoint. Payload's outer
 // toggler-wrapper is hidden so we render only one.
 
+// Force the nav column itself to touch the viewport top — Payload
+// applies a top padding on the nav and template wrap that we don't
+// need (the SidebarHeader provides its own internal padding now).
+.template-default__nav,
+.template-default__wrap,
+.nav {
+  padding-top: 0 !important;
+}
+
 .cs-sidebar-header {
   display: flex;
   flex-direction: column;

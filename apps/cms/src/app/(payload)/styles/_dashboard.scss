@@ -2,11 +2,12 @@
 // =============================================================================
 
 .cs-dashboard {
-  // Header
+  // Header — no horizontal rule under the greeting; the gap to the
+  // KPI cards reads cleanly as whitespace alone.
   &__header {
-    margin-bottom: var(--cs-space-6);
-    padding-bottom: var(--cs-space-4);
-    border-bottom: 1px solid var(--theme-elevation-150);
+    margin-bottom: var(--cs-space-5);
+    padding-bottom: 0;
+    border-bottom: none;
   }
 
   &__title {
@@ -337,34 +338,33 @@
 // All scoped via `:has()` so the rest of the admin (collection lists,
 // document edits, globals) keeps full breadcrumb chrome.
 body:has(.cs-dashboard) {
+  // 1) The breadcrumb step-nav is empty on the dashboard route — hide it.
   .step-nav,
   :has(> .cs-dashboard) > .step-nav {
     display: none;
   }
 
-  // App-header (avatar + step-nav row) — tighten when the breadcrumb
-  // is hidden. The double-row spacing Payload uses to leave room for
-  // the breadcrumb collapses to a single 40px row.
+  // 2) Drop the entire .app-header on the dashboard. With the avatar
+  //    moved to the sidebar UserMenu and the breadcrumb empty, the
+  //    header has no content to host — leaving its row visible just
+  //    pads ~40px of empty space above the greeting. `display: none`
+  //    fully reclaims that band.
   .app-header,
   .template-default__app-header {
-    min-height: 40px;
-    padding-block: 6px;
-    border-bottom: 0;
+    display: none !important;
   }
 
-  // Gutter top padding — Payload gives the content well 24-32px of
-  // top breathing room. With the avatar bar shrunk above it, that
-  // becomes excess. Pull the greeting up flush.
+  // 3) Pull the greeting flush with the top of the content well — no
+  //    Gutter top padding, no header divider.
   .cs-dashboard {
-    padding-top: var(--cs-space-3);
+    padding-top: var(--cs-space-4);
   }
 
-  // Header block sits directly under the avatar bar; drop its top
-  // margin so it hugs the chrome above.
   .cs-dashboard__header {
     margin-top: 0;
     margin-bottom: var(--cs-space-5);
-    padding-bottom: var(--cs-space-3);
+    padding-bottom: 0;
+    border-bottom: none; // no horizontal rule above the KPI cards
   }
 }
 
