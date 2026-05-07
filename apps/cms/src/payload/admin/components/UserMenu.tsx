@@ -27,15 +27,18 @@ type AuthUser = {
 };
 
 /**
- * Replaces Payload's default avatar with a custom button-and-popover.
- * Click the avatar to open a dropdown that shows the editor's name +
- * email, an "Account" link to the standard /admin/account view, and a
- * "Sign out" action that calls Payload's `useAuth().logOut()`.
+ * Sidebar UserMenu — replaces both Payload's default top-right avatar
+ * AND the bottom-left logout link. Mounted via
+ * `admin.components.afterNavLinks` so it sits at the bottom of the
+ * nav column. The whole row is a button: avatar + name + chevron.
  *
- * Wired via `admin.avatar = { Component: '...UserMenu' }` so it slots
- * into the same place Payload renders its default gravatar/avatar.
- * The popover is anchored to the trigger via `position: absolute` and
- * closes on outside-click + Escape.
+ * Click toggles a popover that opens UPWARD (since the trigger is at
+ * the bottom of the sidebar) with: Account → Sign out. Closes on
+ * outside-click, Escape, or item activation.
+ *
+ * Consolidating the user controls in one place lets us hide the empty
+ * `.app-header__user-controls` slot at the top of every view, which
+ * was the source of the ~50px empty band above the page content.
  */
 export const UserMenu = (): ReactElement => {
   const { user, logOut } = useAuth<AuthUser>();
@@ -45,7 +48,6 @@ export const UserMenu = (): ReactElement => {
 
   const close = useCallback(() => setOpen(false), []);
 
-  // Outside click + Esc closes the popover.
   useEffect(() => {
     if (!open) return undefined;
     const onDocClick = (e: MouseEvent): void => {
@@ -68,7 +70,7 @@ export const UserMenu = (): ReactElement => {
     try {
       await logOut();
     } catch {
-      // logOut sometimes throws on already-expired sessions; route
+      // logOut sometimes throws on already-expired sessions — route
       // to the login screen either way.
     }
     router.push('/admin/login');
@@ -78,6 +80,8 @@ export const UserMenu = (): ReactElement => {
   const displayName =
     (user?.name && user.name.trim().length > 0 ? user.name : null) ??
     (user?.email ?? 'Account');
+  const subline =
+    user?.name && user.email && user.email !== user.name ? user.email : '';
   const initials = initialsFor(user?.name ?? user?.email ?? '');
 
   return (
@@ -97,6 +101,33 @@ export const UserMenu = (): ReactElement => {
         <span className="cs-user-menu__avatar" aria-hidden="true">
           {initials}
         </span>
+        <span className="cs-user-menu__identity">
+          <span className="cs-user-menu__name" title={displayName}>
+            {displayName}
+          </span>
+          {subline && (
+            <span className="cs-user-menu__email" title={subline}>
+              {subline}
+            </span>
+          )}
+        </span>
+        <svg
+          className="cs-user-menu__chevron"
+          width="12"
+          height="12"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M4 6l4 4 4-4"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </button>
 
       {open && (
@@ -105,15 +136,6 @@ export const UserMenu = (): ReactElement => {
           role="menu"
           aria-label="Account menu"
         >
-          <div className="cs-user-menu__identity">
-            <span className="cs-user-menu__name">{displayName}</span>
-            {user?.email && user.name ? (
-              <span className="cs-user-menu__email">{user.email}</span>
-            ) : null}
-          </div>
-
-          <div className="cs-user-menu__divider" aria-hidden="true" />
-
           <Link
             href="/admin/account"
             className="cs-user-menu__item"

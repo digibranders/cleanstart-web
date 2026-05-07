@@ -102,9 +102,9 @@ export default buildConfig({
         './payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator',
         './payload/admin/components/NavBadges.tsx#NavBadges',
       ],
-      avatar: {
-        Component: './payload/admin/components/UserMenu.tsx#UserMenu',
-      },
+      afterNavLinks: [
+        './payload/admin/components/UserMenu.tsx#UserMenu',
+      ],
       beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
       graphics: {
         Logo: './payload/admin/Logo.tsx#Logo',
