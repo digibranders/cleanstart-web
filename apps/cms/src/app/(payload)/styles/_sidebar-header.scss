@@ -1,98 +1,47 @@
 // 18. Sidebar header — branded anchor + Dashboard link (BeforeNavLinks slot)
 // =============================================================================
 //
-// Lays out the top of the nav as a single integrated block:
+// Lays out the top of the nav as a single integrated row:
 //
 //   ┌────────────────────────────────────────┐
-//   │ [<]   CleanStart  CMS                  │   ← brand row
-//   │ ▸ Dashboard                            │   ← dashboard nav row
+//   │ [<]   CleanStart  CMS                  │   ← brand row + overlay toggler
+//   │  Search…                ⌘K             │
+//   │ ▸ Dashboard                            │
 //   └────────────────────────────────────────┘
 //
-// The collapse toggler embedded in the brand row uses Payload's own
-// `NavToggler` element, so the NavContext collapse state still works for
-// keyboard users and the mobile breakpoint. Payload's outer
-// toggler-wrapper is hidden so we render only one.
+// Payload's outer NavToggler stays — we don't render an embedded one.
+// Instead we position the outer toggler as a `position: fixed` overlay
+// at the top-left of the viewport so it visually sits *inside* the
+// brand row in both open and collapsed nav states. The brand link
+// keeps a 36px left padding so the toggler has its own seat without
+// covering the wordmark.
 
-// Tighten the wrappers but keep a deliberate top inset so the layout
-// breathes against the viewport top. Payload's default padding here
-// is too generous (used to leave room for the avatar bar we've now
-// removed); 16px is enough for the SidebarHeader and dashboard
-// greeting to feel anchored without crowding the browser frame.
+// Tight top inset: layout breathes against the viewport without
+// reintroducing the empty chrome band we just removed.
 .template-default__nav,
 .template-default__wrap,
 .nav {
-  padding-top: 16px;
+  padding-top: 12px;
 }
 
 .cs-sidebar-header {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 12px 12px 8px;
+  padding: 0 12px 8px;
   margin-bottom: 8px;
   border-bottom: 1px solid var(--cs-border-subtle);
 
-  // Brand row hosts the toggler + the brand link side-by-side.
-  &__brand-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 32px;
-  }
-
-  // Embedded NavToggler — render as a 26px square icon button so it
-  // sits flush with the wordmark height. NavToggler renders a
-  // <button>/<div> internally; we target both via descendant + the
-  // class we set so styling applies regardless of Payload's underlying
-  // tag choice.
-  &__toggle {
-    flex-shrink: 0;
-    width: 26px;
-    height: 26px;
-    min-width: 26px;
-    border-radius: var(--cs-radius-input);
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--cs-text-secondary);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    transition:
-      background-color var(--cs-motion-micro),
-      border-color var(--cs-motion-micro),
-      color var(--cs-motion-micro);
-
-    &:hover {
-      color: var(--cs-cyan-500);
-      border-color: var(--cs-border-subtle);
-      background: var(--cs-tint-brand-soft);
-    }
-
-    &:focus-visible {
-      outline: var(--cs-focus-outline);
-      outline-offset: 1px;
-    }
-  }
-
-  &__toggle-glyph {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 14px;
-    height: 14px;
-    color: currentColor;
-  }
-
-  // Brand link (logo + CMS pill). Click anywhere routes to /admin.
+  // Brand link (logo + CMS pill). Left padding leaves a 36px seat for
+  // the overlay toggler positioned via fixed below.
   &__brand {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     flex: 1 1 auto;
     min-width: 0;
-    padding: 4px 6px;
+    padding: 4px 6px 4px 36px;
+    min-height: 32px;
     border-radius: var(--cs-radius-input);
     color: var(--cs-text-primary);
     text-decoration: none;
@@ -259,37 +208,21 @@
   }
 }
 
-// ─── Outer NavToggler — visible only when the nav is COLLAPSED ───
+// ─── Outer NavToggler — overlay positioned to sit inside the brand row
 //
 // Payload's Default template renders a NavToggler outside the Nav, in
-// `.template-default__nav-toggler-wrapper`. We embed our own toggler
-// inside the SidebarHeader so the editor sees one integrated header
-// when the nav is open. But the embedded one disappears together with
-// the nav when collapsed — leaving no way to expand again.
+// `.template-default__nav-toggler-wrapper`. We render NO embedded
+// toggler — instead the outer one is `position: fixed` at the top-left
+// of the viewport, sized to sit visually inside the SidebarHeader
+// brand row (the brand link reserves a 36px left seat for it). One
+// toggler in both open and collapsed states.
 //
-// Show the outer toggler ONLY when the nav is collapsed (i.e. the
-// sibling Wrapper does NOT carry `template-default--nav-open`). When
-// the nav opens, our embedded toggler takes over.
-//
-// Wrapper structure (Payload):
-//   <div style="position:relative">
-//     <div class="template-default__nav-toggler-wrapper"> ← outer
-//     <div class="template-default[ template-default--nav-open]"> ← Wrapper
-//
-// The `:has(~)` selector catches the open-state Wrapper as a general
-// sibling of the outer toggler.
-.template-default__nav-toggler-wrapper:has(~ .template-default--nav-open) {
-  display: none;
-}
-
-// Style the outer toggler for the collapsed state — small floating
-// pill at top-left so the user has a clear, always-reachable
-// affordance to expand the nav. `position: fixed` keeps it stuck to
-// the viewport regardless of scroll.
+// `top: 18px` lines up with the brand row's vertical centre after the
+// 12px wrap padding; `left: 14px` clears the sidebar's left edge.
 .template-default__nav-toggler-wrapper {
   position: fixed;
-  top: 12px;
-  left: 12px;
+  top: 18px;
+  left: 14px;
   z-index: 50;
   background: transparent;
   border: none;
@@ -300,19 +233,18 @@
   .template-default__nav-toggler-container,
   > div,
   button {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
     border-radius: var(--cs-radius-input);
-    background: var(--cs-surface-raised);
-    border: 1px solid var(--cs-border-subtle);
+    background: transparent;
+    border: 1px solid transparent;
     color: var(--cs-text-secondary);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.4);
     transition:
       background-color var(--cs-motion-micro),
       border-color var(--cs-motion-micro),
@@ -320,7 +252,7 @@
 
     &:hover {
       color: var(--cs-cyan-500);
-      border-color: var(--cs-cyan-500);
+      border-color: var(--cs-border-subtle);
       background: var(--cs-tint-brand-soft);
     }
   }

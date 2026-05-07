@@ -1,6 +1,5 @@
 'use client';
 
-import { NavToggler } from '@payloadcms/ui';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState, type ReactElement } from 'react';
@@ -49,42 +48,21 @@ export const SidebarHeader = (): ReactElement => {
 
   return (
     <div className="cs-sidebar-header" data-cs-sidebar-header>
-      <div className="cs-sidebar-header__brand-row">
-        <NavToggler className="cs-sidebar-header__toggle">
-          <span className="cs-sidebar-header__toggle-glyph" aria-hidden="true">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 16 16"
-              fill="none"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                d="M10 3L5 8l5 5"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-          <span className="cs-sr-only">Toggle sidebar</span>
-        </NavToggler>
-
-        <Link
-          href="/admin"
-          className="cs-sidebar-header__brand"
-          aria-label="CleanStart CMS — go to dashboard"
-        >
-          <span className="cs-sidebar-header__logo">
-            <Logo />
-          </span>
-          <span className="cs-sidebar-header__eyebrow" aria-hidden="true">
-            CMS
-          </span>
-        </Link>
-      </div>
+      {/* Brand row — Payload's outer NavToggler overlays the left edge
+          via position: fixed in `_sidebar-header.scss`, so we only render
+          the brand link here. One toggler, one chevron, no duplication. */}
+      <Link
+        href="/admin"
+        className="cs-sidebar-header__brand"
+        aria-label="CleanStart CMS — go to dashboard"
+      >
+        <span className="cs-sidebar-header__logo">
+          <Logo />
+        </span>
+        <span className="cs-sidebar-header__eyebrow" aria-hidden="true">
+          CMS
+        </span>
+      </Link>
 
       <button
         type="button"
