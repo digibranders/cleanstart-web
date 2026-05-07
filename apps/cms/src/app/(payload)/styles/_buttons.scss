@@ -26,6 +26,7 @@
 
   &:active:not([disabled]) {
     transform: translateY(1px);
+    box-shadow: var(--cs-shadow-press-soft);
   }
 }
 
@@ -62,6 +63,7 @@ button.btn--style-pill-primary,
 
   &:active:not([disabled]) {
     background: var(--cs-cyan-600);
+    box-shadow: var(--cs-shadow-press);
   }
 
   .btn__label {
@@ -94,6 +96,10 @@ div.btn--style-pill-primary {
     border-color: var(--cs-cyan-500);
     color: var(--theme-text);
   }
+
+  &:active:not([disabled]) {
+    box-shadow: var(--cs-shadow-press-soft);
+  }
 }
 
 .btn--style-subtle {
@@ -103,6 +109,10 @@ div.btn--style-pill-primary {
 
   &:hover:not([disabled]) {
     background: var(--theme-elevation-150);
+  }
+
+  &:active:not([disabled]) {
+    box-shadow: var(--cs-shadow-press-soft);
   }
 }
 

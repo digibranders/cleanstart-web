@@ -182,6 +182,26 @@ const saveRecent = (action: Action): void => {
   }
 };
 
+const removeRecent = (id: string): Action[] => {
+  if (typeof window === 'undefined') return [];
+  const next = loadRecent().filter((a) => a.id !== id);
+  try {
+    window.localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {
+    // ignore quota / private-mode failures
+  }
+  return next;
+};
+
+const clearAllRecent = (): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.removeItem(RECENT_KEY);
+  } catch {
+    // ignore
+  }
+};
+
 const stripHashFromTitle = (raw: unknown): string => {
   if (typeof raw !== 'string') return '';
   return raw.length > 0 ? raw : '';
@@ -473,15 +493,28 @@ export const CommandPalette = (): ReactElement | null => {
         <div className="cs-cmdk__list" ref={listRef}>
           {recentActions.length > 0 && (
             <div className="cs-cmdk__group">
-              <div className="cs-cmdk__group-label">Recent</div>
+              <div className="cs-cmdk__group-label cs-cmdk__group-label--with-action">
+                <span>Recent</span>
+                <button
+                  type="button"
+                  className="cs-cmdk__clear-all"
+                  onClick={() => {
+                    clearAllRecent();
+                    setRecent([]);
+                  }}
+                >
+                  Clear history
+                </button>
+              </div>
               {recentActions.map((a) => (
-                <ActionRow
+                <RecentRow
                   key={`recent-${a.id}`}
                   action={{ ...a, icon: 'clock' }}
                   index={allActions.indexOf(a)}
                   active={allActions.indexOf(a) === activeIndex}
                   onActivate={() => activate(a)}
                   onHover={() => setActiveIndex(allActions.indexOf(a))}
+                  onRemove={() => setRecent(removeRecent(a.id))}
                 />
               ))}
             </div>
@@ -590,6 +623,65 @@ const ActionRow = ({
     <span className="cs-cmdk__row-label">{action.label}</span>
     {action.hint && <span className="cs-cmdk__row-hint">{action.hint}</span>}
   </button>
+);
+
+type RecentRowProps = ActionRowProps & {
+  onRemove: () => void;
+};
+
+/**
+ * Recent-history row — same visual rhythm as `ActionRow` but rendered
+ * as a flex container so we can sit a sibling × button next to the
+ * activate button. Nesting interactive elements would break a11y; the
+ * two-button layout keeps each affordance reachable on its own.
+ */
+const RecentRow = ({
+  action,
+  index,
+  active,
+  onActivate,
+  onHover,
+  onRemove,
+}: RecentRowProps): ReactElement => (
+  <div
+    className={
+      active
+        ? 'cs-cmdk__row-wrap cs-cmdk__row-wrap--active'
+        : 'cs-cmdk__row-wrap'
+    }
+  >
+    <button
+      type="button"
+      data-index={index}
+      className="cs-cmdk__row cs-cmdk__row--recent"
+      onClick={onActivate}
+      onMouseEnter={onHover}
+      onFocus={onHover}
+    >
+      <span className="cs-cmdk__row-icon" aria-hidden="true">
+        <Glyph kind={action.icon} />
+      </span>
+      <span className="cs-cmdk__row-label">{action.label}</span>
+      {action.hint && <span className="cs-cmdk__row-hint">{action.hint}</span>}
+    </button>
+    <button
+      type="button"
+      className="cs-cmdk__row-remove"
+      onClick={(e) => {
+        e.stopPropagation();
+        onRemove();
+      }}
+      aria-label={`Remove ${action.label} from recent history`}
+      title="Remove from recent"
+    >
+      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path
+          fill="currentColor"
+          d="M4.7 4.7a1 1 0 0 1 1.4 0L8 6.6l1.9-1.9a1 1 0 1 1 1.4 1.4L9.4 8l1.9 1.9a1 1 0 1 1-1.4 1.4L8 9.4l-1.9 1.9a1 1 0 1 1-1.4-1.4L6.6 8 4.7 6.1a1 1 0 0 1 0-1.4Z"
+        />
+      </svg>
+    </button>
+  </div>
 );
 
 export default CommandPalette;

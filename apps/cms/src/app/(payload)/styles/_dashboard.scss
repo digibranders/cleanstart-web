@@ -248,6 +248,136 @@
     border-radius: var(--cs-radius-card);
   }
 
+  // ─── Activity timeline ─────────────────────────────────────────
+  //
+  // Replaces the static recent-edits table. Day-grouped rows under
+  // "Today / Yesterday / Earlier this week / Older". The vertical
+  // hairline through the status dots reads as a true timeline.
+  &__timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-5, var(--cs-space-4));
+  }
+
+  &__timeline-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-2);
+  }
+
+  &__timeline-heading {
+    margin: 0 0 var(--cs-space-1);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+  }
+
+  &__timeline-rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+
+    // Vertical hairline that runs through the status dots — this is
+    // what makes the list read as a timeline rather than a flat
+    // bulleted list. Fades to transparent at top + bottom so the
+    // line doesn't visually overshoot the first/last row.
+    &::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      left: 5px;
+      width: 1px;
+      background: linear-gradient(
+        to bottom,
+        transparent 0,
+        var(--theme-elevation-200) 12px,
+        var(--theme-elevation-200) calc(100% - 12px),
+        transparent 100%
+      );
+      pointer-events: none;
+    }
+  }
+
+  &__timeline-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 16px 1fr auto;
+    align-items: center;
+    gap: var(--cs-space-3);
+    padding: 6px 0;
+    font-size: 13px;
+  }
+
+  &__timeline-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--theme-elevation-200);
+    border: 2px solid var(--theme-bg);
+    margin-inline-start: 1px;
+    box-shadow: 0 0 0 1px var(--theme-elevation-200);
+    z-index: 1;
+
+    &--live {
+      background: var(--cs-cyan-500);
+      box-shadow: 0 0 0 1px var(--cs-cyan-500), 0 0 0 4px var(--cs-tint-brand-soft);
+    }
+
+    &--draft {
+      background: var(--theme-elevation-300);
+      box-shadow: 0 0 0 1px var(--theme-elevation-300);
+    }
+
+    &--unknown {
+      background: var(--theme-elevation-200);
+    }
+  }
+
+  &__timeline-title {
+    color: var(--theme-text);
+    text-decoration: none;
+    overflow: hidden;
+    display: flex;
+    align-items: baseline;
+    gap: var(--cs-space-2);
+    min-width: 0;
+
+    &:hover {
+      color: var(--cs-cyan-500);
+    }
+  }
+
+  &__timeline-type {
+    flex-shrink: 0;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+  }
+
+  &__timeline-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  &__timeline-time {
+    flex-shrink: 0;
+    font-size: 11.5px;
+    color: var(--theme-text-soft);
+    font-feature-settings: 'tnum' 1;
+    font-variant-numeric: tabular-nums;
+  }
+
   // Quick links grid
   &__quick {
     display: grid;

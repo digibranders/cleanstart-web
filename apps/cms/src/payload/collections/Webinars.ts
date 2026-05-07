@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
-import { seoField, seoSidebarFields } from '../fields/seo';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { validateOptionalUrl } from '../lib/url-shape';
@@ -173,7 +173,7 @@ export const Webinars: CollectionConfig = {
       },
     },
     ...seoSidebarFields({ pathPrefix: '/webinar', descriptionSource: 'abstract' }),
-    seoField,
+    ...seoFieldsForSidebar('webinars'),
   ],
   hooks: {
     afterChange: [slugChangeRedirectHook('webinars')],

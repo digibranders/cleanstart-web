@@ -203,6 +203,41 @@ const PulseCard = ({
 
 type RecentEditsTableProps = { items: RecentEdit[] };
 
+type TimelineGroupKey = 'today' | 'yesterday' | 'thisWeek' | 'older';
+
+const startOfDay = (ms: number): number => {
+  const d = new Date(ms);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+};
+
+const groupForUpdated = (iso: string): TimelineGroupKey => {
+  const t = new Date(iso).getTime();
+  if (!Number.isFinite(t)) return 'older';
+  const now = Date.now();
+  const todayStart = startOfDay(now);
+  const yesterdayStart = todayStart - ONE_DAY;
+  const weekStart = todayStart - 6 * ONE_DAY;
+  if (t >= todayStart) return 'today';
+  if (t >= yesterdayStart) return 'yesterday';
+  if (t >= weekStart) return 'thisWeek';
+  return 'older';
+};
+
+const GROUP_LABELS: Record<TimelineGroupKey, string> = {
+  today: 'Today',
+  yesterday: 'Yesterday',
+  thisWeek: 'Earlier this week',
+  older: 'Older',
+};
+
+/**
+ * Activity timeline. Replaces the static recent-edits table with a
+ * glanceable day-grouped feed: rows under "Today", "Yesterday",
+ * "Earlier this week", "Older", each showing a status dot + collection
+ * type + title + relative time. The vertical hairline through the
+ * status dots reads as a true timeline rather than a list.
+ */
 const RecentEditsTable = ({
   items,
 }: RecentEditsTableProps): ReactElement => {
@@ -214,53 +249,65 @@ const RecentEditsTable = ({
       </div>
     );
   }
+
+  const groups: Array<{ key: TimelineGroupKey; rows: RecentEdit[] }> = [];
+  for (const row of items) {
+    const key = groupForUpdated(row.updatedAt);
+    let bucket = groups.find((g) => g.key === key);
+    if (!bucket) {
+      bucket = { key, rows: [] };
+      groups.push(bucket);
+    }
+    bucket.rows.push(row);
+  }
+
   return (
-    <table className="cs-dashboard__table">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Updated</th>
-        </tr>
-      </thead>
-      <tbody>
-        {items.map((row) => {
-          const href = `/admin/collections/${row.collection}/${row.id}`;
-          const statusClass =
-            row.status === 'published'
-              ? 'cs-dashboard__status cs-dashboard__status--live'
-              : row.status === 'draft'
-                ? 'cs-dashboard__status cs-dashboard__status--draft'
-                : 'cs-dashboard__status cs-dashboard__status--unknown';
-          return (
-            <tr key={`${row.collection}:${row.id}`}>
-              <td>
-                <a className="cs-dashboard__title-link" href={href}>
-                  {row.title}
-                </a>
-              </td>
-              <td className="cs-dashboard__type-cell">
-                {COLLECTION_LABELS[row.collection]}
-              </td>
-              <td>
-                <span className={statusClass}>
-                  <span aria-hidden="true" className="cs-dashboard__status-dot" />
-                  {row.status === 'published'
-                    ? 'Live'
-                    : row.status === 'draft'
-                      ? 'Draft'
-                      : '—'}
-                </span>
-              </td>
-              <td className="cs-dashboard__time-cell">
-                {formatRelative(row.updatedAt)}
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+    <ol className="cs-dashboard__timeline">
+      {groups.map((group) => (
+        <li key={group.key} className="cs-dashboard__timeline-group">
+          <h3 className="cs-dashboard__timeline-heading">
+            {GROUP_LABELS[group.key]}
+          </h3>
+          <ul className="cs-dashboard__timeline-rows">
+            {group.rows.map((row) => {
+              const href = `/admin/collections/${row.collection}/${row.id}`;
+              const dotMod =
+                row.status === 'published'
+                  ? 'live'
+                  : row.status === 'draft'
+                    ? 'draft'
+                    : 'unknown';
+              return (
+                <li
+                  key={`${row.collection}:${row.id}`}
+                  className="cs-dashboard__timeline-row"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`cs-dashboard__timeline-dot cs-dashboard__timeline-dot--${dotMod}`}
+                  />
+                  <a className="cs-dashboard__timeline-title" href={href}>
+                    <span className="cs-dashboard__timeline-type">
+                      {COLLECTION_LABELS[row.collection]}
+                    </span>
+                    <span className="cs-dashboard__timeline-name">
+                      {row.title}
+                    </span>
+                  </a>
+                  <time
+                    className="cs-dashboard__timeline-time"
+                    dateTime={row.updatedAt}
+                    title={new Date(row.updatedAt).toLocaleString()}
+                  >
+                    {formatRelative(row.updatedAt)}
+                  </time>
+                </li>
+              );
+            })}
+          </ul>
+        </li>
+      ))}
+    </ol>
   );
 };
 

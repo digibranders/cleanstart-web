@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
-import { seoField, seoSidebarFields } from '../fields/seo';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import {
   searchSyncAfterChangeHook,
@@ -121,7 +121,7 @@ export const Authors: CollectionConfig = {
       },
     },
     ...seoSidebarFields({ pathPrefix: '/authors', descriptionSource: 'bioShort' }),
-    seoField,
+    ...seoFieldsForSidebar('authors'),
   ],
   hooks: {
     afterChange: [

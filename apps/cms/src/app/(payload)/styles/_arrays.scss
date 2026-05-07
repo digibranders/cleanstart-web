@@ -67,11 +67,16 @@
   font-size: 13px;
 }
 
-// Drag handle — invisible until hover
+// Drag handle — visible at rest so editors know rows are reorderable
 .collapsible__drag,
 .array-field__row-drag {
-  opacity: 0.35;
+  opacity: 0.55;
   transition: opacity var(--cs-motion-micro);
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .array-field__row:hover .collapsible__drag,

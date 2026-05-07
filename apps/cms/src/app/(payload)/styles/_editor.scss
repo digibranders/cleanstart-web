@@ -115,11 +115,14 @@
   background: var(--theme-input-bg);
   border: 1px solid var(--theme-elevation-200);
   border-radius: var(--cs-radius-card);
+  box-shadow: var(--cs-shadow-input-rest);
   transition: border-color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
 
   &:focus-within {
     border-color: var(--cs-cyan-500);
-    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    box-shadow:
+      0 0 0 3px var(--cs-tint-focus-ring),
+      var(--cs-shadow-input-focus);
   }
 
   // Cap the body editor at 85vh with internal scroll so SEO + sidebar
@@ -159,9 +162,9 @@
 .array-field__row .ContentEditable__root,
 .collapsible__content .ContentEditable__root,
 .blocks-field__row .ContentEditable__root {
-  min-height: 48px;
-  padding-top: 6px;
-  padding-bottom: 6px;
+  min-height: 64px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 // Nested wrap shell — render as a flat textarea-style surface so the
@@ -187,12 +190,14 @@
   }
 
   .ContentEditable__root {
-    padding: 6px 10px;
+    padding: 8px 12px;
   }
 
   &:focus-within {
     border-color: var(--cs-cyan-500);
-    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    box-shadow:
+      0 0 0 3px var(--cs-tint-focus-ring),
+      var(--cs-shadow-input-focus);
   }
 }
 

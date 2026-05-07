@@ -135,6 +135,110 @@
     color: var(--cs-text-muted);
   }
 
+  // Group-label variant with a trailing action ("Clear history") on the
+  // Recent group only — flex-row aligned, hairline-thin button.
+  &__group-label--with-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cs-space-3);
+  }
+
+  &__clear-all {
+    background: transparent;
+    border: 0;
+    padding: 2px 6px;
+    margin: -2px -6px -2px 0;
+    color: var(--cs-text-muted);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: var(--cs-radius-chip);
+    transition:
+      color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--color-error-500);
+      background: rgba(220, 38, 38, 0.08);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  // Recent rows live inside a flex wrap so the per-item × button can
+  // sit alongside the activate button without nesting.
+  &__row-wrap {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    transition: background-color var(--cs-motion-micro);
+
+    &--active {
+      background: var(--cs-tint-brand-soft);
+      box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
+    }
+
+    .cs-cmdk__row {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cs-cmdk__row--recent {
+      // The activate button no longer paints its own active background —
+      // the wrap holds it so the × button shares the highlight.
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+
+  &__row-remove {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    margin-inline-end: var(--cs-space-2);
+    background: transparent;
+    border: 0;
+    color: var(--cs-text-muted);
+    cursor: pointer;
+    border-radius: var(--cs-radius-chip);
+    opacity: 0;
+    transition:
+      opacity var(--cs-motion-micro),
+      color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    &:hover {
+      color: var(--color-error-500);
+      background: rgba(220, 38, 38, 0.1);
+    }
+
+    &:focus-visible {
+      opacity: 1;
+      outline: none;
+      box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  // Reveal × button when the row (or its activate button) is hovered or
+  // when the keyboard cursor lands on this row.
+  &__row-wrap:hover &__row-remove,
+  &__row-wrap--active &__row-remove {
+    opacity: 1;
+  }
+
   &__row {
     display: flex;
     align-items: center;

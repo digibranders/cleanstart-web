@@ -48,6 +48,21 @@ export const SavedStateIndicator = (): ReactElement | null => {
   const [editPath, setEditPath] = useState<EditPath | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [, setTick] = useState(0);
+  const [saving, setSaving] = useState(false);
+
+  // Listen for transient "saving" pulses dispatched by the SaveShortcut
+  // and any other CMS code that wants the indicator to flash. The pulse
+  // auto-clears after 1.2s — once the next poll lands updatedAt the
+  // chip flips back to "Saved Xs ago".
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const onSavingPulse = (): void => {
+      setSaving(true);
+      window.setTimeout(() => setSaving(false), 1200);
+    };
+    window.addEventListener('cs-cms:saving', onSavingPulse);
+    return () => window.removeEventListener('cs-cms:saving', onSavingPulse);
+  }, []);
 
   // Detect edit view from pathname; re-detect on history navigation
   // (popstate fires for back/forward) and on a custom route-change
@@ -105,17 +120,26 @@ export const SavedStateIndicator = (): ReactElement | null => {
     return () => window.clearInterval(i);
   }, []);
 
-  if (!editPath || !updatedAt) return null;
+  if (!editPath || (!updatedAt && !saving)) return null;
+
+  if (saving) {
+    return (
+      <output className="cs-saved-indicator cs-saved-indicator--saving" aria-live="polite">
+        <span className="cs-saved-indicator__dot cs-saved-indicator__dot--saving" aria-hidden="true" />
+        <span className="cs-saved-indicator__text">Saving…</span>
+      </output>
+    );
+  }
 
   return (
     <output
       className="cs-saved-indicator"
       aria-live="polite"
-      title={new Date(updatedAt).toLocaleString()}
+      title={updatedAt ? new Date(updatedAt).toLocaleString() : ''}
     >
       <span className="cs-saved-indicator__dot" aria-hidden="true" />
       <span className="cs-saved-indicator__text">
-        Saved {formatRelative(updatedAt)}
+        Saved {updatedAt ? formatRelative(updatedAt) : ''}
       </span>
     </output>
   );

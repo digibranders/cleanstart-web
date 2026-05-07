@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
-import { seoField, seoSidebarFields } from '../fields/seo';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
 import {
@@ -164,7 +164,7 @@ export const KnowledgeBase: CollectionConfig = {
         { name: 'anchor', type: 'text' },
       ],
     },
-    seoField,
+    ...seoFieldsForSidebar('knowledgeBase'),
   ],
   hooks: {
     beforeChange: [

@@ -97,10 +97,14 @@ export default buildConfig({
     },
     components: {
       actions: [
+        './payload/admin/components/SkipLink.tsx#SkipLink',
         './payload/admin/components/SaveShortcut.tsx#SaveShortcut',
         './payload/admin/components/CommandPalette.tsx#CommandPalette',
         './payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator',
         './payload/admin/components/NavBadges.tsx#NavBadges',
+        './payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle',
+        './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
+        './payload/admin/components/ToastBus.tsx#ToastBus',
       ],
       afterNavLinks: [
         './payload/admin/components/UserMenu.tsx#UserMenu',

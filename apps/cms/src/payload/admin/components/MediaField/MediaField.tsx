@@ -880,7 +880,33 @@ export const MediaField = (props: Props): ReactElement => {
               </svg>
             </button>
           </div>
-          <div className="cs-media-field__browse-grid">
+          <div
+            className="cs-media-field__browse-grid"
+            onKeyDown={(e) => {
+              const grid = e.currentTarget;
+              const tiles = Array.from(
+                grid.querySelectorAll<HTMLButtonElement>('button.cs-media-field__browse-tile'),
+              );
+              if (tiles.length === 0) return;
+              const cols = Math.max(
+                1,
+                Math.floor(grid.clientWidth / (140 + 8)),
+              );
+              const active = document.activeElement;
+              let idx = tiles.findIndex((t) => t === active);
+              if (idx === -1) idx = 0;
+              let nextIdx = idx;
+              if (e.key === 'ArrowRight') nextIdx = Math.min(tiles.length - 1, idx + 1);
+              else if (e.key === 'ArrowLeft') nextIdx = Math.max(0, idx - 1);
+              else if (e.key === 'ArrowDown') nextIdx = Math.min(tiles.length - 1, idx + cols);
+              else if (e.key === 'ArrowUp') nextIdx = Math.max(0, idx - cols);
+              else if (e.key === 'Home') nextIdx = 0;
+              else if (e.key === 'End') nextIdx = tiles.length - 1;
+              else return;
+              e.preventDefault();
+              tiles[nextIdx]?.focus();
+            }}
+          >
             {browseLoading && browseResults.length === 0 ? (
               <div className="cs-media-field__browse-empty">Loading…</div>
             ) : browseResults.length === 0 ? (

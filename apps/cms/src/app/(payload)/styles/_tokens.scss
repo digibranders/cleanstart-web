@@ -56,4 +56,15 @@
   --cs-tint-brand-soft: rgba(6, 199, 242, 0.08);
   --cs-tint-brand-medium: rgba(6, 199, 242, 0.14);
   --cs-tint-focus-ring: rgba(6, 199, 242, 0.22);
+  --cs-tint-focus-glow: rgba(6, 199, 242, 0.12);
+
+  // Premium depth — subtle inset + lift for inputs / buttons / cards
+  --cs-shadow-input-rest: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  --cs-shadow-input-focus:
+    inset 0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 12px var(--cs-tint-focus-glow);
+  --cs-shadow-press: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+  --cs-shadow-press-soft: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+  --cs-shadow-lift-sm: 0 2px 6px rgba(0, 0, 0, 0.06);
+  --cs-shadow-lift-md: 0 4px 12px rgba(0, 0, 0, 0.08);
 }

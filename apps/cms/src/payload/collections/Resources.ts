@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
-import { seoField, seoSidebarFields } from '../fields/seo';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import {
   searchSyncAfterChangeHook,
@@ -115,7 +115,7 @@ export const Resources: CollectionConfig = {
         condition: (_data, sibling) => sibling?.gated === true,
       },
     },
-    seoField,
+    ...seoFieldsForSidebar('resources'),
   ],
   hooks: {
     afterChange: [

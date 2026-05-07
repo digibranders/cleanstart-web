@@ -66,6 +66,16 @@ const handleDocumentPaste = (event: ClipboardEvent): void => {
   event.preventDefault();
   event.stopImmediatePropagation();
   insertCleanedNodes(editor, parsed);
+
+  // Surface a passing toast so editors get a confirmation pulse —
+  // otherwise the paste reads as silent magic.
+  try {
+    window.dispatchEvent(new CustomEvent('cs-cms:toast', {
+      detail: { message: 'Pasted and cleaned', type: 'success' },
+    }));
+  } catch {
+    // ignore — toast is best-effort.
+  }
 };
 
 /**

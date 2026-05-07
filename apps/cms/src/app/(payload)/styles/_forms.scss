@@ -44,10 +44,11 @@
     background: var(--theme-input-bg);
     border: 1px solid var(--theme-elevation-200);
     border-radius: var(--cs-radius-input);
-    padding: 0.55rem 0.75rem;
+    padding: 0.5rem 0.75rem;
     font-size: 14px;
-    line-height: 1.45;
+    line-height: 1.5;
     color: var(--theme-text);
+    box-shadow: var(--cs-shadow-input-rest);
     transition:
       border-color var(--cs-motion-micro),
       box-shadow var(--cs-motion-micro),
@@ -65,7 +66,9 @@
     &:focus-visible {
       outline: none;
       border-color: var(--cs-cyan-500);
-      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+      box-shadow:
+        0 0 0 3px var(--cs-tint-focus-ring),
+        var(--cs-shadow-input-focus);
     }
 
     &[disabled],
@@ -83,6 +86,7 @@
     border: 1px solid var(--theme-elevation-200);
     border-radius: var(--cs-radius-input);
     min-height: 38px;
+    box-shadow: var(--cs-shadow-input-rest);
     transition: border-color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
 
     &:hover {
@@ -91,7 +95,9 @@
 
     &--is-focused {
       border-color: var(--cs-cyan-500);
-      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+      box-shadow:
+        0 0 0 3px var(--cs-tint-focus-ring),
+        var(--cs-shadow-input-focus);
     }
   }
 
@@ -102,17 +108,21 @@
   }
 }
 
-// Group fields — a clear hairline divider between groups
+// Group fields — single hairline divider, no double-card weight inside tabs
 .group-field {
-  background: var(--theme-elevation-50);
-  border: 1px solid var(--theme-elevation-150);
-  border-radius: var(--cs-radius-card);
-  padding: var(--cs-space-3);
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--theme-elevation-150);
+  border-radius: 0;
+  padding: var(--cs-space-2) 0 0;
+  margin-top: var(--cs-space-3);
 
   &__label {
     color: var(--theme-text);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
+    letter-spacing: 0.005em;
+    text-transform: none;
     margin-bottom: var(--cs-space-2);
   }
 }

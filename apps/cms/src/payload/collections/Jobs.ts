@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
-import { seoField, seoSidebarFields } from '../fields/seo';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { validateOptionalUrl } from '../lib/url-shape';
@@ -219,7 +219,7 @@ export const Jobs: CollectionConfig = {
       },
     },
     ...seoSidebarFields({ pathPrefix: '/jobs', descriptionSource: 'abstract' }),
-    seoField,
+    ...seoFieldsForSidebar('jobs'),
   ],
   hooks: {
     afterChange: [slugChangeRedirectHook('jobs')],

@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
-import { seoField, seoSidebarFields } from '../fields/seo';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
 import {
@@ -53,6 +53,12 @@ export const Blogs: CollectionConfig = {
       admin: {
         description:
           'Multi-author supported — every byline is credited in JSON-LD author[]. Authors with "accepting new bylines" off are hidden from the picker.',
+        components: {
+          Cell: {
+            path: '@/payload/admin/components/RelationshipCell.tsx#RelationshipCell',
+            clientProps: { collectionSlug: 'authors' },
+          },
+        },
       },
     },
     {
@@ -78,6 +84,14 @@ export const Blogs: CollectionConfig = {
       type: 'relationship',
       relationTo: 'categories',
       hasMany: true,
+      admin: {
+        components: {
+          Cell: {
+            path: '@/payload/admin/components/RelationshipCell.tsx#RelationshipCell',
+            clientProps: { collectionSlug: 'categories' },
+          },
+        },
+      },
     },
     {
       name: 'faqsBulkPaste',
@@ -189,7 +203,7 @@ export const Blogs: CollectionConfig = {
         { name: 'anchor', type: 'text' },
       ],
     },
-    seoField,
+    ...seoFieldsForSidebar('blogs'),
   ],
   hooks: {
     beforeChange: [

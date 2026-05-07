@@ -176,6 +176,54 @@ export const seoField: GroupField = {
 };
 
 /**
+ * Hidden variant of `seoField` — same data shape, but the group itself
+ * is skipped by the in-form renderer. Used by collections that surface
+ * the advanced SEO controls (OG image, advanced OG copy, custom
+ * canonical, speakable selectors) via the right-rail
+ * `SeoAdvancedPanel` instead of as a bottom-of-form group.
+ *
+ * Schema, validators, hooks, and audit logic are untouched — only the
+ * render surface moves.
+ */
+export const seoFieldHidden: GroupField = {
+  ...seoField,
+  admin: {
+    ...(seoField.admin ?? {}),
+    hidden: true,
+  },
+};
+
+/**
+ * Sidebar UI field that mounts the `SeoAdvancedPanel` collapsible card.
+ * Pass the collection slug as `storageKey` so each collection remembers
+ * its own expanded/collapsed state per editor.
+ */
+export const seoAdvancedSidebarField = (args: { storageKey: string }): Field => ({
+  name: 'seoAdvanced',
+  type: 'ui',
+  admin: {
+    position: 'sidebar',
+    components: {
+      Field: {
+        path: '@/payload/admin/components/SeoAdvancedPanel.tsx#SeoAdvancedPanel',
+        clientProps: { storageKey: args.storageKey },
+      },
+    },
+  },
+});
+
+/**
+ * One-call helper a collection can use to install both the hidden
+ * `seoField` data group and the sidebar `SeoAdvancedPanel` UI in a
+ * single spread. Each collection's diff for the SEO consolidation is
+ * one line: replace `seoField` with `...seoFieldsForSidebar(slug)`.
+ */
+export const seoFieldsForSidebar = (storageKey: string): Field[] => [
+  seoFieldHidden,
+  seoAdvancedSidebarField({ storageKey }),
+];
+
+/**
  * Returns the three sidebar UI fields a content collection should
  * splice into its sidebar above `Featured` / `Pinned`:
  *   - SEO Title (auto-synced from `title`, char counter)

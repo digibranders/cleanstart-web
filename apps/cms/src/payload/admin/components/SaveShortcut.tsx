@@ -44,6 +44,26 @@ export const SaveShortcut = (): ReactElement | null => {
 
       if (!button) return; // not on an edit view — let the browser handle it
       e.preventDefault();
+
+      // Save button disabled = nothing to save (form pristine). Surface
+      // a passive toast so the keystroke isn't silently dropped.
+      if ((button as HTMLButtonElement).disabled) {
+        try {
+          window.dispatchEvent(
+            new CustomEvent('cs-cms:toast', {
+              detail: { message: 'Nothing to save', type: 'info' },
+            }),
+          );
+        } catch {
+          // ignore — toast is best-effort.
+        }
+        return;
+      }
+
+      // Surface a transient "Saving…" pulse on the SavedStateIndicator
+      // so editors get instant feedback that Cmd+S registered.
+      window.dispatchEvent(new CustomEvent('cs-cms:saving'));
+
       (button as HTMLButtonElement).click();
     };
 

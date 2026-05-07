@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { pageBuilderBlocks } from '../blocks';
-import { seoField, seoSidebarFields } from '../fields/seo';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { pagesPathBuilderHook } from '../hooks/pages-path-builder';
 import {
@@ -143,7 +143,7 @@ export const Pages: CollectionConfig = {
     // lands. Title / Description / Indexable still surface as sidebar
     // controls — those just read seo.* directly and work fine here.
     ...seoSidebarFields({ pathPrefix: '', descriptionSource: 'abstract' }),
-    seoField,
+    ...seoFieldsForSidebar('pages'),
   ],
   hooks: {
     beforeChange: [pagesPathBuilderHook],
