@@ -1,6 +1,8 @@
 import type { Field, GroupField } from 'payload';
 
+import { isAdminFieldLevel } from '../access';
 import { validateCanonicalOverride } from '../lib/canonical';
+import { validateOverrideForField } from '../lib/jsonld/override-validator';
 import { mediaUploadField } from './media-upload';
 
 const TITLE_CHAR_HINT = 60;
@@ -127,6 +129,44 @@ const canonicalOverrideField: Field = {
   },
 };
 
+/**
+ * Tier 3 of the Schema sidebar plan — admin-only raw JSON-LD override.
+ *
+ * Field-level `access` strips this field from the form payload entirely
+ * for non-admins (not just hidden in DevTools — Payload removes it
+ * from the sanitised doc on read AND blocks updates server-side).
+ *
+ * Validation is doubled up:
+ *  - Server `validate` callback runs the strict Zod schema on every
+ *    save and blocks the write with a specific error.
+ *  - Client UI re-runs the same validator for live feedback as the
+ *    admin types (see `SchemaOverrideField.tsx`).
+ *
+ * The dispatcher consumes this field LAST in the JSON-LD graph so
+ * admin overrides take precedence over Layer 1 + Layer 2 add-ons,
+ * and emits a `console.warn` when an override is in use so the canary
+ * stream surfaces which pages have manual markup.
+ */
+const additionalSchemaField: Field = {
+  name: 'additionalSchema',
+  type: 'json',
+  access: {
+    read: isAdminFieldLevel,
+    update: isAdminFieldLevel,
+    create: isAdminFieldLevel,
+  },
+  admin: {
+    description:
+      'Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.',
+    components: {
+      Field: {
+        path: '@/payload/admin/components/SchemaOverrideField.tsx#SchemaOverrideField',
+      },
+    },
+  },
+  validate: validateOverrideForField,
+};
+
 const speakablePathField: Field = {
   name: 'speakablePath',
   type: 'array',
@@ -172,6 +212,7 @@ export const seoField: GroupField = {
     useCustomCanonicalField,
     canonicalOverrideField,
     speakablePathField,
+    additionalSchemaField,
   ],
 };
 
@@ -224,27 +265,36 @@ export const seoFieldsForSidebar = (storageKey: string): Field[] => [
 ];
 
 /**
- * Returns the three sidebar UI fields a content collection should
- * splice into its sidebar above `Featured` / `Pinned`:
+ * Returns the sidebar UI fields a content collection should splice
+ * into its sidebar above `Featured` / `Pinned`:
  *   - SEO Title (auto-synced from a configurable source field, char counter)
  *   - SEO Description (auto-synced from a configurable source field)
  *   - SEO Indexable (3-chip segmented control)
  *   - SERP Preview (Google snippet mockup)
+ *   - Schema (JSON-LD) preview card with spec-compliance badge
+ *   - Inbound Redirects card (read-only list + "Add" deep-link)
  *
- * `pathPrefix`, `titleSource`, and `descriptionSource` let each
- * collection wire its own URL prefix + which doc-level fields the
- * SEO title/description mirror from. Most content collections have a
- * `title` field; Authors / Categories use `name`.
+ * `pathPrefix`, `titleSource`, `descriptionSource`, and `urlSource`
+ * let each collection wire its own URL prefix + which doc-level
+ * fields the SEO title / description / public URL mirror from. Most
+ * content collections have a `title` + `slug`; Authors / Categories
+ * use `name`; Pages compute a full nested `path`.
  */
 export const seoSidebarFields = (args: {
   pathPrefix: string;
   titleSource?: string;
   descriptionSource?: string;
+  /**
+   * Doc-level field that owns the URL part. `slug` for most
+   * collections, `path` for Pages.
+   */
+  urlSource?: string;
 }): Field[] => {
   const {
     pathPrefix,
     titleSource = 'title',
     descriptionSource = 'abstract',
+    urlSource = 'slug',
   } = args;
   return [
     {
@@ -295,6 +345,32 @@ export const seoSidebarFields = (args: {
           Field: {
             path: '@/payload/admin/components/SerpPreviewField.tsx#SerpPreviewField',
             clientProps: { pathPrefix, titleSource, descriptionSource },
+          },
+        },
+      },
+    },
+    {
+      name: 'schemaPreview',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/SchemaPreviewField.tsx#SchemaPreviewField',
+            clientProps: { pathPrefix, sourceField: urlSource },
+          },
+        },
+      },
+    },
+    {
+      name: 'inboundRedirects',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/InboundRedirectsField.tsx#InboundRedirectsField',
+            clientProps: { pathPrefix, sourceField: urlSource },
           },
         },
       },

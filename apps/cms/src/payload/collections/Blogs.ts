@@ -2,9 +2,13 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
+import { publishedAtField } from '../fields/published-at';
+import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
+import { firstPublishHook } from '../hooks/first-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
@@ -157,6 +161,8 @@ export const Blogs: CollectionConfig = {
         },
       },
     },
+    schemaAddonsField,
+    publishedAtField,
     ...seoSidebarFields({ pathPrefix: '/blog', descriptionSource: 'abstract' }),
     {
       name: 'featured',
@@ -207,6 +213,7 @@ export const Blogs: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
+      firstPublishHook(),
       bodyStatsHook({
         fields: {
           readingMinutes: 'readingMinutes',
@@ -217,6 +224,7 @@ export const Blogs: CollectionConfig = {
     ],
     afterChange: [
       slugChangeRedirectHook('blogs'),
+      schemaOverrideAuditHook('blogs'),
       searchSyncAfterChangeHook('blogs'),
       webhooksPublishAfterChangeHook('blogs'),
     ],

@@ -2,8 +2,12 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { pageBuilderBlocks } from '../blocks';
+import { publishedAtField } from '../fields/published-at';
+import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { firstPublishHook } from '../hooks/first-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { pagesPathBuilderHook } from '../hooks/pages-path-builder';
 import {
   searchSyncAfterChangeHook,
@@ -142,13 +146,16 @@ export const Pages: CollectionConfig = {
     // (which reads slug) shows the empty-state until path-aware support
     // lands. Title / Description / Indexable still surface as sidebar
     // controls — those just read seo.* directly and work fine here.
+    schemaAddonsField,
+    publishedAtField,
     ...seoSidebarFields({ pathPrefix: '', descriptionSource: 'abstract' }),
     ...seoFieldsForSidebar('pages'),
   ],
   hooks: {
-    beforeChange: [pagesPathBuilderHook],
+    beforeChange: [firstPublishHook(), pagesPathBuilderHook],
     afterChange: [
       slugChangeRedirectHook('pages'),
+      schemaOverrideAuditHook('pages'),
       searchSyncAfterChangeHook('pages'),
       webhooksPublishAfterChangeHook('pages'),
     ],

@@ -2,8 +2,12 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
+import { publishedAtField } from '../fields/published-at';
+import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { firstPublishHook } from '../hooks/first-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { validateOptionalUrl } from '../lib/url-shape';
 
@@ -172,11 +176,17 @@ export const Webinars: CollectionConfig = {
         },
       },
     },
+    schemaAddonsField,
+    publishedAtField,
     ...seoSidebarFields({ pathPrefix: '/webinar', descriptionSource: 'abstract' }),
     ...seoFieldsForSidebar('webinars'),
   ],
   hooks: {
-    afterChange: [slugChangeRedirectHook('webinars')],
+    beforeChange: [firstPublishHook()],
+    afterChange: [
+      slugChangeRedirectHook('webinars'),
+      schemaOverrideAuditHook('webinars'),
+    ],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

@@ -49,6 +49,7 @@ export const AuditLog: CollectionConfig = {
         { label: 'Lead exported', value: 'lead_exported' },
         { label: 'DSAR export', value: 'dsar_export' },
         { label: 'DSAR erasure', value: 'dsar_erasure' },
+        { label: 'Schema override changed', value: 'schema_override_changed' },
       ],
       admin: { readOnly: true },
     },

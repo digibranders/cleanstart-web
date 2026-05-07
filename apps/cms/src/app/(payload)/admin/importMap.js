@@ -32,6 +32,9 @@ import { SeoTitleField as SeoTitleField_1a192963c1119f2a2e3e8c2143d913c7 } from 
 import { SeoDescriptionField as SeoDescriptionField_9696c1be1903d357f63d23951e7963fc } from '@/payload/admin/components/SeoDescriptionField.tsx'
 import { SeoIndexableField as SeoIndexableField_ff3cc07c91d10b5899370ac0f262f1fb } from '@/payload/admin/components/SeoIndexableField.tsx'
 import { SerpPreviewField as SerpPreviewField_243778961d714dd69072cd09f703a734 } from '@/payload/admin/components/SerpPreviewField.tsx'
+import { SchemaPreviewField as SchemaPreviewField_2ca2f49f868221997f9932607223d89a } from '@/payload/admin/components/SchemaPreviewField.tsx'
+import { InboundRedirectsField as InboundRedirectsField_1afe69d25c6786c0c51532ee082716da } from '@/payload/admin/components/InboundRedirectsField.tsx'
+import { SchemaOverrideField as SchemaOverrideField_88213973daaae6c5c0e6b5315ed286c1 } from '@/payload/admin/components/SchemaOverrideField.tsx'
 import { SeoAdvancedPanel as SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50 } from '@/payload/admin/components/SeoAdvancedPanel.tsx'
 import { LeadsCsvTruncationBanner as LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb } from '@/payload/admin/components/LeadsCsvTruncationBanner.tsx'
 import { RelationshipCell as RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f } from '@/payload/admin/components/RelationshipCell.tsx'
@@ -93,6 +96,9 @@ export const importMap = {
   "@/payload/admin/components/SeoDescriptionField.tsx#SeoDescriptionField": SeoDescriptionField_9696c1be1903d357f63d23951e7963fc,
   "@/payload/admin/components/SeoIndexableField.tsx#SeoIndexableField": SeoIndexableField_ff3cc07c91d10b5899370ac0f262f1fb,
   "@/payload/admin/components/SerpPreviewField.tsx#SerpPreviewField": SerpPreviewField_243778961d714dd69072cd09f703a734,
+  "@/payload/admin/components/SchemaPreviewField.tsx#SchemaPreviewField": SchemaPreviewField_2ca2f49f868221997f9932607223d89a,
+  "@/payload/admin/components/InboundRedirectsField.tsx#InboundRedirectsField": InboundRedirectsField_1afe69d25c6786c0c51532ee082716da,
+  "@/payload/admin/components/SchemaOverrideField.tsx#SchemaOverrideField": SchemaOverrideField_88213973daaae6c5c0e6b5315ed286c1,
   "@/payload/admin/components/SeoAdvancedPanel.tsx#SeoAdvancedPanel": SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50,
   "@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner": LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb,
   "@/payload/admin/components/RelationshipCell.tsx#RelationshipCell": RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f,

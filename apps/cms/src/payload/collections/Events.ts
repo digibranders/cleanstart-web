@@ -2,8 +2,12 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
+import { publishedAtField } from '../fields/published-at';
+import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { firstPublishHook } from '../hooks/first-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
 export const Events: CollectionConfig = {
@@ -150,11 +154,17 @@ export const Events: CollectionConfig = {
         },
       },
     },
+    schemaAddonsField,
+    publishedAtField,
     ...seoSidebarFields({ pathPrefix: '/events', descriptionSource: 'abstract' }),
     ...seoFieldsForSidebar('events'),
   ],
   hooks: {
-    afterChange: [slugChangeRedirectHook('events')],
+    beforeChange: [firstPublishHook()],
+    afterChange: [
+      slugChangeRedirectHook('events'),
+      schemaOverrideAuditHook('events'),
+    ],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

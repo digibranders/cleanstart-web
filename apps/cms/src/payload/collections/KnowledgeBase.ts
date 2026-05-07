@@ -2,9 +2,13 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
+import { publishedAtField } from '../fields/published-at';
+import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
+import { firstPublishHook } from '../hooks/first-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
@@ -131,6 +135,8 @@ export const KnowledgeBase: CollectionConfig = {
         },
       },
     },
+    schemaAddonsField,
+    publishedAtField,
     ...seoSidebarFields({ pathPrefix: '/knowledge-hub', descriptionSource: 'abstract' }),
     {
       // Data-only — surfaced via the `bodyStats` pill at the top of the
@@ -168,6 +174,7 @@ export const KnowledgeBase: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
+      firstPublishHook(),
       bodyStatsHook({
         fields: {
           readingMinutes: 'readingMinutes',
@@ -178,6 +185,7 @@ export const KnowledgeBase: CollectionConfig = {
     ],
     afterChange: [
       slugChangeRedirectHook('knowledgeBase'),
+      schemaOverrideAuditHook('knowledgeBase'),
       searchSyncAfterChangeHook('knowledgeBase'),
       webhooksPublishAfterChangeHook('knowledgeBase'),
     ],
