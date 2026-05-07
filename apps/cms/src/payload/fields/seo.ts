@@ -226,19 +226,26 @@ export const seoFieldsForSidebar = (storageKey: string): Field[] => [
 /**
  * Returns the three sidebar UI fields a content collection should
  * splice into its sidebar above `Featured` / `Pinned`:
- *   - SEO Title (auto-synced from `title`, char counter)
+ *   - SEO Title (auto-synced from a configurable source field, char counter)
  *   - SEO Description (auto-synced from a configurable source field)
  *   - SEO Indexable (3-chip segmented control)
  *   - SERP Preview (Google snippet mockup)
  *
- * `pathPrefix` and `descriptionSource` let each collection wire its
- * own URL prefix and lead-text field name.
+ * `pathPrefix`, `titleSource`, and `descriptionSource` let each
+ * collection wire its own URL prefix + which doc-level fields the
+ * SEO title/description mirror from. Most content collections have a
+ * `title` field; Authors / Categories use `name`.
  */
 export const seoSidebarFields = (args: {
   pathPrefix: string;
+  titleSource?: string;
   descriptionSource?: string;
 }): Field[] => {
-  const { pathPrefix, descriptionSource = 'abstract' } = args;
+  const {
+    pathPrefix,
+    titleSource = 'title',
+    descriptionSource = 'abstract',
+  } = args;
   return [
     {
       name: 'seoTitle',
@@ -248,7 +255,7 @@ export const seoSidebarFields = (args: {
         components: {
           Field: {
             path: '@/payload/admin/components/SeoTitleField.tsx#SeoTitleField',
-            clientProps: { path: 'seo.title' },
+            clientProps: { path: 'seo.title', sourceField: titleSource },
           },
         },
       },
@@ -287,7 +294,7 @@ export const seoSidebarFields = (args: {
         components: {
           Field: {
             path: '@/payload/admin/components/SerpPreviewField.tsx#SerpPreviewField',
-            clientProps: { pathPrefix, descriptionSource },
+            clientProps: { pathPrefix, titleSource, descriptionSource },
           },
         },
       },

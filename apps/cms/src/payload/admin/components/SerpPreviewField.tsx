@@ -11,6 +11,11 @@ type SerpPreviewFieldProps = {
    */
   pathPrefix?: string;
   /**
+   * Source field for the title fallback when `seo.title` is empty.
+   * Defaults to `title`. Authors / Categories use `name` instead.
+   */
+  titleSource?: string;
+  /**
    * Source field for the description fallback when `seo.description`
    * is empty. Defaults to `abstract`.
    */
@@ -46,11 +51,12 @@ const truncate = (input: string, max: number): string =>
 export const SerpPreviewField = (props: SerpPreviewFieldProps): ReactElement => {
   const {
     pathPrefix = '',
+    titleSource = 'title',
     descriptionSource = 'abstract',
     siteUrl = DEFAULT_SITE_URL,
   } = props;
 
-  const { value: docTitle } = useField<string>({ path: 'title' });
+  const { value: docTitle } = useField<string>({ path: titleSource });
   const { value: seoTitle } = useField<string>({ path: 'seo.title' });
   const { value: seoDesc } = useField<string>({ path: 'seo.description' });
   const { value: sourceDesc } = useField<string>({ path: descriptionSource });

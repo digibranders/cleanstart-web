@@ -120,7 +120,11 @@ export const Authors: CollectionConfig = {
         },
       },
     },
-    ...seoSidebarFields({ pathPrefix: '/authors', descriptionSource: 'bioShort' }),
+    ...seoSidebarFields({
+      pathPrefix: '/authors',
+      titleSource: 'name',
+      descriptionSource: 'bioShort',
+    }),
     ...seoFieldsForSidebar('authors'),
   ],
   hooks: {
