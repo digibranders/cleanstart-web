@@ -354,15 +354,18 @@ body:has(.cs-dashboard) {
     display: none !important;
   }
 
-  // 3) Pull the greeting flush with the top of the content well — no
-  //    Gutter top padding, no header divider.
+  // 3) Pull the greeting close to the top of the content well, but
+  //    keep enough top padding that it breathes against the viewport
+  //    + browser frame. Combined with the wrap's 16px top padding
+  //    (see _sidebar-header.scss), this gives the greeting ~40px of
+  //    headroom — anchored, not crammed.
   .cs-dashboard {
-    padding-top: var(--cs-space-4);
+    padding-top: var(--cs-space-6);
   }
 
   .cs-dashboard__header {
     margin-top: 0;
-    margin-bottom: var(--cs-space-5);
+    margin-bottom: var(--cs-space-6);
     padding-bottom: 0;
     border-bottom: none; // no horizontal rule above the KPI cards
   }
