@@ -14,6 +14,33 @@
 // reads with a 2px cyan left-stripe + brand-tinted background so the
 // editor's current location is obvious at a glance.
 
+// ─── Visual order of nav-groups ──────────────────────────────────
+//
+// Payload renders groups in declaration order (which is driven by the
+// `collections: [...]` array in payload.config.ts). The editorial
+// priority we want for the sidebar is content-first, ops-last:
+//
+//   Content       — what editors touch every day
+//   Globals       — site-wide settings (always near the top)
+//   Taxonomies    — categories the content references
+//   People        — author records
+//   System        — user accounts, media, redirects, audit
+//   Marketing     — forms, leads (occasional admin)
+//
+// `.nav__wrap` is `display: flex; flex-direction: column` (see
+// _user-menu.scss), so flex `order` reshuffles the rendered sequence
+// without forcing a payload.config.ts collection-array reshuffle.
+.cs-sidebar-header { order: 0; }
+.nav-group {
+  &.Content    { order: 1; }
+  &.Globals    { order: 2; }
+  &.Taxonomies { order: 3; }
+  &.People     { order: 4; }
+  &.System     { order: 5; }
+  &.Marketing  { order: 6; }
+}
+.cs-user-menu { order: 100; }
+
 .nav-group {
   // Breathing room between groups so categories register as section
   // dividers, not adjacent rows.
