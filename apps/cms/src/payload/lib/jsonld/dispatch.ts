@@ -1,13 +1,23 @@
+import { dispatchAddons, mergeAddons } from './addons/dispatch';
 import { type ArticleSource, buildArticleBlob, inlineByline } from './article';
 import { buildBreadcrumbBlob } from './breadcrumb';
 import type { JsonLdContext } from './context';
+import { buildEventBlob, type EventAttendanceMode } from './event';
 import { buildFaqPageBlob } from './faq-page';
+import { validateOverride } from './override-validator';
+import {
+  buildJobPostingBlob,
+  type JobLocationSource,
+  type JobSalaryRange,
+} from './job-posting';
 import { buildOrganizationBlob } from './organization';
 import { buildPersonBlob, type AuthorSource } from './person';
 import { onlyResolved, pickResolved, type ResolvedMedia } from './shared';
 import type { JsonLdBlob } from './types';
 import { docCanonicalUrl } from './url';
+import { buildWebPageBlob, webPageVariantForPath } from './web-page';
 import { buildWebsiteBlob } from './website';
+import { extractFromLexical } from '../lexical-extract';
 
 /** Collections this dispatcher can emit blobs for. */
 export type EmittableCollection =
@@ -15,14 +25,24 @@ export type EmittableCollection =
   | 'news'
   | 'guides'
   | 'knowledgeBase'
-  | 'authors';
+  | 'authors'
+  | 'events'
+  | 'webinars'
+  | 'jobs'
+  | 'pages'
+  | 'resources';
 
 const isEmittableCollection = (slug: string): slug is EmittableCollection =>
   slug === 'blogs' ||
   slug === 'news' ||
   slug === 'guides' ||
   slug === 'knowledgeBase' ||
-  slug === 'authors';
+  slug === 'authors' ||
+  slug === 'events' ||
+  slug === 'webinars' ||
+  slug === 'jobs' ||
+  slug === 'pages' ||
+  slug === 'resources';
 
 interface AnyDoc extends Record<string, unknown> {
   slug?: string | null;
@@ -34,6 +54,7 @@ interface SeoBlock {
   title?: string | null;
   description?: string | null;
   speakablePath?: { selector?: string | null }[] | null;
+  additionalSchema?: unknown;
 }
 
 interface CategoryLike {
@@ -56,10 +77,29 @@ const readHeroImage = (doc: AnyDoc): ResolvedMedia | null => {
   return hero;
 };
 
+/**
+ * Resolve `datePublished` for the JSON-LD Article variant.
+ *
+ * Precedence:
+ *   1. `publicationDate` — News uses this (editor-set, signals story
+ *      time rather than first-publish time).
+ *   2. `publishedAt` — auto-set by `firstPublishHook` on the first
+ *      draft → published transition. Editor-overridable for backdating.
+ *   3. `createdAt` — defensive fallback so legacy rows that predate
+ *      the `publishedAt` field still emit a non-null `datePublished`
+ *      and pass schema.org Article validation. Approximate: `createdAt`
+ *      is row-creation time, which is at-or-before first publish — so
+ *      schemes never claim a publish date that's after the actual one.
+ */
 const readPublishedAt = (doc: AnyDoc): string | null => {
-  const explicit = (doc as { publishedAt?: string | null; publicationDate?: string | null });
+  const explicit = (doc as {
+    publishedAt?: string | null;
+    publicationDate?: string | null;
+    createdAt?: string | null;
+  });
   if (typeof explicit.publicationDate === 'string') return explicit.publicationDate;
   if (typeof explicit.publishedAt === 'string') return explicit.publishedAt;
+  if (typeof explicit.createdAt === 'string') return explicit.createdAt;
   return null;
 };
 
@@ -257,12 +297,288 @@ const dispatchAuthor = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   return blobs;
 };
 
+const readSpeakers = (
+  doc: AnyDoc,
+): readonly (AuthorSource | number | null | undefined)[] | null => {
+  const list = (doc as { speakers?: readonly (AuthorSource | number | null)[] | null })
+    .speakers;
+  return list ?? null;
+};
+
+const dispatchEvent = (
+  ctx: JsonLdContext,
+  collection: 'events' | 'webinars',
+  doc: AnyDoc,
+): JsonLdBlob[] => {
+  if (!doc.title || !doc.slug) return [];
+  const url = docCanonicalUrl(ctx.site.baseUrl, collection, doc as { slug: string });
+  if (!url) return [];
+
+  const seo = readSeo(doc);
+  // Webinars are conceptually online; Events default to offline.
+  // (Future: a per-doc `attendanceMode` field would let editors mark
+  // events as Mixed.)
+  const attendanceMode: EventAttendanceMode = collection === 'webinars' ? 'Online' : 'Offline';
+
+  const blobs: JsonLdBlob[] = [
+    buildOrganizationBlob(ctx),
+    buildWebsiteBlob(ctx),
+  ];
+
+  const event = buildEventBlob(ctx, {
+    url,
+    title: doc.title,
+    description: readDescription(doc),
+    heroImage: readHeroImage(doc),
+    startsAt: (doc as { startsAt?: string | null }).startsAt ?? null,
+    endsAt: (doc as { endsAt?: string | null }).endsAt ?? null,
+    attendanceMode,
+    venue: (doc as { venue?: string | null }).venue ?? null,
+    virtualUrl:
+      (doc as { recordingUrl?: string | null }).recordingUrl ??
+      (doc as { registrationUrl?: string | null }).registrationUrl ??
+      null,
+    speakers: readSpeakers(doc),
+    registrationUrl: (doc as { registrationUrl?: string | null }).registrationUrl ?? null,
+    capacity: (doc as { attendeesCap?: number | null }).attendeesCap ?? null,
+  });
+  if (event) blobs.push(event);
+
+  // Inline speaker Person blobs so each `performer` reference resolves.
+  for (const speaker of onlyResolved(
+    readSpeakers(doc) as readonly (Record<string, unknown> | number | null | undefined)[] | null,
+  ) as AuthorSource[]) {
+    const blob = buildPersonBlob(ctx, speaker);
+    if (blob) blobs.push(blob);
+  }
+
+  const breadcrumb = buildBreadcrumbBlob(
+    ctx,
+    collection === 'events'
+      ? [
+          { name: 'Home', path: '/' },
+          { name: 'Events', path: '/event' },
+          { name: doc.title, path: `/event/${doc.slug}` },
+        ]
+      : [
+          { name: 'Home', path: '/' },
+          { name: 'Webinars', path: '/webinar' },
+          { name: doc.title, path: `/webinar/${doc.slug}` },
+        ],
+  );
+  if (breadcrumb) blobs.push(breadcrumb);
+
+  // Optional: speakable selectors propagate via the SEO group; not
+  // currently consumed by Event but kept for parity if future schema
+  // changes add it.
+  void seo;
+
+  return blobs;
+};
+
+const extractDescriptionForJob = (doc: AnyDoc): string => {
+  // schema.org JobPosting REQUIRES `description`. Try richest source
+  // first, then sensible fallbacks so we always have something to
+  // emit (otherwise the JobPosting blob is dropped entirely).
+  const abstract = (doc as { abstract?: string | null }).abstract;
+  if (typeof abstract === 'string' && abstract.length > 0) return abstract;
+
+  const seoDesc = readSeo(doc).description;
+  if (typeof seoDesc === 'string' && seoDesc.length > 0) return seoDesc;
+
+  const body = (doc as { body?: unknown }).body;
+  if (body && typeof body === 'object') {
+    const summary = extractFromLexical(body);
+    if (summary.wordCount > 0) {
+      // We only need text — `extractFromLexical` doesn't return it
+      // verbatim, so reduce one more time. Acceptable inefficiency
+      // since this only runs on the JSON-LD endpoint, behind a 60s
+      // cache.
+      const text = collectLexicalText(body);
+      if (text.length > 0) return text.slice(0, 5000);
+    }
+  }
+
+  return doc.title ?? 'Job description';
+};
+
+interface LexicalNodeShape {
+  text?: string;
+  children?: LexicalNodeShape[];
+}
+
+const collectLexicalText = (body: unknown): string => {
+  const root = (body as { root?: LexicalNodeShape } | null)?.root;
+  if (!root) return '';
+  const out: string[] = [];
+  const walk = (node: LexicalNodeShape): void => {
+    if (typeof node.text === 'string' && node.text.length > 0) {
+      out.push(node.text);
+    }
+    if (node.children) {
+      for (const child of node.children) walk(child);
+    }
+  };
+  walk(root);
+  return out.join(' ').replace(/\s+/g, ' ').trim();
+};
+
+const dispatchJob = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
+  if (!doc.title || !doc.slug) return [];
+  const url = docCanonicalUrl(ctx.site.baseUrl, 'jobs', doc as { slug: string });
+  if (!url) return [];
+
+  const blobs: JsonLdBlob[] = [
+    buildOrganizationBlob(ctx),
+    buildWebsiteBlob(ctx),
+  ];
+
+  const datePosted =
+    (doc as { publishedAt?: string | null }).publishedAt ??
+    (doc as { createdAt?: string | null }).createdAt ??
+    null;
+  if (!datePosted) return blobs;
+
+  const validThrough =
+    (doc as { applicationDeadline?: string | null }).applicationDeadline ??
+    (doc as { expiresAt?: string | null }).expiresAt ??
+    null;
+
+  const salaryRaw = (doc as { salaryRange?: JobSalaryRange | null }).salaryRange ?? null;
+
+  const job = buildJobPostingBlob(ctx, {
+    url,
+    title: doc.title,
+    description: extractDescriptionForJob(doc),
+    datePosted,
+    validThrough,
+    employmentType: (doc as { employmentType?: string | null }).employmentType ?? null,
+    remote: (doc as { remote?: boolean }).remote ?? false,
+    locations:
+      (doc as { locations?: readonly (JobLocationSource | number | null)[] | null })
+        .locations ?? null,
+    experienceLevel: (doc as { experienceLevel?: string | null }).experienceLevel ?? null,
+    salary: salaryRaw,
+    applyUrl:
+      (doc as { applyUrl?: string | null }).applyUrl ??
+      (doc as { atsUrl?: string | null }).atsUrl ??
+      null,
+    hiringStatus:
+      (doc as { hiringStatus?: 'open' | 'paused' | 'closed' }).hiringStatus ?? 'open',
+  });
+  if (job) blobs.push(job);
+
+  const breadcrumb = buildBreadcrumbBlob(ctx, [
+    { name: 'Home', path: '/' },
+    { name: 'Jobs', path: '/job' },
+    { name: doc.title, path: `/job/${doc.slug}` },
+  ]);
+  if (breadcrumb) blobs.push(breadcrumb);
+
+  return blobs;
+};
+
+const dispatchPage = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
+  if (!doc.title) return [];
+  const url = docCanonicalUrl(ctx.site.baseUrl, 'pages', doc as {
+    slug?: string | null;
+    path?: string | null;
+  });
+  if (!url) return [];
+
+  const path = (doc as { path?: string | null }).path ?? null;
+  const variant = webPageVariantForPath(path);
+
+  const blobs: JsonLdBlob[] = [
+    buildOrganizationBlob(ctx),
+    buildWebsiteBlob(ctx),
+  ];
+
+  const page = buildWebPageBlob(ctx, {
+    url,
+    title: doc.title,
+    description: readDescription(doc),
+    heroImage: readHeroImage(doc),
+    datePublished: readPublishedAt(doc),
+    dateModified: readUpdatedAt(doc),
+    variant,
+  });
+  if (page) blobs.push(page);
+
+  // Pages live at arbitrary nested paths. We can't auto-emit a
+  // breadcrumb without knowing the parent chain; the dispatcher
+  // skips it for pages and relies on the public site to render the
+  // breadcrumb structure if needed.
+
+  return blobs;
+};
+
+const dispatchResource = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
+  if (!doc.title || !doc.slug) return [];
+  const url = docCanonicalUrl(ctx.site.baseUrl, 'resources', doc as { slug: string });
+  if (!url) return [];
+
+  const blobs: JsonLdBlob[] = [
+    buildOrganizationBlob(ctx),
+    buildWebsiteBlob(ctx),
+  ];
+
+  const page = buildWebPageBlob(ctx, {
+    url,
+    title: doc.title,
+    description:
+      (doc as { summary?: string | null }).summary ?? readDescription(doc),
+    heroImage: readHeroImage(doc),
+    datePublished: readPublishedAt(doc),
+    dateModified: readUpdatedAt(doc),
+    variant: 'WebPage',
+  });
+  if (page) blobs.push(page);
+
+  const breadcrumb = buildBreadcrumbBlob(ctx, [
+    { name: 'Home', path: '/' },
+    { name: 'Resources', path: '/resources' },
+    { name: doc.title, path: `/resources/${doc.slug}` },
+  ]);
+  if (breadcrumb) blobs.push(breadcrumb);
+
+  return blobs;
+};
+
+const buildLayerOneBlobs = (
+  ctx: JsonLdContext,
+  collection: string,
+  doc: AnyDoc,
+): JsonLdBlob[] => {
+  if (collection === 'authors') return dispatchAuthor(ctx, doc);
+  if (collection === 'events' || collection === 'webinars') {
+    return dispatchEvent(ctx, collection, doc);
+  }
+  if (collection === 'jobs') return dispatchJob(ctx, doc);
+  if (collection === 'pages') return dispatchPage(ctx, doc);
+  if (collection === 'resources') return dispatchResource(ctx, doc);
+  return dispatchArticleLike(
+    ctx,
+    collection as 'blogs' | 'news' | 'guides' | 'knowledgeBase',
+    doc,
+  );
+};
+
 /**
  * Dispatch entry point. Takes a Payload-resolved document plus its
  * collection slug, returns the ordered array of JSON-LD blobs the
  * public renderer should emit. Returns an empty array when the
  * collection is not in the Layer-1 catalog or required fields are
  * missing.
+ *
+ * Pipeline:
+ *   1. Layer 1 — auto-emitted blobs (Article / Event / WebPage / etc.)
+ *   2. Layer 2 — `schemaAddons[]` blocks merged in via the addons
+ *      dispatcher (HowTo, VideoObject, Review, SoftwareApplication,
+ *      manual FAQ entries, breadcrumb suppress/replace).
+ *   3. (Future) Layer 3 — admin-only `additionalSchema` raw JSON
+ *      override appended last so editors' opt-in additions can't be
+ *      overwritten by structured Layer 2 blocks.
  */
 export const buildJsonLdBlobs = (
   ctx: JsonLdContext,
@@ -271,6 +587,45 @@ export const buildJsonLdBlobs = (
 ): JsonLdBlob[] => {
   if (!isEmittableCollection(collection)) return [];
   const typed = doc as AnyDoc;
-  if (collection === 'authors') return dispatchAuthor(ctx, typed);
-  return dispatchArticleLike(ctx, collection, typed);
+
+  const layerOne = buildLayerOneBlobs(ctx, collection, typed);
+  if (layerOne.length === 0) return layerOne;
+
+  const url = layerOne.find((b) => typeof b['@id'] === 'string')?.['@id'] as
+    | string
+    | undefined;
+  const pageUrl = url ?? ctx.site.baseUrl;
+
+  const addons = dispatchAddons(
+    ctx,
+    pageUrl,
+    (typed as { schemaAddons?: unknown }).schemaAddons,
+  );
+  const layerOnePlusAddons = mergeAddons(pageUrl, layerOne, addons);
+
+  // Tier 3 — admin-only `seo.additionalSchema` raw override. Re-
+  // validates here as defence-in-depth: if a row predates an allow-
+  // list contraction, we drop it from the public output rather than
+  // silently emitting a no-longer-allowed @type. Console.warn surfaces
+  // overrides in the canary log stream so we know which pages have
+  // manual markup.
+  const override = readSeo(typed).additionalSchema;
+  if (override == null) return layerOnePlusAddons;
+
+  const result = validateOverride(override);
+  if (!result.ok) {
+    // eslint-disable-next-line no-console -- canary visibility for ops
+    console.warn(
+      `[jsonld] Dropping seo.additionalSchema for ${collection}#${String(typed.id ?? '?')} — ${result.message}`,
+    );
+    return layerOnePlusAddons;
+  }
+
+  // eslint-disable-next-line no-console -- canary visibility for ops
+  console.warn(
+    `[jsonld] Emitting admin override for ${collection}#${String(typed.id ?? '?')}.`,
+  );
+
+  const overrideBlobs = (Array.isArray(override) ? override : [override]) as JsonLdBlob[];
+  return [...layerOnePlusAddons, ...overrideBlobs];
 };
