@@ -9,14 +9,26 @@
 
 .cs-cmdk {
   // Reset the default <dialog> chrome so we can paint our own.
+  // Native <dialog>'s built-in centering doesn't compose with our
+  // `top-offset + horizontal-center` requirement, and `margin: auto`
+  // misbehaves once you set `max-width: 100vw`. Position the dialog
+  // explicitly: pinned 12vh from the top, horizontally centered via
+  // the standard left-50% / translateX(-50%) trick. The dialog sizes
+  // to its panel content, so the backdrop click-target is the
+  // backdrop pseudo-element, not a stretched dialog body.
+  position: fixed;
+  top: 12vh;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0;
+  width: min(640px, calc(100vw - 32px));
+  max-width: none;
+  max-height: min(560px, 76vh);
   border: none;
   background: transparent;
-  padding: 0;
-  margin: 0 auto;
-  max-width: 100vw;
-  max-height: 100vh;
-  inset-block-start: 12vh;
   color: var(--cs-text-primary);
+  overflow: visible;
 
   &::backdrop {
     background: rgba(0, 0, 0, 0.55);
@@ -28,7 +40,7 @@
   }
 
   &__panel {
-    width: min(640px, calc(100vw - 32px));
+    width: 100%;
     background: var(--cs-surface-overlay);
     border: 1px solid var(--cs-border-strong);
     border-radius: var(--cs-radius-modal);
