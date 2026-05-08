@@ -178,21 +178,18 @@ const advancedTwitterFields: Field[] = [
   }),
 ];
 
-// Canonical-URL behaviour today
-// -------------------------------
-// Every page is self-canonical: JSON-LD `url` / `mainEntityOfPage` /
-// `@id` are built from `<baseUrl><route-prefix>/<slug>` via
-// `docCanonicalUrl()` (see lib/jsonld/url.ts). There is no
-// `<link rel="canonical">` HTML emission — apps/web is deferred per
-// CLAUDE.md, so we don't render the public site here.
+// Canonical-URL behaviour
+// ------------------------
+// Every page is self-canonical by default: JSON-LD `url` /
+// `mainEntityOfPage` / `@id` are built from `<baseUrl><route-prefix>/
+// <slug>` via `docCanonicalUrl()` (see lib/jsonld/url.ts). When
+// `seo.useCustomCanonical === true` AND `seo.canonicalOverride` is a
+// valid absolute http(s) URL, the override wins — for content that
+// was originally published off-domain.
 //
-// The two fields below remain in the schema (preserves any existing
-// values) but are hidden from the admin UI. They had no consumer
-// outside the form: `seo.canonicalOverride` was only validated and
-// HEAD-checked at the form layer, never read by the JSON-LD or
-// sitemap emitters. Re-surfacing the UI is a one-liner once a
-// consumer exists in lib/jsonld/url.ts (or wherever apps/web reads
-// canonicals from).
+// The two data fields below stay hidden from the in-form group
+// renderer; the editing surface is the right-rail `CanonicalField`
+// card mounted via `seoCanonicalSidebarField()`.
 const useCustomCanonicalField: Field = {
   name: 'useCustomCanonical',
   type: 'checkbox',
@@ -481,6 +478,25 @@ export const seoSidebarFields = (args: {
         components: {
           Field: {
             path: '@/payload/admin/components/SchemaPreviewField.tsx#SchemaPreviewField',
+            clientProps: { pathPrefix, sourceField: urlSource },
+          },
+        },
+      },
+    },
+    {
+      // Canonical-URL card — surfaces the self-canonical that JSON-LD
+      // emits by default, and lets editors override with an off-domain
+      // canonical when content was originally published elsewhere.
+      // The override flows through `docCanonicalUrl()` in
+      // lib/jsonld/url.ts and replaces the self-URL in every JSON-LD
+      // `url` / `mainEntityOfPage` / `@id` field.
+      name: 'canonicalUrl',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/CanonicalField.tsx#CanonicalField',
             clientProps: { pathPrefix, sourceField: urlSource },
           },
         },

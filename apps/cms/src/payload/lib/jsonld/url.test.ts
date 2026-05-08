@@ -46,4 +46,87 @@ describe('docCanonicalUrl', () => {
   it('returns null for an unregistered collection', () => {
     expect(docCanonicalUrl('https://cleanstart.com', 'mystery', { slug: 'x' })).toBeNull();
   });
+
+  describe('seo.canonicalOverride', () => {
+    it('honours an off-domain override when useCustomCanonical is true', () => {
+      expect(
+        docCanonicalUrl('https://cleanstart.com', 'blogs', {
+          slug: 'self',
+          seo: { useCustomCanonical: true, canonicalOverride: 'https://other.example/article' },
+        }),
+      ).toBe('https://other.example/article');
+    });
+
+    it('falls back to self-canonical when useCustomCanonical is false', () => {
+      expect(
+        docCanonicalUrl('https://cleanstart.com', 'blogs', {
+          slug: 'self',
+          seo: { useCustomCanonical: false, canonicalOverride: 'https://other.example/article' },
+        }),
+      ).toBe('https://cleanstart.com/blogs/self');
+    });
+
+    it('falls back to self-canonical when override is empty', () => {
+      expect(
+        docCanonicalUrl('https://cleanstart.com', 'blogs', {
+          slug: 'self',
+          seo: { useCustomCanonical: true, canonicalOverride: '   ' },
+        }),
+      ).toBe('https://cleanstart.com/blogs/self');
+    });
+
+    it('falls back to self-canonical when override is not a valid URL', () => {
+      expect(
+        docCanonicalUrl('https://cleanstart.com', 'blogs', {
+          slug: 'self',
+          seo: { useCustomCanonical: true, canonicalOverride: 'not-a-url' },
+        }),
+      ).toBe('https://cleanstart.com/blogs/self');
+    });
+
+    it('rejects override URLs with query strings', () => {
+      expect(
+        docCanonicalUrl('https://cleanstart.com', 'blogs', {
+          slug: 'self',
+          seo: { useCustomCanonical: true, canonicalOverride: 'https://other.example/x?utm=1' },
+        }),
+      ).toBe('https://cleanstart.com/blogs/self');
+    });
+
+    it('rejects override URLs with fragments', () => {
+      expect(
+        docCanonicalUrl('https://cleanstart.com', 'blogs', {
+          slug: 'self',
+          seo: { useCustomCanonical: true, canonicalOverride: 'https://other.example/x#frag' },
+        }),
+      ).toBe('https://cleanstart.com/blogs/self');
+    });
+
+    it('rejects non-http(s) override URLs', () => {
+      expect(
+        docCanonicalUrl('https://cleanstart.com', 'blogs', {
+          slug: 'self',
+          seo: { useCustomCanonical: true, canonicalOverride: 'ftp://other.example/x' },
+        }),
+      ).toBe('https://cleanstart.com/blogs/self');
+    });
+
+    it('strips trailing slash from a valid override', () => {
+      expect(
+        docCanonicalUrl('https://cleanstart.com', 'blogs', {
+          slug: 'self',
+          seo: { useCustomCanonical: true, canonicalOverride: 'https://other.example/article/' },
+        }),
+      ).toBe('https://other.example/article');
+    });
+
+    it('uses override even when self-canonical would be null (no slug)', () => {
+      expect(
+        docCanonicalUrl('https://cleanstart.com', 'mystery', {
+          slug: '',
+          seo: { useCustomCanonical: true, canonicalOverride: 'https://other.example/article' },
+        }),
+      ).toBe('https://other.example/article');
+    });
+  });
 });

@@ -220,7 +220,7 @@ const dispatchArticleLike = (
 ): JsonLdBlob[] => {
   const slug = doc.slug ?? '';
   if (!doc.title || !slug) return [];
-  const url = docCanonicalUrl(ctx.site.baseUrl, collection, doc as { slug: string });
+  const url = docCanonicalUrl(ctx.site.baseUrl, collection, doc);
   if (!url) return [];
 
   const variant: ArticleSource['variant'] =
@@ -406,7 +406,7 @@ const dispatchEvent = (
   doc: AnyDoc,
 ): JsonLdBlob[] => {
   if (!doc.title || !doc.slug) return [];
-  const url = docCanonicalUrl(ctx.site.baseUrl, collection, doc as { slug: string });
+  const url = docCanonicalUrl(ctx.site.baseUrl, collection, doc);
   if (!url) return [];
 
   const seo = readSeo(doc);
@@ -523,7 +523,7 @@ const collectLexicalText = (body: unknown): string => {
 
 const dispatchJob = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   if (!doc.title || !doc.slug) return [];
-  const url = docCanonicalUrl(ctx.site.baseUrl, 'jobs', doc as { slug: string });
+  const url = docCanonicalUrl(ctx.site.baseUrl, 'jobs', doc);
   if (!url) return [];
 
   const blobs: JsonLdBlob[] = [
@@ -597,10 +597,7 @@ const readPageBreadcrumb = (
 
 const dispatchPage = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   if (!doc.title) return [];
-  const url = docCanonicalUrl(ctx.site.baseUrl, 'pages', doc as {
-    slug?: string | null;
-    path?: string | null;
-  });
+  const url = docCanonicalUrl(ctx.site.baseUrl, 'pages', doc);
   if (!url) return [];
 
   const path = (doc as { path?: string | null }).path ?? null;
@@ -687,7 +684,7 @@ const buildDigitalDocumentBlob = (
 
 const dispatchResource = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   if (!doc.title || !doc.slug) return [];
-  const url = docCanonicalUrl(ctx.site.baseUrl, 'resources', doc as { slug: string });
+  const url = docCanonicalUrl(ctx.site.baseUrl, 'resources', doc);
   if (!url) return [];
 
   const description =
