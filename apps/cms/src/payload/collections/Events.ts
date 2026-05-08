@@ -6,6 +6,7 @@ import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
 import { firstPublishHook } from '../hooks/first-publish';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
@@ -126,6 +127,54 @@ export const Events: CollectionConfig = {
         condition: (_data, sibling) => sibling?.registrationMode === 'internal',
       },
     },
+    {
+      name: 'eventStatus',
+      type: 'select',
+      defaultValue: 'scheduled',
+      required: true,
+      options: [
+        { label: 'Scheduled', value: 'scheduled' },
+        { label: 'Postponed', value: 'postponed' },
+        { label: 'Cancelled', value: 'cancelled' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description:
+          'Drives the Event JSON-LD eventStatus. Switching to Postponed / Cancelled is required so search engines stop showing the event as still happening.',
+      },
+    },
+    {
+      name: 'cancelledAt',
+      type: 'date',
+      access: { update: () => false },
+      admin: {
+        readOnly: true,
+        date: { pickerAppearance: 'dayAndTime' },
+        description: 'Auto-stamped when eventStatus flips to Cancelled.',
+        position: 'sidebar',
+        condition: (_data, sibling) => sibling?.eventStatus === 'cancelled',
+      },
+    },
+    {
+      name: 'previousStartDate',
+      type: 'date',
+      admin: {
+        date: { pickerAppearance: 'dayAndTime' },
+        description:
+          'Original start date before this event was rescheduled. Auto-captured when you change startsAt while eventStatus is Postponed; emitted as Schema.org Event.previousStartDate.',
+        position: 'sidebar',
+        condition: (_data, sibling) => sibling?.eventStatus === 'postponed',
+      },
+    },
+    {
+      name: 'speakers',
+      type: 'relationship',
+      relationTo: 'authors',
+      hasMany: true,
+      filterOptions: {
+        acceptingNewBylines: { not_equals: false },
+      },
+    },
     mediaUploadField({
       name: 'agendaPdf',
       folderHint: 'web/event',
@@ -160,7 +209,7 @@ export const Events: CollectionConfig = {
     ...seoFieldsForSidebar('events'),
   ],
   hooks: {
-    beforeChange: [firstPublishHook()],
+    beforeChange: [firstPublishHook(), eventStatusTimestampsHook],
     afterChange: [
       slugChangeRedirectHook('events'),
       schemaOverrideAuditHook('events'),

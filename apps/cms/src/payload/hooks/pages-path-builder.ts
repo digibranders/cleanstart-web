@@ -5,6 +5,7 @@ const MAX_DEPTH = 16;
 type PageRow = {
   id?: string | number;
   slug?: string | null;
+  title?: string | null;
   parent?: string | number | { id?: string | number } | null;
   path?: string | null;
 };
@@ -17,7 +18,10 @@ const idOfParent = (parent: PageRow['parent']): string | number | null => {
 
 /**
  * Computes the full URL path for a Page by walking the parent chain
- * root-ward. Idempotent — safe to run on every save.
+ * root-ward, plus the breadcrumb trail (`[{path, label}]`) of every
+ * ancestor + self for the public site to render and the JSON-LD
+ * dispatcher to emit as `BreadcrumbList`. Idempotent — safe to run on
+ * every save.
  *
  * - Root pages get `/<slug>`.
  * - Nested pages get `/<grandparent-slug>/<parent-slug>/<self-slug>`.
@@ -40,7 +44,11 @@ export const pagesPathBuilderHook: CollectionBeforeChangeHook = async ({
   const id = (originalDoc as PageRow | undefined)?.id;
   if (id != null) seen.add(id);
 
+  // segments is built root-first by unshifting; ancestorTrail is the
+  // matching `[{path, label}]` chain (also root-first) used for
+  // breadcrumb emission.
   const segments: string[] = [slug];
+  const ancestorTrail: { slug: string; label: string }[] = [];
   let cursor = idOfParent(next.parent ?? null);
   let depth = 0;
   while (cursor != null) {
@@ -61,10 +69,31 @@ export const pagesPathBuilderHook: CollectionBeforeChangeHook = async ({
     const ancestorSlug = ancestor?.slug;
     if (typeof ancestorSlug === 'string' && ancestorSlug.length > 0) {
       segments.unshift(ancestorSlug);
+      ancestorTrail.unshift({
+        slug: ancestorSlug,
+        label:
+          typeof ancestor?.title === 'string' && ancestor.title.length > 0
+            ? ancestor.title
+            : ancestorSlug,
+      });
     }
     cursor = idOfParent(ancestor?.parent ?? null);
   }
 
   const path = `/${segments.join('/')}`;
-  return { ...data, path };
+
+  // Build breadcrumb trail with cumulative paths. Each ancestor's path
+  // is the slash-join of every segment up to and including it, so the
+  // chain reads `/a`, `/a/b`, `/a/b/self` as it walks down.
+  const breadcrumb: { path: string; label: string }[] = [];
+  const accumulator: string[] = [];
+  for (const crumb of ancestorTrail) {
+    accumulator.push(crumb.slug);
+    breadcrumb.push({ path: `/${accumulator.join('/')}`, label: crumb.label });
+  }
+  const selfLabel =
+    typeof next.title === 'string' && next.title.length > 0 ? next.title : slug;
+  breadcrumb.push({ path, label: selfLabel });
+
+  return { ...data, path, breadcrumb };
 };
