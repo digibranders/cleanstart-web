@@ -1018,3 +1018,541 @@
     }
   }
 }
+
+// =============================================================================
+// Inbound redirects — 410 polish + hot-redirect banner additions
+// =============================================================================
+
+.cs-inbound-redirects {
+  // Banner shown at the top of the body when any row crosses the
+  // hot-traffic threshold. Amber tint signals attention without
+  // crossing into "this is broken" red.
+  &__hot-banner {
+    display: flex;
+    gap: var(--cs-space-2);
+    align-items: flex-start;
+    padding: var(--cs-space-2) var(--cs-space-3);
+    margin-bottom: var(--cs-space-2);
+    background: rgba(217, 119, 6, 0.08); // amber-500 @ 8%
+    border: 1px solid rgba(217, 119, 6, 0.32);
+    border-radius: var(--cs-radius-input);
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--theme-text);
+  }
+
+  &__hot-banner-icon {
+    flex-shrink: 0;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  // Pill rendered in place of "→ <to>" for 410 rows. Reads as
+  // "/old-url · gone · 410" so the row is scannable without an
+  // empty arrow staring at the editor.
+  &__gone-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    background: var(--theme-elevation-150);
+    color: var(--theme-text-soft);
+    border-radius: var(--cs-radius-chip);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+
+  // Tone variant on the summary chip when at least one inbound row
+  // is hot — surfaces the warning into the collapsed header view.
+  &__summary[data-tone='warn'] {
+    color: #d97706; // amber-500 — matches the body banner
+  }
+}
+
+// =============================================================================
+// Outbound redirect — sidebar card mirroring the Inbound shell, plus
+// an "active / shadowed" warning state when a redirect is set.
+// =============================================================================
+
+.cs-outbound-redirect {
+  margin: var(--cs-space-3) 0;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  background: var(--theme-elevation-50);
+  box-shadow: var(--cs-shadow-input-rest);
+  overflow: hidden;
+
+  // When this page has an outbound redirect set, accent the whole
+  // card so editors can spot it at a glance — even when collapsed.
+  &[data-active='true'] {
+    border-color: rgba(217, 119, 6, 0.45);
+    box-shadow:
+      var(--cs-shadow-input-rest),
+      inset 3px 0 0 #d97706;
+  }
+
+  &__header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    padding: var(--cs-space-2) var(--cs-space-3);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    color: var(--theme-text);
+    font-size: 13px;
+    line-height: 1.3;
+    transition: background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__title {
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  &__summary {
+    flex: 1;
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &[data-tone='warn'] {
+      color: #d97706;
+      font-weight: 500;
+    }
+    &[data-tone='error'] {
+      color: var(--color-error-500);
+    }
+  }
+
+  &__chevron {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-text-soft);
+    font-size: 10px;
+    transition: transform var(--cs-motion-micro);
+  }
+
+  &[data-expanded='true'] &__chevron {
+    transform: rotate(-180deg);
+  }
+
+  &__body {
+    padding: var(--cs-space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-2);
+    border-top: 1px solid var(--theme-elevation-150);
+    background: var(--theme-bg);
+  }
+
+  &__active-banner {
+    display: flex;
+    gap: var(--cs-space-2);
+    align-items: flex-start;
+    padding: var(--cs-space-2) var(--cs-space-3);
+    background: rgba(217, 119, 6, 0.10);
+    border: 1px solid rgba(217, 119, 6, 0.40);
+    border-radius: var(--cs-radius-input);
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--theme-text);
+  }
+
+  &__active-banner-icon {
+    flex-shrink: 0;
+    color: #d97706;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  &__hint {
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--theme-text-soft);
+    margin: 0;
+  }
+
+  &__active {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
+  }
+
+  &__kv {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-2);
+    margin: 0;
+
+    > div {
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      gap: var(--cs-space-2);
+      align-items: baseline;
+    }
+
+    dt {
+      font-size: 10.5px;
+      color: var(--theme-text-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    dd {
+      margin: 0;
+      font-size: 12px;
+      color: var(--theme-text);
+
+      code {
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        background: var(--theme-elevation-100);
+        padding: 1px 6px;
+        border-radius: 3px;
+      }
+    }
+  }
+
+  &__active-actions,
+  &__form-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: var(--cs-space-2);
+  }
+
+  &__add {
+    align-self: flex-start;
+    background: var(--theme-elevation-100);
+    border: 1px dashed var(--theme-elevation-250);
+    border-radius: var(--cs-radius-input);
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--theme-text);
+    cursor: pointer;
+    transition:
+      background-color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-150);
+      border-color: var(--cs-cyan-500);
+      border-style: solid;
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__form-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--theme-text-soft);
+    letter-spacing: 0.02em;
+    margin-top: 4px;
+  }
+
+  &__form-label-soft {
+    font-weight: 400;
+    color: var(--theme-text-disabled);
+  }
+
+  &__form-hint {
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--theme-text-soft);
+    margin: 0 0 4px 0;
+    font-style: italic;
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      background: var(--theme-elevation-100);
+      padding: 0 4px;
+      border-radius: 3px;
+      font-style: normal;
+    }
+  }
+
+  &__input,
+  &__select,
+  &__textarea {
+    width: 100%;
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    padding: 6px 10px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--theme-text);
+    font-family: inherit;
+    transition:
+      border-color var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro);
+
+    &::placeholder {
+      color: var(--theme-text-disabled);
+    }
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__input {
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  &__textarea {
+    resize: vertical;
+    min-height: 56px;
+  }
+
+  &__form-error {
+    margin: 4px 0 0 0;
+    font-size: 11.5px;
+    color: var(--color-error-500);
+    line-height: 1.4;
+  }
+
+  &__btn {
+    flex: 1;
+    min-width: 64px;
+    padding: 6px 10px;
+    border: 1px solid var(--theme-elevation-250);
+    border-radius: var(--cs-radius-input);
+    background: transparent;
+    color: var(--theme-text);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover:not([disabled]) {
+      background: var(--theme-elevation-100);
+      border-color: var(--cs-cyan-500);
+    }
+
+    &[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__btn--primary {
+    background: var(--cs-tint-brand-soft);
+    border-color: var(--cs-cyan-500);
+    color: var(--cs-cyan-700);
+
+    &:hover:not([disabled]) {
+      background: var(--cs-tint-brand-medium);
+    }
+  }
+
+  &__btn--danger {
+    color: var(--color-error-500);
+    border-color: var(--theme-elevation-250);
+    flex: 0 0 auto;
+    min-width: 0;
+
+    &:hover:not([disabled]) {
+      background: rgba(255, 92, 92, 0.08);
+      border-color: var(--color-error-500);
+    }
+  }
+}
+
+// =============================================================================
+// URL change history — read-only timeline, mirrors Inbound shell shape.
+// =============================================================================
+
+.cs-url-history {
+  margin: var(--cs-space-3) 0;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  background: var(--theme-elevation-50);
+  box-shadow: var(--cs-shadow-input-rest);
+  overflow: hidden;
+
+  &__header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    padding: var(--cs-space-2) var(--cs-space-3);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    color: var(--theme-text);
+    font-size: 13px;
+    line-height: 1.3;
+    transition: background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__title {
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  &__summary {
+    flex: 1;
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &[data-tone='active'] {
+      color: var(--cs-cyan-700);
+    }
+    &[data-tone='error'] {
+      color: var(--color-error-500);
+    }
+  }
+
+  &__chevron {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-text-soft);
+    font-size: 10px;
+    transition: transform var(--cs-motion-micro);
+  }
+
+  &[data-expanded='true'] &__chevron {
+    transform: rotate(-180deg);
+  }
+
+  &__body {
+    padding: var(--cs-space-3);
+    border-top: 1px solid var(--theme-elevation-150);
+    background: var(--theme-bg);
+  }
+
+  &__hint {
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--theme-text-soft);
+    margin: 0 0 var(--cs-space-2) 0;
+  }
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: history-step;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__row {
+    counter-increment: history-step;
+    border-left: 2px solid var(--theme-elevation-200);
+    padding-left: var(--cs-space-3);
+    position: relative;
+
+    &::before {
+      content: counter(history-step);
+      position: absolute;
+      left: -10px;
+      top: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--theme-elevation-150);
+      color: var(--theme-text-soft);
+      font-size: 10px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &__row-link {
+    display: block;
+    padding: 4px 6px;
+    border-radius: var(--cs-radius-input);
+    color: var(--theme-text);
+    text-decoration: none;
+    transition: background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+  }
+
+  &__row-top {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  &__from,
+  &__to {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    background: var(--theme-elevation-100);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--theme-text);
+    word-break: break-all;
+  }
+
+  &__arrow {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+  }
+
+  &__row-meta {
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+    font-size: 10.5px;
+    color: var(--theme-text-soft);
+  }
+}

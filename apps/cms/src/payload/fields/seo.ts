@@ -375,5 +375,31 @@ export const seoSidebarFields = (args: {
         },
       },
     },
+    {
+      name: 'outboundRedirect',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/OutboundRedirectField.tsx#OutboundRedirectField',
+            clientProps: { pathPrefix, sourceField: urlSource },
+          },
+        },
+      },
+    },
+    {
+      name: 'urlChangeHistory',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField',
+            clientProps: { pathPrefix, sourceField: urlSource },
+          },
+        },
+      },
+    },
   ];
 };
