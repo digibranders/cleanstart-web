@@ -244,6 +244,26 @@ Alternative: add a 1px hairline divider above the trigger (separating it from th
 
 ---
 
+### F31 · Phase-4 reopen — F14 was wrong to close; SeoHealthScoreField + LegacyBioViewer were missed in Phase 2 *(P1)*
+
+**What I missed:** Phase 2's chevron unification covered five sidebar collapsibles but missed two more components that also use `▾` / `▸` Unicode glyphs:
+- [SeoHealthScoreField.tsx:120](apps/cms/src/payload/admin/components/SeoHealthScoreField.tsx#L120) — the green/amber/red SEO health card on every blog/news/page detail. Visible chevron in the user's screenshot at the far right, rendering as a microscopic Unicode triangle. Now uses `<ChevronDown />` with inline transform (rotates `-90deg` when collapsed).
+- [LegacyBioViewer.tsx:85](apps/cms/src/payload/admin/components/LegacyBioViewer.tsx#L85) — the read-only Webflow-bio panel on Author detail. Same `▾`/`▸` pattern. Same fix.
+
+**F14 reopened — closing it as "by design" was wrong.** Three code-level smells in [NavOpenOnDesktop.tsx](apps/cms/src/payload/admin/components/NavOpenOnDesktop.tsx) before the fix:
+
+1. **Race condition by design.** Commit `122753d` literally says *"actually win the race with Payload's NavProvider"*. `setTimeout(..., 0)` inside a `useEffect` to defer past Payload's parent effect. Effect ordering isn't a contract — a Payload upgrade reorders effects and this silently breaks. No test catches it.
+2. **Two effects own the same state.** One sets `navOpen` on path change, another watches `navOpen` and re-asserts policy. The React anti-pattern of deriving state-from-state via effects.
+3. **The 1.5 s manual-toggle grace is a band-aid.** It exists because editors *do* re-open the nav, then get confused when it auto-closes again. The grace window is the symptom of fighting the user, not a feature.
+
+UX-level: every comparable SaaS admin (Notion, Linear, GitHub, Webflow CMS, Sanity, Strapi, Payload's own marketing demos) keeps the nav persistent on desktop. Auto-collapse-on-detail is a 375 px-mobile pattern. At 1440 with a 240 px nav the form column has 1200 px — the editor isn't space-constrained. The body editor's `Fullscreen` button already exists for the genuine "I need every pixel" case (explicit, user-controlled).
+
+**Fix:** redesigned `NavOpenOnDesktop` to a single source of truth — editor preference in `localStorage`. One mount-time effect to default to "open at desktop" if no preference is saved; one click-listener effect to mirror the editor's hamburger toggles into storage. No setTimeout race. No second watcher. No grace window. Below 1024 px Payload's drawer behaviour is preserved as-is.
+
+If we ever genuinely want auto-collapse on doc-edit views, the right primitive is a per-route preference (`localStorage[`cs-nav-collapsed-by-route`]`), not a state-machine racing the framework.
+
+---
+
 ### F12 · Leads list shows "Create new Lead" CTA on an append-only collection *(P1 functional)*
 
 **Where:** `/admin/collections/leads` empty state — central card displays a cyan "Create new Lead" primary button.

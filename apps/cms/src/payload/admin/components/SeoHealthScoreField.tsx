@@ -5,6 +5,7 @@ import type { ReactElement } from 'react';
 import { useMemo, useState } from 'react';
 
 import { type HealthBand, scoreSeoHealth } from '../../lib/seo/health-score';
+import { ChevronDown } from './icons/Chevron';
 
 type SeoHealthScoreFieldProps = {
   /** Source field for the title fallback when `seo.title` is empty. */
@@ -117,7 +118,19 @@ export const SeoHealthScoreField = (
               : `${result.failingCount} issue${result.failingCount === 1 ? '' : 's'} to fix · click for details`}
           </span>
         </span>
-        <span aria-hidden style={{ fontSize: 11, opacity: 0.7 }}>{open ? '▾' : '▸'}</span>
+        <span
+          aria-hidden
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: 0.85,
+            transform: open ? 'rotate(0deg)' : 'rotate(-90deg)',
+            transition: 'transform var(--cs-motion-micro)',
+          }}
+        >
+          <ChevronDown />
+        </span>
       </button>
       {open ? (
         <ul

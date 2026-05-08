@@ -4,6 +4,8 @@ import { useField } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 import { useMemo, useState } from 'react';
 
+import { ChevronDown } from './icons/Chevron';
+
 interface LegacyBioPayload {
   /** Original Webflow rich-text "Education Qualification" content. */
   readonly education?: string | null;
@@ -82,7 +84,19 @@ export const LegacyBioViewer = (): ReactElement | null => {
         <span style={{ flex: 1 }}>
           Legacy Webflow bio · {sections.length} section{sections.length === 1 ? '' : 's'} · click to {collapsed ? 'show' : 'hide'}
         </span>
-        <span aria-hidden style={{ fontSize: 11, opacity: 0.7 }}>{collapsed ? '▸' : '▾'}</span>
+        <span
+          aria-hidden
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: 0.85,
+            transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+            transition: 'transform var(--cs-motion-micro)',
+          }}
+        >
+          <ChevronDown />
+        </span>
       </button>
       {!collapsed ? (
         <div
