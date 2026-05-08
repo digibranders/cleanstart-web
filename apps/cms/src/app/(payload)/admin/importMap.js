@@ -60,6 +60,7 @@ import { CommandPalette as CommandPalette_9e72795c48aa56bf099ac6d02eb8124e } fro
 import { SavedStateIndicator as SavedStateIndicator_8bd5434f7092ab63abeb348597344486 } from '../../../payload/admin/components/SavedStateIndicator.tsx'
 import { NavBadges as NavBadges_208a0014b2eb9ce6cf95af7e4047b13a } from '../../../payload/admin/components/NavBadges.tsx'
 import { NavGroupPersistence as NavGroupPersistence_41d8a055ad6ff26bcaace971cec779b5 } from '../../../payload/admin/components/NavGroupPersistence.tsx'
+import { NavOpenOnDesktop as NavOpenOnDesktop_21bf36b0db39df18e02fc9fdb6b1a47e } from '../../../payload/admin/components/NavOpenOnDesktop.tsx'
 import { EditorFullscreenToggle as EditorFullscreenToggle_a4cffb491dda4a682b514cfa7e26d00f } from '../../../payload/admin/components/EditorFullscreenToggle.tsx'
 import { ShortcutHelpDialog as ShortcutHelpDialog_988ed8f20aac11621cac715bd9040a9f } from '../../../payload/admin/components/ShortcutHelpDialog.tsx'
 import { ListCellEnhancer as ListCellEnhancer_edd569c3aa02f3de17c22f7695d981ee } from '../../../payload/admin/components/ListCellEnhancer.tsx'
@@ -134,6 +135,7 @@ export const importMap = {
   "./payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator": SavedStateIndicator_8bd5434f7092ab63abeb348597344486,
   "./payload/admin/components/NavBadges.tsx#NavBadges": NavBadges_208a0014b2eb9ce6cf95af7e4047b13a,
   "./payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence": NavGroupPersistence_41d8a055ad6ff26bcaace971cec779b5,
+  "./payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop": NavOpenOnDesktop_21bf36b0db39df18e02fc9fdb6b1a47e,
   "./payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle": EditorFullscreenToggle_a4cffb491dda4a682b514cfa7e26d00f,
   "./payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog": ShortcutHelpDialog_988ed8f20aac11621cac715bd9040a9f,
   "./payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer": ListCellEnhancer_edd569c3aa02f3de17c22f7695d981ee,

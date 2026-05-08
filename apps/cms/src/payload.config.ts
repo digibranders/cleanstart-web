@@ -111,6 +111,7 @@ export default buildConfig({
         './payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator',
         './payload/admin/components/NavBadges.tsx#NavBadges',
         './payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence',
+        './payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop',
         './payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle',
         './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
         './payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer',
