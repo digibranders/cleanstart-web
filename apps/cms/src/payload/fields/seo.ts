@@ -7,6 +7,28 @@ import { mediaUploadField } from './media-upload';
 
 const TITLE_CHAR_HINT = 60;
 const DESCRIPTION_CHAR_HINT = 160;
+// Hard caps. Above these, Google reliably truncates the SERP snippet —
+// over-long values waste pixels we already paid for. The sidebar UI
+// shows soft warnings at the hint thresholds; these constants are the
+// last line of defence at save time.
+const TITLE_CHAR_LIMIT = 70;
+const DESCRIPTION_CHAR_LIMIT = 170;
+
+const validateSeoTitleLength = (
+  value: string | string[] | null | undefined,
+): true | string => {
+  if (typeof value !== 'string') return true;
+  if (value.length <= TITLE_CHAR_LIMIT) return true;
+  return `SEO title is ${value.length} characters — Google truncates above ${TITLE_CHAR_LIMIT}. Aim for ≤ ${TITLE_CHAR_HINT}.`;
+};
+
+const validateSeoDescriptionLength = (
+  value: string | string[] | null | undefined,
+): true | string => {
+  if (typeof value !== 'string') return true;
+  if (value.length <= DESCRIPTION_CHAR_LIMIT) return true;
+  return `SEO description is ${value.length} characters — Google truncates above ${DESCRIPTION_CHAR_LIMIT}. Aim for ≤ ${DESCRIPTION_CHAR_HINT}.`;
+};
 
 const indexableField: Field = {
   name: 'indexable',
@@ -36,6 +58,7 @@ const titleField: Field = {
     // via the `seoTitle` sidebar UI field instead.
     hidden: true,
   },
+  validate: validateSeoTitleLength,
 };
 
 const descriptionField: Field = {
@@ -47,6 +70,7 @@ const descriptionField: Field = {
     // via the `seoDescription` sidebar UI field instead.
     hidden: true,
   },
+  validate: validateSeoDescriptionLength,
 };
 
 const ogImageFields: Field[] = [
@@ -94,6 +118,64 @@ const advancedOgFields: Field[] = [
       condition: (_data, siblingData) => siblingData?.useAdvancedOg === true,
     },
   },
+];
+
+// Twitter / X card overrides. The default fallback chain is:
+//   twitterImage → ogImage → site default OG image
+//   twitterTitle → ogTitle → seo.title → doc title
+//   twitterDescription → ogDescription → seo.description → abstract
+// Editors only flip useAdvancedTwitter when the X audience needs a
+// different framing than the OG/Facebook audience — mostly for tone or
+// cropping. The renderer applies the fallback chain.
+const useAdvancedTwitterField: Field = {
+  name: 'useAdvancedTwitter',
+  type: 'checkbox',
+  defaultValue: false,
+  admin: {
+    description:
+      "Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.",
+  },
+};
+
+const advancedTwitterFields: Field[] = [
+  {
+    name: 'twitterCard',
+    type: 'select',
+    defaultValue: 'summary_large_image',
+    options: [
+      { label: 'Summary (small image)', value: 'summary' },
+      { label: 'Summary with large image (default)', value: 'summary_large_image' },
+    ],
+    admin: {
+      description:
+        '`summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.',
+      condition: (_data, siblingData) => siblingData?.useAdvancedTwitter === true,
+    },
+  },
+  {
+    name: 'twitterTitle',
+    type: 'text',
+    admin: {
+      description: 'Defaults to ogTitle, then SEO title.',
+      condition: (_data, siblingData) => siblingData?.useAdvancedTwitter === true,
+    },
+  },
+  {
+    name: 'twitterDescription',
+    type: 'textarea',
+    admin: {
+      description: 'Defaults to ogDescription, then SEO description.',
+      condition: (_data, siblingData) => siblingData?.useAdvancedTwitter === true,
+    },
+  },
+  mediaUploadField({
+    name: 'twitterImage',
+    folderHint: 'web/general',
+    description:
+      'Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.',
+    condition: (_data, siblingData) =>
+      (siblingData as { useAdvancedTwitter?: boolean } | undefined)?.useAdvancedTwitter === true,
+  }),
 ];
 
 const useCustomCanonicalField: Field = {
@@ -167,6 +249,20 @@ const additionalSchemaField: Field = {
   validate: validateOverrideForField,
 };
 
+// Optional target keyword the editor is writing for. Drives the
+// `KeywordTargetField` sidebar density readout. Free-text — we don't
+// validate against an external keyword tool. Hidden from the in-form
+// renderer; the sidebar UI is the editing surface.
+const keywordTargetField: Field = {
+  name: 'keywordTarget',
+  type: 'text',
+  admin: {
+    hidden: true,
+    description:
+      'Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.',
+  },
+};
+
 const speakablePathField: Field = {
   name: 'speakablePath',
   type: 'array',
@@ -209,8 +305,11 @@ export const seoField: GroupField = {
     ...ogImageFields,
     useAdvancedOgField,
     ...advancedOgFields,
+    useAdvancedTwitterField,
+    ...advancedTwitterFields,
     useCustomCanonicalField,
     canonicalOverrideField,
+    keywordTargetField,
     speakablePathField,
     additionalSchemaField,
   ],
@@ -298,6 +397,19 @@ export const seoSidebarFields = (args: {
   } = args;
   return [
     {
+      name: 'seoHealthScore',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/SeoHealthScoreField.tsx#SeoHealthScoreField',
+            clientProps: { titleSource, descriptionSource, urlSource },
+          },
+        },
+      },
+    },
+    {
       name: 'seoTitle',
       type: 'ui',
       admin: {
@@ -344,7 +456,7 @@ export const seoSidebarFields = (args: {
         components: {
           Field: {
             path: '@/payload/admin/components/SerpPreviewField.tsx#SerpPreviewField',
-            clientProps: { pathPrefix, titleSource, descriptionSource },
+            clientProps: { pathPrefix, titleSource, descriptionSource, urlSource },
           },
         },
       },
@@ -397,6 +509,31 @@ export const seoSidebarFields = (args: {
           Field: {
             path: '@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField',
             clientProps: { pathPrefix, sourceField: urlSource },
+          },
+        },
+      },
+    },
+    {
+      name: 'bodyAudit',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/BodyAuditField.tsx#BodyAuditField',
+          },
+        },
+      },
+    },
+    {
+      name: 'keywordTargetUi',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/KeywordTargetField.tsx#KeywordTargetField',
+            clientProps: { titleSource, descriptionSource },
           },
         },
       },
