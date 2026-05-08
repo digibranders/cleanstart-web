@@ -70,6 +70,17 @@ export const submitIndexNow = async (
       headers: { 'content-type': 'application/json; charset=utf-8' },
       body: JSON.stringify(body),
     });
+    if (!res.ok) {
+      // Per IndexNow spec: 200 = ok, 202 = accepted, 400 = invalid
+      // request, 403 = key not valid for host, 422 = URLs don't belong
+      // to host, 429 = throttled. Surface non-2xx as failures so the
+      // afterChange hook actually logs them — silently swallowing was
+      // the original bug.
+      return {
+        kind: 'failed',
+        reason: `IndexNow ${res.status}`,
+      };
+    }
     return { kind: 'submitted', status: res.status, urlCount: args.urls.length };
   } catch (err) {
     return {

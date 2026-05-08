@@ -64,6 +64,33 @@ describe('submitIndexNow', () => {
     if (result.kind === 'failed') expect(result.reason).toBe('connection refused');
   });
 
+  it('reports failure on non-2xx HTTP responses (e.g. 400 invalid key, 403 host mismatch, 5xx outage)', async () => {
+    for (const status of [400, 403, 422, 429, 500]) {
+      const fetcher = vi.fn().mockResolvedValue(okResponse(status));
+      const result = await submitIndexNow({
+        key: 'abc123',
+        baseUrl: 'https://cleanstart.com',
+        urls: ['https://cleanstart.com/blogs/x'],
+        fetcher: fetcher as unknown as typeof fetch,
+      });
+      expect(result.kind).toBe('failed');
+      if (result.kind === 'failed') {
+        expect(result.reason).toBe(`IndexNow ${status}`);
+      }
+    }
+  });
+
+  it('still reports submitted on 2xx (accepted, 202)', async () => {
+    const fetcher = vi.fn().mockResolvedValue(okResponse(202));
+    const result = await submitIndexNow({
+      key: 'abc123',
+      baseUrl: 'https://cleanstart.com',
+      urls: ['https://cleanstart.com/blogs/x'],
+      fetcher: fetcher as unknown as typeof fetch,
+    });
+    expect(result).toEqual({ kind: 'submitted', status: 202, urlCount: 1 });
+  });
+
   it('reports failure for an unparseable baseUrl', async () => {
     const fetcher = vi.fn();
     const result = await submitIndexNow({
