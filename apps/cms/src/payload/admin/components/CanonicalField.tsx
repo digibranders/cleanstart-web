@@ -112,7 +112,7 @@ export const CanonicalField = (props: CanonicalFieldProps): ReactElement => {
   const effectiveUrl = overrideActive ? trimmedOverride : publicUrl;
 
   const summary = useMemo(() => {
-    if (overrideActive) return 'Off-domain override';
+    if (overrideActive) return 'Custom override';
     if (publicUrl) return 'Self · this page';
     return 'No URL yet';
   }, [overrideActive, publicUrl]);
@@ -153,7 +153,7 @@ export const CanonicalField = (props: CanonicalFieldProps): ReactElement => {
         {useCustomCanonical && (
           <div className="cs-canonical__nested">
             <label htmlFor={inputId} className="cs-canonical__label">
-              Off-domain canonical
+              Canonical URL
             </label>
             <input
               id={inputId}
@@ -162,12 +162,19 @@ export const CanonicalField = (props: CanonicalFieldProps): ReactElement => {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setCanonicalOverride(e.target.value === '' ? null : e.target.value)
               }
-              placeholder="https://example.com/article"
+              placeholder="https://cleanstart.com/blog/source-article"
               className="cs-canonical__input"
             />
             <p className="cs-canonical__hint">
-              Use only when this content was originally published off-domain. Internal duplicates
-              should use a redirect instead.
+              Tell search engines a different URL is the source-of-truth for this content.
+              Same-domain or cross-domain — both are valid. Common cases: facet/parameter URLs
+              that should point to a clean URL, migrated URLs preserved alongside a new
+              structure, A/B test variants, or content republished off-domain.
+            </p>
+            <p className="cs-canonical__hint cs-canonical__hint--muted">
+              Different from a redirect: a canonical lets the variant URL keep serving content
+              while consolidating the search-engine signal. Use a Redirect when you want users
+              to actually navigate to the other URL.
             </p>
 
             {health.kind === 'checking' && (

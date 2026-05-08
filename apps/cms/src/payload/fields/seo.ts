@@ -184,12 +184,18 @@ const advancedTwitterFields: Field[] = [
 // `mainEntityOfPage` / `@id` are built from `<baseUrl><route-prefix>/
 // <slug>` via `docCanonicalUrl()` (see lib/jsonld/url.ts). When
 // `seo.useCustomCanonical === true` AND `seo.canonicalOverride` is a
-// valid absolute http(s) URL, the override wins — for content that
-// was originally published off-domain.
+// valid absolute https URL (any domain — same-domain or cross-domain
+// are both legitimate), the override wins.
+//
+// Same-domain canonical is the right tool for facet / parameter
+// stripping, A/B test variants, paginated slices, and migrated URL
+// preservation — i.e. when the variant URL must keep serving content
+// but only one canonical URL should be indexed. Cross-domain
+// canonical is for syndicated content (Medium, partner sites, etc.).
 //
 // The two data fields below stay hidden from the in-form group
 // renderer; the editing surface is the right-rail `CanonicalField`
-// card mounted via `seoCanonicalSidebarField()`.
+// card mounted via `seoSidebarFields()`.
 const useCustomCanonicalField: Field = {
   name: 'useCustomCanonical',
   type: 'checkbox',

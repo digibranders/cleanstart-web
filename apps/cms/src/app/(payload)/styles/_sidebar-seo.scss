@@ -1682,6 +1682,13 @@
     line-height: 1.45;
     color: var(--theme-text-soft);
     margin: 2px 0 0;
+
+    // Secondary "different from a redirect" callout — quieter so the
+    // primary hint remains the more visible one.
+    &--muted {
+      color: var(--theme-text-disabled);
+      font-style: italic;
+    }
   }
 
   &__health {
