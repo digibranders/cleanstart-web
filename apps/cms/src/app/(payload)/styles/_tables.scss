@@ -212,3 +212,35 @@
 .list-controls {
   margin-bottom: var(--cs-space-4);
 }
+
+// ─── Truncate freeform-text cells with ellipsis ──────────────────
+//
+// Long titles (News, Knowledge Hub, Resources) and long URLs (Redirects
+// FROM/TO) consume the row width and push trailing columns past the
+// viewport. Clamp the text-shaped cells; a `title` tooltip from Payload
+// already exposes the full value on hover.
+//
+// Tunable per-collection: if a collection genuinely needs more width
+// here, expose it via that collection's admin.components.Cell.
+.cell-title,
+.cell-name,
+.cell-heading,
+.cell-headline,
+.cell-from,
+.cell-to,
+.cell-permalink,
+.cell-slug {
+  max-width: 480px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  > a,
+  > span {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+  }
+}

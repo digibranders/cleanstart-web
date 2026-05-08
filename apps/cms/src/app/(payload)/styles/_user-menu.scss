@@ -24,7 +24,9 @@
   margin: auto var(--cs-space-2) var(--cs-space-2);
   margin-top: auto;
   padding-top: var(--cs-space-2);
-  border-top: 1px solid var(--cs-border-subtle);
+  // Use the stronger elevation-200 so the divider actually reads at a
+  // glance — `--cs-border-subtle` was too faint against the sidebar bg.
+  border-top: 1px solid var(--theme-elevation-200);
   background: var(--cs-surface-canvas);
   z-index: 5;
 }
@@ -214,6 +216,12 @@ aside.nav,
   }
 
   &--destructive {
+    // Rest state: keep label legible, signal destructive intent on the
+    // icon only — readable scan, no panic colour. Hover then escalates.
+    svg {
+      color: var(--color-error-500);
+    }
+
     &:hover {
       background: var(--cs-status-error-bg);
       color: var(--cs-status-error);

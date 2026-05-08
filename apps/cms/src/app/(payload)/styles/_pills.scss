@@ -32,3 +32,46 @@
   }
 }
 
+// ─── Status-pill severity tiers ──────────────────────────────────
+//
+// Redirect-status pills (and any other status pill shaped via
+// `data-status` or the `cell-_status`-like cells) shouldn't all
+// render in the same brand cyan: an editor scanning the redirects
+// list can't tell a permanent 301 from a destructive 410. Map
+// values to severity-aware colours; default stays cyan so any
+// uncategorised value still shows up.
+[data-status='301'],
+[data-status='moved-permanently'] {
+  // Permanent — calm cyan (the existing default tone, made explicit)
+  color: var(--cs-cyan-500);
+  background: var(--cs-tint-brand-soft);
+}
+
+[data-status='302'],
+[data-status='307'],
+[data-status='308'],
+[data-status='moved-temporarily'] {
+  color: var(--cs-cyan-700);
+  background: var(--cs-tint-brand-soft);
+}
+
+[data-status='410'],
+[data-status='gone'],
+[data-status='404'],
+[data-status='not-found'] {
+  color: var(--color-error-500);
+  background: rgba(220, 38, 38, 0.14);
+}
+
+// Draft / unpublished work — amber, matching the dashboard pulse
+// "draft" semantic.
+[data-status='draft'] {
+  color: var(--color-warning-500);
+  background: rgba(217, 119, 6, 0.14);
+}
+
+[data-status='published'],
+[data-status='live'] {
+  color: var(--color-success-500);
+  background: rgba(0, 167, 111, 0.14);
+}
