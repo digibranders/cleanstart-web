@@ -76,12 +76,15 @@ describe('buildPersonBlob', () => {
     expect(blob?.sameAs).toEqual(['https://twitter.com/jane', 'https://linkedin.com/in/jane']);
   });
 
-  it('emits knowsAbout from topicAreas, dropping blanks', () => {
+  it('emits knowsAbout from topicAreas as DefinedTerms when curated, plain strings otherwise, dropping blanks', () => {
     const blob = buildPersonBlob(ctx, {
       ...minimalAuthor,
-      topicAreas: [{ topic: 'Container security' }, { topic: '' }, { topic: 'SBOM' }],
+      topicAreas: [{ topic: 'Container security' }, { topic: '' }, { topic: 'Quantum cryptography' }],
     });
-    expect(blob?.knowsAbout).toEqual(['Container security', 'SBOM']);
+    expect(blob?.knowsAbout).toEqual([
+      expect.objectContaining({ '@type': 'DefinedTerm', name: 'Container security' }),
+      'Quantum cryptography',
+    ]);
   });
 
   it('omits optional sections when source data is empty', () => {

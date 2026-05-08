@@ -21,6 +21,12 @@ export interface ArticleAboutEntry {
   readonly sameAs?: string;
 }
 
+export interface ArticleCitation {
+  readonly label: string;
+  readonly source?: string | null;
+  readonly url?: string | null;
+}
+
 export interface ArticleSource {
   readonly variant: ArticleVariant;
   /** Canonical absolute URL — used for both `@id` and `url`. */
@@ -36,6 +42,14 @@ export interface ArticleSource {
   readonly about?: ArticleAboutEntry | null;
   readonly wordCount?: number | null;
   readonly keywords?: readonly string[] | null;
+  /**
+   * E-E-A-T citations — surfaced as `citation[]` on the Article. Each
+   * cite renders as a CreativeWork with the label as `name`, the
+   * publishing org as `publisher.name`, and the URL as `url` /
+   * `sameAs`. Currently only Guides expose this — Webflow's
+   * "Article Mentions 1…10" map straight in.
+   */
+  readonly citations?: readonly ArticleCitation[] | null;
   readonly faqHasContent?: boolean;
   readonly speakablePath?: readonly { selector?: string | null }[] | null;
   /** Only set per-doc when the editor has overridden seo.title. */
@@ -144,9 +158,40 @@ export const buildArticleBlob = (
     blob.mentions = source.keywords.map((name) => ({ '@type': 'Thing', name }));
   }
 
+  const citations = buildCitations(source.citations);
+  if (citations.length > 0) {
+    blob.citation = citations;
+  }
+
   blob.speakable = buildSpeakable(source.speakablePath);
 
   return blob as JsonLdBlob;
+};
+
+const buildCitations = (
+  citations: readonly ArticleCitation[] | null | undefined,
+): unknown[] => {
+  if (!citations || citations.length === 0) return [];
+  const out: unknown[] = [];
+  for (const cite of citations) {
+    if (!cite.label || cite.label.length === 0) continue;
+    const entry: Record<string, unknown> = {
+      '@type': 'CreativeWork',
+      name: cite.label,
+    };
+    if (cite.url && cite.url.length > 0) {
+      entry.url = cite.url;
+      entry.sameAs = cite.url;
+    }
+    if (cite.source && cite.source.length > 0) {
+      entry.publisher = {
+        '@type': 'Organization',
+        name: cite.source,
+      };
+    }
+    out.push(entry);
+  }
+  return out;
 };
 
 /**

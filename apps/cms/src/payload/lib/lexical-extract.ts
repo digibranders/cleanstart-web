@@ -115,3 +115,25 @@ export const extractFromLexical = (
     headings,
   };
 };
+
+/**
+ * Concat every text leaf in a Lexical body into a single space-
+ * separated string. Used by the readability scorer + the JSON-LD
+ * dispatcher when it needs raw prose for `description` fallback.
+ */
+export const collectPlainText = (body: unknown): string => {
+  if (!body || typeof body !== 'object') return '';
+  const root = (body as { root?: LexicalNode }).root;
+  if (!root || !root.children) return '';
+  const out: string[] = [];
+  const walk = (node: LexicalNode): void => {
+    if (typeof node.text === 'string' && node.text.length > 0) {
+      out.push(node.text);
+    }
+    if (node.children) {
+      for (const child of node.children) walk(child);
+    }
+  };
+  for (const child of root.children) walk(child);
+  return out.join(' ').replace(/\s+/g, ' ').trim();
+};

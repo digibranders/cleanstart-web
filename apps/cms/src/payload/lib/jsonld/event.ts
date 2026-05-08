@@ -45,6 +45,13 @@ export interface EventSource {
   readonly status?: 'scheduled' | 'cancelled' | 'postponed';
   /** Optional max attendees. Encoded as Offer.eligibleQuantity. */
   readonly capacity?: number | null;
+  /**
+   * Original start date before the event was rescheduled. Surfaced as
+   * Schema.org Event.previousStartDate when present — Google's
+   * official reschedule signal that lets SERP show "rescheduled from
+   * X" without losing the rich-result chip.
+   */
+  readonly previousStartDate?: string | null;
 }
 
 const STATUS_URI: Record<NonNullable<EventSource['status']>, string> = {
@@ -132,6 +139,9 @@ export const buildEventBlob = (
 
   if (source.endsAt) blob.endDate = source.endsAt;
   if (source.description) blob.description = source.description;
+  if (source.previousStartDate && source.status === 'postponed') {
+    blob.previousStartDate = source.previousStartDate;
+  }
 
   const image = imageObjectFromMedia(source.heroImage);
   if (image) blob.image = image;
