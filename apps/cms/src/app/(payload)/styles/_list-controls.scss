@@ -249,3 +249,19 @@
     min-height: 32px;
   }
 }
+
+// ─── Append-only collections: hide create-new affordances ────────
+//
+// Leads is append-only — manual creation in the admin UI would
+// bypass the LeadHandler adapter. Hide the header "Create New" pill
+// AND the empty-state "Create new Lead" cyan primary. API-level
+// `access.create` stays admin-only for emergency tooling.
+//
+// Payload doesn't expose the active collection slug on `body` in v3,
+// so target the create-doc routes directly by href. This catches
+// every entry point (top-right pill, empty-state CTA, any other
+// create link) without coupling to wrapper class names that have
+// shifted between Payload majors.
+a[href='/admin/collections/leads/create'] {
+  display: none !important;
+}

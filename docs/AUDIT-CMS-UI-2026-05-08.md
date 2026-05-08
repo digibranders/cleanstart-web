@@ -595,19 +595,22 @@ Lowest risk, biggest visual lift. All SCSS-only.
 
 **Verify:** every collapsible expands/collapses; chevron rotates; sidebar groups expand/collapse; sidebar visible at 1280/1440/1920; hamburger releases focus after click; body editor toolbar dropdowns are legible.
 
-### Phase 3 — Functional + content fixes (1 PR, ~45 min)
+### Phase 3 — Functional + content fixes (✅ landed)
 
-1. **F12** — `admin.disableCreate: true` on Leads collection.
-2. **F16** — standardise list-header pill semantics (drop "X TOTAL" or render `total · status` pair).
-3. **F19** — tighten "Create new …" copy on long-noun collections.
-4. **F22** — investigate the unidentified icon at top-right of Author Name field; remove or label.
-5. **F23** — fix the `Indexable` 3-button toggle; either shorter label, wrap, or split into 2-button + checkbox.
-6. **F24** — rename "Fullscreen" button to "Focus mode" (or wire true `requestFullscreen` if intended).
-7. **F26** — make Authors / Reviewed By relationship-chip rendering consistent (or document the difference in CLAUDE.md).
-8. **F7** — restyle list-view "Create New" pill.
-9. **F9** — collapse double-chevron stacks in column headers (cosmetic).
-10. **F10** — verify Payload theme persistence (likely a no-op, just confirm).
-11. **F6** — body-editor toolbar consistency (lowest priority; defer).
+1. **F12** ✅ — Leads create-doc routes hidden via CSS `a[href='/admin/collections/leads/create']` in `_list-controls.scss`. Header pill + empty-state CTA both gone. API access unchanged.
+2. **F19** ✅ — empty-state CTA `_empty-state.scss` allows 2-line wrap (`white-space: normal`, `max-width: 320px`, `line-height: 1.25`). Long-noun CTAs no longer overflow the card.
+3. **F23** ✅ — third Indexable option label tightened from `No-index, no-follow` → `Hide entirely`. All three buttons now fit inline at 1280+ widths.
+4. **F22** ❎ closed — no Authors custom Name component exists; the icon I observed was the Next.js dev-tools "1 Issue" floating indicator, not CMS UI.
+5. **F24** ❎ closed — `EditorFullscreenToggle` does provide a true CSS-based fullscreen takeover via `data-cs-fullscreen='true'` on `<html>`. The label is accurate; my earlier observation conflated the in-progress toggle press with the final state.
+6. **F26** ❎ closed — Authors edit-pencil chip vs Reviewed-By no-pencil is **Payload-stock `hasMany` semantics**. Authors is `hasMany: true` (multi-value affordance), reviewedBy is scalar (single-value). Forcing consistency would change semantics.
+
+### Phase 3.1 — deferred (open / nice-to-have)
+
+- **F16** — standardise list-header pill semantics (drop "X TOTAL" or render `total · status` pair).
+- **F7** — restyle list-view "Create New" pill (Phase 1's F13 disabled-button work covers similar tokens; revisit only if visually warranted).
+- **F9** — collapse double-chevron stacks in column headers (cosmetic).
+- **F10** — verify Payload theme persistence (likely a no-op, just confirm).
+- **F6** — body-editor heading dropdown consistency (Phase 2's F27 already polished the toolbar carets; defer the dropdown-internals).
 
 ### Verification matrix (run after each phase)
 - Dashboard (root) — light + dark
