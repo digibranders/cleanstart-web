@@ -28,6 +28,7 @@
     "@payloadcms/ui": "^3.81.0",
     "@lexical/html": "^0.41.0",
     "@lexical/react": "^0.41.0",
+    "@lexical/table": "^0.41.0",
     "lexical": "^0.41.0",
     "@sentry/nextjs": "^9.47.1",
     "cross-env": "^7.0.3",

@@ -35,6 +35,9 @@ importers:
       '@lexical/react':
         specifier: ^0.41.0
         version: 0.41.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.30)
+      '@lexical/table':
+        specifier: ^0.41.0
+        version: 0.41.0
       '@payloadcms/db-postgres':
         specifier: ^3.81.0
         version: 3.84.1(@opentelemetry/api@1.9.1)(payload@3.84.1(graphql@16.13.2)(typescript@5.9.3))

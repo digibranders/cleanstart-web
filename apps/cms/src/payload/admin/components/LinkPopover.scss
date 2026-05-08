@@ -1,0 +1,237 @@
+// Suppress Payload's default floating link editor — our popover takes
+// over the inline-edit role across every rich-text field.
+.link-editor {
+  display: none !important;
+}
+
+// Hide the stock link toolbar button (ToolbarButton renders
+// `data-button-key={item.key}` and a class `toolbar-popup__button-{key}`).
+// Stock LinkFeatureClient registers its button with key `link`; ours
+// uses `cs-link`, so this selector only suppresses the drawer-opening
+// stock button — our inline button stays visible.
+.toolbar-popup__button-link,
+.toolbar-popup__button[data-button-key='link'] {
+  display: none !important;
+}
+
+.cs-link-popover {
+  position: absolute;
+  z-index: 50;
+  width: 360px;
+  padding: 12px;
+  background: var(--theme-elevation-0, #fff);
+  border: 1px solid var(--theme-elevation-150, #e5e7eb);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  font-size: 13px;
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__radios {
+    display: flex;
+    gap: 8px;
+    padding: 2px;
+    background: var(--theme-elevation-50, #f3f4f6);
+    border-radius: 6px;
+    border: 0;
+    margin: 0;
+    min-inline-size: 0;
+  }
+
+  &__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  &__radio {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    color: var(--theme-elevation-600, #4b5563);
+
+    input {
+      accent-color: var(--theme-success-500, #2563eb);
+      margin: 0;
+    }
+
+    &:has(input:checked) {
+      background: var(--theme-elevation-0, #fff);
+      color: var(--theme-elevation-900, #111827);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--theme-elevation-600, #4b5563);
+
+    &--inline {
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 500;
+    }
+  }
+
+  &__input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--theme-elevation-150, #d1d5db);
+    border-radius: 4px;
+    background: var(--theme-elevation-0, #fff);
+    color: var(--theme-elevation-900, #111827);
+    font: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: var(--theme-success-500, #2563eb);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+    }
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--theme-elevation-700, #374151);
+  }
+
+  &__select {
+    padding: 4px 6px;
+    border: 1px solid var(--theme-elevation-150, #d1d5db);
+    border-radius: 4px;
+    background: var(--theme-elevation-0, #fff);
+    color: inherit;
+    font: inherit;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  &__search {
+    position: relative;
+  }
+
+  &__results {
+    position: absolute;
+    inset-inline: 0;
+    top: calc(100% + 4px);
+    max-height: 220px;
+    overflow-y: auto;
+    background: var(--theme-elevation-0, #fff);
+    border: 1px solid var(--theme-elevation-150, #e5e7eb);
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__results-empty {
+    padding: 8px 10px;
+    color: var(--theme-elevation-500, #6b7280);
+    font-size: 12px;
+  }
+
+  &__result {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
+    padding: 6px 10px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+
+    &--active,
+    &:hover {
+      background: var(--theme-elevation-50, #f3f4f6);
+    }
+  }
+
+  &__result-kind {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--theme-elevation-500, #6b7280);
+  }
+
+  &__result-title {
+    font-size: 13px;
+    color: var(--theme-elevation-900, #111827);
+    line-height: 1.3;
+  }
+
+  &__btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    font: inherit;
+    cursor: pointer;
+
+    &--primary {
+      background: var(--theme-success-500, #2563eb);
+      color: #fff;
+
+      &:hover:not(:disabled) {
+        background: var(--theme-success-600, #1d4ed8);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    &--ghost {
+      background: transparent;
+      color: var(--theme-error-500, #dc2626);
+      border-color: var(--theme-elevation-150, #e5e7eb);
+
+      &:hover {
+        background: rgba(220, 38, 38, 0.06);
+      }
+    }
+  }
+}
