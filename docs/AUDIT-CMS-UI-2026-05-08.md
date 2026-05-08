@@ -624,13 +624,13 @@ Lowest risk, biggest visual lift. All SCSS-only.
 5. **F24** ❎ closed — `EditorFullscreenToggle` does provide a true CSS-based fullscreen takeover via `data-cs-fullscreen='true'` on `<html>`. The label is accurate; my earlier observation conflated the in-progress toggle press with the final state.
 6. **F26** ❎ closed — Authors edit-pencil chip vs Reviewed-By no-pencil is **Payload-stock `hasMany` semantics**. Authors is `hasMany: true` (multi-value affordance), reviewedBy is scalar (single-value). Forcing consistency would change semantics.
 
-### Phase 3.1 — deferred (open / nice-to-have)
+### Phase 5 — final cleanup (✅ landed)
 
-- **F16** — standardise list-header pill semantics (drop "X TOTAL" or render `total · status` pair).
-- **F7** — restyle list-view "Create New" pill (Phase 1's F13 disabled-button work covers similar tokens; revisit only if visually warranted).
-- **F9** — collapse double-chevron stacks in column headers (cosmetic).
-- **F10** — verify Payload theme persistence (likely a no-op, just confirm).
-- **F6** — body-editor heading dropdown consistency (Phase 2's F27 already polished the toolbar carets; defer the dropdown-internals).
+- **F7** ✅ — list-view "Create New" header pill restyled to match `.btn--style-secondary` (transparent input bg, neutral border, cyan-on-hover, focus halo) in `_list-controls.scss`. Reads as a button now, not a label.
+- **F9** ✅ — sort-column indicators hidden at rest; surface at 0.45 opacity on header hover; active direction lights up cyan; inactive opposite-direction stays at 0.4 so editors can flip the sort. Cuts the at-rest "four dashes per column" noise.
+- **F10** ✅ closed (verified working) — `/admin/account` exposes "Admin Theme: Automatic / Light / Dark"; choice persists via `localStorage.payload-theme`. No code change.
+- **F6** ❎ closed as resolved by F27 — Phase 2's lexical toolbar caret polish (12 px, proper colour) already covered the body-editor heading-dropdown chevron. The dropdown's internal items are Payload-stock; further customisation would require forking the lexical toolbar plugin and isn't worth the maintenance cost.
+- **F16** ❎ closed as resolved by F18 + observed — after Phase 1's status-pill severity tiers, the Blogs list now renders `2 DRAFTS` (amber) + `3 PUBLISHED` (green) header pills automatically; Authors / Redirects (no status field) keep the neutral `X TOTAL` pill. The pattern is already consistent: status-aware pills when there's a status field, neutral count pill otherwise. No further change warranted.
 
 ### Verification matrix (run after each phase)
 - Dashboard (root) — light + dark

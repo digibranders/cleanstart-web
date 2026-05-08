@@ -134,18 +134,33 @@
 
 // ─── Sort indicator chevrons — single subtle chevron per direction ─
 //
-// Payload renders both ▲ + ▼ side-by-side at full opacity; reads as
-// visual noise. Tone the inactive direction down so the active state
-// is visible at a glance.
+// Payload renders both ▲ + ▼ stacked at full opacity, then again with
+// the column-action menu's own pair on the right of the label. At
+// 11-12 px header-cell sizing this reads as four dashes per column.
+//
+// Treatment:
+//   - Drop the inactive direction further so the column header reads
+//     mostly as a label (current state, unsorted).
+//   - When a sort is applied, the active arrow lights up brand cyan;
+//     the inactive arrow nearly fades out.
+//   - Hide the inactive direction entirely until the column is hovered
+//     OR a sort is applied. Cleans up the at-rest noise.
 .sort-column__buttons,
 .sort-column {
   .sort-column__asc,
   .sort-column__desc {
     color: var(--theme-text-disabled);
-    opacity: 0.5;
+    opacity: 0;
     transition:
       color var(--cs-motion-micro),
       opacity var(--cs-motion-micro);
+  }
+
+  // Surface both directions on column-header hover, faintly, so editors
+  // discover sort affordance without it being permanent chrome.
+  &:hover .sort-column__asc,
+  &:hover .sort-column__desc {
+    opacity: 0.45;
   }
 
   .sort-column__asc:hover,
@@ -154,10 +169,19 @@
     color: var(--theme-text);
   }
 
+  // Active sort: the chosen direction fully visible in cyan; the
+  // opposite direction faintly visible so editors can flip it.
   .sort-column__asc--active,
   .sort-column__desc--active {
     color: var(--cs-cyan-500);
     opacity: 1;
+  }
+
+  // If either direction is active, surface the inactive one at a low
+  // opacity (so it's a discoverable target to flip the sort).
+  &:has(.sort-column__asc--active) .sort-column__desc,
+  &:has(.sort-column__desc--active) .sort-column__asc {
+    opacity: 0.4;
   }
 }
 

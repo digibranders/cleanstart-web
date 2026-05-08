@@ -250,6 +250,43 @@
   }
 }
 
+// ─── List-header "Create New" pill ───────────────────────────────
+//
+// Payload renders the create-doc affordance next to the collection
+// title as a tiny dark pill (`.btn--style-pill` + `--size-small`)
+// that reads more like a label than a button. Promote it to the
+// shared secondary-button look so editors register it as actionable.
+//
+// Uses class match (not href match) so it works for every collection.
+.list-header__title-actions .btn.list-create-new-doc__create-new-button,
+.list-header__title-actions a.btn--style-pill {
+  background: var(--theme-input-bg);
+  border: 1px solid var(--theme-elevation-250);
+  color: var(--theme-text);
+  height: 30px;
+  padding-inline: var(--cs-space-3);
+  border-radius: var(--cs-radius-input);
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.005em;
+  cursor: pointer;
+  transition:
+    border-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover:not([disabled]) {
+    border-color: var(--cs-cyan-500);
+    color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+}
+
 // ─── Append-only collections: hide create-new affordances ────────
 //
 // Leads is append-only — manual creation in the admin UI would
