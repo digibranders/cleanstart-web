@@ -4,6 +4,7 @@ import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
+import { ChevronDown } from './icons/Chevron';
 import { Notice } from './Notice';
 import {
   formatApiError,
@@ -303,7 +304,7 @@ export const InboundRedirectsField = (
           {summaryText}
         </span>
         <span className="cs-inbound-redirects__chevron" aria-hidden="true">
-          ▾
+          <ChevronDown />
         </span>
       </button>
 

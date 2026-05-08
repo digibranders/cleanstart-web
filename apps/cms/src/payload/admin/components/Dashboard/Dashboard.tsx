@@ -2,6 +2,8 @@ import { Gutter } from '@payloadcms/ui';
 import type { AdminViewServerProps, Payload, Where } from 'payload';
 import type { ReactElement, ReactNode } from 'react';
 
+import { ChevronRight } from '../icons/Chevron';
+
 const PROJECT_NAME = 'CleanStart';
 
 const VERSIONED_CONTENT = [
@@ -367,7 +369,7 @@ const QuickLinks = (): ReactElement => (
         <span className="cs-dashboard__quick-label">{link.label}</span>
         <span className="cs-dashboard__quick-desc">{link.description}</span>
         <span aria-hidden="true" className="cs-dashboard__quick-arrow">
-          →
+          <ChevronRight size={14} />
         </span>
       </a>
     ))}

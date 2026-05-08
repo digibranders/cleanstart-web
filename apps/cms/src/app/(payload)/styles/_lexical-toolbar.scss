@@ -119,7 +119,19 @@
 
     .toolbar-popup__dropdown-caret {
       flex-shrink: 0;
-      opacity: 0.6;
+      opacity: 0.85;
+      width: 12px;
+      height: 12px;
+      color: var(--theme-text-soft);
+
+      // Payload renders the caret as a nested <svg>; size it explicitly
+      // so the chevron reads at toolbar density. Without this, Payload's
+      // own caret falls back to ~8px and editors can't tell which
+      // option is selected at a glance.
+      svg {
+        width: 12px !important;
+        height: 12px !important;
+      }
     }
 
     svg {

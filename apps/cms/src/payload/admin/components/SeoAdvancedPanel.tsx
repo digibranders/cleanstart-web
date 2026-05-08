@@ -4,6 +4,8 @@ import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
+import { ChevronDown } from './icons/Chevron';
+
 type SeoAdvancedPanelProps = {
   /**
    * Persisted localStorage key — collection slug, so each list remembers
@@ -258,7 +260,7 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
         <span className="cs-seo-advanced__title">SEO advanced</span>
         <span className="cs-seo-advanced__summary">{summary}</span>
         <span className="cs-seo-advanced__chevron" aria-hidden="true">
-          ▾
+          <ChevronDown />
         </span>
       </button>
 

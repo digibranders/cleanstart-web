@@ -3,6 +3,7 @@
 import type { ReactElement } from 'react';
 import { useEffect, useId, useMemo, useState } from 'react';
 
+import { ChevronDown } from './icons/Chevron';
 import {
   formatRelativeDate,
   useDocPublicUrl,
@@ -131,7 +132,7 @@ export const UrlChangeHistoryField = (
           {summaryText}
         </span>
         <span className="cs-url-history__chevron" aria-hidden="true">
-          ▾
+          <ChevronDown />
         </span>
       </button>
 

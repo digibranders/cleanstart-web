@@ -9,6 +9,7 @@ import {
   type BlobAudit,
   auditBlobList,
 } from '../../lib/jsonld/spec/required-fields';
+import { ChevronDown } from './icons/Chevron';
 
 type SchemaPreviewFieldProps = {
   /**
@@ -230,7 +231,7 @@ export const SchemaPreviewField = (
           }
         />
         <span className="cs-schema-preview__chevron" aria-hidden="true">
-          ▾
+          <ChevronDown />
         </span>
       </button>
 
