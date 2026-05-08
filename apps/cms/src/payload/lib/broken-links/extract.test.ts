@@ -76,4 +76,18 @@ describe('extractAllLinks', () => {
     });
     expect(links).toEqual(['https://shared.example']);
   });
+
+  it('drops editor-planted internal / metadata / loopback URLs (SSRF guard)', () => {
+    const links = extractAllLinks({
+      body: wrap([
+        { type: 'link', fields: { url: 'https://public.example' } },
+        { type: 'link', fields: { url: 'http://169.254.169.254/latest/meta-data/' } },
+        { type: 'link', fields: { url: 'http://localhost/admin' } },
+        { type: 'link', fields: { url: 'http://10.0.0.5/' } },
+      ]),
+      applyUrl: 'http://[::1]/',
+      seo: { canonicalOverride: 'http://internal.local/' },
+    });
+    expect(links).toEqual(['https://public.example']);
+  });
 });

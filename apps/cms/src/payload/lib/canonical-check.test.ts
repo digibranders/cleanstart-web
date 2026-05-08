@@ -2,12 +2,11 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { checkCanonicalUrl } from './canonical-check';
 
-const fakeResponse = (init: { status?: number; url?: string } = {}): Response => {
+const fakeResponse = (init: { status?: number; location?: string } = {}): Response => {
   const status = init.status ?? 200;
-  const res = new Response(null, { status });
-  // Override the read-only `url` getter so we can simulate redirects.
-  Object.defineProperty(res, 'url', { value: init.url ?? '', configurable: true });
-  return res;
+  const headers = new Headers();
+  if (init.location) headers.set('location', init.location);
+  return new Response(null, { status, headers });
 };
 
 describe('checkCanonicalUrl', () => {
@@ -17,7 +16,27 @@ describe('checkCanonicalUrl', () => {
       url: '',
       fetcher: fetcher as unknown as typeof fetch,
     });
-    expect(result).toEqual({ ok: false, kind: 'invalid-url', message: expect.any(String) });
+    expect(result).toMatchObject({ ok: false, kind: 'invalid-url' });
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it('rejects internal addresses without making a request (SSRF guard)', async () => {
+    const fetcher = vi.fn();
+    const cases = [
+      'http://localhost/',
+      'http://127.0.0.1/',
+      'http://169.254.169.254/latest/meta-data/',
+      'http://10.0.0.1/',
+      'http://[::1]/',
+      'http://app.internal/',
+    ];
+    for (const url of cases) {
+      const result = await checkCanonicalUrl({
+        url,
+        fetcher: fetcher as unknown as typeof fetch,
+      });
+      expect(result).toMatchObject({ ok: false, kind: 'unsafe-url' });
+    }
     expect(fetcher).not.toHaveBeenCalled();
   });
 
@@ -27,7 +46,7 @@ describe('checkCanonicalUrl', () => {
       url: 'https://example.com/article',
       fetcher: fetcher as unknown as typeof fetch,
     });
-    expect(result).toMatchObject({ ok: true, status: 200, healthy: true });
+    expect(result).toMatchObject({ ok: true, status: 200, healthy: true, redirected: false });
   });
 
   it('marks 404 as not healthy but still ok=true (request succeeded)', async () => {
@@ -39,19 +58,37 @@ describe('checkCanonicalUrl', () => {
     expect(result).toMatchObject({ ok: true, status: 404, healthy: false });
   });
 
-  it('reports redirected URL when fetch follows a redirect', async () => {
-    const fetcher = vi.fn().mockResolvedValue(
-      fakeResponse({ status: 200, url: 'https://example.com/final' }),
-    );
+  it('manually follows a 301 redirect to a public destination', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(
+        fakeResponse({ status: 301, location: 'https://example.com/final' }),
+      )
+      .mockResolvedValueOnce(fakeResponse({ status: 200 }));
     const result = await checkCanonicalUrl({
       url: 'https://example.com/start',
       fetcher: fetcher as unknown as typeof fetch,
     });
     expect(result).toMatchObject({
       ok: true,
+      status: 200,
       redirected: true,
       finalUrl: 'https://example.com/final',
     });
+  });
+
+  it('refuses to follow a redirect into an internal address', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(
+        fakeResponse({ status: 302, location: 'http://169.254.169.254/' }),
+      );
+    const result = await checkCanonicalUrl({
+      url: 'https://example.com/redirect',
+      fetcher: fetcher as unknown as typeof fetch,
+    });
+    expect(result).toMatchObject({ ok: false, kind: 'unsafe-url' });
+    expect(fetcher).toHaveBeenCalledTimes(1);
   });
 
   it('retries with GET when HEAD returns 405', async () => {

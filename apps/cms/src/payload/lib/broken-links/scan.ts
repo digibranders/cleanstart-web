@@ -1,3 +1,4 @@
+import { isSafePublicHttpUrl } from '../url-safety/ssrf-guard';
 import { extractAllLinks } from './extract';
 
 /**
@@ -75,6 +76,12 @@ const checkUrl = async (
   url: string,
   fetcher: typeof fetch,
 ): Promise<{ status: LinkStatus; httpStatus: number }> => {
+  // Defence-in-depth — extractAllLinks already filters via the same
+  // guard. Catches the path where seedRecords or a future caller hands
+  // an unfiltered URL to the scanner.
+  if (!isSafePublicHttpUrl(url).ok) {
+    return { status: 'network', httpStatus: 0 };
+  }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), HEAD_TIMEOUT_MS);
   const tryFetch = async (method: 'HEAD' | 'GET') =>

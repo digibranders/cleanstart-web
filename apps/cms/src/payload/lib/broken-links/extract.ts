@@ -1,3 +1,5 @@
+import { isSafePublicHttpUrl } from '../url-safety/ssrf-guard';
+
 /**
  * Walk a Lexical body + adjacent doc fields (heroImage, asset) and
  * return a deduplicated set of every external + internal URL the
@@ -6,6 +8,10 @@
  * We deliberately don't follow internal-doc relationships — the
  * `slugChangeRedirectHook` already keeps those resolvable. The
  * scanner cares about typed URL fields and rich-text href anchors.
+ *
+ * SSRF defence: every emitted URL passes `isSafePublicHttpUrl` so
+ * the nightly cron never HEADs an editor-planted private-IP /
+ * loopback / metadata target.
  */
 
 interface LinkAttrs {
@@ -54,16 +60,15 @@ export const extractLinksFromLexical = (body: unknown): string[] => {
   return [...urls];
 };
 
-const isProbablyHttpUrl = (raw: string): boolean =>
-  /^https?:\/\//i.test(raw);
+const isFetchSafeHttpUrl = (raw: string): boolean => isSafePublicHttpUrl(raw).ok;
 
 /**
  * Top-level extractor — handles a doc's body PLUS the most-common
  * URL-bearing typed fields (canonical override, applyUrl, atsUrl,
  * registrationUrl, recordingUrl, slidesUrl, News Link, Resources
- * PDF Url). Returns absolute http(s) URLs only — site-relative paths
- * stay out of the broken-link detector (they round-trip through the
- * Pages / route-prefix layer which already enforces resolution).
+ * PDF Url). Returns absolute http(s) URLs only that pass the SSRF
+ * guard — site-relative paths and editor-planted private/loopback /
+ * metadata addresses stay out of the broken-link detector.
  */
 export const extractAllLinks = (
   doc: Record<string, unknown>,
@@ -71,7 +76,7 @@ export const extractAllLinks = (
   const urls = new Set<string>();
 
   for (const url of extractLinksFromLexical(doc.body)) {
-    if (isProbablyHttpUrl(url)) urls.add(url);
+    if (isFetchSafeHttpUrl(url)) urls.add(url);
   }
 
   const SCALAR_URL_FIELDS = [
@@ -84,12 +89,12 @@ export const extractAllLinks = (
   ] as const;
   for (const key of SCALAR_URL_FIELDS) {
     const value = doc[key];
-    if (typeof value === 'string' && isProbablyHttpUrl(value)) urls.add(value);
+    if (typeof value === 'string' && isFetchSafeHttpUrl(value)) urls.add(value);
   }
 
   // Nested SEO override.
   const seo = doc.seo as { canonicalOverride?: string } | undefined;
-  if (seo && typeof seo.canonicalOverride === 'string' && isProbablyHttpUrl(seo.canonicalOverride)) {
+  if (seo && typeof seo.canonicalOverride === 'string' && isFetchSafeHttpUrl(seo.canonicalOverride)) {
     urls.add(seo.canonicalOverride);
   }
 
