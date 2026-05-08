@@ -583,6 +583,40 @@ export interface Author {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -688,6 +722,40 @@ export interface Category {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -793,6 +861,40 @@ export interface NewsCategory {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -898,6 +1000,40 @@ export interface KnowledgeCategory {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -1440,6 +1576,40 @@ export interface Blog {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -1706,6 +1876,40 @@ export interface News {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -2061,6 +2265,40 @@ export interface Guide {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -2340,6 +2578,40 @@ export interface Resource {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -2641,6 +2913,40 @@ export interface KnowledgeBase {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -2949,6 +3255,40 @@ export interface Event {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -3249,6 +3589,40 @@ export interface Webinar {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -3545,6 +3919,40 @@ export interface Job {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -5389,6 +5797,40 @@ export interface Page {
     twitterImage?: (number | null) | Media;
     useCustomCanonical?: boolean | null;
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -5914,6 +6356,18 @@ export interface AuthorsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -5955,6 +6409,18 @@ export interface CategoriesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -5996,6 +6462,18 @@ export interface NewsCategoriesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6037,6 +6515,18 @@ export interface KnowledgeCategoriesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6313,6 +6803,18 @@ export interface BlogsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6446,6 +6948,18 @@ export interface NewsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6623,6 +7137,18 @@ export interface GuidesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6757,6 +7283,18 @@ export interface ResourcesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6905,6 +7443,18 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -7053,6 +7603,18 @@ export interface EventsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -7196,6 +7758,18 @@ export interface WebinarsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -7341,6 +7915,18 @@ export interface JobsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -8241,6 +8827,18 @@ export interface PagesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
         keywordTarget?: T;
         speakablePath?:
           | T

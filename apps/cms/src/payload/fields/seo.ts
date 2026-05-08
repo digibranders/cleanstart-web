@@ -178,6 +178,92 @@ const advancedTwitterFields: Field[] = [
   }),
 ];
 
+// Robots-meta advanced directives.
+// ----------------------------------
+// `seo.indexable` (3-state) covers index / noindex / noindex,nofollow.
+// This subgroup adds the secondary `<meta name="robots">` directives:
+// noarchive / nosnippet / noimageindex / notranslate (booleans),
+// max-snippet / max-image-preview / max-video-preview (limits), and
+// unavailable_after (date). Composed into a single comma-list by
+// `composeRobotsMeta()` in lib/seo/robots-meta.ts when apps/web ships.
+//
+// JSON-LD has no robots equivalent — these are all `<meta>`-only.
+// Surfaced in the SEO advanced panel under a "Robots directives"
+// subsection (collapsed by default; most pages don't need them).
+const robotsAdvancedField: import('payload').GroupField = {
+  name: 'robotsAdvanced',
+  type: 'group',
+  admin: { hidden: true },
+  fields: [
+    {
+      name: 'noarchive',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { description: "Don't show a cached version in SERP." },
+    },
+    {
+      name: 'nosnippet',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { description: 'Suppress the textual snippet entirely (overrides max-snippet).' },
+    },
+    {
+      name: 'noimageindex',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { description: "Don't index images on this page." },
+    },
+    {
+      name: 'notranslate',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { description: "Don't show the 'Translate' link on this page." },
+    },
+    {
+      name: 'maxSnippet',
+      type: 'number',
+      admin: {
+        description:
+          'Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.',
+      },
+    },
+    {
+      name: 'maxImagePreview',
+      type: 'select',
+      // Override the auto-generated enum name — the default
+      // `enum_<collection>__seo_robots_advanced_max_image_preview`
+      // overflows Postgres' 63-char identifier limit on collections
+      // with versions enabled (which all our content collections do).
+      enumName: 'enum_seo_max_image_preview',
+      options: [
+        { label: 'Default (standard)', value: 'standard' },
+        { label: 'Large (≤1200 px) — best for Discover', value: 'large' },
+        { label: 'None (no preview)', value: 'none' },
+      ],
+      admin: {
+        description:
+          "`large` is the conventional pick for photo-heavy posts targeting Google Discover.",
+      },
+    },
+    {
+      name: 'maxVideoPreview',
+      type: 'number',
+      admin: {
+        description: 'Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.',
+      },
+    },
+    {
+      name: 'unavailableAfter',
+      type: 'date',
+      admin: {
+        description:
+          'Drop the page from the index after this date. Useful for time-bound campaigns / event landings.',
+        date: { pickerAppearance: 'dayAndTime' },
+      },
+    },
+  ],
+};
+
 // Canonical-URL behaviour
 // ------------------------
 // Every page is self-canonical by default: JSON-LD `url` /
@@ -324,6 +410,7 @@ export const seoField: GroupField = {
     ...advancedTwitterFields,
     useCustomCanonicalField,
     canonicalOverrideField,
+    robotsAdvancedField,
     keywordTargetField,
     speakablePathField,
     additionalSchemaField,

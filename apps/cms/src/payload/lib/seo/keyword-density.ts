@@ -59,6 +59,8 @@ const countPhrase = (haystackTokens: string[], needle: string): number => {
 
 export type DensityBand = 'absent' | 'light' | 'good' | 'overused';
 
+const FIRST_PARAGRAPH_TOKEN_LIMIT = 100;
+
 export interface KeywordDensityResult {
   readonly keyword: string;
   readonly bodyOccurrences: number;
@@ -68,6 +70,19 @@ export interface KeywordDensityResult {
   readonly titleOccurrences: number;
   readonly descriptionOccurrences: number;
   readonly band: DensityBand;
+  /**
+   * Keyword present in any body H2 or H3. The page title is the
+   * conceptual H1 in this CMS (Lexical body starts at H2) — title
+   * presence is `titleOccurrences > 0`, not part of this flag.
+   */
+  readonly inH2OrH3: boolean;
+  /** Keyword present in the first 100 body words. */
+  readonly inFirst100Words: boolean;
+}
+
+export interface HeadingExtract {
+  readonly level: 2 | 3 | 4 | 5 | 6;
+  readonly text: string;
 }
 
 const bandFor = (occurrences: number, density: number): DensityBand => {
@@ -79,13 +94,24 @@ const bandFor = (occurrences: number, density: number): DensityBand => {
 
 /**
  * Run the scorer for a single target keyword across the doc's body
- * plain text + SEO title + SEO description.
+ * plain text + SEO title + SEO description, plus heading-position +
+ * first-100-words signals. Headings + first-100-words are signals
+ * Google has historically valued; surfacing them lets editors see at
+ * a glance whether the keyword appears where it counts most, not just
+ * how many times it appears in raw body text.
+ *
+ * Both `headings` and `firstParagraphText` are optional — when omitted
+ * the corresponding signals default to `false` (caller hadn't extracted
+ * those yet) instead of crashing.
  */
 export const scoreKeywordDensity = (args: {
   readonly keyword: string;
   readonly bodyText: string;
   readonly title?: string | null;
   readonly description?: string | null;
+  readonly headings?: readonly HeadingExtract[] | null;
+  /** Plain text of the first body paragraph. Auto-truncated to 100 stemmed tokens. */
+  readonly firstParagraphText?: string | null;
 }): KeywordDensityResult => {
   const trimmed = args.keyword.trim();
   if (trimmed.length === 0) {
@@ -97,6 +123,8 @@ export const scoreKeywordDensity = (args: {
       titleOccurrences: 0,
       descriptionOccurrences: 0,
       band: 'absent',
+      inH2OrH3: false,
+      inFirst100Words: false,
     };
   }
 
@@ -113,6 +141,22 @@ export const scoreKeywordDensity = (args: {
     trimmed,
   );
 
+  const headings = args.headings ?? [];
+  const inH2OrH3 = headings.some(
+    (h) =>
+      (h.level === 2 || h.level === 3) &&
+      countPhrase(stemTokens(tokenize(h.text)), trimmed) > 0,
+  );
+
+  // First-100-words signal — fall back to slicing the body when the
+  // caller didn't extract a first paragraph.
+  const firstSource = (args.firstParagraphText ?? '').trim();
+  const firstWindowTokens =
+    firstSource.length > 0
+      ? stemTokens(tokenize(firstSource)).slice(0, FIRST_PARAGRAPH_TOKEN_LIMIT)
+      : bodyTokens.slice(0, FIRST_PARAGRAPH_TOKEN_LIMIT);
+  const inFirst100Words = countPhrase(firstWindowTokens, trimmed) > 0;
+
   return {
     keyword: trimmed,
     bodyOccurrences,
@@ -121,5 +165,7 @@ export const scoreKeywordDensity = (args: {
     titleOccurrences,
     descriptionOccurrences,
     band: bandFor(bodyOccurrences, bodyDensity),
+    inH2OrH3,
+    inFirst100Words,
   };
 };
