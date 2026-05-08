@@ -4,30 +4,24 @@ import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
+import {
+  formatApiError,
+  formatHitCount,
+  formatRelativeDate,
+  HOT_REDIRECT_THRESHOLD,
+  SOURCE_LABEL,
+  STATUS_OPTIONS,
+  useDocPublicUrl,
+  type RedirectRow,
+  type RedirectStatus,
+} from './_redirects-shared';
+
 type InboundRedirectsFieldProps = {
   /** URL prefix for the collection's public route (e.g. `/blog`). */
   pathPrefix?: string;
   /** Doc-level field that owns the URL part. Defaults to `slug`. */
   sourceField?: string;
 };
-
-type RedirectStatus = '301' | '302' | '307' | '308' | '410';
-type RedirectSource =
-  | 'manual'
-  | 'slug-change'
-  | 'archive-with-redirect'
-  | 'migration-seed';
-
-interface RedirectRow {
-  id: string | number;
-  from: string;
-  to: string;
-  status: RedirectStatus;
-  source: RedirectSource;
-  hitCount?: number | null;
-  lastHitAt?: string | null;
-  notes?: string | null;
-}
 
 interface FetchState {
   status: 'idle' | 'loading' | 'ok' | 'error';
@@ -46,49 +40,6 @@ interface FormState {
   saving: boolean;
 }
 
-const DEFAULT_SITE_URL =
-  (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SITE_URL) ||
-  'https://cleanstart.com';
-
-const STATUS_OPTIONS: { value: RedirectStatus; label: string; hint: string }[] = [
-  { value: '301', label: '301 · Permanent', hint: 'Best for renamed/moved pages — search engines transfer SEO juice.' },
-  { value: '308', label: '308 · Permanent (preserves method)', hint: 'Modern 301 — preserves POST/PUT request bodies.' },
-  { value: '302', label: '302 · Temporary', hint: 'Short-lived. Mostly superseded by 307.' },
-  { value: '307', label: '307 · Temporary (preserves method)', hint: 'A/B tests, maintenance, geo-redirects. Preserves request method/body.' },
-  { value: '410', label: '410 · Gone', hint: 'Permanently removed. No target needed — tells crawlers to delist.' },
-];
-
-const sourceLabel: Record<RedirectSource, string> = {
-  manual: 'manual',
-  'slug-change': 'auto · slug change',
-  'archive-with-redirect': 'archived',
-  'migration-seed': 'migration',
-};
-
-const trimSlash = (s: string): string => s.replace(/^\/+|\/+$/g, '');
-
-const formatHitCount = (n: number | null | undefined): string => {
-  if (n == null || n === 0) return '0 hits';
-  if (n === 1) return '1 hit';
-  if (n < 1000) return `${n} hits`;
-  return `${(n / 1000).toFixed(1)}k hits`;
-};
-
-const formatRelativeDate = (iso: string | null | undefined): string => {
-  if (!iso) return '';
-  const ts = Date.parse(iso);
-  if (Number.isNaN(ts)) return '';
-  const diffMs = Date.now() - ts;
-  const day = 24 * 60 * 60 * 1000;
-  if (diffMs < day) return 'today';
-  const days = Math.floor(diffMs / day);
-  if (days < 30) return `${days}d ago`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months}mo ago`;
-  const years = Math.floor(months / 12);
-  return `${years}y ago`;
-};
-
 const blankForm = (preset?: Partial<FormState>): FormState => ({
   from: '',
   to: '',
@@ -102,24 +53,10 @@ const blankForm = (preset?: Partial<FormState>): FormState => ({
 const formFromRow = (row: RedirectRow): FormState =>
   blankForm({
     from: row.from,
-    to: row.to,
+    to: row.to ?? '',
     status: row.status,
     notes: row.notes ?? '',
   });
-
-/** Extract a useful single-line error message from Payload's API error shape. */
-const formatApiError = async (res: Response): Promise<string> => {
-  try {
-    const body = (await res.json()) as { errors?: { message?: string }[]; message?: string };
-    if (Array.isArray(body.errors) && body.errors[0]?.message) {
-      return body.errors[0].message;
-    }
-    if (body.message) return body.message;
-  } catch {
-    // ignore — fall through
-  }
-  return `HTTP ${res.status}`;
-};
 
 /**
  * Fully-inline CRUD card for the Redirects table, scoped to the
@@ -133,31 +70,20 @@ const formatApiError = async (res: Response): Promise<string> => {
  * rows) and the chain-collapse hook continue to govern writes. The
  * inline UI just removes the navigation cost.
  *
- * Field-level locks for `source: 'slug-change'` rows are surfaced
- * visually (read-only inputs) on top of the server-side enforcement —
- * keeps editors from trying to edit auto-managed rows in the first
- * place.
+ * Visual polish:
+ *  - 410 rows render without a `→` arrow (no `to` field) and show a
+ *    "gone" pill instead — keeps the list scannable.
+ *  - Rows with `hitCount > HOT_REDIRECT_THRESHOLD` get a 🔥 marker;
+ *    when ANY row is hot, the card body opens with a warning banner
+ *    so editors don't casually break high-volume SEO juice.
  */
 export const InboundRedirectsField = (
   props: InboundRedirectsFieldProps,
 ): ReactElement | null => {
   const { pathPrefix = '', sourceField = 'slug' } = props;
   const headingId = useId();
-  const { value: sourceValue } = useField<string>({ path: sourceField });
+  const { publicUrl, sitePath } = useDocPublicUrl({ pathPrefix, sourceField });
   const { value: docStatusValue } = useField<string>({ path: '_status' });
-
-  const publicUrl = useMemo(() => {
-    if (!sourceValue) return '';
-    const root = DEFAULT_SITE_URL.replace(/\/+$/, '');
-    const prefix = pathPrefix ? `/${trimSlash(pathPrefix)}` : '';
-    return `${root}${prefix}/${trimSlash(sourceValue)}`;
-  }, [sourceValue, pathPrefix]);
-
-  const sitePath = useMemo(() => {
-    if (!sourceValue) return '';
-    const prefix = pathPrefix ? `/${trimSlash(pathPrefix)}` : '';
-    return `${prefix}/${trimSlash(sourceValue)}`;
-  }, [sourceValue, pathPrefix]);
 
   const [fetchState, setFetchState] = useState<FetchState>({
     status: 'idle',
@@ -238,8 +164,6 @@ export const InboundRedirectsField = (
 
   const handleSave = useCallback(
     async (id: string | number | null): Promise<void> => {
-      // Client-side guards before hitting the network. Server still
-      // validates, but these catch the most common typos.
       const fromTrim = form.from.trim();
       if (fromTrim.length === 0) {
         setForm((p) => ({ ...p, error: 'From is required.' }));
@@ -268,8 +192,6 @@ export const InboundRedirectsField = (
       } else {
         payload.to = toTrim;
       }
-      // For new rows we set `source: 'manual'`. Existing rows keep
-      // whatever they had (server enforces the lock for slug-change).
       if (id == null) payload.source = 'manual';
 
       const url = id == null ? '/api/redirects' : `/api/redirects/${encodeURIComponent(String(id))}`;
@@ -287,7 +209,6 @@ export const InboundRedirectsField = (
           setForm((p) => ({ ...p, saving: false, error: message }));
           return;
         }
-        // Success — collapse the form and refetch.
         setEditingId(null);
         setCreatingNew(false);
         setForm(blankForm());
@@ -305,7 +226,7 @@ export const InboundRedirectsField = (
       const confirmed =
         typeof window !== 'undefined'
           ? window.confirm(
-              `Delete redirect "${row.from}" → "${row.to}"?\n\nThis can't be undone. Inbound traffic from "${row.from}" will start hitting 404 instead.`,
+              `Delete redirect "${row.from}" → "${row.to ?? '410 (gone)'}"?\n\nThis can't be undone. Inbound traffic from "${row.from}" will start hitting 404 instead.`,
             )
           : false;
       if (!confirmed) return;
@@ -330,18 +251,27 @@ export const InboundRedirectsField = (
     [refetch],
   );
 
-  // No URL yet → nothing to show.
   if (!publicUrl) return null;
 
   const isLive = docStatusValue === 'published';
   const count = fetchState.rows.length;
 
+  // Hot-redirect surfacing — show in the header summary AND in a body
+  // banner so editors don't casually break high-volume SEO juice.
+  const hotRows = fetchState.rows.filter(
+    (r) => (r.hitCount ?? 0) > HOT_REDIRECT_THRESHOLD,
+  );
+  const hotCount = hotRows.length;
+
   const summaryText = (() => {
     if (fetchState.status === 'loading') return 'Checking…';
     if (fetchState.status === 'error') return 'Failed to load';
     if (count === 0) return 'No inbound redirects';
-    if (count === 1) return '1 routing here';
-    return `${count} routing here`;
+    const base = count === 1 ? '1 routing here' : `${count} routing here`;
+    if (hotCount > 0) {
+      return `${base} · 🔥 ${hotCount} high-volume`;
+    }
+    return base;
   })();
 
   return (
@@ -362,9 +292,11 @@ export const InboundRedirectsField = (
           data-tone={
             fetchState.status === 'error'
               ? 'error'
-              : count > 0
-                ? 'active'
-                : 'muted'
+              : hotCount > 0
+                ? 'warn'
+                : count > 0
+                  ? 'active'
+                  : 'muted'
           }
         >
           {summaryText}
@@ -376,6 +308,22 @@ export const InboundRedirectsField = (
 
       {expanded && (
         <div id={headingId} className="cs-inbound-redirects__body">
+          {hotCount > 0 && (
+            <div className="cs-inbound-redirects__hot-banner" role="note">
+              <span className="cs-inbound-redirects__hot-banner-icon" aria-hidden="true">
+                🔥
+              </span>
+              <span>
+                {hotCount === 1
+                  ? '1 high-volume redirect targets this page'
+                  : `${hotCount} high-volume redirects target this page`}
+                . Editing the slug or deleting these rows will break that
+                traffic — the slug-change hook only protects you on rename,
+                not on outright delete.
+              </span>
+            </div>
+          )}
+
           {fetchState.status === 'error' && (
             <p
               className="cs-inbound-redirects__hint"
@@ -395,7 +343,10 @@ export const InboundRedirectsField = (
             <ul className="cs-inbound-redirects__list">
               {fetchState.rows.map((row) =>
                 editingId === row.id ? (
-                  <li key={String(row.id)} className="cs-inbound-redirects__row cs-inbound-redirects__row--editing">
+                  <li
+                    key={String(row.id)}
+                    className="cs-inbound-redirects__row cs-inbound-redirects__row--editing"
+                  >
                     <InlineForm
                       mode="edit"
                       row={row}
@@ -418,31 +369,7 @@ export const InboundRedirectsField = (
                           : 'Edit redirect'
                       }
                     >
-                      <div className="cs-inbound-redirects__row-top">
-                        <code className="cs-inbound-redirects__from">{row.from}</code>
-                        <span className="cs-inbound-redirects__arrow" aria-hidden="true">→</span>
-                        <span className="cs-inbound-redirects__status">{row.status}</span>
-                        {(row.hitCount ?? 0) > 100 && (
-                          <span
-                            className="cs-inbound-redirects__hot"
-                            title="High-traffic redirect — break with care"
-                            aria-label="High-traffic"
-                          >
-                            🔥
-                          </span>
-                        )}
-                      </div>
-                      <div className="cs-inbound-redirects__row-meta">
-                        <span>{sourceLabel[row.source]}</span>
-                        <span aria-hidden="true">·</span>
-                        <span>{formatHitCount(row.hitCount)}</span>
-                        {row.lastHitAt && (
-                          <>
-                            <span aria-hidden="true">·</span>
-                            <span>last {formatRelativeDate(row.lastHitAt)}</span>
-                          </>
-                        )}
-                      </div>
+                      <RowSummary row={row} />
                     </button>
                   </li>
                 ),
@@ -480,6 +407,60 @@ export const InboundRedirectsField = (
   );
 };
 
+/* ----------------------------------------------- Row summary cell */
+
+const RowSummary = ({ row }: { row: RedirectRow }): ReactElement => {
+  const isGone = row.status === '410';
+  const isHot = (row.hitCount ?? 0) > HOT_REDIRECT_THRESHOLD;
+  return (
+    <>
+      <div className="cs-inbound-redirects__row-top">
+        <code className="cs-inbound-redirects__from">{row.from}</code>
+        {isGone ? (
+          <span
+            className="cs-inbound-redirects__gone-pill"
+            title="HTTP 410 Gone — page intentionally removed; no redirect target."
+          >
+            gone
+          </span>
+        ) : (
+          <>
+            <span className="cs-inbound-redirects__arrow" aria-hidden="true">
+              →
+            </span>
+            <span className="cs-inbound-redirects__status">{row.status}</span>
+          </>
+        )}
+        {isGone && (
+          <span className="cs-inbound-redirects__status">{row.status}</span>
+        )}
+        {isHot && (
+          <span
+            className="cs-inbound-redirects__hot"
+            title={`Over ${HOT_REDIRECT_THRESHOLD.toLocaleString()} hits — break with care.`}
+            aria-label="High-traffic"
+          >
+            🔥
+          </span>
+        )}
+      </div>
+      <div className="cs-inbound-redirects__row-meta">
+        <span>{SOURCE_LABEL[row.source]}</span>
+        <span aria-hidden="true">·</span>
+        <span>{formatHitCount(row.hitCount)}</span>
+        {row.lastHitAt && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span>last {formatRelativeDate(row.lastHitAt)}</span>
+          </>
+        )}
+      </div>
+    </>
+  );
+};
+
+/* ----------------------------------------------- Inline edit form */
+
 interface InlineFormProps {
   mode: 'edit' | 'create';
   /** Original row when editing, undefined when creating. */
@@ -508,13 +489,13 @@ const InlineForm = (props: InlineFormProps): ReactElement => {
 
   const currentStatusHint = STATUS_OPTIONS.find((o) => o.value === form.status)?.hint;
 
-  // Enter on a text input triggers Save. Wrapped manually rather than
-  // via a <form> element because Payload's doc edit screen already
-  // mounts everything inside its own <form> — nesting forms is invalid
-  // HTML and triggers React's hydration error.
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
   ): void => {
+    // Enter on a text input triggers Save. Wrapped manually rather than
+    // via a <form> element because Payload's doc edit screen mounts
+    // everything inside its own <form>; nested forms are invalid HTML
+    // and trigger React's hydration error.
     if (e.key === 'Enter' && !e.shiftKey && e.currentTarget.tagName !== 'TEXTAREA') {
       e.preventDefault();
       e.stopPropagation();
