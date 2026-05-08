@@ -1,7 +1,7 @@
 import type { Endpoint } from 'payload';
+import { z } from 'zod';
 
 import {
-  type BulkRedirectInputRow,
   IMPORT_SOURCE_LABEL,
   type RedirectsPayload,
   planBulkRedirectImport,
@@ -22,10 +22,25 @@ const hasEditorRole = (
   user: { role?: string | null } | null | undefined,
 ): boolean => user?.role === 'admin' || user?.role === 'editor';
 
-interface ImportBody {
-  rows?: unknown;
-  dryRun?: unknown;
-}
+/**
+ * Boundary schema for the bulk-import payload. Per CLAUDE.md "Zod at
+ * boundaries" — every REST surface validates here before any value
+ * crosses into the planner. Field-level shape (status enum, path/URL
+ * shape, self-loop check) is re-validated by `validateRow` inside the
+ * planner so seed-records and direct planner callers also get the
+ * full check.
+ */
+const importRowSchema = z.object({
+  from: z.string().min(1).max(2048),
+  to: z.string().max(2048).optional(),
+  status: z.enum(['301', '302', '307', '308', '410']).optional(),
+  notes: z.string().max(4096).optional(),
+});
+
+const importBodySchema = z.object({
+  rows: z.array(importRowSchema).max(MAX_ROWS),
+  dryRun: z.boolean().optional(),
+});
 
 /**
  * POST /api/redirects/import
@@ -51,34 +66,51 @@ export const redirectsImportEndpoint: Endpoint = {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
 
-    let body: ImportBody;
+    let raw: unknown;
     try {
-      body = (req.json ? await req.json() : {}) as ImportBody;
+      raw = req.json ? await req.json() : null;
     } catch {
       return json({ ok: false, error: 'invalid_json' }, { status: 400 });
     }
 
-    if (!Array.isArray(body.rows)) {
-      return json(
-        { ok: false, error: 'invalid_body', detail: '`rows` must be an array.' },
-        { status: 400 },
-      );
-    }
-    if (body.rows.length > MAX_ROWS) {
+    // 5000-row cap is enforced by the schema — surface as 413 (the more
+    // useful status for a too-many-rows case) rather than the generic
+    // 400 Zod would emit on its own.
+    if (
+      raw != null &&
+      typeof raw === 'object' &&
+      Array.isArray((raw as { rows?: unknown }).rows) &&
+      ((raw as { rows: unknown[] }).rows.length > MAX_ROWS)
+    ) {
       return json(
         {
           ok: false,
           error: 'too_many_rows',
           limit: MAX_ROWS,
-          received: body.rows.length,
+          received: (raw as { rows: unknown[] }).rows.length,
         },
         { status: 413 },
       );
     }
 
-    const dryRun = body.dryRun === true;
+    const parsed = importBodySchema.safeParse(raw);
+    if (!parsed.success) {
+      return json(
+        {
+          ok: false,
+          error: 'invalid_body',
+          issues: parsed.error.issues.map((issue) => ({
+            path: issue.path,
+            message: issue.message,
+          })),
+        },
+        { status: 400 },
+      );
+    }
+
+    const dryRun = parsed.data.dryRun === true;
     const plan = await planBulkRedirectImport({
-      rows: body.rows as BulkRedirectInputRow[],
+      rows: parsed.data.rows,
       payload: req.payload as unknown as RedirectsPayload,
     });
 

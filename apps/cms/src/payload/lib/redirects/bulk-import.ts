@@ -9,7 +9,7 @@ const IMPORT_SOURCE = 'migration-seed';
 
 export interface BulkRedirectInputRow {
   readonly from: unknown;
-  readonly to: unknown;
+  readonly to?: unknown;
   readonly status?: unknown;
   readonly notes?: unknown;
 }
