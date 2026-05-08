@@ -72,4 +72,9 @@
   --cs-shadow-press-soft: inset 0 1px 2px rgba(0, 0, 0, 0.06);
   --cs-shadow-lift-sm: 0 2px 6px rgba(0, 0, 0, 0.06);
   --cs-shadow-lift-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  // Slim the nav rail. Payload defaults to 275px which crowds the
+  // doc-edit two-column layout on a 13"–14" laptop; 240px keeps the
+  // nav scannable while giving the form back ~35px of working width.
+  --nav-width: 240px;
 }
