@@ -259,48 +259,92 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
   }] = useListDrawer({ collectionSlugs: ['media'], uploads: true });
   const [ogPreview, setOgPreview] = useState<MediaPreview | null>(null);
   const [ogLoading, setOgLoading] = useState(false);
+  // Hero image + Twitter image previews — needed so the social-card
+  // mock can mirror the actual fallback chain consumers will see:
+  //   og:image     = seo.ogImage      ?? heroImage ?? siteDefault
+  //   twitter:image= seo.twitterImage ?? seo.ogImage ?? heroImage ?? siteDefault
+  // (siteDefault — siteSettings.defaultOgImage — is not yet wired
+  // into the preview; flagged in SEO-CONSUMPTION-MAP.md.)
+  const [heroPreview, setHeroPreview] = useState<MediaPreview | null>(null);
+  const [twImagePreview, setTwImagePreview] = useState<MediaPreview | null>(null);
+
+  // Hero image is part of the doc — read it once via useField. Number
+  // (the relation id) for unpopulated; { id, url, ... } when Payload
+  // populates it on read. We handle both shapes.
+  const { value: heroImageRaw } = useField<unknown>({ path: 'heroImage' });
+  const heroImageId: string | null = useMemo(() => {
+    if (heroImageRaw == null) return null;
+    if (typeof heroImageRaw === 'string' || typeof heroImageRaw === 'number') {
+      return String(heroImageRaw);
+    }
+    if (typeof heroImageRaw === 'object' && heroImageRaw !== null) {
+      const id = (heroImageRaw as { id?: string | number }).id;
+      return id == null ? null : String(id);
+    }
+    return null;
+  }, [heroImageRaw]);
+
+  // Single helper, three call sites — pulls a media doc by id and
+  // returns the shape the preview cards consume.
+  const fetchMedia = useCallback(
+    (
+      mediaId: string,
+      onDone: (preview: MediaPreview | null) => void,
+    ): (() => void) => {
+      let cancelled = false;
+      fetch(`/api/media/${encodeURIComponent(mediaId)}?depth=0`, { credentials: 'include' })
+        .then((res) => (res.ok ? res.json() : null))
+        .then(
+          (
+            doc:
+              | { id?: string | number; url?: string; filename?: string; alt?: string; width?: number; height?: number }
+              | null,
+          ) => {
+            if (cancelled) return;
+            if (!doc) {
+              onDone(null);
+            } else {
+              onDone({
+                id: typeof doc.id === 'string' ? doc.id : String(doc.id ?? mediaId),
+                url: typeof doc.url === 'string' ? doc.url : null,
+                filename: typeof doc.filename === 'string' ? doc.filename : null,
+                alt: typeof doc.alt === 'string' ? doc.alt : null,
+                width: typeof doc.width === 'number' ? doc.width : null,
+                height: typeof doc.height === 'number' ? doc.height : null,
+              });
+            }
+          },
+        )
+        .catch(() => {
+          if (!cancelled) onDone(null);
+        });
+      return () => {
+        cancelled = true;
+      };
+    },
+    [],
+  );
+
   useEffect(() => {
     if (!ogImageValue) {
       setOgPreview(null);
       return;
     }
-    let cancelled = false;
     setOgLoading(true);
-    fetch(`/api/media/${encodeURIComponent(ogImageValue)}?depth=0`, {
-      credentials: 'include',
-    })
-      .then((res) => (res.ok ? res.json() : null))
-      .then(
-        (
-          doc:
-            | { id?: string; url?: string; filename?: string; alt?: string; width?: number; height?: number }
-            | null,
-        ) => {
-          if (cancelled) return;
-          if (!doc) {
-            setOgPreview(null);
-          } else {
-            setOgPreview({
-              id: typeof doc.id === 'string' ? doc.id : String(doc.id ?? ogImageValue),
-              url: typeof doc.url === 'string' ? doc.url : null,
-              filename: typeof doc.filename === 'string' ? doc.filename : null,
-              alt: typeof doc.alt === 'string' ? doc.alt : null,
-              width: typeof doc.width === 'number' ? doc.width : null,
-              height: typeof doc.height === 'number' ? doc.height : null,
-            });
-          }
-        },
-      )
-      .catch(() => {
-        if (!cancelled) setOgPreview(null);
-      })
-      .finally(() => {
-        if (!cancelled) setOgLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [ogImageValue]);
+    const cancel = fetchMedia(ogImageValue, (preview) => {
+      setOgPreview(preview);
+      setOgLoading(false);
+    });
+    return cancel;
+  }, [ogImageValue, fetchMedia]);
+
+  useEffect(() => {
+    if (!heroImageId) {
+      setHeroPreview(null);
+      return;
+    }
+    return fetchMedia(heroImageId, setHeroPreview);
+  }, [heroImageId, fetchMedia]);
 
   const { value: useAdvancedOg, setValue: setUseAdvancedOg } = useField<boolean>({
     path: 'seo.useAdvancedOg',
@@ -323,6 +367,14 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
     useField<string | null>({ path: 'seo.twitterImage' });
   const { value: twitterCard, setValue: setTwitterCard } =
     useField<'summary' | 'summary_large_image' | null>({ path: 'seo.twitterCard' });
+
+  useEffect(() => {
+    if (!twitterImageValue) {
+      setTwImagePreview(null);
+      return;
+    }
+    return fetchMedia(twitterImageValue, setTwImagePreview);
+  }, [twitterImageValue, fetchMedia]);
 
   // Robots advanced — backed by the new robotsAdvanced group.
   const { value: noarchive, setValue: setNoarchive } = useField<boolean>({
@@ -635,15 +687,23 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
             )}
           </div>
 
-          {/* Social-card live preview — uses the effective OG values
-              (override → SEO → doc fallback chain). Sits BETWEEN the
-              OG copy override and the Twitter / Robots / Speakable
-              subsections so editors immediately see the impact of the
-              override they just toggled. */}
+          {/* Social-card live preview — uses the effective values
+              (override → SEO → doc fallback chain) and per-platform
+              image resolution:
+                FB / LinkedIn → seo.ogImage ?? heroImage
+                X            → seo.twitterImage ?? seo.ogImage ?? heroImage
+              (Site-default OG image is not yet wired into the preview;
+              tracked in SEO-CONSUMPTION-MAP.md.) */}
           <div className="cs-seo-advanced__row">
             <span className="cs-seo-advanced__label">Social card preview</span>
             <SocialCardPreview
-              imageUrl={ogPreview?.url ?? null}
+              ogImageUrl={ogPreview?.url ?? heroPreview?.url ?? null}
+              xImageUrl={
+                twImagePreview?.url ??
+                ogPreview?.url ??
+                heroPreview?.url ??
+                null
+              }
               title={effectiveOgTitle}
               description={effectiveOgDesc}
               canonicalUrl={null}

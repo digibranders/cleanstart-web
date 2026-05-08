@@ -6,8 +6,20 @@ import { useState } from 'react';
 type Platform = 'facebook' | 'x' | 'linkedin';
 
 type SocialCardPreviewProps = {
-  /** Effective OG image URL (after fallback chain). */
-  imageUrl?: string | null;
+  /**
+   * Effective `og:image` URL (after fallback chain). Used for FB +
+   * LinkedIn cards (LinkedIn reads og:image — there's no separate
+   * li:image meta).
+   */
+  ogImageUrl?: string | null;
+  /**
+   * Effective `twitter:image` URL — `seo.twitterImage` →
+   * `seo.ogImage` → `heroImage` → site default. Twitter reads
+   * twitter:image first, then falls back to og:image; we do that
+   * resolution in the parent so the preview is honest about what
+   * X will actually render.
+   */
+  xImageUrl?: string | null;
   /** Effective OG title (after fallback chain). */
   title?: string | null;
   /** Effective OG description (after fallback chain). */
@@ -41,7 +53,8 @@ export const SocialCardPreview = (props: SocialCardPreviewProps): ReactElement =
   const [active, setActive] = useState<Platform>('facebook');
   const title = props.title?.trim() || 'Untitled';
   const description = props.description?.trim() || '';
-  const imageUrl = props.imageUrl?.trim() || null;
+  const ogImageUrl = props.ogImageUrl?.trim() || null;
+  const xImageUrl = props.xImageUrl?.trim() || null;
   const host = (() => {
     try {
       return props.canonicalUrl ? new URL(props.canonicalUrl).hostname.replace(/^www\./, '') : '';
@@ -79,11 +92,11 @@ export const SocialCardPreview = (props: SocialCardPreviewProps): ReactElement =
 
       <div className="cs-social-preview__stage" data-platform={active}>
         {active === 'facebook' && (
-          <FacebookCard imageUrl={imageUrl} title={title} description={description} host={host} />
+          <FacebookCard imageUrl={ogImageUrl} title={title} description={description} host={host} />
         )}
-        {active === 'x' && <XCard imageUrl={imageUrl} title={title} host={host} />}
+        {active === 'x' && <XCard imageUrl={xImageUrl} title={title} host={host} />}
         {active === 'linkedin' && (
-          <LinkedInCard imageUrl={imageUrl} title={title} host={host} />
+          <LinkedInCard imageUrl={ogImageUrl} title={title} host={host} />
         )}
       </div>
     </div>
