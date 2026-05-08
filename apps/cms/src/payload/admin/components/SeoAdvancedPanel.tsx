@@ -1,10 +1,11 @@
 'use client';
 
-import { useField, useListDrawer } from '@payloadcms/ui';
+import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { ChevronDown } from './icons/Chevron';
+import { MediaBrowseDialog, type MediaBrowseDoc } from './MediaBrowseDialog';
 import { SocialCardPreview } from './SocialCardPreview';
 
 type SeoAdvancedPanelProps = {
@@ -131,15 +132,15 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
   const { value: ogImageAltValue, setValue: setOgImageAlt } = useField<string | null>({
     path: 'seo.ogImageAlt',
   });
-  const [OgImageListDrawer, , { openDrawer: openOgImageDrawer, closeDrawer: closeOgImageDrawer }] =
-    useListDrawer({ collectionSlugs: ['media'], uploads: true });
+  // Custom thumbnail-grid browser dialog (extracted from MediaField).
+  // Open-state controlled here; the dialog itself is mounted at the
+  // bottom of the panel JSX.
+  const [ogBrowseOpen, setOgBrowseOpen] = useState(false);
   const onPickOgImage = useCallback(
-    (args: { doc: { id?: string | number } }) => {
-      const id = args.doc?.id;
-      if (id != null) setOgImage(typeof id === 'string' ? id : String(id));
-      closeOgImageDrawer();
+    (doc: MediaBrowseDoc) => {
+      setOgImage(doc.id);
     },
-    [setOgImage, closeOgImageDrawer],
+    [setOgImage],
   );
 
   // Upload state — one struct per picker. Tracks in-flight upload,
@@ -252,11 +253,8 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
     [performUpload],
   );
 
-  // Twitter image — same picker pattern.
-  const [TwitterImageListDrawer, , {
-    openDrawer: openTwitterImageDrawer,
-    closeDrawer: closeTwitterImageDrawer,
-  }] = useListDrawer({ collectionSlugs: ['media'], uploads: true });
+  // Twitter image — same browser, separate open state.
+  const [twBrowseOpen, setTwBrowseOpen] = useState(false);
   const [ogPreview, setOgPreview] = useState<MediaPreview | null>(null);
   const [ogLoading, setOgLoading] = useState(false);
   // Hero image + Twitter image previews — needed so the social-card
@@ -550,7 +548,7 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
                   <button
                     type="button"
                     id={ogImageInputId}
-                    onClick={openOgImageDrawer}
+                    onClick={() => setOgBrowseOpen(true)}
                     className="cs-seo-advanced__og-pick"
                     disabled={ogUpload.inFlight}
                   >
@@ -805,7 +803,7 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
                     <div className="cs-seo-advanced__og-actions">
                       <button
                         type="button"
-                        onClick={openTwitterImageDrawer}
+                        onClick={() => setTwBrowseOpen(true)}
                         className="cs-seo-advanced__og-pick"
                         disabled={twUpload.inFlight}
                       >
@@ -1022,16 +1020,20 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
           </div>
         </div>
       )}
-      {/* Picker drawers — must mount inside the React tree for the
-          useListDrawer hooks to render their portal content. The
-          drawers themselves are visually hidden until opened. */}
-      <OgImageListDrawer onSelect={onPickOgImage} />
-      <TwitterImageListDrawer
-        onSelect={(args: { doc: { id?: string | number } }) => {
-          const id = args.doc?.id;
-          if (id != null) setTwitterImage(typeof id === 'string' ? id : String(id));
-          closeTwitterImageDrawer();
-        }}
+      {/* Custom thumbnail-grid browser dialogs (one per slot). Native
+          <dialog> with focus-trap; mounts at the bottom of the panel
+          tree so portal-style top-layer rendering works. */}
+      <MediaBrowseDialog
+        open={ogBrowseOpen}
+        onClose={() => setOgBrowseOpen(false)}
+        onSelect={onPickOgImage}
+        ariaLabel="Browse media for OG image"
+      />
+      <MediaBrowseDialog
+        open={twBrowseOpen}
+        onClose={() => setTwBrowseOpen(false)}
+        onSelect={(doc) => setTwitterImage(doc.id)}
+        ariaLabel="Browse media for X (Twitter) image"
       />
     </div>
   );
