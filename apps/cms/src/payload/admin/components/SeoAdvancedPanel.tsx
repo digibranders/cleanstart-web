@@ -2,7 +2,7 @@
 
 import { useField, useListDrawer } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
-import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { ChevronDown } from './icons/Chevron';
 import { SocialCardPreview } from './SocialCardPreview';
@@ -38,6 +38,30 @@ const OG_TITLE_MAX = 60;
 const OG_TITLE_HARD = 80;
 const OG_DESC_MAX = 160;
 const OG_DESC_HARD = 200;
+
+// Upload constants — mirror MediaField.tsx so OG / Twitter uploads
+// honour the same allowlist + size cap as the rest of the admin.
+const UPLOAD_ALLOWED_MIMES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/avif',
+  'image/svg+xml',
+  'image/gif',
+] as const;
+const UPLOAD_BYTES_LIMIT = 25 * 1024 * 1024; // 25 MB
+
+const validateUploadFile = (file: File): string | null => {
+  if (!UPLOAD_ALLOWED_MIMES.includes(file.type as (typeof UPLOAD_ALLOWED_MIMES)[number])) {
+    return `Unsupported file type${file.type ? ` (${file.type})` : ''}.`;
+  }
+  if (file.size > UPLOAD_BYTES_LIMIT) {
+    const mb = (file.size / 1024 / 1024).toFixed(1);
+    const cap = (UPLOAD_BYTES_LIMIT / 1024 / 1024).toFixed(0);
+    return `File too large (${mb} MB > ${cap} MB).`;
+  }
+  return null;
+};
 
 const STORAGE_PREFIX = 'cs.seo-advanced.expanded:';
 
@@ -116,6 +140,116 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
       closeOgImageDrawer();
     },
     [setOgImage, closeOgImageDrawer],
+  );
+
+  // Upload state — one struct per picker. Tracks in-flight upload,
+  // progress, and last error so the UI can render a progress chip
+  // and an error line without ambient global state.
+  const [ogUpload, setOgUpload] = useState<{
+    inFlight: boolean;
+    progress: number;
+    error: string | null;
+  }>({ inFlight: false, progress: 0, error: null });
+  const [twUpload, setTwUpload] = useState<{
+    inFlight: boolean;
+    progress: number;
+    error: string | null;
+  }>({ inFlight: false, progress: 0, error: null });
+
+  const ogFileInputRef = useRef<HTMLInputElement | null>(null);
+  const twFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const performUpload = useCallback(
+    (
+      file: File,
+      folderHint: string,
+      onProgress: (next: { inFlight: boolean; progress: number; error: string | null }) => void,
+      onSuccess: (newId: string) => void,
+    ) => {
+      const v = validateUploadFile(file);
+      if (v) {
+        onProgress({ inFlight: false, progress: 0, error: v });
+        return;
+      }
+      onProgress({ inFlight: true, progress: 0, error: null });
+
+      const fd = new FormData();
+      fd.append('file', file, file.name);
+      fd.append('_payload', JSON.stringify({ folder: folderHint }));
+
+      const xhr = new XMLHttpRequest();
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          onProgress({ inFlight: true, progress: e.loaded / Math.max(1, e.total), error: null });
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const json = JSON.parse(xhr.responseText) as
+              | { doc?: { id?: string | number } }
+              | { id?: string | number };
+            const newDoc = ('doc' in json && json.doc) ? json.doc : (json as { id?: string | number });
+            if (newDoc?.id != null) {
+              const id = typeof newDoc.id === 'string' ? newDoc.id : String(newDoc.id);
+              onSuccess(id);
+              onProgress({ inFlight: false, progress: 1, error: null });
+            } else {
+              onProgress({
+                inFlight: false,
+                progress: 0,
+                error: 'Upload succeeded but the response was malformed.',
+              });
+            }
+          } catch {
+            onProgress({
+              inFlight: false,
+              progress: 0,
+              error: 'Upload succeeded but the response was unparseable.',
+            });
+          }
+        } else {
+          let msg = `Upload failed (${xhr.status}).`;
+          try {
+            const body = JSON.parse(xhr.responseText) as
+              | { errors?: { message?: string }[]; message?: string };
+            if (body?.errors?.[0]?.message) msg = body.errors[0].message ?? msg;
+            else if (body?.message) msg = body.message;
+          } catch {
+            // ignore
+          }
+          onProgress({ inFlight: false, progress: 0, error: msg });
+        }
+      };
+      xhr.onerror = () => {
+        onProgress({ inFlight: false, progress: 0, error: 'Network error during upload.' });
+      };
+      xhr.open('POST', '/api/media');
+      xhr.setRequestHeader('Accept', 'application/json');
+      xhr.withCredentials = true;
+      xhr.send(fd);
+    },
+    [],
+  );
+
+  const onPickOgFile = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = ''; // reset so picking same filename again still fires onChange
+      if (!file) return;
+      performUpload(file, 'web/general', setOgUpload, (id) => setOgImage(id));
+    },
+    [performUpload, setOgImage],
+  );
+
+  const onPickTwFile = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = '';
+      if (!file) return;
+      performUpload(file, 'web/general', setTwUpload, (id) => setTwitterImage(id));
+    },
+    [performUpload],
   );
 
   // Twitter image — same picker pattern.
@@ -366,10 +500,29 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
                     id={ogImageInputId}
                     onClick={openOgImageDrawer}
                     className="cs-seo-advanced__og-pick"
+                    disabled={ogUpload.inFlight}
                   >
                     {ogImageValue ? 'Change image' : 'Pick image'}
                   </button>
-                  {ogImageValue && (
+                  <button
+                    type="button"
+                    onClick={() => ogFileInputRef.current?.click()}
+                    className="cs-seo-advanced__og-upload"
+                    disabled={ogUpload.inFlight}
+                  >
+                    {ogUpload.inFlight
+                      ? `Uploading ${Math.round(ogUpload.progress * 100)}%`
+                      : 'Upload'}
+                  </button>
+                  <input
+                    ref={ogFileInputRef}
+                    type="file"
+                    accept={UPLOAD_ALLOWED_MIMES.join(',')}
+                    onChange={onPickOgFile}
+                    tabIndex={-1}
+                    style={{ display: 'none' }}
+                  />
+                  {ogImageValue && !ogUpload.inFlight && (
                     <button
                       type="button"
                       onClick={() => {
@@ -383,6 +536,11 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
                     </button>
                   )}
                 </div>
+                {ogUpload.error && (
+                  <p className="cs-seo-advanced__health cs-seo-advanced__health--bad">
+                    ✗ {ogUpload.error}
+                  </p>
+                )}
                 {ogImageValue && (
                   <input
                     type="text"
@@ -589,10 +747,29 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
                         type="button"
                         onClick={openTwitterImageDrawer}
                         className="cs-seo-advanced__og-pick"
+                        disabled={twUpload.inFlight}
                       >
                         {twitterImageValue ? 'Change X image' : 'Pick X image'}
                       </button>
-                      {twitterImageValue && (
+                      <button
+                        type="button"
+                        onClick={() => twFileInputRef.current?.click()}
+                        className="cs-seo-advanced__og-upload"
+                        disabled={twUpload.inFlight}
+                      >
+                        {twUpload.inFlight
+                          ? `Uploading ${Math.round(twUpload.progress * 100)}%`
+                          : 'Upload'}
+                      </button>
+                      <input
+                        ref={twFileInputRef}
+                        type="file"
+                        accept={UPLOAD_ALLOWED_MIMES.join(',')}
+                        onChange={onPickTwFile}
+                        tabIndex={-1}
+                        style={{ display: 'none' }}
+                      />
+                      {twitterImageValue && !twUpload.inFlight && (
                         <button
                           type="button"
                           onClick={() => setTwitterImage(null)}
@@ -603,6 +780,11 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
                         </button>
                       )}
                     </div>
+                    {twUpload.error && (
+                      <p className="cs-seo-advanced__health cs-seo-advanced__health--bad">
+                        ✗ {twUpload.error}
+                      </p>
+                    )}
                     <p className="cs-seo-advanced__hint">
                       X clips at 2:1 (1200×600) — use a different crop here when the OG image
                       is portrait or letter-boxed.
