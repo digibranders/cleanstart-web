@@ -2,12 +2,17 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
+import { publishedAtField } from '../fields/published-at';
+import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { firstPublishHook } from '../hooks/first-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
@@ -89,6 +94,14 @@ export const Resources: CollectionConfig = {
       },
     },
     {
+      name: 'ctaButtonText',
+      type: 'text',
+      admin: {
+        description:
+          'CTA copy on the gated download / view button. Empty falls back to a sensible default by `type` (Whitepapers → "Download whitepaper", Reports → "Read the report", etc).',
+      },
+    },
+    {
       name: 'permalink',
       type: 'ui',
       admin: {
@@ -101,6 +114,8 @@ export const Resources: CollectionConfig = {
         },
       },
     },
+    schemaAddonsField,
+    publishedAtField,
     ...seoSidebarFields({ pathPrefix: '/resources', descriptionSource: 'summary' }),
     {
       name: 'downloadCount',
@@ -118,10 +133,13 @@ export const Resources: CollectionConfig = {
     ...seoFieldsForSidebar('resources'),
   ],
   hooks: {
+    beforeChange: [firstPublishHook()],
     afterChange: [
       slugChangeRedirectHook('resources'),
+      schemaOverrideAuditHook('resources'),
       searchSyncAfterChangeHook('resources'),
       webhooksPublishAfterChangeHook('resources'),
+      indexNowPublishAfterChangeHook('resources'),
     ],
     afterDelete: [searchSyncAfterDeleteHook('resources')],
   },

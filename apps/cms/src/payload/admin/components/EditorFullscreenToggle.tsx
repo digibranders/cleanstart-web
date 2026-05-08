@@ -137,8 +137,8 @@ export const EditorFullscreenToggle = (): ReactElement | null => {
       className="cs-fullscreen-toggle cs-fullscreen-toggle--inline"
       data-active={isFullscreen ? 'true' : 'false'}
       aria-pressed={isFullscreen}
-      aria-label={isFullscreen ? 'Exit focus mode' : 'Enter focus mode'}
-      title={isFullscreen ? 'Exit focus mode (Esc)' : 'Enter focus mode for the body editor'}
+      aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+      title={isFullscreen ? 'Exit fullscreen (Esc)' : 'Open the body editor fullscreen'}
     >
       <svg viewBox="0 0 16 16" aria-hidden="true">
         <path
@@ -146,7 +146,9 @@ export const EditorFullscreenToggle = (): ReactElement | null => {
           d="M3 3h4a1 1 0 1 1 0 2H5v2a1 1 0 1 1-2 0V3Zm0 8a1 1 0 0 1 2 0v2h2a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1v-3Zm10-8a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0V5h-2a1 1 0 1 1 0-2h3Zm0 8a1 1 0 1 1 2 0v3a1 1 0 0 1-1 1h-3a1 1 0 1 1 0-2h2v-2Z"
         />
       </svg>
-      <span className="cs-fullscreen-toggle__label">{isFullscreen ? 'Exit focus' : 'Focus'}</span>
+      <span className="cs-fullscreen-toggle__label">
+        {isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+      </span>
     </button>
   );
 
@@ -159,15 +161,15 @@ export const EditorFullscreenToggle = (): ReactElement | null => {
 };
 
 const ExitCluster = ({ onExit }: { onExit: () => void }): ReactElement => (
-  <section className="cs-fullscreen-cluster" aria-label="Focus mode controls">
-    <span style={{ fontSize: 12, color: 'var(--theme-text-soft)' }}>Focus mode</span>
+  <section className="cs-fullscreen-cluster" aria-label="Fullscreen controls">
+    <span style={{ fontSize: 12, color: 'var(--theme-text-soft)' }}>Fullscreen</span>
     <kbd>Esc</kbd>
     <button
       type="button"
       onClick={onExit}
       className="cs-fullscreen-toggle"
-      aria-label="Exit focus mode"
-      title="Exit focus mode"
+      aria-label="Exit fullscreen"
+      title="Exit fullscreen"
     >
       <svg viewBox="0 0 16 16" aria-hidden="true">
         <path

@@ -8,6 +8,11 @@ const SUPPORTED_COLLECTIONS = new Set([
   'guides',
   'knowledgeBase',
   'authors',
+  'events',
+  'webinars',
+  'jobs',
+  'pages',
+  'resources',
 ]);
 
 const json = (

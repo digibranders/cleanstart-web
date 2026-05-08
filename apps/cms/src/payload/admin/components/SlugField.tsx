@@ -41,6 +41,28 @@ const slugify = (input: string | null | undefined): string => {
     .replace(/^-+|-+$/g, '');
 };
 
+interface EditContext {
+  readonly collection: string;
+  readonly id: string | null;
+}
+
+/**
+ * Parse `/admin/collections/<slug>/<id>` from the current pathname so
+ * the collision check knows which collection to query and which row
+ * (if any) to exclude. Returns null on list / dashboard / create
+ * routes — the caller treats null as "skip the lookup".
+ */
+const matchEditContext = (): EditContext | null => {
+  if (typeof window === 'undefined') return null;
+  const m = window.location.pathname.match(
+    /^\/admin\/collections\/([^/]+)\/([^/?#]+)/,
+  );
+  if (!m) return null;
+  const [, slug, id] = m;
+  if (!slug || !id) return null;
+  return { collection: slug, id: id === 'create' ? null : id };
+};
+
 /**
  * Custom `slug` field. Same data shape as Payload's stock text input,
  * but with a Webflow-style auto-fill: while the slug has never been
@@ -53,6 +75,12 @@ const slugify = (input: string | null | undefined): string => {
  * submit time, so the request actually leaves the browser and the
  * server-side `beforeValidate` slug hook never has to fire.
  */
+type CollisionState =
+  | { kind: 'idle' }
+  | { kind: 'checking' }
+  | { kind: 'available' }
+  | { kind: 'collision'; conflictId: string };
+
 export const SlugField = (props: SlugFieldProps): ReactElement => {
   const { source = 'title', required = false, description, label } = props;
   const path = props.path ?? 'slug';
@@ -60,6 +88,7 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
 
   const { value: docTitleValue } = useField<string>({ path: source });
   const { value: slugValue, setValue: setSlug } = useField<string>({ path });
+  const [collision, setCollision] = useState<CollisionState>({ kind: 'idle' });
 
   const lastSyncedRef = useRef<string>('');
   const [manualMode, setManualMode] = useState<boolean>(() => {
@@ -115,6 +144,57 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
   }, [docTitleValue, setSlug]);
 
   const docTitleEmpty = useMemo(() => (docTitleValue ?? '').trim() === '', [docTitleValue]);
+
+  // Debounced collision lookup. Asks the collection's REST endpoint
+  // whether any other doc already owns this slug; surfaces a soft
+  // warning so the editor sees the conflict before they hit Save and
+  // get a 409 from the unique constraint.
+  useEffect(() => {
+    const trimmed = (slugValue ?? '').trim();
+    if (trimmed.length === 0) {
+      setCollision({ kind: 'idle' });
+      return undefined;
+    }
+    const ctx = matchEditContext();
+    if (!ctx) {
+      setCollision({ kind: 'idle' });
+      return undefined;
+    }
+    setCollision({ kind: 'checking' });
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      try {
+        const url = new URL(`/api/${ctx.collection}`, window.location.origin);
+        url.searchParams.set('where[slug][equals]', trimmed);
+        url.searchParams.set('limit', '2');
+        url.searchParams.set('depth', '0');
+        const res = await fetch(url.toString(), { credentials: 'include' });
+        if (!res.ok) {
+          if (!cancelled) setCollision({ kind: 'idle' });
+          return;
+        }
+        const json = (await res.json()) as { docs?: { id?: string | number }[] };
+        const conflicts = (json.docs ?? []).filter(
+          (d) => d.id != null && String(d.id) !== ctx.id,
+        );
+        if (cancelled) return;
+        if (conflicts.length === 0) {
+          setCollision({ kind: 'available' });
+        } else {
+          setCollision({
+            kind: 'collision',
+            conflictId: String(conflicts[0]?.id ?? ''),
+          });
+        }
+      } catch {
+        if (!cancelled) setCollision({ kind: 'idle' });
+      }
+    }, 400);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [slugValue]);
 
   return (
     <div className="field-type text" style={{ marginBottom: 'var(--cs-space-3, 12px)' }}>
@@ -205,6 +285,39 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
           </button>
         )}
       </p>
+      {collision.kind === 'collision' ? (
+        <output
+          aria-live="polite"
+          style={{
+            display: 'flex',
+            margin: '4px 0 0 0',
+            fontSize: 12,
+            color: '#f08f8f',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <span aria-hidden style={{ fontWeight: 700 }}>!</span>
+          This slug is already used by another doc in this collection. Save
+          will fail at the unique constraint — pick a different slug.
+        </output>
+      ) : null}
+      {collision.kind === 'available' && manualMode ? (
+        <output
+          aria-live="polite"
+          style={{
+            display: 'flex',
+            margin: '4px 0 0 0',
+            fontSize: 11,
+            color: 'var(--theme-text-disabled, #6b6e77)',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <span aria-hidden style={{ color: '#7ddc9c', fontWeight: 700 }}>✓</span>
+          Slug is available.
+        </output>
+      ) : null}
     </div>
   );
 };

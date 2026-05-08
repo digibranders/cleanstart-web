@@ -103,9 +103,27 @@
 // MediaSelfChrome (mounted as the first field in `Media.ts`) renders
 // our own bordered card with rename / copy URL / open-in-tab inline
 // controls — same shape as the blog editor's MediaField. Hide the
-// stock `.file-field` so the two components don't render side-by-side.
+// stock `.file-field` visually but keep it in the layout so its
+// hidden buttons (notably `.file-field__edit` — Payload's Image
+// Editor trigger we proxy to from MediaSelfChrome) are still
+// click-targetable.
 .collection-edit--media .field-type.file-field {
-  display: none !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  pointer-events: none;
+}
+
+// The hidden file-field's image-editor button must stay
+// click-programmable even though the parent is visually hidden.
+.collection-edit--media .field-type.file-field .file-field__edit {
+  pointer-events: auto;
 }
 
 // ─── MediaSelfChrome card ─────────────────────────────────────────
@@ -228,17 +246,50 @@
   }
 }
 
-.cs-media-self__rename-hint {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--theme-text-disabled);
-  opacity: 0;
-  transition: opacity var(--cs-motion-micro);
+// Pencil-edit icon next to the filename — a clear secondary
+// click-target for triggering rename. Visible at low opacity at rest
+// so the affordance is discoverable without hover, full strength on
+// hover/focus so the active state is obvious. Replaces the previous
+// `RENAME` text chip which read as a button but wasn't clickable.
+.cs-media-self__rename-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--cs-radius-input);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--theme-text-soft);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.45;
+  transition:
+    opacity var(--cs-motion-micro),
+    background-color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    color var(--cs-motion-micro);
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+    color: var(--cs-cyan-500);
+    border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
 }
 
-.cs-media-self__filename-row:hover .cs-media-self__rename-hint {
+.cs-media-self__filename-row:hover .cs-media-self__rename-icon {
   opacity: 1;
 }
 
@@ -379,6 +430,16 @@
     background: rgba(0, 196, 106, 0.14);
     border-color: var(--color-success-500, #00c46a);
     color: var(--color-success-500, #00c46a);
+  }
+
+  // Text-label variant for "Edit" (image-editor trigger). Wider than
+  // the 32px icon-button square so the label doesn't truncate.
+  &--text {
+    width: auto;
+    padding: 0 var(--cs-space-3);
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.005em;
   }
 }
 

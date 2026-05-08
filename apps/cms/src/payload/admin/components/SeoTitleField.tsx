@@ -9,6 +9,12 @@ const TITLE_HARD_CAP = 70;
 
 type SeoTitleFieldProps = {
   path: string;
+  /**
+   * The doc-level field whose value is mirrored into `seo.title`
+   * while in auto mode. Defaults to `title`. Authors / Categories use
+   * `name` as their `useAsTitle`, so the helper passes `name` here.
+   */
+  sourceField?: string;
 };
 
 const colorForLength = (len: number): string => {
@@ -39,10 +45,10 @@ const colorForLength = (len: number): string => {
  * around 60 characters, fully cutting at 70.
  */
 export const SeoTitleField = (props: SeoTitleFieldProps): ReactElement => {
-  const { path } = props;
+  const { path, sourceField = 'title' } = props;
   const inputId = useId();
 
-  const { value: docTitleValue } = useField<string>({ path: 'title' });
+  const { value: docTitleValue } = useField<string>({ path: sourceField });
   const { value: seoTitleValue, setValue: setSeoTitle } = useField<string>({ path });
 
   // Track the value we last auto-synced. While the live seo.title

@@ -2,6 +2,8 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
+import { schemaAddonsField } from '../fields/schema-addons';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { bodyStatsHook } from '../hooks/body-stats';
@@ -9,6 +11,7 @@ import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { validateOptionalUrl } from '../lib/url-shape';
@@ -79,6 +82,7 @@ export const News: CollectionConfig = {
         },
       },
     },
+    schemaAddonsField,
     ...seoSidebarFields({ pathPrefix: '/news', descriptionSource: 'abstract' }),
     {
       name: 'publicationDate',
@@ -120,8 +124,10 @@ export const News: CollectionConfig = {
     ],
     afterChange: [
       slugChangeRedirectHook('news'),
+      schemaOverrideAuditHook('news'),
       searchSyncAfterChangeHook('news'),
       webhooksPublishAfterChangeHook('news'),
+      indexNowPublishAfterChangeHook('news'),
     ],
     afterDelete: [searchSyncAfterDeleteHook('news')],
   },

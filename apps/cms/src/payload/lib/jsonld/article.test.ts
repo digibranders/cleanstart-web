@@ -108,9 +108,21 @@ describe('buildArticleBlob', () => {
     ]);
   });
 
-  it('omits author[] when no resolved authors exist', () => {
+  it('falls back to the publishing Organization when no resolved Person authors exist', () => {
+    // schema.org Article requires `author`. When the doc has no
+    // resolved Person authors (staff-written posts where the editor
+    // didn't pick a byline, or unresolved relationships at this
+    // depth), the builder uses the publishing Organization as the
+    // author — same pattern major news sites use for unbylined
+    // posts. Keeps Google Rich Results eligibility intact instead
+    // of silently emitting an invalid blob.
     const blob = buildArticleBlob(ctx, baseSource({ authors: [1, 2, null] }));
-    expect(blob?.author).toBeUndefined();
+    expect(blob?.author).toEqual({ '@id': ctx.organizationId });
+  });
+
+  it('falls back to the publishing Organization when authors is null', () => {
+    const blob = buildArticleBlob(ctx, baseSource({ authors: null }));
+    expect(blob?.author).toEqual({ '@id': ctx.organizationId });
   });
 
   it('emits reviewedBy as inline Person + dateReviewed when set', () => {

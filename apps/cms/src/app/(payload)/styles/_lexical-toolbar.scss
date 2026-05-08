@@ -5,23 +5,52 @@
 // the density closer to Webflow's editor: compact 30px icon-button chrome,
 // thinner separators, content-cluster on the left + secondary actions
 // pushed right.
+//
+// Fixed toolbar layout invariants (the previous version's broad `button`
+// selector squashed dropdown triggers — e.g. the "Normal Text" heading
+// picker — into a 28px square, wrapping their label onto two lines):
+//   * the toolbar container is a single-row flex strip
+//   * icon-only buttons (`.toolbar-popup__button`) stay 28×28
+//   * dropdown triggers size to their content, never wrap
+//   * narrow viewports get horizontal scroll, not overflow
 
 .toolbar-popup__container,
 .fixed-toolbar,
 .lexical-toolbar,
 .rich-text-lexical .toolbar-popup,
 .rich-text-lexical__wrap .toolbar-popup {
-  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
   gap: 2px;
+  padding: 4px 6px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-elevation-200) transparent;
+}
 
-  // Toolbar buttons — square 28-30px, no border at rest, brand-cyan on
-  // hover/active.
-  button,
-  .toolbar-button,
+// FixedToolbar shares space with the absolutely-positioned Fullscreen
+// pill (mounted at top:4 right:8 of the wrap). Reserve enough right-side
+// padding that the rightmost toolbar button never slides underneath the
+// pill — pill width ≈ 110px ("Fullscreen" label + 13px icon + padding)
+// plus 8px right offset + 8px breathing room.
+.fixed-toolbar {
+  padding-right: 134px;
+}
+
+.toolbar-popup__container,
+.fixed-toolbar,
+.lexical-toolbar,
+.rich-text-lexical .toolbar-popup,
+.rich-text-lexical__wrap .toolbar-popup {
+
+  // Icon-only toolbar buttons — square 28×28, no border at rest, brand-cyan
+  // on hover/active.
   .toolbar-popup__button {
     width: 28px;
     height: 28px;
     min-width: 28px;
+    flex-shrink: 0;
     border-radius: var(--cs-radius-input);
     background: transparent;
     border: 1px solid transparent;
@@ -34,7 +63,8 @@
     transition:
       background-color var(--cs-motion-micro),
       color var(--cs-motion-micro),
-      border-color var(--cs-motion-micro);
+      border-color var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro);
 
     svg {
       width: 14px;
@@ -49,15 +79,72 @@
     &.active,
     &[aria-pressed='true'],
     &[data-active='true'] {
-      color: var(--cs-cyan-500);
+      color: var(--cs-cyan-700);
       background: var(--cs-tint-brand-medium);
+      box-shadow: inset 0 0 0 1px var(--cs-cyan-500);
     }
   }
 
-  // Toolbar separators — slim hairline rather than chunky border
+  // Dropdown trigger buttons (heading picker, alignment picker, etc).
+  // Match by structure: any button that owns a dropdown label sizes to
+  // its content rather than collapsing to the 28px icon-button square.
+  button:has(> .toolbar-popup__dropdown-label) {
+    width: auto;
+    min-width: 0;
+    height: 28px;
+    flex-shrink: 0;
+    padding: 0 var(--cs-space-2);
+    border-radius: var(--cs-radius-input);
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--theme-text-soft);
+    font-size: 12.5px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    transition:
+      background-color var(--cs-motion-micro),
+      color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro);
+
+    .toolbar-popup__dropdown-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 12ch;
+    }
+
+    .toolbar-popup__dropdown-caret {
+      flex-shrink: 0;
+      opacity: 0.6;
+    }
+
+    svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    &:hover:not([disabled]):not(:disabled) {
+      color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+    }
+
+    &.active {
+      color: var(--cs-cyan-700);
+      background: var(--cs-tint-brand-medium);
+      box-shadow: inset 0 0 0 1px var(--cs-cyan-500);
+    }
+  }
+
+  // Toolbar separators — slim hairline rather than chunky border.
   .divider,
   .toolbar-popup__divider,
   hr {
+    flex-shrink: 0;
     width: 1px;
     height: 16px;
     background: var(--theme-elevation-200);
@@ -65,16 +152,69 @@
     margin-inline: 4px;
   }
 
-  // Block-format dropdown (paragraph / H1 / H2 …) — keep selectable but
-  // align with icon-button height
-  .block-controls,
-  .toolbar-popup__select,
+  // Native <select> fallback (some toolbar groups still ship one).
   select {
     height: 28px;
     min-height: 28px;
+    flex-shrink: 0;
     padding: 0 var(--cs-space-2);
     border-radius: var(--cs-radius-input);
     font-size: 12.5px;
   }
 }
 
+// The dropdown menu itself (popover that opens from a trigger). It's
+// rendered in a portal at the document level, NOT inside the toolbar
+// strip — style it separately so it doesn't pick up flex constraints.
+.toolbar-popup__dropdown-items {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  gap: 1px;
+  background: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  box-shadow: var(--cs-shadow-lift-md);
+  min-width: 180px;
+
+  .toolbar-popup__dropdown-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    padding: 6px 10px;
+    border-radius: var(--cs-radius-input);
+    color: var(--theme-text);
+    font-size: 13px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    text-align: start;
+    white-space: nowrap;
+    transition:
+      background-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      opacity: 0.85;
+    }
+
+    &:hover:not(.disabled) {
+      background: var(--cs-tint-brand-soft);
+      color: var(--cs-cyan-700);
+    }
+
+    &.active {
+      color: var(--cs-cyan-700);
+      background: var(--cs-tint-brand-medium);
+      font-weight: 600;
+    }
+
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}

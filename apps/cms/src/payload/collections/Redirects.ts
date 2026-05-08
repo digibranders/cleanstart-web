@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { redirectCycleGuardHook } from '../hooks/redirect-cycle-guard';
 import { isValidExternalLink } from '../lib/url-shape';
 
 const SOURCE_OPTIONS: { label: string; value: string }[] = [
@@ -141,6 +142,19 @@ export const Redirects: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'staleness',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField',
+        },
+      },
+    },
   ],
+  hooks: {
+    beforeChange: [redirectCycleGuardHook],
+  },
   timestamps: true,
 };

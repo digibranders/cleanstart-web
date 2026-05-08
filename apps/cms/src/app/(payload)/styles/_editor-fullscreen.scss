@@ -86,12 +86,15 @@ html[data-cs-fullscreen='true'] {
 
 .cs-fullscreen-toggle--inline {
   position: absolute;
-  top: 8px;
+  // Vertically centered on the FixedToolbar's button row. Toolbar metrics
+  // are 4px padding-top + 28px buttons + 4px padding-bottom = 36px, so a
+  // 28px pill at top:4 sits flush with the icon buttons.
+  top: 4px;
   right: 8px;
   // Above Payload's doc-controls strip (z:30) but below modals/drawers.
   z-index: 35;
-  height: 32px;
-  padding: 0 12px 0 10px;
+  height: 28px;
+  padding: 0 10px 0 8px;
   border-radius: 999px;
   background: var(--theme-elevation-100);
   border: 1px solid var(--theme-elevation-200);
@@ -103,6 +106,7 @@ html[data-cs-fullscreen='true'] {
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.01em;
+  line-height: 1;
   cursor: pointer;
   white-space: nowrap;
   transition:
@@ -126,11 +130,12 @@ html[data-cs-fullscreen='true'] {
   svg {
     width: 13px;
     height: 13px;
+    flex-shrink: 0;
   }
 
   @media (max-width: 600px) {
     padding: 0;
-    width: 32px;
+    width: 28px;
     justify-content: center;
 
     .cs-fullscreen-toggle__label {

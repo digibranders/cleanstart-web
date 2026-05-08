@@ -2,8 +2,13 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
+import { publishedAtField } from '../fields/published-at';
+import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
+import { firstPublishHook } from '../hooks/first-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { validateOptionalUrl } from '../lib/url-shape';
 
@@ -138,6 +143,45 @@ export const Webinars: CollectionConfig = {
         acceptingNewBylines: { not_equals: false },
       },
     },
+    {
+      name: 'eventStatus',
+      type: 'select',
+      defaultValue: 'scheduled',
+      required: true,
+      options: [
+        { label: 'Scheduled', value: 'scheduled' },
+        { label: 'Postponed', value: 'postponed' },
+        { label: 'Cancelled', value: 'cancelled' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description:
+          'Drives the Event JSON-LD eventStatus. Switching to Postponed / Cancelled is required so search engines stop showing the webinar as still happening.',
+      },
+    },
+    {
+      name: 'cancelledAt',
+      type: 'date',
+      access: { update: () => false },
+      admin: {
+        readOnly: true,
+        date: { pickerAppearance: 'dayAndTime' },
+        description: 'Auto-stamped when eventStatus flips to Cancelled.',
+        position: 'sidebar',
+        condition: (_data, sibling) => sibling?.eventStatus === 'cancelled',
+      },
+    },
+    {
+      name: 'previousStartDate',
+      type: 'date',
+      admin: {
+        date: { pickerAppearance: 'dayAndTime' },
+        description:
+          'Original start date before this webinar was rescheduled. Auto-captured when you change startsAt while eventStatus is Postponed; emitted as Schema.org Event.previousStartDate.',
+        position: 'sidebar',
+        condition: (_data, sibling) => sibling?.eventStatus === 'postponed',
+      },
+    },
     mediaUploadField({
       name: 'pdf',
       folderHint: 'web/webinar',
@@ -172,11 +216,17 @@ export const Webinars: CollectionConfig = {
         },
       },
     },
+    schemaAddonsField,
+    publishedAtField,
     ...seoSidebarFields({ pathPrefix: '/webinar', descriptionSource: 'abstract' }),
     ...seoFieldsForSidebar('webinars'),
   ],
   hooks: {
-    afterChange: [slugChangeRedirectHook('webinars')],
+    beforeChange: [firstPublishHook(), eventStatusTimestampsHook],
+    afterChange: [
+      slugChangeRedirectHook('webinars'),
+      schemaOverrideAuditHook('webinars'),
+    ],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

@@ -76,6 +76,17 @@ export const Media: CollectionConfig = {
       },
     },
     {
+      name: '_sizeWarning',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/MediaSizeWarningField.tsx#MediaSizeWarningField',
+          },
+        },
+      },
+    },
+    {
       name: 'folder',
       type: 'select',
       options: FOLDERS.map((folder) => ({ label: folder, value: folder })),

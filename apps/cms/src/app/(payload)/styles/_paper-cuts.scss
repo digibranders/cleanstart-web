@@ -1,49 +1,44 @@
 // 23. Paper-cut polish — status pills, toast stacking, breadcrumb home icon
 // =============================================================================
 
-// ─── Status pill polish across versioned list views ───────────────
+// ─── Universal chip polish for every select-field cell ───────────
 //
-// Payload renders `.cell-_status` as a plain text "draft" / "published"
-// label. Promote each value to a coloured chip with a leading dot so the
-// status reads at a glance from the table.
-.cell-_status {
+// Payload renders any select field in a list view as
+//   <td class="cell-{name}">
+//     <span class="selected--{value}">
+//       <span>Visible label</span>
+//     </span>
+//   </td>
+//
+// Examples:
+//   _status:  selected--draft / selected--published / selected--scheduled
+//   status:   selected--301 / selected--302 / selected--410          (redirects)
+//   source:   selected--slug-change / selected--manual / selected--import (redirects)
+//   indexable: selected--index / selected--noindex                   (seo)
+//
+// We style EVERY `[class^='selected--']` span as a chip with a
+// neutral default, then apply semantic colours for known values.
+// The `<td>` parent stays a regular table cell — never apply chip
+// styling there or row alignment breaks.
+
+[class^='cell-'] [class^='selected--'],
+[class^='cell-'] [class*=' selected--'] {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  white-space: nowrap;
-
-  &::before {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-  }
-}
-
-// Map Payload's status values via :has() — match by text content fallback.
-// Payload doesn't add status-specific class modifiers; we colour by value
-// using cell content + collection-list rendering attributes. The pill
-// classes Payload exposes inside cells (.pill, .pill--has-color) carry
-// the actual semantic — surface our chip styling on those.
-.cell-_status .pill,
-.cell-_status .pill--has-color {
-  border-radius: 999px;
-  padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  font-feature-settings: 'tnum' 1;
+  line-height: 1.2;
+  // Neutral default — gets coloured below if the value is recognised.
+  color: var(--theme-text-soft);
+  background: var(--theme-elevation-150);
+  border-color: var(--theme-elevation-200);
 
   &::before {
     content: '';
@@ -54,27 +49,128 @@
     display: inline-block;
     flex-shrink: 0;
   }
+
+  > span {
+    display: inline;
+  }
 }
 
-// Published / Live — cyan
-.cell-_status .pill--style-success,
-.cell-_status .pill[class*='published'] {
+[class^='cell-'] {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+// ─── Lifecycle status (`_status`): draft / published / scheduled ─
+.cell-_status .selected--published {
+  color: var(--color-success-500, #00c46a);
+  background: rgba(0, 196, 106, 0.14);
+  border-color: rgba(0, 196, 106, 0.28);
+}
+
+.cell-_status .selected--draft {
+  color: var(--color-warning-500, #fbbf24);
+  background: rgba(251, 191, 36, 0.14);
+  border-color: rgba(251, 191, 36, 0.30);
+}
+
+.cell-_status .selected--scheduled {
   color: var(--cs-cyan-500);
   background: var(--cs-tint-brand-soft);
+  border-color: var(--cs-tint-brand-medium);
 }
 
-// Draft — neutral
-.cell-_status .pill--style-warning,
-.cell-_status .pill[class*='draft'] {
-  color: var(--theme-text-soft);
-  background: var(--theme-elevation-150);
+// ─── Redirect HTTP-status codes ──────────────────────────────────
+//
+// Semantic colour by class:
+//   2xx → green   (success — rare for redirects)
+//   3xx → cyan    (redirect — the normal happy path)
+//   4xx → amber   (warning — gone / not found)
+//   5xx → red     (error)
+.cell-status [class^='selected--2'] {
+  color: var(--color-success-500, #00c46a);
+  background: rgba(0, 196, 106, 0.14);
+  border-color: rgba(0, 196, 106, 0.28);
 }
 
-// Scheduled — amber
-.cell-_status .pill--style-info,
-.cell-_status .pill[class*='scheduled'] {
-  color: var(--color-warning-500);
-  background: rgba(217, 119, 6, 0.14);
+.cell-status [class^='selected--3'] {
+  color: var(--cs-cyan-500);
+  background: var(--cs-tint-brand-soft);
+  border-color: var(--cs-tint-brand-medium);
+}
+
+.cell-status .selected--410,
+.cell-status [class^='selected--4'] {
+  color: var(--color-warning-500, #fbbf24);
+  background: rgba(251, 191, 36, 0.14);
+  border-color: rgba(251, 191, 36, 0.30);
+}
+
+.cell-status [class^='selected--5'] {
+  color: var(--color-error-500, #ff5c5c);
+  background: rgba(220, 38, 38, 0.14);
+  border-color: rgba(220, 38, 38, 0.28);
+}
+
+// ─── SEO indexable (`indexable`): index / noindex ────────────────
+.cell-indexable .selected--index {
+  color: var(--color-success-500, #00c46a);
+  background: rgba(0, 196, 106, 0.14);
+  border-color: rgba(0, 196, 106, 0.28);
+}
+
+.cell-indexable .selected--noindex,
+.cell-indexable [class*='selected--noindex'] {
+  color: var(--color-error-500, #ff5c5c);
+  background: rgba(220, 38, 38, 0.14);
+  border-color: rgba(220, 38, 38, 0.28);
+}
+
+// ─── Boolean chips (`<code class="bool-cell">true|false</code>`) ──
+//
+// Payload renders boolean fields in list views as a `<code>` block
+// with raw "true" / "false" text — reads like a debug log. Promote
+// to a coloured chip: green for true, neutral for false. The `data-
+// bool` attr is added by `ListCellEnhancer` (CSS can't match by
+// text content alone).
+.bool-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  > span {
+    display: inline;
+  }
+
+  &[data-bool='true'] {
+    color: var(--color-success-500, #00c46a);
+    background: rgba(0, 196, 106, 0.14);
+    border-color: rgba(0, 196, 106, 0.28);
+  }
+
+  &[data-bool='false'] {
+    color: var(--theme-text-soft);
+    background: var(--theme-elevation-150);
+    border-color: var(--theme-elevation-200);
+  }
 }
 
 // ─── Toast stacking — keep multiple toasts readable ────────────────
@@ -190,6 +286,87 @@
   line-height: 1.45;
   letter-spacing: 0.005em;
   text-transform: none;
+}
+
+// ─── Inline status chips on list pages ────────────────────────────
+//
+// `NavBadges` injects a `.cs-list-badge` wrapper next to the list
+// page's `<h1>`. Inside it, one or more `__chip` items show the
+// relevant counts:
+//
+//   versioned content (Blogs, News, …) → DRAFT (amber) + PUBLISHED (green)
+//   non-versioned (Authors, Leads, …)  → TOTAL (neutral)
+//
+// Each chip is a click-to-filter link (versioned) or a passive label
+// (total).
+.cs-list-badge {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  vertical-align: middle;
+  margin-inline-start: var(--cs-space-3);
+  gap: 6px;
+}
+
+.cs-list-badge__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-feature-settings: 'tnum' 1;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro);
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    margin-inline-end: 6px;
+    flex-shrink: 0;
+  }
+
+  // DRAFT — amber (in-progress)
+  &--draft {
+    color: var(--color-warning-500, #fbbf24);
+    background: rgba(251, 191, 36, 0.14);
+    border-color: rgba(251, 191, 36, 0.30);
+
+    &:hover {
+      background: rgba(251, 191, 36, 0.22);
+      color: var(--color-warning-500, #fbbf24);
+    }
+  }
+
+  // PUBLISHED — green (live)
+  &--published {
+    color: var(--color-success-500, #00c46a);
+    background: rgba(0, 196, 106, 0.14);
+    border-color: rgba(0, 196, 106, 0.28);
+
+    &:hover {
+      background: rgba(0, 196, 106, 0.22);
+      color: var(--color-success-500, #00c46a);
+    }
+  }
+
+  // TOTAL — neutral, passive (not a link, no hover)
+  &--total {
+    color: var(--theme-text-soft);
+    background: var(--theme-elevation-150);
+    border-color: var(--theme-elevation-200);
+    cursor: default;
+  }
 }
 
 // ─── Conditional-field reveal transition ───────────────────────────

@@ -172,19 +172,26 @@ body:has(.drawer--is-open) .nav-toggler {
 
 // ─── One close affordance per drawer ──────────────────────────────
 //
-// Payload v3 ships TWO close buttons on doc-drawers:
+// Payload v3 ships TWO close buttons on most drawer flavors:
 //   1. `.drawer__close` — sits at top-LEFT of the drawer panel (a
 //      "back arrow" affordance, but renders as an empty button).
-//   2. `.doc-drawer__header-close` — sits at top-RIGHT of the drawer
-//      header (the conventional close X).
+//   2. A header-X button inside the drawer's header (e.g.
+//      `.doc-drawer__header-close`, `.list-drawer__header-close`,
+//      `.edit-many__header-close`, or anything else with
+//      `class*='header-close'`).
 //
 // Two close buttons in the same drawer is redundant + confusing.
-// Hide the top-left one across all flavors and let the header X own
-// the close affordance. Backdrop click + Esc still close the drawer.
-.doc-drawer .drawer__close,
-.list-drawer .drawer__close,
-.edit-many .drawer__close,
-.edit-many-bulk-uploads .drawer__close {
+// Use `:has()` to hide the top-left one whenever a header-X exists
+// inside the same drawer — that lets the conventional right-aligned
+// X own the close affordance on every flavor (doc, list, edit-many,
+// bulk-upload, edit-upload, etc.) without enumerating slugs.
+//
+// Drawers without a header-X (none in v3 today, but defensive) keep
+// the left close so editors always have a way out. Backdrop click +
+// Esc still close every drawer regardless.
+.drawer--is-open:has([class*='header-close']) > .drawer__close,
+.drawer--is-open:has(.drawer-close-button) > .drawer__close,
+.drawer--is-open:has(.drawer__header [aria-label='Close']) > .drawer__close {
   display: none !important;
 }
 
@@ -233,15 +240,18 @@ body:has(.drawer--is-open) .nav-toggler {
 // Payload's stock drawer widths feel cramped on wide displays and
 // over-wide on small ones. Cap each flavor to a sensible width:
 //
-//   doc-drawer       → min(1080px, 80vw)  — full doc edit, sidebar fits
-//   list-drawer      → min(960px, 75vw)   — denser table view
-//   edit-many        → min(720px, 70vw)   — small form, lots of empty
-//                                            space at full-bleed
-//   bulk-uploads     → min(720px, 70vw)   — same shape as edit-many
+//   doc-drawer        → min(1080px, 80vw)  — full doc edit, sidebar fits
+//   list-drawer       → min(960px, 75vw)   — denser table view
+//   edit-many         → min(720px, 70vw)   — small form, lots of empty
+//                                             space at full-bleed
+//   edit-upload       → min(1280px, 90vw)  — image editor needs a
+//                                             generous preview pane
+//                                             AND a controls column
 //
-// `[class*="--slug-edit-"]` matches the per-collection slugs Payload
-// generates (edit-blogs, edit-news, etc.) so we don't have to enumerate
-// every collection.
+// We avoid the previous over-broad `[class*='--slug-edit-']` matcher
+// because it caught both the bulk-edit (`edit-many`, `edit-blogs`, …)
+// AND the image editor (`edit-upload`) drawers, sizing the latter way
+// too narrow for its split-panel layout.
 .payload__modal-item.doc-drawer {
   width: min(1080px, 80vw);
 }
@@ -250,10 +260,17 @@ body:has(.drawer--is-open) .nav-toggler {
   width: min(960px, 75vw);
 }
 
-.payload__modal-item[class*='--slug-edit-'],
-.payload__modal-item[class*='--slug-bulk-upload'],
+// Image editor drawer — Payload's `<ImageEditor>` lives here. Needs
+// horizontal room for the preview canvas (left) + crop/focal-point
+// controls (right).
+.payload__modal-item[class*='--slug-edit-upload'] {
+  width: min(1280px, 90vw);
+}
+
+// Bulk-edit drawers — small forms, default to a focused 720px so the
+// content doesn't strand the editor in a wasteland of empty space.
 .payload__modal-item[class*='--slug-edit-many'],
-.payload__modal-item[class*='--slug-edit-many-bulk-uploads'] {
+.payload__modal-item[class*='--slug-bulk-upload'] {
   width: min(720px, 70vw);
 }
 

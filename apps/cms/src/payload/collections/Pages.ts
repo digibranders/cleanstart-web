@@ -2,13 +2,18 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { pageBuilderBlocks } from '../blocks';
+import { publishedAtField } from '../fields/published-at';
+import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { firstPublishHook } from '../hooks/first-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { pagesPathBuilderHook } from '../hooks/pages-path-builder';
 import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
@@ -101,6 +106,19 @@ export const Pages: CollectionConfig = {
       admin: { readOnly: true, hidden: true },
     },
     {
+      // Computed by `pagesPathBuilderHook` on every save. The dispatcher
+      // emits a BreadcrumbList JSON-LD blob from this; the public site
+      // can render the same trail without a parent-chain fetch.
+      name: 'breadcrumb',
+      type: 'array',
+      access: { update: () => false },
+      admin: { readOnly: true, hidden: true },
+      fields: [
+        { name: 'path', type: 'text', required: true },
+        { name: 'label', type: 'text', required: true },
+      ],
+    },
+    {
       name: 'permalink',
       type: 'ui',
       admin: {
@@ -138,19 +156,36 @@ export const Pages: CollectionConfig = {
         position: 'sidebar',
       },
     },
-    // Pages use a `path` field rather than `slug`, so the SerpPreview
-    // (which reads slug) shows the empty-state until path-aware support
-    // lands. Title / Description / Indexable still surface as sidebar
-    // controls — those just read seo.* directly and work fine here.
-    ...seoSidebarFields({ pathPrefix: '', descriptionSource: 'abstract' }),
+    {
+      name: 'schemaType',
+      type: 'select',
+      defaultValue: 'auto',
+      options: [
+        { label: 'Auto (from URL)', value: 'auto' },
+        { label: 'WebPage', value: 'WebPage' },
+        { label: 'AboutPage', value: 'AboutPage' },
+        { label: 'ContactPage', value: 'ContactPage' },
+        { label: 'CollectionPage (index / archive)', value: 'CollectionPage' },
+      ],
+      admin: {
+        description:
+          'Schema.org @type for this page. Auto picks WebPage / AboutPage / ContactPage by URL; override here for /pricing → CollectionPage, /contact-eu → ContactPage, etc.',
+        position: 'sidebar',
+      },
+    },
+    schemaAddonsField,
+    publishedAtField,
+    ...seoSidebarFields({ pathPrefix: '', descriptionSource: 'abstract', urlSource: 'path' }),
     ...seoFieldsForSidebar('pages'),
   ],
   hooks: {
-    beforeChange: [pagesPathBuilderHook],
+    beforeChange: [firstPublishHook(), pagesPathBuilderHook],
     afterChange: [
       slugChangeRedirectHook('pages'),
+      schemaOverrideAuditHook('pages'),
       searchSyncAfterChangeHook('pages'),
       webhooksPublishAfterChangeHook('pages'),
+      indexNowPublishAfterChangeHook('pages'),
     ],
     afterDelete: [searchSyncAfterDeleteHook('pages')],
   },

@@ -61,9 +61,9 @@ const toAbsoluteUrl = (url: string): string => {
  */
 export const MediaSelfChrome = (): ReactElement | null => {
   const { id } = useDocumentInfo();
-  // Reactively pull current `alt` and `filename` from the form so the
-  // chrome stays in sync with whatever's been edited inline below
-  // (the "Alt" text input and any future filename-typed cell).
+  // Reactively pull current `alt` from the form so the chrome's
+  // "Alt:" readout stays in sync with whatever's typed in the Alt
+  // textarea below the card.
   const { value: liveAlt } = useField<string>({ path: 'alt' });
 
   const [doc, setDoc] = useState<MediaDoc | null>(null);
@@ -179,6 +179,76 @@ export const MediaSelfChrome = (): ReactElement | null => {
     [onCancelRename, onSaveRename],
   );
 
+  // "Edit Image" delegates to Payload's native image editor button.
+  // We hide Payload's stock `.file-field` chrome via CSS, but the
+  // hidden button is still in the DOM — clicking it opens Payload's
+  // built-in image editor dialog (rotate / crop / focal point).
+  const onEditImage = useCallback(() => {
+    const btn = document.querySelector<HTMLButtonElement>(
+      '.collection-edit--media .field-type.file-field .file-field__edit',
+    );
+    if (btn) btn.click();
+  }, []);
+
+  // "Replace" — file picker that PATCHes the existing media doc with
+  // the new file. Reuses one hidden `<input type="file">` mounted on
+  // first click so consecutive replaces don't leak DOM.
+  const replaceInputRef = useRef<HTMLInputElement | null>(null);
+  const [replacing, setReplacing] = useState(false);
+  const onReplace = useCallback(() => {
+    if (!id) return;
+    let input = replaceInputRef.current;
+    if (!input) {
+      input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*,application/pdf';
+      input.style.display = 'none';
+      input.addEventListener('change', () => {
+        const file = input?.files?.[0];
+        if (!file) return;
+        setReplacing(true);
+        const fd = new FormData();
+        fd.append('file', file);
+        fetch(`/api/media/${encodeURIComponent(String(id))}`, {
+          method: 'PATCH',
+          credentials: 'include',
+          body: fd,
+        })
+          .then(async (res) => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            try {
+              window.dispatchEvent(
+                new CustomEvent('cs-cms:toast', {
+                  detail: { message: 'File replaced.', type: 'success' },
+                }),
+              );
+            } catch {
+              // ignore
+            }
+            // Hard reload so thumbnail / size / dimensions all refresh.
+            window.location.reload();
+          })
+          .catch(() => {
+            setError('Replace failed — file may be too large or wrong type.');
+          })
+          .finally(() => {
+            setReplacing(false);
+            if (input) input.value = '';
+          });
+      });
+      document.body.appendChild(input);
+      replaceInputRef.current = input;
+    }
+    input.click();
+  }, [id]);
+
+  // Show the Edit Image button only for raster images (the editor
+  // doesn't apply to SVG / PDF / etc.).
+  const isRaster = useMemo(() => {
+    const m = doc?.mimeType ?? '';
+    return /^image\/(jpeg|jpg|png|webp|avif|gif)$/.test(m);
+  }, [doc?.mimeType]);
+
   if (!doc?.id || !doc.filename) {
     return null;
   }
@@ -249,9 +319,24 @@ export const MediaSelfChrome = (): ReactElement | null => {
                 >
                   {doc.filename}
                 </button>
-                <span className="cs-media-self__rename-hint" aria-hidden="true">
-                  RENAME
-                </span>
+                <button
+                  type="button"
+                  onClick={onStartRename}
+                  className="cs-media-self__rename-icon"
+                  aria-label="Rename file"
+                  title="Click to rename"
+                >
+                  <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M11.5 2.5a1.414 1.414 0 0 1 2 2L6 12 3 13l1-3 7.5-7.5Z"
+                    />
+                  </svg>
+                </button>
               </>
             )}
           </div>
@@ -288,6 +373,27 @@ export const MediaSelfChrome = (): ReactElement | null => {
             >
               ↗
             </a>
+            <button
+              type="button"
+              onClick={onReplace}
+              disabled={replacing}
+              className="cs-media-self__url-action cs-media-self__url-action--text"
+              title="Replace this file with a new upload"
+              aria-label="Replace file"
+            >
+              {replacing ? '…' : 'Replace'}
+            </button>
+            {isRaster && (
+              <button
+                type="button"
+                onClick={onEditImage}
+                className="cs-media-self__url-action cs-media-self__url-action--text"
+                title="Edit image (rotate, crop, focal point)"
+                aria-label="Edit image"
+              >
+                Edit
+              </button>
+            )}
           </div>
           {liveAlt && (
             <p className="cs-media-self__alt">

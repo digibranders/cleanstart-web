@@ -80,6 +80,30 @@
   }
 }
 
+// ─── Pagination strip — divider + breathing room above ────────────
+//
+// Payload renders the bottom strip as `.page-controls` containing
+// `.page-controls__page-info` ("1–4 of 4") + `.per-page` ("Per Page:
+// 10"). Without a divider it floats next to the table with no clear
+// boundary. Add a hairline top border + comfortable padding so the
+// strip reads as a footer, not table content.
+.page-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--cs-space-4);
+  padding-block: var(--cs-space-3);
+  margin-top: var(--cs-space-2);
+  border-top: 1px solid var(--theme-elevation-150);
+
+  &__page-info {
+    color: var(--theme-text-soft);
+    font-size: 12.5px;
+    font-feature-settings: 'tnum' 1;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
 // ─── Pagination — centred with tabular numerals ────────────────────
 .paginator,
 .list-pagination,

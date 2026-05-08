@@ -8,6 +8,7 @@ import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { validateOptionalUrl } from '../lib/url-shape';
@@ -98,6 +99,34 @@ export const Authors: CollectionConfig = {
       ],
     },
     {
+      // Read-only backstop populated by the Webflow ETL with the
+      // editor's original rich-text bio sub-fields (Education,
+      // Experience, Core Skills & Expertise, Awards & Recognition).
+      // The structured arrays above are the source of truth for
+      // public render + JSON-LD; this field exists so the author
+      // can copy from their original Webflow text while filling the
+      // structured rows post-migration.
+      name: 'legacyBio',
+      type: 'json',
+      access: { update: () => false },
+      admin: { hidden: true, readOnly: true },
+    },
+    {
+      // Sidebar-rendered viewer for `legacyBio`. Renders the original
+      // Webflow bio fragments alongside the form so the editor can
+      // copy → paste into the structured arrays. Auto-hides itself
+      // when `legacyBio` is null (i.e. for any author created after
+      // the Webflow import).
+      name: 'legacyBioViewer',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/payload/admin/components/LegacyBioViewer.tsx#LegacyBioViewer',
+        },
+      },
+    },
+    {
       name: 'acceptingNewBylines',
       type: 'checkbox',
       defaultValue: true,
@@ -120,7 +149,21 @@ export const Authors: CollectionConfig = {
         },
       },
     },
-    ...seoSidebarFields({ pathPrefix: '/authors', descriptionSource: 'bioShort' }),
+    {
+      name: 'credibility',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/payload/admin/components/AuthorCredibilityField.tsx#AuthorCredibilityField',
+        },
+      },
+    },
+    ...seoSidebarFields({
+      pathPrefix: '/authors',
+      titleSource: 'name',
+      descriptionSource: 'bioShort',
+    }),
     ...seoFieldsForSidebar('authors'),
   ],
   hooks: {
@@ -128,6 +171,7 @@ export const Authors: CollectionConfig = {
       slugChangeRedirectHook('authors'),
       searchSyncAfterChangeHook('authors'),
       webhooksPublishAfterChangeHook('authors'),
+      indexNowPublishAfterChangeHook('authors'),
     ],
     afterDelete: [searchSyncAfterDeleteHook('authors')],
   },

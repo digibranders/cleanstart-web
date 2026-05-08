@@ -39,19 +39,47 @@
 
 .table {
   font-size: 13.5px;
+  width: 100%;
+  // Drop the bottom divider — `td` rules handle row separation, and a
+  // table-level border doubled-up on the last row.
+  border-collapse: separate;
+  border-spacing: 0;
 
-  thead th {
-    color: var(--theme-text-soft);
-    font-weight: 600;
-    font-size: 12px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: var(--cs-space-2) var(--cs-space-3);
+  // Header row: a subtle band that anchors the column rhythm without
+  // competing with row content.
+  thead {
+    background: transparent;
+
+    th {
+      color: var(--theme-text-soft);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: var(--cs-space-3) var(--cs-space-3);
+      border-bottom: 1px solid var(--theme-elevation-200);
+      vertical-align: middle;
+      white-space: nowrap;
+      // Active sort: 2px cyan top hairline + saturated label.
+      &[aria-sort='ascending'],
+      &[aria-sort='descending'] {
+        color: var(--theme-text);
+
+        &::after {
+          content: '';
+          position: absolute;
+          inset-inline: 0;
+          top: 0;
+          height: 2px;
+          background: var(--cs-cyan-500);
+        }
+      }
+    }
   }
 
   tbody tr {
     transition: background-color var(--cs-motion-micro);
-    height: 48px;
+    height: 52px;
 
     &:hover {
       background: var(--theme-elevation-100);
@@ -66,9 +94,35 @@
   }
 
   td {
-    padding: var(--cs-space-2) var(--cs-space-3);
+    padding: var(--cs-space-3) var(--cs-space-3);
     color: var(--theme-text);
     border-top: 1px solid var(--theme-elevation-150);
+    vertical-align: middle;
+    line-height: 1.45;
+  }
+
+  // First / last cell in a row — flush to the gutter so the table
+  // visually breathes without horizontal rules running edge-to-edge.
+  td:first-child,
+  th:first-child {
+    padding-inline-start: var(--cs-space-4);
+  }
+  td:last-child,
+  th:last-child {
+    padding-inline-end: var(--cs-space-4);
+  }
+
+  // Title cell links — promote to brand cyan on hover for clear
+  // affordance over plain underlined-text default.
+  td a {
+    color: var(--theme-text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--cs-cyan-500);
+    }
   }
 
   &--appearance-condensed {
@@ -76,6 +130,82 @@
       height: 40px;
     }
   }
+}
+
+// ─── Sort indicator chevrons — single subtle chevron per direction ─
+//
+// Payload renders both ▲ + ▼ side-by-side at full opacity; reads as
+// visual noise. Tone the inactive direction down so the active state
+// is visible at a glance.
+.sort-column__buttons,
+.sort-column {
+  .sort-column__asc,
+  .sort-column__desc {
+    color: var(--theme-text-disabled);
+    opacity: 0.5;
+    transition:
+      color var(--cs-motion-micro),
+      opacity var(--cs-motion-micro);
+  }
+
+  .sort-column__asc:hover,
+  .sort-column__desc:hover {
+    opacity: 1;
+    color: var(--theme-text);
+  }
+
+  .sort-column__asc--active,
+  .sort-column__desc--active {
+    color: var(--cs-cyan-500);
+    opacity: 1;
+  }
+}
+
+// Bulk-select checkbox column — narrow, neutral background.
+.table thead th:has(input[type='checkbox']),
+.table tbody td:has(input[type='checkbox']) {
+  width: 36px;
+  padding-inline: var(--cs-space-3);
+}
+
+// ─── Number cells: tabular figures so digits don't wobble ────────
+//
+// Any cell containing a number-only value (hitCount, filesize before
+// reformat, etc.) gets `tabular-nums` so columns of digits align.
+.cell-hitCount,
+.cell-readingMinutes,
+.cell-wordCount,
+.cell-filesize,
+.cell-width,
+.cell-height,
+[class^='cell-'][class*='count'],
+[class^='cell-'][class*='Count'] {
+  font-feature-settings: 'tnum' 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// ─── Array-of-strings cells (e.g. users.roles) — comma-separated ─
+//
+// Payload renders `roles: ['admin', 'editor']` as `admin, editor`.
+// Promote to a row of small chips for at-a-glance scanning. Pattern
+// targets the inner label spans Payload emits, falling back to the
+// raw text when the structure is plain.
+.cell-roles,
+[class^='cell-roles'] {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--theme-text);
+  letter-spacing: 0.005em;
+}
+
+// ─── Empty cell ('—' fallback) — soft and centered tone ──────────
+//
+// Payload prints "—" when a column has no value. Tone it down so it
+// reads as "absent" rather than competing with real values.
+[class^='cell-']:empty,
+[class^='cell-']:has(> span:only-child:empty) {
+  color: var(--theme-text-disabled);
 }
 
 // List controls strip — toolbar above the table
