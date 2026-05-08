@@ -131,7 +131,12 @@ export const FieldDescriptionTooltip = (): ReactElement | null => {
       button.className = INFO_BTN_CLASS;
       button.tabIndex = -1;
       button.setAttribute('aria-label', `Field info: ${text}`);
-      button.title = text; // OS-level fallback; CSS portal is the primary path.
+      // No `title` attribute: that would surface the OS-level tooltip
+      // alongside our themed portal tooltip and editors get TWO bubbles
+      // on hover. The portal tooltip is our single source of truth.
+      // `aria-label` carries the description for screen readers, and
+      // Payload's existing aria-describedby on the input still resolves
+      // to the (visually-hidden) `.field-description` element.
       button.textContent = 'i';
 
       const onEnter = (): void => showTooltip(button, text);

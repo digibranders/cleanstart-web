@@ -41,6 +41,27 @@
   border: 0;
 }
 
+// ─── Sidebar field labels — pin the info-button to the label text ─
+//
+// Payload's right-rail labels are `display: flex; justify-content:
+// space-between` with three children when there's a badge:
+//   <span>Slug</span>  <button>i</button>  <span>· AUTO</span>
+// Space-between spreads them evenly: label-left, button-middle,
+// badge-right. Editors expect `Slug (i) ... AUTO` (info adjacent to
+// the label, badge stays right). Two surgical overrides:
+//   1. Switch the label to `justify-content: flex-start` so the text
+//      and the button stack at the left.
+//   2. Re-pin the badge to the right via `margin-left: auto` on the
+//      LAST non-button child. (No badge → selector matches nothing,
+//      no-op for plain text labels.)
+.field-label:has(.cs-field-info) {
+  justify-content: flex-start;
+
+  > :last-child:not(.cs-field-info) {
+    margin-left: auto;
+  }
+}
+
 // Inline info-button mounted inside the field label by
 // FieldDescriptionTooltip. Sits immediately after the label text so
 // the layout reads `Slug (i) ... AUTO` — info adjacent to the label,
