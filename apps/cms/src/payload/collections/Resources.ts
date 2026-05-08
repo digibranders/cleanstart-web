@@ -12,6 +12,7 @@ import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
@@ -93,6 +94,14 @@ export const Resources: CollectionConfig = {
       },
     },
     {
+      name: 'ctaButtonText',
+      type: 'text',
+      admin: {
+        description:
+          'CTA copy on the gated download / view button. Empty falls back to a sensible default by `type` (Whitepapers → "Download whitepaper", Reports → "Read the report", etc).',
+      },
+    },
+    {
       name: 'permalink',
       type: 'ui',
       admin: {
@@ -130,6 +139,7 @@ export const Resources: CollectionConfig = {
       schemaOverrideAuditHook('resources'),
       searchSyncAfterChangeHook('resources'),
       webhooksPublishAfterChangeHook('resources'),
+      indexNowPublishAfterChangeHook('resources'),
     ],
     afterDelete: [searchSyncAfterDeleteHook('resources')],
   },

@@ -21,6 +21,14 @@ type SerpPreviewFieldProps = {
    */
   descriptionSource?: string;
   /**
+   * Doc-level field that owns the URL part. `slug` for almost every
+   * collection — Pages override to `path` because they compute a
+   * full nested path on save. When `urlSource` is `path`, the field's
+   * value already contains the leading slash, so the rendered URL
+   * skips the `pathPrefix` prepending.
+   */
+  urlSource?: string;
+  /**
    * Public site URL. Defaults to `process.env.NEXT_PUBLIC_SITE_URL`
    * then `https://cleanstart.com`.
    */
@@ -53,6 +61,7 @@ export const SerpPreviewField = (props: SerpPreviewFieldProps): ReactElement => 
     pathPrefix = '',
     titleSource = 'title',
     descriptionSource = 'abstract',
+    urlSource = 'slug',
     siteUrl = DEFAULT_SITE_URL,
   } = props;
 
@@ -60,7 +69,7 @@ export const SerpPreviewField = (props: SerpPreviewFieldProps): ReactElement => 
   const { value: seoTitle } = useField<string>({ path: 'seo.title' });
   const { value: seoDesc } = useField<string>({ path: 'seo.description' });
   const { value: sourceDesc } = useField<string>({ path: descriptionSource });
-  const { value: slug } = useField<string>({ path: 'slug' });
+  const { value: urlPart } = useField<string>({ path: urlSource });
 
   const titleResolved = useMemo(() => {
     const t = seoTitle?.trim() || docTitle?.trim() || '';
@@ -72,12 +81,19 @@ export const SerpPreviewField = (props: SerpPreviewFieldProps): ReactElement => 
     return truncate(d, 160);
   }, [seoDesc, sourceDesc]);
 
+  // Pages compute a `path` on save that already starts with `/` and
+  // contains the full nested chain (e.g. `/solutions/pricing`). Every
+  // other collection stores a bare `slug` — we glue the prefix on.
   const urlResolved = useMemo(() => {
-    if (!slug) return '';
+    if (!urlPart) return '';
     const root = siteUrl.replace(/\/+$/, '');
+    if (urlSource === 'path') {
+      const path = urlPart.startsWith('/') ? urlPart : `/${urlPart}`;
+      return `${root}${path}`;
+    }
     const prefix = pathPrefix ? `/${trimSlash(pathPrefix)}` : '';
-    return `${root}${prefix}/${trimSlash(slug)}`;
-  }, [slug, pathPrefix, siteUrl]);
+    return `${root}${prefix}/${trimSlash(urlPart)}`;
+  }, [urlPart, urlSource, pathPrefix, siteUrl]);
 
   // Google renders the URL as a breadcrumb-ish path, e.g. `cleanstart.com › blog › sebi-cscrf-audit`
   const displayUrl = useMemo(() => {

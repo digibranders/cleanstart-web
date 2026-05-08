@@ -1,8 +1,26 @@
 'use client';
 
-import { useEffect, useState, type ReactElement } from 'react';
+import { useCallback, useEffect, useState, type ReactElement } from 'react';
 
 const ONE_MIN = 60_000;
+const SAVE_ERROR_TTL_MS = 12_000;
+
+/**
+ * Public helper any save-flow code can call when it knows a save
+ * failed. Surfaces a red "Save failed" pill on the global indicator
+ * so an editor sees the failure even if they missed Payload's toast.
+ *
+ *   import { dispatchSaveError } from '.../SavedStateIndicator';
+ *   dispatchSaveError('Network timeout — retry?');
+ */
+export const dispatchSaveError = (message?: string): void => {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(
+    new CustomEvent('cs-cms:save-error', {
+      detail: { message: message ?? 'Save failed' },
+    }),
+  );
+};
 
 const formatRelative = (iso: string): string => {
   const t = new Date(iso).getTime();
@@ -49,6 +67,7 @@ export const SavedStateIndicator = (): ReactElement | null => {
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [, setTick] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Listen for transient "saving" pulses dispatched by the SaveShortcut
   // and any other CMS code that wants the indicator to flash. The pulse
@@ -58,11 +77,28 @@ export const SavedStateIndicator = (): ReactElement | null => {
     if (typeof window === 'undefined') return undefined;
     const onSavingPulse = (): void => {
       setSaving(true);
+      // A new save attempt clears any prior failure surface — if the
+      // editor is retrying, the error pill should fold while we wait
+      // for the next outcome.
+      setSaveError(null);
       window.setTimeout(() => setSaving(false), 1200);
     };
+    const onSaveError = (event: Event): void => {
+      const message =
+        (event as CustomEvent<{ message?: string }>).detail?.message ?? 'Save failed';
+      setSaving(false);
+      setSaveError(message);
+      window.setTimeout(() => setSaveError(null), SAVE_ERROR_TTL_MS);
+    };
     window.addEventListener('cs-cms:saving', onSavingPulse);
-    return () => window.removeEventListener('cs-cms:saving', onSavingPulse);
+    window.addEventListener('cs-cms:save-error', onSaveError);
+    return () => {
+      window.removeEventListener('cs-cms:saving', onSavingPulse);
+      window.removeEventListener('cs-cms:save-error', onSaveError);
+    };
   }, []);
+
+  const dismissError = useCallback(() => setSaveError(null), []);
 
   // Detect edit view from pathname; re-detect on history navigation
   // (popstate fires for back/forward) and on a custom route-change
@@ -120,7 +156,28 @@ export const SavedStateIndicator = (): ReactElement | null => {
     return () => window.clearInterval(i);
   }, []);
 
-  if (!editPath || (!updatedAt && !saving)) return null;
+  if (!editPath || (!updatedAt && !saving && !saveError)) return null;
+
+  if (saveError) {
+    return (
+      <output
+        className="cs-saved-indicator cs-saved-indicator--error"
+        role="alert"
+        aria-live="assertive"
+      >
+        <span className="cs-saved-indicator__dot cs-saved-indicator__dot--error" aria-hidden="true" />
+        <span className="cs-saved-indicator__text">{saveError}</span>
+        <button
+          type="button"
+          className="cs-saved-indicator__dismiss"
+          aria-label="Dismiss save-error notice"
+          onClick={dismissError}
+        >
+          ×
+        </button>
+      </output>
+    );
+  }
 
   if (saving) {
     return (

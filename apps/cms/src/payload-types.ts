@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     redirects: Redirect;
+    brokenLinks: BrokenLink;
     'audit-log': AuditLog;
     searchLog: SearchLog;
     authors: Author;
@@ -100,6 +101,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
@@ -157,6 +159,7 @@ export interface Config {
       drainLeadQueue: TaskDrainLeadQueue;
       purgeSearchLog: TaskPurgeSearchLog;
       purgeLeadsPii: TaskPurgeLeadsPii;
+      checkBrokenLinks: TaskCheckBrokenLinks;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -332,6 +335,32 @@ export interface Redirect {
   createdAt: string;
 }
 /**
+ * Auto-populated by the nightly link-check cron. Read-only — fix the URL on the source doc and re-publish, the next cron run clears the row.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brokenLinks".
+ */
+export interface BrokenLink {
+  id: number;
+  url: string;
+  status: 'ok' | 'broken' | 'redirect' | 'network';
+  /**
+   * Last observed HTTP status. 0 when the request failed before a response.
+   */
+  httpStatus?: number | null;
+  sourceCollection: string;
+  sourceDocId: string;
+  sourceDocSlug?: string | null;
+  firstSeenAt?: string | null;
+  lastChecked?: string | null;
+  /**
+   * Optional human note (e.g. "publisher confirmed page taken down — replace with archive.org snapshot").
+   */
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Append-only record of sensitive actions on leads + DSAR events. Read-only — entries are written by hooks, never via the admin UI.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -405,7 +434,7 @@ export interface Author {
   id: number;
   name: string;
   /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   photo?: (number | null) | Media;
@@ -483,6 +512,15 @@ export interface Author {
         id?: string | null;
       }[]
     | null;
+  legacyBio?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   /**
    * Toggle off to hide this author from the byline picker on new drafts. Existing bylines stay intact.
    */
@@ -524,6 +562,26 @@ export interface Author {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -531,6 +589,10 @@ export interface Author {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -565,7 +627,7 @@ export interface Category {
   id: number;
   name: string;
   /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   description?: string | null;
@@ -611,6 +673,26 @@ export interface Category {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -618,6 +700,10 @@ export interface Category {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -652,7 +738,7 @@ export interface NewsCategory {
   id: number;
   name: string;
   /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   description?: string | null;
@@ -698,6 +784,26 @@ export interface NewsCategory {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -705,6 +811,10 @@ export interface NewsCategory {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -739,7 +849,7 @@ export interface KnowledgeCategory {
   id: number;
   name: string;
   /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   description?: string | null;
@@ -785,6 +895,26 @@ export interface KnowledgeCategory {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -792,6 +922,10 @@ export interface KnowledgeCategory {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -826,7 +960,7 @@ export interface JobLocation {
   id: number;
   name: string;
   /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   type: 'country' | 'region' | 'city';
@@ -845,7 +979,7 @@ export interface Form {
   id: number;
   name: string;
   /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   /**
@@ -1066,7 +1200,7 @@ export interface Blog {
   id: number;
   title: string;
   /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   /**
@@ -1309,6 +1443,26 @@ export interface Blog {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -1316,6 +1470,10 @@ export interface Blog {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -1350,7 +1508,7 @@ export interface News {
   id: number;
   title: string;
   /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   abstract?: string | null;
@@ -1557,6 +1715,26 @@ export interface News {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -1564,6 +1742,10 @@ export interface News {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -1598,7 +1780,7 @@ export interface Guide {
   id: number;
   title: string;
   /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   heroImage?: (number | null) | Media;
@@ -1637,7 +1819,7 @@ export interface Guide {
       }[]
     | null;
   /**
-   * Replaces Webflow Article About 1…8.
+   * Replaces Webflow Article About 1…8. Each section is one step when "Emit HowTo schema" is on below.
    */
   articleSections?:
     | {
@@ -1660,6 +1842,28 @@ export interface Guide {
         id?: string | null;
       }[]
     | null;
+  /**
+   * When on, the guide emits a Schema.org HowTo blob alongside the TechArticle, treating each Article Section as a step. Use only for genuine procedural content (e.g. "How to harden your SSH server in 6 steps") — Google penalises HowTo on non-procedural articles.
+   */
+  howTo?: {
+    enabled?: boolean | null;
+    /**
+     * ISO 8601 duration for the entire guide (e.g. PT30M = 30 minutes, PT1H30M = 1 hour 30 min).
+     */
+    totalTime?: string | null;
+    /**
+     * ISO 8601 prep duration (optional).
+     */
+    prepTime?: string | null;
+    /**
+     * ISO 8601 active-work duration (optional).
+     */
+    performTime?: string | null;
+    /**
+     * Optional cost hint (e.g. "$0", "$50 in tooling").
+     */
+    estimatedCost?: string | null;
+  };
   /**
    * Replaces Webflow Article Mentions 1…10. Each citation surfaces in JSON-LD citation[].
    */
@@ -1872,6 +2076,26 @@ export interface Guide {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -1879,6 +2103,10 @@ export interface Guide {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -1913,7 +2141,7 @@ export interface Resource {
   id: number;
   title: string;
   /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   type?: ('whitepaper' | 'report' | 'brief' | 'datasheet' | 'case-study') | null;
@@ -1947,6 +2175,10 @@ export interface Resource {
    */
   gateForm?: (number | null) | Form;
   accessLevel?: ('public' | 'lead-gated' | 'customer-only') | null;
+  /**
+   * CTA copy on the gated download / view button. Empty falls back to a sensible default by `type` (Whitepapers → "Download whitepaper", Reports → "Read the report", etc).
+   */
+  ctaButtonText?: string | null;
   /**
    * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
    */
@@ -2129,6 +2361,26 @@ export interface Resource {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -2136,6 +2388,10 @@ export interface Resource {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -2172,7 +2428,7 @@ export interface KnowledgeBase {
   id: number;
   title: string;
   /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   /**
@@ -2412,6 +2668,26 @@ export interface KnowledgeBase {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -2419,6 +2695,10 @@ export interface KnowledgeBase {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -2453,7 +2733,7 @@ export interface Event {
   id: number;
   title: string;
   /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   venue: string;
@@ -2497,6 +2777,19 @@ export interface Event {
    */
   registrationForm?: (number | null) | Form;
   attendeesCap?: number | null;
+  /**
+   * Drives the Event JSON-LD eventStatus. Switching to Postponed / Cancelled is required so search engines stop showing the event as still happening.
+   */
+  eventStatus: 'scheduled' | 'postponed' | 'cancelled';
+  /**
+   * Auto-stamped when eventStatus flips to Cancelled.
+   */
+  cancelledAt?: string | null;
+  /**
+   * Original start date before this event was rescheduled. Auto-captured when you change startsAt while eventStatus is Postponed; emitted as Schema.org Event.previousStartDate.
+   */
+  previousStartDate?: string | null;
+  speakers?: (number | Author)[] | null;
   /**
    * Agenda PDF (routed to web/event/).
    */
@@ -2689,6 +2982,26 @@ export interface Event {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -2696,6 +3009,10 @@ export interface Event {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -2730,7 +3047,7 @@ export interface Webinar {
   id: number;
   title: string;
   /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   heroImage?: (number | null) | Media;
@@ -2769,6 +3086,18 @@ export interface Webinar {
   registrationForm?: (number | null) | Form;
   attendeesCap?: number | null;
   speakers?: (number | Author)[] | null;
+  /**
+   * Drives the Event JSON-LD eventStatus. Switching to Postponed / Cancelled is required so search engines stop showing the webinar as still happening.
+   */
+  eventStatus: 'scheduled' | 'postponed' | 'cancelled';
+  /**
+   * Auto-stamped when eventStatus flips to Cancelled.
+   */
+  cancelledAt?: string | null;
+  /**
+   * Original start date before this webinar was rescheduled. Auto-captured when you change startsAt while eventStatus is Postponed; emitted as Schema.org Event.previousStartDate.
+   */
+  previousStartDate?: string | null;
   /**
    * Slides PDF (routed to web/webinar/).
    */
@@ -2959,6 +3288,26 @@ export interface Webinar {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -2966,6 +3315,10 @@ export interface Webinar {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -3000,7 +3353,7 @@ export interface Job {
   id: number;
   title: string;
   /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   source: 'cms' | 'ats';
@@ -3237,6 +3590,26 @@ export interface Job {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -3244,6 +3617,10 @@ export interface Job {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -3286,6 +3663,10 @@ export interface AboutGallery {
   image: number | Media;
   caption?: string | null;
   /**
+   * Optional click-destination for the gallery image. Site-relative path (/about-us#team) or full URL. Empty = the image is non-interactive.
+   */
+  imageLink?: string | null;
+  /**
    * Drag to reorder in the list view (Phase D admin UX).
    */
   displayOrder?: number | null;
@@ -3301,7 +3682,7 @@ export interface Page {
   id: number;
   title: string;
   /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do).
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   /**
@@ -3309,6 +3690,13 @@ export interface Page {
    */
   parent?: (number | null) | Page;
   path?: string | null;
+  breadcrumb?:
+    | {
+        path: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Compose the page from typed blocks. Section is a layout primitive — every other block is a content unit.
    */
@@ -4871,6 +5259,10 @@ export interface Page {
    */
   pageLayout?: ('default' | 'narrow' | 'full-bleed') | null;
   /**
+   * Schema.org @type for this page. Auto picks WebPage / AboutPage / ContactPage by URL; override here for /pricing → CollectionPage, /contact-eu → ContactPage, etc.
+   */
+  schemaType?: ('auto' | 'WebPage' | 'AboutPage' | 'ContactPage' | 'CollectionPage') | null;
+  /**
    * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
    */
   schemaAddons?:
@@ -5048,6 +5440,26 @@ export interface Page {
      */
     ogDescription?: string | null;
     /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    /**
      * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
      */
     useCustomCanonical?: boolean | null;
@@ -5055,6 +5467,10 @@ export interface Page {
      * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
      */
     canonicalOverride?: string | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -5150,7 +5566,13 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'drainLeadQueue' | 'purgeSearchLog' | 'purgeLeadsPii' | 'schedulePublish';
+        taskSlug:
+          | 'inline'
+          | 'drainLeadQueue'
+          | 'purgeSearchLog'
+          | 'purgeLeadsPii'
+          | 'checkBrokenLinks'
+          | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -5183,7 +5605,9 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'drainLeadQueue' | 'purgeSearchLog' | 'purgeLeadsPii' | 'schedulePublish') | null;
+  taskSlug?:
+    | ('inline' | 'drainLeadQueue' | 'purgeSearchLog' | 'purgeLeadsPii' | 'checkBrokenLinks' | 'schedulePublish')
+    | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -5217,6 +5641,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'brokenLinks';
+        value: number | BrokenLink;
       } | null)
     | ({
         relationTo: 'audit-log';
@@ -5440,6 +5868,23 @@ export interface RedirectsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brokenLinks_select".
+ */
+export interface BrokenLinksSelect<T extends boolean = true> {
+  url?: T;
+  status?: T;
+  httpStatus?: T;
+  sourceCollection?: T;
+  sourceDocId?: T;
+  sourceDocSlug?: T;
+  firstSeenAt?: T;
+  lastChecked?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit-log_select".
  */
 export interface AuditLogSelect<T extends boolean = true> {
@@ -5527,6 +5972,7 @@ export interface AuthorsSelect<T extends boolean = true> {
         year?: T;
         id?: T;
       };
+  legacyBio?: T;
   acceptingNewBylines?: T;
   seo?:
     | T
@@ -5539,8 +5985,14 @@ export interface AuthorsSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -5574,8 +6026,14 @@ export interface CategoriesSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -5609,8 +6067,14 @@ export interface NewsCategoriesSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -5644,8 +6108,14 @@ export interface KnowledgeCategoriesSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -5914,8 +6384,14 @@ export interface BlogsSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -6041,8 +6517,14 @@ export interface NewsSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -6080,6 +6562,15 @@ export interface GuidesSelect<T extends boolean = true> {
         heading?: T;
         body?: T;
         id?: T;
+      };
+  howTo?:
+    | T
+    | {
+        enabled?: T;
+        totalTime?: T;
+        prepTime?: T;
+        performTime?: T;
+        estimatedCost?: T;
       };
   citations?:
     | T
@@ -6203,8 +6694,14 @@ export interface GuidesSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -6232,6 +6729,7 @@ export interface ResourcesSelect<T extends boolean = true> {
   gated?: T;
   gateForm?: T;
   accessLevel?: T;
+  ctaButtonText?: T;
   schemaAddons?:
     | T
     | {
@@ -6330,8 +6828,14 @@ export interface ResourcesSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -6472,8 +6976,14 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -6505,6 +7015,10 @@ export interface EventsSelect<T extends boolean = true> {
   registrationUrl?: T;
   registrationForm?: T;
   attendeesCap?: T;
+  eventStatus?: T;
+  cancelledAt?: T;
+  previousStartDate?: T;
+  speakers?: T;
   agendaPdf?: T;
   gallery?:
     | T
@@ -6610,8 +7124,14 @@ export interface EventsSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -6644,6 +7164,9 @@ export interface WebinarsSelect<T extends boolean = true> {
   registrationForm?: T;
   attendeesCap?: T;
   speakers?: T;
+  eventStatus?: T;
+  cancelledAt?: T;
+  previousStartDate?: T;
   pdf?: T;
   recordingUrl?: T;
   slidesUrl?: T;
@@ -6744,8 +7267,14 @@ export interface WebinarsSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -6883,8 +7412,14 @@ export interface JobsSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -6906,6 +7441,7 @@ export interface AboutGalleriesSelect<T extends boolean = true> {
   slug?: T;
   image?: T;
   caption?: T;
+  imageLink?: T;
   displayOrder?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -6920,6 +7456,13 @@ export interface PagesSelect<T extends boolean = true> {
   slug?: T;
   parent?: T;
   path?: T;
+  breadcrumb?:
+    | T
+    | {
+        path?: T;
+        label?: T;
+        id?: T;
+      };
   layout?:
     | T
     | {
@@ -7671,6 +8214,7 @@ export interface PagesSelect<T extends boolean = true> {
             };
       };
   pageLayout?: T;
+  schemaType?: T;
   schemaAddons?:
     | T
     | {
@@ -7768,8 +8312,14 @@ export interface PagesSelect<T extends boolean = true> {
         useAdvancedOg?: T;
         ogTitle?: T;
         ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        keywordTarget?: T;
         speakablePath?:
           | T
           | {
@@ -7887,6 +8437,23 @@ export interface SiteSetting {
      */
     retentionDays?: number | null;
   };
+  /**
+   * Public-site analytics IDs. Leave blank to disable. Consent mode delays GTM/GA4 firing until the cookie banner returns "accepted".
+   */
+  analytics?: {
+    /**
+     * Google Tag Manager container, e.g. GTM-XXXXXXX.
+     */
+    gtmContainerId?: string | null;
+    /**
+     * GA4 measurement ID, e.g. G-XXXXXXXXXX.
+     */
+    ga4MeasurementId?: string | null;
+    /**
+     * When on, GA4 / GTM tags fire only after the cookie banner returns "accepted" (Google Consent Mode v2). Required for GDPR compliance.
+     */
+    consentModeEnabled?: boolean | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -7912,6 +8479,56 @@ export interface SeoDefault {
    * Used as twitter:site fallback when no author handle is set.
    */
   twitterHandle?: string | null;
+  /**
+   * Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`.
+   */
+  brandIcons?: {
+    /**
+     * 32×32 favicon. Used by `<link rel="icon" sizes="32x32">`.
+     */
+    favicon32?: (number | null) | Media;
+    /**
+     * 192×192 PNG. PWA / Android home-screen icon.
+     */
+    icon192?: (number | null) | Media;
+    /**
+     * 512×512 PNG. PWA / large-tile icon.
+     */
+    icon512?: (number | null) | Media;
+    /**
+     * 180×180 PNG. iOS home-screen icon (`apple-touch-icon`).
+     */
+    appleTouchIcon?: (number | null) | Media;
+    /**
+     * Single-colour SVG for Safari pinned-tab. Will be served as `mask-icon`.
+     */
+    safariPinnedTabSvg?: (number | null) | Media;
+    /**
+     * Hex string (e.g. #0E1117). Surfaced as `<meta name="theme-color">` and as `theme_color` in manifest.json.
+     */
+    themeColor?: string | null;
+  };
+  /**
+   * Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper.
+   */
+  verification?: {
+    /**
+     * google-site-verification (Google Search Console → Settings → Ownership verification → HTML tag).
+     */
+    google?: string | null;
+    /**
+     * msvalidate.01 (Bing Webmaster Tools → Site Settings → Site verification → Meta tag).
+     */
+    bing?: string | null;
+    /**
+     * p:domain_verify (Pinterest → Settings → Claim → claim a website → HTML tag).
+     */
+    pinterest?: string | null;
+    /**
+     * yandex-verification (Yandex Webmaster → Settings → Site verification → Meta tag).
+     */
+    yandex?: string | null;
+  };
   /**
    * Surfaced on every page as the publisher reference. Required for News content.
    */
@@ -8276,6 +8893,13 @@ export interface SiteSettingsSelect<T extends boolean = true> {
     | {
         retentionDays?: T;
       };
+  analytics?:
+    | T
+    | {
+        gtmContainerId?: T;
+        ga4MeasurementId?: T;
+        consentModeEnabled?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -8289,6 +8913,24 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
   defaultDescription?: T;
   defaultOgImage?: T;
   twitterHandle?: T;
+  brandIcons?:
+    | T
+    | {
+        favicon32?: T;
+        icon192?: T;
+        icon512?: T;
+        appleTouchIcon?: T;
+        safariPinnedTabSvg?: T;
+        themeColor?: T;
+      };
+  verification?:
+    | T
+    | {
+        google?: T;
+        bing?: T;
+        pinterest?: T;
+        yandex?: T;
+      };
   organizationJsonLd?:
     | T
     | {
@@ -8506,6 +9148,14 @@ export interface TaskPurgeSearchLog {
  * via the `definition` "TaskPurgeLeadsPii".
  */
 export interface TaskPurgeLeadsPii {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskCheckBrokenLinks".
+ */
+export interface TaskCheckBrokenLinks {
   input?: unknown;
   output?: unknown;
 }

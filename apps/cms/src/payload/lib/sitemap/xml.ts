@@ -104,3 +104,46 @@ export const renderNewsUrlsetXml = (entries: readonly NewsSitemapEntry[]): strin
     '</urlset>',
     '',
   ].join('\n');
+
+export interface ImageSitemapEntry {
+  readonly loc: string;
+  readonly images: ReadonlyArray<{
+    readonly loc: string;
+    readonly caption?: string | null;
+    readonly title?: string | null;
+  }>;
+}
+
+const renderImageEntry = (entry: ImageSitemapEntry): string => {
+  const lines: string[] = ['  <url>', `    <loc>${xmlEscape(entry.loc)}</loc>`];
+  for (const image of entry.images) {
+    lines.push('    <image:image>');
+    lines.push(`      <image:loc>${xmlEscape(image.loc)}</image:loc>`);
+    if (image.caption && image.caption.length > 0) {
+      lines.push(`      <image:caption>${xmlEscape(image.caption)}</image:caption>`);
+    }
+    if (image.title && image.title.length > 0) {
+      lines.push(`      <image:title>${xmlEscape(image.title)}</image:title>`);
+    }
+    lines.push('    </image:image>');
+  }
+  lines.push('  </url>');
+  return lines.join('\n');
+};
+
+/**
+ * Render the Google image sitemap urlset. Wraps the standard
+ * sitemap.xml namespace with the `image:` namespace so each `<url>`
+ * can carry one or more `<image:image>` children.
+ */
+export const renderImageUrlsetXml = (
+  entries: readonly ImageSitemapEntry[],
+): string =>
+  [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+    '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
+    entries.map(renderImageEntry).join('\n'),
+    '</urlset>',
+    '',
+  ].join('\n');

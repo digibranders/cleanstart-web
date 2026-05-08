@@ -11,6 +11,7 @@ import { AboutGalleries } from './payload/collections/AboutGalleries';
 import { AuditLog } from './payload/collections/audit-log';
 import { Authors } from './payload/collections/Authors';
 import { Blogs } from './payload/collections/Blogs';
+import { BrokenLinks } from './payload/collections/BrokenLinks';
 import { Categories } from './payload/collections/Categories';
 import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
@@ -29,9 +30,17 @@ import { Resources } from './payload/collections/Resources';
 import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
+import { canonicalCheckEndpoint } from './payload/endpoints/canonical-check';
 import { jsonLdEndpoint } from './payload/endpoints/jsonld';
+import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
+import { robotsEndpoint } from './payload/endpoints/robots';
 import { searchAnalyticsEndpoint } from './payload/endpoints/search-analytics';
-import { newsSitemapEndpoint, sitemapEndpoint } from './payload/endpoints/sitemap';
+import {
+  imageSitemapEndpoint,
+  newsSitemapEndpoint,
+  sitemapEndpoint,
+} from './payload/endpoints/sitemap';
+import { checkBrokenLinksTask } from './payload/jobs/check-broken-links';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
@@ -102,6 +111,7 @@ export default buildConfig({
         './payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator',
         './payload/admin/components/NavBadges.tsx#NavBadges',
         './payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence',
+        './payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop',
         './payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle',
         './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
         './payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer',
@@ -144,6 +154,7 @@ export default buildConfig({
     Users,
     Media,
     Redirects,
+    BrokenLinks,
     AuditLog,
     SearchLog,
     Authors,
@@ -165,9 +176,18 @@ export default buildConfig({
     Pages,
   ],
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements],
-  endpoints: [jsonLdEndpoint, sitemapEndpoint, newsSitemapEndpoint, searchAnalyticsEndpoint],
+  endpoints: [
+    jsonLdEndpoint,
+    sitemapEndpoint,
+    newsSitemapEndpoint,
+    imageSitemapEndpoint,
+    robotsEndpoint,
+    redirectsImportEndpoint,
+    canonicalCheckEndpoint,
+    searchAnalyticsEndpoint,
+  ],
   jobs: {
-    tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask],
+    tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask],
     autoRun: [
       {
         cron: '*/5 * * * *', // every 5 minutes
@@ -180,6 +200,10 @@ export default buildConfig({
       {
         cron: '15 3 * * *', // daily at 03:15 UTC — leads PII 365-day redaction
         queue: 'leadsPiiPurge',
+      },
+      {
+        cron: '30 4 * * *', // daily at 04:30 UTC — broken-link scan
+        queue: 'brokenLinksScan',
       },
     ],
     shouldAutoRun: () => process.env.NODE_ENV !== 'test',

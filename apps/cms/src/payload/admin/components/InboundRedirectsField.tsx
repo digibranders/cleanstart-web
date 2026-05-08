@@ -4,6 +4,8 @@ import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
+import { ChevronDown } from './icons/Chevron';
+import { Notice } from './Notice';
 import {
   formatApiError,
   formatHitCount,
@@ -302,7 +304,7 @@ export const InboundRedirectsField = (
           {summaryText}
         </span>
         <span className="cs-inbound-redirects__chevron" aria-hidden="true">
-          ▾
+          <ChevronDown />
         </span>
       </button>
 
@@ -325,12 +327,11 @@ export const InboundRedirectsField = (
           )}
 
           {fetchState.status === 'error' && (
-            <p
-              className="cs-inbound-redirects__hint"
-              style={{ color: 'var(--color-error-500, #ff5c5c)' }}
-            >
-              Couldn’t load redirects: {fetchState.error ?? 'unknown error'}
-            </p>
+            <div style={{ marginTop: 6 }}>
+              <Notice variant="error" title="Couldn’t load redirects">
+                {fetchState.error ?? 'unknown error'}
+              </Notice>
+            </div>
           )}
 
           {fetchState.status === 'ok' && count === 0 && !creatingNew && (
@@ -580,7 +581,9 @@ const InlineForm = (props: InlineFormProps): ReactElement => {
       />
 
       {form.error && (
-        <p className="cs-inbound-redirects__form-error">{form.error}</p>
+        <div style={{ marginTop: 8, marginBottom: 8 }}>
+          <Notice variant="error">{form.error}</Notice>
+        </div>
       )}
 
       <div className="cs-inbound-redirects__form-actions">

@@ -1,4 +1,5 @@
 import type { JsonLdContext } from './context';
+import { buildKnowsAboutEntries } from './topic-areas';
 import type { JsonLdBlob } from './types';
 import { absoluteUrl } from './url';
 
@@ -21,6 +22,8 @@ export interface AuthorSource {
     readonly email?: string | null;
   } | null;
   readonly topicAreas?: readonly { topic?: string | null }[] | null;
+  readonly education?: readonly { institution?: string | null }[] | null;
+  readonly awards?: readonly { title?: string | null; issuer?: string | null }[] | null;
 }
 
 const profileUrl = (ctx: JsonLdContext, slug: string): string =>
@@ -40,10 +43,26 @@ const collectSameAs = (author: AuthorSource): string[] => {
   return out.filter((url) => url.length > 0);
 };
 
-const collectKnowsAbout = (author: AuthorSource): string[] =>
-  (author.topicAreas ?? [])
-    .map((entry) => entry.topic ?? '')
-    .filter((topic) => topic.length > 0);
+const collectKnowsAbout = (author: AuthorSource): unknown[] =>
+  buildKnowsAboutEntries(
+    (author.topicAreas ?? []).map((entry) => entry.topic ?? null),
+  );
+
+const collectAlumniOf = (author: AuthorSource): unknown[] =>
+  (author.education ?? [])
+    .map((entry) => entry.institution ?? '')
+    .filter((name) => name.length > 0)
+    .map((name) => ({ '@type': 'EducationalOrganization', name }));
+
+const collectAwards = (author: AuthorSource): string[] =>
+  (author.awards ?? [])
+    .map((entry) => {
+      const title = (entry.title ?? '').trim();
+      if (title.length === 0) return '';
+      const issuer = (entry.issuer ?? '').trim();
+      return issuer.length > 0 ? `${title} (${issuer})` : title;
+    })
+    .filter((s) => s.length > 0);
 
 /**
  * Build the @id for an author Person blob. Used by article emitters
@@ -100,6 +119,12 @@ export const buildPersonBlob = (
 
   const knowsAbout = collectKnowsAbout(author);
   if (knowsAbout.length > 0) blob.knowsAbout = knowsAbout;
+
+  const alumniOf = collectAlumniOf(author);
+  if (alumniOf.length > 0) blob.alumniOf = alumniOf;
+
+  const awards = collectAwards(author);
+  if (awards.length > 0) blob.award = awards;
 
   return blob as JsonLdBlob;
 };

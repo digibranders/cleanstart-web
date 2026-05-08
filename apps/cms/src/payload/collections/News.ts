@@ -11,6 +11,7 @@ import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { validateOptionalUrl } from '../lib/url-shape';
@@ -126,6 +127,7 @@ export const News: CollectionConfig = {
       schemaOverrideAuditHook('news'),
       searchSyncAfterChangeHook('news'),
       webhooksPublishAfterChangeHook('news'),
+      indexNowPublishAfterChangeHook('news'),
     ],
     afterDelete: [searchSyncAfterDeleteHook('news')],
   },

@@ -280,6 +280,17 @@
       border-color: var(--cs-border-subtle) !important;
       background: var(--cs-tint-brand-soft) !important;
     }
+
+    // Strip the cross-cutting button focus tile — the cyan halo from
+    // _button-audit.scss was leaving a visible cyan square on the
+    // hamburger after click, reading as "currently active" even when
+    // nothing was open. Use focus-visible only, with a tighter ring.
+    &:focus { outline: none !important; }
+    &:focus-visible {
+      outline: none !important;
+      box-shadow: 0 0 0 2px var(--cs-tint-focus-ring) !important;
+      background: transparent !important;
+    }
   }
 
   svg {

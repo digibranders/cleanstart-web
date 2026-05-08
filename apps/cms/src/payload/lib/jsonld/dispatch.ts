@@ -4,6 +4,7 @@ import { buildBreadcrumbBlob } from './breadcrumb';
 import type { JsonLdContext } from './context';
 import { buildEventBlob, type EventAttendanceMode } from './event';
 import { buildFaqPageBlob } from './faq-page';
+import { buildHowToBlob, type HowToStep } from './how-to';
 import { validateOverride } from './override-validator';
 import {
   buildJobPostingBlob,
@@ -15,7 +16,7 @@ import { buildPersonBlob, type AuthorSource } from './person';
 import { onlyResolved, pickResolved, type ResolvedMedia } from './shared';
 import type { JsonLdBlob } from './types';
 import { docCanonicalUrl } from './url';
-import { buildWebPageBlob, webPageVariantForPath } from './web-page';
+import { type WebPageVariant, buildWebPageBlob, webPageVariantForPath } from './web-page';
 import { buildWebsiteBlob } from './website';
 import { extractFromLexical } from '../lexical-extract';
 
@@ -137,6 +138,29 @@ const readKeywords = (doc: AnyDoc): string[] | null => {
   return out.length > 0 ? out : null;
 };
 
+interface CitationRow {
+  label?: string | null;
+  source?: string | null;
+  url?: string | null;
+}
+
+const readCitations = (
+  doc: AnyDoc,
+): readonly { label: string; source?: string | null; url?: string | null }[] | null => {
+  const list = (doc as { citations?: CitationRow[] | null }).citations;
+  if (!list) return null;
+  const out = list
+    .filter((row): row is CitationRow & { label: string } =>
+      typeof row.label === 'string' && row.label.length > 0,
+    )
+    .map((row) => ({
+      label: row.label,
+      source: row.source ?? null,
+      url: row.url ?? null,
+    }));
+  return out.length > 0 ? out : null;
+};
+
 const aboutFromCategoryList = (
   doc: AnyDoc,
   field: 'categories' | 'newsCategories',
@@ -230,6 +254,7 @@ const dispatchArticleLike = (
     about,
     wordCount: readWordCount(doc),
     keywords: collection === 'guides' ? readKeywords(doc) : null,
+    citations: collection === 'guides' ? readCitations(doc) : null,
     speakablePath: seo.speakablePath ?? null,
     seoTitle: seo.title ?? null,
   };
@@ -238,7 +263,69 @@ const dispatchArticleLike = (
   const breadcrumb = buildBreadcrumbBlob(ctx, breadcrumbs);
   const faqs = buildFaqPageBlob(url, faqsRaw);
 
-  return composeArticleBlobs(ctx, source, authors, breadcrumb, faqs);
+  const blobs = composeArticleBlobs(ctx, source, authors, breadcrumb, faqs);
+
+  // Guides can opt into a sibling HowTo blob when the editor flips
+  // `howTo.enabled` and the article has at least one section.
+  if (collection === 'guides') {
+    const howTo = buildGuideHowTo(ctx, doc, url);
+    if (howTo) blobs.push(howTo);
+  }
+
+  return blobs;
+};
+
+interface GuideHowToConfig {
+  enabled?: boolean;
+  totalTime?: string | null;
+  prepTime?: string | null;
+  performTime?: string | null;
+  estimatedCost?: string | null;
+}
+
+interface ArticleSectionRow {
+  heading?: string | null;
+  body?: unknown;
+}
+
+const lexicalRichTextToPlain = (body: unknown): string => {
+  // Reuse the canonical text-collector that already handles the
+  // Lexical tree shape — same one the JobPosting description fallback
+  // uses. Avoid a second walk implementation.
+  return collectLexicalText(body);
+};
+
+const buildGuideHowTo = (
+  ctx: JsonLdContext,
+  doc: AnyDoc,
+  url: string,
+) => {
+  const cfg = (doc as { howTo?: GuideHowToConfig }).howTo;
+  if (!cfg?.enabled) return null;
+  const sections =
+    (doc as { articleSections?: ArticleSectionRow[] | null }).articleSections ?? [];
+  const steps: HowToStep[] = [];
+  for (const section of sections) {
+    if (typeof section.heading !== 'string' || section.heading.trim().length === 0) {
+      continue;
+    }
+    const body = lexicalRichTextToPlain(section.body);
+    if (body.length === 0) continue;
+    steps.push({ heading: section.heading.trim(), body });
+  }
+  if (steps.length === 0) return null;
+
+  return buildHowToBlob(ctx, {
+    url,
+    title: doc.title ?? '',
+    description: readDescription(doc),
+    heroImage: readHeroImage(doc),
+    totalTime: cfg.totalTime ?? null,
+    prepTime: cfg.prepTime ?? null,
+    performTime: cfg.performTime ?? null,
+    estimatedCost: cfg.estimatedCost ?? null,
+    steps,
+  });
 };
 
 const breadcrumbsFor = (
@@ -305,6 +392,14 @@ const readSpeakers = (
   return list ?? null;
 };
 
+const readEventStatus = (
+  doc: AnyDoc,
+): 'scheduled' | 'cancelled' | 'postponed' => {
+  const value = (doc as { eventStatus?: string | null }).eventStatus;
+  if (value === 'cancelled' || value === 'postponed') return value;
+  return 'scheduled';
+};
+
 const dispatchEvent = (
   ctx: JsonLdContext,
   collection: 'events' | 'webinars',
@@ -333,6 +428,7 @@ const dispatchEvent = (
     startsAt: (doc as { startsAt?: string | null }).startsAt ?? null,
     endsAt: (doc as { endsAt?: string | null }).endsAt ?? null,
     attendanceMode,
+    status: readEventStatus(doc),
     venue: (doc as { venue?: string | null }).venue ?? null,
     virtualUrl:
       (doc as { recordingUrl?: string | null }).recordingUrl ??
@@ -341,6 +437,8 @@ const dispatchEvent = (
     speakers: readSpeakers(doc),
     registrationUrl: (doc as { registrationUrl?: string | null }).registrationUrl ?? null,
     capacity: (doc as { attendeesCap?: number | null }).attendeesCap ?? null,
+    previousStartDate:
+      (doc as { previousStartDate?: string | null }).previousStartDate ?? null,
   });
   if (event) blobs.push(event);
 
@@ -478,6 +576,25 @@ const dispatchJob = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   return blobs;
 };
 
+interface BreadcrumbRow {
+  path?: string | null;
+  label?: string | null;
+}
+
+const readPageBreadcrumb = (
+  doc: AnyDoc,
+): { name: string; path: string }[] => {
+  const list = (doc as { breadcrumb?: BreadcrumbRow[] | null }).breadcrumb;
+  if (!Array.isArray(list)) return [];
+  const trail: { name: string; path: string }[] = [];
+  for (const row of list) {
+    if (typeof row.path !== 'string' || row.path.length === 0) continue;
+    if (typeof row.label !== 'string' || row.label.length === 0) continue;
+    trail.push({ name: row.label, path: row.path });
+  }
+  return trail;
+};
+
 const dispatchPage = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   if (!doc.title) return [];
   const url = docCanonicalUrl(ctx.site.baseUrl, 'pages', doc as {
@@ -487,7 +604,17 @@ const dispatchPage = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   if (!url) return [];
 
   const path = (doc as { path?: string | null }).path ?? null;
-  const variant = webPageVariantForPath(path);
+  const editorPick = (doc as { schemaType?: string | null }).schemaType;
+  const allowedVariants: readonly WebPageVariant[] = [
+    'WebPage',
+    'AboutPage',
+    'ContactPage',
+    'CollectionPage',
+  ];
+  const variant: WebPageVariant =
+    typeof editorPick === 'string' && allowedVariants.includes(editorPick as WebPageVariant)
+      ? (editorPick as WebPageVariant)
+      : webPageVariantForPath(path);
 
   const blobs: JsonLdBlob[] = [
     buildOrganizationBlob(ctx),
@@ -505,18 +632,66 @@ const dispatchPage = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   });
   if (page) blobs.push(page);
 
-  // Pages live at arbitrary nested paths. We can't auto-emit a
-  // breadcrumb without knowing the parent chain; the dispatcher
-  // skips it for pages and relies on the public site to render the
-  // breadcrumb structure if needed.
+  const trail = readPageBreadcrumb(doc);
+  if (trail.length > 0) {
+    const breadcrumb = buildBreadcrumbBlob(ctx, [
+      { name: 'Home', path: '/' },
+      ...trail,
+    ]);
+    if (breadcrumb) blobs.push(breadcrumb);
+  }
 
   return blobs;
+};
+
+interface ResourceAsset {
+  url?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+}
+
+const readResourceAsset = (doc: AnyDoc): ResourceAsset | null => {
+  const asset = (doc as { asset?: ResourceAsset | number | null }).asset;
+  if (!asset || typeof asset === 'number') return null;
+  if (typeof asset.url !== 'string' || asset.url.length === 0) return null;
+  return asset;
+};
+
+const buildDigitalDocumentBlob = (
+  pageUrl: string,
+  asset: ResourceAsset,
+  title: string,
+  description: string | null,
+): JsonLdBlob | null => {
+  if (typeof asset.url !== 'string' || asset.url.length === 0) return null;
+  const blob: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'DigitalDocument',
+    '@id': `${pageUrl}#asset`,
+    name: title,
+    url: asset.url,
+    isPartOf: { '@id': pageUrl },
+  };
+  if (asset.mimeType && asset.mimeType.length > 0) {
+    blob.encodingFormat = asset.mimeType;
+  }
+  if (typeof asset.filesize === 'number' && asset.filesize > 0) {
+    // Schema.org `contentSize` is a free-text size hint — humans
+    // expect "1.2 MB" rather than raw bytes. Format to one decimal.
+    const mb = asset.filesize / (1024 * 1024);
+    blob.contentSize = mb >= 1 ? `${mb.toFixed(1)} MB` : `${Math.round(asset.filesize / 1024)} KB`;
+  }
+  if (description) blob.description = description;
+  return blob as JsonLdBlob;
 };
 
 const dispatchResource = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   if (!doc.title || !doc.slug) return [];
   const url = docCanonicalUrl(ctx.site.baseUrl, 'resources', doc as { slug: string });
   if (!url) return [];
+
+  const description =
+    (doc as { summary?: string | null }).summary ?? readDescription(doc);
 
   const blobs: JsonLdBlob[] = [
     buildOrganizationBlob(ctx),
@@ -526,14 +701,19 @@ const dispatchResource = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   const page = buildWebPageBlob(ctx, {
     url,
     title: doc.title,
-    description:
-      (doc as { summary?: string | null }).summary ?? readDescription(doc),
+    description,
     heroImage: readHeroImage(doc),
     datePublished: readPublishedAt(doc),
     dateModified: readUpdatedAt(doc),
     variant: 'WebPage',
   });
   if (page) blobs.push(page);
+
+  const asset = readResourceAsset(doc);
+  if (asset) {
+    const digitalDoc = buildDigitalDocumentBlob(url, asset, doc.title, description);
+    if (digitalDoc) blobs.push(digitalDoc);
+  }
 
   const breadcrumb = buildBreadcrumbBlob(ctx, [
     { name: 'Home', path: '/' },

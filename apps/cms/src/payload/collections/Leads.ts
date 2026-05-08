@@ -86,8 +86,15 @@ export const Leads: CollectionConfig = {
     group: 'Marketing',
     description:
       'Form submissions (append-only). Editing is disabled — leads are immutable once captured. Use the CSV export for bulk handoff.',
+    // Append-only contract: manual creation in the admin UI would
+    // bypass the LeadHandler adapter (R2 fallback queue + CRM dispatch
+    // + dedup). The "Create New" header pill and empty-state CTA are
+    // hidden via CSS targeted at `body.collection-leads` — see
+    // _list-controls.scss. API-level `access.create` stays admin-only
+    // for emergency tooling.
     components: {
       beforeListTable: [
+        '@/payload/admin/components/LeadsImmutableBanner.tsx#LeadsImmutableBanner',
         '@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner',
       ],
     },

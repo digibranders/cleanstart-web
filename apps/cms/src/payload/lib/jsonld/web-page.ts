@@ -8,7 +8,11 @@ import type { JsonLdBlob } from './types';
  * subclasses unlock specific Rich Results panels (knowledge-panel
  * "About" tab, contact info card) without changing the core fields.
  */
-export type WebPageVariant = 'WebPage' | 'AboutPage' | 'ContactPage';
+export type WebPageVariant =
+  | 'WebPage'
+  | 'AboutPage'
+  | 'ContactPage'
+  | 'CollectionPage';
 
 export interface WebPageSource {
   /** Canonical absolute URL — `@id` and `url`. */

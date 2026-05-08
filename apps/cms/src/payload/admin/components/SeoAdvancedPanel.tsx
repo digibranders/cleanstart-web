@@ -4,6 +4,8 @@ import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
+import { ChevronDown } from './icons/Chevron';
+
 type SeoAdvancedPanelProps = {
   /**
    * Persisted localStorage key — collection slug, so each list remembers
@@ -20,6 +22,13 @@ type MediaPreview = {
 };
 
 const STORAGE_PREFIX = 'cs.seo-advanced.expanded:';
+
+type CanonicalHealth =
+  | { kind: 'idle' }
+  | { kind: 'checking' }
+  | { kind: 'healthy'; status: number; redirected: boolean; finalUrl: string }
+  | { kind: 'broken'; status: number }
+  | { kind: 'failed'; reason: string };
 
 /**
  * Single right-rail panel housing the OG image + all secondary SEO
@@ -126,6 +135,7 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
     path: 'seo.ogDescription',
   });
 
+  const [canonicalHealth, setCanonicalHealth] = useState<CanonicalHealth>({ kind: 'idle' });
   const { value: useCustomCanonical, setValue: setUseCustomCanonical } = useField<boolean>({
     path: 'seo.useCustomCanonical',
   });
@@ -159,6 +169,68 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
     [speakableSelectors, setSpeakablePath],
   );
 
+  // Debounced HEAD-check on the canonical override URL. Surfaces a
+  // green/amber/red health pill below the input so editors notice
+  // before publish if the canonical 404s or redirects somewhere
+  // unexpected.
+  useEffect(() => {
+    const value = (canonicalOverride ?? '').trim();
+    if (!useCustomCanonical || value.length === 0) {
+      setCanonicalHealth({ kind: 'idle' });
+      return undefined;
+    }
+    if (!/^https?:\/\//i.test(value)) {
+      setCanonicalHealth({ kind: 'idle' });
+      return undefined;
+    }
+    setCanonicalHealth({ kind: 'checking' });
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      try {
+        const url = new URL('/api/canonical/health-check', window.location.origin);
+        url.searchParams.set('url', value);
+        const res = await fetch(url.toString(), { credentials: 'include' });
+        if (!res.ok) {
+          if (!cancelled) {
+            setCanonicalHealth({ kind: 'failed', reason: `HTTP ${res.status}` });
+          }
+          return;
+        }
+        const json = (await res.json()) as
+          | { ok: true; status: number; healthy: boolean; redirected: boolean; finalUrl: string }
+          | { ok: false; kind: string; message?: string };
+        if (cancelled) return;
+        if (!json.ok) {
+          setCanonicalHealth({
+            kind: 'failed',
+            reason: 'message' in json ? json.message ?? json.kind : json.kind,
+          });
+          return;
+        }
+        if (json.healthy) {
+          setCanonicalHealth({
+            kind: 'healthy',
+            status: json.status,
+            redirected: json.redirected,
+            finalUrl: json.finalUrl,
+          });
+        } else {
+          setCanonicalHealth({ kind: 'broken', status: json.status });
+        }
+      } catch (err) {
+        if (cancelled) return;
+        setCanonicalHealth({
+          kind: 'failed',
+          reason: err instanceof Error ? err.message : String(err),
+        });
+      }
+    }, 600);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [useCustomCanonical, canonicalOverride]);
+
   // Status summary — shown in the collapsed header so editors can see
   // at a glance what's customised vs default.
   const summary = useMemo(() => {
@@ -188,7 +260,7 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
         <span className="cs-seo-advanced__title">SEO advanced</span>
         <span className="cs-seo-advanced__summary">{summary}</span>
         <span className="cs-seo-advanced__chevron" aria-hidden="true">
-          ▾
+          <ChevronDown />
         </span>
       </button>
 
@@ -326,6 +398,39 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
                   Only when this content was originally published off-domain. For internal
                   duplicates, use a redirect instead.
                 </p>
+                {canonicalHealth.kind === 'checking' ? (
+                  <p className="cs-seo-advanced__hint" style={{ marginTop: 4 }}>
+                    Checking the URL…
+                  </p>
+                ) : null}
+                {canonicalHealth.kind === 'healthy' ? (
+                  <p
+                    className="cs-seo-advanced__hint"
+                    style={{ marginTop: 4, color: '#7ddc9c' }}
+                  >
+                    ✓ Resolves with HTTP {canonicalHealth.status}
+                    {canonicalHealth.redirected
+                      ? ` — note: redirects to ${canonicalHealth.finalUrl}`
+                      : ''}
+                  </p>
+                ) : null}
+                {canonicalHealth.kind === 'broken' ? (
+                  <p
+                    className="cs-seo-advanced__hint"
+                    style={{ marginTop: 4, color: '#f08f8f', fontWeight: 500 }}
+                  >
+                    ✗ HTTP {canonicalHealth.status} — search engines will drop the rich
+                    result. Fix the URL or disable the canonical override.
+                  </p>
+                ) : null}
+                {canonicalHealth.kind === 'failed' ? (
+                  <p
+                    className="cs-seo-advanced__hint"
+                    style={{ marginTop: 4, color: '#f0c45a' }}
+                  >
+                    Couldn’t check the URL: {canonicalHealth.reason}
+                  </p>
+                ) : null}
               </div>
             )}
           </div>

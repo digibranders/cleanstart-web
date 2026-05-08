@@ -46,20 +46,27 @@
   }
 
   // The "Create a new {label}" link Payload renders gets a primary-button
-  // appearance so editors notice it.
+  // appearance so editors notice it. Long-noun collections (About
+  // galleries, Knowledge categories, Knowledge articles) produce CTAs
+  // wider than the typical button — let the text wrap to two lines
+  // instead of clipping or overflowing the card.
   a,
   button {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 16px;
+    padding: 10px 18px;
     border-radius: var(--cs-radius-input);
     background: var(--cs-cyan-500);
     color: #04212a;
     font-weight: 600;
     font-size: 13.5px;
+    line-height: 1.25;
+    text-align: center;
     text-decoration: none;
     border: 1px solid transparent;
+    max-width: 320px;
+    white-space: normal;
     transition:
       background-color var(--cs-motion-micro),
       box-shadow var(--cs-motion-micro);

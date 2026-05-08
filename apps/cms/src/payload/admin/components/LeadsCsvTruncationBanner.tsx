@@ -4,6 +4,7 @@ import type { ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 
 import { CSV_EXPORT_HARD_CAP_ROWS } from '../../endpoints/export-leads-csv';
+import { Notice } from './Notice';
 
 /**
  * Banner rendered above the leads list view. Dormant until a CSV export
@@ -67,42 +68,11 @@ export const LeadsCsvTruncationBanner = (): ReactElement | null => {
   };
 
   return (
-    <div
-      role="alert"
-      style={{
-        margin: '1rem 0',
-        padding: '0.75rem 1rem',
-        border: '1px solid #d97706',
-        borderLeftWidth: '4px',
-        background: '#fffbeb',
-        color: '#7c2d12',
-        borderRadius: '4px',
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: '0.75rem',
-        fontSize: '0.875rem',
-      }}
-    >
-      <div style={{ flex: 1 }}>
-        <strong>CSV export was truncated.</strong> The most recent export hit
-        the {CSV_EXPORT_HARD_CAP_ROWS.toLocaleString()}-row cap. Use scheduled
-        jobs or a date-range filter for larger exports.
-      </div>
-      <button
-        type="button"
-        onClick={dismiss}
-        style={{
-          background: 'transparent',
-          border: '1px solid #d97706',
-          color: '#7c2d12',
-          padding: '0.25rem 0.625rem',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontSize: '0.75rem',
-        }}
-      >
-        Dismiss
-      </button>
+    <div style={{ margin: '1rem 0' }}>
+      <Notice variant="warn" title="CSV export was truncated" onDismiss={dismiss}>
+        The most recent export hit the {CSV_EXPORT_HARD_CAP_ROWS.toLocaleString()}-row cap.
+        Use scheduled jobs or a date-range filter for larger exports.
+      </Notice>
     </div>
   );
 };
