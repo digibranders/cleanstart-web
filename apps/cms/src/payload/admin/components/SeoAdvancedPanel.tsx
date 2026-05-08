@@ -1,6 +1,6 @@
 'use client';
 
-import { useField } from '@payloadcms/ui';
+import { useField, useListDrawer } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
@@ -96,15 +96,33 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
     [fullStorageKey],
   );
 
-  // OG image — the field is a relationship to media. The MediaField
-  // custom upload writes the related-doc id; we read the same path
-  // here as a string|null and surface a small status pill.
+  // OG image — relationship to the `media` collection. The picker
+  // uses Payload's first-party `useListDrawer` so editors get the
+  // exact same media-list UX as anywhere else in the admin (search,
+  // pagination, upload-from-device, alt-text editing) instead of
+  // having to copy-paste a Media ID.
   const { value: ogImageValue, setValue: setOgImage } = useField<string | null>({
     path: 'seo.ogImage',
   });
   const { value: ogImageAltValue, setValue: setOgImageAlt } = useField<string | null>({
     path: 'seo.ogImageAlt',
   });
+  const [OgImageListDrawer, , { openDrawer: openOgImageDrawer, closeDrawer: closeOgImageDrawer }] =
+    useListDrawer({ collectionSlugs: ['media'], uploads: true });
+  const onPickOgImage = useCallback(
+    (args: { doc: { id?: string | number } }) => {
+      const id = args.doc?.id;
+      if (id != null) setOgImage(typeof id === 'string' ? id : String(id));
+      closeOgImageDrawer();
+    },
+    [setOgImage, closeOgImageDrawer],
+  );
+
+  // Twitter image — same picker pattern.
+  const [TwitterImageListDrawer, , {
+    openDrawer: openTwitterImageDrawer,
+    closeDrawer: closeTwitterImageDrawer,
+  }] = useListDrawer({ collectionSlugs: ['media'], uploads: true });
   const [ogPreview, setOgPreview] = useState<MediaPreview | null>(null);
   const [ogLoading, setOgLoading] = useState(false);
   useEffect(() => {
@@ -342,18 +360,29 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
                 </div>
               )}
               <div className="cs-seo-advanced__og-meta">
-                <input
-                  id={ogImageInputId}
-                  type="text"
-                  value={ogImageValue ?? ''}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setOgImage(e.target.value === '' ? null : e.target.value)
-                  }
-                  placeholder="Media ID (paste or clear)"
-                  spellCheck={false}
-                  autoComplete="off"
-                  className="cs-seo-advanced__input cs-seo-advanced__input--mono"
-                />
+                <div className="cs-seo-advanced__og-actions">
+                  <button
+                    type="button"
+                    id={ogImageInputId}
+                    onClick={openOgImageDrawer}
+                    className="cs-seo-advanced__og-pick"
+                  >
+                    {ogImageValue ? 'Change image' : 'Pick image'}
+                  </button>
+                  {ogImageValue && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOgImage(null);
+                        setOgImageAlt(null);
+                      }}
+                      className="cs-seo-advanced__og-clear"
+                      aria-label="Clear OG image"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
                 {ogImageValue && (
                   <input
                     type="text"
@@ -553,19 +582,27 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
                     />
 
                     <span className="cs-seo-advanced__label">
-                      twitter:image (Media ID — falls back to og:image)
+                      twitter:image (falls back to og:image)
                     </span>
-                    <input
-                      type="text"
-                      value={twitterImageValue ?? ''}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                        setTwitterImage(e.target.value === '' ? null : e.target.value)
-                      }
-                      placeholder="Media ID (paste or clear)"
-                      spellCheck={false}
-                      autoComplete="off"
-                      className="cs-seo-advanced__input cs-seo-advanced__input--mono"
-                    />
+                    <div className="cs-seo-advanced__og-actions">
+                      <button
+                        type="button"
+                        onClick={openTwitterImageDrawer}
+                        className="cs-seo-advanced__og-pick"
+                      >
+                        {twitterImageValue ? 'Change X image' : 'Pick X image'}
+                      </button>
+                      {twitterImageValue && (
+                        <button
+                          type="button"
+                          onClick={() => setTwitterImage(null)}
+                          className="cs-seo-advanced__og-clear"
+                          aria-label="Clear Twitter image"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
                     <p className="cs-seo-advanced__hint">
                       X clips at 2:1 (1200×600) — use a different crop here when the OG image
                       is portrait or letter-boxed.
@@ -743,6 +780,17 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
           </div>
         </div>
       )}
+      {/* Picker drawers — must mount inside the React tree for the
+          useListDrawer hooks to render their portal content. The
+          drawers themselves are visually hidden until opened. */}
+      <OgImageListDrawer onSelect={onPickOgImage} />
+      <TwitterImageListDrawer
+        onSelect={(args: { doc: { id?: string | number } }) => {
+          const id = args.doc?.id;
+          if (id != null) setTwitterImage(typeof id === 'string' ? id : String(id));
+          closeTwitterImageDrawer();
+        }}
+      />
     </div>
   );
 };
