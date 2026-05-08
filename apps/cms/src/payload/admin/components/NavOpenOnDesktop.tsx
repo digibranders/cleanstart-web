@@ -1,128 +1,102 @@
 'use client';
 
 import { useNav } from '@payloadcms/ui';
-import { usePathname } from 'next/navigation';
 import type { ReactElement } from 'react';
 import { useEffect, useRef } from 'react';
 
 const DESKTOP_BREAKPOINT_PX = 1024;
-const MANUAL_TOGGLE_GRACE_MS = 1500;
+const STORAGE_KEY = 'cs-nav-collapsed';
 
 /**
- * Match the document edit / create routes:
- *   /admin/collections/<slug>/<id>
- *   /admin/collections/<slug>/create
- *   /admin/globals/<slug>
+ * Keep Payload's nav rail persistent on desktop, with the editor's
+ * collapse preference stored in localStorage.
  *
- * Editors on these paths benefit from extra horizontal space — the
- * doc-edit two-column layout (form + sidebar) is tight on a 13" / 14"
- * laptop. We auto-collapse the rail there. List views (`/admin/
- * collections/<slug>` with no trailing id) keep the rail open so the
- * editor can scan adjacent collections.
- */
-const isDocumentEditRoute = (pathname: string): boolean =>
-  /^\/admin\/collections\/[^/]+\/[^/]+/.test(pathname) ||
-  /^\/admin\/globals\/[^/]+/.test(pathname);
-
-/**
- * Counter Payload's default nav-collapse behaviour at typical laptop
- * sizes — and auto-close the rail on document edit views to free up
- * working space for the form.
+ * Why this component exists at all:
+ *   Payload's NavProvider keys off `WindowInfo` breakpoints declared as
+ *   `l = (max-width: 1440px)`, `m = 1024px`, `s = 768px`. Its useEffect
+ *   closes the nav whenever any of those is true — so on a 13"-14"
+ *   laptop (≤ 1440 px) `largeBreak` is true on hydration and the rail
+ *   lands collapsed even on a regular desktop. We fight back exactly
+ *   once on first mount per session.
  *
- * Payload's NavProvider keys off `WindowInfo` breakpoints declared as:
- *   l = (max-width: 1440px)
- *   m = (max-width: 1024px)
- *   s = (max-width: 768px)
+ * What it does NOT do (deliberate, see git history pre-Phase-4):
+ *   - No per-route auto-collapse on document-edit views. Surprising
+ *     state changes on navigation are an anti-pattern; Notion / Linear
+ *     / GitHub / Sanity / Strapi all keep their navs persistent at
+ *     desktop widths. The body-editor Fullscreen toggle already exists
+ *     for the genuine "I need every pixel" case, user-controlled and
+ *     explicit.
+ *   - No setTimeout-based race with Payload's effects. We set the nav
+ *     state once on mount, then write through the editor's own
+ *     hamburger toggles to localStorage. No effect-ordering hacks.
+ *   - No reactive `navOpen` watcher that re-asserts policy. One source
+ *     of truth: the editor.
  *
- * The provider's useEffect closes the nav whenever ANY of those is
- * true. On a 13"–14" laptop (≤ 1440 px) `largeBreak` is true on
- * hydration, so the sidebar lands collapsed even on a regular desktop.
- *
- * Two behaviours co-exist here:
- *   1. **List / dashboard / global-listing views** at ≥ 1024 px:
- *      keep the nav open. We force `setNavOpen(true)` on mount and
- *      whenever Payload (or any other internal effect) closes it.
- *   2. **Document edit / create views** at any width: keep the nav
- *      closed. Editors can still expand it with the toggler — manual
- *      toggles are respected for a 1.5 s grace window before the
- *      auto-state re-asserts.
- *
- * Below 1024 px the drawer/overlay behaviour is left alone — tablet
- * and phone editors get the slide-in nav as Payload intends.
+ * Below 1024 px Payload's drawer/overlay behaviour is preserved as-is.
  *
  * Mounted globally via `admin.components.actions`. Renders nothing.
  */
 export const NavOpenOnDesktop = (): ReactElement | null => {
-  const { navOpen, setNavOpen } = useNav();
-  const pathname = usePathname() ?? '';
-  const lastManualToggleAt = useRef<number>(0);
+  const { setNavOpen } = useNav();
+  const initialised = useRef(false);
 
-  // Track manual toggler clicks so we don't immediately fight an
-  // editor who just opened or closed the nav by hand.
+  // 1) On first mount, decide the rail's starting state from the
+  //    editor's saved preference (or default to "open at desktop").
   useEffect(() => {
-    if (typeof document === 'undefined') return undefined;
-    const onClick = (event: Event): void => {
-      const target = event.target as HTMLElement | null;
-      if (target?.closest('.template-default__nav-toggler-wrapper')) {
-        lastManualToggleAt.current = Date.now();
-      }
-    };
-    document.addEventListener('click', onClick, true);
-    return () => document.removeEventListener('click', onClick, true);
-  }, []);
-
-  // Per-route enforcement, deferred to the next task so it lands
-  // AFTER Payload's parent-context effect (child effects fire before
-  // parent effects in React, so a synchronous setNavOpen here gets
-  // clobbered by Payload's setNavOpen in the same commit).
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-    const isDesktop = (): boolean =>
-      window.matchMedia(`(min-width: ${DESKTOP_BREAKPOINT_PX}px)`).matches;
-    const apply = (): void => {
-      if (isDocumentEditRoute(pathname)) {
-        // Auto-close on edit view at any width. Editors can re-open
-        // via the toggler — the manual-toggle grace window keeps that
-        // intent intact for 1.5 s before this re-asserts.
-        window.setTimeout(() => {
-          if (
-            isDocumentEditRoute(pathname) &&
-            Date.now() - lastManualToggleAt.current >= MANUAL_TOGGLE_GRACE_MS
-          ) {
-            setNavOpen(false);
-          }
-        }, 0);
-        return;
-      }
-      if (!isDesktop()) return;
-      window.setTimeout(() => {
-        if (!isDocumentEditRoute(pathname) && isDesktop()) {
-          setNavOpen(true);
-        }
-      }, 0);
-    };
-    apply();
-    const mq = window.matchMedia(`(min-width: ${DESKTOP_BREAKPOINT_PX}px)`);
-    mq.addEventListener('change', apply);
-    return () => mq.removeEventListener('change', apply);
-  }, [pathname, setNavOpen]);
-
-  // Reactive watcher — re-assert the auto-state if Payload (or anyone
-  // else) flips `navOpen` against our policy mid-session and the
-  // editor hasn't just clicked the toggler.
-  useEffect(() => {
+    if (initialised.current) return;
+    initialised.current = true;
     if (typeof window === 'undefined') return;
-    const sinceManual = Date.now() - lastManualToggleAt.current;
-    if (sinceManual < MANUAL_TOGGLE_GRACE_MS) return;
+
     const isDesktop = window.matchMedia(
       `(min-width: ${DESKTOP_BREAKPOINT_PX}px)`,
     ).matches;
-    if (isDocumentEditRoute(pathname)) {
-      if (navOpen) setNavOpen(false);
-      return;
+    if (!isDesktop) return; // Below 1024 — Payload's drawer wins.
+
+    let saved: string | null = null;
+    try {
+      saved = window.localStorage.getItem(STORAGE_KEY);
+    } catch {
+      // Private mode / blocked storage — fall through to default.
     }
-    if (isDesktop && !navOpen) setNavOpen(true);
-  }, [navOpen, pathname, setNavOpen]);
+
+    // saved === 'true' means "editor manually collapsed it"; honour
+    // that. Anything else (null, 'false') means "default open".
+    if (saved !== 'true') {
+      setNavOpen(true);
+    }
+  }, [setNavOpen]);
+
+  // 2) Persist the editor's manual toggle clicks. Capture-phase listener
+  //    so we record the user's intent regardless of which descendant
+  //    inside the toggler wrapper actually receives the click.
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined;
+
+    const onClick = (event: Event): void => {
+      const target = event.target as HTMLElement | null;
+      if (!target?.closest('.template-default__nav-toggler-wrapper')) return;
+
+      // Defer reading the new state to the next tick — Payload's own
+      // click handler flips `navOpen` synchronously, but the DOM
+      // attribute we read from (`aria-expanded`) updates after the
+      // commit. Reading it on the next microtask gives us the truth.
+      window.queueMicrotask(() => {
+        // Payload sets `nav--collapsed` on `<aside class="nav">` when
+        // collapsed. Mirror that to localStorage so the next page load
+        // — or the next browser session — restores the editor's pick.
+        const aside = document.querySelector('aside.nav');
+        const collapsed = aside?.classList.contains('nav--collapsed') ?? false;
+        try {
+          window.localStorage.setItem(STORAGE_KEY, String(collapsed));
+        } catch {
+          // Storage blocked — preference becomes session-only.
+        }
+      });
+    };
+
+    document.addEventListener('click', onClick, true);
+    return () => document.removeEventListener('click', onClick, true);
+  }, []);
 
   return null;
 };

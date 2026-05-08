@@ -30,7 +30,7 @@ const OPTIONS: ReadonlyArray<{
   },
   {
     value: 'noindex,nofollow',
-    label: 'No-index, no-follow',
+    label: 'Hide entirely',
     helper: 'Hidden from Google AND links don’t pass authority.',
     tone: 'error',
   },
