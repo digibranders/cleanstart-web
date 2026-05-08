@@ -1,4 +1,6 @@
 import { MediaSelfChrome as MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56 } from '@/payload/admin/components/MediaSelfChrome.tsx'
+import { MediaSizeWarningField as MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2 } from '@/payload/admin/components/MediaSizeWarningField.tsx'
+import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
 import { SlugField as SlugField_72967e7957358d52051eede57fbdd787 } from '@/payload/admin/components/SlugField.tsx'
 import { MediaCell as MediaCell_04413d560c21645b4689092eae86b482 } from '@/payload/admin/components/MediaField/MediaCell.tsx'
 import { MediaField as MediaField_1167cf2070c08e9bc2c7602fa9c85984 } from '@/payload/admin/components/MediaField/MediaField.tsx'
@@ -27,7 +29,10 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ParagraphFeatureClient as ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { LegacyBioViewer as LegacyBioViewer_879b4bd183ddbb79ae3f346d2661eacc } from '@/payload/admin/components/LegacyBioViewer.tsx'
 import { PermalinkField as PermalinkField_ea9054c021397c838baff6eeae171a19 } from '@/payload/admin/components/PermalinkField.tsx'
+import { AuthorCredibilityField as AuthorCredibilityField_0547251fb6ced865a9066cb05f501acb } from '@/payload/admin/components/AuthorCredibilityField.tsx'
+import { SeoHealthScoreField as SeoHealthScoreField_3d52129c82ef87934ac6d64a7f8387ae } from '@/payload/admin/components/SeoHealthScoreField.tsx'
 import { SeoTitleField as SeoTitleField_1a192963c1119f2a2e3e8c2143d913c7 } from '@/payload/admin/components/SeoTitleField.tsx'
 import { SeoDescriptionField as SeoDescriptionField_9696c1be1903d357f63d23951e7963fc } from '@/payload/admin/components/SeoDescriptionField.tsx'
 import { SeoIndexableField as SeoIndexableField_ff3cc07c91d10b5899370ac0f262f1fb } from '@/payload/admin/components/SeoIndexableField.tsx'
@@ -36,8 +41,11 @@ import { SchemaPreviewField as SchemaPreviewField_2ca2f49f868221997f9932607223d8
 import { InboundRedirectsField as InboundRedirectsField_1afe69d25c6786c0c51532ee082716da } from '@/payload/admin/components/InboundRedirectsField.tsx'
 import { OutboundRedirectField as OutboundRedirectField_6ddb1aebe33d308a1f37b1ba8879601c } from '@/payload/admin/components/OutboundRedirectField.tsx'
 import { UrlChangeHistoryField as UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c } from '@/payload/admin/components/UrlChangeHistoryField.tsx'
+import { BodyAuditField as BodyAuditField_ddda503a0c865518ab222cfaf681f937 } from '@/payload/admin/components/BodyAuditField.tsx'
+import { KeywordTargetField as KeywordTargetField_f76a195216e660dcef6612aab28aea47 } from '@/payload/admin/components/KeywordTargetField.tsx'
 import { SchemaOverrideField as SchemaOverrideField_88213973daaae6c5c0e6b5315ed286c1 } from '@/payload/admin/components/SchemaOverrideField.tsx'
 import { SeoAdvancedPanel as SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50 } from '@/payload/admin/components/SeoAdvancedPanel.tsx'
+import { LeadsImmutableBanner as LeadsImmutableBanner_c4273dccee2521e4317461376b79e241 } from '@/payload/admin/components/LeadsImmutableBanner.tsx'
 import { LeadsCsvTruncationBanner as LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb } from '@/payload/admin/components/LeadsCsvTruncationBanner.tsx'
 import { RelationshipCell as RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f } from '@/payload/admin/components/RelationshipCell.tsx'
 import { FaqBulkPaste as FaqBulkPaste_34cc49081ef861ac2f0f2bcdbdf5a9d4 } from '@/payload/admin/components/FaqBulkPaste.tsx'
@@ -65,6 +73,8 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 /** @type import('payload').ImportMap */
 export const importMap = {
   "@/payload/admin/components/MediaSelfChrome.tsx#MediaSelfChrome": MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56,
+  "@/payload/admin/components/MediaSizeWarningField.tsx#MediaSizeWarningField": MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2,
+  "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
   "@/payload/admin/components/SlugField.tsx#SlugField": SlugField_72967e7957358d52051eede57fbdd787,
   "@/payload/admin/components/MediaField/MediaCell.tsx#MediaCell": MediaCell_04413d560c21645b4689092eae86b482,
   "@/payload/admin/components/MediaField/MediaField.tsx#MediaField": MediaField_1167cf2070c08e9bc2c7602fa9c85984,
@@ -93,7 +103,10 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ParagraphFeatureClient": ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/payload/admin/components/LegacyBioViewer.tsx#LegacyBioViewer": LegacyBioViewer_879b4bd183ddbb79ae3f346d2661eacc,
   "@/payload/admin/components/PermalinkField.tsx#PermalinkField": PermalinkField_ea9054c021397c838baff6eeae171a19,
+  "@/payload/admin/components/AuthorCredibilityField.tsx#AuthorCredibilityField": AuthorCredibilityField_0547251fb6ced865a9066cb05f501acb,
+  "@/payload/admin/components/SeoHealthScoreField.tsx#SeoHealthScoreField": SeoHealthScoreField_3d52129c82ef87934ac6d64a7f8387ae,
   "@/payload/admin/components/SeoTitleField.tsx#SeoTitleField": SeoTitleField_1a192963c1119f2a2e3e8c2143d913c7,
   "@/payload/admin/components/SeoDescriptionField.tsx#SeoDescriptionField": SeoDescriptionField_9696c1be1903d357f63d23951e7963fc,
   "@/payload/admin/components/SeoIndexableField.tsx#SeoIndexableField": SeoIndexableField_ff3cc07c91d10b5899370ac0f262f1fb,
@@ -102,8 +115,11 @@ export const importMap = {
   "@/payload/admin/components/InboundRedirectsField.tsx#InboundRedirectsField": InboundRedirectsField_1afe69d25c6786c0c51532ee082716da,
   "@/payload/admin/components/OutboundRedirectField.tsx#OutboundRedirectField": OutboundRedirectField_6ddb1aebe33d308a1f37b1ba8879601c,
   "@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField": UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c,
+  "@/payload/admin/components/BodyAuditField.tsx#BodyAuditField": BodyAuditField_ddda503a0c865518ab222cfaf681f937,
+  "@/payload/admin/components/KeywordTargetField.tsx#KeywordTargetField": KeywordTargetField_f76a195216e660dcef6612aab28aea47,
   "@/payload/admin/components/SchemaOverrideField.tsx#SchemaOverrideField": SchemaOverrideField_88213973daaae6c5c0e6b5315ed286c1,
   "@/payload/admin/components/SeoAdvancedPanel.tsx#SeoAdvancedPanel": SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50,
+  "@/payload/admin/components/LeadsImmutableBanner.tsx#LeadsImmutableBanner": LeadsImmutableBanner_c4273dccee2521e4317461376b79e241,
   "@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner": LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb,
   "@/payload/admin/components/RelationshipCell.tsx#RelationshipCell": RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f,
   "@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste": FaqBulkPaste_34cc49081ef861ac2f0f2bcdbdf5a9d4,
