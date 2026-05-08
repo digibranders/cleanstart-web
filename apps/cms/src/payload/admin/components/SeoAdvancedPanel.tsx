@@ -23,19 +23,19 @@ type MediaPreview = {
 
 const STORAGE_PREFIX = 'cs.seo-advanced.expanded:';
 
-type CanonicalHealth =
-  | { kind: 'idle' }
-  | { kind: 'checking' }
-  | { kind: 'healthy'; status: number; redirected: boolean; finalUrl: string }
-  | { kind: 'broken'; status: number }
-  | { kind: 'failed'; reason: string };
-
 /**
- * Single right-rail panel housing the OG image + all secondary SEO
- * controls (advanced OG copy, custom canonical, Schema.org speakable
- * selectors). Reads/writes into the existing `seo.*` data shape via
- * `useField`, so no schema or migration is needed — only the *render
- * surface* moves from the main form into the sidebar.
+ * Single right-rail panel housing the OG image + secondary SEO
+ * controls (advanced OG copy, Schema.org speakable selectors).
+ * Reads/writes into the existing `seo.*` data shape via `useField`,
+ * so no schema or migration is needed — only the *render surface*
+ * moves from the main form into the sidebar.
+ *
+ * NB: a custom-canonical-URL block lived here previously; it was
+ * removed because the override field had no consumer (every page is
+ * self-canonical via `docCanonicalUrl()` in lib/jsonld/url.ts, and
+ * `<link rel="canonical">` HTML emission is deferred with apps/web).
+ * The schema fields (`seo.useCustomCanonical`, `seo.canonicalOverride`)
+ * stay hidden in seo.ts so any saved data survives.
  *
  * The panel collapses by default; expanded state persists in
  * localStorage keyed by collection slug.
@@ -44,7 +44,6 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
   const { storageKey } = props;
   const headingId = useId();
   const ogImageInputId = useId();
-  const canonicalInputId = useId();
   const ogTitleInputId = useId();
   const ogDescInputId = useId();
   const speakableInputId = useId();
@@ -135,14 +134,6 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
     path: 'seo.ogDescription',
   });
 
-  const [canonicalHealth, setCanonicalHealth] = useState<CanonicalHealth>({ kind: 'idle' });
-  const { value: useCustomCanonical, setValue: setUseCustomCanonical } = useField<boolean>({
-    path: 'seo.useCustomCanonical',
-  });
-  const { value: canonicalOverride, setValue: setCanonicalOverride } = useField<string | null>({
-    path: 'seo.canonicalOverride',
-  });
-
   const { value: speakablePathValue, setValue: setSpeakablePath } = useField<
     Array<{ selector: string; id?: string }> | null
   >({ path: 'seo.speakablePath' });
@@ -169,84 +160,15 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
     [speakableSelectors, setSpeakablePath],
   );
 
-  // Debounced HEAD-check on the canonical override URL. Surfaces a
-  // green/amber/red health pill below the input so editors notice
-  // before publish if the canonical 404s or redirects somewhere
-  // unexpected.
-  useEffect(() => {
-    const value = (canonicalOverride ?? '').trim();
-    if (!useCustomCanonical || value.length === 0) {
-      setCanonicalHealth({ kind: 'idle' });
-      return undefined;
-    }
-    if (!/^https?:\/\//i.test(value)) {
-      setCanonicalHealth({ kind: 'idle' });
-      return undefined;
-    }
-    setCanonicalHealth({ kind: 'checking' });
-    let cancelled = false;
-    const timer = window.setTimeout(async () => {
-      try {
-        const url = new URL('/api/canonical/health-check', window.location.origin);
-        url.searchParams.set('url', value);
-        const res = await fetch(url.toString(), { credentials: 'include' });
-        if (!res.ok) {
-          if (!cancelled) {
-            setCanonicalHealth({ kind: 'failed', reason: `HTTP ${res.status}` });
-          }
-          return;
-        }
-        const json = (await res.json()) as
-          | { ok: true; status: number; healthy: boolean; redirected: boolean; finalUrl: string }
-          | { ok: false; kind: string; message?: string };
-        if (cancelled) return;
-        if (!json.ok) {
-          setCanonicalHealth({
-            kind: 'failed',
-            reason: 'message' in json ? json.message ?? json.kind : json.kind,
-          });
-          return;
-        }
-        if (json.healthy) {
-          setCanonicalHealth({
-            kind: 'healthy',
-            status: json.status,
-            redirected: json.redirected,
-            finalUrl: json.finalUrl,
-          });
-        } else {
-          setCanonicalHealth({ kind: 'broken', status: json.status });
-        }
-      } catch (err) {
-        if (cancelled) return;
-        setCanonicalHealth({
-          kind: 'failed',
-          reason: err instanceof Error ? err.message : String(err),
-        });
-      }
-    }, 600);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [useCustomCanonical, canonicalOverride]);
-
   // Status summary — shown in the collapsed header so editors can see
   // at a glance what's customised vs default.
   const summary = useMemo(() => {
     const bits: string[] = [];
     if (ogImageValue) bits.push('OG image');
     if (useAdvancedOg) bits.push('OG copy');
-    if (useCustomCanonical && canonicalOverride) bits.push('Canonical');
     if (speakableSelectors.length > 0) bits.push(`${speakableSelectors.length} speakable`);
     return bits.length === 0 ? 'Defaults applied' : bits.join(' · ');
-  }, [
-    ogImageValue,
-    useAdvancedOg,
-    useCustomCanonical,
-    canonicalOverride,
-    speakableSelectors.length,
-  ]);
+  }, [ogImageValue, useAdvancedOg, speakableSelectors.length]);
 
   return (
     <div className="cs-seo-advanced" data-expanded={expanded ? 'true' : 'false'}>
@@ -367,73 +289,18 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
             )}
           </div>
 
-          {/* Custom canonical */}
-          <div className="cs-seo-advanced__row">
-            <label className="cs-seo-advanced__toggle">
-              <input
-                type="checkbox"
-                checked={Boolean(useCustomCanonical)}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setUseCustomCanonical(e.target.checked)
-                }
-              />
-              <span>Use custom canonical URL</span>
-            </label>
-            {useCustomCanonical && (
-              <div className="cs-seo-advanced__nested">
-                <label htmlFor={canonicalInputId} className="cs-seo-advanced__label">
-                  Canonical URL
-                </label>
-                <input
-                  id={canonicalInputId}
-                  type="url"
-                  value={canonicalOverride ?? ''}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setCanonicalOverride(e.target.value === '' ? null : e.target.value)
-                  }
-                  placeholder="https://example.com/article"
-                  className="cs-seo-advanced__input cs-seo-advanced__input--mono"
-                />
-                <p className="cs-seo-advanced__hint">
-                  Only when this content was originally published off-domain. For internal
-                  duplicates, use a redirect instead.
-                </p>
-                {canonicalHealth.kind === 'checking' ? (
-                  <p className="cs-seo-advanced__hint" style={{ marginTop: 4 }}>
-                    Checking the URL…
-                  </p>
-                ) : null}
-                {canonicalHealth.kind === 'healthy' ? (
-                  <p
-                    className="cs-seo-advanced__hint"
-                    style={{ marginTop: 4, color: '#7ddc9c' }}
-                  >
-                    ✓ Resolves with HTTP {canonicalHealth.status}
-                    {canonicalHealth.redirected
-                      ? ` — note: redirects to ${canonicalHealth.finalUrl}`
-                      : ''}
-                  </p>
-                ) : null}
-                {canonicalHealth.kind === 'broken' ? (
-                  <p
-                    className="cs-seo-advanced__hint"
-                    style={{ marginTop: 4, color: '#f08f8f', fontWeight: 500 }}
-                  >
-                    ✗ HTTP {canonicalHealth.status} — search engines will drop the rich
-                    result. Fix the URL or disable the canonical override.
-                  </p>
-                ) : null}
-                {canonicalHealth.kind === 'failed' ? (
-                  <p
-                    className="cs-seo-advanced__hint"
-                    style={{ marginTop: 4, color: '#f0c45a' }}
-                  >
-                    Couldn’t check the URL: {canonicalHealth.reason}
-                  </p>
-                ) : null}
-              </div>
-            )}
-          </div>
+          {/*
+            Custom canonical UI removed. Every page is self-canonical
+            by default — JSON-LD `url` / `mainEntityOfPage` / `@id` are
+            built from `<baseUrl><route-prefix>/<slug>` via
+            `docCanonicalUrl()` in lib/jsonld/url.ts. There is no
+            `<link rel="canonical">` HTML emission today (apps/web is
+            deferred per CLAUDE.md). The `seo.useCustomCanonical` and
+            `seo.canonicalOverride` schema fields are kept but hidden;
+            once the public-site renderer lands and we want a true
+            cross-domain canonical override, surface the UI again
+            here AND wire the consumer in lib/jsonld/url.ts.
+          */}
 
           {/* Speakable selectors */}
           <div className="cs-seo-advanced__row">

@@ -178,13 +178,27 @@ const advancedTwitterFields: Field[] = [
   }),
 ];
 
+// Canonical-URL behaviour today
+// -------------------------------
+// Every page is self-canonical: JSON-LD `url` / `mainEntityOfPage` /
+// `@id` are built from `<baseUrl><route-prefix>/<slug>` via
+// `docCanonicalUrl()` (see lib/jsonld/url.ts). There is no
+// `<link rel="canonical">` HTML emission — apps/web is deferred per
+// CLAUDE.md, so we don't render the public site here.
+//
+// The two fields below remain in the schema (preserves any existing
+// values) but are hidden from the admin UI. They had no consumer
+// outside the form: `seo.canonicalOverride` was only validated and
+// HEAD-checked at the form layer, never read by the JSON-LD or
+// sitemap emitters. Re-surfacing the UI is a one-liner once a
+// consumer exists in lib/jsonld/url.ts (or wherever apps/web reads
+// canonicals from).
 const useCustomCanonicalField: Field = {
   name: 'useCustomCanonical',
   type: 'checkbox',
   defaultValue: false,
   admin: {
-    description:
-      'Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.',
+    hidden: true,
   },
 };
 
@@ -192,9 +206,7 @@ const canonicalOverrideField: Field = {
   name: 'canonicalOverride',
   type: 'text',
   admin: {
-    description:
-      'Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.',
-    condition: (_data, siblingData) => siblingData?.useCustomCanonical === true,
+    hidden: true,
   },
   validate: (
     value: string | string[] | null | undefined,

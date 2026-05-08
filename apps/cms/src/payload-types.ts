@@ -581,13 +581,7 @@ export interface Author {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -692,13 +686,7 @@ export interface Category {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -803,13 +791,7 @@ export interface NewsCategory {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -914,13 +896,7 @@ export interface KnowledgeCategory {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -1462,13 +1438,7 @@ export interface Blog {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -1734,13 +1704,7 @@ export interface News {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -2095,13 +2059,7 @@ export interface Guide {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -2380,13 +2338,7 @@ export interface Resource {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -2687,13 +2639,7 @@ export interface KnowledgeBase {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -3001,13 +2947,7 @@ export interface Event {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -3307,13 +3247,7 @@ export interface Webinar {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -3609,13 +3543,7 @@ export interface Job {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
@@ -5459,13 +5387,7 @@ export interface Page {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
