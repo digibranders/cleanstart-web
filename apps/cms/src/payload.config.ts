@@ -108,6 +108,7 @@ export default buildConfig({
         './payload/admin/components/SkipLink.tsx#SkipLink',
         './payload/admin/components/SaveShortcut.tsx#SaveShortcut',
         './payload/admin/components/CommandPalette.tsx#CommandPalette',
+        './payload/admin/components/FieldDescriptionTooltip.tsx#FieldDescriptionTooltip',
         './payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator',
         './payload/admin/components/NavBadges.tsx#NavBadges',
         './payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence',

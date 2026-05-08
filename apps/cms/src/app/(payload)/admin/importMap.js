@@ -57,6 +57,7 @@ import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/
 import { SkipLink as SkipLink_27a678dd284d4042d03686d8b9a9b8e9 } from '../../../payload/admin/components/SkipLink.tsx'
 import { SaveShortcut as SaveShortcut_add5731a604e577762f1b0196113538b } from '../../../payload/admin/components/SaveShortcut.tsx'
 import { CommandPalette as CommandPalette_9e72795c48aa56bf099ac6d02eb8124e } from '../../../payload/admin/components/CommandPalette.tsx'
+import { FieldDescriptionTooltip as FieldDescriptionTooltip_ba26db738ee9a4c1171ac1c581ba5d08 } from '../../../payload/admin/components/FieldDescriptionTooltip.tsx'
 import { SavedStateIndicator as SavedStateIndicator_8bd5434f7092ab63abeb348597344486 } from '../../../payload/admin/components/SavedStateIndicator.tsx'
 import { NavBadges as NavBadges_208a0014b2eb9ce6cf95af7e4047b13a } from '../../../payload/admin/components/NavBadges.tsx'
 import { NavGroupPersistence as NavGroupPersistence_41d8a055ad6ff26bcaace971cec779b5 } from '../../../payload/admin/components/NavGroupPersistence.tsx'
@@ -132,6 +133,7 @@ export const importMap = {
   "./payload/admin/components/SkipLink.tsx#SkipLink": SkipLink_27a678dd284d4042d03686d8b9a9b8e9,
   "./payload/admin/components/SaveShortcut.tsx#SaveShortcut": SaveShortcut_add5731a604e577762f1b0196113538b,
   "./payload/admin/components/CommandPalette.tsx#CommandPalette": CommandPalette_9e72795c48aa56bf099ac6d02eb8124e,
+  "./payload/admin/components/FieldDescriptionTooltip.tsx#FieldDescriptionTooltip": FieldDescriptionTooltip_ba26db738ee9a4c1171ac1c581ba5d08,
   "./payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator": SavedStateIndicator_8bd5434f7092ab63abeb348597344486,
   "./payload/admin/components/NavBadges.tsx#NavBadges": NavBadges_208a0014b2eb9ce6cf95af7e4047b13a,
   "./payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence": NavGroupPersistence_41d8a055ad6ff26bcaace971cec779b5,
