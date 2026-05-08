@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { taxonomyParentCycleGuardHook } from '../hooks/taxonomy-parent-cycle-guard';
 import { buildTaxonomyFields } from '../lib/build-taxonomy-fields';
 
 export const NewsCategories: CollectionConfig = {
@@ -20,6 +21,7 @@ export const NewsCategories: CollectionConfig = {
   },
   fields: buildTaxonomyFields('newsCategories'),
   hooks: {
+    beforeChange: [taxonomyParentCycleGuardHook('newsCategories')],
     afterChange: [slugChangeRedirectHook('newsCategories')],
   },
   versions: { drafts: true },

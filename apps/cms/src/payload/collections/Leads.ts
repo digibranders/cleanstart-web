@@ -88,6 +88,7 @@ export const Leads: CollectionConfig = {
       'Form submissions (append-only). Editing is disabled — leads are immutable once captured. Use the CSV export for bulk handoff.',
     components: {
       beforeListTable: [
+        '@/payload/admin/components/LeadsImmutableBanner.tsx#LeadsImmutableBanner',
         '@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner',
       ],
     },

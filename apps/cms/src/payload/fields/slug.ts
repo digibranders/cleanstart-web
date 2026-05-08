@@ -14,6 +14,23 @@ type SlugFieldOptions = {
   composite?: boolean;
 };
 
+// Editorial guidance follows the same advice every SEO blog repeats:
+// keep slugs scannable. Above ~80 chars URLs start wrapping and look
+// spammy in SERPs; we hard-block at 120 because Postgres path indexes
+// degrade and some CDN caches truncate.
+const SLUG_LIMIT = 120;
+const SLUG_HINT = 80;
+
+const validateSlugLength = (
+  value: string | string[] | null | undefined,
+): true | string => {
+  if (typeof value !== 'string' || value.length === 0) return true;
+  if (value.length > SLUG_LIMIT) {
+    return `Slug is ${value.length} characters — keep it under ${SLUG_LIMIT}. Aim for ≤ ${SLUG_HINT}.`;
+  }
+  return true;
+};
+
 /**
  * Reusable slug field. Auto-fills from a sibling field on save when blank.
  *
@@ -38,7 +55,7 @@ export const slugField = ({ source = 'name', composite = false }: SlugFieldOptio
   unique: !composite,
   index: true,
   admin: {
-    description: `URL-safe slug. Auto-generated from "${source}" on first save; safe to edit later (a redirect row is created automatically when you do).`,
+    description: `URL-safe slug. Auto-generated from "${source}" on first save; safe to edit later (a redirect row is created automatically when you do). Cap ${SLUG_LIMIT} characters.`,
     position: 'sidebar',
     components: {
       Field: {
@@ -47,6 +64,7 @@ export const slugField = ({ source = 'name', composite = false }: SlugFieldOptio
       },
     },
   },
+  validate: validateSlugLength,
   hooks: {
     beforeValidate: [
       ({ data, value }) => {
