@@ -13,6 +13,7 @@ import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
@@ -188,6 +189,7 @@ export const KnowledgeBase: CollectionConfig = {
       schemaOverrideAuditHook('knowledgeBase'),
       searchSyncAfterChangeHook('knowledgeBase'),
       webhooksPublishAfterChangeHook('knowledgeBase'),
+      indexNowPublishAfterChangeHook('knowledgeBase'),
     ],
     afterDelete: [searchSyncAfterDeleteHook('knowledgeBase')],
   },

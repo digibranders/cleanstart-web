@@ -13,6 +13,7 @@ import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
@@ -98,11 +99,61 @@ export const Guides: CollectionConfig = {
       type: 'array',
       labels: { singular: 'Section', plural: 'Article sections' },
       admin: {
-        description: 'Replaces Webflow Article About 1…8.',
+        description:
+          'Replaces Webflow Article About 1…8. Each section is one step when "Emit HowTo schema" is on below.',
       },
       fields: [
         { name: 'heading', type: 'text', required: true },
         { name: 'body', type: 'richText', required: true },
+      ],
+    },
+    {
+      type: 'group',
+      name: 'howTo',
+      label: 'How-to schema',
+      admin: {
+        description:
+          'When on, the guide emits a Schema.org HowTo blob alongside the TechArticle, treating each Article Section as a step. Use only for genuine procedural content (e.g. "How to harden your SSH server in 6 steps") — Google penalises HowTo on non-procedural articles.',
+      },
+      fields: [
+        {
+          name: 'enabled',
+          type: 'checkbox',
+          defaultValue: false,
+        },
+        {
+          name: 'totalTime',
+          type: 'text',
+          admin: {
+            description:
+              'ISO 8601 duration for the entire guide (e.g. PT30M = 30 minutes, PT1H30M = 1 hour 30 min).',
+            condition: (_data, sibling) => sibling?.enabled === true,
+          },
+        },
+        {
+          name: 'prepTime',
+          type: 'text',
+          admin: {
+            description: 'ISO 8601 prep duration (optional).',
+            condition: (_data, sibling) => sibling?.enabled === true,
+          },
+        },
+        {
+          name: 'performTime',
+          type: 'text',
+          admin: {
+            description: 'ISO 8601 active-work duration (optional).',
+            condition: (_data, sibling) => sibling?.enabled === true,
+          },
+        },
+        {
+          name: 'estimatedCost',
+          type: 'text',
+          admin: {
+            description: 'Optional cost hint (e.g. "$0", "$50 in tooling").',
+            condition: (_data, sibling) => sibling?.enabled === true,
+          },
+        },
       ],
     },
     {
@@ -211,6 +262,7 @@ export const Guides: CollectionConfig = {
       schemaOverrideAuditHook('guides'),
       searchSyncAfterChangeHook('guides'),
       webhooksPublishAfterChangeHook('guides'),
+      indexNowPublishAfterChangeHook('guides'),
     ],
     afterDelete: [searchSyncAfterDeleteHook('guides')],
   },

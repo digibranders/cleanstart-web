@@ -13,6 +13,7 @@ import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
@@ -227,6 +228,7 @@ export const Blogs: CollectionConfig = {
       schemaOverrideAuditHook('blogs'),
       searchSyncAfterChangeHook('blogs'),
       webhooksPublishAfterChangeHook('blogs'),
+      indexNowPublishAfterChangeHook('blogs'),
     ],
     afterDelete: [searchSyncAfterDeleteHook('blogs')],
   },
