@@ -38,7 +38,6 @@ import { SeoDescriptionField as SeoDescriptionField_9696c1be1903d357f63d23951e79
 import { SeoIndexableField as SeoIndexableField_ff3cc07c91d10b5899370ac0f262f1fb } from '@/payload/admin/components/SeoIndexableField.tsx'
 import { SerpPreviewField as SerpPreviewField_243778961d714dd69072cd09f703a734 } from '@/payload/admin/components/SerpPreviewField.tsx'
 import { SchemaPreviewField as SchemaPreviewField_2ca2f49f868221997f9932607223d89a } from '@/payload/admin/components/SchemaPreviewField.tsx'
-import { InboundRedirectsField as InboundRedirectsField_1afe69d25c6786c0c51532ee082716da } from '@/payload/admin/components/InboundRedirectsField.tsx'
 import { OutboundRedirectField as OutboundRedirectField_6ddb1aebe33d308a1f37b1ba8879601c } from '@/payload/admin/components/OutboundRedirectField.tsx'
 import { UrlChangeHistoryField as UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c } from '@/payload/admin/components/UrlChangeHistoryField.tsx'
 import { BodyAuditField as BodyAuditField_ddda503a0c865518ab222cfaf681f937 } from '@/payload/admin/components/BodyAuditField.tsx'
@@ -114,7 +113,6 @@ export const importMap = {
   "@/payload/admin/components/SeoIndexableField.tsx#SeoIndexableField": SeoIndexableField_ff3cc07c91d10b5899370ac0f262f1fb,
   "@/payload/admin/components/SerpPreviewField.tsx#SerpPreviewField": SerpPreviewField_243778961d714dd69072cd09f703a734,
   "@/payload/admin/components/SchemaPreviewField.tsx#SchemaPreviewField": SchemaPreviewField_2ca2f49f868221997f9932607223d89a,
-  "@/payload/admin/components/InboundRedirectsField.tsx#InboundRedirectsField": InboundRedirectsField_1afe69d25c6786c0c51532ee082716da,
   "@/payload/admin/components/OutboundRedirectField.tsx#OutboundRedirectField": OutboundRedirectField_6ddb1aebe33d308a1f37b1ba8879601c,
   "@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField": UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c,
   "@/payload/admin/components/BodyAuditField.tsx#BodyAuditField": BodyAuditField_ddda503a0c865518ab222cfaf681f937,

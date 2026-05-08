@@ -475,20 +475,13 @@ export const seoSidebarFields = (args: {
       },
     },
     {
-      name: 'inboundRedirects',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: {
-            path: '@/payload/admin/components/InboundRedirectsField.tsx#InboundRedirectsField',
-            clientProps: { pathPrefix, sourceField: urlSource },
-          },
-        },
-      },
-    },
-    {
-      name: 'outboundRedirect',
+      // Renamed from "outboundRedirect"; the inbound-redirect sidebar
+      // card was removed (a page doesn't need to surface every URL
+      // pointing AT it inside its own edit view — the Redirects
+      // collection list is the place for that audit). What remains is
+      // the simpler "this page redirects to ___" affordance, labelled
+      // simply "Redirect" in the UI.
+      name: 'redirect',
       type: 'ui',
       admin: {
         position: 'sidebar',

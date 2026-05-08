@@ -273,7 +273,7 @@ export const OutboundRedirectField = (
         aria-controls={headingId}
         onClick={() => setExpanded((v) => !v)}
       >
-        <span className="cs-outbound-redirect__title">Outbound redirect</span>
+        <span className="cs-outbound-redirect__title">Redirect</span>
         <span
           className="cs-outbound-redirect__summary"
           data-tone={
