@@ -635,22 +635,23 @@
     flex-shrink: 0;
   }
 
+  // Dot + label, no chip background. Matches the LIVE pattern used
+  // elsewhere in the admin (Permalink card, Indexable). Pinned to the
+  // right of the row by margin-left:auto so the @type code stays at
+  // the left.
   &__chip {
-    flex: 1;
+    margin-left: auto;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 11.5px;
     font-weight: 500;
     letter-spacing: 0.01em;
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: var(--theme-elevation-100);
-    border: 1px solid var(--theme-elevation-200);
+    padding: 0;
+    background: transparent;
+    border: 0;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
+    flex-shrink: 0;
   }
 
   &__chevron {

@@ -44,6 +44,16 @@ const SUPPORTED_COLLECTIONS = new Set([
 
 const trimSlash = (s: string): string => s.replace(/^\/+|\/+$/g, '');
 
+// Binary Valid / Invalid display for the Schema (JSON-LD) card.
+// "Improvable" (required fields present but some recommended missing)
+// is intentionally collapsed into Valid here — per SEO-team direction
+// the badge is a pass/fail signal, not a tier. The recommended-missing
+// list still shows below the badge so editors see the nudge to fill
+// the optional fields; the badge just doesn't change tier for them.
+//
+// The underlying audit lib (lib/jsonld/spec/required-fields.ts)
+// continues to compute the four-tier severity; other consumers
+// (e.g. the SEO health score card) use the nuanced version.
 const severityCopy: Record<
   BadgeSeverity,
   { label: string; tone: string; hint: string }
@@ -51,12 +61,12 @@ const severityCopy: Record<
   green: {
     label: 'Valid',
     tone: 'var(--color-success-500, #00c46a)',
-    hint: 'All required and recommended fields present.',
+    hint: 'All required fields present. Search engines will accept this schema.',
   },
   amber: {
-    label: 'Valid · improvable',
-    tone: 'var(--color-warning-500, #fbbf24)',
-    hint: 'Required fields present. Some recommended fields missing — leaves Rich Results impressions on the table.',
+    label: 'Valid',
+    tone: 'var(--color-success-500, #00c46a)',
+    hint: 'Required fields present. Some recommended fields are missing — see the list below for opt-in improvements.',
   },
   red: {
     label: 'Invalid',
