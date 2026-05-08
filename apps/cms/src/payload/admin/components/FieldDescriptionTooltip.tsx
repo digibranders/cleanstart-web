@@ -5,6 +5,9 @@ import { useEffect } from 'react';
 
 const PROCESSED_FLAG = 'data-cs-info-processed';
 const INFO_BTN_CLASS = 'cs-field-info';
+const TOOLTIP_ID = 'cs-field-info-tooltip';
+const TOOLTIP_GAP_PX = 8;
+const VIEWPORT_INSET_PX = 8;
 
 /**
  * Global field-description → info-tooltip transform.
@@ -15,29 +18,98 @@ const INFO_BTN_CLASS = 'cs-field-info';
  * Editors who already know what a field does have to scroll past
  * descriptions they no longer read.
  *
- * What: hide the inline description text, append a small "i" button
- * to the field label, and wire the description into the button's
- * native `title` attribute. Hover (or long-press on touch) reveals
- * the description on demand.
+ * What: hide the inline description text, inject a small "i" button
+ * into the field label (positioned right after the label text, before
+ * any badge), and reveal a portal-mounted tooltip on hover.
  *
  * Implementation:
- *   - Hide `.field-description` globally via SCSS (visually) but keep
- *     it in the DOM so screen readers still see it (still associated
- *     with the field via Payload's aria-describedby wiring).
+ *   - SR-only-hide `.field-description` via SCSS but keep it in the
+ *     DOM so Payload's `aria-describedby` wiring still hits the input.
+ *     Net a11y win.
  *   - On mount + via MutationObserver, find unprocessed descriptions,
- *     mark them processed, and inject `<button class="cs-field-info"
- *     title={text} aria-label="Field info">i</button>` into the label.
+ *     mark them processed, and inject `<button class="cs-field-info">`
+ *     into the label. Insert at index 1 so layout reads `Label (i) ...
+ *     Badge`, not `Label Badge (i)`.
+ *   - One shared tooltip element lives at the end of `<body>`. On
+ *     pointerenter/focus, position it relative to the hovered button
+ *     (anchored to the button's right edge, flipped above/below to fit
+ *     the viewport, clamped left so the right rail of the SEO sidebar
+ *     can't clip it). On leave/blur, hide.
  *
- * Why a global mutation observer instead of `admin.components.Description`
- * per field: hundreds of fields across 16 collections + 2 globals + the
- * SEO sidebar. A global hook is one file; per-field config would be
- * mechanical churn across the whole schema.
+ * Why a portal-mounted tooltip:
+ *   Pseudo-element + `position: absolute` is clipped by
+ *   `.document-fields__sidebar { overflow: auto }`. A body-level
+ *   portal escapes every `overflow:` ancestor.
+ *
+ * Why a global mutation observer over per-field
+ * `admin.components.Description`: hundreds of fields across 16
+ * collections + 2 globals + the SEO sidebar group. Global = one file.
+ * Per-field = mechanical schema churn.
  *
  * Mounted via `admin.components.actions` in payload.config.ts.
  */
 export const FieldDescriptionTooltip = (): ReactElement | null => {
   useEffect(() => {
     if (typeof document === 'undefined') return undefined;
+
+    // ─── Singleton tooltip element (portal target) ─────────────────
+    let tooltip = document.getElementById(TOOLTIP_ID) as HTMLDivElement | null;
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.id = TOOLTIP_ID;
+      tooltip.setAttribute('role', 'tooltip');
+      tooltip.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(tooltip);
+    }
+
+    const showTooltip = (button: HTMLButtonElement, text: string): void => {
+      if (!tooltip) return;
+      tooltip.textContent = text;
+      tooltip.setAttribute('data-cs-tooltip-open', 'true');
+      tooltip.setAttribute('aria-hidden', 'false');
+
+      // Make tooltip measurable (display from CSS), then read its size.
+      // Reset positioning first so the previous run's offsets don't bias
+      // the measurement.
+      tooltip.style.left = '0px';
+      tooltip.style.top = '0px';
+
+      const btnRect = button.getBoundingClientRect();
+      const tipRect = tooltip.getBoundingClientRect();
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // Anchor the tooltip's RIGHT edge near the button's right edge so
+      // it grows leftward — that's the safe direction inside the SEO
+      // sidebar where the button sits flush against the right rail.
+      let left = Math.round(btnRect.right + 4 - tipRect.width);
+
+      // But don't let it spill off the LEFT of the viewport; clamp.
+      const minLeft = VIEWPORT_INSET_PX;
+      const maxLeft = vw - tipRect.width - VIEWPORT_INSET_PX;
+      if (left < minLeft) left = minLeft;
+      if (left > maxLeft) left = Math.max(minLeft, maxLeft);
+
+      // Vertical: prefer above the button; flip below if no room.
+      let top = Math.round(btnRect.top - tipRect.height - TOOLTIP_GAP_PX);
+      if (top < VIEWPORT_INSET_PX) {
+        top = Math.round(btnRect.bottom + TOOLTIP_GAP_PX);
+      }
+      // Final vertical clamp (last-ditch safety).
+      if (top + tipRect.height > vh - VIEWPORT_INSET_PX) {
+        top = vh - tipRect.height - VIEWPORT_INSET_PX;
+      }
+
+      tooltip.style.left = `${left + window.scrollX}px`;
+      tooltip.style.top = `${top + window.scrollY}px`;
+    };
+
+    const hideTooltip = (): void => {
+      if (!tooltip) return;
+      tooltip.removeAttribute('data-cs-tooltip-open');
+      tooltip.setAttribute('aria-hidden', 'true');
+    };
 
     const processOne = (desc: HTMLElement): void => {
       if (desc.getAttribute(PROCESSED_FLAG) === 'true') return;
@@ -46,42 +118,45 @@ export const FieldDescriptionTooltip = (): ReactElement | null => {
       const text = (desc.textContent ?? '').trim();
       if (!text) return;
 
-      // Climb to the field root, then find the label inside it.
-      // Payload's structure (verified live):
-      //   .field-type
-      //     .field-type__wrap
-      //       label.field-label
-      //       <input/textarea/...>
-      //       .field-description
       const fieldType = desc.closest('.field-type');
       if (!fieldType) return;
 
       const label = fieldType.querySelector('label.field-label, .field-label');
       if (!label) return;
 
-      // Don't re-inject if a button already exists inside this label
-      // (defends against double-runs from React StrictMode + observer).
       if (label.querySelector(`.${INFO_BTN_CLASS}`)) return;
 
-      const button = document.createElement('button');
+      const button = document.createElement('button') as HTMLButtonElement;
       button.type = 'button';
       button.className = INFO_BTN_CLASS;
-      button.tabIndex = -1; // not in tab order — discoverable via hover
+      button.tabIndex = -1;
       button.setAttribute('aria-label', `Field info: ${text}`);
-      button.title = text;
+      button.title = text; // OS-level fallback; CSS portal is the primary path.
       button.textContent = 'i';
-      label.appendChild(button);
+
+      const onEnter = (): void => showTooltip(button, text);
+      const onLeave = (): void => hideTooltip();
+
+      button.addEventListener('pointerenter', onEnter);
+      button.addEventListener('pointerleave', onLeave);
+      button.addEventListener('focus', onEnter);
+      button.addEventListener('blur', onLeave);
+
+      // Insert at index 1 so the layout reads `Label (i) ... Badge`.
+      const firstChild = label.firstChild;
+      if (firstChild?.nextSibling) {
+        label.insertBefore(button, firstChild.nextSibling);
+      } else {
+        label.appendChild(button);
+      }
     };
 
     const scanAll = (root: ParentNode): void => {
       root.querySelectorAll<HTMLElement>('.field-description').forEach(processOne);
     };
 
-    // Initial pass — covers the first render.
     scanAll(document);
 
-    // Watch for fields added later: collapsibles expanding, drawers
-    // opening, tabs switching, etc.
     const observer = new MutationObserver((mutations) => {
       for (const m of mutations) {
         for (const node of m.addedNodes) {
@@ -90,7 +165,6 @@ export const FieldDescriptionTooltip = (): ReactElement | null => {
           if (el.classList?.contains('field-description')) {
             processOne(el);
           } else {
-            // Subtree might contain descriptions.
             scanAll(el);
           }
         }
@@ -99,7 +173,16 @@ export const FieldDescriptionTooltip = (): ReactElement | null => {
 
     observer.observe(document.body, { childList: true, subtree: true });
 
-    return () => observer.disconnect();
+    // Hide the tooltip on scroll/resize so it doesn't lag behind the
+    // button it's anchored to.
+    window.addEventListener('scroll', hideTooltip, true);
+    window.addEventListener('resize', hideTooltip);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', hideTooltip, true);
+      window.removeEventListener('resize', hideTooltip);
+    };
   }, []);
 
   return null;

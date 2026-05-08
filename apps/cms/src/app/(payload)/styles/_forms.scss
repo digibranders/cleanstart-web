@@ -42,14 +42,15 @@
 }
 
 // Inline info-button mounted inside the field label by
-// FieldDescriptionTooltip. Native `title` attribute carries the
-// description so we don't need a custom tooltip stack — every
-// browser handles the hover delay + positioning out of the box.
+// FieldDescriptionTooltip. Sits immediately after the label text so
+// the layout reads `Slug (i) ... AUTO` — info adjacent to the label,
+// any badge stays right-aligned by Payload's flex.
 .field-label .cs-field-info {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-inline-start: var(--cs-space-2);
+  margin-inline-end: var(--cs-space-1);
   width: 14px;
   height: 14px;
   padding: 0;
@@ -65,6 +66,8 @@
   line-height: 1;
   letter-spacing: 0;
   vertical-align: middle;
+  flex-shrink: 0;
+  position: relative;
   transition:
     color var(--cs-motion-micro),
     border-color var(--cs-motion-micro),
@@ -79,6 +82,50 @@
   &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
+  }
+
+  // The tooltip itself is a body-level portal element managed by
+  // FieldDescriptionTooltip — see `#cs-field-info-tooltip` below.
+  // Pseudo-element approach was clipped by `.document-fields__sidebar
+  // { overflow: auto }`; the portal escapes every overflow ancestor.
+}
+
+// ─── Portal-mounted tooltip (sibling to body) ───────────────────────
+//
+// Single shared element; FieldDescriptionTooltip positions it via JS
+// on hover/focus and clamps it inside the viewport. Hidden by default
+// (max-width: 0 + opacity:0 + visibility:hidden) so it doesn't capture
+// pointer events or take up space in the a11y tree until it's shown.
+#cs-field-info-tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  max-width: 280px;
+  padding: 8px 10px;
+  background: var(--theme-elevation-900);
+  color: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-input);
+  box-shadow: var(--cs-shadow-lift-md);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--cs-motion-micro),
+    visibility var(--cs-motion-micro);
+
+  &[data-cs-tooltip-open='true'] {
+    opacity: 1;
+    visibility: visible;
   }
 }
 
