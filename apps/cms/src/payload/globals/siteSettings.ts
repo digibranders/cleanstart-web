@@ -82,5 +82,57 @@ export const SiteSettings: GlobalConfig = {
         },
       ],
     },
+    {
+      type: 'group',
+      name: 'analytics',
+      label: 'Analytics',
+      admin: {
+        description:
+          'Public-site analytics IDs. Leave blank to disable. Consent mode delays GTM/GA4 firing until the cookie banner returns "accepted".',
+      },
+      fields: [
+        {
+          name: 'gtmContainerId',
+          type: 'text',
+          admin: {
+            description: 'Google Tag Manager container, e.g. GTM-XXXXXXX.',
+          },
+          validate: (value: string | string[] | null | undefined): true | string => {
+            if (value == null || (typeof value === 'string' && value.trim().length === 0)) {
+              return true;
+            }
+            if (typeof value !== 'string' || !/^GTM-[A-Z0-9]+$/.test(value.trim())) {
+              return 'Expected a GTM container ID like GTM-XXXXXXX.';
+            }
+            return true;
+          },
+        },
+        {
+          name: 'ga4MeasurementId',
+          type: 'text',
+          admin: {
+            description: 'GA4 measurement ID, e.g. G-XXXXXXXXXX.',
+          },
+          validate: (value: string | string[] | null | undefined): true | string => {
+            if (value == null || (typeof value === 'string' && value.trim().length === 0)) {
+              return true;
+            }
+            if (typeof value !== 'string' || !/^G-[A-Z0-9]+$/.test(value.trim())) {
+              return 'Expected a GA4 measurement ID like G-XXXXXXXXXX.';
+            }
+            return true;
+          },
+        },
+        {
+          name: 'consentModeEnabled',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: {
+            description:
+              'When on, GA4 / GTM tags fire only after the cookie banner returns "accepted" (Google Consent Mode v2). Required for GDPR compliance.',
+          },
+        },
+      ],
+    },
   ],
 };

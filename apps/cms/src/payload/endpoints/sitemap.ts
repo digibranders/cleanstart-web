@@ -5,7 +5,12 @@ import {
   collectNewsSitemapEntries,
   collectSitemapEntries,
 } from '../lib/sitemap/collect';
-import { renderNewsUrlsetXml, renderUrlsetXml } from '../lib/sitemap/xml';
+import { collectImageSitemapEntries } from '../lib/sitemap/image';
+import {
+  renderImageUrlsetXml,
+  renderNewsUrlsetXml,
+  renderUrlsetXml,
+} from '../lib/sitemap/xml';
 
 const xmlResponse = (xml: string): Response =>
   new Response(xml, {
@@ -88,5 +93,27 @@ export const newsSitemapEndpoint: Endpoint = {
       },
     );
     return xmlResponse(renderNewsUrlsetXml(entries));
+  },
+};
+
+/**
+ * GET /api/sitemap-image.xml
+ *
+ * Image sitemap with one `<image:image>` entry per indexable, hero-
+ * carrying doc. Walks the same emittable surface as /sitemap.xml but
+ * at depth=1 so heroImage / photo URLs resolve. Pages are intentionally
+ * skipped — page-level imagery lives in Lexical blocks and needs a
+ * body-walk extraction (future pass).
+ */
+export const imageSitemapEndpoint: Endpoint = {
+  path: '/sitemap-image.xml',
+  method: 'get',
+  handler: async (req) => {
+    const baseUrl = await readBaseUrl(req.payload);
+    const entries = await collectImageSitemapEntries(
+      req.payload as unknown as SitemapPayload,
+      baseUrl,
+    );
+    return xmlResponse(renderImageUrlsetXml(entries));
   },
 };

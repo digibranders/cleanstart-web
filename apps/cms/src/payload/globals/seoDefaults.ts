@@ -43,6 +43,94 @@ export const SeoDefaults: GlobalConfig = {
     },
     {
       type: 'group',
+      name: 'brandIcons',
+      label: 'Brand icons',
+      admin: {
+        description:
+          'Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`.',
+      },
+      fields: [
+        mediaUploadField({
+          name: 'favicon32',
+          folderHint: 'web/general',
+          description: '32×32 favicon. Used by `<link rel="icon" sizes="32x32">`.',
+        }),
+        mediaUploadField({
+          name: 'icon192',
+          folderHint: 'web/general',
+          description: '192×192 PNG. PWA / Android home-screen icon.',
+        }),
+        mediaUploadField({
+          name: 'icon512',
+          folderHint: 'web/general',
+          description: '512×512 PNG. PWA / large-tile icon.',
+        }),
+        mediaUploadField({
+          name: 'appleTouchIcon',
+          folderHint: 'web/general',
+          description: '180×180 PNG. iOS home-screen icon (`apple-touch-icon`).',
+        }),
+        mediaUploadField({
+          name: 'safariPinnedTabSvg',
+          folderHint: 'web/general',
+          description:
+            'Single-colour SVG for Safari pinned-tab. Will be served as `mask-icon`.',
+        }),
+        {
+          name: 'themeColor',
+          type: 'text',
+          admin: {
+            description:
+              'Hex string (e.g. #0E1117). Surfaced as `<meta name="theme-color">` and as `theme_color` in manifest.json.',
+          },
+        },
+      ],
+    },
+    {
+      type: 'group',
+      name: 'verification',
+      label: 'Search engine verification',
+      admin: {
+        description:
+          'Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper.',
+      },
+      fields: [
+        {
+          name: 'google',
+          type: 'text',
+          admin: {
+            description:
+              'google-site-verification (Google Search Console → Settings → Ownership verification → HTML tag).',
+          },
+        },
+        {
+          name: 'bing',
+          type: 'text',
+          admin: {
+            description:
+              'msvalidate.01 (Bing Webmaster Tools → Site Settings → Site verification → Meta tag).',
+          },
+        },
+        {
+          name: 'pinterest',
+          type: 'text',
+          admin: {
+            description:
+              'p:domain_verify (Pinterest → Settings → Claim → claim a website → HTML tag).',
+          },
+        },
+        {
+          name: 'yandex',
+          type: 'text',
+          admin: {
+            description:
+              'yandex-verification (Yandex Webmaster → Settings → Site verification → Meta tag).',
+          },
+        },
+      ],
+    },
+    {
+      type: 'group',
       name: 'organizationJsonLd',
       label: 'Organization JSON-LD',
       admin: {
