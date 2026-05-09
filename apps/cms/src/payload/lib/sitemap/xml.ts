@@ -28,6 +28,11 @@ export type ChangeFreq =
   | 'yearly'
   | 'never';
 
+export interface HreflangAlternate {
+  readonly hreflang: string;
+  readonly href: string;
+}
+
 export interface SitemapEntry {
   /** Absolute URL — required. */
   readonly loc: string;
@@ -36,6 +41,14 @@ export interface SitemapEntry {
   readonly changefreq?: ChangeFreq;
   /** 0.0 – 1.0. Out-of-range values are clamped. */
   readonly priority?: number;
+  /**
+   * Optional hreflang cluster for this URL. When non-empty, each row
+   * is emitted as `<xhtml:link rel="alternate" hreflang="…" href="…"/>`
+   * inside the `<url>` element. Caller is responsible for cluster
+   * symmetry (self-ref, x-default) — this lib emits whatever it's
+   * given. Use `composeHreflangCluster()` upstream to inject defaults.
+   */
+  readonly alternates?: ReadonlyArray<HreflangAlternate>;
 }
 
 const renderEntry = (entry: SitemapEntry): string => {
@@ -47,24 +60,39 @@ const renderEntry = (entry: SitemapEntry): string => {
     const clamped = Math.max(0, Math.min(1, entry.priority));
     parts.push(`    <priority>${clamped.toFixed(1)}</priority>`);
   }
+  if (entry.alternates && entry.alternates.length > 0) {
+    for (const alt of entry.alternates) {
+      const hreflang = (alt.hreflang ?? '').trim();
+      const href = (alt.href ?? '').trim();
+      if (!hreflang || !href) continue;
+      parts.push(
+        `    <xhtml:link rel="alternate" hreflang="${xmlEscape(hreflang)}" href="${xmlEscape(href)}"/>`,
+      );
+    }
+  }
   parts.push('  </url>');
   return parts.join('\n');
 };
+
+const hasAnyAlternates = (entries: readonly SitemapEntry[]): boolean =>
+  entries.some((e) => Array.isArray(e.alternates) && e.alternates.length > 0);
 
 /**
  * Render a standard sitemap urlset document. Returns the full XML
  * payload including the prolog — caller writes it directly to the
  * response body.
+ *
+ * When ANY entry has hreflang alternates, the root `<urlset>` opens
+ * with the `xhtml` namespace so `<xhtml:link>` children validate.
+ * The namespace is omitted otherwise to keep the document minimal
+ * for sites without multi-locale clusters.
  */
 export const renderUrlsetXml = (entries: readonly SitemapEntry[]): string => {
   const body = entries.map(renderEntry).join('\n');
-  return [
-    '<?xml version="1.0" encoding="UTF-8"?>',
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    body,
-    '</urlset>',
-    '',
-  ].join('\n');
+  const root = hasAnyAlternates(entries)
+    ? '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n        xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+    : '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+  return ['<?xml version="1.0" encoding="UTF-8"?>', root, body, '</urlset>', ''].join('\n');
 };
 
 export interface NewsSitemapEntry {

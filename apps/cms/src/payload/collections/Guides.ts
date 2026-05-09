@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
@@ -24,6 +25,9 @@ export const Guides: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'authors', 'reviewedBy', '_status', 'lastReviewedAt', 'updatedAt'],
     group: 'Content',
+    components: {
+      edit: docStatusBarEditConfig({ showStats: true, showPublishedAt: true }),
+    },
   },
   access: {
     read: () => true,
@@ -36,33 +40,6 @@ export const Guides: CollectionConfig = {
     slugField({ source: 'title' }),
     mediaUploadField({ name: 'heroImage', folderHint: 'web/guide' }),
     { name: 'body', type: 'richText' },
-    {
-      name: 'authors',
-      type: 'relationship',
-      relationTo: 'authors',
-      hasMany: true,
-      filterOptions: {
-        acceptingNewBylines: { not_equals: false },
-      },
-    },
-    {
-      name: 'reviewedBy',
-      type: 'relationship',
-      relationTo: 'authors',
-      admin: {
-        description:
-          'Author who reviewed this guide. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal.',
-      },
-    },
-    {
-      name: 'lastReviewedAt',
-      type: 'date',
-      admin: {
-        description: 'Editorial-freshness signal. Surfaced in JSON-LD dateReviewed.',
-        date: { pickerAppearance: 'dayAndTime' },
-        position: 'sidebar',
-      },
-    },
     {
       name: 'faqsBulkPaste',
       type: 'ui',
@@ -93,6 +70,33 @@ export const Guides: CollectionConfig = {
         // line breaks.
         { name: 'answer', type: 'textarea', required: true },
       ],
+    },
+    {
+      name: 'authors',
+      type: 'relationship',
+      relationTo: 'authors',
+      hasMany: true,
+      filterOptions: {
+        acceptingNewBylines: { not_equals: false },
+      },
+    },
+    {
+      name: 'reviewedBy',
+      type: 'relationship',
+      relationTo: 'authors',
+      admin: {
+        description:
+          'Author who reviewed this guide. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal.',
+      },
+    },
+    {
+      name: 'lastReviewedAt',
+      type: 'date',
+      admin: {
+        description: 'Editorial-freshness signal. Surfaced in JSON-LD dateReviewed.',
+        date: { pickerAppearance: 'dayAndTime' },
+        position: 'sidebar',
+      },
     },
     {
       name: 'articleSections',
@@ -187,16 +191,6 @@ export const Guides: CollectionConfig = {
       hasMany: true,
     },
     {
-      name: 'bodyStats',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: '@/payload/admin/components/BodyStatsField.tsx#BodyStatsField',
-        },
-      },
-    },
-    {
       name: 'permalink',
       type: 'ui',
       admin: {
@@ -213,8 +207,8 @@ export const Guides: CollectionConfig = {
     publishedAtField,
     ...seoSidebarFields({ pathPrefix: '/guides', descriptionSource: 'abstract' }),
     {
-      // Data-only — surfaced via the `bodyStats` pill at the top of the
-      // sidebar. Hidden here so the form doesn't double-render.
+      // Data-only — surfaced via the DocStatusBar in the top status bar.
+      // Hidden here so the form doesn't double-render.
       name: 'readingMinutes',
       type: 'number',
       access: { update: () => false },
@@ -233,15 +227,19 @@ export const Guides: CollectionConfig = {
       labels: { singular: 'Heading', plural: 'Table of contents' },
       admin: {
         readOnly: true,
+        initCollapsed: true,
         description: 'Auto-built from H2/H3 headings in the body on save.',
         components: {
           RowLabel: '@/payload/admin/components/TocRowLabel.tsx#TocRowLabel',
         },
       },
       fields: [
-        { name: 'level', type: 'number' },
-        { name: 'text', type: 'text' },
-        { name: 'anchor', type: 'text' },
+        // Sub-fields explicitly readOnly: parent array's
+        // `admin.readOnly` doesn't propagate to children rendered by
+        // custom Field adapters.
+        { name: 'level', type: 'number', admin: { readOnly: true } },
+        { name: 'text', type: 'text', admin: { readOnly: true } },
+        { name: 'anchor', type: 'text', admin: { readOnly: true } },
       ],
     },
     ...seoFieldsForSidebar('guides'),

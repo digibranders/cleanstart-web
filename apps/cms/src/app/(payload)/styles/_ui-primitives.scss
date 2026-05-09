@@ -1,0 +1,1478 @@
+// =============================================================================
+// CleanStart UI Primitives — Dialog, Drawer, Popover, Combobox, Spinner,
+// Confirm. Used by the picker components and any future custom field UI
+// that needs a modal/floating surface. Built to compose cleanly with the
+// existing Payload chrome — pulls all colours from semantic tokens.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Native <dialog> reset shared by Dialog + Drawer.
+//
+// CRITICAL: every layout / sizing rule below MUST be scoped to `[open]`,
+// because author-CSS overrides the user-agent `dialog:not([open]) { display: none }`
+// rule. Without this gate, every closed dialog in the DOM (one per
+// RelationshipField on a page!) becomes a full-viewport invisible overlay
+// that swallows clicks — sidebar nav, edit-form buttons, all of it.
+// -----------------------------------------------------------------------------
+.cs-dialog:not([open]),
+.cs-drawer:not([open]) {
+  display: none !important;
+}
+
+.cs-dialog[open],
+.cs-drawer[open] {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  max-width: none;
+  max-height: none;
+}
+
+.cs-dialog::backdrop,
+.cs-drawer::backdrop {
+  background: rgba(8, 12, 28, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+// -----------------------------------------------------------------------------
+// Dialog — centred modal panel.
+// -----------------------------------------------------------------------------
+.cs-dialog[open] {
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  height: 100vh;
+  inset: 0;
+  margin: 0;
+}
+
+.cs-dialog__panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--theme-bg, #fff);
+  color: var(--theme-text, #0e1125);
+  border-radius: var(--cs-radius-modal);
+  box-shadow:
+    0 24px 64px rgba(8, 12, 28, 0.32),
+    0 4px 12px rgba(8, 12, 28, 0.18);
+  border: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.08));
+  width: min(94vw, 560px);
+  max-height: 86vh;
+  overflow: hidden;
+  animation: cs-dialog-in var(--cs-motion-modal);
+}
+
+// Size modifier classes sit on the panel itself — use compound selectors.
+.cs-dialog__panel.cs-dialog--sm { width: min(94vw, 420px); }
+.cs-dialog__panel.cs-dialog--md { width: min(94vw, 560px); }
+.cs-dialog__panel.cs-dialog--lg { width: min(94vw, 760px); }
+.cs-dialog__panel.cs-dialog--xl { width: min(96vw, 1080px); }
+.cs-dialog__panel.cs-dialog--full {
+  width: 96vw;
+  height: 92vh;
+  max-height: 92vh;
+}
+
+.cs-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cs-space-3);
+  padding: var(--cs-space-4) var(--cs-space-4) var(--cs-space-3);
+  border-bottom: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+}
+
+.cs-dialog__heading { flex: 1; min-width: 0; }
+
+.cs-dialog__title {
+  margin: 0;
+  font: 600 1rem/1.4 var(--font-display, var(--font-body));
+  color: var(--theme-text, #0e1125);
+}
+
+.cs-dialog__description {
+  margin: var(--cs-space-1) 0 0;
+  font-size: 0.8125rem;
+  color: var(--theme-elevation-600, rgba(0, 0, 0, 0.6));
+}
+
+.cs-dialog__close,
+.cs-drawer__close {
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--cs-radius-input);
+  padding: 6px;
+  cursor: pointer;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: var(--cs-tint-brand-soft);
+    border-color: var(--theme-elevation-100, rgba(0, 0, 0, 0.08));
+  }
+  &:focus-visible {
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: 2px;
+  }
+}
+
+.cs-dialog__body { padding: var(--cs-space-4); overflow: auto; }
+
+.cs-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--cs-space-2);
+  padding: var(--cs-space-3) var(--cs-space-4);
+  border-top: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+  background: var(--theme-elevation-50, rgba(0, 0, 0, 0.02));
+}
+
+@keyframes cs-dialog-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+// -----------------------------------------------------------------------------
+// Drawer — side-panel modal.
+// -----------------------------------------------------------------------------
+.cs-drawer[open] {
+  width: 100vw;
+  height: 100vh;
+  inset: 0;
+  margin: 0;
+}
+
+.cs-drawer__panel {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  background: var(--theme-bg, #fff);
+  color: var(--theme-text, #0e1125);
+  box-shadow:
+    -16px 0 48px rgba(8, 12, 28, 0.18),
+    -2px 0 8px rgba(8, 12, 28, 0.10);
+  border-left: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.08));
+  width: min(96vw, 540px);
+  animation: cs-drawer-in-right var(--cs-motion-modal);
+}
+
+// The side / size modifier classes sit on the panel itself, so use
+// compound selectors. (Earlier descendant selectors silently no-op'd
+// and the drawer rendered full-width.)
+.cs-drawer__panel.cs-drawer--right { right: 0; }
+.cs-drawer__panel.cs-drawer--left {
+  left: 0;
+  border-left: none;
+  border-right: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.08));
+  box-shadow:
+    16px 0 48px rgba(8, 12, 28, 0.18),
+    2px 0 8px rgba(8, 12, 28, 0.10);
+  animation: cs-drawer-in-left var(--cs-motion-modal);
+}
+
+.cs-drawer__panel.cs-drawer--sm { width: min(96vw, 420px); }
+.cs-drawer__panel.cs-drawer--md { width: min(96vw, 540px); }
+.cs-drawer__panel.cs-drawer--lg { width: min(96vw, 760px); }
+.cs-drawer__panel.cs-drawer--xl { width: min(96vw, 1024px); }
+
+.cs-drawer__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cs-space-3);
+  padding: var(--cs-space-4);
+  border-bottom: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+}
+
+.cs-drawer__heading { flex: 1; min-width: 0; }
+
+.cs-drawer__title {
+  margin: 0;
+  font: 600 1rem/1.4 var(--font-display, var(--font-body));
+}
+
+.cs-drawer__subtitle {
+  margin: var(--cs-space-1) 0 0;
+  font-size: 0.75rem;
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cs-drawer__header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+}
+
+.cs-drawer__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--cs-space-3) var(--cs-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-drawer__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--cs-space-2);
+  padding: var(--cs-space-3) var(--cs-space-4);
+  border-top: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+  background: var(--theme-elevation-50, rgba(0, 0, 0, 0.02));
+}
+
+@keyframes cs-drawer-in-right {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes cs-drawer-in-left {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+// -----------------------------------------------------------------------------
+// Popover — anchored, non-modal floating surface.
+// -----------------------------------------------------------------------------
+.cs-popover {
+  background: var(--theme-bg, #fff);
+  color: var(--theme-text, #0e1125);
+  border: 1px solid var(--theme-elevation-150, rgba(0, 0, 0, 0.10));
+  border-radius: var(--cs-radius-card);
+  box-shadow: var(--cs-shadow-lift-md, 0 4px 12px rgba(0, 0, 0, 0.08));
+  min-width: 200px;
+  max-width: 480px;
+  z-index: 1000;
+  animation: cs-popover-in var(--cs-motion-micro);
+}
+
+@keyframes cs-popover-in {
+  from { opacity: 0; transform: translateY(-2px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// -----------------------------------------------------------------------------
+// Combobox — input + listbox.
+// -----------------------------------------------------------------------------
+.cs-combobox {
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cs-combobox__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cs-combobox__input {
+  flex: 1;
+  appearance: none;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  background: var(--theme-input-bg, var(--theme-elevation-50));
+  color: inherit;
+  border-radius: var(--cs-radius-input);
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 0.875rem;
+  box-shadow: var(--cs-shadow-input-rest);
+
+  &:focus {
+    outline: none;
+    border-color: var(--cs-cyan-500);
+    box-shadow: var(--cs-shadow-input-focus);
+  }
+}
+
+.cs-combobox__loading {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.cs-combobox__list {
+  list-style: none;
+  margin: var(--cs-space-2) 0 0;
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+  border-radius: var(--cs-radius-card);
+  background: var(--theme-elevation-50, rgba(0, 0, 0, 0.02));
+  flex: 1;
+  min-height: 0;
+}
+
+.cs-combobox__option {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.04));
+
+  &:last-child { border-bottom: none; }
+
+  &.is-active {
+    background: var(--cs-tint-brand-soft);
+  }
+  &.is-selected {
+    background: var(--cs-tint-brand-medium);
+  }
+  &.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.cs-combobox__thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--cs-radius-chip);
+  object-fit: cover;
+  background: var(--theme-elevation-100);
+  flex-shrink: 0;
+}
+
+.cs-combobox__option-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.cs-combobox__option-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-combobox__option-description {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cs-combobox__empty {
+  padding: var(--cs-space-6) var(--cs-space-4);
+  text-align: center;
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  font-size: 0.875rem;
+}
+
+// -----------------------------------------------------------------------------
+// Spinner.
+// -----------------------------------------------------------------------------
+.cs-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-spinner__ring {
+  display: inline-block;
+  border: 2px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  border-top-color: var(--cs-cyan-500);
+  border-radius: 50%;
+  animation: cs-spinner-rotate 0.7s linear infinite;
+}
+
+.cs-spinner--sm .cs-spinner__ring { width: 14px; height: 14px; }
+.cs-spinner--md .cs-spinner__ring { width: 20px; height: 20px; }
+.cs-spinner--lg .cs-spinner__ring { width: 32px; height: 32px; border-width: 3px; }
+
+.cs-spinner__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@keyframes cs-spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+
+// -----------------------------------------------------------------------------
+// Buttons used inside dialog / drawer footers.
+// -----------------------------------------------------------------------------
+.cs-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--cs-radius-input);
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background var(--cs-motion-micro), border-color var(--cs-motion-micro);
+
+  &:focus-visible {
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.cs-btn--primary {
+  background: var(--cs-cyan-500);
+  color: #fff;
+  &:hover:not(:disabled) { background: var(--cs-cyan-600); }
+}
+
+.cs-btn--subtle {
+  background: transparent;
+  color: inherit;
+  border-color: var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  &:hover:not(:disabled) {
+    background: var(--cs-tint-brand-soft);
+    border-color: var(--cs-cyan-500);
+  }
+}
+
+.cs-btn--danger {
+  background: #dc2626;
+  color: #fff;
+  &:hover:not(:disabled) { background: #b91c1c; }
+}
+
+// -----------------------------------------------------------------------------
+// Confirm dialog body description.
+// -----------------------------------------------------------------------------
+.cs-confirm__description {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--theme-elevation-700, rgba(0, 0, 0, 0.7));
+}
+
+// -----------------------------------------------------------------------------
+// Relationship picker — multi-select tail.
+// -----------------------------------------------------------------------------
+.cs-relationship-picker__count {
+  flex: 1;
+  font-size: 0.8125rem;
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+}
+
+.cs-relationship-picker__check {
+  color: var(--cs-cyan-600);
+  font-weight: 700;
+}
+
+// -----------------------------------------------------------------------------
+// Relationship field — inline searchable dropdown
+//
+// Editor-flow: pills above (current selection), search input + "+ New"
+// button below. Typing into the input opens a Popover-anchored dropdown
+// below with rich rows (thumb · primary · secondary). "+ New" opens a
+// centered Dialog modal with the create form. Backspace on empty input
+// removes last pill.
+//
+// All inputs: pills, input, popover share the same width as the field
+// row, so the dropdown lines up flush with the input it spawned from.
+// -----------------------------------------------------------------------------
+.cs-relationship-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-2);
+}
+
+.cs-relationship-field__control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+// =============================================================================
+// Status badge palette — single source of truth for the colors used on
+// stacked relationship chips. Uses the existing theme palette so it adapts
+// automatically to dark / light mode.
+// =============================================================================
+.cs-relationship-field__pill-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+
+  // Default (unknown status) — neutral.
+  background: var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+  color: var(--theme-elevation-600, rgba(0, 0, 0, 0.55));
+
+  &--published {
+    background: rgba(34, 197, 94, 0.18);
+    color: #4ade80;
+  }
+  &--draft {
+    background: rgba(234, 179, 8, 0.18);
+    color: #fbbf24;
+  }
+  &--archived,
+  &--unpublished {
+    background: rgba(156, 163, 175, 0.18);
+    color: #9ca3af;
+  }
+  &--scheduled {
+    background: rgba(6, 199, 242, 0.18);
+    color: var(--cs-cyan-400, #4dd5f7);
+  }
+}
+
+.cs-relationship-field__pill-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  background: var(--theme-elevation-100, rgba(0, 0, 0, 0.05));
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  border: 1px solid var(--theme-elevation-150, rgba(0, 0, 0, 0.08));
+}
+
+.cs-relationship-field__pill-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.cs-relationship-field--error .cs-relationship-field__inputrow {
+  border-color: #dc2626;
+}
+
+.cs-relationship-field__empty {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 1px dashed var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  border-radius: var(--cs-radius-input);
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  font-size: 0.8125rem;
+  font-style: italic;
+}
+
+// Pills container — generic. Layout-specific styles below.
+.cs-relationship-field__pills {
+  display: flex;
+  gap: 6px;
+  padding: 0;
+}
+
+// Stacked: vertical list of full-width chip rows.
+.cs-relationship-field__pills--stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.cs-relationship-field__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+}
+
+// Inline chip (Gmail-recipient style): pill-shaped, lives inside the input
+// row alongside the cursor.
+.cs-relationship-field__pill--inline {
+  padding: 3px 4px 3px 8px;
+  background: var(--theme-elevation-100, rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  border-radius: 999px;
+  max-width: 280px;
+}
+
+// Stacked chip: full-width row, primary text left, badges + remove right.
+.cs-relationship-field__pill--stacked {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 8px 12px;
+  background: var(--theme-elevation-50, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--theme-elevation-150, rgba(0, 0, 0, 0.08));
+  border-radius: var(--cs-radius-input);
+  width: 100%;
+  max-width: none;
+  transition: border-color var(--cs-motion-micro), background var(--cs-motion-micro);
+
+  &:hover {
+    border-color: var(--theme-elevation-300, rgba(0, 0, 0, 0.12));
+  }
+
+  .cs-relationship-field__pill-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .cs-relationship-field__pill-primary {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .cs-relationship-field__pill-remove {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.cs-relationship-field__thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--theme-elevation-100);
+}
+
+.cs-relationship-field__pill-text {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cs-relationship-field__pill-primary {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-relationship-field__pill-secondary {
+  font-size: 0.6875rem;
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-relationship-field__pill-remove {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.55;
+  transition: background var(--cs-motion-micro), opacity var(--cs-motion-micro);
+  flex-shrink: 0;
+
+  &:hover {
+    background: var(--cs-tint-brand-soft);
+    opacity: 1;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: 1px;
+  }
+}
+
+// Input row + "New" button + (in inline layout) inline chips.
+.cs-relationship-field__inputrow {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 6px;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  background: var(--theme-input-bg, var(--theme-elevation-50));
+  border-radius: var(--cs-radius-input);
+  box-shadow: var(--cs-shadow-input-rest);
+  transition: border-color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
+  min-height: 38px;
+  cursor: text;
+
+  &:focus-within {
+    border-color: var(--cs-cyan-500);
+    box-shadow: var(--cs-shadow-input-focus);
+  }
+}
+
+// When chips live inside the inputrow, the row hosts them as flex items.
+// Pad the input less since the chips already have their own padding.
+.cs-relationship-field__inputrow--has-chips {
+  padding: 4px 4px 4px 4px;
+}
+
+.cs-relationship-field__input {
+  flex: 1 1 120px;
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 4px 8px;
+  min-width: 80px;
+  outline: none;
+
+  &::placeholder { color: var(--theme-elevation-500, rgba(0, 0, 0, 0.45)); }
+}
+
+// Read-only pills container (when input row is suppressed) — keep the
+// same bordered surface so the field still looks like a field.
+.cs-relationship-field__pills--inline-readonly {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  background: var(--theme-input-bg, var(--theme-elevation-50));
+  border-radius: var(--cs-radius-input);
+  min-height: 38px;
+  align-items: center;
+}
+
+.cs-relationship-field__loading {
+  display: inline-flex;
+  align-items: center;
+  padding-inline-end: 8px;
+}
+
+.cs-relationship-field__new {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
+  background: transparent;
+  border: none;
+  border-inline-start: 1px solid var(--theme-elevation-150, rgba(0, 0, 0, 0.08));
+  color: var(--cs-cyan-500);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--cs-motion-micro), color var(--cs-motion-micro);
+
+  &:hover {
+    background: var(--cs-tint-brand-soft);
+    color: var(--cs-cyan-600);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: -2px;
+  }
+}
+
+// Anchored dropdown ----------------------------------------------------------
+// Width comes from `matchAnchorWidth` on Popover (inline style), so it lines
+// up flush with the input that spawned it.
+.cs-relationship-field__popover {
+  padding: 4px;
+  max-height: 360px;
+  overflow: auto;
+  min-width: 280px;
+}
+
+.cs-relationship-field__results {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cs-relationship-field__hint {
+  padding: 12px;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+}
+
+.cs-relationship-field__row {
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--cs-radius-input);
+  // Default (with thumb) — slightly more breathing room.
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  text-align: start;
+  width: 100%;
+  color: inherit;
+  font: inherit;
+  transition: background var(--cs-motion-micro);
+
+  &.is-active,
+  &:hover {
+    background: var(--cs-tint-brand-soft);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: -2px;
+  }
+}
+
+// Compact "no-thumb" dropdown rows — standard dropdown, not a card.
+// Only affects the dropdown rows; pills are styled by their layout class
+// (inline / stacked) above.
+.cs-relationship-field--no-thumb {
+  .cs-relationship-field__row {
+    padding: 6px 10px;
+    gap: 8px;
+  }
+  .cs-relationship-field__row-text {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+  }
+  // Inline status pill on dropdown rows: small uppercase tag next to title.
+  .cs-relationship-field__row-secondary {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+    color: var(--theme-elevation-600, rgba(0, 0, 0, 0.55));
+  }
+}
+
+.cs-relationship-field__row-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: linear-gradient(
+    135deg,
+    var(--cs-cyan-700, #03819f),
+    var(--cs-purple-500, #5d04d8)
+  );
+}
+
+.cs-relationship-field__row-thumb--initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.cs-relationship-field__row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.cs-relationship-field__row-primary {
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-relationship-field__row-secondary {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-relationship-field__row-collection {
+  font-size: 0.6875rem;
+  color: var(--theme-elevation-400, rgba(0, 0, 0, 0.4));
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+// Read-only treatment --------------------------------------------------------
+.cs-relationship-field--readonly .cs-relationship-field__pill {
+  background: var(--theme-elevation-50);
+}
+
+// -----------------------------------------------------------------------------
+// Field adapters — Select, Checkbox, Radio, Number, Text, Textarea, Date, Upload.
+// All sit on top of `field-type` Payload chrome, just restyling the input itself.
+// -----------------------------------------------------------------------------
+
+// Read-only visual treatment — applied via [readonly] / [aria-readonly]
+// on the underlying input, plus a softer surface so editors immediately
+// know the field is locked.
+.cs-text-field__input[readonly],
+.cs-textarea-field__input[readonly],
+.cs-number-field__input[readonly],
+.cs-date-field__input[readonly] {
+  background: var(--theme-elevation-100, rgba(0, 0, 0, 0.04));
+  color: var(--theme-elevation-700, rgba(0, 0, 0, 0.55));
+  cursor: not-allowed;
+  &:focus { box-shadow: none; border-color: var(--theme-elevation-200); }
+}
+
+.cs-select-field__trigger:disabled,
+.cs-number-field__step:disabled,
+.cs-checkbox-field__input:disabled + .cs-checkbox-field__visual {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.cs-text-field__label,
+.cs-textarea-field__label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cs-space-2);
+}
+
+.cs-text-field__count {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  font-variant-numeric: tabular-nums;
+
+  &.is-over { color: #dc2626; font-weight: 600; }
+}
+
+.cs-text-field__input,
+.cs-textarea-field__input,
+.cs-number-field__input,
+.cs-date-field__input {
+  width: 100%;
+  appearance: none;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  background: var(--theme-input-bg, var(--theme-elevation-50));
+  color: inherit;
+  border-radius: var(--cs-radius-input);
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 0.875rem;
+  box-shadow: var(--cs-shadow-input-rest);
+
+  &:focus {
+    outline: none;
+    border-color: var(--cs-cyan-500);
+    box-shadow: var(--cs-shadow-input-focus);
+  }
+}
+
+.cs-textarea-field__input { resize: vertical; min-height: 96px; }
+
+.cs-text-field--error .cs-text-field__input,
+.cs-textarea-field--error .cs-textarea-field__input,
+.cs-number-field--error .cs-number-field__input,
+.cs-date-field--error .cs-date-field__input { border-color: #dc2626; }
+
+// Select trigger -------------------------------------------------------------
+.cs-select-field__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cs-space-2);
+  width: 100%;
+  appearance: none;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  background: var(--theme-input-bg, var(--theme-elevation-50));
+  color: inherit;
+  border-radius: var(--cs-radius-input);
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-align: left;
+
+  &:focus-visible {
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: 2px;
+  }
+}
+
+.cs-select-field__trigger-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-select-field--error .cs-select-field__trigger { border-color: #dc2626; }
+
+.cs-select-field__listbox {
+  width: min(380px, 80vw);
+  max-height: 320px;
+  display: flex;
+  padding: var(--cs-space-2);
+}
+
+// Number stepper -------------------------------------------------------------
+.cs-number-field__row {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  border-radius: var(--cs-radius-input);
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  background: var(--theme-input-bg);
+  overflow: hidden;
+
+  .cs-number-field__input {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    text-align: center;
+    width: 100%;
+    min-width: 80px;
+
+    &:focus {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-cyan-500);
+    }
+  }
+}
+
+.cs-number-field__step {
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0 12px;
+  font-size: 1rem;
+  color: inherit;
+
+  &:hover { background: var(--cs-tint-brand-soft); }
+  &:focus-visible {
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: -2px;
+  }
+}
+
+// Checkbox -------------------------------------------------------------------
+.cs-checkbox-field__row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.cs-checkbox-field__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+
+.cs-checkbox-field__visual {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--theme-elevation-300, rgba(0, 0, 0, 0.18));
+  border-radius: 4px;
+  background: var(--theme-input-bg);
+  color: transparent;
+  transition: background var(--cs-motion-micro), border-color var(--cs-motion-micro);
+}
+
+.cs-checkbox-field__input:checked + .cs-checkbox-field__visual {
+  background: var(--cs-cyan-500);
+  border-color: var(--cs-cyan-500);
+  color: #fff;
+}
+
+.cs-checkbox-field__input:focus-visible + .cs-checkbox-field__visual {
+  outline: 2px solid var(--cs-cyan-500);
+  outline-offset: 2px;
+}
+
+.cs-checkbox-field__label { font-size: 0.875rem; }
+
+// Radio group ----------------------------------------------------------------
+.cs-radio-field__group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--cs-space-2);
+}
+
+.cs-radio-field__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  background: var(--theme-input-bg);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  transition: background var(--cs-motion-micro), border-color var(--cs-motion-micro);
+
+  &.is-checked {
+    background: var(--cs-tint-brand-medium);
+    border-color: var(--cs-cyan-500);
+  }
+
+  &:hover { border-color: var(--cs-cyan-500); }
+}
+
+.cs-radio-field__native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.cs-radio-field__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--theme-elevation-300, rgba(0, 0, 0, 0.18));
+  display: inline-block;
+}
+
+.cs-radio-field__pill.is-checked .cs-radio-field__dot {
+  background: var(--cs-cyan-500);
+  border-color: var(--cs-cyan-500);
+  box-shadow: inset 0 0 0 2px #fff;
+}
+
+// Upload field ---------------------------------------------------------------
+.cs-upload-field__row {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+  padding: var(--cs-space-3);
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  background: var(--theme-input-bg);
+  border-radius: var(--cs-radius-card);
+}
+
+.cs-upload-field__preview {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--cs-radius-input);
+  background: var(--theme-elevation-100);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.cs-upload-field__preview--empty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 4px;
+}
+
+.cs-upload-field__meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cs-upload-field__filename {
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-upload-field__filename--empty {
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  font-style: italic;
+  font-weight: 400;
+}
+
+.cs-upload-field__type {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cs-upload-field__actions {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.cs-upload-field--error .cs-upload-field__row { border-color: #dc2626; }
+
+// -----------------------------------------------------------------------------
+// Schema Addons — nested into the Schema (JSON-LD) card visually, with
+// our custom add modal replacing Payload's stock blocks-drawer.
+// -----------------------------------------------------------------------------
+
+// Suppress the standalone `schemaAddons` field chrome — its label,
+// description, info button, and the stock blocks-drawer trigger.
+// The chip overview + add modal live INSIDE the Schema (JSON-LD) card
+// instead (rendered by SchemaAddonsSection inside SchemaPreviewField).
+//
+// Per-block forms (the inline editors that appear once a block is
+// added) remain visible: editors still need to fill HowTo's name,
+// Video's thumbnail, etc. Those render as Payload Collapsibles below
+// where the standalone label used to sit — we just hide the label
+// itself and the empty-state add-button so it reads as "the per-block
+// editors for the add-ons selected above."
+// Hide the standalone field entirely. All schemaAddons UI lives inside
+// the Schema (JSON-LD) card via SchemaAddonsSection. The DOM is still
+// mounted (so Payload's form state for the rows persists) — only the
+// visible field chrome is suppressed.
+[id$="field-schemaAddons"] {
+  display: none !important;
+}
+
+// Hide the stock blocks-drawer overlay specifically when our custom
+// modal driver toggles it under the hood. We invoke it programmatically
+// via SchemaAddonsSection — the editor sees the CleanStart card-grid
+// modal; this rule keeps the stock drawer out of view during the bridge.
+.payload__modal-item[class*="schemaAddons"],
+.payload__modal-item[class*="blocks-drawer-"] {
+  &:has(.thumbnail-card) {
+    visibility: hidden !important;
+    pointer-events: none;
+  }
+
+  // When there are no blocks, the entire field collapses to nothing —
+  // the empty-state lived on the suppressed label and toggler. This
+  // selector relies on the `:has()` family being supported (Chrome
+  // 105+, Safari 15.4+, Firefox 121+) — Payload admin supports recent
+  // browsers only so this is fine.
+  &:not(:has(.blocks-field__rows)) {
+    display: none;
+  }
+}
+
+// =============================================================================
+// In-card schema-addons section (lives inside SchemaPreviewField).
+// Spacing matches the surrounding `.cs-schema-preview__body` so the section
+// reads as part of the same card.
+// =============================================================================
+.cs-schema-addons {
+  margin-block-start: var(--cs-space-3, 12px);
+  padding: var(--cs-space-3, 12px) var(--cs-space-4, 16px) var(--cs-space-4, 16px);
+  border-block-start: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-2, 8px);
+}
+
+.cs-schema-addons__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cs-space-3, 12px);
+  margin-block-end: 4px;
+}
+
+.cs-schema-addons__heading {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--theme-elevation-600, rgba(0, 0, 0, 0.55));
+}
+
+.cs-schema-addons__empty {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--theme-elevation-500, rgba(0, 0, 0, 0.5));
+  line-height: 1.5;
+}
+
+.cs-schema-addons__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cs-schema-addons__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px 3px 10px;
+  background: var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+  border: 1px solid var(--theme-elevation-150, rgba(0, 0, 0, 0.08));
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.cs-schema-addons__chip-label {
+  white-space: nowrap;
+}
+
+.cs-schema-addons__chip-remove {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.55;
+  transition: background var(--cs-motion-micro), opacity var(--cs-motion-micro);
+
+  &:hover {
+    background: var(--cs-tint-brand-soft);
+    opacity: 1;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: 1px;
+  }
+}
+
+.cs-schema-addons__trigger {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  background: var(--cs-tint-brand-soft);
+  border-radius: var(--cs-radius-input);
+  color: var(--cs-cyan-500);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--cs-motion-micro), border-color var(--cs-motion-micro);
+
+  &:hover {
+    background: var(--cs-tint-brand-medium);
+    border-color: var(--cs-cyan-500);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: 2px;
+  }
+}
+
+// Card grid in the picker modal.
+.cs-schema-addons__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cs-space-3, 12px);
+}
+
+.cs-schema-addons__card {
+  appearance: none;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cs-space-3, 12px);
+  padding: var(--cs-space-3, 12px);
+  background: var(--theme-elevation-50, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--theme-elevation-150, rgba(0, 0, 0, 0.08));
+  border-radius: var(--cs-radius-card, 8px);
+  cursor: pointer;
+  text-align: start;
+  color: inherit;
+  font: inherit;
+  transition:
+    background var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    transform var(--cs-motion-micro);
+
+  &:hover {
+    background: var(--cs-tint-brand-soft);
+    border-color: var(--cs-cyan-500);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: 2px;
+  }
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.cs-schema-addons__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+}
+
+.cs-schema-addons__card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cs-schema-addons__card-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.cs-schema-addons__card-desc {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-600, rgba(0, 0, 0, 0.55));
+  line-height: 1.45;
+}
+
+// -----------------------------------------------------------------------------
+// Document picker — embedded edit frame.
+// -----------------------------------------------------------------------------
+.cs-document-picker__frame {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: var(--theme-bg, #fff);
+  min-height: 70vh;
+}

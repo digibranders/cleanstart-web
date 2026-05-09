@@ -45,7 +45,12 @@ interface DocLite {
   path?: string | null;
   updatedAt?: string | null;
   _status?: string | null;
-  seo?: { indexable?: string | null } | null;
+  seo?: {
+    indexable?: string | null;
+    alternates?:
+      | ReadonlyArray<{ hreflang?: string | null; href?: string | null }>
+      | null;
+  } | null;
 }
 
 const isIndexable = (doc: DocLite): boolean => {
@@ -134,11 +139,27 @@ export const collectSitemapEntries = async (
         if (!listingLastmod && doc.updatedAt) {
           listingLastmod = doc.updatedAt;
         }
+        // Mirror per-page hreflang exactly: whatever the editor pasted
+        // on the doc surfaces here as `<xhtml:link>` rows. Cluster
+        // symmetry / self-ref / x-default are the editor's call —
+        // page-level emission and sitemap stay in lock-step.
+        const rawAlternates = doc.seo?.alternates;
+        const alternates =
+          Array.isArray(rawAlternates) && rawAlternates.length > 0
+            ? rawAlternates
+                .map((alt) => ({
+                  hreflang:
+                    typeof alt.hreflang === 'string' ? alt.hreflang.trim() : '',
+                  href: typeof alt.href === 'string' ? alt.href.trim() : '',
+                }))
+                .filter((alt) => alt.hreflang.length > 0 && alt.href.length > 0)
+            : undefined;
         entries.push({
           loc,
           lastmod: doc.updatedAt ?? null,
           changefreq: config.defaultChangeFreq,
           priority: config.defaultPriority,
+          ...(alternates && alternates.length > 0 ? { alternates } : {}),
         });
       }
       if (!result.hasNextPage) break;

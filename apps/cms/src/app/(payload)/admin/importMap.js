@@ -1,6 +1,12 @@
+import { TextField as TextField_d8b22c7a38a756dd8ecb3437acff34bf } from '@/payload/admin/components/fields/TextField.tsx'
+import { SelectField as SelectField_9c71ee466fcdbb40e13298a3fa959d0e } from '@/payload/admin/components/fields/SelectField.tsx'
 import { MediaSelfChrome as MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56 } from '@/payload/admin/components/MediaSelfChrome.tsx'
 import { MediaSizeWarningField as MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2 } from '@/payload/admin/components/MediaSizeWarningField.tsx'
+import { CheckboxField as CheckboxField_fa838d594eaa6e28e24d17add0c5aa91 } from '@/payload/admin/components/fields/CheckboxField.tsx'
+import { NumberField as NumberField_54a7b672a7a67bcb2120ffcb68d41481 } from '@/payload/admin/components/fields/NumberField.tsx'
+import { TextareaField as TextareaField_910298ace0fe3204ac012253d7fcff5b } from '@/payload/admin/components/fields/TextareaField.tsx'
 import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
+import { RelationshipField as RelationshipField_093f373a4f5250e712293002deb8de6b } from '@/payload/admin/components/fields/RelationshipField.tsx'
 import { SlugField as SlugField_72967e7957358d52051eede57fbdd787 } from '@/payload/admin/components/SlugField.tsx'
 import { MediaCell as MediaCell_04413d560c21645b4689092eae86b482 } from '@/payload/admin/components/MediaField/MediaCell.tsx'
 import { MediaField as MediaField_1167cf2070c08e9bc2c7602fa9c85984 } from '@/payload/admin/components/MediaField/MediaField.tsx'
@@ -42,26 +48,27 @@ import { SeoIndexableField as SeoIndexableField_ff3cc07c91d10b5899370ac0f262f1fb
 import { SerpPreviewField as SerpPreviewField_243778961d714dd69072cd09f703a734 } from '@/payload/admin/components/SerpPreviewField.tsx'
 import { SchemaPreviewField as SchemaPreviewField_2ca2f49f868221997f9932607223d89a } from '@/payload/admin/components/SchemaPreviewField.tsx'
 import { CanonicalField as CanonicalField_26fe47d21538483cc802b09672dbd7f6 } from '@/payload/admin/components/CanonicalField.tsx'
+import { SocialCardField as SocialCardField_b319a069c95a65e993e5d5cd482bdc69 } from '@/payload/admin/components/SocialCardField.tsx'
 import { OutboundRedirectField as OutboundRedirectField_6ddb1aebe33d308a1f37b1ba8879601c } from '@/payload/admin/components/OutboundRedirectField.tsx'
+import { HeadTagsCard as HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462 } from '@/payload/admin/components/HeadTagsCard.tsx'
 import { UrlChangeHistoryField as UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c } from '@/payload/admin/components/UrlChangeHistoryField.tsx'
-import { BodyAuditField as BodyAuditField_ddda503a0c865518ab222cfaf681f937 } from '@/payload/admin/components/BodyAuditField.tsx'
-import { KeywordTargetField as KeywordTargetField_f76a195216e660dcef6612aab28aea47 } from '@/payload/admin/components/KeywordTargetField.tsx'
 import { SchemaOverrideField as SchemaOverrideField_88213973daaae6c5c0e6b5315ed286c1 } from '@/payload/admin/components/SchemaOverrideField.tsx'
 import { SeoAdvancedPanel as SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50 } from '@/payload/admin/components/SeoAdvancedPanel.tsx'
+import { UploadField as UploadField_9a37057695692a15b6c8aaeb6d981611 } from '@/payload/admin/components/fields/UploadField.tsx'
 import { LeadsImmutableBanner as LeadsImmutableBanner_c4273dccee2521e4317461376b79e241 } from '@/payload/admin/components/LeadsImmutableBanner.tsx'
 import { LeadsCsvTruncationBanner as LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb } from '@/payload/admin/components/LeadsCsvTruncationBanner.tsx'
-import { RelationshipCell as RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f } from '@/payload/admin/components/RelationshipCell.tsx'
 import { FaqBulkPaste as FaqBulkPaste_34cc49081ef861ac2f0f2bcdbdf5a9d4 } from '@/payload/admin/components/FaqBulkPaste.tsx'
 import { FaqRowLabel as FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3 } from '@/payload/admin/components/FaqRowLabel.tsx'
-import { BodyStatsField as BodyStatsField_1808f49e77588f0a78a60853e6ace967 } from '@/payload/admin/components/BodyStatsField.tsx'
+import { RelationshipCell as RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f } from '@/payload/admin/components/RelationshipCell.tsx'
 import { TocRowLabel as TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b } from '@/payload/admin/components/TocRowLabel.tsx'
+import { DocHeader as DocHeader_ad90301af1277969698538615cf842dc } from '@/payload/admin/components/DocHeader.tsx'
+import { DocKebabExtras as DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0 } from '@/payload/admin/components/DocKebabExtras.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
 import { SkipLink as SkipLink_27a678dd284d4042d03686d8b9a9b8e9 } from '../../../payload/admin/components/SkipLink.tsx'
 import { SaveShortcut as SaveShortcut_add5731a604e577762f1b0196113538b } from '../../../payload/admin/components/SaveShortcut.tsx'
 import { CommandPalette as CommandPalette_9e72795c48aa56bf099ac6d02eb8124e } from '../../../payload/admin/components/CommandPalette.tsx'
 import { FieldDescriptionTooltip as FieldDescriptionTooltip_ba26db738ee9a4c1171ac1c581ba5d08 } from '../../../payload/admin/components/FieldDescriptionTooltip.tsx'
-import { SavedStateIndicator as SavedStateIndicator_8bd5434f7092ab63abeb348597344486 } from '../../../payload/admin/components/SavedStateIndicator.tsx'
 import { NavBadges as NavBadges_208a0014b2eb9ce6cf95af7e4047b13a } from '../../../payload/admin/components/NavBadges.tsx'
 import { NavGroupPersistence as NavGroupPersistence_41d8a055ad6ff26bcaace971cec779b5 } from '../../../payload/admin/components/NavGroupPersistence.tsx'
 import { NavOpenOnDesktop as NavOpenOnDesktop_21bf36b0db39df18e02fc9fdb6b1a47e } from '../../../payload/admin/components/NavOpenOnDesktop.tsx'
@@ -77,9 +84,15 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "@/payload/admin/components/fields/TextField.tsx#TextField": TextField_d8b22c7a38a756dd8ecb3437acff34bf,
+  "@/payload/admin/components/fields/SelectField.tsx#SelectField": SelectField_9c71ee466fcdbb40e13298a3fa959d0e,
   "@/payload/admin/components/MediaSelfChrome.tsx#MediaSelfChrome": MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56,
   "@/payload/admin/components/MediaSizeWarningField.tsx#MediaSizeWarningField": MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2,
+  "@/payload/admin/components/fields/CheckboxField.tsx#CheckboxField": CheckboxField_fa838d594eaa6e28e24d17add0c5aa91,
+  "@/payload/admin/components/fields/NumberField.tsx#NumberField": NumberField_54a7b672a7a67bcb2120ffcb68d41481,
+  "@/payload/admin/components/fields/TextareaField.tsx#TextareaField": TextareaField_910298ace0fe3204ac012253d7fcff5b,
   "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
+  "@/payload/admin/components/fields/RelationshipField.tsx#RelationshipField": RelationshipField_093f373a4f5250e712293002deb8de6b,
   "@/payload/admin/components/SlugField.tsx#SlugField": SlugField_72967e7957358d52051eede57fbdd787,
   "@/payload/admin/components/MediaField/MediaCell.tsx#MediaCell": MediaCell_04413d560c21645b4689092eae86b482,
   "@/payload/admin/components/MediaField/MediaField.tsx#MediaField": MediaField_1167cf2070c08e9bc2c7602fa9c85984,
@@ -121,26 +134,27 @@ export const importMap = {
   "@/payload/admin/components/SerpPreviewField.tsx#SerpPreviewField": SerpPreviewField_243778961d714dd69072cd09f703a734,
   "@/payload/admin/components/SchemaPreviewField.tsx#SchemaPreviewField": SchemaPreviewField_2ca2f49f868221997f9932607223d89a,
   "@/payload/admin/components/CanonicalField.tsx#CanonicalField": CanonicalField_26fe47d21538483cc802b09672dbd7f6,
+  "@/payload/admin/components/SocialCardField.tsx#SocialCardField": SocialCardField_b319a069c95a65e993e5d5cd482bdc69,
   "@/payload/admin/components/OutboundRedirectField.tsx#OutboundRedirectField": OutboundRedirectField_6ddb1aebe33d308a1f37b1ba8879601c,
+  "@/payload/admin/components/HeadTagsCard.tsx#HeadTagsCard": HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462,
   "@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField": UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c,
-  "@/payload/admin/components/BodyAuditField.tsx#BodyAuditField": BodyAuditField_ddda503a0c865518ab222cfaf681f937,
-  "@/payload/admin/components/KeywordTargetField.tsx#KeywordTargetField": KeywordTargetField_f76a195216e660dcef6612aab28aea47,
   "@/payload/admin/components/SchemaOverrideField.tsx#SchemaOverrideField": SchemaOverrideField_88213973daaae6c5c0e6b5315ed286c1,
   "@/payload/admin/components/SeoAdvancedPanel.tsx#SeoAdvancedPanel": SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50,
+  "@/payload/admin/components/fields/UploadField.tsx#UploadField": UploadField_9a37057695692a15b6c8aaeb6d981611,
   "@/payload/admin/components/LeadsImmutableBanner.tsx#LeadsImmutableBanner": LeadsImmutableBanner_c4273dccee2521e4317461376b79e241,
   "@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner": LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb,
-  "@/payload/admin/components/RelationshipCell.tsx#RelationshipCell": RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f,
   "@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste": FaqBulkPaste_34cc49081ef861ac2f0f2bcdbdf5a9d4,
   "@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel": FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3,
-  "@/payload/admin/components/BodyStatsField.tsx#BodyStatsField": BodyStatsField_1808f49e77588f0a78a60853e6ace967,
+  "@/payload/admin/components/RelationshipCell.tsx#RelationshipCell": RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f,
   "@/payload/admin/components/TocRowLabel.tsx#TocRowLabel": TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b,
+  "@/payload/admin/components/DocHeader.tsx#DocHeader": DocHeader_ad90301af1277969698538615cf842dc,
+  "@/payload/admin/components/DocKebabExtras.tsx#DocKebabExtras": DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,
   "./payload/admin/components/SkipLink.tsx#SkipLink": SkipLink_27a678dd284d4042d03686d8b9a9b8e9,
   "./payload/admin/components/SaveShortcut.tsx#SaveShortcut": SaveShortcut_add5731a604e577762f1b0196113538b,
   "./payload/admin/components/CommandPalette.tsx#CommandPalette": CommandPalette_9e72795c48aa56bf099ac6d02eb8124e,
   "./payload/admin/components/FieldDescriptionTooltip.tsx#FieldDescriptionTooltip": FieldDescriptionTooltip_ba26db738ee9a4c1171ac1c581ba5d08,
-  "./payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator": SavedStateIndicator_8bd5434f7092ab63abeb348597344486,
   "./payload/admin/components/NavBadges.tsx#NavBadges": NavBadges_208a0014b2eb9ce6cf95af7e4047b13a,
   "./payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence": NavGroupPersistence_41d8a055ad6ff26bcaace971cec779b5,
   "./payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop": NavOpenOnDesktop_21bf36b0db39df18e02fc9fdb6b1a47e,

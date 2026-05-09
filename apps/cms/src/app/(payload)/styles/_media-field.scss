@@ -1,67 +1,6 @@
 // 19. MediaField — direct-upload custom Field (replaces Payload upload UI)
 // =============================================================================
 
-// =============================================================================
-// 19a. BodyStatsField — compact word-count + reading-minutes pill row
-// =============================================================================
-//
-// Lives at the top of the sidebar in versioned content collections (Blogs,
-// News, Guides, KnowledgeBase). Replaces two full-width read-only number
-// inputs with one glanceable line. Underlying number fields are still
-// written by `bodyStatsHook` on save — this is a presentation swap only.
-
-.cs-body-stats {
-  margin-bottom: var(--cs-space-3);
-
-  &__row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--cs-space-2);
-  }
-
-  &__pill {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    padding: 8px 10px;
-    background: var(--theme-elevation-100);
-    border: 1px solid var(--theme-elevation-150);
-    border-radius: var(--cs-radius-card);
-    cursor: default;
-    transition: border-color var(--cs-motion-micro);
-
-    &:hover {
-      border-color: var(--theme-elevation-200);
-    }
-  }
-
-  &__value {
-    font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1.1;
-    color: var(--theme-text);
-    font-feature-settings: 'tnum' 1;
-    letter-spacing: -0.01em;
-  }
-
-  &__label {
-    font-size: 10.5px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--theme-text-soft);
-  }
-
-  &__hint {
-    margin: 6px 0 0 0;
-    font-size: 11.5px;
-    line-height: 1.4;
-    color: var(--theme-text-disabled);
-  }
-}
-
 // Visually-hidden helper used inside icon-only links/buttons that supply
 // their own accessible name via a hidden span (biome's a11y rules want
 // real text content even when aria-label is present).

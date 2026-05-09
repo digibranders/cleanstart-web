@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { pageBuilderBlocks } from '../blocks';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
@@ -32,6 +33,9 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'path', 'parent', '_status', 'publishedAt', 'updatedAt'],
     group: 'Content',
+    components: {
+      edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true }),
+    },
   },
   access: {
     read: () => true,

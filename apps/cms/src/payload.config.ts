@@ -45,6 +45,7 @@ import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
+import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
 import { Legal } from './payload/globals/legal';
@@ -109,7 +110,11 @@ export default buildConfig({
         './payload/admin/components/SaveShortcut.tsx#SaveShortcut',
         './payload/admin/components/CommandPalette.tsx#CommandPalette',
         './payload/admin/components/FieldDescriptionTooltip.tsx#FieldDescriptionTooltip',
-        './payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator',
+        // SavedStateIndicator removed — the floating "Saved X ago"
+        // pill in the bottom-right was redundant with Payload's own
+        // toast system and added visual noise on every edit view.
+        // The error-toast surface is preserved via `dispatchSaveError`,
+        // which routes through the standard ToastBus.
         './payload/admin/components/NavBadges.tsx#NavBadges',
         './payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence',
         './payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop',
@@ -175,8 +180,10 @@ export default buildConfig({
     Jobs,
     AboutGalleries,
     Pages,
-  ],
-  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements],
+  ].map(wireCustomFields),
+  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements].map(
+    wireCustomFields,
+  ),
   endpoints: [
     jsonLdEndpoint,
     sitemapEndpoint,

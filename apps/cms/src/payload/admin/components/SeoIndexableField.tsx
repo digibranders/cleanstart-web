@@ -24,13 +24,13 @@ const OPTIONS: ReadonlyArray<{
   },
   {
     value: 'noindex',
-    label: 'No-index',
-    helper: "Hidden from Google. Followed links still pass authority.",
+    label: 'No-Index',
+    helper: 'Hidden from Google. Followed links still pass authority.',
     tone: 'warning',
   },
   {
     value: 'noindex,nofollow',
-    label: 'Hide entirely',
+    label: 'No-Index + No-Follow',
     helper: 'Hidden from Google AND links don’t pass authority.',
     tone: 'error',
   },
@@ -48,7 +48,9 @@ const toneColor: Record<'success' | 'warning' | 'error', string> = {
  * a noindex page to production) deserves loud, visible UI rather
  * than being buried in a select inside a collapsed group.
  *
- * Selection writes back to `seo.indexable` via useField.
+ * Compact single-row layout matching the height of the other sidebar
+ * cards. Per-option helper text lives on the chip's `title` attribute
+ * (and the `Indexable` info-tooltip wired by FieldDescriptionTooltip).
  */
 export const SeoIndexableField = (props: SeoIndexableFieldProps): ReactElement => {
   const { path } = props;
@@ -68,62 +70,20 @@ export const SeoIndexableField = (props: SeoIndexableFieldProps): ReactElement =
   }
 
   return (
-    <fieldset
-      className="field-type seo-indexable-field"
-      style={{
-        marginBottom: 'var(--cs-space-3, 12px)',
-        border: 'none',
-        padding: 0,
-        margin: 0,
-      }}
-    >
-      <legend
-        className="field-label"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 'var(--cs-space-2, 8px)',
-          marginBottom: 4,
-          padding: 0,
-          width: '100%',
-        }}
-      >
-        <span>Indexable</span>
+    <fieldset className="cs-seo-indexable">
+      <legend className="cs-seo-indexable__legend">
+        <span className="cs-seo-indexable__title">Indexable</span>
         <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.35rem',
-            fontSize: 11,
-            color: toneColor[activeOption.tone],
-            fontWeight: 600,
-            letterSpacing: 0.4,
-            textTransform: 'uppercase',
-          }}
+          className="cs-seo-indexable__chip"
+          style={{ color: toneColor[activeOption.tone] }}
         >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: 'currentColor',
-            }}
-          />
           {current === 'index' ? 'Live' : 'Hidden'}
         </span>
       </legend>
 
       <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 4,
-          background: 'var(--theme-input-bg, #14151a)',
-          border: '1px solid var(--theme-elevation-200, #34363d)',
-          borderRadius: 6,
-          padding: 3,
-        }}
+        className="cs-seo-indexable__group"
+        aria-label="Indexable"
       >
         {OPTIONS.map((opt) => {
           const isActive = opt.value === current;
@@ -134,37 +94,15 @@ export const SeoIndexableField = (props: SeoIndexableFieldProps): ReactElement =
               aria-pressed={isActive}
               onClick={() => handleSelect(opt.value)}
               title={opt.helper}
-              style={{
-                background: isActive ? 'var(--cs-tint-brand-soft, rgba(6,199,242,0.08))' : 'transparent',
-                color: isActive ? toneColor[opt.tone] : 'var(--theme-text-soft, #a4a7af)',
-                border: 'none',
-                borderRadius: 4,
-                padding: '0.4rem 0.5rem',
-                fontSize: 12,
-                fontWeight: isActive ? 600 : 500,
-                cursor: 'pointer',
-                transition: 'background-color 120ms ease, color 120ms ease',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
+              className="cs-seo-indexable__option"
+              data-active={isActive ? 'true' : 'false'}
+              style={{ color: isActive ? toneColor[opt.tone] : undefined }}
             >
               {opt.label}
             </button>
           );
         })}
       </div>
-
-      <p
-        className="field-description"
-        style={{
-          margin: '4px 0 0 0',
-          fontSize: 12,
-          color: 'var(--theme-text-soft, #a4a7af)',
-        }}
-      >
-        {activeOption.helper}
-      </p>
     </fieldset>
   );
 };

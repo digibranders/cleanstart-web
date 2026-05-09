@@ -85,4 +85,34 @@ describe('composeRobotsMeta', () => {
   it('treats nullish advanced as no-op', () => {
     expect(composeRobotsMeta({ advanced: null })).toBe('index, follow');
   });
+
+  describe('draft override', () => {
+    it('forces noindex, nofollow when status is draft', () => {
+      expect(composeRobotsMeta({ status: 'draft' })).toBe('noindex, nofollow');
+    });
+
+    it('ignores all advanced directives when status is draft', () => {
+      expect(
+        composeRobotsMeta({
+          status: 'draft',
+          indexable: 'index',
+          advanced: { maxImagePreview: 'large', maxSnippet: -1, noarchive: false },
+        }),
+      ).toBe('noindex, nofollow');
+    });
+
+    it('emits normally when status is published', () => {
+      expect(
+        composeRobotsMeta({ status: 'published', indexable: 'index' }),
+      ).toBe('index, follow');
+    });
+
+    it('emits normally when status is undefined (caller did not pass it)', () => {
+      expect(composeRobotsMeta({ indexable: 'index' })).toBe('index, follow');
+    });
+
+    it('treats null status the same as undefined', () => {
+      expect(composeRobotsMeta({ status: null })).toBe('index, follow');
+    });
+  });
 });

@@ -447,8 +447,11 @@ export const CommandPalette = (): ReactElement | null => {
     [allActions, activeIndex, activate],
   );
 
-  if (typeof window === 'undefined') return null;
-
+  // Note: do NOT short-circuit on `typeof window === 'undefined'` here.
+  // That diverges the SSR and client trees (server renders nothing,
+  // client renders a <dialog>) and triggers a hydration mismatch. The
+  // <dialog> is safe to render on the server in its closed state — the
+  // useEffect above is what actually calls `.showModal()` on the client.
   return (
     <dialog
       ref={dialogRef}

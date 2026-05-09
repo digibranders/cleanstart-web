@@ -100,10 +100,8 @@ export const UrlChangeHistoryField = (
 
   const summaryText = (() => {
     if (fetchState.status === 'loading') return 'Checking…';
-    if (fetchState.status === 'error') return 'Failed to load';
-    if (count === 0) return 'No URL changes';
-    if (count === 1) return '1 previous URL';
-    return `${count} previous URLs`;
+    if (fetchState.status === 'error') return 'Failed';
+    return `${count} change${count === 1 ? '' : 's'}`;
   })();
 
   return (

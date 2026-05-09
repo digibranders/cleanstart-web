@@ -4,6 +4,7 @@ import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useEffect, useId, useMemo, useState } from 'react';
 
+import { ChevronDown } from './icons/Chevron';
 import { useDocPublicUrl } from './_redirects-shared';
 
 type CanonicalFieldProps = {
@@ -36,6 +37,8 @@ type CanonicalHealth =
  */
 export const CanonicalField = (props: CanonicalFieldProps): ReactElement => {
   const inputId = useId();
+  const headingId = useId();
+  const [expanded, setExpanded] = useState(false);
 
   const { value: useCustomCanonical, setValue: setUseCustomCanonical } = useField<boolean>({
     path: 'seo.useCustomCanonical',
@@ -113,7 +116,7 @@ export const CanonicalField = (props: CanonicalFieldProps): ReactElement => {
 
   const summary = useMemo(() => {
     if (overrideActive) return 'Custom override';
-    if (publicUrl) return 'Self · this page';
+    if (publicUrl) return 'Self';
     return 'No URL yet';
   }, [overrideActive, publicUrl]);
 
@@ -122,13 +125,24 @@ export const CanonicalField = (props: CanonicalFieldProps): ReactElement => {
       className="cs-canonical"
       data-active={overrideActive ? 'true' : 'false'}
       data-tone={overrideActive ? 'warn' : 'muted'}
+      data-expanded={expanded ? 'true' : 'false'}
     >
-      <div className="cs-canonical__header">
+      <button
+        type="button"
+        className="cs-canonical__header"
+        aria-expanded={expanded}
+        aria-controls={headingId}
+        onClick={() => setExpanded((v) => !v)}
+      >
         <span className="cs-canonical__title">Canonical URL</span>
+        <span className="cs-canonical__chevron" aria-hidden="true">
+          <ChevronDown />
+        </span>
         <span className="cs-canonical__summary">{summary}</span>
-      </div>
+      </button>
 
-      <div className="cs-canonical__body">
+      {expanded && (
+      <div id={headingId} className="cs-canonical__body">
         <div className="cs-canonical__readout" aria-live="polite">
           {effectiveUrl || <span className="cs-canonical__placeholder">— set the slug to compute —</span>}
         </div>
@@ -152,11 +166,9 @@ export const CanonicalField = (props: CanonicalFieldProps): ReactElement => {
 
         {useCustomCanonical && (
           <div className="cs-canonical__nested">
-            <label htmlFor={inputId} className="cs-canonical__label">
-              Canonical URL
-            </label>
             <input
               id={inputId}
+              aria-label="Canonical URL"
               type="url"
               value={canonicalOverride ?? ''}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -165,17 +177,24 @@ export const CanonicalField = (props: CanonicalFieldProps): ReactElement => {
               placeholder="https://cleanstart.com/blog/source-article"
               className="cs-canonical__input"
             />
-            <p className="cs-canonical__hint">
-              Tell search engines a different URL is the source-of-truth for this content.
-              Same-domain or cross-domain — both are valid. Common cases: facet/parameter URLs
-              that should point to a clean URL, migrated URLs preserved alongside a new
-              structure, A/B test variants, or content republished off-domain.
-            </p>
-            <p className="cs-canonical__hint cs-canonical__hint--muted">
-              Different from a redirect: a canonical lets the variant URL keep serving content
-              while consolidating the search-engine signal. Use a Redirect when you want users
-              to actually navigate to the other URL.
-            </p>
+            <details className="cs-canonical__explainer">
+              <summary>
+                <span className="cs-canonical__explainer-chevron" aria-hidden="true">
+                  <ChevronDown size={14} />
+                </span>
+                When to use this
+              </summary>
+              <p>
+                Points search engines to the source-of-truth URL — useful for facet /
+                parameter URLs, migrated URLs, A/B variants, or content republished
+                off-domain. The variant URL keeps serving content; only the search-engine
+                signal consolidates.
+              </p>
+              <p>
+                <strong>Not a redirect.</strong> Use a Redirect (below) if you want users
+                actually sent to the other URL.
+              </p>
+            </details>
 
             {health.kind === 'checking' && (
               <p className="cs-canonical__health cs-canonical__health--checking">
@@ -202,6 +221,7 @@ export const CanonicalField = (props: CanonicalFieldProps): ReactElement => {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 };

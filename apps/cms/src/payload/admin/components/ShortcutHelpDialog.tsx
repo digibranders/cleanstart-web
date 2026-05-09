@@ -1,7 +1,9 @@
 'use client';
 
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
+
+import { Dialog, DialogBody, DialogHeader } from './ui/Dialog';
 
 type Shortcut = {
   keys: string[];
@@ -41,24 +43,23 @@ const renderKey = (key: string): string => {
 
 /**
  * Discoverable keyboard-shortcut sheet. Opens on `?` (when no input is
- * focused) and on `Cmd+/` from anywhere. Closes on Esc or backdrop
- * click. Lists every CMS shortcut in one glanceable card.
+ * focused) and on `Cmd+/` from anywhere. Refactored onto the shared
+ * Dialog primitive so it inherits proper focus trap, ESC handling, and
+ * backdrop dismiss behaviour automatically.
  */
-export const ShortcutHelpDialog = (): ReactElement | null => {
+export const ShortcutHelpDialog = (): ReactElement => {
   const [open, setOpen] = useState(false);
+  const titleId = useId();
 
   const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
     const onKey = (event: KeyboardEvent): void => {
-      // Cmd/Ctrl+/ — global trigger from anywhere.
       if ((event.metaKey || event.ctrlKey) && event.key === '/') {
         event.preventDefault();
         setOpen((v) => !v);
         return;
       }
-      // ? — only when no input is focused, otherwise interferes with typing.
       if (event.key === '?' && !event.metaKey && !event.ctrlKey) {
         const target = event.target as HTMLElement | null;
         const isEditable =
@@ -70,41 +71,15 @@ export const ShortcutHelpDialog = (): ReactElement | null => {
           setOpen(true);
         }
       }
-      if (event.key === 'Escape' && open) {
-        event.preventDefault();
-        close();
-      }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [open, close]);
-
-  if (!open) {
-    // Render nothing visible — this component still has to be mounted
-    // so its keydown listener stays alive.
-    return null;
-  }
+  }, []);
 
   return (
-    <dialog className="cs-shortcut-help" open aria-labelledby="cs-shortcut-help-title">
-      <button
-        type="button"
-        className="cs-shortcut-help__backdrop"
-        onClick={close}
-        aria-label="Close shortcut help"
-      />
-      <div className="cs-shortcut-help__panel">
-        <header className="cs-shortcut-help__header">
-          <h2 id="cs-shortcut-help-title">Keyboard shortcuts</h2>
-          <button
-            type="button"
-            onClick={close}
-            aria-label="Close"
-            className="cs-shortcut-help__close"
-          >
-            ×
-          </button>
-        </header>
+    <Dialog open={open} onClose={close} labelledBy={titleId} size="md">
+      <DialogHeader id={titleId} title="Keyboard shortcuts" onClose={close} />
+      <DialogBody>
         <div className="cs-shortcut-help__body">
           {SHORTCUTS.map((group) => (
             <section key={group.group}>
@@ -124,11 +99,7 @@ export const ShortcutHelpDialog = (): ReactElement | null => {
             </section>
           ))}
         </div>
-        <footer className="cs-shortcut-help__footer">
-          <kbd>Esc</kbd>
-          <span>to close</span>
-        </footer>
-      </div>
-    </dialog>
+      </DialogBody>
+    </Dialog>
   );
 };

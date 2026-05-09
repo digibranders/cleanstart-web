@@ -264,6 +264,57 @@ const robotsAdvancedField: import('payload').GroupField = {
   ],
 };
 
+// Hreflang alternates
+// --------------------
+// Per-page list of `<link rel="alternate" hreflang="…" href="…">`
+// rows, edited via paste-and-parse on the right-rail "Head tags" card.
+// Editors paste raw `<link>` tags from the source site (Eventus, etc.);
+// the client component parses them on blur into structured rows that
+// can be edited / removed individually.
+//
+// Rendering layer (apps/web + sitemap) pulls these via
+// `composeHreflangCluster()` in lib/seo/hreflang.ts, which also auto-
+// injects a self-reference and an `x-default` fallback so editors only
+// need to paste OTHER variants. See `composeHreflangCluster.test.ts`
+// for the cluster-construction contract.
+//
+// Hidden from the in-form group renderer — editing surface is the
+// `HeadTagsCard` Hreflang section.
+// Stored as JSON, not as a Payload `array`. The `array` machinery
+// requires the field to render somewhere so its row state registers
+// in the form, and our parent `seoFieldHidden` group is hidden in the
+// in-form area. JSON sidesteps the row registry entirely — the
+// sidebar `HeadTagsCard` reads/writes the blob via `useField` +
+// `setValue`. Defensive normalisation lives in
+// `lib/seo/hreflang.ts` so malformed shapes never reach renderers.
+const alternatesField: Field = {
+  name: 'alternates',
+  type: 'json',
+  admin: { hidden: true },
+};
+
+// Custom head tags
+// -----------------
+// Curated escape hatch for one-off `<meta>` tags. Two kinds in v1:
+//   meta-name     → `<meta name="…" content="…">`
+//   meta-property → `<meta property="…" content="…">`
+//
+// Covers ≈ 95% of real-world per-page tag asks (news_keywords,
+// format-detection, og:video, twitter:player, custom og:type, etc.)
+// without exposing a raw-HTML textarea. Editor picks a kind, fills
+// `key` + `content`. Composed by `composeCustomTags()` in
+// lib/seo/custom-tags.ts when apps/web ships.
+//
+// Hidden from the in-form group renderer — editing surface is the
+// `HeadTagsCard` in the right rail.
+// Same JSON-blob storage as `alternatesField` — see comment above.
+// Shape: `Array<{ kind: 'meta-name' | 'meta-property', key, content }>`.
+const customTagsField: Field = {
+  name: 'customTags',
+  type: 'json',
+  admin: { hidden: true },
+};
+
 // Canonical-URL behaviour
 // ------------------------
 // Every page is self-canonical by default: JSON-LD `url` /
@@ -411,6 +462,8 @@ export const seoField: GroupField = {
     useCustomCanonicalField,
     canonicalOverrideField,
     robotsAdvancedField,
+    alternatesField,
+    customTagsField,
     keywordTargetField,
     speakablePathField,
     additionalSchemaField,
@@ -596,6 +649,24 @@ export const seoSidebarFields = (args: {
       },
     },
     {
+      // Social Card — OG image upload + alt + Facebook/X/LinkedIn live
+      // preview. Promoted out of `SeoAdvancedPanel` so the OG image
+      // (touched on ~40% of edits) is one click away instead of three
+      // card-expansions deep. Collapsed by default; sits below
+      // Canonical so the SERP/Schema/Canonical "what indexes" cluster
+      // stays contiguous, with social-share controls following.
+      name: 'socialCard',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/SocialCardField.tsx#SocialCardField',
+          },
+        },
+      },
+    },
+    {
       // Renamed from "outboundRedirect"; the inbound-redirect sidebar
       // card was removed (a page doesn't need to surface every URL
       // pointing AT it inside its own edit view — the Redirects
@@ -615,6 +686,26 @@ export const seoSidebarFields = (args: {
       },
     },
     {
+      // "Head/Header tags" — collapsed-by-default card with three
+      // sections: Quick add (universal paste), Other language versions
+      // (hreflang `seo.alternates`), Extra meta tags (`seo.customTags`).
+      // Robots directives intentionally NOT here — they live in the
+      // existing SEO Advanced surface so all advanced SEO controls
+      // stay in one place. Sits above URL change history so editors
+      // working on hreflang / meta tags don't have to scroll past a
+      // read-only audit log to reach an active editing surface.
+      name: 'headTags',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/HeadTagsCard.tsx#HeadTagsCard',
+          },
+        },
+      },
+    },
+    {
       name: 'urlChangeHistory',
       type: 'ui',
       admin: {
@@ -623,31 +714,6 @@ export const seoSidebarFields = (args: {
           Field: {
             path: '@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField',
             clientProps: { pathPrefix, sourceField: urlSource },
-          },
-        },
-      },
-    },
-    {
-      name: 'bodyAudit',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: {
-            path: '@/payload/admin/components/BodyAuditField.tsx#BodyAuditField',
-          },
-        },
-      },
-    },
-    {
-      name: 'keywordTargetUi',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: {
-            path: '@/payload/admin/components/KeywordTargetField.tsx#KeywordTargetField',
-            clientProps: { titleSource, descriptionSource },
           },
         },
       },

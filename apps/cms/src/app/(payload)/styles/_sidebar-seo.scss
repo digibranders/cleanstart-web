@@ -635,21 +635,20 @@
     flex-shrink: 0;
   }
 
-  // Dot + label, no chip background. Matches the LIVE pattern used
-  // elsewhere in the admin (Permalink card, Indexable). Pinned to the
-  // right of the row by margin-left:auto so the @type code stays at
-  // the left.
+  // Right-aligned colored dot + text — no background. Consistent
+  // tag idiom across every SEO sidebar card.
   &__chip {
     margin-left: auto;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 11.5px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    padding: 0;
+    gap: 5px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     background: transparent;
     border: 0;
+    padding: 0;
     white-space: nowrap;
     flex-shrink: 0;
   }
@@ -1430,19 +1429,29 @@
   }
 
   &__summary {
-    flex: 1;
+    // Right-aligned colored dot + text. No background — keeps the
+    // rail visually quiet. Standard tag idiom across the sidebar.
+    flex: 0 0 auto;
+    margin-left: auto;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--theme-text-soft);
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     white-space: nowrap;
+
 
     &[data-tone='warn'] {
       color: #d97706;
-      font-weight: 500;
     }
     &[data-tone='error'] {
       color: var(--color-error-500);
+    }
+    &[data-tone='active'] {
+      color: var(--cs-cyan-600, var(--cs-cyan-500));
     }
   }
 
@@ -1742,15 +1751,22 @@
   }
 
   &__summary {
-    flex: 1;
+    // Right-aligned colored dot + text. No background.
+    flex: 0 0 auto;
+    margin-left: auto;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--theme-text-soft);
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     white-space: nowrap;
 
+
     &[data-tone='active'] {
-      color: var(--cs-cyan-700);
+      color: var(--cs-cyan-600, var(--cs-cyan-500));
     }
     &[data-tone='error'] {
       color: var(--color-error-500);
@@ -1873,6 +1889,180 @@
 // off-domain override when the editor enables it. When override is
 // active, the card gets a warn-tone left edge so it reads as
 // non-default.
+// =============================================================================
+// Slug field — sidebar-mounted custom Field. Replaces inline styles
+// + middle-dot decoration with a proper status chip pattern that
+// matches the rest of the rail (`●Auto`, `●Available`).
+// =============================================================================
+
+.cs-slug {
+  margin-bottom: var(--cs-space-3);
+
+  &__label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cs-space-2);
+    margin-bottom: 4px;
+    color: var(--theme-text);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  &__label-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__required {
+    color: var(--color-error-500);
+    font-weight: 700;
+    margin-inline-start: 2px;
+  }
+
+  // Consistent with the other SEO sidebar tags: colored uppercase
+  // text, no background, no dot, no border.
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    color: var(--theme-text-soft);
+    white-space: nowrap;
+    cursor: default;
+
+    &[data-tone='ok'] {
+      color: var(--color-success-500, #00c46a);
+    }
+  }
+
+  &__chip-dot {
+    display: none;
+  }
+
+  &__input {
+    width: 100%;
+  }
+
+  &__hint {
+    margin: 4px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11.5px;
+    color: var(--theme-text-soft);
+    line-height: 1.4;
+  }
+
+  &__reset {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--cs-cyan-500, #06c7f2);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: rgba(6, 199, 242, 0.4);
+    text-underline-offset: 2px;
+    transition: text-decoration-color var(--cs-motion-micro);
+
+    &:hover {
+      text-decoration-color: var(--cs-cyan-500, #06c7f2);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
+      border-radius: 2px;
+    }
+  }
+
+  &__collision {
+    margin: 4px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--color-error-500, #f08f8f);
+
+    > span {
+      font-weight: 700;
+    }
+  }
+}
+
+// Hide every leading-dot span across SEO sidebar tags. Dots were the
+// previous visual idiom; now we use plain colored uppercase text.
+.cs-permalink__dot,
+.cs-social-card__dot,
+.cs-schema-preview__chip > [class$="__dot"],
+.cs-seo-health__dot {
+  display: none !important;
+}
+
+// =============================================================================
+// Sidebar collapsible card headers — consistent visual order across cards.
+//
+//   [Title]  [▾ chevron]    ............................   [tag/chip]
+//
+// Forces every header to use the same visual flow regardless of DOM order
+// via flex `order`. Margins are reset because the original idiom relied on
+// `margin-left: auto` only on the chip/summary; with `order` driving layout
+// we want both chevron (next to title) and tag (far right) to behave
+// predictably.
+// =============================================================================
+.cs-canonical__header,
+.cs-outbound-redirect__header,
+.cs-url-history__header,
+.cs-schema-preview__header,
+.cs-social-card__header,
+.cs-head-tags__header,
+.cs-seo-health__header {
+  & > .cs-canonical__title,
+  & > .cs-outbound-redirect__title,
+  & > .cs-url-history__title,
+  & > .cs-schema-preview__title,
+  & > .cs-social-card__title,
+  & > .cs-head-tags__title,
+  & > .cs-seo-health__title {
+    order: 0;
+  }
+
+  & > .cs-canonical__chevron,
+  & > .cs-outbound-redirect__chevron,
+  & > .cs-url-history__chevron,
+  & > .cs-schema-preview__chevron,
+  & > .cs-social-card__chevron,
+  & > .cs-head-tags__chevron,
+  & > .cs-seo-health__chevron {
+    order: 1;
+    margin-left: 0;
+  }
+
+  & > .cs-canonical__summary,
+  & > .cs-outbound-redirect__summary,
+  & > .cs-url-history__summary,
+  & > .cs-schema-preview__chip,
+  & > .cs-social-card__chip,
+  & > .cs-head-tags__summary,
+  & > .cs-seo-health__chip,
+  & > .cs-seo-health__score {
+    order: 2;
+    margin-left: auto;
+  }
+}
+
 .cs-canonical {
   margin: var(--cs-space-3) 0;
   border: 1px solid var(--theme-elevation-150);
@@ -1890,9 +2080,20 @@
 
   &__header {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
+    align-items: center;
     gap: var(--cs-space-2);
+    width: 100%;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin-bottom: 0;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+  }
+
+  &[data-expanded='true'] &__header {
     margin-bottom: var(--cs-space-2);
   }
 
@@ -1902,14 +2103,45 @@
     color: var(--theme-text);
   }
 
-  &__summary {
-    font-size: 11.5px;
+  &__chevron {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
     color: var(--theme-text-soft);
+    font-size: 10px;
+    transition: transform var(--cs-motion-micro);
+    flex-shrink: 0;
   }
 
+  &[data-expanded='true'] &__chevron {
+    transform: rotate(-180deg);
+  }
+
+  &__summary {
+    margin-left: auto;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+  }
+
+  // Healthy "Self" canonical — colored dot+text, no background.
+  &[data-active='false'] &__summary {
+    color: var(--cs-cyan-600, var(--cs-cyan-500));
+  }
+
+  // Custom override — amber dot+text, no background.
   &[data-active='true'] &__summary {
     color: #d97706;
-    font-weight: 500;
   }
 
   &__body {
@@ -2020,4 +2252,1214 @@
       color: var(--color-warning-500);
     }
   }
+
+  // Collapsed-by-default explainer — replaces two paragraphs of inline
+  // copy. Editors who already know what canonical means see only the
+  // input + health line; editors who don't get a "When to use this"
+  // disclosure they can expand. Recovers ~120px of vertical real estate
+  // on the 99% case.
+  &__explainer {
+    margin: 4px 0 0;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--theme-text-soft);
+
+    > summary {
+      cursor: pointer;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--theme-text-soft);
+      list-style: none;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color var(--cs-motion-micro);
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+
+      &:hover {
+        color: var(--theme-text);
+      }
+    }
+
+    &[open] .cs-canonical__explainer-chevron {
+      transform: rotate(0deg);
+    }
+
+    p {
+      margin: 6px 0 0;
+    }
+
+    strong {
+      color: var(--theme-text);
+      font-weight: 600;
+    }
+  }
+
+  &__explainer-chevron {
+    display: inline-flex;
+    width: 14px;
+    height: 14px;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-text-soft);
+    transition: transform var(--cs-motion-micro);
+    flex-shrink: 0;
+    transform: rotate(-90deg);
+  }
+}
+
+// =============================================================================
+// Doc-header — custom replacement for Payload's title row + status meta.
+// Mounted via `beforeDocumentControls` so it lives inside the sticky
+// `.doc-controls` strip alongside the native Save Draft / Publish /
+// kebab buttons. Layout (single row):
+//
+//   [●LIVE  Title]   [Modified · Published · words · read]   [native actions]
+//
+// The native title h1 and tab strip are hidden via `_chrome.scss`, so
+// this is now the canonical document header.
+// =============================================================================
+
+.cs-doc-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  column-gap: var(--cs-space-3);
+  row-gap: 4px;
+
+  // ── Status badge + title — sit inline with everything else now.
+  //    `__top` keeps the badge tight against the title (8px gap) and
+  //    is itself a flex item in the parent's row, so it shrinks
+  //    first when the row gets crowded — the badge stays visible,
+  //    the title ellipsizes.
+  &__top {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    line-height: 1;
+    background: var(--theme-elevation-100);
+    color: var(--theme-text-soft);
+    border: 1px solid var(--theme-elevation-150);
+
+    &[data-tone='live'] {
+      color: var(--color-success-500, #00c46a);
+      background: rgba(0, 196, 106, 0.1);
+      border-color: rgba(0, 196, 106, 0.32);
+    }
+  }
+
+  &__badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+  }
+
+  &__title {
+    margin: 0;
+    padding: 0;
+    font-size: 22px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--theme-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  // ── Row 2: meta list (Modified · Published · words · read) ──────
+  &__meta {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 2px 14px;
+    font-size: 12.5px;
+    line-height: 1.3;
+    color: var(--theme-text-soft);
+    overflow: hidden;
+    min-width: 0;
+    max-width: 100%;
+
+    li {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+  }
+
+  &__meta-label {
+    color: var(--theme-text-soft);
+    font-weight: 400;
+  }
+
+  &__meta-value {
+    color: var(--theme-text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // ── Responsive guards — keep action buttons in frame on narrow
+  //    viewports by progressively pruning low-priority chrome:
+  //
+  //    < 1100px : drop the "Published" timestamp (long)
+  //    <  900px : drop word + read pills
+  //    <  720px : hide the full meta row, keep only badge + title
+  //    <  560px : shrink the title and tighten the badge
+  // ────────────────────────────────────────────────────────────────
+  @media (max-width: 1100px) {
+    &__meta li:nth-child(2) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    &__meta li:nth-child(n + 3) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 720px) {
+    &__meta {
+      display: none;
+    }
+  }
+
+  @media (max-width: 560px) {
+    &__title {
+      font-size: 18px;
+    }
+
+    &__badge {
+      padding: 2px 8px;
+      font-size: 10px;
+    }
+  }
+}
+
+// =============================================================================
+// Permalink card — single-row monospace URL with inline icon affordances.
+// Replaces the previous Copy / Visit button row.
+// =============================================================================
+
+.cs-permalink {
+  margin: var(--cs-space-3) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &--empty {
+    padding: var(--cs-space-2) var(--cs-space-3);
+    border: 1px dashed var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    background: var(--theme-elevation-50);
+    color: var(--theme-text-disabled);
+    font-size: 12px;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--theme-text-soft);
+  }
+
+  &__chip {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+    flex-shrink: 0;
+
+    &[data-tone='live'] {
+      color: var(--color-success-500, #00c46a);
+    }
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+  }
+
+  &__row {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    padding: 6px 8px;
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+    box-shadow: var(--cs-shadow-input-rest);
+  }
+
+  &__url {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 12px;
+    color: var(--theme-text);
+    line-height: 1.5;
+    word-break: break-all;
+    align-self: center;
+    user-select: all;
+  }
+
+  &__icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    border: 0;
+    background: transparent;
+    color: var(--theme-text-soft);
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      background-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+      color: var(--theme-text);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+
+    &[data-state='success'] {
+      color: var(--color-success-500, #00c46a);
+    }
+  }
+}
+
+// =============================================================================
+// SEO health-score card — slim collapsed row matching `.cs-schema-preview`
+// header height; expanded panel below shows per-check ✓ / ✗ list.
+// =============================================================================
+
+.cs-seo-health {
+  margin: var(--cs-space-3) 0;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  background: var(--theme-input-bg);
+  box-shadow: var(--cs-shadow-input-rest);
+  overflow: hidden;
+
+  &__header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    padding: var(--cs-space-2) var(--cs-space-3);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    color: var(--theme-text);
+    font-size: 13px;
+    line-height: 1.3;
+    transition: background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__title {
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  &__chip {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+  }
+
+  &__score {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  &__chevron {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-text-soft);
+    font-size: 10px;
+    transition: transform var(--cs-motion-micro);
+    flex-shrink: 0;
+  }
+
+  &[data-expanded='true'] &__chevron {
+    transform: rotate(-180deg);
+  }
+
+  &__body {
+    padding: var(--cs-space-3);
+    border-top: 1px solid var(--theme-elevation-150);
+    background: var(--theme-bg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-2);
+  }
+
+  &__summary {
+    margin: 0;
+    font-size: 12px;
+    color: var(--theme-text-soft);
+  }
+
+  &__checks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--theme-text);
+
+      &[data-pass='true'] {
+        color: var(--theme-text-soft);
+      }
+    }
+  }
+
+  &__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-error-500, #c54040);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+
+    li[data-pass='true'] & {
+      background: var(--color-success-500, #2fae67);
+    }
+  }
+}
+
+// =============================================================================
+// Indexable — slim segmented control matching `.cs-schema-preview` header
+// height. Helper text reaches editors via tooltip / chip title.
+// =============================================================================
+
+.cs-seo-indexable {
+  margin: var(--cs-space-3) 0;
+  padding: 0;
+  border: 0;
+
+  &__legend {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin: 0 0 6px;
+    padding: 0;
+    gap: var(--cs-space-2);
+  }
+
+  &__title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--theme-text);
+  }
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+  }
+
+  &__group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    padding: 2px;
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-input);
+  }
+
+  // Tightened from font-size 12px / padding 5px 6px so the longest
+  // label ("No-Index + No-Follow") fits without truncation across the
+  // three equal-width columns. Keeps `text-overflow: ellipsis` as a
+  // safety net for narrower viewports / long-string locales.
+  &__option {
+    background: transparent;
+    color: var(--theme-text-soft);
+    border: 0;
+    border-radius: 4px;
+    padding: 5px 3px;
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-align: center;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition:
+      background-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+
+    &[data-active='true'] {
+      background: var(--cs-tint-brand-soft, rgba(6, 199, 242, 0.08));
+      font-weight: 600;
+    }
+  }
+}
+
+// =============================================================================
+// Head/Header tags card — adopts the `.cs-schema-preview` chrome so the
+// rail is visually consistent end-to-end.
+// =============================================================================
+
+.cs-head-tags {
+  margin: var(--cs-space-3) 0;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  background: var(--theme-input-bg);
+  box-shadow: var(--cs-shadow-input-rest);
+  overflow: hidden;
+
+  &__header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    padding: var(--cs-space-2) var(--cs-space-3);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    color: var(--theme-text);
+    font-size: 13px;
+    line-height: 1.3;
+    transition: background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__title {
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  &__summary {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &[data-tone='active'] {
+      color: var(--cs-cyan-600, var(--cs-cyan-500));
+    }
+  }
+
+  &__chevron {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-text-soft);
+    font-size: 10px;
+    transition: transform var(--cs-motion-micro);
+    flex-shrink: 0;
+  }
+
+  &[data-expanded='true'] &__chevron {
+    transform: rotate(-180deg);
+  }
+
+  &__body {
+    padding: 0;
+    border-top: 1px solid var(--theme-elevation-150);
+    background: var(--theme-bg);
+    display: flex;
+    flex-direction: column;
+  }
+
+  // ── Section ─────────────────────────────────────────────────────
+  // Each panel (Quick add / Hreflang / Extra meta) is a tight stack
+  // with shared rhythm. Sections separated by a thin rule rather
+  // than a 12px gap so the card reads as one piece, not three.
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px var(--cs-space-3) 12px;
+
+    & + & {
+      border-top: 1px solid var(--theme-elevation-150);
+    }
+  }
+
+  &__section-head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__section-title {
+    margin: 0;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--theme-text);
+    line-height: 1.2;
+  }
+
+  &__section-hint {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--theme-text-soft);
+  }
+
+  // ── Inputs ──────────────────────────────────────────────────────
+  &__input,
+  &__textarea {
+    width: 100%;
+    padding: 5px 8px;
+    border-radius: var(--cs-radius-input);
+    border: 1px solid var(--theme-elevation-200);
+    background: var(--theme-input-bg);
+    color: var(--theme-text);
+    font-size: 11.5px;
+    line-height: 1.4;
+    font-family: inherit;
+
+    &::placeholder {
+      color: var(--theme-text-disabled);
+    }
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-tint-focus-ring);
+      box-shadow: inset 0 0 0 1px var(--cs-tint-focus-ring);
+    }
+
+    &--mono {
+      font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    }
+  }
+
+  &__textarea {
+    font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 11px;
+    resize: vertical;
+    min-height: 56px;
+  }
+
+  // ── Buttons ─────────────────────────────────────────────────────
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__btn {
+    align-self: flex-start;
+    padding: 4px 10px;
+    border-radius: var(--cs-radius-input);
+    border: 1px solid var(--theme-elevation-200);
+    background: var(--theme-elevation-50);
+    color: var(--theme-text);
+    font-size: 11.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro);
+
+    &:hover:not(:disabled) {
+      background: var(--theme-elevation-100);
+      border-color: var(--theme-elevation-250, var(--theme-elevation-200));
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    &--primary {
+      border-color: var(--cs-cyan-500, #06c7f2);
+      background: rgba(6, 199, 242, 0.08);
+      color: var(--cs-cyan-500, #06c7f2);
+
+      &:hover:not(:disabled) {
+        background: rgba(6, 199, 242, 0.14);
+      }
+    }
+
+    &--ghost {
+      background: transparent;
+      border-color: transparent;
+      color: var(--theme-text-soft);
+
+      &:hover:not(:disabled) {
+        background: var(--theme-elevation-100);
+        color: var(--theme-text);
+      }
+    }
+  }
+
+  &__feedback {
+    font-size: 11px;
+    color: var(--theme-text-soft);
+    line-height: 1.3;
+  }
+
+  // ── Row lists ───────────────────────────────────────────────────
+  &__rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__hreflang-row {
+    display: grid;
+    grid-template-columns: 76px 1fr 24px;
+    gap: 4px;
+    align-items: center;
+  }
+
+  &__meta-row {
+    display: grid;
+    grid-template-columns: 96px 1fr 24px;
+    gap: 4px;
+    align-items: start;
+  }
+
+  &__meta-row-fields {
+    display: grid;
+    gap: 4px;
+  }
+
+  &__remove {
+    width: 24px;
+    height: 24px;
+    border: 0;
+    background: transparent;
+    color: var(--theme-text-soft);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 4px;
+    align-self: center;
+
+    &:hover {
+      background: var(--theme-elevation-100);
+      color: var(--theme-text);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  // ── Issue list (hreflang lint) ──────────────────────────────────
+  &__issues {
+    list-style: none;
+    margin: 0;
+    padding: 6px 8px;
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    border-radius: var(--cs-radius-input);
+    background: rgba(251, 191, 36, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 11px;
+    line-height: 1.4;
+
+    li {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      color: var(--theme-text-soft);
+
+      span {
+        flex-shrink: 0;
+      }
+
+      &[data-severity='warning'] {
+        color: var(--color-warning-500, #fbbf24);
+      }
+    }
+  }
+}
+
+// =============================================================================
+// Social Card — Tier 2 sidebar card. Promoted out of `SeoAdvancedPanel`
+// so the OG image is one click away. Reuses the `.cs-schema-preview`
+// chrome (border, radius, input-bg, shadow) so the sidebar reads as one
+// visual primitive top-to-bottom.
+// =============================================================================
+
+.cs-social-card {
+  margin: var(--cs-space-3) 0;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  background: var(--theme-input-bg);
+  box-shadow: var(--cs-shadow-input-rest);
+  overflow: hidden;
+
+  &__header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-2);
+    padding: var(--cs-space-2) var(--cs-space-3);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    color: var(--theme-text);
+    font-size: 13px;
+    line-height: 1.3;
+    transition: background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__title {
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  // Right-aligned pill tag — consistent with canonical / outbound
+  // redirect / SchemaPreview chip pattern across the SEO sidebar.
+  &__chip {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--theme-text-soft);
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &[data-tone='active'] {
+      color: var(--cs-cyan-600, var(--cs-cyan-500));
+    }
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+  }
+
+  &__chevron {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-text-soft);
+    font-size: 10px;
+    transition: transform var(--cs-motion-micro);
+    flex-shrink: 0;
+  }
+
+  &[data-expanded='true'] &__chevron {
+    transform: rotate(-180deg);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-2);
+    padding: var(--cs-space-3);
+    border-top: 1px solid var(--theme-elevation-150);
+    background: var(--theme-bg);
+  }
+
+  &__og-row {
+    display: flex;
+    gap: var(--cs-space-2);
+    align-items: flex-start;
+  }
+
+  &__og-thumb {
+    flex-shrink: 0;
+    width: 96px;
+    height: 56px;
+    border-radius: var(--cs-radius-input);
+    overflow: hidden;
+    border: 1px solid var(--theme-elevation-150);
+    background: var(--theme-elevation-50);
+    display: block;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  &__og-empty,
+  &__og-skel {
+    flex-shrink: 0;
+    width: 96px;
+    height: 56px;
+    border-radius: var(--cs-radius-input);
+    border: 1px dashed var(--theme-elevation-200);
+    background: var(--theme-elevation-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--theme-text-disabled);
+  }
+
+  &__og-skel {
+    background: linear-gradient(
+      90deg,
+      var(--theme-elevation-50) 0%,
+      var(--theme-elevation-100) 50%,
+      var(--theme-elevation-50) 100%
+    );
+    background-size: 200% 100%;
+    animation: cs-social-card-skel 1.2s linear infinite;
+  }
+
+  @keyframes cs-social-card-skel {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+
+  &__og-meta {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__og-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  &__btn {
+    padding: 4px 10px;
+    border-radius: var(--cs-radius-input);
+    border: 1px solid var(--theme-elevation-200);
+    background: var(--theme-elevation-50);
+    color: var(--theme-text);
+    font-size: 11.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro);
+
+    &:hover:not(:disabled) {
+      background: var(--theme-elevation-100);
+      border-color: var(--theme-elevation-250, var(--theme-elevation-200));
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    &--ghost {
+      background: transparent;
+      border-color: transparent;
+      color: var(--theme-text-soft);
+
+      &:hover:not(:disabled) {
+        background: var(--theme-elevation-100);
+        color: var(--theme-text);
+      }
+    }
+  }
+
+  &__input {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: var(--cs-radius-input);
+    border: 1px solid var(--theme-elevation-200);
+    background: var(--theme-input-bg);
+    color: var(--theme-text);
+    font-size: 12px;
+    line-height: 1.4;
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-tint-focus-ring);
+      box-shadow: inset 0 0 0 1px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--theme-text-soft);
+
+    &--meta {
+      color: var(--theme-text-disabled);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  &__error {
+    margin: 0;
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--color-error-500);
+  }
+
+  &__warnings {
+    list-style: none;
+    margin: 0;
+    padding: 6px 8px;
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    border-radius: var(--cs-radius-input);
+    background: rgba(251, 191, 36, 0.06);
+    color: var(--color-warning-500, #fbbf24);
+    font-size: 11.5px;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__preview {
+    margin-top: var(--cs-space-2);
+  }
+
+  // ── og:title / og:description override (lives inside the social
+  //    card now — the social card *is* the OG surface, so this
+  //    belongs here, not in SEO Advanced). Visual style mirrors the
+  //    other Social Card body sub-blocks: subtle box, internal stack.
+  &__override {
+    border-top: 1px solid var(--theme-elevation-150);
+    padding-top: var(--cs-space-2);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--theme-text);
+    user-select: none;
+
+    input {
+      accent-color: var(--cs-cyan-500, #06c7f2);
+      cursor: pointer;
+    }
+  }
+
+  &__override-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 4px;
+  }
+
+  &__field-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__field-label {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--theme-text-soft);
+  }
+
+  &__input--textarea {
+    resize: vertical;
+    min-height: 48px;
+    line-height: 1.4;
+    font-family: inherit;
+  }
+
+  &__counter {
+    font-size: 10.5px;
+    font-variant-numeric: tabular-nums;
+    color: var(--theme-text-soft);
+
+    &--warn {
+      color: var(--color-warning-500, #fbbf24);
+    }
+
+    &--bad {
+      color: var(--color-error-500, #ff5c5c);
+    }
+  }
+}
+
+// =============================================================================
+// Editorial flags divider — `featured` and `pinned` checkboxes sit
+// below SEO Advanced. Add a top-margin + thin rule so they read as a
+// separate group, not part of the SEO band.
+// =============================================================================
+
+.field-type.checkbox.field-name-featured {
+  margin-top: var(--cs-space-4);
+  padding-top: var(--cs-space-3);
+  border-top: 1px solid var(--theme-elevation-150);
 }

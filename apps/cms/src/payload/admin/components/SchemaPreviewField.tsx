@@ -257,6 +257,17 @@ export const SchemaPreviewField = (
           />
         </div>
       )}
+      {/* Layered add-ons UI is intentionally NOT mounted here. The
+          underlying `schemaAddons` blocks field renders only `blockName`
+          for each row — Payload doesn't fetch the per-block schema map
+          for any of the 6 add-on types (HowTo / Video / FAQ / Review /
+          Software / BreadcrumbList), so editors can add chips but can't
+          fill the actual fields. Until that's fixed, exposing a
+          half-working "Add" affordance is worse than no affordance.
+          Data still flows through the field for API-driven writes
+          (Local API, scripts, future migrations) — the dispatcher reads
+          schemaAddons unchanged. Re-mount `<SchemaAddonsSection />` here
+          once schema-addons.ts block configs render their fields. */}
     </div>
   );
 };
@@ -274,16 +285,6 @@ const SeverityChip = (props: {
       style={{ color: tone }}
       title={severityCopy[severity].hint}
     >
-      <span
-        aria-hidden="true"
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: '50%',
-          background: 'currentColor',
-          display: 'inline-block',
-        }}
-      />
       {label}
     </span>
   );
@@ -348,9 +349,14 @@ const SchemaBodyContent = (props: {
       {audit.perBlob.map((blobAudit, idx) => {
         const blob = fetchState.blobs[idx];
         if (!blob) return null;
-        const hasIssues =
-          blobAudit.missingRequired.length > 0 ||
-          blobAudit.missingRecommended.length > 0;
+        // Only the `required` (red) issues are surfaced as inline items —
+        // those genuinely break the schema. The `recommended` list was
+        // visual noise on the happy path: editors saw "Valid" on the chip
+        // but a stack of "recommended · sameAs / contactPoint / description"
+        // lines underneath, suggesting work that doesn't actually move the
+        // pass/fail needle. Hidden here; still tracked in the audit object
+        // so the SEO health score card can use it.
+        const hasIssues = blobAudit.missingRequired.length > 0;
         return (
           <div
             key={`${blobAudit.blobType}-${idx}`}
@@ -368,11 +374,6 @@ const SchemaBodyContent = (props: {
                 {blobAudit.missingRequired.map((key) => (
                   <li key={`req-${key}`} data-severity="red">
                     <strong>required</strong> · <code>{key}</code>
-                  </li>
-                ))}
-                {blobAudit.missingRecommended.map((key) => (
-                  <li key={`rec-${key}`} data-severity="amber">
-                    recommended · <code>{key}</code>
                   </li>
                 ))}
               </ul>

@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { mediaUploadField } from '../fields/media-upload';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
@@ -23,6 +24,9 @@ export const News: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'newsCategories', 'publicationDate', '_status', 'updatedAt'],
     group: 'Content',
+    components: {
+      edit: docStatusBarEditConfig({ showStats: true, showPublishedAt: false }),
+    },
   },
   access: {
     read: () => true,
@@ -60,16 +64,6 @@ export const News: CollectionConfig = {
       validate: validateOptionalUrl,
     },
     {
-      name: 'bodyStats',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: '@/payload/admin/components/BodyStatsField.tsx#BodyStatsField',
-        },
-      },
-    },
-    {
       name: 'permalink',
       type: 'ui',
       admin: {
@@ -101,8 +95,8 @@ export const News: CollectionConfig = {
       hasMany: true,
     },
     {
-      // Data-only — surfaced via the `bodyStats` pill at the top of the
-      // sidebar. Hidden here so the form doesn't double-render.
+      // Data-only — surfaced via the DocStatusBar in the top status bar.
+      // Hidden here so the form doesn't double-render.
       name: 'readingMinutes',
       type: 'number',
       access: { update: () => false },

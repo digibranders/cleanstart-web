@@ -33,26 +33,70 @@ const DEFAULT_SITE_URL =
 
 const trimSlash = (s: string): string => s.replace(/^\/+|\/+$/g, '');
 
+const ClipboardIcon = ({ checked }: { checked: boolean }): ReactElement =>
+  checked ? (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+      <path
+        d="M3.5 8.5l3 3 6-6"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ) : (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+      <rect
+        x="4"
+        y="3"
+        width="8"
+        height="10"
+        rx="1.5"
+        stroke="currentColor"
+        strokeWidth="1.4"
+      />
+      <path
+        d="M6 3v-.5A1.5 1.5 0 0 1 7.5 1h1A1.5 1.5 0 0 1 10 2.5V3"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+
+const ExternalLinkIcon = (): ReactElement => (
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+    <path
+      d="M9 3h4v4"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M13 3l-6 6"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M11 9.5V12a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 3 12V7a1.5 1.5 0 0 1 1.5-1.5H7"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 /**
  * Sidebar-mounted UI field that surfaces the live public URL of the
  * current document. Reads the `slug` field reactively, composes the
  * URL from a configurable site root + collection path prefix, and
- * renders a monospace preview with Copy / Visit affordances.
- *
- * Wire on a collection via:
- *   {
- *     name: 'permalink',
- *     type: 'ui',
- *     admin: {
- *       position: 'sidebar',
- *       components: {
- *         Field: {
- *           path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
- *           clientProps: { pathPrefix: '/blog' },
- *         },
- *       },
- *     },
- *   },
+ * renders a single-row monospace preview with inline Copy / Visit
+ * icon buttons (replaces the previous below-row action buttons that
+ * spent two full rows on icons-with-labels).
  */
 export const PermalinkField = (props: PermalinkFieldProps): ReactElement => {
   const { pathPrefix = '', siteUrl = DEFAULT_SITE_URL, sourceField = 'slug' } = props;
@@ -79,17 +123,7 @@ export const PermalinkField = (props: PermalinkFieldProps): ReactElement => {
 
   if (!sourceValue) {
     return (
-      <div
-        style={{
-          marginBottom: '1rem',
-          padding: '0.75rem',
-          border: '1px dashed var(--theme-elevation-200, #34363d)',
-          borderRadius: '6px',
-          background: 'var(--theme-elevation-50, #1c1d21)',
-          color: 'var(--theme-text-disabled, #6b6e77)',
-          fontSize: '12px',
-        }}
-      >
+      <div className="cs-permalink cs-permalink--empty">
         {sourceField === 'path'
           ? 'URL will appear once the page is saved.'
           : 'Permalink will appear once a slug is set.'}
@@ -98,102 +132,40 @@ export const PermalinkField = (props: PermalinkFieldProps): ReactElement => {
   }
 
   return (
-    <div style={{ marginBottom: '1rem' }}>
-      <div
-        style={{
-          fontSize: '13px',
-          fontWeight: 500,
-          color: 'var(--theme-text-soft, #a4a7af)',
-          marginBottom: '0.4rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-        }}
-      >
+    <div className="cs-permalink">
+      <div className="cs-permalink__label">
         <span>Permalink</span>
         <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.3rem',
-            padding: '0.05rem 0.45rem',
-            borderRadius: '999px',
-            background: isLive
-              ? 'rgba(0, 196, 106, 0.14)'
-              : 'rgba(164, 167, 175, 0.14)',
-            color: isLive ? 'var(--color-success-500, #00c46a)' : 'var(--theme-text-soft, #a4a7af)',
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-          }}
+          className="cs-permalink__chip"
+          data-tone={isLive ? 'live' : 'draft'}
         >
-          <span
-            style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              background: 'currentColor',
-            }}
-          />
+          <span className="cs-permalink__dot" aria-hidden="true" />
           {isLive ? 'Live' : 'Draft'}
         </span>
       </div>
-      <div
-        style={{
-          background: 'var(--theme-input-bg, #14151a)',
-          border: '1px solid var(--theme-elevation-200, #34363d)',
-          borderRadius: '6px',
-          padding: '0.55rem 0.65rem',
-          fontFamily:
-            '"JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
-          fontSize: '12px',
-          color: 'var(--theme-text, #e8e9eb)',
-          wordBreak: 'break-all',
-          lineHeight: 1.5,
-          userSelect: 'all',
-        }}
-      >
-        {fullUrl}
-      </div>
-      <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.5rem' }}>
+      <div className="cs-permalink__row">
+        <span className="cs-permalink__url" title={fullUrl}>
+          {fullUrl}
+        </span>
         <button
           type="button"
+          className="cs-permalink__icon-btn"
           onClick={handleCopy}
-          style={{
-            flex: 1,
-            padding: '0.4rem 0.65rem',
-            borderRadius: '6px',
-            fontSize: '12.5px',
-            fontWeight: 500,
-            cursor: 'pointer',
-            border: '1px solid var(--theme-elevation-250, #3e4048)',
-            background: 'transparent',
-            color: copied ? 'var(--color-success-500, #00c46a)' : 'var(--theme-text, #e8e9eb)',
-            transition: 'border-color 120ms ease, color 120ms ease',
-          }}
+          aria-label={copied ? 'URL copied' : 'Copy URL'}
+          title={copied ? 'Copied!' : 'Copy URL'}
+          data-state={copied ? 'success' : 'idle'}
         >
-          {copied ? 'Copied!' : 'Copy URL'}
+          <ClipboardIcon checked={copied} />
         </button>
         <a
           href={fullUrl}
           target="_blank"
           rel="noopener noreferrer"
-          style={{
-            flex: 1,
-            padding: '0.4rem 0.65rem',
-            borderRadius: '6px',
-            fontSize: '12.5px',
-            fontWeight: 500,
-            textAlign: 'center',
-            border: '1px solid var(--theme-elevation-250, #3e4048)',
-            background: 'transparent',
-            color: 'var(--theme-text, #e8e9eb)',
-            textDecoration: 'none',
-            transition: 'border-color 120ms ease, color 120ms ease, background-color 120ms ease',
-          }}
+          className="cs-permalink__icon-btn"
+          aria-label="Open URL in new tab"
+          title="Open in new tab"
         >
-          Visit ↗
+          <ExternalLinkIcon />
         </a>
       </div>
     </div>

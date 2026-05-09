@@ -2,13 +2,15 @@
 // 5. Forms — labels, inputs, helpers, focus
 // =============================================================================
 
-// Labels — quieter, weight-500, slight tracking
+// Labels — bold + heading-bright so editors can scan a long form by
+// label first. The field VALUE then sits one notch softer (input or
+// readonly token) and the eye knows which role to land on.
 .field-label,
 .field-type__label,
 .field-type label {
-  color: var(--theme-text-soft);
+  color: var(--cs-text-heading);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.005em;
   margin-bottom: 4px;
 }
@@ -175,7 +177,7 @@
     padding: 0.5rem 0.75rem;
     font-size: 14px;
     line-height: 1.5;
-    color: var(--theme-text);
+    color: var(--cs-text-input);
     box-shadow: var(--cs-shadow-input-rest);
     transition:
       border-color var(--cs-motion-micro),
@@ -183,7 +185,7 @@
       background-color var(--cs-motion-micro);
 
     &::placeholder {
-      color: var(--theme-text-disabled);
+      color: var(--cs-text-placeholder);
     }
 
     &:hover:not([disabled]):not(:focus):not(:focus-visible) {
@@ -202,7 +204,7 @@
     &[disabled],
     &[readonly] {
       background: var(--theme-elevation-50);
-      color: var(--theme-text-disabled);
+      color: var(--cs-text-readonly);
       cursor: not-allowed;
     }
   }
@@ -246,7 +248,7 @@
   margin-top: var(--cs-space-3);
 
   &__label {
-    color: var(--theme-text);
+    color: var(--cs-text-heading);
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.005em;

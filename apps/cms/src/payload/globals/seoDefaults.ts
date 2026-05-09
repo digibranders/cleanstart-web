@@ -127,6 +127,14 @@ export const SeoDefaults: GlobalConfig = {
               'yandex-verification (Yandex Webmaster → Settings → Site verification → Meta tag).',
           },
         },
+        {
+          name: 'facebookDomain',
+          type: 'text',
+          admin: {
+            description:
+              'facebook-domain-verification (Meta Business Suite → Brand Safety → Domains → Verify → Meta-tag).',
+          },
+        },
       ],
     },
     {

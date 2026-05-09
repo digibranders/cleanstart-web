@@ -56,6 +56,15 @@ export interface RobotsAdvanced {
 export interface RobotsMetaInput {
   readonly indexable?: IndexableValue | null;
   readonly advanced?: RobotsAdvanced | null;
+  /**
+   * Payload's `_status` field on the doc. When anything other than
+   * `'published'` (i.e. `'draft'` or unset), the composer returns
+   * `'noindex, nofollow'` immediately, ignoring every other input.
+   *
+   * This is the safety net against accidentally indexing drafts —
+   * editors can't override it from the admin UI.
+   */
+  readonly status?: 'published' | 'draft' | string | null;
 }
 
 const indexFollowPair = (indexable: IndexableValue | null | undefined): string => {
@@ -95,8 +104,16 @@ const formatMaxNum = (
 /**
  * Compose the robots meta content string. Empty advanced + default
  * indexable returns `'index, follow'`.
+ *
+ * Hard rule: when `input.status` is anything other than `'published'`,
+ * the result is always `'noindex, nofollow'` — protects drafts and
+ * scheduled docs from accidental indexing regardless of card state.
  */
 export const composeRobotsMeta = (input: RobotsMetaInput): string => {
+  if (input.status !== undefined && input.status !== null && input.status !== 'published') {
+    return 'noindex, nofollow';
+  }
+
   const directives: string[] = [];
   directives.push(indexFollowPair(input.indexable ?? null));
 

@@ -311,7 +311,7 @@ Goal: prod-quality posture; ready for cutover-day runbook.
 
 ## Future — Integrations dashboard
 
-> Research: **`docs/INTEGRATIONS-RESEARCH.md`** is the authoritative scoping note for what this dashboard supports, why, and the open product questions still to resolve. Read it before scheduling any of the work below.
+> Research: **`docs/INTEGRATIONS-RESEARCH.md`** is the authoritative scoping note for what this dashboard supports, why, and the open product questions still to resolve. Read it before scheduling any of the work below. **`docs/INTEGRATIONS-RESEARCH-V2.md`** extends it with inbound webhooks, analytics read-back (GA4 / GSC / Clarity), and the L1/L2/L3 admin dashboard UX, and proposes the J1 / J2 / J3 milestone breakdown.
 
 Post-launch admin surface where editors connect external channels from a CMS settings page (no env-var edits, no code changes per channel). Each row in an encrypted `integrations` collection registers a matching LeadHandler / observability-shipper / sitemap-pinger at runtime through the existing `registerSecondaryHandler()` pipeline.
 

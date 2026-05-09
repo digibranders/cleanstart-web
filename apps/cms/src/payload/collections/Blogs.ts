@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
@@ -26,6 +27,9 @@ export const Blogs: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'authors', 'categories', '_status', 'publishedAt', 'updatedAt'],
     group: 'Content',
+    components: {
+      edit: docStatusBarEditConfig({ showStats: true, showPublishedAt: true }),
+    },
   },
   access: {
     read: () => true,
@@ -45,6 +49,37 @@ export const Blogs: CollectionConfig = {
     },
     mediaUploadField({ name: 'heroImage', folderHint: 'web/blog' }),
     { name: 'body', type: 'richText' },
+    {
+      name: 'faqsBulkPaste',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste',
+            clientProps: { targetField: 'faqs' },
+          },
+        },
+      },
+    },
+    {
+      name: 'faqs',
+      type: 'array',
+      labels: { singular: 'FAQ', plural: 'FAQs' },
+      admin: {
+        description:
+          'Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.',
+        components: {
+          RowLabel: '@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel',
+        },
+      },
+      fields: [
+        { name: 'question', type: 'text', required: true },
+        // Plain-text answer — matches Schema.org `acceptedAnswer.text`
+        // and keeps each FAQ row compact. Multiple paragraphs via
+        // line breaks.
+        { name: 'answer', type: 'textarea', required: true },
+      ],
+    },
     {
       name: 'authors',
       type: 'relationship',
@@ -99,55 +134,11 @@ export const Blogs: CollectionConfig = {
       },
     },
     {
-      name: 'faqsBulkPaste',
-      type: 'ui',
-      admin: {
-        components: {
-          Field: {
-            path: '@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste',
-            clientProps: { targetField: 'faqs' },
-          },
-        },
-      },
-    },
-    {
-      name: 'faqs',
-      type: 'array',
-      labels: { singular: 'FAQ', plural: 'FAQs' },
-      admin: {
-        description:
-          'Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.',
-        components: {
-          RowLabel: '@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel',
-        },
-      },
-      fields: [
-        { name: 'question', type: 'text', required: true },
-        // Plain-text answer — matches Schema.org `acceptedAnswer.text`
-        // and keeps each FAQ row compact. Multiple paragraphs via
-        // line breaks.
-        { name: 'answer', type: 'textarea', required: true },
-      ],
-    },
-    {
       name: 'relatedPosts',
       type: 'relationship',
       relationTo: 'blogs',
       hasMany: true,
       admin: { description: 'Manually curated. Empty = listing component picks by category.' },
-    },
-    {
-      // Glanceable stats at the very top of the sidebar — editors check
-      // word count + reading minutes constantly while drafting. Compact
-      // pill row replaces the two full-width read-only number fields.
-      name: 'bodyStats',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: '@/payload/admin/components/BodyStatsField.tsx#BodyStatsField',
-        },
-      },
     },
     {
       name: 'permalink',
@@ -166,21 +157,9 @@ export const Blogs: CollectionConfig = {
     publishedAtField,
     ...seoSidebarFields({ pathPrefix: '/blog', descriptionSource: 'abstract' }),
     {
-      name: 'featured',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: { position: 'sidebar' },
-    },
-    {
-      name: 'pinned',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: { position: 'sidebar' },
-    },
-    {
-      // Data-only — surfaced as a compact pill at the top of the sidebar
-      // via `bodyStats` (BodyStatsField). Hidden here so the form doesn't
-      // double-render the value as a full-size number input.
+      // Data-only — surfaced via the DocStatusBar in the top status bar.
+      // Hidden here so the form doesn't double-render the value as a
+      // full-size number input.
       name: 'readingMinutes',
       type: 'number',
       access: { update: () => false },
@@ -199,18 +178,48 @@ export const Blogs: CollectionConfig = {
       labels: { singular: 'Heading', plural: 'Table of contents' },
       admin: {
         readOnly: true,
+        // Start each TOC row collapsed — they're auto-generated read-only
+        // metadata; the row label (TocRowLabel) already surfaces the
+        // heading text + level inline, so the level/text/anchor triple
+        // doesn't need to be expanded by default.
+        initCollapsed: true,
         description: 'Auto-built from H2/H3 headings in the body on save.',
         components: {
           RowLabel: '@/payload/admin/components/TocRowLabel.tsx#TocRowLabel',
         },
       },
       fields: [
-        { name: 'level', type: 'number' },
-        { name: 'text', type: 'text' },
-        { name: 'anchor', type: 'text' },
+        // Sub-fields explicitly readOnly: parent array's `admin.readOnly`
+        // doesn't propagate to children when fields are rendered by
+        // custom Field adapters. Belt + suspenders alongside the
+        // parent's `access.update: () => false` (which already blocks
+        // server-side writes).
+        { name: 'level', type: 'number', admin: { readOnly: true } },
+        { name: 'text', type: 'text', admin: { readOnly: true } },
+        { name: 'anchor', type: 'text', admin: { readOnly: true } },
       ],
     },
     ...seoFieldsForSidebar('blogs'),
+    {
+      // Editorial flags — separated from the SEO band by a divider
+      // styled in `_sidebar-seo.scss`. Payload's sidebar render places
+      // the `seoAdvanced` UI field at the very end of the rail
+      // regardless of source-order; featured / pinned therefore land
+      // between Head/Header tags (last T4 card) and SEO Advanced
+      // (T5). The SCSS divider sits ABOVE featured to mark the
+      // SEO → editorial boundary. SEO Advanced as the final card is
+      // an acceptable end-of-rail anchor for the expert toolbox.
+      name: 'featured',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'pinned',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { position: 'sidebar' },
+    },
   ],
   hooks: {
     beforeChange: [

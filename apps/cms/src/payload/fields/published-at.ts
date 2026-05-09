@@ -38,6 +38,10 @@ export const publishedAtField: Field = {
     description:
       'Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.',
     date: { pickerAppearance: 'dayAndTime' },
-    position: 'sidebar',
+    // Surfaced in the document edit-view's top status bar via
+    // DocStatusBar (mounted as `admin.components.edit.beforeDocumentControls`),
+    // which reads this value through `useField`. Hidden here so the form
+    // doesn't render a duplicate read-only date input.
+    hidden: true,
   },
 };

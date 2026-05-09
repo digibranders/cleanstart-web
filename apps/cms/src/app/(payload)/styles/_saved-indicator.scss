@@ -2,11 +2,15 @@
 // SavedStateIndicator — floating "Saved X ago" chip on edit views
 // =============================================================================
 //
-// Mounted globally; renders nothing on non-edit routes. Position fixed
-// at the bottom-right corner so it stays out of the form chrome path
-// regardless of scroll position. The dot is a calm green pulse to
-// signal "alive / OK"; chip text uses the secondary text colour so it
-// reads as a passive status, not a control.
+// REMOVED. The component is unmounted from `payload.config.ts` actions.
+// This `display: none` is belt-and-suspenders so the pill never
+// reappears even if a different code path re-mounts it during a Payload
+// runtime restart.
+.cs-saved-indicator,
+.cs-saved-indicator--saving,
+.cs-saved-indicator--error {
+  display: none !important;
+}
 
 .cs-saved-indicator {
   position: fixed;

@@ -147,3 +147,84 @@ button#action-save[disabled] {
   opacity: 0.7;
   box-shadow: none !important;
 }
+
+// =============================================================================
+// Doc-controls action emphasis: flip the visual hierarchy so the SAFE
+// action (Save Draft) is the primary cyan button and Publish becomes a
+// secondary outlined button. Editors in fast-iterate mode hit Save
+// Draft repeatedly; making it the eye-drawing affordance speeds the
+// loop and reduces accidental publishes — Publish is now an explicit
+// "I really mean it" click rather than the path of least resistance.
+// =============================================================================
+
+// Save Draft → primary cyan
+.doc-controls button#action-save-draft {
+  background: var(--cs-cyan-500);
+  color: #04212a;
+  border: 1px solid transparent;
+  border-radius: var(--cs-radius-input);
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.005em;
+  padding-inline: var(--cs-space-4);
+  height: 36px;
+
+  &:hover:not([disabled]) {
+    background: var(--cs-cyan-400);
+    box-shadow:
+      0 1px 0 0 rgba(6, 199, 242, 0.25),
+      0 6px 16px -8px rgba(6, 199, 242, 0.4);
+  }
+
+  &:active:not([disabled]) {
+    background: var(--cs-cyan-600);
+    box-shadow: var(--cs-shadow-press);
+  }
+
+  &[disabled] {
+    background: var(--theme-elevation-150) !important;
+    color: var(--theme-text-disabled) !important;
+    cursor: not-allowed !important;
+    opacity: 0.7;
+    box-shadow: none !important;
+  }
+}
+
+// Publish → secondary outlined. Override both the bare-button case and
+// the wrapped `.btn--style-pill-primary > button` case so we beat the
+// earlier primary-cyan rule on specificity AND source order.
+.doc-controls button#action-save,
+.doc-controls .btn--style-pill-primary > button#action-save,
+.doc-controls .btn--style-primary > button#action-save {
+  background: transparent !important;
+  color: var(--theme-text) !important;
+  border: 1px solid var(--theme-elevation-250) !important;
+  font-weight: 500;
+  box-shadow: none !important;
+
+  &:hover:not([disabled]) {
+    border-color: var(--cs-cyan-500) !important;
+    color: var(--theme-text) !important;
+    background: transparent !important;
+  }
+
+  &:active:not([disabled]) {
+    box-shadow: var(--cs-shadow-press-soft) !important;
+  }
+
+  &[disabled] {
+    color: var(--theme-text-disabled) !important;
+    border-color: var(--theme-elevation-150) !important;
+    background: transparent !important;
+    cursor: not-allowed !important;
+    opacity: 0.7;
+  }
+}
+
+// The schedule-publish chevron lives in the same `.btn--style-pill-primary`
+// wrapper as Publish; keep it visually paired with Publish's secondary
+// look (transparent + outlined) instead of the cyan wrapper background
+// that the unwrapped primary case carries.
+.doc-controls .btn--style-pill-primary {
+  border-color: var(--theme-elevation-250) !important;
+}

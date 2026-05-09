@@ -137,6 +137,79 @@ export const FaqBulkPaste = (props: FaqBulkPasteProps): ReactElement | null => {
     };
   }, [handlePaste]);
 
+  // ─── Auto-focus the new row's Question on "Add FAQ" ──────────────
+  // When a single new `.array-field__row` is appended (standard
+  // add-row click), focus its first text input — which is always the
+  // Question field, since the row schema is `question` → `answer`.
+  //
+  // Implemented with a MutationObserver scoped to the FAQ array's
+  // field container: not coupled to useField row counts, robust to
+  // the row's content rendering on a delay (the input may appear up
+  // to ~1s after the row node), and naturally ignores bulk-paste
+  // (which inserts multiple rows in one batch — count delta ≠ 1).
+  useEffect(() => {
+    const findField = (): HTMLElement | null => {
+      const expected = `field-${arrayLeaf}`;
+      return (
+        document.getElementById(expected) ??
+        document.querySelector<HTMLElement>(`[id^="${expected}__"]`)
+      );
+    };
+
+    let cancelled = false;
+    let lastCount: number | null = null;
+
+    const findLastQuestion = (field: HTMLElement): HTMLInputElement | null => {
+      const rows = field.querySelectorAll<HTMLElement>('.array-field__row');
+      const lastRow = rows[rows.length - 1];
+      return lastRow?.querySelector<HTMLInputElement>('input[type="text"]') ?? null;
+    };
+
+    const handle = (): void => {
+      const field = findField();
+      if (!field) return;
+      const rows = field.querySelectorAll('.array-field__row');
+      const next = rows.length;
+      if (lastCount === null) {
+        lastCount = next;
+        return;
+      }
+      if (next === lastCount + 1) {
+        // Payload moves focus to <main> ~1ms after our first focus
+        // call (its own scroll-into-view on row add), so defer the
+        // first attempt past that and re-focus at growing intervals
+        // to win the race until the input renders and stays focused.
+        const delays = [120, 260, 450, 700, 1000, 1400];
+        let i = 0;
+        const tryAt = (): void => {
+          if (cancelled) return;
+          const f = findField();
+          const input = f ? findLastQuestion(f) : null;
+          if (input && document.activeElement !== input) {
+            input.focus();
+          }
+          i += 1;
+          const next = delays[i];
+          const prev = delays[i - 1];
+          if (next !== undefined && prev !== undefined) {
+            window.setTimeout(tryAt, next - prev);
+          }
+        };
+        const first = delays[0];
+        if (first !== undefined) window.setTimeout(tryAt, first);
+      }
+      lastCount = next;
+    };
+
+    handle();
+    const observer = new MutationObserver(handle);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [arrayLeaf]);
+
   // ─── Portal host: a dedicated <li> child of the array's
   // header-actions UL. Created (or re-located) whenever Payload
   // re-renders the array-field. The Portal then renders our React-
