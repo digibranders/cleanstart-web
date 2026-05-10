@@ -581,14 +581,60 @@ export interface Author {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -692,14 +738,60 @@ export interface Category {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -803,14 +895,60 @@ export interface NewsCategory {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -914,14 +1052,60 @@ export interface KnowledgeCategory {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -1224,6 +1408,16 @@ export interface Blog {
     [k: string]: unknown;
   } | null;
   /**
+   * Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.
+   */
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Multi-author supported — every byline is credited in JSON-LD author[]. Authors with "accepting new bylines" off are hidden from the picker.
    */
   authors?: (number | Author)[] | null;
@@ -1236,16 +1430,6 @@ export interface Blog {
    */
   lastReviewedAt?: string | null;
   categories?: (number | Category)[] | null;
-  /**
-   * Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.
-   */
-  faqs?:
-    | {
-        question: string;
-        answer: string;
-        id?: string | null;
-      }[]
-    | null;
   /**
    * Manually curated. Empty = listing component picks by category.
    */
@@ -1391,8 +1575,6 @@ export interface Blog {
    * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
    */
   publishedAt?: string | null;
-  featured?: boolean | null;
-  pinned?: boolean | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
   /**
@@ -1462,14 +1644,60 @@ export interface Blog {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -1496,6 +1724,8 @@ export interface Blog {
       | boolean
       | null;
   };
+  featured?: boolean | null;
+  pinned?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1734,14 +1964,60 @@ export interface News {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -1799,15 +2075,6 @@ export interface Guide {
     };
     [k: string]: unknown;
   } | null;
-  authors?: (number | Author)[] | null;
-  /**
-   * Author who reviewed this guide. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal.
-   */
-  reviewedBy?: (number | null) | Author;
-  /**
-   * Editorial-freshness signal. Surfaced in JSON-LD dateReviewed.
-   */
-  lastReviewedAt?: string | null;
   /**
    * Replaces Webflow Q1…Q5 / Ans1…Ans5. Drives FAQPage JSON-LD when non-empty.
    */
@@ -1818,6 +2085,15 @@ export interface Guide {
         id?: string | null;
       }[]
     | null;
+  authors?: (number | Author)[] | null;
+  /**
+   * Author who reviewed this guide. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal.
+   */
+  reviewedBy?: (number | null) | Author;
+  /**
+   * Editorial-freshness signal. Surfaced in JSON-LD dateReviewed.
+   */
+  lastReviewedAt?: string | null;
   /**
    * Replaces Webflow Article About 1…8. Each section is one step when "Emit HowTo schema" is on below.
    */
@@ -2095,14 +2371,60 @@ export interface Guide {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -2380,14 +2702,60 @@ export interface Resource {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -2456,14 +2824,6 @@ export interface KnowledgeBase {
     [k: string]: unknown;
   } | null;
   /**
-   * Author who reviewed this article for technical accuracy. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal for KB content.
-   */
-  reviewedBy?: (number | null) | Author;
-  /**
-   * Date of the most recent technical review. Surfaced as Schema.org dateReviewed.
-   */
-  lastReviewedAt?: string | null;
-  /**
    * Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.
    */
   faqs?:
@@ -2473,6 +2833,14 @@ export interface KnowledgeBase {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Author who reviewed this article for technical accuracy. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal for KB content.
+   */
+  reviewedBy?: (number | null) | Author;
+  /**
+   * Date of the most recent technical review. Surfaced as Schema.org dateReviewed.
+   */
+  lastReviewedAt?: string | null;
   /**
    * Manually curated. Empty = listing component picks by category.
    */
@@ -2687,14 +3055,60 @@ export interface KnowledgeBase {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -3001,14 +3415,60 @@ export interface Event {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -3307,14 +3767,60 @@ export interface Webinar {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -3609,14 +4115,60 @@ export interface Job {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -5459,14 +6011,60 @@ export interface Page {
      * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
      */
     twitterImage?: (number | null) | Media;
-    /**
-     * Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.
-     */
     useCustomCanonical?: boolean | null;
-    /**
-     * Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.
-     */
     canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
@@ -5992,6 +6590,20 @@ export interface AuthorsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6033,6 +6645,20 @@ export interface CategoriesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6074,6 +6700,20 @@ export interface NewsCategoriesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6115,6 +6755,20 @@ export interface KnowledgeCategoriesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6263,10 +6917,6 @@ export interface BlogsSelect<T extends boolean = true> {
   abstract?: T;
   heroImage?: T;
   body?: T;
-  authors?: T;
-  reviewedBy?: T;
-  lastReviewedAt?: T;
-  categories?: T;
   faqs?:
     | T
     | {
@@ -6274,6 +6924,10 @@ export interface BlogsSelect<T extends boolean = true> {
         answer?: T;
         id?: T;
       };
+  authors?: T;
+  reviewedBy?: T;
+  lastReviewedAt?: T;
+  categories?: T;
   relatedPosts?: T;
   schemaAddons?:
     | T
@@ -6361,8 +7015,6 @@ export interface BlogsSelect<T extends boolean = true> {
             };
       };
   publishedAt?: T;
-  featured?: T;
-  pinned?: T;
   readingMinutes?: T;
   wordCount?: T;
   tableOfContents?:
@@ -6391,6 +7043,20 @@ export interface BlogsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6400,6 +7066,8 @@ export interface BlogsSelect<T extends boolean = true> {
             };
         additionalSchema?: T;
       };
+  featured?: T;
+  pinned?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -6524,6 +7192,20 @@ export interface NewsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6546,9 +7228,6 @@ export interface GuidesSelect<T extends boolean = true> {
   slug?: T;
   heroImage?: T;
   body?: T;
-  authors?: T;
-  reviewedBy?: T;
-  lastReviewedAt?: T;
   faqs?:
     | T
     | {
@@ -6556,6 +7235,9 @@ export interface GuidesSelect<T extends boolean = true> {
         answer?: T;
         id?: T;
       };
+  authors?: T;
+  reviewedBy?: T;
+  lastReviewedAt?: T;
   articleSections?:
     | T
     | {
@@ -6701,6 +7383,20 @@ export interface GuidesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6835,6 +7531,20 @@ export interface ResourcesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -6859,8 +7569,6 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
   heroImage?: T;
   category?: T;
   body?: T;
-  reviewedBy?: T;
-  lastReviewedAt?: T;
   faqs?:
     | T
     | {
@@ -6868,6 +7576,8 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
         answer?: T;
         id?: T;
       };
+  reviewedBy?: T;
+  lastReviewedAt?: T;
   relatedArticles?: T;
   schemaAddons?:
     | T
@@ -6983,6 +7693,20 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -7131,6 +7855,20 @@ export interface EventsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -7274,6 +8012,20 @@ export interface WebinarsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -7419,6 +8171,20 @@ export interface JobsSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -8319,6 +9085,20 @@ export interface PagesSelect<T extends boolean = true> {
         twitterImage?: T;
         useCustomCanonical?: T;
         canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
         keywordTarget?: T;
         speakablePath?:
           | T
@@ -8528,6 +9308,10 @@ export interface SeoDefault {
      * yandex-verification (Yandex Webmaster → Settings → Site verification → Meta tag).
      */
     yandex?: string | null;
+    /**
+     * facebook-domain-verification (Meta Business Suite → Brand Safety → Domains → Verify → Meta-tag).
+     */
+    facebookDomain?: string | null;
   };
   /**
    * Surfaced on every page as the publisher reference. Required for News content.
@@ -8930,6 +9714,7 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
         bing?: T;
         pinterest?: T;
         yandex?: T;
+        facebookDomain?: T;
       };
   organizationJsonLd?:
     | T

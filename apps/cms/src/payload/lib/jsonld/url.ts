@@ -19,21 +19,76 @@ export const absoluteUrl = (baseUrl: string, path: string): string => {
 };
 
 /**
+ * Doc shape for canonical-URL computation. `seo` is typed as `unknown`
+ * because the full Payload doc shape varies per collection; we narrow
+ * at runtime. This lets every dispatch site pass its own typed doc
+ * (or the looser `AnyDoc` from dispatch.ts) without a cast.
+ */
+export type CanonicalDoc = {
+  slug?: string | null;
+  path?: string | null;
+  seo?: unknown;
+};
+
+type SeoCanonicalShape = {
+  useCustomCanonical?: boolean | null;
+  canonicalOverride?: string | null;
+};
+
+const readSeoCanonical = (seo: unknown): SeoCanonicalShape => {
+  if (typeof seo !== 'object' || seo === null) return {};
+  const o = seo as SeoCanonicalShape;
+  return {
+    useCustomCanonical: o.useCustomCanonical ?? null,
+    canonicalOverride: o.canonicalOverride ?? null,
+  };
+};
+
+/**
+ * Validates that an override looks like an absolute http(s) URL with no
+ * query / fragment. Mirrors the save-time validator in lib/canonical so
+ * we never emit JSON-LD pointing at junk if a record was somehow saved
+ * with a value that drifted from the validator (legacy import data,
+ * direct DB edits, etc.).
+ */
+const isValidOverride = (raw: string): boolean => {
+  try {
+    const u = new URL(raw);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return false;
+    if (u.search.length > 0) return false;
+    if (u.hash.length > 0) return false;
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
  * Compose the canonical absolute URL for a document.
  *
- * - For `pages`, uses `doc.path` (the parent-resolved path) when set.
- * - For everything else, uses `<route-prefix>/<slug>` from
- *   `route-prefixes.ts`.
+ * Resolution order:
+ *   1. `seo.useCustomCanonical === true` AND `seo.canonicalOverride`
+ *      is a valid absolute http(s) URL → return that override. This
+ *      is for content originally published off-domain where Google
+ *      should credit the original source.
+ *   2. For `pages`, use `doc.path` (the parent-resolved path).
+ *   3. For everything else, use `<route-prefix>/<slug>` from
+ *      `route-prefixes.ts`.
  *
  * Returns `null` when the doc lacks a slug or the collection has no
- * registered prefix — caller decides whether to skip emission or
- * fall back to a custom canonical from `seo.canonicalOverride`.
+ * registered prefix AND there's no valid override — caller decides
+ * whether to skip emission entirely.
  */
 export const docCanonicalUrl = (
   baseUrl: string,
   collection: string,
-  doc: { slug?: string | null; path?: string | null },
+  doc: CanonicalDoc,
 ): string | null => {
+  const seo = readSeoCanonical(doc.seo);
+  const override = seo.canonicalOverride?.trim() ?? '';
+  if (seo.useCustomCanonical === true && override.length > 0 && isValidOverride(override)) {
+    return trimTrailingSlash(override);
+  }
   const path = collectionUrlFromDoc(collection, doc);
   if (path == null) return null;
   return absoluteUrl(baseUrl, path);

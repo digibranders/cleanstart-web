@@ -63,11 +63,70 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Test
-        run: pnpm --filter @cleanstart/cms test
+      - name: Test (with coverage)
+        run: pnpm --filter @cleanstart/cms test:coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cms-coverage
+          path: apps/cms/coverage/
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Verify generated Payload types are not stale
         run: pnpm --filter @cleanstart/cms verify:types
 
       - name: Build
         run: pnpm build
+
+  cms-e2e:
+    name: apps/cms · e2e (@phase-d-preview)
+    needs: cms
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: cleanstart
+          POSTGRES_PASSWORD: cleanstart
+          POSTGRES_DB: cleanstart
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cleanstart -d cleanstart"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URI: postgres://cleanstart:cleanstart@localhost:5432/cleanstart
+      PAYLOAD_SECRET: ci-only-not-a-real-secret
+      PAYLOAD_PUBLIC_SERVER_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @cleanstart/cms exec playwright install --with-deps chromium
+
+      - name: Run E2E (preview phase only — narrow gate)
+        run: pnpm --filter @cleanstart/cms test:e2e --grep @phase-d-preview
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cms-playwright-report
+          path: apps/cms/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14

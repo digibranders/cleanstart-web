@@ -2,24 +2,154 @@
 // 5. Forms — labels, inputs, helpers, focus
 // =============================================================================
 
-// Labels — quieter, weight-500, slight tracking
+// Labels — bold + heading-bright so editors can scan a long form by
+// label first. The field VALUE then sits one notch softer (input or
+// readonly token) and the eye knows which role to land on.
 .field-label,
 .field-type__label,
 .field-type label {
-  color: var(--theme-text-soft);
+  color: var(--cs-text-heading);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.005em;
   margin-bottom: 4px;
 }
 
 // Helper / description text under fields
+//
+// Replaced by an inline `i` info button next to the label; the description
+// itself stays in the DOM (Payload wires it as `aria-describedby`, so
+// keeping it readable to screen readers is a free a11y win) but is
+// visually hidden once FieldDescriptionTooltip has processed it.
 .field-description {
   color: var(--theme-text-soft);
   font-size: 12px;
   line-height: 1.4;
   margin-top: 4px;
   opacity: 0.85;
+}
+
+.field-description[data-cs-info-processed='true'] {
+  // Visually hide; keep AT-accessible.
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ─── Sidebar field labels — pin the info-button to the label text ─
+//
+// Payload's right-rail labels are `display: flex; justify-content:
+// space-between` with three children when there's a badge:
+//   <span>Slug</span>  <button>i</button>  <span>· AUTO</span>
+// Space-between spreads them evenly: label-left, button-middle,
+// badge-right. Editors expect `Slug (i) ... AUTO` (info adjacent to
+// the label, badge stays right). Two surgical overrides:
+//   1. Switch the label to `justify-content: flex-start` so the text
+//      and the button stack at the left.
+//   2. Re-pin the badge to the right via `margin-left: auto` on the
+//      LAST non-button child. (No badge → selector matches nothing,
+//      no-op for plain text labels.)
+.field-label:has(.cs-field-info) {
+  justify-content: flex-start;
+
+  > :last-child:not(.cs-field-info) {
+    margin-left: auto;
+  }
+}
+
+// Inline info-button mounted inside the field label by
+// FieldDescriptionTooltip. Sits immediately after the label text so
+// the layout reads `Slug (i) ... AUTO` — info adjacent to the label,
+// any badge stays right-aligned by Payload's flex.
+.field-label .cs-field-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline-start: var(--cs-space-2);
+  margin-inline-end: var(--cs-space-1);
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--theme-elevation-300);
+  color: var(--theme-text-soft);
+  cursor: help;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1;
+  letter-spacing: 0;
+  vertical-align: middle;
+  flex-shrink: 0;
+  position: relative;
+  transition:
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    color: var(--cs-cyan-500);
+    border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
+  }
+
+  // The tooltip itself is a body-level portal element managed by
+  // FieldDescriptionTooltip — see `#cs-field-info-tooltip` below.
+  // Pseudo-element approach was clipped by `.document-fields__sidebar
+  // { overflow: auto }`; the portal escapes every overflow ancestor.
+}
+
+// ─── Portal-mounted tooltip (sibling to body) ───────────────────────
+//
+// Single shared element; FieldDescriptionTooltip positions it via JS
+// on hover/focus and clamps it inside the viewport. Hidden by default
+// (max-width: 0 + opacity:0 + visibility:hidden) so it doesn't capture
+// pointer events or take up space in the a11y tree until it's shown.
+#cs-field-info-tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  max-width: 280px;
+  padding: 8px 10px;
+  background: var(--theme-elevation-900);
+  color: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-input);
+  box-shadow: var(--cs-shadow-lift-md);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--cs-motion-micro),
+    visibility var(--cs-motion-micro);
+
+  &[data-cs-tooltip-open='true'] {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 // Required asterisk — gentle red, never alarming
@@ -47,7 +177,7 @@
     padding: 0.5rem 0.75rem;
     font-size: 14px;
     line-height: 1.5;
-    color: var(--theme-text);
+    color: var(--cs-text-input);
     box-shadow: var(--cs-shadow-input-rest);
     transition:
       border-color var(--cs-motion-micro),
@@ -55,7 +185,7 @@
       background-color var(--cs-motion-micro);
 
     &::placeholder {
-      color: var(--theme-text-disabled);
+      color: var(--cs-text-placeholder);
     }
 
     &:hover:not([disabled]):not(:focus):not(:focus-visible) {
@@ -74,7 +204,7 @@
     &[disabled],
     &[readonly] {
       background: var(--theme-elevation-50);
-      color: var(--theme-text-disabled);
+      color: var(--cs-text-readonly);
       cursor: not-allowed;
     }
   }
@@ -118,7 +248,7 @@
   margin-top: var(--cs-space-3);
 
   &__label {
-    color: var(--theme-text);
+    color: var(--cs-text-heading);
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.005em;

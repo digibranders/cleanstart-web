@@ -1,0 +1,50 @@
+// Suppress the stock "Table" item inside Payload's `+` toolbar
+// dropdown — our inline grid picker takes over the insert path.
+.toolbar-popup__button-table,
+.toolbar-popup__button[data-button-key='table'] {
+  display: none !important;
+}
+
+.cs-table-picker {
+  position: fixed;
+  z-index: 1000;
+  padding: 12px;
+  background: var(--theme-elevation-0, #fff);
+  border: 1px solid var(--theme-elevation-150, #e5e7eb);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+  width: 230px;
+
+  &__label {
+    text-align: center;
+    color: var(--theme-elevation-700, #374151);
+    margin-bottom: 6px;
+  }
+
+  &__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__row {
+    display: flex;
+    gap: 2px;
+  }
+
+  &__cell {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--theme-elevation-150, #d1d5db);
+    border-radius: 2px;
+    background: var(--theme-elevation-50, #f3f4f6);
+    cursor: pointer;
+    padding: 0;
+
+    &--active {
+      background: var(--theme-success-500, #2563eb);
+      border-color: var(--theme-success-600, #1d4ed8);
+    }
+  }
+}

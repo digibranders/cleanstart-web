@@ -3,6 +3,7 @@ import {
   BlockquoteFeature,
   BoldFeature,
   ChecklistFeature,
+  EXPERIMENTAL_TableFeature,
   FixedToolbarFeature,
   HeadingFeature,
   HorizontalRuleFeature,
@@ -23,6 +24,8 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical';
 
+import { cleanstartLinkPopoverFeature } from './link-popover-feature';
+import { cleanstartTablePopoverFeature } from './table-popover-feature';
 import { RichPasteFeature } from './rich-paste-feature';
 
 export const cleanstartLexicalEditor = () =>
@@ -44,10 +47,27 @@ export const cleanstartLexicalEditor = () =>
       OrderedListFeature(),
       ChecklistFeature(),
       HorizontalRuleFeature(),
+      EXPERIMENTAL_TableFeature(),
+      cleanstartTablePopoverFeature(),
       AlignFeature(),
       IndentFeature(),
 
-      LinkFeature(),
+      LinkFeature({
+        fields: [
+          {
+            name: 'rel',
+            type: 'select',
+            defaultValue: 'follow',
+            options: [
+              { label: 'follow', value: 'follow' },
+              { label: 'nofollow', value: 'nofollow' },
+              { label: 'sponsored', value: 'sponsored' },
+              { label: 'ugc', value: 'ugc' },
+            ],
+          },
+        ],
+      }),
+      cleanstartLinkPopoverFeature(),
       RelationshipFeature(),
       UploadFeature(),
 

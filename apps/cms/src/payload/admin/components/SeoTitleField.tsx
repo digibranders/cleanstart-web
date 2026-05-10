@@ -143,8 +143,11 @@ export const SeoTitleField = (props: SeoTitleFieldProps): ReactElement => {
           )}
           <span
             style={{
-              fontSize: 11,
-              fontWeight: 500,
+              display: 'inline-flex',
+              alignItems: 'center',
+              fontSize: 10.5,
+              fontWeight: 600,
+              letterSpacing: '0.04em',
               color: charColor,
               fontFeatureSettings: '"tnum" 1',
             }}

@@ -53,6 +53,20 @@
   --cs-text-accent: var(--cs-cyan-500);
   --cs-text-on-accent: #04212a;
 
+  // ─── Text role tokens — separate editable from read-only ──────
+  // `--cs-text-primary` covers body / paragraph copy; the tokens
+  // below split out roles that previously collapsed onto it. They
+  // pull from the elevation ramp so light/dark inversion stays
+  // automatic — no per-theme overrides needed.
+  //   input       editable input value         (#f5f6f7 dk / #131418 lt)
+  //   heading     doc title, KPI numbers       (#ffffff dk / #0a0b0e lt)
+  //   readonly    [readonly]/[disabled] value  (#b8bcc4 dk / #34363c lt)
+  //   placeholder ::placeholder, empty hints   (#6b6e77 dk / #8b8f96 lt)
+  --cs-text-input: var(--theme-elevation-900);
+  --cs-text-heading: var(--theme-elevation-1000);
+  --cs-text-readonly: var(--theme-elevation-700);
+  --cs-text-placeholder: var(--theme-elevation-400);
+
   // ─── Status ───────────────────────────────────────────────────
   // Match the four Payload status flavours used in admin chrome.
   --cs-status-success: var(--color-success-500);

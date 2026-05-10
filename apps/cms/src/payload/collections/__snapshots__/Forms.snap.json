@@ -1,0 +1,238 @@
+{
+  "slug": "forms",
+  "versions": {
+    "drafts": true
+  },
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "name",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "slug",
+      "required": true,
+      "unique": true
+    },
+    {
+      "type": "textarea",
+      "name": "description"
+    },
+    {
+      "type": "array",
+      "name": "fields",
+      "required": true,
+      "fields": [
+        {
+          "type": "text",
+          "name": "name",
+          "required": true
+        },
+        {
+          "type": "select",
+          "name": "type",
+          "required": true,
+          "options": [
+            {
+              "value": "text"
+            },
+            {
+              "value": "email"
+            },
+            {
+              "value": "textarea"
+            },
+            {
+              "value": "select"
+            },
+            {
+              "value": "checkbox"
+            },
+            {
+              "value": "consent"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "label"
+        },
+        {
+          "type": "checkbox",
+          "name": "required"
+        },
+        {
+          "type": "text",
+          "name": "placeholder"
+        },
+        {
+          "type": "text",
+          "name": "helpText"
+        },
+        {
+          "type": "text",
+          "name": "defaultValue"
+        },
+        {
+          "type": "array",
+          "name": "options",
+          "fields": [
+            {
+              "type": "text",
+              "name": "label",
+              "required": true
+            },
+            {
+              "type": "text",
+              "name": "value",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": "textarea",
+          "name": "consentText"
+        },
+        {
+          "type": "group",
+          "name": "validation",
+          "fields": [
+            {
+              "type": "number",
+              "name": "minLength"
+            },
+            {
+              "type": "number",
+              "name": "maxLength"
+            },
+            {
+              "type": "text",
+              "name": "pattern"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "name": "conditions",
+          "fields": [
+            {
+              "type": "select",
+              "name": "mode",
+              "options": [
+                {
+                  "value": "all"
+                },
+                {
+                  "value": "any"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "name": "rules",
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "fieldName",
+                  "required": true
+                },
+                {
+                  "type": "select",
+                  "name": "operator",
+                  "required": true,
+                  "options": [
+                    {
+                      "value": "equals"
+                    },
+                    {
+                      "value": "notEquals"
+                    },
+                    {
+                      "value": "contains"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "name": "value",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "errorMessage"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "submitLabel"
+    },
+    {
+      "type": "group",
+      "name": "postSubmit",
+      "fields": [
+        {
+          "type": "select",
+          "name": "kind",
+          "required": true,
+          "options": [
+            {
+              "value": "message"
+            },
+            {
+              "value": "redirect"
+            }
+          ]
+        },
+        {
+          "type": "richText",
+          "name": "body"
+        },
+        {
+          "type": "text",
+          "name": "url"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "crmHandlers",
+      "hasMany": true,
+      "options": [
+        {
+          "value": "hubspot"
+        },
+        {
+          "value": "salesforce"
+        }
+      ]
+    },
+    {
+      "type": "array",
+      "name": "notifyTo",
+      "fields": [
+        {
+          "type": "email",
+          "name": "email",
+          "required": true
+        }
+      ]
+    },
+    {
+      "type": "number",
+      "name": "schemaVersion"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 2,
+    "afterChange": 0,
+    "beforeValidate": 0,
+    "afterDelete": 0
+  }
+}

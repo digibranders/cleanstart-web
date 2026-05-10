@@ -57,6 +57,72 @@ describe('renderUrlsetXml', () => {
     const xml = renderUrlsetXml([{ loc: 'https://x/' }]);
     expect(xml).not.toContain('<lastmod>');
   });
+
+  describe('hreflang alternates', () => {
+    it('omits the xhtml namespace when no entries have alternates', () => {
+      const xml = renderUrlsetXml([{ loc: 'https://x/' }]);
+      expect(xml).not.toContain('xmlns:xhtml');
+      expect(xml).not.toContain('<xhtml:link');
+    });
+
+    it('adds the xhtml namespace + xhtml:link rows when entries carry alternates', () => {
+      const xml = renderUrlsetXml([
+        {
+          loc: 'https://x/us/',
+          alternates: [
+            { hreflang: 'en-US', href: 'https://x/us/' },
+            { hreflang: 'en-AE', href: 'https://x/ae/' },
+            { hreflang: 'x-default', href: 'https://x/' },
+          ],
+        },
+      ]);
+      expect(xml).toContain('xmlns:xhtml="http://www.w3.org/1999/xhtml"');
+      expect(xml).toContain(
+        '<xhtml:link rel="alternate" hreflang="en-US" href="https://x/us/"/>',
+      );
+      expect(xml).toContain(
+        '<xhtml:link rel="alternate" hreflang="en-AE" href="https://x/ae/"/>',
+      );
+      expect(xml).toContain(
+        '<xhtml:link rel="alternate" hreflang="x-default" href="https://x/"/>',
+      );
+    });
+
+    it('skips alternate rows missing hreflang or href', () => {
+      const xml = renderUrlsetXml([
+        {
+          loc: 'https://x/us/',
+          alternates: [
+            { hreflang: '', href: 'https://x/us/' },
+            { hreflang: 'en-AE', href: '' },
+            { hreflang: 'en-US', href: 'https://x/us/' },
+          ],
+        },
+      ]);
+      expect(xml).toContain('hreflang="en-US"');
+      expect(xml).not.toContain('hreflang=""');
+    });
+
+    it('escapes special characters inside alternate href', () => {
+      const xml = renderUrlsetXml([
+        {
+          loc: 'https://x/',
+          alternates: [{ hreflang: 'en-US', href: 'https://x/?a=1&b=2' }],
+        },
+      ]);
+      expect(xml).toContain('href="https://x/?a=1&amp;b=2"');
+    });
+
+    it('emits the namespace once even when only some entries carry alternates', () => {
+      const xml = renderUrlsetXml([
+        { loc: 'https://x/a' },
+        { loc: 'https://x/b', alternates: [{ hreflang: 'en', href: 'https://x/b' }] },
+        { loc: 'https://x/c' },
+      ]);
+      // single occurrence of xmlns:xhtml in the root <urlset>
+      expect(xml.match(/xmlns:xhtml/g)?.length).toBe(1);
+    });
+  });
 });
 
 describe('renderNewsUrlsetXml', () => {

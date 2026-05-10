@@ -1,0 +1,89 @@
+{
+  "slug": "media",
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "ui",
+      "name": "_chrome"
+    },
+    {
+      "type": "ui",
+      "name": "_sizeWarning"
+    },
+    {
+      "type": "select",
+      "name": "folder",
+      "options": [
+        {
+          "value": "web/blog"
+        },
+        {
+          "value": "web/news"
+        },
+        {
+          "value": "web/guide"
+        },
+        {
+          "value": "web/resource"
+        },
+        {
+          "value": "web/event"
+        },
+        {
+          "value": "web/webinar"
+        },
+        {
+          "value": "web/job"
+        },
+        {
+          "value": "web/author"
+        },
+        {
+          "value": "web/about"
+        },
+        {
+          "value": "web/page"
+        },
+        {
+          "value": "web/general"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "name": "decorative"
+    },
+    {
+      "type": "text",
+      "name": "alt"
+    },
+    {
+      "type": "text",
+      "name": "caption"
+    },
+    {
+      "type": "text",
+      "name": "credit"
+    },
+    {
+      "type": "group",
+      "name": "focalPoint",
+      "fields": [
+        {
+          "type": "number",
+          "name": "x"
+        },
+        {
+          "type": "number",
+          "name": "y"
+        }
+      ]
+    }
+  ],
+  "hooks": {
+    "beforeChange": 1,
+    "afterChange": 0,
+    "beforeValidate": 1,
+    "afterDelete": 0
+  }
+}

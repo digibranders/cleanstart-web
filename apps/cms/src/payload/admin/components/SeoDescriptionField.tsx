@@ -103,6 +103,7 @@ export const SeoDescriptionField = (props: SeoDescriptionFieldProps): ReactEleme
           justifyContent: 'space-between',
           gap: 'var(--cs-space-2, 8px)',
           marginBottom: 4,
+          width: '100%',
         }}
       >
         <span>Meta Description</span>
@@ -123,8 +124,11 @@ export const SeoDescriptionField = (props: SeoDescriptionFieldProps): ReactEleme
           )}
           <span
             style={{
-              fontSize: 11,
-              fontWeight: 500,
+              display: 'inline-flex',
+              alignItems: 'center',
+              fontSize: 10.5,
+              fontWeight: 600,
+              letterSpacing: '0.04em',
               color: charColor,
               fontFeatureSettings: '"tnum" 1',
             }}

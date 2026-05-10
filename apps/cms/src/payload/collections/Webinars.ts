@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
@@ -19,6 +20,9 @@ export const Webinars: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'webinarType', 'region', 'startsAt', '_status', 'updatedAt'],
     group: 'Content',
+    components: {
+      edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true }),
+    },
   },
   access: {
     read: () => true,

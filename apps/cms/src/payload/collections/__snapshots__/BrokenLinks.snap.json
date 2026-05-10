@@ -1,0 +1,66 @@
+{
+  "slug": "brokenLinks",
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "url",
+      "required": true
+    },
+    {
+      "type": "select",
+      "name": "status",
+      "required": true,
+      "options": [
+        {
+          "value": "ok"
+        },
+        {
+          "value": "broken"
+        },
+        {
+          "value": "redirect"
+        },
+        {
+          "value": "network"
+        }
+      ]
+    },
+    {
+      "type": "number",
+      "name": "httpStatus"
+    },
+    {
+      "type": "text",
+      "name": "sourceCollection",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "sourceDocId",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "sourceDocSlug"
+    },
+    {
+      "type": "date",
+      "name": "firstSeenAt"
+    },
+    {
+      "type": "date",
+      "name": "lastChecked"
+    },
+    {
+      "type": "textarea",
+      "name": "note"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 0,
+    "afterChange": 0,
+    "beforeValidate": 0,
+    "afterDelete": 0
+  }
+}

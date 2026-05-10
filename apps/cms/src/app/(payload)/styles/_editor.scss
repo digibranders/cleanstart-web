@@ -22,7 +22,7 @@
   font-weight: 700;
   letter-spacing: -0.015em;
   margin: var(--cs-space-6) 0 var(--cs-space-3) 0;
-  color: var(--theme-text);
+  color: var(--cs-text-heading);
 }
 
 .LexicalEditorTheme__h1 {
@@ -138,6 +138,7 @@
 
 .ContentEditable__root {
   caret-color: var(--cs-cyan-500);
+  color: var(--cs-text-input);
   // Default minimum for the top-level body editor — generous writing
   // canvas. Nested editors (inside array rows / collapsibles / tabs)
   // override below so short answers don't get padded with empty space.
@@ -154,7 +155,7 @@
   &::selection,
   *::selection {
     background: var(--cs-tint-brand-medium);
-    color: var(--theme-text);
+    color: var(--cs-text-input);
   }
 }
 

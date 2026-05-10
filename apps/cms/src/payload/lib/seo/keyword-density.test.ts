@@ -53,4 +53,69 @@ describe('scoreKeywordDensity', () => {
     expect(r.titleOccurrences).toBe(1);
     expect(r.descriptionOccurrences).toBe(1);
   });
+
+  describe('heading + first-100-words signals', () => {
+    it('detects keyword in H2', () => {
+      const r = scoreKeywordDensity({
+        keyword: 'sbom signing',
+        bodyText: 'lorem ipsum',
+        headings: [{ level: 2, text: 'Why SBOM signing matters' }],
+      });
+      expect(r.inH2OrH3).toBe(true);
+    });
+
+    it('detects keyword in H3', () => {
+      const r = scoreKeywordDensity({
+        keyword: 'sbom',
+        bodyText: 'lorem',
+        headings: [{ level: 3, text: 'SBOM in production' }],
+      });
+      expect(r.inH2OrH3).toBe(true);
+    });
+
+    it('does NOT count H4-H6 toward inH2OrH3', () => {
+      const r = scoreKeywordDensity({
+        keyword: 'sbom',
+        bodyText: 'lorem',
+        headings: [
+          { level: 4, text: 'SBOM advanced' },
+          { level: 5, text: 'SBOM deep' },
+        ],
+      });
+      expect(r.inH2OrH3).toBe(false);
+    });
+
+    it('inH2OrH3 false when headings empty', () => {
+      const r = scoreKeywordDensity({
+        keyword: 'sbom',
+        bodyText: 'sbom is everywhere',
+      });
+      expect(r.inH2OrH3).toBe(false);
+    });
+
+    it('first-100-words: detects keyword in first paragraph when provided', () => {
+      const r = scoreKeywordDensity({
+        keyword: 'sbom',
+        bodyText: `${'filler '.repeat(200)}sbom`,
+        firstParagraphText: 'This article opens with SBOM front and centre.',
+      });
+      expect(r.inFirst100Words).toBe(true);
+    });
+
+    it('first-100-words: falls back to slicing body when firstParagraphText absent', () => {
+      const r = scoreKeywordDensity({
+        keyword: 'sbom',
+        bodyText: `sbom is the topic. ${'filler '.repeat(300)}`,
+      });
+      expect(r.inFirst100Words).toBe(true);
+    });
+
+    it('first-100-words: returns false when keyword appears only after the window', () => {
+      const r = scoreKeywordDensity({
+        keyword: 'sbom',
+        bodyText: `${'filler '.repeat(120)}sbom appears late`,
+      });
+      expect(r.inFirst100Words).toBe(false);
+    });
+  });
 });

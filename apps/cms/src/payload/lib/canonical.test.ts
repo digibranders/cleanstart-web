@@ -29,19 +29,16 @@ describe('validateCanonicalOverride', () => {
     if (!check.ok) expect(check.issue).toBe('not-https');
   });
 
-  it('warns on same-domain canonical (cleanstart.com)', () => {
-    const check = validateCanonicalOverride('https://cleanstart.com/blogs/sbom-101');
-    expect(check.ok).toBe(false);
-    if (!check.ok) {
-      expect(check.severity).toBe('warn');
-      expect(check.issue).toBe('same-domain');
-    }
+  it('passes same-domain canonical (cleanstart.com) — legitimate for facets / params / migrated URLs', () => {
+    expect(
+      validateCanonicalOverride('https://cleanstart.com/blogs/sbom-101').ok,
+    ).toBe(true);
   });
 
-  it('warns on same-domain canonical (www.cleanstart.com)', () => {
-    const check = validateCanonicalOverride('https://www.cleanstart.com/blogs/sbom-101');
-    expect(check.ok).toBe(false);
-    if (!check.ok) expect(check.issue).toBe('same-domain');
+  it('passes same-domain canonical (www.cleanstart.com)', () => {
+    expect(
+      validateCanonicalOverride('https://www.cleanstart.com/blogs/sbom-101').ok,
+    ).toBe(true);
   });
 
   it('warns on URLs with query strings', () => {
@@ -56,7 +53,7 @@ describe('validateCanonicalOverride', () => {
     if (!check.ok) expect(check.issue).toBe('has-query-or-fragment');
   });
 
-  it('passes a clean off-domain HTTPS canonical', () => {
+  it('passes a clean cross-domain HTTPS canonical', () => {
     expect(validateCanonicalOverride('https://medium.com/@me/sbom-101').ok).toBe(true);
   });
 });

@@ -1,5 +1,6 @@
 // =============================================================================
-// 4. Page chrome — doc-controls (sticky), step-nav (breadcrumb)
+// 4. Page chrome — doc-header (breadcrumb + title + tabs), doc-controls (meta
+//    + save buttons strip), step-nav (breadcrumb)
 // =============================================================================
 
 // Step nav (breadcrumb) — quieter, with slight wordmark tracking
@@ -18,37 +19,176 @@
   }
 }
 
-// Sticky doc controls — Webflow's editor strip stays visible while scrolling.
-// Add a low-opacity shadow when scrolled past the top so the strip lifts.
+// Doc header — Payload's default stack was breadcrumb · BIG title row ·
+// tab strip (Edit / Versions / API) · meta + actions. We've collapsed
+// it into one custom strip:
+//
+//   • The breadcrumb (.step-nav) stays.
+//   • The native title row + tab strip are hidden entirely.
+//   • A custom DocHeader (status badge · title · meta) renders inside
+//     the doc-controls strip via `beforeDocumentControls`.
+//   • Versions and API URL are reachable from the kebab popup
+//     (DocKebabExtras adds them via `editMenuItems`).
+//
+// "Edit" is gone (we are already on the edit view), so the user only
+// sees actionable affordances.
+.doc-header {
+  display: none !important;
+}
+
+.doc-tabs {
+  display: none !important;
+}
+
+// Sticky doc controls — now the canonical document header. Hosts our
+// custom DocHeader (title row + meta row, left) and Payload's native
+// Save Draft / Publish / kebab buttons (right) on a single visual band.
+//
+// Layout note: Payload renders `BeforeDocumentControls` (where we
+// inject DocHeader) INSIDE `.doc-controls__controls`, sibling to the
+// Save/Publish buttons — NOT inside `.doc-controls__content` (the
+// left slot). To get DocHeader visually on the left of the strip,
+// we collapse the now-empty `__content` slot (Status / LastModified /
+// Created meta is hidden because DocHeader replaces it) and let
+// `__controls-wrapper` fill the full row, with DocHeader pushed left
+// by `margin-right: auto`.
 .doc-controls {
   position: sticky;
   top: 0;
   z-index: 30;
   background: var(--theme-bg);
   border-bottom: 1px solid var(--theme-elevation-150);
-  padding-top: var(--cs-space-2);
-  padding-bottom: var(--cs-space-2);
+  // Match Payload's form column gutter on both sides so the DRAFT
+  // badge aligns with the Title label / first input on the left, and
+  // the kebab aligns with the right edge of the SEO sidebar inputs
+  // on the right.
+  //
+  // We split into longhand declarations (instead of the `padding`
+  // shorthand) because mixing CSS custom properties with a shorthand
+  // can invalidate the entire declaration when one of the vars is
+  // unresolved at the cascade level Payload renders this strip in.
+  // Each longhand has its own pixel fallback via `var(--…, <px>)`.
+  //
+  // `!important` is needed because Payload's `@layer payload-default`
+  // ships zeroing rules for the `gutter` class set this element
+  // carries (`gutter gutter--left gutter--right`) that win by source
+  // order at our viewport width.
+  padding-top: var(--cs-space-3, 12px) !important;
+  padding-bottom: var(--cs-space-3, 12px) !important;
+  padding-left: var(--gutter-h, 60px) !important;
+  padding-right: var(--gutter-h, 60px) !important;
   backdrop-filter: saturate(140%) blur(6px);
   transition: box-shadow var(--cs-motion-macro);
 
-  &__content {
-    gap: var(--cs-space-4);
+  &__wrapper {
+    height: auto;
+    min-height: 60px;
+    align-items: center;
+    // Payload's default `gap: 20px` between `__content` (left slot,
+    // which we hide) and `__controls-wrapper` would still push the
+    // controls 20px right even with the content slot collapsed. Zero
+    // it so DocHeader / Save Draft align with the form's gutter (x=60)
+    // not x=80.
+    gap: 0;
   }
 
+  // Empty when meta is hidden — `display: none` so it stops affecting
+  // flex layout entirely (collapsing alone still triggers the parent's
+  // gap between siblings).
+  &__content {
+    display: none;
+  }
+
+  // Hide Payload's native meta strip (Status · Last Modified · Created)
+  // — DocHeader replaces it.
   &__meta {
-    color: var(--theme-text-soft);
-    font-size: 13px;
+    display: none;
   }
 
   &__divider {
-    background: var(--theme-elevation-200);
-    width: 1px;
-    height: 18px;
-    margin-inline: var(--cs-space-2);
+    display: none;
   }
 
+  // Two-row layout target:
+  //
+  //   ┌──────────────────────────────────────────────────────────┐
+  //   │ DRAFT · hello · Modified 1h ago · — words · — read       │  ← row 1: DocHeader
+  //   │                  [Save Draft] [Publish ▾]    [⋮ kebab]   │  ← row 2: action row
+  //   └──────────────────────────────────────────────────────────┘
+  //
+  // Payload's DOM is awkward for this: `__controls-wrapper` has TWO
+  // children — `__controls` (Save/Publish/etc + DocHeader injected
+  // via beforeDocumentControls) and `__popup` (the kebab). When
+  // `__controls` wraps to a second row, `__popup` stays as a sibling
+  // and visually floats at the strip's top-right corner — out of
+  // alignment with the Save / Publish row below.
+  //
+  // Fix: `display: contents` on `__controls` dissolves its box, so
+  // DocHeader + Save + Publish + (Schedule ▾) + kebab all become flat
+  // siblings under `__controls-wrapper`'s flex layout. With wrapper
+  // set to `flex-wrap: wrap` + `justify-content: flex-end`, DocHeader
+  // claims row 1 (`flex: 1 0 100%`) and the rest wrap onto row 2,
+  // right-clustered together — kebab next to the action buttons.
   &__controls-wrapper {
+    flex: 1 1 auto;
+    min-width: 0;
+    align-self: center;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: var(--cs-space-2, 8px);
+    column-gap: var(--cs-space-2, 8px);
+  }
+
+  &__controls {
+    display: contents;
+  }
+
+  // DocHeader is dissolved (`display: contents`) so its two slots
+  // (`__top` = badge + title; `__meta` = Modified · Published · words ·
+  // read) become flat siblings under `__controls-wrapper`'s flex,
+  // alongside the action buttons. This lets us split DocHeader across
+  // rows:
+  //
+  //   ┌──────────────────────────────────────────────────────────────┐
+  //   │ ●LIVE  Long title here…                                      │  row 1 — __top, full width
+  //   │ Modified 2d ago · Published — · — words · — read   [Save Draft] [Publish ▾] [⋮]
+  //   │ ↑ __meta (left)                              action buttons (right) ↑
+  //   └──────────────────────────────────────────────────────────────┘
+  .cs-doc-header {
+    display: contents;
+  }
+
+  // Row 1: full-width title row. `order: -1` is defensive — DocHeader
+  // is already first in DOM, but explicit order survives DOM changes.
+  .cs-doc-header__top {
+    order: -1;
+    flex: 1 0 100%;
+    min-width: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
     gap: var(--cs-space-2);
+  }
+
+  // Row 2 left: the meta strip. `flex: 1 1 auto` makes it grow to
+  // absorb the slack, which (in flexbox) naturally pushes the
+  // intrinsic-width action buttons to the right edge — cleaner than
+  // relying on `justify-content` (which would lose to a flex-grow
+  // sibling anyway).
+  .cs-doc-header__meta {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+  }
+
+  // The kebab popup ends row 2. Without this, `.doc-controls__popup`
+  // would stay a flex sibling of `__controls-wrapper`'s actual children
+  // — but since we use `display: contents` on `__controls`, the kebab
+  // joins the same flex flow naturally and just needs to keep its
+  // intrinsic size.
+  &__popup {
+    flex: 0 0 auto;
   }
 }
 
@@ -69,4 +209,149 @@
       box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.18);
     }
   }
+}
+
+// =============================================================================
+// Right-rail scroll: Payload's native sidebar-wrap already implements
+// dual-pane scroll for us. `.document-fields__sidebar-wrap` is sticky
+// (top: var(--doc-controls-height)) and `.document-fields__sidebar`
+// inside it has `overflow-y: auto; height: 100%` from Payload's @layer.
+// We don't override that here — we want it. The Tier-1 dual-pane
+// rules below (in the `:has(.document-fields--has-sidebar)` block)
+// fix the body shell so the wrap's calc(100vh - …) actually has a
+// stable parent height to fill.
+// =============================================================================
+
+// =============================================================================
+// Dual-pane scroll for edit views with a sidebar.
+//
+// Goal: main column and right rail each scroll INDEPENDENTLY inside
+// the viewport. The page itself does not scroll. The page-edge
+// scrollbar therefore belongs to the rail; the main column gets its
+// own scrollbar at the column boundary (between main and sidebar).
+//
+// Scoped via `:has(.document-fields--has-sidebar)` so list views,
+// account, dashboard, and other Payload screens are unaffected.
+// =============================================================================
+
+html:has(.collection-edit .document-fields--has-sidebar),
+body:has(.collection-edit .document-fields--has-sidebar) {
+  height: 100%;
+  overflow: hidden;
+}
+
+// Override the html-level scrollbar-gutter: stable from earlier; the
+// page no longer scrolls, so reserving a gutter is meaningless and
+// would just leave a dead strip at the right edge.
+html:has(.collection-edit .document-fields--has-sidebar) {
+  scrollbar-gutter: auto;
+}
+
+// The unnamed Next.js root + template wrappers fill the viewport.
+body:has(.collection-edit .document-fields--has-sidebar) > div:first-of-type {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.template-default:has(.collection-edit .document-fields--has-sidebar) {
+  height: 100vh;
+}
+
+.template-default__wrap:has(.collection-edit .document-fields--has-sidebar) {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+
+  // app-header at the top stays in the flow; everything below shares
+  // the remaining viewport height.
+  > .app-header {
+    flex: 0 0 auto;
+  }
+
+  > main.collection-edit {
+    flex: 1 1 auto;
+    overflow: hidden;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.collection-edit:has(.document-fields--has-sidebar) {
+  > .collection-edit__form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+}
+
+// The form layer holds (in this order): the doc-controls strip
+// (sticky), the breadcrumb/step-nav slot, and the main-wrapper that
+// contains the actual form fields. Doc-controls and breadcrumb stay
+// in the flow at fixed sizes; main-wrapper takes the rest.
+.collection-edit__form:has(.document-fields--has-sidebar) {
+  > .doc-controls,
+  > .step-nav,
+  > .gutter--top {
+    flex: 0 0 auto;
+  }
+
+  > .collection-edit__main-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+}
+
+.collection-edit__main:has(.document-fields--has-sidebar) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+// The actual two-column row.
+.document-fields--has-sidebar {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+
+  // Each column: own scroll container. `min-width: 0` keeps long
+  // titles ellipsizing inside the rail's child cards.
+  > .document-fields__main,
+  > .document-fields__sidebar {
+    overflow-y: auto;
+    height: 100%;
+    min-width: 0;
+    // Stable gutter so card expand/collapse never shifts inner
+    // content sideways.
+    scrollbar-gutter: stable;
+  }
+
+  > .document-fields__sidebar {
+    overflow-y: auto;
+    height: 100%;
+    max-height: 100%;
+  }
+}
+
+// Bottom breathing room for both scroll columns. Without this, the
+// last card in the right rail (typically Featured/Pinned checkboxes
+// or whatever lives at the end of `seoFieldsForSidebar`) butts into
+// the viewport edge — looks unfinished. 32px gives a calm gutter.
+//
+// Targeted via the `*-wrap` sticky parent (which is the actual
+// scrollable in Payload's vendor SCSS) AND the bare class to cover
+// alternate Payload renders.
+.document-fields__sidebar,
+.document-fields__sidebar-wrap,
+.document-fields__main {
+  padding-bottom: var(--cs-space-8, 32px);
 }

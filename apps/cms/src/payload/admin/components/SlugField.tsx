@@ -82,7 +82,7 @@ type CollisionState =
   | { kind: 'collision'; conflictId: string };
 
 export const SlugField = (props: SlugFieldProps): ReactElement => {
-  const { source = 'title', required = false, description, label } = props;
+  const { source = 'title', required = false, label } = props;
   const path = props.path ?? 'slug';
   const inputId = useId();
 
@@ -197,46 +197,36 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
   }, [slugValue]);
 
   return (
-    <div className="field-type text" style={{ marginBottom: 'var(--cs-space-3, 12px)' }}>
-      <label
-        htmlFor={inputId}
-        className="field-label"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 'var(--cs-space-2, 8px)',
-          marginBottom: 4,
-        }}
-      >
-        <span>
+    <div className="cs-slug field-type text">
+      <label htmlFor={inputId} className="cs-slug__label">
+        <span className="cs-slug__label-text">
           {label ?? 'Slug'}
           {required && (
-            <span
-              aria-hidden="true"
-              style={{
-                color: 'var(--color-error-500)',
-                fontWeight: 700,
-                marginInlineStart: 4,
-              }}
-            >
+            <span aria-hidden="true" className="cs-slug__required">
               *
             </span>
           )}
         </span>
         {!manualMode && !docTitleEmpty && (
           <span
-            style={{
-              fontSize: 11,
-              color: 'var(--cs-cyan-500, #06c7f2)',
-              fontWeight: 500,
-              letterSpacing: 0.5,
-              textTransform: 'uppercase',
-            }}
-            title="Auto-synced from the title. Type here to override."
+            className="cs-slug__chip"
+            data-tone="auto"
+            title="Auto-synced from the title. Type to override."
           >
-            · auto
+            <span className="cs-slug__chip-dot" aria-hidden="true" />
+            Auto
           </span>
+        )}
+        {manualMode && collision.kind === 'available' && (
+          <output
+            aria-live="polite"
+            className="cs-slug__chip"
+            data-tone="ok"
+            title="This slug is unique in the collection."
+          >
+            <span className="cs-slug__chip-dot" aria-hidden="true" />
+            Available
+          </output>
         )}
       </label>
       <input
@@ -248,74 +238,23 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
         spellCheck={false}
         autoComplete="off"
         required={required}
+        className="cs-slug__input"
       />
-      <p
-        className="field-description"
-        style={{
-          margin: '4px 0 0 0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '0.5rem',
-        }}
-      >
-        <span style={{ fontSize: 12, color: 'var(--theme-text-soft, #a4a7af)' }}>
-          {manualMode
-            ? "Custom — won't track the title."
-            : (description ?? 'URL-safe slug. Auto-synced from the title.')}
-        </span>
-        {manualMode && !docTitleEmpty && (
+      {manualMode && !docTitleEmpty && (
+        <p className="cs-slug__hint">
           <button
             type="button"
             onClick={handleResetToTitle}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              fontSize: 12,
-              fontWeight: 500,
-              color: 'var(--cs-cyan-500, #06c7f2)',
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              textDecorationColor: 'rgba(6, 199, 242, 0.4)',
-              textUnderlineOffset: 2,
-            }}
+            className="cs-slug__reset"
           >
             Reset to title
           </button>
-        )}
-      </p>
+        </p>
+      )}
       {collision.kind === 'collision' ? (
-        <output
-          aria-live="polite"
-          style={{
-            display: 'flex',
-            margin: '4px 0 0 0',
-            fontSize: 12,
-            color: '#f08f8f',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <span aria-hidden style={{ fontWeight: 700 }}>!</span>
-          This slug is already used by another doc in this collection. Save
-          will fail at the unique constraint — pick a different slug.
-        </output>
-      ) : null}
-      {collision.kind === 'available' && manualMode ? (
-        <output
-          aria-live="polite"
-          style={{
-            display: 'flex',
-            margin: '4px 0 0 0',
-            fontSize: 11,
-            color: 'var(--theme-text-disabled, #6b6e77)',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <span aria-hidden style={{ color: '#7ddc9c', fontWeight: 700 }}>✓</span>
-          Slug is available.
+        <output aria-live="polite" className="cs-slug__collision">
+          <span aria-hidden="true">!</span>
+          This slug is already in use. Save will fail — pick a different one.
         </output>
       ) : null}
     </div>

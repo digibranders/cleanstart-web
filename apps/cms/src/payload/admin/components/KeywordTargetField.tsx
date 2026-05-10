@@ -4,9 +4,10 @@ import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useId, useMemo } from 'react';
 
-import { collectPlainText } from '../../lib/lexical-extract';
+import { collectPlainText, extractFromLexical } from '../../lib/lexical-extract';
 import {
   type DensityBand,
+  type HeadingExtract,
   scoreKeywordDensity,
 } from '../../lib/seo/keyword-density';
 
@@ -77,11 +78,20 @@ export const KeywordTargetField = (
 
   const result = useMemo(() => {
     if (!keyword || keyword.trim().length === 0) return null;
+    const summary = extractFromLexical(body);
+    // Translate Heading[] from lexical-extract into the
+    // HeadingExtract[] the scorer expects. Both share `level` + `text`
+    // by design; the cast is just narrowing the level union.
+    const headings: HeadingExtract[] = summary.headings.map((h) => ({
+      level: h.level as HeadingExtract['level'],
+      text: h.text,
+    }));
     return scoreKeywordDensity({
       keyword,
       bodyText: collectPlainText(body),
       title: seoTitle?.trim() || docTitle?.trim() || null,
       description: seoDesc?.trim() || sourceDesc?.trim() || null,
+      headings,
     });
   }, [keyword, body, seoTitle, docTitle, seoDesc, sourceDesc]);
 
@@ -142,6 +152,32 @@ export const KeywordTargetField = (
             }
           >
             Desc · {result.descriptionOccurrences > 0 ? '✓' : '✗'}
+          </span>
+          <span
+            style={{
+              ...chipStyle,
+              color: result.inH2OrH3 ? '#7ddc9c' : '#f0c45a',
+            }}
+            title={
+              result.inH2OrH3
+                ? 'Keyword appears in at least one H2 / H3 heading — strong topical signal.'
+                : 'Keyword missing from H2 / H3 headings — Google weights heading text heavily for topical relevance.'
+            }
+          >
+            H2/H3 · {result.inH2OrH3 ? '✓' : '✗'}
+          </span>
+          <span
+            style={{
+              ...chipStyle,
+              color: result.inFirst100Words ? '#7ddc9c' : '#f0c45a',
+            }}
+            title={
+              result.inFirst100Words
+                ? 'Keyword appears in the first 100 words — early-mention signal.'
+                : 'Keyword missing from the first 100 words — Google weights early body content heavily.'
+            }
+          >
+            Lead · {result.inFirst100Words ? '✓' : '✗'}
           </span>
         </div>
       ) : (

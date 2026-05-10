@@ -332,6 +332,60 @@ body:has(.drawer--is-open) .nav-toggler {
   border-top: 1px solid var(--theme-elevation-150);
 }
 
+// ─── Leave-without-saving modal — reverse visual primacy ────────────
+//
+// Default Payload behaviour: "Stay on this page" renders as a
+// secondary button (left) and "Leave anyway" renders as the primary
+// brand-coloured button (right). For an unsaved-changes warning,
+// that's backwards — the destructive choice (discard work) shouldn't
+// look like the safe default.
+//
+// Swap: promote "Stay on this page" to primary (cyan, on the right),
+// demote "Leave anyway" to a subdued secondary (muted, on the left).
+// Targeted by the modal's stable slug id `#leave-without-saving` so
+// other ConfirmationModals (delete dialogs, etc.) keep their default
+// destructive-primary affordance.
+#leave-without-saving {
+  // Visual order: Leave anyway (left, muted) · Stay on this page
+  // (right, primary). Use `order` instead of row-reverse so the
+  // controls strip's `justify-content: flex-end` keeps both buttons
+  // pinned to the right of the modal footer.
+  #confirm-action {
+    order: 1;
+  }
+  #confirm-cancel {
+    order: 2;
+  }
+
+  // "Stay on this page" — promote to primary cyan filled button.
+  #confirm-cancel {
+    background-color: var(--cs-cyan-500);
+    color: var(--theme-bg, #0a0a0a);
+    border-color: transparent;
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--cs-cyan-600, var(--cs-cyan-500));
+      color: var(--theme-bg, #0a0a0a);
+      filter: brightness(1.05);
+    }
+  }
+
+  // "Leave anyway" — demote to muted secondary (no brand fill).
+  #confirm-action {
+    background: transparent;
+    color: var(--theme-text-soft, var(--theme-elevation-700));
+    border: 1px solid var(--theme-elevation-200);
+
+    &:hover,
+    &:focus-visible {
+      background: var(--theme-elevation-100);
+      color: var(--theme-text);
+      border-color: var(--theme-elevation-300);
+    }
+  }
+}
+
 @keyframes cms-modal-in {
   from {
     transform: translateY(8px) scale(0.99);

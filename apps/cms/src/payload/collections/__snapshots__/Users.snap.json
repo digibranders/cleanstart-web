@@ -1,0 +1,34 @@
+{
+  "slug": "users",
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "name",
+      "required": true
+    },
+    {
+      "type": "select",
+      "name": "roles",
+      "required": true,
+      "hasMany": true,
+      "options": [
+        {
+          "value": "admin"
+        },
+        {
+          "value": "editor"
+        },
+        {
+          "value": "author"
+        }
+      ]
+    }
+  ],
+  "hooks": {
+    "beforeChange": 0,
+    "afterChange": 0,
+    "beforeValidate": 0,
+    "afterDelete": 0
+  }
+}

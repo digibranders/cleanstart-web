@@ -178,13 +178,167 @@ const advancedTwitterFields: Field[] = [
   }),
 ];
 
+// Robots-meta advanced directives.
+// ----------------------------------
+// `seo.indexable` (3-state) covers index / noindex / noindex,nofollow.
+// This subgroup adds the secondary `<meta name="robots">` directives:
+// noarchive / nosnippet / noimageindex / notranslate (booleans),
+// max-snippet / max-image-preview / max-video-preview (limits), and
+// unavailable_after (date). Composed into a single comma-list by
+// `composeRobotsMeta()` in lib/seo/robots-meta.ts when apps/web ships.
+//
+// JSON-LD has no robots equivalent — these are all `<meta>`-only.
+// Surfaced in the SEO advanced panel under a "Robots directives"
+// subsection (collapsed by default; most pages don't need them).
+const robotsAdvancedField: import('payload').GroupField = {
+  name: 'robotsAdvanced',
+  type: 'group',
+  admin: { hidden: true },
+  fields: [
+    {
+      name: 'noarchive',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { description: "Don't show a cached version in SERP." },
+    },
+    {
+      name: 'nosnippet',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { description: 'Suppress the textual snippet entirely (overrides max-snippet).' },
+    },
+    {
+      name: 'noimageindex',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { description: "Don't index images on this page." },
+    },
+    {
+      name: 'notranslate',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { description: "Don't show the 'Translate' link on this page." },
+    },
+    {
+      name: 'maxSnippet',
+      type: 'number',
+      admin: {
+        description:
+          'Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.',
+      },
+    },
+    {
+      name: 'maxImagePreview',
+      type: 'select',
+      // Override the auto-generated enum name — the default
+      // `enum_<collection>__seo_robots_advanced_max_image_preview`
+      // overflows Postgres' 63-char identifier limit on collections
+      // with versions enabled (which all our content collections do).
+      enumName: 'enum_seo_max_image_preview',
+      options: [
+        { label: 'Default (standard)', value: 'standard' },
+        { label: 'Large (≤1200 px) — best for Discover', value: 'large' },
+        { label: 'None (no preview)', value: 'none' },
+      ],
+      admin: {
+        description:
+          "`large` is the conventional pick for photo-heavy posts targeting Google Discover.",
+      },
+    },
+    {
+      name: 'maxVideoPreview',
+      type: 'number',
+      admin: {
+        description: 'Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.',
+      },
+    },
+    {
+      name: 'unavailableAfter',
+      type: 'date',
+      admin: {
+        description:
+          'Drop the page from the index after this date. Useful for time-bound campaigns / event landings.',
+        date: { pickerAppearance: 'dayAndTime' },
+      },
+    },
+  ],
+};
+
+// Hreflang alternates
+// --------------------
+// Per-page list of `<link rel="alternate" hreflang="…" href="…">`
+// rows, edited via paste-and-parse on the right-rail "Head tags" card.
+// Editors paste raw `<link>` tags from the source site (Eventus, etc.);
+// the client component parses them on blur into structured rows that
+// can be edited / removed individually.
+//
+// Rendering layer (apps/web + sitemap) pulls these via
+// `composeHreflangCluster()` in lib/seo/hreflang.ts, which also auto-
+// injects a self-reference and an `x-default` fallback so editors only
+// need to paste OTHER variants. See `composeHreflangCluster.test.ts`
+// for the cluster-construction contract.
+//
+// Hidden from the in-form group renderer — editing surface is the
+// `HeadTagsCard` Hreflang section.
+// Stored as JSON, not as a Payload `array`. The `array` machinery
+// requires the field to render somewhere so its row state registers
+// in the form, and our parent `seoFieldHidden` group is hidden in the
+// in-form area. JSON sidesteps the row registry entirely — the
+// sidebar `HeadTagsCard` reads/writes the blob via `useField` +
+// `setValue`. Defensive normalisation lives in
+// `lib/seo/hreflang.ts` so malformed shapes never reach renderers.
+const alternatesField: Field = {
+  name: 'alternates',
+  type: 'json',
+  admin: { hidden: true },
+};
+
+// Custom head tags
+// -----------------
+// Curated escape hatch for one-off `<meta>` tags. Two kinds in v1:
+//   meta-name     → `<meta name="…" content="…">`
+//   meta-property → `<meta property="…" content="…">`
+//
+// Covers ≈ 95% of real-world per-page tag asks (news_keywords,
+// format-detection, og:video, twitter:player, custom og:type, etc.)
+// without exposing a raw-HTML textarea. Editor picks a kind, fills
+// `key` + `content`. Composed by `composeCustomTags()` in
+// lib/seo/custom-tags.ts when apps/web ships.
+//
+// Hidden from the in-form group renderer — editing surface is the
+// `HeadTagsCard` in the right rail.
+// Same JSON-blob storage as `alternatesField` — see comment above.
+// Shape: `Array<{ kind: 'meta-name' | 'meta-property', key, content }>`.
+const customTagsField: Field = {
+  name: 'customTags',
+  type: 'json',
+  admin: { hidden: true },
+};
+
+// Canonical-URL behaviour
+// ------------------------
+// Every page is self-canonical by default: JSON-LD `url` /
+// `mainEntityOfPage` / `@id` are built from `<baseUrl><route-prefix>/
+// <slug>` via `docCanonicalUrl()` (see lib/jsonld/url.ts). When
+// `seo.useCustomCanonical === true` AND `seo.canonicalOverride` is a
+// valid absolute https URL (any domain — same-domain or cross-domain
+// are both legitimate), the override wins.
+//
+// Same-domain canonical is the right tool for facet / parameter
+// stripping, A/B test variants, paginated slices, and migrated URL
+// preservation — i.e. when the variant URL must keep serving content
+// but only one canonical URL should be indexed. Cross-domain
+// canonical is for syndicated content (Medium, partner sites, etc.).
+//
+// The two data fields below stay hidden from the in-form group
+// renderer; the editing surface is the right-rail `CanonicalField`
+// card mounted via `seoSidebarFields()`.
 const useCustomCanonicalField: Field = {
   name: 'useCustomCanonical',
   type: 'checkbox',
   defaultValue: false,
   admin: {
-    description:
-      'Only enable when this content was originally published elsewhere and you want Google to credit the original URL. For duplicate pages on cleanstart.com, use a redirect instead.',
+    hidden: true,
   },
 };
 
@@ -192,9 +346,7 @@ const canonicalOverrideField: Field = {
   name: 'canonicalOverride',
   type: 'text',
   admin: {
-    description:
-      'Off-domain canonical URL (HTTPS, no query/fragment). Validated at save time. Every change writes an audit row.',
-    condition: (_data, siblingData) => siblingData?.useCustomCanonical === true,
+    hidden: true,
   },
   validate: (
     value: string | string[] | null | undefined,
@@ -309,6 +461,9 @@ export const seoField: GroupField = {
     ...advancedTwitterFields,
     useCustomCanonicalField,
     canonicalOverrideField,
+    robotsAdvancedField,
+    alternatesField,
+    customTagsField,
     keywordTargetField,
     speakablePathField,
     additionalSchemaField,
@@ -475,20 +630,50 @@ export const seoSidebarFields = (args: {
       },
     },
     {
-      name: 'inboundRedirects',
+      // Canonical-URL card — surfaces the self-canonical that JSON-LD
+      // emits by default, and lets editors override with an off-domain
+      // canonical when content was originally published elsewhere.
+      // The override flows through `docCanonicalUrl()` in
+      // lib/jsonld/url.ts and replaces the self-URL in every JSON-LD
+      // `url` / `mainEntityOfPage` / `@id` field.
+      name: 'canonicalUrl',
       type: 'ui',
       admin: {
         position: 'sidebar',
         components: {
           Field: {
-            path: '@/payload/admin/components/InboundRedirectsField.tsx#InboundRedirectsField',
+            path: '@/payload/admin/components/CanonicalField.tsx#CanonicalField',
             clientProps: { pathPrefix, sourceField: urlSource },
           },
         },
       },
     },
     {
-      name: 'outboundRedirect',
+      // Social Card — OG image upload + alt + Facebook/X/LinkedIn live
+      // preview. Promoted out of `SeoAdvancedPanel` so the OG image
+      // (touched on ~40% of edits) is one click away instead of three
+      // card-expansions deep. Collapsed by default; sits below
+      // Canonical so the SERP/Schema/Canonical "what indexes" cluster
+      // stays contiguous, with social-share controls following.
+      name: 'socialCard',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/SocialCardField.tsx#SocialCardField',
+          },
+        },
+      },
+    },
+    {
+      // Renamed from "outboundRedirect"; the inbound-redirect sidebar
+      // card was removed (a page doesn't need to surface every URL
+      // pointing AT it inside its own edit view — the Redirects
+      // collection list is the place for that audit). What remains is
+      // the simpler "this page redirects to ___" affordance, labelled
+      // simply "Redirect" in the UI.
+      name: 'redirect',
       type: 'ui',
       admin: {
         position: 'sidebar',
@@ -496,6 +681,26 @@ export const seoSidebarFields = (args: {
           Field: {
             path: '@/payload/admin/components/OutboundRedirectField.tsx#OutboundRedirectField',
             clientProps: { pathPrefix, sourceField: urlSource },
+          },
+        },
+      },
+    },
+    {
+      // "Head/Header tags" — collapsed-by-default card with three
+      // sections: Quick add (universal paste), Other language versions
+      // (hreflang `seo.alternates`), Extra meta tags (`seo.customTags`).
+      // Robots directives intentionally NOT here — they live in the
+      // existing SEO Advanced surface so all advanced SEO controls
+      // stay in one place. Sits above URL change history so editors
+      // working on hreflang / meta tags don't have to scroll past a
+      // read-only audit log to reach an active editing surface.
+      name: 'headTags',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/HeadTagsCard.tsx#HeadTagsCard',
           },
         },
       },
@@ -509,31 +714,6 @@ export const seoSidebarFields = (args: {
           Field: {
             path: '@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField',
             clientProps: { pathPrefix, sourceField: urlSource },
-          },
-        },
-      },
-    },
-    {
-      name: 'bodyAudit',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: {
-            path: '@/payload/admin/components/BodyAuditField.tsx#BodyAuditField',
-          },
-        },
-      },
-    },
-    {
-      name: 'keywordTargetUi',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: {
-            path: '@/payload/admin/components/KeywordTargetField.tsx#KeywordTargetField',
-            clientProps: { titleSource, descriptionSource },
           },
         },
       },

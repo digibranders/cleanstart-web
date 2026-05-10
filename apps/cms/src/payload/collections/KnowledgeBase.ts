@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
@@ -28,6 +29,9 @@ export const KnowledgeBase: CollectionConfig = {
     group: 'Content',
     description:
       'Technical knowledge-base articles surfaced under /knowledge-hub. Each article gets its own indexable URL — replaces the single-page Webflow KB.',
+    components: {
+      edit: docStatusBarEditConfig({ showStats: true, showPublishedAt: true }),
+    },
   },
   access: {
     read: () => true,
@@ -58,25 +62,6 @@ export const KnowledgeBase: CollectionConfig = {
     },
     { name: 'body', type: 'richText' },
     {
-      name: 'reviewedBy',
-      type: 'relationship',
-      relationTo: 'authors',
-      admin: {
-        description:
-          'Author who reviewed this article for technical accuracy. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal for KB content.',
-      },
-    },
-    {
-      name: 'lastReviewedAt',
-      type: 'date',
-      admin: {
-        description:
-          'Date of the most recent technical review. Surfaced as Schema.org dateReviewed.',
-        date: { pickerAppearance: 'dayAndTime' },
-        position: 'sidebar',
-      },
-    },
-    {
       name: 'faqsBulkPaste',
       type: 'ui',
       admin: {
@@ -105,22 +90,31 @@ export const KnowledgeBase: CollectionConfig = {
       ],
     },
     {
+      name: 'reviewedBy',
+      type: 'relationship',
+      relationTo: 'authors',
+      admin: {
+        description:
+          'Author who reviewed this article for technical accuracy. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal for KB content.',
+      },
+    },
+    {
+      name: 'lastReviewedAt',
+      type: 'date',
+      admin: {
+        description:
+          'Date of the most recent technical review. Surfaced as Schema.org dateReviewed.',
+        date: { pickerAppearance: 'dayAndTime' },
+        position: 'sidebar',
+      },
+    },
+    {
       name: 'relatedArticles',
       type: 'relationship',
       relationTo: 'knowledgeBase',
       hasMany: true,
       admin: {
         description: 'Manually curated. Empty = listing component picks by category.',
-      },
-    },
-    {
-      name: 'bodyStats',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: '@/payload/admin/components/BodyStatsField.tsx#BodyStatsField',
-        },
       },
     },
     {
@@ -140,8 +134,8 @@ export const KnowledgeBase: CollectionConfig = {
     publishedAtField,
     ...seoSidebarFields({ pathPrefix: '/knowledge-hub', descriptionSource: 'abstract' }),
     {
-      // Data-only — surfaced via the `bodyStats` pill at the top of the
-      // sidebar. Hidden here so the form doesn't double-render.
+      // Data-only — surfaced via the DocStatusBar in the top status bar.
+      // Hidden here so the form doesn't double-render.
       name: 'readingMinutes',
       type: 'number',
       access: { update: () => false },
@@ -160,15 +154,19 @@ export const KnowledgeBase: CollectionConfig = {
       labels: { singular: 'Heading', plural: 'Table of contents' },
       admin: {
         readOnly: true,
+        initCollapsed: true,
         description: 'Auto-built from H2/H3 headings in the body on save.',
         components: {
           RowLabel: '@/payload/admin/components/TocRowLabel.tsx#TocRowLabel',
         },
       },
       fields: [
-        { name: 'level', type: 'number' },
-        { name: 'text', type: 'text' },
-        { name: 'anchor', type: 'text' },
+        // Sub-fields explicitly readOnly: parent array's
+        // `admin.readOnly` doesn't propagate to children rendered by
+        // custom Field adapters.
+        { name: 'level', type: 'number', admin: { readOnly: true } },
+        { name: 'text', type: 'text', admin: { readOnly: true } },
+        { name: 'anchor', type: 'text', admin: { readOnly: true } },
       ],
     },
     ...seoFieldsForSidebar('knowledgeBase'),

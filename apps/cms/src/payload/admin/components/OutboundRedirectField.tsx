@@ -253,11 +253,11 @@ export const OutboundRedirectField = (
   const hasOutbound = row != null;
 
   const summaryText = (() => {
-    if (fetchState.status === 'loading') return 'Checking…';
-    if (fetchState.status === 'error') return 'Failed to load';
-    if (!hasOutbound) return 'Page serves its own content';
-    if (row.status === '410') return `${row.status} · gone`;
-    return `→ ${row.to ?? ''} · ${row.status}`;
+    if (fetchState.status === 'loading') return 'Checking';
+    if (fetchState.status === 'error') return 'Error';
+    if (!hasOutbound) return 'None';
+    if (row.status === '410') return 'Gone';
+    return 'Redirected';
   })();
 
   return (
@@ -273,7 +273,7 @@ export const OutboundRedirectField = (
         aria-controls={headingId}
         onClick={() => setExpanded((v) => !v)}
       >
-        <span className="cs-outbound-redirect__title">Outbound redirect</span>
+        <span className="cs-outbound-redirect__title">Redirect</span>
         <span
           className="cs-outbound-redirect__summary"
           data-tone={
@@ -293,18 +293,6 @@ export const OutboundRedirectField = (
 
       {expanded && (
         <div id={headingId} className="cs-outbound-redirect__body">
-          {hasOutbound && !editing && (
-            <div className="cs-outbound-redirect__active-banner" role="note">
-              <span className="cs-outbound-redirect__active-banner-icon" aria-hidden="true">
-                ⚠
-              </span>
-              <span>
-                This page is shadowed by a redirect — visitors don&rsquo;t see
-                the page content; they&rsquo;re routed to the target below.
-              </span>
-            </div>
-          )}
-
           {fetchState.status === 'error' && (
             <p
               className="cs-outbound-redirect__hint"
@@ -330,26 +318,14 @@ export const OutboundRedirectField = (
               onDisable={handleDisable}
             />
           ) : isLive ? (
-            <>
-              <p className="cs-outbound-redirect__hint">
-                This page serves its own content. Set an outbound redirect to
-                retire it (301), shadow it temporarily (307), or mark it gone
-                (410) without deleting the doc.
-              </p>
-              <button
-                type="button"
-                onClick={handleEnableClick}
-                className="cs-outbound-redirect__add"
-              >
-                + Set up an outbound redirect
-              </button>
-            </>
-          ) : (
-            <p className="cs-outbound-redirect__hint">
-              Publish the page first — outbound redirects only make sense on a
-              URL that already resolves.
-            </p>
-          )}
+            <button
+              type="button"
+              onClick={handleEnableClick}
+              className="cs-outbound-redirect__add"
+            >
+              + Set up an outbound redirect
+            </button>
+          ) : null}
         </div>
       )}
     </div>
@@ -436,7 +412,6 @@ const InlineForm = (props: InlineFormProps): ReactElement => {
   const toId = useId();
   const statusId = useId();
   const notesId = useId();
-  const currentStatusHint = STATUS_OPTIONS.find((o) => o.value === form.status)?.hint;
 
   return (
     <div className="cs-outbound-redirect__form">
@@ -455,9 +430,6 @@ const InlineForm = (props: InlineFormProps): ReactElement => {
           </option>
         ))}
       </select>
-      {currentStatusHint && (
-        <p className="cs-outbound-redirect__form-hint">{currentStatusHint}</p>
-      )}
 
       {!isGone && (
         <>
@@ -475,11 +447,6 @@ const InlineForm = (props: InlineFormProps): ReactElement => {
             autoComplete="off"
             className="cs-outbound-redirect__input"
           />
-          <p className="cs-outbound-redirect__form-hint">
-            Site-relative path (e.g. <code>/products</code>) or a full
-            <code> https://</code> URL. Avoid pointing at another redirect — the
-            chain-collapse hook will rewrite it on save.
-          </p>
         </>
       )}
 
@@ -490,7 +457,6 @@ const InlineForm = (props: InlineFormProps): ReactElement => {
         id={notesId}
         value={form.notes}
         onChange={onChange('notes')}
-        placeholder="Why this page redirects (campaign retirement, replaced page, etc.). Future editors thank you."
         rows={2}
         className="cs-outbound-redirect__textarea"
       />
