@@ -35,6 +35,12 @@ const FIELD_OVERRIDES: Partial<Record<Field['type'], string>> = {
   select: '@/payload/admin/components/fields/SelectField.tsx#SelectField',
   checkbox: '@/payload/admin/components/fields/CheckboxField.tsx#CheckboxField',
   radio: '@/payload/admin/components/fields/RadioField.tsx#RadioField',
+  // Wave 2 part 2 — structural fields. Both wrap a labelled chrome
+  // around Payload's `RenderFields` so children stamped above keep
+  // resolving to our custom Field components.
+  group: '@/payload/admin/components/fields/GroupField.tsx#GroupField',
+  collapsible:
+    '@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField',
 };
 
 const hasOwnFieldOverride = (field: Field): boolean => {

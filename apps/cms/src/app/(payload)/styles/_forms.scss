@@ -362,6 +362,95 @@
 }
 
 // =============================================================================
+// Group field (Wave 2 part 2) — labelled fieldset around RenderFields
+// =============================================================================
+.cs-group {
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  margin: var(--cs-space-3) 0;
+  padding: var(--cs-space-5);
+
+  &__legend {
+    color: var(--cs-text-heading);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0 var(--cs-space-2);
+    text-transform: uppercase;
+  }
+
+  &__description {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    line-height: 1.4;
+    margin: 0 0 var(--cs-space-3);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
+  }
+}
+
+// =============================================================================
+// Collapsible field (Wave 2 part 2) — <details>-based expand/collapse
+// =============================================================================
+.cs-collapsible {
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  margin: var(--cs-space-3) 0;
+
+  &__summary {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    font-weight: 600;
+    gap: var(--cs-space-2);
+    list-style: none;
+    padding: var(--cs-space-3) var(--cs-space-4);
+    user-select: none;
+
+    &::-webkit-details-marker { display: none; }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__chevron {
+    color: var(--theme-text-soft);
+    display: inline-flex;
+    transition: transform var(--cs-motion-micro);
+  }
+
+  &.is-open .cs-collapsible__chevron {
+    transform: rotate(180deg);
+  }
+
+  &__title { color: var(--cs-text-heading); }
+
+  &__description {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    line-height: 1.4;
+    margin: 0 var(--cs-space-4) var(--cs-space-2);
+  }
+
+  &__body {
+    border-top: 1px solid var(--theme-elevation-150);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
+    padding: var(--cs-space-4);
+  }
+}
+
+// =============================================================================
 // Point field — two number inputs side by side (lng / lat)
 // =============================================================================
 .cs-point-field {

@@ -72,11 +72,18 @@ const ALLOW_LIST = new Set<string>([
   'escapeDiffHTML',
   'unescapeDiffHTML',
   'fieldComponents',
-  // ----- transitional render-side imports (TODO: remove in Wave 6) -----
+  // ----- transitional render-side imports (TODO: remove in later waves) -----
   // `PopupList` is used in DocKebabExtras.tsx pending replacement with
   // @cleanstart/ui DropdownMenu under the kebab. Tracked as part of
   // Wave 6.
   'PopupList',
+  // `RenderFields` composes the inner field tree of structural fields
+  // (Group, Collapsible, Tabs, Array, Blocks). It owns the
+  // intersection-observer lazy-render pipeline tied into Payload's
+  // RSC route. Replacing it cleanly is a Wave 8 follow-up; until then
+  // our structural field components import it to delegate inner-tree
+  // composition while owning the chrome.
+  'RenderFields',
 ]);
 
 const TARGET = '@payloadcms/ui';
