@@ -1,0 +1,139 @@
+{
+  "slug": "leads",
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "relationship",
+      "name": "form",
+      "required": true,
+      "relationTo": "forms"
+    },
+    {
+      "type": "number",
+      "name": "formSchemaVersion",
+      "required": true
+    },
+    {
+      "type": "json",
+      "name": "fields",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "source"
+    },
+    {
+      "type": "group",
+      "name": "utm",
+      "fields": [
+        {
+          "type": "text",
+          "name": "campaign"
+        },
+        {
+          "type": "text",
+          "name": "source"
+        },
+        {
+          "type": "text",
+          "name": "medium"
+        },
+        {
+          "type": "text",
+          "name": "term"
+        },
+        {
+          "type": "text",
+          "name": "content"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "ip"
+    },
+    {
+      "type": "text",
+      "name": "userAgent"
+    },
+    {
+      "type": "date",
+      "name": "consentGivenAt"
+    },
+    {
+      "type": "textarea",
+      "name": "consentSnapshot"
+    },
+    {
+      "type": "text",
+      "name": "privacyPolicyVersion"
+    },
+    {
+      "type": "array",
+      "name": "consentCategories",
+      "fields": [
+        {
+          "type": "text",
+          "name": "category"
+        }
+      ]
+    },
+    {
+      "type": "array",
+      "name": "syncedTo",
+      "fields": [
+        {
+          "type": "text",
+          "name": "handler",
+          "required": true
+        },
+        {
+          "type": "select",
+          "name": "status",
+          "required": true,
+          "options": [
+            {
+              "value": "pending"
+            },
+            {
+              "value": "synced"
+            },
+            {
+              "value": "failed"
+            },
+            {
+              "value": "skipped"
+            }
+          ]
+        },
+        {
+          "type": "date",
+          "name": "syncedAt"
+        },
+        {
+          "type": "text",
+          "name": "externalId"
+        },
+        {
+          "type": "text",
+          "name": "error"
+        }
+      ]
+    },
+    {
+      "type": "json",
+      "name": "enriched"
+    },
+    {
+      "type": "relationship",
+      "name": "duplicateOf",
+      "relationTo": "leads"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 0,
+    "afterChange": 0,
+    "beforeValidate": 0,
+    "afterDelete": 1
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "slug": "redirects",
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "from",
+      "required": true,
+      "unique": true
+    },
+    {
+      "type": "select",
+      "name": "status",
+      "required": true,
+      "options": [
+        {
+          "value": "301"
+        },
+        {
+          "value": "302"
+        },
+        {
+          "value": "307"
+        },
+        {
+          "value": "308"
+        },
+        {
+          "value": "410"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "to"
+    },
+    {
+      "type": "select",
+      "name": "source",
+      "required": true,
+      "options": [
+        {
+          "value": "manual"
+        },
+        {
+          "value": "slug-change"
+        },
+        {
+          "value": "archive-with-redirect"
+        },
+        {
+          "value": "migration-seed"
+        }
+      ]
+    },
+    {
+      "type": "textarea",
+      "name": "notes"
+    },
+    {
+      "type": "number",
+      "name": "hitCount"
+    },
+    {
+      "type": "date",
+      "name": "lastHitAt"
+    },
+    {
+      "type": "ui",
+      "name": "staleness"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 1,
+    "afterChange": 0,
+    "beforeValidate": 0,
+    "afterDelete": 0
+  }
+}

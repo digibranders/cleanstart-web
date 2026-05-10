@@ -1,0 +1,3241 @@
+{
+  "slug": "pages",
+  "versions": {
+    "drafts": true
+  },
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "title",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "slug",
+      "required": true
+    },
+    {
+      "type": "relationship",
+      "name": "parent",
+      "relationTo": "pages"
+    },
+    {
+      "type": "text",
+      "name": "path"
+    },
+    {
+      "type": "array",
+      "name": "breadcrumb",
+      "fields": [
+        {
+          "type": "text",
+          "name": "path",
+          "required": true
+        },
+        {
+          "type": "text",
+          "name": "label",
+          "required": true
+        }
+      ]
+    },
+    {
+      "type": "ui",
+      "name": "permalink"
+    },
+    {
+      "type": "blocks",
+      "name": "layout",
+      "blocks": [
+        {
+          "slug": "section",
+          "fields": [
+            {
+              "type": "select",
+              "name": "variant",
+              "required": true,
+              "options": [
+                {
+                  "value": "stack"
+                },
+                {
+                  "value": "two-column"
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "name": "gap",
+              "options": [
+                {
+                  "value": "sm"
+                },
+                {
+                  "value": "md"
+                },
+                {
+                  "value": "lg"
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "name": "alignment",
+              "options": [
+                {
+                  "value": "start"
+                },
+                {
+                  "value": "center"
+                },
+                {
+                  "value": "end"
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "name": "background",
+              "options": [
+                {
+                  "value": "none"
+                },
+                {
+                  "value": "surface"
+                },
+                {
+                  "value": "inverted"
+                }
+              ]
+            },
+            {
+              "type": "blocks",
+              "name": "children",
+              "required": true,
+              "blocks": [
+                {
+                  "slug": "hero",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "eyebrow"
+                    },
+                    {
+                      "type": "text",
+                      "name": "headline",
+                      "required": true
+                    },
+                    {
+                      "type": "textarea",
+                      "name": "sub"
+                    },
+                    {
+                      "type": "group",
+                      "name": "primaryCta",
+                      "fields": [
+                        {
+                          "type": "select",
+                          "name": "variant",
+                          "options": [
+                            {
+                              "value": "primary"
+                            },
+                            {
+                              "value": "secondary"
+                            },
+                            {
+                              "value": "ghost"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "name": "trackingId"
+                        },
+                        {
+                          "type": "group",
+                          "name": "link",
+                          "fields": [
+                            {
+                              "type": "text",
+                              "name": "text"
+                            },
+                            {
+                              "type": "select",
+                              "name": "kind",
+                              "options": [
+                                {
+                                  "value": "doc"
+                                },
+                                {
+                                  "value": "media"
+                                },
+                                {
+                                  "value": "url"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "relationship",
+                              "name": "target",
+                              "relationTo": [
+                                "pages",
+                                "blogs",
+                                "news",
+                                "guides",
+                                "resources",
+                                "events",
+                                "webinars",
+                                "jobs",
+                                "authors",
+                                "categories",
+                                "newsCategories"
+                              ]
+                            },
+                            {
+                              "type": "upload",
+                              "name": "mediaTarget",
+                              "relationTo": "media"
+                            },
+                            {
+                              "type": "text",
+                              "name": "url"
+                            },
+                            {
+                              "type": "checkbox",
+                              "name": "newTab"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "group",
+                      "name": "secondaryCta",
+                      "fields": [
+                        {
+                          "type": "select",
+                          "name": "variant",
+                          "options": [
+                            {
+                              "value": "primary"
+                            },
+                            {
+                              "value": "secondary"
+                            },
+                            {
+                              "value": "ghost"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "name": "trackingId"
+                        },
+                        {
+                          "type": "group",
+                          "name": "link",
+                          "fields": [
+                            {
+                              "type": "text",
+                              "name": "text"
+                            },
+                            {
+                              "type": "select",
+                              "name": "kind",
+                              "options": [
+                                {
+                                  "value": "doc"
+                                },
+                                {
+                                  "value": "media"
+                                },
+                                {
+                                  "value": "url"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "relationship",
+                              "name": "target",
+                              "relationTo": [
+                                "pages",
+                                "blogs",
+                                "news",
+                                "guides",
+                                "resources",
+                                "events",
+                                "webinars",
+                                "jobs",
+                                "authors",
+                                "categories",
+                                "newsCategories"
+                              ]
+                            },
+                            {
+                              "type": "upload",
+                              "name": "mediaTarget",
+                              "relationTo": "media"
+                            },
+                            {
+                              "type": "text",
+                              "name": "url"
+                            },
+                            {
+                              "type": "checkbox",
+                              "name": "newTab"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "group",
+                      "name": "background",
+                      "fields": [
+                        {
+                          "type": "select",
+                          "name": "kind",
+                          "options": [
+                            {
+                              "value": "none"
+                            },
+                            {
+                              "value": "image"
+                            },
+                            {
+                              "value": "video"
+                            },
+                            {
+                              "value": "gradient"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "upload",
+                          "name": "media",
+                          "relationTo": "media"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "cta",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "headline",
+                      "required": true
+                    },
+                    {
+                      "type": "textarea",
+                      "name": "body"
+                    },
+                    {
+                      "type": "group",
+                      "name": "primaryCta",
+                      "fields": [
+                        {
+                          "type": "select",
+                          "name": "variant",
+                          "options": [
+                            {
+                              "value": "primary"
+                            },
+                            {
+                              "value": "secondary"
+                            },
+                            {
+                              "value": "ghost"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "name": "trackingId"
+                        },
+                        {
+                          "type": "group",
+                          "name": "link",
+                          "fields": [
+                            {
+                              "type": "text",
+                              "name": "text"
+                            },
+                            {
+                              "type": "select",
+                              "name": "kind",
+                              "options": [
+                                {
+                                  "value": "doc"
+                                },
+                                {
+                                  "value": "media"
+                                },
+                                {
+                                  "value": "url"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "relationship",
+                              "name": "target",
+                              "relationTo": [
+                                "pages",
+                                "blogs",
+                                "news",
+                                "guides",
+                                "resources",
+                                "events",
+                                "webinars",
+                                "jobs",
+                                "authors",
+                                "categories",
+                                "newsCategories"
+                              ]
+                            },
+                            {
+                              "type": "upload",
+                              "name": "mediaTarget",
+                              "relationTo": "media"
+                            },
+                            {
+                              "type": "text",
+                              "name": "url"
+                            },
+                            {
+                              "type": "checkbox",
+                              "name": "newTab"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "group",
+                      "name": "secondaryCta",
+                      "fields": [
+                        {
+                          "type": "select",
+                          "name": "variant",
+                          "options": [
+                            {
+                              "value": "primary"
+                            },
+                            {
+                              "value": "secondary"
+                            },
+                            {
+                              "value": "ghost"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "name": "trackingId"
+                        },
+                        {
+                          "type": "group",
+                          "name": "link",
+                          "fields": [
+                            {
+                              "type": "text",
+                              "name": "text"
+                            },
+                            {
+                              "type": "select",
+                              "name": "kind",
+                              "options": [
+                                {
+                                  "value": "doc"
+                                },
+                                {
+                                  "value": "media"
+                                },
+                                {
+                                  "value": "url"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "relationship",
+                              "name": "target",
+                              "relationTo": [
+                                "pages",
+                                "blogs",
+                                "news",
+                                "guides",
+                                "resources",
+                                "events",
+                                "webinars",
+                                "jobs",
+                                "authors",
+                                "categories",
+                                "newsCategories"
+                              ]
+                            },
+                            {
+                              "type": "upload",
+                              "name": "mediaTarget",
+                              "relationTo": "media"
+                            },
+                            {
+                              "type": "text",
+                              "name": "url"
+                            },
+                            {
+                              "type": "checkbox",
+                              "name": "newTab"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "select",
+                      "name": "background",
+                      "options": [
+                        {
+                          "value": "surface"
+                        },
+                        {
+                          "value": "inverted"
+                        },
+                        {
+                          "value": "brand"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "richText",
+                  "fields": [
+                    {
+                      "type": "richText",
+                      "name": "body",
+                      "required": true
+                    },
+                    {
+                      "type": "select",
+                      "name": "maxWidth",
+                      "options": [
+                        {
+                          "value": "prose"
+                        },
+                        {
+                          "value": "wide"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "formBlock",
+                  "fields": [
+                    {
+                      "type": "relationship",
+                      "name": "form",
+                      "required": true,
+                      "relationTo": "forms"
+                    },
+                    {
+                      "type": "text",
+                      "name": "headline"
+                    },
+                    {
+                      "type": "textarea",
+                      "name": "description"
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "overridePostSubmit"
+                    },
+                    {
+                      "type": "group",
+                      "name": "postSubmit",
+                      "fields": [
+                        {
+                          "type": "select",
+                          "name": "kind",
+                          "options": [
+                            {
+                              "value": "message"
+                            },
+                            {
+                              "value": "redirect"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "richText",
+                          "name": "body"
+                        },
+                        {
+                          "type": "text",
+                          "name": "url"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "select",
+                      "name": "layout",
+                      "options": [
+                        {
+                          "value": "inline"
+                        },
+                        {
+                          "value": "split"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "featureGrid",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "eyebrow"
+                    },
+                    {
+                      "type": "text",
+                      "name": "heading"
+                    },
+                    {
+                      "type": "textarea",
+                      "name": "sub"
+                    },
+                    {
+                      "type": "select",
+                      "name": "columns",
+                      "options": [
+                        {
+                          "value": "2"
+                        },
+                        {
+                          "value": "3"
+                        },
+                        {
+                          "value": "4"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "array",
+                      "name": "features",
+                      "required": true,
+                      "fields": [
+                        {
+                          "type": "upload",
+                          "name": "icon",
+                          "relationTo": "media"
+                        },
+                        {
+                          "type": "text",
+                          "name": "title",
+                          "required": true
+                        },
+                        {
+                          "type": "textarea",
+                          "name": "body"
+                        },
+                        {
+                          "type": "group",
+                          "name": "link",
+                          "fields": [
+                            {
+                              "type": "text",
+                              "name": "text"
+                            },
+                            {
+                              "type": "select",
+                              "name": "kind",
+                              "options": [
+                                {
+                                  "value": "doc"
+                                },
+                                {
+                                  "value": "media"
+                                },
+                                {
+                                  "value": "url"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "relationship",
+                              "name": "target",
+                              "relationTo": [
+                                "pages",
+                                "blogs",
+                                "news",
+                                "guides",
+                                "resources",
+                                "events",
+                                "webinars",
+                                "jobs",
+                                "authors",
+                                "categories",
+                                "newsCategories"
+                              ]
+                            },
+                            {
+                              "type": "upload",
+                              "name": "mediaTarget",
+                              "relationTo": "media"
+                            },
+                            {
+                              "type": "text",
+                              "name": "url"
+                            },
+                            {
+                              "type": "checkbox",
+                              "name": "newTab"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "logoCloud",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "heading"
+                    },
+                    {
+                      "type": "array",
+                      "name": "logos",
+                      "required": true,
+                      "fields": [
+                        {
+                          "type": "upload",
+                          "name": "image",
+                          "required": true,
+                          "relationTo": "media"
+                        },
+                        {
+                          "type": "text",
+                          "name": "alt",
+                          "required": true
+                        },
+                        {
+                          "type": "text",
+                          "name": "url"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "monochrome"
+                    }
+                  ]
+                },
+                {
+                  "slug": "integrationLogos",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "heading"
+                    },
+                    {
+                      "type": "textarea",
+                      "name": "sub"
+                    },
+                    {
+                      "type": "array",
+                      "name": "integrations",
+                      "required": true,
+                      "fields": [
+                        {
+                          "type": "text",
+                          "name": "name",
+                          "required": true
+                        },
+                        {
+                          "type": "upload",
+                          "name": "logo",
+                          "required": true,
+                          "relationTo": "media"
+                        },
+                        {
+                          "type": "select",
+                          "name": "category",
+                          "options": [
+                            {
+                              "value": "ci-cd"
+                            },
+                            {
+                              "value": "registry"
+                            },
+                            {
+                              "value": "kubernetes"
+                            },
+                            {
+                              "value": "cloud"
+                            },
+                            {
+                              "value": "security"
+                            },
+                            {
+                              "value": "observability"
+                            },
+                            {
+                              "value": "other"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "name": "url"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "testimonial",
+                  "fields": [
+                    {
+                      "type": "textarea",
+                      "name": "quote",
+                      "required": true
+                    },
+                    {
+                      "type": "text",
+                      "name": "person",
+                      "required": true
+                    },
+                    {
+                      "type": "text",
+                      "name": "role"
+                    },
+                    {
+                      "type": "text",
+                      "name": "company"
+                    },
+                    {
+                      "type": "upload",
+                      "name": "companyLogo",
+                      "relationTo": "media"
+                    },
+                    {
+                      "type": "upload",
+                      "name": "avatar",
+                      "relationTo": "media"
+                    },
+                    {
+                      "type": "select",
+                      "name": "variant",
+                      "options": [
+                        {
+                          "value": "card"
+                        },
+                        {
+                          "value": "pull-quote"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "stats",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "heading"
+                    },
+                    {
+                      "type": "array",
+                      "name": "metrics",
+                      "required": true,
+                      "fields": [
+                        {
+                          "type": "text",
+                          "name": "value",
+                          "required": true
+                        },
+                        {
+                          "type": "text",
+                          "name": "label",
+                          "required": true
+                        },
+                        {
+                          "type": "text",
+                          "name": "sublabel"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "metricsBar",
+                  "fields": [
+                    {
+                      "type": "array",
+                      "name": "metrics",
+                      "required": true,
+                      "fields": [
+                        {
+                          "type": "text",
+                          "name": "label",
+                          "required": true
+                        },
+                        {
+                          "type": "text",
+                          "name": "value",
+                          "required": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "select",
+                      "name": "background",
+                      "options": [
+                        {
+                          "value": "inverted"
+                        },
+                        {
+                          "value": "surface"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "faq",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "heading"
+                    },
+                    {
+                      "type": "textarea",
+                      "name": "sub"
+                    },
+                    {
+                      "type": "ui",
+                      "name": "bulkPaste"
+                    },
+                    {
+                      "type": "array",
+                      "name": "items",
+                      "required": true,
+                      "fields": [
+                        {
+                          "type": "text",
+                          "name": "question",
+                          "required": true
+                        },
+                        {
+                          "type": "textarea",
+                          "name": "answer",
+                          "required": true
+                        }
+                      ]
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "allowMultipleOpen"
+                    }
+                  ]
+                },
+                {
+                  "slug": "gallery",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "heading"
+                    },
+                    {
+                      "type": "select",
+                      "name": "layout",
+                      "options": [
+                        {
+                          "value": "grid"
+                        },
+                        {
+                          "value": "masonry"
+                        },
+                        {
+                          "value": "carousel"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "array",
+                      "name": "images",
+                      "required": true,
+                      "fields": [
+                        {
+                          "type": "upload",
+                          "name": "media",
+                          "required": true,
+                          "relationTo": "media"
+                        },
+                        {
+                          "type": "text",
+                          "name": "caption"
+                        },
+                        {
+                          "type": "text",
+                          "name": "link"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "embed",
+                  "fields": [
+                    {
+                      "type": "select",
+                      "name": "provider",
+                      "required": true,
+                      "options": [
+                        {
+                          "value": "youtube"
+                        },
+                        {
+                          "value": "vimeo"
+                        },
+                        {
+                          "value": "loom"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "name": "url",
+                      "required": true
+                    },
+                    {
+                      "type": "text",
+                      "name": "title"
+                    },
+                    {
+                      "type": "select",
+                      "name": "aspectRatio",
+                      "options": [
+                        {
+                          "value": "16-9"
+                        },
+                        {
+                          "value": "4-3"
+                        },
+                        {
+                          "value": "1-1"
+                        },
+                        {
+                          "value": "9-16"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "codeBlock",
+                  "fields": [
+                    {
+                      "type": "select",
+                      "name": "language",
+                      "required": true,
+                      "options": [
+                        {
+                          "value": "bash"
+                        },
+                        {
+                          "value": "dockerfile"
+                        },
+                        {
+                          "value": "yaml"
+                        },
+                        {
+                          "value": "json"
+                        },
+                        {
+                          "value": "typescript"
+                        },
+                        {
+                          "value": "javascript"
+                        },
+                        {
+                          "value": "python"
+                        },
+                        {
+                          "value": "go"
+                        },
+                        {
+                          "value": "rust"
+                        },
+                        {
+                          "value": "sql"
+                        },
+                        {
+                          "value": "hcl"
+                        },
+                        {
+                          "value": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "name": "filename"
+                    },
+                    {
+                      "type": "code",
+                      "name": "content",
+                      "required": true
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "showLineNumbers"
+                    },
+                    {
+                      "type": "text",
+                      "name": "highlightLines"
+                    }
+                  ]
+                },
+                {
+                  "slug": "pricing",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "eyebrow"
+                    },
+                    {
+                      "type": "text",
+                      "name": "heading"
+                    },
+                    {
+                      "type": "textarea",
+                      "name": "sub"
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "billingToggle"
+                    },
+                    {
+                      "type": "array",
+                      "name": "tiers",
+                      "required": true,
+                      "fields": [
+                        {
+                          "type": "text",
+                          "name": "name",
+                          "required": true
+                        },
+                        {
+                          "type": "group",
+                          "name": "price",
+                          "fields": [
+                            {
+                              "type": "text",
+                              "name": "monthly"
+                            },
+                            {
+                              "type": "text",
+                              "name": "yearly"
+                            },
+                            {
+                              "type": "select",
+                              "name": "currency",
+                              "options": [
+                                {
+                                  "value": "USD"
+                                },
+                                {
+                                  "value": "EUR"
+                                },
+                                {
+                                  "value": "GBP"
+                                },
+                                {
+                                  "value": "INR"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "name": "tagline"
+                        },
+                        {
+                          "type": "array",
+                          "name": "features",
+                          "required": true,
+                          "fields": [
+                            {
+                              "type": "text",
+                              "name": "label",
+                              "required": true
+                            },
+                            {
+                              "type": "text",
+                              "name": "tooltip"
+                            },
+                            {
+                              "type": "checkbox",
+                              "name": "included"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "group",
+                          "name": "cta",
+                          "fields": [
+                            {
+                              "type": "select",
+                              "name": "variant",
+                              "options": [
+                                {
+                                  "value": "primary"
+                                },
+                                {
+                                  "value": "secondary"
+                                },
+                                {
+                                  "value": "ghost"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "name": "trackingId"
+                            },
+                            {
+                              "type": "group",
+                              "name": "link",
+                              "fields": [
+                                {
+                                  "type": "text",
+                                  "name": "text"
+                                },
+                                {
+                                  "type": "select",
+                                  "name": "kind",
+                                  "options": [
+                                    {
+                                      "value": "doc"
+                                    },
+                                    {
+                                      "value": "media"
+                                    },
+                                    {
+                                      "value": "url"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "relationship",
+                                  "name": "target",
+                                  "relationTo": [
+                                    "pages",
+                                    "blogs",
+                                    "news",
+                                    "guides",
+                                    "resources",
+                                    "events",
+                                    "webinars",
+                                    "jobs",
+                                    "authors",
+                                    "categories",
+                                    "newsCategories"
+                                  ]
+                                },
+                                {
+                                  "type": "upload",
+                                  "name": "mediaTarget",
+                                  "relationTo": "media"
+                                },
+                                {
+                                  "type": "text",
+                                  "name": "url"
+                                },
+                                {
+                                  "type": "checkbox",
+                                  "name": "newTab"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "checkbox",
+                          "name": "highlight"
+                        },
+                        {
+                          "type": "text",
+                          "name": "highlightLabel"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slug": "jobsList",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "heading"
+                    },
+                    {
+                      "type": "textarea",
+                      "name": "sub"
+                    },
+                    {
+                      "type": "group",
+                      "name": "filters",
+                      "fields": [
+                        {
+                          "type": "select",
+                          "name": "department",
+                          "options": [
+                            {
+                              "value": "engineering"
+                            },
+                            {
+                              "value": "sales"
+                            },
+                            {
+                              "value": "marketing"
+                            },
+                            {
+                              "value": "customer-success"
+                            },
+                            {
+                              "value": "operations"
+                            },
+                            {
+                              "value": "finance"
+                            },
+                            {
+                              "value": "legal"
+                            },
+                            {
+                              "value": "people"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "relationship",
+                          "name": "locations",
+                          "hasMany": true,
+                          "relationTo": "jobLocations"
+                        },
+                        {
+                          "type": "checkbox",
+                          "name": "remoteOnly"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "showFilters"
+                    },
+                    {
+                      "type": "text",
+                      "name": "emptyMessage"
+                    }
+                  ]
+                },
+                {
+                  "slug": "table",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "caption"
+                    },
+                    {
+                      "type": "array",
+                      "name": "headers",
+                      "required": true,
+                      "fields": [
+                        {
+                          "type": "text",
+                          "name": "label",
+                          "required": true
+                        },
+                        {
+                          "type": "checkbox",
+                          "name": "highlight"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "firstColIsHeader"
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "stickyFirstColumn"
+                    },
+                    {
+                      "type": "array",
+                      "name": "rows",
+                      "required": true,
+                      "fields": [
+                        {
+                          "type": "array",
+                          "name": "cells",
+                          "required": true,
+                          "fields": [
+                            {
+                              "type": "select",
+                              "name": "type",
+                              "options": [
+                                {
+                                  "value": "text"
+                                },
+                                {
+                                  "value": "check"
+                                },
+                                {
+                                  "value": "cross"
+                                },
+                                {
+                                  "value": "partial"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "name": "value"
+                            },
+                            {
+                              "type": "text",
+                              "name": "tooltip"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "hero",
+          "fields": [
+            {
+              "type": "text",
+              "name": "eyebrow"
+            },
+            {
+              "type": "text",
+              "name": "headline",
+              "required": true
+            },
+            {
+              "type": "textarea",
+              "name": "sub"
+            },
+            {
+              "type": "group",
+              "name": "primaryCta",
+              "fields": [
+                {
+                  "type": "select",
+                  "name": "variant",
+                  "options": [
+                    {
+                      "value": "primary"
+                    },
+                    {
+                      "value": "secondary"
+                    },
+                    {
+                      "value": "ghost"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "name": "trackingId"
+                },
+                {
+                  "type": "group",
+                  "name": "link",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "text"
+                    },
+                    {
+                      "type": "select",
+                      "name": "kind",
+                      "options": [
+                        {
+                          "value": "doc"
+                        },
+                        {
+                          "value": "media"
+                        },
+                        {
+                          "value": "url"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "relationship",
+                      "name": "target",
+                      "relationTo": [
+                        "pages",
+                        "blogs",
+                        "news",
+                        "guides",
+                        "resources",
+                        "events",
+                        "webinars",
+                        "jobs",
+                        "authors",
+                        "categories",
+                        "newsCategories"
+                      ]
+                    },
+                    {
+                      "type": "upload",
+                      "name": "mediaTarget",
+                      "relationTo": "media"
+                    },
+                    {
+                      "type": "text",
+                      "name": "url"
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "newTab"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "name": "secondaryCta",
+              "fields": [
+                {
+                  "type": "select",
+                  "name": "variant",
+                  "options": [
+                    {
+                      "value": "primary"
+                    },
+                    {
+                      "value": "secondary"
+                    },
+                    {
+                      "value": "ghost"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "name": "trackingId"
+                },
+                {
+                  "type": "group",
+                  "name": "link",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "text"
+                    },
+                    {
+                      "type": "select",
+                      "name": "kind",
+                      "options": [
+                        {
+                          "value": "doc"
+                        },
+                        {
+                          "value": "media"
+                        },
+                        {
+                          "value": "url"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "relationship",
+                      "name": "target",
+                      "relationTo": [
+                        "pages",
+                        "blogs",
+                        "news",
+                        "guides",
+                        "resources",
+                        "events",
+                        "webinars",
+                        "jobs",
+                        "authors",
+                        "categories",
+                        "newsCategories"
+                      ]
+                    },
+                    {
+                      "type": "upload",
+                      "name": "mediaTarget",
+                      "relationTo": "media"
+                    },
+                    {
+                      "type": "text",
+                      "name": "url"
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "newTab"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "name": "background",
+              "fields": [
+                {
+                  "type": "select",
+                  "name": "kind",
+                  "options": [
+                    {
+                      "value": "none"
+                    },
+                    {
+                      "value": "image"
+                    },
+                    {
+                      "value": "video"
+                    },
+                    {
+                      "value": "gradient"
+                    }
+                  ]
+                },
+                {
+                  "type": "upload",
+                  "name": "media",
+                  "relationTo": "media"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "cta",
+          "fields": [
+            {
+              "type": "text",
+              "name": "headline",
+              "required": true
+            },
+            {
+              "type": "textarea",
+              "name": "body"
+            },
+            {
+              "type": "group",
+              "name": "primaryCta",
+              "fields": [
+                {
+                  "type": "select",
+                  "name": "variant",
+                  "options": [
+                    {
+                      "value": "primary"
+                    },
+                    {
+                      "value": "secondary"
+                    },
+                    {
+                      "value": "ghost"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "name": "trackingId"
+                },
+                {
+                  "type": "group",
+                  "name": "link",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "text"
+                    },
+                    {
+                      "type": "select",
+                      "name": "kind",
+                      "options": [
+                        {
+                          "value": "doc"
+                        },
+                        {
+                          "value": "media"
+                        },
+                        {
+                          "value": "url"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "relationship",
+                      "name": "target",
+                      "relationTo": [
+                        "pages",
+                        "blogs",
+                        "news",
+                        "guides",
+                        "resources",
+                        "events",
+                        "webinars",
+                        "jobs",
+                        "authors",
+                        "categories",
+                        "newsCategories"
+                      ]
+                    },
+                    {
+                      "type": "upload",
+                      "name": "mediaTarget",
+                      "relationTo": "media"
+                    },
+                    {
+                      "type": "text",
+                      "name": "url"
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "newTab"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "group",
+              "name": "secondaryCta",
+              "fields": [
+                {
+                  "type": "select",
+                  "name": "variant",
+                  "options": [
+                    {
+                      "value": "primary"
+                    },
+                    {
+                      "value": "secondary"
+                    },
+                    {
+                      "value": "ghost"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "name": "trackingId"
+                },
+                {
+                  "type": "group",
+                  "name": "link",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "text"
+                    },
+                    {
+                      "type": "select",
+                      "name": "kind",
+                      "options": [
+                        {
+                          "value": "doc"
+                        },
+                        {
+                          "value": "media"
+                        },
+                        {
+                          "value": "url"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "relationship",
+                      "name": "target",
+                      "relationTo": [
+                        "pages",
+                        "blogs",
+                        "news",
+                        "guides",
+                        "resources",
+                        "events",
+                        "webinars",
+                        "jobs",
+                        "authors",
+                        "categories",
+                        "newsCategories"
+                      ]
+                    },
+                    {
+                      "type": "upload",
+                      "name": "mediaTarget",
+                      "relationTo": "media"
+                    },
+                    {
+                      "type": "text",
+                      "name": "url"
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "newTab"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "name": "background",
+              "options": [
+                {
+                  "value": "surface"
+                },
+                {
+                  "value": "inverted"
+                },
+                {
+                  "value": "brand"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "richText",
+          "fields": [
+            {
+              "type": "richText",
+              "name": "body",
+              "required": true
+            },
+            {
+              "type": "select",
+              "name": "maxWidth",
+              "options": [
+                {
+                  "value": "prose"
+                },
+                {
+                  "value": "wide"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "formBlock",
+          "fields": [
+            {
+              "type": "relationship",
+              "name": "form",
+              "required": true,
+              "relationTo": "forms"
+            },
+            {
+              "type": "text",
+              "name": "headline"
+            },
+            {
+              "type": "textarea",
+              "name": "description"
+            },
+            {
+              "type": "checkbox",
+              "name": "overridePostSubmit"
+            },
+            {
+              "type": "group",
+              "name": "postSubmit",
+              "fields": [
+                {
+                  "type": "select",
+                  "name": "kind",
+                  "options": [
+                    {
+                      "value": "message"
+                    },
+                    {
+                      "value": "redirect"
+                    }
+                  ]
+                },
+                {
+                  "type": "richText",
+                  "name": "body"
+                },
+                {
+                  "type": "text",
+                  "name": "url"
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "name": "layout",
+              "options": [
+                {
+                  "value": "inline"
+                },
+                {
+                  "value": "split"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "featureGrid",
+          "fields": [
+            {
+              "type": "text",
+              "name": "eyebrow"
+            },
+            {
+              "type": "text",
+              "name": "heading"
+            },
+            {
+              "type": "textarea",
+              "name": "sub"
+            },
+            {
+              "type": "select",
+              "name": "columns",
+              "options": [
+                {
+                  "value": "2"
+                },
+                {
+                  "value": "3"
+                },
+                {
+                  "value": "4"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "name": "features",
+              "required": true,
+              "fields": [
+                {
+                  "type": "upload",
+                  "name": "icon",
+                  "relationTo": "media"
+                },
+                {
+                  "type": "text",
+                  "name": "title",
+                  "required": true
+                },
+                {
+                  "type": "textarea",
+                  "name": "body"
+                },
+                {
+                  "type": "group",
+                  "name": "link",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "text"
+                    },
+                    {
+                      "type": "select",
+                      "name": "kind",
+                      "options": [
+                        {
+                          "value": "doc"
+                        },
+                        {
+                          "value": "media"
+                        },
+                        {
+                          "value": "url"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "relationship",
+                      "name": "target",
+                      "relationTo": [
+                        "pages",
+                        "blogs",
+                        "news",
+                        "guides",
+                        "resources",
+                        "events",
+                        "webinars",
+                        "jobs",
+                        "authors",
+                        "categories",
+                        "newsCategories"
+                      ]
+                    },
+                    {
+                      "type": "upload",
+                      "name": "mediaTarget",
+                      "relationTo": "media"
+                    },
+                    {
+                      "type": "text",
+                      "name": "url"
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "newTab"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "logoCloud",
+          "fields": [
+            {
+              "type": "text",
+              "name": "heading"
+            },
+            {
+              "type": "array",
+              "name": "logos",
+              "required": true,
+              "fields": [
+                {
+                  "type": "upload",
+                  "name": "image",
+                  "required": true,
+                  "relationTo": "media"
+                },
+                {
+                  "type": "text",
+                  "name": "alt",
+                  "required": true
+                },
+                {
+                  "type": "text",
+                  "name": "url"
+                }
+              ]
+            },
+            {
+              "type": "checkbox",
+              "name": "monochrome"
+            }
+          ]
+        },
+        {
+          "slug": "integrationLogos",
+          "fields": [
+            {
+              "type": "text",
+              "name": "heading"
+            },
+            {
+              "type": "textarea",
+              "name": "sub"
+            },
+            {
+              "type": "array",
+              "name": "integrations",
+              "required": true,
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "name",
+                  "required": true
+                },
+                {
+                  "type": "upload",
+                  "name": "logo",
+                  "required": true,
+                  "relationTo": "media"
+                },
+                {
+                  "type": "select",
+                  "name": "category",
+                  "options": [
+                    {
+                      "value": "ci-cd"
+                    },
+                    {
+                      "value": "registry"
+                    },
+                    {
+                      "value": "kubernetes"
+                    },
+                    {
+                      "value": "cloud"
+                    },
+                    {
+                      "value": "security"
+                    },
+                    {
+                      "value": "observability"
+                    },
+                    {
+                      "value": "other"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "name": "url"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "testimonial",
+          "fields": [
+            {
+              "type": "textarea",
+              "name": "quote",
+              "required": true
+            },
+            {
+              "type": "text",
+              "name": "person",
+              "required": true
+            },
+            {
+              "type": "text",
+              "name": "role"
+            },
+            {
+              "type": "text",
+              "name": "company"
+            },
+            {
+              "type": "upload",
+              "name": "companyLogo",
+              "relationTo": "media"
+            },
+            {
+              "type": "upload",
+              "name": "avatar",
+              "relationTo": "media"
+            },
+            {
+              "type": "select",
+              "name": "variant",
+              "options": [
+                {
+                  "value": "card"
+                },
+                {
+                  "value": "pull-quote"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "stats",
+          "fields": [
+            {
+              "type": "text",
+              "name": "heading"
+            },
+            {
+              "type": "array",
+              "name": "metrics",
+              "required": true,
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "value",
+                  "required": true
+                },
+                {
+                  "type": "text",
+                  "name": "label",
+                  "required": true
+                },
+                {
+                  "type": "text",
+                  "name": "sublabel"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "metricsBar",
+          "fields": [
+            {
+              "type": "array",
+              "name": "metrics",
+              "required": true,
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "label",
+                  "required": true
+                },
+                {
+                  "type": "text",
+                  "name": "value",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "name": "background",
+              "options": [
+                {
+                  "value": "inverted"
+                },
+                {
+                  "value": "surface"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "faq",
+          "fields": [
+            {
+              "type": "text",
+              "name": "heading"
+            },
+            {
+              "type": "textarea",
+              "name": "sub"
+            },
+            {
+              "type": "ui",
+              "name": "bulkPaste"
+            },
+            {
+              "type": "array",
+              "name": "items",
+              "required": true,
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "question",
+                  "required": true
+                },
+                {
+                  "type": "textarea",
+                  "name": "answer",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "type": "checkbox",
+              "name": "allowMultipleOpen"
+            }
+          ]
+        },
+        {
+          "slug": "gallery",
+          "fields": [
+            {
+              "type": "text",
+              "name": "heading"
+            },
+            {
+              "type": "select",
+              "name": "layout",
+              "options": [
+                {
+                  "value": "grid"
+                },
+                {
+                  "value": "masonry"
+                },
+                {
+                  "value": "carousel"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "name": "images",
+              "required": true,
+              "fields": [
+                {
+                  "type": "upload",
+                  "name": "media",
+                  "required": true,
+                  "relationTo": "media"
+                },
+                {
+                  "type": "text",
+                  "name": "caption"
+                },
+                {
+                  "type": "text",
+                  "name": "link"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "embed",
+          "fields": [
+            {
+              "type": "select",
+              "name": "provider",
+              "required": true,
+              "options": [
+                {
+                  "value": "youtube"
+                },
+                {
+                  "value": "vimeo"
+                },
+                {
+                  "value": "loom"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "name": "url",
+              "required": true
+            },
+            {
+              "type": "text",
+              "name": "title"
+            },
+            {
+              "type": "select",
+              "name": "aspectRatio",
+              "options": [
+                {
+                  "value": "16-9"
+                },
+                {
+                  "value": "4-3"
+                },
+                {
+                  "value": "1-1"
+                },
+                {
+                  "value": "9-16"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "codeBlock",
+          "fields": [
+            {
+              "type": "select",
+              "name": "language",
+              "required": true,
+              "options": [
+                {
+                  "value": "bash"
+                },
+                {
+                  "value": "dockerfile"
+                },
+                {
+                  "value": "yaml"
+                },
+                {
+                  "value": "json"
+                },
+                {
+                  "value": "typescript"
+                },
+                {
+                  "value": "javascript"
+                },
+                {
+                  "value": "python"
+                },
+                {
+                  "value": "go"
+                },
+                {
+                  "value": "rust"
+                },
+                {
+                  "value": "sql"
+                },
+                {
+                  "value": "hcl"
+                },
+                {
+                  "value": "text"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "name": "filename"
+            },
+            {
+              "type": "code",
+              "name": "content",
+              "required": true
+            },
+            {
+              "type": "checkbox",
+              "name": "showLineNumbers"
+            },
+            {
+              "type": "text",
+              "name": "highlightLines"
+            }
+          ]
+        },
+        {
+          "slug": "pricing",
+          "fields": [
+            {
+              "type": "text",
+              "name": "eyebrow"
+            },
+            {
+              "type": "text",
+              "name": "heading"
+            },
+            {
+              "type": "textarea",
+              "name": "sub"
+            },
+            {
+              "type": "checkbox",
+              "name": "billingToggle"
+            },
+            {
+              "type": "array",
+              "name": "tiers",
+              "required": true,
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "name",
+                  "required": true
+                },
+                {
+                  "type": "group",
+                  "name": "price",
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "monthly"
+                    },
+                    {
+                      "type": "text",
+                      "name": "yearly"
+                    },
+                    {
+                      "type": "select",
+                      "name": "currency",
+                      "options": [
+                        {
+                          "value": "USD"
+                        },
+                        {
+                          "value": "EUR"
+                        },
+                        {
+                          "value": "GBP"
+                        },
+                        {
+                          "value": "INR"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "name": "tagline"
+                },
+                {
+                  "type": "array",
+                  "name": "features",
+                  "required": true,
+                  "fields": [
+                    {
+                      "type": "text",
+                      "name": "label",
+                      "required": true
+                    },
+                    {
+                      "type": "text",
+                      "name": "tooltip"
+                    },
+                    {
+                      "type": "checkbox",
+                      "name": "included"
+                    }
+                  ]
+                },
+                {
+                  "type": "group",
+                  "name": "cta",
+                  "fields": [
+                    {
+                      "type": "select",
+                      "name": "variant",
+                      "options": [
+                        {
+                          "value": "primary"
+                        },
+                        {
+                          "value": "secondary"
+                        },
+                        {
+                          "value": "ghost"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "name": "trackingId"
+                    },
+                    {
+                      "type": "group",
+                      "name": "link",
+                      "fields": [
+                        {
+                          "type": "text",
+                          "name": "text"
+                        },
+                        {
+                          "type": "select",
+                          "name": "kind",
+                          "options": [
+                            {
+                              "value": "doc"
+                            },
+                            {
+                              "value": "media"
+                            },
+                            {
+                              "value": "url"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "relationship",
+                          "name": "target",
+                          "relationTo": [
+                            "pages",
+                            "blogs",
+                            "news",
+                            "guides",
+                            "resources",
+                            "events",
+                            "webinars",
+                            "jobs",
+                            "authors",
+                            "categories",
+                            "newsCategories"
+                          ]
+                        },
+                        {
+                          "type": "upload",
+                          "name": "mediaTarget",
+                          "relationTo": "media"
+                        },
+                        {
+                          "type": "text",
+                          "name": "url"
+                        },
+                        {
+                          "type": "checkbox",
+                          "name": "newTab"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "checkbox",
+                  "name": "highlight"
+                },
+                {
+                  "type": "text",
+                  "name": "highlightLabel"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "jobsList",
+          "fields": [
+            {
+              "type": "text",
+              "name": "heading"
+            },
+            {
+              "type": "textarea",
+              "name": "sub"
+            },
+            {
+              "type": "group",
+              "name": "filters",
+              "fields": [
+                {
+                  "type": "select",
+                  "name": "department",
+                  "options": [
+                    {
+                      "value": "engineering"
+                    },
+                    {
+                      "value": "sales"
+                    },
+                    {
+                      "value": "marketing"
+                    },
+                    {
+                      "value": "customer-success"
+                    },
+                    {
+                      "value": "operations"
+                    },
+                    {
+                      "value": "finance"
+                    },
+                    {
+                      "value": "legal"
+                    },
+                    {
+                      "value": "people"
+                    }
+                  ]
+                },
+                {
+                  "type": "relationship",
+                  "name": "locations",
+                  "hasMany": true,
+                  "relationTo": "jobLocations"
+                },
+                {
+                  "type": "checkbox",
+                  "name": "remoteOnly"
+                }
+              ]
+            },
+            {
+              "type": "checkbox",
+              "name": "showFilters"
+            },
+            {
+              "type": "text",
+              "name": "emptyMessage"
+            }
+          ]
+        },
+        {
+          "slug": "table",
+          "fields": [
+            {
+              "type": "text",
+              "name": "caption"
+            },
+            {
+              "type": "array",
+              "name": "headers",
+              "required": true,
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "label",
+                  "required": true
+                },
+                {
+                  "type": "checkbox",
+                  "name": "highlight"
+                }
+              ]
+            },
+            {
+              "type": "checkbox",
+              "name": "firstColIsHeader"
+            },
+            {
+              "type": "checkbox",
+              "name": "stickyFirstColumn"
+            },
+            {
+              "type": "array",
+              "name": "rows",
+              "required": true,
+              "fields": [
+                {
+                  "type": "array",
+                  "name": "cells",
+                  "required": true,
+                  "fields": [
+                    {
+                      "type": "select",
+                      "name": "type",
+                      "options": [
+                        {
+                          "value": "text"
+                        },
+                        {
+                          "value": "check"
+                        },
+                        {
+                          "value": "cross"
+                        },
+                        {
+                          "value": "partial"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "name": "value"
+                    },
+                    {
+                      "type": "text",
+                      "name": "tooltip"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "pageLayout",
+      "options": [
+        {
+          "value": "default"
+        },
+        {
+          "value": "narrow"
+        },
+        {
+          "value": "full-bleed"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "schemaType",
+      "options": [
+        {
+          "value": "auto"
+        },
+        {
+          "value": "WebPage"
+        },
+        {
+          "value": "AboutPage"
+        },
+        {
+          "value": "ContactPage"
+        },
+        {
+          "value": "CollectionPage"
+        }
+      ]
+    },
+    {
+      "type": "blocks",
+      "name": "schemaAddons",
+      "blocks": [
+        {
+          "slug": "howTo",
+          "fields": [
+            {
+              "type": "text",
+              "name": "name",
+              "required": true
+            },
+            {
+              "type": "textarea",
+              "name": "description",
+              "required": true
+            },
+            {
+              "type": "text",
+              "name": "totalTime"
+            },
+            {
+              "type": "array",
+              "name": "steps",
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "name",
+                  "required": true
+                },
+                {
+                  "type": "textarea",
+                  "name": "text",
+                  "required": true
+                },
+                {
+                  "type": "upload",
+                  "name": "image",
+                  "relationTo": "media"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "videoObject",
+          "fields": [
+            {
+              "type": "text",
+              "name": "name",
+              "required": true
+            },
+            {
+              "type": "textarea",
+              "name": "description",
+              "required": true
+            },
+            {
+              "type": "upload",
+              "name": "thumbnail",
+              "required": true,
+              "relationTo": "media"
+            },
+            {
+              "type": "date",
+              "name": "uploadDate",
+              "required": true
+            },
+            {
+              "type": "text",
+              "name": "contentUrl",
+              "required": true
+            },
+            {
+              "type": "text",
+              "name": "embedUrl"
+            },
+            {
+              "type": "text",
+              "name": "duration"
+            }
+          ]
+        },
+        {
+          "slug": "faqPage",
+          "fields": [
+            {
+              "type": "array",
+              "name": "questions",
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "question",
+                  "required": true
+                },
+                {
+                  "type": "textarea",
+                  "name": "answer",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "review",
+          "fields": [
+            {
+              "type": "select",
+              "name": "itemReviewedType",
+              "required": true,
+              "options": [
+                {
+                  "value": "Product"
+                },
+                {
+                  "value": "Service"
+                },
+                {
+                  "value": "SoftwareApplication"
+                },
+                {
+                  "value": "Organization"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "name": "itemReviewedName",
+              "required": true
+            },
+            {
+              "type": "number",
+              "name": "ratingValue",
+              "required": true
+            },
+            {
+              "type": "textarea",
+              "name": "reviewBody"
+            },
+            {
+              "type": "text",
+              "name": "authorName"
+            }
+          ]
+        },
+        {
+          "slug": "softwareApp",
+          "fields": [
+            {
+              "type": "text",
+              "name": "name",
+              "required": true
+            },
+            {
+              "type": "select",
+              "name": "category",
+              "required": true,
+              "options": [
+                {
+                  "value": "BusinessApplication"
+                },
+                {
+                  "value": "DeveloperApplication"
+                },
+                {
+                  "value": "SecurityApplication"
+                },
+                {
+                  "value": "CommunicationApplication"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "name": "os",
+              "required": true
+            },
+            {
+              "type": "text",
+              "name": "price",
+              "required": true
+            },
+            {
+              "type": "select",
+              "name": "currency",
+              "required": true,
+              "options": [
+                {
+                  "value": "USD"
+                },
+                {
+                  "value": "EUR"
+                },
+                {
+                  "value": "GBP"
+                },
+                {
+                  "value": "INR"
+                }
+              ]
+            },
+            {
+              "type": "number",
+              "name": "ratingValue"
+            },
+            {
+              "type": "number",
+              "name": "ratingCount"
+            }
+          ]
+        },
+        {
+          "slug": "breadcrumbList",
+          "fields": [
+            {
+              "type": "select",
+              "name": "mode",
+              "required": true,
+              "options": [
+                {
+                  "value": "suppress"
+                },
+                {
+                  "value": "replace"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "name": "crumbs",
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "name",
+                  "required": true
+                },
+                {
+                  "type": "text",
+                  "name": "path",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "date",
+      "name": "publishedAt"
+    },
+    {
+      "type": "ui",
+      "name": "seoHealthScore"
+    },
+    {
+      "type": "ui",
+      "name": "seoTitle"
+    },
+    {
+      "type": "ui",
+      "name": "seoDescription"
+    },
+    {
+      "type": "ui",
+      "name": "seoIndexable"
+    },
+    {
+      "type": "ui",
+      "name": "serpPreview"
+    },
+    {
+      "type": "ui",
+      "name": "schemaPreview"
+    },
+    {
+      "type": "ui",
+      "name": "canonicalUrl"
+    },
+    {
+      "type": "ui",
+      "name": "socialCard"
+    },
+    {
+      "type": "ui",
+      "name": "redirect"
+    },
+    {
+      "type": "ui",
+      "name": "headTags"
+    },
+    {
+      "type": "ui",
+      "name": "urlChangeHistory"
+    },
+    {
+      "type": "group",
+      "name": "seo",
+      "fields": [
+        {
+          "type": "text",
+          "name": "title"
+        },
+        {
+          "type": "textarea",
+          "name": "description"
+        },
+        {
+          "type": "select",
+          "name": "indexable",
+          "options": [
+            {
+              "value": "index"
+            },
+            {
+              "value": "noindex"
+            },
+            {
+              "value": "noindex,nofollow"
+            }
+          ]
+        },
+        {
+          "type": "upload",
+          "name": "ogImage",
+          "relationTo": "media"
+        },
+        {
+          "type": "text",
+          "name": "ogImageAlt"
+        },
+        {
+          "type": "checkbox",
+          "name": "useAdvancedOg"
+        },
+        {
+          "type": "text",
+          "name": "ogTitle"
+        },
+        {
+          "type": "textarea",
+          "name": "ogDescription"
+        },
+        {
+          "type": "checkbox",
+          "name": "useAdvancedTwitter"
+        },
+        {
+          "type": "select",
+          "name": "twitterCard",
+          "options": [
+            {
+              "value": "summary"
+            },
+            {
+              "value": "summary_large_image"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "twitterTitle"
+        },
+        {
+          "type": "textarea",
+          "name": "twitterDescription"
+        },
+        {
+          "type": "upload",
+          "name": "twitterImage",
+          "relationTo": "media"
+        },
+        {
+          "type": "checkbox",
+          "name": "useCustomCanonical"
+        },
+        {
+          "type": "text",
+          "name": "canonicalOverride"
+        },
+        {
+          "type": "group",
+          "name": "robotsAdvanced",
+          "fields": [
+            {
+              "type": "checkbox",
+              "name": "noarchive"
+            },
+            {
+              "type": "checkbox",
+              "name": "nosnippet"
+            },
+            {
+              "type": "checkbox",
+              "name": "noimageindex"
+            },
+            {
+              "type": "checkbox",
+              "name": "notranslate"
+            },
+            {
+              "type": "number",
+              "name": "maxSnippet"
+            },
+            {
+              "type": "select",
+              "name": "maxImagePreview",
+              "options": [
+                {
+                  "value": "standard"
+                },
+                {
+                  "value": "large"
+                },
+                {
+                  "value": "none"
+                }
+              ]
+            },
+            {
+              "type": "number",
+              "name": "maxVideoPreview"
+            },
+            {
+              "type": "date",
+              "name": "unavailableAfter"
+            }
+          ]
+        },
+        {
+          "type": "json",
+          "name": "alternates"
+        },
+        {
+          "type": "json",
+          "name": "customTags"
+        },
+        {
+          "type": "text",
+          "name": "keywordTarget"
+        },
+        {
+          "type": "array",
+          "name": "speakablePath",
+          "fields": [
+            {
+              "type": "text",
+              "name": "selector",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": "json",
+          "name": "additionalSchema"
+        }
+      ]
+    },
+    {
+      "type": "ui",
+      "name": "seoAdvanced"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 2,
+    "afterChange": 5,
+    "beforeValidate": 0,
+    "afterDelete": 1
+  }
+}
