@@ -82,8 +82,10 @@ import { ShortcutHelpDialog as ShortcutHelpDialog_988ed8f20aac11621cac715bd9040a
 import { ListCellEnhancer as ListCellEnhancer_edd569c3aa02f3de17c22f7695d981ee } from '../../../payload/admin/components/ListCellEnhancer.tsx'
 import { ToastBus as ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4 } from '../../../payload/admin/components/ToastBus.tsx'
 import { UserMenu as UserMenu_8a2f404b3fa17e34974bf49ed5367371 } from '../../../payload/admin/components/UserMenu.tsx'
+import { CmsLoginHero as CmsLoginHero_32623b867969588592e72c90b3b4967a } from '../../../payload/admin/components/auth/CmsLoginHero.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
+import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } from '../../../payload/admin/components/auth/CmsAccountView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -172,7 +174,9 @@ export const importMap = {
   "./payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer": ListCellEnhancer_edd569c3aa02f3de17c22f7695d981ee,
   "./payload/admin/components/ToastBus.tsx#ToastBus": ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4,
   "./payload/admin/components/UserMenu.tsx#UserMenu": UserMenu_8a2f404b3fa17e34974bf49ed5367371,
+  "./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero": CmsLoginHero_32623b867969588592e72c90b3b4967a,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
+  "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

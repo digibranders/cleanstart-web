@@ -129,6 +129,9 @@ export default buildConfig({
         './payload/admin/components/UserMenu.tsx#UserMenu',
       ],
       beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
+      // Wave 5 — branded hero injected above the stock LoginForm. Full
+      // login-route replacement waits for the 2FA backend (Phase I).
+      beforeLogin: ['./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero'],
       graphics: {
         Logo: './payload/admin/Logo.tsx#Logo',
         Icon: './payload/admin/Icon.tsx#Icon',
@@ -137,6 +140,12 @@ export default buildConfig({
         dashboard: {
           Component:
             './payload/admin/components/Dashboard/Dashboard.tsx#Dashboard',
+        },
+        // Wave 5 — replaces the stock /admin/account screen with our
+        // own profile + password + reserved-2FA layout.
+        account: {
+          Component:
+            './payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView',
         },
       },
     },

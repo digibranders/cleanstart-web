@@ -59,6 +59,119 @@
   }
 }
 
+// Wave 5 — branded login hero injected above the form via beforeLogin.
+.cs-login-hero {
+  margin-bottom: var(--cs-space-6);
+  text-align: center;
+
+  &__eyebrow {
+    color: var(--cs-cyan-600);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    margin: 0 0 var(--cs-space-1);
+    text-transform: uppercase;
+  }
+
+  &__title {
+    color: var(--cs-text-heading);
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 var(--cs-space-2);
+  }
+
+  &__lede {
+    color: var(--theme-text-soft);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+// Wave 5 — account view (replaces stock views.account).
+.cs-account {
+  margin: 0 auto;
+  max-width: 720px;
+  padding: var(--cs-space-8) var(--cs-space-6);
+
+  &__header { margin-bottom: var(--cs-space-8); }
+
+  &__eyebrow {
+    color: var(--cs-cyan-600);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    margin: 0 0 var(--cs-space-1);
+    text-transform: uppercase;
+  }
+
+  &__title {
+    color: var(--cs-text-heading);
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0 0 var(--cs-space-2);
+  }
+
+  &__lede {
+    color: var(--theme-text-soft);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &__form { display: flex; flex-direction: column; gap: var(--cs-space-6); }
+
+  &__group {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    padding: var(--cs-space-6);
+
+    legend {
+      color: var(--cs-text-heading);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 0 var(--cs-space-2);
+      text-transform: uppercase;
+    }
+
+    &--reserved {
+      background: transparent;
+      border-style: dashed;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-1);
+    margin-top: var(--cs-space-3);
+
+    > span {
+      color: var(--cs-text-heading);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    &:first-of-type { margin-top: var(--cs-space-2); }
+  }
+
+  &__hint {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    line-height: 1.4;
+    margin: var(--cs-space-2) 0 0;
+  }
+
+  &__actions { display: flex; justify-content: flex-end; }
+}
+
 // Login error banner — Payload renders auth errors as plain red text
 // inside the form. Promote the message to a tinted callout with a
 // left border + icon so editors don't miss it.
