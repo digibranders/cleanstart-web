@@ -25,6 +25,7 @@ import {
 } from '@payloadcms/richtext-lexical';
 
 import { cleanstartLinkPopoverFeature } from './link-popover-feature';
+import { cleanstartSlashMenuFeature } from './slash-menu-feature';
 import { cleanstartTablePopoverFeature } from './table-popover-feature';
 import { RichPasteFeature } from './rich-paste-feature';
 
@@ -78,5 +79,10 @@ export const cleanstartLexicalEditor = () =>
       InlineToolbarFeature(),
 
       RichPasteFeature(),
+
+      // Wave 7 — type `/` at the start of a paragraph to open an
+      // anchored block-insert popover (Heading 2/3, Quote, lists, HR).
+      // Layered on top of the stock features it dispatches into.
+      cleanstartSlashMenuFeature(),
     ],
   });
