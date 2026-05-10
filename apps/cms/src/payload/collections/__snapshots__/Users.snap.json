@@ -23,6 +23,10 @@
           "value": "author"
         }
       ]
+    },
+    {
+      "type": "json",
+      "name": "preferences"
     }
   ],
   "hooks": {
