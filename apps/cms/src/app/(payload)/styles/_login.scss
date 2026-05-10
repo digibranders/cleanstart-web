@@ -59,6 +59,25 @@
   }
 }
 
+// Wave 5 part 2 — branded login footer injected below the form via afterLogin.
+.cs-login-footer {
+  color: var(--theme-text-soft);
+  font-size: 12px;
+  margin-top: var(--cs-space-6);
+  text-align: center;
+
+  &__line { margin: 0 0 var(--cs-space-1); }
+
+  &__brand {
+    color: var(--theme-text-soft);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    margin: 0;
+    opacity: 0.7;
+  }
+}
+
 // Wave 5 — branded login hero injected above the form via beforeLogin.
 .cs-login-hero {
   margin-bottom: var(--cs-space-6);

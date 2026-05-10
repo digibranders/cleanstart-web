@@ -89,6 +89,7 @@ import { ShortcutHelpDialog as ShortcutHelpDialog_988ed8f20aac11621cac715bd9040a
 import { ListCellEnhancer as ListCellEnhancer_edd569c3aa02f3de17c22f7695d981ee } from '../../../payload/admin/components/ListCellEnhancer.tsx'
 import { ToastBus as ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4 } from '../../../payload/admin/components/ToastBus.tsx'
 import { SchedulePublishDialog as SchedulePublishDialog_62a4d26942a4492d8188fd667302ded6 } from '../../../payload/admin/components/SchedulePublishDialog.tsx'
+import { CmsLoginFooter as CmsLoginFooter_67c5b820b6d3bc2ad13ebd4c41435e40 } from '../../../payload/admin/components/auth/CmsLoginFooter.tsx'
 import { UserMenu as UserMenu_8a2f404b3fa17e34974bf49ed5367371 } from '../../../payload/admin/components/UserMenu.tsx'
 import { CmsLoginHero as CmsLoginHero_32623b867969588592e72c90b3b4967a } from '../../../payload/admin/components/auth/CmsLoginHero.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
@@ -189,6 +190,7 @@ export const importMap = {
   "./payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer": ListCellEnhancer_edd569c3aa02f3de17c22f7695d981ee,
   "./payload/admin/components/ToastBus.tsx#ToastBus": ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4,
   "./payload/admin/components/SchedulePublishDialog.tsx#SchedulePublishDialog": SchedulePublishDialog_62a4d26942a4492d8188fd667302ded6,
+  "./payload/admin/components/auth/CmsLoginFooter.tsx#CmsLoginFooter": CmsLoginFooter_67c5b820b6d3bc2ad13ebd4c41435e40,
   "./payload/admin/components/UserMenu.tsx#UserMenu": UserMenu_8a2f404b3fa17e34974bf49ed5367371,
   "./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero": CmsLoginHero_32623b867969588592e72c90b3b4967a,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,

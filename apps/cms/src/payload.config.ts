@@ -157,6 +157,7 @@ export default buildConfig({
       // Wave 5 — branded hero injected above the stock LoginForm. Full
       // login-route replacement waits for the 2FA backend (Phase I).
       beforeLogin: ['./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero'],
+      afterLogin: ['./payload/admin/components/auth/CmsLoginFooter.tsx#CmsLoginFooter'],
       graphics: {
         Logo: './payload/admin/Logo.tsx#Logo',
         Icon: './payload/admin/Icon.tsx#Icon',
