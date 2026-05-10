@@ -1,8 +1,9 @@
 import type { Story } from '@ladle/react';
+import type { ReactElement } from 'react';
 
 import { ToastProvider, useToast } from './Toast';
 
-const Inner = (): JSX.Element => {
+const Inner = (): ReactElement => {
   const { push } = useToast();
   return (
     <div style={{ padding: 40, display: 'flex', gap: 8, flexWrap: 'wrap' }}>

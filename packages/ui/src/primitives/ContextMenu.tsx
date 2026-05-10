@@ -91,7 +91,7 @@ export const ContextMenu = (props: Props): ReactElement | null => {
     >
       {items.map((item, i) => {
         if (item.kind === 'separator') {
-          return <div key={item.id} role="separator" className="cs-menu__separator" />;
+          return <hr key={item.id} className="cs-menu__separator" />;
         }
         if (item.kind === 'label') {
           return (

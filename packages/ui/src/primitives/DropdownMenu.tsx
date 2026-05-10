@@ -59,13 +59,13 @@ export const DropdownMenu = (props: Props): ReactElement | null => {
     .map((it, i) => (it.kind === 'item' && !it.disabled ? i : -1))
     .filter((i) => i >= 0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only re-run when the menu opens; enabledIndexes is derived from a frozen `items` prop
   useEffect(() => {
     if (!open) return;
     const first = enabledIndexes[0];
     if (first !== undefined) {
       window.requestAnimationFrame(() => itemRefs.current[first]?.focus());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   if (!open) return null;
@@ -115,7 +115,7 @@ export const DropdownMenu = (props: Props): ReactElement | null => {
     >
       {items.map((item, i) => {
         if (item.kind === 'separator') {
-          return <div key={item.id} role="separator" className="cs-menu__separator" />;
+          return <hr key={item.id} className="cs-menu__separator" />;
         }
         if (item.kind === 'label') {
           return (

@@ -82,7 +82,7 @@ export const ToastProvider = (props: { readonly children: ReactNode }): ReactEle
   return (
     <ToastContext.Provider value={value}>
       {props.children}
-      <div className="cs-toast-region" role="region" aria-label="Notifications">
+      <section className="cs-toast-region" aria-label="Notifications">
         <ol className="cs-toast-region__list">
           {toasts.map((t) => (
             <li
@@ -118,7 +118,7 @@ export const ToastProvider = (props: { readonly children: ReactNode }): ReactEle
             </li>
           ))}
         </ol>
-      </div>
+      </section>
     </ToastContext.Provider>
   );
 };

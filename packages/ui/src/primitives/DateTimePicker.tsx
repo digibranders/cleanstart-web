@@ -136,28 +136,17 @@ export const DateTimePicker = (props: Props): ReactElement => {
         <span className={display ? 'cs-datetime__value' : 'cs-datetime__placeholder'}>
           {display || placeholder}
         </span>
-        {value && !required && !disabled ? (
-          <span
-            role="button"
-            tabIndex={0}
-            className="cs-datetime__clear"
-            aria-label="Clear"
-            onClick={(e) => {
-              e.stopPropagation();
-              onChange(null);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                e.stopPropagation();
-                onChange(null);
-              }
-            }}
-          >
-            ×
-          </span>
-        ) : null}
       </button>
+      {value && !required && !disabled ? (
+        <button
+          type="button"
+          className="cs-datetime__clear"
+          aria-label="Clear"
+          onClick={() => onChange(null)}
+        >
+          ×
+        </button>
+      ) : null}
       <Popover
         open={open}
         onClose={() => setOpen(false)}
@@ -186,21 +175,29 @@ export const DateTimePicker = (props: Props): ReactElement => {
             </button>
           </header>
           <div className="cs-datetime__weekdays" aria-hidden="true">
-            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((w, i) => (
-              <span key={`dow-${i}`}>{w}</span>
+            {[
+              { id: 'sun', l: 'S' },
+              { id: 'mon', l: 'M' },
+              { id: 'tue', l: 'T' },
+              { id: 'wed', l: 'W' },
+              { id: 'thu', l: 'T2' },
+              { id: 'fri', l: 'F' },
+              { id: 'sat', l: 'S2' },
+            ].map((w) => (
+              <span key={w.id}>{w.l.replace(/2$/, '')}</span>
             ))}
           </div>
-          <div className="cs-datetime__grid" role="grid">
-            {grid.map((d, i) => {
+          <div className="cs-datetime__grid">
+            {grid.map((d) => {
               const inMonth = d.getMonth() === anchorMonth.getMonth();
               const blocked = (min && d < min) || (max && d > max);
               const selected = sameDay(d, valueDate);
               const today = sameDay(d, new Date());
+              const isoKey = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
               return (
                 <button
-                  key={`d-${i}`}
+                  key={isoKey}
                   type="button"
-                  role="gridcell"
                   className={[
                     'cs-datetime__day',
                     inMonth ? '' : 'is-out',
