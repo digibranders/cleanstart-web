@@ -1,0 +1,34 @@
+{
+  "slug": "searchLog",
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "query",
+      "required": true
+    },
+    {
+      "type": "number",
+      "name": "resultsCount",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "locale"
+    },
+    {
+      "type": "text",
+      "name": "ip"
+    },
+    {
+      "type": "text",
+      "name": "userAgent"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 0,
+    "afterChange": 0,
+    "beforeValidate": 0,
+    "afterDelete": 0
+  }
+}

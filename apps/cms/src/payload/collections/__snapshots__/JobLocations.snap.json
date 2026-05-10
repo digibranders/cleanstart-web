@@ -1,0 +1,44 @@
+{
+  "slug": "jobLocations",
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "name",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "slug",
+      "required": true,
+      "unique": true
+    },
+    {
+      "type": "select",
+      "name": "type",
+      "required": true,
+      "options": [
+        {
+          "value": "country"
+        },
+        {
+          "value": "region"
+        },
+        {
+          "value": "city"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "isoCountry",
+      "required": true
+    }
+  ],
+  "hooks": {
+    "beforeChange": 0,
+    "afterChange": 0,
+    "beforeValidate": 0,
+    "afterDelete": 0
+  }
+}

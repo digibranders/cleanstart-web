@@ -210,7 +210,10 @@ export const submitLeadEndpoint: Endpoint = {
     if (!formDoc) return invalidFormResponse;
     // Draft forms must not accept public submissions — an editor working
     // on a new form shouldn't capture leads against it until they publish.
-    if (formDoc._status != null && formDoc._status !== 'published') {
+    // Forms always carries `versions: { drafts: true }`, so a missing
+    // `_status` indicates a misconfiguration rather than a publishable
+    // row; reject those too.
+    if (formDoc._status !== 'published') {
       return invalidFormResponse;
     }
 

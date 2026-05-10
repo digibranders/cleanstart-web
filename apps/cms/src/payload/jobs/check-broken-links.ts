@@ -31,16 +31,27 @@ export const checkBrokenLinksTask: TaskConfig<'checkBrokenLinks'> = {
       payload: req.payload as unknown as ScannerPayload,
     });
 
-    // Snapshot existing rows so we can detect which to delete.
-    const existing = (await req.payload.find({
-      collection: 'brokenLinks',
-      limit: 5000,
-      depth: 0,
-      overrideAccess: true,
-    })) as { docs: ExistingRow[] };
+    // Snapshot existing rows so we can detect which to delete. We
+    // paginate because hard-capping at 5000 means anything past page 1
+    // would never be revisited — once the table grows past that it
+    // would stop self-cleaning and editors see "broken" badges for
+    // links that have been fixed.
+    const SNAPSHOT_PAGE_SIZE = 1000;
     const existingByKey = new Map<string, ExistingRow>();
-    for (const row of existing.docs) {
-      existingByKey.set(`${row.url}|${row.sourceDocId}`, row);
+    let snapshotPage = 1;
+    while (true) {
+      const result = (await req.payload.find({
+        collection: 'brokenLinks',
+        limit: SNAPSHOT_PAGE_SIZE,
+        page: snapshotPage,
+        depth: 0,
+        overrideAccess: true,
+      })) as { docs: ExistingRow[]; hasNextPage?: boolean };
+      for (const row of result.docs) {
+        existingByKey.set(`${row.url}|${row.sourceDocId}`, row);
+      }
+      if (!result.hasNextPage) break;
+      snapshotPage += 1;
     }
 
     const seen = new Set<string>();

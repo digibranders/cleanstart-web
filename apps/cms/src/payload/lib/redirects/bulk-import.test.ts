@@ -21,7 +21,9 @@ describe('planBulkRedirectImport', () => {
       rows: [{ from: '/old', to: '/new' }],
       payload: fakePayload({}),
     });
-    expect(plan.create).toEqual([{ from: '/old', to: '/new', status: '301' }]);
+    expect(plan.create).toEqual([
+      { from: '/old', to: '/new', status: '301', sourceIndex: 0 },
+    ]);
     expect(plan.update).toEqual([]);
     expect(plan.errors).toEqual([]);
     expect(plan.skipped).toEqual([]);
@@ -35,7 +37,13 @@ describe('planBulkRedirectImport', () => {
     expect(plan.update).toEqual([
       {
         id: 99,
-        row: { from: '/old', to: '/even-newer', status: '302', notes: 'rerouted' },
+        row: {
+          from: '/old',
+          to: '/even-newer',
+          status: '302',
+          notes: 'rerouted',
+          sourceIndex: 0,
+        },
       },
     ]);
     expect(plan.create).toEqual([]);
@@ -58,8 +66,28 @@ describe('planBulkRedirectImport', () => {
       rows: [{ from: '/gone', to: '', status: '410' }],
       payload: fakePayload({}),
     });
-    expect(plan.create).toEqual([{ from: '/gone', to: '', status: '410' }]);
+    expect(plan.create).toEqual([
+      { from: '/gone', to: '', status: '410', sourceIndex: 0 },
+    ]);
     expect(plan.errors).toEqual([]);
+  });
+
+  it('reports duplicate `from` rows as skipped, with the last occurrence acted on', async () => {
+    const plan = await planBulkRedirectImport({
+      rows: [
+        { from: '/old', to: '/v1' },
+        { from: '/keep', to: '/keep-target' },
+        { from: '/old', to: '/v2' },
+      ],
+      payload: fakePayload({}),
+    });
+    expect(plan.create.map((r) => r.from)).toEqual(['/keep', '/old']);
+    const oldRow = plan.create.find((r) => r.from === '/old');
+    expect(oldRow?.to).toBe('/v2');
+    expect(oldRow?.sourceIndex).toBe(2);
+    expect(plan.skipped).toEqual([
+      expect.objectContaining({ index: 0, reason: expect.stringContaining('Duplicate') }),
+    ]);
   });
 
   it('rejects rows with missing or malformed fields', async () => {

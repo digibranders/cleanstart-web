@@ -18,6 +18,40 @@ const paragraph = (text: string) => ({
 });
 
 describe('extractFromLexical', () => {
+  it('does NOT count code-block text toward word count', () => {
+    const tree = lexical([
+      paragraph('one two three'),
+      {
+        type: 'code',
+        children: [
+          { type: 'code-highlight', text: 'const' },
+          { type: 'code-highlight', text: ' x = 1 + 2;' },
+          { type: 'code-highlight', text: ' // a long comment' },
+        ],
+      },
+      paragraph('four five'),
+    ]);
+    const result = extractFromLexical(tree);
+    expect(result.wordCount).toBe(5);
+  });
+
+  it('does NOT count embed / inline-block content toward word count', () => {
+    const tree = lexical([
+      paragraph('alpha beta'),
+      {
+        type: 'block',
+        fields: { url: 'https://example.com', caption: 'caption text' },
+      },
+      {
+        type: 'inline-block',
+        fields: { label: 'inline label words' },
+      },
+      paragraph('gamma'),
+    ]);
+    const result = extractFromLexical(tree);
+    expect(result.wordCount).toBe(3);
+  });
+
   it('returns zeros for null/undefined/non-object input', () => {
     expect(extractFromLexical(null)).toEqual({ wordCount: 0, readingMinutes: 0, headings: [] });
     expect(extractFromLexical(undefined)).toEqual({ wordCount: 0, readingMinutes: 0, headings: [] });

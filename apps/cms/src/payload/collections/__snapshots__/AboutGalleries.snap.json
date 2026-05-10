@@ -1,0 +1,44 @@
+{
+  "slug": "aboutGalleries",
+  "versions": {
+    "drafts": true
+  },
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "name",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "slug",
+      "required": true,
+      "unique": true
+    },
+    {
+      "type": "upload",
+      "name": "image",
+      "required": true,
+      "relationTo": "media"
+    },
+    {
+      "type": "text",
+      "name": "caption"
+    },
+    {
+      "type": "text",
+      "name": "imageLink"
+    },
+    {
+      "type": "number",
+      "name": "displayOrder"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 0,
+    "afterChange": 0,
+    "beforeValidate": 0,
+    "afterDelete": 0
+  }
+}

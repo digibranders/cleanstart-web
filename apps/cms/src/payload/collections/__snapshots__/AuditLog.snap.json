@@ -1,0 +1,74 @@
+{
+  "slug": "audit-log",
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "date",
+      "name": "timestamp",
+      "required": true
+    },
+    {
+      "type": "select",
+      "name": "action",
+      "required": true,
+      "options": [
+        {
+          "value": "lead_deleted"
+        },
+        {
+          "value": "lead_exported"
+        },
+        {
+          "value": "dsar_export"
+        },
+        {
+          "value": "dsar_erasure"
+        },
+        {
+          "value": "schema_override_changed"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "targetCollection",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "targetId",
+      "required": true
+    },
+    {
+      "type": "relationship",
+      "name": "actorUserId",
+      "relationTo": "users"
+    },
+    {
+      "type": "text",
+      "name": "requestIp"
+    },
+    {
+      "type": "text",
+      "name": "userAgent"
+    },
+    {
+      "type": "text",
+      "name": "acceptLanguage"
+    },
+    {
+      "type": "number",
+      "name": "proxyChainLength"
+    },
+    {
+      "type": "json",
+      "name": "metadata"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 0,
+    "afterChange": 0,
+    "beforeValidate": 0,
+    "afterDelete": 0
+  }
+}
