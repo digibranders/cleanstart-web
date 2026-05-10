@@ -45,6 +45,7 @@ import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
+import { wireCustomEditView } from './payload/lib/wire-custom-edit-view';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { wireCustomListView } from './payload/lib/wire-custom-list-view';
 import { Announcements } from './payload/globals/announcements';
@@ -183,10 +184,11 @@ export default buildConfig({
     Pages,
   ]
     .map(wireCustomListView)
+    .map(wireCustomEditView)
     .map(wireCustomFields),
-  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements].map(
-    wireCustomFields,
-  ),
+  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements]
+    .map(wireCustomEditView)
+    .map(wireCustomFields),
   endpoints: [
     jsonLdEndpoint,
     sitemapEndpoint,

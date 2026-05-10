@@ -1,6 +1,7 @@
 import { TextField as TextField_d8b22c7a38a756dd8ecb3437acff34bf } from '@/payload/admin/components/fields/TextField.tsx'
 import { SelectField as SelectField_9c71ee466fcdbb40e13298a3fa959d0e } from '@/payload/admin/components/fields/SelectField.tsx'
 import { JsonField as JsonField_c698ed818f2263de63387a332e0e62c8 } from '@/payload/admin/components/fields/JsonField.tsx'
+import { CmsEditView as CmsEditView_1d4cf1c527e707894062bb7e5b5087de } from '@/payload/admin/components/views/edit/CmsEditView.tsx'
 import { CmsListView as CmsListView_339f71bcd64a39b547313d733bae8857 } from '@/payload/admin/components/views/list/CmsListView.tsx'
 import { MediaSelfChrome as MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56 } from '@/payload/admin/components/MediaSelfChrome.tsx'
 import { MediaSizeWarningField as MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2 } from '@/payload/admin/components/MediaSizeWarningField.tsx'
@@ -90,6 +91,7 @@ export const importMap = {
   "@/payload/admin/components/fields/TextField.tsx#TextField": TextField_d8b22c7a38a756dd8ecb3437acff34bf,
   "@/payload/admin/components/fields/SelectField.tsx#SelectField": SelectField_9c71ee466fcdbb40e13298a3fa959d0e,
   "@/payload/admin/components/fields/JsonField.tsx#JsonField": JsonField_c698ed818f2263de63387a332e0e62c8,
+  "@/payload/admin/components/views/edit/CmsEditView.tsx#CmsEditView": CmsEditView_1d4cf1c527e707894062bb7e5b5087de,
   "@/payload/admin/components/views/list/CmsListView.tsx#CmsListView": CmsListView_339f71bcd64a39b547313d733bae8857,
   "@/payload/admin/components/MediaSelfChrome.tsx#MediaSelfChrome": MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56,
   "@/payload/admin/components/MediaSizeWarningField.tsx#MediaSizeWarningField": MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2,
