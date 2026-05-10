@@ -78,6 +78,9 @@ jobs:
       - name: Verify generated Payload types are not stale
         run: pnpm --filter @cleanstart/cms verify:types
 
+      - name: Verify @payloadcms/ui import allow-list (Wave 8 lock-in)
+        run: pnpm --filter @cleanstart/cms verify:payload-ui
+
       - name: Build
         run: pnpm build
 
