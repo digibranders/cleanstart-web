@@ -51,6 +51,36 @@ export const Users: CollectionConfig = {
         description: 'Composite roles supported. Author = own drafts only. Editor = publish content. Admin = full access.',
       },
     },
+    // ---------------------------------------------------------------
+    // Per-editor admin-UI preferences. Backs the Wave 3 "saved views"
+    // surface (column visibility, where filters, sort, page size per
+    // collection) and any future personalised state. Hidden from the
+    // admin UI — managed via @/payload/admin/lib/saved-views.ts.
+    //
+    // Shape (loose by design — additive over time):
+    //   {
+    //     savedViews?: {
+    //       [collectionSlug: string]: {
+    //         active?: string;
+    //         views?: Array<{
+    //           id: string;
+    //           name: string;
+    //           columns?: string[];
+    //           where?: Where;
+    //           sort?: string;
+    //           limit?: number;
+    //         }>;
+    //       };
+    //     };
+    //   }
+    // ---------------------------------------------------------------
+    {
+      name: 'preferences',
+      type: 'json',
+      admin: {
+        hidden: true,
+      },
+    },
   ],
   timestamps: true,
 };

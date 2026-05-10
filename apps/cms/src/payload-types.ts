@@ -198,6 +198,15 @@ export interface User {
    * Composite roles supported. Author = own drafts only. Editor = publish content. Admin = full access.
    */
   roles: ('admin' | 'editor' | 'author')[];
+  preferences?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -6372,6 +6381,7 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   roles?: T;
+  preferences?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

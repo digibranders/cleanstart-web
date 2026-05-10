@@ -127,7 +127,7 @@ describe('wireCustomFields', () => {
     );
   });
 
-  it('does NOT recurse into blocks (rendering pipeline assumes stock components)', () => {
+  it('recurses into blocks now that BlocksField composes via RenderFields (Wave 2 part 2)', () => {
     const wired = wireCustomFields({
       slug: 'demo',
       fields: [
@@ -147,14 +147,18 @@ describe('wireCustomFields', () => {
       | (Field & { blocks: Array<{ fields: Field[] }> })
       | undefined;
     const heroHeadline = blocks?.blocks[0]?.fields[0] as Field;
-    expect(componentPath(heroHeadline)).toBeUndefined();
+    expect(componentPath(heroHeadline)).toBe(
+      '@/payload/admin/components/fields/TextField.tsx#TextField',
+    );
   });
 
-  it('leaves date fields untouched (stock picker is preferred)', () => {
+  it('wires date fields to the @cleanstart/ui DateTimePicker (Wave 2)', () => {
     const wired = wireCustomFields({
       slug: 'demo',
       fields: [{ name: 'publishedAt', type: 'date' }],
     });
-    expect(componentPath(fieldOf(wired, 'publishedAt'))).toBeUndefined();
+    expect(componentPath(fieldOf(wired, 'publishedAt'))).toBe(
+      '@/payload/admin/components/fields/DateField.tsx#DateField',
+    );
   });
 });

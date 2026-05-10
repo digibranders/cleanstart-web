@@ -78,8 +78,16 @@ jobs:
       - name: Verify generated Payload types are not stale
         run: pnpm --filter @cleanstart/cms verify:types
 
+      - name: Verify @payloadcms/ui import allow-list (Wave 8 lock-in)
+        run: pnpm --filter @cleanstart/cms verify:payload-ui
+
       - name: Build
         run: pnpm build
+
+      - name: Verify admin first-load bundle budget (Wave 8 part 2)
+        run: pnpm --filter @cleanstart/cms verify:bundle-budget
+        env:
+          CMS_BUNDLE_BUDGET_BYTES_GZ: '512000'
 
   cms-e2e:
     name: apps/cms · e2e (@phase-d-preview)
@@ -127,6 +135,123 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cms-playwright-report
+          path: apps/cms/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  ui-ladle-build:
+    name: packages/ui · Ladle build
+    needs: cms
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Build Ladle stories
+        run: pnpm --filter @cleanstart/ui ladle:build
+      - name: Upload Ladle build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-ladle-build
+          path: packages/ui/build/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  cms-vr:
+    name: apps/cms · visual regression (@phase-ui-vr)
+    needs: cms
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: cleanstart
+          POSTGRES_PASSWORD: cleanstart
+          POSTGRES_DB: cleanstart
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cleanstart -d cleanstart"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URI: postgres://cleanstart:cleanstart@localhost:5432/cleanstart
+      PAYLOAD_SECRET: ci-only-not-a-real-secret
+      PAYLOAD_PUBLIC_SERVER_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm --filter @cleanstart/cms exec playwright install --with-deps chromium
+      # Advisory until baseline screenshots are committed. Run
+      # `pnpm --filter @cleanstart/cms test:e2e --grep @phase-ui-vr --update-snapshots`
+      # locally (with chromium installed), commit the *.png files under
+      # tests/e2e/ui/__screenshots__/, then flip this back to blocking.
+      - name: Run visual-regression suite
+        run: pnpm --filter @cleanstart/cms test:e2e --grep @phase-ui-vr
+        continue-on-error: true
+      - name: Upload VR report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cms-vr-report
+          path: apps/cms/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  cms-a11y:
+    name: apps/cms · a11y (@phase-ui-a11y)
+    needs: cms
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: cleanstart
+          POSTGRES_PASSWORD: cleanstart
+          POSTGRES_DB: cleanstart
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cleanstart -d cleanstart"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URI: postgres://cleanstart:cleanstart@localhost:5432/cleanstart
+      PAYLOAD_SECRET: ci-only-not-a-real-secret
+      PAYLOAD_PUBLIC_SERVER_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm --filter @cleanstart/cms exec playwright install --with-deps chromium
+      - name: Run a11y suite
+        run: pnpm --filter @cleanstart/cms test:e2e --grep @phase-ui-a11y
+      - name: Upload a11y report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cms-a11y-report
           path: apps/cms/playwright-report/
           if-no-files-found: ignore
           retention-days: 14

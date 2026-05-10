@@ -45,7 +45,9 @@ import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
+import { wireCustomEditView } from './payload/lib/wire-custom-edit-view';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
+import { wireCustomListView } from './payload/lib/wire-custom-list-view';
 import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
 import { Legal } from './payload/globals/legal';
@@ -144,11 +146,18 @@ export default buildConfig({
         './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
         './payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer',
         './payload/admin/components/ToastBus.tsx#ToastBus',
+        // Wave 4 part 2 — Cmd/Ctrl-Shift-S opens our schedule-publish
+        // dialog (DateTimePicker + Dialog from @cleanstart/ui).
+        './payload/admin/components/SchedulePublishDialog.tsx#SchedulePublishDialog',
       ],
       afterNavLinks: [
         './payload/admin/components/UserMenu.tsx#UserMenu',
       ],
       beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
+      // Wave 5 — branded hero injected above the stock LoginForm. Full
+      // login-route replacement waits for the 2FA backend (Phase I).
+      beforeLogin: ['./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero'],
+      afterLogin: ['./payload/admin/components/auth/CmsLoginFooter.tsx#CmsLoginFooter'],
       graphics: {
         Logo: './payload/admin/Logo.tsx#Logo',
         Icon: './payload/admin/Icon.tsx#Icon',
@@ -157,6 +166,12 @@ export default buildConfig({
         dashboard: {
           Component:
             './payload/admin/components/Dashboard/Dashboard.tsx#Dashboard',
+        },
+        // Wave 5 — replaces the stock /admin/account screen with our
+        // own profile + password + reserved-2FA layout.
+        account: {
+          Component:
+            './payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView',
         },
       },
     },
@@ -202,10 +217,13 @@ export default buildConfig({
     Jobs,
     AboutGalleries,
     Pages,
-  ].map(wireCustomFields),
-  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements].map(
-    wireCustomFields,
-  ),
+  ]
+    .map(wireCustomListView)
+    .map(wireCustomEditView)
+    .map(wireCustomFields),
+  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements]
+    .map(wireCustomEditView)
+    .map(wireCustomFields),
   endpoints: [
     jsonLdEndpoint,
     sitemapEndpoint,

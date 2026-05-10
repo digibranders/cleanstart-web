@@ -1,10 +1,34 @@
-export { Combobox } from './Combobox';
-export type { ComboboxOption } from './Combobox';
-export { ConfirmDialog } from './ConfirmDialog';
-export { Dialog, DialogBody, DialogFooter, DialogHeader } from './Dialog';
-export { Drawer, DrawerBody, DrawerFooter, DrawerHeader } from './Drawer';
-export { Popover } from './Popover';
-export { Spinner } from './Spinner';
-export { useAnchoredPosition } from './hooks/useAnchoredPosition';
-export type { Placement } from './hooks/useAnchoredPosition';
-export { useDismiss } from './hooks/useDismiss';
+// Primitives now live in `@cleanstart/ui`. This file is preserved so
+// existing relative imports (`./ui/index`) keep compiling. New code
+// should import from `@cleanstart/ui` directly.
+
+export {
+  Combobox,
+  ConfirmDialog,
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  DialogHeader,
+  Drawer,
+  DrawerBody,
+  DrawerFooter,
+  DrawerHeader,
+  Popover,
+  Spinner,
+  Tooltip,
+  DropdownMenu,
+  ContextMenu,
+  DateTimePicker,
+  ToastProvider,
+  useToast,
+  dispatchToast,
+  useAnchoredPosition,
+  useDismiss,
+} from '@cleanstart/ui';
+export type {
+  ComboboxOption,
+  Placement,
+  DropdownMenuItem,
+  ToastInput,
+  ToastTone,
+} from '@cleanstart/ui';

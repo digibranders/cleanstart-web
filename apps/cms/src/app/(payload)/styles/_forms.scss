@@ -360,3 +360,624 @@
     text-underline-offset: 2px;
   }
 }
+
+// =============================================================================
+// Tabs field (Wave 2 part 2) — horizontal tablist + tabpanel
+// =============================================================================
+.cs-tabs {
+  margin: var(--cs-space-3) 0;
+
+  &__list {
+    border-bottom: 1px solid var(--theme-elevation-150);
+    display: flex;
+    gap: var(--cs-space-2);
+    overflow-x: auto;
+  }
+
+  &__tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--theme-text-soft);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    padding: var(--cs-space-2) var(--cs-space-3);
+    transition: color var(--cs-motion-micro), border-color var(--cs-motion-micro);
+
+    &:hover { color: var(--theme-text); }
+
+    &.is-active {
+      border-bottom-color: var(--cs-cyan-500);
+      color: var(--cs-text-heading);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 -2px 0 var(--cs-cyan-500);
+    }
+  }
+
+  &__panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
+    padding-top: var(--cs-space-4);
+  }
+}
+
+// Row field (Wave 2 part 2) — flex children
+.cs-row {
+  display: grid;
+  gap: var(--cs-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+// Array field (Wave 2 part 2) — drag-sort + add/remove
+.cs-array,
+.cs-blocks {
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  margin: var(--cs-space-3) 0;
+  padding: var(--cs-space-4);
+
+  &__legend {
+    align-items: baseline;
+    color: var(--cs-text-heading);
+    display: flex;
+    font-size: 13px;
+    font-weight: 600;
+    gap: var(--cs-space-2);
+    letter-spacing: 0.02em;
+    padding: 0 var(--cs-space-2);
+    text-transform: uppercase;
+  }
+
+  &__count {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: none;
+  }
+
+  &__description {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    margin: var(--cs-space-1) 0 var(--cs-space-3);
+  }
+
+  &__warn {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: var(--cs-radius-input);
+    color: #b45309;
+    font-size: 12px;
+    margin: 0 0 var(--cs-space-3);
+    padding: var(--cs-space-2) var(--cs-space-3);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__row {
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    display: grid;
+    gap: var(--cs-space-2);
+    grid-template-columns: 24px 28px 1fr 28px;
+    padding: var(--cs-space-3);
+    transition: border-color var(--cs-motion-micro), opacity var(--cs-motion-micro);
+
+    &.is-dragging { opacity: 0.4; }
+    &.is-hover { border-color: var(--cs-cyan-500); }
+  }
+
+  &__row-handle {
+    color: var(--theme-text-soft);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:active { cursor: grabbing; }
+  }
+
+  &__row-index {
+    color: var(--theme-text-soft);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-align: center;
+    align-self: start;
+    padding-top: 4px;
+  }
+
+  &__row-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
+    min-width: 0;
+  }
+
+  &__row-remove {
+    align-items: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--cs-radius-chip);
+    color: var(--theme-text-soft);
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 16px;
+    height: 28px;
+    justify-content: center;
+    width: 28px;
+    align-self: start;
+
+    &:hover {
+      border-color: var(--color-error-500);
+      color: var(--color-error-500);
+    }
+  }
+
+  &__add {
+    margin-top: var(--cs-space-3);
+  }
+}
+
+.cs-blocks {
+  &__row {
+    grid-template-columns: 1fr;
+  }
+
+  &__row-header {
+    align-items: center;
+    border-bottom: 1px solid var(--theme-elevation-150);
+    display: grid;
+    gap: var(--cs-space-2);
+    grid-template-columns: 24px 28px 1fr 28px;
+    margin-bottom: var(--cs-space-3);
+    padding-bottom: var(--cs-space-2);
+  }
+
+  &__row-type {
+    color: var(--cs-text-heading);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__row-missing {
+    color: var(--color-error-500);
+    font-size: 12px;
+  }
+
+  &__picker {
+    display: grid;
+    gap: var(--cs-space-2);
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__picker-item {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--cs-space-3);
+    text-align: left;
+    transition: border-color var(--cs-motion-micro), background var(--cs-motion-micro);
+    width: 100%;
+
+    &:hover {
+      background: var(--cs-tint-brand-soft);
+      border-color: var(--cs-cyan-500);
+    }
+
+    &-label {
+      color: var(--cs-text-heading);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    &-slug {
+      color: var(--theme-text-soft);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+  }
+}
+
+// Join field (Wave 2 part 2) — read-only related-doc list
+.cs-join {
+  &__count {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    margin-bottom: var(--cs-space-1);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__row {
+    border-bottom: 1px solid var(--theme-elevation-150);
+    padding: var(--cs-space-1) 0;
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__link {
+    color: var(--cs-text-link);
+    font-size: 13px;
+    text-decoration: none;
+
+    &:hover { color: var(--cs-text-link-hover); text-decoration: underline; }
+  }
+
+  &__empty {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    font-style: italic;
+  }
+}
+
+// Code field (Wave 2 part 2) — CodeMirror 6 editor
+.cs-code-field {
+  &__editor {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-input);
+    overflow: hidden;
+    transition: border-color var(--cs-motion-micro);
+
+    .cm-editor {
+      max-height: 480px;
+      min-height: 160px;
+    }
+
+    &:focus-within {
+      border-color: var(--cs-cyan-500);
+      box-shadow: var(--cs-shadow-input-focus);
+    }
+  }
+
+  &--error &__editor { border-color: var(--color-error-500); }
+}
+
+// =============================================================================
+// Group field (Wave 2 part 2) — labelled fieldset around RenderFields
+// =============================================================================
+.cs-group {
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  margin: var(--cs-space-3) 0;
+  padding: var(--cs-space-5);
+
+  &__legend {
+    color: var(--cs-text-heading);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0 var(--cs-space-2);
+    text-transform: uppercase;
+  }
+
+  &__description {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    line-height: 1.4;
+    margin: 0 0 var(--cs-space-3);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
+  }
+}
+
+// =============================================================================
+// Collapsible field (Wave 2 part 2) — <details>-based expand/collapse
+// =============================================================================
+.cs-collapsible {
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  margin: var(--cs-space-3) 0;
+
+  &__summary {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    font-weight: 600;
+    gap: var(--cs-space-2);
+    list-style: none;
+    padding: var(--cs-space-3) var(--cs-space-4);
+    user-select: none;
+
+    &::-webkit-details-marker { display: none; }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+  }
+
+  &__chevron {
+    color: var(--theme-text-soft);
+    display: inline-flex;
+    transition: transform var(--cs-motion-micro);
+  }
+
+  &.is-open .cs-collapsible__chevron {
+    transform: rotate(180deg);
+  }
+
+  &__title { color: var(--cs-text-heading); }
+
+  &__description {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    line-height: 1.4;
+    margin: 0 var(--cs-space-4) var(--cs-space-2);
+  }
+
+  &__body {
+    border-top: 1px solid var(--theme-elevation-150);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
+    padding: var(--cs-space-4);
+  }
+}
+
+// =============================================================================
+// Point field — two number inputs side by side (lng / lat)
+// =============================================================================
+.cs-point-field {
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--cs-space-3);
+    margin-top: var(--cs-space-1);
+  }
+
+  &__cell {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-1);
+  }
+
+  &__cell-label {
+    color: var(--theme-text-soft);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+}
+
+// =============================================================================
+// JSON field — monospace textarea with parse-on-blur error surfacing
+// =============================================================================
+.cs-textarea {
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-input);
+  color: var(--theme-text);
+  font-size: 13px;
+  line-height: 1.5;
+  padding: var(--cs-space-2) var(--cs-space-3);
+  width: 100%;
+  resize: vertical;
+  transition:
+    border-color var(--cs-motion-micro),
+    box-shadow var(--cs-motion-micro);
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--cs-cyan-500);
+    box-shadow: var(--cs-shadow-input-focus);
+  }
+
+  &--mono {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    tab-size: 2;
+  }
+}
+
+.cs-json-field--error .cs-textarea {
+  border-color: var(--color-error-500);
+}
+
+// =============================================================================
+// DateTimePicker — calendar grid + popover panel
+// =============================================================================
+.cs-datetime {
+  display: inline-block;
+  width: 100%;
+
+  &__trigger {
+    align-items: center;
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-input);
+    color: var(--theme-text);
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 13px;
+    gap: var(--cs-space-2);
+    height: 36px;
+    justify-content: space-between;
+    padding: 0 var(--cs-space-3);
+    transition: border-color var(--cs-motion-micro);
+    width: 100%;
+
+    &:hover:not(:disabled) {
+      border-color: var(--cs-cyan-300);
+    }
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow: var(--cs-shadow-input-focus);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  &__placeholder {
+    color: var(--theme-text-soft);
+  }
+
+  &__clear {
+    color: var(--theme-text-soft);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+
+    &:hover {
+      color: var(--color-error-500);
+    }
+  }
+
+  &__panel {
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-card);
+    box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.45);
+    padding: var(--cs-space-3);
+    min-width: 280px;
+  }
+
+  &__panel-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--cs-space-2);
+  }
+
+  &__nav {
+    background: transparent;
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-chip);
+    color: var(--theme-text);
+    cursor: pointer;
+    height: 28px;
+    width: 28px;
+
+    &:hover {
+      border-color: var(--cs-cyan-500);
+      color: var(--cs-cyan-500);
+    }
+  }
+
+  &__month-year {
+    font-weight: 600;
+  }
+
+  &__weekdays {
+    color: var(--theme-text-soft);
+    display: grid;
+    font-size: 11px;
+    font-weight: 600;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: var(--cs-space-1);
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  &__grid {
+    display: grid;
+    gap: 2px;
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  &__day {
+    aspect-ratio: 1 / 1;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--cs-radius-chip);
+    color: var(--theme-text);
+    cursor: pointer;
+    font-size: 12px;
+    transition: all var(--cs-motion-micro);
+
+    &.is-out {
+      color: var(--theme-text-soft);
+      opacity: 0.5;
+    }
+
+    &.is-today {
+      border-color: var(--cs-cyan-300);
+    }
+
+    &.is-selected {
+      background: var(--cs-cyan-500);
+      color: white;
+    }
+
+    &.is-blocked {
+      cursor: not-allowed;
+      opacity: 0.3;
+    }
+
+    &:hover:not(.is-selected):not(.is-blocked) {
+      background: var(--cs-tint-brand-soft);
+    }
+  }
+
+  &__panel-footer {
+    align-items: center;
+    border-top: 1px solid var(--theme-elevation-150);
+    display: flex;
+    gap: var(--cs-space-3);
+    justify-content: space-between;
+    margin-top: var(--cs-space-3);
+    padding-top: var(--cs-space-3);
+  }
+
+  &__time {
+    align-items: center;
+    display: flex;
+    gap: var(--cs-space-2);
+    font-size: 12px;
+
+    input {
+      background: var(--theme-elevation-50);
+      border: 1px solid var(--theme-elevation-150);
+      border-radius: var(--cs-radius-input);
+      color: var(--theme-text);
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+  }
+
+  &__tz {
+    color: var(--theme-text-soft);
+    font-size: 11px;
+    font-family: var(--font-mono);
+  }
+}

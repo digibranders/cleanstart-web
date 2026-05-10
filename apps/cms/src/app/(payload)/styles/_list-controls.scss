@@ -3,6 +3,173 @@
 // bulk-actions footer, smart cells (relationship & date).
 // =============================================================================
 
+// -----------------------------------------------------------------------------
+// Wave 3 — CleanStart custom list view chrome (CmsListView). The legacy
+// stock-list selectors below remain as resets until every collection is
+// verified rendering through CmsListView; Wave 6 deletes them.
+// -----------------------------------------------------------------------------
+.cs-list {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--cs-app-header-height, 56px));
+
+  &__gutter { flex: 1; }
+
+  &__header {
+    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cs-space-4);
+    justify-content: space-between;
+    margin-bottom: var(--cs-space-6);
+    padding-top: var(--cs-space-6);
+  }
+
+  &__heading { flex: 1; min-width: 240px; }
+
+  &__title {
+    color: var(--cs-text-heading);
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  &__description {
+    color: var(--theme-text-soft);
+    font-size: 13px;
+    line-height: 1.4;
+    margin-top: 4px;
+  }
+
+  &__controls {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cs-space-2);
+  }
+
+  &__search { align-items: center; display: inline-flex; }
+
+  &__search-input {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-input);
+    color: var(--theme-text);
+    font-size: 13px;
+    height: 36px;
+    min-width: 240px;
+    padding: 0 var(--cs-space-3);
+    transition: border-color var(--cs-motion-micro);
+
+    &:focus-visible {
+      border-color: var(--cs-cyan-500);
+      box-shadow: var(--cs-shadow-input-focus);
+      outline: none;
+    }
+  }
+
+  &__menu-trigger {
+    align-items: center;
+    display: inline-flex;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+  }
+
+  &__table {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    overflow: hidden;
+  }
+}
+
+.cs-bulk-bar {
+  align-items: center;
+  background: var(--theme-elevation-100);
+  border-top: 1px solid var(--theme-elevation-200);
+  bottom: 0;
+  box-shadow: 0 -8px 24px -8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  gap: var(--cs-space-4);
+  justify-content: space-between;
+  left: var(--nav-width, 240px);
+  padding: var(--cs-space-3) var(--cs-space-6);
+  position: sticky;
+  right: 0;
+  z-index: 40;
+
+  &__count {
+    color: var(--theme-text);
+    font-size: 13px;
+
+    strong { color: var(--cs-text-heading); font-weight: 600; }
+  }
+
+  &__actions { display: flex; gap: var(--cs-space-2); }
+}
+
+.cs-column-picker {
+  &__list { list-style: none; margin: 0; padding: 0; }
+
+  &__row {
+    border-bottom: 1px solid var(--theme-elevation-150);
+    padding: var(--cs-space-2) 0;
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__row-label {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    gap: var(--cs-space-2);
+
+    input[type='checkbox'] { cursor: pointer; }
+  }
+}
+
+.cs-saved-views {
+  &__trigger {
+    align-items: center;
+    display: inline-flex;
+    gap: 4px;
+    height: 36px;
+  }
+
+  &__count {
+    color: var(--theme-text-soft);
+    font-size: 11px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-1);
+
+    > span {
+      color: var(--cs-text-heading);
+      font-size: 13px;
+      font-weight: 600;
+    }
+  }
+}
+
+.cs-visually-hidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 // ─── List header search input ──────────────────────────────────────
 //
 // Payload's stock `.search-filter` wraps its input in a ~50px-tall

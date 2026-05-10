@@ -60,6 +60,16 @@ kbd {
 // Drawer system — unified close button, backdrop, header, sizing
 // =============================================================================
 //
+// Wave 6 status: these selectors stay in place ONLY for stock Payload
+// drawer surfaces we haven't yet migrated (the upload bulk drawer + a
+// handful of internal Lexical drawers). All consumer call sites we
+// own — RelationshipField, MediaField, MediaPicker — render through
+// our @cleanstart/ui Drawer (native <dialog> + own chrome). The
+// remaining hacks below are scoped to stock Payload modifiers and
+// don't fire on our own `.cs-drawer`. They get deleted in the same
+// commit that flips the last useDocumentDrawer / useListDrawer
+// consumer over to <DocPicker>/<ListPicker> (tracked in the plan).
+//
 // Payload v3 ships several drawer flavors (`doc-drawer`, `list-drawer`,
 // `edit-many`, `edit-many-bulk-uploads`) that all share the
 // `.drawer--is-open` modifier. Each renders a stock close button that
