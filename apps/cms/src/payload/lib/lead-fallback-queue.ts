@@ -19,8 +19,25 @@ const QUEUE_PREFIX = 'lead-fallback-queue/';
 const QUARANTINE_PREFIX = 'lead-fallback-queue/abandoned/';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
+/**
+ * In dev / test we fall back to a path next to the source tree so a
+ * fresh clone "just works" without env setup. In production this
+ * relative path can land inside the Next build output and get wiped
+ * on the next deploy, taking parked submissions with it — so we
+ * require the operator to pin LEAD_QUEUE_LOCAL_DIR explicitly.
+ */
 const defaultQueueDir = path.resolve(dirname, '../../../.lead-fallback-queue');
-const localQueueDir = (): string => process.env.LEAD_QUEUE_LOCAL_DIR ?? defaultQueueDir;
+const localQueueDir = (): string => {
+  const fromEnv = process.env.LEAD_QUEUE_LOCAL_DIR;
+  if (fromEnv && fromEnv.trim().length > 0) return fromEnv;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'LEAD_QUEUE_LOCAL_DIR is required in production so the lead-fallback queue path survives deploys. ' +
+        'Point it at a persistent volume (e.g. /var/lib/cleanstart/lead-fallback-queue).',
+    );
+  }
+  return defaultQueueDir;
+};
 const localQuarantineDir = (): string => path.join(localQueueDir(), 'abandoned');
 
 export type QueuedSubmission = {

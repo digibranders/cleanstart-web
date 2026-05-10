@@ -1,10 +1,21 @@
 import type { Endpoint } from 'payload';
 
 import { clientIpFromHeaders } from '../lib/client-ip';
+import { type RateLimitConfig, checkAndRecord } from '../lib/rate-limit';
 
 const QUERY_MAX_LEN = 200;
 const LOCALE_MAX_LEN = 16;
-const UA_MAX_LEN = 200;
+
+/**
+ * Search-analytics is much higher volume than lead-submit (one user
+ * fires multiple queries per visit), so the budget is wider than
+ * DEFAULT_RATE_LIMITS. The cap is still tight enough that a single
+ * IP can't fill 50k rows in a day.
+ */
+export const SEARCH_ANALYTICS_RATE_LIMITS: RateLimitConfig = {
+  perMinute: 60,
+  perDay: 600,
+};
 
 const json = (
   body: unknown,
@@ -51,24 +62,36 @@ const validate = (
 /**
  * POST /api/search/analytics
  *
- * Public endpoint — the public site (or any consumer) reports a
- * search query plus its result count back to the CMS. We log every
- * query, but the high-leverage signal is `resultsCount: 0` —
- * editors filter on those to find content gaps.
+ * Public endpoint — the public site reports a search query plus its
+ * result count back to the CMS. We log every query, but the
+ * high-leverage signal is `resultsCount: 0` — editors filter on
+ * those to find content gaps.
  *
- * Auth: public. We rely on the existing CORS allow-list at the
- * reverse proxy + the per-IP rate limit on the surrounding lead
- * endpoint set; if abuse becomes visible in the log the same
- * rate-limit backend can be wired in here too. (Phase G ticket.)
+ * Auth: public, but per-IP rate-limited (see SEARCH_ANALYTICS_RATE_LIMITS).
+ * The IP is used in-memory for the rate-limit key only — it is never
+ * persisted to the searchLog row, and neither is the User-Agent.
+ * Storing them on a no-consent public endpoint was a privacy footgun.
  *
  * The collection's create access is admin-locked, so this endpoint
- * uses `overrideAccess: true` — there's no other way to write a
- * row.
+ * uses `overrideAccess: true` — there's no other way to write a row.
  */
 export const searchAnalyticsEndpoint: Endpoint = {
   path: '/search/analytics',
   method: 'post',
   handler: async (req) => {
+    const ip = clientIpFromHeaders(req.headers);
+    const limit = checkAndRecord(`search-analytics:${ip}`, SEARCH_ANALYTICS_RATE_LIMITS);
+    if (!limit.ok) {
+      return json(
+        {
+          ok: false,
+          error: 'rate_limited',
+          retryAfterSeconds: Math.ceil(limit.retryAfterMs / 1000),
+        },
+        { status: 429 },
+      );
+    }
+
     let body: AnalyticsBody;
     try {
       body = (await (req as unknown as { json?: () => Promise<unknown> }).json?.()) as AnalyticsBody;
@@ -84,10 +107,6 @@ export const searchAnalyticsEndpoint: Endpoint = {
       return json({ ok: false, error: checked.error }, { status: 400 });
     }
 
-    const ip = clientIpFromHeaders(req.headers);
-    const ua = req.headers.get('user-agent');
-    const userAgent = ua ? ua.slice(0, UA_MAX_LEN) : null;
-
     try {
       await req.payload.create({
         collection: 'searchLog',
@@ -95,8 +114,6 @@ export const searchAnalyticsEndpoint: Endpoint = {
           query: checked.data.query,
           resultsCount: checked.data.resultsCount,
           ...(checked.data.locale ? { locale: checked.data.locale } : {}),
-          ...(ip ? { ip } : {}),
-          ...(userAgent ? { userAgent } : {}),
         },
         overrideAccess: true,
       });
