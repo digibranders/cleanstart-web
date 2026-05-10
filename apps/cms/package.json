@@ -23,6 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1042.0",
     "@cleanstart/types": "workspace:*",
+    "@cleanstart/ui": "workspace:*",
     "@lexical/html": "^0.41.0",
     "@lexical/react": "^0.41.0",
     "@lexical/table": "^0.41.0",
@@ -44,6 +45,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@cleanstart/config": "workspace:*",
     "@playwright/test": "^1.59.1",
     "@types/node": "^22.10.5",

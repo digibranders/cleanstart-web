@@ -1,0 +1,30 @@
+{
+  "name": "@cleanstart/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./primitives/*": "./src/primitives/*",
+    "./hooks/*": "./src/hooks/*"
+  },
+  "scripts": {
+    "lint": "biome lint src",
+    "typecheck": "tsc --noEmit",
+    "ladle": "ladle serve",
+    "ladle:build": "ladle build"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@cleanstart/config": "workspace:*",
+    "@ladle/react": "^5.0.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.3"
+  }
+}
