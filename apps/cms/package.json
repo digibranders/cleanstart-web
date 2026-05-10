@@ -18,6 +18,7 @@
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "verify:types": "node --experimental-strip-types --no-warnings scripts/check-types-drift.ts",
     "verify:payload-ui": "node --experimental-strip-types --no-warnings scripts/check-payload-ui-allowlist.ts",
+    "verify:bundle-budget": "node --experimental-strip-types --no-warnings scripts/check-bundle-budget.ts",
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
     "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create"
   },

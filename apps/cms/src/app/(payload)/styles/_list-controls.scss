@@ -132,6 +132,32 @@
   }
 }
 
+.cs-saved-views {
+  &__trigger {
+    align-items: center;
+    display: inline-flex;
+    gap: 4px;
+    height: 36px;
+  }
+
+  &__count {
+    color: var(--theme-text-soft);
+    font-size: 11px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-1);
+
+    > span {
+      color: var(--cs-text-heading);
+      font-size: 13px;
+      font-weight: 600;
+    }
+  }
+}
+
 .cs-visually-hidden {
   border: 0;
   clip: rect(0 0 0 0);

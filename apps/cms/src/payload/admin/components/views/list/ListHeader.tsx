@@ -5,6 +5,8 @@ import Link from 'next/link';
 import type { ChangeEvent, ReactElement, ReactNode, RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { SavedViews } from './SavedViews';
+
 type Props = {
   readonly collectionLabel: string;
   readonly collectionSlug: string;
@@ -58,6 +60,7 @@ export const ListHeader = (props: Props): ReactElement => {
         {description ? <div className="cs-list__description">{description}</div> : null}
       </div>
       <div className="cs-list__controls">
+        <SavedViews collectionSlug={props.collectionSlug} />
         <label className="cs-list__search">
           <span className="cs-visually-hidden">Search {collectionLabel}</span>
           <input

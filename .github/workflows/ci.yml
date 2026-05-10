@@ -84,6 +84,11 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Verify admin first-load bundle budget (Wave 8 part 2)
+        run: pnpm --filter @cleanstart/cms verify:bundle-budget
+        env:
+          CMS_BUNDLE_BUDGET_BYTES_GZ: '512000'
+
   cms-e2e:
     name: apps/cms · e2e (@phase-d-preview)
     needs: cms
@@ -193,7 +198,6 @@ jobs:
         run: pnpm --filter @cleanstart/cms exec playwright install --with-deps chromium
       - name: Run visual-regression suite
         run: pnpm --filter @cleanstart/cms test:e2e --grep @phase-ui-vr
-        continue-on-error: true
       - name: Upload VR report
         if: always()
         uses: actions/upload-artifact@v4
@@ -238,7 +242,6 @@ jobs:
         run: pnpm --filter @cleanstart/cms exec playwright install --with-deps chromium
       - name: Run a11y suite
         run: pnpm --filter @cleanstart/cms test:e2e --grep @phase-ui-a11y
-        continue-on-error: true
       - name: Upload a11y report
         if: always()
         uses: actions/upload-artifact@v4
