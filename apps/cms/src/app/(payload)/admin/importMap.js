@@ -44,6 +44,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ParagraphFeatureClient as ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { ArrayField as ArrayField_bd55658ce5d98c1c995dbb3e9e65c4e7 } from '@/payload/admin/components/fields/ArrayField.tsx'
 import { EmailField as EmailField_7dd923731832c5c33b25cd573216c1bc } from '@/payload/admin/components/fields/EmailField.tsx'
 import { LegacyBioViewer as LegacyBioViewer_879b4bd183ddbb79ae3f346d2661eacc } from '@/payload/admin/components/LegacyBioViewer.tsx'
 import { PermalinkField as PermalinkField_ea9054c021397c838baff6eeae171a19 } from '@/payload/admin/components/PermalinkField.tsx'
@@ -67,9 +68,11 @@ import { LeadsCsvTruncationBanner as LeadsCsvTruncationBanner_e22b2ed864c6d0e287
 import { FaqBulkPaste as FaqBulkPaste_34cc49081ef861ac2f0f2bcdbdf5a9d4 } from '@/payload/admin/components/FaqBulkPaste.tsx'
 import { FaqRowLabel as FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3 } from '@/payload/admin/components/FaqRowLabel.tsx'
 import { RelationshipCell as RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f } from '@/payload/admin/components/RelationshipCell.tsx'
+import { BlocksField as BlocksField_81821d6c72d1fc3a46ee03c3fb264707 } from '@/payload/admin/components/fields/BlocksField.tsx'
 import { TocRowLabel as TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b } from '@/payload/admin/components/TocRowLabel.tsx'
 import { DocHeader as DocHeader_ad90301af1277969698538615cf842dc } from '@/payload/admin/components/DocHeader.tsx'
 import { DocKebabExtras as DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0 } from '@/payload/admin/components/DocKebabExtras.tsx'
+import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/payload/admin/components/fields/CodeField.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
 import { SkipLink as SkipLink_27a678dd284d4042d03686d8b9a9b8e9 } from '../../../payload/admin/components/SkipLink.tsx'
@@ -138,6 +141,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ParagraphFeatureClient": ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/payload/admin/components/fields/ArrayField.tsx#ArrayField": ArrayField_bd55658ce5d98c1c995dbb3e9e65c4e7,
   "@/payload/admin/components/fields/EmailField.tsx#EmailField": EmailField_7dd923731832c5c33b25cd573216c1bc,
   "@/payload/admin/components/LegacyBioViewer.tsx#LegacyBioViewer": LegacyBioViewer_879b4bd183ddbb79ae3f346d2661eacc,
   "@/payload/admin/components/PermalinkField.tsx#PermalinkField": PermalinkField_ea9054c021397c838baff6eeae171a19,
@@ -161,9 +165,11 @@ export const importMap = {
   "@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste": FaqBulkPaste_34cc49081ef861ac2f0f2bcdbdf5a9d4,
   "@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel": FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3,
   "@/payload/admin/components/RelationshipCell.tsx#RelationshipCell": RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f,
+  "@/payload/admin/components/fields/BlocksField.tsx#BlocksField": BlocksField_81821d6c72d1fc3a46ee03c3fb264707,
   "@/payload/admin/components/TocRowLabel.tsx#TocRowLabel": TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b,
   "@/payload/admin/components/DocHeader.tsx#DocHeader": DocHeader_ad90301af1277969698538615cf842dc,
   "@/payload/admin/components/DocKebabExtras.tsx#DocKebabExtras": DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0,
+  "@/payload/admin/components/fields/CodeField.tsx#CodeField": CodeField_4aa85fbd783c4d26c5c89ebf383941c1,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,
   "./payload/admin/components/SkipLink.tsx#SkipLink": SkipLink_27a678dd284d4042d03686d8b9a9b8e9,

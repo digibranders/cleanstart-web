@@ -32,6 +32,7 @@ export type { ToastInput, ToastTone } from './primitives/Toast';
 export { useAnchoredPosition } from './hooks/useAnchoredPosition';
 export type { Placement } from './hooks/useAnchoredPosition';
 export { useDismiss } from './hooks/useDismiss';
+export { useDragSort } from './hooks/useDragSort';
 
 // Tokens
 export { tokens, themeAttr } from './tokens';
