@@ -46,6 +46,7 @@ import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
+import { wireCustomListView } from './payload/lib/wire-custom-list-view';
 import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
 import { Legal } from './payload/globals/legal';
@@ -180,7 +181,9 @@ export default buildConfig({
     Jobs,
     AboutGalleries,
     Pages,
-  ].map(wireCustomFields),
+  ]
+    .map(wireCustomListView)
+    .map(wireCustomFields),
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements].map(
     wireCustomFields,
   ),

@@ -1,10 +1,13 @@
 import { TextField as TextField_d8b22c7a38a756dd8ecb3437acff34bf } from '@/payload/admin/components/fields/TextField.tsx'
 import { SelectField as SelectField_9c71ee466fcdbb40e13298a3fa959d0e } from '@/payload/admin/components/fields/SelectField.tsx'
+import { JsonField as JsonField_c698ed818f2263de63387a332e0e62c8 } from '@/payload/admin/components/fields/JsonField.tsx'
+import { CmsListView as CmsListView_339f71bcd64a39b547313d733bae8857 } from '@/payload/admin/components/views/list/CmsListView.tsx'
 import { MediaSelfChrome as MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56 } from '@/payload/admin/components/MediaSelfChrome.tsx'
 import { MediaSizeWarningField as MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2 } from '@/payload/admin/components/MediaSizeWarningField.tsx'
 import { CheckboxField as CheckboxField_fa838d594eaa6e28e24d17add0c5aa91 } from '@/payload/admin/components/fields/CheckboxField.tsx'
 import { NumberField as NumberField_54a7b672a7a67bcb2120ffcb68d41481 } from '@/payload/admin/components/fields/NumberField.tsx'
 import { TextareaField as TextareaField_910298ace0fe3204ac012253d7fcff5b } from '@/payload/admin/components/fields/TextareaField.tsx'
+import { DateField as DateField_a74145b29e7a0acd050f8f68af83aab6 } from '@/payload/admin/components/fields/DateField.tsx'
 import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
 import { RelationshipField as RelationshipField_093f373a4f5250e712293002deb8de6b } from '@/payload/admin/components/fields/RelationshipField.tsx'
 import { SlugField as SlugField_72967e7957358d52051eede57fbdd787 } from '@/payload/admin/components/SlugField.tsx'
@@ -38,6 +41,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ParagraphFeatureClient as ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { EmailField as EmailField_7dd923731832c5c33b25cd573216c1bc } from '@/payload/admin/components/fields/EmailField.tsx'
 import { LegacyBioViewer as LegacyBioViewer_879b4bd183ddbb79ae3f346d2661eacc } from '@/payload/admin/components/LegacyBioViewer.tsx'
 import { PermalinkField as PermalinkField_ea9054c021397c838baff6eeae171a19 } from '@/payload/admin/components/PermalinkField.tsx'
 import { AuthorCredibilityField as AuthorCredibilityField_0547251fb6ced865a9066cb05f501acb } from '@/payload/admin/components/AuthorCredibilityField.tsx'
@@ -78,7 +82,6 @@ import { ListCellEnhancer as ListCellEnhancer_edd569c3aa02f3de17c22f7695d981ee }
 import { ToastBus as ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4 } from '../../../payload/admin/components/ToastBus.tsx'
 import { UserMenu as UserMenu_8a2f404b3fa17e34974bf49ed5367371 } from '../../../payload/admin/components/UserMenu.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
-import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -86,11 +89,14 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 export const importMap = {
   "@/payload/admin/components/fields/TextField.tsx#TextField": TextField_d8b22c7a38a756dd8ecb3437acff34bf,
   "@/payload/admin/components/fields/SelectField.tsx#SelectField": SelectField_9c71ee466fcdbb40e13298a3fa959d0e,
+  "@/payload/admin/components/fields/JsonField.tsx#JsonField": JsonField_c698ed818f2263de63387a332e0e62c8,
+  "@/payload/admin/components/views/list/CmsListView.tsx#CmsListView": CmsListView_339f71bcd64a39b547313d733bae8857,
   "@/payload/admin/components/MediaSelfChrome.tsx#MediaSelfChrome": MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56,
   "@/payload/admin/components/MediaSizeWarningField.tsx#MediaSizeWarningField": MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2,
   "@/payload/admin/components/fields/CheckboxField.tsx#CheckboxField": CheckboxField_fa838d594eaa6e28e24d17add0c5aa91,
   "@/payload/admin/components/fields/NumberField.tsx#NumberField": NumberField_54a7b672a7a67bcb2120ffcb68d41481,
   "@/payload/admin/components/fields/TextareaField.tsx#TextareaField": TextareaField_910298ace0fe3204ac012253d7fcff5b,
+  "@/payload/admin/components/fields/DateField.tsx#DateField": DateField_a74145b29e7a0acd050f8f68af83aab6,
   "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
   "@/payload/admin/components/fields/RelationshipField.tsx#RelationshipField": RelationshipField_093f373a4f5250e712293002deb8de6b,
   "@/payload/admin/components/SlugField.tsx#SlugField": SlugField_72967e7957358d52051eede57fbdd787,
@@ -124,6 +130,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ParagraphFeatureClient": ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/payload/admin/components/fields/EmailField.tsx#EmailField": EmailField_7dd923731832c5c33b25cd573216c1bc,
   "@/payload/admin/components/LegacyBioViewer.tsx#LegacyBioViewer": LegacyBioViewer_879b4bd183ddbb79ae3f346d2661eacc,
   "@/payload/admin/components/PermalinkField.tsx#PermalinkField": PermalinkField_ea9054c021397c838baff6eeae171a19,
   "@/payload/admin/components/AuthorCredibilityField.tsx#AuthorCredibilityField": AuthorCredibilityField_0547251fb6ced865a9066cb05f501acb,
@@ -164,7 +171,6 @@ export const importMap = {
   "./payload/admin/components/ToastBus.tsx#ToastBus": ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4,
   "./payload/admin/components/UserMenu.tsx#UserMenu": UserMenu_8a2f404b3fa17e34974bf49ed5367371,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,
-  "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
