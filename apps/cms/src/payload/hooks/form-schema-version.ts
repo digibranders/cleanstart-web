@@ -23,9 +23,19 @@ type FormDoc = {
 
 const fingerprintFields = (fields: FormFieldShape[] | null | undefined): string => {
   if (!fields) return '[]';
-  return JSON.stringify(
-    fields.map((field) => ({ name: field?.name ?? null, type: field?.type ?? null })),
-  );
+  // Sort by name so a pure visual reorder of fields doesn't bump the
+  // schema version. Field identity is the (name, type) tuple — two
+  // forms with identical {name,type} sets but different display order
+  // capture leads with the same key shape, so the dedup window stays
+  // intact across editor reorderings.
+  const stable = fields
+    .map((field) => ({ name: field?.name ?? null, type: field?.type ?? null }))
+    .sort((a, b) => {
+      const an = a.name ?? '';
+      const bn = b.name ?? '';
+      return an.localeCompare(bn);
+    });
+  return JSON.stringify(stable);
 };
 
 export const formSchemaVersionHook: CollectionBeforeChangeHook = async ({

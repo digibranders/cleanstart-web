@@ -124,6 +124,11 @@ export const collectSitemapEntries = async (
     while (page <= MAX_PAGES) {
       const result = await payload.find({
         collection: config.collection,
+        // Explicit status filter — `draft: false` is a hint Payload uses
+        // to pick the latest draft over the latest published when both
+        // exist, but it doesn't exclude documents that are draft-only.
+        // Belt-and-braces with the post-filter below.
+        where: { _status: { equals: 'published' } },
         limit: PER_PAGE,
         page,
         sort: '-updatedAt',
@@ -133,7 +138,7 @@ export const collectSitemapEntries = async (
       });
       for (const doc of result.docs) {
         if (!isIndexable(doc)) continue;
-        if (doc._status != null && doc._status !== 'published') continue;
+        if (doc._status !== 'published') continue;
         const loc = buildLoc(baseUrl, config.collection, doc);
         if (!loc) continue;
         if (!listingLastmod && doc.updatedAt) {
