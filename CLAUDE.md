@@ -28,6 +28,7 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 │       └── src/payload/{collections,globals,blocks,fields,access,lib}/
 ├── packages/
 │   ├── types/                       re-exports apps/cms/payload-types
+│   ├── ui/                          custom design-system primitives (Drawer, Dialog, Popover, Combobox, ConfirmDialog, Spinner, Tooltip, DropdownMenu, ContextMenu, DateTimePicker, Toast) + tokens; consumed by apps/cms today, will be reused by apps/web when it returns
 │   └── config/                      tsconfig · biome · eslint
 ├── migrations/webflow-import/       Phase H: ETL scripts
 ├── infra/                           docker-compose · Caddy · backup/restore scripts
@@ -36,7 +37,18 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 └── CLAUDE.md                        this file
 ```
 
-`apps/web` is **deferred** — the previous bootstrap was discarded along with all design / UI / brand / token / component-map / Figma-extracted assets and the four routing+SEO contracts (`WEB-ARCHITECTURE`, `BACKLOG-WEB`, `CONTENT-MODEL`, `SEO-PLAYBOOK`). Nothing in `docs/web/` survives. Reintroduction is a future wave; `packages/ui` is intentionally absent.
+`apps/web` is **deferred** — the previous bootstrap was discarded along with all design / UI / brand / token / component-map / Figma-extracted assets and the four routing+SEO contracts (`WEB-ARCHITECTURE`, `BACKLOG-WEB`, `CONTENT-MODEL`, `SEO-PLAYBOOK`). Nothing in `docs/web/` survives. Reintroduction is a future wave.
+
+`packages/ui` was reintroduced as part of the admin-UI takeover (plan: `~/.claude/plans/confirm-we-add-fuzzy-wind.md`). It hosts the custom React primitives that previously lived under `apps/cms/src/payload/admin/components/ui/`, plus new ones (Tooltip, DropdownMenu, ContextMenu, DateTimePicker, Toast). When `apps/web` returns, it consumes the same package — no duplication.
+
+### `@payloadcms/ui` is a data-layer-only dependency
+
+CleanStart owns every render path under `/admin`. Imports from `@payloadcms/ui` are limited to the **data layer**:
+
+- Allowed: `useField`, `useFormFields`, `useDocumentInfo`, `useListQuery`, `useTableColumns`, `useSelection`, `useAuth`, `useConfig`, `useLocale`, `useTranslation`, `useDocumentDrawer` (the hook only — render comes from `@cleanstart/ui`).
+- Forbidden: render-side exports (any component, including `Button`, `Drawer`, `Modal`, `Pill`, `useEditDepth`-driven view shells, etc.).
+
+ESLint enforces the allow-list (Wave 8 flips it from warn to error). The `@payloadcms/ui` major is pinned (currently `^3.81.0`); a new major is a *data-layer* upgrade only — never a UI upgrade.
 
 ---
 

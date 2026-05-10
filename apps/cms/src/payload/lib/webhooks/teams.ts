@@ -19,6 +19,7 @@
  */
 
 import type { WebhookEvent } from './dispatch';
+import { redactWebhookErrorBody } from './redact-error-body';
 
 interface AdaptiveFact {
   readonly title: string;
@@ -123,7 +124,7 @@ export const postTeamsWebhook = async (
     });
     if (!res.ok) {
       const text = await res.text().catch(() => '');
-      return { ok: false, status: res.status, error: text };
+      return { ok: false, status: res.status, error: redactWebhookErrorBody(text) };
     }
     return { ok: true, status: res.status };
   } catch (err) {

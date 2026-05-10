@@ -1,8 +1,9 @@
 'use client';
 
+import { DateTimePicker } from '@cleanstart/ui';
 import { useField } from '@payloadcms/ui';
 import type { DateFieldClientProps } from 'payload';
-import type { ChangeEvent, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import { useId } from 'react';
 
 const labelOf = (raw: unknown): string => {
@@ -13,20 +14,13 @@ const labelOf = (raw: unknown): string => {
   return '';
 };
 
-const toIsoLocal = (val: string | Date | null | undefined): string => {
-  if (val == null || val === '') return '';
-  const d = typeof val === 'string' ? new Date(val) : val;
-  if (Number.isNaN(d.getTime())) return '';
-  const pad = (n: number): string => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-    d.getHours(),
-  )}:${pad(d.getMinutes())}`;
-};
-
 /**
- * Custom date(time) field. Uses native <input type="datetime-local"> or
- * <input type="date"> based on the field's pickerAppearance — both are
- * keyboard-accessible without dragging in a third-party calendar.
+ * Custom date / datetime field. Composes the calendar + time popover
+ * from `@cleanstart/ui`. Replaces stock react-datepicker so storage
+ * (always ISO) is decoupled from display (locale + optional timezone).
+ *
+ * - `pickerAppearance: 'dayOnly'` → date mode, no time controls
+ * - anything else → datetime mode with time row
  */
 export const DateField = (props: DateFieldClientProps): ReactElement => {
   const { field, path } = props;
@@ -38,27 +32,12 @@ export const DateField = (props: DateFieldClientProps): ReactElement => {
   const labelText = labelOf(field.label) || path;
   const description =
     typeof field.admin?.description === 'string' ? field.admin.description : undefined;
-  const dateOpts = (field.admin as { date?: { pickerAppearance?: string } } | undefined)?.date;
+  const dateOpts = (field.admin as { date?: { pickerAppearance?: string; timezone?: string } } | undefined)
+    ?.date;
   const appearance = dateOpts?.pickerAppearance;
-  const inputType: 'date' | 'datetime-local' = appearance === 'dayOnly' ? 'date' : 'datetime-local';
+  const mode: 'date' | 'datetime' = appearance === 'dayOnly' ? 'date' : 'datetime';
+  const tz = dateOpts?.timezone;
   const readOnly = field.admin?.readOnly === true;
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const raw = e.target.value;
-    if (raw === '') {
-      setValue(null);
-      return;
-    }
-    const d = new Date(raw);
-    if (!Number.isNaN(d.getTime())) setValue(d.toISOString());
-  };
-
-  const inputValue =
-    inputType === 'date'
-      ? typeof value === 'string'
-        ? value.slice(0, 10)
-        : ''
-      : toIsoLocal(value);
 
   return (
     <div className={`field-type date cs-date-field${showError ? ' cs-date-field--error' : ''}`}>
@@ -71,15 +50,15 @@ export const DateField = (props: DateFieldClientProps): ReactElement => {
           </span>
         ) : null}
       </label>
-      <input
+      <DateTimePicker
         id={inputId}
-        type={inputType}
-        className="cs-date-field__input"
-        value={inputValue}
-        onChange={handleChange}
-        required={field.required}
-        readOnly={readOnly}
-        aria-readonly={readOnly || undefined}
+        value={value ?? null}
+        onChange={(next) => setValue(next ?? null)}
+        mode={mode}
+        {...(tz !== undefined ? { timezone: tz } : {})}
+        disabled={readOnly}
+        {...(field.required !== undefined ? { required: field.required } : {})}
+        ariaLabel={labelText}
       />
       {description ? <p className="field-description">{description}</p> : null}
       {showError && errorMessage ? (

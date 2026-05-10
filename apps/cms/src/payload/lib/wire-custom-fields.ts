@@ -25,14 +25,28 @@ const FIELD_OVERRIDES: Partial<Record<Field['type'], string>> = {
   text: '@/payload/admin/components/fields/TextField.tsx#TextField',
   textarea: '@/payload/admin/components/fields/TextareaField.tsx#TextareaField',
   number: '@/payload/admin/components/fields/NumberField.tsx#NumberField',
-  // `date` deliberately NOT overridden — Payload's stock date picker
-  // (calendar + time wheel popover) is more polished than what we'd
-  // hand-roll from a native `datetime-local`. Keep stock until we
-  // build a real calendar popover.
-  // date: '@/payload/admin/components/fields/DateField.tsx#DateField',
+  // Wave 2: DateField now composes the @cleanstart/ui DateTimePicker
+  // (calendar + time popover, ISO storage, optional timezone). Replaces
+  // stock react-datepicker.
+  date: '@/payload/admin/components/fields/DateField.tsx#DateField',
+  email: '@/payload/admin/components/fields/EmailField.tsx#EmailField',
+  point: '@/payload/admin/components/fields/PointField.tsx#PointField',
+  json: '@/payload/admin/components/fields/JsonField.tsx#JsonField',
   select: '@/payload/admin/components/fields/SelectField.tsx#SelectField',
   checkbox: '@/payload/admin/components/fields/CheckboxField.tsx#CheckboxField',
   radio: '@/payload/admin/components/fields/RadioField.tsx#RadioField',
+  // Wave 2 part 2 — structural fields. All wrap a labelled chrome
+  // around Payload's `RenderFields` so children stamped above keep
+  // resolving to our custom Field components.
+  group: '@/payload/admin/components/fields/GroupField.tsx#GroupField',
+  collapsible:
+    '@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField',
+  tabs: '@/payload/admin/components/fields/TabsField.tsx#TabsField',
+  row: '@/payload/admin/components/fields/RowField.tsx#RowField',
+  array: '@/payload/admin/components/fields/ArrayField.tsx#ArrayField',
+  blocks: '@/payload/admin/components/fields/BlocksField.tsx#BlocksField',
+  join: '@/payload/admin/components/fields/JoinField.tsx#JoinField',
+  code: '@/payload/admin/components/fields/CodeField.tsx#CodeField',
 };
 
 const hasOwnFieldOverride = (field: Field): boolean => {
@@ -80,13 +94,19 @@ const walkFields = (fields: Field[]): Field[] =>
         ...next,
         tabs: tabs.tabs.map((tab) => ({ ...tab, fields: walkFields(tab.fields) })),
       } as Field;
+    } else if (next.type === 'blocks') {
+      // Wave 2 part 2: our custom BlocksField composes block sub-fields
+      // through RenderFields (no longer the lazy stock RSC pipeline),
+      // so it's safe — and necessary — to stamp custom Field overrides
+      // recursively into each block's sub-fields.
+      const blocks = next as typeof next & {
+        blocks: Array<{ fields: Field[] } & Record<string, unknown>>;
+      };
+      next = {
+        ...next,
+        blocks: blocks.blocks.map((b) => ({ ...b, fields: walkFields(b.fields) })),
+      } as Field;
     }
-    // Blocks are intentionally NOT recursed into. Payload's blocks-field
-    // renderer mounts each block's fields lazily via its own RSC payload;
-    // injecting custom `admin.components.Field` strings into block sub-
-    // fields breaks that rendering pipeline (rows mount but their inner
-    // fields never render). Leave block sub-fields as stock — editors
-    // see Payload's per-block forms inline, which is the desired UX.
 
     return next;
   });

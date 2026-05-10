@@ -1,6 +1,7 @@
 import type { Endpoint } from 'payload';
 import { z } from 'zod';
 
+import { hasAnyRole } from '../access/typed-user';
 import {
   IMPORT_SOURCE_LABEL,
   type RedirectsPayload,
@@ -17,10 +18,6 @@ const json = (data: unknown, init?: ResponseInit): Response =>
   });
 
 const MAX_ROWS = 5000;
-
-const hasEditorRole = (
-  user: { role?: string | null } | null | undefined,
-): boolean => user?.role === 'admin' || user?.role === 'editor';
 
 /**
  * Boundary schema for the bulk-import payload. Per CLAUDE.md "Zod at
@@ -62,7 +59,7 @@ export const redirectsImportEndpoint: Endpoint = {
   path: '/redirects/import',
   method: 'post',
   handler: async (req) => {
-    if (!hasEditorRole(req.user as { role?: string } | null)) {
+    if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
 
@@ -145,7 +142,7 @@ export const redirectsImportEndpoint: Endpoint = {
         created += 1;
       } catch (err) {
         runtimeErrors.push({
-          index: -1,
+          index: row.sourceIndex,
           message: err instanceof Error ? err.message : String(err),
         });
       }
@@ -166,7 +163,7 @@ export const redirectsImportEndpoint: Endpoint = {
         updated += 1;
       } catch (err) {
         runtimeErrors.push({
-          index: -1,
+          index: row.sourceIndex,
           message: err instanceof Error ? err.message : String(err),
         });
       }

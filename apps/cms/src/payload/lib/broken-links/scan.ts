@@ -158,12 +158,26 @@ export const scanForBrokenLinks = async (
   }
 
   // De-dupe by URL: one HEAD per unique URL, fan back out to all
-  // pairs that referenced it.
+  // pairs that referenced it. Run with a small concurrency cap so a
+  // doc with hundreds of outbound links doesn't serialise into
+  // hours of work behind the queue.
+  const CHECK_CONCURRENCY = 8;
   const uniqueUrls = [...new Set(pairs.map((p) => p.url))];
   const checks = new Map<string, { status: LinkStatus; httpStatus: number }>();
-  for (const url of uniqueUrls) {
-    checks.set(url, await checkUrl(url, fetcher));
-  }
+  let cursor = 0;
+  const worker = async (): Promise<void> => {
+    while (true) {
+      const i = cursor;
+      cursor += 1;
+      if (i >= uniqueUrls.length) return;
+      const url = uniqueUrls[i];
+      if (typeof url !== 'string') continue;
+      checks.set(url, await checkUrl(url, fetcher));
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(CHECK_CONCURRENCY, uniqueUrls.length) }, () => worker()),
+  );
 
   for (const pair of pairs) {
     const result = checks.get(pair.url);

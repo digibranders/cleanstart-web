@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { searchAnalyticsEndpoint } from './search-analytics';
+import { __resetRateLimitStore } from '../lib/rate-limit';
+import { SEARCH_ANALYTICS_RATE_LIMITS, searchAnalyticsEndpoint } from './search-analytics';
 
 const handler = searchAnalyticsEndpoint.handler;
 if (!handler) throw new Error('handler undefined');
@@ -38,6 +39,10 @@ const callJson = async (
 };
 
 describe('POST /api/search/analytics', () => {
+  beforeEach(() => {
+    __resetRateLimitStore();
+  });
+
   it('rejects an empty / missing query', async () => {
     const a = await callJson({ resultsCount: 0 });
     expect(a.status).toBe(400);
@@ -74,52 +79,43 @@ describe('POST /api/search/analytics', () => {
     expect(result.json).toMatchObject({ error: 'locale_invalid' });
   });
 
-  it('happy path — creates a searchLog row and returns ok', async () => {
+  it('happy path — creates a searchLog row without ip / userAgent and returns ok', async () => {
     const { status, json, create } = await callJson(
       { query: 'sbom', resultsCount: 0, locale: 'en-US' },
       { 'user-agent': 'Mozilla/5.0' },
     );
     expect(status).toBe(200);
     expect(json).toEqual({ ok: true });
-    expect(create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        collection: 'searchLog',
-        overrideAccess: true,
-        data: expect.objectContaining({
-          query: 'sbom',
-          resultsCount: 0,
-          locale: 'en-US',
-          userAgent: 'Mozilla/5.0',
-        }),
-      }),
-    );
+    expect(create).toHaveBeenCalledTimes(1);
+    const calls = create.mock.calls as unknown as Array<[{ data: Record<string, unknown> }]>;
+    const data = calls[0]?.[0]?.data;
+    expect(data).toEqual({ query: 'sbom', resultsCount: 0, locale: 'en-US' });
+    expect(data).not.toHaveProperty('ip');
+    expect(data).not.toHaveProperty('userAgent');
   });
 
-  it('truncates over-long query / locale / userAgent', async () => {
-    const { create } = await callJson(
-      {
-        query: 'x'.repeat(500),
-        resultsCount: 0,
-        locale: 'long-locale-tag-much-too-long',
-      },
-      { 'user-agent': 'A'.repeat(500) },
-    );
+  it('truncates over-long query / locale', async () => {
+    const { create } = await callJson({
+      query: 'x'.repeat(500),
+      resultsCount: 0,
+      locale: 'long-locale-tag-much-too-long',
+    });
     const calls = create.mock.calls as unknown as Array<
-      [{ data: { query: string; locale: string; userAgent: string } }]
+      [{ data: { query: string; locale: string } }]
     >;
     const data = calls[0]?.[0]?.data;
     expect(data?.query.length).toBe(200);
     expect(data?.locale.length).toBe(16);
-    expect(data?.userAgent.length).toBe(200);
   });
 
-  it('omits locale / ip / userAgent when not present', async () => {
+  it('omits locale when not present and never persists ip / userAgent', async () => {
     const { create } = await callJson({ query: 'foo', resultsCount: 5 });
     const calls = create.mock.calls as unknown as Array<[{ data: Record<string, unknown> }]>;
     const data = calls[0]?.[0]?.data;
     expect(data?.query).toBe('foo');
     expect(data?.resultsCount).toBe(5);
     expect(data?.locale).toBeUndefined();
+    expect(data?.ip).toBeUndefined();
     expect(data?.userAgent).toBeUndefined();
   });
 
@@ -138,5 +134,17 @@ describe('POST /api/search/analytics', () => {
       expect.objectContaining({ error: 'db down' }),
       'searchLog create failed',
     );
+  });
+
+  it('rate-limits a flood of requests from the same IP', async () => {
+    // Drive past the per-minute cap and assert the next call returns 429.
+    for (let i = 0; i < SEARCH_ANALYTICS_RATE_LIMITS.perMinute; i += 1) {
+      const r = await callJson({ query: `q${i}`, resultsCount: 0 });
+      expect(r.status).toBe(200);
+    }
+    const limited = await callJson({ query: 'one-too-many', resultsCount: 0 });
+    expect(limited.status).toBe(429);
+    expect(limited.json).toMatchObject({ error: 'rate_limited' });
+    expect(limited.json).toHaveProperty('retryAfterSeconds');
   });
 });

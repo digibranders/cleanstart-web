@@ -23,6 +23,23 @@ type LexicalNode = {
 
 const HEADING_TAGS: ReadonlySet<string> = new Set(['h2', 'h3', 'h4', 'h5', 'h6']);
 
+/**
+ * Lexical node types that contribute non-prose content. Skipped from
+ * the word-count walk so a 200-line code listing doesn't inflate
+ * reading time, and so embed cards (video / iframe / form) don't
+ * count their internal labels as body words. The walker still
+ * recurses INTO regular paragraphs, lists, quotes, etc.
+ */
+const NON_PROSE_TYPES: ReadonlySet<string> = new Set([
+  'code',
+  'code-highlight',
+  'block',
+  'inline-block',
+  'horizontalrule',
+  'linebreak',
+  'tab',
+]);
+
 const collectText = (node: LexicalNode): string => {
   if (typeof node.text === 'string') return node.text;
   if (!node.children) return '';
@@ -84,6 +101,12 @@ export const extractFromLexical = (
   const seenAnchors = new Map<string, number>();
 
   const walk = (node: LexicalNode): void => {
+    if (typeof node.type === 'string' && NON_PROSE_TYPES.has(node.type)) {
+      // Code blocks, embeds, inline blocks, etc. don't count toward
+      // body word count or reading time. Skip them and their subtree.
+      return;
+    }
+
     if (node.type === 'heading' && typeof node.tag === 'string' && HEADING_TAGS.has(node.tag)) {
       const text = collectText(node).trim();
       if (text.length > 0) {

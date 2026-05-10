@@ -198,6 +198,15 @@ export interface User {
    * Composite roles supported. Author = own drafts only. Editor = publish content. Admin = full access.
    */
   roles: ('admin' | 'editor' | 'author')[];
+  preferences?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -264,7 +273,6 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1373,6 +1381,10 @@ export interface Lead {
    * Set when a same-email same-form submission lands within 24h of the original. The duplicate row is kept for audit; CRM secondaries skip the resync.
    */
   duplicateOf?: (number | null) | Lead;
+  /**
+   * Stamped by the daily PII purge once ip / userAgent / email / phone fields have been nulled. Used as the idempotency marker so re-runs skip already-redacted rows.
+   */
+  piiRedactedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -6369,6 +6381,7 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   roles?: T;
+  preferences?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -6402,7 +6415,6 @@ export interface MediaSelect<T extends boolean = true> {
         x?: T;
         y?: T;
       };
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -6904,6 +6916,7 @@ export interface LeadsSelect<T extends boolean = true> {
       };
   enriched?: T;
   duplicateOf?: T;
+  piiRedactedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

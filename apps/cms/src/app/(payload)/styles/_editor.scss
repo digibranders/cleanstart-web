@@ -1,6 +1,137 @@
 // 12. Body editor (Lexical) — readable rhythm + heading anchors
 // =============================================================================
 
+// -----------------------------------------------------------------------------
+// Wave 4 — CleanStart edit-view shell (CmsEditView). Wraps Payload's pre-
+// rendered DocumentSlots (PreviewButton, PublishButton, SaveButton, Status,
+// LivePreview, etc.) in a calmer, two-column layout. Stamps via
+// wireCustomEditView in payload.config.ts. Versions / diff sub-view lands
+// in Wave 4 part 2.
+// -----------------------------------------------------------------------------
+.cs-edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-4);
+
+  &__bar {
+    align-items: center;
+    background: var(--theme-elevation-50);
+    border-bottom: 1px solid var(--theme-elevation-150);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cs-space-3);
+    justify-content: space-between;
+    padding: var(--cs-space-3) var(--cs-space-6);
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+
+  &__bar-left {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cs-space-3);
+    min-width: 0;
+  }
+
+  &__bar-right {
+    align-items: center;
+    display: flex;
+    gap: var(--cs-space-2);
+  }
+
+  &__status { font-size: 13px; }
+
+  &__description {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    line-height: 1.4;
+    max-width: 320px;
+  }
+
+  &__upload {
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    padding: var(--cs-space-3);
+  }
+
+  &__body {
+    display: grid;
+    gap: var(--cs-space-6);
+    grid-template-columns: 1fr;
+    padding: 0 var(--cs-space-6);
+
+    @media (min-width: 1280px) {
+      &:has(.cs-edit__preview-col) {
+        grid-template-columns: 1fr minmax(360px, 480px);
+      }
+    }
+  }
+
+  &__form-col { min-width: 0; }
+  &__preview-col {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    overflow: hidden;
+  }
+}
+
+.cs-publish-menu {
+  align-items: stretch;
+  display: inline-flex;
+
+  &__primary {
+    display: inline-flex;
+
+    > * {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+  }
+
+  &__chevron {
+    align-items: center;
+    background: var(--cs-cyan-500);
+    border: none;
+    border-bottom-right-radius: var(--cs-radius-input);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    border-top-right-radius: var(--cs-radius-input);
+    color: white;
+    cursor: pointer;
+    display: inline-flex;
+    height: auto;
+    justify-content: center;
+    padding: 0 8px;
+    transition: background var(--cs-motion-micro);
+
+    &:hover { background: var(--cs-cyan-600); }
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px white;
+    }
+  }
+}
+
+.cs-edit__menu-slot {
+  display: inline-flex;
+  width: 100%;
+
+  // Payload's slot buttons come with their own background. Inside the
+  // dropdown we want the menu-row hover state to dominate, so flatten
+  // those nested buttons.
+  > button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: inherit !important;
+    height: auto;
+    padding: 0;
+    width: 100%;
+  }
+}
+
 .rich-text-lexical,
 .LexicalEditorTheme__paragraph,
 .editor-shell {

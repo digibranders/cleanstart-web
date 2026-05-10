@@ -1476,3 +1476,306 @@
   background: var(--theme-bg, #fff);
   min-height: 70vh;
 }
+
+// =============================================================================
+// Media picker (Wave 6) — drawer-mounted thumbnail grid
+// =============================================================================
+.cs-media-picker {
+  &__loading {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: var(--cs-space-8);
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--cs-space-3);
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    list-style: none;
+    margin: var(--cs-space-3) 0 0;
+    padding: 0;
+  }
+
+  &__tile {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-1);
+    overflow: hidden;
+    padding: 0;
+    transition: border-color var(--cs-motion-micro);
+    width: 100%;
+
+    &:hover { border-color: var(--cs-cyan-500); }
+
+    img {
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    &-placeholder {
+      align-items: center;
+      aspect-ratio: 4 / 3;
+      background: var(--theme-elevation-100);
+      color: var(--theme-text-soft);
+      display: flex;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    &-name {
+      color: var(--theme-text);
+      font-size: 12px;
+      overflow: hidden;
+      padding: 4px var(--cs-space-2) var(--cs-space-2);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+// =============================================================================
+// Schedule-publish dialog (Wave 4 part 2)
+// =============================================================================
+.cs-schedule-error {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: var(--cs-radius-input);
+  color: var(--color-error-500);
+  display: block;
+  font-size: 12px;
+  margin-top: var(--cs-space-3);
+  padding: var(--cs-space-2) var(--cs-space-3);
+}
+
+// =============================================================================
+// Lexical block handle (Wave 7 part 2) — left-rail drag grip
+// =============================================================================
+.cs-block-handle {
+  align-items: center;
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-chip);
+  color: var(--theme-text-soft);
+  cursor: grab;
+  display: inline-flex;
+  height: 22px;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  width: 22px;
+  will-change: transform;
+
+  &:hover { color: var(--cs-cyan-500); }
+  &:active { cursor: grabbing; }
+}
+
+.cs-block-handle__target {
+  background: var(--cs-cyan-500);
+  height: 2px;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  will-change: transform;
+}
+
+// =============================================================================
+// Tooltip — hover/focus bubble (Wave 1 primitive)
+// =============================================================================
+.cs-tooltip {
+  background: var(--theme-elevation-800);
+  border-radius: var(--cs-radius-chip);
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
+  color: var(--theme-elevation-50);
+  font-size: 12px;
+  line-height: 1.4;
+  max-width: 240px;
+  padding: 6px 10px;
+  pointer-events: none;
+  z-index: 200;
+  animation: cms-popup-in var(--cs-motion-micro);
+}
+
+// =============================================================================
+// DropdownMenu / ContextMenu — anchored single-column menu (Wave 1)
+// =============================================================================
+.cs-menu {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-card);
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.45);
+  padding: var(--cs-space-1);
+  min-width: 180px;
+  z-index: 150;
+  animation: cms-popup-in var(--cs-motion-micro);
+
+  &__item {
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--cs-radius-chip);
+    color: var(--theme-text);
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    gap: var(--cs-space-2);
+    padding: 6px 10px;
+    text-align: left;
+    width: 100%;
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      background: var(--cs-tint-brand-soft);
+      outline: none;
+    }
+
+    &.is-disabled,
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    &--danger {
+      color: var(--color-error-500);
+
+      &:hover:not(:disabled),
+      &:focus-visible {
+        background: rgba(220, 38, 38, 0.08);
+      }
+    }
+  }
+
+  &__icon {
+    align-items: center;
+    color: var(--theme-text-soft);
+    display: inline-flex;
+    height: 16px;
+    justify-content: center;
+    width: 16px;
+  }
+
+  &__label {
+    color: var(--theme-text-soft);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 8px 10px 4px;
+    text-transform: uppercase;
+  }
+
+  &__label-text {
+    flex: 1;
+  }
+
+  &__shortcut {
+    color: var(--theme-text-soft);
+    font-size: 11px;
+    margin-left: var(--cs-space-2);
+  }
+
+  &__separator {
+    background: var(--theme-elevation-200);
+    height: 1px;
+    margin: 4px 0;
+  }
+
+  &--context {
+    // Right-click menus don't need to align to an anchor; positioned at
+    // the pointer.
+  }
+}
+
+// =============================================================================
+// Toast region — bottom-right stack (Wave 1)
+// =============================================================================
+.cs-toast-region {
+  bottom: 24px;
+  pointer-events: none;
+  position: fixed;
+  right: 24px;
+  z-index: 250;
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.cs-toast {
+  align-items: flex-start;
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-left-width: 3px;
+  border-radius: var(--cs-radius-card);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.35);
+  color: var(--theme-text);
+  display: flex;
+  font-size: 13px;
+  gap: var(--cs-space-3);
+  max-width: 360px;
+  min-width: 240px;
+  padding: var(--cs-space-3);
+  pointer-events: auto;
+  animation: cms-popup-in var(--cs-motion-modal);
+
+  &--info { border-left-color: var(--cs-cyan-500); }
+  &--success { border-left-color: #16a34a; }
+  &--warning { border-left-color: #f59e0b; }
+  &--error { border-left-color: var(--color-error-500); }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  &__message {
+    color: var(--theme-text-soft);
+    line-height: 1.4;
+  }
+
+  &__action {
+    background: transparent;
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-chip);
+    color: var(--cs-cyan-500);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+
+    &:hover {
+      border-color: var(--cs-cyan-500);
+    }
+  }
+
+  &__close {
+    background: transparent;
+    border: none;
+    color: var(--theme-text-soft);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 4px;
+
+    &:hover {
+      color: var(--theme-text);
+    }
+  }
+}
