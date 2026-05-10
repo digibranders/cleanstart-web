@@ -146,6 +146,9 @@ export default buildConfig({
         './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
         './payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer',
         './payload/admin/components/ToastBus.tsx#ToastBus',
+        // Wave 4 part 2 — Cmd/Ctrl-Shift-S opens our schedule-publish
+        // dialog (DateTimePicker + Dialog from @cleanstart/ui).
+        './payload/admin/components/SchedulePublishDialog.tsx#SchedulePublishDialog',
       ],
       afterNavLinks: [
         './payload/admin/components/UserMenu.tsx#UserMenu',

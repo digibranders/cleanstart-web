@@ -2,6 +2,7 @@ import { TextField as TextField_d8b22c7a38a756dd8ecb3437acff34bf } from '@/paylo
 import { SelectField as SelectField_9c71ee466fcdbb40e13298a3fa959d0e } from '@/payload/admin/components/fields/SelectField.tsx'
 import { JsonField as JsonField_c698ed818f2263de63387a332e0e62c8 } from '@/payload/admin/components/fields/JsonField.tsx'
 import { CmsEditView as CmsEditView_1d4cf1c527e707894062bb7e5b5087de } from '@/payload/admin/components/views/edit/CmsEditView.tsx'
+import { CmsVersionsView as CmsVersionsView_71bab36acacf155692a8bdc59630eed9 } from '@/payload/admin/components/views/versions/CmsVersionsView.tsx'
 import { CmsListView as CmsListView_339f71bcd64a39b547313d733bae8857 } from '@/payload/admin/components/views/list/CmsListView.tsx'
 import { MediaSelfChrome as MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56 } from '@/payload/admin/components/MediaSelfChrome.tsx'
 import { MediaSizeWarningField as MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2 } from '@/payload/admin/components/MediaSizeWarningField.tsx'
@@ -18,6 +19,7 @@ import { MediaField as MediaField_1167cf2070c08e9bc2c7602fa9c85984 } from '@/pay
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
+import { CleanstartBlockHandleFeatureClient as CleanstartBlockHandleFeatureClient_329d0ffd69d1e6c27ccb28a698beb21f } from '@/payload/admin/components/CleanstartBlockHandleFeatureClient.ts'
 import { CleanstartSlashMenuFeatureClient as CleanstartSlashMenuFeatureClient_6bbc83499361f42dd6f4d1cf2de95076 } from '@/payload/admin/components/CleanstartSlashMenuFeatureClient.ts'
 import { RichPasteFeatureClient as RichPasteFeatureClient_ed3a5de8bf0054673d45b1536bad59f3 } from '@/payload/admin/components/RichPasteFeatureClient.ts'
 import { InlineToolbarFeatureClient as InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -86,6 +88,7 @@ import { EditorFullscreenToggle as EditorFullscreenToggle_a4cffb491dda4a682b514c
 import { ShortcutHelpDialog as ShortcutHelpDialog_988ed8f20aac11621cac715bd9040a9f } from '../../../payload/admin/components/ShortcutHelpDialog.tsx'
 import { ListCellEnhancer as ListCellEnhancer_edd569c3aa02f3de17c22f7695d981ee } from '../../../payload/admin/components/ListCellEnhancer.tsx'
 import { ToastBus as ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4 } from '../../../payload/admin/components/ToastBus.tsx'
+import { SchedulePublishDialog as SchedulePublishDialog_62a4d26942a4492d8188fd667302ded6 } from '../../../payload/admin/components/SchedulePublishDialog.tsx'
 import { UserMenu as UserMenu_8a2f404b3fa17e34974bf49ed5367371 } from '../../../payload/admin/components/UserMenu.tsx'
 import { CmsLoginHero as CmsLoginHero_32623b867969588592e72c90b3b4967a } from '../../../payload/admin/components/auth/CmsLoginHero.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
@@ -99,6 +102,7 @@ export const importMap = {
   "@/payload/admin/components/fields/SelectField.tsx#SelectField": SelectField_9c71ee466fcdbb40e13298a3fa959d0e,
   "@/payload/admin/components/fields/JsonField.tsx#JsonField": JsonField_c698ed818f2263de63387a332e0e62c8,
   "@/payload/admin/components/views/edit/CmsEditView.tsx#CmsEditView": CmsEditView_1d4cf1c527e707894062bb7e5b5087de,
+  "@/payload/admin/components/views/versions/CmsVersionsView.tsx#CmsVersionsView": CmsVersionsView_71bab36acacf155692a8bdc59630eed9,
   "@/payload/admin/components/views/list/CmsListView.tsx#CmsListView": CmsListView_339f71bcd64a39b547313d733bae8857,
   "@/payload/admin/components/MediaSelfChrome.tsx#MediaSelfChrome": MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56,
   "@/payload/admin/components/MediaSizeWarningField.tsx#MediaSizeWarningField": MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2,
@@ -115,6 +119,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
+  "@/payload/admin/components/CleanstartBlockHandleFeatureClient.ts#CleanstartBlockHandleFeatureClient": CleanstartBlockHandleFeatureClient_329d0ffd69d1e6c27ccb28a698beb21f,
   "@/payload/admin/components/CleanstartSlashMenuFeatureClient.ts#CleanstartSlashMenuFeatureClient": CleanstartSlashMenuFeatureClient_6bbc83499361f42dd6f4d1cf2de95076,
   "@/payload/admin/components/RichPasteFeatureClient.ts#RichPasteFeatureClient": RichPasteFeatureClient_ed3a5de8bf0054673d45b1536bad59f3,
   "@payloadcms/richtext-lexical/client#InlineToolbarFeatureClient": InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
@@ -183,6 +188,7 @@ export const importMap = {
   "./payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog": ShortcutHelpDialog_988ed8f20aac11621cac715bd9040a9f,
   "./payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer": ListCellEnhancer_edd569c3aa02f3de17c22f7695d981ee,
   "./payload/admin/components/ToastBus.tsx#ToastBus": ToastBus_3cc1e6b1b31508834b30aa83c9f20cc4,
+  "./payload/admin/components/SchedulePublishDialog.tsx#SchedulePublishDialog": SchedulePublishDialog_62a4d26942a4492d8188fd667302ded6,
   "./payload/admin/components/UserMenu.tsx#UserMenu": UserMenu_8a2f404b3fa17e34974bf49ed5367371,
   "./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero": CmsLoginHero_32623b867969588592e72c90b3b4967a,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,

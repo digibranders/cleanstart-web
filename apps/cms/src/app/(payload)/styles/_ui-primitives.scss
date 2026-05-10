@@ -1478,6 +1478,116 @@
 }
 
 // =============================================================================
+// Media picker (Wave 6) — drawer-mounted thumbnail grid
+// =============================================================================
+.cs-media-picker {
+  &__loading {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: var(--cs-space-8);
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--cs-space-3);
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    list-style: none;
+    margin: var(--cs-space-3) 0 0;
+    padding: 0;
+  }
+
+  &__tile {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-1);
+    overflow: hidden;
+    padding: 0;
+    transition: border-color var(--cs-motion-micro);
+    width: 100%;
+
+    &:hover { border-color: var(--cs-cyan-500); }
+
+    img {
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    &-placeholder {
+      align-items: center;
+      aspect-ratio: 4 / 3;
+      background: var(--theme-elevation-100);
+      color: var(--theme-text-soft);
+      display: flex;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    &-name {
+      color: var(--theme-text);
+      font-size: 12px;
+      overflow: hidden;
+      padding: 4px var(--cs-space-2) var(--cs-space-2);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+// =============================================================================
+// Schedule-publish dialog (Wave 4 part 2)
+// =============================================================================
+.cs-schedule-error {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: var(--cs-radius-input);
+  color: var(--color-error-500);
+  display: block;
+  font-size: 12px;
+  margin-top: var(--cs-space-3);
+  padding: var(--cs-space-2) var(--cs-space-3);
+}
+
+// =============================================================================
+// Lexical block handle (Wave 7 part 2) — left-rail drag grip
+// =============================================================================
+.cs-block-handle {
+  align-items: center;
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--cs-radius-chip);
+  color: var(--theme-text-soft);
+  cursor: grab;
+  display: inline-flex;
+  height: 22px;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  width: 22px;
+  will-change: transform;
+
+  &:hover { color: var(--cs-cyan-500); }
+  &:active { cursor: grabbing; }
+}
+
+.cs-block-handle__target {
+  background: var(--cs-cyan-500);
+  height: 2px;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  will-change: transform;
+}
+
+// =============================================================================
 // Tooltip — hover/focus bubble (Wave 1 primitive)
 // =============================================================================
 .cs-tooltip {

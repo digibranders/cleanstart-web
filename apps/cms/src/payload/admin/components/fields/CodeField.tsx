@@ -115,10 +115,9 @@ export const CodeField = (props: CodeFieldClientProps): ReactElement => {
       view.destroy();
       viewRef.current = null;
     };
-    // Mount once per language/readOnly combination — `value` syncing is
-    // handled by the dedicated effect above to avoid recreating the
-    // editor on every keystroke.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: see above note — `value`/`setValue` intentionally excluded
+    // Mount once per language/readOnly combination — `value` syncing
+    // is handled by the dedicated effect above to avoid recreating
+    // CodeMirror on every keystroke.
   }, [language, readOnly]);
 
   return (

@@ -1,6 +1,8 @@
 import type { CollectionConfig, GlobalConfig } from 'payload';
 
 const CMS_EDIT_VIEW = '@/payload/admin/components/views/edit/CmsEditView.tsx#CmsEditView';
+const CMS_VERSIONS_VIEW =
+  '@/payload/admin/components/views/versions/CmsVersionsView.tsx#CmsVersionsView';
 
 /**
  * Stamp the CleanStart custom edit view onto every collection + global
@@ -33,6 +35,9 @@ export const wireCustomEditView = <T extends CollectionConfig | GlobalConfig>(
           edit: {
             ...edit,
             default: { Component: CMS_EDIT_VIEW },
+            ...(edit.versions
+              ? {}
+              : { versions: { Component: CMS_VERSIONS_VIEW } }),
           },
         },
       },
