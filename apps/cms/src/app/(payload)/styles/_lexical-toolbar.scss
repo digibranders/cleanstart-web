@@ -57,6 +57,21 @@
 // divider. Slim hairline group dividers; container rounds its top
 // corners and uses a single 1px bottom border so the toolbar reads as
 // the cap of the editor card (matches GitHub's comment composer).
+//
+// Mounting + layout-shift contract:
+//   * `position: sticky; top: 0` — the toolbar stays pinned to the top
+//     of its scrolling ancestor when the body grows tall. No more
+//     formatting affordances scrolling away mid-edit.
+//   * Sibling Fullscreen pill (absolutely positioned at top:4 right:8
+//     of the wrap) is repinned via `position: sticky` rules below so
+//     it tracks the toolbar instead of getting orphaned at the wrap
+//     edge once the toolbar scrolls past.
+//   * `flex-wrap: wrap` instead of nowrap — on narrow viewports the
+//     right-aligned cluster wraps onto a second row rather than
+//     becoming unreachable behind a horizontal scrollbar.
+//   * `min-height` so the row never collapses below the icon size
+//     even when the heading-picker dropdown is briefly empty during
+//     a state transition (prevents 1-frame layout shift on focus).
 .toolbar-popup__container,
 .fixed-toolbar,
 .lexical-toolbar,
@@ -64,16 +79,13 @@
 .rich-text-lexical__wrap .toolbar-popup {
   display: flex;
   align-items: center;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 2px;
   padding: 6px 8px;
+  min-height: 44px;
   background: var(--theme-elevation-50);
   border: 1px solid var(--theme-elevation-150);
-  border-bottom: none;
   border-radius: var(--cs-radius-card) var(--cs-radius-card) 0 0;
-  overflow-x: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--theme-elevation-200) transparent;
 
   // Push everything from the first divider rightwards. This keeps the
   // heading-picker dropdown ("Normal Text" / "Heading 2" / etc) on the
@@ -86,12 +98,38 @@
   }
 }
 
-// FixedToolbar shares space with the absolutely-positioned Fullscreen
-// pill (mounted at top:4 right:8 of the wrap). With actions now
-// right-aligned, reserve a smaller padding-right (just the pill +
-// breathing room — no longer the full label cluster).
+// Pin the FixedToolbar to the top of its scrolling ancestor so editors
+// keep their formatting affordances in view while scrolling a long
+// body. `top: 0` aligns it to the editor's own scroll container; if
+// the page-level edit-bar (.cs-edit__bar) is also sticky above it,
+// stack offsets are layered through z-index — toolbar at 25, edit
+// bar at 30 (per _editor.scss) — so the toolbar slides under the bar
+// without flicker.
 .fixed-toolbar {
+  position: sticky;
+  // Stack below the sticky `.cs-edit__bar` (Wave 4 chrome, z:30,
+  // top:0). The bar's measured height is roughly 60px (12+36+12);
+  // expose a CSS var so the offset stays tunable when the bar's
+  // padding changes.
+  top: var(--cs-edit-bar-height, 60px);
+  z-index: 25;
+  // Single hairline between toolbar and body, not two stacked borders.
+  border-bottom: none;
+  // The Fullscreen pill (`.cs-fullscreen-toggle--inline`) is
+  // `position: absolute` of `.rich-text-lexical__wrap` at top:4
+  // right:8 — so it sits ON TOP of the toolbar's right cluster when
+  // the user is at the top of the editor. Reserve right-side
+  // breathing room so the pill never overlaps the rightmost button.
+  // Pill width ≈ 110px ("Fullscreen" label + chevron + padding) plus
+  // 8px right offset + 6px breathing room.
   padding-right: 124px;
+
+  // When the wrap is in inline-fullscreen mode the pill repositions
+  // itself (handled in _editor-fullscreen.scss). Drop the reservation
+  // there so right-aligned buttons hug the edge.
+  .rich-text-lexical__wrap.is-inline-fullscreen & {
+    padding-right: 8px;
+  }
 }
 
 .toolbar-popup__container,

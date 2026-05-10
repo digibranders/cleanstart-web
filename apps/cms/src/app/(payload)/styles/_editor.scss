@@ -12,6 +12,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--cs-space-4);
+  // Set on the parent so descendants — including the FixedToolbar
+  // mounted deeper in the tree — can `top: var(--cs-edit-bar-height)`
+  // and stack cleanly below the sticky doc bar without hard-coded
+  // magic numbers.
+  --cs-edit-bar-height: 60px;
 
   &__bar {
     align-items: center;
