@@ -6,7 +6,7 @@ const handler = redirectsImportEndpoint.handler as (req: unknown) => Promise<Res
 
 const makeReq = (
   body: unknown,
-  user: { role?: string } | null = { role: 'editor' },
+  user: { roles?: string[] } | null = { roles: ['editor'] },
   payloadOverrides: Record<string, unknown> = {},
 ) => {
   const find = vi.fn().mockResolvedValue({ docs: [] });
@@ -32,7 +32,7 @@ describe('redirectsImportEndpoint', () => {
 
   it('returns 400 when JSON parse fails', async () => {
     const req = {
-      user: { role: 'admin' },
+      user: { roles: ['admin'] },
       payload: {},
       json: () => {
         throw new Error('bad json');
@@ -85,7 +85,7 @@ describe('redirectsImportEndpoint', () => {
     const create = vi.fn().mockResolvedValue({ id: 1 });
     const update = vi.fn().mockResolvedValue({});
     const req = {
-      user: { role: 'admin' },
+      user: { roles: ['admin'] },
       json: async () => ({
         rows: [
           { from: '/a', to: '/b' },

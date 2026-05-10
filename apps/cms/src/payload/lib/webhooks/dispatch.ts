@@ -1,3 +1,4 @@
+import { redactWebhookErrorBody } from './redact-error-body';
 import { signWebhook, type SignedHeaders, type WebhookSigningKey } from './sign';
 import { buildTeamsPayload, postTeamsWebhook } from './teams';
 
@@ -127,7 +128,12 @@ const postGeneric = async (
     });
     if (!res.ok) {
       const text = await res.text().catch(() => '');
-      return { destinationId: dest.id, ok: false, status: res.status, error: text };
+      return {
+        destinationId: dest.id,
+        ok: false,
+        status: res.status,
+        error: redactWebhookErrorBody(text),
+      };
     }
     return { destinationId: dest.id, ok: true, status: res.status };
   } catch (err) {

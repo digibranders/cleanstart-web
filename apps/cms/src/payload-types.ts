@@ -1381,6 +1381,10 @@ export interface Lead {
    * Set when a same-email same-form submission lands within 24h of the original. The duplicate row is kept for audit; CRM secondaries skip the resync.
    */
   duplicateOf?: (number | null) | Lead;
+  /**
+   * Stamped by the daily PII purge once ip / userAgent / email / phone fields have been nulled. Used as the idempotency marker so re-runs skip already-redacted rows.
+   */
+  piiRedactedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -6912,6 +6916,7 @@ export interface LeadsSelect<T extends boolean = true> {
       };
   enriched?: T;
   duplicateOf?: T;
+  piiRedactedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

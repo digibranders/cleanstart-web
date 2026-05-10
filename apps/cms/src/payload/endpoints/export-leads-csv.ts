@@ -2,6 +2,7 @@ import type { Endpoint, Where } from 'payload';
 
 import { hasAnyRole } from '../access/typed-user';
 import { toCsv } from '../lib/csv';
+import { extractRequestMeta } from '../lib/request-meta';
 
 type LeadRow = {
   id: number;
@@ -168,11 +169,60 @@ export const exportLeadsCsvEndpoint: Endpoint = {
       }
     }
 
+    // GDPR Art. 15 audit trail — every PII export must be tied to a
+    // specific admin/editor + the filter that selected the rows. Audit
+    // failures are isolated so a misbehaving audit-log collection
+    // can't block a legitimate export.
+    try {
+      const meta = extractRequestMeta(req.headers);
+      const rawActorId = req.user
+        ? ((req.user as { id?: string | number }).id ?? null)
+        : null;
+      const actorId =
+        typeof rawActorId === 'number'
+          ? rawActorId
+          : typeof rawActorId === 'string'
+            ? Number.parseInt(rawActorId, 10)
+            : null;
+      const actorUserId =
+        typeof actorId === 'number' && Number.isFinite(actorId) ? actorId : null;
+      await req.payload.create({
+        collection: 'audit-log',
+        data: {
+          timestamp: new Date().toISOString(),
+          action: 'lead_exported',
+          targetCollection: 'leads',
+          targetId: 'bulk',
+          actorUserId,
+          requestIp: meta.ip,
+          userAgent: meta.userAgent ?? null,
+          acceptLanguage: meta.acceptLanguage ?? null,
+          proxyChainLength: meta.proxyChainLength,
+          metadata: {
+            rowCount: flat.length,
+            truncated,
+            filter: Object.fromEntries(url.searchParams.entries()),
+          },
+        },
+        overrideAccess: true,
+      });
+    } catch (error) {
+      req.payload.logger?.error?.(
+        { err: error instanceof Error ? error.message : String(error) },
+        'Failed to write audit-log row for leads CSV export',
+      );
+    }
+
     const csv = toCsv(HEADERS, flat);
     const headers: Record<string, string> = {
       'content-type': 'text/csv; charset=utf-8',
       'content-disposition': `attachment; filename="leads-${todayStamp()}.csv"`,
       'cache-control': 'no-store',
+      // The `since` / `until` query params are interpreted as UTC. The
+      // header lets the admin UI render a banner when the editor's
+      // browser is in a different timezone, so they don't double-count
+      // edge-of-day rows.
+      'x-leads-date-tz': 'UTC',
     };
     if (truncated) {
       headers['x-leads-truncated'] = 'true';

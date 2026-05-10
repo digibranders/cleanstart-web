@@ -72,10 +72,11 @@ const writeLeadDeletionAudit: CollectionAfterDeleteHook = async ({ req, doc, id 
  * secondaries). Editor-facing fields are limited to filterable metadata;
  * the actual answers live as JSON in `fields`.
  *
- * PII fields (`fields.email`, `fields.phone`, `ip`, `userAgent`) are
- * auto-purged after siteSettings.leads.retentionDays via the lead-purge
- * cron (Phase G). Sentry / structured-log redaction is applied
- * separately so the raw values never reach an external sink.
+ * PII fields (email-typed keys + phone-named keys inside `fields`,
+ * plus `ip`, `userAgent`) are auto-purged after retentionDays via
+ * the lead-purge cron (Phase G); the row sets `piiRedactedAt` once
+ * scrubbed. Sentry / structured-log redaction is applied separately
+ * so the raw values never reach an external sink.
  */
 export const Leads: CollectionConfig = {
   slug: 'leads',
@@ -258,6 +259,18 @@ export const Leads: CollectionConfig = {
           'Set when a same-email same-form submission lands within 24h of the original. The duplicate row is kept for audit; CRM secondaries skip the resync.',
         readOnly: true,
         position: 'sidebar',
+      },
+    },
+    {
+      name: 'piiRedactedAt',
+      type: 'date',
+      access: { update: () => false },
+      admin: {
+        description:
+          'Stamped by the daily PII purge once ip / userAgent / email / phone fields have been nulled. Used as the idempotency marker so re-runs skip already-redacted rows.',
+        readOnly: true,
+        position: 'sidebar',
+        date: { pickerAppearance: 'dayAndTime' },
       },
     },
   ],

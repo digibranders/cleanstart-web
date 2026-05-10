@@ -27,6 +27,8 @@ const buildPayload = (totalPages: number) => ({
       totalPages,
     });
   }),
+  create: vi.fn().mockResolvedValue({ id: 1 }),
+  logger: { error: vi.fn() },
 });
 
 const callEndpoint = async (totalPages: number): Promise<Response> => {
@@ -65,5 +67,31 @@ describe('GET /export-csv truncation signaling (W-D-14)', () => {
     } as unknown as Parameters<typeof handler>[0];
     const res = (await handler(req)) as Response;
     expect(res.status).toBe(403);
+  });
+
+  it('writes an audit-log entry on a successful export', async () => {
+    const payload = buildPayload(1);
+    const req = {
+      headers: { get: () => null },
+      user: adminUser,
+      url: 'http://internal/api/leads/export-csv?formId=42',
+      payload,
+    } as unknown as Parameters<typeof handler>[0];
+    await handler(req);
+    expect(payload.create).toHaveBeenCalledTimes(1);
+    const args = payload.create.mock.calls[0]?.[0] as {
+      collection: string;
+      data: { action: string; targetCollection: string; metadata: Record<string, unknown> };
+    };
+    expect(args.collection).toBe('audit-log');
+    expect(args.data.action).toBe('lead_exported');
+    expect(args.data.targetCollection).toBe('leads');
+    expect(args.data.metadata.rowCount).toBe(CSV_EXPORT_PAGE_SIZE);
+    expect(args.data.metadata.filter).toEqual({ formId: '42' });
+  });
+
+  it('emits the X-Leads-Date-Tz=UTC header so the admin UI can warn editors in non-UTC zones', async () => {
+    const res = await callEndpoint(1);
+    expect(res.headers.get('x-leads-date-tz')).toBe('UTC');
   });
 });

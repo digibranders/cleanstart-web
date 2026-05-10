@@ -128,6 +128,10 @@
       "type": "relationship",
       "name": "duplicateOf",
       "relationTo": "leads"
+    },
+    {
+      "type": "date",
+      "name": "piiRedactedAt"
     }
   ],
   "hooks": {

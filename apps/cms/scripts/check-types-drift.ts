@@ -56,4 +56,35 @@ if (before !== after) {
   process.exit(1);
 }
 
+// Locked-schema presence assertions. CLAUDE.md "Schema decisions
+// locked this session" pins specific field names for the launch
+// posture; if a future Payload upgrade or refactor silently drops one,
+// the file-equality check above would still pass (since it compares
+// freshly-generated to committed). These checks fail loudly instead.
+const REQUIRED_SYMBOLS: { context: string; needle: string }[] = [
+  { context: 'Webinars', needle: 'registrationMode' },
+  { context: 'Webinars', needle: 'registrationForm' },
+  { context: 'Webinars', needle: 'registrationUrl' },
+  { context: 'Resources', needle: 'gateForm' },
+  { context: 'KnowledgeBase', needle: 'knowledgeBase' },
+  { context: 'KnowledgeCategories', needle: 'knowledgeCategories' },
+  { context: 'Leads', needle: 'piiRedactedAt' },
+];
+
+const missing = REQUIRED_SYMBOLS.filter(({ needle }) => !after.includes(needle));
+if (missing.length > 0) {
+  process.stderr.write(
+    [
+      '',
+      '✖ Payload types missing locked-schema fields:',
+      ...missing.map(
+        ({ context, needle }) => `  - ${context}: \`${needle}\` not found in payload-types.ts`,
+      ),
+      '  These fields are pinned by CLAUDE.md and must round-trip through the generator.',
+      '',
+    ].join('\n'),
+  );
+  process.exit(1);
+}
+
 process.stdout.write('✓ Payload types are up to date.\n');

@@ -73,6 +73,28 @@ const r2EnvComplete = (): boolean =>
       process.env.R2_BUCKET,
   );
 
+const serverURL = process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000';
+
+/**
+ * CORS / CSRF allow-list for the admin REST surface. Defaults to the
+ * configured serverURL only; PAYLOAD_CORS_ORIGINS lets ops widen it
+ * (e.g. add a staging admin origin) without a code change.
+ *
+ * Public form-submit / search-analytics endpoints have their own
+ * narrower CORS gating inside the handlers, so they aren't affected
+ * by this list.
+ */
+const adminAllowedOrigins = (): string[] => {
+  const raw = process.env.PAYLOAD_CORS_ORIGINS;
+  if (raw && raw.trim().length > 0) {
+    return raw
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+  }
+  return [serverURL];
+};
+
 // Storage plugin: enabled only when all four R2 env vars are set so dev
 // iteration without R2 still works (Media falls back to the local
 // staticDir on the collection). In production, the absence of any of
@@ -228,7 +250,12 @@ export default buildConfig({
         queue: 'brokenLinksScan',
       },
     ],
-    shouldAutoRun: () => process.env.NODE_ENV !== 'test',
+    // Positive opt-in: cron tasks register only when PAYLOAD_AUTO_RUN
+    // is exactly 'true'. Vitest worker subprocesses (and CI runners
+    // that fork the process) inherit the parent env but rarely have
+    // this set, so the lead-queue drain / PII purge / broken-link scan
+    // can't spuriously fire during tests.
+    shouldAutoRun: () => process.env.PAYLOAD_AUTO_RUN === 'true',
   },
   plugins: storagePlugins,
   onInit: () => {
@@ -236,7 +263,9 @@ export default buildConfig({
   },
   editor: cleanstartLexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),
-  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
+  serverURL,
+  cors: adminAllowedOrigins(),
+  csrf: adminAllowedOrigins(),
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
