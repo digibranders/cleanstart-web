@@ -13,7 +13,17 @@
   flex-direction: column;
   min-height: calc(100vh - var(--cs-app-header-height, 56px));
 
-  &__gutter { flex: 1; }
+  // Payload's stock Gutter wraps lists with `--gutter-h: 60px` padding
+  // on both sides. That eats nearly 120px of horizontal real estate
+  // before the table can even start, which forces horizontal scroll
+  // on collections with 4+ default columns (blogs, news, etc). Tighten
+  // it to a 16px breathing margin so the table can stretch and most
+  // columns fit without scroll on a 1280px viewport.
+  &__gutter {
+    flex: 1;
+    padding-left: var(--cs-space-4, 16px) !important;
+    padding-right: var(--cs-space-4, 16px) !important;
+  }
 
   &__header {
     align-items: flex-start;
@@ -261,7 +271,6 @@
   gap: var(--cs-space-4);
   padding-block: var(--cs-space-3);
   margin-top: var(--cs-space-2);
-  border-top: 1px solid var(--theme-elevation-150);
 
   &__page-info {
     color: var(--theme-text-soft);

@@ -419,19 +419,64 @@
   background: var(--theme-elevation-50);
   border: 1px solid var(--theme-elevation-150);
   border-radius: var(--cs-radius-card);
-  margin: var(--cs-space-3) 0;
-  padding: var(--cs-space-4);
+  // Breathing room between this card and the surrounding form
+  // sections (e.g. Body → FAQs → Authors). Inner padding stays tight
+  // so the card doesn't feel airy.
+  margin: var(--cs-space-6) 0;
+  padding: var(--cs-space-3);
 
   &__legend {
-    align-items: baseline;
+    align-items: center;
+    box-sizing: border-box;
     color: var(--cs-text-heading);
     display: flex;
     font-size: 13px;
     font-weight: 600;
-    gap: var(--cs-space-2);
+    gap: var(--cs-space-3);
+    justify-content: space-between;
     letter-spacing: 0.02em;
-    padding: 0 var(--cs-space-2);
+    margin-bottom: var(--cs-space-3);
+    padding: 0 var(--cs-space-1);
     text-transform: uppercase;
+    width: 100%;
+  }
+
+  &__title {
+    align-items: baseline;
+    display: inline-flex;
+    gap: var(--cs-space-2);
+  }
+
+  &__legend-actions {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--cs-space-2);
+    text-transform: none;
+  }
+
+  &__action {
+    background: transparent;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-chip);
+    color: var(--theme-text-soft);
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0;
+    padding: 4px var(--cs-space-2);
+    text-transform: none;
+    transition: border-color var(--cs-motion-micro), color var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--cs-cyan-500);
+      color: var(--cs-text-heading);
+    }
+
+    &--danger:hover {
+      border-color: var(--color-error-500);
+      color: var(--color-error-500);
+    }
   }
 
   &__count {
@@ -470,14 +515,36 @@
     background: var(--theme-elevation-100);
     border: 1px solid var(--theme-elevation-150);
     border-radius: var(--cs-radius-card);
-    display: grid;
-    gap: var(--cs-space-2);
-    grid-template-columns: 24px 28px 1fr 28px;
-    padding: var(--cs-space-3);
+    overflow: hidden;
     transition: border-color var(--cs-motion-micro), opacity var(--cs-motion-micro);
 
     &.is-dragging { opacity: 0.4; }
     &.is-hover { border-color: var(--cs-cyan-500); }
+  }
+
+  &__row-header {
+    align-items: center;
+    display: grid;
+    gap: var(--cs-space-2);
+    grid-template-columns: 20px 1fr 28px;
+    padding: 6px var(--cs-space-2) 6px var(--cs-space-2);
+
+    &.is-readonly {
+      grid-template-columns: 24px 1fr;
+    }
+
+    .cs-array__row.is-open & {
+      border-bottom: 1px solid var(--theme-elevation-150);
+    }
+  }
+
+  &__row-static-index {
+    color: var(--theme-text-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
   }
 
   &__row-handle {
@@ -490,20 +557,73 @@
     &:active { cursor: grabbing; }
   }
 
+  &__row-toggle {
+    align-items: center;
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    display: grid;
+    font: inherit;
+    gap: var(--cs-space-2);
+    grid-template-columns: 12px 22px 1fr;
+    min-width: 0;
+    padding: 4px 0;
+    text-align: left;
+
+    &--rowlabel {
+      grid-template-columns: 12px 1fr;
+    }
+  }
+
+  &__row-chevron {
+    color: var(--theme-text-soft);
+    display: inline-flex;
+    height: 12px;
+    width: 12px;
+  }
+
   &__row-index {
     color: var(--theme-text-soft);
     font-family: var(--font-mono);
     font-size: 11px;
     text-align: center;
-    align-self: start;
-    padding-top: 4px;
+  }
+
+  &__row-summary {
+    color: var(--cs-text-heading);
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    em {
+      color: var(--theme-text-soft);
+      font-style: italic;
+    }
   }
 
   &__row-body {
     display: flex;
     flex-direction: column;
-    gap: var(--cs-space-3);
+    gap: var(--cs-space-2);
     min-width: 0;
+    padding: var(--cs-space-2) var(--cs-space-3) var(--cs-space-3);
+
+    .field-type,
+    .field-label {
+      margin: 0;
+    }
+
+    .field-label {
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .cs-textarea-field__input,
+    .cs-text-field__input {
+      padding: 6px 10px;
+    }
   }
 
   &__row-remove {
@@ -515,10 +635,9 @@
     cursor: pointer;
     display: inline-flex;
     font-size: 16px;
-    height: 28px;
+    height: 24px;
     justify-content: center;
-    width: 28px;
-    align-self: start;
+    width: 24px;
 
     &:hover {
       border-color: var(--color-error-500);
@@ -667,15 +786,17 @@
   background: var(--theme-elevation-50);
   border: 1px solid var(--theme-elevation-150);
   border-radius: var(--cs-radius-card);
-  margin: var(--cs-space-3) 0;
-  padding: var(--cs-space-5);
+  margin: var(--cs-space-6) 0;
+  padding: var(--cs-space-3);
 
   &__legend {
     color: var(--cs-text-heading);
+    display: block;
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.02em;
-    padding: 0 var(--cs-space-2);
+    margin-bottom: var(--cs-space-3);
+    padding: 0 var(--cs-space-1);
     text-transform: uppercase;
   }
 
