@@ -1,8 +1,6 @@
 import { TextField as TextField_d8b22c7a38a756dd8ecb3437acff34bf } from '@/payload/admin/components/fields/TextField.tsx'
 import { SelectField as SelectField_9c71ee466fcdbb40e13298a3fa959d0e } from '@/payload/admin/components/fields/SelectField.tsx'
 import { JsonField as JsonField_c698ed818f2263de63387a332e0e62c8 } from '@/payload/admin/components/fields/JsonField.tsx'
-import { CmsEditView as CmsEditView_1d4cf1c527e707894062bb7e5b5087de } from '@/payload/admin/components/views/edit/CmsEditView.tsx'
-import { CmsVersionsView as CmsVersionsView_71bab36acacf155692a8bdc59630eed9 } from '@/payload/admin/components/views/versions/CmsVersionsView.tsx'
 import { CmsListView as CmsListView_339f71bcd64a39b547313d733bae8857 } from '@/payload/admin/components/views/list/CmsListView.tsx'
 import { MediaSelfChrome as MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56 } from '@/payload/admin/components/MediaSelfChrome.tsx'
 import { MediaSizeWarningField as MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2 } from '@/payload/admin/components/MediaSizeWarningField.tsx'
@@ -10,7 +8,6 @@ import { CheckboxField as CheckboxField_fa838d594eaa6e28e24d17add0c5aa91 } from 
 import { NumberField as NumberField_54a7b672a7a67bcb2120ffcb68d41481 } from '@/payload/admin/components/fields/NumberField.tsx'
 import { GroupField as GroupField_74bc515fedbf6bc79a8d465c8195685c } from '@/payload/admin/components/fields/GroupField.tsx'
 import { TextareaField as TextareaField_910298ace0fe3204ac012253d7fcff5b } from '@/payload/admin/components/fields/TextareaField.tsx'
-import { DateField as DateField_a74145b29e7a0acd050f8f68af83aab6 } from '@/payload/admin/components/fields/DateField.tsx'
 import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
 import { RelationshipField as RelationshipField_093f373a4f5250e712293002deb8de6b } from '@/payload/admin/components/fields/RelationshipField.tsx'
 import { SlugField as SlugField_72967e7957358d52051eede57fbdd787 } from '@/payload/admin/components/SlugField.tsx'
@@ -19,12 +16,14 @@ import { MediaField as MediaField_1167cf2070c08e9bc2c7602fa9c85984 } from '@/pay
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
-import { CleanstartBlockHandleFeatureClient as CleanstartBlockHandleFeatureClient_329d0ffd69d1e6c27ccb28a698beb21f } from '@/payload/admin/components/CleanstartBlockHandleFeatureClient.ts'
 import { CleanstartSlashMenuFeatureClient as CleanstartSlashMenuFeatureClient_6bbc83499361f42dd6f4d1cf2de95076 } from '@/payload/admin/components/CleanstartSlashMenuFeatureClient.ts'
 import { RichPasteFeatureClient as RichPasteFeatureClient_ed3a5de8bf0054673d45b1536bad59f3 } from '@/payload/admin/components/RichPasteFeatureClient.ts'
 import { InlineToolbarFeatureClient as InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { FixedToolbarFeatureClient as FixedToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { CleanstartInlineImageFeatureClient as CleanstartInlineImageFeatureClient_74586527eb72192e6c6a27300883f3de } from '@/payload/admin/components/InlineImage/CleanstartInlineImageFeatureClient.ts'
 import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { CleanstartAddMenuFeatureClient as CleanstartAddMenuFeatureClient_3bb091ca9ee97b5a57a7d5234ea492d1 } from '@/payload/admin/components/AddMenu/CleanstartAddMenuFeatureClient'
+import { CleanstartEmbedFeatureClient as CleanstartEmbedFeatureClient_0d8d46efc1fc83e23b5f221c6e92ed8f } from '@/payload/admin/components/Embed/CleanstartEmbedFeatureClient.ts'
 import { RelationshipFeatureClient as RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { CleanstartLinkPopoverFeatureClient as CleanstartLinkPopoverFeatureClient_aa209658d47709ec5b8e1bfbaac37adb } from '@/payload/admin/components/CleanstartLinkPopoverFeatureClient.ts'
 import { LinkFeatureClient as LinkFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -62,7 +61,6 @@ import { SocialCardField as SocialCardField_b319a069c95a65e993e5d5cd482bdc69 } f
 import { OutboundRedirectField as OutboundRedirectField_6ddb1aebe33d308a1f37b1ba8879601c } from '@/payload/admin/components/OutboundRedirectField.tsx'
 import { HeadTagsCard as HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462 } from '@/payload/admin/components/HeadTagsCard.tsx'
 import { UrlChangeHistoryField as UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c } from '@/payload/admin/components/UrlChangeHistoryField.tsx'
-import { SchemaOverrideField as SchemaOverrideField_88213973daaae6c5c0e6b5315ed286c1 } from '@/payload/admin/components/SchemaOverrideField.tsx'
 import { SeoAdvancedPanel as SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50 } from '@/payload/admin/components/SeoAdvancedPanel.tsx'
 import { UploadField as UploadField_9a37057695692a15b6c8aaeb6d981611 } from '@/payload/admin/components/fields/UploadField.tsx'
 import { LeadsImmutableBanner as LeadsImmutableBanner_c4273dccee2521e4317461376b79e241 } from '@/payload/admin/components/LeadsImmutableBanner.tsx'
@@ -93,6 +91,7 @@ import { CmsLoginFooter as CmsLoginFooter_67c5b820b6d3bc2ad13ebd4c41435e40 } fro
 import { UserMenu as UserMenu_8a2f404b3fa17e34974bf49ed5367371 } from '../../../payload/admin/components/UserMenu.tsx'
 import { CmsLoginHero as CmsLoginHero_32623b867969588592e72c90b3b4967a } from '../../../payload/admin/components/auth/CmsLoginHero.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
+import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
 import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } from '../../../payload/admin/components/auth/CmsAccountView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -102,8 +101,6 @@ export const importMap = {
   "@/payload/admin/components/fields/TextField.tsx#TextField": TextField_d8b22c7a38a756dd8ecb3437acff34bf,
   "@/payload/admin/components/fields/SelectField.tsx#SelectField": SelectField_9c71ee466fcdbb40e13298a3fa959d0e,
   "@/payload/admin/components/fields/JsonField.tsx#JsonField": JsonField_c698ed818f2263de63387a332e0e62c8,
-  "@/payload/admin/components/views/edit/CmsEditView.tsx#CmsEditView": CmsEditView_1d4cf1c527e707894062bb7e5b5087de,
-  "@/payload/admin/components/views/versions/CmsVersionsView.tsx#CmsVersionsView": CmsVersionsView_71bab36acacf155692a8bdc59630eed9,
   "@/payload/admin/components/views/list/CmsListView.tsx#CmsListView": CmsListView_339f71bcd64a39b547313d733bae8857,
   "@/payload/admin/components/MediaSelfChrome.tsx#MediaSelfChrome": MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56,
   "@/payload/admin/components/MediaSizeWarningField.tsx#MediaSizeWarningField": MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2,
@@ -111,7 +108,6 @@ export const importMap = {
   "@/payload/admin/components/fields/NumberField.tsx#NumberField": NumberField_54a7b672a7a67bcb2120ffcb68d41481,
   "@/payload/admin/components/fields/GroupField.tsx#GroupField": GroupField_74bc515fedbf6bc79a8d465c8195685c,
   "@/payload/admin/components/fields/TextareaField.tsx#TextareaField": TextareaField_910298ace0fe3204ac012253d7fcff5b,
-  "@/payload/admin/components/fields/DateField.tsx#DateField": DateField_a74145b29e7a0acd050f8f68af83aab6,
   "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
   "@/payload/admin/components/fields/RelationshipField.tsx#RelationshipField": RelationshipField_093f373a4f5250e712293002deb8de6b,
   "@/payload/admin/components/SlugField.tsx#SlugField": SlugField_72967e7957358d52051eede57fbdd787,
@@ -120,12 +116,14 @@ export const importMap = {
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
-  "@/payload/admin/components/CleanstartBlockHandleFeatureClient.ts#CleanstartBlockHandleFeatureClient": CleanstartBlockHandleFeatureClient_329d0ffd69d1e6c27ccb28a698beb21f,
   "@/payload/admin/components/CleanstartSlashMenuFeatureClient.ts#CleanstartSlashMenuFeatureClient": CleanstartSlashMenuFeatureClient_6bbc83499361f42dd6f4d1cf2de95076,
   "@/payload/admin/components/RichPasteFeatureClient.ts#RichPasteFeatureClient": RichPasteFeatureClient_ed3a5de8bf0054673d45b1536bad59f3,
   "@payloadcms/richtext-lexical/client#InlineToolbarFeatureClient": InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#FixedToolbarFeatureClient": FixedToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/payload/admin/components/InlineImage/CleanstartInlineImageFeatureClient.ts#CleanstartInlineImageFeatureClient": CleanstartInlineImageFeatureClient_74586527eb72192e6c6a27300883f3de,
   "@payloadcms/richtext-lexical/client#UploadFeatureClient": UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/payload/admin/components/AddMenu/CleanstartAddMenuFeatureClient#CleanstartAddMenuFeatureClient": CleanstartAddMenuFeatureClient_3bb091ca9ee97b5a57a7d5234ea492d1,
+  "@/payload/admin/components/Embed/CleanstartEmbedFeatureClient.ts#CleanstartEmbedFeatureClient": CleanstartEmbedFeatureClient_0d8d46efc1fc83e23b5f221c6e92ed8f,
   "@payloadcms/richtext-lexical/client#RelationshipFeatureClient": RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/payload/admin/components/CleanstartLinkPopoverFeatureClient.ts#CleanstartLinkPopoverFeatureClient": CleanstartLinkPopoverFeatureClient_aa209658d47709ec5b8e1bfbaac37adb,
   "@payloadcms/richtext-lexical/client#LinkFeatureClient": LinkFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
@@ -163,7 +161,6 @@ export const importMap = {
   "@/payload/admin/components/OutboundRedirectField.tsx#OutboundRedirectField": OutboundRedirectField_6ddb1aebe33d308a1f37b1ba8879601c,
   "@/payload/admin/components/HeadTagsCard.tsx#HeadTagsCard": HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462,
   "@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField": UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c,
-  "@/payload/admin/components/SchemaOverrideField.tsx#SchemaOverrideField": SchemaOverrideField_88213973daaae6c5c0e6b5315ed286c1,
   "@/payload/admin/components/SeoAdvancedPanel.tsx#SeoAdvancedPanel": SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50,
   "@/payload/admin/components/fields/UploadField.tsx#UploadField": UploadField_9a37057695692a15b6c8aaeb6d981611,
   "@/payload/admin/components/LeadsImmutableBanner.tsx#LeadsImmutableBanner": LeadsImmutableBanner_c4273dccee2521e4317461376b79e241,
@@ -194,6 +191,7 @@ export const importMap = {
   "./payload/admin/components/UserMenu.tsx#UserMenu": UserMenu_8a2f404b3fa17e34974bf49ed5367371,
   "./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero": CmsLoginHero_32623b867969588592e72c90b3b4967a,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,
+  "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
   "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
