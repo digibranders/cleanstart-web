@@ -61,6 +61,7 @@ export const TextField = (props: TextFieldClientProps): ReactElement => {
       </label>
       <input
         id={inputId}
+        name={path}
         type="text"
         className="cs-text-field__input"
         value={value ?? ''}

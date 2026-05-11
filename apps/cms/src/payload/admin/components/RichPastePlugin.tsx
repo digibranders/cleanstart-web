@@ -71,7 +71,7 @@ const handleDocumentPaste = (event: ClipboardEvent): void => {
   // otherwise the paste reads as silent magic.
   try {
     window.dispatchEvent(new CustomEvent('cs-cms:toast', {
-      detail: { message: 'Pasted and cleaned', type: 'success' },
+      detail: { message: 'Rich text pasted and cleaned.', type: 'success' },
     }));
   } catch {
     // ignore — toast is best-effort.

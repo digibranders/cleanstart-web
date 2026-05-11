@@ -2,12 +2,27 @@
 
 import { useEffect } from 'react';
 
-const STOCK_KEYS = ['link', 'table'] as const;
+const STOCK_BUTTON_KEYS = ['link', 'table'] as const;
+// The `add` dropdown group (key="add") is contributed to by EXPERIMENTAL_TableFeature,
+// RelationshipFeature, HorizontalRuleFeature, and UploadFeature. Each item opens a stock
+// Payload drawer. We suppress the entire group and replace it with our custom AddMenu.
+const STOCK_GROUP_KEYS = ['add'] as const;
 
-const hideStockButtons = (root: ParentNode): void => {
-  for (const key of STOCK_KEYS) {
+const hideStockToolbarItems = (root: ParentNode): void => {
+  for (const key of STOCK_BUTTON_KEYS) {
     const matches = root.querySelectorAll<HTMLElement>(
       `[data-button-key="${key}"]`,
+    );
+    for (const node of matches) {
+      if (!node.hasAttribute('data-cs-hidden')) {
+        node.setAttribute('data-cs-hidden', 'true');
+        node.style.display = 'none';
+      }
+    }
+  }
+  for (const key of STOCK_GROUP_KEYS) {
+    const matches = root.querySelectorAll<HTMLElement>(
+      `[data-toolbar-group-key="${key}"]`,
     );
     for (const node of matches) {
       if (!node.hasAttribute('data-cs-hidden')) {
@@ -31,9 +46,9 @@ const hideStockButtons = (root: ParentNode): void => {
 export function StockToolbarSuppressorPlugin(): null {
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    hideStockButtons(document);
+    hideStockToolbarItems(document);
     const observer = new MutationObserver(() => {
-      hideStockButtons(document);
+      hideStockToolbarItems(document);
     });
     observer.observe(document.body, {
       childList: true,

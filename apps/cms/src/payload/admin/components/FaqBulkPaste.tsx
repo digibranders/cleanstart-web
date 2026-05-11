@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { parseFaqBulk } from '../../lib/faq-bulk-parse';
+import { showToast } from './ToastBus';
 
 type FaqBulkPasteProps = {
   path: string;
@@ -57,7 +58,7 @@ const buildSubFieldState = (
  */
 export const FaqBulkPaste = (props: FaqBulkPasteProps): ReactElement | null => {
   const { path, schemaPath, targetField = 'items' } = props;
-  const { addFieldRow, replaceFieldRow, removeFieldRow, getDataByPath } = useForm();
+  const { addFieldRow, dispatchFields, removeFieldRow, getDataByPath } = useForm();
   const [portalHost, setPortalHost] = useState<HTMLElement | null>(null);
 
   // Subscribe to the array's value reactively so Clear all hides the
@@ -111,13 +112,22 @@ export const FaqBulkPaste = (props: FaqBulkPasteProps): ReactElement | null => {
       const [firstPair, ...restPairs] = parsed;
       if (!firstPair) return;
 
-      replaceFieldRow({
-        path: arrayPath,
-        schemaPath: arraySchemaPath,
-        rowIndex: startIndex,
-        subFieldState: buildSubFieldState(firstPair.question, firstPair.answerParagraphs),
+      // Set the values on the row the user pasted into (keeping its
+      // existing id), then ADD_ROW for the remaining pairs. Avoids
+      // REPLACE_ROW (acts like insert in our state shape) and
+      // REMOVE_ROW + ADD_ROW (race conditions across the React
+      // reducer commit), and preserves the row's stable identity.
+      const firstAnswer = firstPair.answerParagraphs.join('\n\n');
+      dispatchFields({
+        type: 'UPDATE',
+        path: `${arrayPath}.${startIndex}.question`,
+        value: firstPair.question,
       });
-
+      dispatchFields({
+        type: 'UPDATE',
+        path: `${arrayPath}.${startIndex}.answer`,
+        value: firstAnswer,
+      });
       restPairs.forEach((pair, i) => {
         addFieldRow({
           path: arrayPath,
@@ -126,8 +136,10 @@ export const FaqBulkPaste = (props: FaqBulkPasteProps): ReactElement | null => {
           subFieldState: buildSubFieldState(pair.question, pair.answerParagraphs),
         });
       });
+
+      showToast({ message: `${parsed.length} Q&A pairs split and added.`, type: 'success' });
     },
-    [addFieldRow, arrayPath, arraySchemaPath, inputNamePattern, replaceFieldRow],
+    [addFieldRow, arrayPath, arraySchemaPath, dispatchFields, inputNamePattern],
   );
 
   useEffect(() => {

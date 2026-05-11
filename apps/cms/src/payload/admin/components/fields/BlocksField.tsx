@@ -7,7 +7,7 @@ import {
   DialogHeader,
   useDragSort,
 } from '@cleanstart/ui';
-import { RenderFields, useField } from '@payloadcms/ui';
+import { RenderFields, useField, useForm } from '@payloadcms/ui';
 import type { BlocksFieldClientProps } from 'payload';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
@@ -26,20 +26,30 @@ type BlockRow = {
   readonly [k: string]: unknown;
 };
 
+type UseFieldWithRows = {
+  readonly rows?: ReadonlyArray<BlockRow>;
+  readonly value?: number;
+};
+
 /**
  * Custom Blocks field. Layered chrome on top of Payload's
  * RenderFields: pick-block dialog (typed list of block configs),
  * row chrome (drag handle + index + collapsible body + remove),
  * reorder via useDragSort.
  *
- * Block sub-fields render via RenderFields. The `wireCustomFields`
- * stamp applies recursively so nested custom Field components surface.
+ * Row data lives in the form state under `${path}.${index}.<subfield>`;
+ * row metadata (id, blockType, customComponents) comes back from
+ * `useField({ hasRows: true })` as `rows`. `addFieldRow` /
+ * `removeFieldRow` / `moveFieldRow` on the form context dispatch the
+ * reducer actions so dirty, validation, and autosave stay in sync.
  */
 export const BlocksField = (props: BlocksFieldClientProps): ReactElement => {
   const { field, path, schemaPath, permissions, readOnly, forceRender } = props;
-  const { value, setValue } = useField<ReadonlyArray<BlockRow> | undefined>({ path });
+  const fieldState = useField({ hasRows: true, path }) as UseFieldWithRows;
+  const rows: ReadonlyArray<BlockRow> = Array.isArray(fieldState.rows) ? fieldState.rows : [];
 
-  const rows = (value ?? []) as ReadonlyArray<BlockRow>;
+  const { addFieldRow, removeFieldRow, moveFieldRow } = useForm();
+
   const labelText = labelOf(field.label) || path;
   const description =
     typeof field.admin?.description === 'string' ? field.admin.description : undefined;
@@ -54,23 +64,21 @@ export const BlocksField = (props: BlocksFieldClientProps): ReactElement => {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState<number | null>(null);
 
-  const setRows = (next: ReadonlyArray<BlockRow>): void => {
-    setValue(next as unknown as BlockRow[]);
-  };
-
   const reorder = (from: number, to: number): void => {
     if (from === to) return;
-    const arr = [...rows];
-    const [moved] = arr.splice(from, 1);
-    if (moved !== undefined) arr.splice(to, 0, moved);
-    setRows(arr);
+    moveFieldRow({ moveFromIndex: from, moveToIndex: to, path });
   };
   const remove = (idx: number): void => {
-    setRows(rows.filter((_, i) => i !== idx));
+    removeFieldRow({ path, rowIndex: idx });
     setConfirmRemove(null);
   };
   const insertBlock = (slug: string): void => {
-    setRows([...rows, { blockType: slug } as BlockRow]);
+    addFieldRow({
+      path,
+      rowIndex: rows.length,
+      schemaPath: schemaPath ?? path,
+      blockType: slug,
+    });
     setPickerOpen(false);
   };
 
@@ -78,14 +86,14 @@ export const BlocksField = (props: BlocksFieldClientProps): ReactElement => {
   const atMax = max != null && rows.length >= max;
 
   return (
-    <fieldset className="cs-blocks">
-      <legend className="cs-blocks__legend">
+    <section className="cs-blocks" aria-label={labelText}>
+      <header className="cs-blocks__legend">
         {labelText}
         <span className="cs-blocks__count">
           ({rows.length}
           {max != null ? ` / ${max}` : ''})
         </span>
-      </legend>
+      </header>
       {description ? <p className="cs-blocks__description">{description}</p> : null}
 
       <ol className="cs-blocks__list">
@@ -139,14 +147,17 @@ export const BlocksField = (props: BlocksFieldClientProps): ReactElement => {
                     fields={blockCfg.fields as never}
                     parentPath={`${path}.${i}`}
                     parentSchemaPath={`${schemaPath ?? path}.${row.blockType}`}
-                    parentIndexPath={String(i)}
+                    parentIndexPath=""
                     permissions={
-                      permissions && typeof permissions === 'object' && 'fields' in permissions
-                        ? (permissions.fields as Record<string, never>) ?? {}
-                        : {}
+                      permissions === true
+                        ? permissions
+                        : ((permissions as { fields?: unknown })?.fields as Record<
+                            string,
+                            never
+                          >) ?? {}
                     }
                     readOnly={readOnly ?? false}
-                    {...(forceRender !== undefined ? { forceRender } : {})}
+                    forceRender={forceRender ?? true}
                   />
                 ) : (
                   <p className="cs-blocks__row-missing">
@@ -207,7 +218,7 @@ export const BlocksField = (props: BlocksFieldClientProps): ReactElement => {
         confirmLabel="Remove"
         tone="danger"
       />
-    </fieldset>
+    </section>
   );
 };
 

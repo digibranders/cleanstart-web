@@ -124,18 +124,38 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
       >
         <div className="cs-select-field__listbox">
           <Combobox
-            options={filtered.map((o) => ({
-              ...o,
-              ...(selected.includes(o.value)
-                ? { description: '✓ Selected' }
-                : {}),
-            }))}
+            options={filtered}
             query={query}
             onQueryChange={setQuery}
             onChange={(v) => handlePick(String(v))}
             autoFocus
             ariaLabel={labelText}
             value={!hasMany ? (selected[0] ?? null) : null}
+            renderOption={(opt) => (
+              <span className="cs-select-field__option-row">
+                <span className="cs-combobox__option-text">
+                  <span className="cs-combobox__option-label">{opt.label}</span>
+                </span>
+                {selected.includes(String(opt.value)) ? (
+                  <svg
+                    className="cs-select-field__check"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3 8l4 4 6-7"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                ) : null}
+              </span>
+            )}
           />
         </div>
       </Popover>
