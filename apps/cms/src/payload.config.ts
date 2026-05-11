@@ -31,7 +31,7 @@ import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
 import { canonicalCheckEndpoint } from './payload/endpoints/canonical-check';
-import { jsonLdEndpoint } from './payload/endpoints/jsonld';
+import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
 import { robotsEndpoint } from './payload/endpoints/robots';
 import { searchAnalyticsEndpoint } from './payload/endpoints/search-analytics';
@@ -226,6 +226,7 @@ export default buildConfig({
     .map(wireCustomFields),
   endpoints: [
     jsonLdEndpoint,
+    jsonLdPreviewEndpoint,
     sitemapEndpoint,
     newsSitemapEndpoint,
     imageSitemapEndpoint,

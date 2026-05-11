@@ -5,7 +5,7 @@ import type { JsonLdContext } from './context';
 import { buildEventBlob, type EventAttendanceMode } from './event';
 import { buildFaqPageBlob } from './faq-page';
 import { buildHowToBlob, type HowToStep } from './how-to';
-import { validateOverride } from './override-validator';
+import { validateOverrideForCollection } from './override-validator';
 import {
   buildJobPostingBlob,
   type JobLocationSource,
@@ -789,7 +789,7 @@ export const buildJsonLdBlobs = (
   const override = readSeo(typed).additionalSchema;
   if (override == null) return layerOnePlusAddons;
 
-  const result = validateOverride(override);
+  const result = validateOverrideForCollection(override, collection);
   if (!result.ok) {
     // eslint-disable-next-line no-console -- canary visibility for ops
     console.warn(

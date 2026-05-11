@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CleanStart CMS — JSON-LD Schema System</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --surface-2: #f6f6f4;
+    --surface-3: #f1f1ee;
+    --border: #e7e5e0;
+    --border-strong: #d4d2cc;
+    --text: #14171f;
+    --text-soft: #4a4f5c;
+    --text-muted: #7a7f8c;
+    --accent: #2563eb;
+    --accent-soft: #eff4ff;
+    --good: #047857;
+    --good-soft: #ecfdf5;
+    --warn: #b45309;
+    --warn-soft: #fffbeb;
+    --danger: #b91c1c;
+    --danger-soft: #fef2f2;
+    --code-bg: #f1f1ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--text); font: 15px/1.6 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+  .layout { display: grid; grid-template-columns: minmax(220px, 260px) minmax(0, 1fr); gap: 2.5rem; max-width: 1240px; margin: 0 auto; padding: 2.5rem 1.5rem 6rem; }
+  main { max-width: 880px; min-width: 0; padding: 0; }
+  .sidebar { position: sticky; top: 1.5rem; align-self: start; max-height: calc(100vh - 3rem); overflow-y: auto; padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; }
+  .sidebar__title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin: 0 0 0.6rem; }
+  .sidebar ol { padding-left: 1.3rem; margin: 0; }
+  .sidebar li { margin: 0.3rem 0; line-height: 1.45; }
+  .sidebar a { color: var(--text-soft); text-decoration: none; }
+  .sidebar a:hover { color: var(--accent); }
+  .sidebar a.is-current { color: var(--accent); font-weight: 600; }
+  @media (max-width: 880px) {
+    .layout { display: block; padding: 1.5rem 1rem 4rem; }
+    .sidebar { position: static; max-height: none; margin-bottom: 1.5rem; }
+  }
+  h1 { font-size: 1.8rem; margin: 0 0 0.4rem; letter-spacing: -0.01em; }
+  h2 { font-size: 1.35rem; margin: 3rem 0 0.6rem; letter-spacing: -0.005em; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+  h3 { font-size: 1.05rem; margin: 1.8rem 0 0.5rem; }
+  h4 { font-size: 0.95rem; margin: 1.2rem 0 0.3rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+  p { margin: 0.6rem 0; }
+  code { background: var(--code-bg); padding: 0.08em 0.32em; border-radius: 3px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.88em; }
+  pre { background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 0.9rem 1rem; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85rem; line-height: 1.55; }
+  pre code { background: transparent; padding: 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; margin: 0.8rem 0 1.2rem; }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+  th { background: var(--surface-3); font-weight: 600; }
+  td code { white-space: nowrap; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-left: 1.4rem; }
+  li { margin: 0.25rem 0; }
+  .lede { color: var(--text-soft); font-size: 1.05rem; }
+  .kicker { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 1.5rem; }
+  .pill { display: inline-block; padding: 0.1em 0.55em; border-radius: 999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; vertical-align: middle; }
+  .pill-good { background: var(--good-soft); color: var(--good); border: 1px solid #a7f3d0; }
+  .pill-warn { background: var(--warn-soft); color: var(--warn); border: 1px solid #fde68a; }
+  .pill-danger { background: var(--danger-soft); color: var(--danger); border: 1px solid #fecaca; }
+  .pill-info { background: var(--accent-soft); color: var(--accent); border: 1px solid #c7d8ff; }
+  .callout { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 0.7rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .callout--warn { border-color: var(--warn); background: var(--warn-soft); }
+  .callout--danger { border-color: var(--danger); background: var(--danger-soft); }
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; margin: 1.5rem 0 2rem; }
+  .toc ol { padding-left: 1.3rem; margin: 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .flow { display: grid; gap: 0.5rem; margin: 1rem 0 1.5rem; }
+  .flow-step { display: grid; grid-template-columns: 2rem 1fr; gap: 0.7rem; align-items: start; }
+  .flow-step__num { background: var(--accent); color: white; width: 1.7rem; height: 1.7rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; }
+  .flow-step__body { padding-top: 0.15rem; }
+  .filepath { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85em; color: var(--text-soft); }
+  .small { font-size: 0.85rem; color: var(--text-soft); }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="sidebar" aria-label="Table of contents">
+  <p class="sidebar__title">On this page</p>
+  <ol>
+    <li><a href="#why">Why JSON-LD matters</a></li>
+    <li><a href="#layers">The three layers</a></li>
+    <li><a href="#layer1">Layer 1 — auto blobs</a></li>
+    <li><a href="#layer2">Layer 2 — schemaAddons</a></li>
+    <li><a href="#layer3">Layer 3 — admin custom</a></li>
+    <li><a href="#allowlist">Override allowlist</a></li>
+    <li><a href="#collection-gates">Collection restrictions</a></li>
+    <li><a href="#validator">Validator pipeline</a></li>
+    <li><a href="#ingest">Multi-blob ingestion</a></li>
+    <li><a href="#endpoints">Endpoints</a></li>
+    <li><a href="#audit">Audit logging</a></li>
+    <li><a href="#spec-audit">Spec audit &amp; badges</a></li>
+    <li><a href="#security">Security boundaries</a></li>
+    <li><a href="#howto-paste">How to paste a file</a></li>
+    <li><a href="#howto-new-type">Add a new auto type</a></li>
+  </ol>
+</aside>
+
+<main>
+
+<p class="kicker">CleanStart CMS · Engineering reference</p>
+<h1>JSON-LD Schema System</h1>
+<p class="lede">How CleanStart generates, audits, and lets admins extend the Schema.org JSON-LD emitted on every published page — what is automatic, what is editable, what is hard-blocked, and the security boundaries in between.</p>
+
+<h2 id="why">1. Why JSON-LD matters at all</h2>
+<p>Search engines and LLMs read structured data to understand what a page <em>is</em>: an article, a job posting, a software product, an FAQ. Good structured data feeds:</p>
+<ul>
+  <li><strong>Google Rich Results</strong> (FAQ accordions, video carousels, jobs, breadcrumb crumbs) — visible SERP enhancements that raise CTR.</li>
+  <li><strong>Knowledge Graph entity attribution</strong> — who owns the page, who wrote it, what software it describes.</li>
+  <li><strong>LLM citation</strong> — Perplexity, ChatGPT search, Claude, Gemini all consume Schema.org markup when summarising or citing pages.</li>
+</ul>
+<p>Bad structured data costs us: missing required fields means Google ignores the blob; spammy markup triggers <em>manual actions</em> (named penalties). The system in this doc is designed so the easy path produces correct markup automatically and the hard path (manual override) is gated on every dangerous shape.</p>
+
+<h2 id="layers">2. The three layers</h2>
+<p>Every published page emits a <em>graph</em> of one or more <code>&lt;script type="application/ld+json"&gt;</code> tags. The graph is composed top-down through three layers, in this order:</p>
+<table>
+  <thead><tr><th>Layer</th><th>Source</th><th>Who controls it</th><th>Common types</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Layer 1 — Auto</strong></td><td>Dispatcher reads doc fields</td><td>Engineering (code)</td><td><code>Organization</code>, <code>WebSite</code>, <code>Article</code>, <code>Person</code>, <code>BreadcrumbList</code>, <code>JobPosting</code>, <code>Event</code>, <code>WebPage</code>, <code>DigitalDocument</code>, <code>FAQPage</code></td></tr>
+    <tr><td><strong>Layer 2 — Add-ons</strong></td><td><code>schemaAddons</code> blocks field</td><td>Editors (UI)</td><td><code>HowTo</code>, <code>VideoObject</code>, <code>Review</code>, <code>SoftwareApplication</code>, manual FAQ entries, breadcrumb replace/suppress</td></tr>
+    <tr><td><strong>Layer 3 — Custom</strong></td><td><code>seo.additionalSchema</code> JSON field</td><td>Admin only (via picker modal)</td><td>Any allowlisted type not already covered (e.g. <code>FAQPage</code> with edge-case Qs on a non-blog page, <code>ProfilePage</code> on authors, <code>Course</code>)</td></tr>
+  </tbody>
+</table>
+<p>The dispatcher runs Layer 1 first, then Layer 2 merges/replaces specific entries, then Layer 3 is <strong>appended last</strong>. Order matters: later layers can add to the graph but never silently overwrite the canonical Layer-1 entity ids.</p>
+
+<div class="callout">
+  <strong>The append-only contract.</strong> No layer ever replaces the Layer-1 graph wholesale. This is the single most important invariant in the system: one bad paste must never blank out the page's Organization, WebSite, Article, or Breadcrumb blobs.
+</div>
+
+<h2 id="layer1">3. Layer 1 — auto-emitted blobs</h2>
+<p>Driven entirely by code in <span class="filepath">apps/cms/src/payload/lib/jsonld/dispatch.ts</span>. The dispatcher inspects the doc and the collection slug, then composes the canonical graph from per-type builders:</p>
+<table>
+  <thead><tr><th>Builder</th><th>File</th><th>Emits</th></tr></thead>
+  <tbody>
+    <tr><td>Article-like</td><td><span class="filepath">article.ts</span></td><td><code>Article</code> / <code>NewsArticle</code> / <code>TechArticle</code> / <code>BlogPosting</code></td></tr>
+    <tr><td>Organization</td><td><span class="filepath">organization.ts</span></td><td><code>Organization</code> (publisher; from <code>siteSettings</code> global)</td></tr>
+    <tr><td>WebSite</td><td><span class="filepath">website.ts</span></td><td><code>WebSite</code> with optional <code>SearchAction</code></td></tr>
+    <tr><td>Person</td><td><span class="filepath">person.ts</span></td><td><code>Person</code> (authors, speakers)</td></tr>
+    <tr><td>Breadcrumb</td><td><span class="filepath">breadcrumb.ts</span></td><td><code>BreadcrumbList</code></td></tr>
+    <tr><td>WebPage</td><td><span class="filepath">web-page.ts</span></td><td><code>WebPage</code>/<code>AboutPage</code>/<code>ContactPage</code>/<code>CollectionPage</code></td></tr>
+    <tr><td>Event</td><td><span class="filepath">event.ts</span></td><td><code>Event</code> (events &amp; webinars)</td></tr>
+    <tr><td>JobPosting</td><td><span class="filepath">job-posting.ts</span></td><td><code>JobPosting</code></td></tr>
+    <tr><td>FAQ</td><td><span class="filepath">faq-page.ts</span></td><td><code>FAQPage</code> from the <code>faqs[]</code> field on Article-like docs</td></tr>
+    <tr><td>HowTo</td><td><span class="filepath">how-to.ts</span></td><td><code>HowTo</code> when guide has <code>howTo.enabled</code></td></tr>
+  </tbody>
+</table>
+
+<h3>What each collection auto-emits</h3>
+<p>The picker UI (Layer 3) needs to know what is already in the graph so it can default-skip duplicates. Source of truth: <code>AUTO_EMITTED_TYPES_BY_COLLECTION</code> in <span class="filepath">override-validator.ts</span>.</p>
+<table>
+  <thead><tr><th>Collection</th><th>Auto-emitted <code>@type</code> values</th></tr></thead>
+  <tbody>
+    <tr><td><code>blogs</code></td><td>Organization, WebSite, Article, Person, BreadcrumbList, FAQPage</td></tr>
+    <tr><td><code>news</code></td><td>Organization, WebSite, NewsArticle, Person, BreadcrumbList, FAQPage</td></tr>
+    <tr><td><code>guides</code></td><td>Organization, WebSite, TechArticle, Person, BreadcrumbList, FAQPage, HowTo</td></tr>
+    <tr><td><code>knowledgeBase</code></td><td>Organization, WebSite, TechArticle, Person, BreadcrumbList, FAQPage</td></tr>
+    <tr><td><code>authors</code></td><td>Organization, WebSite, Person, BreadcrumbList</td></tr>
+    <tr><td><code>events</code></td><td>Organization, WebSite, Event, Person, BreadcrumbList</td></tr>
+    <tr><td><code>webinars</code></td><td>Organization, WebSite, Event, Person, BreadcrumbList</td></tr>
+    <tr><td><code>jobs</code></td><td>Organization, WebSite, JobPosting, BreadcrumbList</td></tr>
+    <tr><td><code>pages</code></td><td>Organization, WebSite, WebPage, AboutPage, ContactPage, CollectionPage, BreadcrumbList</td></tr>
+    <tr><td><code>resources</code></td><td>Organization, WebSite, WebPage, DigitalDocument, BreadcrumbList</td></tr>
+  </tbody>
+</table>
+
+<h3>Where each property comes from</h3>
+<p>The Article variant illustrates the pattern. The dispatcher pulls each Schema.org property from a known doc field:</p>
+<table>
+  <thead><tr><th>Schema property</th><th>Doc source</th></tr></thead>
+  <tbody>
+    <tr><td><code>headline</code></td><td><code>doc.title</code></td></tr>
+    <tr><td><code>description</code></td><td><code>doc.abstract</code> → falls back to <code>seo.description</code></td></tr>
+    <tr><td><code>image</code></td><td><code>doc.heroImage</code></td></tr>
+    <tr><td><code>author</code></td><td><code>doc.authors[]</code> (resolved Person blobs)</td></tr>
+    <tr><td><code>datePublished</code></td><td><code>doc.publicationDate</code> → <code>publishedAt</code> → <code>createdAt</code></td></tr>
+    <tr><td><code>dateModified</code></td><td><code>doc.updatedAt</code></td></tr>
+    <tr><td><code>publisher</code></td><td>Layer-1 <code>Organization</code> blob (sitewide)</td></tr>
+    <tr><td><code>wordCount</code></td><td><code>doc.wordCount</code> (auto-computed on save)</td></tr>
+    <tr><td><code>about</code></td><td>First category name from <code>doc.categories</code> / <code>doc.newsCategories</code></td></tr>
+    <tr><td><code>speakable</code></td><td><code>seo.speakablePath[]</code> CSS selectors</td></tr>
+  </tbody>
+</table>
+<p class="small">The full list lives in the per-builder files. To change what Layer 1 emits, edit a builder and ship a CMS deploy — there is no admin toggle for Layer 1.</p>
+
+<h2 id="layer2">4. Layer 2 — schemaAddons blocks</h2>
+<p>Editors who need a richer graph than the auto-emitter produces (a HowTo on a blog, a SoftwareApplication on a page) reach for the <code>schemaAddons[]</code> blocks field. Each block is a typed form an editor fills in with structured fields; the dispatcher builds a valid Schema.org blob from the block data.</p>
+<table>
+  <thead><tr><th>Block type</th><th>Builds</th><th>Typical use</th></tr></thead>
+  <tbody>
+    <tr><td><code>howToAddon</code></td><td><code>HowTo</code></td><td>Step-by-step content not modelled as a guide</td></tr>
+    <tr><td><code>videoAddon</code></td><td><code>VideoObject</code></td><td>Embedded videos on any page</td></tr>
+    <tr><td><code>faqAddon</code></td><td>Adds entries to the page's <code>FAQPage</code></td><td>Editor-curated FAQs without using the dedicated <code>faqs[]</code> field</td></tr>
+    <tr><td><code>reviewAddon</code></td><td><code>Review</code></td><td>Product / resource reviews</td></tr>
+    <tr><td><code>softwareAddon</code></td><td><code>SoftwareApplication</code></td><td>Software product pages</td></tr>
+    <tr><td><code>breadcrumbAddon</code></td><td>Replaces / suppresses Layer 1 <code>BreadcrumbList</code></td><td>Atypical IA where the auto-derived trail is wrong</td></tr>
+  </tbody>
+</table>
+<p>Why use Layer 2 over Layer 3? Layer 2 keeps editors away from raw JSON. The block form enforces required fields, validates URLs, and never lets the editor break the JSON syntax.</p>
+
+<h2 id="layer3">5. Layer 3 — admin custom additions</h2>
+<p>Some shapes don't fit Layer 1 or Layer 2: a paste from a third-party generator, a one-off <code>FAQPage</code> on a <code>pages</code> doc (which has no auto FAQ), a <code>ProfilePage</code> on an author detail page. For these, admins use the <strong>Custom additions</strong> modal on the Schema (JSON-LD) sidebar card.</p>
+
+<p>The underlying field is <code>seo.additionalSchema</code> (a Payload JSON field, admin-only via <code>isAdminFieldLevel</code>). It accepts a single Schema.org blob or an array of blobs. The dispatcher appends them <em>after</em> Layer 2.</p>
+
+<h3>What the admin sees</h3>
+<p>The Schema (JSON-LD) sidebar card has, in order:</p>
+<ol>
+  <li>A severity chip (Valid / Invalid / Draft / Unverified) for the whole page.</li>
+  <li>Expanded view: one row per blob currently in the graph, each with its own severity chip and a "Custom" pill if it came from <code>additionalSchema</code>.</li>
+  <li>A "Show raw JSON-LD" details block (the exact text the public site will emit).</li>
+  <li>Three buttons: <em>Copy JSON-LD</em>, <em>Test in Rich Results ↗</em>, and (admin-only) <em>Add custom overrides</em> / <em>Edit custom overrides (N)</em>.</li>
+</ol>
+<p>Clicking the Edit button opens the modal — that is the only entry point. There is no inline editor in the sidebar; the modal exists to make every paste go through the ingest classifier (next section).</p>
+
+<h2 id="allowlist">6. The override allowlist</h2>
+<p>Schema.org has 800+ types. Most are dangerous on a B2B marketing site (medical, legal, governmental, e-commerce). The admin override is restricted to a small allowlist of types we have committed to keeping correct: <code>ALLOWED_OVERRIDE_TYPES</code> in <span class="filepath">override-validator.ts</span>.</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Allowed</th><th>Excluded by design</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Article variants</td>
+      <td>Article, NewsArticle, TechArticle, BlogPosting, CreativeWork</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>WebPage variants</td>
+      <td>WebPage, AboutPage, ContactPage, CollectionPage</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>Editorial / rich-result</td>
+      <td>HowTo, FAQPage, QAPage, VideoObject</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>Education</td>
+      <td>Course, Dataset</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>Product / app</td>
+      <td>SoftwareApplication, WebApplication, Service</td>
+      <td>Product, Offer, MobileApplication <span class="pill pill-danger">no surface</span></td>
+    </tr>
+    <tr>
+      <td>Speakable</td>
+      <td>SpeakableSpecification</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>Per-collection-gated</td>
+      <td>ProfilePage, Review, AggregateRating <span class="pill pill-warn">restricted</span></td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>Auto-emitted by code</td>
+      <td>—</td>
+      <td>Organization, WebSite, Person, BreadcrumbList, JobPosting, Event, BusinessEvent <span class="pill pill-danger">@id collision risk</span></td>
+    </tr>
+    <tr>
+      <td>Off-surface / risky</td>
+      <td>—</td>
+      <td>MedicalCondition, LegalService, Drug, GovernmentService, Recipe, Book, AudioObject, PodcastEpisode, PodcastSeries, Movie, VacationRental <span class="pill pill-danger">never</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout callout--warn">
+  <strong>Adding to the allowlist is a code change.</strong> Every entry is a maintenance commitment — we have to keep emitting valid markup for that type as Schema.org evolves. New types are added in <span class="filepath">override-validator.ts</span> and a corresponding spec rule is added to <span class="filepath">spec/required-fields.ts</span>.
+</div>
+
+<h2 id="collection-gates">7. Per-collection restrictions</h2>
+<p>Three allowlisted types are gated to specific collections via <code>COLLECTION_RESTRICTED_TYPES</code>. Rationale: a <code>Review</code> blob on a blog page is a documented manual-action trigger; <code>ProfilePage</code> only makes semantic sense on author pages.</p>
+<table>
+  <thead><tr><th>Type</th><th>Allowed on</th><th>Blocked on</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>ProfilePage</code></td>
+      <td><code>authors</code> only</td>
+      <td>everything else</td>
+      <td>Google's 2024 author-profile rich-result type. Pointless and misleading on non-profile pages.</td>
+    </tr>
+    <tr>
+      <td><code>Review</code></td>
+      <td><code>resources</code>, <code>events</code>, <code>webinars</code></td>
+      <td><code>blogs</code>, <code>news</code>, <code>guides</code>, <code>knowledgeBase</code>, <code>authors</code>, <code>pages</code>, <code>jobs</code></td>
+      <td>Top manual-action trigger ("structured data manipulation"). Allowed only where a reviewable subject genuinely exists.</td>
+    </tr>
+    <tr>
+      <td><code>AggregateRating</code></td>
+      <td><code>resources</code>, <code>events</code>, <code>webinars</code></td>
+      <td>same as Review</td>
+      <td>Same reason. Google's March 2026 enforcement threshold is ≥5 verifiable open-system reviews.</td>
+    </tr>
+  </tbody>
+</table>
+<p>The collection gate is enforced in three places (defence in depth):</p>
+<ol>
+  <li>Picker UI shows a hard-disabled "Wrong collection" row.</li>
+  <li>Field <code>validate</code> hook on <code>additionalSchema</code> rejects the save with a line-item error.</li>
+  <li>Dispatcher re-runs <code>validateOverrideForCollection</code> before emitting, so a row written before the rule existed still gets dropped from the public output.</li>
+</ol>
+
+<h2 id="validator">8. The validator pipeline</h2>
+<p>Every override save runs through <code>validateOverride</code> (or its collection-aware sibling <code>validateOverrideForCollection</code>) in <span class="filepath">override-validator.ts</span>. The pipeline is a sequence of cheap, deterministic gates:</p>
+
+<div class="flow">
+  <div class="flow-step"><div class="flow-step__num">1</div><div class="flow-step__body"><strong>Null short-circuit.</strong> Unset field → valid. Cheap.</div></div>
+  <div class="flow-step"><div class="flow-step__num">2</div><div class="flow-step__body"><strong>Size guard (16 KB).</strong> <code>JSON.stringify</code> + <code>Buffer.byteLength</code>. Done before Zod so a 5 MB blob doesn't DoS the save handler.</div></div>
+  <div class="flow-step"><div class="flow-step__num">3</div><div class="flow-step__body"><strong>Zod schema.</strong> <code>@context</code> must be exactly <code>"https://schema.org"</code> (no http, no array). <code>@type</code> must be on the global allowlist, single string or non-empty array.</div></div>
+  <div class="flow-step"><div class="flow-step__num">4</div><div class="flow-step__body"><strong>Nested-<code>@id</code> scan.</strong> Recursive walk; top-level <code>@id</code> is allowed (legitimate self-id), nested <code>@id</code> is rejected (schema-injection vector).</div></div>
+  <div class="flow-step"><div class="flow-step__num">5</div><div class="flow-step__body"><strong>(collection-aware variant only)</strong> Per-collection gate for ProfilePage / Review / AggregateRating.</div></div>
+</div>
+
+<p>The same validator runs on the server (<code>validate</code> hook + dispatcher re-check) and on the client (live red error in the picker). One source of truth.</p>
+
+<h3>Tolerant parser — <code>parseLenient</code> / <code>parseLenientMulti</code></h3>
+<p>Pastes from external generators (Webflow, Rank Math, ChatGPT) come with garbage. Before validation runs, the parser:</p>
+<ul>
+  <li>Strips wrapping <code>&lt;script type="application/ld+json"&gt;…&lt;/script&gt;</code> tags.</li>
+  <li>Normalises <code>"http://schema.org"</code> → <code>"https://schema.org"</code> (only at the <code>@context</code> position).</li>
+  <li>Removes JSON5-style trailing commas as a fallback.</li>
+  <li>Reports a line/column on parse failure so the editor can find the problem.</li>
+</ul>
+<p>The "multi" variant extracts every <code>&lt;script&gt;</code> block from a single paste independently — the shape SEO generators emit, with comments separating multiple blobs. Each block parses on its own; one bad block doesn't poison the whole paste.</p>
+
+<h2 id="ingest">9. Multi-blob ingestion &amp; the picker UI</h2>
+<p>When the admin pastes a file with several <code>@type</code> blobs, the modal classifies each one against four buckets via <code>buildIngestPlan</code>:</p>
+<table>
+  <thead><tr><th>Reason</th><th>Default action</th><th>Overridable?</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>allowed</code> <span class="pill pill-good">merge</span></td><td>Merge</td><td>Yes</td><td>On the allowlist, not auto-emitted, no off-domain @id → safe to append.</td></tr>
+    <tr><td><code>duplicates-auto-emit</code></td><td>Skip</td><td>Only if type is also on user allowlist (e.g. FAQPage on guides)</td><td>The dispatcher already generates this blob from doc fields. Letting the paste in adds a second, possibly diluting the canonical shape.</td></tr>
+    <tr><td><code>off-domain-id</code></td><td>Skip</td><td>Yes</td><td>Top-level <code>@id</code> points at a domain other than the site origin. Forcing this in splits Google's knowledge-graph entity between domains.</td></tr>
+    <tr><td><code>off-allowlist</code> <span class="pill pill-danger">hard</span></td><td>Skip</td><td>No</td><td><code>@type</code> is not on <code>ALLOWED_OVERRIDE_TYPES</code>.</td></tr>
+    <tr><td><code>collection-restricted</code> <span class="pill pill-danger">hard</span></td><td>Skip</td><td>No</td><td>Type is gated to a different collection (Review on a blog).</td></tr>
+    <tr><td><code>nested-id</code> <span class="pill pill-danger">hard</span></td><td>Skip</td><td>No</td><td>Schema-injection vector (nested <code>@id</code> pulling external graphs).</td></tr>
+    <tr><td><code>oversize</code> <span class="pill pill-danger">hard</span></td><td>Skip</td><td>No</td><td>Single blob exceeds the 16 KB cap.</td></tr>
+    <tr><td><code>invalid-shape</code> <span class="pill pill-danger">hard</span></td><td>Skip</td><td>No</td><td>Block is not a JSON object.</td></tr>
+  </tbody>
+</table>
+
+<p>The picker renders one row per blob with a checkbox. Rows marked <em>overridable</em> have an enabled checkbox the admin can flip. Rows marked <em>hard</em> have a disabled checkbox — no UI gesture can save them, and even if the request was hand-crafted the field validator would reject it.</p>
+
+<p>On Apply, only the checked blobs are written to <code>seo.additionalSchema</code>. If exactly one blob remains, it's stored as a single object; multiple blobs are stored as an array. The dispatcher handles both shapes transparently.</p>
+
+<div class="callout">
+  <strong>Why every row defaults to skip.</strong> Pasting a five-block generator file should produce zero unintended writes until the admin explicitly opts each one in. The opt-in cost is one click per intended row; the opt-out cost of getting it wrong is a brand-attribution split that takes months to unwind.
+</div>
+
+<h2 id="endpoints">10. JSON-LD endpoints</h2>
+<p>Two HTTP endpoints, both at <code>/api/jsonld/&lt;collection&gt;/&lt;id&gt;</code>:</p>
+
+<h4><span class="pill pill-info">GET</span> Public</h4>
+<ul>
+  <li>Open access (matches each collection's <code>read</code> rule).</li>
+  <li>Published docs only — drafts return 404.</li>
+  <li>Returns <code>{ blobs }</code> ordered as the public renderer should emit them.</li>
+  <li><code>Cache-Control: public, max-age=60</code>.</li>
+</ul>
+
+<h4><span class="pill pill-info">POST</span> Admin draft preview</h4>
+<ul>
+  <li>Admin role required (<code>hasRole(req.user, 'admin')</code>) — anything else returns 403.</li>
+  <li>Body: <code>{ additionalSchema?: unknown }</code> — re-validated server-side via <code>validateOverrideForCollection</code> before merging.</li>
+  <li>Includes drafts so editors can preview changes before publishing.</li>
+  <li><code>Cache-Control: no-store</code>.</li>
+  <li>Used by the sidebar card to render a live "Preview only — applies on publish" merge of the unsaved override.</li>
+</ul>
+
+<h2 id="audit">11. Audit logging</h2>
+<p>Every change to <code>seo.additionalSchema</code> writes one row to the <code>audit-log</code> collection via the <code>schemaOverrideAuditHook</code> (<span class="filepath">apps/cms/src/payload/hooks/schema-override-audit.ts</span>):</p>
+<pre><code>{
+  action: "schema_override_changed",
+  targetCollection: "blogs",
+  targetId: "13",
+  actorUserId: 1,
+  requestIp: "...", userAgent: "...",
+  metadata: {
+    before: { /* previous additionalSchema value */ },
+    after:  { /* new value */ },
+    operation: "created" | "updated" | "cleared"
+  }
+}</code></pre>
+<p>Capped by the field's 16 KB Zod limit so the row stays small. Audit-log write failures never block the parent save — they log and move on, matching the lead-deletion hook pattern.</p>
+
+<h2 id="spec-audit">12. Spec audit &amp; severity badges</h2>
+<p>The badges in the sidebar (Valid / Invalid / Unverified) come from a separate audit pass that compares each blob's properties to a per-<code>@type</code> required/recommended table in <span class="filepath">apps/cms/src/payload/lib/jsonld/spec/required-fields.ts</span>:</p>
+<ul>
+  <li><span class="pill pill-good">Valid</span> — all required fields present.</li>
+  <li><span class="pill pill-good">Valid</span> (amber underneath) — required fields present, some recommended fields missing.</li>
+  <li><span class="pill pill-danger">Invalid</span> — one or more required fields missing. Search engines will reject the blob.</li>
+  <li><span class="pill" style="background:#eee;color:#555;border:1px solid #ccc;">Unverified</span> — <code>@type</code> not in <code>SCHEMA_SPEC</code>. We treat the blob as informational only.</li>
+</ul>
+<p>The spec audit is <em>separate</em> from the override validator: a paste that's structurally OK but missing recommended fields will save (it just shows amber). This matches how editors work — saving slightly-incomplete blobs is fine; the recommended-fields nudge appears in the card as a list under the blob.</p>
+
+<h2 id="security">13. Security boundaries</h2>
+<table>
+  <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+  <tbody>
+    <tr><td>Schema spam / manual action</td><td>Tight <code>@type</code> allowlist (22 entries). Per-collection gates for Review / AggregateRating / ProfilePage. Default-skip on every paste. Audit log captures author + diff.</td></tr>
+    <tr><td>Knowledge-graph entity split (off-domain <code>@id</code>)</td><td>Picker detects mismatched origin and defaults that row to skip with an explanatory message.</td></tr>
+    <tr><td>Schema-injection (nested <code>@id</code> pulling external graphs)</td><td>Hard-block in the validator; rejected at field-save, dispatcher, and picker.</td></tr>
+    <tr><td>Permission escalation</td><td><code>seo.additionalSchema</code> field-level access locked to admin role. Picker UI gated via <code>useAuth()</code>. POST preview endpoint checks role before accepting body.</td></tr>
+    <tr><td>DoS via huge paste</td><td>16 KB cap enforced before Zod runs; 64 KB upload cap before parse runs.</td></tr>
+    <tr><td>Payload-side <code>&lt;/script&gt;</code> escape</td><td><strong>Public-site responsibility:</strong> when <code>apps/web</code> returns, its <code>&lt;script type="application/ld+json"&gt;</code> serializer must escape the four-character <code>&lt;/</code> sequence to <code>&lt;\/</code> in any user-supplied string. Documented as a Phase-A launch blocker.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="howto-paste">14. How to paste a custom JSON-LD file</h2>
+<p>Walking through the typical SEO-team workflow (a generator output file like <code>cleanstart-foo-schema.txt</code>):</p>
+<div class="flow">
+  <div class="flow-step"><div class="flow-step__num">1</div><div class="flow-step__body">Open the document in the CMS. Expand the <strong>Schema (JSON-LD)</strong> sidebar card.</div></div>
+  <div class="flow-step"><div class="flow-step__num">2</div><div class="flow-step__body">Click <strong>Add custom overrides</strong> (or <strong>Edit custom overrides (N)</strong>). The modal opens.</div></div>
+  <div class="flow-step"><div class="flow-step__num">3</div><div class="flow-step__body">Either paste the whole file into the textarea or click <strong>Choose File</strong> and pick the <code>.txt</code> / <code>.json</code> / <code>.jsonld</code>.</div></div>
+  <div class="flow-step"><div class="flow-step__num">4</div><div class="flow-step__body">The picker appears under <strong>Ingest plan</strong>. Each <code>&lt;script&gt;</code> block becomes one row with a checkbox and a reason badge. Read the reasons; everything defaults to skip.</div></div>
+  <div class="flow-step"><div class="flow-step__num">5</div><div class="flow-step__body">Check only the boxes you want. Disabled rows are hard-blocked — flip the off-domain @id, edit the @id to point at <code>cleanstart.com</code>, or just live with the auto-emit version.</div></div>
+  <div class="flow-step"><div class="flow-step__num">6</div><div class="flow-step__body">Click <strong>Apply</strong>. The modal closes; the sidebar now shows a "Custom additions: N blob(s)" pill on each merged row in the live preview.</div></div>
+  <div class="flow-step"><div class="flow-step__num">7</div><div class="flow-step__body">Save the document. The audit log gets one row; the next publish emits the merged graph to the public site.</div></div>
+</div>
+<p>For most SEO-generated files (which include Organization / WebSite / WebPage / BreadcrumbList that we already auto-emit), the realistic merge count is 1 — usually the FAQPage on a page where the auto-emitter doesn't generate one.</p>
+
+<h2 id="howto-new-type">15. How to add a new auto-emitted type</h2>
+<p>Engineering task. Roughly:</p>
+<ol>
+  <li>Write a builder under <span class="filepath">apps/cms/src/payload/lib/jsonld/&lt;type&gt;.ts</span> following the existing pattern (<code>(ctx, source) =&gt; JsonLdBlob | null</code>).</li>
+  <li>Wire it into <span class="filepath">dispatch.ts</span> for the collections that should emit it.</li>
+  <li>Add the type to <code>AUTO_EMITTED_TYPES_BY_COLLECTION</code> in <span class="filepath">override-validator.ts</span> so the picker default-skips duplicates.</li>
+  <li>Add a row to <code>SCHEMA_SPEC</code> in <span class="filepath">spec/required-fields.ts</span> with the required + recommended properties (cross-check against schema.org and Google's structured-data docs).</li>
+  <li>Write a Vitest spec next to the builder. The existing dispatcher tests are good templates.</li>
+  <li>Run the four pre-completion checks: <code>pnpm --filter @cleanstart/cms lint &amp;&amp; pnpm --filter @cleanstart/cms typecheck &amp;&amp; pnpm --filter @cleanstart/cms test &amp;&amp; pnpm --filter @cleanstart/cms build</code>.</li>
+</ol>
+
+<p class="small" style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+Source files referenced in this doc:
+<code>apps/cms/src/payload/lib/jsonld/{dispatch,override-validator,spec/required-fields}.ts</code> ·
+<code>apps/cms/src/payload/admin/components/SchemaPreviewField.tsx</code> ·
+<code>apps/cms/src/payload/fields/seo.ts</code> ·
+<code>apps/cms/src/payload/endpoints/jsonld.ts</code> ·
+<code>apps/cms/src/payload/hooks/schema-override-audit.ts</code>.
+</p>
+
+</main>
+
+</div>
+
+<script>
+  (function () {
+    const links = Array.from(document.querySelectorAll('.sidebar a[href^="#"]'));
+    const byId = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
+    const sections = Array.from(byId.keys()).map((id) => document.getElementById(id)).filter(Boolean);
+    if (sections.length === 0) return;
+    const setCurrent = (id) => {
+      for (const a of links) a.classList.toggle('is-current', a.getAttribute('href') === '#' + id);
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setCurrent(visible[0].target.id);
+      },
+      { rootMargin: '-25% 0px -65% 0px', threshold: 0 },
+    );
+    for (const s of sections) io.observe(s);
+  })();
+</script>
+
+</body>
+</html>
