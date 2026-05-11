@@ -17,7 +17,7 @@ export const dispatchSaveError = (message?: string): void => {
   if (typeof window === 'undefined') return;
   window.dispatchEvent(
     new CustomEvent('cs-cms:save-error', {
-      detail: { message: message ?? 'Save failed' },
+      detail: { message: message ?? 'Save failed. Please try again.' },
     }),
   );
 };

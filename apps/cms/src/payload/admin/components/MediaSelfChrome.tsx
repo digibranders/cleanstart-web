@@ -230,6 +230,18 @@ export const MediaSelfChrome = (): ReactElement | null => {
           })
           .catch(() => {
             setError('Replace failed — file may be too large or wrong type.');
+            try {
+              window.dispatchEvent(
+                new CustomEvent('cs-cms:toast', {
+                  detail: {
+                    message: 'File replacement failed — the file may be too large or the wrong type.',
+                    type: 'error',
+                  },
+                }),
+              );
+            } catch {
+              // ignore
+            }
           })
           .finally(() => {
             setReplacing(false);

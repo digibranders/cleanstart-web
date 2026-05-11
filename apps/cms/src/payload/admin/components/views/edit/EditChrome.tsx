@@ -5,6 +5,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 type Props = {
   readonly controls: ReactNode;
+  readonly form: ReactNode;
   readonly description?: ReactNode;
   readonly status?: ReactNode;
   readonly beforeControls?: ReactNode;
@@ -17,16 +18,17 @@ type Props = {
 
 /**
  * Edit-view layout shell. Two columns at desktop:
- *   - left  · the form (rendered by Payload one layer below us)
- *   - right · status, controls, custom sidebar fields
+ *   - left  · the form (`<DocumentFields>`, supplied via `form` slot)
+ *   - right · status, controls, optional live-preview pane
  *
- * On `documentSubViewType === 'version'` or `'versions'` Payload's
- * own version pane mounts in place of the form column; our chrome
- * still wraps it so the action bar stays consistent.
+ * On `documentSubViewType === 'version'` or `'versions'` Payload's own
+ * version pane mounts in place of the form via the same `form` slot,
+ * so our chrome stays consistent across edit / version subviews.
  */
 export const EditChrome = (props: Props): ReactElement => {
   const {
     controls,
+    form,
     description,
     status,
     beforeControls,
@@ -62,14 +64,7 @@ export const EditChrome = (props: Props): ReactElement => {
       ) : null}
 
       <div className="cs-edit__body">
-        <div className="cs-edit__form-col">
-          {/*
-            The actual <form> tree (RenderFields, errors, autosave plumbing)
-            is composed below us by Payload's document RSC route. We are the
-            chrome around it. children of <CmsEditView> arrive automatically
-            via the route's render — nothing more to mount here.
-          */}
-        </div>
+        <div className="cs-edit__form-col">{form}</div>
         {livePreview ? (
           <aside className="cs-edit__preview-col" aria-label="Live preview">
             {livePreview}

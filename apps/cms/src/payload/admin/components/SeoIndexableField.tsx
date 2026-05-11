@@ -77,7 +77,7 @@ export const SeoIndexableField = (props: SeoIndexableFieldProps): ReactElement =
           className="cs-seo-indexable__chip"
           style={{ color: toneColor[activeOption.tone] }}
         >
-          {current === 'index' ? 'Live' : 'Hidden'}
+          {activeOption.label}
         </span>
       </legend>
 

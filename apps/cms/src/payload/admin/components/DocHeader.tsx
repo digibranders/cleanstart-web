@@ -99,7 +99,7 @@ export const DocHeader = (props: DocHeaderProps): ReactElement => {
           title={isLive ? 'Published — visible on the public site.' : 'Draft — not yet visible on the public site.'}
         >
           <span className="cs-doc-header__badge-dot" aria-hidden="true" />
-          {isLive ? 'Live' : 'Draft'}
+          {isLive ? 'Published' : 'Draft'}
         </span>
         <h1 className="cs-doc-header__title" title={title}>
           {title}
