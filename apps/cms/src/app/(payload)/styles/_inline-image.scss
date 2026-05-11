@@ -1,0 +1,548 @@
+// Suppress Payload's stock slash-menu popup. The core LexicalEditor
+// hard-mounts `SlashMenuPlugin` from `dist/lexical/plugins/SlashMenu`
+// — it can't be disabled via config. We render our own sleeker menu
+// (`cs-slash-menu` via `cleanstartSlashMenuFeature`), so the stock
+// popup is purely a duplicate. Hiding it also removes the stock
+// "Upload" slash entry that would otherwise re-open the Payload
+// media drawer.
+.slash-menu-popup {
+  display: none !important;
+}
+
+// Styles for the custom inline-image insert experience layered on
+// top of Payload's `UploadFeature`. The image card itself still uses
+// Payload's stock `UploadComponent`; this stylesheet only covers the
+// surfaces we own:
+//
+//   - `cs-inline-image-dialog` — the three-tab insert dialog (Device,
+//     Browse, From URL) opened by the `/image` slash command and the
+//     `OPEN_INLINE_IMAGE_DIALOG_COMMAND` toolbar dispatch.
+//   - `cs-inline-image__toast` — transient error surface for failed
+//     paste / drop uploads inside the editor.
+
+.cs-inline-image-dialog {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  max-width: min(640px, 92vw);
+  width: 100%;
+  color: inherit;
+
+  &::backdrop {
+    background: rgba(8, 10, 18, 0.55);
+    backdrop-filter: blur(6px);
+  }
+
+  // Wide variant used by the per-placement Edit dialog so the
+  // two-column layout (preview + form) fits without crowding.
+  &--wide {
+    max-width: min(880px, 94vw);
+  }
+}
+
+.cs-inline-image-dialog__panel {
+  background: var(--theme-elevation-50, #fff);
+  color: var(--theme-text, #111);
+  border: 1px solid var(--theme-elevation-150, rgba(0, 0, 0, 0.08));
+  border-radius: 12px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cs-inline-image-dialog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+}
+
+.cs-inline-image-dialog__title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.cs-inline-image-dialog__close {
+  background: transparent;
+  border: 0;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+  padding: 4px 8px;
+  border-radius: 6px;
+
+  &:hover {
+    background: var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+  }
+}
+
+.cs-inline-image-dialog__tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 14px 0;
+  border-bottom: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+}
+
+.cs-inline-image-dialog__tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--theme-text, #444);
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 2px solid transparent;
+
+  &.is-active {
+    color: var(--theme-success-500, #0ea5e9);
+    border-bottom-color: currentColor;
+  }
+
+  &:hover:not(.is-active) {
+    background: var(--theme-elevation-100, rgba(0, 0, 0, 0.05));
+  }
+}
+
+.cs-inline-image-dialog__body {
+  padding: 22px 22px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 200px;
+}
+
+.cs-inline-image-dialog__hint {
+  font-size: 12.5px;
+  color: var(--theme-text, #555);
+  opacity: 0.78;
+  margin: 0;
+
+  code {
+    background: var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+}
+
+.cs-inline-image-dialog__label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--theme-text, #444);
+}
+
+.cs-inline-image-dialog__input {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  background: var(--theme-input-bg, #fff);
+  color: inherit;
+
+  &:focus {
+    outline: 2px solid var(--theme-success-500, #0ea5e9);
+    outline-offset: 1px;
+  }
+}
+
+.cs-inline-image-dialog__primary {
+  align-self: flex-start;
+  appearance: none;
+  border: 0;
+  background: var(--theme-success-500, #0ea5e9);
+  color: #fff;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.cs-inline-image-dialog__device,
+.cs-inline-image-dialog__url {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cs-inline-image-dialog__error {
+  margin: 0 22px 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--theme-error-100, #fee2e2);
+  color: var(--theme-error-700, #991b1b);
+  font-size: 12.5px;
+}
+
+// Edit dialog (per-placement fields) — extends the shared
+// `.cs-inline-image-dialog` panel with a preview, toggle groups,
+// and a two-tier footer.
+.cs-inline-image-edit {
+  gap: 16px;
+}
+
+.cs-inline-image-edit__preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--theme-elevation-100, rgba(0, 0, 0, 0.04));
+
+  img {
+    max-width: 100%;
+    max-height: 220px;
+    border-radius: 6px;
+    object-fit: contain;
+  }
+}
+
+.cs-inline-image-edit__filename {
+  font-size: 12px;
+  opacity: 0.7;
+  word-break: break-all;
+}
+
+.cs-inline-image-edit__fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cs-inline-image-edit__toggle-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cs-inline-image-edit__toggle {
+  appearance: none;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  background: transparent;
+  color: inherit;
+  padding: 7px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+
+  &:hover {
+    background: var(--theme-elevation-100, rgba(0, 0, 0, 0.05));
+  }
+
+  &.is-active {
+    background: var(--theme-success-500, #0ea5e9);
+    border-color: var(--theme-success-500, #0ea5e9);
+    color: #fff;
+  }
+}
+
+.cs-inline-image-edit__checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cs-inline-image-edit__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 22px 18px;
+  border-top: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+}
+
+.cs-inline-image-edit__footer-secondary {
+  display: flex;
+  gap: 8px;
+}
+
+.cs-inline-image-edit__btn {
+  appearance: none;
+  border: 1px solid transparent;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &--secondary {
+    border-color: var(--theme-elevation-200, rgba(0, 0, 0, 0.14));
+    background: transparent;
+    color: inherit;
+
+    &:hover {
+      background: var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+    }
+  }
+
+  &--destructive {
+    border-color: var(--theme-error-300, #fca5a5);
+    background: transparent;
+    color: var(--theme-error-700, #b91c1c);
+
+    &:hover {
+      background: var(--theme-error-100, #fee2e2);
+    }
+  }
+}
+
+// Two-column Edit dialog (wide variant). Left pane is preview + file
+// meta + filename rename + focal point picker; right pane is grouped
+// form sections (Placement, Media library).
+.cs-inline-image-edit2 {
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-inline-image-edit2__body {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) 1fr;
+  gap: 22px;
+  padding: 18px 22px;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.cs-inline-image-edit2__left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cs-inline-image-edit2__preview {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  border-radius: 10px;
+  background: var(--theme-elevation-100, rgba(0, 0, 0, 0.04));
+  overflow: hidden;
+  cursor: crosshair;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--theme-success-500, #0ea5e9);
+    outline-offset: 2px;
+  }
+}
+
+.cs-inline-image-edit2__preview-skeleton {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: var(--theme-text-soft, #888);
+}
+
+.cs-inline-image-edit2__focal-dot {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: var(--theme-success-500, #0ea5e9);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 0 12px rgba(14, 165, 233, 0.55);
+  pointer-events: none;
+}
+
+.cs-inline-image-edit2__focal-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cs-inline-image-edit2__focal-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--theme-text, #444);
+
+  input {
+    width: 56px;
+    padding: 4px 6px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+    background: var(--theme-input-bg, transparent);
+    color: inherit;
+  }
+}
+
+.cs-inline-image-edit2__chip {
+  appearance: none;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.14));
+  background: transparent;
+  color: inherit;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+  }
+
+  &--primary {
+    background: var(--theme-success-500, #0ea5e9);
+    border-color: var(--theme-success-500, #0ea5e9);
+    color: #fff;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.cs-inline-image-edit2__meta {
+  font-size: 11.5px;
+  color: var(--theme-text-soft, #888);
+}
+
+.cs-inline-image-edit2__filename {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  min-width: 0;
+}
+
+.cs-inline-image-edit2__filename-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--theme-text, #333);
+}
+
+.cs-inline-image-edit2__ext {
+  font-size: 11.5px;
+  color: var(--theme-text-soft, #888);
+}
+
+.cs-inline-image-edit2__right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.cs-inline-image-edit2__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cs-inline-image-edit2__section-title {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--theme-text-soft, #888);
+  border-bottom: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+  padding-bottom: 6px;
+}
+
+.cs-inline-image-edit2__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cs-inline-image-edit2__folder {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cs-inline-image-edit2__code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+}
+
+// Tighten the shared dialog body padding when used inside the wide
+// variant (it provides its own grid padding above).
+.cs-inline-image-dialog--wide .cs-inline-image-dialog__body {
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 0;
+}
+
+.cs-inline-image__toast {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  z-index: 80;
+  background: var(--theme-error-700, #991b1b);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+  animation: cs-inline-image-toast 4.6s ease forwards;
+}
+
+@keyframes cs-inline-image-toast {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  6%,
+  92% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

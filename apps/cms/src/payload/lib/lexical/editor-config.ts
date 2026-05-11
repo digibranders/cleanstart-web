@@ -24,7 +24,9 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical';
 
-import { cleanstartBlockHandleFeature } from './block-handle-feature';
+import { cleanstartAddMenuFeature } from './add-menu-feature';
+import { cleanstartEmbedFeature } from './embed-feature';
+import { cleanstartInlineImageFeature } from './inline-image-feature';
 import { cleanstartLinkPopoverFeature } from './link-popover-feature';
 import { cleanstartSlashMenuFeature } from './slash-menu-feature';
 import { cleanstartTablePopoverFeature } from './table-popover-feature';
@@ -71,7 +73,71 @@ export const cleanstartLexicalEditor = () =>
       }),
       cleanstartLinkPopoverFeature(),
       RelationshipFeature(),
-      UploadFeature(),
+      cleanstartEmbedFeature(),
+      cleanstartAddMenuFeature(),
+
+      // Per-placement metadata fields. They live on each upload node's
+      // `fields` object inside the Lexical JSON — no Media collection
+      // schema change. `alt` defaults from the linked Media doc's own
+      // `alt` on insertion (via the inline-image plugin) and is
+      // editable per placement so the same image can carry a different
+      // contextual alt in different posts.
+      UploadFeature({
+        collections: {
+          media: {
+            fields: [
+              {
+                name: 'alt',
+                type: 'text',
+                label: 'Alt text (this placement)',
+                admin: {
+                  description:
+                    'Per-placement alt. Defaults from the Media library on insert; override here for context.',
+                },
+              },
+              {
+                name: 'caption',
+                type: 'text',
+                label: 'Caption',
+              },
+              {
+                name: 'alignment',
+                type: 'select',
+                defaultValue: 'center',
+                options: [
+                  { label: 'Left', value: 'left' },
+                  { label: 'Center', value: 'center' },
+                  { label: 'Right', value: 'right' },
+                  { label: 'Full-width', value: 'full' },
+                ],
+              },
+              {
+                name: 'size',
+                type: 'select',
+                defaultValue: 'large',
+                options: [
+                  { label: 'Small', value: 'small' },
+                  { label: 'Medium', value: 'medium' },
+                  { label: 'Large', value: 'large' },
+                  { label: 'Full', value: 'full' },
+                ],
+              },
+              {
+                name: 'decorative',
+                type: 'checkbox',
+                label: 'Decorative (suppress alt requirement)',
+              },
+            ],
+          },
+        },
+      }),
+
+      // Custom inline-image surface: paste/drop direct upload, a
+      // three-tab insert dialog (Device / Browse / URL), and a slash
+      // menu entry — all bypassing the default media browser modal.
+      // Layered on top of UploadFeature: it still owns the node,
+      // serialization, and SSR.
+      cleanstartInlineImageFeature(),
 
       // Persistent toolbar — addresses editor reports that bold/italic
       // "weren't working": the default inline-on-selection floater is
@@ -86,9 +152,5 @@ export const cleanstartLexicalEditor = () =>
       // Layered on top of the stock features it dispatches into.
       cleanstartSlashMenuFeature(),
 
-      // Wave 7 part 2 — left-rail drag handle for top-level blocks.
-      // Hover anywhere inside a paragraph / heading / list / quote to
-      // surface the grip; drag to reorder.
-      cleanstartBlockHandleFeature(),
     ],
   });
