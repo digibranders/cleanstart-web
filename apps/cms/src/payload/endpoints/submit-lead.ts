@@ -158,13 +158,39 @@ export const submitLeadEndpoint: Endpoint = {
     const data = parsed.data;
     const userAgent = req.headers.get('user-agent') ?? undefined;
 
-    // Honeypot — silently swallow with 200 OK so bots don't learn they
-    // tripped the trap. Logged for spam analytics.
+    // Honeypot — return 200 OK so bots don't learn they tripped the trap.
+    // Store the submission with the honeypot value set for admin visibility
+    // and GDPR audit completeness. CRM secondaries are intentionally skipped.
     if (typeof data.website === 'string' && data.website.trim().length > 0) {
       req.payload.logger.info(
         { ip, userAgent: userAgent ?? null },
-        'Lead submission swallowed — honeypot tripped',
+        'Lead submission flagged — honeypot tripped',
       );
+      const numericHoneypotFormId =
+        typeof data.formId === 'number' ? data.formId : Number.parseInt(String(data.formId), 10);
+      if (Number.isInteger(numericHoneypotFormId) && numericHoneypotFormId > 0) {
+        try {
+          await req.payload.create({
+            collection: 'leads',
+            data: {
+              form: numericHoneypotFormId,
+              formSchemaVersion: 0,
+              fields: typeof data.fields === 'object' && data.fields !== null ? data.fields : {},
+              source: data.source ?? null,
+              ip: ip ?? null,
+              userAgent: userAgent ?? null,
+              honeypot: data.website,
+              turnstilePassed: false,
+            },
+            overrideAccess: true,
+          });
+        } catch (err) {
+          req.payload.logger.warn(
+            { err: err instanceof Error ? err.message : String(err) },
+            'Failed to persist honeypot lead',
+          );
+        }
+      }
       return json({ ok: true }, { headers: responseCors });
     }
 

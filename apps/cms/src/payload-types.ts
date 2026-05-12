@@ -1454,6 +1454,14 @@ export interface Lead {
    * Stamped by the daily PII purge once ip / userAgent / email / phone fields have been nulled. Used as the idempotency marker so re-runs skip already-redacted rows.
    */
   piiRedactedAt?: string | null;
+  /**
+   * Non-empty when the hidden honeypot field was filled at submit time. Indicates likely bot submission.
+   */
+  honeypot?: string | null;
+  /**
+   * False when the Cloudflare Turnstile challenge was not passed at submit time.
+   */
+  turnstilePassed?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -7001,6 +7009,8 @@ export interface LeadsSelect<T extends boolean = true> {
   enriched?: T;
   duplicateOf?: T;
   piiRedactedAt?: T;
+  honeypot?: T;
+  turnstilePassed?: T;
   updatedAt?: T;
   createdAt?: T;
 }

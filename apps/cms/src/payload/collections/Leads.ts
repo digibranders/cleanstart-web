@@ -97,6 +97,8 @@ export const Leads: CollectionConfig = {
       beforeListTable: [
         '@/payload/admin/components/LeadsImmutableBanner.tsx#LeadsImmutableBanner',
         '@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner',
+        '@/payload/admin/components/DsarActionsPanel.tsx#DsarActionsPanel',
+        '@/payload/admin/components/FlaggedLeadsTab.tsx#FlaggedLeadsTab',
       ],
     },
   },
@@ -271,6 +273,26 @@ export const Leads: CollectionConfig = {
         readOnly: true,
         position: 'sidebar',
         date: { pickerAppearance: 'dayAndTime' },
+      },
+    },
+    {
+      name: 'honeypot',
+      type: 'text',
+      admin: {
+        description:
+          'Non-empty when the hidden honeypot field was filled at submit time. Indicates likely bot submission.',
+        readOnly: true,
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'turnstilePassed',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        description: 'False when the Cloudflare Turnstile challenge was not passed at submit time.',
+        readOnly: true,
+        position: 'sidebar',
       },
     },
   ],

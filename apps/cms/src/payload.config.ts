@@ -34,6 +34,8 @@ import { Webinars } from './payload/collections/Webinars';
 import { canonicalCheckEndpoint } from './payload/endpoints/canonical-check';
 import { userReassignContentEndpoint } from './payload/endpoints/user-offboard';
 import { publishChecklistEndpoint } from './payload/endpoints/publish-checklist';
+import { dsarFindEndpoint, dsarDeleteEndpoint } from './payload/endpoints/leads-dsar';
+import { retryLeadSyncEndpoint } from './payload/endpoints/retry-lead-sync';
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
 import { robotsEndpoint } from './payload/endpoints/robots';
@@ -243,6 +245,9 @@ export default buildConfig({
     searchAnalyticsEndpoint,
     userReassignContentEndpoint,
     publishChecklistEndpoint,
+    dsarFindEndpoint,
+    dsarDeleteEndpoint,
+    retryLeadSyncEndpoint,
   ],
   jobs: {
     tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask, retryWebhookTask],
