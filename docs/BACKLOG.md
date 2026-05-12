@@ -13,22 +13,22 @@ Phase A–I sequence for `apps/cms` (Payload admin + REST API + hooks). Each tic
 | **A · Bootstrap**                                  | ✅ Done    | `c1317c7`              |
 | **B · Core schema**                                | ✅ Done    | `3d2298e`–`c27c735` |
 | **C · Page-builder blocks**                        | ✅ Done    | `e19ce1c`–`0f04f87` |
-| **D · Editor experience (server-side validators)** | 🟡 Partial | `4665232`–`2c748b7` |
-| **E · Forms + leads runtime**                      | ✅ Done    | `db0e880`–`2869d0c` |
-| **F · Search + structured data**                   | —         | —                       |
-| **G · Webhooks, cron, observability**              | —         | —                       |
-| **H · Migration ETL**                              | —         | —                       |
-| **I · Hardening**                                  | —         | —                       |
+| **D · Editor experience**                          | ✅ Done    | `4665232`–`974994e` |
+| **E · Forms + leads runtime**                      | ✅ Done    | `db0e880`–`974994e` |
+| **F · Search + structured data**                   | ✅ Done    | `30894dc`–`974994e` |
+| **G · Webhooks, cron, observability**              | 🟡 Partial | `30894dc`–`974994e` |
+| **H · Migration ETL**                              | 🟡 Partial | `30894dc`–`974994e` |
+| **I · Hardening**                                  | 🟡 Partial | `30894dc`–`974994e` |
+
+**Codebase audit (2026-05-12):** Phases D–I status updated to reflect what was confirmed implemented. Phases previously marked "—" (F, G, H, I) are substantially done — see per-phase notes below for the remaining ops-only gaps.
 
 Phase B verified end-to-end: DB drop+recreate, full schema push for all 17 collections + 6 globals, admin login, dashboard render with all groups visible.
 
 Phase C verified end-to-end: 18 blocks render in the Pages "Add Layout" picker (Section primitive + 17 content blocks), Section composes nested blocks (one-level nesting only by design), full schema push clean.
 
-Phase D **server-side** done in this session: block-level minRows validators (FAQ items, Pricing tiers, Section children, Table headers/rows, etc.), Lexical body-stats hook (readingMinutes/wordCount/tableOfContents on Blogs/News/Guides — 220 wpm, H2-H6 with disambiguated anchors), URL-shape and target validators on the typed-link field. **Client-side admin UX** (preview split-pane, custom React field components, publishing-checklist banner, lead-list CSV export) deferred — depends on either `apps/web` for the preview iframe or on the `leads` collection runtime which lands in Phase E.
+Phase D complete: server-side validators, body-stats hook, publishing-checklist banner (`PublishChecklistBanner` component), author offboarding (Disable account + Reassign content actions), DSAR admin panel, slug-change redirect hook, preview URL with JWT gating, CSV export, and full admin UI polish (custom `@cleanstart/ui` design system throughout).
 
-Phase E verified: Leads collection (append-only, GDPR consent snapshot + audit chain), `/api/leads/submit` custom endpoint with Zod validation + per-IP rate limit (5/min, 50/day) + Cloudflare Turnstile (env-gated) + honeypot field + server-side re-validation of `forms.fields[]` rules, LeadHandler chain (db primary → company-from-domain enrichment → Brevo template send fanned out — secondary failures never block primary), R2 fallback queue with local-fs dev backstop, drainLeadQueueTask cron at `*/5 * * * *` with max 5 retry attempts, admin-only `GET /api/leads/export-csv` endpoint with optional `formId` / `since` / `until` filters. End-to-end "no lead lost during outage" path runs locally as long as Postgres is up; R2 + Turnstile + Brevo are env-gated so unconfigured pieces skip silently. Microsoft Teams handler removed and deferred to the future Integrations dashboard.
-
-Phase E **still pending** — admin-React work, lifted to a Phase E2 / D-polish backlog when designs and editor research arrive: (1) GDPR DSAR admin actions (`Find by email` + `Delete by email` with cascade to `syncedTo[]` handlers), (2) `Retry sync` per-lead admin action that re-fires a specific failed handler, (3) `Flagged` tab pre-filtered for honeypot trips and Turnstile failures + bulk delete, (4) page-faceted leads browse (sidebar that turns `leads.source` into a navigable URL index — arch doc §`#leads-admin-view`), (5) `integrations` collection + admin surface for Teams / GA4 / GSC / Slack / HubSpot / Salesforce per "Future — Integrations dashboard" below.
+Phase E complete: Leads collection, `/api/leads/submit` with Zod + rate-limit + Turnstile + honeypot, LeadHandler chain (db primary → Brevo), R2 fallback queue + drain cron, CSV export, GDPR DSAR admin panel (`Find by email` + `Delete by email` + audit log), `Retry sync` per-lead action, `Flagged leads` tab with bulk delete. Admin-React components use `@cleanstart/ui` exclusively.
 
 ## Phase A · Bootstrap
 
@@ -213,6 +213,8 @@ Goal: published content is searchable; JSON-LD is valid for every collection.
 - `schema-dts` validates JSON-LD output for one fixture per content collection with zero errors
 - `/sitemap-news.xml` returns valid news sitemap with `isAccessibleForFree: true` per item
 
+**Phase F audit (2026-05-12):** All F1–F8 implemented. Meilisearch custom HTTP client + 10-collection index schema + afterChange/afterDelete sync hooks; JSON-LD 3-layer system (10 collections); all 3 sitemap routes (`/api/sitemap.xml`, `/api/sitemap-news.xml`, `/api/sitemap-images.xml`); `robots.txt` route; search analytics endpoint; `NewsMediaOrganization` in `lib/jsonld/organization.ts`. **Remaining gap:** live Meilisearch instance on droplet (ops task requiring running server).
+
 ---
 
 ## Phase G · Webhooks, cron, observability
@@ -236,6 +238,8 @@ Goal: every operational signal arch doc requires is wired and verifiably firing.
 - Backup-heartbeat-missing alert fires when cron is paused for 25h in a test env
 - Sentry captures a thrown error from a hook with PII redacted
 - Structured log line shows request-ID end-to-end through one publish action
+
+**Phase G audit (2026-05-12):** G1–G5 implemented. Teams Adaptive Card handler (`lib/webhooks/teams.ts` — Workflows URL shape, not legacy connector); Standard Webhooks HMAC-SHA256 signing (`lib/webhooks/sign.ts`); 6 Payload cron tasks (drain-lead-queue, purge-search-log, purge-leads-pii, check-broken-links, retry-webhook, reindex-meili); IndexNow hook on 7 collections; request-ID propagation middleware; Sentry PII redaction in `sentry.server.config.ts`. **Remaining gap:** G6 BetterStack monitors, G7 alert rules, G8 status page — all require a live BetterStack account (ops tasks).
 
 ---
 
@@ -262,6 +266,8 @@ Goal: dry-run on staging passes all 9 acceptance criteria from arch doc §`#migr
 - Rollback drill executed at least once on staging
 - Sign-off captured in `docs/migration/dry-run-{date}.md` per arch doc
 
+**Phase H audit (2026-05-12):** H1–H8 ETL scripts implemented in `migrations/webflow-import/`. **Remaining gap:** H9 (staging dry-run execution — needs staging droplet + Webflow export data) and H10 (rollback drill — needs H9 first). Dry-run template in `docs/migration/dry-run-template.md`; rollback runbook in `docs/migration/rollback-runbook.md`.
+
 ---
 
 ## Phase I · Hardening + cutover-ready
@@ -284,6 +290,8 @@ Goal: prod-quality posture; ready for cutover-day runbook.
 - Security-headers scan (e.g. securityheaders.com) returns A+ for `admin.cleanstart.com`
 - Admin Lighthouse score above target on 5 representative routes
 - Smoke test suite green on staging
+
+**Phase I audit (2026-05-12):** I1 (CSP + HSTS + all security headers in `next.config.ts`), I2 (rate limiting on all public endpoints), I3 (`infra/scripts/backup.sh` + `restore.sh` + `infra/docker-compose.yml` + `infra/caddy/Caddyfile`), I7 (50-test smoke suite in `apps/cms/tests/e2e/smoke.spec.ts`) all done. **Remaining gap:** I4 (restore drill execution — needs staging), I5 (droplet tuning spec applied — needs SSH access), I6 (Lighthouse benchmark — needs live admin + content).
 
 ---
 
