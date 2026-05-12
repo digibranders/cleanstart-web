@@ -13,30 +13,49 @@ import { showToast } from './ToastBus';
 import type { ReactElement } from 'react';
 import { useEffect, useId, useState } from 'react';
 
+type SchedulePublishDialogProps = {
+  /**
+   * Controlled open state. When provided, the component becomes
+   * controlled and the keyboard shortcut is disabled. When omitted
+   * the component manages its own state and opens on Cmd/Ctrl-Shift-S.
+   */
+  open?: boolean;
+  /** Called when the dialog requests to close (controlled mode only). */
+  onClose?: () => void;
+};
+
 /**
- * Schedule-Publish dialog. Opened via a custom kbd shortcut
- * (Cmd/Ctrl-Shift-S) or from the publish dropdown's "Schedule" item
- * (wired in PublishMenu). Posts a Payload `payload-jobs/run` schedule
- * via the standard payload jobs API:
+ * Schedule-Publish dialog. Two entry points:
  *
+ * 1. Keyboard shortcut (Cmd/Ctrl-Shift-S) — self-managed open state,
+ *    registered as a global admin action component in payload.config.ts.
+ * 2. Controlled mode — pass `open` + `onClose` to embed inside another
+ *    surface (e.g. PublishMenu dropdown).
+ *
+ * Posts a Payload schedulePublish job:
  *   POST /api/payload-jobs
- *
- * with `{ task: 'schedulePublish', input: { docId, collection, when } }`.
- *
- * If the schedule plugin isn't installed (this CMS doesn't ship it
- * yet), the dialog still surfaces — submission is gated on a
- * server-error toast. This is a UI-shipping wave; the backend job
- * lands in a follow-up.
+ *   { task: 'schedulePublish', input: { collection, id, when } }
  */
-export const SchedulePublishDialog = (): ReactElement | null => {
+export const SchedulePublishDialog = ({
+  open: openProp,
+  onClose,
+}: SchedulePublishDialogProps = {}): ReactElement | null => {
+  const controlled = openProp !== undefined;
   const titleId = useId();
   const { id, collectionSlug } = useDocumentInfo();
-  const [open, setOpen] = useState(false);
+  const [openInternal, setOpenInternal] = useState(false);
   const [when, setWhen] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const open = controlled ? (openProp ?? false) : openInternal;
+  const handleClose = (): void => {
+    if (controlled) onClose?.();
+    else setOpenInternal(false);
+  };
+
   useEffect(() => {
+    if (controlled) return;
     const onKey = (e: KeyboardEvent): void => {
       // Open on Cmd/Ctrl-Shift-S (matching SaveShortcut's modifier
       // family). Only fires when an entity is loaded.
@@ -47,12 +66,12 @@ export const SchedulePublishDialog = (): ReactElement | null => {
         id != null
       ) {
         e.preventDefault();
-        setOpen(true);
+        setOpenInternal(true);
       }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [id]);
+  }, [id, controlled]);
 
   if (id == null || !collectionSlug) return null;
 
@@ -75,7 +94,7 @@ export const SchedulePublishDialog = (): ReactElement | null => {
         setError(text || `HTTP ${res.status}`);
         return;
       }
-      setOpen(false);
+      handleClose();
       setWhen(null);
       showToast({ message: 'Publish scheduled.', type: 'success' });
     } catch (err) {
@@ -88,7 +107,7 @@ export const SchedulePublishDialog = (): ReactElement | null => {
   return (
     <Dialog
       open={open}
-      onClose={() => setOpen(false)}
+      onClose={handleClose}
       labelledBy={titleId}
       size="sm"
       dismissOnBackdrop={false}
@@ -96,7 +115,7 @@ export const SchedulePublishDialog = (): ReactElement | null => {
       <DialogHeader
         id={titleId}
         title="Schedule publish"
-        onClose={() => setOpen(false)}
+        onClose={handleClose}
         description="Pick a date + time. The doc will publish automatically when the queue picks the job up."
       />
       <DialogBody>
@@ -109,7 +128,7 @@ export const SchedulePublishDialog = (): ReactElement | null => {
         <button
           type="button"
           className="cs-btn cs-btn--subtle"
-          onClick={() => setOpen(false)}
+          onClick={handleClose}
           disabled={busy}
         >
           Cancel

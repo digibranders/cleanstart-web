@@ -49,6 +49,11 @@ export interface IndexSettings {
   primaryKey?: string;
 }
 
+export interface IndexStats {
+  numberOfDocuments: number;
+  isIndexing: boolean;
+}
+
 export interface SearchClient {
   readonly enabled: boolean;
   upsertDocuments: (
@@ -57,6 +62,7 @@ export interface SearchClient {
   ) => Promise<SearchOpResult>;
   deleteDocument: (indexUid: string, id: string) => Promise<SearchOpResult>;
   updateSettings: (indexUid: string, settings: IndexSettings) => Promise<SearchOpResult>;
+  getStats: (indexUid: string) => Promise<IndexStats | null>;
   search: (
     indexUid: string,
     query: string,
@@ -83,6 +89,7 @@ export const createSearchClient = (config: SearchClientConfig): SearchClient => 
       upsertDocuments: async () => ({ ok: true, skipped: true, reason: 'not-configured' }),
       deleteDocument: async () => ({ ok: true, skipped: true, reason: 'not-configured' }),
       updateSettings: async () => ({ ok: true, skipped: true, reason: 'not-configured' }),
+      getStats: async () => null,
       search: async () => null,
     };
   }
@@ -129,6 +136,18 @@ export const createSearchClient = (config: SearchClientConfig): SearchClient => 
       ),
     updateSettings: (indexUid, settings) =>
       request('PATCH', `/indexes/${encodeURIComponent(indexUid)}/settings`, settings),
+    getStats: async (indexUid): Promise<IndexStats | null> => {
+      try {
+        const res = await f(`${baseUrl}/indexes/${encodeURIComponent(indexUid)}/stats`, {
+          method: 'GET',
+          headers: headers(),
+        });
+        if (!res.ok) return null;
+        return (await res.json().catch(() => null)) as IndexStats | null;
+      } catch {
+        return null;
+      }
+    },
     search: async (indexUid, query, opts) => {
       const res = await f(`${baseUrl}/indexes/${encodeURIComponent(indexUid)}/search`, {
         method: 'POST',

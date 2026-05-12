@@ -8,6 +8,10 @@
       "required": true
     },
     {
+      "type": "checkbox",
+      "name": "enabled"
+    },
+    {
       "type": "select",
       "name": "roles",
       "required": true,

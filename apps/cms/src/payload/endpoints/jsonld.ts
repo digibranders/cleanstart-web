@@ -3,6 +3,13 @@ import type { Endpoint } from 'payload';
 import { buildJsonLdBlobs, buildJsonLdContext } from '../lib/jsonld';
 import { hasRole } from '../access/typed-user';
 import { validateOverrideForCollection } from '../lib/jsonld/override-validator';
+import { clientIpFromHeaders } from '../lib/client-ip';
+import { type RateLimitConfig, checkAndRecord } from '../lib/rate-limit';
+
+const JSONLD_RATE_LIMITS: RateLimitConfig = {
+  perMinute: 20,
+  perDay: 400,
+};
 
 const SUPPORTED_COLLECTIONS = new Set([
   'blogs',
@@ -81,6 +88,15 @@ export const jsonLdEndpoint: Endpoint = {
   path: '/jsonld/:collection/:id',
   method: 'get',
   handler: async (req) => {
+    const ip = clientIpFromHeaders(req.headers);
+    const limit = checkAndRecord(`jsonld:${ip}`, JSONLD_RATE_LIMITS);
+    if (!limit.ok) {
+      return json(
+        { error: 'rate_limited', retryAfterSeconds: Math.ceil(limit.retryAfterMs / 1000) },
+        { status: 429 },
+      );
+    }
+
     const params = readParams(req as Parameters<typeof readParams>[0]);
     if (!params) {
       return json({ error: 'missing_collection_or_id' }, { status: 400 });

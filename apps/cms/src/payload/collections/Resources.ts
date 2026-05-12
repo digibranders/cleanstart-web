@@ -7,6 +7,7 @@ import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { contentTitleField } from '../fields/title';
 import { firstPublishHook } from '../hooks/first-publish';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import {
@@ -35,7 +36,7 @@ export const Resources: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
+    contentTitleField,
     slugField({ source: 'title' }),
     {
       name: 'type',

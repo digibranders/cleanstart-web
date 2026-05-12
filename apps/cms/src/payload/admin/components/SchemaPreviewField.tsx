@@ -19,6 +19,30 @@ import {
 } from '../../lib/jsonld/spec/required-fields';
 import { ChevronDown } from './icons/Chevron';
 
+const CopyIcon = (): ReactElement => (
+  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+    <path
+      d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2H3.5A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+const CheckIcon = (): ReactElement => (
+  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <polyline
+      points="2,8 6,12 14,4"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 type SchemaPreviewFieldProps = {
   pathPrefix?: string;
   sourceField?: string;
@@ -382,6 +406,15 @@ const SchemaBodyContent = (props: {
     onOpenEditor,
   } = props;
 
+  const [blobCopied, setBlobCopied] = useState<number | null>(null);
+
+  const handleBlobCopy = useCallback((blob: Record<string, unknown>, idx: number) => {
+    if (typeof navigator === 'undefined' || !navigator.clipboard) return;
+    void navigator.clipboard.writeText(JSON.stringify(blob, null, 2));
+    setBlobCopied(idx);
+    window.setTimeout(() => setBlobCopied((prev) => (prev === idx ? null : prev)), 1500);
+  }, []);
+
   if (fetchState.status === 'unsupported') {
     return (
       <p className="cs-schema-preview__hint">
@@ -456,6 +489,15 @@ const SchemaBodyContent = (props: {
             className="cs-schema-preview__blob"
           >
             <div className="cs-schema-preview__blob-header">
+              <button
+                type="button"
+                className="cs-schema-preview__blob-copy"
+                aria-label={`Copy ${blobAudit.blobType} JSON-LD`}
+                title={blobCopied === idx ? 'Copied!' : `Copy ${blobAudit.blobType} JSON`}
+                onClick={() => handleBlobCopy(blob, idx)}
+              >
+                {blobCopied === idx ? <CheckIcon /> : <CopyIcon />}
+              </button>
               <code>@type: {blobAudit.blobType}</code>
               {isCustom && (
                 <span

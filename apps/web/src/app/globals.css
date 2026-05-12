@@ -1,0 +1,1313 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+
+  --color-cs-navy-0: #151021;
+  --color-cs-navy-1: #10123e;
+  --color-cs-blue-1: #131e8f;
+  --color-cs-purple-1: #471ec0;
+  --color-cs-purple-2: #471fc3;
+  --color-cs-purple-3: #551ec3;
+  --color-cs-cyan: #2cc1eb;
+  --color-cs-cyan-2: #33baec;
+  --color-cs-lavender: #dab6f3;
+  --color-cs-text-dark: #111111;
+
+  --container-cs: 1276px;
+
+  --radius-cs-card: 24px;
+  --radius-cs-card-lg: 40px;
+  --radius-cs-pill: 8px;
+}
+
+:root {
+  /* Hero + CleanStart Factory shared background — Figma frame 108:8631 (1920×2209).
+     The Figma gradient transform maps the frame's top edge to gradient
+     position ~0.20 and the bottom edge to ~0.99 (so only the middle ~80% of
+     the original 8-stop gradient is visible inside the frame). We bake that
+     mapping in directly: the visible gradient runs TOP → BOTTOM with the
+     dark navy at top, deep blue mid, brightest purple ~75% down, then the
+     alpha-fade tail at the bottom so the seam into #F6F6F6 is soft.
+     The .bg-cs-hero rule still applies a #151021 fallback bg-color for the
+     transparent-tail safety. */
+  --bg-hero-mesh: linear-gradient(
+    to bottom,
+    #151021 0%,
+    #14143C 22%,
+    #181A5E 42%,
+    #1F1F88 56%,
+    #2B22B0 68%,
+    #4226D5 80%,
+    #5028E5 89%,
+    rgba(80, 40, 229, 0.62) 95%,
+    rgba(80, 40, 229, 0) 100%
+  );
+
+  /* Decorative purple radial blobs (Figma "Union" vectors, fill #640DFB radial)
+     used as overlays for the mesh-blob effect. Two opacity tiers: 0.30 inside hero,
+     0.10 elsewhere. */
+  --cs-blob-color: #640DFB;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+html, body {
+  background: #ffffff;
+  color: #111111;
+  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Hero gradient mesh — solid #151021 fallback under the gradient so the
+   alpha-fade at the top stop resolves to dark (matching Figma's canvas). */
+.bg-cs-hero {
+  background-color: #151021;
+  background-image: var(--bg-hero-mesh);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* Subtle grid overlay used inside hero — STACKS over the mesh gradient
+   (grid lines on top, mesh underneath) so both render together. */
+.bg-cs-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  background-repeat: repeat;
+}
+
+/* When the wrapper has BOTH bg-cs-hero and bg-cs-grid, stack grid on top of mesh
+   (multiple backgrounds — first layer paints on top). */
+.bg-cs-hero.bg-cs-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    var(--bg-hero-mesh);
+  background-size: 80px 80px, 80px 80px, 100% 100%;
+  background-repeat: repeat, repeat, no-repeat;
+}
+
+/* Engine panel gradient */
+.bg-cs-engine {
+  background: linear-gradient(180deg, #151021 0%, #131e8f 71%, #551ec3 100%);
+}
+
+.shadow-cs-engine {
+  box-shadow:
+    -8px 4px 20px 0 rgba(0, 0, 0, 0.23),
+    -33px 16px 37px 0 rgba(0, 0, 0, 0.20),
+    -74px 37px 49px 0 rgba(0, 0, 0, 0.12),
+    -131px 65px 59px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* Diagonal stripe pattern for engine panel inner */
+.bg-cs-diagonal {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.045) 0,
+    rgba(255, 255, 255, 0.045) 1px,
+    transparent 1px,
+    transparent 6px);
+}
+
+/* Engine panel inner cards (AI Logic Engine / CleanCompile Factory) */
+.cs-engine-card {
+  background: linear-gradient(180deg, rgba(217, 217, 217, 0.25) 0%, rgba(50, 50, 50, 0) 100%);
+  border: 1px solid rgba(218, 182, 243, 0.35);
+  border-radius: 24px;
+  backdrop-filter: blur(2px);
+  box-shadow: inset 1px 1px 0 0 rgba(218, 182, 243, 0.45);
+}
+
+/* ===========================================================================
+   CTA SYSTEM — extracted directly from Figma (CleanStart V4)
+   --------------------------------------------------------------------------
+   Two distinct CTA types found in Figma:
+     1. "Glass Button" — Book a Demo (153×38), Browse Images (205×40),
+        Get a Demo (177×43). All share the SAME multi-layer fill + stroke:
+          • base: rgba(255,255,255,0.65)
+          • LINEAR_DODGE radial #FFFFFF→#3D00FF @50% (blue tint top-left)
+          • LINEAR_DODGE radial #FFFFFF→#3D00FF @90% (blue tint bottom-right)
+          • stroke A: solid white @SOFT_LIGHT
+          • stroke B: radial #DAB6F3→transparent @LINEAR_DODGE (lavender glow)
+          • corner radius 8, stroke weight 1
+     2. "Link CTA" — Read Case study, Explore (resource cards), Explore for
+        Developers. Plain text + arrow, no background.
+   --------------------------------------------------------------------------
+   Interactive states (UX best practices):
+     • cursor:pointer · 220ms cubic-bezier(.2,.9,.3,1)
+     • focus-visible: cyan ring (#33BAEC) outline-offset 3px
+     • hover: -1px lift, sheen shimmer, glow grows
+     • active: scale 0.97 (80ms press feedback)
+     • disabled: 45% opacity, cursor not-allowed, pointer-events none
+     • prefers-reduced-motion: animations disabled
+   =========================================================================== */
+
+@keyframes cs-cta-shine {
+  0%   { transform: translateX(-110%) skewX(-12deg); }
+  60%  { transform: translateX(120%)  skewX(-12deg); }
+  100% { transform: translateX(120%)  skewX(-12deg); }
+}
+
+/* ---------------------------------------------------------------------------
+   GLASS BUTTON — exact Figma reproduction (Frame 1410104211, Buttons 108:8598)
+   Used by: "Book a Demo" (153×38), "Browse Images" (205×40), "Get a Demo" (177×43)
+   --------------------------------------------------------------------------- */
+.cs-btn-glass {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #1B1F4F;
+  /* Default size — overridden via --cs-btn-h / --cs-btn-px on each instance */
+  height: var(--cs-btn-h, 40px);
+  padding: 0 var(--cs-btn-px, 18px);
+  font-size: var(--cs-btn-fs, 14px);
+  border-radius: 8px;
+  /* Figma layered fill: base white@65% + 2 LINEAR_DODGE radial blue tints */
+  background:
+    /* radial blue tint, top-right (LINEAR_DODGE → screen blend) */
+    radial-gradient(120% 110% at 100% 0%,
+      rgba(60, 0, 255, 0.28) 0%,
+      rgba(60, 0, 255, 0) 60%),
+    /* radial blue tint, bottom-left */
+    radial-gradient(110% 90% at 0% 100%,
+      rgba(60, 0, 255, 0.18) 0%,
+      rgba(60, 0, 255, 0) 60%),
+    /* white base */
+    rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  /* Lavender top-left rim glow (Figma 2nd stroke #DAB6F3 LINEAR_DODGE) +
+     subtle drop shadow + inner highlight */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 1px 1px 0 rgba(218, 182, 243, 0.45),
+    inset -1px -1px 0 rgba(218, 182, 243, 0.20),
+    0 4px 18px -4px rgba(57, 30, 192, 0.30),
+    0 2px 6px -2px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    transform 220ms cubic-bezier(.2, .9, .3, 1),
+    box-shadow 220ms ease-out,
+    background-color 200ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Shine-sheen overlay that animates across button on hover */
+.cs-btn-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.50) 50%,
+    transparent 70%);
+  transform: translateX(-110%) skewX(-12deg);
+  pointer-events: none;
+  opacity: 0;
+}
+.cs-btn-glass:hover {
+  transform: translateY(-1px);
+  background:
+    radial-gradient(120% 110% at 100% 0%, rgba(60, 0, 255, 0.36) 0%, rgba(60, 0, 255, 0) 60%),
+    radial-gradient(110% 90% at 0% 100%,  rgba(60, 0, 255, 0.24) 0%, rgba(60, 0, 255, 0) 60%),
+    rgba(255, 255, 255, 0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 1px 1px 0 rgba(218, 182, 243, 0.65),
+    inset -1px -1px 0 rgba(218, 182, 243, 0.30),
+    0 12px 28px -6px rgba(57, 30, 192, 0.55),
+    0 4px 10px -2px rgba(0, 0, 0, 0.25);
+}
+.cs-btn-glass:hover::after { opacity: 1; animation: cs-cta-shine 900ms ease-out 1; }
+.cs-btn-glass:active { transform: translateY(0) scale(0.97); transition-duration: 80ms; }
+.cs-btn-glass:focus { outline: none; }
+.cs-btn-glass:focus-visible {
+  outline: 2px solid #33BAEC;
+  outline-offset: 3px;
+}
+.cs-btn-glass[aria-disabled="true"],
+.cs-btn-glass:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.cs-btn-glass .cs-cta-arrow {
+  transition: transform 220ms cubic-bezier(.2, .9, .3, 1);
+}
+.cs-btn-glass:hover .cs-cta-arrow { transform: translateX(4px); }
+
+/* ---- LINK CTA — Read Case study / Explore (resource cards) / Explore for Developers
+   Figma: pure text + arrow inside Frame 19, no background. */
+.cs-link-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #FFFFFF;
+  text-decoration: none;
+  padding: 4px 0;
+  transition: color 200ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.cs-link-cta--light { color: #3960F9; }
+.cs-link-cta--lightDark { color: #1B1F4F; }
+.cs-link-cta::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  opacity: 0.55;
+  transition: transform 240ms cubic-bezier(.2, .9, .3, 1);
+}
+.cs-link-cta:hover::after { transform: scaleX(1); }
+.cs-link-cta:hover { color: #33BAEC; }
+.cs-link-cta--light:hover  { color: #1B1F4F; }
+.cs-link-cta--lightDark:hover { color: #3960F9; }
+.cs-link-cta:hover .cs-cta-arrow { transform: translateX(4px); }
+.cs-link-cta:focus { outline: none; }
+.cs-link-cta:focus-visible {
+  outline: 2px solid #33BAEC;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.cs-link-cta .cs-cta-arrow { transition: transform 220ms cubic-bezier(.2, .9, .3, 1); }
+
+/* ---- KEEP existing pill (Plan/Analyze/etc.) but add proper interactive states */
+.cs-pill-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 31px;
+  padding: 5px 16px;
+  border-radius: 999px;
+  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 110%;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  white-space: nowrap;
+  border: 1.3px solid rgba(205, 228, 255, 0.55);
+  background:
+    radial-gradient(ellipse 70% 110% at 43% 31%, #000000 0%, #000000 19%, #1E5AFF 100%);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(205, 228, 255, 0.35),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: filter 180ms ease, transform 180ms cubic-bezier(.2,.9,.3,1), box-shadow 220ms ease;
+}
+.cs-pill-cta:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(205, 228, 255, 0.55),
+    0 6px 16px -4px rgba(30, 90, 255, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+}
+.cs-pill-cta:active { transform: translateY(0) scale(0.97); transition-duration: 80ms; }
+.cs-pill-cta:focus-visible { outline: 2px solid #CDE4FF; outline-offset: 2px; }
+
+/* ---- Legacy classes kept as aliases for any spots that still reference them */
+.cs-pill-glass { /* kept for backward compatibility — prefer cs-btn-secondary */
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(80% 60% at 50% 110%, rgba(218, 182, 243, 0.35), rgba(255, 255, 255, 0) 60%),
+    rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 4px 18px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(6px);
+}
+.cs-pill-demo { /* kept — header demo button */
+  background: linear-gradient(135deg,
+    rgba(112, 112, 112, 0.28) 0%,
+    rgba(214, 214, 214, 0.28) 23%,
+    rgba(214, 214, 214, 0.28) 68%,
+    rgba(155, 155, 155, 0.28) 84%);
+  border: 1.5px solid rgba(174, 174, 174, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-cta-base,
+  .cs-btn-primary,
+  .cs-btn-secondary,
+  .cs-btn-ghost-dark,
+  .cs-link-cta,
+  .cs-pill-cta {
+    transition: none !important;
+  }
+  .cs-btn-primary::after { animation: none !important; opacity: 0 !important; }
+  .cs-btn-primary:hover,
+  .cs-btn-secondary:hover,
+  .cs-btn-ghost-dark:hover,
+  .cs-pill-cta:hover { transform: none !important; }
+}
+
+/* Header glass nav */
+.cs-nav-glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+   PRIMARY NAVIGATION — dark-glass header + mega-menu surfaces
+   Spec: plan file (cleanstart-nav-logo-png-use-this-logo-*).md
+   ============================================================ */
+
+/* Scrolled header — subtle dark glass band so content underneath fades out */
+.cs-nav-shadow {
+  background-color: rgba(21, 16, 33, 0.72);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 10px 30px -16px rgba(8, 4, 24, 0.55);
+}
+
+/* Mega-menu / compact dropdown surface — dark glass card */
+.cs-mega-surface {
+  background-color: rgba(21, 16, 33, 0.92);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow:
+    0 24px 64px -16px rgba(8, 4, 24, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Hover state for individual menu items — subtle gradient left bar + soft fill */
+.cs-mega-item {
+  position: relative;
+}
+.cs-mega-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #471fc3 0%, #2cc1eb 100%);
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+.cs-mega-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+.cs-mega-item:hover::before {
+  opacity: 1;
+}
+
+/* Active route — gradient underline beneath top-level nav links */
+.cs-nav-link {
+  padding-bottom: 6px;
+}
+.cs-nav-link-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  border-radius: 1.5px;
+  background: linear-gradient(90deg, #471fc3 0%, #2cc1eb 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-nav-shadow,
+  .cs-mega-item,
+  .cs-mega-item::before,
+  .cs-nav-link::after {
+    transition: none !important;
+  }
+}
+
+/* Factory card body — glassy blue */
+.cs-factory-card {
+  background:
+    radial-gradient(140% 90% at 50% 0%, rgba(135, 200, 255, 0.55), rgba(46, 78, 200, 0.25) 60%, rgba(20, 30, 100, 0.6) 100%);
+  border: 1px solid rgba(180, 210, 255, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 18px 40px -16px rgba(20, 18, 60, 0.6);
+}
+
+/* Comparison card outer (Public Images / CleanStart) */
+.cs-cmp-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid rgba(44, 193, 235, 0.4);
+  box-shadow: 0 24px 60px -20px rgba(45, 90, 200, 0.2);
+}
+
+/* Public Images header strip */
+.cs-cmp-public-header {
+  background:
+    radial-gradient(140% 130% at 0% 0%, #1a3a52 0%, #0c1727 60%, #0a0e1a 100%);
+}
+
+/* CleanStart header strip */
+.cs-cmp-cleanstart-header {
+  background:
+    radial-gradient(160% 140% at 100% 0%, #6a3df0 0%, #2c2299 55%, #1a1452 100%);
+}
+
+/* Rocket flame beam */
+/* Testimonial card fade+slide animation (used by BuiltForTeams carousel) */
+@keyframes cs-fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [style*="cs-fade-slide-in"] { animation: none !important; }
+}
+
+/* FAQ answer drawer — kept minimal; height + opacity are driven by inline
+   styles in the React component for reliable transition behavior across
+   browsers. Per Google Core Web Vitals, the resulting section growth
+   within 500ms of user input is excluded from CLS. */
+@media (prefers-reduced-motion: reduce) {
+  [data-faq-answer] { transition: none !important; }
+}
+
+@keyframes cs-flame-pulse {
+  0%, 100% { opacity: 0.85; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.05); }
+}
+
+/* Rocket flame — replicates Figma "光斑 flare" component
+   - Layered radial + linear gradients matching Figma color palette
+   - Bright cyan core (#D3FFF8) → blue (#15ADFA / #0166CC) → fade
+   - Tapered teardrop with bright bulb at TOP (where flame emerges from card)
+   - Default vertical (top-down). For bottom flames, use .cs-rocket-flame--down */
+.cs-rocket-flame {
+  position: absolute;
+  width: 36px;
+  height: 220px;
+  pointer-events: none;
+  /* Soft outer halo */
+  background: radial-gradient(ellipse 50% 14% at 50% 8%,
+    rgba(211, 255, 248, 0.85) 0%,
+    rgba(21, 173, 250, 0.55) 18%,
+    rgba(1, 102, 204, 0.30) 40%,
+    rgba(1, 10, 28, 0) 80%);
+  filter: blur(4px);
+  border-radius: 999px;
+  transform-origin: top center;
+  animation: cs-flame-pulse 1.8s ease-in-out infinite;
+}
+
+/* Bright cyan bulb at the top — the flame's glowing "head"
+   Positioned 4px BELOW flame top so bulb stays out of the card above */
+.cs-rocket-flame::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(211, 255, 248, 0.95) 25%,
+    rgba(21, 173, 250, 0.7) 55%,
+    rgba(21, 173, 250, 0) 90%);
+  filter: blur(2px);
+  border-radius: 50%;
+}
+
+/* Inner bright trailing core — narrow column of light below the bulb */
+.cs-rocket-flame::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(211, 255, 248, 0.85) 18%,
+    rgba(21, 173, 250, 0.55) 50%,
+    rgba(1, 102, 204, 0.20) 80%,
+    rgba(1, 10, 28, 0) 100%);
+  filter: blur(1.5px);
+  border-radius: 999px;
+}
+
+/* ============================================================
+   HERO ORB — animated container-image factory.
+   Center logo + rotating chromatic ring + chips that flow
+   in from the left ("vulnerable images") and emerge clean
+   on the right ("hardened by CleanStart").
+   ============================================================ */
+
+/* Whole-orb float — applied to the wrapper so the sphere AND the cube move
+   together as one unit. Wrapper already has `translate(-50%, -50%)` for
+   centring, so we compose that into every keyframe. Tiny amplitudes give a
+   3D bob without ever drifting the cube off the sphere. */
+@keyframes cs-orb-core-breathe {
+  0%   { transform: translate(-50%, -50%) translate3d(0, 0, 0)    rotateX(0deg)    rotateY(0deg)    scale(1);     filter: brightness(1); }
+  25%  { transform: translate(-50%, -50%) translate3d(0, -1.4%, 0) rotateX(2deg)    rotateY(-2.5deg) scale(1.012); filter: brightness(1.03); }
+  50%  { transform: translate(-50%, -50%) translate3d(0, -2.2%, 0) rotateX(0deg)    rotateY(0deg)    scale(1.022); filter: brightness(1.06); }
+  75%  { transform: translate(-50%, -50%) translate3d(0, -1.4%, 0) rotateX(-2deg)   rotateY(2.5deg)  scale(1.012); filter: brightness(1.03); }
+  100% { transform: translate(-50%, -50%) translate3d(0, 0, 0)    rotateX(0deg)    rotateY(0deg)    scale(1);     filter: brightness(1); }
+}
+
+/* Centre cube — static position; only a gentle scale + brightness pulse so
+   it breathes with the sphere. No rotation: the cube is a flat image and
+   rotateY would visibly flatten it at 90°. */
+@keyframes cs-orb-cube-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);     filter: brightness(1)    drop-shadow(0 0 0 rgb(180 140 255 / 0)); }
+  50%      { transform: translate(-50%, -50%) scale(1.035); filter: brightness(1.08) drop-shadow(0 0 12px rgb(180 140 255 / 0.45)); }
+}
+
+.cs-orb-stage {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  aspect-ratio: 1280 / 520;
+  margin-inline: auto;
+  container-type: inline-size;
+}
+
+.cs-orb-flow { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+/* Orb container — single Figma export sized in container query units so it
+   tracks the stage width. The PNG bakes in glow bleed, so cqi is mapped to
+   the orb's inscribed sphere (309×420 in Figma coords). */
+/* Width math: Figma frame is 1920 wide, orb group is 309 wide → ~16.1% of
+   frame. The PNG export expanded bounds for glow bleed (sphere is ~59% of
+   image width). 26cqi → on a 1228px stage the container is ~319px and the
+   visible sphere lands at ~189px — keeps the orb at ~2.6× chip size so the
+   sphere doesn't dominate while the baked-in glow halo still has room. */
+.cs-orb {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(220px, 26cqi, 340px);
+  height: auto;
+  z-index: 3;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.25)); /* Figma effect: drop shadow X0 Y4 blur4 #000 25% */
+  /* 3D scene: depth lets the wrapper bob/tilt with real perspective. */
+  perspective: 900px;
+  perspective-origin: 50% 45%;
+  transform-style: preserve-3d;
+  /* Float applied to the wrapper so sphere + cube move as one. The keyframe
+     composes `translate(-50%, -50%)` into every transform, replacing the
+     static centring transform we used to put on the wrapper directly. */
+  animation: cs-orb-core-breathe 7s ease-in-out infinite;
+  will-change: transform, filter;
+}
+
+.cs-orb__img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Cube logo (Figma node 177:154) — sized at ~29% of the container so it
+   matches the original cube/sphere ratio (cube 152px / orb group 309px ≈
+   49%, multiplied by the sphere's ~59% share of the container width).
+   Centred over the sphere with a slow 3D rotate to mirror the cleanstart.com
+   hero loop. */
+/* Position math: Figma's PNG exporter expanded bounds asymmetrically for
+   effect bleed, so the visible sphere is NOT centred in the 1040×1250 PNG.
+   Measured alpha-centroid of `orb-sphere.png` is (55.9%, 46.6%) — that's
+   where the cube must land to read as centred on the sphere. */
+.cs-orb__cube {
+  position: absolute;
+  left: 55.9%;
+  top: 46.6%;
+  width: 29%;
+  height: auto;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 50%;
+  animation: cs-orb-cube-pulse 4.5s ease-in-out infinite;
+  pointer-events: none;
+  will-change: transform, filter;
+  /* Figma node 177:154 uses mix-blend-mode: luminosity, so the cube takes
+     the lightness of its source pixels and the purple of the sphere
+     underneath. The export only carries lightness; the colour comes back
+     from the sphere at composite time. */
+  mix-blend-mode: luminosity;
+}
+
+/* Flow chips (logos travelling along the beams) -------------------
+   Sized + styled to mirror Figma's Category/* tiles: 72px square,
+   ~16px corner radius, dark glass fill, gradient stroke, layered drop shadow. */
+.cs-flow-chip {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 100% at 30% 20%, rgba(120, 90, 220, 0.28), rgba(20, 12, 50, 0.72) 75%),
+    linear-gradient(180deg, rgba(40, 24, 80, 0.85), rgba(20, 12, 50, 0.92));
+  border: 1px solid rgba(218, 182, 243, 0.35);
+  box-shadow:
+    0 12px 28px -10px rgba(8, 4, 30, 0.65),
+    0 6px 14px -6px rgba(8, 4, 30, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  position: relative;
+}
+.cs-flow-chip img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* Inbound (vulnerable) — slightly muted + red status dot */
+.cs-flow-chip.is-in img {
+  filter: brightness(1.08) saturate(0.78);
+}
+.cs-flow-chip.is-in::after {
+  content: "";
+  position: absolute;
+  top: 7px; right: 7px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #FF6C6C; /* Figma fill_DXSVFV */
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 8px rgba(255, 108, 108, 0.95);
+}
+
+/* Outbound (hardened) — Figma fill_DIHLOB stroke (90deg #1E5AFF → #CDE4FF)
+   plus fill_UD6ZBP green status dot. */
+.cs-flow-chip.is-out {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(135deg, rgba(30, 90, 255, 0.18), rgba(255, 255, 255, 0.06)) padding-box,
+    linear-gradient(90deg, #1E5AFF 0%, #CDE4FF 100%) border-box;
+  box-shadow:
+    0 8px 24px -8px rgba(30, 90, 255, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.cs-flow-chip.is-out img { filter: brightness(1.18); }
+.cs-flow-chip.is-out::after {
+  content: "";
+  position: absolute;
+  top: 7px; right: 7px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #2EFD54; /* Figma fill_UD6ZBP */
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 10px rgba(46, 253, 84, 0.95);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-orb,
+  .cs-orb__cube { animation: none !important; }
+  .cs-orb { transform: translate(-50%, -50%); }
+}
+
+/* ============================================================
+   TESTIMONIALS — three-up carousel with dominant centre card.
+   Figma frames 108:8456 (carousel) / 108:8443 (nav row).
+   ============================================================ */
+
+@keyframes cs-tt-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -3px, 0); }
+}
+@keyframes cs-tt-progress {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}
+@keyframes cs-tt-slide-in-right {
+  from { opacity: 0; transform: translate3d(48px, 0, 0) scale(0.985); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0)    scale(1); }
+}
+@keyframes cs-tt-slide-in-left {
+  from { opacity: 0; transform: translate3d(-48px, 0, 0) scale(0.985); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0)     scale(1); }
+}
+
+.cs-tt-carousel {
+  /* Allow side cards to extend beyond the section container width without
+     creating a horizontal scrollbar — the section already has overflow:hidden. */
+  isolation: isolate;
+}
+
+.cs-tt-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 360px;
+}
+
+/* ---- Card base ---------------------------------------------------------- */
+.cs-tt-card {
+  position: relative;
+  display: flex;
+  text-align: left;
+  overflow: hidden;
+  color: white;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+.cs-tt-card__photo {
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 24px;
+}
+.cs-tt-card__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cs-tt-card__body {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+.cs-tt-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cs-tt-card__name {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.cs-tt-card__role {
+  color: rgb(255 255 255 / 0.7);
+}
+.cs-tt-card__quote {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.cs-tt-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: rgb(255 255 255 / 0.95);
+  transition: color 180ms ease-out, transform 180ms ease-out;
+}
+.cs-tt-card__cta:hover {
+  color: white;
+}
+.cs-tt-card__cta:hover svg {
+  transform: translateX(2px);
+}
+.cs-tt-card__cta svg { transition: transform 180ms ease-out; }
+
+/* ---- Active (centre) card ----------------------------------------------
+   Subtle frosted panel: lifts the card off the gradient and cleanly masks
+   any side-card content that ends up behind its body area. Modern stacked-
+   deck pattern — keeps the active card clearly dominant while the sides
+   overlap behind. */
+.cs-tt-card--active {
+  width: 798px;
+  height: 329px;
+  max-width: 100%;
+  z-index: 30;
+  border-radius: 24px;
+  /* Fully opaque panel — no alpha. The side peeks were bleeding through
+     before, breaking the "in front" depth cue. */
+  background:
+    linear-gradient(135deg, #1F1740 0%, #242682 60%, #3F279E 100%);
+  box-shadow:
+    0 24px 60px -20px rgba(7, 4, 30, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  /* Gentle floating only — the previous slide-in animation was leaving the
+     card offset from its centered final position when the page entered via
+     FadeUp wrapper. Float is purely vertical and doesn't break centering. */
+  animation: cs-tt-float 7s ease-in-out infinite;
+}
+.cs-tt-card--active .cs-tt-card__photo { width: 264px; height: 329px; border-radius: 24px 0 0 24px; }
+.cs-tt-card--active .cs-tt-card__body  { padding: 28px 36px 24px; gap: 18px; }
+.cs-tt-card--active .cs-tt-card__name  { font-size: 20px; }
+.cs-tt-card--active .cs-tt-card__role  { font-size: 14px; }
+.cs-tt-card--active .cs-tt-card__quote {
+  font-size: 21px;
+  line-height: 1.35;
+  margin-top: -6px;
+}
+.cs-tt-card--active .cs-tt-card__cta   { font-size: 16px; }
+.cs-tt-card__quote-mark { display: block; margin-bottom: -8px; }
+
+/* ---- Side peek cards (stacked-deck depth) ------------------------------
+   Full-content cards (photo + meta + quote + CTA) sitting BEHIND the active
+   card. Scaled down and dimmed via filter (NOT opacity, so the section
+   gradient doesn't bleed through). Reads as "another testimonial behind"
+   while remaining recognisable. Click to jump to that testimonial.        */
+.cs-tt-peek {
+  position: absolute;
+  top: 50%;
+  width: 600px;
+  height: 260px;
+  z-index: 10;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  display: flex;
+  text-align: left;
+  background:
+    linear-gradient(135deg, rgba(28, 22, 58, 0.96) 0%, rgba(32, 32, 110, 0.94) 60%, rgba(54, 35, 138, 0.96) 100%);
+  border-radius: 22px;
+  overflow: hidden;
+  filter: blur(1.4px) saturate(0.78) brightness(0.66);
+  box-shadow:
+    0 18px 40px -20px rgba(7, 4, 30, 0.7),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition:
+    filter 360ms ease-out,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Active card is 798 wide centred. We want each peek's INNER edge to sit
+   ~80 px INSIDE the active card so part of it visually tucks behind.
+     left peek inner (right) edge at stage_center - 319 → translate(-319px)
+     right peek inner (left)  edge at stage_center + 319 → translate(+319px)
+   With scale 0.74 origin at the inner edge, the peek's outer edge sits at
+   stage_center ∓ 319 ∓ 600·0.74 ≈ stage_center ∓ 763. */
+.cs-tt-peek[data-pos="left"] {
+  right: 50%;
+  transform: translate(-319px, -50%) scale(0.74);
+  transform-origin: right center;
+}
+.cs-tt-peek[data-pos="right"] {
+  left: 50%;
+  transform: translate(319px, -50%) scale(0.74);
+  transform-origin: left center;
+}
+.cs-tt-peek:hover,
+.cs-tt-peek:focus-visible {
+  filter: blur(0.6px) saturate(1) brightness(0.86);
+}
+.cs-tt-peek[data-pos="left"]:hover,
+.cs-tt-peek[data-pos="left"]:focus-visible {
+  transform: translate(-300px, -50%) scale(0.77);
+}
+.cs-tt-peek[data-pos="right"]:hover,
+.cs-tt-peek[data-pos="right"]:focus-visible {
+  transform: translate(300px, -50%) scale(0.77);
+}
+.cs-tt-peek:focus-visible {
+  outline: 2px solid rgb(132 188 255 / 0.7);
+  outline-offset: 6px;
+}
+.cs-tt-peek__photo {
+  position: relative;
+  flex-shrink: 0;
+  width: 208px;
+  height: 260px;
+  overflow: hidden;
+  border-radius: 22px 0 0 22px;
+}
+.cs-tt-peek__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cs-tt-peek__body {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 22px 24px;
+  color: white;
+}
+.cs-tt-peek__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cs-tt-peek__name {
+  display: block;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+.cs-tt-peek__role {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgb(255 255 255 / 0.7);
+}
+.cs-tt-peek__quote {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  margin: 10px 0;
+}
+.cs-tt-peek__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: rgb(255 255 255 / 0.95);
+}
+
+/* ---- Side cards (preview) ----------------------------------------------
+   Stacked-deck layout: both side cards fully inside the stage and visibly
+   peek out from behind the active card. Active's frosted body cleanly
+   masks the inner overlap so no readable text bleeds through. */
+.cs-tt-card--side {
+  position: absolute;
+  top: 50%;
+  width: 638px;
+  height: 263px;
+  z-index: 10;
+  cursor: pointer;
+  opacity: 0.42;
+  filter: blur(0.6px);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 100%);
+  box-shadow: 0 12px 32px -16px rgba(7, 4, 30, 0.5);
+  transition:
+    opacity 360ms ease-out,
+    filter 360ms ease-out,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cs-tt-card--side[data-pos="left"] {
+  right: 50%;
+  transform: translateY(-50%) scale(0.85);
+  /* `right: 50%` anchors the card's unscaled right edge to the stage centre.
+     Scale(0.85) shrinks toward the card's own centre, so the visible side
+     card sits ~50 px left of stage centre with ~190 px peeking past the
+     active card's left edge. Both side cards fit fully within the stage. */
+}
+.cs-tt-card--side[data-pos="right"] {
+  left: 50%;
+  transform: translateY(-50%) scale(0.85);
+}
+.cs-tt-card--side:hover,
+.cs-tt-card--side:focus-visible {
+  opacity: 0.7;
+  filter: blur(0);
+  transform: translateY(-50%) scale(0.88);
+}
+.cs-tt-card--side:focus-visible {
+  outline: 2px solid rgb(132 188 255 / 0.7);
+  outline-offset: 6px;
+}
+.cs-tt-card--side .cs-tt-card__photo { width: 211px; height: 263px; }
+.cs-tt-card--side .cs-tt-card__body  { padding: 0 12px 0 24px; }
+.cs-tt-card--side .cs-tt-card__name  { font-size: 15px; }
+.cs-tt-card--side .cs-tt-card__role  { font-size: 12px; }
+.cs-tt-card--side .cs-tt-card__quote {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cs-tt-card__cta--peek { font-size: 13px; color: rgb(255 255 255 / 0.7); }
+
+/* ---- Mobile / narrow: hide side cards entirely ------------------------- */
+@media (max-width: 1023px) {
+  .cs-tt-card--side { display: none; }
+  .cs-tt-card--active {
+    width: 100%;
+    height: auto;
+    min-height: 300px;
+    flex-direction: column;
+  }
+  .cs-tt-card--active .cs-tt-card__photo {
+    width: 100%;
+    height: 220px;
+  }
+  .cs-tt-card--active .cs-tt-card__body {
+    padding: 24px 0 0 0;
+    gap: 16px;
+  }
+  .cs-tt-stage { height: auto; min-height: 480px; }
+}
+
+/* ---- Nav button (Figma 108:8444 / 108:8448) ---------------------------- */
+.cs-tt-nav {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: 1.002px solid #DAB6F3;
+  background: rgba(187, 175, 255, 0.08);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  isolation: isolate;
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 200ms ease-out,
+              border-color 200ms ease-out;
+  overflow: hidden;
+}
+.cs-tt-nav:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 0 0 4px rgba(218, 182, 243, 0.14),
+              0 8px 22px -10px rgba(218, 182, 243, 0.55);
+  border-color: rgb(255 255 255 / 0.9);
+}
+.cs-tt-nav:active { transform: scale(0.97); }
+.cs-tt-nav:focus-visible {
+  outline: 2px solid rgb(132 188 255 / 0.7);
+  outline-offset: 4px;
+}
+.cs-tt-nav[data-direction="prev"] .cs-tt-nav__arrow { transform: scaleX(-1); }
+
+/* Two plus-lighter radial glows that match Figma's exact gradient stops:
+   #DAB6F3 → rgba(177,145,208,.75) → rgba(135,108,173,.5) → rgba(52,34,102,0). */
+.cs-tt-nav__glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  mix-blend-mode: plus-lighter;
+}
+.cs-tt-nav__glow--tr {
+  background: radial-gradient(
+    ellipse 70% 90% at 92% 22%,
+    rgba(218, 182, 243, 0.20) 0%,
+    rgba(177, 145, 208, 0.15) 25%,
+    rgba(135, 108, 173, 0.10) 50%,
+    rgba(52, 34, 102, 0)      100%
+  );
+}
+.cs-tt-nav__glow--bottom {
+  background: radial-gradient(
+    ellipse 45% 75% at 50% 100%,
+    rgba(218, 182, 243, 0.30) 0%,
+    rgba(177, 145, 208, 0.225) 25%,
+    rgba(135, 108, 173, 0.15)  50%,
+    rgba(52, 34, 102, 0)       100%
+  );
+}
+.cs-tt-nav__arrow { position: relative; z-index: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-tt-card--active { animation: none; }
+  .cs-tt-card--side { transition: none; }
+  .cs-tt-nav { transition: none; }
+}
+
+/* Marquee — right-to-left infinite scroll */
+@keyframes cs-marquee-rtl {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+.cs-marquee {
+  display: flex;
+  width: max-content;
+  animation: cs-marquee-rtl 60s linear infinite;
+}
+
+.cs-marquee:hover { animation-play-state: paused; }
+
+/* Gradient text used in section headings ("patching", "Advantage") */
+.cs-text-gradient-purple {
+  background: linear-gradient(90deg, #5a3df0 0%, #a06bff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Grid backdrop for security section (subtle) */
+.cs-section-light {
+  background:
+    radial-gradient(700px 350px at 12% 10%, rgba(99, 70, 255, 0.06), transparent 60%),
+    radial-gradient(700px 350px at 85% 80%, rgba(0, 200, 255, 0.06), transparent 60%),
+    #f5f6f7;
+}
+
+/* Container utility */
+.cs-container { max-width: 1276px; margin-inline: auto; padding-inline: 24px; }
+
+@media (max-width: 1340px) {
+  .cs-container { padding-inline: 32px; }
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}

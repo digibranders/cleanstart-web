@@ -13,7 +13,7 @@ describe('destinationsFromEnv', () => {
       WEBHOOK_TEAMS_URL: 'https://teams.example/hook',
     } as unknown as NodeJS.ProcessEnv);
     expect(dests).toHaveLength(1);
-    expect(dests[0]).toMatchObject({ id: 'teams', kind: 'teams' });
+    expect(dests[0]).toMatchObject({ id: 'teams', kind: 'teams', source: 'env' });
   });
 
   it('builds a generic destination only when both URL + secret are set', () => {
@@ -27,7 +27,7 @@ describe('destinationsFromEnv', () => {
       WEBHOOK_GENERIC_SIGNING_SECRET: 'secret',
     } as unknown as NodeJS.ProcessEnv);
     expect(both).toHaveLength(1);
-    expect(both[0]).toMatchObject({ id: 'generic', kind: 'generic' });
+    expect(both[0]).toMatchObject({ id: 'generic', kind: 'generic', source: 'env' });
   });
 
   it('honours WEBHOOK_TEAMS_EVENTS as a comma-list filter', () => {
@@ -35,7 +35,7 @@ describe('destinationsFromEnv', () => {
       WEBHOOK_TEAMS_URL: 'https://x',
       WEBHOOK_TEAMS_EVENTS: 'lead.submitted',
     } as unknown as NodeJS.ProcessEnv);
-    expect(dests[0]?.events).toEqual(['lead.submitted']);
+    expect(dests[0]?.routing.events).toEqual(['lead.submitted']);
   });
 
   it('falls back to all events when WEBHOOK_TEAMS_EVENTS is empty / unknown', () => {
@@ -43,8 +43,16 @@ describe('destinationsFromEnv', () => {
       WEBHOOK_TEAMS_URL: 'https://x',
       WEBHOOK_TEAMS_EVENTS: 'bogus.event',
     } as unknown as NodeJS.ProcessEnv);
-    expect(dests[0]?.events).toEqual(['document.published', 'lead.submitted']);
+    expect(dests[0]?.routing.events).toEqual(['document.published', 'lead.submitted']);
   });
+});
+
+const teamsDest = (id: string, events: ('document.published' | 'lead.submitted')[]) => ({
+  id,
+  source: 'env' as const,
+  kind: 'teams' as const,
+  url: `https://${id}`,
+  routing: { events },
 });
 
 describe('dispatchEvent', () => {
@@ -56,19 +64,12 @@ describe('dispatchEvent', () => {
     expect(result).toEqual([]);
   });
 
-  it('skips destinations that don\'t subscribe to the event', async () => {
+  it("skips destinations that don't subscribe to the event", async () => {
     const fetchMock = vi.fn(async () => new Response(null, { status: 200 }));
     const result = await dispatchEvent(
       { event: 'document.published', data: { slug: 'x' } },
       {
-        destinations: [
-          {
-            id: 'teams',
-            kind: 'teams',
-            url: 'https://x',
-            events: ['lead.submitted'],
-          },
-        ],
+        destinations: [teamsDest('teams', ['lead.submitted'])],
         fetch: fetchMock as unknown as typeof fetch,
       },
     );
@@ -76,19 +77,48 @@ describe('dispatchEvent', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it('applies routing.collections filter to document.published events', async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 202 }));
+    const dest = {
+      ...teamsDest('teams', ['document.published']),
+      routing: { events: ['document.published'] as const, collections: ['blogs'] },
+    };
+    await dispatchEvent(
+      { event: 'document.published', data: { collection: 'pages', slug: 'x' } },
+      { destinations: [dest], fetch: fetchMock as unknown as typeof fetch },
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+    await dispatchEvent(
+      { event: 'document.published', data: { collection: 'blogs', slug: 'x' } },
+      { destinations: [dest], fetch: fetchMock as unknown as typeof fetch },
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('applies routing.formSlugs filter to lead.submitted events', async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 202 }));
+    const dest = {
+      ...teamsDest('teams', ['lead.submitted']),
+      routing: { events: ['lead.submitted'] as const, formSlugs: ['demo-request'] },
+    };
+    await dispatchEvent(
+      { event: 'lead.submitted', data: { formSlug: 'contact', email: 'a@b.com' } },
+      { destinations: [dest], fetch: fetchMock as unknown as typeof fetch },
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+    await dispatchEvent(
+      { event: 'lead.submitted', data: { formSlug: 'demo-request', email: 'a@b.com' } },
+      { destinations: [dest], fetch: fetchMock as unknown as typeof fetch },
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it('posts to a Teams destination with the rendered card', async () => {
     const fetchMock = vi.fn(async () => new Response(null, { status: 202 }));
     const result = await dispatchEvent(
       { event: 'document.published', data: { slug: 'x', title: 'X' } },
       {
-        destinations: [
-          {
-            id: 'teams',
-            kind: 'teams',
-            url: 'https://x',
-            events: ['document.published'],
-          },
-        ],
+        destinations: [teamsDest('teams', ['document.published'])],
         fetch: fetchMock as unknown as typeof fetch,
       },
     );
@@ -105,9 +135,10 @@ describe('dispatchEvent', () => {
         destinations: [
           {
             id: 'gen',
+            source: 'env',
             kind: 'generic',
             url: 'https://recv',
-            events: ['lead.submitted'],
+            routing: { events: ['lead.submitted'] },
             signingKeys: [{ id: 'k1', secret: 'shhh' }],
           },
         ],
@@ -138,14 +169,7 @@ describe('dispatchEvent', () => {
     const result = await dispatchEvent(
       { event: 'document.published', data: {} },
       {
-        destinations: [
-          {
-            id: 'teams',
-            kind: 'teams',
-            url: 'https://x',
-            events: ['document.published'],
-          },
-        ],
+        destinations: [teamsDest('teams', ['document.published'])],
         fetch: fetchMock as unknown as typeof fetch,
         logger: { warn },
       },
@@ -153,7 +177,7 @@ describe('dispatchEvent', () => {
     expect(result[0]).toMatchObject({ ok: false, status: 500 });
     expect(warn).toHaveBeenCalledWith(
       expect.objectContaining({ destination: 'teams', status: 500 }),
-      'webhook delivery failed',
+      expect.stringContaining('webhook delivery failed'),
     );
   });
 
@@ -169,8 +193,8 @@ describe('dispatchEvent', () => {
       { event: 'document.published', data: {} },
       {
         destinations: [
-          { id: 'a', kind: 'teams', url: 'https://a', events: ['document.published'] },
-          { id: 'b', kind: 'teams', url: 'https://b', events: ['document.published'] },
+          teamsDest('a', ['document.published']),
+          teamsDest('b', ['document.published']),
         ],
         fetch: fetchMock as unknown as typeof fetch,
       },

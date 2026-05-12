@@ -9,6 +9,7 @@ import sharp from 'sharp';
 
 import { AboutGalleries } from './payload/collections/AboutGalleries';
 import { AuditLog } from './payload/collections/audit-log';
+import { WebhookDeadLetter } from './payload/collections/WebhookDeadLetter';
 import { Authors } from './payload/collections/Authors';
 import { Blogs } from './payload/collections/Blogs';
 import { BrokenLinks } from './payload/collections/BrokenLinks';
@@ -16,6 +17,7 @@ import { Categories } from './payload/collections/Categories';
 import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
+import { Integrations } from './payload/collections/Integrations';
 import { JobLocations } from './payload/collections/JobLocations';
 import { Jobs } from './payload/collections/Jobs';
 import { KnowledgeBase } from './payload/collections/KnowledgeBase';
@@ -31,6 +33,15 @@ import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
 import { canonicalCheckEndpoint } from './payload/endpoints/canonical-check';
+import { userReassignContentEndpoint } from './payload/endpoints/user-offboard';
+import { publishChecklistEndpoint } from './payload/endpoints/publish-checklist';
+import { dsarFindEndpoint, dsarDeleteEndpoint } from './payload/endpoints/leads-dsar';
+import { retryLeadSyncEndpoint } from './payload/endpoints/retry-lead-sync';
+import {
+  integrationsAuditEndpoint,
+  integrationsHealthEndpoint,
+  integrationsTestEndpoint,
+} from './payload/endpoints/integrations-actions';
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
 import { robotsEndpoint } from './payload/endpoints/robots';
@@ -44,10 +55,13 @@ import { checkBrokenLinksTask } from './payload/jobs/check-broken-links';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
+import { reindexMeiliTask } from './payload/jobs/reindex-meili';
+import { retryWebhookTask } from './payload/jobs/retry-webhook';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { wireCustomEditView } from './payload/lib/wire-custom-edit-view';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { wireCustomListView } from './payload/lib/wire-custom-list-view';
+import { wirePublishGate } from './payload/lib/wire-publish-gate';
 import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
 import { Legal } from './payload/globals/legal';
@@ -200,6 +214,8 @@ export default buildConfig({
     BrokenLinks,
     AuditLog,
     SearchLog,
+    WebhookDeadLetter,
+    Integrations,
     Authors,
     Categories,
     NewsCategories,
@@ -218,6 +234,7 @@ export default buildConfig({
     AboutGalleries,
     Pages,
   ]
+    .map(wirePublishGate)
     .map(wireCustomListView)
     .map(wireCustomEditView)
     .map(wireCustomFields),
@@ -234,13 +251,25 @@ export default buildConfig({
     redirectsImportEndpoint,
     canonicalCheckEndpoint,
     searchAnalyticsEndpoint,
+    userReassignContentEndpoint,
+    publishChecklistEndpoint,
+    dsarFindEndpoint,
+    dsarDeleteEndpoint,
+    retryLeadSyncEndpoint,
+    integrationsTestEndpoint,
+    integrationsHealthEndpoint,
+    integrationsAuditEndpoint,
   ],
   jobs: {
-    tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask],
+    tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask, retryWebhookTask, reindexMeiliTask],
     autoRun: [
       {
         cron: '*/5 * * * *', // every 5 minutes
         queue: 'leadQueueDrain',
+      },
+      {
+        cron: '*/5 * * * *', // every 5 minutes — retry failed webhook deliveries
+        queue: 'webhookRetry',
       },
       {
         cron: '0 3 * * *', // daily at 03:00 UTC — searchLog 90-day retention
@@ -253,6 +282,10 @@ export default buildConfig({
       {
         cron: '30 4 * * *', // daily at 04:30 UTC — broken-link scan
         queue: 'brokenLinksScan',
+      },
+      {
+        cron: '0 5 * * *', // daily at 05:00 UTC — Meilisearch drift check + self-healing
+        queue: 'meiliReindex',
       },
     ],
     // Positive opt-in: cron tasks register only when PAYLOAD_AUTO_RUN

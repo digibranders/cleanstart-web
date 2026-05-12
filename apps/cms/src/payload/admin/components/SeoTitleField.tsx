@@ -2,7 +2,7 @@
 
 import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
 const TITLE_TARGET = 60;
 const TITLE_HARD_CAP = 70;
@@ -25,24 +25,25 @@ const colorForLength = (len: number): string => {
 };
 
 /**
- * Custom Field for `seo.title` with auto-sync from the document
- * title.
+ * Custom Field for `seo.title` with auto-sync from the document title.
  *
  * UX model (Yoast / Rank Math style):
  *
  *  1. **Empty meta title** → silently mirrors the document `title`
- *     value as the user types. The mirrored value is stored, so the
+ *     value as the user types. The mirrored value is stored so the
  *     editor sees the real string that will be served as `<title>`.
- *  2. **Editor types in the meta title** → component stops syncing.
- *     Once the user has typed anything that differs from the most
- *     recently synced document title, sync is paused for the lifetime
- *     of this form session.
+ *  2. **Editor types in the meta title** → sync stops. Manual mode is
+ *     entered only via direct user input in `handleChange` — never
+ *     inferred reactively from value divergence (which causes a race
+ *     condition where the detect-divergence effect fires with the
+ *     pre-update value and locks manual mode after the very first
+ *     source keystroke).
  *  3. **Reset button** → re-enables sync, snapping the meta title
  *     back to the current document title.
  *
  * Plus a character counter with traffic-light coloring (green ≤ 60,
- * amber 60-70, red > 70) — Google typically truncates titles at
- * around 60 characters, fully cutting at 70.
+ * amber 60-70, red > 70) — Google typically truncates titles at ~60
+ * characters, fully cutting at 70.
  */
 export const SeoTitleField = (props: SeoTitleFieldProps): ReactElement => {
   const { path, sourceField = 'title' } = props;
@@ -51,49 +52,40 @@ export const SeoTitleField = (props: SeoTitleFieldProps): ReactElement => {
   const { value: docTitleValue } = useField<string>({ path: sourceField });
   const { value: seoTitleValue, setValue: setSeoTitle } = useField<string>({ path });
 
-  // Track the value we last auto-synced. While the live seo.title
-  // matches that value, sync is in "auto" mode — we keep mirroring.
-  // The moment the value differs (because the user typed), we switch
-  // to "manual" mode and stop syncing until the user clicks Reset.
-  const lastSyncedRef = useRef<string>('');
+  /**
+   * manualMode = true  → editor typed a custom SEO title; auto-sync off.
+   * manualMode = false → SEO title mirrors the source field; auto-sync on.
+   *
+   * Initial value: false for new docs (empty SEO title), true for existing
+   * docs whose stored title no longer matches the current source value
+   * (i.e. was previously customised).
+   */
   const [manualMode, setManualMode] = useState<boolean>(() => {
-    // On first mount: if there's already a stored seo.title that
-    // differs from the document title, the editor previously
-    // customised it. Respect that — start in manual mode.
     const stored = (seoTitleValue ?? '').trim();
     const docTitle = (docTitleValue ?? '').trim();
     return stored !== '' && stored !== docTitle;
   });
 
-  // Auto-sync effect: when document title changes and we're in auto
-  // mode, mirror the new value into seo.title.
+  /**
+   * Auto-sync: whenever the source field changes and we're not in manual
+   * mode, push its value straight into seo.title. No secondary "detect
+   * divergence" effect needed — manual mode is entered exclusively via
+   * handleChange.
+   */
   useEffect(() => {
     if (manualMode) return;
-    const next = docTitleValue ?? '';
-    if (seoTitleValue === next) {
-      lastSyncedRef.current = next;
-      return;
-    }
-    setSeoTitle(next);
-    lastSyncedRef.current = next;
-  }, [docTitleValue, manualMode, seoTitleValue, setSeoTitle]);
+    setSeoTitle(docTitleValue ?? '');
+  }, [docTitleValue, manualMode, setSeoTitle]);
 
-  // Detect manual edits: if the live value differs from what we
-  // last synced AND it differs from the doc title, the user typed.
-  useEffect(() => {
-    if (manualMode) return;
-    const live = seoTitleValue ?? '';
-    if (live !== lastSyncedRef.current && live !== (docTitleValue ?? '')) {
-      setManualMode(true);
-    }
-  }, [seoTitleValue, docTitleValue, manualMode]);
-
+  /**
+   * User typed in the SEO title input. Enter manual mode only when the
+   * result diverges from the source (so typing the exact source value
+   * does not lock the field).
+   */
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const next = event.target.value;
       setSeoTitle(next);
-      // The change came from the user; flip to manual mode unless
-      // they happened to type the exact doc title (rare).
       if (next !== (docTitleValue ?? '')) {
         setManualMode(true);
       }
@@ -101,10 +93,12 @@ export const SeoTitleField = (props: SeoTitleFieldProps): ReactElement => {
     [docTitleValue, setSeoTitle],
   );
 
+  /**
+   * Reset: snap back to the source value and re-engage auto-sync.
+   * Set the value immediately so there's no flash while the effect runs.
+   */
   const handleResetToTitle = useCallback(() => {
-    const next = docTitleValue ?? '';
-    setSeoTitle(next);
-    lastSyncedRef.current = next;
+    setSeoTitle(docTitleValue ?? '');
     setManualMode(false);
   }, [docTitleValue, setSeoTitle]);
 
@@ -114,8 +108,7 @@ export const SeoTitleField = (props: SeoTitleFieldProps): ReactElement => {
 
   return (
     <div className="field-type text seo-title-field" style={{ marginBottom: 'var(--cs-space-3, 12px)' }}>
-      <label
-        htmlFor={inputId}
+      <div
         className="field-label"
         style={{
           display: 'flex',
@@ -125,38 +118,38 @@ export const SeoTitleField = (props: SeoTitleFieldProps): ReactElement => {
           marginBottom: 4,
         }}
       >
-        <span>Meta Title</span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-          {!manualMode && !docTitleEmpty && (
-            <span
-              style={{
-                fontSize: 11,
-                color: 'var(--cs-cyan-500, #06c7f2)',
-                fontWeight: 500,
-                letterSpacing: 0.5,
-                textTransform: 'uppercase',
-              }}
-              title="Auto-synced from the document title. Type here to override."
-            >
-              · auto
-            </span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <label htmlFor={inputId}>Meta Title</label>
+          {!docTitleEmpty && (
+            <label className="cs-slug__auto-toggle">
+              <input
+                type="checkbox"
+                checked={!manualMode}
+                onChange={(e) => {
+                  if (e.target.checked) handleResetToTitle();
+                  else setManualMode(true);
+                }}
+                className="cs-slug__auto-check"
+              />
+              <span>Auto</span>
+            </label>
           )}
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              fontSize: 10.5,
-              fontWeight: 600,
-              letterSpacing: '0.04em',
-              color: charColor,
-              fontFeatureSettings: '"tnum" 1',
-            }}
-            aria-live="polite"
-          >
-            {charCount} / {TITLE_TARGET}
-          </span>
         </span>
-      </label>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            fontSize: 10.5,
+            fontWeight: 600,
+            letterSpacing: '0.04em',
+            color: charColor,
+            fontFeatureSettings: '"tnum" 1',
+          }}
+          aria-live="polite"
+        >
+          {charCount} / {TITLE_TARGET}
+        </span>
+      </div>
       <input
         id={inputId}
         type="text"
@@ -166,32 +159,12 @@ export const SeoTitleField = (props: SeoTitleFieldProps): ReactElement => {
         spellCheck
         autoComplete="off"
       />
-      <p className="field-description" style={{ margin: '4px 0 0 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+      <p className="field-description" style={{ margin: '4px 0 0 0' }}>
         <span style={{ fontSize: 12, color: 'var(--theme-text-soft, #a4a7af)' }}>
           {manualMode
-            ? 'Custom — won’t track the document title.'
+            ? "Custom — won't track the document title."
             : `Auto-synced from the document title. Aim for ≤ ${TITLE_TARGET} characters.`}
         </span>
-        {manualMode && !docTitleEmpty && (
-          <button
-            type="button"
-            onClick={handleResetToTitle}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              fontSize: 12,
-              fontWeight: 500,
-              color: 'var(--cs-cyan-500, #06c7f2)',
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              textDecorationColor: 'rgba(6, 199, 242, 0.4)',
-              textUnderlineOffset: 2,
-            }}
-          >
-            Reset to title
-          </button>
-        )}
       </p>
     </div>
   );

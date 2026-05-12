@@ -7,6 +7,13 @@ import {
   type RedirectsPayload,
   planBulkRedirectImport,
 } from '../lib/redirects/bulk-import';
+import { clientIpFromHeaders } from '../lib/client-ip';
+import { type RateLimitConfig, checkAndRecord } from '../lib/rate-limit';
+
+const REDIRECTS_IMPORT_RATE_LIMITS: RateLimitConfig = {
+  perMinute: 5,
+  perDay: 50,
+};
 
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
@@ -59,6 +66,15 @@ export const redirectsImportEndpoint: Endpoint = {
   path: '/redirects/import',
   method: 'post',
   handler: async (req) => {
+    const ip = clientIpFromHeaders(req.headers);
+    const limit = checkAndRecord(`redirects-import:${ip}`, REDIRECTS_IMPORT_RATE_LIMITS);
+    if (!limit.ok) {
+      return json(
+        { ok: false, error: 'rate_limited', retryAfterSeconds: Math.ceil(limit.retryAfterMs / 1000) },
+        { status: 429 },
+      );
+    }
+
     if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }

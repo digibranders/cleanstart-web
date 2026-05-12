@@ -1,8 +1,9 @@
 'use client';
 
+import { Tooltip } from '@cleanstart/ui';
 import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
 type SlugFieldProps = {
   /**
@@ -83,13 +84,15 @@ const matchEditContext = (): EditContext | null => {
  * Custom `slug` field. Same data shape as Payload's stock text input,
  * but with a Webflow-style auto-fill: while the slug has never been
  * manually edited, every keystroke in the source field (default
- * `title`) re-slugs into here. The first manual edit pins it — sync
- * stops, and a "Reset to title" link lets the editor opt back in.
+ * `title`) re-slugs into here in real time. The first manual edit that
+ * diverges from the auto-slug pins it — sync stops, and a
+ * "Reset to title" link lets the editor opt back in.
  *
- * This unblocks the Save Draft → "slug is invalid" error: Payload's
- * client-side `required: true` validator now sees a populated value at
- * submit time, so the request actually leaves the browser and the
- * server-side `beforeValidate` slug hook never has to fire.
+ * Manual mode is entered exclusively via direct typing in the slug
+ * input (`handleChange`). It is never inferred reactively from value
+ * divergence — that approach causes a race condition where the
+ * "detect divergence" effect fires with the pre-update `slugValue`
+ * and locks manual mode after the very first title keystroke.
  */
 type CollisionState =
   | { kind: 'idle' }
@@ -106,44 +109,38 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
   const { value: slugValue, setValue: setSlug } = useField<string>({ path });
   const [collision, setCollision] = useState<CollisionState>({ kind: 'idle' });
 
-  const lastSyncedRef = useRef<string>('');
+  /**
+   * manualMode = true  → editor has typed a custom slug; auto-sync off.
+   * manualMode = false → slug mirrors the title; auto-sync on.
+   *
+   * Initial value: false for new docs (empty slug), true for existing
+   * docs whose stored slug no longer matches the auto-slug of the
+   * current title (i.e. was previously customised).
+   */
   const [manualMode, setManualMode] = useState<boolean>(() => {
     const stored = (slugValue ?? '').trim();
     if (stored === '') return false;
-    // If the stored slug doesn't match a slugified version of the
-    // current title, the editor previously customised it. Respect that.
     return stored !== slugify(docTitleValue ?? '');
   });
 
-  // Auto-sync: while in auto mode, mirror the slugified title.
+  /**
+   * Auto-sync: whenever the title changes and we're not in manual mode,
+   * push the slugified title straight into the slug field. No
+   * intermediate ref needed — we never infer mode from value divergence.
+   */
   useEffect(() => {
     if (manualMode) return;
-    const next = slugify(docTitleValue ?? '');
-    if (slugValue === next) {
-      lastSyncedRef.current = next;
-      return;
-    }
-    setSlug(next);
-    lastSyncedRef.current = next;
-  }, [docTitleValue, manualMode, slugValue, setSlug]);
+    setSlug(slugify(docTitleValue ?? ''));
+  }, [docTitleValue, manualMode, setSlug]);
 
-  // Detect manual edits (typed value diverges from both the last
-  // synced value AND the slugified title).
-  useEffect(() => {
-    if (manualMode) return;
-    const live = slugValue ?? '';
-    const docSlug = slugify(docTitleValue ?? '');
-    if (live !== lastSyncedRef.current && live !== docSlug) {
-      setManualMode(true);
-    }
-  }, [slugValue, docTitleValue, manualMode]);
-
+  /**
+   * User typed directly in the slug input. Live-normalise the value and
+   * enter manual mode only when the result diverges from the auto-slug
+   * (so typing the exact same value as the title doesn't lock the field).
+   */
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      const next = event.target.value;
-      // Live normalise: keep hyphens the editor is actively typing but
-      // don't strip trailing ones yet — that prevents typing `word-next`.
-      const cleaned = slugifyLive(next);
+      const cleaned = slugifyLive(event.target.value);
       setSlug(cleaned);
       if (slugify(cleaned) !== slugify(docTitleValue ?? '')) {
         setManualMode(true);
@@ -159,10 +156,13 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
     }
   }, [slugValue, setSlug]);
 
+  /**
+   * Reset: clear manual mode so the next title keystroke re-engages
+   * auto-sync. The slug is immediately set to the current auto-slug so
+   * the field doesn't flash a stale value while waiting for the effect.
+   */
   const handleResetToTitle = useCallback(() => {
-    const next = slugify(docTitleValue ?? '');
-    setSlug(next);
-    lastSyncedRef.current = next;
+    setSlug(slugify(docTitleValue ?? ''));
     setManualMode(false);
   }, [docTitleValue, setSlug]);
 
@@ -221,25 +221,46 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
 
   return (
     <div className="cs-slug field-type text">
-      <label htmlFor={inputId} className="cs-slug__label">
+      <div className="cs-slug__label">
         <span className="cs-slug__label-text">
-          {label ?? 'Slug'}
-          {required && (
-            <span aria-hidden="true" className="cs-slug__required">
-              *
-            </span>
+          <label htmlFor={inputId}>
+            {label ?? 'Slug'}
+            {required && (
+              <span aria-hidden="true" className="cs-slug__required">
+                *
+              </span>
+            )}
+          </label>
+          {!docTitleEmpty && (
+            <>
+              <label className="cs-slug__auto-toggle">
+                <input
+                  type="checkbox"
+                  checked={!manualMode}
+                  onChange={(e) => {
+                    if (e.target.checked) handleResetToTitle();
+                    else setManualMode(true);
+                  }}
+                  className="cs-slug__auto-check"
+                />
+                <span>Auto</span>
+              </label>
+              <Tooltip
+                placement="bottom-start"
+                content={
+                  <>
+                    <b>On</b> — slug syncs live from the title as you type.<br />
+                    <b>Off</b> — slug is frozen; title changes won't affect it.
+                  </>
+                }
+              >
+                <button type="button" className="cs-slug__auto-info" aria-label="How auto-sync works">
+                  i
+                </button>
+              </Tooltip>
+            </>
           )}
         </span>
-        {!manualMode && !docTitleEmpty && (
-          <span
-            className="cs-slug__chip"
-            data-tone="auto"
-            title="Auto-synced from the title. Type to override."
-          >
-            <span className="cs-slug__chip-dot" aria-hidden="true" />
-            Auto
-          </span>
-        )}
         {manualMode && collision.kind === 'available' && (
           <output
             aria-live="polite"
@@ -247,11 +268,10 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
             data-tone="ok"
             title="This slug is unique in the collection."
           >
-            <span className="cs-slug__chip-dot" aria-hidden="true" />
             Available
           </output>
         )}
-      </label>
+      </div>
       <input
         id={inputId}
         type="text"
@@ -264,17 +284,6 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
         required={required}
         className="cs-slug__input"
       />
-      {manualMode && !docTitleEmpty && (
-        <p className="cs-slug__hint">
-          <button
-            type="button"
-            onClick={handleResetToTitle}
-            className="cs-slug__reset"
-          >
-            Reset to title
-          </button>
-        </p>
-      )}
       {collision.kind === 'collision' ? (
         <output aria-live="polite" className="cs-slug__collision">
           <span aria-hidden="true">!</span>

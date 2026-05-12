@@ -73,6 +73,8 @@ export interface Config {
     brokenLinks: BrokenLink;
     'audit-log': AuditLog;
     searchLog: SearchLog;
+    webhooks_dead_letter: WebhooksDeadLetter;
+    integrations: Integration;
     authors: Author;
     categories: Category;
     newsCategories: NewsCategory;
@@ -104,6 +106,8 @@ export interface Config {
     brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
+    webhooks_dead_letter: WebhooksDeadLetterSelect<false> | WebhooksDeadLetterSelect<true>;
+    integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
@@ -160,6 +164,8 @@ export interface Config {
       purgeSearchLog: TaskPurgeSearchLog;
       purgeLeadsPii: TaskPurgeLeadsPii;
       checkBrokenLinks: TaskCheckBrokenLinks;
+      retryWebhook: TaskRetryWebhook;
+      meiliReindex: TaskMeiliReindex;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -194,6 +200,10 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name: string;
+  /**
+   * Uncheck to block this user from logging in. Use the "Disable account" action instead of editing this directly.
+   */
+  enabled?: boolean | null;
   /**
    * Composite roles supported. Author = own drafts only. Editor = publish content. Admin = full access.
    */
@@ -273,6 +283,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -377,7 +388,14 @@ export interface BrokenLink {
 export interface AuditLog {
   id: number;
   timestamp: string;
-  action: 'lead_deleted' | 'lead_exported' | 'dsar_export' | 'dsar_erasure' | 'schema_override_changed';
+  action:
+    | 'lead_deleted'
+    | 'lead_exported'
+    | 'dsar_export'
+    | 'dsar_erasure'
+    | 'schema_override_changed'
+    | 'user_disabled'
+    | 'content_reassigned';
   targetCollection: string;
   targetId: string;
   /**
@@ -431,6 +449,128 @@ export interface SearchLog {
    * User-Agent header. Trimmed at 200 chars.
    */
   userAgent?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "webhooks_dead_letter".
+ */
+export interface WebhooksDeadLetter {
+  id: number;
+  /**
+   * Unique ID for this delivery attempt (UUID).
+   */
+  webhookId: string;
+  event: 'document.published' | 'lead.submitted';
+  /**
+   * Full event data blob. Used to re-run the delivery on retry.
+   */
+  eventPayload:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * teams | generic | <custom id>
+   */
+  destinationId: string;
+  destinationKind: 'teams' | 'generic';
+  /**
+   * First 80 chars of the destination URL for quick scanning.
+   */
+  destinationLabel?: string | null;
+  /**
+   * How many delivery attempts have been made (including the original).
+   */
+  attemptCount: number;
+  /**
+   * Error message or HTTP status from the most recent attempt.
+   */
+  lastError?: string | null;
+  /**
+   * When the retry task will next attempt this delivery. Null = no more retries.
+   */
+  nextRetryAt?: string | null;
+  /**
+   * Set when a retry succeeds. Null = still failing or exhausted.
+   */
+  resolvedAt?: string | null;
+  /**
+   * x-request-id from the originating HTTP request, for log correlation.
+   */
+  requestId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Outbound channels and analytics read-back wired without a code change. Encrypted secrets, per-row routing.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrations".
+ */
+export interface Integration {
+  id: number;
+  /**
+   * Human-readable name, e.g. "Sales channel · #sales-eng-leads".
+   */
+  label: string;
+  /**
+   * Integration type. Locked after creation — changing kind means delete + recreate.
+   */
+  kind:
+    | 'teamsWorkflow'
+    | 'genericWebhook'
+    | 'zohoCrm'
+    | 'ga4DataApi'
+    | 'gscSearchAnalyticsApi'
+    | 'gscUrlInspectionApi'
+    | 'msClarity'
+    | 'cloudflareWebAnalytics'
+    | 'calComInbound'
+    | 'brevoBounceCallback';
+  /**
+   * Pause without deleting. Disabled rows are skipped by the dispatcher.
+   */
+  enabled?: boolean | null;
+  /**
+   * How this row is configured. Env rows are synthesised from process.env for read-only display; new rows are always "db".
+   */
+  source?: ('db' | 'env') | null;
+  routing: {
+    /**
+     * Which events trigger a delivery to this row.
+     */
+    events: ('document.published' | 'lead.submitted')[];
+    /**
+     * Filter document.published by collection slug. Empty = all collections.
+     */
+    collections?: string[] | null;
+    /**
+     * Filter lead.submitted by form slug. Empty = all forms.
+     */
+    formSlugs?: string[] | null;
+  };
+  /**
+   * Per-kind config (webhook URL, signing secret, OAuth tokens, etc.). Encrypted at rest with PAYLOAD_SECRET-derived AES-256-GCM. Never returned in plaintext after save.
+   */
+  config:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Last time the health badge re-queried webhooks_dead_letter for this row.
+   */
+  lastHealthAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1385,6 +1525,14 @@ export interface Lead {
    * Stamped by the daily PII purge once ip / userAgent / email / phone fields have been nulled. Used as the idempotency marker so re-runs skip already-redacted rows.
    */
   piiRedactedAt?: string | null;
+  /**
+   * Non-empty when the hidden honeypot field was filled at submit time. Indicates likely bot submission.
+   */
+  honeypot?: string | null;
+  /**
+   * False when the Cloudflare Turnstile challenge was not passed at submit time.
+   */
+  turnstilePassed?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -6164,6 +6312,8 @@ export interface PayloadJob {
           | 'purgeSearchLog'
           | 'purgeLeadsPii'
           | 'checkBrokenLinks'
+          | 'retryWebhook'
+          | 'meiliReindex'
           | 'schedulePublish';
         taskID: string;
         input?:
@@ -6198,7 +6348,16 @@ export interface PayloadJob {
       }[]
     | null;
   taskSlug?:
-    | ('inline' | 'drainLeadQueue' | 'purgeSearchLog' | 'purgeLeadsPii' | 'checkBrokenLinks' | 'schedulePublish')
+    | (
+        | 'inline'
+        | 'drainLeadQueue'
+        | 'purgeSearchLog'
+        | 'purgeLeadsPii'
+        | 'checkBrokenLinks'
+        | 'retryWebhook'
+        | 'meiliReindex'
+        | 'schedulePublish'
+      )
     | null;
   queue?: string | null;
   waitUntil?: string | null;
@@ -6245,6 +6404,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'searchLog';
         value: number | SearchLog;
+      } | null)
+    | ({
+        relationTo: 'webhooks_dead_letter';
+        value: number | WebhooksDeadLetter;
+      } | null)
+    | ({
+        relationTo: 'integrations';
+        value: number | Integration;
       } | null)
     | ({
         relationTo: 'authors';
@@ -6362,6 +6529,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  enabled?: T;
   roles?: T;
   preferences?: T;
   updatedAt?: T;
@@ -6397,6 +6565,7 @@ export interface MediaSelect<T extends boolean = true> {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -6503,6 +6672,46 @@ export interface SearchLogSelect<T extends boolean = true> {
   locale?: T;
   ip?: T;
   userAgent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "webhooks_dead_letter_select".
+ */
+export interface WebhooksDeadLetterSelect<T extends boolean = true> {
+  webhookId?: T;
+  event?: T;
+  eventPayload?: T;
+  destinationId?: T;
+  destinationKind?: T;
+  destinationLabel?: T;
+  attemptCount?: T;
+  lastError?: T;
+  nextRetryAt?: T;
+  resolvedAt?: T;
+  requestId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrations_select".
+ */
+export interface IntegrationsSelect<T extends boolean = true> {
+  label?: T;
+  kind?: T;
+  enabled?: T;
+  source?: T;
+  routing?:
+    | T
+    | {
+        events?: T;
+        collections?: T;
+        formSlugs?: T;
+      };
+  config?: T;
+  lastHealthAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -6899,6 +7108,8 @@ export interface LeadsSelect<T extends boolean = true> {
   enriched?: T;
   duplicateOf?: T;
   piiRedactedAt?: T;
+  honeypot?: T;
+  turnstilePassed?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -9936,6 +10147,22 @@ export interface TaskPurgeLeadsPii {
  * via the `definition` "TaskCheckBrokenLinks".
  */
 export interface TaskCheckBrokenLinks {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskRetryWebhook".
+ */
+export interface TaskRetryWebhook {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskMeiliReindex".
+ */
+export interface TaskMeiliReindex {
   input?: unknown;
   output?: unknown;
 }
