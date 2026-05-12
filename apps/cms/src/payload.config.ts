@@ -33,6 +33,7 @@ import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
 import { canonicalCheckEndpoint } from './payload/endpoints/canonical-check';
 import { userReassignContentEndpoint } from './payload/endpoints/user-offboard';
+import { publishChecklistEndpoint } from './payload/endpoints/publish-checklist';
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
 import { robotsEndpoint } from './payload/endpoints/robots';
@@ -51,6 +52,7 @@ import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { wireCustomEditView } from './payload/lib/wire-custom-edit-view';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { wireCustomListView } from './payload/lib/wire-custom-list-view';
+import { wirePublishGate } from './payload/lib/wire-publish-gate';
 import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
 import { Legal } from './payload/globals/legal';
@@ -222,6 +224,7 @@ export default buildConfig({
     AboutGalleries,
     Pages,
   ]
+    .map(wirePublishGate)
     .map(wireCustomListView)
     .map(wireCustomEditView)
     .map(wireCustomFields),
@@ -239,6 +242,7 @@ export default buildConfig({
     canonicalCheckEndpoint,
     searchAnalyticsEndpoint,
     userReassignContentEndpoint,
+    publishChecklistEndpoint,
   ],
   jobs: {
     tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask, retryWebhookTask],
