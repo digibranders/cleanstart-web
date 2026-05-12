@@ -1914,6 +1914,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    line-height: 1;
   }
 
   &__required {
@@ -1952,38 +1953,115 @@
     width: 100%;
   }
 
-  &__hint {
-    margin: 4px 0 0;
-    display: flex;
+  // Unified auto-sync checkbox toggle. Shared by SlugField, SeoTitleField,
+  // SeoDescriptionField. A <label> (implicit) wrapping a small checkbox
+  // + "Auto" text. Checked = syncing from source; unchecked = manual.
+  // The toggle label renders the visual checkbox via ::before so Payload's
+  // input[type=checkbox] overrides can never affect its size. The actual
+  // <input> is sr-only: hidden visually, but keyboard- and screen-reader-
+  // accessible so tabbing + space still toggles it.
+  &__auto-toggle {
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: 11.5px;
-    color: var(--theme-text-soft);
-    line-height: 1.4;
-  }
-
-  &__reset {
-    background: transparent;
-    border: 0;
+    gap: 3px;
     padding: 0;
-    font-size: 11.5px;
-    font-weight: 500;
-    color: var(--cs-cyan-500, #06c7f2);
+    margin: 0;
     cursor: pointer;
-    text-decoration: underline;
-    text-decoration-color: rgba(6, 199, 242, 0.4);
-    text-underline-offset: 2px;
-    transition: text-decoration-color var(--cs-motion-micro);
+    user-select: none;
+    line-height: 1;
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    color: var(--theme-text-disabled, #6b6e77) !important;
+    transition: color var(--cs-motion-micro);
 
     &:hover {
-      text-decoration-color: var(--cs-cyan-500, #06c7f2);
+      color: var(--theme-text-soft, #a4a7af) !important;
+    }
+
+    > span {
+      font-size: 11px;
+      font-weight: 400;
+      color: inherit;
+    }
+
+    // Visual checkbox box — 9×9 px, always under our control.
+    &::before {
+      content: '';
+      display: inline-block;
+      flex-shrink: 0;
+      width: 9px;
+      height: 9px;
+      border: 1.5px solid currentColor;
+      border-radius: 2px;
+      background: transparent;
+      transition: background var(--cs-motion-micro), border-color var(--cs-motion-micro);
+    }
+
+    // Checked state: fill cyan + white tick SVG.
+    &:has(> .cs-slug__auto-check:checked)::before {
+      border-color: var(--cs-cyan-500, #06c7f2);
+      background-color: var(--cs-cyan-500, #06c7f2);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.5 4.2L3.2 5.8L6.5 2.2' stroke='%23000814' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-size: 8px 8px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    // Focus ring on the hidden checkbox tunnels back to the visual box.
+    &:has(> .cs-slug__auto-check:focus-visible)::before {
+      outline: 2px solid var(--cs-tint-focus-ring);
+      outline-offset: 1px;
+    }
+  }
+
+  // SR-only: visually hidden, still in tab order and togglable via Space.
+  &__auto-check {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
+  // Small circular info button. Hover/focus shows the Tooltip explaining
+  // what on/off means. No background — blends into the label row.
+  &__auto-info {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 11px;
+    height: 11px;
+    min-width: 11px;
+    min-height: 11px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: 1px solid var(--theme-text-disabled, #6b6e77);
+    border-radius: 50%;
+    font-size: 8px;
+    font-weight: 700;
+    font-style: italic;
+    font-family: Georgia, serif;
+    color: var(--theme-text-disabled, #6b6e77);
+    cursor: help;
+    line-height: 1;
+    transition: border-color var(--cs-motion-micro), color var(--cs-motion-micro);
+
+    &:hover {
+      border-color: var(--theme-text-soft, #a4a7af);
+      color: var(--theme-text-soft, #a4a7af);
     }
 
     &:focus-visible {
       outline: none;
       box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
-      border-radius: 2px;
+      border-color: var(--cs-cyan-500, #06c7f2);
+      color: var(--cs-cyan-500, #06c7f2);
     }
   }
 

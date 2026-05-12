@@ -3,6 +3,7 @@ import { CheckboxField as CheckboxField_fa838d594eaa6e28e24d17add0c5aa91 } from 
 import { SelectField as SelectField_9c71ee466fcdbb40e13298a3fa959d0e } from '@/payload/admin/components/fields/SelectField.tsx'
 import { JsonField as JsonField_c698ed818f2263de63387a332e0e62c8 } from '@/payload/admin/components/fields/JsonField.tsx'
 import { DocHeader as DocHeader_ad90301af1277969698538615cf842dc } from '@/payload/admin/components/DocHeader.tsx'
+import { ScheduleKebabItem as ScheduleKebabItem_b2fe3de723766fada5b43a3f21ddb9a5 } from '@/payload/admin/components/ScheduleKebabItem.tsx'
 import { DocKebabExtras as DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0 } from '@/payload/admin/components/DocKebabExtras.tsx'
 import { DisableUserAction as DisableUserAction_6c8d4d4a3960948e585eb302bcb89460 } from '@/payload/admin/components/DisableUserAction.tsx'
 import { ReassignContentAction as ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca } from '@/payload/admin/components/ReassignContentAction.tsx'
@@ -108,6 +109,7 @@ export const importMap = {
   "@/payload/admin/components/fields/SelectField.tsx#SelectField": SelectField_9c71ee466fcdbb40e13298a3fa959d0e,
   "@/payload/admin/components/fields/JsonField.tsx#JsonField": JsonField_c698ed818f2263de63387a332e0e62c8,
   "@/payload/admin/components/DocHeader.tsx#DocHeader": DocHeader_ad90301af1277969698538615cf842dc,
+  "@/payload/admin/components/ScheduleKebabItem.tsx#ScheduleKebabItem": ScheduleKebabItem_b2fe3de723766fada5b43a3f21ddb9a5,
   "@/payload/admin/components/DocKebabExtras.tsx#DocKebabExtras": DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0,
   "@/payload/admin/components/DisableUserAction.tsx#DisableUserAction": DisableUserAction_6c8d4d4a3960948e585eb302bcb89460,
   "@/payload/admin/components/ReassignContentAction.tsx#ReassignContentAction": ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca,

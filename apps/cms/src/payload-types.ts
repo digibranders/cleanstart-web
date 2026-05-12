@@ -163,6 +163,7 @@ export interface Config {
       purgeLeadsPii: TaskPurgeLeadsPii;
       checkBrokenLinks: TaskCheckBrokenLinks;
       retryWebhook: TaskRetryWebhook;
+      meiliReindex: TaskMeiliReindex;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -6242,6 +6243,7 @@ export interface PayloadJob {
           | 'purgeLeadsPii'
           | 'checkBrokenLinks'
           | 'retryWebhook'
+          | 'meiliReindex'
           | 'schedulePublish';
         taskID: string;
         input?:
@@ -6283,6 +6285,7 @@ export interface PayloadJob {
         | 'purgeLeadsPii'
         | 'checkBrokenLinks'
         | 'retryWebhook'
+        | 'meiliReindex'
         | 'schedulePublish'
       )
     | null;
@@ -10056,6 +10059,14 @@ export interface TaskCheckBrokenLinks {
  * via the `definition` "TaskRetryWebhook".
  */
 export interface TaskRetryWebhook {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskMeiliReindex".
+ */
+export interface TaskMeiliReindex {
   input?: unknown;
   output?: unknown;
 }
