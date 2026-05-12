@@ -49,6 +49,7 @@ import { checkBrokenLinksTask } from './payload/jobs/check-broken-links';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
+import { reindexMeiliTask } from './payload/jobs/reindex-meili';
 import { retryWebhookTask } from './payload/jobs/retry-webhook';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { wireCustomEditView } from './payload/lib/wire-custom-edit-view';
@@ -250,7 +251,7 @@ export default buildConfig({
     retryLeadSyncEndpoint,
   ],
   jobs: {
-    tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask, retryWebhookTask],
+    tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask, retryWebhookTask, reindexMeiliTask],
     autoRun: [
       {
         cron: '*/5 * * * *', // every 5 minutes
@@ -271,6 +272,10 @@ export default buildConfig({
       {
         cron: '30 4 * * *', // daily at 04:30 UTC — broken-link scan
         queue: 'brokenLinksScan',
+      },
+      {
+        cron: '0 5 * * *', // daily at 05:00 UTC — Meilisearch drift check + self-healing
+        queue: 'meiliReindex',
       },
     ],
     // Positive opt-in: cron tasks register only when PAYLOAD_AUTO_RUN

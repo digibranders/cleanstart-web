@@ -22,6 +22,7 @@ const makeClient = (overrides: Partial<SearchClient> = {}): SearchClient => ({
   upsertDocuments: vi.fn(async () => okResult),
   deleteDocument: vi.fn(async () => okResult),
   updateSettings: vi.fn(async () => okResult),
+  getStats: vi.fn(async () => null),
   search: vi.fn(async () => null),
   ...overrides,
 });
