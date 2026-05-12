@@ -710,6 +710,32 @@
     }
   }
 
+  &__blob-copy {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--cs-radius-sm, 3px);
+    color: var(--theme-text-soft);
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+    outline-offset: 2px;
+
+    &:hover {
+      color: var(--theme-text);
+      background: var(--theme-elevation-150);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-brand, var(--theme-elevation-400));
+    }
+  }
+
   &__issues {
     list-style: none;
     padding: 0;

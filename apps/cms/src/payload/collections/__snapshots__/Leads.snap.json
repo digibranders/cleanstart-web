@@ -132,6 +132,14 @@
     {
       "type": "date",
       "name": "piiRedactedAt"
+    },
+    {
+      "type": "text",
+      "name": "honeypot"
+    },
+    {
+      "type": "checkbox",
+      "name": "turnstilePassed"
     }
   ],
   "hooks": {

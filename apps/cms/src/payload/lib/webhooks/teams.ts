@@ -18,13 +18,40 @@
  * doc §decisions).
  */
 
-import type { WebhookEvent } from './dispatch';
+import type { WebhookEvent, WebhookEventName } from './dispatch';
 import { redactWebhookErrorBody } from './redact-error-body';
 
 interface AdaptiveFact {
   readonly title: string;
   readonly value: string;
 }
+
+/**
+ * Per arch doc §webhooks and INTEGRATIONS-RESEARCH v1 §1.2, Adaptive
+ * Cards posted via Teams Workflows resolve `<at>Name</at>` tokens
+ * against an `msteams.entities[]` array. Each entry needs the AAD
+ * Object ID (GUID) and the UPN — plain `@displayName` strings do not
+ * notify. Cross-tenant guests use a UPN of the form
+ * `user_fynix.digital#EXT#@cleanstart.onmicrosoft.com`.
+ */
+export interface TeamsMention {
+  readonly displayName: string;
+  readonly aadObjectId: string;
+  readonly upn: string;
+  /** When set, restricts the mention to specific event types. */
+  readonly triggerOn?: readonly WebhookEventName[];
+}
+
+interface TeamsEntity {
+  readonly type: 'mention';
+  readonly text: string;
+  readonly mentioned: { readonly id: string; readonly name: string };
+}
+
+const isMentionEligible = (mention: TeamsMention, event: WebhookEvent): boolean => {
+  if (!mention.triggerOn || mention.triggerOn.length === 0) return true;
+  return mention.triggerOn.includes(event.event);
+};
 
 const truncateValue = (raw: unknown, max = 240): string => {
   if (raw == null) return '—';
@@ -51,13 +78,36 @@ const headlineFromEvent = (event: WebhookEvent): string => {
   return '(no headline)';
 };
 
+export interface BuildTeamsPayloadOptions {
+  readonly mentions?: readonly TeamsMention[];
+}
+
 /**
  * Build the JSON payload Teams Workflows expects. Returns the
  * stringified body — callers POST it directly so the dispatch
  * layer can sign / log the same string that hits the wire.
+ *
+ * When mentions are passed, a leading TextBlock with `<at>Name</at>`
+ * tokens is prepended to the card body, and the matching
+ * `msteams.entities[]` array is attached so Teams resolves the
+ * mentions into pings.
  */
-export const buildTeamsPayload = (event: WebhookEvent): string => {
+export const buildTeamsPayload = (
+  event: WebhookEvent,
+  options: BuildTeamsPayloadOptions = {},
+): string => {
   const facts = factsFromData(event.data);
+  const eligible = (options.mentions ?? []).filter((m) => isMentionEligible(m, event));
+  const entities: TeamsEntity[] = eligible.map((m) => ({
+    type: 'mention',
+    text: `<at>${m.displayName}</at>`,
+    mentioned: { id: m.aadObjectId, name: m.upn },
+  }));
+  const mentionLine =
+    entities.length > 0
+      ? `Heads up: ${entities.map((e) => e.text).join(' ')}`
+      : null;
+
   const card = {
     type: 'message',
     attachments: [
@@ -82,6 +132,9 @@ export const buildTeamsPayload = (event: WebhookEvent): string => {
               wrap: true,
               text: headlineFromEvent(event),
             },
+            ...(mentionLine
+              ? [{ type: 'TextBlock', wrap: true, text: mentionLine }]
+              : []),
             ...(facts.length > 0
               ? [
                   {
@@ -91,6 +144,7 @@ export const buildTeamsPayload = (event: WebhookEvent): string => {
                 ]
               : []),
           ],
+          ...(entities.length > 0 ? { msteams: { entities } } : {}),
         },
       },
     ],
@@ -112,10 +166,10 @@ export interface TeamsDeliveryResult {
 export const postTeamsWebhook = async (
   url: string,
   event: WebhookEvent,
-  options: { fetch?: typeof fetch } = {},
+  options: { fetch?: typeof fetch; mentions?: readonly TeamsMention[] } = {},
 ): Promise<TeamsDeliveryResult> => {
   const f = options.fetch ?? globalThis.fetch;
-  const body = buildTeamsPayload(event);
+  const body = buildTeamsPayload(event, options.mentions ? { mentions: options.mentions } : {});
   try {
     const res = await f(url, {
       method: 'POST',

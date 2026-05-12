@@ -33,9 +33,6 @@ export const docStatusBarEditConfig = (args: DocStatusBarMountArgs = {}): EditCo
     ],
     editMenuItems: [
       {
-        path: '@/payload/admin/components/ScheduleKebabItem.tsx#ScheduleKebabItem',
-      },
-      {
         path: '@/payload/admin/components/DocKebabExtras.tsx#DocKebabExtras',
       },
     ],

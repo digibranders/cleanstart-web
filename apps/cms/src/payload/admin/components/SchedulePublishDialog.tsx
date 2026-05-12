@@ -25,14 +25,16 @@ type SchedulePublishDialogProps = {
 };
 
 /**
- * Schedule-Publish dialog. Opened via a custom kbd shortcut
- * (Cmd/Ctrl-Shift-S) or in controlled mode by passing `open`/`onClose`
- * props (used by ScheduleKebabItem). Posts a Payload schedulePublish
- * job via the standard payload jobs API:
+ * Schedule-Publish dialog. Two entry points:
  *
+ * 1. Keyboard shortcut (Cmd/Ctrl-Shift-S) — self-managed open state,
+ *    registered as a global admin action component in payload.config.ts.
+ * 2. Controlled mode — pass `open` + `onClose` to embed inside another
+ *    surface (e.g. PublishMenu dropdown).
+ *
+ * Posts a Payload schedulePublish job:
  *   POST /api/payload-jobs
- *
- * with `{ task: 'schedulePublish', input: { docId, collection, when } }`.
+ *   { task: 'schedulePublish', input: { collection, id, when } }
  */
 export const SchedulePublishDialog = ({
   open: openProp,

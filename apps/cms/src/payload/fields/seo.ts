@@ -6,6 +6,7 @@ import {
   validateOverrideForField,
   validateOverrideForFieldOnCollection,
 } from '../lib/jsonld/override-validator';
+import { normaliseText } from '../lib/normalise-text';
 import { mediaUploadField } from './media-upload';
 
 const TITLE_CHAR_HINT = 60;
@@ -56,6 +57,9 @@ const titleField: Field = {
   name: 'title',
   label: 'SEO title',
   type: 'text',
+  hooks: {
+    beforeChange: [({ value }) => normaliseText(value)],
+  },
   admin: {
     description: `SEO title. Falls back to the document title + site default. Aim for ≤ ${TITLE_CHAR_HINT} characters.`,
     // Hidden from the in-form group renderer — the editor edits this
@@ -69,6 +73,9 @@ const descriptionField: Field = {
   name: 'description',
   label: 'SEO description',
   type: 'textarea',
+  hooks: {
+    beforeChange: [({ value }) => normaliseText(value)],
+  },
   admin: {
     description: `SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ ${DESCRIPTION_CHAR_HINT} characters.`,
     // Hidden from the in-form group renderer — the editor edits this

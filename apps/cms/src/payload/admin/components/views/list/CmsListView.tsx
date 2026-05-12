@@ -13,11 +13,16 @@ import {
   SelectionProvider,
   useConfig,
   useListQuery,
+  // Navigation-state exception: useStepNav is a context hook that renders
+  // nothing. DefaultListView calls it to own the breadcrumb; since
+  // CmsListView replaces DefaultListView entirely, we must do the same or
+  // the crumb stays stale on SPA nav and blank on hard refresh.
+  useStepNav,
 } from '@payloadcms/ui';
 import type { ClientCollectionConfig } from 'payload';
 import type { ListViewClientProps } from 'payload';
 import type { ReactElement } from 'react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { ColumnPicker } from './ColumnPicker';
 import { BulkActionBar } from './BulkActionBar';
@@ -64,6 +69,7 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
   } = props;
 
   const { config } = useConfig();
+  const adminRoute = config.routes.admin as string;
   const collectionConfig = useMemo(
     () =>
       config.collections.find((c) => c.slug === collectionSlug),
@@ -71,6 +77,7 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
   );
 
   const { data } = useListQuery();
+  const { setStepNav } = useStepNav();
 
   const [columnPickerOpen, setColumnPickerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -111,6 +118,10 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
     }
     return collectionSlug;
   }, [collectionConfig, collectionSlug]);
+
+  useEffect(() => {
+    setStepNav([{ label: collectionLabel, url: `${adminRoute}/collections/${collectionSlug}` }]);
+  }, [setStepNav, collectionLabel, adminRoute, collectionSlug]);
 
   return (
     <SelectionProvider docs={data?.docs ?? []} totalDocs={data?.totalDocs ?? 0}>

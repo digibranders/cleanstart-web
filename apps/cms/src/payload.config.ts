@@ -17,6 +17,7 @@ import { Categories } from './payload/collections/Categories';
 import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
+import { Integrations } from './payload/collections/Integrations';
 import { JobLocations } from './payload/collections/JobLocations';
 import { Jobs } from './payload/collections/Jobs';
 import { KnowledgeBase } from './payload/collections/KnowledgeBase';
@@ -36,6 +37,11 @@ import { userReassignContentEndpoint } from './payload/endpoints/user-offboard';
 import { publishChecklistEndpoint } from './payload/endpoints/publish-checklist';
 import { dsarFindEndpoint, dsarDeleteEndpoint } from './payload/endpoints/leads-dsar';
 import { retryLeadSyncEndpoint } from './payload/endpoints/retry-lead-sync';
+import {
+  integrationsAuditEndpoint,
+  integrationsHealthEndpoint,
+  integrationsTestEndpoint,
+} from './payload/endpoints/integrations-actions';
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
 import { robotsEndpoint } from './payload/endpoints/robots';
@@ -209,6 +215,7 @@ export default buildConfig({
     AuditLog,
     SearchLog,
     WebhookDeadLetter,
+    Integrations,
     Authors,
     Categories,
     NewsCategories,
@@ -249,6 +256,9 @@ export default buildConfig({
     dsarFindEndpoint,
     dsarDeleteEndpoint,
     retryLeadSyncEndpoint,
+    integrationsTestEndpoint,
+    integrationsHealthEndpoint,
+    integrationsAuditEndpoint,
   ],
   jobs: {
     tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask, retryWebhookTask, reindexMeiliTask],

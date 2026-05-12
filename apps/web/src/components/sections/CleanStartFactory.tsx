@@ -63,9 +63,9 @@ export function CleanStartFactory() {
         aria-labelledby="cleanstart-factory-title"
         className="mx-auto mt-10 grid w-full max-w-[1276px] grid-cols-2 gap-4 px-6 sm:mt-12 sm:grid-cols-3 sm:gap-5 lg:mt-14 lg:grid-cols-5 lg:gap-7"
       >
-        {CARDS.map((card, i) => (
+        {CARDS.map((card) => (
           <div role="listitem" key={card.title}>
-            <FactoryCard {...card} step={i + 1} />
+            <FactoryCard {...card} />
           </div>
         ))}
       </div>

@@ -3,7 +3,6 @@ import { CheckboxField as CheckboxField_fa838d594eaa6e28e24d17add0c5aa91 } from 
 import { SelectField as SelectField_9c71ee466fcdbb40e13298a3fa959d0e } from '@/payload/admin/components/fields/SelectField.tsx'
 import { JsonField as JsonField_c698ed818f2263de63387a332e0e62c8 } from '@/payload/admin/components/fields/JsonField.tsx'
 import { DocHeader as DocHeader_ad90301af1277969698538615cf842dc } from '@/payload/admin/components/DocHeader.tsx'
-import { ScheduleKebabItem as ScheduleKebabItem_b2fe3de723766fada5b43a3f21ddb9a5 } from '@/payload/admin/components/ScheduleKebabItem.tsx'
 import { DocKebabExtras as DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0 } from '@/payload/admin/components/DocKebabExtras.tsx'
 import { DisableUserAction as DisableUserAction_6c8d4d4a3960948e585eb302bcb89460 } from '@/payload/admin/components/DisableUserAction.tsx'
 import { ReassignContentAction as ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca } from '@/payload/admin/components/ReassignContentAction.tsx'
@@ -15,6 +14,9 @@ import { GroupField as GroupField_74bc515fedbf6bc79a8d465c8195685c } from '@/pay
 import { TextareaField as TextareaField_910298ace0fe3204ac012253d7fcff5b } from '@/payload/admin/components/fields/TextareaField.tsx'
 import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
 import { RelationshipField as RelationshipField_093f373a4f5250e712293002deb8de6b } from '@/payload/admin/components/fields/RelationshipField.tsx'
+import { HealthBadge as HealthBadge_89f48d3894398c6d1021775cfdeaf211 } from '@/payload/admin/components/integrations/HealthBadge.tsx'
+import { TestButton as TestButton_0a975e83e531dadfb4f8fa6589a5704a } from '@/payload/admin/components/integrations/TestButton.tsx'
+import { AuditTrail as AuditTrail_eca9fb91faa70a942f7e3507305e451c } from '@/payload/admin/components/integrations/AuditTrail.tsx'
 import { SlugField as SlugField_72967e7957358d52051eede57fbdd787 } from '@/payload/admin/components/SlugField.tsx'
 import { MediaCell as MediaCell_04413d560c21645b4689092eae86b482 } from '@/payload/admin/components/MediaField/MediaCell.tsx'
 import { MediaField as MediaField_1167cf2070c08e9bc2c7602fa9c85984 } from '@/payload/admin/components/MediaField/MediaField.tsx'
@@ -109,7 +111,6 @@ export const importMap = {
   "@/payload/admin/components/fields/SelectField.tsx#SelectField": SelectField_9c71ee466fcdbb40e13298a3fa959d0e,
   "@/payload/admin/components/fields/JsonField.tsx#JsonField": JsonField_c698ed818f2263de63387a332e0e62c8,
   "@/payload/admin/components/DocHeader.tsx#DocHeader": DocHeader_ad90301af1277969698538615cf842dc,
-  "@/payload/admin/components/ScheduleKebabItem.tsx#ScheduleKebabItem": ScheduleKebabItem_b2fe3de723766fada5b43a3f21ddb9a5,
   "@/payload/admin/components/DocKebabExtras.tsx#DocKebabExtras": DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0,
   "@/payload/admin/components/DisableUserAction.tsx#DisableUserAction": DisableUserAction_6c8d4d4a3960948e585eb302bcb89460,
   "@/payload/admin/components/ReassignContentAction.tsx#ReassignContentAction": ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca,
@@ -121,6 +122,9 @@ export const importMap = {
   "@/payload/admin/components/fields/TextareaField.tsx#TextareaField": TextareaField_910298ace0fe3204ac012253d7fcff5b,
   "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
   "@/payload/admin/components/fields/RelationshipField.tsx#RelationshipField": RelationshipField_093f373a4f5250e712293002deb8de6b,
+  "@/payload/admin/components/integrations/HealthBadge.tsx#HealthBadge": HealthBadge_89f48d3894398c6d1021775cfdeaf211,
+  "@/payload/admin/components/integrations/TestButton.tsx#TestButton": TestButton_0a975e83e531dadfb4f8fa6589a5704a,
+  "@/payload/admin/components/integrations/AuditTrail.tsx#AuditTrail": AuditTrail_eca9fb91faa70a942f7e3507305e451c,
   "@/payload/admin/components/SlugField.tsx#SlugField": SlugField_72967e7957358d52051eede57fbdd787,
   "@/payload/admin/components/MediaField/MediaCell.tsx#MediaCell": MediaCell_04413d560c21645b4689092eae86b482,
   "@/payload/admin/components/MediaField/MediaField.tsx#MediaField": MediaField_1167cf2070c08e9bc2c7602fa9c85984,

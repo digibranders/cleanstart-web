@@ -3,26 +3,11 @@ import Image from "next/image";
 export interface FactoryCardProps {
   title: string;
   description: string;
-  /** 1-based pipeline position — rendered as a small step badge. */
-  step?: number;
 }
 
-export function FactoryCard({ title, description, step }: FactoryCardProps) {
+export function FactoryCard({ title, description }: FactoryCardProps) {
   return (
     <div className="cs-factory-card relative h-[374px] w-full overflow-hidden rounded-[24px]">
-      {step !== undefined && (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute left-3 top-3 z-10 flex h-6 min-w-6 items-center justify-center rounded-full px-2 font-sans text-[11px] font-semibold tracking-[0.04em] text-white/90"
-          style={{
-            background: "rgba(255,255,255,0.10)",
-            backdropFilter: "blur(4px)",
-            border: "1px solid rgba(255,255,255,0.18)",
-          }}
-        >
-          0{step}
-        </span>
-      )}
       {/* Layer 1 — purple ellipse (upper-left accent, like Figma Ellipse 46683 #5D04D7) */}
       <div
         className="pointer-events-none absolute"

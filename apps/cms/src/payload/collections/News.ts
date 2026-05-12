@@ -7,6 +7,7 @@ import { schemaAddonsField } from '../fields/schema-addons';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
+import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
 import {
   searchSyncAfterChangeHook,
@@ -35,7 +36,7 @@ export const News: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
+    contentTitleField,
     slugField({ source: 'title' }),
     { name: 'abstract', type: 'textarea' },
     mediaUploadField({ name: 'heroImage', folderHint: 'web/news' }),

@@ -4,7 +4,9 @@ import {
   MAX_ATTEMPTS,
   RETRY_DELAYS_MS,
   destinationsFromEnv,
+  destinationsFromPayload,
   dispatchEvent,
+  mergeDestinations,
   type WebhookEvent,
   type WebhookEventName,
 } from '../lib/webhooks/dispatch';
@@ -49,7 +51,9 @@ export const retryWebhookTask: TaskConfig<'retryWebhook'> = {
       return { output: { retried: 0, resolved: 0, exhausted: 0 } };
     }
 
-    const destinations = destinationsFromEnv();
+    const envDestinations = destinationsFromEnv();
+    const dbDestinations = await destinationsFromPayload(req.payload);
+    const destinations = mergeDestinations(dbDestinations, envDestinations);
     let resolved = 0;
     let exhausted = 0;
 

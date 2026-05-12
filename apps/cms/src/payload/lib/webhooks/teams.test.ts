@@ -63,6 +63,55 @@ describe('buildTeamsPayload', () => {
     });
     expect(raw).toContain('…');
   });
+
+  it('injects msteams.entities[] and an <at> line when mentions are passed', () => {
+    const raw = buildTeamsPayload(baseEvent, {
+      mentions: [
+        {
+          displayName: 'Alex',
+          aadObjectId: 'aad-1',
+          upn: 'alex@cleanstart.com',
+        },
+        {
+          displayName: 'Priya',
+          aadObjectId: 'aad-2',
+          upn: 'priya_fynix.digital#EXT#@cleanstart.onmicrosoft.com',
+        },
+      ],
+    });
+    expect(raw).toContain('<at>Alex</at>');
+    expect(raw).toContain('<at>Priya</at>');
+    const parsed = JSON.parse(raw) as {
+      attachments: {
+        content: {
+          msteams?: { entities: { type: string; mentioned: { id: string; name: string } }[] };
+        };
+      }[];
+    };
+    expect(parsed.attachments[0]?.content.msteams?.entities.length).toBe(2);
+    expect(parsed.attachments[0]?.content.msteams?.entities[0]?.mentioned.id).toBe('aad-1');
+    expect(parsed.attachments[0]?.content.msteams?.entities[1]?.mentioned.name).toContain(
+      '#EXT#',
+    );
+  });
+
+  it('skips mentions whose triggerOn list does not include the event', () => {
+    const raw = buildTeamsPayload(baseEvent, {
+      mentions: [
+        {
+          displayName: 'OnlyLeads',
+          aadObjectId: 'aad-3',
+          upn: 'sales@cleanstart.com',
+          triggerOn: ['lead.submitted'],
+        },
+      ],
+    });
+    const parsed = JSON.parse(raw) as {
+      attachments: { content: { msteams?: unknown } }[];
+    };
+    expect(parsed.attachments[0]?.content.msteams).toBeUndefined();
+    expect(raw).not.toContain('<at>OnlyLeads</at>');
+  });
 });
 
 describe('postTeamsWebhook', () => {

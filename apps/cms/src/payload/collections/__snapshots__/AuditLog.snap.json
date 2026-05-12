@@ -26,6 +26,12 @@
         },
         {
           "value": "schema_override_changed"
+        },
+        {
+          "value": "user_disabled"
+        },
+        {
+          "value": "content_reassigned"
         }
       ]
     },

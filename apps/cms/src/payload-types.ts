@@ -74,6 +74,7 @@ export interface Config {
     'audit-log': AuditLog;
     searchLog: SearchLog;
     webhooks_dead_letter: WebhooksDeadLetter;
+    integrations: Integration;
     authors: Author;
     categories: Category;
     newsCategories: NewsCategory;
@@ -106,6 +107,7 @@ export interface Config {
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
     webhooks_dead_letter: WebhooksDeadLetterSelect<false> | WebhooksDeadLetterSelect<true>;
+    integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
@@ -501,6 +503,73 @@ export interface WebhooksDeadLetter {
    * x-request-id from the originating HTTP request, for log correlation.
    */
   requestId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Outbound channels and analytics read-back wired without a code change. Encrypted secrets, per-row routing.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrations".
+ */
+export interface Integration {
+  id: number;
+  /**
+   * Human-readable name, e.g. "Sales channel · #sales-eng-leads".
+   */
+  label: string;
+  /**
+   * Integration type. Locked after creation — changing kind means delete + recreate.
+   */
+  kind:
+    | 'teamsWorkflow'
+    | 'genericWebhook'
+    | 'zohoCrm'
+    | 'ga4DataApi'
+    | 'gscSearchAnalyticsApi'
+    | 'gscUrlInspectionApi'
+    | 'msClarity'
+    | 'cloudflareWebAnalytics'
+    | 'calComInbound'
+    | 'brevoBounceCallback';
+  /**
+   * Pause without deleting. Disabled rows are skipped by the dispatcher.
+   */
+  enabled?: boolean | null;
+  /**
+   * How this row is configured. Env rows are synthesised from process.env for read-only display; new rows are always "db".
+   */
+  source?: ('db' | 'env') | null;
+  routing: {
+    /**
+     * Which events trigger a delivery to this row.
+     */
+    events: ('document.published' | 'lead.submitted')[];
+    /**
+     * Filter document.published by collection slug. Empty = all collections.
+     */
+    collections?: string[] | null;
+    /**
+     * Filter lead.submitted by form slug. Empty = all forms.
+     */
+    formSlugs?: string[] | null;
+  };
+  /**
+   * Per-kind config (webhook URL, signing secret, OAuth tokens, etc.). Encrypted at rest with PAYLOAD_SECRET-derived AES-256-GCM. Never returned in plaintext after save.
+   */
+  config:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Last time the health badge re-queried webhooks_dead_letter for this row.
+   */
+  lastHealthAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -6340,6 +6409,10 @@ export interface PayloadLockedDocument {
         value: number | WebhooksDeadLetter;
       } | null)
     | ({
+        relationTo: 'integrations';
+        value: number | Integration;
+      } | null)
+    | ({
         relationTo: 'authors';
         value: number | Author;
       } | null)
@@ -6616,6 +6689,27 @@ export interface WebhooksDeadLetterSelect<T extends boolean = true> {
   nextRetryAt?: T;
   resolvedAt?: T;
   requestId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrations_select".
+ */
+export interface IntegrationsSelect<T extends boolean = true> {
+  label?: T;
+  kind?: T;
+  enabled?: T;
+  source?: T;
+  routing?:
+    | T
+    | {
+        events?: T;
+        collections?: T;
+        formSlugs?: T;
+      };
+  config?: T;
+  lastHealthAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

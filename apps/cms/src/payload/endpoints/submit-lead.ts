@@ -222,14 +222,22 @@ export const submitLeadEndpoint: Endpoint = {
     // Server-side re-application of forms.fields[].validation rules.
     // The public form enforces these client-side; this stops a tampered
     // DOM or hand-crafted POST from shipping junk into the leads table.
-    let formDoc: { _status?: string | null; fields?: FormFieldDef[] | null } | null;
+    let formDoc: {
+      _status?: string | null;
+      fields?: FormFieldDef[] | null;
+      slug?: string | null;
+    } | null;
     try {
       formDoc = (await req.payload.findByID({
         collection: 'forms',
         id: numericFormId,
         depth: 0,
         overrideAccess: true,
-      })) as { _status?: string | null; fields?: FormFieldDef[] | null } | null;
+      })) as {
+        _status?: string | null;
+        fields?: FormFieldDef[] | null;
+        slug?: string | null;
+      } | null;
     } catch {
       return invalidFormResponse;
     }
@@ -297,11 +305,12 @@ export const submitLeadEndpoint: Endpoint = {
             event: 'lead.submitted',
             data: {
               formId: numericFormId,
+              ...(formDoc?.slug ? { formSlug: formDoc.slug } : {}),
               duplicate: result.duplicateOfLeadId != null,
               ...(submission.source ? { source: submission.source } : {}),
             },
           },
-          { logger: req.payload.logger },
+          { logger: req.payload.logger, payload: req.payload },
         );
       } catch (webhookErr) {
         req.payload.logger.warn(
