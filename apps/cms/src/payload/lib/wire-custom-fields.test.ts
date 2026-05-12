@@ -152,13 +152,11 @@ describe('wireCustomFields', () => {
     );
   });
 
-  it('wires date fields to the @cleanstart/ui DateTimePicker (Wave 2)', () => {
+  it('leaves date fields to Payload\'s stock DateTime field', () => {
     const wired = wireCustomFields({
       slug: 'demo',
       fields: [{ name: 'publishedAt', type: 'date' }],
     });
-    expect(componentPath(fieldOf(wired, 'publishedAt'))).toBe(
-      '@/payload/admin/components/fields/DateField.tsx#DateField',
-    );
+    expect(componentPath(fieldOf(wired, 'publishedAt'))).toBeUndefined();
   });
 });

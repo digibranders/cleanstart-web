@@ -25,10 +25,9 @@ const FIELD_OVERRIDES: Partial<Record<Field['type'], string>> = {
   text: '@/payload/admin/components/fields/TextField.tsx#TextField',
   textarea: '@/payload/admin/components/fields/TextareaField.tsx#TextareaField',
   number: '@/payload/admin/components/fields/NumberField.tsx#NumberField',
-  // Wave 2: DateField now composes the @cleanstart/ui DateTimePicker
-  // (calendar + time popover, ISO storage, optional timezone). Replaces
-  // stock react-datepicker.
-  date: '@/payload/admin/components/fields/DateField.tsx#DateField',
+  // Date intentionally left to Payload's stock DateTime field — the
+  // bundled calendar / time picker is a better default than our
+  // earlier custom DateField (parked in the codebase for future use).
   email: '@/payload/admin/components/fields/EmailField.tsx#EmailField',
   point: '@/payload/admin/components/fields/PointField.tsx#PointField',
   json: '@/payload/admin/components/fields/JsonField.tsx#JsonField',

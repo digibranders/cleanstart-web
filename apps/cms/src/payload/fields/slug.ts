@@ -1,4 +1,4 @@
-import type { Field } from 'payload';
+import type { Field, Payload, Where } from 'payload';
 
 import { slugify } from '../lib/slugify';
 
@@ -21,6 +21,8 @@ type SlugFieldOptions = {
 const SLUG_LIMIT = 120;
 const SLUG_HINT = 80;
 
+const SLUG_COLLISION_MESSAGE = 'This slug is already in use — pick a different one.';
+
 const validateSlugLength = (
   value: string | string[] | null | undefined,
 ): true | string => {
@@ -29,6 +31,35 @@ const validateSlugLength = (
     return `Slug is ${value.length} characters — keep it under ${SLUG_LIMIT}. Aim for ≤ ${SLUG_HINT}.`;
   }
   return true;
+};
+
+type SlugValidateOptions = {
+  id?: string | number | undefined;
+  data?: Record<string, unknown> | undefined;
+  siblingData?: Record<string, unknown> | undefined;
+  req?: { payload?: Payload };
+  collectionSlug?: string;
+};
+
+const buildCollisionWhere = ({
+  value,
+  id,
+  parent,
+  composite,
+}: {
+  value: string;
+  id: string | number | undefined;
+  parent: unknown;
+  composite: boolean;
+}): Where => {
+  const where: Where = { slug: { equals: value } };
+  if (id != null) {
+    where.id = { not_equals: id };
+  }
+  if (composite) {
+    where.parent = parent == null ? { exists: false } : { equals: parent };
+  }
+  return where;
 };
 
 /**
@@ -64,7 +95,44 @@ export const slugField = ({ source = 'name', composite = false }: SlugFieldOptio
       },
     },
   },
-  validate: validateSlugLength,
+  validate: async (
+    value: string | string[] | null | undefined,
+    options: SlugValidateOptions,
+  ): Promise<true | string> => {
+    const lengthResult = validateSlugLength(value);
+    if (lengthResult !== true) return lengthResult;
+
+    if (typeof value !== 'string' || value.trim().length === 0) return true;
+
+    const payload = options.req?.payload;
+    const collectionSlug = options.collectionSlug;
+    if (!payload || !collectionSlug) return true;
+
+    const parent = composite
+      ? (options.siblingData?.parent ?? options.data?.parent ?? null)
+      : null;
+
+    const where = buildCollisionWhere({
+      value,
+      id: options.id,
+      parent,
+      composite,
+    });
+
+    const result = await payload.find({
+      collection: collectionSlug as never,
+      where,
+      limit: 1,
+      depth: 0,
+      pagination: false,
+      overrideAccess: true,
+    });
+
+    if (result.docs.length > 0) {
+      return SLUG_COLLISION_MESSAGE;
+    }
+    return true;
+  },
   hooks: {
     beforeValidate: [
       ({ data, value }) => {

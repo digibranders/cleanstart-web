@@ -97,12 +97,12 @@ export const TabsField = (props: TabsFieldClientProps): ReactElement => {
               parentSchemaPath={schemaPath ?? ''}
               parentIndexPath=""
               permissions={
-                permissions && typeof permissions === 'object' && 'fields' in permissions
-                  ? (permissions.fields as Record<string, never>) ?? {}
-                  : {}
+                permissions === true
+                  ? permissions
+                  : ((permissions as { fields?: unknown })?.fields as Record<string, never>) ?? {}
               }
               readOnly={readOnly ?? false}
-              {...(forceRender !== undefined ? { forceRender } : {})}
+              forceRender={forceRender ?? true}
             />
           </div>
         );

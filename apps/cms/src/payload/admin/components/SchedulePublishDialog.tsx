@@ -8,6 +8,8 @@ import {
   DialogHeader,
 } from '@cleanstart/ui';
 import { useDocumentInfo } from '@payloadcms/ui';
+
+import { showToast } from './ToastBus';
 import type { ReactElement } from 'react';
 import { useEffect, useId, useState } from 'react';
 
@@ -75,6 +77,7 @@ export const SchedulePublishDialog = (): ReactElement | null => {
       }
       setOpen(false);
       setWhen(null);
+      showToast({ message: 'Publish scheduled.', type: 'success' });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Network error');
     } finally {

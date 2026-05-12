@@ -30,8 +30,8 @@ export const GroupField = (props: GroupFieldClientProps): ReactElement => {
     typeof field.admin?.description === 'string' ? field.admin.description : undefined;
 
   return (
-    <fieldset className="cs-group">
-      {labelText ? <legend className="cs-group__legend">{labelText}</legend> : null}
+    <section className="cs-group" aria-label={labelText || undefined}>
+      {labelText ? <header className="cs-group__legend">{labelText}</header> : null}
       {description ? <p className="cs-group__description">{description}</p> : null}
       <div className="cs-group__body">
         <RenderFields
@@ -40,15 +40,15 @@ export const GroupField = (props: GroupFieldClientProps): ReactElement => {
           parentSchemaPath={schemaPath ?? path}
           parentIndexPath=""
           permissions={
-            permissions && typeof permissions === 'object' && 'fields' in permissions
-              ? (permissions.fields as Record<string, never>) ?? {}
-              : {}
+            permissions === true
+              ? permissions
+              : ((permissions as { fields?: unknown })?.fields as Record<string, never>) ?? {}
           }
           readOnly={readOnly ?? false}
-          {...(forceRender !== undefined ? { forceRender } : {})}
+          forceRender={forceRender ?? true}
         />
       </div>
-    </fieldset>
+    </section>
   );
 };
 

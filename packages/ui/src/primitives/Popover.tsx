@@ -49,8 +49,8 @@ export const Popover = (props: Props): ReactElement | null => {
   const lastFocusedRef = useRef<HTMLElement | null>(null);
 
   const pos = useAnchoredPosition({
-    anchor: anchorRef.current,
-    floating: floatingRef.current,
+    anchorRef,
+    floatingRef,
     open,
     placement,
     offset,

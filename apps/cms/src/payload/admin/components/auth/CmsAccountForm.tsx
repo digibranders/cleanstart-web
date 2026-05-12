@@ -1,9 +1,10 @@
 'use client';
 
-import { useToast } from '@cleanstart/ui';
 import { useAuth, useConfig } from '@payloadcms/ui';
 import type { ChangeEvent, FormEvent, ReactElement } from 'react';
 import { useEffect, useState } from 'react';
+
+import { showToast } from '../ToastBus';
 
 type FormState = {
   name: string;
@@ -20,7 +21,6 @@ type FormState = {
 export const CmsAccountForm = (): ReactElement => {
   const { user } = useAuth();
   const { config } = useConfig();
-  const { push } = useToast();
 
   const [form, setForm] = useState<FormState>({
     name: '',
@@ -52,7 +52,7 @@ export const CmsAccountForm = (): ReactElement => {
     e.preventDefault();
     if (!user) return;
     if (form.newPassword && form.newPassword !== form.confirmPassword) {
-      push({ message: 'New password and confirmation do not match.', tone: 'error' });
+      showToast({ message: 'New password and confirmation do not match.', type: 'error' });
       return;
     }
     setBusy(true);
@@ -70,15 +70,21 @@ export const CmsAccountForm = (): ReactElement => {
         body: JSON.stringify(body),
       });
       if (!res.ok) {
-        const detail = await res.text();
-        push({
-          title: 'Save failed',
-          message: detail || `HTTP ${res.status}`,
-          tone: 'error',
-        });
+        const raw = await res.text();
+        let errorMessage = 'Your account could not be saved. Please try again.';
+        try {
+          const json = JSON.parse(raw) as { errors?: Array<{ message?: string }>; message?: string };
+          const first = json.errors?.[0]?.message ?? json.message;
+          if (typeof first === 'string' && first.trim().length > 0 && first.length <= 120) {
+            errorMessage = first.trim();
+          }
+        } catch {
+          // keep the fallback message
+        }
+        showToast({ message: errorMessage, type: 'error' });
         return;
       }
-      push({ message: 'Account updated.', tone: 'success' });
+      showToast({ message: 'Account updated.', type: 'success' });
       setForm((prev) => ({ ...prev, newPassword: '', confirmPassword: '' }));
     } finally {
       setBusy(false);

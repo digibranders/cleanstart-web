@@ -41,6 +41,22 @@ const slugify = (input: string | null | undefined): string => {
     .replace(/^-+|-+$/g, '');
 };
 
+/**
+ * Slug-safe live normaliser for onChange. Converts invalid characters
+ * to hyphens and collapses runs, but does NOT strip leading/trailing
+ * hyphens — that would eat the `-` the editor just typed before they
+ * can finish the next word segment. Full trim happens on blur.
+ */
+const slugifyLive = (input: string): string => {
+  if (!input) return '';
+  return input
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/-{2,}/g, '-');
+};
+
 interface EditContext {
   readonly collection: string;
   readonly id: string | null;
@@ -125,16 +141,23 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const next = event.target.value;
-      // Slugify on the fly so the editor can't accidentally type
-      // capitals / spaces that would later break the URL.
-      const cleaned = slugify(next);
+      // Live normalise: keep hyphens the editor is actively typing but
+      // don't strip trailing ones yet — that prevents typing `word-next`.
+      const cleaned = slugifyLive(next);
       setSlug(cleaned);
-      if (cleaned !== slugify(docTitleValue ?? '')) {
+      if (slugify(cleaned) !== slugify(docTitleValue ?? '')) {
         setManualMode(true);
       }
     },
     [docTitleValue, setSlug],
   );
+
+  const handleBlur = useCallback(() => {
+    const trimmed = slugify(slugValue ?? '');
+    if (trimmed !== (slugValue ?? '')) {
+      setSlug(trimmed);
+    }
+  }, [slugValue, setSlug]);
 
   const handleResetToTitle = useCallback(() => {
     const next = slugify(docTitleValue ?? '');
@@ -234,6 +257,7 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
         type="text"
         value={slugValue ?? ''}
         onChange={handleChange}
+        onBlur={handleBlur}
         placeholder={docTitleEmpty ? 'Set the title first' : ''}
         spellCheck={false}
         autoComplete="off"

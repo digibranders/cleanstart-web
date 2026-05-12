@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import type { RefObject } from 'react';
 
 export type Placement =
   | 'bottom-start'
@@ -11,8 +12,11 @@ export type Placement =
   | 'left-start';
 
 type Args = {
-  readonly anchor: HTMLElement | null;
-  readonly floating: HTMLElement | null;
+  /** Ref to the trigger element. Read via `.current` inside the
+   *  recompute loop so a freshly-mounted floating element resolves
+   *  on its first frame without depending on a re-render. */
+  readonly anchorRef: RefObject<HTMLElement | null>;
+  readonly floatingRef: RefObject<HTMLElement | null>;
   readonly open: boolean;
   readonly placement?: Placement;
   readonly offset?: number;
@@ -78,8 +82,8 @@ const clamp = (pos: Position, floatRect: DOMRect, padding: number): Position => 
  */
 export const useAnchoredPosition = (args: Args): Position | null => {
   const {
-    anchor,
-    floating,
+    anchorRef,
+    floatingRef,
     open,
     placement = 'bottom-start',
     offset = 6,
@@ -88,12 +92,14 @@ export const useAnchoredPosition = (args: Args): Position | null => {
   const [pos, setPos] = useState<Position | null>(null);
 
   const update = useCallback((): void => {
+    const anchor = anchorRef.current;
+    const floating = floatingRef.current;
     if (!anchor || !floating) return;
     const aRect = anchor.getBoundingClientRect();
     const fRect = floating.getBoundingClientRect();
     const raw = compute(aRect, fRect, placement, offset);
     setPos(clamp(raw, fRect, viewportPadding));
-  }, [anchor, floating, placement, offset, viewportPadding]);
+  }, [anchorRef, floatingRef, placement, offset, viewportPadding]);
 
   useEffect(() => {
     if (!open) {

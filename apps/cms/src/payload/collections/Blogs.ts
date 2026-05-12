@@ -66,8 +66,10 @@ export const Blogs: CollectionConfig = {
       type: 'array',
       labels: { singular: 'FAQ', plural: 'FAQs' },
       admin: {
-        description:
-          'Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.',
+        // Start collapsed — long answer paragraphs make an expanded
+        // 5-FAQ list dominate the form; the row summary already shows
+        // the question text, so collapsed is the better default.
+        initCollapsed: true,
         components: {
           RowLabel: '@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel',
         },
@@ -179,23 +181,20 @@ export const Blogs: CollectionConfig = {
       admin: {
         readOnly: true,
         // Start each TOC row collapsed — they're auto-generated read-only
-        // metadata; the row label (TocRowLabel) already surfaces the
-        // heading text + level inline, so the level/text/anchor triple
-        // doesn't need to be expanded by default.
+        // metadata. The row summary surfaces the heading text inline so
+        // expand only reveals the slug-anchor.
         initCollapsed: true,
-        description: 'Auto-built from H2/H3 headings in the body on save.',
         components: {
           RowLabel: '@/payload/admin/components/TocRowLabel.tsx#TocRowLabel',
         },
       },
       fields: [
-        // Sub-fields explicitly readOnly: parent array's `admin.readOnly`
-        // doesn't propagate to children when fields are rendered by
-        // custom Field adapters. Belt + suspenders alongside the
-        // parent's `access.update: () => false` (which already blocks
-        // server-side writes).
-        { name: 'level', type: 'number', admin: { readOnly: true } },
-        { name: 'text', type: 'text', admin: { readOnly: true } },
+        // `level` + `text` are auto-derived and shown in the row summary —
+        // hidden from the row body to keep TOC rows compact. `anchor` is
+        // the only thing worth exposing on expand (the slug used in the
+        // permalink fragment).
+        { name: 'level', type: 'number', admin: { readOnly: true, hidden: true } },
+        { name: 'text', type: 'text', admin: { readOnly: true, hidden: true } },
         { name: 'anchor', type: 'text', admin: { readOnly: true } },
       ],
     },

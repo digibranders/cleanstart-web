@@ -40,8 +40,8 @@ export const DropdownMenu = (props: Props): ReactElement | null => {
   const floatingRef = useRef<HTMLDivElement | null>(null);
 
   const pos = useAnchoredPosition({
-    anchor: anchorRef.current,
-    floating: floatingRef.current,
+    anchorRef,
+    floatingRef,
     open,
     placement,
     offset: 6,

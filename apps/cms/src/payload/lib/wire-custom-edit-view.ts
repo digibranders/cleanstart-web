@@ -1,46 +1,22 @@
 import type { CollectionConfig, GlobalConfig } from 'payload';
 
-const CMS_EDIT_VIEW = '@/payload/admin/components/views/edit/CmsEditView.tsx#CmsEditView';
-const CMS_VERSIONS_VIEW =
-  '@/payload/admin/components/views/versions/CmsVersionsView.tsx#CmsVersionsView';
-
 /**
- * Stamp the CleanStart custom edit view onto every collection + global
- * that doesn't already declare its own. Mirrors the shape of
- * `wireCustomFields` and `wireCustomListView` so collection + global
- * definitions stay declarative.
+ * Custom edit-view stamp — currently a no-op pass-through.
  *
- * Per-entity overrides win — if an author has set
- * `admin.components.views.edit.default`, we don't touch it. This only
- * stamps the `default` sub-view; `versions` / `version` rebuilds land
- * in Wave 4 part 2.
+ * The previous implementation pointed `views.edit.default` at
+ * `CmsEditView`, but replacing Payload's `DefaultEditView` strips the
+ * `<Form>` provider that supplies `getData` / `getFields` /
+ * `dispatchFields` / `addFieldRow` to every `useField` call below us
+ * (including the custom Field components stamped by
+ * `wireCustomFields`). Rebuilding that orchestration — `<Form>` with
+ * the right `initialState`, autosave plumbing, document-lock modals,
+ * `<OperationProvider>` — is a deferred wave on its own.
+ *
+ * Until that wave lands, fall back to Payload's stock edit chrome
+ * while keeping every per-field custom component (TextField,
+ * TextareaField, ArrayField, BlocksField, RelationshipField, etc.).
+ * The list view's custom chrome (`wireCustomListView`) is unaffected.
  */
 export const wireCustomEditView = <T extends CollectionConfig | GlobalConfig>(
   entity: T,
-): T => {
-  const adminCfg = (entity.admin ?? {}) as Record<string, unknown>;
-  const components = (adminCfg.components ?? {}) as Record<string, unknown>;
-  const views = (components.views ?? {}) as Record<string, unknown>;
-  const edit = (views.edit ?? {}) as Record<string, unknown>;
-  if (edit.default || edit.Component) return entity;
-
-  return {
-    ...entity,
-    admin: {
-      ...adminCfg,
-      components: {
-        ...components,
-        views: {
-          ...views,
-          edit: {
-            ...edit,
-            default: { Component: CMS_EDIT_VIEW },
-            ...(edit.versions
-              ? {}
-              : { versions: { Component: CMS_VERSIONS_VIEW } }),
-          },
-        },
-      },
-    },
-  } as T;
-};
+): T => entity;

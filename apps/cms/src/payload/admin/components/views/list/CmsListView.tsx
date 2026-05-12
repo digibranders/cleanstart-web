@@ -9,10 +9,12 @@ import {
 } from '@cleanstart/ui';
 import {
   Gutter,
-  ListQueryProvider,
+  PageControls,
   SelectionProvider,
   useConfig,
+  useListQuery,
 } from '@payloadcms/ui';
+import type { ClientCollectionConfig } from 'payload';
 import type { ListViewClientProps } from 'payload';
 import type { ReactElement } from 'react';
 import { useMemo, useRef, useState } from 'react';
@@ -30,8 +32,10 @@ import { ListHeader } from './ListHeader';
  * pre-rendered `Table` slot. We:
  *   1. wrap with our chrome (header, search, sort summary, column
  *      picker, bulk-action bar)
- *   2. mount `ListQueryProvider` + `SelectionProvider` so all the
- *      Payload data hooks the inner cells use keep working
+ *   2. mount `SelectionProvider` so bulk-action cells keep working
+ *      (Payload's RSC pipeline already wraps us in `ListQueryProvider`
+ *      — re-mounting one here would shadow `data` to undefined and
+ *      crash the list view)
  *   3. delegate the actual <table> render to the supplied slot —
  *      virtualisation lands in Wave 8 hardening once column widths
  *      are stable
@@ -65,6 +69,8 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
       config.collections.find((c) => c.slug === collectionSlug),
     [config, collectionSlug],
   );
+
+  const { data } = useListQuery();
 
   const [columnPickerOpen, setColumnPickerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -107,13 +113,8 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
   }, [collectionConfig, collectionSlug]);
 
   return (
-    <ListQueryProvider
-      collectionSlug={collectionSlug}
-      data={undefined}
-      modifySearchParams
-    >
-      <SelectionProvider docs={[]} totalDocs={0}>
-        <div className="cs-list">
+    <SelectionProvider docs={data?.docs ?? []} totalDocs={data?.totalDocs ?? 0}>
+      <div className="cs-list">
           <Gutter className="cs-list__gutter">
             {BeforeList}
             <ListHeader
@@ -138,6 +139,10 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
               {Table}
             </section>
             {AfterListTable}
+
+            {collectionConfig && (data?.docs?.length ?? 0) > 0 ? (
+              <PageControls collectionConfig={collectionConfig as ClientCollectionConfig} />
+            ) : null}
 
             {AfterList}
           </Gutter>
@@ -167,9 +172,8 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
               <ColumnPicker columnState={columnState} />
             </DrawerBody>
           </Drawer>
-        </div>
-      </SelectionProvider>
-    </ListQueryProvider>
+      </div>
+    </SelectionProvider>
   );
 };
 

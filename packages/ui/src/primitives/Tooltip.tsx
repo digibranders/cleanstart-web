@@ -28,8 +28,8 @@ export const Tooltip = (props: Props): ReactElement => {
   const [open, setOpen] = useState(false);
 
   const pos = useAnchoredPosition({
-    anchor: anchorRef.current,
-    floating: floatingRef.current,
+    anchorRef,
+    floatingRef,
     open,
     placement,
     offset: 8,

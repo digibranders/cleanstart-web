@@ -185,11 +185,67 @@
   }
 }
 
-// Bulk-select checkbox column — narrow, neutral background.
-.table thead th:has(input[type='checkbox']),
-.table tbody td:has(input[type='checkbox']) {
+// Column widths — switch to fixed table-layout so per-column `width`
+// declarations are honoured strictly. With auto-layout the browser
+// ignored both `width: 1px` (couldn't shrink below intrinsic min) and
+// `max-width: 320px` (auto-layout ignores max-width on cells). Fixed
+// layout treats the first row's column widths as authoritative.
+//
+// Payload renders list tables as `<div class="table"><table>...`, so
+// the wrapper carries `.table` but the `<table>` element itself is
+// class-less. Target the actual `<table>` via the `.table > table`
+// child combinator so our table-layout / width takes effect.
+.table > table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.table thead th,
+.table tbody td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table thead th[id='heading-_select'],
+.table tbody td.cell-_select {
   width: 36px;
-  padding-inline: var(--cs-space-3);
+  padding-inline: var(--cs-space-2);
+
+  input[type='checkbox'] { margin: 0; }
+}
+
+// Status / updatedAt / date columns — content fits in 160-200px.
+.table thead th[id='heading-_status'],
+.table tbody td.cell-_status { width: 200px; }
+
+.table thead th[id='heading-updatedAt'],
+.table thead th[id='heading-createdAt'],
+.table thead th[id='heading-publicationDate'],
+.table tbody td.cell-updatedAt,
+.table tbody td.cell-createdAt,
+.table tbody td.cell-publicationDate { width: 160px; }
+
+// Relationship columns (authors, categories, etc.) — natural pill width.
+.table thead th[id='heading-authors'],
+.table thead th[id='heading-categories'],
+.table thead th[id='heading-newsCategories'],
+.table thead th[id='heading-knowledgeCategories'],
+.table tbody td.cell-authors,
+.table tbody td.cell-categories,
+.table tbody td.cell-newsCategories,
+.table tbody td.cell-knowledgeCategories { width: 180px; }
+
+// Title-style cells (the primary link column) — soak up remaining
+// width. With table-layout: fixed and no explicit width on these,
+// they absorb the leftover proportionally.
+.table tbody td.cell-title > a,
+.table tbody td.cell-name > a,
+.table tbody td.cell-question > a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 // ─── Number cells: tabular figures so digits don't wobble ────────

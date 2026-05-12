@@ -1,9 +1,17 @@
 'use client';
 
-import { useDocumentInfo, useField } from '@payloadcms/ui';
+import { useAuth, useDocumentInfo, useField } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
+import {
+  AUTO_EMITTED_TYPES_BY_COLLECTION,
+  buildIngestPlan,
+  parseLenientMulti,
+  type IngestPlan,
+  type IngestPlanItem,
+} from '../../lib/jsonld/override-validator';
 import {
   type BadgeSeverity,
   type BlobAudit,
@@ -12,16 +20,7 @@ import {
 import { ChevronDown } from './icons/Chevron';
 
 type SchemaPreviewFieldProps = {
-  /**
-   * URL prefix passed by the seoSidebarFields helper, e.g. `/blog`.
-   * Used to compose the public URL for the "Test in Rich Results"
-   * deep-link. Empty string when sourceField already carries a full
-   * path (Pages).
-   */
   pathPrefix?: string;
-  /**
-   * Doc-level field that owns the URL part. Defaults to `slug`.
-   */
   sourceField?: string;
 };
 
@@ -42,18 +41,10 @@ const SUPPORTED_COLLECTIONS = new Set([
   'resources',
 ]);
 
+const MAX_UPLOAD_BYTES = 64 * 1024;
+
 const trimSlash = (s: string): string => s.replace(/^\/+|\/+$/g, '');
 
-// Binary Valid / Invalid display for the Schema (JSON-LD) card.
-// "Improvable" (required fields present but some recommended missing)
-// is intentionally collapsed into Valid here — per SEO-team direction
-// the badge is a pass/fail signal, not a tier. The recommended-missing
-// list still shows below the badge so editors see the nudge to fill
-// the optional fields; the badge just doesn't change tier for them.
-//
-// The underlying audit lib (lib/jsonld/spec/required-fields.ts)
-// continues to compute the four-tier severity; other consumers
-// (e.g. the SEO health score card) use the nuanced version.
 const severityCopy: Record<
   BadgeSeverity,
   { label: string; tone: string; hint: string }
@@ -66,7 +57,7 @@ const severityCopy: Record<
   amber: {
     label: 'Valid',
     tone: 'var(--color-success-500, #00c46a)',
-    hint: 'Required fields present. Some recommended fields are missing — see the list below for opt-in improvements.',
+    hint: 'Required fields present. Some recommended fields are missing.',
   },
   red: {
     label: 'Invalid',
@@ -83,36 +74,50 @@ const severityCopy: Record<
 interface FetchState {
   status: 'idle' | 'loading' | 'ok' | 'error' | 'unsupported' | 'unpublished';
   blobs: readonly Record<string, unknown>[];
+  fromPreview: boolean;
+  autoTypes: ReadonlySet<string>;
   error?: string;
 }
 
-/**
- * Tier 1 of the Schema sidebar plan — a read-only preview card that
- * shows editors exactly what JSON-LD their page will emit, with a
- * spec-compliance badge and a one-click "Test in Rich Results"
- * deep-link.
- *
- * Data flows:
- *  - `useDocumentInfo()` gives us collection + numeric id.
- *  - We call the existing `/api/jsonld/:collection/:id` endpoint.
- *  - On the response, we run each blob through `auditBlob` to compute
- *    the badge severity.
- *  - The card refetches when the doc id changes or the editor saves
- *    (we listen for the form's `_status` field, which Payload bumps on
- *    every save).
- *
- * Tier 2 (add-ons) and Tier 3 (admin-only raw override) plug into
- * the same blob list later — the dispatcher will append them server-
- * side, and this preview will surface them with no UI changes here.
- */
+const blobTypeOf = (blob: Record<string, unknown>): string => {
+  const raw = blob['@type'];
+  if (typeof raw === 'string') return raw;
+  if (Array.isArray(raw) && typeof raw[0] === 'string') return raw[0];
+  return 'Unknown';
+};
+
+const stringifyValue = (value: unknown): string => {
+  if (value == null) return '';
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return '';
+  }
+};
+
+const overrideBlobsOf = (value: unknown): Record<string, unknown>[] => {
+  if (value == null) return [];
+  if (Array.isArray(value)) return value as Record<string, unknown>[];
+  return [value as Record<string, unknown>];
+};
+
 export const SchemaPreviewField = (
   props: SchemaPreviewFieldProps,
 ): ReactElement => {
   const { pathPrefix = '', sourceField = 'slug' } = props;
   const headingId = useId();
+  const { user } = useAuth();
   const { id: docId, collectionSlug } = useDocumentInfo();
   const { value: statusValue } = useField<string>({ path: '_status' });
   const { value: sourceValue } = useField<string>({ path: sourceField });
+  const { value: overrideValue, setValue: setOverrideValue } = useField<unknown>({
+    path: 'seo.additionalSchema',
+  });
+
+  const isAdmin = useMemo(() => {
+    const roles = (user as { roles?: readonly string[] } | null | undefined)?.roles;
+    return Array.isArray(roles) && roles.includes('admin');
+  }, [user]);
 
   const supported = useMemo(
     () => (collectionSlug ? SUPPORTED_COLLECTIONS.has(collectionSlug) : false),
@@ -129,63 +134,96 @@ export const SchemaPreviewField = (
   const [fetchState, setFetchState] = useState<FetchState>({
     status: 'idle',
     blobs: [],
+    fromPreview: false,
+    autoTypes: new Set(),
   });
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  // Refetch when the doc id changes or after a save (status flips).
+  const persistedTextRef = useRef<string>(stringifyValue(overrideValue));
   useEffect(() => {
-    if (docId == null) {
-      setFetchState({ status: 'idle', blobs: [] });
-      return undefined;
-    }
-    if (!collectionSlug) {
-      setFetchState({ status: 'idle', blobs: [] });
+    persistedTextRef.current = stringifyValue(overrideValue);
+  }, [overrideValue]);
+
+  useEffect(() => {
+    if (docId == null || !collectionSlug) {
+      setFetchState({ status: 'idle', blobs: [], fromPreview: false, autoTypes: new Set() });
       return undefined;
     }
     if (!supported) {
-      setFetchState({ status: 'unsupported', blobs: [] });
+      setFetchState({ status: 'unsupported', blobs: [], fromPreview: false, autoTypes: new Set() });
       return undefined;
     }
-    if (statusValue !== 'published') {
-      setFetchState({ status: 'unpublished', blobs: [] });
+
+    const canPreview = isAdmin && (overrideValue != null || statusValue !== 'published');
+
+    if (!canPreview && statusValue !== 'published') {
+      setFetchState({ status: 'unpublished', blobs: [], fromPreview: false, autoTypes: new Set() });
       return undefined;
     }
 
     let cancelled = false;
-    setFetchState((s) => ({ status: 'loading', blobs: s.blobs }));
+    setFetchState((s) => ({ ...s, status: 'loading' }));
 
-    fetch(
-      `/api/jsonld/${encodeURIComponent(collectionSlug)}/${encodeURIComponent(String(docId))}`,
-      { credentials: 'include' },
-    )
+    const url = `/api/jsonld/${encodeURIComponent(collectionSlug)}/${encodeURIComponent(String(docId))}`;
+
+    const request: Promise<Response> = canPreview
+      ? fetch(url, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ additionalSchema: overrideValue ?? null }),
+        })
+      : fetch(url, { credentials: 'include' });
+
+    request
       .then(async (res) => {
         if (!res.ok) {
           const body = (await res.json().catch(() => null)) as
-            | { error?: string }
+            | { error?: string; message?: string }
             | null;
-          throw new Error(body?.error ?? `HTTP ${res.status}`);
+          throw new Error(body?.message ?? body?.error ?? `HTTP ${res.status}`);
         }
         return res.json() as Promise<{ blobs?: Record<string, unknown>[] }>;
       })
       .then((body) => {
         if (cancelled) return;
         const blobs = Array.isArray(body.blobs) ? body.blobs : [];
-        setFetchState({ status: 'ok', blobs });
+        const overrideBlobsList = canPreview ? overrideBlobsOf(overrideValue) : [];
+        const overrideTypes = new Set(overrideBlobsList.map(blobTypeOf));
+        const autoTypes = new Set<string>();
+        for (const b of blobs) {
+          const t = blobTypeOf(b);
+          if (!overrideTypes.has(t)) autoTypes.add(t);
+        }
+        setFetchState({ status: 'ok', blobs, fromPreview: canPreview, autoTypes });
       })
       .catch((err: Error) => {
         if (cancelled) return;
-        setFetchState({ status: 'error', blobs: [], error: err.message });
+        setFetchState({
+          status: 'error',
+          blobs: [],
+          fromPreview: false,
+          autoTypes: new Set(),
+          error: err.message,
+        });
       });
 
     return () => {
       cancelled = true;
     };
-  }, [docId, collectionSlug, statusValue, supported]);
+  }, [docId, collectionSlug, statusValue, supported, overrideValue, isAdmin]);
 
   const audit = useMemo(
     () => auditBlobList(fetchState.blobs),
     [fetchState.blobs],
+  );
+
+  const overrideBlobs = useMemo(() => overrideBlobsOf(overrideValue), [overrideValue]);
+  const overrideTypeSet = useMemo(
+    () => new Set(overrideBlobs.map(blobTypeOf)),
+    [overrideBlobs],
   );
 
   const handleCopy = useCallback(() => {
@@ -206,6 +244,44 @@ export const SchemaPreviewField = (
     [publicUrl],
   );
 
+  const overallSeverity: BadgeSeverity = (() => {
+    if (fetchState.status === 'ok') return audit.severity;
+    if (
+      fetchState.status === 'unsupported' ||
+      fetchState.status === 'unpublished' ||
+      fetchState.status === 'idle' ||
+      fetchState.status === 'loading'
+    ) {
+      return 'grey';
+    }
+    return 'red';
+  })();
+
+  const overallLabel: string =
+    fetchState.status === 'unsupported'
+      ? 'No builder'
+      : fetchState.status === 'unpublished'
+        ? 'Draft'
+        : fetchState.status === 'loading'
+          ? 'Checking…'
+          : fetchState.status === 'error'
+            ? 'Error'
+            : severityCopy[audit.severity].label;
+
+  const handleModalApply = useCallback(
+    (next: readonly Record<string, unknown>[]) => {
+      if (next.length === 0) {
+        setOverrideValue(null);
+      } else if (next.length === 1) {
+        setOverrideValue(next[0]);
+      } else {
+        setOverrideValue(next);
+      }
+      setModalOpen(false);
+    },
+    [setOverrideValue],
+  );
+
   return (
     <div className="cs-schema-preview" data-expanded={expanded ? 'true' : 'false'}>
       <button
@@ -216,30 +292,7 @@ export const SchemaPreviewField = (
         onClick={() => setExpanded((v) => !v)}
       >
         <span className="cs-schema-preview__title">Schema (JSON-LD)</span>
-        <SeverityChip
-          severity={
-            fetchState.status === 'ok'
-              ? audit.severity
-              : fetchState.status === 'unsupported'
-                ? 'grey'
-                : fetchState.status === 'unpublished'
-                  ? 'grey'
-                  : fetchState.status === 'error'
-                    ? 'red'
-                    : 'grey'
-          }
-          label={
-            fetchState.status === 'unsupported'
-              ? 'No builder'
-              : fetchState.status === 'unpublished'
-                ? 'Draft'
-                : fetchState.status === 'loading'
-                  ? 'Checking…'
-                  : fetchState.status === 'error'
-                    ? 'Error'
-                    : severityCopy[audit.severity].label
-          }
-        />
+        <SeverityChip severity={overallSeverity} label={overallLabel} />
         <span className="cs-schema-preview__chevron" aria-hidden="true">
           <ChevronDown />
         </span>
@@ -254,20 +307,32 @@ export const SchemaPreviewField = (
             richResultsUrl={richResultsUrl}
             copied={copied}
             onCopy={handleCopy}
+            overrideTypes={overrideTypeSet}
+            isAdmin={isAdmin}
+            supported={supported}
+            overrideCount={overrideBlobs.length}
+            onOpenEditor={() => setModalOpen(true)}
           />
+
+          {!isAdmin && overrideBlobs.length > 0 && (
+            <p className="cs-schema-preview__hint">
+              Custom additions: {overrideBlobs.length} blob
+              {overrideBlobs.length === 1 ? '' : 's'} (
+              {Array.from(overrideTypeSet).join(', ')}). Admin role required to edit.
+            </p>
+          )}
         </div>
       )}
-      {/* Layered add-ons UI is intentionally NOT mounted here. The
-          underlying `schemaAddons` blocks field renders only `blockName`
-          for each row — Payload doesn't fetch the per-block schema map
-          for any of the 6 add-on types (HowTo / Video / FAQ / Review /
-          Software / BreadcrumbList), so editors can add chips but can't
-          fill the actual fields. Until that's fixed, exposing a
-          half-working "Add" affordance is worse than no affordance.
-          Data still flows through the field for API-driven writes
-          (Local API, scripts, future migrations) — the dispatcher reads
-          schemaAddons unchanged. Re-mount `<SchemaAddonsSection />` here
-          once schema-addons.ts block configs render their fields. */}
+
+      {modalOpen && (
+        <SchemaOverrideModal
+          collectionSlug={collectionSlug ?? null}
+          siteOrigin={DEFAULT_SITE_URL}
+          currentOverrides={overrideBlobs}
+          onApply={handleModalApply}
+          onCancel={() => setModalOpen(false)}
+        />
+      )}
     </div>
   );
 };
@@ -297,25 +362,45 @@ const SchemaBodyContent = (props: {
   richResultsUrl: string | null;
   copied: boolean;
   onCopy: () => void;
+  overrideTypes: ReadonlySet<string>;
+  isAdmin: boolean;
+  supported: boolean;
+  overrideCount: number;
+  onOpenEditor: () => void;
 }): ReactElement => {
-  const { fetchState, audit, publicUrl, richResultsUrl, copied, onCopy } = props;
+  const {
+    fetchState,
+    audit,
+    publicUrl,
+    richResultsUrl,
+    copied,
+    onCopy,
+    overrideTypes,
+    isAdmin,
+    supported,
+    overrideCount,
+    onOpenEditor,
+  } = props;
 
   if (fetchState.status === 'unsupported') {
     return (
       <p className="cs-schema-preview__hint">
-        No JSON-LD builder is registered for this collection yet. Phase 2 of the
-        SEO sidebar plan adds builders for events, webinars, jobs, pages, and
-        resources.
+        No JSON-LD builder is registered for this collection yet.
       </p>
     );
   }
 
   if (fetchState.status === 'unpublished') {
     return (
-      <p className="cs-schema-preview__hint">
-        Schema is generated only for published documents. Save and publish to
-        see the JSON-LD that will be emitted.
-      </p>
+      <>
+        <p className="cs-schema-preview__hint">
+          Schema is generated only for published documents. Save and publish to
+          see the JSON-LD that will be emitted.
+        </p>
+        {isAdmin && (
+          <EditOverridesButton overrideCount={overrideCount} onClick={onOpenEditor} />
+        )}
+      </>
     );
   }
 
@@ -346,17 +431,25 @@ const SchemaBodyContent = (props: {
 
   return (
     <>
+      {fetchState.fromPreview && (
+        <p
+          className="cs-schema-preview__hint"
+          style={{
+            background: 'var(--theme-elevation-50, rgba(255,255,255,0.04))',
+            padding: '0.5rem 0.65rem',
+            borderRadius: 4,
+            margin: '0 0 0.75rem',
+          }}
+        >
+          Preview only — custom additions apply on publish.
+        </p>
+      )}
+
       {audit.perBlob.map((blobAudit, idx) => {
         const blob = fetchState.blobs[idx];
         if (!blob) return null;
-        // Only the `required` (red) issues are surfaced as inline items —
-        // those genuinely break the schema. The `recommended` list was
-        // visual noise on the happy path: editors saw "Valid" on the chip
-        // but a stack of "recommended · sameAs / contactPoint / description"
-        // lines underneath, suggesting work that doesn't actually move the
-        // pass/fail needle. Hidden here; still tracked in the audit object
-        // so the SEO health score card can use it.
         const hasIssues = blobAudit.missingRequired.length > 0;
+        const isCustom = overrideTypes.has(blobAudit.blobType);
         return (
           <div
             key={`${blobAudit.blobType}-${idx}`}
@@ -364,6 +457,19 @@ const SchemaBodyContent = (props: {
           >
             <div className="cs-schema-preview__blob-header">
               <code>@type: {blobAudit.blobType}</code>
+              {isCustom && (
+                <span
+                  className="cs-schema-preview__chip"
+                  data-severity="grey"
+                  style={{
+                    marginLeft: '0.4rem',
+                    color: 'var(--theme-text-soft, #a4a7af)',
+                  }}
+                  title="From custom additions (seo.additionalSchema)"
+                >
+                  Custom
+                </span>
+              )}
               <SeverityChip
                 severity={blobAudit.severity}
                 label={severityCopy[blobAudit.severity].label}
@@ -408,7 +514,418 @@ const SchemaBodyContent = (props: {
             Test in Rich Results ↗
           </a>
         )}
+        {isAdmin && supported && (
+          <EditOverridesButton overrideCount={overrideCount} onClick={onOpenEditor} />
+        )}
       </div>
     </>
+  );
+};
+
+const EditOverridesButton = (props: {
+  overrideCount: number;
+  onClick: () => void;
+}): ReactElement => (
+  <button
+    type="button"
+    className="cs-schema-preview__btn"
+    onClick={props.onClick}
+    title="Paste raw JSON-LD or upload a file. Each block is reviewed before saving."
+  >
+    {props.overrideCount > 0
+      ? `Edit custom overrides (${props.overrideCount})`
+      : 'Add custom overrides'}
+  </button>
+);
+
+interface SchemaOverrideModalProps {
+  collectionSlug: string | null;
+  siteOrigin: string;
+  currentOverrides: readonly Record<string, unknown>[];
+  onApply: (next: readonly Record<string, unknown>[]) => void;
+  onCancel: () => void;
+}
+
+interface PickerRow {
+  readonly item: IngestPlanItem;
+  /** `null` when the row is not overridable; otherwise the user's choice. */
+  readonly checked: boolean;
+}
+
+const reasonLabel: Record<IngestPlanItem['reason'], string> = {
+  allowed: 'Merge',
+  'duplicates-auto-emit': 'Auto-emitted',
+  'off-allowlist': 'Not allowed',
+  'collection-restricted': 'Wrong collection',
+  'off-domain-id': 'Off-domain @id',
+  'nested-id': 'Nested @id',
+  'invalid-shape': 'Invalid',
+  oversize: 'Too large',
+};
+
+const reasonTone: Record<IngestPlanItem['reason'], string> = {
+  allowed: 'var(--color-success-500, #00c46a)',
+  'duplicates-auto-emit': 'var(--theme-text-soft, #a4a7af)',
+  'off-allowlist': 'var(--color-error-500, #ff5c5c)',
+  'collection-restricted': 'var(--color-error-500, #ff5c5c)',
+  'off-domain-id': 'var(--theme-warning-500, #d29922)',
+  'nested-id': 'var(--color-error-500, #ff5c5c)',
+  'invalid-shape': 'var(--color-error-500, #ff5c5c)',
+  oversize: 'var(--color-error-500, #ff5c5c)',
+};
+
+const SchemaOverrideModal = (props: SchemaOverrideModalProps): ReactElement | null => {
+  const { collectionSlug, siteOrigin, currentOverrides, onApply, onCancel } = props;
+  const [text, setText] = useState<string>(() => {
+    if (currentOverrides.length === 0) return '';
+    if (currentOverrides.length === 1) return JSON.stringify(currentOverrides[0], null, 2);
+    return JSON.stringify(currentOverrides, null, 2);
+  });
+  const [uploadError, setUploadError] = useState<string>('');
+  const [fileWarnings, setFileWarnings] = useState<readonly string[]>([]);
+  const [parseErrors, setParseErrors] = useState<readonly { line?: number; message: string }[]>([]);
+  const [plan, setPlan] = useState<IngestPlan | null>(null);
+  const [decisions, setDecisions] = useState<Record<number, boolean>>({});
+
+  const recompute = useCallback(
+    (input: string) => {
+      if (input.trim().length === 0) {
+        setPlan(null);
+        setDecisions({});
+        setParseErrors([]);
+        setFileWarnings([]);
+        return;
+      }
+      const parsed = parseLenientMulti(input);
+      const blobs: unknown[] = [];
+      const errs: { line?: number; message: string }[] = [];
+      for (const block of parsed.blocks) {
+        if (block.ok) blobs.push(block.data);
+        else errs.push({ message: block.message, ...(block.line ? { line: block.line } : {}) });
+      }
+      const allWarnings = [
+        ...parsed.warnings,
+        ...parsed.blocks.flatMap((b) => (b.ok ? b.warnings : [])),
+      ];
+      setFileWarnings(allWarnings);
+      setParseErrors(errs);
+      // Flatten: if a parsed block is itself an array of blobs (the
+      // legitimate single-blob-array shape), expand it so the picker
+      // operates on individual `@type`s.
+      const flat: unknown[] = [];
+      for (const b of blobs) {
+        if (Array.isArray(b)) flat.push(...b);
+        else flat.push(b);
+      }
+      const nextPlan = buildIngestPlan(flat, { collectionSlug, siteOrigin });
+      setPlan(nextPlan);
+      const initial: Record<number, boolean> = {};
+      nextPlan.items.forEach((item, idx) => {
+        initial[idx] = item.action === 'merge';
+      });
+      setDecisions(initial);
+    },
+    [collectionSlug, siteOrigin],
+  );
+
+  useEffect(() => {
+    recompute(text);
+  }, [text, recompute]);
+
+  const handleFile = useCallback(
+    (file: File | null | undefined) => {
+      if (!file) return;
+      if (file.size > MAX_UPLOAD_BYTES) {
+        setUploadError(`File is ${file.size} bytes; max is ${MAX_UPLOAD_BYTES}.`);
+        return;
+      }
+      setUploadError('');
+      void file.text().then((content) => {
+        setText(content);
+      });
+    },
+    [],
+  );
+
+  const handleFormat = useCallback(() => {
+    const parsed = parseLenientMulti(text);
+    const allBlobs: unknown[] = [];
+    for (const block of parsed.blocks) {
+      if (block.ok) allBlobs.push(block.data);
+    }
+    if (allBlobs.length === 0) {
+      setUploadError('No parseable JSON-LD blocks found to format.');
+      return;
+    }
+    setUploadError('');
+    setText(
+      allBlobs.length === 1
+        ? JSON.stringify(allBlobs[0], null, 2)
+        : JSON.stringify(allBlobs, null, 2),
+    );
+  }, [text]);
+
+  const rows: readonly PickerRow[] = useMemo(() => {
+    if (!plan) return [];
+    return plan.items.map((item, idx) => ({
+      item,
+      checked: decisions[idx] ?? item.action === 'merge',
+    }));
+  }, [plan, decisions]);
+
+  const toggleRow = useCallback((idx: number) => {
+    setDecisions((prev) => {
+      const cur = prev[idx] ?? rows[idx]?.checked ?? false;
+      return { ...prev, [idx]: !cur };
+    });
+  }, [rows]);
+
+  const handleApply = useCallback(() => {
+    const merged: Record<string, unknown>[] = [];
+    rows.forEach((row, idx) => {
+      const checked = decisions[idx] ?? row.item.action === 'merge';
+      if (checked && row.item.overridable) {
+        merged.push(row.item.blob);
+      } else if (checked && row.item.action === 'merge') {
+        merged.push(row.item.blob);
+      }
+    });
+    onApply(merged);
+  }, [rows, decisions, onApply]);
+
+  const summary = useMemo(() => {
+    const mergeCount = rows.filter((r) => (decisions[rows.indexOf(r)] ?? r.item.action === 'merge')).length;
+    return { mergeCount, total: rows.length };
+  }, [rows, decisions]);
+
+  // Portal to document.body so the modal escapes any ancestor stacking
+  // context — without this, components like the Lexical body toolbar
+  // (which sit higher in the document's stacking order with `z-index: 25`
+  // inside their own context) end up rendered above the modal even
+  // though the modal's local z-index is much larger.
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div
+      aria-label="Custom JSON-LD additions modal backdrop"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0,0,0,0.55)',
+        zIndex: 10000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <dialog
+        open
+        aria-modal="true"
+        aria-label="Custom JSON-LD additions"
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') onCancel();
+        }}
+        style={{
+          background: 'var(--theme-elevation-100, #1c1f24)',
+          color: 'var(--theme-text, #e6e6e6)',
+          width: 'min(880px, 94vw)',
+          maxHeight: '92vh',
+          borderRadius: 8,
+          padding: '1rem 1.25rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.75rem',
+          overflow: 'auto',
+          border: 'none',
+          position: 'static',
+        }}
+      >
+        <h2 style={{ margin: 0, fontSize: '1rem' }}>Custom JSON-LD additions</h2>
+        <p style={{ fontSize: '0.8rem', margin: 0, color: 'var(--theme-text-soft, #a4a7af)' }}>
+          Paste raw JSON-LD, a full <code>&lt;script type="application/ld+json"&gt;</code> file,
+          or upload a <code>.json</code>/<code>.jsonld</code>/<code>.txt</code> file (≤{' '}
+          {MAX_UPLOAD_BYTES} bytes). Each block is reviewed against the page&rsquo;s
+          auto-generated graph before saving — duplicates and off-domain @ids default to skip.
+        </p>
+
+        <label style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center' }}>
+          <input
+            type="file"
+            accept=".json,.jsonld,.txt,application/json,application/ld+json"
+            onChange={(e) => handleFile(e.target.files?.[0])}
+          />
+        </label>
+
+        {fileWarnings.length > 0 && (
+          <ul
+            style={{
+              color: 'var(--theme-warning-500, #d29922)',
+              fontSize: '0.8rem',
+              margin: 0,
+              paddingLeft: '1rem',
+            }}
+          >
+            {fileWarnings.map((w) => (
+              <li key={`fw-${w}`}>{w}</li>
+            ))}
+          </ul>
+        )}
+        {uploadError && (
+          <p style={{ color: 'var(--color-error-500, #ff5c5c)', fontSize: '0.85rem', margin: 0 }}>
+            {uploadError}
+          </p>
+        )}
+        {parseErrors.length > 0 && (
+          <ul
+            style={{
+              color: 'var(--color-error-500, #ff5c5c)',
+              fontSize: '0.8rem',
+              margin: 0,
+              paddingLeft: '1rem',
+            }}
+          >
+            {parseErrors.map((e) => (
+              <li key={`pe-${e.message}-${e.line ?? 0}`}>
+                {e.line ? `Line ${e.line}: ` : ''}
+                {e.message}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          spellCheck={false}
+          rows={10}
+          placeholder='{ "@context": "https://schema.org", "@type": "FAQPage", ... }'
+          style={{
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+            fontSize: '0.82rem',
+            background: 'var(--theme-elevation-50, #14171c)',
+            color: 'inherit',
+            border: '1px solid var(--theme-elevation-200, #2a2f36)',
+            borderRadius: 4,
+            padding: '0.5rem',
+            width: '100%',
+            resize: 'vertical',
+            minHeight: 180,
+          }}
+        />
+
+        {rows.length > 0 && (
+          <div>
+            <p style={{ margin: '0 0 0.4rem', fontSize: '0.85rem', fontWeight: 600 }}>
+              Ingest plan ({summary.mergeCount} of {summary.total} will be merged)
+            </p>
+            <ul
+              style={{
+                listStyle: 'none',
+                margin: 0,
+                padding: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.4rem',
+              }}
+            >
+              {rows.map((row, idx) => {
+                const checked = decisions[idx] ?? row.item.action === 'merge';
+                const tone = reasonTone[row.item.reason];
+                const isAutoEmitted =
+                  collectionSlug != null &&
+                  AUTO_EMITTED_TYPES_BY_COLLECTION[collectionSlug]?.has(row.item.blobType);
+                return (
+                  <li
+                    key={`row-${idx}-${row.item.blobType}`}
+                    style={{
+                      border: `1px solid ${tone}`,
+                      borderRadius: 4,
+                      padding: '0.5rem 0.65rem',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.6rem',
+                      background: 'var(--theme-elevation-50, rgba(255,255,255,0.02))',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      disabled={!row.item.overridable && row.item.action === 'skip'}
+                      onChange={() => toggleRow(idx)}
+                      aria-label={`Include ${row.item.blobType}`}
+                      style={{ marginTop: '0.2rem' }}
+                    />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <code style={{ fontSize: '0.85rem' }}>@type: {row.item.blobType}</code>
+                        <span
+                          style={{
+                            fontSize: '0.7rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            color: tone,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {reasonLabel[row.item.reason]}
+                        </span>
+                        {isAutoEmitted && (
+                          <span
+                            style={{
+                              fontSize: '0.7rem',
+                              color: 'var(--theme-text-soft, #a4a7af)',
+                            }}
+                          >
+                            (auto-emitted for {collectionSlug})
+                          </span>
+                        )}
+                      </div>
+                      <p
+                        style={{
+                          margin: '0.2rem 0 0',
+                          fontSize: '0.78rem',
+                          color: 'var(--theme-text-soft, #a4a7af)',
+                        }}
+                      >
+                        {row.item.message}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+          <button type="button" className="cs-schema-preview__btn" onClick={handleFormat}>
+            Format / lint
+          </button>
+          {currentOverrides.length > 0 && (
+            <button
+              type="button"
+              className="cs-schema-preview__btn"
+              onClick={() => onApply([])}
+              title="Clear all custom overrides for this document"
+            >
+              Clear all
+            </button>
+          )}
+          <button type="button" className="cs-schema-preview__btn" onClick={onCancel}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="cs-schema-preview__btn"
+            data-tone="success"
+            onClick={handleApply}
+            disabled={rows.length === 0 && currentOverrides.length === 0}
+          >
+            Apply {summary.mergeCount > 0 ? `(${summary.mergeCount})` : ''}
+          </button>
+        </div>
+      </dialog>
+    </div>,
+    document.body,
   );
 };

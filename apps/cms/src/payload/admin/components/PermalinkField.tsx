@@ -140,7 +140,7 @@ export const PermalinkField = (props: PermalinkFieldProps): ReactElement => {
           data-tone={isLive ? 'live' : 'draft'}
         >
           <span className="cs-permalink__dot" aria-hidden="true" />
-          {isLive ? 'Live' : 'Draft'}
+          {isLive ? 'Published' : 'Draft'}
         </span>
       </div>
       <div className="cs-permalink__row">

@@ -51,7 +51,7 @@ export const SaveShortcut = (): ReactElement | null => {
         try {
           window.dispatchEvent(
             new CustomEvent('cs-cms:toast', {
-              detail: { message: 'Nothing to save', type: 'info' },
+              detail: { message: 'No changes to save.', type: 'info' },
             }),
           );
         } catch {

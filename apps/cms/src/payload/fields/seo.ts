@@ -1,8 +1,11 @@
-import type { Field, GroupField } from 'payload';
+import type { Field, GroupField, JSONFieldValidation } from 'payload';
 
 import { isAdminFieldLevel } from '../access';
 import { validateCanonicalOverride } from '../lib/canonical';
-import { validateOverrideForField } from '../lib/jsonld/override-validator';
+import {
+  validateOverrideForField,
+  validateOverrideForFieldOnCollection,
+} from '../lib/jsonld/override-validator';
 import { mediaUploadField } from './media-upload';
 
 const TITLE_CHAR_HINT = 60;
@@ -51,6 +54,7 @@ const indexableField: Field = {
 
 const titleField: Field = {
   name: 'title',
+  label: 'SEO title',
   type: 'text',
   admin: {
     description: `SEO title. Falls back to the document title + site default. Aim for ≤ ${TITLE_CHAR_HINT} characters.`,
@@ -63,6 +67,7 @@ const titleField: Field = {
 
 const descriptionField: Field = {
   name: 'description',
+  label: 'SEO description',
   type: 'textarea',
   admin: {
     description: `SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ ${DESCRIPTION_CHAR_HINT} characters.`,
@@ -374,7 +379,7 @@ const canonicalOverrideField: Field = {
  *  - Server `validate` callback runs the strict Zod schema on every
  *    save and blocks the write with a specific error.
  *  - Client UI re-runs the same validator for live feedback as the
- *    admin types (see `SchemaOverrideField.tsx`).
+ *    admin types (the editor lives in `SchemaPreviewField.tsx`).
  *
  * The dispatcher consumes this field LAST in the JSON-LD graph so
  * admin overrides take precedence over Layer 1 + Layer 2 add-ons,
@@ -391,14 +396,21 @@ const additionalSchemaField: Field = {
   },
   admin: {
     description:
-      'Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.',
-    components: {
-      Field: {
-        path: '@/payload/admin/components/SchemaOverrideField.tsx#SchemaOverrideField',
-      },
-    },
+      'Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.',
+    // No custom Field renderer — the editing UI is owned by the
+    // unified Schema (JSON-LD) sidebar card (SchemaPreviewField). Setting
+    // `hidden: true` keeps the raw JSON field from also rendering inside
+    // the SEO Advanced group (would be a duplicate editing surface).
+    hidden: true,
   },
-  validate: validateOverrideForField,
+  validate: ((value: unknown, ctx: unknown): true | string => {
+    const req = (ctx as { req?: { collection?: { config?: { slug?: string } } } }).req;
+    const slug = req?.collection?.config?.slug ?? null;
+    if (slug == null || slug.length === 0) {
+      return validateOverrideForField(value);
+    }
+    return validateOverrideForFieldOnCollection(slug)(value);
+  }) as JSONFieldValidation,
 };
 
 // Optional target keyword the editor is writing for. Drives the

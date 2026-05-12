@@ -657,7 +657,7 @@ export interface Author {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -814,7 +814,7 @@ export interface Category {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -971,7 +971,7 @@ export interface NewsCategory {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -1128,7 +1128,7 @@ export interface KnowledgeCategory {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -1419,9 +1419,6 @@ export interface Blog {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.
-   */
   faqs?:
     | {
         question: string;
@@ -1589,9 +1586,6 @@ export interface Blog {
   publishedAt?: string | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
-  /**
-   * Auto-built from H2/H3 headings in the body on save.
-   */
   tableOfContents?:
     | {
         level?: number | null;
@@ -1724,7 +1718,7 @@ export interface Blog {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -2044,7 +2038,7 @@ export interface News {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -2087,9 +2081,6 @@ export interface Guide {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Replaces Webflow Q1…Q5 / Ans1…Ans5. Drives FAQPage JSON-LD when non-empty.
-   */
   faqs?:
     | {
         question: string;
@@ -2316,9 +2307,6 @@ export interface Guide {
   publishedAt?: string | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
-  /**
-   * Auto-built from H2/H3 headings in the body on save.
-   */
   tableOfContents?:
     | {
         level?: number | null;
@@ -2451,7 +2439,7 @@ export interface Guide {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -2782,7 +2770,7 @@ export interface Resource {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -2835,9 +2823,6 @@ export interface KnowledgeBase {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Optional. When non-empty, emits FAQPage JSON-LD on the rendered page.
-   */
   faqs?:
     | {
         question: string;
@@ -3000,9 +2985,6 @@ export interface KnowledgeBase {
   publishedAt?: string | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
-  /**
-   * Auto-built from H2/H3 headings in the body on save.
-   */
   tableOfContents?:
     | {
         level?: number | null;
@@ -3135,7 +3117,7 @@ export interface KnowledgeBase {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -3495,7 +3477,7 @@ export interface Event {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -3847,7 +3829,7 @@ export interface Webinar {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -4195,7 +4177,7 @@ export interface Job {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -6091,7 +6073,7 @@ export interface Page {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row.
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {

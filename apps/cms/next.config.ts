@@ -32,7 +32,14 @@ const nextConfig: NextConfig = {
   },
 };
 
-const withCleanstart = withPayload(nextConfig);
+// `devBundleServerPackages: true` opts out of withPayload's default
+// dev externalization of `payload` + `@payloadcms/*` server packages.
+// Without bundling them, Turbopack's RSC chunker for `@payloadcms/ui`
+// occasionally resolved `RenderDefaultCell` to `undefined` at SSR
+// call time and surfaced "C is not a function" in the list view's
+// `buildColumnState/renderCell.tsx`. Bundling forces a deterministic
+// chunk graph at the cost of slightly slower cold-start in dev.
+const withCleanstart = withPayload(nextConfig, { devBundleServerPackages: true });
 
 // Sentry wrapper is a no-op when SENTRY_DSN is unset (the runtime
 // configs early-return). Source-map upload is gated on the auth token

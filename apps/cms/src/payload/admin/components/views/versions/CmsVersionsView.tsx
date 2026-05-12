@@ -30,6 +30,7 @@ export const CmsVersionsView = (props: DocumentViewClientProps): ReactElement =>
 
   return (
     <EditChrome
+      form={null}
       documentSubViewType={documentSubViewType}
       controls={
         <>
