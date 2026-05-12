@@ -12,8 +12,46 @@ const r2PublicHost = (() => {
   }
 })();
 
+// Connect-src needs to include R2 for direct browser-to-R2 uploads in the
+// media picker. When R2_PUBLIC_BASE is set we add its origin; otherwise
+// 'self' covers localhost dev.
+const r2ConnectSrc = r2PublicHost ? `https://${r2PublicHost}` : '';
+
+// Content-Security-Policy for the Payload admin shell.
+// 'unsafe-inline' and 'unsafe-eval' are required by the Next.js + React
+// bundle that Payload ships. Tighten to script nonces in a future pass once
+// we have a nonce-injection middleware and the bundle is audited.
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval'`,
+  `style-src 'self' 'unsafe-inline'`,
+  `img-src 'self' blob: data: https:`,
+  `font-src 'self' data:`,
+  `connect-src 'self' ${r2ConnectSrc}`.trim(),
+  `media-src 'self' blob:`,
+  `worker-src 'none'`,
+  `object-src 'none'`,
+  `frame-ancestors 'none'`,
+  `base-uri 'self'`,
+  `form-action 'self'`,
+]
+  .filter(Boolean)
+  .join('; ');
+
+const securityHeaders = [
+  { key: 'Content-Security-Policy', value: csp },
+  { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+];
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  async headers() {
+    return [{ source: '/(.*)', headers: securityHeaders }];
+  },
   images: {
     remotePatterns: [
       {

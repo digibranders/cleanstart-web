@@ -2,6 +2,13 @@ import type { Endpoint } from 'payload';
 import { z } from 'zod';
 
 import { checkCanonicalUrl } from '../lib/canonical-check';
+import { clientIpFromHeaders } from '../lib/client-ip';
+import { type RateLimitConfig, checkAndRecord } from '../lib/rate-limit';
+
+const CANONICAL_CHECK_RATE_LIMITS: RateLimitConfig = {
+  perMinute: 10,
+  perDay: 200,
+};
 
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
@@ -44,6 +51,15 @@ export const canonicalCheckEndpoint: Endpoint = {
   path: '/canonical/health-check',
   method: 'get',
   handler: async (req) => {
+    const ip = clientIpFromHeaders(req.headers);
+    const limit = checkAndRecord(`canonical-check:${ip}`, CANONICAL_CHECK_RATE_LIMITS);
+    if (!limit.ok) {
+      return json(
+        { ok: false, error: 'rate_limited', retryAfterSeconds: Math.ceil(limit.retryAfterMs / 1000) },
+        { status: 429 },
+      );
+    }
+
     if (!hasEditorRole(req.user as { role?: string } | null)) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
