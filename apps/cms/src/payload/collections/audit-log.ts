@@ -50,6 +50,8 @@ export const AuditLog: CollectionConfig = {
         { label: 'DSAR export', value: 'dsar_export' },
         { label: 'DSAR erasure', value: 'dsar_erasure' },
         { label: 'Schema override changed', value: 'schema_override_changed' },
+        { label: 'User disabled', value: 'user_disabled' },
+        { label: 'Content reassigned', value: 'content_reassigned' },
       ],
       admin: { readOnly: true },
     },

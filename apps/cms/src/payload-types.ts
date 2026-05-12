@@ -198,6 +198,10 @@ export interface User {
   id: number;
   name: string;
   /**
+   * Uncheck to block this user from logging in. Use the "Disable account" action instead of editing this directly.
+   */
+  enabled?: boolean | null;
+  /**
    * Composite roles supported. Author = own drafts only. Editor = publish content. Admin = full access.
    */
   roles: ('admin' | 'editor' | 'author')[];
@@ -380,7 +384,14 @@ export interface BrokenLink {
 export interface AuditLog {
   id: number;
   timestamp: string;
-  action: 'lead_deleted' | 'lead_exported' | 'dsar_export' | 'dsar_erasure' | 'schema_override_changed';
+  action:
+    | 'lead_deleted'
+    | 'lead_exported'
+    | 'dsar_export'
+    | 'dsar_erasure'
+    | 'schema_override_changed'
+    | 'user_disabled'
+    | 'content_reassigned';
   targetCollection: string;
   targetId: string;
   /**
@@ -6433,6 +6444,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  enabled?: T;
   roles?: T;
   preferences?: T;
   updatedAt?: T;

@@ -32,6 +32,7 @@ import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
 import { canonicalCheckEndpoint } from './payload/endpoints/canonical-check';
+import { userReassignContentEndpoint } from './payload/endpoints/user-offboard';
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
 import { robotsEndpoint } from './payload/endpoints/robots';
@@ -237,6 +238,7 @@ export default buildConfig({
     redirectsImportEndpoint,
     canonicalCheckEndpoint,
     searchAnalyticsEndpoint,
+    userReassignContentEndpoint,
   ],
   jobs: {
     tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask, retryWebhookTask],

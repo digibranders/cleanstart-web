@@ -1,15 +1,27 @@
 import type { CollectionConfig } from 'payload';
+import { ValidationError } from 'payload';
 
 import { ROLES } from '@cleanstart/types';
 
 import { isAdmin, isAdminFieldLevel, isAdminOrSelf, userRoles } from '../access';
+import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'email',
-    defaultColumns: ['email', 'name', 'roles', 'updatedAt'],
+    defaultColumns: ['email', 'name', 'roles', 'enabled', 'updatedAt'],
     group: 'System',
+    components: {
+      edit: {
+        ...docStatusBarEditConfig({ showPublishedAt: false, showStats: false }),
+        editMenuItems: [
+          ...(docStatusBarEditConfig().editMenuItems ?? []),
+          { path: '@/payload/admin/components/DisableUserAction.tsx#DisableUserAction' },
+          { path: '@/payload/admin/components/ReassignContentAction.tsx#ReassignContentAction' },
+        ],
+      },
+    },
   },
   auth: {
     tokenExpiration: 60 * 60 * 8,
@@ -31,11 +43,36 @@ export const Users: CollectionConfig = {
       return roles.includes('admin') || roles.includes('editor') || roles.includes('author');
     },
   },
+  hooks: {
+    // Block disabled users at the login stage — throws before a JWT is issued.
+    beforeLogin: [
+      async ({ user }) => {
+        if ((user as { enabled?: boolean }).enabled === false) {
+          throw new ValidationError({
+            errors: [{ message: 'This account has been disabled. Contact an administrator.', path: 'email' }],
+          });
+        }
+        return user;
+      },
+    ],
+  },
   fields: [
     {
       name: 'name',
       type: 'text',
       required: true,
+    },
+    {
+      name: 'enabled',
+      type: 'checkbox',
+      defaultValue: true,
+      access: {
+        update: isAdminFieldLevel,
+      },
+      admin: {
+        description: 'Uncheck to block this user from logging in. Use the "Disable account" action instead of editing this directly.',
+        position: 'sidebar',
+      },
     },
     {
       name: 'roles',
