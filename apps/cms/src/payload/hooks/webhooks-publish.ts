@@ -1,6 +1,7 @@
 import type { CollectionAfterChangeHook } from 'payload';
 
 import { dispatchEvent } from '../lib/webhooks/dispatch';
+import { getRequestId } from '../lib/request-id';
 
 /**
  * afterChange hook factory — fires `document.published` when a doc
@@ -14,6 +15,7 @@ import { dispatchEvent } from '../lib/webhooks/dispatch';
  *
  * Same fail-soft contract as the search-sync hooks: dispatch
  * outage logs but never throws into the surrounding save.
+ * Failures are persisted to webhooks_dead_letter for retry.
  */
 export const webhooksPublishAfterChangeHook =
   (collection: string): CollectionAfterChangeHook =>
@@ -25,6 +27,7 @@ export const webhooksPublishAfterChangeHook =
       const isPublished = current === 'published';
       if (!isPublished || wasPublished) return doc;
 
+      const requestId = getRequestId(req.headers as { get(name: string): string | null });
       const typed = doc as Record<string, unknown>;
       await dispatchEvent(
         {
@@ -40,7 +43,11 @@ export const webhooksPublishAfterChangeHook =
               (typed.updatedAt as string | undefined),
           },
         },
-        { logger: req.payload.logger },
+        {
+          logger: req.payload.logger,
+          payload: req.payload,
+          requestId,
+        },
       );
     } catch (err) {
       req.payload.logger?.warn?.(

@@ -1,3 +1,7 @@
+import { randomUUID } from 'node:crypto';
+
+import type { BasePayload } from 'payload';
+
 import { redactWebhookErrorBody } from './redact-error-body';
 import { signWebhook, type SignedHeaders, type WebhookSigningKey } from './sign';
 import { buildTeamsPayload, postTeamsWebhook } from './teams';
@@ -98,11 +102,24 @@ export interface DispatchResult {
   readonly error?: string;
 }
 
+/** Retry delay curve in milliseconds: attempt 1→2, 2→3, 3→4, 4→5. */
+const RETRY_DELAYS_MS = [
+  5 * 60 * 1000,   // 5 min
+  15 * 60 * 1000,  // 15 min
+  60 * 60 * 1000,  // 1 h
+  6 * 60 * 60 * 1000, // 6 h
+];
+
+const MAX_ATTEMPTS = 5;
+
 interface DispatchOptions {
   readonly destinations?: readonly AnyDestination[];
   readonly fetch?: typeof fetch;
   readonly logger?: { warn?: (meta: Record<string, unknown>, msg: string) => void };
   readonly now?: Date;
+  /** Payload instance — when supplied, failures are persisted to webhooks_dead_letter. */
+  readonly payload?: BasePayload;
+  readonly requestId?: string;
 }
 
 const postGeneric = async (
@@ -147,13 +164,50 @@ const postGeneric = async (
 };
 
 /**
+ * Persists a failed delivery to the webhooks_dead_letter collection and
+ * schedules the first retry. Errors here are swallowed — a DB write
+ * failure must not propagate back into the publish/lead flow.
+ */
+const recordFailure = async (
+  payload: BasePayload,
+  dest: AnyDestination,
+  event: WebhookEvent,
+  result: DispatchResult,
+  requestId: string | undefined,
+): Promise<void> => {
+  try {
+    const now = new Date();
+    const nextRetryAt = new Date(now.getTime() + (RETRY_DELAYS_MS[0] ?? 5 * 60 * 1000));
+    await payload.create({
+      collection: 'webhooks_dead_letter',
+      data: {
+        webhookId: randomUUID(),
+        event: event.event,
+        eventPayload: { ...event.data } as Record<string, unknown>,
+        destinationId: dest.id,
+        destinationKind: dest.kind,
+        destinationLabel: dest.url.slice(0, 80),
+        attemptCount: 1,
+        lastError: result.error ?? `HTTP ${result.status}`,
+        nextRetryAt: nextRetryAt.toISOString(),
+        resolvedAt: null,
+        ...(requestId ? { requestId } : {}),
+      },
+      overrideAccess: true,
+    });
+  } catch {
+    // Intentionally swallowed — dead-letter write failure is not fatal.
+  }
+};
+
+/**
  * Fan out a single event to every configured destination that
  * subscribes to it. Always resolves — never throws — so a webhook
  * outage cannot block a publish or a lead submission.
  *
- * Failures are logged via the supplied logger (Pino-style).
- * Returns the per-destination outcomes for callers that want to
- * audit individually.
+ * When `options.payload` is provided, failures are persisted to
+ * webhooks_dead_letter and the retryWebhookTask picks them up on
+ * the retry schedule (5 min → 15 min → 1 h → 6 h, max 5 attempts).
  */
 export const dispatchEvent = async (
   event: WebhookEvent,
@@ -185,9 +239,13 @@ export const dispatchEvent = async (
           event: event.event,
           status: result.status,
           error: result.error,
+          requestId: options.requestId,
         },
-        'webhook delivery failed',
+        'webhook delivery failed — recording for retry',
       );
+      if (options.payload) {
+        await recordFailure(options.payload, dest, event, result, options.requestId);
+      }
     }
     results.push(result);
   }
@@ -195,3 +253,4 @@ export const dispatchEvent = async (
 };
 
 export { buildTeamsPayload };
+export { RETRY_DELAYS_MS, MAX_ATTEMPTS };

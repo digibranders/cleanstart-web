@@ -9,6 +9,7 @@ import sharp from 'sharp';
 
 import { AboutGalleries } from './payload/collections/AboutGalleries';
 import { AuditLog } from './payload/collections/audit-log';
+import { WebhookDeadLetter } from './payload/collections/WebhookDeadLetter';
 import { Authors } from './payload/collections/Authors';
 import { Blogs } from './payload/collections/Blogs';
 import { BrokenLinks } from './payload/collections/BrokenLinks';
@@ -44,6 +45,7 @@ import { checkBrokenLinksTask } from './payload/jobs/check-broken-links';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
+import { retryWebhookTask } from './payload/jobs/retry-webhook';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { wireCustomEditView } from './payload/lib/wire-custom-edit-view';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
@@ -200,6 +202,7 @@ export default buildConfig({
     BrokenLinks,
     AuditLog,
     SearchLog,
+    WebhookDeadLetter,
     Authors,
     Categories,
     NewsCategories,
@@ -236,11 +239,15 @@ export default buildConfig({
     searchAnalyticsEndpoint,
   ],
   jobs: {
-    tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask],
+    tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask, retryWebhookTask],
     autoRun: [
       {
         cron: '*/5 * * * *', // every 5 minutes
         queue: 'leadQueueDrain',
+      },
+      {
+        cron: '*/5 * * * *', // every 5 minutes — retry failed webhook deliveries
+        queue: 'webhookRetry',
       },
       {
         cron: '0 3 * * *', // daily at 03:00 UTC — searchLog 90-day retention

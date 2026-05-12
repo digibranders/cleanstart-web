@@ -73,6 +73,7 @@ export interface Config {
     brokenLinks: BrokenLink;
     'audit-log': AuditLog;
     searchLog: SearchLog;
+    webhooks_dead_letter: WebhooksDeadLetter;
     authors: Author;
     categories: Category;
     newsCategories: NewsCategory;
@@ -104,6 +105,7 @@ export interface Config {
     brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
+    webhooks_dead_letter: WebhooksDeadLetterSelect<false> | WebhooksDeadLetterSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
@@ -160,6 +162,7 @@ export interface Config {
       purgeSearchLog: TaskPurgeSearchLog;
       purgeLeadsPii: TaskPurgeLeadsPii;
       checkBrokenLinks: TaskCheckBrokenLinks;
+      retryWebhook: TaskRetryWebhook;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -431,6 +434,61 @@ export interface SearchLog {
    * User-Agent header. Trimmed at 200 chars.
    */
   userAgent?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "webhooks_dead_letter".
+ */
+export interface WebhooksDeadLetter {
+  id: number;
+  /**
+   * Unique ID for this delivery attempt (UUID).
+   */
+  webhookId: string;
+  event: 'document.published' | 'lead.submitted';
+  /**
+   * Full event data blob. Used to re-run the delivery on retry.
+   */
+  eventPayload:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * teams | generic | <custom id>
+   */
+  destinationId: string;
+  destinationKind: 'teams' | 'generic';
+  /**
+   * First 80 chars of the destination URL for quick scanning.
+   */
+  destinationLabel?: string | null;
+  /**
+   * How many delivery attempts have been made (including the original).
+   */
+  attemptCount: number;
+  /**
+   * Error message or HTTP status from the most recent attempt.
+   */
+  lastError?: string | null;
+  /**
+   * When the retry task will next attempt this delivery. Null = no more retries.
+   */
+  nextRetryAt?: string | null;
+  /**
+   * Set when a retry succeeds. Null = still failing or exhausted.
+   */
+  resolvedAt?: string | null;
+  /**
+   * x-request-id from the originating HTTP request, for log correlation.
+   */
+  requestId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -6164,6 +6222,7 @@ export interface PayloadJob {
           | 'purgeSearchLog'
           | 'purgeLeadsPii'
           | 'checkBrokenLinks'
+          | 'retryWebhook'
           | 'schedulePublish';
         taskID: string;
         input?:
@@ -6198,7 +6257,15 @@ export interface PayloadJob {
       }[]
     | null;
   taskSlug?:
-    | ('inline' | 'drainLeadQueue' | 'purgeSearchLog' | 'purgeLeadsPii' | 'checkBrokenLinks' | 'schedulePublish')
+    | (
+        | 'inline'
+        | 'drainLeadQueue'
+        | 'purgeSearchLog'
+        | 'purgeLeadsPii'
+        | 'checkBrokenLinks'
+        | 'retryWebhook'
+        | 'schedulePublish'
+      )
     | null;
   queue?: string | null;
   waitUntil?: string | null;
@@ -6245,6 +6312,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'searchLog';
         value: number | SearchLog;
+      } | null)
+    | ({
+        relationTo: 'webhooks_dead_letter';
+        value: number | WebhooksDeadLetter;
       } | null)
     | ({
         relationTo: 'authors';
@@ -6503,6 +6574,25 @@ export interface SearchLogSelect<T extends boolean = true> {
   locale?: T;
   ip?: T;
   userAgent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "webhooks_dead_letter_select".
+ */
+export interface WebhooksDeadLetterSelect<T extends boolean = true> {
+  webhookId?: T;
+  event?: T;
+  eventPayload?: T;
+  destinationId?: T;
+  destinationKind?: T;
+  destinationLabel?: T;
+  attemptCount?: T;
+  lastError?: T;
+  nextRetryAt?: T;
+  resolvedAt?: T;
+  requestId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -9936,6 +10026,14 @@ export interface TaskPurgeLeadsPii {
  * via the `definition` "TaskCheckBrokenLinks".
  */
 export interface TaskCheckBrokenLinks {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskRetryWebhook".
+ */
+export interface TaskRetryWebhook {
   input?: unknown;
   output?: unknown;
 }
