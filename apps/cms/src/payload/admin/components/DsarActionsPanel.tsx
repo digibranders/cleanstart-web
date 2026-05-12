@@ -94,21 +94,18 @@ export const DsarActionsPanel = (): ReactElement => {
   }, []);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        gap: '0.5rem',
-        marginBottom: '0.75rem',
-        flexWrap: 'wrap',
-      }}
-    >
-      <button type="button" onClick={() => { setFindOpen(true); setEmail(''); setFindResult(null); }}>
+    <div className="cs-dsar-panel">
+      <button
+        type="button"
+        className="cs-btn cs-btn--subtle"
+        onClick={() => { setFindOpen(true); setEmail(''); setFindResult(null); }}
+      >
         DSAR: Find by email
       </button>
       <button
         type="button"
+        className="cs-btn cs-btn--danger"
         onClick={() => { setDeleteOpen(true); setEmail(''); setDeleteResult(null); }}
-        style={{ color: 'var(--theme-error-500, #ef4444)' }}
       >
         DSAR: Delete by email
       </button>
@@ -134,25 +131,30 @@ export const DsarActionsPanel = (): ReactElement => {
             </div>
           ) : (
             <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <span>Email address</span>
+              <span className="cs-text-field__label">Email address</span>
               <input
                 type="email"
+                className="cs-text-field__input"
                 value={email}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 placeholder="subject@example.com"
-                style={{ padding: '0.375rem 0.5rem' }}
               />
             </label>
           )}
         </DialogBody>
         <DialogFooter>
           {findResult ? (
-            <button type="button" onClick={resetFind}>Close</button>
+            <button type="button" className="cs-btn cs-btn--subtle" onClick={resetFind}>
+              Close
+            </button>
           ) : (
             <>
-              <button type="button" onClick={resetFind}>Cancel</button>
+              <button type="button" className="cs-btn cs-btn--subtle" onClick={resetFind}>
+                Cancel
+              </button>
               <button
                 type="button"
+                className="cs-btn cs-btn--primary"
                 onClick={() => void handleFind()}
                 disabled={!email.trim() || busy}
               >
@@ -174,18 +176,18 @@ export const DsarActionsPanel = (): ReactElement => {
             </p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--theme-error-500, #ef4444)' }}>
+              <p className="cs-dsar-panel__warning">
                 This permanently deletes all leads matching this email. An audit log entry is written
                 for each deletion (GDPR Art. 17).
               </p>
               <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                <span>Email address</span>
+                <span className="cs-text-field__label">Email address</span>
                 <input
                   type="email"
+                  className="cs-text-field__input"
                   value={email}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                   placeholder="subject@example.com"
-                  style={{ padding: '0.375rem 0.5rem' }}
                 />
               </label>
             </div>
@@ -193,15 +195,19 @@ export const DsarActionsPanel = (): ReactElement => {
         </DialogBody>
         <DialogFooter>
           {deleteResult ? (
-            <button type="button" onClick={resetDelete}>Close</button>
+            <button type="button" className="cs-btn cs-btn--subtle" onClick={resetDelete}>
+              Close
+            </button>
           ) : (
             <>
-              <button type="button" onClick={resetDelete}>Cancel</button>
+              <button type="button" className="cs-btn cs-btn--subtle" onClick={resetDelete}>
+                Cancel
+              </button>
               <button
                 type="button"
+                className="cs-btn cs-btn--danger"
                 onClick={() => setConfirmDeleteOpen(true)}
                 disabled={!email.trim() || busy}
-                style={{ color: 'var(--theme-error-500, #ef4444)' }}
               >
                 Delete records…
               </button>

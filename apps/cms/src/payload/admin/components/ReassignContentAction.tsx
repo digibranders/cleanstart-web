@@ -81,7 +81,7 @@ export const ReassignContentAction = (): ReactElement | null => {
 
   return (
     <>
-      <button type="button" onClick={handleOpen}>
+      <button type="button" className="cs-btn cs-btn--subtle" onClick={handleOpen}>
         Reassign content
       </button>
 
@@ -104,13 +104,13 @@ export const ReassignContentAction = (): ReactElement | null => {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                <span>From author (being offboarded)</span>
+                <span className="cs-text-field__label">From author (being offboarded)</span>
                 <select
+                  className="cs-native-select"
                   value={fromId ?? ''}
                   onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                     setFromId(e.target.value ? Number(e.target.value) : null)
                   }
-                  style={{ padding: '0.375rem 0.5rem' }}
                 >
                   <option value="">Select author…</option>
                   {authors.map((a) => (
@@ -122,13 +122,13 @@ export const ReassignContentAction = (): ReactElement | null => {
               </label>
 
               <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                <span>To author (replacement)</span>
+                <span className="cs-text-field__label">To author (replacement)</span>
                 <select
+                  className="cs-native-select"
                   value={toId ?? ''}
                   onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                     setToId(e.target.value ? Number(e.target.value) : null)
                   }
-                  style={{ padding: '0.375rem 0.5rem' }}
                 >
                   <option value="">Select author…</option>
                   {authors
@@ -145,12 +145,17 @@ export const ReassignContentAction = (): ReactElement | null => {
         </DialogBody>
         <DialogFooter>
           {result ? (
-            <button type="button" onClick={() => setOpen(false)}>Close</button>
+            <button type="button" className="cs-btn cs-btn--subtle" onClick={() => setOpen(false)}>
+              Close
+            </button>
           ) : (
             <>
-              <button type="button" onClick={() => setOpen(false)}>Cancel</button>
+              <button type="button" className="cs-btn cs-btn--subtle" onClick={() => setOpen(false)}>
+                Cancel
+              </button>
               <button
                 type="button"
+                className="cs-btn cs-btn--primary"
                 onClick={() => void handleReassign()}
                 disabled={fromId == null || toId == null || busy}
               >

@@ -26,8 +26,36 @@ const flagReason = (lead: FlaggedLead): string => {
   return 'Unknown flag';
 };
 
+const CHECK_ICON = (
+  <svg width="10" height="10" viewBox="0 0 16 16" fill="none" role="presentation">
+    <title>Checked</title>
+    <path d="M3 8l4 4 6-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+type CheckboxProps = {
+  checked: boolean;
+  onChange: () => void;
+  label: string;
+};
+
+const Checkbox = ({ checked, onChange, label }: CheckboxProps): ReactElement => (
+  <label className="cs-checkbox-field__row">
+    <input
+      type="checkbox"
+      className="cs-checkbox-field__input"
+      checked={checked}
+      onChange={onChange}
+      aria-label={label}
+    />
+    <span className="cs-checkbox-field__visual" aria-hidden="true">
+      {checked ? CHECK_ICON : null}
+    </span>
+  </label>
+);
+
 /**
- * Renders a "Flagged leads" tab above the Leads list table. Loads leads
+ * Renders a "Flagged leads" panel above the Leads list table. Loads leads
  * where `honeypot` is non-empty or `turnstilePassed = false`. Admins
  * can bulk-delete the flagged records.
  *
@@ -104,97 +132,78 @@ export const FlaggedLeadsTab = (): ReactElement => {
     });
   }, []);
 
+  const allSelected = leads != null && leads.length > 0 && selectedIds.size === leads.length;
+
+  const toggleAll = useCallback(() => {
+    if (!leads) return;
+    setSelectedIds(allSelected ? new Set() : new Set(leads.map((l) => l.id)));
+  }, [leads, allSelected]);
+
   return (
-    <div style={{ marginBottom: '0.75rem' }}>
-      <button type="button" onClick={open ? () => setOpen(false) : handleOpen}>
+    <div className="cs-flagged-panel">
+      <button
+        type="button"
+        className="cs-btn cs-btn--subtle"
+        onClick={open ? () => setOpen(false) : handleOpen}
+      >
         {open ? 'Hide flagged' : 'Flagged leads'}
       </button>
 
       {open && (
-        <div
-          style={{
-            marginTop: '0.75rem',
-            border: '1px solid var(--theme-elevation-150)',
-            borderRadius: '4px',
-            overflow: 'hidden',
-          }}
-        >
+        <div className="cs-flagged-panel__table-wrap">
           {busy ? (
-            <p style={{ padding: '0.75rem', margin: 0 }}>Loading…</p>
+            <p className="cs-flagged-panel__empty">Loading…</p>
           ) : !leads || leads.length === 0 ? (
-            <p style={{ padding: '0.75rem', margin: 0, color: 'var(--theme-elevation-500)' }}>
-              No flagged leads.
-            </p>
+            <p className="cs-flagged-panel__empty">No flagged leads.</p>
           ) : (
             <>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.5rem 0.75rem',
-                  background: 'var(--theme-elevation-50)',
-                  borderBottom: '1px solid var(--theme-elevation-150)',
-                }}
-              >
-                <span style={{ fontSize: '0.8125rem' }}>
+              <div className="cs-flagged-panel__toolbar">
+                <span className="cs-flagged-panel__toolbar-count">
                   {leads.length} flagged lead{leads.length !== 1 ? 's' : ''}
                   {selectedIds.size < leads.length ? ` (${selectedIds.size} selected)` : ''}
                 </span>
                 <button
                   type="button"
+                  className="cs-btn cs-btn--danger"
                   onClick={() => setConfirmOpen(true)}
                   disabled={selectedIds.size === 0 || busy}
-                  style={{ color: 'var(--theme-error-500, #ef4444)', marginLeft: 'auto' }}
                 >
                   Delete selected ({selectedIds.size})
                 </button>
               </div>
 
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
+              <table className="cs-flagged-panel__table">
                 <thead>
-                  <tr style={{ background: 'var(--theme-elevation-50)' }}>
-                    <th style={{ padding: '0.375rem 0.75rem', textAlign: 'left', width: '2rem' }}>
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.size === leads.length}
-                        onChange={() =>
-                          selectedIds.size === leads.length
-                            ? setSelectedIds(new Set())
-                            : setSelectedIds(new Set(leads.map((l) => l.id)))
-                        }
+                  <tr>
+                    <th className="cs-flagged-panel__th" style={{ width: '2.5rem' }}>
+                      <Checkbox
+                        checked={allSelected}
+                        onChange={toggleAll}
+                        label="Select all flagged leads"
                       />
                     </th>
-                    <th style={{ padding: '0.375rem 0.75rem', textAlign: 'left' }}>ID</th>
-                    <th style={{ padding: '0.375rem 0.75rem', textAlign: 'left' }}>Form</th>
-                    <th style={{ padding: '0.375rem 0.75rem', textAlign: 'left' }}>Flag reason</th>
-                    <th style={{ padding: '0.375rem 0.75rem', textAlign: 'left' }}>Created</th>
+                    <th className="cs-flagged-panel__th">ID</th>
+                    <th className="cs-flagged-panel__th">Form</th>
+                    <th className="cs-flagged-panel__th">Flag reason</th>
+                    <th className="cs-flagged-panel__th">Created</th>
                   </tr>
                 </thead>
                 <tbody>
                   {leads.map((lead) => (
-                    <tr
-                      key={lead.id}
-                      style={{ borderTop: '1px solid var(--theme-elevation-100)' }}
-                    >
-                      <td style={{ padding: '0.375rem 0.75rem' }}>
-                        <input
-                          type="checkbox"
+                    <tr key={lead.id} className="cs-flagged-panel__tr">
+                      <td className="cs-flagged-panel__td">
+                        <Checkbox
                           checked={selectedIds.has(lead.id)}
                           onChange={() => toggleSelect(lead.id)}
+                          label={`Select lead ${lead.id}`}
                         />
                       </td>
-                      <td style={{ padding: '0.375rem 0.75rem' }}>{lead.id}</td>
-                      <td style={{ padding: '0.375rem 0.75rem' }}>{resolveFormId(lead.form)}</td>
-                      <td
-                        style={{
-                          padding: '0.375rem 0.75rem',
-                          color: 'var(--theme-error-500, #ef4444)',
-                        }}
-                      >
+                      <td className="cs-flagged-panel__td">{lead.id}</td>
+                      <td className="cs-flagged-panel__td">{resolveFormId(lead.form)}</td>
+                      <td className="cs-flagged-panel__td cs-flagged-panel__flag-cell">
                         {flagReason(lead)}
                       </td>
-                      <td style={{ padding: '0.375rem 0.75rem' }}>
+                      <td className="cs-flagged-panel__td">
                         {new Date(lead.createdAt).toLocaleDateString()}
                       </td>
                     </tr>

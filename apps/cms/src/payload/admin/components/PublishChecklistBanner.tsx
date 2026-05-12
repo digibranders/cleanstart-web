@@ -32,13 +32,12 @@ const colorFor = (check: CheckResult): string => {
 };
 
 /**
- * Advisory banner that shows the publishing checklist state above the
- * document controls. Calls GET /api/[collection]/[id]/checklist on mount
- * and whenever the document ID changes (i.e. after save).
+ * Advisory banner showing the publishing checklist state above document
+ * controls. Calls GET /api/[collection]/[id]/checklist on mount and
+ * whenever the document ID changes (after save).
  *
  * The banner is purely informational — the server-side publishGateHook
- * is the hard gate. This component shows editors what to fix before
- * attempting to publish.
+ * is the hard gate. This shows editors what to fix before publishing.
  *
  * Mounted via admin.components.beforeDocumentControls on content collections.
  */
@@ -89,66 +88,45 @@ export const PublishChecklistBanner = (): ReactElement | null => {
 
   return (
     <div
-      style={{
-        borderLeft: `3px solid ${summaryColor}`,
-        background: 'var(--theme-elevation-50, rgba(0,0,0,.04))',
-        borderRadius: '0 4px 4px 0',
-        marginBottom: '0.75rem',
-        padding: '0.5rem 0.75rem',
-        fontSize: '0.8125rem',
-        lineHeight: 1.4,
-      }}
+      className="cs-checklist-banner"
+      style={{ borderLeftColor: summaryColor }}
     >
       <button
         type="button"
+        className="cs-checklist-banner__toggle"
         onClick={() => setOpen((v) => !v)}
-        style={{
-          all: 'unset',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          width: '100%',
-          color: summaryColor,
-          fontWeight: 600,
-        }}
+        aria-expanded={open}
       >
-        <span>{allPass ? ICON_PASS : blockers.length > 0 ? ICON_BLOCKER : ICON_WARN}</span>
-        <span style={{ flex: 1 }}>{summaryText}</span>
-        <span style={{ fontSize: '0.7rem', color: 'var(--theme-elevation-500)' }}>
-          {open ? '▲ hide' : '▼ details'}
+        <span className="cs-checklist-banner__icon" style={{ color: summaryColor }} aria-hidden="true">
+          {allPass ? ICON_PASS : blockers.length > 0 ? ICON_BLOCKER : ICON_WARN}
+        </span>
+        <span className="cs-checklist-banner__summary" style={{ color: summaryColor }}>
+          {summaryText}
+        </span>
+        <span className="cs-checklist-banner__chevron" aria-hidden="true">
+          {open ? '▲' : '▼'}
         </span>
       </button>
 
       {open && (
-        <ul
-          style={{
-            margin: '0.5rem 0 0',
-            padding: '0 0 0 1.25rem',
-            listStyle: 'none',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.25rem',
-          }}
-        >
+        <ul className="cs-checklist-banner__list">
           {checks.map((check) => (
             <li
               key={check.id}
-              style={{
-                display: 'flex',
-                gap: '0.4rem',
-                color: check.pass
-                  ? 'var(--theme-elevation-600)'
-                  : colorFor(check),
-              }}
+              className="cs-checklist-banner__item"
+              style={{ color: check.pass ? 'var(--theme-elevation-600)' : colorFor(check) }}
             >
-              <span style={{ color: colorFor(check), fontWeight: 600, minWidth: '1rem' }}>
+              <span
+                className="cs-checklist-banner__item-icon"
+                style={{ color: colorFor(check) }}
+                aria-hidden="true"
+              >
                 {iconFor(check)}
               </span>
               <span>
                 <strong>{check.label}</strong>
                 {!check.pass && check.message != null ? (
-                  <span style={{ opacity: 0.85 }}> — {check.message}</span>
+                  <span className="cs-checklist-banner__item-msg"> — {check.message}</span>
                 ) : null}
               </span>
             </li>

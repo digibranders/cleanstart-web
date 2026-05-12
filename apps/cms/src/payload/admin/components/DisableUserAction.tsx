@@ -58,8 +58,8 @@ export const DisableUserAction = (): ReactElement | null => {
     <>
       <button
         type="button"
+        className="cs-btn cs-btn--danger"
         onClick={() => setOpen(true)}
-        style={{ color: 'var(--theme-error-500, #ef4444)' }}
       >
         Disable account
       </button>
