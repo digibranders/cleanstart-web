@@ -2,8 +2,11 @@ import type { Endpoint } from 'payload';
 import { z } from 'zod';
 
 import { hasRole } from '../access/typed-user';
+import {
+  resolveGenericCredentials,
+  resolveTeamsCredentials,
+} from '../lib/integrations/credentials';
 import { dispatchEvent } from '../lib/webhooks/dispatch';
-import { decryptJson, isEncrypted } from '../lib/integrations/secrets';
 import type { TeamsMention } from '../lib/webhooks/teams';
 import type { WebhookEventName } from '../lib/webhooks/dispatch';
 
@@ -26,21 +29,13 @@ interface IntegrationRow {
     collections?: string[] | null;
     formSlugs?: string[] | null;
   } | null;
-  config: unknown;
+  teamsConfig?: { webhookUrl?: string | null; mentions?: TeamsMention[] | null } | null;
+  genericConfig?: {
+    url?: string | null;
+    signingSecret?: string | null;
+    signingKeyId?: string | null;
+  } | null;
 }
-
-const decodeConfig = <T>(raw: unknown): T | null => {
-  if (raw == null) return null;
-  if (typeof raw === 'string' && isEncrypted(raw)) {
-    try {
-      return decryptJson<T>(raw);
-    } catch {
-      return null;
-    }
-  }
-  if (typeof raw === 'object') return raw as T;
-  return null;
-};
 
 const fixtureEvent = (event: WebhookEventName) =>
   event === 'lead.submitted'
@@ -108,30 +103,29 @@ export const integrationsTestEndpoint: Endpoint = {
         : never
       : never;
     if (row.kind === 'teamsWorkflow') {
-      const config = decodeConfig<{ webhookUrl?: string; mentions?: readonly TeamsMention[] }>(
-        row.config,
-      );
-      if (!config?.webhookUrl) {
-        return json({ ok: false, error: 'config missing webhookUrl' }, { status: 400 });
+      const creds = resolveTeamsCredentials({ teamsConfig: row.teamsConfig ?? null });
+      if (!creds) {
+        return json({ ok: false, error: 'teamsConfig.webhookUrl missing' }, { status: 400 });
       }
       destinations = [
         {
           id: `test:${row.id}`,
           source: 'db',
           kind: 'teams',
-          url: config.webhookUrl,
+          url: creds.webhookUrl,
           routing: { events: [firstEvent] },
           label: row.label,
-          ...(config.mentions ? { mentions: config.mentions } : {}),
+          ...(creds.mentions ? { mentions: creds.mentions } : {}),
         },
       ];
     } else if (row.kind === 'genericWebhook') {
-      const config = decodeConfig<{ url?: string; signingSecret?: string; signingKeyId?: string }>(
-        row.config,
-      );
-      if (!config?.url || !config.signingSecret) {
+      const creds = resolveGenericCredentials({
+        id: row.id,
+        genericConfig: row.genericConfig ?? null,
+      });
+      if (!creds) {
         return json(
-          { ok: false, error: 'config missing url or signingSecret' },
+          { ok: false, error: 'genericConfig.url or signingSecret missing' },
           { status: 400 },
         );
       }
@@ -140,17 +134,15 @@ export const integrationsTestEndpoint: Endpoint = {
           id: `test:${row.id}`,
           source: 'db',
           kind: 'generic',
-          url: config.url,
+          url: creds.url,
           routing: { events: [firstEvent] },
-          signingKeys: [
-            { id: config.signingKeyId ?? `test-${row.id}`, secret: config.signingSecret },
-          ],
+          signingKeys: [{ id: creds.signingKeyId, secret: creds.signingSecret }],
           label: row.label,
         },
       ];
     } else {
       return json(
-        { ok: false, error: `kind "${row.kind}" is not testable in J1` },
+        { ok: false, error: `kind "${row.kind}" is not testable from this endpoint` },
         { status: 400 },
       );
     }

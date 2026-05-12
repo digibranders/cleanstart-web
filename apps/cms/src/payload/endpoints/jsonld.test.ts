@@ -39,7 +39,12 @@ const callEndpoint = async (
   url: string,
   payload: FakePayload = makePayload(),
 ): Promise<{ res: Response; payload: FakePayload }> => {
-  const req = { url, payload } as unknown as Parameters<typeof handler>[0];
+  const req = {
+    url,
+    payload,
+    // The endpoint reads req.headers for IP-based rate limiting.
+    headers: new Headers(),
+  } as unknown as Parameters<typeof handler>[0];
   const res = await handler(req);
   return { res, payload };
 };

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import type { BasePayload } from 'payload';
 
-import { decryptJson, isEncrypted } from '../integrations/secrets';
+import { resolveGenericCredentials, resolveTeamsCredentials } from '../integrations/credentials';
 import { routingMatches, type IntegrationRouting } from '../integrations/router';
 import { redactWebhookErrorBody } from './redact-error-body';
 import { signWebhook, type SignedHeaders, type WebhookSigningKey } from './sign';
@@ -109,33 +109,16 @@ interface IntegrationRow {
     collections?: string[] | null;
     formSlugs?: string[] | null;
   } | null;
-  config: unknown;
+  teamsConfig?: {
+    webhookUrl?: string | null;
+    mentions?: TeamsMention[] | null;
+  } | null;
+  genericConfig?: {
+    url?: string | null;
+    signingSecret?: string | null;
+    signingKeyId?: string | null;
+  } | null;
 }
-
-interface TeamsRowConfig {
-  readonly webhookUrl?: string;
-  readonly mentions?: readonly TeamsMention[];
-}
-
-interface GenericRowConfig {
-  readonly url?: string;
-  readonly signingSecret?: string;
-  readonly signingKeyId?: string;
-}
-
-const decodeConfig = <T>(raw: unknown): T | null => {
-  if (raw == null) return null;
-  if (typeof raw === 'string') {
-    if (!isEncrypted(raw)) return null;
-    try {
-      return decryptJson<T>(raw);
-    } catch {
-      return null;
-    }
-  }
-  if (typeof raw === 'object') return raw as T;
-  return null;
-};
 
 const rowToDestination = (row: IntegrationRow): AnyDestination | null => {
   const id = `db:${row.id}`;
@@ -146,36 +129,38 @@ const rowToDestination = (row: IntegrationRow): AnyDestination | null => {
   };
 
   if (row.kind === 'teamsWorkflow') {
-    const config = decodeConfig<TeamsRowConfig>(row.config);
-    if (!config?.webhookUrl) return null;
+    const creds = resolveTeamsCredentials({ teamsConfig: row.teamsConfig ?? null });
+    if (!creds) return null;
     return {
       id,
       source: 'db',
       kind: 'teams',
-      url: config.webhookUrl,
+      url: creds.webhookUrl,
       routing,
       label: row.label,
-      ...(config.mentions ? { mentions: config.mentions } : {}),
+      ...(creds.mentions ? { mentions: creds.mentions } : {}),
     };
   }
 
   if (row.kind === 'genericWebhook') {
-    const config = decodeConfig<GenericRowConfig>(row.config);
-    if (!config?.url || !config.signingSecret) return null;
+    const creds = resolveGenericCredentials({
+      id: row.id,
+      genericConfig: row.genericConfig ?? null,
+    });
+    if (!creds) return null;
     return {
       id,
       source: 'db',
       kind: 'generic',
-      url: config.url,
+      url: creds.url,
       routing,
-      signingKeys: [{ id: config.signingKeyId ?? `db-${row.id}`, secret: config.signingSecret }],
+      signingKeys: [{ id: creds.signingKeyId, secret: creds.signingSecret }],
       label: row.label,
     };
   }
 
-  // J1 only dispatches teamsWorkflow + genericWebhook. Other kinds
-  // (zohoCrm, ga4DataApi, etc.) live in the same collection but are
-  // handled by their own pipelines.
+  // Only teamsWorkflow + genericWebhook fan out via dispatchEvent.
+  // hubspotCrm is a secondary LeadHandler; analytics kinds use crons.
   return null;
 };
 

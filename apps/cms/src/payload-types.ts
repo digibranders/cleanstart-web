@@ -75,6 +75,7 @@ export interface Config {
     searchLog: SearchLog;
     webhooks_dead_letter: WebhooksDeadLetter;
     integrations: Integration;
+    analyticsCache: AnalyticsCache;
     authors: Author;
     categories: Category;
     newsCategories: NewsCategory;
@@ -108,6 +109,7 @@ export interface Config {
     searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
     webhooks_dead_letter: WebhooksDeadLetterSelect<false> | WebhooksDeadLetterSelect<true>;
     integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
+    analyticsCache: AnalyticsCacheSelect<false> | AnalyticsCacheSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
@@ -166,6 +168,9 @@ export interface Config {
       checkBrokenLinks: TaskCheckBrokenLinks;
       retryWebhook: TaskRetryWebhook;
       meiliReindex: TaskMeiliReindex;
+      dashboardRefreshFrequent: TaskDashboardRefreshFrequent;
+      dashboardRefreshDaily: TaskDashboardRefreshDaily;
+      analyticsCachePrune: TaskAnalyticsCachePrune;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -283,7 +288,6 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -508,7 +512,7 @@ export interface WebhooksDeadLetter {
   createdAt: string;
 }
 /**
- * Outbound channels and analytics read-back wired without a code change. Encrypted secrets, per-row routing.
+ * Outbound destinations and analytics read-back. Credentials (HubSpot, GA4 service account, Clarity, Cloudflare, Brevo, Cal.com) live in env vars set by ops; per-channel URLs (Teams, generic webhook) are encrypted in the row.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "integrations".
@@ -516,49 +520,191 @@ export interface WebhooksDeadLetter {
 export interface Integration {
   id: number;
   /**
-   * Human-readable name, e.g. "Sales channel · #sales-eng-leads".
+   * Human-readable name. "Sales · #sales-eng-leads", "Zapier — lead webhook", etc.
    */
   label: string;
   /**
-   * Integration type. Locked after creation — changing kind means delete + recreate.
+   * Integration type. Locked after creation.
    */
   kind:
     | 'teamsWorkflow'
     | 'genericWebhook'
-    | 'zohoCrm'
+    | 'hubspotCrm'
     | 'ga4DataApi'
     | 'gscSearchAnalyticsApi'
     | 'gscUrlInspectionApi'
     | 'msClarity'
     | 'cloudflareWebAnalytics'
     | 'calComInbound'
-    | 'brevoBounceCallback';
+    | 'brevoBounceCallback'
+    | 'zohoCrm';
   /**
-   * Pause without deleting. Disabled rows are skipped by the dispatcher.
+   * Pause without deleting.
    */
   enabled?: boolean | null;
   /**
-   * How this row is configured. Env rows are synthesised from process.env for read-only display; new rows are always "db".
+   * Which events trigger this destination. Empty filter = all collections / all forms.
    */
-  source?: ('db' | 'env') | null;
-  routing: {
-    /**
-     * Which events trigger a delivery to this row.
-     */
+  routing?: {
     events: ('document.published' | 'lead.submitted')[];
     /**
-     * Filter document.published by collection slug. Empty = all collections.
+     * Filter document.published events by collection slug (e.g. "blogs", "news"). Empty = all.
      */
     collections?: string[] | null;
     /**
-     * Filter lead.submitted by form slug. Empty = all forms.
+     * Filter lead.submitted events by form slug (e.g. "demo-request"). Empty = all forms.
      */
     formSlugs?: string[] | null;
   };
   /**
-   * Per-kind config (webhook URL, signing secret, OAuth tokens, etc.). Encrypted at rest with PAYLOAD_SECRET-derived AES-256-GCM. Never returned in plaintext after save.
+   * One row = one Teams channel. Get the URL from the Workflows app in Teams (template: "Post to a channel when a webhook request is received").
    */
-  config:
+  teamsConfig?: {
+    /**
+     * Workflow webhook URL. Encrypted at rest. Leave blank when editing to keep the saved value.
+     */
+    webhookUrl: string;
+    /**
+     * Optional — paste each person's AAD Object ID + UPN from the Entra portal to ping them with @-mentions.
+     */
+    mentions?:
+      | {
+          displayName: string;
+          aadObjectId: string;
+          upn: string;
+          /**
+           * Optional — restrict this mention to specific events. Empty = all.
+           */
+          triggerOn?: ('document.published' | 'lead.submitted')[] | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Posts a signed JSON payload (Standard Webhooks) to an external URL. Use this for Zapier / n8n / Make / custom receivers.
+   */
+  genericConfig?: {
+    /**
+     * Subscriber URL. Encrypted at rest.
+     */
+    url: string;
+    /**
+     * HMAC-SHA256 shared secret. Encrypted at rest. Leave blank when editing to keep the saved value.
+     */
+    signingSecret: string;
+    /**
+     * Optional key ID surfaced in audit logs and used during rotation.
+     */
+    signingKeyId?: string | null;
+  };
+  /**
+   * Access token comes from the HUBSPOT_PRIVATE_APP_TOKEN env var — nothing to paste here. This row only carries optional mapping overrides.
+   */
+  hubspotConfig?: {
+    /**
+     * Whether to also create a HubSpot Lead alongside the Contact. Default writes a Contact only.
+     */
+    writeMode?: ('contactOnly' | 'contactAndLead') | null;
+    /**
+     * HubSpot lifecyclestage value. Default "lead".
+     */
+    defaultLifecycleStage?: string | null;
+    /**
+     * HubSpot hs_lead_status value. Default "NEW".
+     */
+    defaultLeadStatus?: string | null;
+    /**
+     * Optional — map submission field names onto HubSpot property API names. Standard mapping (email → email, name → firstname/lastname) is automatic.
+     */
+    fieldMapping?:
+      | {
+          submissionField: string;
+          hubspotProperty: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Service-account JSON is set globally via GOOGLE_APPLICATION_CREDENTIALS_JSON env. Grant the SA Viewer role on the GA4 property.
+   */
+  ga4Config?: {
+    /**
+     * GA4 property ID (numbers only — find it in Admin → Property Settings).
+     */
+    propertyId: string;
+  };
+  /**
+   * Service-account JSON is set globally via GOOGLE_APPLICATION_CREDENTIALS_JSON env. Add the SA as a user (or delegated owner for Indexing API) in GSC.
+   */
+  gscConfig?: {
+    /**
+     * GSC property identifier. Domain property = "sc-domain:cleanstart.com". URL prefix = "https://cleanstart.com/" (trailing slash).
+     */
+    siteUrl: string;
+  };
+  /**
+   * API token comes from the CLARITY_API_TOKEN env var — nothing to paste here. Generate it in Clarity → Settings → Data Export.
+   */
+  clarityConfig?: {};
+  /**
+   * API token comes from the CLOUDFLARE_API_TOKEN env var. This row only specifies which Cloudflare account to read.
+   */
+  cloudflareConfig?: {
+    /**
+     * Cloudflare account ID (32-char hex). Optional — falls back to CLOUDFLARE_ACCOUNT_TAG env.
+     */
+    accountTag?: string | null;
+  };
+  /**
+   * Cal.com posts to /api/integrations/calcom; signing secret is the CALCOM_SIGNING_SECRET env var. This row maps bookings to a lead form.
+   */
+  calcomConfig?: {
+    /**
+     * Form ID to attribute Cal.com bookings to. Editors create a hidden "Cal.com bookings" form and paste its ID here.
+     */
+    fallbackFormId: number;
+  };
+  /**
+   * Bearer token comes from the BREVO_INBOUND_TOKEN env var. Register https://admin.cleanstart.com/api/integrations/brevo as a webhook in Brevo with that token in the auth field.
+   */
+  brevoConfig?: {};
+  /**
+   * DB-backed rows = editable. Legacy (env) rows are read-only.
+   */
+  source?: ('db' | 'env') | null;
+  /**
+   * When the health badge last polled.
+   */
+  lastHealthAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Cached aggregate analytics payloads (GA4, GSC, Clarity, Cloudflare). Server-managed — do not edit by hand.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analyticsCache".
+ */
+export interface AnalyticsCache {
+  id: number;
+  /**
+   * Scopes cache keys per environment so staging never reads prod payloads.
+   */
+  env: 'production' | 'staging' | 'development';
+  provider: 'ga4DataApi' | 'gscSearchAnalyticsApi' | 'gscUrlInspectionApi' | 'msClarity' | 'cloudflareWebAnalytics';
+  scope: 'global' | 'document';
+  /**
+   * Identifier within the scope. For global = "default"; for per-document = the canonical URL or "<collection>:<id>".
+   */
+  key: string;
+  /**
+   * When the underlying API call was made. Drives staleness.
+   */
+  capturedAt: string;
+  /**
+   * Provider-shape aggregate response. Schema documented per handler in lib/integrations/kinds/.
+   */
+  payload:
     | {
         [k: string]: unknown;
       }
@@ -567,10 +713,6 @@ export interface Integration {
     | number
     | boolean
     | null;
-  /**
-   * Last time the health badge re-queried webhooks_dead_letter for this row.
-   */
-  lastHealthAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1533,6 +1675,14 @@ export interface Lead {
    * False when the Cloudflare Turnstile challenge was not passed at submit time.
    */
   turnstilePassed?: boolean | null;
+  /**
+   * Updated by the Brevo bounce/complaint webhook. Hard bounce / complaint / unsubscribed = stop sending transactional email to this address.
+   */
+  emailHealth?: ('good' | 'soft_bounce' | 'hard_bounce' | 'complaint' | 'unsubscribed') | null;
+  /**
+   * When emailHealth was last set by the Brevo callback.
+   */
+  emailHealthAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -6314,6 +6464,9 @@ export interface PayloadJob {
           | 'checkBrokenLinks'
           | 'retryWebhook'
           | 'meiliReindex'
+          | 'dashboardRefreshFrequent'
+          | 'dashboardRefreshDaily'
+          | 'analyticsCachePrune'
           | 'schedulePublish';
         taskID: string;
         input?:
@@ -6356,6 +6509,9 @@ export interface PayloadJob {
         | 'checkBrokenLinks'
         | 'retryWebhook'
         | 'meiliReindex'
+        | 'dashboardRefreshFrequent'
+        | 'dashboardRefreshDaily'
+        | 'analyticsCachePrune'
         | 'schedulePublish'
       )
     | null;
@@ -6412,6 +6568,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'integrations';
         value: number | Integration;
+      } | null)
+    | ({
+        relationTo: 'analyticsCache';
+        value: number | AnalyticsCache;
       } | null)
     | ({
         relationTo: 'authors';
@@ -6565,7 +6725,6 @@ export interface MediaSelect<T extends boolean = true> {
         x?: T;
         y?: T;
       };
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -6702,7 +6861,6 @@ export interface IntegrationsSelect<T extends boolean = true> {
   label?: T;
   kind?: T;
   enabled?: T;
-  source?: T;
   routing?:
     | T
     | {
@@ -6710,8 +6868,79 @@ export interface IntegrationsSelect<T extends boolean = true> {
         collections?: T;
         formSlugs?: T;
       };
-  config?: T;
+  teamsConfig?:
+    | T
+    | {
+        webhookUrl?: T;
+        mentions?:
+          | T
+          | {
+              displayName?: T;
+              aadObjectId?: T;
+              upn?: T;
+              triggerOn?: T;
+              id?: T;
+            };
+      };
+  genericConfig?:
+    | T
+    | {
+        url?: T;
+        signingSecret?: T;
+        signingKeyId?: T;
+      };
+  hubspotConfig?:
+    | T
+    | {
+        writeMode?: T;
+        defaultLifecycleStage?: T;
+        defaultLeadStatus?: T;
+        fieldMapping?:
+          | T
+          | {
+              submissionField?: T;
+              hubspotProperty?: T;
+              id?: T;
+            };
+      };
+  ga4Config?:
+    | T
+    | {
+        propertyId?: T;
+      };
+  gscConfig?:
+    | T
+    | {
+        siteUrl?: T;
+      };
+  clarityConfig?: T | {};
+  cloudflareConfig?:
+    | T
+    | {
+        accountTag?: T;
+      };
+  calcomConfig?:
+    | T
+    | {
+        fallbackFormId?: T;
+      };
+  brevoConfig?: T | {};
+  source?: T;
   lastHealthAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analyticsCache_select".
+ */
+export interface AnalyticsCacheSelect<T extends boolean = true> {
+  env?: T;
+  provider?: T;
+  scope?: T;
+  key?: T;
+  capturedAt?: T;
+  payload?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -7110,6 +7339,8 @@ export interface LeadsSelect<T extends boolean = true> {
   piiRedactedAt?: T;
   honeypot?: T;
   turnstilePassed?: T;
+  emailHealth?: T;
+  emailHealthAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -10163,6 +10394,30 @@ export interface TaskRetryWebhook {
  * via the `definition` "TaskMeiliReindex".
  */
 export interface TaskMeiliReindex {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskDashboardRefreshFrequent".
+ */
+export interface TaskDashboardRefreshFrequent {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskDashboardRefreshDaily".
+ */
+export interface TaskDashboardRefreshDaily {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskAnalyticsCachePrune".
+ */
+export interface TaskAnalyticsCachePrune {
   input?: unknown;
   output?: unknown;
 }

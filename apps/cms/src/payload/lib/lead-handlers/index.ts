@@ -1,15 +1,17 @@
 import { brevoHandler } from './brevo';
 import { companyFromDomainHandler } from './company-from-domain';
+import { hubspotHandler } from './hubspot';
 import { registerSecondaryHandler } from './registry';
 
-// Day-1 secondary chain:
+// Secondary chain:
 //   - company-from-domain  (free enrichment, no env gate)
 //   - brevo                (template-based notification, env-gated)
+//   - hubspot              (primary CRM — Phase J3; reads DB-backed
+//                           integration row, no env gate)
 //
-// Microsoft Teams (and GA, GSC, Slack, HubSpot, etc.) move to a later
-// "Integrations" admin surface where editors connect each channel from
-// a CMS settings page, not env vars. See docs/BACKLOG.md
-// "Future — Integrations dashboard".
+// Slack/Discord/Teams move to a later "Integrations" admin surface
+// where editors connect each channel from a CMS settings page, not
+// env vars. See docs/BACKLOG.md "Future — Integrations dashboard".
 
 let registered = false;
 
@@ -23,9 +25,11 @@ export const registerLeadHandlers = (): void => {
   registered = true;
   registerSecondaryHandler(companyFromDomainHandler);
   registerSecondaryHandler(brevoHandler);
+  registerSecondaryHandler(hubspotHandler);
 };
 
-export { brevoHandler, companyFromDomainHandler };
+export { brevoHandler, companyFromDomainHandler, hubspotHandler };
+export { hubspotGdprDeleteByEmail } from './hubspot';
 export {
   registerSecondaryHandler,
   listSecondaryHandlers,

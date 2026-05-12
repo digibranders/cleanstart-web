@@ -261,7 +261,7 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
             </>
           )}
         </span>
-        {manualMode && collision.kind === 'available' && (
+        {collision.kind === 'available' && (
           <output
             aria-live="polite"
             className="cs-slug__chip"

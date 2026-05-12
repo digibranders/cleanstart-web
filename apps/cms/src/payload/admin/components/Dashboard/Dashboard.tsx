@@ -3,6 +3,7 @@ import type { AdminViewServerProps, Payload, Where } from 'payload';
 import type { ReactElement, ReactNode } from 'react';
 
 import { ChevronRight } from '../icons/Chevron';
+import { AnalyticsCards } from './AnalyticsCards';
 
 const PROJECT_NAME = 'CleanStart';
 
@@ -468,6 +469,8 @@ export const Dashboard = async (
           href="/admin/collections/redirects"
         />
       </section>
+
+      <AnalyticsCards payload={payload} />
 
       <section aria-label="Recent edits" className="cs-dashboard__section">
         <div className="cs-dashboard__section-head">
