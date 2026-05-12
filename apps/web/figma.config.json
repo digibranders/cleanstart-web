@@ -1,0 +1,11 @@
+{
+  "codeConnect": {
+    "include": ["src/components/**/*.figma.tsx"],
+    "exclude": ["node_modules/**", ".next/**", ".turbo/**", "dist/**"],
+    "parser": "react",
+    "importPaths": {
+      "src/components/*": "@/components/*"
+    },
+    "label": "CleanStart"
+  }
+}

@@ -283,6 +283,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -6564,6 +6565,7 @@ export interface MediaSelect<T extends boolean = true> {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
