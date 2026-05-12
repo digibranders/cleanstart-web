@@ -10,6 +10,7 @@ import { Footer } from "@/components/sections/Footer";
 import { SecurityNotPatching } from "@/components/sections/SecurityNotPatching";
 import { CleanStartAdvantage } from "@/components/sections/CleanStartAdvantage";
 import { FadeUp } from "@/components/ui/FadeUp";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -95,15 +96,70 @@ export default function Home() {
         <FadeUp>
           <BuiltForTeams />
         </FadeUp>
-        <FadeUp>
-          <FrequentlyAskedQuestions />
-        </FadeUp>
-        <FadeUp>
-          <ResourcesInsights />
-        </FadeUp>
-        <FadeUp>
-          <ReadyToSecureCTA />
-        </FadeUp>
+        {/* FAQ + Resources + CTA share one continuous #F6F6F6 canvas so their
+            transparent backgrounds and decorative blobs/grids bleed across
+            section boundaries without a hard edge.
+            Three 1101×1101 corner grid SVGs from Figma (nodes 108:8523,
+            108:8524, 108:7625) — each carries its own radial-gradient mask so
+            the grid only renders near the corner anchor and fades to fully
+            transparent at the SVG edges. */}
+        <div className="relative bg-[#F6F6F6]">
+          {/* Decorative grid SVGs live in their own absolute, overflow-hidden
+              layer so they're clipped to the wrapper bounds — but the wrapper
+              itself does NOT clip. That keeps the CTA card free to overflow
+              the wrapper bottom (mb-[-90px]) and stay visually on top of the
+              Footer instead of getting cut off by overflow:hidden. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+          >
+            {/* LEFT-TOP grid — Figma 108:8523, x=-435, y=5488 in 1920 frame.
+                Wrapper-relative top = 5488−6231 = −743px. */}
+            <Image
+              src="/images/faq/bg-grid-faq-left.svg"
+              alt=""
+              width={1101}
+              height={1101}
+              unoptimized
+              loading="eager"
+              className="absolute"
+              style={{ left: "-435px", top: "-743px", width: "1101px", height: "1101px", maxWidth: "none" }}
+            />
+            {/* RIGHT-MIDDLE grid — Figma 108:8524, x=1392, y=6657.
+                Right = 1920−1392−1101 = −573px; top = 6657−6231 = 426px. */}
+            <Image
+              src="/images/faq/bg-grid-faq-right.svg"
+              alt=""
+              width={1101}
+              height={1101}
+              unoptimized
+              loading="eager"
+              className="absolute"
+              style={{ right: "-573px", top: "426px", width: "1101px", height: "1101px", maxWidth: "none" }}
+            />
+            {/* LEFT-BOTTOM grid — Figma 108:7625, x=-343, y=7736.
+                Wrapper-relative top = 7736−6231 = 1505px. */}
+            <Image
+              src="/images/faq/bg-grid-faq-bottom-left.svg"
+              alt=""
+              width={1101}
+              height={1101}
+              unoptimized
+              loading="eager"
+              className="absolute"
+              style={{ left: "-343px", top: "1505px", width: "1101px", height: "1101px", maxWidth: "none" }}
+            />
+          </div>
+          <FadeUp>
+            <FrequentlyAskedQuestions />
+          </FadeUp>
+          <FadeUp>
+            <ResourcesInsights />
+          </FadeUp>
+          <FadeUp>
+            <ReadyToSecureCTA />
+          </FadeUp>
+        </div>
       </main>
       <Footer />
     </>

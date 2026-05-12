@@ -56,15 +56,19 @@ export function ReadyToSecureCTA() {
             />
           </div>
 
-          {/* Card — Figma: 1276×335, vertical gradient bottom→top, asymmetric pad 122/145 */}
+          {/* Card — Figma 108:8595 exact: 1276×335, gradient 180deg
+              (top #131E8F → bottom #471EC0), border-radius 40, asymmetric
+              padding 80/145/80/122 (top/right/bottom/left). Content is
+              top-aligned per Figma — title left column (401×165) and right
+              column (description 493×87 + 18px gap + button) both anchor
+              to the top of the content area. */}
           <div
-            className="relative grid items-start gap-y-8 overflow-hidden p-8 md:gap-y-0 md:p-12 lg:items-start lg:[grid-template-columns:401px_493px] lg:[column-gap:115px] lg:[padding:80px_145px_80px_122px]"
+            className="relative grid grid-cols-1 items-start gap-y-8 overflow-hidden p-8 md:gap-y-0 md:p-12 lg:items-start lg:[grid-template-columns:401px_493px] lg:[column-gap:115px] lg:[padding:80px_145px_80px_122px]"
             style={{
-              gridTemplateColumns: "1fr",
               borderRadius: "40px",
               background:
-                "linear-gradient(to top, #131E8F 0%, #471EC0 100%)",
-              minHeight: "335px",
+                "linear-gradient(180deg, #131E8F 0%, #471EC0 100%)",
+              height: "335px",
             }}
           >
             {/* Decorative purple radial blob in the background */}
@@ -81,24 +85,28 @@ export function ReadyToSecureCTA() {
               }}
             />
 
-            {/* Title (left column) */}
+            {/* Title — Figma 108:8596 style_A0S8KL: Figtree Bold 55px,
+                line-height 100%, letter-spacing -5%, color white, 401×165. */}
             <h2
               id="cta-title"
               className="relative z-10 font-sans text-white"
               style={{
                 fontSize: "clamp(2rem,4.6vw,3.4375rem)",
                 fontWeight: 700,
-                lineHeight: "105%",
+                lineHeight: "100%",
                 letterSpacing: "-0.05em",
+                maxWidth: "401px",
               }}
             >
               Ready to Secure Your Container Infrastructure?
             </h2>
 
-            {/* Right column: description + button */}
-            <div className="relative z-10 flex flex-col items-start gap-[25px]">
+            {/* Right column — description + button. Figma 108:8597 description
+                style_LAOX54: Figtree Regular 21px, line-height 140%, ls -4%,
+                white opacity 0.8, 493×87. Gap to button = 18px per Figma. */}
+            <div className="relative z-10 flex flex-col items-start gap-[18px]">
               <p
-                className="font-sans text-white"
+                className="font-sans text-white/80"
                 style={{
                   fontSize: "21px",
                   fontWeight: 400,
