@@ -284,10 +284,36 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 
 ---
 
+## Branch strategy
+
+```
+web ──────┐
+          ├──► development (CI + integration) ──► main (production)
+cms ──────┘
+```
+
+| Branch | Purpose | PRs to | Notes |
+|--------|---------|--------|-------|
+| `web` | All `apps/web` marketing site work | `development` | Never commit CMS changes here |
+| `cms` | All `apps/cms` Payload work | `development` | Never commit web changes here |
+| `development` | CI gate + integration | `main` | No direct feature work — merge only |
+| `main` | Production | — | Coolify deploys `apps/cms` on push here |
+
+**Rules:**
+- All feature work starts from and PRs back to `development` via `web` or `cms` branch.
+- Never push directly to `main`. Only `development` → `main` PRs after CI passes.
+- Never work directly on `development` — it is the integration branch, not a feature branch.
+- `web` and `cms` branches are permanent — never delete them.
+- Keep `web` and `cms` branches rebased on `development` before opening a PR to avoid conflicts.
+- One concern per PR: a `web` PR touches only `apps/web`; a `cms` PR touches only `apps/cms`.
+  Shared files (`CLAUDE.md`, `docs/`, `packages/`) may go in either PR depending on what drove the change.
+
+---
+
 ## Deploy rules
 
 - `apps/cms` deploys via **Coolify** on push to `main`. There is no other deploy path.
-- `apps/web` has no production deployment yet — it is in active development on the `development` branch.
+- `apps/web` has no production deployment yet — actively developed on the `web` branch.
 - Postgres lives on the same droplet, localhost-bound. Migrations run via Payload's migration runner, never raw SQL.
 - Cloudflare WAF sits in front of `admin.cleanstart.com`. 2FA is mandatory for every admin user.
 - Staging is a separate droplet (or DB) per arch doc §`#staging`. Never point staging at prod data.
