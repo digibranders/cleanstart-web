@@ -28,7 +28,7 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <Link
-            href="/"
+            href="/book-a-demo"
             className="cs-btn-glass hidden xl:inline-flex"
             style={{
               ["--cs-btn-h" as string]: "38px",

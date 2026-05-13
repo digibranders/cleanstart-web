@@ -50,6 +50,8 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 
 **`apps/web`** was re-bootstrapped at commit `ac5a0d0` as a purpose-built Next.js 16.2.5 / React 19 / Tailwind v4 marketing site. It currently has a hero page and Figma Code Connect wired (`figma.config.json`; component stubs live at `src/components/**/*.figma.tsx`). It is **early-stage** — no production deployment yet, no separate CI gate yet. The design/token/routing contracts from the prior wipe are gone; everything in `apps/web` now is built from Figma ground up. When touching `apps/web`, preserve the Code Connect setup: do not delete `figma.config.json` or restructure `src/components/` without understanding the connected Figma component mapping.
 
+**Full page inventory:** `docs/WEB-PAGES.md` — canonical list of all 31 pages, their URL slugs, types (Static / CMS Listing / CMS Detail / Legal / Utility), build status, and recommended build order. Update the status column there whenever a page is completed.
+
 **`packages/ui`** hosts the custom React primitives (`Drawer`, `Dialog`, `Popover`, `Combobox`, `ConfirmDialog`, `Spinner`, `Tooltip`, `DropdownMenu`, `ContextMenu`, `DateTimePicker`, `Toast`) plus design tokens. Consumed by both `apps/cms` and `apps/web` — no duplication between the two apps.
 
 ### `@payloadcms/ui` is a data-layer-only dependency
@@ -98,6 +100,110 @@ pnpm --filter @cleanstart/web build
 - **Three similar lines beats a premature abstraction.** Don't extract helpers until you have a third caller.
 - **Validate at system boundaries only.** Trust internal code. Don't add defensive checks for impossible states.
 - **Lexical nodes** follow the pattern in arch doc §`#table-handling` and §`#link-handling`. Custom nodes live in `apps/cms/src/payload/lib/lexical/`.
+
+---
+
+## apps/web — marketing site conventions
+
+Everything in this section applies only to `apps/web`. It does not override the global code conventions above — it extends them.
+
+### Component structure
+
+- One section per file: `src/components/sections/[page]/SectionName.tsx`
+- Page entry point: `src/app/[page]/page.tsx`
+- All nav links live in **one place only**: `src/lib/nav-config.ts`. Changing a page slug means changing it there — both desktop and mobile nav pick it up automatically.
+- Do not restructure `src/components/` or delete `figma.config.json` without understanding the Figma Code Connect mapping.
+
+### Figma-to-code rules
+
+Every section is built directly from Figma design context. These rules are non-negotiable:
+
+**Values must be exact — never approximated.**
+- Copy gradient strings verbatim including angle, all stops, and opacities.
+- Letter-spacing in `em` exactly as Figma reports (e.g. `-0.05em` ≠ `-0.04em`).
+- Border-radius in exact `px` — `40px` is not `rounded-2xl` (which is `16px`).
+- Shadow strings copied in full including all layers.
+- Use `style={{}}` inline for any value that cannot be expressed as an exact Tailwind class.
+- Use `clamp(minREM, Xvw, maxREM)` for all font sizes — never hardcode `px` for text.
+
+**Section wrapper pattern:**
+```tsx
+<section className="relative overflow-hidden ..." style={{ minHeight: "Xpx" }}>
+  {/* decorative elements — absolute positioned */}
+  <div className="relative mx-auto max-w-[1276px] px-6">
+    {/* content */}
+  </div>
+</section>
+```
+The outer `relative overflow-hidden` clips decorative elements. The inner `relative` wrapper ensures content sits above absolute decorative layers.
+
+### Asset extraction rules
+
+Before saving any asset downloaded from Figma MCP:
+1. Detect actual format: `file --mime-type -b <file>`
+   - `image/svg+xml` → save as `.svg` even if Figma called it `.png`
+   - `image/png` → `.png` · `image/jpeg` → `.jpg`
+2. Name descriptively: `hero-bg-grid.svg`, `founders-photo.png`, `card-glow.svg`
+3. Save to `public/images/[page-name]/`
+4. Verify the file exists on disk before referencing it in JSX
+
+Never recreate an SVG asset in code — always extract the actual file from Figma MCP. If MCP did not return it, call `get_design_context` on the specific child node that contains it.
+
+### Image component rules
+
+- `next/image` (`Image`) for all PNG/JPG content images — requires explicit `width` and `height`.
+- Plain `<img>` for decorative SVGs. Always add `// eslint-disable-next-line @next/next/no-img-element` on the line above.
+- Every decorative element must have: `aria-hidden`, `pointer-events-none`, `select-none`, `loading="lazy"`, `decoding="async"`.
+
+### Background decorative elements
+
+Grids, blobs, guide lines, and glow flares are the most commonly missed detail. Rules:
+
+- Positions use exact Figma `px` coordinates — including negative values. Do not move an element inward to "fix" a negative position; partial off-screen clipping via `overflow-hidden` is intentional.
+- For vertical guide lines, use proportional positioning so they scale: `left: calc(Xpx / 1920 * 100%)` not fixed `px`.
+- Radial gradient blobs are pure CSS `<div>` with `borderRadius: "50%"` — not SVG files.
+- Bottom glow flares: `<div>` pinned `bottom-0 left-0 right-0`, `mix-blend-mode: screen` if Figma shows screen blend.
+- Elements only visible at wide viewports: `className="hidden xl:block"`.
+
+### CTA ↔ Footer overlap pattern
+
+When a CTA card overlaps the Footer's dark background (standard pattern across all pages):
+
+- `mb-[-Xpx]` goes on the `<section>` element — **not** the card div inside it.
+- `z-20` goes on the **inner card wrapper div** — not the section.
+- `<Footer />` stays outside `<main>` as a sibling — no extra wrapper needed in `page.tsx`.
+- The section must not have a solid background that covers the overlap zone. If it has `bg-white`, replace with a gradient overlay that fades to `rgba(0,0,0,0)` at the bottom so the footer dark background bleeds through.
+
+### FadeUp scroll animation
+
+- Wrap every section below the fold in `<FadeUp>` in `page.tsx`.
+- Never wrap the Hero (above the fold).
+- Sections that share a continuous Figma frame (e.g. Hero + Factory) go inside **one** background wrapper div — not separate `FadeUp` wrappers for the background.
+- `FadeUp` accepts `className` via spread — use `<FadeUp className="relative z-10">` if the section's card must render above a following sibling (e.g. footer) and stacking context is needed.
+
+### Visual verification workflow
+
+`preview_screenshot` only captures at `scrollY=0`. To bring any section into view:
+
+```js
+// Shift the ENTIRE page — use body, not main, so footer moves too
+document.body.style.transform = `translateY(-${top - 100}px)`;
+document.body.style.transformOrigin = 'top left';
+// Reset:
+document.body.style.transform = '';
+```
+
+Force FadeUp/animation wrappers visible before screenshotting:
+```js
+document.querySelectorAll('*').forEach(el => {
+  if (window.getComputedStyle(el).opacity === '0') {
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+  }
+});
+```
+
+A section is not done until its screenshot matches the Figma reference at 1440px.
 
 ---
 
@@ -198,4 +304,5 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 - **Migration question?** Arch doc §`#migration` (and the seven subsections under it).
 - **Integration question?** Read `docs/INTEGRATIONS-RESEARCH.md` (Teams/webhook deep-dive, Standard Webhooks signing) and `docs/INTEGRATIONS-RESEARCH-V2.md` (analytics read-back, inbound webhooks, J1/J2/J3 milestones).
 - **Background job question?** Arch doc §`#cron-jobs` + the job file and its co-located test.
+- **Which apps/web page to build next, or what slug/category a page uses?** `docs/WEB-PAGES.md`.
 - **Decision not in arch doc and not in this file?** Stop and ask. Don't invent.
