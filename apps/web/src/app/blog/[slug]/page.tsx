@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getBlogBySlug, getRelatedBlogs } from "@/lib/blog";
+import { Header } from "@/components/sections/Header";
 import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
 import { BlogDetailContent } from "@/components/sections/blog/BlogDetailContent";
 import { BlogDetailRelatedPosts } from "@/components/sections/blog/BlogDetailRelatedPosts";
-import { ReadyToSecureCTA } from "@/components/sections/ReadyToSecureCTA";
+import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { Footer } from "@/components/sections/Footer";
 
 interface BlogDetailPageProps {
@@ -49,6 +50,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
 
   return (
     <>
+      <Header />
       <main>
         <BlogDetailHero
           title={post.title}
@@ -66,11 +68,13 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
           abstract={post.abstract ?? undefined}
         />
 
-        {relatedPosts.length > 0 && (
-          <BlogDetailRelatedPosts posts={relatedPosts} />
-        )}
-
-        <ReadyToSecureCTA />
+        {/* Shared gradient zone — RelatedPosts + CTA share one continuous background in Figma */}
+        <div style={{ background: "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)" }}>
+          {relatedPosts.length > 0 && (
+            <BlogDetailRelatedPosts posts={relatedPosts} />
+          )}
+          <BlogDetailCTA />
+        </div>
       </main>
 
       <Footer />

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { formatBlogDate } from "@/lib/blog";
+import { formatBlogDate, mediaUrl } from "@/lib/blog";
 import type { Blog } from "@/lib/blog";
 
 interface BlogDetailRelatedPostsProps {
@@ -14,11 +14,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
     <section
       className="relative w-full overflow-hidden"
       data-section="BlogDetailRelatedPosts"
-      style={{
-        // Figma 330:522 — dark gradient matching the hero
-        background: "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)",
-        minHeight: "928px",
-      }}
+      style={{ minHeight: "928px" }}
     >
       <div className="relative mx-auto max-w-[1276px] px-6">
         {/* Header row */}
@@ -103,7 +99,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
         <div className="relative shrink-0 mx-3 mt-3 rounded-[20px] overflow-hidden" style={{ height: "200px" }}>
           {post.heroImage ? (
             <Image
-              src={post.heroImage.url}
+              src={mediaUrl(post.heroImage.url)!}
               alt={post.heroImage.alt ?? post.title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -116,23 +112,24 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
           )}
         </div>
 
-        {/* Category badge */}
+        {/* Category badge — Figma 330:526, y=190 (22px above image bottom at y=212) */}
         {primaryCategory && (
-          <div className="relative mx-[32px] mt-[-14px] mb-0 self-start">
-            <div className="relative inline-flex items-center gap-[10px] px-[12px] py-[6px] rounded-[8px] overflow-hidden">
-              <Image
-                src="/images/blog-detail/related-card-category-bg.png"
-                alt=""
-                aria-hidden
-                fill
-                className="object-cover pointer-events-none select-none"
-              />
-              <span
-                className="relative z-10 whitespace-nowrap"
-                style={{ fontFamily: "Figtree, sans-serif", fontWeight: 500, fontSize: "16px", lineHeight: 1.3, color: "#4a3bf1" }}
-              >
-                {primaryCategory.name}
-              </span>
+          <div className="mx-[32px] mt-[-22px] self-start">
+            <div
+              className="inline-flex items-center whitespace-nowrap"
+              style={{
+                padding: "6px 12px",
+                borderRadius: "8px",
+                background: "linear-gradient(90deg, #F5F5F9 0%, #EAE5FE 100%)",
+                boxShadow: "0px 3px 0px 0px rgba(74,59,241,0.3)",
+                fontFamily: "Figtree, sans-serif",
+                fontWeight: 500,
+                fontSize: "16px",
+                lineHeight: 1.3,
+                color: "#4a3bf1",
+              }}
+            >
+              {primaryCategory.name}
             </div>
           </div>
         )}
@@ -144,7 +141,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
             {post.publishedAt && (
               <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/blogs/icon-calendar.svg" alt="" aria-hidden width={18} height={18} className="shrink-0" />
+                <img src="/images/blogs/icon-calendar-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0" />
                 <span style={{ fontFamily: "Figtree, sans-serif", fontWeight: 500, fontSize: "14px", color: "#666", lineHeight: "normal" }}>
                   {formatBlogDate(post.publishedAt)}
                 </span>
@@ -153,7 +150,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
             {post.readingMinutes != null && (
               <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/blogs/icon-clock.svg" alt="" aria-hidden width={18} height={18} className="shrink-0" />
+                <img src="/images/blogs/icon-clock-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0" />
                 <span style={{ fontFamily: "Figtree, sans-serif", fontWeight: 500, fontSize: "14px", color: "#666", lineHeight: "normal" }}>
                   {post.readingMinutes} min read
                 </span>
@@ -189,7 +186,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
             </span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/blog-detail/icon-read-more-arrow.svg"
+              src="/images/blogs/icon-arrow-read-more.svg"
               alt=""
               aria-hidden
               width={24}

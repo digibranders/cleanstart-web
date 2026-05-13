@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { formatBlogDate } from "@/lib/blog";
+import { formatBlogDate, mediaUrl } from "@/lib/blog";
 import type { BlogCategory, BlogAuthor, BlogImage } from "@/lib/blog";
 
 interface BlogDetailHeroProps {
@@ -102,16 +102,16 @@ export function BlogDetailHero({
         </nav>
 
         {/* Title */}
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-10">
           <h1
             className="text-white text-center"
             style={{
               fontFamily: "Figtree, sans-serif",
-              fontWeight: 500,
-              fontSize: "clamp(40px, 5vw, 72px)",
-              lineHeight: 1,
-              letterSpacing: "-0.05em",
-              maxWidth: "674px",
+              fontWeight: 600,
+              fontSize: "clamp(26px, 2.4vw, 40px)",
+              lineHeight: 1.25,
+              letterSpacing: "-0.03em",
+              maxWidth: "860px",
             }}
           >
             {title}
@@ -119,13 +119,19 @@ export function BlogDetailHero({
         </div>
 
         {/* Horizontal separator */}
-        <div
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/blogs/hero-divider-line.svg"
+          alt=""
+          aria-hidden
           className="w-full mt-[133px]"
-          style={{ height: "1px", background: "rgba(255,255,255,0.15)" }}
+          style={{ height: "1px", display: "block" }}
+          loading="lazy"
+          decoding="async"
         />
 
         {/* Meta row — reading time | author | date */}
-        <div className="flex items-center pt-[22px] pb-[40px] gap-0">
+        <div className="flex items-center justify-between pt-[22px] pb-[40px]">
           {/* Reading time */}
           {readingMinutes != null && (
             <div className="flex items-center gap-[4px] shrink-0">
@@ -156,7 +162,7 @@ export function BlogDetailHero({
             <div className="flex items-center gap-[7px] shrink-0">
               {primaryAuthor.avatar ? (
                 <Image
-                  src={primaryAuthor.avatar.url}
+                  src={mediaUrl(primaryAuthor.avatar.url)!}
                   alt={primaryAuthor.name}
                   width={32}
                   height={32}
@@ -224,14 +230,16 @@ function BreadcrumbChevron(): React.ReactElement {
 
 function MetaSeparator(): React.ReactElement {
   return (
-    <div
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/images/blogs/hero-meta-separator.svg"
+      alt=""
       aria-hidden
-      className="mx-[204px] shrink-0 hidden lg:block"
-      style={{
-        width: "1px",
-        height: "45px",
-        background: "rgba(255,255,255,0.2)",
-      }}
+      width={1}
+      height={46}
+      className="mx-4 shrink-0 hidden lg:block"
+      loading="lazy"
+      decoding="async"
     />
   );
 }
