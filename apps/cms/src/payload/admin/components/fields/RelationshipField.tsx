@@ -75,9 +75,9 @@ const ROW_HINTS: Record<string, RowHint> = {
   jobs: { primary: ['title'], secondary: ['location'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'Job' },
 
   // Taxonomies / pickers: inline chips, no thumb, "+ New" allowed.
-  categories: { primary: ['title'], secondary: ['description', 'slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
-  newsCategories: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
-  knowledgeCategories: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
+  categories: { primary: ['name', 'title'], secondary: [], showThumb: false, showCreate: true, chipLayout: 'inline' },
+  newsCategories: { primary: ['name', 'title'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
+  knowledgeCategories: { primary: ['name', 'title'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
   jobLocations: { primary: ['city'], secondary: ['country'], showThumb: false, showCreate: true, chipLayout: 'inline' },
   forms: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'inline' },
   redirects: { primary: ['from'], secondary: ['to'], showThumb: false, showCreate: false, chipLayout: 'inline' },
@@ -451,7 +451,7 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
     (field.admin as { allowCreate?: boolean } | undefined)?.allowCreate !== false;
   const showCreate = primaryHint.showCreate !== false && allowCreate;
 
-  // Render a single pill — extracted because we render in two layouts.
+  // Render a single pill — used only for hasMany stacked layout.
   const renderPill = (pill: ResolvedDoc): ReactElement => {
     const hint = ROW_HINTS[pill.relationTo] ?? DEFAULT_HINT;
     const typeLabel = hint.typeLabel ?? titleCaseSlug(pill.relationTo);
@@ -503,6 +503,198 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
     );
   };
 
+  // ─── Single-select: cs-collections-select style (same as SelectField / integrations forms) ───
+  if (!hasMany) {
+    const selectedPill = pills[0] ?? null;
+    const isEmpty = selectedPill === null;
+    const listboxId = `${labelId}-listbox`;
+
+    const singleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setOpen(true);
+        setActiveIdx((i) => Math.min(i + 1, visibleResults.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveIdx((i) => Math.max(0, i - 1));
+      } else if (e.key === 'Enter') {
+        const target = visibleResults[activeIdx];
+        if (target) { e.preventDefault(); handlePick(target); }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        setOpen(false);
+        setQuery('');
+      }
+    };
+
+    return (
+      <div className={`field-type relationship${showError ? ' field-type--error' : ''}`}>
+        {Label ?? (
+          <span className="field-label" id={labelId}>
+            {labelText}
+            {field.required ? <span className="required" aria-hidden="true"> *</span> : null}
+          </span>
+        )}
+
+        <div className={`cs-collections-select${open ? ' is-open' : ''}${showError ? ' cs-collections-select--error' : ''}`}>
+          <div
+            className="cs-collections-select__control"
+            onClick={() => !readOnly && inputRef.current?.focus()}
+            onKeyDown={(e) => {
+              if ((e.key === 'Enter' || e.key === ' ') && !readOnly) inputRef.current?.focus();
+            }}
+          >
+            {!readOnly ? (
+              <input
+                ref={inputRef}
+                type="text"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded={open}
+                aria-controls={listboxId}
+                aria-activedescendant={
+                  open && visibleResults[activeIdx]
+                    ? `${listboxId}-opt-${activeIdx}`
+                    : undefined
+                }
+                aria-labelledby={labelId}
+                className="cs-collections-select__input"
+                value={open ? query : (selectedPill?.primary ?? '')}
+                placeholder={isEmpty ? `Search ${slugs.join(' / ')}…` : ''}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setOpen(true);
+                  setActiveIdx(0);
+                }}
+                onFocus={(e) => {
+                  setOpen(true);
+                  if (!isEmpty) { setQuery(''); e.target.select(); }
+                }}
+                onBlur={() => setTimeout(() => setOpen(false), 150)}
+                onKeyDown={singleKeyDown}
+              />
+            ) : (
+              <span className="cs-collections-select__input cs-collections-select__input--readonly">
+                {selectedPill?.primary ?? <em>No selection</em>}
+              </span>
+            )}
+
+            {loading ? (
+              <span className="cs-relationship-field__loading">
+                <Spinner size="sm" label="Searching" />
+              </span>
+            ) : null}
+
+            {!isEmpty && !readOnly ? (
+              <button
+                type="button"
+                className="cs-collections-select__reset"
+                aria-label="Clear selection"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  commit([]);
+                  setQuery('');
+                  inputRef.current?.focus();
+                }}
+              >
+                ×
+              </button>
+            ) : null}
+
+            {showCreate ? (
+              <button
+                type="button"
+                className="cs-relationship-field__new"
+                onClick={() => setCreateOpen(true)}
+                title={`Create new ${slugs[0]}`}
+                aria-label={`Create new ${slugs[0]}`}
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
+                <span>New</span>
+              </button>
+            ) : null}
+          </div>
+
+          {open && !readOnly ? (
+            <div
+              id={listboxId}
+              // biome-ignore lint/a11y/useSemanticElements: custom select listbox; div is required here because a <select> cannot participate in a combobox composite widget
+              role="listbox"
+              tabIndex={-1}
+              aria-label={labelText}
+              className="cs-collections-select__dropdown"
+            >
+              {loading && visibleResults.length === 0 ? (
+                <div className="cs-collections-select__empty">Searching…</div>
+              ) : visibleResults.length === 0 ? (
+                <div className="cs-collections-select__empty">
+                  {query ? `No matches for "${query}"` : 'No options'}
+                </div>
+              ) : (
+                visibleResults.map((doc, i) => {
+                  const docHint = ROW_HINTS[doc.relationTo] ?? DEFAULT_HINT;
+                  const showBadges = docHint.chipLayout === 'stacked';
+                  const docTypeLabel = showBadges ? (docHint.typeLabel ?? titleCaseSlug(doc.relationTo)) : null;
+                  const status = showBadges ? doc.status?.toLowerCase() : undefined;
+                  return (
+                    <button
+                      key={`${doc.relationTo}:${doc.id}`}
+                      id={`${listboxId}-opt-${i}`}
+                      type="button"
+                      // biome-ignore lint/a11y/useSemanticElements: option inside a custom listbox; native <option> is only valid inside <select>
+                      role="option"
+                      tabIndex={-1}
+                      aria-selected={selectedPill?.id === doc.id}
+                      className={`cs-collections-select__option${i === activeIdx ? ' is-active' : ''}`}
+                      onMouseEnter={() => setActiveIdx(i)}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handlePick(doc);
+                      }}
+                    >
+                      <span className="cs-collections-select__opt-label">{doc.primary}</span>
+                      {doc.secondary ? (
+                        <span className="cs-collections-select__opt-slug">{doc.secondary}</span>
+                      ) : null}
+                      {showBadges && (docTypeLabel || status) ? (
+                        <span className="cs-relationship-field__pill-badges">
+                          {docTypeLabel ? <span className="cs-relationship-field__pill-type">{docTypeLabel}</span> : null}
+                          {status ? <span className={`cs-relationship-field__pill-status cs-relationship-field__pill-status--${status}`}>{status}</span> : null}
+                        </span>
+                      ) : null}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          ) : null}
+        </div>
+
+        {Description ?? (description ? <p className="field-description">{description}</p> : null)}
+        {ErrorRender ??
+          (showError && errorMessage ? (
+            <output className="field-error" aria-live="polite">
+              {errorMessage}
+            </output>
+          ) : null)}
+
+        {createOpen ? (
+          <DocumentPicker
+            open={createOpen}
+            onClose={() => setCreateOpen(false)}
+            relationTo={slugs[0] ?? fallbackRelationTo}
+            id={null}
+            title={`New ${slugs[0]}`}
+            onSaved={handleCreated}
+          />
+        ) : null}
+      </div>
+    );
+  }
+
+  // ─── Multi-select: chip + Popover layout ────────────────────────────────────
   return (
     <div
       className={`field-type relationship cs-relationship-field${
@@ -519,7 +711,6 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
       )}
 
       <div className="cs-relationship-field__control">
-        {/* Stacked layout: pills render as a vertical list ABOVE the input. */}
         {chipLayout === 'stacked' && pills.length > 0 ? (
           <div className="cs-relationship-field__pills cs-relationship-field__pills--stacked" aria-label="Selected">
             {pills.map(renderPill)}
@@ -534,8 +725,6 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
                 : ''
             }`}
             ref={inputWrapRef}
-            // Click anywhere in the input row focuses the actual input —
-            // important for the inline layout where chips eat space.
             onClick={(e) => {
               if (e.target === e.currentTarget) inputRef.current?.focus();
             }}
@@ -545,20 +734,13 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
               }
             }}
           >
-            {/* Inline layout: chips wrap inside the input row, Gmail-style. */}
             {chipLayout === 'inline' && pills.length > 0 ? pills.map(renderPill) : null}
 
             <input
               ref={inputRef}
               type="search"
               className="cs-relationship-field__input"
-              placeholder={
-                pills.length === 0
-                  ? `Search ${slugs.join(' / ')}…`
-                  : hasMany
-                    ? 'Add more…'
-                    : 'Replace selection…'
-              }
+              placeholder={pills.length === 0 ? `Search ${slugs.join(' / ')}…` : 'Add more…'}
               value={query}
               onChange={onInputChange}
               onFocus={() => setOpen(true)}
@@ -597,8 +779,6 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
         ) : pills.length === 0 ? (
           <span className="cs-relationship-field__empty">No selection</span>
         ) : (
-          // Read-only with stacked pills already rendered above; for
-          // read-only inline, render the pills here as a static list.
           chipLayout === 'inline' ? (
             <div className="cs-relationship-field__pills cs-relationship-field__pills--inline-readonly">
               {pills.map(renderPill)}
@@ -635,10 +815,6 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
             </div>
           ) : (
             visibleResults.map((doc, i) => {
-              // Stacked-layout collections (blogs/news/pages/...) get the
-              // same badge UI in the dropdown row as on the chip — type +
-              // colored status. Inline-layout collections keep the
-              // free-form `secondary` text (role/location/slug).
               const docHint = ROW_HINTS[doc.relationTo] ?? DEFAULT_HINT;
               const docTypeLabel = docHint.typeLabel ?? titleCaseSlug(doc.relationTo);
               const showBadges = docHint.chipLayout === 'stacked';

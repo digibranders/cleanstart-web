@@ -1,33 +1,54 @@
 'use client';
 
-import { useRowLabel } from '@payloadcms/ui';
+import { useFormFields, useRowLabel } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
-
-type TocRowData = {
-  level?: number | string | null;
-  text?: string | null;
-};
 
 const truncate = (input: string, max: number): string =>
   input.length > max ? `${input.slice(0, max - 1).trimEnd()}…` : input;
 
-const formatLevel = (raw: TocRowData['level']): string => {
-  if (typeof raw === 'number' && Number.isFinite(raw)) return `H${raw}`;
-  if (typeof raw === 'string' && /^[1-6]$/.test(raw.trim())) return `H${raw.trim()}`;
-  return 'H?';
-};
+const formatLevel = (raw: number | null | undefined): string =>
+  typeof raw === 'number' && Number.isFinite(raw) ? `H${raw}` : 'H?';
 
 /**
- * Row label for the auto-built `tableOfContents` array. Shows the
- * heading level + heading text on the collapsed row (e.g. "H2 ·
- * What Is the SEBI CSCRF Audit") instead of the default
- * `Heading 01`/`Heading 02`, so editors can verify TOC structure
- * at a glance.
+ * Row label for the auto-built `tableOfContents` array. Shows the heading
+ * level + text on the collapsed row (e.g. "H2 · What Is Attack Surface
+ * Reduction") so editors can verify TOC structure at a glance.
+ *
+ * Why useFormFields instead of useRowLabel().data:
+ * - useRowLabel().data reads from RowLabelContext which reconstructs row data
+ *   from form-state keys. admin.hidden: true skips addFieldStatePromise so
+ *   those keys are never registered — data is always empty.
+ * - useDocumentInfo().initialData is set once on page load and is NOT updated
+ *   after in-session saves, so it always reflects stale pre-save values.
+ * - useFormFields reads directly from the live flat form state by dot-path
+ *   (e.g. "tableOfContents.0.level"). addFieldStatePromise registers ALL
+ *   sub-fields server-side regardless of row collapse state, and form state
+ *   is updated on every save without a page refresh.
+ *
+ * Prerequisite: level and text must use HiddenField (custom null component)
+ * not admin.hidden: true. The null component does not trigger
+ * fieldIsHiddenOrDisabled, so the fields ARE included in form state.
  */
 export const TocRowLabel = (): ReactElement => {
-  const { data } = useRowLabel<TocRowData>();
-  const level = formatLevel(data?.level);
-  const text = (data?.text ?? '').trim();
+  const { rowNumber } = useRowLabel();
+
+  const level = useFormFields(
+    ([fields]) =>
+      rowNumber != null
+        ? (fields[`tableOfContents.${rowNumber}.level`]?.value as number | undefined)
+        : undefined,
+  );
+
+  const text = useFormFields(
+    ([fields]) =>
+      rowNumber != null
+        ? (fields[`tableOfContents.${rowNumber}.text`]?.value as string | undefined)
+        : undefined,
+  );
+
+  const displayLevel = formatLevel(level);
+  const displayText = (text ?? '').trim();
+
   return (
     <span>
       <span
@@ -44,9 +65,13 @@ export const TocRowLabel = (): ReactElement => {
           textAlign: 'center',
         }}
       >
-        {level}
+        {displayLevel}
       </span>
-      {text ? truncate(text, 110) : <em style={{ opacity: 0.6 }}>(no heading text)</em>}
+      {displayText ? (
+        truncate(displayText, 110)
+      ) : (
+        <em style={{ opacity: 0.6 }}>(no heading text)</em>
+      )}
     </span>
   );
 };
