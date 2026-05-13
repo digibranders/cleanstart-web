@@ -15,8 +15,9 @@ build/
 # false-positive diffs every session. Next regenerates it as needed.
 next-env.d.ts
 
-# Claude Code per-user settings (launch.json is committed; settings.local.json is per-user)
+# Claude Code per-user settings and runtime files
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
 
 # Generated types — Payload regenerates this; do not edit by hand
 # (still committed; ignore only local stale copies during regeneration)
