@@ -1,8 +1,9 @@
 // Single source of truth for the marketing nav. Mirrors cleanstart.com production IA.
 // Consumed by both DesktopNav and MobileNav so the desktop bar and mobile sheet never drift.
 //
-// All hrefs point to "/" for now — sub-pages haven't been built yet. When a section
-// page lands, swap its href in this file and both desktop + mobile nav pick it up.
+// All slugs match docs/WEB-PAGES.md exactly. Pages not yet built keep their correct final
+// slug here — do NOT use "/" as a placeholder. When a page is built its route folder must
+// match the href in this file.
 
 export type NavLeaf = {
   label: string;
@@ -37,8 +38,6 @@ export type NavFlatItem = {
 
 export type NavItem = NavMegaItem | NavCompactItem | NavFlatItem;
 
-const HOME = "/";
-
 export const NAV_TREE: NavItem[] = [
   {
     kind: "mega",
@@ -49,17 +48,17 @@ export const NAV_TREE: NavItem[] = [
         items: [
           {
             label: "CleanStart Images",
-            href: HOME,
+            href: "/cleanstart-images",
             description: "Hardened, minimal container images with near-zero CVEs.",
           },
           {
             label: "CleanStart SBOM",
-            href: HOME,
+            href: "/software-bill-materials",
             description: "Signed SBOMs and provenance for every artifact you ship.",
           },
           {
             label: "CleanSight",
-            href: HOME,
+            href: "/cleansight",
             description: "Runtime visibility into vulnerabilities and drift.",
           },
         ],
@@ -75,22 +74,22 @@ export const NAV_TREE: NavItem[] = [
         items: [
           {
             label: "FIPS Compliance",
-            href: HOME,
+            href: "/fips",
             description: "FIPS 140-3 validated cryptography across your stack.",
           },
           {
             label: "Enhance SCA",
-            href: HOME,
+            href: "/software-composition-analysis",
             description: "Cut SCA noise with cleaner base images and signed SBOMs.",
           },
           {
             label: "Vulnerability Remediation",
-            href: HOME,
+            href: "/vulnerability-remediation",
             description: "Patch upstream once, ship hardened downstream everywhere.",
           },
           {
             label: "Attack Surface Reduction",
-            href: HOME,
+            href: "/attack-surface-reduction",
             description: "Distroless-style minimal images shrink your blast radius.",
           },
         ],
@@ -102,8 +101,8 @@ export const NAV_TREE: NavItem[] = [
     label: "Audience",
     width: 260,
     items: [
-      { label: "For Developers", href: HOME },
-      { label: "For CISO", href: HOME },
+      { label: "For Developers", href: "/for-developers" },
+      { label: "For CISO", href: "/for-ciso" },
     ],
   },
   {
@@ -114,18 +113,18 @@ export const NAV_TREE: NavItem[] = [
       {
         title: "Insights",
         items: [
-          { label: "Blogs", href: HOME },
-          { label: "Resource Center", href: HOME },
-          { label: "Newsroom", href: HOME },
-          { label: "Knowledge Hub", href: HOME },
+          { label: "Blogs", href: "/blogs" },
+          { label: "Resource Center", href: "/resource-center" },
+          { label: "Newsroom", href: "/news" },
+          { label: "Knowledge Hub", href: "/knowledge-hub" },
         ],
       },
       {
         title: "Events",
         items: [
-          { label: "In-Person Events", href: HOME },
-          { label: "Webinars", href: HOME },
-          { label: "Podcast", href: HOME },
+          { label: "In-Person Events", href: "/events" },
+          { label: "Webinars", href: "/webinars" },
+          { label: "Podcast", href: "/podcast" },
         ],
       },
     ],
@@ -135,13 +134,13 @@ export const NAV_TREE: NavItem[] = [
     label: "Company",
     width: 260,
     items: [
-      { label: "About Us", href: HOME },
-      { label: "Teams", href: HOME },
-      { label: "Community", href: HOME },
-      { label: "Careers", href: HOME },
-      { label: "Contact Us", href: HOME },
+      { label: "About Us", href: "/about-us" },
+      { label: "Teams", href: "/teams" },
+      { label: "Community", href: "/community" },
+      { label: "Careers", href: "/careers" },
+      { label: "Contact Us", href: "/contact-us" },
     ],
   },
-  { kind: "flat", label: "Pricing", href: HOME },
-  { kind: "flat", label: "Partners", href: HOME },
+  { kind: "flat", label: "Pricing", href: "/pricing" },
+  { kind: "flat", label: "Partners", href: "/partners" },
 ];

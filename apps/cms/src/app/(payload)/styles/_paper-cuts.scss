@@ -428,3 +428,100 @@
   border-radius: var(--cs-radius-input);
 }
 
+
+// ─── react-select (rs__*) dropdown + multi-value polish ────────────
+//
+// react-select renders its menu via a DOM portal (body-level), so the
+// menu is NOT a descendant of .react-select in the DOM. Selectors like
+// `.react-select .rs__option` never match the portal-rendered menu.
+//
+// Strategy: scope to `.rs__menu .rs__*` (same two-class specificity as
+// Payload's `.react-select .rs__*` rules) but keep everything OUTSIDE
+// any @layer so the cascade-layer order makes our rules win without
+// needing !important.
+//
+// The .react-select selectors below only cover the control widget (the
+// visible input box), which is NOT in a portal.
+
+// ── Menu panel (portal, body-level) ───────────────────────────────
+.rs__menu {
+  background: var(--theme-elevation-100) !important;
+  border: 1px solid var(--theme-elevation-200) !important;
+  border-radius: var(--cs-radius-card) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+  overflow: hidden !important;
+  margin-top: 4px !important;
+}
+
+.rs__menu .rs__menu-list {
+  padding: 4px;
+  background: transparent;
+}
+
+// Option rows — flat, no grey box, no border
+.rs__menu .rs__option {
+  background: transparent;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 5px;
+  font-size: 13px;
+  color: var(--theme-text);
+  cursor: pointer;
+  padding: 7px 10px;
+}
+
+.rs__menu .rs__option--is-focused,
+.rs__menu .rs__option:hover {
+  background-color: var(--theme-elevation-150);
+  color: var(--cs-cyan-500);
+}
+
+.rs__menu .rs__option--is-selected {
+  background-color: rgba(6, 199, 242, 0.12);
+  color: var(--cs-cyan-500);
+}
+
+.rs__menu .rs__option--is-focused.rs__option--is-selected,
+.rs__menu .rs__option--is-selected:hover {
+  background-color: rgba(6, 199, 242, 0.18);
+  color: var(--cs-cyan-500);
+}
+
+// ── Multi-value chips (inside .react-select control, not portal) ───
+.react-select .rs__multi-value {
+  background: rgba(6, 199, 242, 0.1);
+  border: 1px solid rgba(6, 199, 242, 0.25);
+  border-radius: 4px;
+}
+
+.react-select .rs__multi-value__label {
+  color: var(--cs-cyan-500);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 4px 2px 8px;
+}
+
+.react-select .rs__multi-value__remove {
+  background: transparent;
+  color: var(--cs-cyan-500);
+  opacity: 0.6;
+  border-radius: 0 3px 3px 0;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(6, 199, 242, 0.15);
+    color: var(--cs-cyan-500);
+    opacity: 1;
+  }
+}
+
+// Placeholder + single-value (inside .react-select control)
+.react-select .rs__placeholder {
+  color: var(--theme-elevation-400);
+  font-size: 13px;
+}
+
+.react-select .rs__single-value {
+  color: var(--theme-text);
+}

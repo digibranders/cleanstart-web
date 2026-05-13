@@ -168,7 +168,7 @@ const teamsConfigGroup: Field = {
   admin: {
     condition: kindIs('teamsWorkflow'),
     description:
-      'One row = one Teams channel. Get the URL from the Workflows app in Teams (template: "Post to a channel when a webhook request is received").',
+      'Sends notifications to a Teams channel. Each row connects to one channel — you can add multiple rows for multiple channels.',
   },
   fields: [
     {
@@ -177,7 +177,7 @@ const teamsConfigGroup: Field = {
       required: true,
       admin: {
         description:
-          'Workflow webhook URL. Encrypted at rest. Leave blank when editing to keep the saved value.',
+          'The webhook URL for your Teams channel. In Teams, open the channel → Workflows → "Post to a channel when a webhook request is received" to generate this URL. Saved securely — leave blank to keep the existing value.',
         placeholder: 'https://prod-XX.westus.logic.azure.com/workflows/...',
       },
     },
@@ -187,7 +187,7 @@ const teamsConfigGroup: Field = {
       labels: { singular: 'mention', plural: 'mentions' },
       admin: {
         description:
-          'Optional — paste each person\'s AAD Object ID + UPN from the Entra portal to ping them with @-mentions.',
+          'Optional — tag specific team members in notifications. Ask your IT admin for each person\'s User ID and email address from Microsoft Entra (Azure AD).',
       },
       fields: [
         { name: 'displayName', type: 'text', required: true, admin: { placeholder: 'Alex' } },
@@ -212,7 +212,7 @@ const teamsConfigGroup: Field = {
             { label: 'lead.submitted', value: 'lead.submitted' },
           ],
           admin: {
-            description: 'Optional — restrict this mention to specific events. Empty = all.',
+            description: 'Optional — only mention this person for specific event types. Leave empty to mention them on all notifications.',
           },
         },
       ],
@@ -227,7 +227,7 @@ const genericConfigGroup: Field = {
   admin: {
     condition: kindIs('genericWebhook'),
     description:
-      'Posts a signed JSON payload (Standard Webhooks) to an external URL. Use this for Zapier / n8n / Make / custom receivers.',
+      'Sends event data to an external automation tool like Zapier, Make, or n8n whenever something happens on the site.',
   },
   fields: [
     {
@@ -235,7 +235,7 @@ const genericConfigGroup: Field = {
       type: 'text',
       required: true,
       admin: {
-        description: 'Subscriber URL. Encrypted at rest.',
+        description: 'The destination URL provided by your automation tool. Saved securely.',
         placeholder: 'https://hooks.zapier.com/...',
       },
     },
@@ -245,14 +245,14 @@ const genericConfigGroup: Field = {
       required: true,
       admin: {
         description:
-          'HMAC-SHA256 shared secret. Encrypted at rest. Leave blank when editing to keep the saved value.',
+          'A secret passphrase used to verify that notifications genuinely came from CleanStart. Saved securely — leave blank to keep the existing value.',
       },
     },
     {
       name: 'signingKeyId',
       type: 'text',
       admin: {
-        description: 'Optional key ID surfaced in audit logs and used during rotation.',
+        description: 'Optional label for this secret key — useful if you rotate secrets and want to track which key is active.',
       },
     },
   ],
@@ -265,7 +265,7 @@ const hubspotConfigGroup: Field = {
   admin: {
     condition: kindIs('hubspotCrm'),
     description:
-      'Access token comes from the HUBSPOT_PRIVATE_APP_TOKEN env var — nothing to paste here. This row only carries optional mapping overrides.',
+      'Your HubSpot connection is already set up by the technical team. Use the options below to control how new form submissions appear in HubSpot.',
   },
   fields: [
     {
@@ -278,23 +278,43 @@ const hubspotConfigGroup: Field = {
       ],
       admin: {
         description:
-          'Whether to also create a HubSpot Lead alongside the Contact. Default writes a Contact only.',
+          'Choose whether to create just a Contact in HubSpot, or a Contact and a Lead record together.',
       },
     },
     {
       name: 'defaultLifecycleStage',
-      type: 'text',
+      type: 'select',
       defaultValue: 'lead',
+      options: [
+        { label: 'Subscriber', value: 'subscriber' },
+        { label: 'Lead', value: 'lead' },
+        { label: 'Marketing Qualified Lead', value: 'marketingqualifiedlead' },
+        { label: 'Sales Qualified Lead', value: 'salesqualifiedlead' },
+        { label: 'Opportunity', value: 'opportunity' },
+        { label: 'Customer', value: 'customer' },
+        { label: 'Evangelist', value: 'evangelist' },
+        { label: 'Other', value: 'other' },
+      ],
       admin: {
-        description: 'HubSpot lifecyclestage value. Default "lead".',
+        description: 'Where new contacts will be placed in your HubSpot pipeline.',
       },
     },
     {
       name: 'defaultLeadStatus',
-      type: 'text',
+      type: 'select',
       defaultValue: 'NEW',
+      options: [
+        { label: 'New', value: 'NEW' },
+        { label: 'Open', value: 'OPEN' },
+        { label: 'In Progress', value: 'IN_PROGRESS' },
+        { label: 'Open Deal', value: 'OPEN_DEAL' },
+        { label: 'Unqualified', value: 'UNQUALIFIED' },
+        { label: 'Attempted to Contact', value: 'ATTEMPTED_TO_CONTACT' },
+        { label: 'Connected', value: 'CONNECTED' },
+        { label: 'Bad Timing', value: 'BAD_TIMING' },
+      ],
       admin: {
-        description: 'HubSpot hs_lead_status value. Default "NEW".',
+        description: 'The initial follow-up status applied to new contacts in HubSpot.',
       },
     },
     {
@@ -303,7 +323,7 @@ const hubspotConfigGroup: Field = {
       labels: { singular: 'mapping', plural: 'mappings' },
       admin: {
         description:
-          'Optional — map submission field names onto HubSpot property API names. Standard mapping (email → email, name → firstname/lastname) is automatic.',
+          'Optional — if your form has custom fields, map them to the matching HubSpot property here. Email and name are mapped automatically.',
       },
       fields: [
         {
@@ -326,11 +346,11 @@ const hubspotConfigGroup: Field = {
 const ga4ConfigGroup: Field = {
   name: 'ga4Config',
   type: 'group',
-  label: 'GA4 settings',
+  label: 'Google Analytics 4 settings',
   admin: {
     condition: kindIs('ga4DataApi'),
     description:
-      'Service-account JSON is set globally via GOOGLE_APPLICATION_CREDENTIALS_JSON env. Grant the SA Viewer role on the GA4 property.',
+      'Pulls your website traffic data into the dashboard. The connection credentials are already set up by the technical team — just enter your Property ID below.',
   },
   fields: [
     {
@@ -338,7 +358,7 @@ const ga4ConfigGroup: Field = {
       type: 'text',
       required: true,
       admin: {
-        description: 'GA4 property ID (numbers only — find it in Admin → Property Settings).',
+        description: 'Your GA4 Property ID — a number you can find in Google Analytics under Admin → Property Settings.',
         placeholder: '123456789',
       },
     },
@@ -352,7 +372,7 @@ const gscConfigGroup: Field = {
   admin: {
     condition: kindIs(['gscSearchAnalyticsApi', 'gscUrlInspectionApi']),
     description:
-      'Service-account JSON is set globally via GOOGLE_APPLICATION_CREDENTIALS_JSON env. Add the SA as a user (or delegated owner for Indexing API) in GSC.',
+      'Pulls search performance data (clicks, impressions) from Google. The connection credentials are already set up by the technical team — just enter your site address below.',
   },
   fields: [
     {
@@ -361,7 +381,7 @@ const gscConfigGroup: Field = {
       required: true,
       admin: {
         description:
-          'GSC property identifier. Domain property = "sc-domain:cleanstart.com". URL prefix = "https://cleanstart.com/" (trailing slash).',
+          'Your site as it appears in Google Search Console. Use "sc-domain:cleanstart.com" for a domain property, or "https://cleanstart.com/" (with trailing slash) for a URL-prefix property.',
         placeholder: 'sc-domain:cleanstart.com',
       },
     },
@@ -371,11 +391,11 @@ const gscConfigGroup: Field = {
 const clarityConfigGroup: Field = {
   name: 'clarityConfig',
   type: 'group',
-  label: 'MS Clarity settings',
+  label: 'Microsoft Clarity settings',
   admin: {
     condition: kindIs('msClarity'),
     description:
-      'API token comes from the CLARITY_API_TOKEN env var — nothing to paste here. Generate it in Clarity → Settings → Data Export.',
+      'Shows which pages have the most user friction (rage clicks, dead clicks). Everything is already set up by the technical team — no extra configuration needed here.',
   },
   fields: [
     {
@@ -399,7 +419,7 @@ const cloudflareConfigGroup: Field = {
   admin: {
     condition: kindIs('cloudflareWebAnalytics'),
     description:
-      'API token comes from the CLOUDFLARE_API_TOKEN env var. This row only specifies which Cloudflare account to read.',
+      'Shows pageview and visitor data from Cloudflare. The connection is already set up by the technical team. The field below is optional — only fill it in if you have multiple Cloudflare accounts.',
   },
   fields: [
     {
@@ -407,7 +427,7 @@ const cloudflareConfigGroup: Field = {
       type: 'text',
       admin: {
         description:
-          'Cloudflare account ID (32-char hex). Optional — falls back to CLOUDFLARE_ACCOUNT_TAG env.',
+          'Optional — your Cloudflare Account ID. Leave blank to use the default account already configured by the technical team.',
         placeholder: 'abc123def456...',
       },
     },
@@ -417,11 +437,11 @@ const cloudflareConfigGroup: Field = {
 const calcomConfigGroup: Field = {
   name: 'calcomConfig',
   type: 'group',
-  label: 'Cal.com inbound settings',
+  label: 'Cal.com settings',
   admin: {
     condition: kindIs('calComInbound'),
     description:
-      'Cal.com posts to /api/integrations/calcom; signing secret is the CALCOM_SIGNING_SECRET env var. This row maps bookings to a lead form.',
+      'Automatically creates a lead record whenever someone books a meeting via Cal.com. The security connection is already set up by the technical team.',
   },
   fields: [
     {
@@ -430,7 +450,7 @@ const calcomConfigGroup: Field = {
       required: true,
       admin: {
         description:
-          'Form ID to attribute Cal.com bookings to. Editors create a hidden "Cal.com bookings" form and paste its ID here.',
+          'The ID of the form that Cal.com bookings should be recorded under. Create a form called "Cal.com Bookings" in the Forms collection, then paste its numeric ID here.',
       },
     },
   ],
@@ -443,7 +463,7 @@ const brevoConfigGroup: Field = {
   admin: {
     condition: kindIs('brevoBounceCallback'),
     description:
-      'Bearer token comes from the BREVO_INBOUND_TOKEN env var. Register https://admin.cleanstart.com/api/integrations/brevo as a webhook in Brevo with that token in the auth field.',
+      'Keeps your email list clean by automatically marking contacts who bounced or complained. Everything is set up by the technical team — no configuration needed here.',
   },
   fields: [
     {
@@ -470,7 +490,7 @@ export const Integrations: CollectionConfig = {
     useAsTitle: 'label',
     defaultColumns: ['label', 'kind', 'enabled', 'source', 'updatedAt'],
     description:
-      'Outbound destinations and analytics read-back. Credentials (HubSpot, GA4 service account, Clarity, Cloudflare, Brevo, Cal.com) live in env vars set by ops; per-channel URLs (Teams, generic webhook) are encrypted in the row.',
+      'Connect CleanStart to your other tools — CRM, analytics, notifications, and automations. Each row is one connection. Your technical team handles credentials; you control what gets sent where.',
   },
   access: {
     read: isAdmin,
@@ -489,7 +509,7 @@ export const Integrations: CollectionConfig = {
       type: 'text',
       required: true,
       admin: {
-        description: 'Human-readable name. "Sales · #sales-eng-leads", "Zapier — lead webhook", etc.',
+        description: 'A friendly name to identify this connection, e.g. "Sales team notifications" or "Zapier lead alerts".',
       },
     },
     {
@@ -498,14 +518,14 @@ export const Integrations: CollectionConfig = {
       required: true,
       options: [...ACTIVE_KIND_OPTIONS, ...RESERVED_KIND_OPTIONS],
       admin: {
-        description: 'Integration type. Locked after creation.',
+        description: 'The type of tool you are connecting to. Cannot be changed after saving.',
       },
     },
     {
       name: 'enabled',
       type: 'checkbox',
       defaultValue: true,
-      admin: { description: 'Pause without deleting.' },
+      admin: { description: 'Turn this connection on or off without removing it.' },
     },
     {
       name: 'routing',
@@ -514,7 +534,7 @@ export const Integrations: CollectionConfig = {
       admin: {
         condition: (_, sibling) => isDispatching(sibling),
         description:
-          'Which events trigger this destination. Empty filter = all collections / all forms.',
+          'Choose which activity on the site triggers a notification. Leave all filters empty to receive everything.',
       },
       fields: [
         {
@@ -526,13 +546,36 @@ export const Integrations: CollectionConfig = {
             { label: 'document.published — on first publish of a content doc', value: 'document.published' },
             { label: 'lead.submitted — on every public form submission', value: 'lead.submitted' },
           ],
+          admin: {
+            components: {
+              Field: {
+                path: '@/payload/admin/components/integrations/EventsMultiSelect.tsx#EventsMultiSelect',
+              },
+            },
+          },
         },
         {
           name: 'collections',
-          type: 'text',
+          type: 'select',
           hasMany: true,
+          options: [
+            { label: 'Blogs', value: 'blogs' },
+            { label: 'News', value: 'news' },
+            { label: 'Guides', value: 'guides' },
+            { label: 'Resources', value: 'resources' },
+            { label: 'Knowledge Base', value: 'knowledgeBase' },
+            { label: 'Events', value: 'events' },
+            { label: 'Webinars', value: 'webinars' },
+            { label: 'Jobs', value: 'jobs' },
+            { label: 'Pages', value: 'pages' },
+          ],
           admin: {
-            description: 'Filter document.published events by collection slug (e.g. "blogs", "news"). Empty = all.',
+            description: 'Filter document.published events by collection. Empty = all collections.',
+            components: {
+              Field: {
+                path: '@/payload/admin/components/integrations/CollectionsMultiSelect.tsx#CollectionsMultiSelect',
+              },
+            },
           },
         },
         {
@@ -540,7 +583,12 @@ export const Integrations: CollectionConfig = {
           type: 'text',
           hasMany: true,
           admin: {
-            description: 'Filter lead.submitted events by form slug (e.g. "demo-request"). Empty = all forms.',
+            description: 'Filter lead.submitted events by form slug. Empty = all forms.',
+            components: {
+              Field: {
+                path: '@/payload/admin/components/integrations/FormSlugsMultiSelect.tsx#FormSlugsMultiSelect',
+              },
+            },
           },
         },
       ],

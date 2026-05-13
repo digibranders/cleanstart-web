@@ -104,7 +104,7 @@ export function MobileNav() {
 
         <div className="border-t border-white/8 p-4">
           <Link
-            href="/"
+            href="/book-a-demo"
             onClick={close}
             className="cs-btn-glass w-full"
             style={{
