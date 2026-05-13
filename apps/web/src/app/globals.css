@@ -1300,6 +1300,118 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ===========================================================================
+   BLOG ARTICLE BODY TYPOGRAPHY
+   Exact values from Figma 330:338 — article content section
+   =========================================================================== */
+
+.article-body {
+  font-family: Figtree, ui-sans-serif, system-ui, sans-serif;
+  color: #111111;
+}
+
+.article-body .article-paragraph {
+  font-size: clamp(16px, 1.4vw, 20px);
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: -0.04em;
+  color: rgba(17,17,17,0.8);
+  margin-bottom: 1.25em;
+}
+.article-body .article-paragraph:last-child { margin-bottom: 0; }
+
+.article-body .article-h1 {
+  font-size: clamp(32px, 3.5vw, 56px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: #111111;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+.article-body .article-h2 {
+  font-size: clamp(26px, 2.8vw, 40px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.05em;
+  color: #111111;
+  margin-top: 2.25rem;
+  margin-bottom: 0.875rem;
+}
+.article-body .article-h3 {
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+  color: #111111;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.article-body .article-h4,
+.article-body .article-h5,
+.article-body .article-h6 {
+  font-size: clamp(16px, 1.4vw, 20px);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.03em;
+  color: #111111;
+  margin-top: 1.75rem;
+  margin-bottom: 0.625rem;
+}
+
+.article-body .article-ul,
+.article-body .article-ol {
+  font-size: clamp(16px, 1.4vw, 20px);
+  line-height: 1.7;
+  letter-spacing: -0.04em;
+  color: rgba(17,17,17,0.8);
+  padding-left: 1.5em;
+  margin-bottom: 1.25em;
+}
+.article-body .article-ul { list-style-type: disc; }
+.article-body .article-ol { list-style-type: decimal; }
+.article-body .article-li { margin-bottom: 0.4em; }
+
+.article-body .article-blockquote {
+  border-left: 4px solid #4a3bf1;
+  padding: 0.75em 1.25em;
+  margin: 1.75rem 0;
+  background: rgba(74,59,241,0.04);
+  border-radius: 0 8px 8px 0;
+  font-size: clamp(16px, 1.4vw, 20px);
+  font-style: italic;
+  color: rgba(17,17,17,0.7);
+  line-height: 1.6;
+}
+
+.article-body .article-pre {
+  background: #1a1a2e;
+  color: #e2e8f0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 0.9em;
+  line-height: 1.65;
+  margin: 1.5rem 0;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+}
+
+.article-body .article-hr {
+  border: none;
+  border-top: 1px solid rgba(17,17,17,0.12);
+  margin: 2.5rem 0;
+}
+
+.article-body .article-figure {
+  margin: 1.75rem 0;
+}
+
+/* First h2 should have less top margin if it's the very first child */
+.article-body > .article-h2:first-child,
+.article-body > .article-h1:first-child {
+  margin-top: 0;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -1,0 +1,198 @@
+import React from "react";
+import Image from "next/image";
+import type { LexicalNode, LexicalRoot } from "@/lib/blog";
+
+// TEXT_FORMAT bitmask constants
+const FORMAT_BOLD = 1;
+const FORMAT_ITALIC = 2;
+const FORMAT_STRIKETHROUGH = 4;
+const FORMAT_UNDERLINE = 8;
+const FORMAT_CODE = 16;
+const FORMAT_SUBSCRIPT = 32;
+const FORMAT_SUPERSCRIPT = 64;
+
+function renderTextNode(node: Extract<LexicalNode, { type: "text" }>, key: string): React.ReactElement {
+  const fmt = node.format ?? 0;
+  let el: React.ReactNode = node.text;
+
+  if (fmt & FORMAT_CODE) {
+    el = (
+      <code
+        className="rounded px-1 py-0.5 text-[0.9em]"
+        style={{ background: "rgba(17,17,17,0.08)", fontFamily: "monospace" }}
+      >
+        {el}
+      </code>
+    );
+  }
+  if (fmt & FORMAT_BOLD) el = <strong>{el}</strong>;
+  if (fmt & FORMAT_ITALIC) el = <em>{el}</em>;
+  if (fmt & FORMAT_UNDERLINE) el = <u>{el}</u>;
+  if (fmt & FORMAT_STRIKETHROUGH) el = <s>{el}</s>;
+  if (fmt & FORMAT_SUBSCRIPT) el = <sub>{el}</sub>;
+  if (fmt & FORMAT_SUPERSCRIPT) el = <sup>{el}</sup>;
+
+  return <React.Fragment key={key}>{el}</React.Fragment>;
+}
+
+function renderNodes(nodes: LexicalNode[], prefix: string): React.ReactNode[] {
+  return nodes.map((node, i) => renderNode(node, `${prefix}-${i}`));
+}
+
+function renderNode(node: LexicalNode, key: string): React.ReactNode {
+  switch (node.type) {
+    case "text":
+      return renderTextNode(node as Extract<LexicalNode, { type: "text" }>, key);
+
+    case "link":
+    case "autolink": {
+      const linkNode = node as Extract<LexicalNode, { type: "link" | "autolink" }>;
+      const href = linkNode.url ?? (linkNode.fields as { url?: string } | undefined)?.url ?? "#";
+      const isExternal = href.startsWith("http");
+      return (
+        <a
+          key={key}
+          href={href}
+          target={isExternal ? "_blank" : undefined}
+          rel={isExternal ? "noopener noreferrer" : undefined}
+          style={{ color: "#4a3bf1", textDecoration: "underline", textUnderlineOffset: "3px" }}
+        >
+          {renderNodes(linkNode.children ?? [], key)}
+        </a>
+      );
+    }
+
+    case "paragraph": {
+      const pNode = node as Extract<LexicalNode, { type: "paragraph" }>;
+      const children = pNode.children ?? [];
+      if (children.length === 0) return <br key={key} />;
+      return (
+        <p key={key} className="article-paragraph">
+          {renderNodes(children, key)}
+        </p>
+      );
+    }
+
+    case "heading": {
+      const hNode = node as Extract<LexicalNode, { type: "heading" }>;
+      const tag = hNode.tag ?? "h2";
+      const children = renderNodes(hNode.children ?? [], key);
+      const textContent = extractText(hNode.children ?? []);
+      const id = slugifyText(textContent);
+      return React.createElement(tag, { key, id, className: `article-${tag}` }, children);
+    }
+
+    case "list": {
+      const lNode = node as Extract<LexicalNode, { type: "list" }>;
+      const Tag = lNode.listType === "number" ? "ol" : "ul";
+      return (
+        <Tag key={key} className={`article-${Tag}`}>
+          {(lNode.children ?? []).map((item, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: Lexical list items have no stable id
+            <li key={`${key}-li-${i}`} className="article-li">
+              {renderNodes(
+                (item as { children?: LexicalNode[] }).children ?? [],
+                `${key}-li-${i}`,
+              )}
+            </li>
+          ))}
+        </Tag>
+      );
+    }
+
+    case "listitem": {
+      const liNode = node as Extract<LexicalNode, { type: "listitem" }>;
+      return (
+        <li key={key} className="article-li">
+          {renderNodes(liNode.children ?? [], key)}
+        </li>
+      );
+    }
+
+    case "quote": {
+      const qNode = node as Extract<LexicalNode, { type: "quote" }>;
+      return (
+        <blockquote key={key} className="article-blockquote">
+          {renderNodes(qNode.children ?? [], key)}
+        </blockquote>
+      );
+    }
+
+    case "code": {
+      const cNode = node as Extract<LexicalNode, { type: "code" }>;
+      const codeText = extractText(cNode.children ?? []);
+      return (
+        <pre key={key} className="article-pre">
+          <code>{codeText}</code>
+        </pre>
+      );
+    }
+
+    case "horizontalrule":
+      return <hr key={key} className="article-hr" />;
+
+    case "upload": {
+      const uNode = node as Extract<LexicalNode, { type: "upload" }>;
+      const val = uNode.value as { url?: string; alt?: string; width?: number; height?: number } | undefined;
+      if (!val?.url) return null;
+      return (
+        <figure key={key} className="article-figure">
+          <Image
+            src={val.url}
+            alt={val.alt ?? ""}
+            width={val.width ?? 800}
+            height={val.height ?? 450}
+            className="rounded-lg w-full h-auto"
+          />
+        </figure>
+      );
+    }
+
+    default: {
+      const generic = node as { children?: LexicalNode[] };
+      if (generic.children?.length) {
+        return (
+          <React.Fragment key={key}>
+            {renderNodes(generic.children, key)}
+          </React.Fragment>
+        );
+      }
+      return null;
+    }
+  }
+}
+
+function extractText(nodes: LexicalNode[]): string {
+  return nodes
+    .map((n) => {
+      if (n.type === "text") return (n as Extract<LexicalNode, { type: "text" }>).text;
+      const generic = n as { children?: LexicalNode[] };
+      if (generic.children) return extractText(generic.children);
+      return "";
+    })
+    .join("");
+}
+
+function slugifyText(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+interface RenderLexicalProps {
+  content: LexicalRoot | null | undefined;
+  className?: string;
+}
+
+export function RenderLexical({ content, className = "" }: RenderLexicalProps): React.ReactElement | null {
+  if (!content?.root?.children?.length) return null;
+
+  return (
+    <div className={`article-body ${className}`}>
+      {renderNodes(content.root.children, "root")}
+    </div>
+  );
+}
