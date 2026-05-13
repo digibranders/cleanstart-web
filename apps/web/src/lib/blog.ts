@@ -1,0 +1,246 @@
+export type BlogCategory = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+export type BlogAuthor = {
+  id: string;
+  name: string;
+  avatar?: BlogImage;
+  bio?: string;
+};
+
+export type BlogImage = {
+  id: string;
+  url: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+};
+
+export type Blog = {
+  id: string;
+  title: string;
+  slug: string;
+  abstract?: string;
+  heroImage?: BlogImage;
+  categories?: BlogCategory[];
+  authors?: BlogAuthor[];
+  publishedAt?: string;
+  readingMinutes?: number;
+  featured?: boolean;
+};
+
+// Lexical rich-text node types from Payload CMS
+export type LexicalTextNode = {
+  type: "text";
+  text: string;
+  /** Bitmask: 1=bold 2=italic 4=strikethrough 8=underline 16=code 32=subscript 64=superscript */
+  format?: number;
+  version: number;
+};
+
+export type LexicalLinkNode = {
+  type: "link" | "autolink";
+  url?: string;
+  fields?: { url?: string; newTab?: boolean };
+  children: LexicalNode[];
+  version: number;
+};
+
+export type LexicalListItemNode = {
+  type: "listitem";
+  value: number;
+  children: LexicalNode[];
+  version: number;
+};
+
+export type LexicalListNode = {
+  type: "list";
+  listType: "bullet" | "number" | "check";
+  children: LexicalListItemNode[];
+  version: number;
+};
+
+export type LexicalHeadingNode = {
+  type: "heading";
+  tag: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  children: LexicalNode[];
+  version: number;
+};
+
+export type LexicalQuoteNode = {
+  type: "quote";
+  children: LexicalNode[];
+  version: number;
+};
+
+export type LexicalCodeNode = {
+  type: "code";
+  language?: string;
+  children: LexicalNode[];
+  version: number;
+};
+
+export type LexicalParagraphNode = {
+  type: "paragraph";
+  children: LexicalNode[];
+  version: number;
+  format?: string;
+};
+
+export type LexicalHorizontalRuleNode = {
+  type: "horizontalrule";
+  version: number;
+};
+
+export type LexicalUploadNode = {
+  type: "upload";
+  value?: { url?: string; alt?: string; width?: number; height?: number };
+  version: number;
+};
+
+export type LexicalNode =
+  | LexicalTextNode
+  | LexicalLinkNode
+  | LexicalListNode
+  | LexicalListItemNode
+  | LexicalHeadingNode
+  | LexicalQuoteNode
+  | LexicalCodeNode
+  | LexicalParagraphNode
+  | LexicalHorizontalRuleNode
+  | LexicalUploadNode
+  | { type: string; children?: LexicalNode[]; version: number; [key: string]: unknown };
+
+export type LexicalRoot = {
+  root: {
+    type: string;
+    children: LexicalNode[];
+    direction: "ltr" | "rtl" | null;
+    format: string;
+    indent: number;
+    version: number;
+  };
+};
+
+export type TocEntry = {
+  level?: number | null;
+  text?: string | null;
+  anchor?: string | null;
+  id?: string | null;
+};
+
+export type BlogDetail = Blog & {
+  body?: LexicalRoot | null;
+  tableOfContents?: TocEntry[] | null;
+  relatedPosts?: Blog[] | null;
+};
+
+type PayloadListResponse<T> = {
+  docs: T[];
+  totalDocs: number;
+  hasNextPage: boolean;
+  nextPage?: number | null;
+  page: number;
+  totalPages: number;
+};
+
+const CMS_URL =
+  process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
+
+async function fetchCMS<T>(path: string): Promise<T> {
+  const res = await fetch(`${CMS_URL}${path}`, {
+    next: { revalidate: 60 },
+  });
+  if (!res.ok) {
+    throw new Error(`CMS fetch failed: ${res.status} ${path}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+export async function getFeaturedBlog(): Promise<Blog | null> {
+  const featured = await fetchCMS<PayloadListResponse<Blog>>(
+    "/api/blogs?where[_status][equals]=published&where[featured][equals]=true&depth=2&limit=1&sort=-publishedAt",
+  );
+  if (featured.docs[0]) return featured.docs[0];
+
+  // Fall back to the latest published post when no post is explicitly featured
+  const latest = await fetchCMS<PayloadListResponse<Blog>>(
+    "/api/blogs?where[_status][equals]=published&depth=2&limit=1&sort=-publishedAt",
+  );
+  return latest.docs[0] ?? null;
+}
+
+export async function getBlogs({
+  page = 1,
+  limit = 9,
+  category,
+  search,
+}: {
+  page?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+} = {}): Promise<PayloadListResponse<Blog>> {
+  const params = new URLSearchParams({
+    "where[_status][equals]": "published",
+    depth: "2",
+    limit: String(limit),
+    page: String(page),
+    sort: "-publishedAt",
+  });
+  if (category) {
+    params.set("where[categories.slug][in][0]", category);
+  }
+  if (search) {
+    params.set("where[title][contains]", search);
+  }
+  return fetchCMS<PayloadListResponse<Blog>>(`/api/blogs?${params.toString()}`);
+}
+
+export async function getBlogCategories(): Promise<BlogCategory[]> {
+  const data = await fetchCMS<PayloadListResponse<BlogCategory>>(
+    "/api/categories?limit=100&sort=name",
+  );
+  return data.docs;
+}
+
+export async function getBlogBySlug(slug: string): Promise<BlogDetail | null> {
+  const data = await fetchCMS<PayloadListResponse<BlogDetail>>(
+    `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&where[_status][equals]=published&depth=3&limit=1`,
+  );
+  return data.docs[0] ?? null;
+}
+
+export async function getRelatedBlogs(blogId: string, categoryIds: string[]): Promise<Blog[]> {
+  if (categoryIds.length === 0) {
+    const data = await fetchCMS<PayloadListResponse<Blog>>(
+      `/api/blogs?where[_status][equals]=published&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
+    );
+    return data.docs;
+  }
+  const catParam = categoryIds
+    .map((id, i) => `where[categories][in][${i}]=${encodeURIComponent(id)}`)
+    .join("&");
+  const data = await fetchCMS<PayloadListResponse<Blog>>(
+    `/api/blogs?where[_status][equals]=published&where[id][not_equals]=${blogId}&${catParam}&depth=2&limit=3&sort=-publishedAt`,
+  );
+  if (data.docs.length < 3) {
+    const fallback = await fetchCMS<PayloadListResponse<Blog>>(
+      `/api/blogs?where[_status][equals]=published&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
+    );
+    return fallback.docs;
+  }
+  return data.docs;
+}
+
+export function formatBlogDate(iso?: string): string {
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
