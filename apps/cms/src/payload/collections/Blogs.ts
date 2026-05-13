@@ -126,7 +126,7 @@ export const Blogs: CollectionConfig = {
       name: 'categories',
       type: 'relationship',
       relationTo: 'categories',
-      hasMany: true,
+      hasMany: false,
       admin: {
         components: {
           Cell: {
@@ -175,6 +175,20 @@ export const Blogs: CollectionConfig = {
       admin: { readOnly: true, hidden: true },
     },
     {
+      name: 'tocDepth',
+      type: 'select',
+      defaultValue: 'h2',
+      options: [
+        { label: 'H2 only', value: 'h2' },
+        { label: 'H2 + H3', value: 'h2_h3' },
+        { label: 'H2 + H3 + H4', value: 'h2_h3_h4' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Heading levels that appear in the Table of Contents. Re-save to apply.',
+      },
+    },
+    {
       name: 'tableOfContents',
       type: 'array',
       access: { update: () => false },
@@ -190,12 +204,22 @@ export const Blogs: CollectionConfig = {
         },
       },
       fields: [
-        // `level` + `text` are auto-derived and shown in the row summary —
-        // hidden from the row body to keep TOC rows compact. `anchor` is
-        // the only thing worth exposing on expand (the slug used in the
-        // permalink fragment).
-        { name: 'level', type: 'number', admin: { readOnly: true, hidden: true } },
-        { name: 'text', type: 'text', admin: { readOnly: true, hidden: true } },
+        {
+          name: 'level',
+          type: 'number',
+          admin: {
+            readOnly: true,
+            components: { Field: '@/payload/admin/components/HiddenField.tsx#HiddenField' },
+          },
+        },
+        {
+          name: 'text',
+          type: 'text',
+          admin: {
+            readOnly: true,
+            components: { Field: '@/payload/admin/components/HiddenField.tsx#HiddenField' },
+          },
+        },
         { name: 'anchor', type: 'text', admin: { readOnly: true } },
       ],
     },
@@ -230,6 +254,7 @@ export const Blogs: CollectionConfig = {
           wordCount: 'wordCount',
           tableOfContents: 'tableOfContents',
         },
+        tocLevelsField: 'tocDepth',
       }),
     ],
     afterChange: [

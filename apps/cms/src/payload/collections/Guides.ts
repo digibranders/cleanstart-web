@@ -237,8 +237,22 @@ export const Guides: CollectionConfig = {
         // summary — hidden from the row body to keep TOC rows compact.
         // Only `anchor` is exposed on expand (the slug used in the
         // permalink fragment).
-        { name: 'level', type: 'number', admin: { readOnly: true, hidden: true } },
-        { name: 'text', type: 'text', admin: { readOnly: true, hidden: true } },
+        {
+          name: 'level',
+          type: 'number',
+          admin: {
+            readOnly: true,
+            components: { Field: '@/payload/admin/components/HiddenField.tsx#HiddenField' },
+          },
+        },
+        {
+          name: 'text',
+          type: 'text',
+          admin: {
+            readOnly: true,
+            components: { Field: '@/payload/admin/components/HiddenField.tsx#HiddenField' },
+          },
+        },
         { name: 'anchor', type: 'text', admin: { readOnly: true } },
       ],
     },

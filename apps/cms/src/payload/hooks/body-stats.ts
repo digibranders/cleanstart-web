@@ -2,6 +2,13 @@ import type { CollectionBeforeChangeHook } from 'payload';
 
 import { extractFromLexical } from '../lib/lexical-extract';
 
+/** Maps the `tocDepth` select value to concrete heading levels. */
+export const TOC_DEPTH_LEVELS: Readonly<Record<string, number[]>> = {
+  h2: [2],
+  h2_h3: [2, 3],
+  h2_h3_h4: [2, 3, 4],
+};
+
 type BodyStatsOptions = {
   /** Source field name (defaults to `body`). */
   source?: string;
@@ -11,6 +18,31 @@ type BodyStatsOptions = {
     readingMinutes?: string;
     tableOfContents?: string;
   };
+  /**
+   * Name of a `select` field in the document whose value maps to heading
+   * levels via `TOC_DEPTH_LEVELS`. Takes precedence over `tocLevels`.
+   * Falls back to `tocLevels` (or [2]) when the field is absent or
+   * unrecognised.
+   */
+  tocLevelsField?: string;
+  /**
+   * Static fallback heading levels when `tocLevelsField` is not set or its
+   * value is unrecognised. Defaults to [2] (H2-only).
+   */
+  tocLevels?: number[];
+};
+
+const resolveTocLevels = (
+  data: Record<string, unknown>,
+  options: BodyStatsOptions,
+): Set<number> => {
+  if (options.tocLevelsField) {
+    const val = data[options.tocLevelsField];
+    if (typeof val === 'string' && val in TOC_DEPTH_LEVELS) {
+      return new Set(TOC_DEPTH_LEVELS[val]);
+    }
+  }
+  return new Set(options.tocLevels ?? [2]);
 };
 
 /**
@@ -28,10 +60,12 @@ export const bodyStatsHook = (options: BodyStatsOptions = {}): CollectionBeforeC
 
   return ({ data }) => {
     if (!data) return data;
-    const body = (data as Record<string, unknown>)[source];
+    const row = data as Record<string, unknown>;
+    const body = row[source];
     const summary = extractFromLexical(body);
+    const tocLevels = resolveTocLevels(row, options);
 
-    const next = { ...data } as Record<string, unknown>;
+    const next = { ...row };
     if (fields.wordCount) {
       next[fields.wordCount] = summary.wordCount;
     }
@@ -39,11 +73,13 @@ export const bodyStatsHook = (options: BodyStatsOptions = {}): CollectionBeforeC
       next[fields.readingMinutes] = summary.readingMinutes;
     }
     if (fields.tableOfContents) {
-      next[fields.tableOfContents] = summary.headings.map((heading) => ({
-        level: heading.level,
-        text: heading.text,
-        anchor: heading.anchor,
-      }));
+      next[fields.tableOfContents] = summary.headings
+        .filter((h) => tocLevels.has(h.level))
+        .map((heading) => ({
+          level: heading.level,
+          text: heading.text,
+          anchor: heading.anchor,
+        }));
     }
     return next;
   };
