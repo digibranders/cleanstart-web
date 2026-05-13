@@ -1166,59 +1166,6 @@
 .cs-date-field--error .cs-date-field__input { border-color: #dc2626; }
 
 // Select trigger -------------------------------------------------------------
-.cs-select-field__trigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--cs-space-2);
-  width: 100%;
-  appearance: none;
-  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
-  background: var(--theme-input-bg, var(--theme-elevation-50));
-  color: inherit;
-  border-radius: var(--cs-radius-input);
-  padding: 8px 12px;
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
-  text-align: left;
-
-  &:focus-visible {
-    outline: 2px solid var(--cs-cyan-500);
-    outline-offset: 2px;
-  }
-}
-
-.cs-select-field__trigger-text {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.cs-select-field--error .cs-select-field__trigger { border-color: #dc2626; }
-
-.cs-select-field__listbox {
-  width: min(380px, 80vw);
-  max-height: 320px;
-  display: flex;
-  flex-direction: column;
-  padding: var(--cs-space-2);
-}
-
-.cs-select-field__option-row {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: var(--cs-space-2);
-
-  .cs-combobox__option-text { flex: 1; }
-}
-
-.cs-select-field__check {
-  flex-shrink: 0;
-  color: var(--cs-cyan-500);
-}
 
 // Number stepper -------------------------------------------------------------
 .cs-number-field__row {
@@ -2020,6 +1967,10 @@
     .cs-collections-select.is-open & {
       border-color: var(--cs-cyan-500);
       box-shadow: 0 0 0 2px rgba(6, 199, 242, 0.15);
+    }
+
+    .cs-collections-select--error & {
+      border-color: #dc2626;
     }
   }
 

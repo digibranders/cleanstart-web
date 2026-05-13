@@ -326,6 +326,13 @@ without switching branches:
 **Open the correct folder in Claude Code for the work you're doing.** The worktree
 is already on the right branch — no `git checkout` needed.
 
+**Claude must always use the designated worktree for the task at hand:**
+- CMS work → `~/Desktop/AI/cleanstart/cleanstart-cms` only
+- Web work → `~/Desktop/AI/cleanstart/cleanstart-web` only
+- Work spanning both CMS and web → make changes in each dedicated worktree separately; never use a third location
+- Never make changes in `cleanstart-website` (development) or any other location unless explicitly instructed
+- Never create new Claude session worktrees for any work — always use the dedicated worktrees above
+
 Dev servers also run independently per worktree — `apps/cms` on port 3000,
 `apps/web` on port 3001, no port conflicts.
 
