@@ -43,6 +43,9 @@ export default defineConfig({
         command: 'pnpm dev',
         url: 'http://localhost:3000/admin',
         reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
+        // 120s is not enough on a cold CI runner: predev runs generate:importmap
+        // (Payload init + Postgres) before next dev starts, then Next.js
+        // JIT-compiles the admin route on first request. 3 min is the safe floor.
+        timeout: 180_000,
       },
 });
