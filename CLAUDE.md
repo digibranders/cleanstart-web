@@ -4,6 +4,8 @@ This file tells Claude Code *how* to work in this repo. It does not duplicate th
 
 **Source of truth for *what*:** `docs/cleanstart-cms-architecture.html`. Every ticket, every design call, every schema decision references an anchor in that file (e.g. `#new-fields`, `#blocks`, `#publishing-checklist`). If this CLAUDE.md and the arch doc disagree, the arch doc wins for product/architecture decisions; this file wins for code conventions.
 
+**CLAUDE.md is always in sync across all branches.** Any change to this file must be immediately copied to every worktree (`cleanstart-cms`, `cleanstart-web`, `cleanstart-website`) and committed on each branch (`cms`, `web`, `development`, `main`) so no branch ever has a stale version.
+
 **Plan of record:** `~/.claude/plans/lets-review-the-doc-curried-feigenbaum.md` (CMS-only Phase A–I sequence). The current backlog is at `docs/BACKLOG.md`. Phases A–I are substantially done (see backlog for remaining ops-only gaps). **Currently active scope: Phase J — Integrations dashboard** (`apps/cms` Integrations collection + editor self-serve UI). `apps/web` marketing site is also active as of Phase J (see below).
 
 ---
