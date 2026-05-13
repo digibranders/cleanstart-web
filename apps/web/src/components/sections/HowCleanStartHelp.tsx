@@ -84,7 +84,7 @@ export function HowCleanStartHelp() {
 
       <div className="relative mx-auto w-full max-w-[1276px] px-6">
         {/* Title row + 1×90 vertical separator + description */}
-        <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:flex-row md:gap-12">
+        <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:flex-row md:gap-[70px]">
           <h2
             id="how-cleanstart-title"
             className="font-sans text-[#111111]"
@@ -110,11 +110,12 @@ export function HowCleanStartHelp() {
           <p
             className="font-sans text-[#111111] md:mt-3"
             style={{
-              fontSize: "clamp(1rem,1.6vw,1.625rem)",
+              fontSize: "clamp(1rem,1.6vw,1.875rem)",
               fontWeight: 400,
               lineHeight: "140%",
               letterSpacing: "-0.04em",
               maxWidth: "604px",
+              opacity: 0.8,
             }}
           >
             Help Tailored solutions for every role in your organization — from
@@ -122,26 +123,25 @@ export function HowCleanStartHelp() {
           </p>
         </div>
 
-        {/* Cards container — single white L-shape SVG (Figma Vector 1194233942)
-            wraps the 3 feature cards as ONE connected shape, with cutout for CISO.
-            CISO sits in the cutout as its own dark gradient card.
-            The shape extends past the bottom of the cards to connect with the
-            next (BuiltForTeams) section — matches Figma where there's no gap. */}
-        <div className="relative pb-0">
-          {/* White L-shape SVG. viewBox matches our actual layout (1276 wide × 648 tall
-              from h-[308] × 2 rows + 32px gap). Cutout = top-left CISO area (655 × 308),
-              bottom block fills full width from y=308 to 648 with rounded outer corners.
-              The shape covers the 32px vertical gap between rows so the 3 light cards
-              appear to sit on a single connected white surface, matching Figma. */}
+        {/* Cards container — break out of px-6 on desktop so SVG coordinates
+            are in true 1276px space matching Figma (node 108:8008, 1276×678).
+            pb-[30px] adds the 30px extension below the card grid that connects
+            this section to the next. */}
+        <div className="relative pb-[30px] md:-mx-6">
+          {/* White L-shape SVG (Figma Vector 1194233942, 1276×678).
+              viewBox: 1276 wide × 678 tall (308 row1 + 32 gap + 308 row2 + 30px extension).
+              Cutout: top-left 654×340 — CISO card (308px) + gap (32px) so the gap zone
+              shows as section background (#F6F6F6), not white.
+              All corners: 40px radius (r=40 → koff=22.09px). */}
           <svg
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-full w-full"
-            viewBox="0 0 1276 648"
+            className="pointer-events-none absolute inset-x-0 top-0 h-full w-full hidden md:block"
+            viewBox="0 0 1276 678"
             preserveAspectRatio="none"
             style={{ zIndex: 0 }}
           >
             <path
-              d="M1216 0L715 0C681.863 0 655 26.86 655 60L655 248C655 281.21 626.55 308 591.34 308L60 308C26.66 308 0 334 0 368L0 588C0 621.21 26.66 648 60 648L1216 648C1249.21 648 1276 621.21 1276 588L1276 60C1276 26.79 1249.21 0 1216 0Z"
+              d="M694 0L1236 0C1258.09 0 1276 22.09 1276 40L1276 638C1276 660.09 1258.09 678 1236 678L40 678C17.91 678 0 660.09 0 638L0 380C0 357.91 17.91 340 40 340L614 340C636.09 340 654 317.91 654 300L654 40C654 17.91 671.91 0 694 0Z"
               fill="white"
             />
           </svg>
@@ -230,12 +230,12 @@ function CisoCard({
 
       {/* Description */}
       <p
-        className="mt-[14px] font-sans text-white/95"
+        className="mt-[22px] font-sans text-white/95"
         style={{
-          fontSize: "18px",
+          fontSize: "20px",
           fontWeight: 400,
           lineHeight: "140%",
-          letterSpacing: "-0.04em",
+          letterSpacing: "-0.05em",
           maxWidth: "504px",
         }}
       >
@@ -293,6 +293,7 @@ function TabPill({
         fontFamily: "Inter, var(--font-figtree), system-ui, sans-serif",
         fontSize: "18px",
         fontWeight: 500,
+        opacity: active ? 1 : 0.7,
         background: active
           ? "linear-gradient(180deg, #2B97D1 0%, #395FF9 100%)"
           : "transparent",
