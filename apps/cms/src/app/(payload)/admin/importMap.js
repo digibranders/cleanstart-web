@@ -14,6 +14,9 @@ import { GroupField as GroupField_74bc515fedbf6bc79a8d465c8195685c } from '@/pay
 import { TextareaField as TextareaField_910298ace0fe3204ac012253d7fcff5b } from '@/payload/admin/components/fields/TextareaField.tsx'
 import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
 import { RelationshipField as RelationshipField_093f373a4f5250e712293002deb8de6b } from '@/payload/admin/components/fields/RelationshipField.tsx'
+import { EventsMultiSelect as EventsMultiSelect_8bcd98a59f96a65fd684ba41f20f1e87 } from '@/payload/admin/components/integrations/EventsMultiSelect.tsx'
+import { CollectionsMultiSelect as CollectionsMultiSelect_a770c3187edb082d594bd5627797c7bd } from '@/payload/admin/components/integrations/CollectionsMultiSelect.tsx'
+import { FormSlugsMultiSelect as FormSlugsMultiSelect_11ab94aa8a76e3e72d0050cdfae907ac } from '@/payload/admin/components/integrations/FormSlugsMultiSelect.tsx'
 import { ArrayField as ArrayField_bd55658ce5d98c1c995dbb3e9e65c4e7 } from '@/payload/admin/components/fields/ArrayField.tsx'
 import { ClarityConfigNote as ClarityConfigNote_dd07c5d802b83ad4ca896a67326d6b90 } from '@/payload/admin/components/integrations/ConfigNote.tsx'
 import { BrevoConfigNote as BrevoConfigNote_dd07c5d802b83ad4ca896a67326d6b90 } from '@/payload/admin/components/integrations/ConfigNote.tsx'
@@ -124,6 +127,9 @@ export const importMap = {
   "@/payload/admin/components/fields/TextareaField.tsx#TextareaField": TextareaField_910298ace0fe3204ac012253d7fcff5b,
   "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
   "@/payload/admin/components/fields/RelationshipField.tsx#RelationshipField": RelationshipField_093f373a4f5250e712293002deb8de6b,
+  "@/payload/admin/components/integrations/EventsMultiSelect.tsx#EventsMultiSelect": EventsMultiSelect_8bcd98a59f96a65fd684ba41f20f1e87,
+  "@/payload/admin/components/integrations/CollectionsMultiSelect.tsx#CollectionsMultiSelect": CollectionsMultiSelect_a770c3187edb082d594bd5627797c7bd,
+  "@/payload/admin/components/integrations/FormSlugsMultiSelect.tsx#FormSlugsMultiSelect": FormSlugsMultiSelect_11ab94aa8a76e3e72d0050cdfae907ac,
   "@/payload/admin/components/fields/ArrayField.tsx#ArrayField": ArrayField_bd55658ce5d98c1c995dbb3e9e65c4e7,
   "@/payload/admin/components/integrations/ConfigNote.tsx#ClarityConfigNote": ClarityConfigNote_dd07c5d802b83ad4ca896a67326d6b90,
   "@/payload/admin/components/integrations/ConfigNote.tsx#BrevoConfigNote": BrevoConfigNote_dd07c5d802b83ad4ca896a67326d6b90,

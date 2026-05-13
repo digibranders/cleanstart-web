@@ -512,7 +512,7 @@ export interface WebhooksDeadLetter {
   createdAt: string;
 }
 /**
- * Outbound destinations and analytics read-back. Credentials (HubSpot, GA4 service account, Clarity, Cloudflare, Brevo, Cal.com) live in env vars set by ops; per-channel URLs (Teams, generic webhook) are encrypted in the row.
+ * Connect CleanStart to your other tools — CRM, analytics, notifications, and automations. Each row is one connection. Your technical team handles credentials; you control what gets sent where.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "integrations".
@@ -520,11 +520,11 @@ export interface WebhooksDeadLetter {
 export interface Integration {
   id: number;
   /**
-   * Human-readable name. "Sales · #sales-eng-leads", "Zapier — lead webhook", etc.
+   * A friendly name to identify this connection, e.g. "Sales team notifications" or "Zapier lead alerts".
    */
   label: string;
   /**
-   * Integration type. Locked after creation.
+   * The type of tool you are connecting to. Cannot be changed after saving.
    */
   kind:
     | 'teamsWorkflow'
@@ -539,33 +539,35 @@ export interface Integration {
     | 'brevoBounceCallback'
     | 'zohoCrm';
   /**
-   * Pause without deleting.
+   * Turn this connection on or off without removing it.
    */
   enabled?: boolean | null;
   /**
-   * Which events trigger this destination. Empty filter = all collections / all forms.
+   * Choose which activity on the site triggers a notification. Leave all filters empty to receive everything.
    */
   routing?: {
     events: ('document.published' | 'lead.submitted')[];
     /**
-     * Filter document.published events by collection slug (e.g. "blogs", "news"). Empty = all.
+     * Filter document.published events by collection. Empty = all collections.
      */
-    collections?: string[] | null;
+    collections?:
+      | ('blogs' | 'news' | 'guides' | 'resources' | 'knowledgeBase' | 'events' | 'webinars' | 'jobs' | 'pages')[]
+      | null;
     /**
-     * Filter lead.submitted events by form slug (e.g. "demo-request"). Empty = all forms.
+     * Filter lead.submitted events by form slug. Empty = all forms.
      */
     formSlugs?: string[] | null;
   };
   /**
-   * One row = one Teams channel. Get the URL from the Workflows app in Teams (template: "Post to a channel when a webhook request is received").
+   * Sends notifications to a Teams channel. Each row connects to one channel — you can add multiple rows for multiple channels.
    */
   teamsConfig?: {
     /**
-     * Workflow webhook URL. Encrypted at rest. Leave blank when editing to keep the saved value.
+     * The webhook URL for your Teams channel. In Teams, open the channel → Workflows → "Post to a channel when a webhook request is received" to generate this URL. Saved securely — leave blank to keep the existing value.
      */
     webhookUrl: string;
     /**
-     * Optional — paste each person's AAD Object ID + UPN from the Entra portal to ping them with @-mentions.
+     * Optional — tag specific team members in notifications. Ask your IT admin for each person's User ID and email address from Microsoft Entra (Azure AD).
      */
     mentions?:
       | {
@@ -573,7 +575,7 @@ export interface Integration {
           aadObjectId: string;
           upn: string;
           /**
-           * Optional — restrict this mention to specific events. Empty = all.
+           * Optional — only mention this person for specific event types. Leave empty to mention them on all notifications.
            */
           triggerOn?: ('document.published' | 'lead.submitted')[] | null;
           id?: string | null;
@@ -581,40 +583,62 @@ export interface Integration {
       | null;
   };
   /**
-   * Posts a signed JSON payload (Standard Webhooks) to an external URL. Use this for Zapier / n8n / Make / custom receivers.
+   * Sends event data to an external automation tool like Zapier, Make, or n8n whenever something happens on the site.
    */
   genericConfig?: {
     /**
-     * Subscriber URL. Encrypted at rest.
+     * The destination URL provided by your automation tool. Saved securely.
      */
     url: string;
     /**
-     * HMAC-SHA256 shared secret. Encrypted at rest. Leave blank when editing to keep the saved value.
+     * A secret passphrase used to verify that notifications genuinely came from CleanStart. Saved securely — leave blank to keep the existing value.
      */
     signingSecret: string;
     /**
-     * Optional key ID surfaced in audit logs and used during rotation.
+     * Optional label for this secret key — useful if you rotate secrets and want to track which key is active.
      */
     signingKeyId?: string | null;
   };
   /**
-   * Access token comes from the HUBSPOT_PRIVATE_APP_TOKEN env var — nothing to paste here. This row only carries optional mapping overrides.
+   * Your HubSpot connection is already set up by the technical team. Use the options below to control how new form submissions appear in HubSpot.
    */
   hubspotConfig?: {
     /**
-     * Whether to also create a HubSpot Lead alongside the Contact. Default writes a Contact only.
+     * Choose whether to create just a Contact in HubSpot, or a Contact and a Lead record together.
      */
     writeMode?: ('contactOnly' | 'contactAndLead') | null;
     /**
-     * HubSpot lifecyclestage value. Default "lead".
+     * Where new contacts will be placed in your HubSpot pipeline.
      */
-    defaultLifecycleStage?: string | null;
+    defaultLifecycleStage?:
+      | (
+          | 'subscriber'
+          | 'lead'
+          | 'marketingqualifiedlead'
+          | 'salesqualifiedlead'
+          | 'opportunity'
+          | 'customer'
+          | 'evangelist'
+          | 'other'
+        )
+      | null;
     /**
-     * HubSpot hs_lead_status value. Default "NEW".
+     * The initial follow-up status applied to new contacts in HubSpot.
      */
-    defaultLeadStatus?: string | null;
+    defaultLeadStatus?:
+      | (
+          | 'NEW'
+          | 'OPEN'
+          | 'IN_PROGRESS'
+          | 'OPEN_DEAL'
+          | 'UNQUALIFIED'
+          | 'ATTEMPTED_TO_CONTACT'
+          | 'CONNECTED'
+          | 'BAD_TIMING'
+        )
+      | null;
     /**
-     * Optional — map submission field names onto HubSpot property API names. Standard mapping (email → email, name → firstname/lastname) is automatic.
+     * Optional — if your form has custom fields, map them to the matching HubSpot property here. Email and name are mapped automatically.
      */
     fieldMapping?:
       | {
@@ -625,47 +649,47 @@ export interface Integration {
       | null;
   };
   /**
-   * Service-account JSON is set globally via GOOGLE_APPLICATION_CREDENTIALS_JSON env. Grant the SA Viewer role on the GA4 property.
+   * Pulls your website traffic data into the dashboard. The connection credentials are already set up by the technical team — just enter your Property ID below.
    */
   ga4Config?: {
     /**
-     * GA4 property ID (numbers only — find it in Admin → Property Settings).
+     * Your GA4 Property ID — a number you can find in Google Analytics under Admin → Property Settings.
      */
     propertyId: string;
   };
   /**
-   * Service-account JSON is set globally via GOOGLE_APPLICATION_CREDENTIALS_JSON env. Add the SA as a user (or delegated owner for Indexing API) in GSC.
+   * Pulls search performance data (clicks, impressions) from Google. The connection credentials are already set up by the technical team — just enter your site address below.
    */
   gscConfig?: {
     /**
-     * GSC property identifier. Domain property = "sc-domain:cleanstart.com". URL prefix = "https://cleanstart.com/" (trailing slash).
+     * Your site as it appears in Google Search Console. Use "sc-domain:cleanstart.com" for a domain property, or "https://cleanstart.com/" (with trailing slash) for a URL-prefix property.
      */
     siteUrl: string;
   };
   /**
-   * API token comes from the CLARITY_API_TOKEN env var — nothing to paste here. Generate it in Clarity → Settings → Data Export.
+   * Shows which pages have the most user friction (rage clicks, dead clicks). Everything is already set up by the technical team — no extra configuration needed here.
    */
   clarityConfig?: {};
   /**
-   * API token comes from the CLOUDFLARE_API_TOKEN env var. This row only specifies which Cloudflare account to read.
+   * Shows pageview and visitor data from Cloudflare. The connection is already set up by the technical team. The field below is optional — only fill it in if you have multiple Cloudflare accounts.
    */
   cloudflareConfig?: {
     /**
-     * Cloudflare account ID (32-char hex). Optional — falls back to CLOUDFLARE_ACCOUNT_TAG env.
+     * Optional — your Cloudflare Account ID. Leave blank to use the default account already configured by the technical team.
      */
     accountTag?: string | null;
   };
   /**
-   * Cal.com posts to /api/integrations/calcom; signing secret is the CALCOM_SIGNING_SECRET env var. This row maps bookings to a lead form.
+   * Automatically creates a lead record whenever someone books a meeting via Cal.com. The security connection is already set up by the technical team.
    */
   calcomConfig?: {
     /**
-     * Form ID to attribute Cal.com bookings to. Editors create a hidden "Cal.com bookings" form and paste its ID here.
+     * The ID of the form that Cal.com bookings should be recorded under. Create a form called "Cal.com Bookings" in the Forms collection, then paste its numeric ID here.
      */
     fallbackFormId: number;
   };
   /**
-   * Bearer token comes from the BREVO_INBOUND_TOKEN env var. Register https://admin.cleanstart.com/api/integrations/brevo as a webhook in Brevo with that token in the auth field.
+   * Keeps your email list clean by automatically marking contacts who bounced or complained. Everything is set up by the technical team — no configuration needed here.
    */
   brevoConfig?: {};
   /**
