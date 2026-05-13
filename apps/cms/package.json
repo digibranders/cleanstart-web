@@ -7,7 +7,7 @@
     "predev": "pnpm run generate:importmap",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --port 3000",
     "prebuild": "pnpm run generate:importmap",
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
+    "build": "cross-env \"NODE_OPTIONS=--no-deprecation --max-old-space-size=4096\" next build",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start --port 3000",
     "lint": "biome lint src",
     "typecheck": "tsc --noEmit",
