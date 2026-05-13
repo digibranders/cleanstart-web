@@ -5,8 +5,10 @@ page slugs, categories, types, and build status across the dev journey.
 
 **When a page is built:**
 1. Add its route in `apps/web/src/app/[slug]/page.tsx`
-2. Wire its href in `apps/web/src/lib/nav-config.ts`
-3. Mark status as ✅ in this file
+2. Mark status as ✅ in this file
+3. Update its `href` in `apps/web/src/lib/nav-config.ts` from `"/"` to the real slug
+
+**Nav link rule:** `nav-config.ts` uses the real slug only for ✅ pages. ⬜ and 🚧 pages use `"/"` as a placeholder. This file is the authority — when updating nav-config.ts, check the status column here first.
 
 ---
 
@@ -83,8 +85,8 @@ page slugs, categories, types, and build status across the dev journey.
 
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
-| 13 | Blogs (Listing) | `/blogs` | CMS Listing | ⬜ | Payload `posts` collection |
-| 12 | Blog – Single Post | `/blogs/[slug]` | CMS Detail | ⬜ | Dynamic route, Payload `posts` |
+| 13 | Blogs (Listing) | `/blogs` | CMS Listing | ✅ | Route at `src/app/blogs/` |
+| 12 | Blog – Single Post | `/blog/[slug]` | CMS Detail | ✅ | Route at `src/app/blog/[slug]/` |
 | 14 | Knowledge Hub | `/knowledge-hub` | CMS Listing | ⬜ | Payload `knowledgeBase` collection |
 | 15 | Newsroom | `/news` | CMS Listing | ⬜ | Payload `news` collection |
 | 16 | Podcast | `/podcast` | CMS Listing | ⬜ | Payload `podcast` collection |
@@ -136,16 +138,16 @@ page slugs, categories, types, and build status across the dev journey.
 Build static pages first (no CMS dependency), then CMS listing pages, then CMS detail pages.
 
 **Wave 1 — Static marketing (highest business value)**
-Homepage ✅ → About Us 🚧 → Book a Demo → Contact Us → Pricing → Products (3 pages) → Solutions (6 pages)
+Homepage ✅ → About Us ✅ → Book a Demo → Contact Us → Pricing → Products (3 pages) → Solutions (6 pages)
 
 **Wave 2 — Static supporting**
 Partners → Careers → Teams → Community → Deal Registration
 
 **Wave 3 — CMS listing pages** (needs CMS live)
-Blogs → Knowledge Hub → Newsroom → Resource Center → Webinars → Events → Podcast
+Blogs ✅ → Knowledge Hub → Newsroom → Resource Center → Webinars → Events → Podcast
 
 **Wave 4 — CMS detail / dynamic routes**
-Blog Single Post → Author Page
+Blog Single Post ✅ → Author Page
 
 **Wave 5 — Legal + Utility**
 Legal Hub → Privacy Policy → Terms & Conditions → 404 Page
