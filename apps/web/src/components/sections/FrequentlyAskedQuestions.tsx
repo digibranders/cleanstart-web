@@ -93,61 +93,43 @@ export function FrequentlyAskedQuestions() {
       // Note: no overflow-hidden — lets the decorative lavender/cyan/purple
       // blobs bleed across the top/bottom section boundaries. Body has
       // overflow-x: hidden so horizontal scroll is still prevented.
-      className="relative w-full bg-[#F6F6F6] py-14 sm:py-16 lg:py-20"
+      className="relative w-full py-14 sm:py-16 lg:py-20"
       aria-labelledby="faq-title"
     >
-      {/* Figma 108:8523 — soft purple radial bleed off the left edge (10% opacity, 1101px) */}
+      {/* Figma 108:7627 "Ellipse 46691" — cyan glow at top-right of FAQ.
+          Figma absolute: x=1496, y=6374, 262×262 in 1920-wide frame.
+          With FAQ section top at y=6231 (title y=6311 minus py-20 80px),
+          section-relative top = 6374−6231 = 143px.
+          Horizontal: right = 1920−1496−262 = 162px from viewport right edge. */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
         style={{
-          left: "-435px",
-          top: "-200px",
-          width: "1100px",
-          height: "1100px",
-          background:
-            "radial-gradient(circle, rgba(100,13,251,0.10) 0%, rgba(100,13,251,0) 70%)",
-        }}
-      />
-      {/* Figma 108:8524 — soft purple radial bleed off the right edge */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          right: "-435px",
-          top: "350px",
-          width: "1100px",
-          height: "1100px",
-          background:
-            "radial-gradient(circle, rgba(100,13,251,0.10) 0%, rgba(100,13,251,0) 70%)",
-        }}
-      />
-      {/* Figma 108:7627 — cyan glow top-right (262×262, #2CC1EB @ 20%, blur 203) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          right: "11%",
-          top: "60px",
+          right: "162px",
+          top: "143px",
           width: "262px",
           height: "262px",
-          borderRadius: "50%",
-          backgroundColor: "rgba(44,193,235,0.20)",
-          filter: "blur(120px)",
+          borderRadius: "262px",
+          backgroundColor: "#2CC1EB",
+          opacity: 0.2,
+          filter: "blur(101.5px)",
         }}
       />
-      {/* Figma 108:7626 — pink/lavender glow bottom-left (262×262, #DF9CFF @ 50%, blur 263) */}
+      {/* Figma 108:7626 "Ellipse 46681" — pink/lavender glow on the left of FAQ.
+          Figma absolute: x=215, y=6884, 262×262.
+          Section-relative top = 6884−6231 = 653px; left = 215px from viewport. */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
         style={{
-          left: "11%",
-          bottom: "-50px",
+          left: "215px",
+          top: "653px",
           width: "262px",
           height: "262px",
-          borderRadius: "50%",
-          backgroundColor: "rgba(223,156,255,0.50)",
-          filter: "blur(140px)",
+          borderRadius: "262px",
+          backgroundColor: "#DF9BFF",
+          opacity: 0.5,
+          filter: "blur(131.5px)",
         }}
       />
 

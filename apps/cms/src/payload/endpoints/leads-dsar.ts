@@ -5,6 +5,7 @@ import { hasRole } from '../access/typed-user';
 import { clientIpFromHeaders } from '../lib/client-ip';
 import { checkAndRecord } from '../lib/rate-limit';
 import { extractEmail } from '../lib/lead-handlers/extract-fields';
+import { hubspotGdprDeleteByEmail } from '../lib/lead-handlers/hubspot';
 
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
@@ -138,6 +139,20 @@ export const dsarDeleteEndpoint: Endpoint = {
       matchesEmail(lead, targetEmail),
     );
 
+    // Cascade to HubSpot first — irreversible (permanently blocklists
+    // the email in the CRM). Fail-soft: if HubSpot can't be reached,
+    // log + still complete the local deletion. An admin can re-run the
+    // DSAR delete once HubSpot is back up to ensure the CRM is purged.
+    let hubspotDeleted = false;
+    try {
+      hubspotDeleted = await hubspotGdprDeleteByEmail(req.payload, targetEmail);
+    } catch (err) {
+      req.payload.logger?.warn?.(
+        { error: err instanceof Error ? err.message : String(err), email: targetEmail },
+        'DSAR: HubSpot gdpr-delete failed — continuing with local deletion',
+      );
+    }
+
     let deleted = 0;
     for (const lead of matching) {
       await req.payload.delete({
@@ -163,6 +178,6 @@ export const dsarDeleteEndpoint: Endpoint = {
       deleted += 1;
     }
 
-    return json({ ok: true, deleted });
+    return json({ ok: true, deleted, hubspotDeleted });
   },
 };

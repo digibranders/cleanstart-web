@@ -13,7 +13,8 @@
       "**/node_modules/**",
       "**/dist/**",
       "**/payload-types.ts",
-      "**/importMap.js"
+      "**/importMap.js",
+      "**/migrations/*.json"
     ]
   },
   "formatter": {

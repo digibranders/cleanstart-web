@@ -72,16 +72,6 @@ export function Footer() {
           "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
     >
-      {/* Top seam fade — dissolves the dark navy footer into the light CTA section
-          above so the boundary is not a sharp horizontal edge. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[220px]"
-        style={{
-          background:
-            "linear-gradient(180deg, #F6F6F6 0%, rgba(246,246,246,0.55) 35%, rgba(246,246,246,0.15) 70%, rgba(246,246,246,0) 100%)",
-        }}
-      />
       {/* Big purple ellipse — Figma 46640 (974×863) at (308, -358), color #7A59FF, opacity 3%, blur 250px.
           Very subtle huge soft glow that brightens the upper-left of the footer. */}
       <div

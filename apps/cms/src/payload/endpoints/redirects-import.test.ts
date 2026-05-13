@@ -1,8 +1,16 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { __resetRateLimitStore } from '../lib/rate-limit';
 import { redirectsImportEndpoint } from './redirects-import';
 
 const handler = redirectsImportEndpoint.handler as (req: unknown) => Promise<Response>;
+
+// Empty Headers mocks all share the same fallback IP, so without a
+// reset between tests the per-IP rate-limit bucket carries state
+// across cases and the later requests trip a 429.
+beforeEach(() => {
+  __resetRateLimitStore();
+});
 
 const makeReq = (
   body: unknown,
@@ -18,6 +26,7 @@ const makeReq = (
       json: async () => body,
       user,
       payload,
+      headers: new Headers(),
     } as unknown as Parameters<typeof handler>[0],
     spies: { find, create, update },
   };
@@ -34,6 +43,7 @@ describe('redirectsImportEndpoint', () => {
     const req = {
       user: { roles: ['admin'] },
       payload: {},
+      headers: new Headers(),
       json: () => {
         throw new Error('bad json');
       },
@@ -93,6 +103,7 @@ describe('redirectsImportEndpoint', () => {
         ],
       }),
       payload: { find, create, update },
+      headers: new Headers(),
     } as unknown as Parameters<typeof handler>[0];
 
     const res = await handler(req);

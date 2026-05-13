@@ -7,16 +7,16 @@ import {
   DropdownMenu,
   type DropdownMenuItem,
 } from '@cleanstart/ui';
+// useStepNav is a pure context hook (no render output) that owns the admin
+// breadcrumb state. CmsListView fully replaces DefaultListView, so we must
+// call it here or the breadcrumb stays stale on SPA nav and blank on hard
+// refresh. Functionally equivalent to useListQuery (already on the allow-list).
 import {
   Gutter,
   PageControls,
   SelectionProvider,
   useConfig,
   useListQuery,
-  // Navigation-state exception: useStepNav is a context hook that renders
-  // nothing. DefaultListView calls it to own the breadcrumb; since
-  // CmsListView replaces DefaultListView entirely, we must do the same or
-  // the crumb stays stale on SPA nav and blank on hard refresh.
   useStepNav,
 } from '@payloadcms/ui';
 import type { ClientCollectionConfig } from 'payload';

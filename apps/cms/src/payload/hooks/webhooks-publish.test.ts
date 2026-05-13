@@ -10,6 +10,11 @@ const makeReq = () =>
     payload: {
       logger: { warn: vi.fn() },
     },
+    // getRequestId() reads req.headers.get('x-request-id'); stub a
+    // Fetch-API-shaped Headers object so the test exercises the same
+    // code path as the production request — no headers means no
+    // request-id propagation, which is a valid runtime state.
+    headers: new Headers(),
   }) as unknown as Parameters<ReturnType<typeof webhooksPublishAfterChangeHook>>[0]['req'];
 
 afterEach(() => {

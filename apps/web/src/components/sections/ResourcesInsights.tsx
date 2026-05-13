@@ -190,12 +190,6 @@ export function ResourcesInsights() {
     <section
       className="relative w-full py-32"
       aria-labelledby="resources-title"
-      style={{
-        // Top fade lets the FAQ section's lavender blob bleed continues smoothly
-        // into Resources instead of being cut off at a sharp horizontal seam.
-        background:
-          "linear-gradient(180deg, rgba(246,246,246,0) 0%, rgba(246,246,246,0.45) 25%, rgba(246,246,246,0.85) 55%, #F6F6F6 80%, #F6F6F6 100%)",
-      }}
     >
       {/* Figma 108:7625 — soft purple radial bleed off the bottom-left edge (10% opacity, 1101×1101) */}
       <div

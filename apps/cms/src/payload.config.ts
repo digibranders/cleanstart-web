@@ -17,6 +17,7 @@ import { Categories } from './payload/collections/Categories';
 import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
+import { AnalyticsCache } from './payload/collections/AnalyticsCache';
 import { Integrations } from './payload/collections/Integrations';
 import { JobLocations } from './payload/collections/JobLocations';
 import { Jobs } from './payload/collections/Jobs';
@@ -42,6 +43,15 @@ import {
   integrationsHealthEndpoint,
   integrationsTestEndpoint,
 } from './payload/endpoints/integrations-actions';
+import {
+  dashboardsGlobalEndpoint,
+  dashboardsGscInspectEndpoint,
+  dashboardsGscPerDocEndpoint,
+} from './payload/endpoints/dashboards';
+import {
+  brevoBounceInboundEndpoint,
+  calcomInboundEndpoint,
+} from './payload/endpoints/integrations-inbound';
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
 import { robotsEndpoint } from './payload/endpoints/robots';
@@ -57,8 +67,12 @@ import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
 import { reindexMeiliTask } from './payload/jobs/reindex-meili';
 import { retryWebhookTask } from './payload/jobs/retry-webhook';
+import { analyticsCachePruneTask } from './payload/jobs/analytics-cache-prune';
+import { dashboardRefreshDailyTask } from './payload/jobs/dashboard-refresh-daily';
+import { dashboardRefreshFrequentTask } from './payload/jobs/dashboard-refresh-frequent';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { wireCustomEditView } from './payload/lib/wire-custom-edit-view';
+import { wireAnalyticsTab } from './payload/lib/wire-analytics-tab';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { wireCustomListView } from './payload/lib/wire-custom-list-view';
 import { wirePublishGate } from './payload/lib/wire-publish-gate';
@@ -216,6 +230,7 @@ export default buildConfig({
     SearchLog,
     WebhookDeadLetter,
     Integrations,
+    AnalyticsCache,
     Authors,
     Categories,
     NewsCategories,
@@ -237,6 +252,7 @@ export default buildConfig({
     .map(wirePublishGate)
     .map(wireCustomListView)
     .map(wireCustomEditView)
+    .map(wireAnalyticsTab)
     .map(wireCustomFields),
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements]
     .map(wireCustomEditView)
@@ -259,9 +275,24 @@ export default buildConfig({
     integrationsTestEndpoint,
     integrationsHealthEndpoint,
     integrationsAuditEndpoint,
+    dashboardsGlobalEndpoint,
+    dashboardsGscPerDocEndpoint,
+    dashboardsGscInspectEndpoint,
+    calcomInboundEndpoint,
+    brevoBounceInboundEndpoint,
   ],
   jobs: {
-    tasks: [drainLeadQueueTask, purgeSearchLogTask, purgeLeadsPiiTask, checkBrokenLinksTask, retryWebhookTask, reindexMeiliTask],
+    tasks: [
+      drainLeadQueueTask,
+      purgeSearchLogTask,
+      purgeLeadsPiiTask,
+      checkBrokenLinksTask,
+      retryWebhookTask,
+      reindexMeiliTask,
+      dashboardRefreshFrequentTask,
+      dashboardRefreshDailyTask,
+      analyticsCachePruneTask,
+    ],
     autoRun: [
       {
         cron: '*/5 * * * *', // every 5 minutes
@@ -287,6 +318,18 @@ export default buildConfig({
         cron: '0 5 * * *', // daily at 05:00 UTC — Meilisearch drift check + self-healing
         queue: 'meiliReindex',
       },
+      {
+        cron: '*/15 * * * *', // every 15 minutes — GA4 + CF WA dashboard cache refresh
+        queue: 'dashboardRefreshFrequent',
+      },
+      {
+        cron: '0 6 * * *', // daily at 06:00 UTC — GSC + Clarity dashboard cache refresh
+        queue: 'dashboardRefreshDaily',
+      },
+      {
+        cron: '0 7 * * *', // daily at 07:00 UTC — analyticsCache 90-day prune
+        queue: 'analyticsCachePrune',
+      },
     ],
     // Positive opt-in: cron tasks register only when PAYLOAD_AUTO_RUN
     // is exactly 'true'. Vitest worker subprocesses (and CI runners
@@ -311,6 +354,12 @@ export default buildConfig({
     pool: {
       connectionString: requireEnv('DATABASE_URI'),
     },
+    // Migrations are authoritative in staging / prod / CI. Local dev
+    // keeps `push: true` so editors can iterate on collection shape
+    // without minting a migration on every save — the change is then
+    // captured via `pnpm migrate:create <name>` when it settles. See
+    // src/payload/migrations/README.md.
+    push: process.env.NODE_ENV !== 'production' && process.env.PAYLOAD_DB_PUSH !== 'false',
   }),
   sharp,
   graphQL: {

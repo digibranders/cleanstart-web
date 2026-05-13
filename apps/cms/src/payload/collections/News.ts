@@ -49,12 +49,28 @@ export const News: CollectionConfig = {
       filterOptions: {
         acceptingNewBylines: { not_equals: false },
       },
+      admin: {
+        components: {
+          Cell: {
+            path: '@/payload/admin/components/RelationshipCell.tsx#RelationshipCell',
+            clientProps: { collectionSlug: 'authors' },
+          },
+        },
+      },
     },
     {
       name: 'newsCategories',
       type: 'relationship',
       relationTo: 'newsCategories',
       hasMany: true,
+      admin: {
+        components: {
+          Cell: {
+            path: '@/payload/admin/components/RelationshipCell.tsx#RelationshipCell',
+            clientProps: { collectionSlug: 'newsCategories' },
+          },
+        },
+      },
     },
     {
       name: 'externalUrl',

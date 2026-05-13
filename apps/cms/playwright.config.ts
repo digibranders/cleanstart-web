@@ -40,9 +40,12 @@ export default defineConfig({
   webServer: process.env.CMS_BASE_URL
     ? undefined
     : {
-        command: 'pnpm dev',
+        // CI: use the pre-built output so the server starts in seconds
+        // and avoids JIT-compilation delay on first request.
+        // Local: use dev server for fast iteration (no build step needed).
+        command: process.env.CI ? 'pnpm start' : 'pnpm dev',
         url: 'http://localhost:3000/admin',
         reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
+        timeout: 60_000,
       },
 });

@@ -12,6 +12,10 @@ const makeReq = (
   ({
     url,
     user,
+    // The endpoint passes req.headers to clientIpFromHeaders for rate
+    // limiting. Provide an empty Headers so the helper's .get() lookup
+    // resolves to null without throwing.
+    headers: new Headers(),
   }) as unknown as Parameters<typeof handler>[0];
 
 beforeEach(() => {

@@ -14,6 +14,9 @@ import { GroupField as GroupField_74bc515fedbf6bc79a8d465c8195685c } from '@/pay
 import { TextareaField as TextareaField_910298ace0fe3204ac012253d7fcff5b } from '@/payload/admin/components/fields/TextareaField.tsx'
 import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
 import { RelationshipField as RelationshipField_093f373a4f5250e712293002deb8de6b } from '@/payload/admin/components/fields/RelationshipField.tsx'
+import { ArrayField as ArrayField_bd55658ce5d98c1c995dbb3e9e65c4e7 } from '@/payload/admin/components/fields/ArrayField.tsx'
+import { ClarityConfigNote as ClarityConfigNote_dd07c5d802b83ad4ca896a67326d6b90 } from '@/payload/admin/components/integrations/ConfigNote.tsx'
+import { BrevoConfigNote as BrevoConfigNote_dd07c5d802b83ad4ca896a67326d6b90 } from '@/payload/admin/components/integrations/ConfigNote.tsx'
 import { HealthBadge as HealthBadge_89f48d3894398c6d1021775cfdeaf211 } from '@/payload/admin/components/integrations/HealthBadge.tsx'
 import { TestButton as TestButton_0a975e83e531dadfb4f8fa6589a5704a } from '@/payload/admin/components/integrations/TestButton.tsx'
 import { AuditTrail as AuditTrail_eca9fb91faa70a942f7e3507305e451c } from '@/payload/admin/components/integrations/AuditTrail.tsx'
@@ -52,7 +55,6 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ParagraphFeatureClient as ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { ArrayField as ArrayField_bd55658ce5d98c1c995dbb3e9e65c4e7 } from '@/payload/admin/components/fields/ArrayField.tsx'
 import { EmailField as EmailField_7dd923731832c5c33b25cd573216c1bc } from '@/payload/admin/components/fields/EmailField.tsx'
 import { LegacyBioViewer as LegacyBioViewer_879b4bd183ddbb79ae3f346d2661eacc } from '@/payload/admin/components/LegacyBioViewer.tsx'
 import { PermalinkField as PermalinkField_ea9054c021397c838baff6eeae171a19 } from '@/payload/admin/components/PermalinkField.tsx'
@@ -79,6 +81,7 @@ import { FaqRowLabel as FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3 } from '@/p
 import { RelationshipCell as RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f } from '@/payload/admin/components/RelationshipCell.tsx'
 import { BlocksField as BlocksField_81821d6c72d1fc3a46ee03c3fb264707 } from '@/payload/admin/components/fields/BlocksField.tsx'
 import { TocRowLabel as TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b } from '@/payload/admin/components/TocRowLabel.tsx'
+import { AnalyticsTab as AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b } from '@/payload/admin/components/integrations/AnalyticsTab.tsx'
 import { PublishChecklistBanner as PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec } from '@/payload/admin/components/PublishChecklistBanner.tsx'
 import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/payload/admin/components/fields/CodeField.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
@@ -99,7 +102,6 @@ import { CmsLoginFooter as CmsLoginFooter_67c5b820b6d3bc2ad13ebd4c41435e40 } fro
 import { UserMenu as UserMenu_8a2f404b3fa17e34974bf49ed5367371 } from '../../../payload/admin/components/UserMenu.tsx'
 import { CmsLoginHero as CmsLoginHero_32623b867969588592e72c90b3b4967a } from '../../../payload/admin/components/auth/CmsLoginHero.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
-import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
 import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } from '../../../payload/admin/components/auth/CmsAccountView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -122,6 +124,9 @@ export const importMap = {
   "@/payload/admin/components/fields/TextareaField.tsx#TextareaField": TextareaField_910298ace0fe3204ac012253d7fcff5b,
   "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
   "@/payload/admin/components/fields/RelationshipField.tsx#RelationshipField": RelationshipField_093f373a4f5250e712293002deb8de6b,
+  "@/payload/admin/components/fields/ArrayField.tsx#ArrayField": ArrayField_bd55658ce5d98c1c995dbb3e9e65c4e7,
+  "@/payload/admin/components/integrations/ConfigNote.tsx#ClarityConfigNote": ClarityConfigNote_dd07c5d802b83ad4ca896a67326d6b90,
+  "@/payload/admin/components/integrations/ConfigNote.tsx#BrevoConfigNote": BrevoConfigNote_dd07c5d802b83ad4ca896a67326d6b90,
   "@/payload/admin/components/integrations/HealthBadge.tsx#HealthBadge": HealthBadge_89f48d3894398c6d1021775cfdeaf211,
   "@/payload/admin/components/integrations/TestButton.tsx#TestButton": TestButton_0a975e83e531dadfb4f8fa6589a5704a,
   "@/payload/admin/components/integrations/AuditTrail.tsx#AuditTrail": AuditTrail_eca9fb91faa70a942f7e3507305e451c,
@@ -160,7 +165,6 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ParagraphFeatureClient": ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "@/payload/admin/components/fields/ArrayField.tsx#ArrayField": ArrayField_bd55658ce5d98c1c995dbb3e9e65c4e7,
   "@/payload/admin/components/fields/EmailField.tsx#EmailField": EmailField_7dd923731832c5c33b25cd573216c1bc,
   "@/payload/admin/components/LegacyBioViewer.tsx#LegacyBioViewer": LegacyBioViewer_879b4bd183ddbb79ae3f346d2661eacc,
   "@/payload/admin/components/PermalinkField.tsx#PermalinkField": PermalinkField_ea9054c021397c838baff6eeae171a19,
@@ -187,6 +191,7 @@ export const importMap = {
   "@/payload/admin/components/RelationshipCell.tsx#RelationshipCell": RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f,
   "@/payload/admin/components/fields/BlocksField.tsx#BlocksField": BlocksField_81821d6c72d1fc3a46ee03c3fb264707,
   "@/payload/admin/components/TocRowLabel.tsx#TocRowLabel": TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b,
+  "@/payload/admin/components/integrations/AnalyticsTab.tsx#AnalyticsTab": AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b,
   "@/payload/admin/components/PublishChecklistBanner.tsx#PublishChecklistBanner": PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec,
   "@/payload/admin/components/fields/CodeField.tsx#CodeField": CodeField_4aa85fbd783c4d26c5c89ebf383941c1,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
@@ -207,7 +212,6 @@ export const importMap = {
   "./payload/admin/components/UserMenu.tsx#UserMenu": UserMenu_8a2f404b3fa17e34974bf49ed5367371,
   "./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero": CmsLoginHero_32623b867969588592e72c90b3b4967a,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,
-  "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
   "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
