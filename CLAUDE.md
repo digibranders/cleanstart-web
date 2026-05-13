@@ -296,8 +296,8 @@ cms ──────┘
 |--------|---------|--------|-------|
 | `web` | All `apps/web` marketing site work | `development` | Never commit CMS changes here |
 | `cms` | All `apps/cms` Payload work | `development` | Never commit web changes here |
-| `development` | CI gate + integration | `main` | No direct feature work — merge only |
-| `main` | Production | — | Coolify deploys `apps/cms` on push here |
+| `development` | **Staging** — CI gate + staging deployment | `main` | No direct feature work — merge only |
+| `main` | **Production** | — | Coolify deploys on push here |
 
 **Rules:**
 - All feature work starts from and PRs back to `development` via `web` or `cms` branch.
@@ -312,8 +312,8 @@ cms ──────┘
 
 ## Deploy rules
 
-- `apps/cms` deploys via **Coolify** on push to `main`. There is no other deploy path.
-- `apps/web` has no production deployment yet — actively developed on the `web` branch.
+- `apps/cms` deploys via **Coolify** on push to `main` (production). Staging deployment tracks `development`.
+- `apps/web` has no production deployment yet — actively developed on the `web` branch, staging on `development`.
 - Postgres lives on the same droplet, localhost-bound. Migrations run via Payload's migration runner, never raw SQL.
 - Cloudflare WAF sits in front of `admin.cleanstart.com`. 2FA is mandatory for every admin user.
 - Staging is a separate droplet (or DB) per arch doc §`#staging`. Never point staging at prod data.
