@@ -20,7 +20,7 @@ export function BlogsCTA(): React.ReactElement {
   return (
     <section
       className="relative w-full"
-      style={{ marginBottom: "-126px", paddingTop: "0", zIndex: 10 }}
+      style={{ marginBottom: "-126px", paddingTop: "0", paddingBottom: "67px", zIndex: 10 }}
       aria-labelledby="blogs-cta-title"
     >
       <div className="relative px-6">
@@ -30,18 +30,18 @@ export function BlogsCTA(): React.ReactElement {
             maxWidth: "1276px",
             height: "335px",
             borderRadius: "40px",
-            background: "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)",
+            background: "linear-gradient(180deg, #131e8f 0%, #471ec0 100%)",
           }}
         >
-          {/* Decorative orb — bottom left */}
+          {/* Decorative orb — bottom left — Figma 255:10293, x=-63 y=209, 218×220 */}
           <div
             aria-hidden
             className="pointer-events-none select-none absolute"
             style={{
               left: "-63px",
-              bottom: "-63px",
-              width: "178px",
-              height: "178px",
+              top: "209px",
+              width: "218px",
+              height: "220px",
               transform: "rotate(16.04deg)",
               opacity: 0.8,
             }}
@@ -56,15 +56,15 @@ export function BlogsCTA(): React.ReactElement {
             />
           </div>
 
-          {/* Decorative orb — top right */}
+          {/* Decorative orb — top right — Figma 255:10294, x=1130 y=-63, 222×221 */}
           <div
             aria-hidden
             className="pointer-events-none select-none absolute"
             style={{
-              right: "-93px",
+              left: "1130px",
               top: "-63px",
-              width: "178px",
-              height: "178px",
+              width: "222px",
+              height: "221px",
               transform: "rotate(-72.69deg)",
               opacity: 0.8,
             }}

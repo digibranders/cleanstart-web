@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { type Blog, formatBlogDate } from "@/lib/blog";
+import { type Blog, formatBlogDate, mediaUrl } from "@/lib/blog";
 
 interface BlogCardProps {
   post: Blog;
@@ -36,7 +36,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
       >
         {post.heroImage?.url ? (
           <Image
-            src={post.heroImage.url}
+            src={mediaUrl(post.heroImage.url)!}
             alt={post.heroImage.alt ?? post.title}
             fill
             className="object-cover"
@@ -181,7 +181,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
 
         {/* Read more — always at the bottom */}
         <Link
-          href={`/blogs/${post.slug}`}
+          href={`/blog/${post.slug}`}
           className="flex items-center"
           style={{ gap: "8px" }}
           aria-label={`Read more about ${post.title}`}

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { type Blog, type BlogCategory, formatBlogDate } from "@/lib/blog";
+import { type Blog, type BlogCategory, formatBlogDate, mediaUrl } from "@/lib/blog";
 import { BlogsHeroSearch } from "./BlogsHeroSearch";
 
 const HERO_GRADIENT =
@@ -200,7 +200,7 @@ export function BlogsHero({
 
               {/* Read more link */}
               <Link
-                href={`/blogs/${featuredPost.slug}`}
+                href={`/blog/${featuredPost.slug}`}
                 className="flex items-center gap-2 font-sans font-medium text-white text-center"
                 style={{ fontSize: "20px", lineHeight: "1.5" }}
               >
@@ -239,7 +239,7 @@ export function BlogsHero({
               >
                 {featuredPost.heroImage?.url ? (
                   <Image
-                    src={featuredPost.heroImage.url}
+                    src={mediaUrl(featuredPost.heroImage.url)!}
                     alt={featuredPost.heroImage.alt ?? featuredPost.title}
                     fill
                     className="object-cover"
