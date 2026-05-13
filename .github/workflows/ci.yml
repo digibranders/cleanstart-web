@@ -127,6 +127,9 @@ jobs:
       - name: Build
         run: pnpm --filter @cleanstart/cms build
 
+      - name: Migrate database
+        run: pnpm --filter @cleanstart/cms migrate
+
       - name: Install Playwright browsers
         run: pnpm --filter @cleanstart/cms exec playwright install --with-deps chromium
 
@@ -200,6 +203,9 @@ jobs:
       - name: Build
         run: pnpm --filter @cleanstart/cms build
 
+      - name: Migrate database
+        run: pnpm --filter @cleanstart/cms migrate
+
       - name: Install Playwright browsers
         run: pnpm --filter @cleanstart/cms exec playwright install --with-deps chromium
       # Advisory until baseline screenshots are committed. Run
@@ -251,6 +257,9 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build
         run: pnpm --filter @cleanstart/cms build
+
+      - name: Migrate database
+        run: pnpm --filter @cleanstart/cms migrate
 
       - name: Install Playwright browsers
         run: pnpm --filter @cleanstart/cms exec playwright install --with-deps chromium
