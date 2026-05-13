@@ -217,6 +217,9 @@ These are hard rules. Do not work around them — flag and stop instead.
 - **Never rename a Next.js route segment post-launch** (e.g. `/webinar/[slug]` → `/webinars/[slug]`). It breaks every indexed URL. Arch doc §`#migration` last subsection is explicit.
 - **Never commit `.env*`, secrets, R2 keys, Brevo keys, Webflow tokens, or 2FA seeds.** They live in 1Password vault `cleanstart-migration` and Coolify env-vars panel.
 - **Never enable GraphQL on the Payload admin.** Arch doc §`#decisions`: `graphQL: { disable: true }` at launch.
+- **Never push directly to `main` or `development`.** All changes go through a PR from `web` or `cms`.
+- **Never commit `apps/cms` changes on the `web` branch or vice versa.** One branch, one concern.
+- **Never delete the `web` or `cms` branches.** They are permanent feature branches.
 - **Never `git add -A` or `git add .`** at repo root. Stage specific paths.
 - **Never `--no-verify`** on commits. If a hook fails, fix it.
 - **Never delete data or drop tables** without explicit user confirmation, even in dev. Postgres on the droplet is shared with staging.
@@ -288,25 +291,41 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 
 ```
 web ──────┐
-          ├──► development (CI + integration) ──► main (production)
+          ├──► development (staging) ──► main (production)
 cms ──────┘
 ```
 
-| Branch | Purpose | PRs to | Notes |
-|--------|---------|--------|-------|
-| `web` | All `apps/web` marketing site work | `development` | Never commit CMS changes here |
-| `cms` | All `apps/cms` Payload work | `development` | Never commit web changes here |
-| `development` | **Staging** — CI gate + staging deployment | `main` | No direct feature work — merge only |
-| `main` | **Production** | — | Coolify deploys on push here |
+### Branch roles
 
-**Rules:**
-- All feature work starts from and PRs back to `development` via `web` or `cms` branch.
-- Never push directly to `main`. Only `development` → `main` PRs after CI passes.
-- Never work directly on `development` — it is the integration branch, not a feature branch.
-- `web` and `cms` branches are permanent — never delete them.
-- Keep `web` and `cms` branches rebased on `development` before opening a PR to avoid conflicts.
-- One concern per PR: a `web` PR touches only `apps/web`; a `cms` PR touches only `apps/cms`.
-  Shared files (`CLAUDE.md`, `docs/`, `packages/`) may go in either PR depending on what drove the change.
+| Branch | Role | Deploys to | PRs to |
+|--------|------|------------|--------|
+| `web` | Feature branch — all `apps/web` work | — | `development` |
+| `cms` | Feature branch — all `apps/cms` work | — | `development` |
+| `development` | **Staging** — integration + CI gate | Coolify staging | `main` |
+| `main` | **Production** | Coolify production | — |
+
+### Workflow
+
+1. All feature work happens on `web` or `cms` — never directly on `development` or `main`.
+2. When a feature is ready, open a PR from `web` or `cms` → `development`.
+3. CI runs on `development`. Once checks pass, the change is live on staging.
+4. When staging is verified and ready to ship, open a PR from `development` → `main`.
+5. Coolify deploys production on push to `main`.
+
+### Hard rules
+
+- **Never push directly to `main`** — only via `development` PR after CI passes.
+- **Never work directly on `development`** — it is staging/integration, not a feature branch.
+- **`web` and `cms` are permanent branches** — never delete them.
+- **`web` touches only `apps/web`** — no CMS changes, no exceptions.
+- **`cms` touches only `apps/cms`** — no web changes, no exceptions.
+- Shared files (`CLAUDE.md`, `docs/`, `packages/`) go in whichever PR drove the change.
+- Always sync your feature branch with `development` before opening a PR:
+  ```bash
+  git checkout web   # or cms
+  git merge development
+  git push origin web
+  ```
 
 ---
 
