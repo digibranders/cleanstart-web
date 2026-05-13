@@ -84,6 +84,26 @@ const ALLOW_LIST = new Set<string>([
   // our structural field components import it to delegate inner-tree
   // composition while owning the chrome.
   'RenderFields',
+  // `DocumentFields` wraps RenderFields with the <form> element,
+  // autosave orchestration, server-action error boundaries, and the
+  // field-state initialisation contract (initialValue vs value) that
+  // Payload's RSC edit-route relies on. CmsEditView owns the chrome
+  // (header, sidebar, controls) but must delegate the form body to
+  // this seam — reimplementing it here would duplicate the entire
+  // Payload form layer. Replace only when we have a first-party form
+  // shell; track as a Wave 9+ task.
+  'DocumentFields',
+  // `PageControls` renders Payload's built-in pagination bar (prev /
+  // next page, per-page selector). CmsListView will eventually replace
+  // it with a @cleanstart/ui Pagination primitive; until that component
+  // exists this stays on the list. Tracked as part of Wave 9.
+  'PageControls',
+  // `useStepNav` is a pure context hook — it renders nothing. It
+  // manages the admin breadcrumb state. CmsListView replaces
+  // DefaultListView entirely, so it must call useStepNav itself or the
+  // breadcrumb stays stale on SPA nav and blank on hard refresh.
+  // Functionally equivalent to useListQuery (already allowed).
+  'useStepNav',
 ]);
 
 const TARGET = '@payloadcms/ui';
