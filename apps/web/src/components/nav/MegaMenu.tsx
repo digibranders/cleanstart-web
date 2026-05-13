@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { NavGroup } from "@/lib/nav-config";
 
 export function MegaMenu({
@@ -31,20 +30,17 @@ export function MegaMenu({
             )}
             <ul className="flex flex-col">
               {group.items.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="cs-mega-item group block rounded-[12px] px-3 py-2.5 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#33BAEC]/70"
-                  >
-                    <div className="text-[14.5px] font-medium leading-tight text-white/95 transition-colors group-hover:text-white">
+                <li key={item.label}>
+                  <span className="block rounded-[12px] px-3 py-2.5">
+                    <div className="text-[14.5px] font-medium leading-tight text-white/95">
                       {item.label}
                     </div>
                     {showDescriptions && item.description && (
-                      <div className="mt-1 text-[12.5px] leading-snug text-white/55 transition-colors group-hover:text-white/75">
+                      <div className="mt-1 text-[12.5px] leading-snug text-white/55">
                         {item.description}
                       </div>
                     )}
-                  </Link>
+                  </span>
                 </li>
               ))}
             </ul>

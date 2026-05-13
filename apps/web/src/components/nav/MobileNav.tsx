@@ -45,14 +45,12 @@ export function MobileNav() {
             {NAV_TREE.map((item) => {
               if (item.kind === "flat") {
                 return (
-                  <Link
+                  <span
                     key={item.label}
-                    href={item.href}
-                    onClick={close}
-                    className="block rounded-[10px] px-3 py-3 text-[15px] font-medium text-white/90 transition-colors hover:bg-white/[0.06] hover:text-white"
+                    className="block rounded-[10px] px-3 py-3 text-[15px] font-medium text-white/90"
                   >
                     {item.label}
-                  </Link>
+                  </span>
                 );
               }
               const leaves =
@@ -83,14 +81,10 @@ export function MobileNav() {
                             {leaf.__header}
                           </li>
                         ) : (
-                          <li key={leaf.href}>
-                            <Link
-                              href={leaf.href}
-                              onClick={close}
-                              className="block rounded-[8px] px-3 py-2 text-[14px] text-white/80 transition-colors hover:bg-white/[0.06] hover:text-white"
-                            >
+                          <li key={leaf.label}>
+                            <span className="block rounded-[8px] px-3 py-2 text-[14px] text-white/80">
                               {leaf.label}
-                            </Link>
+                            </span>
                           </li>
                         )
                       )}

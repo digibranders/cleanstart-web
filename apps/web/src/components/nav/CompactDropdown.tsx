@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { NavLeaf } from "@/lib/nav-config";
 
 export function CompactDropdown({
@@ -12,13 +11,10 @@ export function CompactDropdown({
     <div className="cs-mega-surface" style={{ width }}>
       <ul className="flex flex-col p-2">
         {items.map((item) => (
-          <li key={item.href}>
-            <Link
-              href={item.href}
-              className="cs-mega-item block rounded-[10px] px-3 py-2.5 text-[14.5px] font-medium leading-tight text-white/90 outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-[#33BAEC]/70"
-            >
+          <li key={item.label}>
+            <span className="block rounded-[10px] px-3 py-2.5 text-[14.5px] font-medium leading-tight text-white/90">
               {item.label}
-            </Link>
+            </span>
           </li>
         ))}
       </ul>

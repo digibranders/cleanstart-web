@@ -1,9 +1,10 @@
 // Single source of truth for the marketing nav. Mirrors cleanstart.com production IA.
 // Consumed by both DesktopNav and MobileNav so the desktop bar and mobile sheet never drift.
 //
-// All slugs match docs/WEB-PAGES.md exactly. Pages not yet built keep their correct final
-// slug here — do NOT use "/" as a placeholder. When a page is built its route folder must
-// match the href in this file.
+// Slug authority: docs/WEB-PAGES.md. All items carry their real final slug regardless of
+// build status. Unbuilt items are rendered as <span> (non-clickable) — not <Link> — so
+// the href is data-only until the page exists. When a page is marked ✅ in WEB-PAGES.md,
+// switch its renderer from <span> to <Link> in MegaMenu / CompactDropdown / MobileNav.
 
 export type NavLeaf = {
   label: string;
