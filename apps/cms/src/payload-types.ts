@@ -1760,7 +1760,7 @@ export interface Blog {
    * Date of the most recent review pass. When unset, falls back to updatedAt with a note in the SEO panel.
    */
   lastReviewedAt?: string | null;
-  categories?: (number | Category)[] | null;
+  categories?: (number | null) | Category;
   /**
    * Manually curated. Empty = listing component picks by category.
    */
@@ -1908,6 +1908,10 @@ export interface Blog {
   publishedAt?: string | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
+  /**
+   * Heading levels that appear in the Table of Contents. Re-save to apply.
+   */
+  tocDepth?: ('h2' | 'h2_h3' | 'h2_h3_h4') | null;
   tableOfContents?:
     | {
         level?: number | null;
@@ -7478,6 +7482,7 @@ export interface BlogsSelect<T extends boolean = true> {
   publishedAt?: T;
   readingMinutes?: T;
   wordCount?: T;
+  tocDepth?: T;
   tableOfContents?:
     | T
     | {
