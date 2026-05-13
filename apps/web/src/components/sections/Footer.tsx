@@ -102,16 +102,6 @@ export function Footer() {
           filter: "blur(125px)",
         }}
       />
-      {/* Faint horizontal divider line near top (Figma "Line 104-108") */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-[142px] h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent 0%, rgba(133,107,255,0.4) 50%, transparent 100%)",
-        }}
-      />
-
       <div className="relative px-6">
        <div className="relative mx-auto w-full max-w-[1276px] pt-[179px] pb-[80px]">
         {/* Top row — tagline (left) + social icons (right). Figma centers vertically (both center at y=207). */}

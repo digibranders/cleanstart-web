@@ -101,6 +101,31 @@ export type LexicalUploadNode = {
   version: number;
 };
 
+/**
+ * headerState bitmask from Payload Lexical tables:
+ *   0 = body cell, 1 = row header, 2 = column header, 3 = both
+ */
+export type LexicalTableCellNode = {
+  type: "tablecell";
+  headerState?: number;
+  colSpan?: number;
+  rowSpan?: number;
+  children: LexicalNode[];
+  version: number;
+};
+
+export type LexicalTableRowNode = {
+  type: "tablerow";
+  children: LexicalTableCellNode[];
+  version: number;
+};
+
+export type LexicalTableNode = {
+  type: "table";
+  children: LexicalTableRowNode[];
+  version: number;
+};
+
 export type LexicalNode =
   | LexicalTextNode
   | LexicalLinkNode
@@ -112,6 +137,9 @@ export type LexicalNode =
   | LexicalParagraphNode
   | LexicalHorizontalRuleNode
   | LexicalUploadNode
+  | LexicalTableNode
+  | LexicalTableRowNode
+  | LexicalTableCellNode
   | { type: string; children?: LexicalNode[]; version: number; [key: string]: unknown };
 
 export type LexicalRoot = {
@@ -150,6 +178,14 @@ type PayloadListResponse<T> = {
 const CMS_URL =
   process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
 
+// Payload returns relative URLs (e.g. /api/media/file/...) when serverURL isn't set.
+// Prefix them so Next.js Image can resolve them against the CMS host, not the web app.
+export function mediaUrl(url: string | undefined | null): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `${CMS_URL}${url}`;
+}
+
 async function fetchCMS<T>(path: string): Promise<T> {
   const res = await fetch(`${CMS_URL}${path}`, {
     next: { revalidate: 60 },
@@ -160,15 +196,17 @@ async function fetchCMS<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+const PUBLISHED_FILTER =
+  "where[_status][equals]=published&where[publishedAt][exists]=true";
+
 export async function getFeaturedBlog(): Promise<Blog | null> {
   const featured = await fetchCMS<PayloadListResponse<Blog>>(
-    "/api/blogs?where[_status][equals]=published&where[featured][equals]=true&depth=2&limit=1&sort=-publishedAt",
+    `/api/blogs?${PUBLISHED_FILTER}&where[featured][equals]=true&depth=2&limit=1&sort=-publishedAt`,
   );
   if (featured.docs[0]) return featured.docs[0];
 
-  // Fall back to the latest published post when no post is explicitly featured
   const latest = await fetchCMS<PayloadListResponse<Blog>>(
-    "/api/blogs?where[_status][equals]=published&depth=2&limit=1&sort=-publishedAt",
+    `/api/blogs?${PUBLISHED_FILTER}&depth=2&limit=1&sort=-publishedAt`,
   );
   return latest.docs[0] ?? null;
 }
@@ -186,6 +224,7 @@ export async function getBlogs({
 } = {}): Promise<PayloadListResponse<Blog>> {
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
+    "where[publishedAt][exists]": "true",
     depth: "2",
     limit: String(limit),
     page: String(page),
@@ -209,7 +248,7 @@ export async function getBlogCategories(): Promise<BlogCategory[]> {
 
 export async function getBlogBySlug(slug: string): Promise<BlogDetail | null> {
   const data = await fetchCMS<PayloadListResponse<BlogDetail>>(
-    `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&where[_status][equals]=published&depth=3&limit=1`,
+    `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&${PUBLISHED_FILTER}&depth=3&limit=1`,
   );
   return data.docs[0] ?? null;
 }
@@ -217,7 +256,7 @@ export async function getBlogBySlug(slug: string): Promise<BlogDetail | null> {
 export async function getRelatedBlogs(blogId: string, categoryIds: string[]): Promise<Blog[]> {
   if (categoryIds.length === 0) {
     const data = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?where[_status][equals]=published&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
+      `/api/blogs?${PUBLISHED_FILTER}&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
     );
     return data.docs;
   }
@@ -225,11 +264,11 @@ export async function getRelatedBlogs(blogId: string, categoryIds: string[]): Pr
     .map((id, i) => `where[categories][in][${i}]=${encodeURIComponent(id)}`)
     .join("&");
   const data = await fetchCMS<PayloadListResponse<Blog>>(
-    `/api/blogs?where[_status][equals]=published&where[id][not_equals]=${blogId}&${catParam}&depth=2&limit=3&sort=-publishedAt`,
+    `/api/blogs?${PUBLISHED_FILTER}&where[id][not_equals]=${blogId}&${catParam}&depth=2&limit=3&sort=-publishedAt`,
   );
   if (data.docs.length < 3) {
     const fallback = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?where[_status][equals]=published&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
+      `/api/blogs?${PUBLISHED_FILTER}&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
     );
     return fallback.docs;
   }

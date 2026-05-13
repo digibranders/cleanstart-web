@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import type { LexicalNode, LexicalRoot } from "@/lib/blog";
+import type { LexicalNode, LexicalRoot, LexicalTableNode } from "@/lib/blog";
 
 // TEXT_FORMAT bitmask constants
 const FORMAT_BOLD = 1;
@@ -130,6 +130,39 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
 
     case "horizontalrule":
       return <hr key={key} className="article-hr" />;
+
+    case "table": {
+      const tNode = node as LexicalTableNode;
+      return (
+        <div key={key} className="article-table-wrapper">
+          <table className="article-table">
+            <tbody>
+              {(tNode.children ?? []).map((row, ri) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: Lexical table rows have no stable id
+                <tr key={`${key}-row-${ri}`}>
+                  {(row.children ?? []).map((cell, ci) => {
+                    const cellKey = `${key}-cell-${ri}-${ci}`;
+                    const content = renderNodes(cell.children ?? [], cellKey);
+                    const hs = cell.headerState ?? 0;
+                    if (hs === 2) {
+                      return <th key={cellKey} className="article-th-col" colSpan={cell.colSpan} rowSpan={cell.rowSpan}>{content}</th>;
+                    }
+                    if (hs !== 0) {
+                      return <th key={cellKey} className="article-th-row" colSpan={cell.colSpan} rowSpan={cell.rowSpan}>{content}</th>;
+                    }
+                    return <td key={cellKey} colSpan={cell.colSpan} rowSpan={cell.rowSpan}>{content}</td>;
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    case "tablerow":
+    case "tablecell":
+      return null;
 
     case "upload": {
       const uNode = node as Extract<LexicalNode, { type: "upload" }>;

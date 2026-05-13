@@ -1321,42 +1321,42 @@ body {
 .article-body .article-paragraph:last-child { margin-bottom: 0; }
 
 .article-body .article-h1 {
-  font-size: clamp(32px, 3.5vw, 56px);
+  font-size: clamp(24px, 2vw, 32px);
   font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
   color: #111111;
   margin-top: 2.5rem;
   margin-bottom: 1rem;
 }
 .article-body .article-h2 {
-  font-size: clamp(26px, 2.8vw, 40px);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.05em;
+  font-size: clamp(20px, 1.6vw, 26px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
   color: #111111;
-  margin-top: 2.25rem;
-  margin-bottom: 0.875rem;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
 }
 .article-body .article-h3 {
-  font-size: clamp(20px, 2vw, 28px);
+  font-size: clamp(17px, 1.25vw, 21px);
   font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.04em;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
   color: #111111;
   margin-top: 2rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.625rem;
 }
 .article-body .article-h4,
 .article-body .article-h5,
 .article-body .article-h6 {
-  font-size: clamp(16px, 1.4vw, 20px);
+  font-size: clamp(15px, 1.1vw, 18px);
   font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.03em;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
   color: #111111;
   margin-top: 1.75rem;
-  margin-bottom: 0.625rem;
+  margin-bottom: 0.5rem;
 }
 
 .article-body .article-ul,
@@ -1404,6 +1404,57 @@ body {
 
 .article-body .article-figure {
   margin: 1.75rem 0;
+}
+
+/* ── Article table ─────────────────────────────────────────────────────────── */
+.article-body .article-table-wrapper {
+  margin: 1.75rem 0;
+  overflow-x: auto;
+}
+
+.article-body .article-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Figtree, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(16px, 1.2vw, 20px);
+  line-height: 1.4;
+  letter-spacing: -0.04em;
+}
+
+.article-body .article-table th,
+.article-body .article-table td {
+  text-align: left;
+  padding: 10px 24px;
+  border: 1px solid #e1e1e1;
+  background: #f7f7f7;
+  vertical-align: top;
+}
+
+/* Row header (first row): semibold */
+.article-body .article-table th.article-th-row {
+  font-weight: 600;
+  color: #000000;
+}
+
+/* Column header (first col, non-header-row): medium */
+.article-body .article-table th.article-th-col {
+  font-weight: 500;
+  color: #000000;
+}
+
+.article-body .article-table td {
+  font-weight: 400;
+  color: rgba(17, 17, 17, 0.8);
+}
+
+/* Strip paragraph spacing inside table cells */
+.article-body .article-table th .article-paragraph,
+.article-body .article-table td .article-paragraph {
+  margin-bottom: 0;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
 }
 
 /* First h2 should have less top margin if it's the very first child */
