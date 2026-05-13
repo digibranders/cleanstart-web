@@ -312,6 +312,23 @@ cms ──────┘
 4. When staging is verified and ready to ship, open a PR from `development` → `main`.
 5. Coolify deploys production on push to `main`.
 
+### Worktrees — parallel sessions
+
+Each branch has a dedicated worktree so CMS and web sessions can run simultaneously
+without switching branches:
+
+| Worktree path | Branch | Use for |
+|---------------|--------|---------|
+| `~/Desktop/AI/cleanstart/cleanstart-website` | `development` | Staging, shared docs, branch syncing |
+| `~/Desktop/AI/cleanstart/cleanstart-cms` | `cms` | All `apps/cms` work |
+| `~/Desktop/AI/cleanstart/cleanstart-web` | `web` | All `apps/web` work |
+
+**Open the correct folder in Claude Code for the work you're doing.** The worktree
+is already on the right branch — no `git checkout` needed.
+
+Dev servers also run independently per worktree — `apps/cms` on port 3000,
+`apps/web` on port 3001, no port conflicts.
+
 ### Hard rules
 
 - **Never push directly to `main`** — only via `development` PR after CI passes.
