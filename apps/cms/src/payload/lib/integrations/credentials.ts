@@ -58,8 +58,8 @@ export interface TeamsCredentials {
 }
 
 interface TeamsRowConfig {
-  webhookUrl?: string;
-  mentions?: TeamsCredentials['mentions'];
+  webhookUrl?: string | null;
+  mentions?: TeamsCredentials['mentions'] | null;
 }
 
 export const resolveTeamsCredentials = (
@@ -82,9 +82,9 @@ export interface GenericCredentials {
 }
 
 interface GenericRowConfig {
-  url?: string;
-  signingSecret?: string;
-  signingKeyId?: string;
+  url?: string | null;
+  signingSecret?: string | null;
+  signingKeyId?: string | null;
 }
 
 export const resolveGenericCredentials = (
@@ -98,7 +98,7 @@ export const resolveGenericCredentials = (
   return {
     url,
     signingSecret: secret,
-    signingKeyId: row?.genericConfig?.signingKeyId ?? `db-${row?.id ?? 'unknown'}`,
+    signingKeyId: row?.genericConfig?.signingKeyId ?? `db-${String(row?.id ?? 'unknown')}`,
   };
 };
 
