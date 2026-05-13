@@ -40,12 +40,12 @@ export default defineConfig({
   webServer: process.env.CMS_BASE_URL
     ? undefined
     : {
-        command: 'pnpm dev',
+        // CI: use the pre-built output so the server starts in seconds
+        // and avoids JIT-compilation delay on first request.
+        // Local: use dev server for fast iteration (no build step needed).
+        command: process.env.CI ? 'pnpm start' : 'pnpm dev',
         url: 'http://localhost:3000/admin',
         reuseExistingServer: !process.env.CI,
-        // 120s is not enough on a cold CI runner: predev runs generate:importmap
-        // (Payload init + Postgres) before next dev starts, then Next.js
-        // JIT-compiles the admin route on first request. 3 min is the safe floor.
-        timeout: 180_000,
+        timeout: 60_000,
       },
 });

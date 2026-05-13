@@ -124,6 +124,9 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Build
+        run: pnpm --filter @cleanstart/cms build
+
       - name: Install Playwright browsers
         run: pnpm --filter @cleanstart/cms exec playwright install --with-deps chromium
 
@@ -194,6 +197,9 @@ jobs:
           cache: pnpm
       - name: Install
         run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm --filter @cleanstart/cms build
+
       - name: Install Playwright browsers
         run: pnpm --filter @cleanstart/cms exec playwright install --with-deps chromium
       # Advisory until baseline screenshots are committed. Run
@@ -243,6 +249,9 @@ jobs:
           cache: pnpm
       - name: Install
         run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm --filter @cleanstart/cms build
+
       - name: Install Playwright browsers
         run: pnpm --filter @cleanstart/cms exec playwright install --with-deps chromium
       - name: Run a11y suite
