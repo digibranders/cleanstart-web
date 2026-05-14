@@ -90,7 +90,8 @@ page slugs, categories, types, and build status across the dev journey.
 | 14 | Knowledge Hub | `/knowledge-hub` | CMS Listing | ⬜ | Payload `knowledgeBase` collection |
 | 15 | Newsroom | `/news` | CMS Listing | ⬜ | Payload `news` collection |
 | 16 | Podcast | `/podcast` | CMS Listing | ⬜ | Payload `podcast` collection |
-| 17 | Resource Center | `/resource-center` | CMS Listing | ⬜ | Payload `resources` collection |
+| 17 | Resource Center | `/resource-center` | CMS Listing | ✅ | Route at `src/app/resource-center/` |
+| 17b | Resource Detail | `/resource/[slug]` | CMS Detail | ✅ | Route at `src/app/resource/[slug]/` |
 | — | Author Page | `/author/[slug]` | CMS Detail | ⬜ | Dynamic route, Payload `authors` |
 
 ---
