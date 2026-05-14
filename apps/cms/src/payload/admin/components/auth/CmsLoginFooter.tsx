@@ -13,7 +13,7 @@ export const CmsLoginFooter = (): ReactElement => {
       <p className="cs-login-footer__line">
         Trouble signing in? Reach the CleanStart admin team in #cms-support.
       </p>
-      <p className="cs-login-footer__brand">CleanStart · admin.cleanstart.com</p>
+      <p className="cs-login-footer__brand">CleanStart · cms.cleanstart.com</p>
     </div>
   );
 };
