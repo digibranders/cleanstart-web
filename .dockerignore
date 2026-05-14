@@ -1,0 +1,40 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies (installed fresh in Docker)
+**/node_modules
+
+# Next.js build outputs
+**/.next
+**/out
+
+# Local env files — secrets must be passed via Coolify env vars, never baked in
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+
+# Dev tooling
+**/.turbo
+**/coverage
+**/.nyc_output
+**/*.log
+**/npm-debug.log*
+
+# OS / editor
+.DS_Store
+**/.DS_Store
+.idea
+.vscode
+
+# Docs and migration scripts not needed at runtime
+docs/
+migrations/webflow-import/
+infra/
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/tests/e2e
