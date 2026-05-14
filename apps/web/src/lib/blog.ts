@@ -25,7 +25,7 @@ export type Blog = {
   slug: string;
   abstract?: string;
   heroImage?: BlogImage;
-  categories?: BlogCategory[];
+  categories?: BlogCategory | null;
   authors?: BlogAuthor[];
   publishedAt?: string;
   readingMinutes?: number;

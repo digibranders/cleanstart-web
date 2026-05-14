@@ -10,6 +10,8 @@ export type NavLeaf = {
   label: string;
   href: string;
   description?: string;
+  /** true = page is built and the item renders as a <Link>; omit or false = <span> */
+  built?: boolean;
 };
 
 export type NavGroup = {
@@ -87,6 +89,7 @@ export const NAV_TREE: NavItem[] = [
             label: "Vulnerability Remediation",
             href: "/vulnerability-remediation",
             description: "Patch upstream once, ship hardened downstream everywhere.",
+            built: true,
           },
           {
             label: "Attack Surface Reduction",
@@ -114,7 +117,7 @@ export const NAV_TREE: NavItem[] = [
       {
         title: "Insights",
         items: [
-          { label: "Blogs", href: "/blogs" },
+          { label: "Blogs", href: "/blogs", built: true },
           { label: "Resource Center", href: "/resource-center" },
           { label: "Newsroom", href: "/news" },
           { label: "Knowledge Hub", href: "/knowledge-hub" },
@@ -135,7 +138,7 @@ export const NAV_TREE: NavItem[] = [
     label: "Company",
     width: 260,
     items: [
-      { label: "About Us", href: "/about-us" },
+      { label: "About Us", href: "/about-us", built: true },
       { label: "Teams", href: "/teams" },
       { label: "Community", href: "/community" },
       { label: "Careers", href: "/careers" },

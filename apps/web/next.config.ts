@@ -20,9 +20,9 @@ const nextConfig: NextConfig = {
         pathname: "/api/media/**",
       },
       {
-        // Payload CMS media — production (admin.cleanstart.com)
+        // Payload CMS media — production (cms.cleanstart.com)
         protocol: "https",
-        hostname: "admin.cleanstart.com",
+        hostname: "cms.cleanstart.com",
         pathname: "/api/media/**",
       },
     ],

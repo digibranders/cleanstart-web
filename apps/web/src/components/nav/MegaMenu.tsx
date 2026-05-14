@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { NavGroup } from "@/lib/nav-config";
 
 export function MegaMenu({
@@ -29,9 +30,9 @@ export function MegaMenu({
               </div>
             )}
             <ul className="flex flex-col">
-              {group.items.map((item) => (
-                <li key={item.label}>
-                  <span className="block rounded-[12px] px-3 py-2.5">
+              {group.items.map((item) => {
+                const inner = (
+                  <>
                     <div className="text-[14.5px] font-medium leading-tight text-white/95">
                       {item.label}
                     </div>
@@ -40,9 +41,25 @@ export function MegaMenu({
                         {item.description}
                       </div>
                     )}
-                  </span>
-                </li>
-              ))}
+                  </>
+                );
+                return (
+                  <li key={item.label}>
+                    {item.built ? (
+                      <Link
+                        href={item.href}
+                        className="block rounded-[12px] px-3 py-2.5 transition-colors hover:bg-white/[0.06]"
+                      >
+                        {inner}
+                      </Link>
+                    ) : (
+                      <span className="block rounded-[12px] px-3 py-2.5 cursor-default">
+                        {inner}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))}
