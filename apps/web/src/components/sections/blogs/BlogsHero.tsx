@@ -278,8 +278,8 @@ function CategoryPill({
       href={href}
       className="cs-category-pill flex items-center justify-center font-sans font-semibold text-white shrink-0"
       style={{
-        height: "48px",
-        padding: "10px 32px",
+        height: "42px",
+        padding: "8px 32px",
         borderRadius: "30px",
         background: active
           ? "rgba(196,70,239,0.6)"

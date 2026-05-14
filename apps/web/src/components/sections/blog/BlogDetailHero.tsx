@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { formatBlogDate, mediaUrl } from "@/lib/blog";
 import type { BlogCategory, BlogAuthor, BlogImage } from "@/lib/blog";
 
@@ -131,7 +130,7 @@ export function BlogDetailHero({
         />
 
         {/* Meta row — reading time | author | date */}
-        <div className="flex items-center justify-between pt-[22px] pb-[40px]">
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-3 pt-[22px] pb-[40px] sm:justify-between">
           {/* Reading time */}
           {readingMinutes != null && (
             <div className="flex items-center gap-[4px] shrink-0">
@@ -160,14 +159,13 @@ export function BlogDetailHero({
           {/* Author */}
           {primaryAuthor && (
             <div className="flex items-center gap-[7px] shrink-0">
-              {primaryAuthor.avatar ? (
-                <Image
-                  src={mediaUrl(primaryAuthor.avatar.url)!}
+              {primaryAuthor.photo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={mediaUrl(primaryAuthor.photo.url)}
                   alt={primaryAuthor.name}
-                  width={32}
-                  height={32}
                   className="rounded-full object-cover shrink-0"
-                  style={{ width: "32px", height: "32px" }}
+                  style={{ width: "32px", height: "32px", display: "block" }}
                 />
               ) : (
                 <div

@@ -4,6 +4,7 @@ import { getBlogBySlug, getRelatedBlogs } from "@/lib/blog";
 import { Header } from "@/components/sections/Header";
 import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
 import { BlogDetailContent } from "@/components/sections/blog/BlogDetailContent";
+import { BlogDetailFAQ } from "@/components/sections/blog/BlogDetailFAQ";
 import { BlogDetailRelatedPosts } from "@/components/sections/blog/BlogDetailRelatedPosts";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { Footer } from "@/components/sections/Footer";
@@ -68,13 +69,18 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
           abstract={post.abstract ?? undefined}
         />
 
-        {/* Dark zone — Figma gradient: #151021 0% → #131E8F 62% → #471EC0 100% */}
-        <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)" }}>
-          {relatedPosts.length > 0 && (
+        {post.faqs && post.faqs.length > 0 && (
+          <BlogDetailFAQ faqs={post.faqs} />
+        )}
+
+        {/* Dark zone — Related posts only */}
+        {relatedPosts.length > 0 && (
+          <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)" }}>
             <BlogDetailRelatedPosts posts={relatedPosts} />
-          )}
-          <BlogDetailCTA />
-        </div>
+          </div>
+        )}
+
+        <BlogDetailCTA />
       </main>
 
       <Footer />

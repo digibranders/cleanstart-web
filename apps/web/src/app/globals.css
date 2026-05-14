@@ -1450,13 +1450,7 @@ body {
   vertical-align: top;
 }
 
-/* Row header (first row): semibold */
-.article-body .article-table th.article-th-row {
-  font-weight: 600;
-  color: #000000;
-}
-
-/* Column header (first col, non-header-row): medium */
+.article-body .article-table th.article-th-row,
 .article-body .article-table th.article-th-col {
   font-weight: 500;
   color: #000000;

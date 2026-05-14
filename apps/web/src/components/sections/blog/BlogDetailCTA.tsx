@@ -1,5 +1,4 @@
 import type React from "react";
-import Link from "next/link";
 
 export function BlogDetailCTA(): React.ReactElement {
   return (
@@ -112,8 +111,8 @@ export function BlogDetailCTA(): React.ReactElement {
               </h2>
 
               {/* Button — Figma 330:1283, 168×44, radius 8, bg #3960F9, overflow clip */}
-              <Link
-                href="/contact"
+              <button
+                type="button"
                 className="transition-transform duration-200 hover:-translate-y-px active:scale-[0.97] active:duration-[80ms]"
                 style={{
                   position: "relative",
@@ -165,7 +164,7 @@ export function BlogDetailCTA(): React.ReactElement {
                     pointerEvents: "none",
                   }}
                 />
-              </Link>
+              </button>
             </div>
           </div>
         </div>

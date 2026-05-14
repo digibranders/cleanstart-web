@@ -27,7 +27,7 @@ export function MobileNav() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         aria-label="Open menu"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white outline-none transition-colors hover:bg-white/[0.08] focus-visible:ring-2 focus-visible:ring-[#33BAEC] xl:hidden"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white outline-none transition-colors hover:bg-white/[0.08] focus-visible:ring-2 focus-visible:ring-[#33BAEC] lg:hidden"
       >
         <MenuIcon className="size-5" />
       </SheetTrigger>
@@ -107,8 +107,8 @@ export function MobileNav() {
         </div>
 
         <div className="border-t border-white/8 p-4">
-          <Link
-            href="/book-a-demo"
+          <button
+            type="button"
             onClick={close}
             className="cs-btn-glass w-full"
             style={{
@@ -118,7 +118,7 @@ export function MobileNav() {
             }}
           >
             Book a Demo
-          </Link>
+          </button>
         </div>
       </SheetContent>
     </Sheet>

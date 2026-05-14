@@ -35,7 +35,7 @@ const PARTNERS = [
 
 export function AboutEcosystems() {
   return (
-    <section className="relative overflow-hidden bg-white py-[100px]">
+    <section className="relative overflow-hidden bg-white py-[100px] pb-5">
       {/* Decorative blobs */}
       <div
         aria-hidden
@@ -74,7 +74,7 @@ export function AboutEcosystems() {
             letterSpacing: "-0.05em",
           }}
         >
-          Built for The Ecosystems{" "}
+          Built for The <br /> Ecosystems{" "}
           <span
             style={{
               background:
@@ -88,42 +88,43 @@ export function AboutEcosystems() {
           </span>
         </h2>
 
-        {/* Logo strip */}
-        <div className="relative mt-[60px]">
-          {/* Left fade */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24"
-            style={{
-              background:
-                "linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)",
-            }}
-          />
-          {/* Right fade */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24"
-            style={{
-              background:
-                "linear-gradient(270deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)",
-            }}
-          />
+      </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-[120px] gap-y-10">
-            {PARTNERS.map((p) => (
-              <div key={p.name} className="flex shrink-0 items-center justify-center">
-                <Image
-                  src={p.src}
-                  alt={p.name}
-                  width={p.width}
-                  height={p.height}
-                  className="h-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                  style={{ maxHeight: "88px", maxWidth: p.width }}
-                  loading="lazy"
-                />
-              </div>
-            ))}
-          </div>
+      {/* Logo strip — full-width, single row, faded edges */}
+      <div className="relative mt-[60px] overflow-hidden">
+        {/* Left fade */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[180px]"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)",
+          }}
+        />
+        {/* Right fade */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-[180px]"
+          style={{
+            background:
+              "linear-gradient(270deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)",
+          }}
+        />
+
+        <div className="flex items-center justify-center gap-x-[120px] px-[180px]">
+          {PARTNERS.map((p) => (
+            <div key={p.name} className="flex shrink-0 items-center justify-center">
+              <Image
+                src={p.src}
+                alt={p.name}
+                width={p.width}
+                height={p.height}
+                className="h-auto object-contain opacity-80 transition-opacity hover:opacity-100"
+                style={{ maxHeight: "88px", maxWidth: p.width }}
+                loading="lazy"
+              />
+            </div>
+          ))}
         </div>
       </div>
     </section>

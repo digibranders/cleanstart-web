@@ -14,7 +14,7 @@ import { CompactDropdown } from "@/components/nav/CompactDropdown";
 
 export function DesktopNav() {
   return (
-    <NavigationMenu className="hidden xl:flex" align="center">
+    <NavigationMenu className="hidden lg:flex" align="center">
       <NavigationMenuList className="gap-7">
         {NAV_TREE.map((item) => {
           if (item.kind === "flat") {

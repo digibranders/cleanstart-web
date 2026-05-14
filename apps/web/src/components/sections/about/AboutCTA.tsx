@@ -1,6 +1,6 @@
 export function AboutCTA() {
   return (
-    <section className="relative w-full bg-white pb-0 pt-16 mb-[-100px]">
+    <section className="relative w-full bg-white mb-[-175px] py-10">
       <div className="relative z-20 mx-auto max-w-[1276px] px-6">
         {/* CTA card — Figma: gradient #131E8F → #471EC0, rounded-[40px], 1276×335 */}
         <div
@@ -19,7 +19,7 @@ export function AboutCTA() {
               backgroundImage: `url('/images/about/cta-bg-mask.svg')`,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              opacity: 0.15,
+              opacity: 0.8,
             }}
           />
 

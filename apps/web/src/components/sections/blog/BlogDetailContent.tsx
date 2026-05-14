@@ -25,7 +25,7 @@ export function BlogDetailContent({
       {/* Subtle decorative blobs — keep visual continuity from hero */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: "-480px",
           top: "-360px",
@@ -37,7 +37,7 @@ export function BlogDetailContent({
       />
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           right: "-300px",
           bottom: "200px",
@@ -58,7 +58,7 @@ export function BlogDetailContent({
         <div className="relative flex gap-12 pt-16 pb-28">
 
           {/* ── LEFT: Table of Contents (sticky below header) ── */}
-          <aside className="hidden xl:block shrink-0" style={{ width: "260px" }}>
+          <aside className="hidden lg:block shrink-0" style={{ width: "260px" }}>
             <div
               className="sticky"
               style={{ top: "72px", maxHeight: "calc(100vh - 80px)", overflowY: "auto" }}
@@ -68,7 +68,8 @@ export function BlogDetailContent({
           </aside>
 
           {/* ── CENTER: Article body ── */}
-          <article className="min-w-0 flex-1" style={{ maxWidth: "680px" }}>
+          {/* mx-auto centers the column when the xl TOC sidebar is hidden; xl:mx-0 resets it once the sidebar is visible */}
+          <article className="min-w-0 flex-1 mx-auto lg:mx-0" style={{ maxWidth: "680px" }}>
             {heroImage && (
               <div className="mb-10 overflow-hidden" style={{ borderRadius: "16px" }}>
                 <Image

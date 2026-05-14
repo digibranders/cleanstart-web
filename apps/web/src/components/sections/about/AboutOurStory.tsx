@@ -2,42 +2,44 @@ export function AboutOurStory() {
   return (
     <section
       className="relative overflow-hidden"
-      style={{ minHeight: "711px" }}
+      style={{ height: "600px" }}
     >
       {/* Full-width founders photo as background */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/about/founders-photo.png"
+        src="/images/about/founders-photo2.png"
         alt="CleanStart founders"
-        className="absolute inset-0 h-full w-full object-cover object-center"
+        className="absolute inset-0 full w-full object-cover"
+        style={{ objectPosition: "80% center" }}
         loading="lazy"
         decoding="async"
       />
 
-      {/* Dark gradient overlay left-to-right — matches Figma linear-gradient 84deg black→transparent */}
+      {/* Black left-to-right fade — Figma node 248:2108, exact 2-stop values */}
       <div
         aria-hidden
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(84deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.70) 30%, rgba(0,0,0,0.30) 65%, rgba(0,0,0,0) 100%)",
+            "linear-gradient(84.003deg, rgba(0,0,0,0.88) 1.453%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0) 58%)",
         }}
       />
 
-      {/* Purple tint overlay — Figma gradient fill on top */}
+      {/* Purple gradient from bottom — Figma node 248:2107, rotate-180 → 0deg, layer opacity 60% */}
       <div
         aria-hidden
         className="absolute inset-0"
         style={{
+          opacity: 0.6,
           background:
-            "linear-gradient(180deg, rgba(71,30,192,0.25) 0%, rgba(70,30,191,0.15) 50%, rgba(66,30,188,0) 100%)",
+            "linear-gradient(0deg, rgba(71,30,192,0.6) 0%, rgba(70,30,191,0.522) 16.724%, rgba(66,30,188,0.3) 56.81%, rgba(66,30,188,0) 100%)",
         }}
       />
 
       {/* Text content — left-aligned */}
       <div className="relative mx-auto max-w-[1276px] px-6">
         <div
-          className="flex flex-col gap-6 py-[120px]"
+          className="flex flex-col gap-6 py-[150px]"
           style={{ maxWidth: "514px" }}
         >
           <h2
@@ -72,11 +74,11 @@ export function AboutOurStory() {
               opacity: 0.8,
             }}
           >
-            Our founders spent decades in cybersecurity and engineering and saw
-            a recurring flaw: security was always added after software was
-            built. CleanStart began with a simple belief, trust must start at
-            the foundation. That belief drives everything we do, helping
-            organizations move fast, stay compliant, and deliver software the
+            Our founders spent decades in cybersecurity and <br /> engineering and saw
+            a recurring flaw: security was <br /> always added after software was
+            built. CleanStart <br /> began with a simple belief, trust must start at
+            the <br /> foundation.That belief drives everything we do, <br /> helping
+            organizations move fast, stay compliant, and <br /> deliver software the
             world can trust.
           </p>
         </div>

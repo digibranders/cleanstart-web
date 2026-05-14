@@ -7,7 +7,7 @@ export type BlogCategory = {
 export type BlogAuthor = {
   id: string;
   name: string;
-  avatar?: BlogImage;
+  photo?: BlogImage;
   bio?: string;
 };
 
@@ -160,10 +160,17 @@ export type TocEntry = {
   id?: string | null;
 };
 
+export type BlogFaqItem = {
+  id?: string;
+  question: string;
+  answer: string;
+};
+
 export type BlogDetail = Blog & {
   body?: LexicalRoot | null;
   tableOfContents?: TocEntry[] | null;
   relatedPosts?: Blog[] | null;
+  faqs?: BlogFaqItem[] | null;
 };
 
 type PayloadListResponse<T> = {
@@ -250,7 +257,28 @@ export async function getBlogBySlug(slug: string): Promise<BlogDetail | null> {
   const data = await fetchCMS<PayloadListResponse<BlogDetail>>(
     `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&${PUBLISHED_FILTER}&depth=3&limit=1`,
   );
-  return data.docs[0] ?? null;
+  const post = data.docs[0] ?? null;
+  if (!post) return null;
+
+  // Payload's R2/S3 storage adapter does not populate `url` for upload fields
+  // nested beyond depth=1 (blog → author → photo). Re-fetch authors directly
+  // at depth=1 so their photo.url is properly resolved.
+  if (post.authors && post.authors.length > 0) {
+    const idParams = post.authors
+      .map((a, i) => `where[id][in][${i}]=${encodeURIComponent(a.id)}`)
+      .join("&");
+    try {
+      const authorsData = await fetchCMS<PayloadListResponse<BlogAuthor>>(
+        `/api/authors?${idParams}&depth=1&limit=10`,
+      );
+      const authorMap = new Map(authorsData.docs.map((a) => [a.id, a]));
+      post.authors = post.authors.map((a) => authorMap.get(a.id) ?? a);
+    } catch {
+      // Non-fatal: fall back to the authors already embedded in the post
+    }
+  }
+
+  return post;
 }
 
 export async function getRelatedBlogs(blogId: string, categoryIds: string[]): Promise<Blog[]> {

@@ -72,20 +72,21 @@ export function FactoryEnginePanel() {
 
       {/* Inner layout — Figma exact: panel 1276px wide.
            L pad 46 (3.61%) | left card 512 (40.13%) | arrow 154 (12.07%) | right card 512 (40.13%) | R pad 50 (3.92%)
-           Arrow is a CHILD of the left card so its left edge naturally aligns with the card's right edge via `left: 100%`. */}
-      <div className="relative flex items-center justify-between px-[3.61%] py-[33px]">
+           Arrow is a CHILD of the left card so its left edge naturally aligns with the card's right edge via `left: 100%`.
+           Mobile: cards stack vertically, arrow hidden. lg+: side-by-side Figma layout. */}
+      <div className="relative flex flex-col gap-4 p-4 sm:p-6 lg:flex-row lg:items-center lg:justify-between lg:px-[3.61%] lg:py-[33px]">
         {/* Left card (relative, so arrow can position absolutely inside it).
              Right border is faded to transparent so there's no hard vertical line where the
              arrow connects — the radial blob (below) handles the smooth color transition. */}
         <div
-          className="cs-engine-card relative flex h-[188.72px] w-[40.13%] flex-col items-center justify-center gap-[18px] px-6 py-6"
+          className="cs-engine-card relative flex h-auto w-full flex-col items-center justify-center gap-[18px] px-5 py-6 sm:px-6 lg:h-[188.72px] lg:w-[40.13%]"
           style={{ borderRightColor: "transparent" }}
         >
           <div className="flex w-full max-w-[343px] flex-col items-start gap-4">
             <h4
               className="font-sans text-white"
               style={{
-                fontSize: "36px",
+                fontSize: "clamp(24px, 2.8vw, 36px)",
                 fontWeight: 500,
                 lineHeight: "100%",
                 letterSpacing: "-0.05em",
@@ -96,7 +97,7 @@ export function FactoryEnginePanel() {
             <p
               className="font-sans text-white opacity-80"
               style={{
-                fontSize: "18px",
+                fontSize: "clamp(14px, 1.4vw, 18px)",
                 fontWeight: 400,
                 lineHeight: "110%",
                 letterSpacing: "-0.04em",
@@ -105,7 +106,7 @@ export function FactoryEnginePanel() {
               Multi-agent orchestration that plans, analyzes, and optimizes every build.
             </p>
           </div>
-          <div className="flex w-full max-w-[343px] items-center gap-4">
+          <div className="flex w-full max-w-[343px] flex-wrap items-center gap-2 lg:gap-4">
             {LEFT_PILLS.map((p) => (
               <button key={p} type="button" className="cs-pill-cta">
                 {p}
@@ -132,10 +133,9 @@ export function FactoryEnginePanel() {
             }}
           />
 
-          {/* Arrow — child of LEFT CARD, positioned with left:100% so its left edge is flush
-               with the card's right edge (matches Figma: left card right=881, arrow left=881). */}
+          {/* Arrow — only visible on lg+ side-by-side layout */}
           <div
-            className="pointer-events-none absolute z-10"
+            className="pointer-events-none absolute z-10 hidden lg:block"
             style={{
               left: "100%",
               top: "50%",
@@ -148,12 +148,12 @@ export function FactoryEnginePanel() {
         </div>
 
         {/* Right card */}
-        <div className="cs-engine-card flex h-[188.72px] w-[40.13%] flex-col items-center justify-center gap-[18px] px-6 py-6">
+        <div className="cs-engine-card flex h-auto w-full flex-col items-center justify-center gap-[18px] px-5 py-6 sm:px-6 lg:h-[188.72px] lg:w-[40.13%]">
           <div className="flex w-full max-w-[365px] flex-col items-start gap-4">
             <h4
               className="font-sans text-white"
               style={{
-                fontSize: "36px",
+                fontSize: "clamp(24px, 2.8vw, 36px)",
                 fontWeight: 500,
                 lineHeight: "100%",
                 letterSpacing: "-0.05em",
@@ -164,7 +164,7 @@ export function FactoryEnginePanel() {
             <p
               className="font-sans text-white opacity-80"
               style={{
-                fontSize: "18px",
+                fontSize: "clamp(14px, 1.4vw, 18px)",
                 fontWeight: 400,
                 lineHeight: "110%",
                 letterSpacing: "-0.04em",
@@ -173,7 +173,7 @@ export function FactoryEnginePanel() {
               Hermetic, deterministic builds. Only what you specify.
             </p>
           </div>
-          <div className="flex w-full max-w-[365px] items-center gap-4">
+          <div className="flex w-full max-w-[365px] flex-wrap items-center gap-2 lg:gap-4">
             {RIGHT_PILLS.map((p) => (
               <button key={p} type="button" className="cs-pill-cta">
                 {p}
