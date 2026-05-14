@@ -11,6 +11,8 @@ import {
   useState,
 } from 'react';
 
+import { PdfThumb } from './PdfThumb';
+
 type MediaSize = {
   url?: string | null;
   width?: number | null;
@@ -36,7 +38,7 @@ type ClientFieldShape = {
   required?: boolean;
   admin?: {
     description?: string;
-    custom?: { folderHint?: string };
+    custom?: { folderHint?: string; accept?: readonly string[] };
   } | null;
 };
 
@@ -46,16 +48,58 @@ type Props = {
   readOnly?: boolean;
 };
 
-const ALLOWED_MIMES = [
+const DEFAULT_IMAGE_MIMES = [
   'image/jpeg',
   'image/png',
   'image/webp',
   'image/avif',
   'image/svg+xml',
   'image/gif',
-];
+] as const;
 
-const IMAGE_BYTES_LIMIT = 25 * 1024 * 1024;
+const MB = 1024 * 1024;
+const IMAGE_BYTES_LIMIT = 25 * MB;
+const PDF_BYTES_LIMIT = 50 * MB;
+const VIDEO_BYTES_LIMIT = 200 * MB;
+const ZIP_BYTES_LIMIT = 100 * MB;
+
+const ZIP_MIMES = new Set(['application/zip', 'application/x-zip-compressed']);
+
+const limitForMime = (mimeType: string | undefined | null): number => {
+  if (!mimeType) return IMAGE_BYTES_LIMIT;
+  if (mimeType.startsWith('image/')) return IMAGE_BYTES_LIMIT;
+  if (mimeType === 'application/pdf') return PDF_BYTES_LIMIT;
+  if (mimeType === 'video/mp4') return VIDEO_BYTES_LIMIT;
+  if (ZIP_MIMES.has(mimeType)) return ZIP_BYTES_LIMIT;
+  return IMAGE_BYTES_LIMIT;
+};
+
+const MIME_LABELS: Record<string, string> = {
+  'image/jpeg': 'JPEG',
+  'image/png': 'PNG',
+  'image/webp': 'WebP',
+  'image/avif': 'AVIF',
+  'image/svg+xml': 'SVG',
+  'image/gif': 'GIF',
+  'application/pdf': 'PDF',
+  'video/mp4': 'MP4',
+  'application/zip': 'ZIP',
+  'application/x-zip-compressed': 'ZIP',
+};
+
+const typeLabelForMime = (mime: string | undefined | null): string => {
+  if (!mime) return '—';
+  return MIME_LABELS[mime] ?? mime.split('/').pop()?.toUpperCase() ?? mime;
+};
+
+const formatAcceptList = (mimes: readonly string[]): string => {
+  const labels: string[] = [];
+  for (const m of mimes) {
+    const label = MIME_LABELS[m] ?? m;
+    if (!labels.includes(label)) labels.push(label);
+  }
+  return labels.join(', ');
+};
 
 const formatBytes = (bytes: number | null | undefined): string => {
   if (!bytes || bytes <= 0) return '';
@@ -87,14 +131,13 @@ const splitFilename = (filename: string): { stem: string; ext: string } => {
   return { stem: trimmed.slice(0, dot), ext: trimmed.slice(dot) };
 };
 
-const validateFile = (file: File): string | null => {
-  if (!ALLOWED_MIMES.includes(file.type)) {
+const validateFile = (file: File, acceptedMimes: readonly string[]): string | null => {
+  if (!acceptedMimes.includes(file.type)) {
     return `Unsupported file type${file.type ? ` (${file.type})` : ''}.`;
   }
-  if (file.size > IMAGE_BYTES_LIMIT) {
-    return `File too large (${formatBytes(file.size)} > ${formatBytes(
-      IMAGE_BYTES_LIMIT,
-    )}).`;
+  const limit = limitForMime(file.type);
+  if (file.size > limit) {
+    return `File too large (${formatBytes(file.size)} > ${formatBytes(limit)}).`;
   }
   return null;
 };
@@ -125,6 +168,12 @@ export const MediaField = (props: Props): ReactElement => {
       : 'web/general';
   const required = Boolean(props.field?.required);
   const description = props.field?.admin?.description ?? '';
+  const acceptedMimes = useMemo<readonly string[]>(() => {
+    const custom = props.field?.admin?.custom?.accept;
+    return Array.isArray(custom) && custom.length > 0
+      ? (custom as readonly string[])
+      : DEFAULT_IMAGE_MIMES;
+  }, [props.field?.admin?.custom?.accept]);
   const label =
     props.field?.label ??
     (props.field?.name
@@ -284,7 +333,7 @@ export const MediaField = (props: Props): ReactElement => {
 
   const startUpload = useCallback(
     (file: File) => {
-      const v = validateFile(file);
+      const v = validateFile(file, acceptedMimes);
       if (v) {
         setError(v);
         return;
@@ -344,7 +393,7 @@ export const MediaField = (props: Props): ReactElement => {
       xhr.withCredentials = true;
       xhr.send(fd);
     },
-    [folderHint, setValue],
+    [acceptedMimes, folderHint, setValue],
   );
 
   const onPickFile = useCallback(
@@ -466,6 +515,7 @@ export const MediaField = (props: Props): ReactElement => {
         if (refetch.ok) setDoc((await refetch.json()) as MediaDoc);
       }
       setEditingFilename(false);
+      setError(null);
     } catch {
       setError('Could not rename file. The original filename is still in use.');
     } finally {
@@ -509,16 +559,26 @@ export const MediaField = (props: Props): ReactElement => {
 
   const helperText = useMemo(() => {
     if (description) return description;
-    return 'JPEG, PNG, WebP, AVIF, GIF, SVG up to 25 MB. Drag and drop, paste a URL, or click to upload.';
-  }, [description]);
+    const maxLimit = acceptedMimes.reduce(
+      (max, mime) => Math.max(max, limitForMime(mime)),
+      0,
+    );
+    const limitMb = Math.round(maxLimit / MB);
+    return `${formatAcceptList(acceptedMimes)} up to ${limitMb} MB. Drag and drop, paste a URL, or click to upload.`;
+  }, [acceptedMimes, description]);
 
   const filename = doc?.filename ?? '';
   const dimensions =
     doc?.width && doc?.height ? `${doc.width} × ${doc.height}` : '';
   const filesize = formatBytes(doc?.filesize ?? null);
   const mime = doc?.mimeType ?? '';
+  const isPdf = mime === 'application/pdf';
   const absoluteUrl = doc?.url ? toAbsoluteUrl(doc.url) : '';
-  const thumbUrl = pickThumbUrl(doc);
+  // PDFs have no `sizes` map — `pickThumbUrl` would fall back to the PDF
+  // URL and render as a broken image. PDFs use the PdfThumb canvas path
+  // instead, so suppress the image src for them.
+  const thumbUrl = isPdf ? null : pickThumbUrl(doc);
+  const pdfUrl = isPdf ? absoluteUrl : null;
   const previewUrl = pickPreviewUrl(doc);
 
   const isEmpty = !value && !uploading;
@@ -623,6 +683,8 @@ export const MediaField = (props: Props): ReactElement => {
             {thumbUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={thumbUrl} alt={doc?.alt ?? ''} loading="lazy" />
+            ) : pdfUrl ? (
+              <PdfThumb url={pdfUrl} filename={doc?.filename ?? undefined} />
             ) : docLoading ? (
               <span className="cs-media-field__thumb-skeleton" aria-hidden="true" />
             ) : (
@@ -648,6 +710,7 @@ export const MediaField = (props: Props): ReactElement => {
                       if (e.key === 'Escape') {
                         setEditingFilename(false);
                         setFilenameDraft(splitFilename(doc?.filename ?? '').stem);
+                        setError(null);
                       }
                     }}
                     spellCheck={false}
@@ -676,6 +739,7 @@ export const MediaField = (props: Props): ReactElement => {
                   onClick={() => {
                     setEditingFilename(false);
                     setFilenameDraft(splitFilename(doc?.filename ?? '').stem);
+                    setError(null);
                   }}
                   disabled={filenameSaving}
                 >
@@ -689,6 +753,7 @@ export const MediaField = (props: Props): ReactElement => {
                   className="cs-media-field__filename"
                   title={filename ? `${filename} — click to rename` : 'Untitled'}
                   onClick={() => {
+                    setError(null);
                     setFilenameDraft(splitFilename(doc?.filename ?? '').stem);
                     setEditingFilename(true);
                   }}
@@ -878,7 +943,7 @@ export const MediaField = (props: Props): ReactElement => {
         ref={fileInputRef}
         id={inputId}
         type="file"
-        accept={ALLOWED_MIMES.join(',')}
+        accept={acceptedMimes.join(',')}
         onChange={onPickFile}
         hidden
         disabled={props.readOnly}
@@ -952,7 +1017,13 @@ export const MediaField = (props: Props): ReactElement => {
               <div className="cs-media-field__browse-empty">No matches.</div>
             ) : (
               browseResults.map((m) => {
-                const t = pickThumbUrl(m);
+                const tileMime = m.mimeType ?? '';
+                const isImage = tileMime.startsWith('image/');
+                const isPdfTile = tileMime === 'application/pdf';
+                const t = isImage ? pickThumbUrl(m) : null;
+                const pdfTileUrl =
+                  isPdfTile && m.url ? toAbsoluteUrl(m.url) : null;
+                const typeLabel = typeLabelForMime(m.mimeType);
                 return (
                   <button
                     key={m.id}
@@ -964,10 +1035,19 @@ export const MediaField = (props: Props): ReactElement => {
                     {t ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={t} alt={m.alt ?? ''} loading="lazy" />
+                    ) : pdfTileUrl ? (
+                      <PdfThumb
+                        url={pdfTileUrl}
+                        width={140}
+                        filename={m.filename ?? undefined}
+                      />
                     ) : (
-                      <span className="cs-media-field__browse-tile-fallback">{m.mimeType ?? '—'}</span>
+                      <span className="cs-media-field__browse-tile-fallback">
+                        {typeLabel}
+                      </span>
                     )}
                     <span className="cs-media-field__browse-tile-name">{m.filename}</span>
+                    <span className="cs-media-field__browse-tile-type">{typeLabel}</span>
                   </button>
                 );
               })

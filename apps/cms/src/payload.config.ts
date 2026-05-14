@@ -101,11 +101,6 @@ const r2EnvComplete = (): boolean =>
       process.env.R2_BUCKET,
   );
 
-// Startup diagnostic — remove once R2 uploads are confirmed working.
-console.log('[payload.config] r2EnvComplete:', r2EnvComplete());
-console.log('[payload.config] R2_PUBLIC_BASE:', process.env.R2_PUBLIC_BASE ?? '<not set>');
-console.log('[payload.config] r2UploadPrefix will be:', process.env.R2_UPLOAD_PREFIX ?? (process.env.NODE_ENV === 'production' ? 'web' : 'dev'));
-
 const serverURL = process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000';
 
 /**

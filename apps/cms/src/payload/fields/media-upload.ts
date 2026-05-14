@@ -24,6 +24,14 @@ export type MediaUploadOptions = {
     | 'web/general';
   /** Field description (rendered under the label). */
   description?: string;
+  /**
+   * MIME types accepted by the upload picker for this field. Defaults to the
+   * image set used by editorial covers. Pass a downloadable set
+   * (`['application/pdf', 'application/zip', 'application/x-zip-compressed']`)
+   * for asset-style fields so the OS file picker exposes PDFs/ZIPs instead
+   * of greying them out.
+   */
+  accept?: readonly string[];
   /** Standard Payload admin.condition. */
   condition?: Condition;
   /** Pass through validate. */
@@ -58,7 +66,10 @@ export const mediaUploadField = (opts: MediaUploadOptions): Field => ({
       Field: '@/payload/admin/components/MediaField/MediaField.tsx#MediaField',
       Cell: '@/payload/admin/components/MediaField/MediaCell.tsx#MediaCell',
     },
-    custom: { folderHint: opts.folderHint ?? 'web/general' },
+    custom: {
+      folderHint: opts.folderHint ?? 'web/general',
+      ...(opts.accept ? { accept: opts.accept } : {}),
+    },
     ...(opts.description ? { description: opts.description } : {}),
     ...(opts.condition ? { condition: opts.condition } : {}),
   },

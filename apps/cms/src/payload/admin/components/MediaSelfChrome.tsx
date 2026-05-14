@@ -124,6 +124,7 @@ export const MediaSelfChrome = (): ReactElement | null => {
   }, [absoluteUrl]);
 
   const onStartRename = useCallback(() => {
+    setError(null);
     setFilenameDraft(stem);
     setEditingFilename(true);
   }, [stem]);
@@ -131,6 +132,7 @@ export const MediaSelfChrome = (): ReactElement | null => {
   const onCancelRename = useCallback(() => {
     setEditingFilename(false);
     setFilenameDraft('');
+    setError(null);
   }, []);
 
   const onSaveRename = useCallback(async () => {

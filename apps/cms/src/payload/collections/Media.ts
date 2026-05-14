@@ -134,6 +134,14 @@ export const Media: CollectionConfig = {
       type: 'text',
       admin: { description: 'Photographer / source attribution.' },
     },
+    // R2 storage path prefix — set automatically from the folder field on
+    // every new upload so files land at {uploadPrefix}/{type}/{filename}.
+    // Hidden in admin; managed entirely by the beforeChange hook below.
+    {
+      name: 'prefix',
+      type: 'text',
+      admin: { hidden: true },
+    },
     {
       type: 'group',
       name: 'focalPoint',
@@ -187,6 +195,19 @@ export const Media: CollectionConfig = {
       },
     ],
     beforeChange: [
+      // Compute R2 prefix from folder on new uploads only.
+      // Folder values are 'web/{type}'; strip 'web/' and prepend the
+      // upload prefix so files land at e.g. dev/blog/filename.webp.
+      ({ data, req }) => {
+        if (!req.file) return data;
+        const folder = data?.folder as string | undefined;
+        if (!folder) return data;
+        const uploadPrefix =
+          process.env.R2_UPLOAD_PREFIX ??
+          (process.env.NODE_ENV === 'production' ? 'web' : 'dev');
+        const folderType = folder.replace(/^web\//, '');
+        return { ...data, prefix: `${uploadPrefix}/${folderType}` };
+      },
       ({ data }) => {
         if (data?.alt || data?.decorative) return data;
         if (!isImage(data?.mimeType)) return data;

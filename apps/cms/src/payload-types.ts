@@ -288,6 +288,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -2793,8 +2794,11 @@ export interface Resource {
    */
   slug: string;
   type?: ('whitepaper' | 'report' | 'brief' | 'datasheet' | 'case-study') | null;
-  heroImage?: (number | null) | Media;
   summary?: string | null;
+  /**
+   * PDF or ZIP downloadable. Routed to web/resource/.
+   */
+  asset?: (number | null) | Media;
   body?: {
     root: {
       type: string;
@@ -2810,10 +2814,6 @@ export interface Resource {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * PDF or other downloadable. Routed to web/resource/.
-   */
-  asset?: (number | null) | Media;
   /**
    * When enabled, the asset download requires a form submission. Sets accessLevel to lead-gated by default.
    */
@@ -6753,6 +6753,7 @@ export interface MediaSelect<T extends boolean = true> {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -7884,10 +7885,9 @@ export interface ResourcesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   type?: T;
-  heroImage?: T;
   summary?: T;
-  body?: T;
   asset?: T;
+  body?: T;
   gated?: T;
   gateForm?: T;
   accessLevel?: T;
