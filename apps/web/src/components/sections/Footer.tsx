@@ -103,7 +103,8 @@ export function Footer() {
         }}
       />
       <div className="relative px-6">
-       <div className="relative mx-auto w-full max-w-[1276px] pt-[179px] pb-[80px]">
+       {/* pt-[304px] matches Figma — footer tagline starts 304px from footer top (80px below CTA card bottom) */}
+       <div className="relative mx-auto w-full max-w-[1276px] pt-[304px] pb-[80px]">
         {/* Top row — tagline (left) + social icons (right). Figma centers vertically (both center at y=207). */}
         <div className="flex flex-wrap items-center justify-between gap-8">
           <p

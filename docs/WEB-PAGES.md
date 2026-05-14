@@ -64,7 +64,7 @@ page slugs, categories, types, and build status across the dev journey.
 |---|-----------|----------|------|--------|-------|
 | 2 | Attack Surface Reduction | `/attack-surface-reduction` | Static | ⬜ | |
 | 4 | FIPS Compliance | `/fips` | Static | ⬜ | |
-| 5 | Vulnerability Remediation | `/vulnerability-remediation` | Static | ⬜ | |
+| 5 | Vulnerability Remediation | `/vulnerability-remediation` | Static | ✅ | All 7 sections built |
 | 9 | For CISO | `/for-ciso` | Static | ⬜ | |
 | 10 | For Developers | `/for-developers` | Static | ⬜ | |
 | 3 | Enhance SCA | `/software-composition-analysis` | Static | ⬜ | |
