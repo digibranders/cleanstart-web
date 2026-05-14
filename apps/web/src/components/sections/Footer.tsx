@@ -61,15 +61,14 @@ const LEGAL_LINKS = [
   { label: "Security", href: "#security" },
 ];
 
-export function Footer() {
+export function Footer({ topPadding = 179 }: { topPadding?: number } = {}) {
   return (
     <footer
       className="relative w-full overflow-hidden text-white"
       style={{
-        // Figma 108:8061 fill — vertical linear gradient top→bottom:
-        // #151021 (0%) → #131E8F (62.5%) → #471EC0 (100%)
+        // Figma 108:8061 fill — top→bottom: #151021 (0%) → #131E8F (70.794%) → #471EC0 (113.28%)
         background:
-          "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
+          "linear-gradient(180deg, #151021 0%, #131E8F 70.794%, #471EC0 113.28%)",
       }}
     >
       {/* Big purple ellipse — Figma 46640 (974×863) at (308, -358), color #7A59FF, opacity 3%, blur 250px.
@@ -103,10 +102,9 @@ export function Footer() {
         }}
       />
       <div className="relative px-6">
-       {/* pt-[304px] matches Figma — footer tagline starts 304px from footer top (80px below CTA card bottom) */}
-       <div className="relative mx-auto w-full max-w-[1276px] pt-[304px] pb-[80px]">
-        {/* Top row — tagline (left) + social icons (right). Figma centers vertically (both center at y=207). */}
-        <div className="flex flex-wrap items-center justify-between gap-8">
+       <div className="relative mx-auto w-full max-w-[1276px] pb-[80px]" style={{ paddingTop: `${topPadding}px` }}>
+        {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
+        <div className="flex flex-wrap items-start justify-between gap-8">
           <p
             className="font-sans text-white"
             style={{

@@ -1,5 +1,5 @@
 import { FactoryCard } from "@/components/ui/FactoryCard";
-import { FactoryEnginePanel } from "@/components/sections/FactoryEnginePanel";
+import { FactoryEnginePanel } from "@/components/sections/home/FactoryEnginePanel";
 import { RocketFlame } from "@/components/ui/RocketFlame";
 
 const CARDS = [

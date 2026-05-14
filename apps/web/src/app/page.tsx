@@ -1,14 +1,14 @@
 import { Header } from "@/components/sections/Header";
-import { Hero } from "@/components/sections/Hero";
-import { CleanStartFactory } from "@/components/sections/CleanStartFactory";
-import { HowCleanStartHelp } from "@/components/sections/HowCleanStartHelp";
-import { BuiltForTeams } from "@/components/sections/BuiltForTeams";
-import { FrequentlyAskedQuestions } from "@/components/sections/FrequentlyAskedQuestions";
-import { ResourcesInsights } from "@/components/sections/ResourcesInsights";
-import { ReadyToSecureCTA } from "@/components/sections/ReadyToSecureCTA";
+import { Hero } from "@/components/sections/home/Hero";
+import { CleanStartFactory } from "@/components/sections/home/CleanStartFactory";
+import { HowCleanStartHelp } from "@/components/sections/home/HowCleanStartHelp";
+import { BuiltForTeams } from "@/components/sections/home/BuiltForTeams";
+import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
+import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
+import { ReadyToSecureCTA } from "@/components/sections/home/ReadyToSecureCTA";
 import { Footer } from "@/components/sections/Footer";
-import { SecurityNotPatching } from "@/components/sections/SecurityNotPatching";
-import { CleanStartAdvantage } from "@/components/sections/CleanStartAdvantage";
+import { SecurityNotPatching } from "@/components/sections/home/SecurityNotPatching";
+import { CleanStartAdvantage } from "@/components/sections/home/CleanStartAdvantage";
 import { FadeUp } from "@/components/ui/FadeUp";
 import Image from "next/image";
 

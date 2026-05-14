@@ -1,6 +1,6 @@
 import { ArrowRightShort } from "@/components/icons/ArrowRightShort";
-import { HeroOrb } from "@/components/sections/HeroOrb";
-import { TrustedByMarquee } from "@/components/sections/TrustedByMarquee";
+import { HeroOrb } from "@/components/sections/home/HeroOrb";
+import { TrustedByMarquee } from "@/components/sections/home/TrustedByMarquee";
 
 export function Hero() {
   return (

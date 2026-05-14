@@ -273,6 +273,26 @@ body {
 }
 .cs-btn-glass:hover::after { opacity: 1; animation: cs-cta-shine 900ms ease-out 1; }
 .cs-btn-glass:active { transform: translateY(0) scale(0.97); transition-duration: 80ms; }
+/* Modifier for buttons joined to an input — suppresses the lift transform */
+.cs-btn-glass--no-lift:hover { transform: none; }
+.cs-btn-glass--no-lift:active { transform: scale(0.97); }
+
+/* Category pill — Glass (blur) + Noise texture from Figma */
+.cs-category-pill {
+  position: relative;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.cs-category-pill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.25;
+  pointer-events: none;
+  border-radius: inherit;
+}
 .cs-btn-glass:focus { outline: none; }
 .cs-btn-glass:focus-visible {
   outline: 2px solid #33BAEC;
