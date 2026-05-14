@@ -14,7 +14,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
     <section
       className="relative w-full overflow-hidden"
       data-section="BlogDetailRelatedPosts"
-      style={{ minHeight: "928px" }}
+      style={{ minHeight: "580px" }}
     >
       <div className="relative mx-auto max-w-[1276px] px-6">
         {/* Header row */}
@@ -68,7 +68,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
         </div>
 
         {/* Cards grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-[114px] pb-[80px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-[80px] pb-[80px]">
           {posts.map((post) => (
             <RelatedPostCard key={post.id} post={post} />
           ))}
@@ -79,7 +79,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
 }
 
 function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
-  const primaryCategory = post.categories?.[0];
+  const primaryCategory = post.categories ?? undefined;
 
   return (
     <Link

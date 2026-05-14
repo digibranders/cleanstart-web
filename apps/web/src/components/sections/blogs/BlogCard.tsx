@@ -9,7 +9,7 @@ interface BlogCardProps {
 export function BlogCard({ post }: BlogCardProps): React.ReactElement {
   const date = formatBlogDate(post.publishedAt);
   const readTime = post.readingMinutes ? `${post.readingMinutes} min read` : null;
-  const primaryCategory = post.categories?.[0];
+  const primaryCategory = post.categories ?? undefined;
 
   return (
     <article
@@ -56,7 +56,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
       {/* Category badge — overlaps image bottom */}
       {primaryCategory && (
         <div
-          className="absolute flex items-center justify-center"
+          className="absolute flex items-center justify-center overflow-hidden"
           style={{
             top: "190px",
             left: "32px",
@@ -73,6 +73,37 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
             alt=""
             aria-hidden
             className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none rounded-[8px]"
+          />
+          {/* Left cyan glow ellipse */}
+          <div
+            aria-hidden
+            className="absolute pointer-events-none select-none"
+            style={{
+              width: "54px",
+              height: "8px",
+              left: "14px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              borderRadius: "50%",
+              background: "#00cfff",
+              filter: "blur(8px)",
+              opacity: 0.75,
+            }}
+          />
+          {/* Right purple blur ellipse — 32×5 #4A3BF1 layer blur */}
+          <div
+            aria-hidden
+            className="absolute pointer-events-none select-none"
+            style={{
+              width: "32px",
+              height: "5px",
+              right: "14px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              borderRadius: "50%",
+              background: "#4a3bf1",
+              filter: "blur(5px)",
+            }}
           />
           <span
             className="relative font-sans font-medium whitespace-nowrap"

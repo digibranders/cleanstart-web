@@ -45,7 +45,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
 
   if (!post) notFound();
 
-  const categoryIds = (post.categories ?? []).map((c) => c.id);
+  const categoryIds = post.categories ? [post.categories.id] : [];
   const relatedPosts = await getRelatedBlogs(post.id, categoryIds);
 
   return (
@@ -68,8 +68,8 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
           abstract={post.abstract ?? undefined}
         />
 
-        {/* Shared gradient zone — RelatedPosts + CTA share one continuous background in Figma */}
-        <div style={{ background: "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)" }}>
+        {/* Dark zone — Figma gradient: #151021 0% → #131E8F 62% → #471EC0 100% */}
+        <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)" }}>
           {relatedPosts.length > 0 && (
             <BlogDetailRelatedPosts posts={relatedPosts} />
           )}

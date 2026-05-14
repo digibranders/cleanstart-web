@@ -3,24 +3,17 @@ import Link from "next/link";
 
 export function BlogDetailCTA(): React.ReactElement {
   return (
-    <section className="relative w-full mb-[-126px]" style={{ paddingTop: "40px", paddingBottom: "126px" }}>
+    <section className="relative w-full pt-[0px] pb-[28px] mb-[-165px]">
       <div className="relative px-6">
         <div className="relative z-20 mx-auto w-full max-w-[1276px]">
-          {/*
-            Figma 330:1276 — white card, 1276×375, radius 40, pad 80/100/80/100
-            layout: HORIZONTAL CENTER, gap 68
-          */}
-          {/*
-            Figma 330:1276 — white card, 1276×375px fixed, radius 40, padding 80px 100px
-            Row layout: justifyContent center, alignItems center, gap 68
-          */}
+          {/* Figma 330:1276 — white card, 1276×375px, radius 40, padding 80px 100px */}
           <div
             className="relative overflow-hidden flex items-center justify-center"
             style={{
               background: "#fff",
               borderRadius: "40px",
               padding: "80px 100px",
-              height: "375px",
+              height: "330px",
             }}
           >
             {/* Union 1 — Figma 330:1277, x=547 y=-220, 1101×1101, opacity 0.08 */}
@@ -30,7 +23,7 @@ export function BlogDetailCTA(): React.ReactElement {
               src="/images/blog-detail/cta/cta-union.svg"
               alt=""
               className="pointer-events-none select-none absolute"
-              style={{ left: "547px", top: "-220px", width: "1101px", height: "1101px", opacity: 0.08 }}
+              style={{ left: "547px", top: "-220px", width: "1101px", height: "1101px" }}
               loading="lazy"
               decoding="async"
             />
@@ -41,7 +34,7 @@ export function BlogDetailCTA(): React.ReactElement {
               src="/images/blog-detail/cta/cta-union.svg"
               alt=""
               className="pointer-events-none select-none absolute"
-              style={{ left: "-496px", top: "-239px", width: "1101px", height: "1101px", opacity: 0.08 }}
+              style={{ left: "-496px", top: "-239px", width: "1101px", height: "1101px" }}
               loading="lazy"
               decoding="async"
             />
@@ -75,37 +68,25 @@ export function BlogDetailCTA(): React.ReactElement {
               }}
             />
 
-            {/* Screenshot left — Figma 330:1292, x=-90 y=214, 259×260, rotate 15deg */}
+            {/* Cube left — Figma 330:1292, x=-90 y=214, 259×260, rotate -15deg */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               aria-hidden
-              src="/images/blog-detail/cta/cta-screenshot.png"
+              src="/images/blog-detail/cta/cta-cube.png"
               alt=""
-              className="pointer-events-none select-none absolute object-cover"
-              style={{
-                left: "-90px",
-                top: "214px",
-                width: "259px",
-                height: "260px",
-                transform: "rotate(15deg)",
-              }}
+              className="pointer-events-none select-none absolute object-contain"
+              style={{ left: "-90px", top: "214px", width: "259px", height: "260px", transform: "rotate(-15deg)" }}
               loading="lazy"
               decoding="async"
             />
-            {/* Screenshot right — Figma 330:1293, x=1130 y=-63, 259×260, rotate 15deg */}
+            {/* Cube right — Figma 330:1293, x=1130 y=-63, 259×260, rotate -15deg */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               aria-hidden
-              src="/images/blog-detail/cta/cta-screenshot.png"
+              src="/images/blog-detail/cta/cta-cube.png"
               alt=""
-              className="pointer-events-none select-none absolute object-cover"
-              style={{
-                left: "1130px",
-                top: "-63px",
-                width: "259px",
-                height: "260px",
-                transform: "rotate(15deg)",
-              }}
+              className="pointer-events-none select-none absolute object-contain"
+              style={{ left: "1130px", top: "-63px", width: "259px", height: "260px", transform: "rotate(-15deg)" }}
               loading="lazy"
               decoding="async"
             />
@@ -130,20 +111,24 @@ export function BlogDetailCTA(): React.ReactElement {
                 Built. Tested. Trusted.
               </h2>
 
-              {/* Button — Figma 330:1283, 168×44, radius 8, bg #3960F9 */}
+              {/* Button — Figma 330:1283, 168×44, radius 8, bg #3960F9, overflow clip */}
               <Link
                 href="/contact"
+                className="transition-transform duration-200 hover:-translate-y-px active:scale-[0.97] active:duration-[80ms]"
                 style={{
+                  position: "relative",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "8px",
+                  width: "168px",
                   height: "44px",
-                  paddingLeft: "12px",
-                  paddingRight: "12px",
+                  paddingLeft: "14px",
+                  paddingRight: "14px",
                   borderRadius: "8px",
                   background: "#3960f9",
                   boxShadow:
                     "0px 0px 0px 1px #3960f9, 0px 1px 2px -1px rgba(9,6,63,0.4), inset 0px 1px 0px 0px rgba(255,255,255,0.16)",
+                  overflow: "hidden",
                   color: "#fff",
                   fontFamily: "Inter, sans-serif",
                   fontWeight: 500,
@@ -154,7 +139,7 @@ export function BlogDetailCTA(): React.ReactElement {
                   whiteSpace: "nowrap",
                 }}
               >
-                <span>Get in Touch</span>
+                <span style={{ position: "relative", zIndex: 1 }}>Get in Touch</span>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/blog-detail/cta/cta-arrow.svg"
@@ -162,7 +147,23 @@ export function BlogDetailCTA(): React.ReactElement {
                   aria-hidden
                   width={25}
                   height={22}
-                  style={{ display: "block" }}
+                  style={{ display: "block", position: "relative", zIndex: 1 }}
+                />
+                {/* Glow — Figma 330:1291, #FFFFFF 60%, layer blur, 30.07×30.07 at top=41.1px centered */}
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: "calc(50% + 3.2px)",
+                    top: "41.1px",
+                    width: "30.073px",
+                    height: "30.073px",
+                    transform: "translateX(-50%)",
+                    background: "rgba(255,255,255,0.6)",
+                    borderRadius: "50%",
+                    filter: "blur(10px)",
+                    pointerEvents: "none",
+                  }}
                 />
               </Link>
             </div>

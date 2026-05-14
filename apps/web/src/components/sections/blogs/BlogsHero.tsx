@@ -5,7 +5,7 @@ import { type Blog, type BlogCategory, formatBlogDate, mediaUrl } from "@/lib/bl
 import { BlogsHeroSearch } from "./BlogsHeroSearch";
 
 const HERO_GRADIENT =
-  "linear-gradient(180deg, rgb(21,16,33) 25.7%, rgb(16,18,62) 31.2%, rgb(19,30,143) 51.0%, rgb(71,30,192) 68.7%, rgb(71,31,195) 79.8%, rgba(70,30,191,0.85) 85.0%, rgba(66,30,188,0.4) 93.7%, rgba(66,30,188,0) 98.9%)";
+  "linear-gradient(180deg, #151021 0%, #10123e 45%, #131e8f 61%, #471ec0 75%, #471fc3 84%, rgba(70,30,191,0.85) 88%, rgba(66,30,188,0.40) 95%, rgba(66,30,188,0) 99%)";
 
 interface BlogsHeroProps {
   featuredPost: Blog | null;
@@ -55,7 +55,7 @@ export function BlogsHero({
         className="pointer-events-none select-none absolute"
         style={{
           left: "-119px",
-          top: "319px",
+          top: "279px",
           width: "332px",
           height: "313px",
           mixBlendMode: "hard-light",
@@ -76,7 +76,7 @@ export function BlogsHero({
         {/* Title + search + categories — centered block */}
         <div
           className="flex flex-col items-center gap-10 mx-auto"
-          style={{ paddingTop: "166px", maxWidth: "864px" }}
+          style={{ paddingTop: "122px", maxWidth: "864px" }}
         >
           {/* Title + subtitle + search */}
           <div
@@ -114,7 +114,7 @@ export function BlogsHero({
               fallback={
                 <div
                   className="flex items-center"
-                  style={{ height: "52px", width: "674px" }}
+                  style={{ height: "36px", width: "674px" }}
                 />
               }
             >
@@ -145,10 +145,10 @@ export function BlogsHero({
           </div>
         </div>
 
-        {/* Featured article — 2-column: text left, image right */}
+        {/* Featured Blog — 2-column: text left, image right */}
         {featuredPost ? (
           <div
-            className="grid mt-[152px]"
+            className="grid mt-[102px]"
             style={{
               gridTemplateColumns: "513px 1fr",
               gap: "32px",
@@ -166,7 +166,7 @@ export function BlogsHero({
                     letterSpacing: "-0.04em",
                   }}
                 >
-                  FEATURED ARTICLES
+                  FEATURED BLOGS
                 </p>
                 <div className="flex flex-col gap-4 w-full">
                   <h2
@@ -276,7 +276,7 @@ function CategoryPill({
   return (
     <Link
       href={href}
-      className="flex items-center justify-center font-sans font-semibold text-white shrink-0"
+      className="cs-category-pill flex items-center justify-center font-sans font-semibold text-white shrink-0"
       style={{
         height: "48px",
         padding: "10px 32px",

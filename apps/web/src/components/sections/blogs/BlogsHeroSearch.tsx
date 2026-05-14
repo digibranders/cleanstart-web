@@ -41,7 +41,7 @@ export function BlogsHeroSearch({
         className="relative overflow-hidden"
         style={{
           width: "622px",
-          height: "52px",
+          height: "42px",
           background: "rgba(255,255,255,0.2)",
           border: "1px solid rgba(237,203,255,0.6)",
           borderRight: "none",
@@ -64,7 +64,7 @@ export function BlogsHeroSearch({
         type="submit"
         aria-label="Search"
         className="relative flex items-center justify-center shrink-0 overflow-hidden"
-        style={{ width: "52px", height: "52px", borderRadius: "0 12px 12px 0" }}
+        style={{ width: "52px", height: "42px", borderRadius: "0 12px 12px 0" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

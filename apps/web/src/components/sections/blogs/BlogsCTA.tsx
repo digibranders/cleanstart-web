@@ -20,7 +20,7 @@ export function BlogsCTA(): React.ReactElement {
   return (
     <section
       className="relative w-full"
-      style={{ marginBottom: "-126px", paddingTop: "0", paddingBottom: "67px", zIndex: 10 }}
+      style={{ marginBottom: "-165px", zIndex: 10 }}
       aria-labelledby="blogs-cta-title"
     >
       <div className="relative px-6">
@@ -28,27 +28,29 @@ export function BlogsCTA(): React.ReactElement {
           className="relative mx-auto overflow-hidden"
           style={{
             maxWidth: "1276px",
-            height: "335px",
+            height: "330px",
             borderRadius: "40px",
-            background: "linear-gradient(180deg, #131e8f 0%, #471ec0 100%)",
+            background: "linear-gradient(180deg, #471ec0 0%, #131e8f 100%)",
           }}
         >
-          {/* Decorative orb — bottom left — Figma 255:10293, x=-63 y=209, 218×220 */}
+          {/* Left cube — Figma 255:10293, rotation=-16.04°, opacity=0.8
+               AABB: x=-14 y=209 w=176 h=178
+               Pre-rotation CSS origin (center): left=7px top=230px */}
           <div
             aria-hidden
             className="pointer-events-none select-none absolute"
             style={{
-              left: "-63px",
-              top: "209px",
-              width: "218px",
-              height: "220px",
-              transform: "rotate(16.04deg)",
+              left: "-45px",
+              top: "230px",
+              width: "176px",
+              height: "178px",
+              // transform: "rotate(-16.04deg)",
               opacity: 0.8,
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/blogs/cta-orb.png"
+              src="/images/blogs/cta-cube-left2.png"
               alt=""
               loading="lazy"
               decoding="async"
@@ -56,22 +58,24 @@ export function BlogsCTA(): React.ReactElement {
             />
           </div>
 
-          {/* Decorative orb — top right — Figma 255:10294, x=1130 y=-63, 222×221 */}
+          {/* Right cube — Figma 255:10294, rotation=72.69°, opacity=0.8
+               AABB: x=1130 y=105 w=176 h=178
+               Pre-rotation CSS origin (center): left=1153px top=126px */}
           <div
             aria-hidden
             className="pointer-events-none select-none absolute"
             style={{
-              left: "1130px",
-              top: "-63px",
-              width: "222px",
-              height: "221px",
-              transform: "rotate(-72.69deg)",
+              left: "1145px",
+              top: "-40px",
+              width: "176px",
+              height: "178px",
+              // transform: "rotate(72.69deg)",
               opacity: 0.8,
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/blogs/cta-orb.png"
+              src="/images/blogs/cta-cube-right2.png"
               alt=""
               loading="lazy"
               decoding="async"
@@ -158,7 +162,7 @@ export function BlogsCTA(): React.ReactElement {
                     {/* Subscribe button — matches navbar Book a Demo glass style */}
                     <button
                       type="submit"
-                      className="cs-btn-glass shrink-0"
+                      className="cs-btn-glass cs-btn-glass--no-lift shrink-0"
                       style={{
                         ["--cs-btn-h" as string]: "43px",
                         ["--cs-btn-px" as string]: "16px",

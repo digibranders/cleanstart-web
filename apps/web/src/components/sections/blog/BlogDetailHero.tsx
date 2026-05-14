@@ -5,7 +5,7 @@ import type { BlogCategory, BlogAuthor, BlogImage } from "@/lib/blog";
 
 interface BlogDetailHeroProps {
   title: string;
-  categories?: BlogCategory[] | undefined;
+  categories?: BlogCategory | null | undefined;
   authors?: BlogAuthor[] | undefined;
   publishedAt?: string | undefined;
   readingMinutes?: number | undefined;
@@ -27,7 +27,7 @@ export function BlogDetailHero({
       style={{
         minHeight: "479px",
         background:
-          "linear-gradient(180deg, #151021 0%, #10123E 38%, #131E8F 67%, #471EC0 80%, #471FC3 92%, rgba(70,30,191,0.85) 98%, rgba(66,30,188,0.4) 100%, rgba(66,30,188,0) 100%)",
+          "linear-gradient(180deg, #151021 0%, #10123E 38%, #131E8F 67%, #471EC0 80%, #471FC3 100%)",
       }}
     >
       {/* Decorative bg grid — same mask-group pattern used across dark hero sections */}
@@ -36,8 +36,8 @@ export function BlogDetailHero({
         aria-hidden
         src="/images/blogs/hero-orb-top.png"
         alt=""
-        className="pointer-events-none select-none absolute top-0 right-0 hidden xl:block"
-        style={{ width: "406px", height: "412px", mixBlendMode: "lighten", opacity: 0.4 }}
+        className="pointer-events-none select-none absolute top-20 right-0 hidden xl:block"
+        style={{ width: "265px", height: "265px", mixBlendMode: "lighten", opacity: 0.4 }}
         loading="lazy"
         decoding="async"
       />
