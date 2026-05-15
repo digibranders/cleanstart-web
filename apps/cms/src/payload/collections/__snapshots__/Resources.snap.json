@@ -38,22 +38,17 @@
       ]
     },
     {
-      "type": "upload",
-      "name": "heroImage",
-      "relationTo": "media"
-    },
-    {
       "type": "textarea",
       "name": "summary"
-    },
-    {
-      "type": "richText",
-      "name": "body"
     },
     {
       "type": "upload",
       "name": "asset",
       "relationTo": "media"
+    },
+    {
+      "type": "richText",
+      "name": "body"
     },
     {
       "type": "checkbox",

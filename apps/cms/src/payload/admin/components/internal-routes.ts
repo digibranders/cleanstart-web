@@ -16,7 +16,7 @@
 // migration if any path shape changes.
 
 const ROUTES: Record<string, string> = {
-  authors: '/authors',
+  authors: '/author',
   blogs: '/blog',
   events: '/events',
   guides: '/guides',

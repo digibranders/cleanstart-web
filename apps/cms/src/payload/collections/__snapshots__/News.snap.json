@@ -26,6 +26,37 @@
       "relationTo": "media"
     },
     {
+      "type": "text",
+      "name": "publisher"
+    },
+    {
+      "type": "upload",
+      "name": "publisherLogo",
+      "relationTo": "media"
+    },
+    {
+      "type": "select",
+      "name": "pressType",
+      "options": [
+        {
+          "value": "press-release"
+        },
+        {
+          "value": "news"
+        },
+        {
+          "value": "announcement"
+        },
+        {
+          "value": "feature"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "location"
+    },
+    {
       "type": "richText",
       "name": "body"
     },

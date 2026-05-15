@@ -30,7 +30,7 @@ export const SITEMAP_COLLECTIONS: ReadonlyArray<{
   { collection: 'events', defaultPriority: 0.5, defaultChangeFreq: 'monthly', listingPath: '/events' },
   { collection: 'webinars', defaultPriority: 0.5, defaultChangeFreq: 'monthly', listingPath: '/webinars' },
   { collection: 'jobs', defaultPriority: 0.5, defaultChangeFreq: 'daily', listingPath: '/jobs' },
-  { collection: 'authors', defaultPriority: 0.3, defaultChangeFreq: 'monthly', listingPath: '/authors' },
+  { collection: 'authors', defaultPriority: 0.3, defaultChangeFreq: 'monthly', listingPath: '/author' },
   { collection: 'categories', defaultPriority: 0.4, defaultChangeFreq: 'monthly', listingPath: null },
   { collection: 'newsCategories', defaultPriority: 0.4, defaultChangeFreq: 'monthly', listingPath: null },
   { collection: 'knowledgeCategories', defaultPriority: 0.4, defaultChangeFreq: 'monthly', listingPath: null },
