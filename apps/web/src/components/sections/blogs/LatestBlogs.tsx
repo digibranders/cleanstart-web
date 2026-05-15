@@ -127,26 +127,10 @@ export function LatestBlogs({
               <div className="flex justify-center mt-[60px]">
                 <Link
                   href={`/blogs?${nextPageParams.toString()}`}
-                  className="relative flex items-center justify-center overflow-hidden"
-                  style={{
-                    width: "156px",
-                    height: "44px",
-                    borderRadius: "8px",
-                    background: "#3960f9",
-                    boxShadow:
-                      "0 0 0 1.002px #3960f9, 0 1.002px 2.005px -1.002px rgba(9,6,63,0.4), inset 0 1.002px 0 0 rgba(255,255,255,0.16)",
-                  }}
+                  className="cs-btn-blue gap-2"
+                  style={{ width: "156px", height: "44px", fontSize: "18px" }}
                 >
-                  <span
-                    className="font-sans font-medium text-white relative z-10"
-                    style={{
-                      fontSize: "18px",
-                      lineHeight: "24px",
-                      letterSpacing: "-0.01em",
-                    }}
-                  >
-                    View More
-                  </span>
+                  View More
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/images/blogs/icon-arrow-right.svg"
@@ -154,7 +138,7 @@ export function LatestBlogs({
                     aria-hidden
                     width={25}
                     height={22}
-                    className="relative z-10 ml-2 pointer-events-none select-none"
+                    className="pointer-events-none select-none"
                     loading="lazy"
                     decoding="async"
                   />

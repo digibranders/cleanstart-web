@@ -34,7 +34,7 @@ export default async function ResourceDetailPage({
   return (
     <>
       <Header />
-      <main>
+      <main style={{ background: "#f6f6f6" }}>
         {/* Hero — dark gradient, breadcrumb, title, download button */}
         <ResourceDetailHero resource={resource} />
 
@@ -44,11 +44,11 @@ export default async function ResourceDetailPage({
         </FadeUp>
 
         {/* Lead capture — overlaps footer */}
-        <FadeUp className="relative z-10" style={{ marginTop: "80px" }}>
+        <FadeUp className="relative z-10">
           <ResourceDetailLeadCapture resource={resource} />
         </FadeUp>
       </main>
-      <Footer topPadding={225} />
+      <Footer topPadding={234} />
     </>
   );
 }

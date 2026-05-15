@@ -223,18 +223,13 @@ export function ResourceDetailHero({
           <a
             href={assetHref}
             download={assetHref !== "#"}
-            className="inline-flex items-center justify-center gap-3 font-sans font-bold text-white"
+            className="cs-btn-blue gap-3 font-bold"
             style={{
               width: "840px",
               maxWidth: "100%",
               height: "64px",
-              borderRadius: "8px",
-              background: "#3960f9",
-              boxShadow:
-                "0px 1px 2px -1px rgba(9,6,63,0.4), 0px 0px 0px 1px #3960f9, inset 0px 1px 0px 0px rgba(255,255,255,0.16)",
               fontSize: "clamp(1.25rem, 1.25vw, 1.5rem)",
               letterSpacing: "-0.05em",
-              textDecoration: "none",
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}

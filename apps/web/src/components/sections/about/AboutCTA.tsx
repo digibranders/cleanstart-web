@@ -88,20 +88,8 @@ export function AboutCTA() {
               {/* Blue "How it works" button */}
               <a
                 href="#how-it-works"
-                className="inline-flex items-center justify-center rounded-lg font-sans font-medium text-white transition-all duration-200 hover:-translate-y-px hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#3960F9]"
-                style={{
-                  width: "163px",
-                  height: "43px",
-                  fontSize: "18px",
-                  fontFamily:
-                    "var(--font-inter), ui-sans-serif, system-ui, sans-serif",
-                  letterSpacing: "-0.01em",
-                  fontWeight: 500,
-                  background: "#3960F9",
-                  boxShadow:
-                    "0 0 0 1.002px #3960F9, 0 1px 2px rgba(9,6,63,0.4), inset 0 1px 0 rgba(255,255,255,0.16)",
-                  borderRadius: "8px",
-                }}
+                className="cs-btn-blue"
+                style={{ width: "163px", height: "43px", fontSize: "18px" }}
               >
                 How it works
               </a>
@@ -109,20 +97,8 @@ export function AboutCTA() {
               {/* Blue "Careers" button */}
               <a
                 href="#careers"
-                className="inline-flex items-center justify-center rounded-lg font-sans font-medium text-white transition-all duration-200 hover:-translate-y-px hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#3960F9]"
-                style={{
-                  width: "111px",
-                  height: "43px",
-                  fontSize: "18px",
-                  fontFamily:
-                    "var(--font-inter), ui-sans-serif, system-ui, sans-serif",
-                  letterSpacing: "-0.01em",
-                  fontWeight: 500,
-                  background: "#3960F9",
-                  boxShadow:
-                    "0 0 0 1.002px #3960F9, 0 1px 2px rgba(9,6,63,0.4), inset 0 1px 0 rgba(255,255,255,0.16)",
-                  borderRadius: "8px",
-                }}
+                className="cs-btn-blue"
+                style={{ width: "111px", height: "43px", fontSize: "18px" }}
               >
                 Careers
               </a>

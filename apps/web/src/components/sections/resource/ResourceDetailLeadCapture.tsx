@@ -24,7 +24,7 @@ export function ResourceDetailLeadCapture({
   return (
     <section
       className="relative w-full"
-      style={{ marginBottom: "-165px", zIndex: 10 }}
+      style={{ marginBottom: "-234px", zIndex: 10, background: "#f6f6f6", paddingTop: "80px" }}
       aria-labelledby="rd-cta-title"
     >
       <div className="relative px-6">

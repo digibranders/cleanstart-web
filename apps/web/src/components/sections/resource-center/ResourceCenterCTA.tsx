@@ -142,18 +142,8 @@ export function ResourceCenterCTA(): React.ReactElement {
 
                 <Link
                   href="/book-a-demo"
-                  className="relative overflow-hidden inline-flex items-center gap-2 text-white font-sans font-medium"
-                  style={{
-                    height: "44px",
-                    padding: "0 20px",
-                    borderRadius: "8px",
-                    background: "#3960f9",
-                    boxShadow:
-                      "0px 1px 2px -1px rgba(9,6,63,0.4), 0px 0px 0px 1px #3960f9, inset 0px 1px 0px 0px rgba(255,255,255,0.16)",
-                    fontSize: "18px",
-                    letterSpacing: "-0.01em",
-                    textDecoration: "none",
-                  }}
+                  className="cs-btn-blue relative overflow-hidden gap-2"
+                  style={{ height: "44px", padding: "0 20px", fontSize: "18px" }}
                 >
                   {/* Bottom-center glow — matches Figma Ellipse3938 layer-blur */}
                   <span

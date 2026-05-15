@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { RenderLexical } from "@/lib/renderLexical";
 import type { ResourceDetail } from "@/lib/resources";
+import { mediaUrl } from "@/lib/resources";
 
 interface ResourceDetailContentProps {
   resource: ResourceDetail;
@@ -8,6 +10,8 @@ interface ResourceDetailContentProps {
 export function ResourceDetailContent({
   resource,
 }: ResourceDetailContentProps): React.ReactElement {
+  const coverUrl = mediaUrl(resource.heroImage?.url);
+
   return (
     <section
       className="relative"
@@ -31,20 +35,36 @@ export function ResourceDetailContent({
       >
         {/* White content card */}
         <div
-          className="relative mx-auto"
+          className="relative mx-auto overflow-hidden"
           style={{
             background: "white",
             borderRadius: "24px",
-            paddingTop: "48px",
             paddingBottom: "80px",
-            paddingLeft: "24px",
-            paddingRight: "24px",
           }}
         >
+          {/* Cover image — flush at card top */}
+          {coverUrl && (
+            <div className="flex justify-center" style={{ paddingTop: "48px", paddingLeft: "24px", paddingRight: "24px" }}>
+              <Image
+                src={coverUrl}
+                alt={resource.heroImage?.alt ?? resource.title}
+                width={839}
+                height={455}
+                style={{ borderRadius: "16px", objectFit: "cover" }}
+                priority
+              />
+            </div>
+          )}
+
           {/* Body text */}
           <div
             className="mx-auto"
-            style={{ maxWidth: "840px" }}
+            style={{
+              maxWidth: "840px",
+              paddingTop: "48px",
+              paddingLeft: "24px",
+              paddingRight: "24px",
+            }}
           >
             {resource.summary && (
               <p
