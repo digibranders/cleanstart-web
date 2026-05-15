@@ -286,7 +286,7 @@ export function AboutOurVision() {
             <a
               href="#contact"
               className="cs-btn-blue"
-              style={{ width: "131px", height: "44px", fontSize: "18px" }}
+              style={{ width: "131px", height: "44px", fontSize: "1.125rem" }}
             >
               Contact Us
             </a>

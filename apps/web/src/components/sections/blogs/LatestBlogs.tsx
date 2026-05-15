@@ -103,7 +103,7 @@ export function LatestBlogs({
         {posts.length === 0 ? (
           <p
             className="font-sans text-center py-20"
-            style={{ color: "rgba(17,17,17,0.54)", fontSize: "18px" }}
+            style={{ color: "rgba(17,17,17,0.54)", fontSize: "1.125rem" }}
           >
             No posts found.
           </p>
@@ -128,7 +128,7 @@ export function LatestBlogs({
                 <Link
                   href={`/blogs?${nextPageParams.toString()}`}
                   className="cs-btn-blue gap-2"
-                  style={{ width: "156px", height: "44px", fontSize: "18px" }}
+                  style={{ width: "156px", height: "44px", fontSize: "1.125rem" }}
                 >
                   View More
                   {/* eslint-disable-next-line @next/next/no-img-element */}

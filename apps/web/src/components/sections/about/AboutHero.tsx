@@ -79,7 +79,6 @@ export function AboutHero() {
                 ["--cs-btn-h" as string]: "40px",
                 ["--cs-btn-px" as string]: "18px",
                 ["--cs-btn-fs" as string]: "20px",
-                fontFamily: "var(--font-inter), ui-sans-serif, system-ui, sans-serif",
                 color: "#111111",
                 letterSpacing: "-0.05em",
                 fontWeight: 500,

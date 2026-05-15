@@ -7,8 +7,8 @@ import Image from "next/image";
  * Section: "How CleanStart Will Help"
  * Figma title 108:8004 (1259×126) + 4 cards in 2×2 grid (each 622×308)
  *
- * Title       — Figtree Bold  62px, line 100%, ls -5%, color #111
- * Description — Figtree Regular 30px, line 140%, ls -4%, color #111
+ * Title       — Manrope Bold  62px, line 100%, ls -5%, color #111
+ * Description — Sora Regular 30px, line 140%, ls -4%, color #111
  *
  * 2x2 grid (gap 32, each card 622×308):
  *  - Top-left:  CISO card (108:8009)         — DARK gradient + tabs + title + desc + CTA
@@ -18,8 +18,8 @@ import Image from "next/image";
  *
  * CISO card (622×308, corner-radius 40, gradient #151021 → #131E8F (62.5%) → #471EC0):
  *  - Tab pill (269×42 at x=52,y=32): subtle lavender frosted glass with white SOFT_LIGHT stroke
- *    + "For CISOs" active pill (109×34, royal-blue gradient #2B97D1→#395FF9, white text Inter Medium 18px)
- *    + "For Developers" inactive (text-only, Inter Medium 18px white)
+ *    + "For CISOs" active pill (109×34, royal-blue gradient #2B97D1→#395FF9, white text Sora Medium 18px)
+ *    + "For Developers" inactive (text-only, Sora Medium 18px white)
  *  - Title "Security leadership that scales" Bold 40px white at (52,110), ls -5% line 100%
  *  - Description Regular 20px white at (52,172), line 140% ls -5%
  *  - "Explore for Developers →" CTA at bottom-right (right=37, bottom=32)
@@ -87,14 +87,8 @@ export function HowCleanStartHelp() {
         <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:flex-row md:gap-[70px]">
           <h2
             id="how-cleanstart-title"
-            className="font-sans text-[#111111]"
-            style={{
-              fontSize: "clamp(2rem,5.2vw,3.875rem)",
-              fontWeight: 700,
-              lineHeight: "105%",
-              letterSpacing: "-0.05em",
-              maxWidth: "444px",
-            }}
+            className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
+            style={{ maxWidth: "444px" }}
           >
             How CleanStart Will Help
           </h2>
@@ -108,15 +102,8 @@ export function HowCleanStartHelp() {
             }}
           />
           <p
-            className="font-sans text-[#111111] md:mt-3"
-            style={{
-              fontSize: "clamp(1rem,1.6vw,1.875rem)",
-              fontWeight: 400,
-              lineHeight: "140%",
-              letterSpacing: "-0.04em",
-              maxWidth: "604px",
-              opacity: 0.8,
-            }}
+            className="text-[clamp(1rem,1.6vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.04em] text-[#111111] md:mt-3"
+            style={{ maxWidth: "604px", opacity: 0.8 }}
           >
             Help Tailored solutions for every role in your organization — from
             security leaders to engineering teams.
@@ -214,14 +201,8 @@ function CisoCard({
 
       {/* Title — Figma 40px Bold; falls back to 36px on narrow viewports so it stays one line */}
       <h3
-        className="mt-[28px] font-sans text-white"
-        style={{
-          fontSize: "clamp(32px, 3.2vw, 40px)",
-          fontWeight: 700,
-          lineHeight: "110%",
-          letterSpacing: "-0.05em",
-          maxWidth: "504px",
-        }}
+        className="mt-[28px] font-display text-[clamp(2rem,3.2vw,2.5rem)] font-bold leading-[1.1] tracking-[-0.05em] text-white"
+        style={{ maxWidth: "504px" }}
       >
         {activeTab === "ciso"
           ? "Security leadership that scales"
@@ -230,14 +211,8 @@ function CisoCard({
 
       {/* Description */}
       <p
-        className="mt-[22px] font-sans text-white/95"
-        style={{
-          fontSize: "20px",
-          fontWeight: 400,
-          lineHeight: "140%",
-          letterSpacing: "-0.05em",
-          maxWidth: "504px",
-        }}
+        className="mt-[22px] text-xl font-normal leading-[1.4] tracking-[-0.05em] text-white/95"
+        style={{ maxWidth: "504px" }}
       >
         Without deterministic builds, artifacts can change across environments.
       </p>
@@ -288,11 +263,8 @@ function TabPill({
       id={`ciso-tab-${id}`}
       aria-selected={active}
       onClick={onClick}
-      className="relative h-[34px] cursor-pointer rounded-[999px] px-3 font-sans text-white transition-all duration-200"
+      className="relative h-[34px] cursor-pointer rounded-[999px] px-3 text-lg font-medium text-white transition-all duration-200"
       style={{
-        fontFamily: "var(--font-inter), var(--font-figtree), system-ui, sans-serif",
-        fontSize: "18px",
-        fontWeight: 500,
         opacity: active ? 1 : 0.7,
         background: active
           ? "linear-gradient(180deg, #2B97D1 0%, #395FF9 100%)"
@@ -362,26 +334,14 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
       {/* Title + description */}
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         <h3
-          className="font-sans text-[#111111]"
-          style={{
-            fontSize: "32px",
-            fontWeight: 700,
-            lineHeight: "100%",
-            letterSpacing: "-0.05em",
-            maxWidth: "234px",
-          }}
+          className="font-display text-[2rem] font-bold leading-none tracking-[-0.05em] text-[#111111]"
+          style={{ maxWidth: "234px" }}
         >
           {card.title}
         </h3>
         <p
-          className="font-sans text-[#333333]"
-          style={{
-            fontSize: "22px",
-            fontWeight: 400,
-            lineHeight: "140%",
-            letterSpacing: "-0.05em",
-            maxWidth: "244px",
-          }}
+          className="text-[1.375rem] font-normal leading-[1.4] tracking-[-0.05em] text-[#333333]"
+          style={{ maxWidth: "244px" }}
         >
           {card.description}
         </p>

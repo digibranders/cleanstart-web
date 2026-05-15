@@ -29,8 +29,7 @@ export default function GlobalError({
           justifyContent: "center",
           padding: "4rem 1.5rem",
           textAlign: "center",
-          fontFamily:
-            "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          fontFamily: "var(--font-manrope), ui-sans-serif, system-ui, sans-serif",
           background: "#fafafa",
           color: "#111",
         }}

@@ -53,7 +53,7 @@ export function BlogsHeroSearch({
           name="q"
           defaultValue={initialQuery}
           placeholder="Search blogs...."
-          className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 font-sans text-[16px] leading-[1.5] outline-none"
+          className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 text-base leading-[1.5] outline-none"
           style={{ fontWeight: 400 }}
         />
       </div>

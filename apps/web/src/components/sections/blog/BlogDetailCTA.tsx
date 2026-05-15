@@ -95,17 +95,10 @@ export function BlogDetailCTA(): React.ReactElement {
               className="relative z-10 flex flex-col items-center"
               style={{ gap: "32px", width: "634px", maxWidth: "100%" }}
             >
-              {/* Title — Figma 330:1282, Figtree Bold 72px, #111, ls -5%, lh 100% */}
+              {/* Title — Figma 330:1282, Manrope Bold 72px, #111, ls -5%, lh 100% */}
               <h2
-                style={{
-                  fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "clamp(36px, 5vw, 72px)",
-                  letterSpacing: "-0.05em",
-                  lineHeight: 1,
-                  color: "#111111",
-                  textAlign: "center",
-                }}
+                className="font-display text-display-lg font-bold leading-none tracking-[-0.05em] text-center"
+                style={{ color: "#111111" }}
               >
                 Built. Tested. Trusted.
               </h2>
@@ -114,7 +107,7 @@ export function BlogDetailCTA(): React.ReactElement {
               <button
                 type="button"
                 className="cs-btn-blue relative overflow-hidden gap-2"
-                style={{ width: "168px", height: "44px", padding: "0 14px", fontSize: "18px" }}
+                style={{ width: "168px", height: "44px", padding: "0 14px", fontSize: "1.125rem" }}
               >
                 <span style={{ position: "relative", zIndex: 1 }}>Get in Touch</span>
                 {/* eslint-disable-next-line @next/next/no-img-element */}

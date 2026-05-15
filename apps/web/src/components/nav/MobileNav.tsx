@@ -47,7 +47,7 @@ export function MobileNav() {
                 return (
                   <span
                     key={item.label}
-                    className="block rounded-[10px] px-3 py-3 text-[15px] font-medium text-white/90 cursor-default"
+                    className="block rounded-[10px] px-3 py-3 text-base font-medium text-white/90 cursor-default"
                   >
                     {item.label}
                   </span>
@@ -67,7 +67,7 @@ export function MobileNav() {
                   value={item.label}
                   className="!border-b-0"
                 >
-                  <AccordionTrigger className="px-3 py-3 text-[15px] font-medium text-white/90 hover:text-white hover:no-underline">
+                  <AccordionTrigger className="px-3 py-3 text-base font-medium text-white/90 hover:text-white hover:no-underline">
                     {item.label}
                   </AccordionTrigger>
                   <AccordionContent className="pl-3">
@@ -76,7 +76,7 @@ export function MobileNav() {
                         "__header" in leaf ? (
                           <li
                             key={`h-${i}`}
-                            className="px-3 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/40"
+                            className="px-3 pt-3 pb-1 text-2xs font-semibold uppercase tracking-[0.08em] text-white/40"
                           >
                             {leaf.__header}
                           </li>
@@ -86,12 +86,12 @@ export function MobileNav() {
                               <Link
                                 href={leaf.href}
                                 onClick={close}
-                                className="block rounded-[8px] px-3 py-2 text-[14px] text-white/80 transition-colors hover:bg-white/[0.06] hover:text-white"
+                                className="block rounded-[8px] px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/[0.06] hover:text-white"
                               >
                                 {leaf.label}
                               </Link>
                             ) : (
-                              <span className="block rounded-[8px] px-3 py-2 text-[14px] text-white/80 cursor-default">
+                              <span className="block rounded-[8px] px-3 py-2 text-sm text-white/80 cursor-default">
                                 {leaf.label}
                               </span>
                             )}

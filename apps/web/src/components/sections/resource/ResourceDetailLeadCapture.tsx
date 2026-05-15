@@ -160,15 +160,8 @@ export function ResourceDetailLeadCapture({
               >
                 {/* Legal teaser */}
                 <p
-                  className="font-sans font-normal"
-                  style={{
-                    fontSize: "21px",
-                    lineHeight: "1.4",
-                    letterSpacing: "-0.04em",
-                    color: "white",
-                    opacity: 0.8,
-                    width: "493px",
-                  }}
+                  className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white"
+                  style={{ opacity: 0.8, width: "493px" }}
                 >
                   By checking this box, you agree that CleanStart may use your
                   information to contact you. You may opt out at any time.{" "}
@@ -189,7 +182,7 @@ export function ResourceDetailLeadCapture({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter Your Email"
-                    className="font-sans font-normal bg-white"
+                    className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] bg-white"
                     style={{
                       width: "352px",
                       height: "41px",
@@ -197,9 +190,6 @@ export function ResourceDetailLeadCapture({
                       border: "1px solid #111",
                       paddingLeft: "20px",
                       paddingRight: "16px",
-                      fontSize: "21px",
-                      lineHeight: "1.4",
-                      letterSpacing: "-0.04em",
                       color: "#111",
                       outline: "none",
                     }}
@@ -208,7 +198,7 @@ export function ResourceDetailLeadCapture({
                   {/* Glass "Get in Touch" button */}
                   <button
                     type="submit"
-                    className="relative overflow-hidden inline-flex items-center justify-center gap-2 font-sans font-medium shrink-0"
+                    className="relative overflow-hidden inline-flex items-center justify-center gap-2 text-lg font-medium tracking-[-0.01em] shrink-0"
                     style={{
                       height: "43px",
                       padding: "9px 18px",
@@ -217,8 +207,6 @@ export function ResourceDetailLeadCapture({
                       background: "rgba(255,255,255,0.65)",
                       backdropFilter: "blur(8px)",
                       WebkitBackdropFilter: "blur(8px)",
-                      fontSize: "18px",
-                      letterSpacing: "-0.01em",
                       color: "#111",
                       cursor: "pointer",
                     }}
@@ -275,15 +263,8 @@ export function ResourceDetailLeadCapture({
                   />
                   <label
                     htmlFor="rd-consent"
-                    className="font-sans font-normal"
-                    style={{
-                      fontSize: "21px",
-                      lineHeight: "1.4",
-                      letterSpacing: "-0.04em",
-                      color: "white",
-                      opacity: 0.8,
-                      width: "504px",
-                    }}
+                    className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white"
+                    style={{ opacity: 0.8, width: "504px" }}
                   >
                     I agree to receive other communications from CleanStart.*
                   </label>

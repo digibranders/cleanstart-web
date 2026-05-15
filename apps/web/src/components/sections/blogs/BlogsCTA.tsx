@@ -111,13 +111,8 @@ export function BlogsCTA(): React.ReactElement {
                 style={{ width: "493px", gap: "24px" }}
               >
                 <p
-                  className="font-sans font-normal text-white"
-                  style={{
-                    fontSize: "21px",
-                    lineHeight: "1.4",
-                    letterSpacing: "-0.04em",
-                    opacity: 0.8,
-                  }}
+                  className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white"
+                  style={{ opacity: 0.8 }}
                 >
                   Get the latest research, insights, and updates straight to
                   your inbox
@@ -125,8 +120,8 @@ export function BlogsCTA(): React.ReactElement {
 
                 {submitted ? (
                   <p
-                    className="font-sans font-medium text-white"
-                    style={{ fontSize: "16px", opacity: 0.9 }}
+                    className="text-base font-medium text-white"
+                    style={{ opacity: 0.9 }}
                   >
                     Thanks! You&apos;re subscribed.
                   </p>
@@ -154,7 +149,7 @@ export function BlogsCTA(): React.ReactElement {
                         name="email"
                         required
                         placeholder="Enter your email"
-                        className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 font-sans text-[16px] leading-[1.5] outline-none"
+                        className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 text-base leading-[1.5] outline-none"
                         style={{ fontWeight: 400 }}
                       />
                     </div>

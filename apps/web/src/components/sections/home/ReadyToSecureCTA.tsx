@@ -6,8 +6,8 @@ import Image from "next/image";
  * Figma Group 2085665042 (108:8594) — card 1276×335 with kubr bird peeking from top.
  *
  * - Card: linear gradient #131E8F → #471EC0, corner radius 40
- * - Title: Figtree Bold 55px, white, left-aligned
- * - Description: Figtree Regular 21px, white, right column
+ * - Title: Manrope Bold 55px, white, left-aligned
+ * - Description: Sora Regular 21px, white, right column
  * - Button: white-ish glassy bg, "Get a Demo" + arrow icon
  * - Bird image (cta-kubr.png): 304×206, sits ABOVE the card peeking out from the top
  */
@@ -85,35 +85,23 @@ export function ReadyToSecureCTA() {
               }}
             />
 
-            {/* Title — Figma 108:8596 style_A0S8KL: Figtree Bold 55px,
+            {/* Title — Figma 108:8596 style_A0S8KL: Manrope Bold 55px,
                 line-height 100%, letter-spacing -5%, color white, 401×165. */}
             <h2
               id="cta-title"
-              className="relative z-10 font-sans text-white"
-              style={{
-                fontSize: "clamp(2rem,4.6vw,3.4375rem)",
-                fontWeight: 700,
-                lineHeight: "100%",
-                letterSpacing: "-0.05em",
-                maxWidth: "401px",
-              }}
+              className="relative z-10 font-display text-display-sm font-bold leading-none tracking-[-0.05em] text-white"
+              style={{ maxWidth: "401px" }}
             >
               Ready to Secure Your Container Infrastructure?
             </h2>
 
             {/* Right column — description + button. Figma 108:8597 description
-                style_LAOX54: Figtree Regular 21px, line-height 140%, ls -4%,
+                style_LAOX54: Sora Regular 21px, line-height 140%, ls -4%,
                 white opacity 0.8, 493×87. Gap to button = 18px per Figma. */}
             <div className="relative z-10 flex flex-col items-start gap-[18px]">
               <p
-                className="font-sans text-white/80"
-                style={{
-                  fontSize: "21px",
-                  fontWeight: 400,
-                  lineHeight: "140%",
-                  letterSpacing: "-0.04em",
-                  maxWidth: "493px",
-                }}
+                className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white/80"
+                style={{ maxWidth: "493px" }}
               >
                 Start with zero-CVE hardened images. Deploy faster with
                 confidence knowing your containers are secured from the ground

@@ -2,9 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { RenderLexical } from "@/lib/renderLexical";
-import { mediaUrl } from "@/lib/blog";
 import type { LexicalRoot, TocEntry, BlogImage } from "@/lib/blog";
 
 interface BlogDetailContentProps {
@@ -17,7 +15,7 @@ interface BlogDetailContentProps {
 export function BlogDetailContent({
   body,
   tableOfContents,
-  heroImage,
+  heroImage: _heroImage,
   abstract,
 }: BlogDetailContentProps): React.ReactElement {
   return (
@@ -70,28 +68,11 @@ export function BlogDetailContent({
           {/* ── CENTER: Article body ── */}
           {/* mx-auto centers the column when the xl TOC sidebar is hidden; xl:mx-0 resets it once the sidebar is visible */}
           <article className="min-w-0 flex-1 mx-auto lg:mx-0" style={{ maxWidth: "680px" }}>
-            {heroImage && (
-              <div className="mb-10 overflow-hidden" style={{ borderRadius: "16px" }}>
-                <Image
-                  src={mediaUrl(heroImage.url)!}
-                  alt={heroImage.alt ?? ""}
-                  width={heroImage.width ?? 680}
-                  height={heroImage.height ?? 383}
-                  className="w-full h-auto object-cover"
-                  priority
-                />
-              </div>
-            )}
-
             {abstract && (
               <p
-                className="mb-8"
+                className="mb-8 text-[clamp(1rem,1.2vw,1.125rem)] leading-[1.7] tracking-[-0.01em]"
                 style={{
-                  fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
-                  fontSize: "clamp(16px, 1.2vw, 18px)",
                   color: "rgba(17,17,17,0.65)",
-                  lineHeight: 1.7,
-                  letterSpacing: "-0.01em",
                   borderLeft: "3px solid #4a3bf1",
                   paddingLeft: "16px",
                 }}
@@ -146,7 +127,7 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
       clearTimeout(t);
       window.removeEventListener("scroll", onScroll);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [h2Entries.length]);
 
   if (!h2Entries.length) return null;
@@ -154,12 +135,8 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
   return (
     <nav aria-label="Table of contents">
       <p
+        className="text-xs font-bold uppercase tracking-[0.06em]"
         style={{
-          fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
-          fontWeight: 700,
-          fontSize: "13px",
-          letterSpacing: "0.06em",
-          textTransform: "uppercase",
           color: "rgba(17,17,17,0.4)",
           marginBottom: "12px",
           paddingLeft: "4px",
@@ -192,9 +169,8 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
                   paddingRight: "8px",
                   paddingTop: "7px",
                   paddingBottom: "7px",
-                  fontSize: "13.5px",
+                  fontSize: "0.875rem",
                   lineHeight: 1.55,
-                  fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
                   fontWeight: isActive ? 600 : 400,
                   color: isActive ? "#4a3bf1" : "rgba(17,17,17,0.65)",
                   transition: "color 0.2s",

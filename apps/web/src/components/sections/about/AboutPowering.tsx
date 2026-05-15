@@ -109,25 +109,12 @@ export function AboutPowering() {
       <div className="relative mx-auto max-w-[1276px] px-6 pt-[100px] pb-[20px]">
         {/* Title group — 248:2152 (centered, max-w 969px) */}
         <div className="mx-auto flex max-w-[969px] flex-col items-center gap-6 text-center text-white">
-          <h2
-            className="font-sans font-bold"
-            style={{
-              fontSize: "clamp(2rem, 4.3vw, 3.875rem)",
-              lineHeight: 1,
-              letterSpacing: "-0.05em",
-            }}
-          >
+          <h2 className="font-display text-display-md font-bold leading-none tracking-[-0.05em]">
             Powering Trusted Software Delivery for Global Leaders.
           </h2>
           <p
-            className="font-sans font-normal"
-            style={{
-              fontSize: "clamp(1.125rem, 2.08vw, 1.875rem)",
-              lineHeight: 1.4,
-              letterSpacing: "-0.04em",
-              opacity: 0.8,
-              maxWidth: "835px",
-            }}
+            className="text-[clamp(1.125rem,2.08vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.04em]"
+            style={{ opacity: 0.8, maxWidth: "835px" }}
           >
             Tailored solutions for every role in your organization — from
             security leaders to engineering teams.
@@ -198,31 +185,25 @@ function FeatureCard({ title, description }: Card) {
           />
         </div>
 
-        {/* Title — 248:2182 (32px Figtree Bold, tracking -0.05em, #111) */}
+        {/* Title — 248:2182 (32px Manrope Bold, tracking -0.05em, #111) */}
         <h3
-          className="absolute font-sans font-bold text-[#111]"
+          className="absolute font-display text-[2rem] font-bold leading-none tracking-[-0.05em] text-[#111]"
           style={{
             top: "180px",
             left: "24px",
             right: "24px",
-            fontSize: "32px",
-            lineHeight: 1,
-            letterSpacing: "-0.05em",
           }}
         >
           {title}
         </h3>
 
-        {/* Body — 248:2183 (20px Figtree Regular, leading 1.4, tracking -0.05em, #555) */}
+        {/* Body — 248:2183 (20px Sora Regular, leading 1.4, tracking -0.05em, #555) */}
         <p
-          className="absolute font-sans font-normal text-[#555]"
+          className="absolute text-xl font-normal leading-[1.4] tracking-[-0.05em] text-[#555]"
           style={{
             top: "260px",
             left: "24px",
             right: "24px",
-            fontSize: "20px",
-            lineHeight: 1.4,
-            letterSpacing: "-0.05em",
           }}
         >
           {description}

@@ -145,26 +145,15 @@ export function AboutWhoWeAre() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <p
-                    className="font-sans font-bold"
-                    style={{
-                      fontSize: "32px",
-                      lineHeight: "1.0",
-                      letterSpacing: "-0.05em",
-                      color: "#333",
-                    }}
+                  <h3
+                    className="font-display text-[2rem] font-bold leading-none tracking-[-0.05em]"
+                    style={{ color: "#333" }}
                   >
                     {pillar.title}
-                  </p>
+                  </h3>
                   <p
-                    className="font-sans"
-                    style={{
-                      fontSize: "20px",
-                      fontWeight: 400,
-                      lineHeight: "1.4",
-                      letterSpacing: "-0.05em",
-                      color: "#333",
-                    }}
+                    className="text-xl font-normal leading-[1.4] tracking-[-0.05em]"
+                    style={{ color: "#333" }}
                   >
                     {pillar.description}
                   </p>

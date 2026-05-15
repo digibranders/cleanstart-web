@@ -32,13 +32,8 @@ export function ResourceGrid({
         style={{ minHeight: "400px" }}
       >
         <p
-          className="font-sans font-normal text-center"
-          style={{
-            fontSize: "20px",
-            lineHeight: 1.4,
-            color: "rgba(17,17,17,0.54)",
-            letterSpacing: "-0.04em",
-          }}
+          className="text-xl font-normal leading-[1.4] tracking-[-0.04em] text-center"
+          style={{ color: "rgba(17,17,17,0.54)" }}
         >
           No resources found.{" "}
           {activeType || searchQuery ? (
@@ -72,7 +67,7 @@ export function ResourceGrid({
           <Link
             href={nextPageHref()}
             className="cs-btn-blue relative overflow-hidden gap-2"
-            style={{ height: "44px", padding: "0 20px", fontSize: "18px" }}
+            style={{ height: "44px", padding: "0 20px", fontSize: "1.125rem" }}
           >
             {/* Bottom-center glow — matches Figma Ellipse3938 layer-blur */}
             <span

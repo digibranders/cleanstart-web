@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatBlogDate, mediaUrl } from "@/lib/blog";
+import { formatBlogDate, pickImageUrl } from "@/lib/blog";
 import type { BlogCategory, BlogAuthor, BlogImage } from "@/lib/blog";
 
 interface BlogDetailHeroProps {
@@ -74,8 +74,8 @@ export function BlogDetailHero({
 
           <Link
             href="/blogs"
-            className="flex items-center h-8 px-2 rounded-full"
-            style={{ color: "#98ACC3", fontSize: "12px", fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", lineHeight: 1.4 }}
+            className="flex items-center h-8 px-2 rounded-full text-xs leading-[1.4]"
+            style={{ color: "#98ACC3" }}
           >
             Resources
           </Link>
@@ -84,8 +84,8 @@ export function BlogDetailHero({
 
           <Link
             href="/blogs"
-            className="flex items-center h-8 px-2 rounded-full"
-            style={{ color: "#98ACC3", fontSize: "12px", fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", lineHeight: 1.4 }}
+            className="flex items-center h-8 px-2 rounded-full text-xs leading-[1.4]"
+            style={{ color: "#98ACC3" }}
           >
             Blogs
           </Link>
@@ -93,8 +93,8 @@ export function BlogDetailHero({
           <BreadcrumbChevron />
 
           <span
-            className="flex items-center h-8 px-2 max-w-[220px] truncate"
-            style={{ color: "#BFCCDA", fontSize: "12px", fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", lineHeight: 1.4 }}
+            className="flex items-center h-8 px-2 max-w-[220px] truncate text-xs leading-[1.4]"
+            style={{ color: "#BFCCDA" }}
           >
             {title}
           </span>
@@ -103,15 +103,8 @@ export function BlogDetailHero({
         {/* Title */}
         <div className="flex justify-center mt-10">
           <h1
-            className="text-white text-center"
-            style={{
-              fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
-              fontWeight: 600,
-              fontSize: "clamp(26px, 2.4vw, 40px)",
-              lineHeight: 1.25,
-              letterSpacing: "-0.03em",
-              maxWidth: "860px",
-            }}
+            className="font-display text-[clamp(1.625rem,2.4vw,2.5rem)] font-semibold leading-[1.25] tracking-[-0.03em] text-white text-center"
+            style={{ maxWidth: "860px" }}
           >
             {title}
           </h1>
@@ -144,8 +137,7 @@ export function BlogDetailHero({
                 className="shrink-0"
               />
               <span
-                className="text-white whitespace-nowrap"
-                style={{ fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", fontWeight: 500, fontSize: "clamp(14px, 1.4vw, 20px)", lineHeight: 1.3 }}
+                className="text-white whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-medium leading-[1.3]"
               >
                 {readingMinutes} min read
               </span>
@@ -162,7 +154,7 @@ export function BlogDetailHero({
               {primaryAuthor.photo ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={mediaUrl(primaryAuthor.photo.url)}
+                  src={pickImageUrl(primaryAuthor.photo, ["thumb", "card", "hero"])}
                   alt={primaryAuthor.name}
                   className="rounded-full object-cover shrink-0"
                   style={{ width: "32px", height: "32px", display: "block" }}
@@ -175,8 +167,7 @@ export function BlogDetailHero({
                 />
               )}
               <span
-                className="text-white whitespace-nowrap"
-                style={{ fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", fontWeight: 500, fontSize: "clamp(14px, 1.4vw, 20px)", lineHeight: 1.3 }}
+                className="text-white whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-medium leading-[1.3]"
               >
                 By {primaryAuthor.name}
               </span>
@@ -199,14 +190,7 @@ export function BlogDetailHero({
                 style={{ width: "40px", height: "40px" }}
               />
               <span
-                className="text-white whitespace-nowrap"
-                style={{
-                  fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
-                  fontWeight: 500,
-                  fontSize: "clamp(14px, 1.4vw, 20px)",
-                  lineHeight: 1,
-                  letterSpacing: "-0.05em",
-                }}
+                className="text-white whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-medium leading-none tracking-[-0.05em]"
               >
                 {formatBlogDate(publishedAt)}
               </span>

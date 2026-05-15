@@ -22,7 +22,7 @@ export function ComparisonCard({ variant, title, bullets }: ComparisonCardProps)
         }`}
       >
         <HeaderIcon className="h-[22px] w-[22px]" />
-        <span className="font-sans text-[24px] font-semibold tracking-[-0.02em] text-white">
+        <span className="font-display text-2xl font-semibold tracking-[-0.02em] text-white">
           {title}
         </span>
       </div>
@@ -30,7 +30,7 @@ export function ComparisonCard({ variant, title, bullets }: ComparisonCardProps)
         {bullets.map((b) => (
           <div key={b} className="flex items-center gap-4">
             <Bullet className="shrink-0" />
-            <span className="font-sans text-[16px] font-medium leading-[1.4] tracking-[-0.01em] text-[#111111]/85">
+            <span className="text-base font-medium leading-[1.4] tracking-[-0.01em] text-[#111111]/85">
               {b}
             </span>
           </div>

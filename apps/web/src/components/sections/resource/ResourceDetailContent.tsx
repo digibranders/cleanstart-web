@@ -68,13 +68,10 @@ export function ResourceDetailContent({
           >
             {resource.summary && (
               <p
-                className="font-sans font-normal"
+                className="text-xl font-normal leading-[1.4] tracking-[-0.04em]"
                 style={{
-                  fontSize: "20px",
-                  lineHeight: "1.4",
                   color: "#111",
                   opacity: 0.8,
-                  letterSpacing: "-0.04em",
                   marginBottom: "24px",
                 }}
               >
@@ -82,14 +79,8 @@ export function ResourceDetailContent({
               </p>
             )}
             <div
-              className="resource-body"
-              style={{
-                fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
-                fontSize: "20px",
-                lineHeight: "1.4",
-                color: "#111",
-                letterSpacing: "-0.04em",
-              }}
+              className="resource-body text-xl leading-[1.4] tracking-[-0.04em]"
+              style={{ color: "#111" }}
             >
               <RenderLexical content={resource.body} />
             </div>

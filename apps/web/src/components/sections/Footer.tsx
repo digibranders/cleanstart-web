@@ -106,14 +106,8 @@ export function Footer({ topPadding = 179 }: { topPadding?: number } = {}) {
         {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
         <div className="flex flex-wrap items-start justify-between gap-8">
           <p
-            className="font-sans text-white"
-            style={{
-              fontSize: "20px",
-              fontWeight: 400,
-              lineHeight: "28px",
-              letterSpacing: "-0.04em",
-              maxWidth: "396px",
-            }}
+            className="text-lg font-normal leading-[1.4] tracking-[-0.04em] text-white"
+            style={{ maxWidth: "396px" }}
           >
             Hardened container images with zero known vulnerabilities. Secure by
             design, built for speed.
@@ -164,15 +158,7 @@ export function Footer({ topPadding = 179 }: { topPadding?: number } = {}) {
 
         {/* Awarded with row — Figma 16px gap between heading and badges */}
         <div className="mt-[56px] flex flex-col items-center gap-[16px]">
-          <h3
-            className="font-sans text-white"
-            style={{
-              fontSize: "20px",
-              fontWeight: 600,
-              lineHeight: "24px",
-              letterSpacing: "-0.04em",
-            }}
-          >
+          <h3 className="font-display text-base font-semibold leading-[1.3] tracking-[-0.04em] text-white">
             Awarded with
           </h3>
           <div className="flex flex-wrap items-center justify-center gap-[25px]">
@@ -199,13 +185,8 @@ export function Footer({ topPadding = 179 }: { topPadding?: number } = {}) {
               />
             </div>
             <span
-              className="font-sans text-white/95"
-              style={{
-                fontSize: "11.1px",
-                fontWeight: 400,
-                lineHeight: "12px",
-                letterSpacing: "0.24px",
-              }}
+              className="text-2xs font-normal leading-[1.1] text-white/95"
+              style={{ letterSpacing: "0.24px" }}
             >
               ©2026 CleanStart. All rights reserved.
             </span>
@@ -218,12 +199,8 @@ export function Footer({ topPadding = 179 }: { topPadding?: number } = {}) {
                 <li className="flex leading-none">
                   <a
                     href={link.href}
-                    className="font-sans italic text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
-                    style={{
-                      fontSize: "12px",
-                      lineHeight: "21px",
-                      letterSpacing: "0.24px",
-                    }}
+                    className="text-xs italic leading-[1.75] text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
+                    style={{ letterSpacing: "0.24px" }}
                   >
                     {link.label}
                   </a>
@@ -247,15 +224,7 @@ export function Footer({ topPadding = 179 }: { topPadding?: number } = {}) {
 function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
   return (
     <div>
-      <h3
-        className="font-sans text-white"
-        style={{
-          fontSize: "20px",
-          fontWeight: 600,
-          lineHeight: "24px",
-          letterSpacing: "-0.04em",
-        }}
-      >
+      <h3 className="font-display text-base font-semibold leading-[1.3] tracking-[-0.04em] text-white">
         {title}
       </h3>
       <ul className="mt-6 flex flex-col gap-3">
@@ -263,13 +232,7 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
           <li key={link.href} className="flex leading-none">
             <a
               href={link.href}
-              className="group inline-flex items-center gap-2 font-sans text-white/85 transition-colors duration-200 hover:text-white cursor-pointer"
-              style={{
-                fontSize: "16px",
-                fontWeight: 400,
-                lineHeight: "22px",
-                letterSpacing: "-0.04em",
-              }}
+              className="group inline-flex items-center gap-2 text-sm font-normal leading-[1.4] tracking-[-0.04em] text-white/85 transition-colors duration-200 hover:text-white cursor-pointer"
             >
               <span>{link.label}</span>
               <svg

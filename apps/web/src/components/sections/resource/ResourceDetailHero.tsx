@@ -130,12 +130,10 @@ export function ResourceDetailHero({
           />
           <Link
             href="/resource-center"
-            className="flex items-center justify-center font-sans font-normal shrink-0"
+            className="flex items-center justify-center text-xs font-normal leading-[1.4] shrink-0"
             style={{
               padding: "0 8px",
               height: "32px",
-              fontSize: "12px",
-              lineHeight: "1.4",
               color: "#98acc3",
               textDecoration: "none",
               borderRadius: "1000px",
@@ -156,12 +154,10 @@ export function ResourceDetailHero({
           />
           <Link
             href={`/resource-center?type=${encodeURIComponent(resource.type ?? "")}`}
-            className="flex items-center justify-center font-sans font-normal shrink-0"
+            className="flex items-center justify-center text-xs font-normal leading-[1.4] shrink-0"
             style={{
               padding: "0 8px",
               height: "32px",
-              fontSize: "12px",
-              lineHeight: "1.4",
               color: "#98acc3",
               textDecoration: "none",
               borderRadius: "1000px",
@@ -181,12 +177,11 @@ export function ResourceDetailHero({
             decoding="async"
           />
           <span
-            className="font-sans font-normal truncate"
+            className="text-xs font-normal truncate"
             style={{
               padding: "0 8px",
               height: "32px",
               lineHeight: "32px",
-              fontSize: "12px",
               color: "#bfccda",
               maxWidth: "320px",
             }}

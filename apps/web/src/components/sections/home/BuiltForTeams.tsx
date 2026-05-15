@@ -162,14 +162,8 @@ export function BuiltForTeams() {
             </span>
           </h2>
           <p
-            className="mx-auto mt-6 font-sans text-white/85"
-            style={{
-              fontSize: "20px",
-              fontWeight: 400,
-              lineHeight: "150%",
-              letterSpacing: "-0.02em",
-              maxWidth: "620px",
-            }}
+            className="mx-auto mt-6 text-xl font-normal leading-[1.5] tracking-[-0.02em] text-white/85"
+            style={{ maxWidth: "620px" }}
           >
             CleanStart replaces unpredictable builds with verified, secure
             images — helping engineering teams cut response times and prevent

@@ -106,12 +106,8 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
             }}
           />
           <span
-            className="relative font-sans font-medium whitespace-nowrap"
-            style={{
-              fontSize: "16px",
-              lineHeight: "1.3",
-              color: "#4a3bf1",
-            }}
+            className="relative text-base font-medium leading-[1.3] whitespace-nowrap"
+            style={{ color: "#4a3bf1" }}
           >
             {primaryCategory.name}
           </span>
@@ -146,8 +142,8 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
                   decoding="async"
                 />
                 <span
-                  className="font-sans font-medium"
-                  style={{ fontSize: "14px", lineHeight: "normal", color: "#666" }}
+                  className="text-sm font-medium leading-normal"
+                  style={{ color: "#666" }}
                 >
                   {date}
                 </span>
@@ -167,8 +163,8 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
                   decoding="async"
                 />
                 <span
-                  className="font-sans font-medium"
-                  style={{ fontSize: "14px", lineHeight: "normal", color: "#666" }}
+                  className="text-sm font-medium leading-normal"
+                  style={{ color: "#666" }}
                 >
                   {readTime}
                 </span>
@@ -179,12 +175,9 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
           {/* Title + excerpt */}
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <h3
-              className="font-sans font-medium overflow-hidden"
+              className="font-display text-[clamp(1rem,1.67vw,1.5rem)] font-medium leading-[1.3] tracking-[-0.05em] overflow-hidden"
               style={{
-                fontSize: "clamp(1rem,1.67vw,1.5rem)",
-                lineHeight: "1.3",
                 color: "#111",
-                letterSpacing: "-0.05em",
                 display: "-webkit-box",
                 WebkitLineClamp: 3,
                 WebkitBoxOrient: "vertical",
@@ -194,10 +187,8 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
             </h3>
             {post.abstract && (
               <p
-                className="font-sans font-normal overflow-hidden"
+                className="text-base font-normal leading-[1.3] overflow-hidden"
                 style={{
-                  fontSize: "16px",
-                  lineHeight: "1.3",
                   color: "rgba(17,17,17,0.54)",
                   display: "-webkit-box",
                   WebkitLineClamp: 3,
@@ -218,12 +209,8 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
           aria-label={`Read more about ${post.title}`}
         >
           <span
-            className="font-sans font-medium text-center whitespace-nowrap"
-            style={{
-              fontSize: "20px",
-              lineHeight: "1.5",
-              color: "#4a3bf1",
-            }}
+            className="text-xl font-medium leading-[1.5] text-center whitespace-nowrap"
+            style={{ color: "#4a3bf1" }}
           >
             Read more
           </span>
