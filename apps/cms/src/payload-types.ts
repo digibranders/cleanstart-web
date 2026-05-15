@@ -281,6 +281,7 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
+  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -1760,7 +1761,7 @@ export interface Blog {
    * Date of the most recent review pass. When unset, falls back to updatedAt with a note in the SEO panel.
    */
   lastReviewedAt?: string | null;
-  categories?: (number | Category)[] | null;
+  categories?: (number | null) | Category;
   /**
    * Manually curated. Empty = listing component picks by category.
    */
@@ -1908,6 +1909,10 @@ export interface Blog {
   publishedAt?: string | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
+  /**
+   * Heading levels that appear in the Table of Contents. Re-save to apply.
+   */
+  tocDepth?: ('h2' | 'h2_h3' | 'h2_h3_h4') | null;
   tableOfContents?:
     | {
         level?: number | null;
@@ -2071,6 +2076,22 @@ export interface News {
   slug: string;
   abstract?: string | null;
   heroImage?: (number | null) | Media;
+  /**
+   * Outlet name shown on the listing card meta strip and detail hero (e.g. "Dark Reading").
+   */
+  publisher?: string | null;
+  /**
+   * Outlet logo (~400×120, transparent PNG/SVG). Rendered large on the listing card and as the hero card on the detail page.
+   */
+  publisherLogo?: (number | null) | Media;
+  /**
+   * Pill shown on cards and the detail meta strip.
+   */
+  pressType?: ('press-release' | 'news' | 'announcement' | 'feature') | null;
+  /**
+   * Dateline city, e.g. "Lewes, DE" — rendered before the body opener.
+   */
+  location?: string | null;
   body?: {
     root: {
       type: string;
@@ -2789,8 +2810,11 @@ export interface Resource {
    */
   slug: string;
   type?: ('whitepaper' | 'report' | 'brief' | 'datasheet' | 'case-study') | null;
-  heroImage?: (number | null) | Media;
   summary?: string | null;
+  /**
+   * PDF or ZIP downloadable. Routed to web/resource/.
+   */
+  asset?: (number | null) | Media;
   body?: {
     root: {
       type: string;
@@ -2806,10 +2830,6 @@ export interface Resource {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * PDF or other downloadable. Routed to web/resource/.
-   */
-  asset?: (number | null) | Media;
   /**
    * When enabled, the asset download requires a form submission. Sets accessLevel to lead-gated by default.
    */
@@ -6743,6 +6763,7 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
+  prefix?: T;
   focalPoint?:
     | T
     | {
@@ -7478,6 +7499,7 @@ export interface BlogsSelect<T extends boolean = true> {
   publishedAt?: T;
   readingMinutes?: T;
   wordCount?: T;
+  tocDepth?: T;
   tableOfContents?:
     | T
     | {
@@ -7542,6 +7564,10 @@ export interface NewsSelect<T extends boolean = true> {
   slug?: T;
   abstract?: T;
   heroImage?: T;
+  publisher?: T;
+  publisherLogo?: T;
+  pressType?: T;
+  location?: T;
   body?: T;
   authors?: T;
   newsCategories?: T;
@@ -7879,10 +7905,9 @@ export interface ResourcesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   type?: T;
-  heroImage?: T;
   summary?: T;
-  body?: T;
   asset?: T;
+  body?: T;
   gated?: T;
   gateForm?: T;
   accessLevel?: T;

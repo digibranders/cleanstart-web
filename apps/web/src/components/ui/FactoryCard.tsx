@@ -83,26 +83,10 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
 
       {/* Text frame — y=184, w=169, gap=12 between title and description */}
       <div className="absolute left-1/2 top-[184px] flex w-[169px] -translate-x-1/2 flex-col items-center gap-3 text-center">
-        <h3
-          className="font-sans text-white"
-          style={{
-            fontSize: "33px",
-            fontWeight: 500,
-            lineHeight: "100%",
-            letterSpacing: "-0.05em",
-          }}
-        >
+        <h3 className="font-display text-[2.0625rem] font-medium leading-none tracking-[-0.05em] text-white">
           {renderTitle(title)}
         </h3>
-        <p
-          className="font-sans text-white"
-          style={{
-            fontSize: "18px",
-            fontWeight: 400,
-            lineHeight: "110%",
-            letterSpacing: "-0.04em",
-          }}
-        >
+        <p className="text-lg font-normal leading-[1.1] tracking-[-0.04em] text-white">
           {description}
         </p>
       </div>

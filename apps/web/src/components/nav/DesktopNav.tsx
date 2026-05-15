@@ -9,19 +9,20 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { NAV_TREE } from "@/lib/nav-config";
-import { NavLink } from "@/components/nav/NavLink";
 import { MegaMenu } from "@/components/nav/MegaMenu";
 import { CompactDropdown } from "@/components/nav/CompactDropdown";
 
 export function DesktopNav() {
   return (
-    <NavigationMenu className="hidden xl:flex" align="center">
+    <NavigationMenu className="hidden lg:flex" align="center">
       <NavigationMenuList className="gap-7">
         {NAV_TREE.map((item) => {
           if (item.kind === "flat") {
             return (
               <NavigationMenuItem key={item.label}>
-                <NavLink href={item.href}>{item.label}</NavLink>
+                <span className="cs-nav-link relative inline-flex items-center text-base font-medium leading-none text-white/85">
+                  {item.label}
+                </span>
               </NavigationMenuItem>
             );
           }

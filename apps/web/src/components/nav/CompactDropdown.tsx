@@ -12,13 +12,19 @@ export function CompactDropdown({
     <div className="cs-mega-surface" style={{ width }}>
       <ul className="flex flex-col p-2">
         {items.map((item) => (
-          <li key={item.href}>
-            <Link
-              href={item.href}
-              className="cs-mega-item block rounded-[10px] px-3 py-2.5 text-[14.5px] font-medium leading-tight text-white/90 outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-[#33BAEC]/70"
-            >
-              {item.label}
-            </Link>
+          <li key={item.label}>
+            {item.built ? (
+              <Link
+                href={item.href}
+                className="block rounded-[10px] px-3 py-2.5 text-sm font-medium leading-tight text-white/90 transition-colors hover:bg-white/[0.06] hover:text-white"
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <span className="block rounded-[10px] px-3 py-2.5 text-sm font-medium leading-tight text-white/90 cursor-default">
+                {item.label}
+              </span>
+            )}
           </li>
         ))}
       </ul>

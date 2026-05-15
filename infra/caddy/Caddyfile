@@ -1,4 +1,4 @@
-admin.cleanstart.com {
+cms.cleanstart.com {
   reverse_proxy localhost:3000
 
   log {

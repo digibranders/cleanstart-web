@@ -5,7 +5,26 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  /* Typography
+     - All font sizes use rem or clamp(rem, vw, rem). Never px.
+     - Headings use font-display (Manrope); everything else inherits font-sans (Sora).
+     - See apps/web/docs/typography.md for the role -> token map. */
+  --font-sans: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  --text-display-sm: clamp(1.75rem, 4.6vw, 3.4375rem);
+  --text-display-md: clamp(2rem, 5.2vw, 3.875rem);
+  --text-display-lg: clamp(2.25rem, 6.5vw, 4.5rem);
 
   --color-cs-navy-0: #151021;
   --color-cs-navy-1: #10123e;
@@ -89,7 +108,7 @@
 html, body {
   background: #ffffff;
   color: #111111;
-  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -192,6 +211,54 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
+   SOLID BLUE BUTTON — #3960F9, radius 8px, layered box-shadow
+   Used by all primary solid-blue CTAs site-wide (contact, how-it-works, careers, view-more, download, etc.)
+   Width / height / font-size stay as inline styles per instance.
+   --------------------------------------------------------------------------- */
+.cs-btn-blue {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  color: #ffffff;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  border-radius: 8px;
+  background: #3960F9;
+  box-shadow:
+    0 0 0 1.002px #3960F9,
+    0 1px 2px rgba(9, 6, 63, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  transition: transform 200ms ease, filter 200ms ease, box-shadow 200ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.cs-btn-blue:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.10);
+}
+.cs-btn-blue:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 80ms;
+  filter: brightness(1);
+}
+.cs-btn-blue:focus { outline: none; }
+.cs-btn-blue:focus-visible {
+  outline: 2px solid #33BAEC;
+  outline-offset: 3px;
+}
+.cs-btn-blue[aria-disabled="true"],
+.cs-btn-blue:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
    GLASS BUTTON — exact Figma reproduction (Frame 1410104211, Buttons 108:8598)
    Used by: "Book a Demo" (153×38), "Browse Images" (205×40), "Get a Demo" (177×43)
    --------------------------------------------------------------------------- */
@@ -205,7 +272,7 @@ body {
   white-space: nowrap;
   user-select: none;
   text-decoration: none;
-  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: #1B1F4F;
@@ -273,6 +340,26 @@ body {
 }
 .cs-btn-glass:hover::after { opacity: 1; animation: cs-cta-shine 900ms ease-out 1; }
 .cs-btn-glass:active { transform: translateY(0) scale(0.97); transition-duration: 80ms; }
+/* Modifier for buttons joined to an input — suppresses the lift transform */
+.cs-btn-glass--no-lift:hover { transform: none; }
+.cs-btn-glass--no-lift:active { transform: scale(0.97); }
+
+/* Category pill — Glass (blur) + Noise texture from Figma */
+.cs-category-pill {
+  position: relative;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.cs-category-pill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.25;
+  pointer-events: none;
+  border-radius: inherit;
+}
 .cs-btn-glass:focus { outline: none; }
 .cs-btn-glass:focus-visible {
   outline: 2px solid #33BAEC;
@@ -297,8 +384,8 @@ body {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
-  font-size: 16px;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: #FFFFFF;
@@ -343,8 +430,8 @@ body {
   height: 31px;
   padding: 5px 16px;
   border-radius: 999px;
-  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
-  font-size: 18px;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.125rem;
   font-weight: 400;
   line-height: 110%;
   letter-spacing: -0.04em;
@@ -909,14 +996,14 @@ body {
 }
 .cs-tt-card--active .cs-tt-card__photo { width: 264px; height: 329px; border-radius: 24px 0 0 24px; }
 .cs-tt-card--active .cs-tt-card__body  { padding: 28px 36px 24px; gap: 18px; }
-.cs-tt-card--active .cs-tt-card__name  { font-size: 20px; }
-.cs-tt-card--active .cs-tt-card__role  { font-size: 14px; }
+.cs-tt-card--active .cs-tt-card__name  { font-size: 1.25rem; }
+.cs-tt-card--active .cs-tt-card__role  { font-size: 0.875rem; }
 .cs-tt-card--active .cs-tt-card__quote {
-  font-size: 21px;
+  font-size: 1.3125rem;
   line-height: 1.35;
   margin-top: -6px;
 }
-.cs-tt-card--active .cs-tt-card__cta   { font-size: 16px; }
+.cs-tt-card--active .cs-tt-card__cta   { font-size: 1rem; }
 .cs-tt-card__quote-mark { display: block; margin-bottom: -8px; }
 
 /* ---- Side peek cards (stacked-deck depth) ------------------------------
@@ -1011,13 +1098,13 @@ body {
 .cs-tt-peek__name {
   display: block;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1rem;
   letter-spacing: -0.02em;
 }
 .cs-tt-peek__role {
   display: block;
   margin-top: 2px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: rgb(255 255 255 / 0.7);
 }
 .cs-tt-peek__quote {
@@ -1025,7 +1112,7 @@ body {
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1.3;
   letter-spacing: -0.02em;
@@ -1035,7 +1122,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: rgb(255 255 255 / 0.95);
@@ -1086,10 +1173,10 @@ body {
 }
 .cs-tt-card--side .cs-tt-card__photo { width: 211px; height: 263px; }
 .cs-tt-card--side .cs-tt-card__body  { padding: 0 12px 0 24px; }
-.cs-tt-card--side .cs-tt-card__name  { font-size: 15px; }
-.cs-tt-card--side .cs-tt-card__role  { font-size: 12px; }
+.cs-tt-card--side .cs-tt-card__name  { font-size: 0.9375rem; }
+.cs-tt-card--side .cs-tt-card__role  { font-size: 0.75rem; }
 .cs-tt-card--side .cs-tt-card__quote {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.4;
   display: -webkit-box;
@@ -1097,7 +1184,7 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.cs-tt-card__cta--peek { font-size: 13px; color: rgb(255 255 255 / 0.7); }
+.cs-tt-card__cta--peek { font-size: 0.8125rem; color: rgb(255 255 255 / 0.7); }
 
 /* ---- Mobile / narrow: hide side cards entirely ------------------------- */
 @media (max-width: 1023px) {
@@ -1306,7 +1393,7 @@ body {
    =========================================================================== */
 
 .article-body {
-  font-family: Figtree, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   color: #111111;
 }
 
@@ -1321,42 +1408,42 @@ body {
 .article-body .article-paragraph:last-child { margin-bottom: 0; }
 
 .article-body .article-h1 {
-  font-size: clamp(32px, 3.5vw, 56px);
+  font-size: clamp(24px, 2vw, 32px);
   font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
   color: #111111;
   margin-top: 2.5rem;
   margin-bottom: 1rem;
 }
 .article-body .article-h2 {
-  font-size: clamp(26px, 2.8vw, 40px);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.05em;
+  font-size: clamp(20px, 1.6vw, 26px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
   color: #111111;
-  margin-top: 2.25rem;
-  margin-bottom: 0.875rem;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
 }
 .article-body .article-h3 {
-  font-size: clamp(20px, 2vw, 28px);
+  font-size: clamp(17px, 1.25vw, 21px);
   font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.04em;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
   color: #111111;
   margin-top: 2rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.625rem;
 }
 .article-body .article-h4,
 .article-body .article-h5,
 .article-body .article-h6 {
-  font-size: clamp(16px, 1.4vw, 20px);
+  font-size: clamp(15px, 1.1vw, 18px);
   font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.03em;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
   color: #111111;
   margin-top: 1.75rem;
-  margin-bottom: 0.625rem;
+  margin-bottom: 0.5rem;
 }
 
 .article-body .article-ul,
@@ -1404,6 +1491,51 @@ body {
 
 .article-body .article-figure {
   margin: 1.75rem 0;
+}
+
+/* ── Article table ─────────────────────────────────────────────────────────── */
+.article-body .article-table-wrapper {
+  margin: 1.75rem 0;
+  overflow-x: auto;
+}
+
+.article-body .article-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(16px, 1.2vw, 20px);
+  line-height: 1.4;
+  letter-spacing: -0.04em;
+}
+
+.article-body .article-table th,
+.article-body .article-table td {
+  text-align: left;
+  padding: 10px 24px;
+  border: 1px solid #e1e1e1;
+  background: #f7f7f7;
+  vertical-align: top;
+}
+
+.article-body .article-table th.article-th-row,
+.article-body .article-table th.article-th-col {
+  font-weight: 500;
+  color: #000000;
+}
+
+.article-body .article-table td {
+  font-weight: 400;
+  color: rgba(17, 17, 17, 0.8);
+}
+
+/* Strip paragraph spacing inside table cells */
+.article-body .article-table th .article-paragraph,
+.article-body .article-table td .article-paragraph {
+  margin-bottom: 0;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
 }
 
 /* First h2 should have less top margin if it's the very first child */

@@ -83,6 +83,7 @@ import { FaqBulkPaste as FaqBulkPaste_34cc49081ef861ac2f0f2bcdbdf5a9d4 } from '@
 import { FaqRowLabel as FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3 } from '@/payload/admin/components/FaqRowLabel.tsx'
 import { RelationshipCell as RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f } from '@/payload/admin/components/RelationshipCell.tsx'
 import { BlocksField as BlocksField_81821d6c72d1fc3a46ee03c3fb264707 } from '@/payload/admin/components/fields/BlocksField.tsx'
+import { HiddenField as HiddenField_551417bca9579543e47edbdd4648802b } from '@/payload/admin/components/HiddenField.tsx'
 import { TocRowLabel as TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b } from '@/payload/admin/components/TocRowLabel.tsx'
 import { AnalyticsTab as AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b } from '@/payload/admin/components/integrations/AnalyticsTab.tsx'
 import { PublishChecklistBanner as PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec } from '@/payload/admin/components/PublishChecklistBanner.tsx'
@@ -105,6 +106,7 @@ import { CmsLoginFooter as CmsLoginFooter_67c5b820b6d3bc2ad13ebd4c41435e40 } fro
 import { UserMenu as UserMenu_8a2f404b3fa17e34974bf49ed5367371 } from '../../../payload/admin/components/UserMenu.tsx'
 import { CmsLoginHero as CmsLoginHero_32623b867969588592e72c90b3b4967a } from '../../../payload/admin/components/auth/CmsLoginHero.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
+import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
 import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } from '../../../payload/admin/components/auth/CmsAccountView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -196,6 +198,7 @@ export const importMap = {
   "@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel": FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3,
   "@/payload/admin/components/RelationshipCell.tsx#RelationshipCell": RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f,
   "@/payload/admin/components/fields/BlocksField.tsx#BlocksField": BlocksField_81821d6c72d1fc3a46ee03c3fb264707,
+  "@/payload/admin/components/HiddenField.tsx#HiddenField": HiddenField_551417bca9579543e47edbdd4648802b,
   "@/payload/admin/components/TocRowLabel.tsx#TocRowLabel": TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b,
   "@/payload/admin/components/integrations/AnalyticsTab.tsx#AnalyticsTab": AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b,
   "@/payload/admin/components/PublishChecklistBanner.tsx#PublishChecklistBanner": PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec,
@@ -218,6 +221,7 @@ export const importMap = {
   "./payload/admin/components/UserMenu.tsx#UserMenu": UserMenu_8a2f404b3fa17e34974bf49ed5367371,
   "./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero": CmsLoginHero_32623b867969588592e72c90b3b4967a,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,
+  "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
   "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1

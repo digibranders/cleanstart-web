@@ -3,6 +3,8 @@
 import type { ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { PdfThumb } from './MediaField/PdfThumb';
+
 type MediaSize = {
   url?: string | null;
 };
@@ -13,12 +15,39 @@ export type MediaBrowseDoc = {
   mimeType?: string | null;
   url?: string | null;
   alt?: string | null;
+  width?: number | null;
+  height?: number | null;
   sizes?: Record<string, MediaSize | undefined> | null;
 };
 
-const pickThumbUrl = (doc: MediaBrowseDoc): string | null => {
+const MIME_LABELS: Record<string, string> = {
+  'image/jpeg': 'JPEG',
+  'image/png': 'PNG',
+  'image/webp': 'WebP',
+  'image/avif': 'AVIF',
+  'image/svg+xml': 'SVG',
+  'image/gif': 'GIF',
+  'application/pdf': 'PDF',
+  'video/mp4': 'MP4',
+  'application/zip': 'ZIP',
+  'application/x-zip-compressed': 'ZIP',
+};
+
+const typeLabelForMime = (mime: string | undefined | null): string => {
+  if (!mime) return '—';
+  return MIME_LABELS[mime] ?? mime.split('/').pop()?.toUpperCase() ?? mime;
+};
+
+const pickImageThumbUrl = (doc: MediaBrowseDoc): string | null => {
+  if (!doc.mimeType?.startsWith('image/')) return null;
   const fromSizes = doc.sizes?.thumb?.url ?? doc.sizes?.card?.url ?? null;
   return fromSizes ?? doc.url ?? null;
+};
+
+const toAbsoluteUrl = (url: string): string => {
+  if (/^https?:\/\//.test(url)) return url;
+  if (typeof window === 'undefined') return url;
+  return new URL(url, window.location.origin).toString();
 };
 
 type Props = {
@@ -191,7 +220,13 @@ export const MediaBrowseDialog = (props: Props): ReactElement | null => {
             <div className="cs-media-field__browse-empty">No matches.</div>
           ) : (
             results.map((m) => {
-              const t = pickThumbUrl(m);
+              const tileMime = m.mimeType ?? '';
+              const t = pickImageThumbUrl(m);
+              const pdfTileUrl =
+                tileMime === 'application/pdf' && m.url
+                  ? toAbsoluteUrl(m.url)
+                  : null;
+              const typeLabel = typeLabelForMime(m.mimeType);
               return (
                 <button
                   key={m.id}
@@ -204,13 +239,26 @@ export const MediaBrowseDialog = (props: Props): ReactElement | null => {
                   title={m.filename ?? m.id}
                 >
                   {t ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={t} alt={m.alt ?? ''} loading="lazy" />
+                  ) : pdfTileUrl ? (
+                    <PdfThumb
+                      url={pdfTileUrl}
+                      width={140}
+                      filename={m.filename ?? undefined}
+                    />
                   ) : (
                     <span className="cs-media-field__browse-tile-fallback">
-                      {m.mimeType ?? '—'}
+                      {typeLabel}
                     </span>
                   )}
                   <span className="cs-media-field__browse-tile-name">{m.filename}</span>
+                  <span className="cs-media-field__browse-tile-type">{typeLabel}</span>
+                  {m.width && m.height ? (
+                    <span className="cs-media-field__browse-tile-dims">
+                      {m.width}×{m.height}
+                    </span>
+                  ) : null}
                 </button>
               );
             })

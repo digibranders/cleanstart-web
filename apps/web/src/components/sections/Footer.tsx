@@ -61,15 +61,14 @@ const LEGAL_LINKS = [
   { label: "Security", href: "#security" },
 ];
 
-export function Footer() {
+export function Footer({ topPadding = 179 }: { topPadding?: number } = {}) {
   return (
     <footer
       className="relative w-full overflow-hidden text-white"
       style={{
-        // Figma 108:8061 fill — vertical linear gradient top→bottom:
-        // #151021 (0%) → #131E8F (62.5%) → #471EC0 (100%)
+        // Figma 108:8061 fill — top→bottom: #151021 (0%) → #131E8F (70.794%) → #471EC0 (113.28%)
         background:
-          "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
+          "linear-gradient(180deg, #151021 0%, #131E8F 70.794%, #471EC0 113.28%)",
       }}
     >
       {/* Big purple ellipse — Figma 46640 (974×863) at (308, -358), color #7A59FF, opacity 3%, blur 250px.
@@ -102,29 +101,13 @@ export function Footer() {
           filter: "blur(125px)",
         }}
       />
-      {/* Faint horizontal divider line near top (Figma "Line 104-108") */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-[142px] h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent 0%, rgba(133,107,255,0.4) 50%, transparent 100%)",
-        }}
-      />
-
       <div className="relative px-6">
-       <div className="relative mx-auto w-full max-w-[1276px] pt-[179px] pb-[80px]">
-        {/* Top row — tagline (left) + social icons (right). Figma centers vertically (both center at y=207). */}
-        <div className="flex flex-wrap items-center justify-between gap-8">
+       <div className="relative mx-auto w-full max-w-[1276px] pb-[80px]" style={{ paddingTop: `${topPadding}px` }}>
+        {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
+        <div className="flex flex-wrap items-start justify-between gap-8">
           <p
-            className="font-sans text-white"
-            style={{
-              fontSize: "20px",
-              fontWeight: 400,
-              lineHeight: "28px",
-              letterSpacing: "-0.04em",
-              maxWidth: "396px",
-            }}
+            className="text-lg font-normal leading-[1.4] tracking-[-0.04em] text-white"
+            style={{ maxWidth: "396px" }}
           >
             Hardened container images with zero known vulnerabilities. Secure by
             design, built for speed.
@@ -146,6 +129,7 @@ export function Footer() {
                       "inset 2.67px 2.67px 13.33px 4px rgba(168, 108, 252, 0.4)",
                   }}
                 >
+                  <span className="sr-only">{s.name}</span>
                   <svg
                     width="20"
                     height="20"
@@ -174,15 +158,7 @@ export function Footer() {
 
         {/* Awarded with row — Figma 16px gap between heading and badges */}
         <div className="mt-[56px] flex flex-col items-center gap-[16px]">
-          <h3
-            className="font-sans text-white"
-            style={{
-              fontSize: "20px",
-              fontWeight: 600,
-              lineHeight: "24px",
-              letterSpacing: "-0.04em",
-            }}
-          >
+          <h3 className="font-display text-base font-semibold leading-[1.3] tracking-[-0.04em] text-white">
             Awarded with
           </h3>
           <div className="flex flex-wrap items-center justify-center gap-[25px]">
@@ -209,13 +185,8 @@ export function Footer() {
               />
             </div>
             <span
-              className="font-sans text-white/95"
-              style={{
-                fontSize: "11.1px",
-                fontWeight: 400,
-                lineHeight: "12px",
-                letterSpacing: "0.24px",
-              }}
+              className="text-2xs font-normal leading-[1.1] text-white/95"
+              style={{ letterSpacing: "0.24px" }}
             >
               ©2026 CleanStart. All rights reserved.
             </span>
@@ -228,12 +199,8 @@ export function Footer() {
                 <li className="flex leading-none">
                   <a
                     href={link.href}
-                    className="font-sans italic text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
-                    style={{
-                      fontSize: "12px",
-                      lineHeight: "21px",
-                      letterSpacing: "0.24px",
-                    }}
+                    className="text-xs italic leading-[1.75] text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
+                    style={{ letterSpacing: "0.24px" }}
                   >
                     {link.label}
                   </a>
@@ -257,15 +224,7 @@ export function Footer() {
 function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
   return (
     <div>
-      <h3
-        className="font-sans text-white"
-        style={{
-          fontSize: "20px",
-          fontWeight: 600,
-          lineHeight: "24px",
-          letterSpacing: "-0.04em",
-        }}
-      >
+      <h3 className="font-display text-base font-semibold leading-[1.3] tracking-[-0.04em] text-white">
         {title}
       </h3>
       <ul className="mt-6 flex flex-col gap-3">
@@ -273,13 +232,7 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
           <li key={link.href} className="flex leading-none">
             <a
               href={link.href}
-              className="group inline-flex items-center gap-2 font-sans text-white/85 transition-colors duration-200 hover:text-white cursor-pointer"
-              style={{
-                fontSize: "16px",
-                fontWeight: 400,
-                lineHeight: "22px",
-                letterSpacing: "-0.04em",
-              }}
+              className="group inline-flex items-center gap-2 text-sm font-normal leading-[1.4] tracking-[-0.04em] text-white/85 transition-colors duration-200 hover:text-white cursor-pointer"
             >
               <span>{link.label}</span>
               <svg

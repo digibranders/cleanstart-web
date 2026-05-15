@@ -54,6 +54,7 @@
     "lexical": "^0.41.0",
     "next": "^16.2.0",
     "payload": "^3.81.0",
+    "pdfjs-dist": "^5.7.284",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "safe-regex": "^2.1.1",

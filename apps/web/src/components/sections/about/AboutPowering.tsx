@@ -1,6 +1,17 @@
-import Image from "next/image";
+/**
+ * AboutPowering — Figma node 248:2141
+ * Frame: 1920×1017, gradient bg, 3 feature cards on a starfield-grid background.
+ *
+ * Card geometry (per Figma):
+ *  - outer shadow box: 404×478 (29px halo around white card)
+ *  - cyan glow ring:   362×440 (8px halo around white card)
+ *  - white card:       346×420 (rounded-16)
+ *  - cards laid out in a 1276px container, white-card pitch = 437px, gap = 91px
+ */
 
-const FEATURE_CARDS = [
+type Card = { title: string; description: string };
+
+const CARDS: Card[] = [
   {
     title: "Accelerates Development",
     description:
@@ -18,210 +29,185 @@ const FEATURE_CARDS = [
   },
 ];
 
+// 6 white guide-line x-positions in the 1920px Figma frame (248:2145–2150).
+const GUIDE_LINES_X = [323, 726, 759, 1164, 1195, 1599] as const;
+
 export function AboutPowering() {
   return (
     <section
-      className="relative overflow-hidden bg-cs-hero"
-      style={{ minHeight: "1017px" }}
+      className="relative w-full overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)",
+      }}
     >
-      {/* Background grid vectors — Figma: left at -525px/top:394px and right at 1521px/top:-210px */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/about/powering-bg-vector.svg"
-        alt=""
-        className="pointer-events-none absolute select-none"
-        style={{ left: "-525px", top: "394px", width: "979px", height: "979px" }}
-        loading="lazy"
-        decoding="async"
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/about/powering-bg-vector.svg"
-        alt=""
-        className="pointer-events-none absolute select-none"
-        style={{ left: "1521px", top: "-210px", width: "979px", height: "979px" }}
-        loading="lazy"
-        decoding="async"
-      />
-      {/* Decorative purple radial blobs on the sides */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          left: "-80px",
-          top: "150px",
-          width: "432px",
-          height: "432px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(closest-side, rgba(122,89,255,0.25) 0%, transparent 100%)",
-          filter: "blur(40px)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          right: "-80px",
-          top: "150px",
-          width: "432px",
-          height: "432px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(closest-side, rgba(122,89,255,0.25) 0%, transparent 100%)",
-          filter: "blur(40px)",
-        }}
-      />
+      {/* ── Decorative background layer ─────────────────────────────── */}
 
-      {/* Subtle vertical guide lines — matches Figma white gradient lines */}
-      {[323, 726, 759, 1164, 1195, 1599].map((x) => (
+      {/* Purple ellipse blobs — 248:2142/2143, rotated 8.58deg */}
+      {[130.75, 1306.73].map((leftPx) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={leftPx}
+          aria-hidden
+          src="/images/about/powering-ellipse-blob.svg"
+          alt=""
+          className="pointer-events-none absolute hidden select-none xl:block"
+          style={{
+            left: `calc(${leftPx}px / 1920 * 100%)`,
+            top: "246px",
+            width: "432px",
+            height: "432px",
+            transform: "rotate(8.58deg) scale(2.0687)",
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+      ))}
+
+      {/* Background grid vectors — 248:2144 / 248:2151 */}
+      {(
+        [
+          [-525, 394],
+          [1521, -210],
+        ] as const
+      ).map(([x, y]) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={`${x}-${y}`}
+          aria-hidden
+          src="/images/about/powering-bg-vector.svg"
+          alt=""
+          className="pointer-events-none absolute hidden select-none xl:block"
+          style={{
+            left: `calc(${x}px / 1920 * 100%)`,
+            top: `${y}px`,
+            width: "979px",
+            height: "979px",
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+      ))}
+
+      {/* Vertical white guide lines — 248:2145–2150 (6 lines, opacity 0.9) */}
+      {GUIDE_LINES_X.map((x) => (
         <div
           key={x}
           aria-hidden
-          className="pointer-events-none absolute top-0 bottom-0 hidden xl:block"
+          className="pointer-events-none absolute top-[180px] hidden h-[1335px] w-px xl:block"
           style={{
             left: `calc(${x}px / 1920 * 100%)`,
-            width: "1px",
+            opacity: 0.9,
             background:
-              "linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.12) 40%, rgba(255,255,255,0.12) 65%, transparent 100%)",
+              "linear-gradient(180deg, rgba(255,255,255,0) 13.67%, #ffffff 39.101%, rgba(255,255,255,0) 64.532%)",
           }}
         />
       ))}
 
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-[100px] pb-[120px]">
-        {/* Section header */}
+      {/* ── Foreground content ─────────────────────────────────────── */}
+
+      <div className="relative mx-auto max-w-[1276px] px-6 pt-[100px] pb-[20px]">
+        {/* Title group — 248:2152 (centered, max-w 969px) */}
         <div className="mx-auto flex max-w-[969px] flex-col items-center gap-6 text-center text-white">
-          <h2
-            className="font-sans font-bold"
-            style={{
-              fontSize: "clamp(2rem, 3.5vw, 3.875rem)",
-              lineHeight: "1.0",
-              letterSpacing: "-0.05em",
-            }}
-          >
+          <h2 className="font-display text-display-md font-bold leading-none tracking-[-0.05em]">
             Powering Trusted Software Delivery for Global Leaders.
           </h2>
           <p
-            className="font-sans"
-            style={{
-              fontSize: "clamp(1rem, 1.8vw, 1.875rem)",
-              fontWeight: 400,
-              lineHeight: "1.4",
-              letterSpacing: "-0.04em",
-              opacity: 0.8,
-              maxWidth: "835px",
-            }}
+            className="text-[clamp(1.125rem,2.08vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.04em]"
+            style={{ opacity: 0.8, maxWidth: "835px" }}
           >
             Tailored solutions for every role in your organization — from
             security leaders to engineering teams.
           </p>
         </div>
 
-        {/* Horizontal divider line */}
-        <div
-          aria-hidden
-          className="my-16 h-px w-full"
-          style={{
-            background:
-              "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)",
-          }}
-        />
-
-        {/* Feature cards */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {FEATURE_CARDS.map((card) => (
+        {/* Cards row — Figma top=412 → 80px gap below title block */}
+        <div className="mt-20 flex flex-wrap items-stretch justify-center gap-y-16 gap-x-[91px]">
+          {CARDS.map((card) => (
             <FeatureCard key={card.title} {...card} />
           ))}
         </div>
       </div>
 
-      {/* Bottom cyan glow flares */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-0 left-0 right-0 h-[285px] mix-blend-screen"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 100% at 50% 100%, rgba(21,173,250,0.18) 0%, rgba(1,102,204,0.12) 40%, transparent 70%)",
-        }}
-      />
     </section>
   );
 }
 
-function FeatureCard({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
+function FeatureCard({ title, description }: Card) {
   return (
-    <div className="relative">
-      {/* Outer cyan glow frame — Figma powering-card-glow.svg (404×478 at opacity 0.3) */}
+    <div
+      className="relative shrink-0"
+      style={{ width: "346px", height: "420px" }}
+    >
+      {/* Outer shadow — 248:2159 (404×478, 29px halo, top-rounded glow PNG) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/about/powering-card-glow.svg"
         alt=""
-        className="pointer-events-none absolute select-none"
-        style={{
-          top: "-20px",
-          left: "-22px",
-          width: "calc(100% + 44px)",
-          height: "calc(100% + 40px)",
-        }}
+        className="pointer-events-none absolute -inset-x-[29px] -top-[29px] h-[478px] w-[404px] max-w-none select-none"
+        loading="lazy"
+        decoding="async"
       />
-      {/* White card */}
+
+      {/* Cyan glow ring — 248:2161 (362×440, #2CC1EB @ 0.3, rounded-24) */}
       <div
-        className="relative flex flex-col gap-4 overflow-hidden rounded-2xl bg-white p-8"
-        style={{
-          boxShadow: "0 24px 48px -16px rgba(28,60,142,0.18)",
-        }}
-      >
-        {/* Blue ball icon */}
+        aria-hidden
+        className="pointer-events-none absolute -inset-2 rounded-[24px]"
+        style={{ backgroundColor: "#2CC1EB", opacity: 0.3 }}
+      />
+
+      {/* White card — 248:2162 (346×420, rounded-16) */}
+      <div className="relative h-full w-full overflow-hidden rounded-[16px] bg-white">
+        {/* Ball — 248:2163 (96×96, blue gradient, inset highlight) */}
         <div
-          className="flex items-center justify-center overflow-hidden rounded-full shrink-0"
+          className="absolute flex items-center justify-center overflow-hidden"
           style={{
+            top: "24px",
+            left: "24px",
             width: "96px",
             height: "96px",
+            borderRadius: "160px",
             background: "linear-gradient(180deg, #239CFF 0%, #005BE3 100%)",
-            boxShadow: "0 6px 14px rgba(28,60,142,0.33)",
+            boxShadow:
+              "0px 6.171px 14.537px rgba(28,60,142,0.33), inset 0px -0.233px 0.291px rgba(0,44,179,0.5), inset 0px 0.116px 0.582px rgba(255,255,255,0.81)",
           }}
         >
-          <Image
-            src="/images/about/feature-card-icon.svg"
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/about/powering-ball-icon.svg"
             alt=""
             width={54}
             height={54}
             className="h-[54px] w-[54px] object-contain"
+            loading="lazy"
+            decoding="async"
           />
         </div>
 
-        <div className="flex flex-col gap-4">
-          <h3
-            className="font-sans font-bold text-[#111]"
-            style={{
-              fontSize: "32px",
-              lineHeight: "1.0",
-              letterSpacing: "-0.05em",
-            }}
-          >
-            {title}
-          </h3>
-          <p
-            className="font-sans text-[#555]"
-            style={{
-              fontSize: "20px",
-              fontWeight: 400,
-              lineHeight: "1.4",
-              letterSpacing: "-0.05em",
-            }}
-          >
-            {description}
-          </p>
-        </div>
+        {/* Title — 248:2182 (32px Manrope Bold, tracking -0.05em, #111) */}
+        <h3
+          className="absolute font-display text-[2rem] font-bold leading-none tracking-[-0.05em] text-[#111]"
+          style={{
+            top: "180px",
+            left: "24px",
+            right: "24px",
+          }}
+        >
+          {title}
+        </h3>
+
+        {/* Body — 248:2183 (20px Sora Regular, leading 1.4, tracking -0.05em, #555) */}
+        <p
+          className="absolute text-xl font-normal leading-[1.4] tracking-[-0.05em] text-[#555]"
+          style={{
+            top: "260px",
+            left: "24px",
+            right: "24px",
+          }}
+        >
+          {description}
+        </p>
       </div>
     </div>
   );

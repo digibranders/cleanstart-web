@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { type Blog, formatBlogDate } from "@/lib/blog";
+import { type Blog, formatBlogDate, mediaUrl } from "@/lib/blog";
 
 interface BlogCardProps {
   post: Blog;
@@ -9,7 +9,7 @@ interface BlogCardProps {
 export function BlogCard({ post }: BlogCardProps): React.ReactElement {
   const date = formatBlogDate(post.publishedAt);
   const readTime = post.readingMinutes ? `${post.readingMinutes} min read` : null;
-  const primaryCategory = post.categories?.[0];
+  const primaryCategory = post.categories ?? undefined;
 
   return (
     <article
@@ -36,7 +36,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
       >
         {post.heroImage?.url ? (
           <Image
-            src={post.heroImage.url}
+            src={mediaUrl(post.heroImage.url)!}
             alt={post.heroImage.alt ?? post.title}
             fill
             className="object-cover"
@@ -56,7 +56,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
       {/* Category badge — overlaps image bottom */}
       {primaryCategory && (
         <div
-          className="absolute flex items-center justify-center"
+          className="absolute flex items-center justify-center overflow-hidden"
           style={{
             top: "190px",
             left: "32px",
@@ -74,13 +74,40 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
             aria-hidden
             className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none rounded-[8px]"
           />
-          <span
-            className="relative font-sans font-medium whitespace-nowrap"
+          {/* Left cyan glow ellipse */}
+          <div
+            aria-hidden
+            className="absolute pointer-events-none select-none"
             style={{
-              fontSize: "16px",
-              lineHeight: "1.3",
-              color: "#4a3bf1",
+              width: "54px",
+              height: "8px",
+              left: "14px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              borderRadius: "50%",
+              background: "#00cfff",
+              filter: "blur(8px)",
+              opacity: 0.75,
             }}
+          />
+          {/* Right purple blur ellipse — 32×5 #4A3BF1 layer blur */}
+          <div
+            aria-hidden
+            className="absolute pointer-events-none select-none"
+            style={{
+              width: "32px",
+              height: "5px",
+              right: "14px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              borderRadius: "50%",
+              background: "#4a3bf1",
+              filter: "blur(5px)",
+            }}
+          />
+          <span
+            className="relative text-base font-medium leading-[1.3] whitespace-nowrap"
+            style={{ color: "#4a3bf1" }}
           >
             {primaryCategory.name}
           </span>
@@ -115,8 +142,8 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
                   decoding="async"
                 />
                 <span
-                  className="font-sans font-medium"
-                  style={{ fontSize: "14px", lineHeight: "normal", color: "#666" }}
+                  className="text-sm font-medium leading-normal"
+                  style={{ color: "#666" }}
                 >
                   {date}
                 </span>
@@ -136,8 +163,8 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
                   decoding="async"
                 />
                 <span
-                  className="font-sans font-medium"
-                  style={{ fontSize: "14px", lineHeight: "normal", color: "#666" }}
+                  className="text-sm font-medium leading-normal"
+                  style={{ color: "#666" }}
                 >
                   {readTime}
                 </span>
@@ -148,12 +175,9 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
           {/* Title + excerpt */}
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <h3
-              className="font-sans font-medium overflow-hidden"
+              className="font-display text-[clamp(1rem,1.67vw,1.5rem)] font-medium leading-[1.3] tracking-[-0.05em] overflow-hidden"
               style={{
-                fontSize: "clamp(1rem,1.67vw,1.5rem)",
-                lineHeight: "1.3",
                 color: "#111",
-                letterSpacing: "-0.05em",
                 display: "-webkit-box",
                 WebkitLineClamp: 3,
                 WebkitBoxOrient: "vertical",
@@ -163,10 +187,8 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
             </h3>
             {post.abstract && (
               <p
-                className="font-sans font-normal overflow-hidden"
+                className="text-base font-normal leading-[1.3] overflow-hidden"
                 style={{
-                  fontSize: "16px",
-                  lineHeight: "1.3",
                   color: "rgba(17,17,17,0.54)",
                   display: "-webkit-box",
                   WebkitLineClamp: 3,
@@ -181,18 +203,14 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
 
         {/* Read more — always at the bottom */}
         <Link
-          href={`/blogs/${post.slug}`}
+          href={`/blog/${post.slug}`}
           className="flex items-center"
           style={{ gap: "8px" }}
           aria-label={`Read more about ${post.title}`}
         >
           <span
-            className="font-sans font-medium text-center whitespace-nowrap"
-            style={{
-              fontSize: "20px",
-              lineHeight: "1.5",
-              color: "#4a3bf1",
-            }}
+            className="text-xl font-medium leading-[1.5] text-center whitespace-nowrap"
+            style={{ color: "#4a3bf1" }}
           >
             Read more
           </span>

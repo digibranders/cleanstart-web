@@ -30,18 +30,17 @@ export function BlogsHeroSearch({
   );
 
   return (
+    <search aria-label="Search blogs" className="contents">
     <form
       onSubmit={handleSearch}
       className="flex items-center"
-      role="search"
-      aria-label="Search blogs"
     >
       {/* Input */}
       <div
         className="relative overflow-hidden"
         style={{
           width: "622px",
-          height: "52px",
+          height: "42px",
           background: "rgba(255,255,255,0.2)",
           border: "1px solid rgba(237,203,255,0.6)",
           borderRight: "none",
@@ -54,7 +53,7 @@ export function BlogsHeroSearch({
           name="q"
           defaultValue={initialQuery}
           placeholder="Search blogs...."
-          className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 font-sans text-[16px] leading-[1.5] outline-none"
+          className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 text-base leading-[1.5] outline-none"
           style={{ fontWeight: 400 }}
         />
       </div>
@@ -64,7 +63,7 @@ export function BlogsHeroSearch({
         type="submit"
         aria-label="Search"
         className="relative flex items-center justify-center shrink-0 overflow-hidden"
-        style={{ width: "52px", height: "52px", borderRadius: "0 12px 12px 0" }}
+        style={{ width: "52px", height: "42px", borderRadius: "0 12px 12px 0" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -75,5 +74,6 @@ export function BlogsHeroSearch({
         />
       </button>
     </form>
+    </search>
   );
 }

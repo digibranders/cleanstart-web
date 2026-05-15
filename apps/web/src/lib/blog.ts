@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 export type BlogCategory = {
   id: string;
   name: string;
@@ -7,8 +9,15 @@ export type BlogCategory = {
 export type BlogAuthor = {
   id: string;
   name: string;
-  avatar?: BlogImage;
+  photo?: BlogImage;
   bio?: string;
+  linkedin?: string;
+};
+
+export type BlogImageSize = {
+  url?: string | null;
+  width?: number;
+  height?: number;
 };
 
 export type BlogImage = {
@@ -17,6 +26,11 @@ export type BlogImage = {
   alt?: string;
   width?: number;
   height?: number;
+  sizes?: {
+    thumb?: BlogImageSize;
+    card?: BlogImageSize;
+    hero?: BlogImageSize;
+  };
 };
 
 export type Blog = {
@@ -25,7 +39,7 @@ export type Blog = {
   slug: string;
   abstract?: string;
   heroImage?: BlogImage;
-  categories?: BlogCategory[];
+  categories?: BlogCategory | null;
   authors?: BlogAuthor[];
   publishedAt?: string;
   readingMinutes?: number;
@@ -101,6 +115,31 @@ export type LexicalUploadNode = {
   version: number;
 };
 
+/**
+ * headerState bitmask from Payload Lexical tables:
+ *   0 = body cell, 1 = row header, 2 = column header, 3 = both
+ */
+export type LexicalTableCellNode = {
+  type: "tablecell";
+  headerState?: number;
+  colSpan?: number;
+  rowSpan?: number;
+  children: LexicalNode[];
+  version: number;
+};
+
+export type LexicalTableRowNode = {
+  type: "tablerow";
+  children: LexicalTableCellNode[];
+  version: number;
+};
+
+export type LexicalTableNode = {
+  type: "table";
+  children: LexicalTableRowNode[];
+  version: number;
+};
+
 export type LexicalNode =
   | LexicalTextNode
   | LexicalLinkNode
@@ -112,6 +151,9 @@ export type LexicalNode =
   | LexicalParagraphNode
   | LexicalHorizontalRuleNode
   | LexicalUploadNode
+  | LexicalTableNode
+  | LexicalTableRowNode
+  | LexicalTableCellNode
   | { type: string; children?: LexicalNode[]; version: number; [key: string]: unknown };
 
 export type LexicalRoot = {
@@ -132,10 +174,17 @@ export type TocEntry = {
   id?: string | null;
 };
 
+export type BlogFaqItem = {
+  id?: string;
+  question: string;
+  answer: string;
+};
+
 export type BlogDetail = Blog & {
   body?: LexicalRoot | null;
   tableOfContents?: TocEntry[] | null;
   relatedPosts?: Blog[] | null;
+  faqs?: BlogFaqItem[] | null;
 };
 
 type PayloadListResponse<T> = {
@@ -150,6 +199,31 @@ type PayloadListResponse<T> = {
 const CMS_URL =
   process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
 
+// Payload returns relative URLs (e.g. /api/media/file/...) when serverURL isn't set.
+// Prefix them so Next.js Image can resolve them against the CMS host, not the web app.
+export function mediaUrl(url: string | undefined | null): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `${CMS_URL}${url}`;
+}
+
+// Prefer a generated size variant when present. Payload's Media collection
+// can drift between its `url`/`filename` and the underlying R2 object (e.g. a
+// slug/sanitize hook renames the doc but the storage object is not moved),
+// leaving the canonical `url` 404'ing while the size variants — derived at
+// upload time and never renamed — remain correct.
+export function pickImageUrl(
+  image: BlogImage | undefined | null,
+  preferred: ReadonlyArray<"thumb" | "card" | "hero"> = ["card", "thumb", "hero"],
+): string | undefined {
+  if (!image) return undefined;
+  for (const key of preferred) {
+    const sized = image.sizes?.[key]?.url;
+    if (sized) return mediaUrl(sized);
+  }
+  return mediaUrl(image.url);
+}
+
 async function fetchCMS<T>(path: string): Promise<T> {
   const res = await fetch(`${CMS_URL}${path}`, {
     next: { revalidate: 60 },
@@ -160,15 +234,17 @@ async function fetchCMS<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+const PUBLISHED_FILTER =
+  "where[_status][equals]=published&where[publishedAt][exists]=true";
+
 export async function getFeaturedBlog(): Promise<Blog | null> {
   const featured = await fetchCMS<PayloadListResponse<Blog>>(
-    "/api/blogs?where[_status][equals]=published&where[featured][equals]=true&depth=2&limit=1&sort=-publishedAt",
+    `/api/blogs?${PUBLISHED_FILTER}&where[featured][equals]=true&depth=2&limit=1&sort=-publishedAt`,
   );
   if (featured.docs[0]) return featured.docs[0];
 
-  // Fall back to the latest published post when no post is explicitly featured
   const latest = await fetchCMS<PayloadListResponse<Blog>>(
-    "/api/blogs?where[_status][equals]=published&depth=2&limit=1&sort=-publishedAt",
+    `/api/blogs?${PUBLISHED_FILTER}&depth=2&limit=1&sort=-publishedAt`,
   );
   return latest.docs[0] ?? null;
 }
@@ -186,6 +262,7 @@ export async function getBlogs({
 } = {}): Promise<PayloadListResponse<Blog>> {
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
+    "where[publishedAt][exists]": "true",
     depth: "2",
     limit: String(limit),
     page: String(page),
@@ -207,17 +284,40 @@ export async function getBlogCategories(): Promise<BlogCategory[]> {
   return data.docs;
 }
 
-export async function getBlogBySlug(slug: string): Promise<BlogDetail | null> {
-  const data = await fetchCMS<PayloadListResponse<BlogDetail>>(
-    `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&where[_status][equals]=published&depth=3&limit=1`,
-  );
-  return data.docs[0] ?? null;
-}
+export const getBlogBySlug = cache(
+  async (slug: string): Promise<BlogDetail | null> => {
+    const data = await fetchCMS<PayloadListResponse<BlogDetail>>(
+      `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&${PUBLISHED_FILTER}&depth=3&limit=1`,
+    );
+    const post = data.docs[0] ?? null;
+    if (!post) return null;
+
+    // Payload's R2/S3 storage adapter does not populate `url` for upload fields
+    // nested beyond depth=1 (blog → author → photo). Re-fetch authors directly
+    // at depth=1 so their photo.url is properly resolved.
+    if (post.authors && post.authors.length > 0) {
+      const idParams = post.authors
+        .map((a, i) => `where[id][in][${i}]=${encodeURIComponent(a.id)}`)
+        .join("&");
+      try {
+        const authorsData = await fetchCMS<PayloadListResponse<BlogAuthor>>(
+          `/api/authors?${idParams}&depth=1&limit=10`,
+        );
+        const authorMap = new Map(authorsData.docs.map((a) => [a.id, a]));
+        post.authors = post.authors.map((a) => authorMap.get(a.id) ?? a);
+      } catch {
+        // Non-fatal: fall back to the authors already embedded in the post
+      }
+    }
+
+    return post;
+  },
+);
 
 export async function getRelatedBlogs(blogId: string, categoryIds: string[]): Promise<Blog[]> {
   if (categoryIds.length === 0) {
     const data = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?where[_status][equals]=published&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
+      `/api/blogs?${PUBLISHED_FILTER}&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
     );
     return data.docs;
   }
@@ -225,11 +325,11 @@ export async function getRelatedBlogs(blogId: string, categoryIds: string[]): Pr
     .map((id, i) => `where[categories][in][${i}]=${encodeURIComponent(id)}`)
     .join("&");
   const data = await fetchCMS<PayloadListResponse<Blog>>(
-    `/api/blogs?where[_status][equals]=published&where[id][not_equals]=${blogId}&${catParam}&depth=2&limit=3&sort=-publishedAt`,
+    `/api/blogs?${PUBLISHED_FILTER}&where[id][not_equals]=${blogId}&${catParam}&depth=2&limit=3&sort=-publishedAt`,
   );
   if (data.docs.length < 3) {
     const fallback = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?where[_status][equals]=published&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
+      `/api/blogs?${PUBLISHED_FILTER}&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
     );
     return fallback.docs;
   }

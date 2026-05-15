@@ -228,6 +228,7 @@ export const InlineImageEditDialog = (props: Props): ReactElement => {
       const json = (await res.json()) as { doc?: MediaDoc };
       if (json?.doc) setDoc(json.doc);
       setEditingFilename(false);
+      setError(null);
     } catch {
       setError('Could not rename file.');
     }
@@ -402,7 +403,7 @@ export const InlineImageEditDialog = (props: Props): ReactElement => {
                         e.preventDefault();
                         void onSaveFilename();
                       }
-                      if (e.key === 'Escape') setEditingFilename(false);
+                      if (e.key === 'Escape') { setEditingFilename(false); setError(null); }
                     }}
                     spellCheck={false}
                     aria-label="Filename (extension locked)"
@@ -428,6 +429,7 @@ export const InlineImageEditDialog = (props: Props): ReactElement => {
                     className="cs-inline-image-edit2__chip"
                     disabled={!doc}
                     onClick={() => {
+                      setError(null);
                       setFilenameDraft(filenameParts.stem);
                       setEditingFilename(true);
                     }}

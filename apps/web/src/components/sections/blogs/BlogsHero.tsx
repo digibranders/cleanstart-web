@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { type Blog, type BlogCategory, formatBlogDate } from "@/lib/blog";
+import { type Blog, type BlogCategory, formatBlogDate, mediaUrl } from "@/lib/blog";
 import { BlogsHeroSearch } from "./BlogsHeroSearch";
 
 const HERO_GRADIENT =
-  "linear-gradient(180deg, rgb(21,16,33) 25.7%, rgb(16,18,62) 31.2%, rgb(19,30,143) 51.0%, rgb(71,30,192) 68.7%, rgb(71,31,195) 79.8%, rgba(70,30,191,0.85) 85.0%, rgba(66,30,188,0.4) 93.7%, rgba(66,30,188,0) 98.9%)";
+  "linear-gradient(180deg, #151021 0%, #10123e 45%, #131e8f 61%, #471ec0 75%, #471fc3 84%, rgba(70,30,191,0.85) 88%, rgba(66,30,188,0.40) 95%, rgba(66,30,188,0) 99%)";
 
 interface BlogsHeroProps {
   featuredPost: Blog | null;
@@ -55,7 +55,7 @@ export function BlogsHero({
         className="pointer-events-none select-none absolute"
         style={{
           left: "-119px",
-          top: "319px",
+          top: "279px",
           width: "332px",
           height: "313px",
           mixBlendMode: "hard-light",
@@ -76,7 +76,7 @@ export function BlogsHero({
         {/* Title + search + categories — centered block */}
         <div
           className="flex flex-col items-center gap-10 mx-auto"
-          style={{ paddingTop: "166px", maxWidth: "864px" }}
+          style={{ paddingTop: "122px", maxWidth: "864px" }}
         >
           {/* Title + subtitle + search */}
           <div
@@ -86,7 +86,7 @@ export function BlogsHero({
             <div className="flex flex-col items-center gap-8 w-full">
               <h1
                 id="blogs-hero-title"
-                className="font-sans font-semibold text-white text-center w-full"
+                className="font-display font-semibold text-white text-center w-full"
                 style={{
                   fontSize: "clamp(3rem,5.6vw,5rem)",
                   lineHeight: "1.0",
@@ -114,7 +114,7 @@ export function BlogsHero({
               fallback={
                 <div
                   className="flex items-center"
-                  style={{ height: "52px", width: "674px" }}
+                  style={{ height: "36px", width: "674px" }}
                 />
               }
             >
@@ -123,10 +123,9 @@ export function BlogsHero({
           </div>
 
           {/* Category filter pills */}
-          <div
+          <nav
             className="flex flex-wrap items-center justify-center"
             style={{ gap: "16px" }}
-            role="navigation"
             aria-label="Blog categories"
           >
             <CategoryPill
@@ -142,13 +141,13 @@ export function BlogsHero({
                 active={activeCategory === cat.slug}
               />
             ))}
-          </div>
+          </nav>
         </div>
 
-        {/* Featured article — 2-column: text left, image right */}
+        {/* Featured Blog — 2-column: text left, image right */}
         {featuredPost ? (
           <div
-            className="grid mt-[152px]"
+            className="grid mt-[102px]"
             style={{
               gridTemplateColumns: "513px 1fr",
               gap: "32px",
@@ -158,23 +157,15 @@ export function BlogsHero({
             <div className="flex flex-col gap-6 items-start">
               <div className="flex flex-col gap-6 w-full">
                 <p
-                  className="font-sans font-medium"
-                  style={{
-                    fontSize: "20px",
-                    lineHeight: "1.5",
-                    color: "#d8d8d8",
-                    letterSpacing: "-0.04em",
-                  }}
+                  className="text-xl font-medium leading-[1.5] tracking-[-0.04em]"
+                  style={{ color: "#d8d8d8" }}
                 >
-                  FEATURED ARTICLES
+                  FEATURED BLOGS
                 </p>
                 <div className="flex flex-col gap-4 w-full">
                   <h2
-                    className="font-sans font-bold text-white overflow-hidden"
+                    className="font-display text-[clamp(1.5rem,3.06vw,2.75rem)] font-bold leading-none tracking-[-0.05em] text-white overflow-hidden"
                     style={{
-                      fontSize: "clamp(1.5rem,3.06vw,2.75rem)",
-                      lineHeight: "1.0",
-                      letterSpacing: "-0.05em",
                       display: "-webkit-box",
                       WebkitLineClamp: 3,
                       WebkitBoxOrient: "vertical",
@@ -184,13 +175,8 @@ export function BlogsHero({
                   </h2>
                   {featuredPost.abstract && (
                     <p
-                      className="font-sans font-normal"
-                      style={{
-                        fontSize: "clamp(1rem,1.53vw,1.375rem)",
-                        lineHeight: "1.4",
-                        letterSpacing: "-0.05em",
-                        color: "#d1e5ff",
-                      }}
+                      className="text-[clamp(1rem,1.53vw,1.375rem)] font-normal leading-[1.4] tracking-[-0.05em]"
+                      style={{ color: "#d1e5ff" }}
                     >
                       {featuredPost.abstract}
                     </p>
@@ -200,9 +186,8 @@ export function BlogsHero({
 
               {/* Read more link */}
               <Link
-                href={`/blogs/${featuredPost.slug}`}
-                className="flex items-center gap-2 font-sans font-medium text-white text-center"
-                style={{ fontSize: "20px", lineHeight: "1.5" }}
+                href={`/blog/${featuredPost.slug}`}
+                className="flex items-center gap-2 text-xl font-medium leading-[1.5] text-white text-center"
               >
                 Read more
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -239,7 +224,7 @@ export function BlogsHero({
               >
                 {featuredPost.heroImage?.url ? (
                   <Image
-                    src={featuredPost.heroImage.url}
+                    src={mediaUrl(featuredPost.heroImage.url)!}
                     alt={featuredPost.heroImage.alt ?? featuredPost.title}
                     fill
                     className="object-cover"
@@ -276,10 +261,10 @@ function CategoryPill({
   return (
     <Link
       href={href}
-      className="flex items-center justify-center font-sans font-semibold text-white shrink-0"
+      className="cs-category-pill flex items-center justify-center font-sans font-semibold text-white shrink-0"
       style={{
-        height: "48px",
-        padding: "10px 32px",
+        height: "42px",
+        padding: "8px 32px",
         borderRadius: "30px",
         background: active
           ? "rgba(196,70,239,0.6)"

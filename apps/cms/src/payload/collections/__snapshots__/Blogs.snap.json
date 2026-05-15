@@ -67,7 +67,6 @@
     {
       "type": "relationship",
       "name": "categories",
-      "hasMany": true,
       "relationTo": "categories"
     },
     {
@@ -383,6 +382,21 @@
     {
       "type": "number",
       "name": "wordCount"
+    },
+    {
+      "type": "select",
+      "name": "tocDepth",
+      "options": [
+        {
+          "value": "h2"
+        },
+        {
+          "value": "h2_h3"
+        },
+        {
+          "value": "h2_h3_h4"
+        }
+      ]
     },
     {
       "type": "array",

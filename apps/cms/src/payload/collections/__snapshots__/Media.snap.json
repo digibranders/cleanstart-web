@@ -66,6 +66,10 @@
       "name": "credit"
     },
     {
+      "type": "text",
+      "name": "prefix"
+    },
+    {
       "type": "group",
       "name": "focalPoint",
       "fields": [
@@ -81,7 +85,7 @@
     }
   ],
   "hooks": {
-    "beforeChange": 1,
+    "beforeChange": 3,
     "afterChange": 0,
     "beforeValidate": 1,
     "afterDelete": 0

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { bodyStatsHook } from './body-stats';
+import { bodyStatsHook, TOC_DEPTH_LEVELS } from './body-stats';
 
 const lexical = (children: unknown[]) => ({
   root: { type: 'root', children },
@@ -65,6 +65,54 @@ describe('bodyStatsHook', () => {
     const out = (await callHook(hook, { title: 'no body' })) as Record<string, unknown>;
     expect(out.title).toBe('no body');
     expect(out.wordCount).toBe(0);
+  });
+
+  it('tocLevels (static) filters to specified heading levels only', async () => {
+    const hook = bodyStatsHook({ tocLevels: [2] });
+    const out = (await callHook(hook, {
+      body: lexical([heading('h2', 'Section'), heading('h3', 'Sub'), heading('h4', 'Detail')]),
+    })) as Record<string, unknown>;
+    expect(out.tableOfContents).toEqual([{ level: 2, text: 'Section', anchor: 'section' }]);
+  });
+
+  it('tocLevelsField reads depth from the document field', async () => {
+    const hook = bodyStatsHook({ tocLevelsField: 'tocDepth' });
+    const body = lexical([heading('h2', 'Section'), heading('h3', 'Sub'), heading('h4', 'Detail')]);
+
+    const h2Only = (await callHook(hook, { body, tocDepth: 'h2' })) as Record<string, unknown>;
+    expect(h2Only.tableOfContents).toEqual([{ level: 2, text: 'Section', anchor: 'section' }]);
+
+    const h2h3 = (await callHook(hook, { body, tocDepth: 'h2_h3' })) as Record<string, unknown>;
+    expect(h2h3.tableOfContents).toEqual([
+      { level: 2, text: 'Section', anchor: 'section' },
+      { level: 3, text: 'Sub', anchor: 'sub' },
+    ]);
+
+    const h2h3h4 = (await callHook(hook, { body, tocDepth: 'h2_h3_h4' })) as Record<
+      string,
+      unknown
+    >;
+    expect(h2h3h4.tableOfContents).toEqual([
+      { level: 2, text: 'Section', anchor: 'section' },
+      { level: 3, text: 'Sub', anchor: 'sub' },
+      { level: 4, text: 'Detail', anchor: 'detail' },
+    ]);
+  });
+
+  it('tocLevelsField falls back to H2-only when the field value is absent', async () => {
+    const hook = bodyStatsHook({ tocLevelsField: 'tocDepth' });
+    const out = (await callHook(hook, {
+      body: lexical([heading('h2', 'A'), heading('h3', 'B')]),
+    })) as Record<string, unknown>;
+    expect(out.tableOfContents).toEqual([{ level: 2, text: 'A', anchor: 'a' }]);
+  });
+
+  it('TOC_DEPTH_LEVELS covers all select option values', () => {
+    expect(TOC_DEPTH_LEVELS).toMatchObject({
+      h2: [2],
+      h2_h3: [2, 3],
+      h2_h3_h4: [2, 3, 4],
+    });
   });
 
   it('honours a custom `source` field name', async () => {

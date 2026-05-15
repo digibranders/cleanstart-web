@@ -1,14 +1,17 @@
 // Single source of truth for the marketing nav. Mirrors cleanstart.com production IA.
 // Consumed by both DesktopNav and MobileNav so the desktop bar and mobile sheet never drift.
 //
-// All slugs match docs/WEB-PAGES.md exactly. Pages not yet built keep their correct final
-// slug here — do NOT use "/" as a placeholder. When a page is built its route folder must
-// match the href in this file.
+// Slug authority: docs/WEB-PAGES.md. All items carry their real final slug regardless of
+// build status. Unbuilt items are rendered as <span> (non-clickable) — not <Link> — so
+// the href is data-only until the page exists. When a page is marked ✅ in WEB-PAGES.md,
+// switch its renderer from <span> to <Link> in MegaMenu / CompactDropdown / MobileNav.
 
 export type NavLeaf = {
   label: string;
   href: string;
   description?: string;
+  /** true = page is built and the item renders as a <Link>; omit or false = <span> */
+  built?: boolean;
 };
 
 export type NavGroup = {
@@ -86,6 +89,7 @@ export const NAV_TREE: NavItem[] = [
             label: "Vulnerability Remediation",
             href: "/vulnerability-remediation",
             description: "Patch upstream once, ship hardened downstream everywhere.",
+            built: true,
           },
           {
             label: "Attack Surface Reduction",
@@ -113,16 +117,16 @@ export const NAV_TREE: NavItem[] = [
       {
         title: "Insights",
         items: [
-          { label: "Blogs", href: "/blogs" },
-          { label: "Resource Center", href: "/resource-center" },
-          { label: "Newsroom", href: "/news" },
+          { label: "Blogs", href: "/blogs", built: true },
+          { label: "Resource Center", href: "/resource-center", built: true },
+          { label: "Newsroom", href: "/news", built: true },
           { label: "Knowledge Hub", href: "/knowledge-hub" },
         ],
       },
       {
         title: "Events",
         items: [
-          { label: "In-Person Events", href: "/events" },
+          { label: "In-Person Events", href: "/events", built: true },
           { label: "Webinars", href: "/webinars" },
           { label: "Podcast", href: "/podcast" },
         ],
@@ -134,7 +138,7 @@ export const NAV_TREE: NavItem[] = [
     label: "Company",
     width: 260,
     items: [
-      { label: "About Us", href: "/about-us" },
+      { label: "About Us", href: "/about-us", built: true },
       { label: "Teams", href: "/teams" },
       { label: "Community", href: "/community" },
       { label: "Careers", href: "/careers" },

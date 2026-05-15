@@ -49,14 +49,14 @@ export const Resources: CollectionConfig = {
         { label: 'Case study', value: 'case-study' },
       ],
     },
-    mediaUploadField({ name: 'heroImage', folderHint: 'web/resource' }),
     { name: 'summary', type: 'textarea' },
-    { name: 'body', type: 'richText' },
     mediaUploadField({
       name: 'asset',
       folderHint: 'web/resource',
-      description: 'PDF or other downloadable. Routed to web/resource/.',
+      description: 'PDF or ZIP downloadable. Routed to web/resource/.',
+      accept: ['application/pdf', 'application/zip', 'application/x-zip-compressed'],
     }),
+    { name: 'body', type: 'richText' },
     {
       name: 'gated',
       type: 'checkbox',

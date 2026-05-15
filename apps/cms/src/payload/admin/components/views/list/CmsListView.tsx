@@ -145,6 +145,15 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
               ariaLabel={`${collectionLabel} actions`}
             />
 
+            {enableRowSelections ? (
+              <BulkActionBar
+                collectionSlug={collectionSlug}
+                {...(hasDeletePermission !== undefined ? { hasDeletePermission } : {})}
+                {...(disableBulkDelete !== undefined ? { disableBulkDelete } : {})}
+                {...(disableBulkEdit !== undefined ? { disableBulkEdit } : {})}
+              />
+            ) : null}
+
             {BeforeListTable}
             <section className="cs-list__table" aria-label={`${collectionLabel} list`}>
               {Table}
@@ -157,15 +166,6 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
 
             {AfterList}
           </Gutter>
-
-          {enableRowSelections ? (
-            <BulkActionBar
-              collectionSlug={collectionSlug}
-              {...(hasDeletePermission !== undefined ? { hasDeletePermission } : {})}
-              {...(disableBulkDelete !== undefined ? { disableBulkDelete } : {})}
-              {...(disableBulkEdit !== undefined ? { disableBulkEdit } : {})}
-            />
-          ) : null}
 
           <Drawer
             open={columnPickerOpen}

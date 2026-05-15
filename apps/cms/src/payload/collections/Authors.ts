@@ -144,7 +144,7 @@ export const Authors: CollectionConfig = {
         components: {
           Field: {
             path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
-            clientProps: { pathPrefix: '/authors' },
+            clientProps: { pathPrefix: '/author' },
           },
         },
       },
@@ -160,7 +160,7 @@ export const Authors: CollectionConfig = {
       },
     },
     ...seoSidebarFields({
-      pathPrefix: '/authors',
+      pathPrefix: '/author',
       titleSource: 'name',
       descriptionSource: 'bioShort',
     }),

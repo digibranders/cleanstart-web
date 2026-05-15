@@ -1,0 +1,147 @@
+name: Web CI
+
+on:
+  push:
+    branches: [main, development]
+    paths:
+      - "apps/web/**"
+      - "packages/ui/**"
+      - "packages/types/**"
+      - "packages/config/**"
+      - "pnpm-lock.yaml"
+      - "turbo.json"
+      - ".github/workflows/web.yml"
+  pull_request:
+    branches: [main, development]
+    paths:
+      - "apps/web/**"
+      - "packages/ui/**"
+      - "packages/types/**"
+      - "packages/config/**"
+      - "pnpm-lock.yaml"
+      - "turbo.json"
+      - ".github/workflows/web.yml"
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 24
+  # Pinned to staging CMS so build-time fetches resolve. Override per env in
+  # Vercel — this only affects CI builds.
+  NEXT_PUBLIC_CMS_URL: https://cms-dev.cleanstart.com
+
+jobs:
+  web:
+    name: apps/web · lint · typecheck · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Restore Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-web-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-web-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json') }}-
+            turbo-web-${{ runner.os }}-
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --filter @cleanstart/web lint
+
+      - name: Typecheck
+        run: pnpm --filter @cleanstart/web typecheck
+
+      - name: Build
+        run: pnpm --filter @cleanstart/web build
+
+      - name: Capture build size
+        if: always()
+        run: |
+          if [ -d "apps/web/.next" ]; then
+            du -sh apps/web/.next 2>/dev/null || true
+            find apps/web/.next/static/chunks -name "*.js" -type f 2>/dev/null \
+              | xargs -I{} du -h {} 2>/dev/null \
+              | sort -hr | head -20 || true
+          fi
+
+      - name: Upload Next.js build (for Lighthouse job)
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-next-build
+          path: |
+            apps/web/.next/**
+            !apps/web/.next/cache/**
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
+  web-lhci:
+    name: apps/web · Lighthouse CI (mobile + desktop)
+    needs: web
+    runs-on: ubuntu-latest
+    # Temporarily disabled: Lighthouse hits NO_FCP on routes that fetch from
+    # the CMS at runtime (no CMS available in CI). Re-enable after stubbing CMS.
+    if: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Download Next.js build
+        uses: actions/download-artifact@v4
+        with:
+          name: web-next-build
+          path: apps/web/.next
+
+      - name: Install Lighthouse CI
+        run: pnpm add -g @lhci/cli@0.14.x
+
+      - name: Start production server
+        run: pnpm --filter @cleanstart/web start &
+        env:
+          PORT: 3001
+
+      - name: Wait for server
+        run: |
+          for i in {1..30}; do
+            if curl -sf http://localhost:3001/api/health > /dev/null; then
+              echo "Server ready"; exit 0
+            fi
+            sleep 2
+          done
+          echo "Server did not become ready"; exit 1
+
+      - name: Run Lighthouse CI
+        run: lhci autorun --config=apps/web/.lighthouserc.json
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-lighthouse-reports
+          path: .lighthouseci/
+          if-no-files-found: ignore
+          retention-days: 14

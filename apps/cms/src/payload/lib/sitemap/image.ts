@@ -20,7 +20,6 @@ const IMAGE_COLLECTIONS: ReadonlyArray<{
   { collection: 'news', imageField: 'heroImage' },
   { collection: 'guides', imageField: 'heroImage' },
   { collection: 'knowledgeBase', imageField: 'heroImage' },
-  { collection: 'resources', imageField: 'heroImage' },
   { collection: 'events', imageField: 'heroImage' },
   { collection: 'webinars', imageField: 'heroImage' },
   { collection: 'authors', imageField: 'photo' },

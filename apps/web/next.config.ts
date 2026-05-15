@@ -1,7 +1,26 @@
+import path from "node:path";
 import type { NextConfig } from "next";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "1",
+});
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: path.resolve(process.cwd(), "..", ".."),
+  },
+  async redirects() {
+    return [
+      {
+        source: "/blog",
+        destination: "/blogs",
+        permanent: true,
+      },
+    ];
+  },
   images: {
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         // Payload CMS media — local dev
@@ -11,13 +30,25 @@ const nextConfig: NextConfig = {
         pathname: "/api/media/**",
       },
       {
-        // Payload CMS media — production (admin.cleanstart.com)
+        // Payload CMS media — dev tunnel (cms-dev.cleanstart.com)
         protocol: "https",
-        hostname: "admin.cleanstart.com",
+        hostname: "cms-dev.cleanstart.com",
         pathname: "/api/media/**",
+      },
+      {
+        // Payload CMS media — production (cms.cleanstart.com)
+        protocol: "https",
+        hostname: "cms.cleanstart.com",
+        pathname: "/api/media/**",
+      },
+      {
+        // Payload CMS media CDN — staging/production (cdn.cleanstart.com)
+        protocol: "https",
+        hostname: "cdn.cleanstart.com",
+        pathname: "/**",
       },
     ],
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

@@ -291,67 +291,104 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 
 ## Branch strategy
 
+**Model: short-lived feature branches off `development` (GitHub Flow).** The previous `web` / `cms` long-lived branches are retired — they were a single-dev workflow that breaks down with 3 devs sharing the same branch.
+
 ```
-web ──────┐
-          ├──► development (staging) ──► main (production)
-cms ──────┘
+feat/* · fix/* · chore/* ──► development (staging) ──► main (production)
+                              ▲                          ▲
+                              │                          │
+                              hotfix/* ──────────────────┘ (back-merged to development)
 ```
 
 ### Branch roles
 
-| Branch | Role | Deploys to | PRs to |
-|--------|------|------------|--------|
-| `web` | Feature branch — all `apps/web` work | — | `development` |
-| `cms` | Feature branch — all `apps/cms` work | — | `development` |
-| `development` | **Staging** — integration + CI gate | Coolify staging | `main` |
-| `main` | **Production** | Coolify production | — |
+| Branch | Vercel env | Domain | Lifetime | PRs to |
+|---|---|---|---|---|
+| `feat/*`, `fix/*`, `chore/*`, `hotfix/*` | Preview (auto, per push) | `*-cleanstart-web.vercel.app` | Hours–days; deleted on merge | `development` (or `main` for hotfix) |
+| `development` | Preview (stable alias) | `staging.cleanstart.com` | Permanent | `main` (release PR) |
+| `main` | Production | `www.cleanstart.com` | Permanent | — |
 
-### Workflow
+### Branch naming
 
-1. All feature work happens on `web` or `cms` — never directly on `development` or `main`.
-2. When a feature is ready, open a PR from `web` or `cms` → `development`.
-3. CI runs on `development`. Once checks pass, the change is live on staging.
-4. When staging is verified and ready to ship, open a PR from `development` → `main`.
-5. Coolify deploys production on push to `main`.
+`<type>/<scope>-<short-kebab-desc>` — no author prefix.
+
+- `feat/web-pricing-page`
+- `feat/cms-integrations-zoho`
+- `fix/web-blog-canonical`
+- `chore/cms-bump-payload-3.82`
+- `hotfix/web-csp-report-uri` (only off `main`)
+
+`<scope>` is `web|cms|ui|types|infra|docs`. **One concern per branch** — don't mix CMS and web in the same feature branch (CI path filters depend on this).
+
+### Workflow per task
+
+```bash
+git checkout development && git pull
+git checkout -b feat/web-pricing-page
+
+# work, commit
+
+git push -u origin feat/web-pricing-page
+gh pr create --base development --fill
+# Vercel posts preview URL; CI runs lint/typecheck/build/Lighthouse/axe
+# Reviewer approves → squash-merge → branch auto-deleted
+```
+
+To pick up someone else's just-merged work:
+
+```bash
+git checkout development && git pull
+git checkout feat/my-thing
+git rebase development        # if needed
+```
+
+No coordination required. No two devs ever push to the same branch.
+
+### Promotion to production
+
+`development` → `main` is a **release PR**, not a continuous merge:
+
+- Rotating release captain opens the PR weekly (or on-demand for urgent ships)
+- PR title: `release: <YYYY-MM-DD>`; body lists merged feature PRs since last release
+- CI gate + manual QA sign-off comment from release captain
+- Squash-merge to `main` → Vercel **promotes the existing staging artifact** to production (no rebuild, <30s)
+- Tag `main`: `web-vYYYY.MM.DD`
+
+### Hotfix lane (production-only emergencies)
+
+```bash
+git checkout main && git pull
+git checkout -b hotfix/web-<issue>
+# fix, commit, push
+gh pr create --base main --label hotfix --fill
+# 1 reviewer + green CI → merge → auto-promote
+git checkout development && git pull && git merge main && git push  # back-merge
+```
 
 ### Worktrees — parallel sessions
 
-Each branch has a dedicated worktree so CMS and web sessions can run simultaneously
-without switching branches:
+The previous `cleanstart-cms` / `cleanstart-web` worktrees on dedicated long-lived branches no longer apply. Replace with:
 
-| Worktree path | Branch | Use for |
-|---------------|--------|---------|
-| `~/Desktop/AI/cleanstart/cleanstart-website` | `development` | Staging, shared docs, branch syncing |
-| `~/Desktop/AI/cleanstart/cleanstart-cms` | `cms` | All `apps/cms` work |
-| `~/Desktop/AI/cleanstart/cleanstart-web` | `web` | All `apps/web` work |
+| Worktree path | Default branch | Use for |
+|---|---|---|
+| `~/Desktop/AI/cleanstart/cleanstart-website` | `development` | Reading shared docs, opening release PRs, syncing |
+| `~/Desktop/AI/cleanstart/cleanstart-feature` | feature branch (varies) | All feature work — `git checkout -b feat/...` here, throw away after merge |
 
-**Open the correct folder in Claude Code for the work you're doing.** The worktree
-is already on the right branch — no `git checkout` needed.
+Optional: spin up a second feature worktree (`cleanstart-feature-2`) for parallel tasks — `git worktree add ../cleanstart-feature-2 feat/other-thing`.
 
-**Claude must always use the designated worktree for the task at hand:**
-- CMS work → `~/Desktop/AI/cleanstart/cleanstart-cms` only
-- Web work → `~/Desktop/AI/cleanstart/cleanstart-web` only
-- Work spanning both CMS and web → make changes in each dedicated worktree separately; never use a third location
-- Never make changes in `cleanstart-website` (development) or any other location unless explicitly instructed
-- Never create new Claude session worktrees for any work — always use the dedicated worktrees above
-
-Dev servers also run independently per worktree — `apps/cms` on port 3000,
-`apps/web` on port 3001, no port conflicts.
+Dev servers run independently per worktree — `apps/cms` on port 3000, `apps/web` on port 3001, no port conflicts.
 
 ### Hard rules
 
-- **Never push directly to `main`** — only via `development` PR after CI passes.
-- **Never work directly on `development`** — it is staging/integration, not a feature branch.
-- **`web` and `cms` are permanent branches** — never delete them.
-- **`web` touches only `apps/web`** — no CMS changes, no exceptions.
-- **`cms` touches only `apps/cms`** — no web changes, no exceptions.
+- **Never push directly to `development` or `main`.** All changes via PR.
+- **Never reuse a feature branch** after its PR merges. Delete it. Start a new one for the next task.
+- **One concern per PR.** CMS and web changes go in separate PRs.
+- **Squash-merge only** to `development` and `main` — keeps history linear and revertable.
+- **Required reviewers:** 1 for feature PRs, 2 for release PRs to `main`.
+- **CI checks before merge to `development`:** lint, typecheck, build, bundle-size, Lighthouse, axe, Playwright smoke.
+- **CI checks before merge to `main`:** all of the above + manual QA sign-off comment from the release captain.
+- **`web` and `cms` long-lived branches are retired** — do not recreate them.
 - Shared files (`CLAUDE.md`, `docs/`, `packages/`) go in whichever PR drove the change.
-- Always sync your feature branch with `development` before opening a PR:
-  ```bash
-  git checkout web   # or cms
-  git merge development
-  git push origin web
-  ```
 
 ---
 
@@ -376,4 +413,5 @@ Dev servers also run independently per worktree — `apps/cms` on port 3000,
 - **Integration question?** Read `docs/INTEGRATIONS-RESEARCH.md` (Teams/webhook deep-dive, Standard Webhooks signing) and `docs/INTEGRATIONS-RESEARCH-V2.md` (analytics read-back, inbound webhooks, J1/J2/J3 milestones).
 - **Background job question?** Arch doc §`#cron-jobs` + the job file and its co-located test.
 - **Which apps/web page to build next, or what slug/category a page uses?** `docs/WEB-PAGES.md`.
+- **`apps/web` production question?** (deploy strategy, security headers, CSP, SEO, sitemap, JSON-LD, AI bots, cookie consent, DNS, rollback) → **`docs/WEB-PRODUCTION.md`** (canonical for everything web-prod). The HTML arch doc remains canonical for CMS prod only.
 - **Decision not in arch doc and not in this file?** Stop and ask. Don't invent.

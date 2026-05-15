@@ -123,6 +123,15 @@ const adminAllowedOrigins = (): string[] => {
   return [serverURL];
 };
 
+// Top-level folder prefix for all R2 uploads.
+// Derived from NODE_ENV so the correct folder is used automatically:
+//   next dev   → NODE_ENV=development → 'dev'
+//   next start → NODE_ENV=production  → 'web'
+// R2_UPLOAD_PREFIX overrides this for staging or special environments.
+const r2UploadPrefix: string =
+  process.env.R2_UPLOAD_PREFIX ??
+  (process.env.NODE_ENV === 'production' ? 'web' : 'dev');
+
 // Storage plugin: enabled only when all four R2 env vars are set so dev
 // iteration without R2 still works (Media falls back to the local
 // staticDir on the collection). In production, the absence of any of
@@ -133,7 +142,15 @@ const storagePlugins = r2EnvComplete()
       s3Storage({
         collections: {
           media: {
-            prefix: 'media',
+            prefix: r2UploadPrefix,
+            // Serve files directly from the R2 CDN — bypass Payload's
+            // /api/media/file proxy so URLs resolve to the public base.
+            disablePayloadAccessControl: true,
+            generateFileURL: ({ filename, prefix }) => {
+              const publicBase = process.env.R2_PUBLIC_BASE ?? '';
+              const effectivePrefix = prefix || r2UploadPrefix;
+              return `${publicBase}/${effectivePrefix}/${encodeURIComponent(filename)}`;
+            },
           },
         },
         bucket: requireEnv('R2_BUCKET'),

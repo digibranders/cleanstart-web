@@ -9,13 +9,9 @@ File: `doWR9Xbwgkz6dqR9n4m3BB` — Home page (node 108:7624) — frame 1920×927
 - Hero block: 1201px wide, 360px from left
 - Section gaps: ~96–110px vertical between sections
 
-## Typography — **Figtree** (Google Fonts)
-| Style | Weight | Size | LH | LS |
-|-------|--------|------|----|----|
-| Display 62 SemiBold (Factory heading) | 600 | 62px | 100% | -5% |
-| Display 62 Bold (Security heading) | 700 | 62px | 100% | -5% |
-| Body 30 Regular (description) | 400 | 30px | 140% | -4% |
-| Body 19 Regular (Trusted by subtitle) | 400 | 19px | 110% | -3% |
+## Typography
+
+Typography moved to [typography.md](./typography.md) — canonical token table, role → font/size map, and component cheatsheet live there. Site fonts: **Manrope** (headings via `font-display`) and **Sora** (body via `font-sans`). All sizes are `rem` or `clamp(rem, vw, rem)`.
 
 ## Colors
 ### Brand

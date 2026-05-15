@@ -25,28 +25,41 @@ export function MegaMenu({
         {groups.map((group, gi) => (
           <div key={gi} className="flex flex-col">
             {group.title && (
-              <div className="px-3 pt-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/45">
+              <div className="px-3 pt-3 pb-2 text-2xs font-semibold uppercase tracking-[0.08em] text-white/45">
                 {group.title}
               </div>
             )}
             <ul className="flex flex-col">
-              {group.items.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="cs-mega-item group block rounded-[12px] px-3 py-2.5 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#33BAEC]/70"
-                  >
-                    <div className="text-[14.5px] font-medium leading-tight text-white/95 transition-colors group-hover:text-white">
+              {group.items.map((item) => {
+                const inner = (
+                  <>
+                    <div className="text-sm font-medium leading-tight text-white/95">
                       {item.label}
                     </div>
                     {showDescriptions && item.description && (
-                      <div className="mt-1 text-[12.5px] leading-snug text-white/55 transition-colors group-hover:text-white/75">
+                      <div className="mt-1 text-xs leading-snug text-white/55">
                         {item.description}
                       </div>
                     )}
-                  </Link>
-                </li>
-              ))}
+                  </>
+                );
+                return (
+                  <li key={item.label}>
+                    {item.built ? (
+                      <Link
+                        href={item.href}
+                        className="block rounded-[12px] px-3 py-2.5 transition-colors hover:bg-white/[0.06]"
+                      >
+                        {inner}
+                      </Link>
+                    ) : (
+                      <span className="block rounded-[12px] px-3 py-2.5 cursor-default">
+                        {inner}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))}

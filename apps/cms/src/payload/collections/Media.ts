@@ -1,7 +1,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import type { CollectionConfig } from 'payload';
+import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload';
+import { ValidationError } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { humaniseFilename } from '../lib/humanise-filename';
@@ -26,6 +27,35 @@ const FOLDERS = [
 
 const isImage = (mimeType: string | undefined | null): boolean =>
   Boolean(mimeType?.startsWith('image/'));
+
+// Reject any update that changes `filename` without attaching a new file.
+// Renaming the doc would update media.url to a key that does not exist in R2
+// (the s3-storage plugin only writes to R2 when req.file is present), and the
+// derived `sizes.*` filenames are baked from the original upload name and
+// would still point at the old object — leaving every consumer broken.
+// Exported for direct unit testing.
+export const rejectFilenameRename: CollectionBeforeChangeHook = ({
+  data,
+  req,
+  operation,
+  originalDoc,
+}) => {
+  if (operation !== 'update') return data;
+  if (req.file) return data;
+  const incoming = (data as { filename?: unknown }).filename;
+  const previous = (originalDoc as { filename?: unknown } | undefined)?.filename;
+  if (typeof incoming !== 'string' || typeof previous !== 'string') return data;
+  if (incoming === previous) return data;
+  throw new ValidationError({
+    errors: [
+      {
+        message:
+          'Filename rename is not supported after upload. Detach the file and re-upload to change the name.',
+        path: 'filename',
+      },
+    ],
+  });
+};
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -134,6 +164,14 @@ export const Media: CollectionConfig = {
       type: 'text',
       admin: { description: 'Photographer / source attribution.' },
     },
+    // R2 storage path prefix — set automatically from the folder field on
+    // every new upload so files land at {uploadPrefix}/{type}/{filename}.
+    // Hidden in admin; managed entirely by the beforeChange hook below.
+    {
+      name: 'prefix',
+      type: 'text',
+      admin: { hidden: true },
+    },
     {
       type: 'group',
       name: 'focalPoint',
@@ -187,6 +225,24 @@ export const Media: CollectionConfig = {
       },
     ],
     beforeChange: [
+      // Reject filename rename after upload. The s3-storage plugin only writes
+      // to R2 when req.file is attached, so a filename-only update would
+      // recompute media.url against a key that does not exist in R2 and leave
+      // every consumer 404'ing. Editors must detach + re-upload to rename.
+      rejectFilenameRename,
+      // Compute R2 prefix from folder on new uploads only.
+      // Folder values are 'web/{type}'; strip 'web/' and prepend the
+      // upload prefix so files land at e.g. dev/blog/filename.webp.
+      ({ data, req }) => {
+        if (!req.file) return data;
+        const folder = data?.folder as string | undefined;
+        if (!folder) return data;
+        const uploadPrefix =
+          process.env.R2_UPLOAD_PREFIX ??
+          (process.env.NODE_ENV === 'production' ? 'web' : 'dev');
+        const folderType = folder.replace(/^web\//, '');
+        return { ...data, prefix: `${uploadPrefix}/${folderType}` };
+      },
       ({ data }) => {
         if (data?.alt || data?.decorative) return data;
         if (!isImage(data?.mimeType)) return data;

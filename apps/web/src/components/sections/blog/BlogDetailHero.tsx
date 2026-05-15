@@ -1,11 +1,10 @@
 import Link from "next/link";
-import Image from "next/image";
-import { formatBlogDate } from "@/lib/blog";
+import { formatBlogDate, pickImageUrl } from "@/lib/blog";
 import type { BlogCategory, BlogAuthor, BlogImage } from "@/lib/blog";
 
 interface BlogDetailHeroProps {
   title: string;
-  categories?: BlogCategory[] | undefined;
+  categories?: BlogCategory | null | undefined;
   authors?: BlogAuthor[] | undefined;
   publishedAt?: string | undefined;
   readingMinutes?: number | undefined;
@@ -27,7 +26,7 @@ export function BlogDetailHero({
       style={{
         minHeight: "479px",
         background:
-          "linear-gradient(180deg, #151021 0%, #10123E 38%, #131E8F 67%, #471EC0 80%, #471FC3 92%, rgba(70,30,191,0.85) 98%, rgba(66,30,188,0.4) 100%, rgba(66,30,188,0) 100%)",
+          "linear-gradient(180deg, #151021 0%, #10123E 38%, #131E8F 67%, #471EC0 80%, #471FC3 100%)",
       }}
     >
       {/* Decorative bg grid — same mask-group pattern used across dark hero sections */}
@@ -36,8 +35,8 @@ export function BlogDetailHero({
         aria-hidden
         src="/images/blogs/hero-orb-top.png"
         alt=""
-        className="pointer-events-none select-none absolute top-0 right-0 hidden xl:block"
-        style={{ width: "406px", height: "412px", mixBlendMode: "lighten", opacity: 0.4 }}
+        className="pointer-events-none select-none absolute top-20 right-0 hidden xl:block"
+        style={{ width: "265px", height: "265px", mixBlendMode: "lighten", opacity: 0.4 }}
         loading="lazy"
         decoding="async"
       />
@@ -75,8 +74,8 @@ export function BlogDetailHero({
 
           <Link
             href="/blogs"
-            className="flex items-center h-8 px-2 rounded-full"
-            style={{ color: "#98ACC3", fontSize: "12px", fontFamily: "Figtree, sans-serif", lineHeight: 1.4 }}
+            className="flex items-center h-8 px-2 rounded-full text-xs leading-[1.4]"
+            style={{ color: "#98ACC3" }}
           >
             Resources
           </Link>
@@ -85,8 +84,8 @@ export function BlogDetailHero({
 
           <Link
             href="/blogs"
-            className="flex items-center h-8 px-2 rounded-full"
-            style={{ color: "#98ACC3", fontSize: "12px", fontFamily: "Figtree, sans-serif", lineHeight: 1.4 }}
+            className="flex items-center h-8 px-2 rounded-full text-xs leading-[1.4]"
+            style={{ color: "#98ACC3" }}
           >
             Blogs
           </Link>
@@ -94,38 +93,37 @@ export function BlogDetailHero({
           <BreadcrumbChevron />
 
           <span
-            className="flex items-center h-8 px-2 max-w-[220px] truncate"
-            style={{ color: "#BFCCDA", fontSize: "12px", fontFamily: "Figtree, sans-serif", lineHeight: 1.4 }}
+            className="flex items-center h-8 px-2 max-w-[220px] truncate text-xs leading-[1.4]"
+            style={{ color: "#BFCCDA" }}
           >
             {title}
           </span>
         </nav>
 
         {/* Title */}
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-10">
           <h1
-            className="text-white text-center"
-            style={{
-              fontFamily: "Figtree, sans-serif",
-              fontWeight: 500,
-              fontSize: "clamp(40px, 5vw, 72px)",
-              lineHeight: 1,
-              letterSpacing: "-0.05em",
-              maxWidth: "674px",
-            }}
+            className="font-display text-[clamp(1.625rem,2.4vw,2.5rem)] font-semibold leading-[1.25] tracking-[-0.03em] text-white text-center"
+            style={{ maxWidth: "860px" }}
           >
             {title}
           </h1>
         </div>
 
         {/* Horizontal separator */}
-        <div
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/blogs/hero-divider-line.svg"
+          alt=""
+          aria-hidden
           className="w-full mt-[133px]"
-          style={{ height: "1px", background: "rgba(255,255,255,0.15)" }}
+          style={{ height: "1px", display: "block" }}
+          loading="lazy"
+          decoding="async"
         />
 
         {/* Meta row — reading time | author | date */}
-        <div className="flex items-center pt-[22px] pb-[40px] gap-0">
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-3 pt-[22px] pb-[40px] sm:justify-between">
           {/* Reading time */}
           {readingMinutes != null && (
             <div className="flex items-center gap-[4px] shrink-0">
@@ -139,8 +137,7 @@ export function BlogDetailHero({
                 className="shrink-0"
               />
               <span
-                className="text-white whitespace-nowrap"
-                style={{ fontFamily: "Figtree, sans-serif", fontWeight: 500, fontSize: "clamp(14px, 1.4vw, 20px)", lineHeight: 1.3 }}
+                className="text-white whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-medium leading-[1.3]"
               >
                 {readingMinutes} min read
               </span>
@@ -154,14 +151,13 @@ export function BlogDetailHero({
           {/* Author */}
           {primaryAuthor && (
             <div className="flex items-center gap-[7px] shrink-0">
-              {primaryAuthor.avatar ? (
-                <Image
-                  src={primaryAuthor.avatar.url}
+              {primaryAuthor.photo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={pickImageUrl(primaryAuthor.photo, ["thumb", "card", "hero"])}
                   alt={primaryAuthor.name}
-                  width={32}
-                  height={32}
                   className="rounded-full object-cover shrink-0"
-                  style={{ width: "32px", height: "32px" }}
+                  style={{ width: "32px", height: "32px", display: "block" }}
                 />
               ) : (
                 <div
@@ -171,8 +167,7 @@ export function BlogDetailHero({
                 />
               )}
               <span
-                className="text-white whitespace-nowrap"
-                style={{ fontFamily: "Figtree, sans-serif", fontWeight: 500, fontSize: "clamp(14px, 1.4vw, 20px)", lineHeight: 1.3 }}
+                className="text-white whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-medium leading-[1.3]"
               >
                 By {primaryAuthor.name}
               </span>
@@ -195,14 +190,7 @@ export function BlogDetailHero({
                 style={{ width: "40px", height: "40px" }}
               />
               <span
-                className="text-white whitespace-nowrap"
-                style={{
-                  fontFamily: "Figtree, sans-serif",
-                  fontWeight: 500,
-                  fontSize: "clamp(14px, 1.4vw, 20px)",
-                  lineHeight: 1,
-                  letterSpacing: "-0.05em",
-                }}
+                className="text-white whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-medium leading-none tracking-[-0.05em]"
               >
                 {formatBlogDate(publishedAt)}
               </span>
@@ -224,14 +212,16 @@ function BreadcrumbChevron(): React.ReactElement {
 
 function MetaSeparator(): React.ReactElement {
   return (
-    <div
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/images/blogs/hero-meta-separator.svg"
+      alt=""
       aria-hidden
-      className="mx-[204px] shrink-0 hidden lg:block"
-      style={{
-        width: "1px",
-        height: "45px",
-        background: "rgba(255,255,255,0.2)",
-      }}
+      width={1}
+      height={46}
+      className="mx-4 shrink-0 hidden lg:block"
+      loading="lazy"
+      decoding="async"
     />
   );
 }
