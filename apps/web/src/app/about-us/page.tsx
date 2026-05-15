@@ -8,16 +8,26 @@ import { AboutEcosystems } from "@/components/sections/about/AboutEcosystems";
 import { AboutCTA } from "@/components/sections/about/AboutCTA";
 import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
+import { buildPageMetadata } from "@/lib/seo/canonical";
+import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
-export const metadata = {
-  title: "About Us | CleanStart",
+export const metadata = buildPageMetadata({
+  title: "About Us",
   description:
     "CleanStart builds trusted software delivery by integrating security, compliance, and provenance into every build.",
-};
+  path: "/about-us",
+});
 
 export default function AboutPage() {
   return (
     <>
+      <JsonLd
+        id="about-breadcrumbs"
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "About Us" },
+        ])}
+      />
       <Header />
       <main>
         {/* Hero shares the same dark gradient wrapper as the homepage hero */}

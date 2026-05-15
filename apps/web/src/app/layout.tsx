@@ -5,6 +5,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { WebVitals } from "@/components/observability/WebVitals";
+import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
+import { JsonLd, organizationSchema } from "@/lib/seo/jsonld";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -28,8 +30,6 @@ const inter = Inter({
 
 const isProduction = process.env.VERCEL_ENV === "production";
 
-const SITE_URL = "https://www.cleanstart.com";
-const SITE_NAME = "CleanStart";
 const TITLE = "CleanStart — Secure by Design. Built from Source.";
 const DESCRIPTION =
   "Verified container images. Built from source, hardened, signed, and continuously verified.";
@@ -104,6 +104,7 @@ export default function RootLayout({
       style={{ ["--font-sans" as string]: "var(--font-figtree)" }}
     >
       <body>
+        <JsonLd id="org-jsonld" data={organizationSchema()} />
         <WebVitals />
         {children}
         <Analytics />
