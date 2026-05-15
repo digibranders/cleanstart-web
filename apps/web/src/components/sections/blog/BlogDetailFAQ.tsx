@@ -91,9 +91,8 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                       </span>
                     </button>
 
-                    <div
+                    <section
                       id={answerId}
-                      role="region"
                       aria-hidden={!isOpen}
                       style={{
                         maxHeight: isOpen ? "800px" : "0px",
@@ -123,7 +122,7 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                           ) : null
                         )}
                       </div>
-                    </div>
+                    </section>
                   </div>
                 );
               })}

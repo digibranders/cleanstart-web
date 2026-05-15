@@ -263,9 +263,8 @@ function FaqItemRow({
           is the correct UX (not a CLS regression).
           Inline styles for the height/opacity transition keep the cascade
           deterministic across browsers. */}
-      <div
+      <section
         id={answerId}
-        role="region"
         aria-hidden={!isOpen}
         data-faq-answer={isOpen ? "open" : "closed"}
         style={{
@@ -287,7 +286,7 @@ function FaqItemRow({
         >
           {item.a}
         </p>
-      </div>
+      </section>
     </div>
   );
 }

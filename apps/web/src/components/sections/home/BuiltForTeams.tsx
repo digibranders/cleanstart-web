@@ -177,10 +177,9 @@ export function BuiltForTeams() {
           </p>
         </header>
 
-        <div
+        <section
           ref={carouselRef}
           className="cs-tt-carousel relative mt-16 outline-none sm:mt-20"
-          role="region"
           aria-roledescription="carousel"
           aria-label="Customer testimonials"
           onKeyDown={onKeyDown}
@@ -273,7 +272,7 @@ export function BuiltForTeams() {
             </div>
             <NavButton direction="next" onClick={goNext} label="Next testimonial" />
           </div>
-        </div>
+        </section>
       </div>
     </section>
   );
