@@ -1,6 +1,8 @@
 // Resource Center data layer — mirrors the blog.ts pattern.
 // All data flows from Payload CMS via the REST API.
 
+import { cache } from "react";
+
 export type ResourceType =
   | "whitepaper"
   | "report"
@@ -87,14 +89,14 @@ export async function getResources({
   );
 }
 
-export async function getResourceBySlug(
-  slug: string,
-): Promise<ResourceDetail | null> {
-  const data = await fetchCMS<PayloadListResponse<ResourceDetail>>(
-    `/api/resources?where[slug][equals]=${encodeURIComponent(slug)}&${PUBLISHED_FILTER}&depth=3&limit=1`,
-  );
-  return data.docs[0] ?? null;
-}
+export const getResourceBySlug = cache(
+  async (slug: string): Promise<ResourceDetail | null> => {
+    const data = await fetchCMS<PayloadListResponse<ResourceDetail>>(
+      `/api/resources?where[slug][equals]=${encodeURIComponent(slug)}&${PUBLISHED_FILTER}&depth=3&limit=1`,
+    );
+    return data.docs[0] ?? null;
+  },
+);
 
 /** Human-readable label for a resource type. */
 export function resourceTypeLabel(type: ResourceType | null | undefined): string {

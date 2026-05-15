@@ -46,6 +46,7 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                 const id = item.id ?? String(i);
                 const isOpen = openId === id;
                 const answerId = `blog-faq-answer-${id}`;
+                const questionId = `blog-faq-question-${id}`;
                 return (
                   <div
                     key={id}
@@ -55,6 +56,7 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                   >
                     <button
                       type="button"
+                      id={questionId}
                       onClick={() => setOpenId(isOpen ? null : id)}
                       aria-expanded={isOpen}
                       aria-controls={answerId}
@@ -93,6 +95,7 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
 
                     <section
                       id={answerId}
+                      aria-labelledby={questionId}
                       aria-hidden={!isOpen}
                       style={{
                         maxHeight: isOpen ? "800px" : "0px",

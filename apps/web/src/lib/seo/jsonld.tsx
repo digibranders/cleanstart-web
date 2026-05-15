@@ -88,6 +88,7 @@ export function blogPostingSchema({
   authors,
   category,
 }: BlogPostingSchemaInput) {
+  const lastModified = modifiedAt ?? publishedAt;
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -96,9 +97,7 @@ export function blogPostingSchema({
     ...(description ? { description } : {}),
     ...(imageUrl ? { image: [imageUrl] } : {}),
     ...(publishedAt ? { datePublished: publishedAt } : {}),
-    ...(modifiedAt ?? publishedAt
-      ? { dateModified: modifiedAt ?? publishedAt }
-      : {}),
+    ...(lastModified ? { dateModified: lastModified } : {}),
     ...(authors && authors.length > 0
       ? {
           author: authors.map((a) => ({ "@type": "Person", name: a.name })),
@@ -128,6 +127,7 @@ export function articleSchema({
   imageUrl,
   type,
 }: ArticleSchemaInput) {
+  const lastModified = modifiedAt ?? publishedAt;
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -136,9 +136,7 @@ export function articleSchema({
     ...(description ? { description } : {}),
     ...(imageUrl ? { image: [imageUrl] } : {}),
     ...(publishedAt ? { datePublished: publishedAt } : {}),
-    ...(modifiedAt ?? publishedAt
-      ? { dateModified: modifiedAt ?? publishedAt }
-      : {}),
+    ...(lastModified ? { dateModified: lastModified } : {}),
     ...(type ? { genre: type } : {}),
     publisher: { "@id": ORGANIZATION_ID },
   };

@@ -40,6 +40,8 @@ async function fetchPublished(collection: string): Promise<CmsDoc[]> {
   }
 }
 
+// Keep in sync with docs/WEB-PAGES.md as new static pages ship
+// (pricing, contact-us, products, careers, etc. — currently not built).
 const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: "/" },
   { path: "/about-us" },
