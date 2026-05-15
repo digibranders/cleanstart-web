@@ -17,6 +17,8 @@ const inter = Inter({
   display: "swap",
 });
 
+const isProduction = process.env.VERCEL_ENV === "production";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://cleanstart.com"),
   title: {
@@ -25,6 +27,9 @@ export const metadata: Metadata = {
   },
   description:
     "Verified container images. Built from source, hardened, signed, and continuously verified.",
+  robots: isProduction
+    ? { index: true, follow: true }
+    : { index: false, follow: false, googleBot: { index: false, follow: false } },
   openGraph: {
     title: "CleanStart — Secure by Design. Built from Source.",
     description:
