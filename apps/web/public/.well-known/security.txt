@@ -1,0 +1,4 @@
+Contact: mailto:security@cleanstart.com
+Expires: 2026-11-15T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://www.cleanstart.com/.well-known/security.txt

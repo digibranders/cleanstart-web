@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+const PRODUCTION_HOST = "https://www.cleanstart.com";
+
 export default function robots(): MetadataRoute.Robots {
   const isProduction = process.env.VERCEL_ENV === "production";
 
@@ -9,9 +11,15 @@ export default function robots(): MetadataRoute.Robots {
     };
   }
 
+  // Decision §8 of WEB-PRODUCTION.md: allow all AI crawlers except Bytespider.
+  // ByteDance's Bytespider ignores robots.txt — the symbolic disallow here is
+  // backed by a Vercel Firewall rule on User-Agent.
   return {
-    rules: [{ userAgent: "*", allow: "/" }],
-    sitemap: "https://cleanstart.com/sitemap.xml",
-    host: "https://cleanstart.com",
+    rules: [
+      { userAgent: "*", allow: "/" },
+      { userAgent: "Bytespider", disallow: "/" },
+    ],
+    sitemap: `${PRODUCTION_HOST}/sitemap.xml`,
+    host: PRODUCTION_HOST,
   };
 }

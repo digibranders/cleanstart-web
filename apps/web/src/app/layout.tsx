@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { WebVitals } from "@/components/observability/WebVitals";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -19,29 +22,61 @@ const inter = Inter({
 
 const isProduction = process.env.VERCEL_ENV === "production";
 
+const SITE_URL = "https://www.cleanstart.com";
+const SITE_NAME = "CleanStart";
+const TITLE = "CleanStart — Secure by Design. Built from Source.";
+const DESCRIPTION =
+  "Verified container images. Built from source, hardened, signed, and continuously verified.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cleanstart.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "CleanStart — Secure by Design. Built from Source.",
+    default: TITLE,
     template: "%s | CleanStart",
   },
-  description:
-    "Verified container images. Built from source, hardened, signed, and continuously verified.",
+  description: DESCRIPTION,
+  alternates: {
+    canonical: "/",
+  },
   robots: isProduction
-    ? { index: true, follow: true }
+    ? {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+          "max-video-preview": -1,
+        },
+      }
     : { index: false, follow: false, googleBot: { index: false, follow: false } },
   openGraph: {
-    title: "CleanStart — Secure by Design. Built from Source.",
-    description:
-      "Verified container images. Built from source, hardened, signed, and continuously verified.",
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
     type: "website",
-    siteName: "CleanStart",
+    siteName: SITE_NAME,
+    images: [
+      {
+        url: "/og/default.png",
+        width: 1200,
+        height: 630,
+        alt: "CleanStart — verified container images",
+      },
+    ],
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "CleanStart — Secure by Design. Built from Source.",
-    description:
-      "Verified container images. Built from source, hardened, signed, and continuously verified.",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [
+      {
+        url: "/og/default.png",
+        alt: "CleanStart — verified container images",
+      },
+    ],
   },
 };
 
@@ -62,7 +97,12 @@ export default function RootLayout({
       className={cn("font-sans", figtree.variable, inter.variable)}
       style={{ ["--font-sans" as string]: "var(--font-figtree)" }}
     >
-      <body>{children}</body>
+      <body>
+        <WebVitals />
+        {children}
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   );
 }
