@@ -96,11 +96,11 @@ export function AboutOurVision() {
               {/* Echo ring trail — five SVG ellipses from Figma node 248:2129 (back to front render order) */}
               {/* Each bbox is sized to its Figma rendered-bbox % of the CONTENT bounds (609×568); inner uses SVG-natural aspect to keep ellipse shape locked. */}
 
-              {/* Ellipse 46701 — sized to bullseye DISC (61.78% × 62.51%), Figma center preserved */}
+              {/* Ellipse 46701 — reduced to 0.7× of disc size, center preserved */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute flex items-center justify-center"
-                style={{ left: "2.56%", top: "34.74%", width: "61.78%", height: "62.51%" }}
+                style={{ left: "11.83%", top: "44.11%", width: "43.25%", height: "43.76%" }}
               >
                 <div
                   className="flex items-center justify-center"
@@ -121,11 +121,11 @@ export function AboutOurVision() {
                 </div>
               </div>
 
-              {/* Ellipse 46702 — sized to bullseye DISC, Figma center preserved */}
+              {/* Ellipse 46702 — reduced to 0.7×, center preserved */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute flex items-center justify-center"
-                style={{ left: "-5.34%", top: "43.31%", width: "61.78%", height: "62.51%" }}
+                style={{ left: "3.93%", top: "52.68%", width: "43.25%", height: "43.76%" }}
               >
                 <div
                   className="flex items-center justify-center"
@@ -146,11 +146,11 @@ export function AboutOurVision() {
                 </div>
               </div>
 
-              {/* Ellipse 46700 — sized to bullseye DISC, Figma center preserved */}
+              {/* Ellipse 46700 — reduced to 0.7×, center preserved */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute flex items-center justify-center"
-                style={{ left: "10.10%", top: "26.47%", width: "61.78%", height: "62.51%" }}
+                style={{ left: "19.37%", top: "35.84%", width: "43.25%", height: "43.76%" }}
               >
                 <div
                   className="flex items-center justify-center"
@@ -171,11 +171,11 @@ export function AboutOurVision() {
                 </div>
               </div>
 
-              {/* Ellipse 46698 — sized to bullseye DISC, Figma center preserved */}
+              {/* Ellipse 46698 — reduced to 0.7×, center preserved */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute flex items-center justify-center"
-                style={{ left: "19.98%", top: "17.50%", width: "61.78%", height: "62.51%" }}
+                style={{ left: "29.25%", top: "26.87%", width: "43.25%", height: "43.76%" }}
               >
                 <div
                   className="flex items-center justify-center"
@@ -196,11 +196,11 @@ export function AboutOurVision() {
                 </div>
               </div>
 
-              {/* Ellipse 46699 — sized to bullseye DISC (matches other rings), original Figma position */}
+              {/* Ellipse 46699 — reduced to 0.7×, center preserved */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute flex items-center justify-center"
-                style={{ left: "28.19%", top: "8.01%", width: "61.78%", height: "62.51%" }}
+                style={{ left: "37.46%", top: "17.39%", width: "43.25%", height: "43.76%" }}
               >
                 <div
                   className="flex items-center justify-center"
@@ -229,7 +229,7 @@ export function AboutOurVision() {
                 height={353}
                 className="absolute object-contain"
                 style={{
-                  left: "29.23%",
+                  left: "35%",
                   top: "0.16%",
                   width: "70.89%",
                   height: "71.55%",

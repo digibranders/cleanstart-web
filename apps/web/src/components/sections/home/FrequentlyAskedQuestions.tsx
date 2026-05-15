@@ -93,7 +93,7 @@ export function FrequentlyAskedQuestions() {
       // Note: no overflow-hidden — lets the decorative lavender/cyan/purple
       // blobs bleed across the top/bottom section boundaries. Body has
       // overflow-x: hidden so horizontal scroll is still prevented.
-      className="relative w-full py-14 sm:py-16 lg:py-20"
+      className="relative w-full py-14 sm:py-16 lg:py-20 mb-[-50px]"
       aria-labelledby="faq-title"
     >
       {/* Figma 108:7627 "Ellipse 46691" — cyan glow at top-right of FAQ.

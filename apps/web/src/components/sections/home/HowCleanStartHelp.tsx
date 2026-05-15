@@ -127,7 +127,7 @@ export function HowCleanStartHelp() {
             are in true 1276px space matching Figma (node 108:8008, 1276×678).
             pb-[30px] adds the 30px extension below the card grid that connects
             this section to the next. */}
-        <div className="relative pb-[30px] md:-mx-6">
+        <div className="relative pb-[30px] md:-mx-6 mb-[-30px]">
           {/* White L-shape SVG (Figma Vector 1194233942, 1276×678).
               viewBox: 1276 wide × 678 tall (308 row1 + 32 gap + 308 row2 + 30px extension).
               Cutout: top-left 654×340 — CISO card (308px) + gap (32px) so the gap zone
