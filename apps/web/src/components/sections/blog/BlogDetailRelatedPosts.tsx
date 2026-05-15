@@ -22,7 +22,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
           <h2
             className="leading-none"
             style={{
-              fontFamily: "Figtree, sans-serif",
+              fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
               fontWeight: 700,
               fontSize: "clamp(36px, 4.3vw, 62px)",
               letterSpacing: "-0.05em",
@@ -49,7 +49,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
           >
             <span
               className="text-white group-hover:text-[#2CC1EB] transition-colors duration-200"
-              style={{ fontFamily: "Figtree, sans-serif", fontWeight: 700, fontSize: "clamp(20px, 2.2vw, 32px)", letterSpacing: "-0.05em", lineHeight: 1 }}
+              style={{ fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", fontWeight: 700, fontSize: "clamp(20px, 2.2vw, 32px)", letterSpacing: "-0.05em", lineHeight: 1 }}
             >
               See All
             </span>
@@ -122,7 +122,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
                 borderRadius: "8px",
                 background: "linear-gradient(90deg, #F5F5F9 0%, #EAE5FE 100%)",
                 boxShadow: "0px 3px 0px 0px rgba(74,59,241,0.3)",
-                fontFamily: "Figtree, sans-serif",
+                fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
                 fontWeight: 500,
                 fontSize: "16px",
                 lineHeight: 1.3,
@@ -142,7 +142,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
               <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/blogs/icon-calendar-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0" />
-                <span style={{ fontFamily: "Figtree, sans-serif", fontWeight: 500, fontSize: "14px", color: "#666", lineHeight: "normal" }}>
+                <span style={{ fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", fontWeight: 500, fontSize: "14px", color: "#666", lineHeight: "normal" }}>
                   {formatBlogDate(post.publishedAt)}
                 </span>
               </div>
@@ -151,7 +151,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
               <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/blogs/icon-clock-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0" />
-                <span style={{ fontFamily: "Figtree, sans-serif", fontWeight: 500, fontSize: "14px", color: "#666", lineHeight: "normal" }}>
+                <span style={{ fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", fontWeight: 500, fontSize: "14px", color: "#666", lineHeight: "normal" }}>
                   {post.readingMinutes} min read
                 </span>
               </div>
@@ -161,7 +161,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
           {/* Title */}
           <h3
             className="line-clamp-3 flex-1"
-            style={{ fontFamily: "Figtree, sans-serif", fontWeight: 500, fontSize: "24px", lineHeight: 1.3, color: "#111" }}
+            style={{ fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", fontWeight: 500, fontSize: "24px", lineHeight: 1.3, color: "#111" }}
           >
             {post.title}
           </h3>
@@ -170,7 +170,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
           {post.abstract && (
             <p
               className="line-clamp-3"
-              style={{ fontFamily: "Figtree, sans-serif", fontWeight: 400, fontSize: "16px", lineHeight: 1.3, color: "rgba(17,17,17,0.54)" }}
+              style={{ fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", fontWeight: 400, fontSize: "16px", lineHeight: 1.3, color: "rgba(17,17,17,0.54)" }}
             >
               {post.abstract}
             </p>
@@ -180,7 +180,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
           <div className="flex items-center gap-2 mt-auto pt-2">
             <span
               className="group-hover:text-[#3928e0] transition-colors duration-200"
-              style={{ fontFamily: "Figtree, sans-serif", fontWeight: 500, fontSize: "20px", lineHeight: 1.5, color: "#4a3bf1" }}
+              style={{ fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", fontWeight: 500, fontSize: "20px", lineHeight: 1.5, color: "#4a3bf1" }}
             >
               Read more
             </span>

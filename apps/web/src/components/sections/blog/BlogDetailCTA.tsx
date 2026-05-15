@@ -98,7 +98,7 @@ export function BlogDetailCTA(): React.ReactElement {
               {/* Title — Figma 330:1282, Figtree Bold 72px, #111, ls -5%, lh 100% */}
               <h2
                 style={{
-                  fontFamily: "Figtree, sans-serif",
+                  fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
                   fontWeight: 700,
                   fontSize: "clamp(36px, 5vw, 72px)",
                   letterSpacing: "-0.05em",

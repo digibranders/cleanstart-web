@@ -84,7 +84,7 @@ export function ResourceDetailContent({
             <div
               className="resource-body"
               style={{
-                fontFamily: "Figtree, sans-serif",
+                fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
                 fontSize: "20px",
                 lineHeight: "1.4",
                 color: "#111",

@@ -23,7 +23,7 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
           <div className="min-w-0 flex-1 mx-auto xl:mx-0" style={{ maxWidth: "680px" }}>
             <h2
               style={{
-                fontFamily: "Figtree, sans-serif",
+                fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
                 fontWeight: 700,
                 fontSize: "clamp(22px, 2vw, 32px)",
                 letterSpacing: "-0.04em",
@@ -64,7 +64,7 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                       <span
                         className="flex-1 transition-colors duration-200 group-hover:text-[#3960f9]"
                         style={{
-                          fontFamily: "Figtree, sans-serif",
+                          fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
                           fontWeight: 600,
                           fontSize: "clamp(15px, 1.1vw, 17px)",
                           lineHeight: 1.4,
@@ -108,7 +108,7 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                             <p
                               key={j}
                               style={{
-                                fontFamily: "Figtree, sans-serif",
+                                fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
                                 fontWeight: 400,
                                 fontSize: "clamp(14px, 1vw, 15px)",
                                 lineHeight: 1.65,

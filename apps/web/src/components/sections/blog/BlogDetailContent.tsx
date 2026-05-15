@@ -87,7 +87,7 @@ export function BlogDetailContent({
               <p
                 className="mb-8"
                 style={{
-                  fontFamily: "Figtree, sans-serif",
+                  fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
                   fontSize: "clamp(16px, 1.2vw, 18px)",
                   color: "rgba(17,17,17,0.65)",
                   lineHeight: 1.7,
@@ -155,7 +155,7 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
     <nav aria-label="Table of contents">
       <p
         style={{
-          fontFamily: "Figtree, sans-serif",
+          fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
           fontWeight: 700,
           fontSize: "13px",
           letterSpacing: "0.06em",
@@ -194,7 +194,7 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
                   paddingBottom: "7px",
                   fontSize: "13.5px",
                   lineHeight: 1.55,
-                  fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif",
+                  fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
                   fontWeight: isActive ? 600 : 400,
                   color: isActive ? "#4a3bf1" : "rgba(17,17,17,0.65)",
                   transition: "color 0.2s",

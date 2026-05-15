@@ -290,7 +290,7 @@ function TabPill({
       onClick={onClick}
       className="relative h-[34px] cursor-pointer rounded-[999px] px-3 font-sans text-white transition-all duration-200"
       style={{
-        fontFamily: "Inter, var(--font-figtree), system-ui, sans-serif",
+        fontFamily: "var(--font-inter), var(--font-figtree), system-ui, sans-serif",
         fontSize: "18px",
         fontWeight: 500,
         opacity: active ? 1 : 0.7,

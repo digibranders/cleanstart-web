@@ -75,7 +75,7 @@ export function BlogDetailHero({
           <Link
             href="/blogs"
             className="flex items-center h-8 px-2 rounded-full"
-            style={{ color: "#98ACC3", fontSize: "12px", fontFamily: "Figtree, sans-serif", lineHeight: 1.4 }}
+            style={{ color: "#98ACC3", fontSize: "12px", fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", lineHeight: 1.4 }}
           >
             Resources
           </Link>
@@ -85,7 +85,7 @@ export function BlogDetailHero({
           <Link
             href="/blogs"
             className="flex items-center h-8 px-2 rounded-full"
-            style={{ color: "#98ACC3", fontSize: "12px", fontFamily: "Figtree, sans-serif", lineHeight: 1.4 }}
+            style={{ color: "#98ACC3", fontSize: "12px", fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", lineHeight: 1.4 }}
           >
             Blogs
           </Link>
@@ -94,7 +94,7 @@ export function BlogDetailHero({
 
           <span
             className="flex items-center h-8 px-2 max-w-[220px] truncate"
-            style={{ color: "#BFCCDA", fontSize: "12px", fontFamily: "Figtree, sans-serif", lineHeight: 1.4 }}
+            style={{ color: "#BFCCDA", fontSize: "12px", fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", lineHeight: 1.4 }}
           >
             {title}
           </span>
@@ -105,7 +105,7 @@ export function BlogDetailHero({
           <h1
             className="text-white text-center"
             style={{
-              fontFamily: "Figtree, sans-serif",
+              fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
               fontWeight: 600,
               fontSize: "clamp(26px, 2.4vw, 40px)",
               lineHeight: 1.25,
@@ -145,7 +145,7 @@ export function BlogDetailHero({
               />
               <span
                 className="text-white whitespace-nowrap"
-                style={{ fontFamily: "Figtree, sans-serif", fontWeight: 500, fontSize: "clamp(14px, 1.4vw, 20px)", lineHeight: 1.3 }}
+                style={{ fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", fontWeight: 500, fontSize: "clamp(14px, 1.4vw, 20px)", lineHeight: 1.3 }}
               >
                 {readingMinutes} min read
               </span>
@@ -176,7 +176,7 @@ export function BlogDetailHero({
               )}
               <span
                 className="text-white whitespace-nowrap"
-                style={{ fontFamily: "Figtree, sans-serif", fontWeight: 500, fontSize: "clamp(14px, 1.4vw, 20px)", lineHeight: 1.3 }}
+                style={{ fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif", fontWeight: 500, fontSize: "clamp(14px, 1.4vw, 20px)", lineHeight: 1.3 }}
               >
                 By {primaryAuthor.name}
               </span>
@@ -201,7 +201,7 @@ export function BlogDetailHero({
               <span
                 className="text-white whitespace-nowrap"
                 style={{
-                  fontFamily: "Figtree, sans-serif",
+                  fontFamily: "var(--font-figtree), ui-sans-serif, system-ui, sans-serif",
                   fontWeight: 500,
                   fontSize: "clamp(14px, 1.4vw, 20px)",
                   lineHeight: 1,

@@ -1374,7 +1374,7 @@ body {
    =========================================================================== */
 
 .article-body {
-  font-family: Figtree, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
   color: #111111;
 }
 
@@ -1483,7 +1483,7 @@ body {
 .article-body .article-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: Figtree, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(16px, 1.2vw, 20px);
   line-height: 1.4;
   letter-spacing: -0.04em;
