@@ -119,14 +119,14 @@ export const NAV_TREE: NavItem[] = [
         items: [
           { label: "Blogs", href: "/blogs", built: true },
           { label: "Resource Center", href: "/resource-center", built: true },
-          { label: "Newsroom", href: "/news" },
+          { label: "Newsroom", href: "/news", built: true },
           { label: "Knowledge Hub", href: "/knowledge-hub" },
         ],
       },
       {
         title: "Events",
         items: [
-          { label: "In-Person Events", href: "/events" },
+          { label: "In-Person Events", href: "/events", built: true },
           { label: "Webinars", href: "/webinars" },
           { label: "Podcast", href: "/podcast" },
         ],

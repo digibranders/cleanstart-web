@@ -4,6 +4,7 @@ import { getBlogBySlug, getRelatedBlogs, mediaUrl } from "@/lib/blog";
 import { Header } from "@/components/sections/Header";
 import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
 import { BlogDetailContent } from "@/components/sections/blog/BlogDetailContent";
+import { BlogDetailAuthor } from "@/components/sections/blog/BlogDetailAuthor";
 import { BlogDetailFAQ } from "@/components/sections/blog/BlogDetailFAQ";
 import { BlogDetailRelatedPosts } from "@/components/sections/blog/BlogDetailRelatedPosts";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
@@ -105,6 +106,8 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
           heroImage={post.heroImage}
           abstract={post.abstract ?? undefined}
         />
+
+        <BlogDetailAuthor authors={post.authors} />
 
         {post.faqs && post.faqs.length > 0 && (
           <BlogDetailFAQ faqs={post.faqs} />

@@ -11,6 +11,13 @@ export type BlogAuthor = {
   name: string;
   photo?: BlogImage;
   bio?: string;
+  linkedin?: string;
+};
+
+export type BlogImageSize = {
+  url?: string | null;
+  width?: number;
+  height?: number;
 };
 
 export type BlogImage = {
@@ -19,6 +26,11 @@ export type BlogImage = {
   alt?: string;
   width?: number;
   height?: number;
+  sizes?: {
+    thumb?: BlogImageSize;
+    card?: BlogImageSize;
+    hero?: BlogImageSize;
+  };
 };
 
 export type Blog = {
@@ -193,6 +205,23 @@ export function mediaUrl(url: string | undefined | null): string | undefined {
   if (!url) return undefined;
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
   return `${CMS_URL}${url}`;
+}
+
+// Prefer a generated size variant when present. Payload's Media collection
+// can drift between its `url`/`filename` and the underlying R2 object (e.g. a
+// slug/sanitize hook renames the doc but the storage object is not moved),
+// leaving the canonical `url` 404'ing while the size variants — derived at
+// upload time and never renamed — remain correct.
+export function pickImageUrl(
+  image: BlogImage | undefined | null,
+  preferred: ReadonlyArray<"thumb" | "card" | "hero"> = ["card", "thumb", "hero"],
+): string | undefined {
+  if (!image) return undefined;
+  for (const key of preferred) {
+    const sized = image.sizes?.[key]?.url;
+    if (sized) return mediaUrl(sized);
+  }
+  return mediaUrl(image.url);
 }
 
 async function fetchCMS<T>(path: string): Promise<T> {
