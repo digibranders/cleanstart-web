@@ -60,12 +60,8 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
           className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none rounded-[8px]"
         />
         <span
-          className="relative font-sans font-medium whitespace-nowrap"
-          style={{
-            fontSize: "16px",
-            lineHeight: "1.3",
-            color: "#4a3bf1",
-          }}
+          className="relative text-base font-medium leading-[1.3] whitespace-nowrap"
+          style={{ color: "#4a3bf1" }}
         >
           {typeLabel}
         </span>
@@ -83,7 +79,7 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
       >
         {/* Title */}
         <h3
-          className="font-sans font-medium overflow-hidden"
+          className="font-display font-medium overflow-hidden"
           style={{
             fontSize: "clamp(0.875rem, 1.25vw, 1.5rem)",
             lineHeight: "1.3",

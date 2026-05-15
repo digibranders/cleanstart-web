@@ -95,17 +95,10 @@ export function BlogDetailCTA(): React.ReactElement {
               className="relative z-10 flex flex-col items-center"
               style={{ gap: "32px", width: "634px", maxWidth: "100%" }}
             >
-              {/* Title — Figma 330:1282, Figtree Bold 72px, #111, ls -5%, lh 100% */}
+              {/* Title — Figma 330:1282, Manrope Bold 72px, #111, ls -5%, lh 100% */}
               <h2
-                style={{
-                  fontFamily: "Figtree, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "clamp(36px, 5vw, 72px)",
-                  letterSpacing: "-0.05em",
-                  lineHeight: 1,
-                  color: "#111111",
-                  textAlign: "center",
-                }}
+                className="font-display text-display-lg font-bold leading-none tracking-[-0.05em] text-center"
+                style={{ color: "#111111" }}
               >
                 Built. Tested. Trusted.
               </h2>
@@ -113,30 +106,8 @@ export function BlogDetailCTA(): React.ReactElement {
               {/* Button — Figma 330:1283, 168×44, radius 8, bg #3960F9, overflow clip */}
               <button
                 type="button"
-                className="transition-transform duration-200 hover:-translate-y-px active:scale-[0.97] active:duration-[80ms]"
-                style={{
-                  position: "relative",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  width: "168px",
-                  height: "44px",
-                  paddingLeft: "14px",
-                  paddingRight: "14px",
-                  borderRadius: "8px",
-                  background: "#3960f9",
-                  boxShadow:
-                    "0px 0px 0px 1px #3960f9, 0px 1px 2px -1px rgba(9,6,63,0.4), inset 0px 1px 0px 0px rgba(255,255,255,0.16)",
-                  overflow: "hidden",
-                  color: "#fff",
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 500,
-                  fontSize: "18px",
-                  letterSpacing: "-0.01em",
-                  lineHeight: "1.33",
-                  textDecoration: "none",
-                  whiteSpace: "nowrap",
-                }}
+                className="cs-btn-blue relative overflow-hidden gap-2"
+                style={{ width: "168px", height: "44px", padding: "0 14px", fontSize: "1.125rem" }}
               >
                 <span style={{ position: "relative", zIndex: 1 }}>Get in Touch</span>
                 {/* eslint-disable-next-line @next/next/no-img-element */}

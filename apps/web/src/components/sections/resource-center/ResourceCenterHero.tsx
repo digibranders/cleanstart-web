@@ -129,7 +129,7 @@ export function ResourceCenterHero({
           >
             <h1
               id="rc-hero-title"
-              className="font-sans font-semibold leading-none"
+              className="font-display font-semibold leading-none"
               style={{
                 fontSize: "clamp(2.5rem, 3.75vw, 4.5rem)",
                 letterSpacing: "-0.05em",
@@ -161,12 +161,11 @@ export function ResourceCenterHero({
           </div>
 
           {/* Search bar */}
+          <search aria-label="Search resources" className="contents">
           <form
             onSubmit={handleSearch}
             className="flex items-center w-full"
             style={{ maxWidth: "674px" }}
-            role="search"
-            aria-label="Search resources"
           >
             <div
               className="relative overflow-hidden flex-1"
@@ -184,7 +183,7 @@ export function ResourceCenterHero({
                 name="q"
                 defaultValue={initialQuery}
                 placeholder="Search resources..."
-                className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 font-sans text-[16px] leading-[1.5] outline-none"
+                className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 text-base leading-[1.5] outline-none"
                 style={{ fontWeight: 400 }}
               />
             </div>
@@ -225,6 +224,7 @@ export function ResourceCenterHero({
               </svg>
             </button>
           </form>
+          </search>
         </div>
 
         {/* Popular search pills */}

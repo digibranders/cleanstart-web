@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { RenderLexical } from "@/lib/renderLexical";
 import type { ResourceDetail } from "@/lib/resources";
+import { mediaUrl } from "@/lib/resources";
 
 interface ResourceDetailContentProps {
   resource: ResourceDetail;
@@ -8,6 +10,8 @@ interface ResourceDetailContentProps {
 export function ResourceDetailContent({
   resource,
 }: ResourceDetailContentProps): React.ReactElement {
+  const coverUrl = mediaUrl(resource.heroImage?.url);
+
   return (
     <section
       className="relative"
@@ -31,30 +35,43 @@ export function ResourceDetailContent({
       >
         {/* White content card */}
         <div
-          className="relative mx-auto"
+          className="relative mx-auto overflow-hidden"
           style={{
             background: "white",
             borderRadius: "24px",
-            paddingTop: "48px",
             paddingBottom: "80px",
-            paddingLeft: "24px",
-            paddingRight: "24px",
           }}
         >
+          {/* Cover image — flush at card top */}
+          {coverUrl && (
+            <div className="flex justify-center" style={{ paddingTop: "48px", paddingLeft: "24px", paddingRight: "24px" }}>
+              <Image
+                src={coverUrl}
+                alt={resource.heroImage?.alt ?? resource.title}
+                width={839}
+                height={455}
+                style={{ borderRadius: "16px", objectFit: "cover" }}
+                priority
+              />
+            </div>
+          )}
+
           {/* Body text */}
           <div
             className="mx-auto"
-            style={{ maxWidth: "840px" }}
+            style={{
+              maxWidth: "840px",
+              paddingTop: "48px",
+              paddingLeft: "24px",
+              paddingRight: "24px",
+            }}
           >
             {resource.summary && (
               <p
-                className="font-sans font-normal"
+                className="text-xl font-normal leading-[1.4] tracking-[-0.04em]"
                 style={{
-                  fontSize: "20px",
-                  lineHeight: "1.4",
                   color: "#111",
                   opacity: 0.8,
-                  letterSpacing: "-0.04em",
                   marginBottom: "24px",
                 }}
               >
@@ -62,14 +79,8 @@ export function ResourceDetailContent({
               </p>
             )}
             <div
-              className="resource-body"
-              style={{
-                fontFamily: "Figtree, sans-serif",
-                fontSize: "20px",
-                lineHeight: "1.4",
-                color: "#111",
-                letterSpacing: "-0.04em",
-              }}
+              className="resource-body text-xl leading-[1.4] tracking-[-0.04em]"
+              style={{ color: "#111" }}
             >
               <RenderLexical content={resource.body} />
             </div>

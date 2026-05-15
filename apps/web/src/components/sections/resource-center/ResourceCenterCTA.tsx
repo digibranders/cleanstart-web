@@ -107,7 +107,7 @@ export function ResourceCenterCTA(): React.ReactElement {
               {/* Left: headline */}
               <h2
                 id="rc-cta-title"
-                className="font-sans font-bold shrink-0"
+                className="font-display font-bold shrink-0"
                 style={{
                   fontSize: "clamp(1.75rem, 2.86vw, 3.4375rem)",
                   lineHeight: 1,
@@ -125,15 +125,8 @@ export function ResourceCenterCTA(): React.ReactElement {
                 style={{ width: "564px", gap: "40px" }}
               >
                 <p
-                  className="font-sans font-normal"
-                  style={{
-                    fontSize: "21px",
-                    lineHeight: "1.4",
-                    letterSpacing: "-0.04em",
-                    color: "#111",
-                    opacity: 0.8,
-                    width: "493px",
-                  }}
+                  className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em]"
+                  style={{ color: "#111", opacity: 0.8, width: "493px" }}
                 >
                   Why waste time patching what shouldn&apos;t exist? CleanStart
                   flips security from reactive to preventative, giving you cleaner
@@ -142,18 +135,8 @@ export function ResourceCenterCTA(): React.ReactElement {
 
                 <Link
                   href="/book-a-demo"
-                  className="relative overflow-hidden inline-flex items-center gap-2 text-white font-sans font-medium"
-                  style={{
-                    height: "44px",
-                    padding: "0 20px",
-                    borderRadius: "8px",
-                    background: "#3960f9",
-                    boxShadow:
-                      "0px 1px 2px -1px rgba(9,6,63,0.4), 0px 0px 0px 1px #3960f9, inset 0px 1px 0px 0px rgba(255,255,255,0.16)",
-                    fontSize: "18px",
-                    letterSpacing: "-0.01em",
-                    textDecoration: "none",
-                  }}
+                  className="cs-btn-blue relative overflow-hidden gap-2"
+                  style={{ height: "44px", padding: "0 20px", fontSize: "1.125rem" }}
                 >
                   {/* Bottom-center glow — matches Figma Ellipse3938 layer-blur */}
                   <span

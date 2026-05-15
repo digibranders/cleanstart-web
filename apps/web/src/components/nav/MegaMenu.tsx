@@ -25,7 +25,7 @@ export function MegaMenu({
         {groups.map((group, gi) => (
           <div key={gi} className="flex flex-col">
             {group.title && (
-              <div className="px-3 pt-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/45">
+              <div className="px-3 pt-3 pb-2 text-2xs font-semibold uppercase tracking-[0.08em] text-white/45">
                 {group.title}
               </div>
             )}
@@ -33,11 +33,11 @@ export function MegaMenu({
               {group.items.map((item) => {
                 const inner = (
                   <>
-                    <div className="text-[14.5px] font-medium leading-tight text-white/95">
+                    <div className="text-sm font-medium leading-tight text-white/95">
                       {item.label}
                     </div>
                     {showDescriptions && item.description && (
-                      <div className="mt-1 text-[12.5px] leading-snug text-white/55">
+                      <div className="mt-1 text-xs leading-snug text-white/55">
                         {item.description}
                       </div>
                     )}

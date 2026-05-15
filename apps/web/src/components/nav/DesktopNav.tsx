@@ -20,7 +20,7 @@ export function DesktopNav() {
           if (item.kind === "flat") {
             return (
               <NavigationMenuItem key={item.label}>
-                <span className="cs-nav-link relative inline-flex items-center text-[15px] font-medium leading-none text-white/85">
+                <span className="cs-nav-link relative inline-flex items-center text-base font-medium leading-none text-white/85">
                   {item.label}
                 </span>
               </NavigationMenuItem>

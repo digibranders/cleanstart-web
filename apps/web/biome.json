@@ -8,8 +8,8 @@
         "rules": {
           "a11y": {
             "noSvgWithoutTitle": "off",
-            "useSemanticElements": "off",
-            "useAnchorContent": "off"
+            "useSemanticElements": "error",
+            "useAnchorContent": "error"
           },
           "suspicious": {
             "noArrayIndexKey": "off"

@@ -29,8 +29,7 @@ export default function GlobalError({
           justifyContent: "center",
           padding: "4rem 1.5rem",
           textAlign: "center",
-          fontFamily:
-            "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+          fontFamily: "var(--font-sora), ui-sans-serif, system-ui, sans-serif",
           background: "#fafafa",
           color: "#111",
         }}
@@ -49,6 +48,7 @@ export default function GlobalError({
         <h1
           style={{
             marginTop: "1rem",
+            fontFamily: "var(--font-manrope), ui-sans-serif, system-ui, sans-serif",
             fontSize: "2.25rem",
             lineHeight: 1.15,
             fontWeight: 700,

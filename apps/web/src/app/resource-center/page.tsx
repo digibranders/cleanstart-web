@@ -8,12 +8,12 @@ import { ResourceCenterSidebar } from "@/components/sections/resource-center/Res
 import { ResourceGrid } from "@/components/sections/resource-center/ResourceGrid";
 import { ResourceCenterCTA } from "@/components/sections/resource-center/ResourceCenterCTA";
 import { getResources } from "@/lib/resources";
+import { buildPageMetadata } from "@/lib/seo/canonical";
+import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
-export const metadata: Metadata = {
-  title: "Resource Center | CleanStart",
-  description:
-    "A curated collection of whitepapers, reports, datasheets, and case studies on container security.",
-};
+const TITLE = "Resource Center";
+const DESCRIPTION =
+  "A curated collection of whitepapers, reports, datasheets, and case studies on container security.";
 
 interface ResourceCenterPageProps {
   searchParams: Promise<{
@@ -21,6 +21,19 @@ interface ResourceCenterPageProps {
     type?: string;
     q?: string;
   }>;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: ResourceCenterPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
+  return buildPageMetadata({
+    title: TITLE,
+    description: DESCRIPTION,
+    path: "/resource-center",
+    noindex: page >= 6,
+  });
 }
 
 export default async function ResourceCenterPage({
@@ -45,6 +58,13 @@ export default async function ResourceCenterPage({
 
   return (
     <>
+      <JsonLd
+        id="resource-center-breadcrumbs"
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Resource Center" },
+        ])}
+      />
       <Header />
       <main style={{ background: "#f6f6f6" }}>
         {/* Hero — dark gradient, search, popular tags */}

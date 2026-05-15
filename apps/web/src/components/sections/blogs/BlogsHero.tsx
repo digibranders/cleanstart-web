@@ -86,7 +86,7 @@ export function BlogsHero({
             <div className="flex flex-col items-center gap-8 w-full">
               <h1
                 id="blogs-hero-title"
-                className="font-sans font-semibold text-white text-center w-full"
+                className="font-display font-semibold text-white text-center w-full"
                 style={{
                   fontSize: "clamp(3rem,5.6vw,5rem)",
                   lineHeight: "1.0",
@@ -123,10 +123,9 @@ export function BlogsHero({
           </div>
 
           {/* Category filter pills */}
-          <div
+          <nav
             className="flex flex-wrap items-center justify-center"
             style={{ gap: "16px" }}
-            role="navigation"
             aria-label="Blog categories"
           >
             <CategoryPill
@@ -142,7 +141,7 @@ export function BlogsHero({
                 active={activeCategory === cat.slug}
               />
             ))}
-          </div>
+          </nav>
         </div>
 
         {/* Featured Blog — 2-column: text left, image right */}
@@ -158,23 +157,15 @@ export function BlogsHero({
             <div className="flex flex-col gap-6 items-start">
               <div className="flex flex-col gap-6 w-full">
                 <p
-                  className="font-sans font-medium"
-                  style={{
-                    fontSize: "20px",
-                    lineHeight: "1.5",
-                    color: "#d8d8d8",
-                    letterSpacing: "-0.04em",
-                  }}
+                  className="text-xl font-medium leading-[1.5] tracking-[-0.04em]"
+                  style={{ color: "#d8d8d8" }}
                 >
                   FEATURED BLOGS
                 </p>
                 <div className="flex flex-col gap-4 w-full">
                   <h2
-                    className="font-sans font-bold text-white overflow-hidden"
+                    className="font-display text-[clamp(1.5rem,3.06vw,2.75rem)] font-bold leading-none tracking-[-0.05em] text-white overflow-hidden"
                     style={{
-                      fontSize: "clamp(1.5rem,3.06vw,2.75rem)",
-                      lineHeight: "1.0",
-                      letterSpacing: "-0.05em",
                       display: "-webkit-box",
                       WebkitLineClamp: 3,
                       WebkitBoxOrient: "vertical",
@@ -184,13 +175,8 @@ export function BlogsHero({
                   </h2>
                   {featuredPost.abstract && (
                     <p
-                      className="font-sans font-normal"
-                      style={{
-                        fontSize: "clamp(1rem,1.53vw,1.375rem)",
-                        lineHeight: "1.4",
-                        letterSpacing: "-0.05em",
-                        color: "#d1e5ff",
-                      }}
+                      className="text-[clamp(1rem,1.53vw,1.375rem)] font-normal leading-[1.4] tracking-[-0.05em]"
+                      style={{ color: "#d1e5ff" }}
                     >
                       {featuredPost.abstract}
                     </p>
@@ -201,8 +187,7 @@ export function BlogsHero({
               {/* Read more link */}
               <Link
                 href={`/blog/${featuredPost.slug}`}
-                className="flex items-center gap-2 font-sans font-medium text-white text-center"
-                style={{ fontSize: "20px", lineHeight: "1.5" }}
+                className="flex items-center gap-2 text-xl font-medium leading-[1.5] text-white text-center"
               >
                 Read more
                 {/* eslint-disable-next-line @next/next/no-img-element */}

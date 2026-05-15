@@ -5,7 +5,7 @@ import Image from "next/image";
  * Figma group 108:7892 (1276×819 at y=2329)
  *
  * Layout:
- *  - Title (444×124, Figtree Bold 62px) with "patching" in cyan→purple gradient
+ *  - Title (444×124, Manrope Bold 62px) with "patching" in cyan→purple gradient
  *  - Vertical 1×90 gradient separator between title and description
  *  - Description (576×84, Regular 26px line 150% color #111 @ 80% opacity)
  *  - Two cards (622×600 outer · cyan border, 622×~441 inner white)
@@ -20,8 +20,8 @@ import Image from "next/image";
  *  - White inner content (corner-radius 32) with:
  *    + Decorative purple/cyan radial blobs at low opacity (Figma Ellipse 46681/46682)
  *    + 5-row bullet list:
- *       Public Images → snowflake icon (gray)        + Figtree SemiBold 22px label
- *       CleanStart    → sparkle icon (cyan→purple)   + Figtree Bold 22px label
+ *       Public Images → snowflake icon (gray)        + Sora SemiBold 22px label
+ *       CleanStart    → sparkle icon (cyan→purple)   + Sora Bold 22px label
  */
 
 const PUBLIC_IMAGES = [
@@ -98,14 +98,8 @@ export function SecurityNotPatching() {
         <div className="flex flex-col items-start gap-6 md:flex-row md:gap-12">
           <h2
             id="security-title"
-            className="font-sans text-[#111111]"
-            style={{
-              fontSize: "clamp(2rem,5.2vw,3.875rem)",
-              fontWeight: 700,
-              lineHeight: "100%",
-              letterSpacing: "-0.05em",
-              maxWidth: "444px",
-            }}
+            className="font-display text-display-md font-bold leading-none tracking-[-0.05em] text-[#111111]"
+            style={{ maxWidth: "444px" }}
           >
             Security isn&rsquo;t just{" "}
             <span
@@ -128,14 +122,8 @@ export function SecurityNotPatching() {
             }}
           />
           <p
-            className="font-sans text-[#111111] md:mt-3"
-            style={{
-              fontSize: "clamp(1rem,2vw,1.875rem)",
-              fontWeight: 400,
-              lineHeight: "140%",
-              letterSpacing: "-0.04em",
-              maxWidth: "576px",
-            }}
+            className="text-[clamp(1rem,2vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.04em] text-[#111111] md:mt-3"
+            style={{ maxWidth: "576px" }}
           >
             Recognized for innovation in secure software supply chain and
             hardened container images.
@@ -268,15 +256,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                   height={48}
                   className="h-[47px] w-[41px]"
                 />
-                <span
-                  className="font-sans text-white"
-                  style={{
-                    fontSize: "32px",
-                    fontWeight: 700,
-                    letterSpacing: "-0.05em",
-                    lineHeight: "100%",
-                  }}
-                >
+                <span className="font-display text-[2rem] font-bold leading-none tracking-[-0.05em] text-white">
                   Public Images
                 </span>
               </>
@@ -348,12 +328,8 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                   />
                 )}
                 <span
-                  className="font-sans text-[#333333]"
-                  style={{
-                    fontSize: "22px",
-                    fontWeight: isPublic ? 600 : 700,
-                    letterSpacing: "-0.01em",
-                  }}
+                  className="text-[1.375rem] tracking-[-0.01em] text-[#333333]"
+                  style={{ fontWeight: isPublic ? 600 : 700 }}
                 >
                   {label}
                 </span>

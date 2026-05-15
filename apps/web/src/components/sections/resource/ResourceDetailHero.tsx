@@ -130,12 +130,10 @@ export function ResourceDetailHero({
           />
           <Link
             href="/resource-center"
-            className="flex items-center justify-center font-sans font-normal shrink-0"
+            className="flex items-center justify-center text-xs font-normal leading-[1.4] shrink-0"
             style={{
               padding: "0 8px",
               height: "32px",
-              fontSize: "12px",
-              lineHeight: "1.4",
               color: "#98acc3",
               textDecoration: "none",
               borderRadius: "1000px",
@@ -156,12 +154,10 @@ export function ResourceDetailHero({
           />
           <Link
             href={`/resource-center?type=${encodeURIComponent(resource.type ?? "")}`}
-            className="flex items-center justify-center font-sans font-normal shrink-0"
+            className="flex items-center justify-center text-xs font-normal leading-[1.4] shrink-0"
             style={{
               padding: "0 8px",
               height: "32px",
-              fontSize: "12px",
-              lineHeight: "1.4",
               color: "#98acc3",
               textDecoration: "none",
               borderRadius: "1000px",
@@ -181,12 +177,11 @@ export function ResourceDetailHero({
             decoding="async"
           />
           <span
-            className="font-sans font-normal truncate"
+            className="text-xs font-normal truncate"
             style={{
               padding: "0 8px",
               height: "32px",
               lineHeight: "32px",
-              fontSize: "12px",
               color: "#bfccda",
               maxWidth: "320px",
             }}
@@ -203,7 +198,7 @@ export function ResourceDetailHero({
         >
           <h1
             id="rd-hero-title"
-            className="font-sans font-semibold text-center text-white"
+            className="font-display font-semibold text-center text-white"
             style={{
               fontSize: "clamp(2rem, 3.75vw, 4.5rem)",
               lineHeight: 1,
@@ -223,18 +218,13 @@ export function ResourceDetailHero({
           <a
             href={assetHref}
             download={assetHref !== "#"}
-            className="inline-flex items-center justify-center gap-3 font-sans font-bold text-white"
+            className="cs-btn-blue gap-3 font-bold"
             style={{
               width: "840px",
               maxWidth: "100%",
               height: "64px",
-              borderRadius: "8px",
-              background: "#3960f9",
-              boxShadow:
-                "0px 1px 2px -1px rgba(9,6,63,0.4), 0px 0px 0px 1px #3960f9, inset 0px 1px 0px 0px rgba(255,255,255,0.16)",
               fontSize: "clamp(1.25rem, 1.25vw, 1.5rem)",
               letterSpacing: "-0.05em",
-              textDecoration: "none",
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}

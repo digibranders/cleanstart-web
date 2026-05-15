@@ -229,10 +229,11 @@ export function AboutOurVision() {
                 height={353}
                 className="absolute object-contain"
                 style={{
-                  left: "35%",
-                  top: "0.16%",
-                  width: "70.89%",
-                  height: "71.55%",
+                  left: "33%",
+                  top: "-14%",
+                  width: "95%",
+                  height: "93%",
+                  transform: "rotate(-12.65deg)",
                 }}
                 loading="lazy"
               />
@@ -243,7 +244,7 @@ export function AboutOurVision() {
           <div className="flex flex-col gap-10 lg:max-w-[622px]">
             <div className="flex flex-col gap-6">
               <h2
-                className="font-sans font-bold"
+                className="font-display font-bold"
                 style={{
                   fontSize: "clamp(2.5rem, 4vw, 3.875rem)",
                   lineHeight: "1.0",
@@ -284,17 +285,8 @@ export function AboutOurVision() {
             {/* Blue "Contact Us" button */}
             <a
               href="#contact"
-              className="inline-flex items-center justify-center rounded-lg font-sans font-medium text-white transition-all duration-200 hover:-translate-y-px hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#3960F9]"
-              style={{
-                width: "131px",
-                height: "44px",
-                fontSize: "18px",
-                letterSpacing: "-0.01em",
-                background: "#3960F9",
-                boxShadow:
-                  "0 0 0 1.002px #3960F9, 0 1px 2px rgba(9,6,63,0.4), inset 0 1px 0 rgba(255,255,255,0.16)",
-                borderRadius: "8px",
-              }}
+              className="cs-btn-blue"
+              style={{ width: "131px", height: "44px", fontSize: "1.125rem" }}
             >
               Contact Us
             </a>

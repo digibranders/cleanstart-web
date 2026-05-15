@@ -7,12 +7,12 @@ import React, { useState } from "react";
  * Figma 108:8525 (title) + 108:8527 (description) + 108:8555 (left card) + 108:8575 (right card)
  *
  * Figma exact specs:
- * - Title: Figtree Bold 62px, color #111
- * - Description: Figtree Regular 30px, color #111
+ * - Title: Manrope Bold 62px, color #111
+ * - Description: Sora Regular 30px, color #111
  * - Each card: 622×variable, 40px corner radius, 40px padding all sides, white bg
  * - Vertical layout, 32px gap between FAQ items
- * - Item question: Figtree Bold 32px, color #111
- * - Item answer: Figtree Regular 20px, color #666
+ * - Item question: Manrope Bold 32px, color #111
+ * - Item answer: Sora Regular 20px, color #666
  * - Question-to-answer gap (open): 16px
  * - Toggle icon: 32×32 frame with 21×21 black filled +/× vector
  * - Divider between items: 1px solid #D9D9D9
@@ -138,26 +138,14 @@ export function FrequentlyAskedQuestions() {
         <div className="mb-8 flex flex-col items-start justify-between gap-5 md:mb-10 md:flex-row md:gap-12">
           <h2
             id="faq-title"
-            className="font-sans text-[#111111]"
-            style={{
-              fontSize: "clamp(2rem,5.2vw,3.875rem)",
-              fontWeight: 700,
-              lineHeight: "105%",
-              letterSpacing: "-0.05em",
-              maxWidth: "493px",
-            }}
+            className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
+            style={{ maxWidth: "493px" }}
           >
             Frequently Asked Questions
           </h2>
           <p
-            className="font-sans text-[#111111]"
-            style={{
-              fontSize: "clamp(1rem,1.8vw,1.875rem)",
-              fontWeight: 400,
-              lineHeight: "140%",
-              letterSpacing: "-0.03em",
-              maxWidth: "585px",
-            }}
+            className="text-[clamp(1rem,1.8vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.03em] text-[#111111]"
+            style={{ maxWidth: "585px" }}
           >
             Common questions about CleanStart&apos;s hardened container images,
             security, and integrations.
@@ -244,13 +232,7 @@ function FaqItemRow({
         className="group flex w-full items-start justify-between gap-6 text-left cursor-pointer md:gap-12"
       >
         <span
-          className="flex-1 font-sans text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
-          style={{
-            fontSize: "clamp(1.0625rem,1.6vw,1.5rem)",
-            fontWeight: 700,
-            lineHeight: "125%",
-            letterSpacing: "-0.03em",
-          }}
+          className="flex-1 font-display text-[clamp(1.0625rem,1.6vw,1.5rem)] font-bold leading-[1.25] tracking-[-0.03em] text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
         >
           {item.q}
         </span>
@@ -263,9 +245,8 @@ function FaqItemRow({
           is the correct UX (not a CLS regression).
           Inline styles for the height/opacity transition keep the cascade
           deterministic across browsers. */}
-      <div
+      <section
         id={answerId}
-        role="region"
         aria-hidden={!isOpen}
         data-faq-answer={isOpen ? "open" : "closed"}
         style={{
@@ -277,17 +258,11 @@ function FaqItemRow({
         }}
       >
         <p
-          className="pt-3 font-sans text-[#333333]"
-          style={{
-            fontSize: "clamp(0.875rem,1.05vw,1rem)",
-            fontWeight: 400,
-            lineHeight: "155%",
-            letterSpacing: "-0.01em",
-          }}
+          className="pt-3 text-[clamp(0.875rem,1.05vw,1rem)] font-normal leading-[1.55] tracking-[-0.01em] text-[#333333]"
         >
           {item.a}
         </p>
-      </div>
+      </section>
     </div>
   );
 }

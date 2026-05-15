@@ -5,11 +5,11 @@ import Image from "next/image";
  * CleanStart Advantage section — Figma frame 108:7864 (1920×817)
  * Children: bg image overlay, intro frame (108:7868), stats row (108:7872)
  *
- * Title (108:7869) — Figtree SemiBold 62px, line 100%, letter-spacing -5%
+ * Title (108:7869) — Manrope SemiBold 62px, line 100%, letter-spacing -5%
  *   "CleanStart " in solid white
  *   "Advantage" in linear gradient #9A50FF → #2CC1EB
  *
- * Description (108:7870) — Figtree Regular 26px, line 150%, letter-spacing -5%, white
+ * Description (108:7870) — Sora Regular 26px, line 150%, letter-spacing -5%, white
  *
  * Stats row (108:7872) — 1276×109. Five stat blocks with four 1×109 vertical
  *   separators (white-fading gradient). Exact x positions extracted from Figma:
@@ -23,8 +23,8 @@ import Image from "next/image";
  *     Sep 4   x=1084
  *     Stat 5  x=1160 w=116  "100%"      "Deterministic builds"
  *
- * Stat number — Figtree Bold 36px, line 100%, letter-spacing -5%
- * Stat label  — Figtree Medium 24px, line 110%, letter-spacing -5%
+ * Stat number — Manrope Bold 36px, line 100%, letter-spacing -5%
+ * Stat label  — Sora Medium 24px, line 110%, letter-spacing -5%
  */
 
 interface Stat {
@@ -70,13 +70,7 @@ export function CleanStartAdvantage() {
         <div className="max-w-[517px]">
           <h2
             id="advantage-title"
-            className="font-sans text-white"
-            style={{
-              fontSize: "clamp(2rem,5.2vw,3.875rem)",
-              fontWeight: 600,
-              lineHeight: "105%",
-              letterSpacing: "-0.05em",
-            }}
+            className="font-display text-display-md font-semibold leading-[1.05] tracking-[-0.05em] text-white"
           >
             CleanStart
             <br />
@@ -91,13 +85,7 @@ export function CleanStartAdvantage() {
             </span>
           </h2>
           <p
-            className="mt-6 font-sans text-white"
-            style={{
-              fontSize: "clamp(1rem,1.6vw,1.625rem)",
-              fontWeight: 400,
-              lineHeight: "150%",
-              letterSpacing: "-0.05em",
-            }}
+            className="mt-6 text-[clamp(1rem,1.6vw,1.625rem)] font-normal leading-[1.5] tracking-[-0.05em] text-white"
           >
             Real results from teams that replaced vulnerable public images with
             CleanStart&rsquo;s hardened, source-built containers
@@ -127,26 +115,12 @@ function StatBlock({ stat }: { stat: Stat }) {
   return (
     <div className="flex shrink-0 flex-col">
       <div
-        className="font-sans text-white"
-        style={{
-          fontSize: "36px",
-          fontWeight: 700,
-          lineHeight: "100%",
-          letterSpacing: "-0.05em",
-          whiteSpace: "nowrap",
-        }}
+        className="font-display text-4xl font-bold leading-none tracking-[-0.05em] text-white"
+        style={{ whiteSpace: "nowrap" }}
       >
         {stat.value}
       </div>
-      <div
-        className="mt-5 max-w-[180px] font-sans text-white"
-        style={{
-          fontSize: "24px",
-          fontWeight: 500,
-          lineHeight: "110%",
-          letterSpacing: "-0.05em",
-        }}
-      >
+      <div className="mt-5 max-w-[180px] text-2xl font-medium leading-[1.1] tracking-[-0.05em] text-white">
         {stat.label}
       </div>
     </div>

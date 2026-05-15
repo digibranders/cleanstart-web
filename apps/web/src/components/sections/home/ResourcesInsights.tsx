@@ -7,8 +7,8 @@ import Image from "next/image";
  * Section: "Resources & Insights"
  * Figma title 108:8526 + tab bar 108:8529 (929×64) + 3 article cards
  *
- * - Title: Figtree Bold 62px, color #111111
- * - Description: Figtree Regular 21px, color #333333
+ * - Title: Manrope Bold 62px, color #111111
+ * - Description: Sora Regular 21px, color #333333
  * - Tab bar: 6 tabs ("Blogs" active by default), white bg, 30px corner radius, 64h
  *   - Active tab: gradient pill #2B97D1→#3960F9 with white text + small white dot underneath
  *   - Inactive tabs: gray text #666
@@ -222,25 +222,11 @@ export function ResourcesInsights() {
         {/* Title + description (stacked, left-aligned) */}
         <h2
           id="resources-title"
-          className="font-sans text-[#111111]"
-          style={{
-            fontSize: "clamp(2rem,5.2vw,3.875rem)",
-            fontWeight: 700,
-            lineHeight: "105%",
-            letterSpacing: "-0.05em",
-          }}
+          className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
         >
           Resources &amp; Insights
         </h2>
-        <p
-          className="mt-5 max-w-[622px] font-sans text-[#333333]"
-          style={{
-            fontSize: "clamp(0.95rem,1.4vw,1.3125rem)",
-            fontWeight: 400,
-            lineHeight: "150%",
-            letterSpacing: "-0.02em",
-          }}
-        >
+        <p className="mt-5 max-w-[622px] text-[clamp(0.95rem,1.4vw,1.3125rem)] font-normal leading-[1.5] tracking-[-0.02em] text-[#333333]">
           Stay informed with the latest research, threat intelligence reports,
           and expert analysis from our security team.
         </p>
@@ -267,16 +253,12 @@ export function ResourcesInsights() {
                 aria-controls="resources-articles"
                 id={`tab-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative flex h-12 cursor-pointer items-center justify-center rounded-full px-8 font-sans transition-colors duration-200 ease-out ${
+                className={`relative flex h-12 cursor-pointer items-center justify-center rounded-full px-8 text-xl font-semibold leading-[1] tracking-[-0.05em] transition-colors duration-200 ease-out ${
                   isActive
                     ? "text-white"
                     : "text-[#666666] hover:text-[#111111]"
                 }`}
                 style={{
-                  fontSize: "20px",
-                  fontWeight: 600,
-                  letterSpacing: "-0.05em",
-                  lineHeight: "20px",
                   background: isActive
                     ? "linear-gradient(180deg, #2B97D1 0%, #3960F9 100%)"
                     : "transparent",
@@ -326,32 +308,16 @@ function ArticleCard({ article }: { article: Article }) {
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
-      {/* Figma: title Figtree Bold 21px, color #000 */}
-      <h3
-        className="font-sans text-black transition-colors duration-200 group-hover:text-[#1B1F4F]"
-        style={{
-          fontSize: "21px",
-          fontWeight: 700,
-          lineHeight: "130%",
-          letterSpacing: "-0.02em",
-        }}
-      >
+      {/* Figma: title Manrope Bold 21px, color #000 */}
+      <h3 className="font-display text-[1.3125rem] font-bold leading-[1.3] tracking-[-0.02em] text-black transition-colors duration-200 group-hover:text-[#1B1F4F]">
         {article.title}
       </h3>
-      {/* Figma: description Figtree Regular 16px, color #333 */}
-      <p
-        className="font-sans text-[#333333]"
-        style={{
-          fontSize: "16px",
-          fontWeight: 400,
-          lineHeight: "150%",
-          letterSpacing: "-0.01em",
-        }}
-      >
+      {/* Figma: description Sora Regular 16px, color #333 */}
+      <p className="text-base font-normal leading-[1.5] tracking-[-0.01em] text-[#333333]">
         {article.description}
       </p>
-      {/* Figma: "Explore" Figtree Bold 16px, color #000, with filled chevron arrow */}
-      <span className="inline-flex items-center gap-2 font-sans text-black transition-transform duration-200 group-hover:translate-x-1" style={{ fontSize: "16px", fontWeight: 700 }}>
+      {/* Figma: "Explore" Sora Bold 16px, color #000, with filled chevron arrow */}
+      <span className="inline-flex items-center gap-2 text-base font-bold text-black transition-transform duration-200 group-hover:translate-x-1">
         <span>Explore</span>
         <svg
           width="8"

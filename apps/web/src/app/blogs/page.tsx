@@ -10,12 +10,12 @@ import {
   getBlogs,
   getBlogCategories,
 } from "@/lib/blog";
+import { buildPageMetadata } from "@/lib/seo/canonical";
+import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
-export const metadata: Metadata = {
-  title: "Blogs | CleanStart",
-  description:
-    "A curated collection of writings, research, and solutions on container security, DevOps, and compliance.",
-};
+const TITLE = "Blogs";
+const DESCRIPTION =
+  "A curated collection of writings, research, and solutions on container security, DevOps, and compliance.";
 
 interface BlogsPageProps {
   searchParams: Promise<{
@@ -23,6 +23,20 @@ interface BlogsPageProps {
     category?: string;
     q?: string;
   }>;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: BlogsPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
+  // Per WEB-PRODUCTION.md §5: paginated pages 6+ → noindex, follow.
+  return buildPageMetadata({
+    title: TITLE,
+    description: DESCRIPTION,
+    path: "/blogs",
+    noindex: page >= 6,
+  });
 }
 
 export default async function BlogsPage({
@@ -47,6 +61,13 @@ export default async function BlogsPage({
 
   return (
     <>
+      <JsonLd
+        id="blogs-breadcrumbs"
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Blogs" },
+        ])}
+      />
       <Header />
       <main style={{ background: "#f6f6f6" }}>
         {/* Hero — dark gradient, includes featured post */}

@@ -35,17 +35,12 @@ export function ResourceCenterSidebar({
         }}
       >
         {/* Heading */}
-        <p
-          className="font-sans font-bold mb-4"
-          style={{
-            fontSize: "24px",
-            lineHeight: "1.2",
-            color: "#111",
-            letterSpacing: "-0.05em",
-          }}
+        <h3
+          className="font-display text-2xl font-bold leading-[1.2] tracking-[-0.05em] mb-4"
+          style={{ color: "#111" }}
         >
           Categories
-        </p>
+        </h3>
 
         {/* Divider */}
         <div
@@ -81,11 +76,8 @@ export function ResourceCenterSidebar({
                 decoding="async"
               />
               <span
-                className="font-sans font-semibold whitespace-nowrap"
+                className="font-display text-xl font-semibold leading-none tracking-[-0.05em] whitespace-nowrap"
                 style={{
-                  fontSize: "20px",
-                  lineHeight: 1,
-                  letterSpacing: "-0.05em",
                   ...(
                     !activeType
                       ? {
@@ -128,11 +120,8 @@ export function ResourceCenterSidebar({
                     decoding="async"
                   />
                   <span
-                    className="font-sans font-semibold whitespace-nowrap"
+                    className="font-display text-xl font-semibold leading-none tracking-[-0.05em] whitespace-nowrap"
                     style={{
-                      fontSize: "20px",
-                      lineHeight: 1,
-                      letterSpacing: "-0.05em",
                       ...(
                         isActive
                           ? {
