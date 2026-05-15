@@ -82,8 +82,8 @@ jobs:
         with:
           name: web-next-build
           path: |
-            apps/web/.next
-            !apps/web/.next/cache
+            apps/web/.next/**
+            !apps/web/.next/cache/**
           if-no-files-found: error
           retention-days: 1
 
