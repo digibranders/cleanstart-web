@@ -376,7 +376,7 @@ const dispatchAuthor = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
 
   const breadcrumb = buildBreadcrumbBlob(ctx, [
     { name: 'Home', path: '/' },
-    { name: 'Authors', path: '/authors' },
+    { name: 'Authors', path: '/author' },
     { name, path: `/author/${slug}` },
   ]);
   if (breadcrumb) blobs.push(breadcrumb);

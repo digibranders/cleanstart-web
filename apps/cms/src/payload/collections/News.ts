@@ -40,6 +40,41 @@ export const News: CollectionConfig = {
     slugField({ source: 'title' }),
     { name: 'abstract', type: 'textarea' },
     mediaUploadField({ name: 'heroImage', folderHint: 'web/news' }),
+    {
+      name: 'publisher',
+      type: 'text',
+      admin: {
+        description:
+          'Outlet name shown on the listing card meta strip and detail hero (e.g. "Dark Reading").',
+      },
+    },
+    mediaUploadField({
+      name: 'publisherLogo',
+      folderHint: 'web/news',
+      description:
+        'Outlet logo (~400×120, transparent PNG/SVG). Rendered large on the listing card and as the hero card on the detail page.',
+    }),
+    {
+      name: 'pressType',
+      type: 'select',
+      defaultValue: 'press-release',
+      admin: {
+        description: 'Pill shown on cards and the detail meta strip.',
+      },
+      options: [
+        { label: 'Press Release', value: 'press-release' },
+        { label: 'News', value: 'news' },
+        { label: 'Announcement', value: 'announcement' },
+        { label: 'Feature', value: 'feature' },
+      ],
+    },
+    {
+      name: 'location',
+      type: 'text',
+      admin: {
+        description: 'Dateline city, e.g. "Lewes, DE" — rendered before the body opener.',
+      },
+    },
     { name: 'body', type: 'richText' },
     {
       name: 'authors',

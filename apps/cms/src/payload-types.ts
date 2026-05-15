@@ -2076,6 +2076,22 @@ export interface News {
   slug: string;
   abstract?: string | null;
   heroImage?: (number | null) | Media;
+  /**
+   * Outlet name shown on the listing card meta strip and detail hero (e.g. "Dark Reading").
+   */
+  publisher?: string | null;
+  /**
+   * Outlet logo (~400×120, transparent PNG/SVG). Rendered large on the listing card and as the hero card on the detail page.
+   */
+  publisherLogo?: (number | null) | Media;
+  /**
+   * Pill shown on cards and the detail meta strip.
+   */
+  pressType?: ('press-release' | 'news' | 'announcement' | 'feature') | null;
+  /**
+   * Dateline city, e.g. "Lewes, DE" — rendered before the body opener.
+   */
+  location?: string | null;
   body?: {
     root: {
       type: string;
@@ -7548,6 +7564,10 @@ export interface NewsSelect<T extends boolean = true> {
   slug?: T;
   abstract?: T;
   heroImage?: T;
+  publisher?: T;
+  publisherLogo?: T;
+  pressType?: T;
+  location?: T;
   body?: T;
   authors?: T;
   newsCategories?: T;
