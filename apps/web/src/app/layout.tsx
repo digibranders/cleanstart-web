@@ -11,13 +11,19 @@ const figtree = Figtree({
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-figtree",
   display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 });
 
+// Inter is the secondary font (used in a few sections). Skipping preload
+// keeps the LCP request budget for Figtree, which is on every page.
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-inter",
   display: "swap",
+  preload: false,
+  adjustFontFallback: true,
 });
 
 const isProduction = process.env.VERCEL_ENV === "production";
