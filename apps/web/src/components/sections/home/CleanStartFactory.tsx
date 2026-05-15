@@ -58,17 +58,16 @@ export function CleanStartFactory() {
         </p>
       </div>
 
-      <div
-        role="list"
+      <ul
         aria-labelledby="cleanstart-factory-title"
-        className="mx-auto mt-10 grid w-full max-w-[1276px] grid-cols-2 gap-4 px-6 sm:mt-12 sm:grid-cols-3 sm:gap-5 lg:mt-14 lg:grid-cols-5 lg:gap-7"
+        className="mx-auto mt-10 grid w-full max-w-[1276px] grid-cols-2 gap-4 px-6 sm:mt-12 sm:grid-cols-3 sm:gap-5 lg:mt-14 lg:grid-cols-5 lg:gap-7 list-none p-0"
       >
         {CARDS.map((card) => (
-          <div role="listitem" key={card.title}>
+          <li key={card.title}>
             <FactoryCard {...card} />
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
 
       {/* Engine panel + flames */}
       <div className="relative mx-auto mt-12 max-w-[1276px] px-6">

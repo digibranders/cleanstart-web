@@ -123,10 +123,9 @@ export function BlogsHero({
           </div>
 
           {/* Category filter pills */}
-          <div
+          <nav
             className="flex flex-wrap items-center justify-center"
             style={{ gap: "16px" }}
-            role="navigation"
             aria-label="Blog categories"
           >
             <CategoryPill
@@ -142,7 +141,7 @@ export function BlogsHero({
                 active={activeCategory === cat.slug}
               />
             ))}
-          </div>
+          </nav>
         </div>
 
         {/* Featured Blog — 2-column: text left, image right */}

@@ -30,11 +30,10 @@ export function BlogsHeroSearch({
   );
 
   return (
+    <search aria-label="Search blogs" className="contents">
     <form
       onSubmit={handleSearch}
       className="flex items-center"
-      role="search"
-      aria-label="Search blogs"
     >
       {/* Input */}
       <div
@@ -75,5 +74,6 @@ export function BlogsHeroSearch({
         />
       </button>
     </form>
+    </search>
   );
 }

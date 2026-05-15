@@ -135,6 +135,7 @@ export function Footer({ topPadding = 179 }: { topPadding?: number } = {}) {
                       "inset 2.67px 2.67px 13.33px 4px rgba(168, 108, 252, 0.4)",
                   }}
                 >
+                  <span className="sr-only">{s.name}</span>
                   <svg
                     width="20"
                     height="20"

@@ -161,12 +161,11 @@ export function ResourceCenterHero({
           </div>
 
           {/* Search bar */}
+          <search aria-label="Search resources" className="contents">
           <form
             onSubmit={handleSearch}
             className="flex items-center w-full"
             style={{ maxWidth: "674px" }}
-            role="search"
-            aria-label="Search resources"
           >
             <div
               className="relative overflow-hidden flex-1"
@@ -225,6 +224,7 @@ export function ResourceCenterHero({
               </svg>
             </button>
           </form>
+          </search>
         </div>
 
         {/* Popular search pills */}

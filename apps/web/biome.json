@@ -7,9 +7,9 @@
       "linter": {
         "rules": {
           "a11y": {
-            "noSvgWithoutTitle": "off",
-            "useSemanticElements": "off",
-            "useAnchorContent": "off"
+            "noSvgWithoutTitle": "warn",
+            "useSemanticElements": "error",
+            "useAnchorContent": "error"
           },
           "suspicious": {
             "noArrayIndexKey": "off"
