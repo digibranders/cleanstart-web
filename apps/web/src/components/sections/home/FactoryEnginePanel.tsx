@@ -84,9 +84,9 @@ export function FactoryEnginePanel() {
         >
           <div className="flex w-full max-w-[343px] flex-col items-start gap-4">
             <h4
-              className="font-sans text-white"
+              className="font-display text-white"
               style={{
-                fontSize: "clamp(24px, 2.8vw, 36px)",
+                fontSize: "clamp(1.5rem, 2.8vw, 2.25rem)",
                 fontWeight: 500,
                 lineHeight: "100%",
                 letterSpacing: "-0.05em",
@@ -97,7 +97,7 @@ export function FactoryEnginePanel() {
             <p
               className="font-sans text-white opacity-80"
               style={{
-                fontSize: "clamp(14px, 1.4vw, 18px)",
+                fontSize: "clamp(0.875rem, 1.4vw, 1.125rem)",
                 fontWeight: 400,
                 lineHeight: "110%",
                 letterSpacing: "-0.04em",
@@ -151,9 +151,9 @@ export function FactoryEnginePanel() {
         <div className="cs-engine-card flex h-auto w-full flex-col items-center justify-center gap-[18px] px-5 py-6 sm:px-6 lg:h-[188.72px] lg:w-[40.13%]">
           <div className="flex w-full max-w-[365px] flex-col items-start gap-4">
             <h4
-              className="font-sans text-white"
+              className="font-display text-white"
               style={{
-                fontSize: "clamp(24px, 2.8vw, 36px)",
+                fontSize: "clamp(1.5rem, 2.8vw, 2.25rem)",
                 fontWeight: 500,
                 lineHeight: "100%",
                 letterSpacing: "-0.05em",
@@ -164,7 +164,7 @@ export function FactoryEnginePanel() {
             <p
               className="font-sans text-white opacity-80"
               style={{
-                fontSize: "clamp(14px, 1.4vw, 18px)",
+                fontSize: "clamp(0.875rem, 1.4vw, 1.125rem)",
                 fontWeight: 400,
                 lineHeight: "110%",
                 letterSpacing: "-0.04em",

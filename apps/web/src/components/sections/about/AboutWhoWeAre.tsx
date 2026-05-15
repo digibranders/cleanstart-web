@@ -61,7 +61,7 @@ export function AboutWhoWeAre() {
         {/* Heading row */}
         <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-start lg:gap-[106px]">
           <h2
-            className="shrink-0 font-sans font-bold"
+            className="shrink-0 font-display font-bold"
             style={{
               fontSize: "clamp(2.5rem, 4vw, 3.875rem)",
               lineHeight: "1.0",

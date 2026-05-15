@@ -42,7 +42,7 @@ export function AboutCTA() {
           <div className="relative flex flex-col items-center gap-8 text-center text-white">
             <div className="flex flex-col items-center gap-5">
               <h2
-                className="font-sans font-bold"
+                className="font-display font-bold"
                 style={{
                   fontSize: "clamp(2rem, 4vw, 3.4375rem)",
                   lineHeight: "1.0",

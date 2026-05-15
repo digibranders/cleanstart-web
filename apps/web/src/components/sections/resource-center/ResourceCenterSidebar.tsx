@@ -76,7 +76,7 @@ export function ResourceCenterSidebar({
                 decoding="async"
               />
               <span
-                className="text-xl font-semibold leading-none tracking-[-0.05em] whitespace-nowrap"
+                className="font-display text-xl font-semibold leading-none tracking-[-0.05em] whitespace-nowrap"
                 style={{
                   ...(
                     !activeType
@@ -120,7 +120,7 @@ export function ResourceCenterSidebar({
                     decoding="async"
                   />
                   <span
-                    className="text-xl font-semibold leading-none tracking-[-0.05em] whitespace-nowrap"
+                    className="font-display text-xl font-semibold leading-none tracking-[-0.05em] whitespace-nowrap"
                     style={{
                       ...(
                         isActive

@@ -67,7 +67,7 @@ export function AboutEcosystems() {
       <div className="relative mx-auto max-w-[1276px] px-6">
         {/* Heading */}
         <h2
-          className="text-center font-sans font-bold text-black"
+          className="text-center font-display font-bold text-black"
           style={{
             fontSize: "clamp(2rem, 4vw, 3.875rem)",
             lineHeight: "1.0",

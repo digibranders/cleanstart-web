@@ -43,7 +43,7 @@ export function AboutOurStory() {
           style={{ maxWidth: "514px" }}
         >
           <h2
-            className="font-sans font-bold text-white"
+            className="font-display font-bold text-white"
             style={{
               fontSize: "clamp(2.5rem, 4vw, 4rem)",
               lineHeight: "1.0",

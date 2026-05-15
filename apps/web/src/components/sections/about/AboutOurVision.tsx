@@ -244,7 +244,7 @@ export function AboutOurVision() {
           <div className="flex flex-col gap-10 lg:max-w-[622px]">
             <div className="flex flex-col gap-6">
               <h2
-                className="font-sans font-bold"
+                className="font-display font-bold"
                 style={{
                   fontSize: "clamp(2.5rem, 4vw, 3.875rem)",
                   lineHeight: "1.0",

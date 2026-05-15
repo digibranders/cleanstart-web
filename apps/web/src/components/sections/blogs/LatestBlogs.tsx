@@ -88,7 +88,7 @@ export function LatestBlogs({
       <div className="relative mx-auto max-w-[1276px] px-6">
         {/* Section heading */}
         <h2
-          className="font-sans font-bold"
+          className="font-display font-bold"
           style={{
             fontSize: "clamp(2rem,3.61vw,3.25rem)",
             lineHeight: "normal",

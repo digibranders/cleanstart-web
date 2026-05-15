@@ -107,7 +107,7 @@ export function ResourceCenterCTA(): React.ReactElement {
               {/* Left: headline */}
               <h2
                 id="rc-cta-title"
-                className="font-sans font-bold shrink-0"
+                className="font-display font-bold shrink-0"
                 style={{
                   fontSize: "clamp(1.75rem, 2.86vw, 3.4375rem)",
                   lineHeight: 1,

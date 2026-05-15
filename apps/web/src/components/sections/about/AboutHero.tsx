@@ -62,7 +62,7 @@ export function AboutHero() {
         <div className="pt-[178px] pb-[80px]">
           <div className="flex flex-col items-start gap-14 lg:max-w-[436px]">
             <h1
-              className="font-sans font-semibold text-white"
+              className="font-display font-semibold text-white"
               style={{
                 fontSize: "clamp(3rem, 5.5vw, 5.5rem)",
                 lineHeight: "1.0",

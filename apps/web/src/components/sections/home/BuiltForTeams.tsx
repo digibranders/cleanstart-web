@@ -140,7 +140,7 @@ export function BuiltForTeams() {
         <header className="mx-auto max-w-[760px] text-center">
           <h2
             id="testimonials-title"
-            className="font-sans"
+            className="font-display"
             style={{
               fontSize: "clamp(2rem,5.2vw,3.875rem)",
               fontWeight: 700,

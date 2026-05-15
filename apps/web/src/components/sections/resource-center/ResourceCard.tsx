@@ -79,7 +79,7 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
       >
         {/* Title */}
         <h3
-          className="font-sans font-medium overflow-hidden"
+          className="font-display font-medium overflow-hidden"
           style={{
             fontSize: "clamp(0.875rem, 1.25vw, 1.5rem)",
             lineHeight: "1.3",

@@ -38,7 +38,7 @@ export function CleanStartFactory() {
       <div className="mx-auto max-w-[820px] px-6 text-center">
         <h2
           id="cleanstart-factory-title"
-          className="font-sans text-[clamp(2rem,5.2vw,3.875rem)] font-bold tracking-[-0.05em] text-white"
+          className="font-display text-[clamp(2rem,5.2vw,3.875rem)] font-bold tracking-[-0.05em] text-white"
           style={{ lineHeight: "100%" }}
         >
           The CleanStart Factory

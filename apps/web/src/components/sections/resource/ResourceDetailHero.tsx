@@ -198,7 +198,7 @@ export function ResourceDetailHero({
         >
           <h1
             id="rd-hero-title"
-            className="font-sans font-semibold text-center text-white"
+            className="font-display font-semibold text-center text-white"
             style={{
               fontSize: "clamp(2rem, 3.75vw, 4.5rem)",
               lineHeight: 1,

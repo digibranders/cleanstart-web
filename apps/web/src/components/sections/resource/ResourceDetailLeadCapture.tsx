@@ -141,7 +141,7 @@ export function ResourceDetailLeadCapture({
               {/* Left: headline */}
               <h2
                 id="rd-cta-title"
-                className="font-sans font-bold shrink-0 text-white"
+                className="font-display font-bold shrink-0 text-white"
                 style={{
                   fontSize: "clamp(1.75rem, 2.86vw, 3.4375rem)",
                   lineHeight: 1,

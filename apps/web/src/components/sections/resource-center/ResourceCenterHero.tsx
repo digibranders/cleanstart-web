@@ -129,7 +129,7 @@ export function ResourceCenterHero({
           >
             <h1
               id="rc-hero-title"
-              className="font-sans font-semibold leading-none"
+              className="font-display font-semibold leading-none"
               style={{
                 fontSize: "clamp(2.5rem, 3.75vw, 4.5rem)",
                 letterSpacing: "-0.05em",

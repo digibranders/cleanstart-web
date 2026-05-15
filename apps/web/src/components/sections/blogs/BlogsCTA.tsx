@@ -94,7 +94,7 @@ export function BlogsCTA(): React.ReactElement {
               {/* Title */}
               <h2
                 id="blogs-cta-title"
-                className="font-sans font-bold text-white shrink-0"
+                className="font-display font-bold text-white shrink-0"
                 style={{
                   fontSize: "clamp(1.75rem,3.82vw,3.4375rem)",
                   lineHeight: "1.0",

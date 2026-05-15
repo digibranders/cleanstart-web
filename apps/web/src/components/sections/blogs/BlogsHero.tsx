@@ -86,7 +86,7 @@ export function BlogsHero({
             <div className="flex flex-col items-center gap-8 w-full">
               <h1
                 id="blogs-hero-title"
-                className="font-sans font-semibold text-white text-center w-full"
+                className="font-display font-semibold text-white text-center w-full"
                 style={{
                   fontSize: "clamp(3rem,5.6vw,5rem)",
                   lineHeight: "1.0",
