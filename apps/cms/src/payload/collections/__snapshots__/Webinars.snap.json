@@ -54,16 +54,16 @@
       "required": true,
       "options": [
         {
-          "value": "Americas"
+          "value": "north-america"
         },
         {
-          "value": "EMEA"
+          "value": "asia-mea"
         },
         {
-          "value": "APAC"
+          "value": "emea"
         },
         {
-          "value": "Global"
+          "value": "global"
         }
       ]
     },
