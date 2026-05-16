@@ -90,6 +90,7 @@ export interface Config {
     knowledgeBase: KnowledgeBase;
     events: Event;
     webinars: Webinar;
+    podcastEpisodes: PodcastEpisode;
     jobs: Job;
     aboutGalleries: AboutGallery;
     pages: Page;
@@ -124,6 +125,7 @@ export interface Config {
     knowledgeBase: KnowledgeBaseSelect<false> | KnowledgeBaseSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     webinars: WebinarsSelect<false> | WebinarsSelect<true>;
+    podcastEpisodes: PodcastEpisodesSelect<false> | PodcastEpisodesSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
     aboutGalleries: AboutGalleriesSelect<false> | AboutGalleriesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
@@ -144,6 +146,7 @@ export interface Config {
     footerNav: FooterNav;
     legal: Legal;
     announcements: Announcement;
+    podcastPage: PodcastPage;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
@@ -153,6 +156,7 @@ export interface Config {
     footerNav: FooterNavSelect<false> | FooterNavSelect<true>;
     legal: LegalSelect<false> | LegalSelect<true>;
     announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
+    podcastPage: PodcastPageSelect<false> | PodcastPageSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -2835,7 +2839,7 @@ export interface Resource {
    */
   gated?: boolean | null;
   /**
-   * Form the visitor fills to unlock the download. Required when gated.
+   * Form the visitor fills to unlock the download. Required when gated — the validator blocks save until set.
    */
   gateForm?: (number | null) | Form;
   accessLevel?: ('public' | 'lead-gated' | 'customer-only') | null;
@@ -4183,6 +4187,57 @@ export interface Webinar {
       | boolean
       | null;
   };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "podcastEpisodes".
+ */
+export interface PodcastEpisode {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  /**
+   * Sequential episode number, rendered as "Episode N" on cards and the hero.
+   */
+  episodeNumber: number;
+  /**
+   * Full YouTube URL (watch / youtu.be / embed / shorts). The 11-char video ID is auto-extracted on save and stored in youtubeVideoId.
+   */
+  youtubeUrl: string;
+  /**
+   * Auto-extracted from youtubeUrl on every save.
+   */
+  youtubeVideoId?: string | null;
+  /**
+   * Optional custom thumbnail. Leave blank to use YouTube’s maxresdefault thumbnail.
+   */
+  thumbnailOverride?: (number | null) | Media;
+  /**
+   * Short summary shown on listing cards and the featured hero. Keep under ~240 characters.
+   */
+  abstract?: string | null;
+  /**
+   * Total runtime in seconds. Surfaced as Schema.org duration / readable runtime badges.
+   */
+  durationSeconds?: number | null;
+  /**
+   * When on, this episode appears in the Featured Content section on /podcast.
+   */
+  featured?: boolean | null;
+  /**
+   * Defaults to the current moment on creation. Drives sort order on /podcast (newest first).
+   */
+  publicationDate: string;
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -6674,6 +6729,10 @@ export interface PayloadLockedDocument {
         value: number | Webinar;
       } | null)
     | ({
+        relationTo: 'podcastEpisodes';
+        value: number | PodcastEpisode;
+      } | null)
+    | ({
         relationTo: 'jobs';
         value: number | Job;
       } | null)
@@ -8527,6 +8586,26 @@ export interface WebinarsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "podcastEpisodes_select".
+ */
+export interface PodcastEpisodesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  episodeNumber?: T;
+  youtubeUrl?: T;
+  youtubeVideoId?: T;
+  thumbnailOverride?: T;
+  abstract?: T;
+  durationSeconds?: T;
+  featured?: T;
+  publicationDate?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "jobs_select".
  */
 export interface JobsSelect<T extends boolean = true> {
@@ -10121,6 +10200,63 @@ export interface Announcement {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "podcastPage".
+ */
+export interface PodcastPage {
+  id: number;
+  /**
+   * Small tag above the hero title. Optional.
+   */
+  heroEyebrow?: string | null;
+  /**
+   * Full hero title. Use heroTitleHighlight to mark the word(s) that should render in the accent colour.
+   */
+  heroTitle: string;
+  /**
+   * Substring of heroTitle that renders in the accent colour (case-sensitive match).
+   */
+  heroTitleHighlight: string;
+  /**
+   * One- or two-line subtitle shown beneath the hero title.
+   */
+  heroSubtitle?: string | null;
+  /**
+   * Episode shown in the hero embed. Leave empty to fall back to the most recent published episode.
+   */
+  featuredHeroEpisode?: (number | null) | PodcastEpisode;
+  latestEpisodesTitle?: string | null;
+  /**
+   * How many recent episodes to render on the listing grid.
+   */
+  latestEpisodesLimit?: number | null;
+  /**
+   * Heading for the Featured Content section. Pair with featuredSectionHighlight to mark the accent-coloured word(s).
+   */
+  featuredSectionTitle?: string | null;
+  /**
+   * Substring of featuredSectionTitle that renders in the accent colour (case-sensitive match).
+   */
+  featuredSectionHighlight?: string | null;
+  /**
+   * Cards rendered above the footer. Leave empty to fall back to the built-in defaults.
+   */
+  ctaCards?:
+    | {
+        title: string;
+        body: string;
+        ctaLabel: string;
+        /**
+         * Destination URL or path. Accepts `/site-path` or `https://…`.
+         */
+        ctaHref: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -10380,6 +10516,33 @@ export interface AnnouncementsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "podcastPage_select".
+ */
+export interface PodcastPageSelect<T extends boolean = true> {
+  heroEyebrow?: T;
+  heroTitle?: T;
+  heroTitleHighlight?: T;
+  heroSubtitle?: T;
+  featuredHeroEpisode?: T;
+  latestEpisodesTitle?: T;
+  latestEpisodesLimit?: T;
+  featuredSectionTitle?: T;
+  featuredSectionHighlight?: T;
+  ctaCards?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats_select".
  */
 export interface PayloadJobsStatsSelect<T extends boolean = true> {
@@ -10506,6 +10669,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'webinars';
           value: number | Webinar;
+        } | null)
+      | ({
+          relationTo: 'podcastEpisodes';
+          value: number | PodcastEpisode;
         } | null)
       | ({
           relationTo: 'jobs';

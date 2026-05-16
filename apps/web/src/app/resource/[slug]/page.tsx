@@ -84,7 +84,12 @@ export default async function ResourceDetailPage({
         })}
       />
       <Header />
-      <main style={{ background: "#f6f6f6" }}>
+      <main
+        style={{
+          background:
+            "linear-gradient(180deg, #151021 0%, #10123E 22%, #131E8F 48%, #471EC0 72%, #471FC3 100%)",
+        }}
+      >
         {/* Hero — dark gradient, breadcrumb, title, download button */}
         <ResourceDetailHero resource={resource} />
 

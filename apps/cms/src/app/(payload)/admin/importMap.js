@@ -89,6 +89,7 @@ import { AnalyticsTab as AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b } from '@
 import { PublishChecklistBanner as PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec } from '@/payload/admin/components/PublishChecklistBanner.tsx'
 import { PublishOverrideGuard as PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02 } from '@/payload/admin/components/PublishOverrideGuard.tsx'
 import { SlugRequirementGuard as SlugRequirementGuard_96979dae1465790bd97b2f570fed4659 } from '@/payload/admin/components/SlugRequirementGuard.tsx'
+import { GateFormLabel as GateFormLabel_c191dd670871074ae1a1cea086f78af8 } from '@/payload/admin/components/GateFormLabel.tsx'
 import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/payload/admin/components/fields/CodeField.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
@@ -207,6 +208,7 @@ export const importMap = {
   "@/payload/admin/components/PublishChecklistBanner.tsx#PublishChecklistBanner": PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec,
   "@/payload/admin/components/PublishOverrideGuard.tsx#PublishOverrideGuard": PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02,
   "@/payload/admin/components/SlugRequirementGuard.tsx#SlugRequirementGuard": SlugRequirementGuard_96979dae1465790bd97b2f570fed4659,
+  "@/payload/admin/components/GateFormLabel.tsx#GateFormLabel": GateFormLabel_c191dd670871074ae1a1cea086f78af8,
   "@/payload/admin/components/fields/CodeField.tsx#CodeField": CodeField_4aa85fbd783c4d26c5c89ebf383941c1,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,

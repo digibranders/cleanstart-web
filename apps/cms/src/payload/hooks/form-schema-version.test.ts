@@ -13,12 +13,13 @@ const callHook = async (
   data: Record<string, unknown>,
   originalDoc: Record<string, unknown> | undefined,
   totalDocs: number,
+  operation: 'create' | 'update' = 'update',
 ) =>
   formSchemaVersionHook({
     data,
     originalDoc,
     req: makeReq(totalDocs),
-    operation: 'update',
+    operation,
     collection: { slug: 'forms' } as never,
     context: {} as never,
   } as never);
@@ -73,6 +74,43 @@ describe('formSchemaVersionHook', () => {
       1,
     )) as { schemaVersion: number };
     expect(result.schemaVersion).toBe(2);
+  });
+
+  it('is a no-op on create even if originalDoc is provided (admin-UI publish-on-create path)', async () => {
+    const req = makeReq(0);
+    await callHook(
+      { fields: [{ name: 'a', type: 'text' }] },
+      { id: 1, fields: [] },
+      0,
+      'create',
+    );
+    expect(req.payload.count).not.toHaveBeenCalled();
+  });
+
+  it('is a no-op when originalDoc.id is NaN (defensive — Drizzle integer column would otherwise blow up)', async () => {
+    const req = makeReq(0);
+    await formSchemaVersionHook({
+      data: { fields: [{ name: 'a', type: 'text' }] },
+      originalDoc: { id: Number.NaN, fields: [] } as never,
+      req,
+      operation: 'update',
+      collection: { slug: 'forms' } as never,
+      context: {} as never,
+    } as never);
+    expect(req.payload.count).not.toHaveBeenCalled();
+  });
+
+  it('is a no-op when originalDoc has no id', async () => {
+    const req = makeReq(0);
+    await formSchemaVersionHook({
+      data: { fields: [{ name: 'a', type: 'text' }] },
+      originalDoc: { fields: [] } as never,
+      req,
+      operation: 'update',
+      collection: { slug: 'forms' } as never,
+      context: {} as never,
+    } as never);
+    expect(req.payload.count).not.toHaveBeenCalled();
   });
 
   it('does NOT treat validation-rule change as a shape change (lead keys still mean the same thing)', async () => {

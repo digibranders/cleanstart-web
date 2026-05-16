@@ -1,0 +1,66 @@
+{
+  "slug": "podcastEpisodes",
+  "versions": {
+    "drafts": true
+  },
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "title",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "slug",
+      "required": true,
+      "unique": true
+    },
+    {
+      "type": "number",
+      "name": "episodeNumber",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "youtubeUrl",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "youtubeVideoId"
+    },
+    {
+      "type": "upload",
+      "name": "thumbnailOverride",
+      "relationTo": "media"
+    },
+    {
+      "type": "textarea",
+      "name": "abstract"
+    },
+    {
+      "type": "number",
+      "name": "durationSeconds"
+    },
+    {
+      "type": "checkbox",
+      "name": "featured"
+    },
+    {
+      "type": "date",
+      "name": "publicationDate",
+      "required": true
+    },
+    {
+      "type": "date",
+      "name": "publishedAt"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 2,
+    "afterChange": 0,
+    "beforeValidate": 0,
+    "afterDelete": 0
+  }
+}

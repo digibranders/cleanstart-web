@@ -64,3 +64,6 @@ apps/cms/.lead-fallback-queue/
 .env*.local
 
 launch.json
+
+# Local scratch space
+tmp/

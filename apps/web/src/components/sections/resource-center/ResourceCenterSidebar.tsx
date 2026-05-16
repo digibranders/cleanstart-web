@@ -20,8 +20,7 @@ export function ResourceCenterSidebar({
   return (
     <nav
       aria-label="Resource type filter"
-      className="shrink-0"
-      style={{ width: "295px" }}
+      className="shrink-0 w-full lg:w-[295px]"
     >
       {/* White card background */}
       <div

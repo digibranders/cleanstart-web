@@ -105,8 +105,7 @@ export function Footer({
               break out of the 1276×330 card (e.g. the home page kubr bird
               peeking above the card top). */}
           <div
-            className="pointer-events-auto relative w-[1276px] max-w-full"
-            style={{ height: "330px" }}
+            className="pointer-events-auto relative w-[1276px] max-w-full h-[460px] sm:h-[400px] lg:h-[330px]"
           >
             {/* Clipped card surface — fills the slot and clips inner content
                 to the rounded 1276×330 box. */}
@@ -155,7 +154,7 @@ export function Footer({
           }}
         />
       <div className="relative px-6">
-       <div className="relative mx-auto w-full max-w-[1276px] pb-[80px]" style={{ paddingTop: hasCta ? "225px" : "80px" }}>
+       <div className={`relative mx-auto w-full max-w-[1276px] pb-[80px] ${hasCta ? "pt-[320px] sm:pt-[260px] lg:pt-[225px]" : "pt-[80px]"}`}>
         {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
         <div className="flex flex-wrap items-start justify-between gap-8">
           <p

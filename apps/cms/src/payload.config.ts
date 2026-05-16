@@ -28,6 +28,7 @@ import { Media } from './payload/collections/Media';
 import { News } from './payload/collections/News';
 import { NewsCategories } from './payload/collections/NewsCategories';
 import { Pages } from './payload/collections/Pages';
+import { PodcastEpisodes } from './payload/collections/PodcastEpisodes';
 import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
 import { SearchLog } from './payload/collections/SearchLog';
@@ -81,6 +82,7 @@ import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
 import { Legal } from './payload/globals/legal';
 import { MainNav } from './payload/globals/mainNav';
+import { PodcastPage } from './payload/globals/podcastPage';
 import { SeoDefaults } from './payload/globals/seoDefaults';
 import { SiteSettings } from './payload/globals/siteSettings';
 
@@ -269,6 +271,7 @@ export default buildConfig({
     KnowledgeBase,
     Events,
     Webinars,
+    PodcastEpisodes,
     Jobs,
     AboutGalleries,
     Pages,
@@ -278,7 +281,7 @@ export default buildConfig({
     .map(wireCustomEditView)
     .map(wireAnalyticsTab)
     .map(wireCustomFields),
-  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements]
+  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements, PodcastPage]
     .map(wireCustomEditView)
     .map(wireCustomFields),
   endpoints: [

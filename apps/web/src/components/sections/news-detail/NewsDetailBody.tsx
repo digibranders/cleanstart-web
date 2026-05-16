@@ -20,7 +20,7 @@ export function NewsDetailBody({ item }: NewsDetailBodyProps): React.ReactElemen
       className="relative w-full bg-white"
       data-section="NewsDetailBody"
     >
-      <div className="relative mx-auto max-w-[820px] px-6 pb-[80px]">
+      <div className="relative mx-auto max-w-[820px] px-6 pt-[64px] pb-[80px]">
         {/* Publisher logo card */}
         {logoUrl && (
           <div

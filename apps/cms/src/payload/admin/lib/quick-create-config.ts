@@ -109,6 +109,25 @@ export const QUICK_CREATE_CONFIG: Record<string, QuickCreateConfig | undefined> 
       { name: 'slug', type: 'slug', label: 'Slug', source: 'name' },
     ],
   },
+  forms: {
+    title: 'New form',
+    // Forms.ts sets `versions: { drafts: true }`, so the required
+    // `fields` array doesn't have to be satisfied for the quick-create
+    // draft to save — the editor fills the fields in the full edit
+    // view later (via the "Open form →" toast action).
+    supportsDrafts: true,
+    fields: [
+      {
+        name: 'name',
+        type: 'text',
+        label: 'Form name',
+        required: true,
+        placeholder: 'Whitepaper download gate',
+        maxLength: 120,
+      },
+      { name: 'slug', type: 'slug', label: 'Slug', source: 'name' },
+    ],
+  },
   jobLocations: {
     title: 'New job location',
     supportsDrafts: false, // collection has no `versions: { drafts: true }`

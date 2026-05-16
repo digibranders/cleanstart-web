@@ -48,13 +48,9 @@ export function ResourceGrid({
 
   return (
     <div className="flex-1 flex flex-col">
-      {/* 3-column grid — 295px cards, 32px gaps */}
+      {/* Grid — single column on mobile, 2-col on tablet, 3-col on desktop */}
       <div
-        className="grid"
-        style={{
-          gridTemplateColumns: "repeat(3, 295px)",
-          gap: "32px",
-        }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center lg:justify-items-start"
       >
         {resources.map((resource) => (
           <ResourceCard key={resource.id} resource={resource} />
