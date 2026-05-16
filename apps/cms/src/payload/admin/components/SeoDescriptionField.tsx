@@ -5,7 +5,10 @@ import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
 const DESC_TARGET = 160;
-const DESC_HARD_CAP = 200;
+// Color is advisory only — the publish gate no longer hard-blocks on
+// description length. Amber spans the wide "longer than ideal but still
+// reasonable" range; red is reserved for clearly excessive values.
+const DESC_HARD_CAP = 240;
 
 type SeoDescriptionFieldProps = {
   path: string;
@@ -39,7 +42,8 @@ const colorForLength = (len: number): string => {
  *   - "Reset to <source>" link snaps back to auto mode
  *
  * Char counter is traffic-light: green ≤ 160 (Google's typical truncation),
- * amber 160-200, red > 200 (Google fully cuts).
+ * amber 161-240, red > 240. Advisory only — publishing is allowed at any
+ * length (with a confirm prompt outside the recommended range).
  */
 export const SeoDescriptionField = (props: SeoDescriptionFieldProps): ReactElement => {
   const { path, sourceField = 'abstract' } = props;
