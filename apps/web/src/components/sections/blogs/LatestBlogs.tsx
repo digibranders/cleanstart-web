@@ -55,7 +55,29 @@ export function LatestBlogs({
           opacity: 0.1,
         }}
       />
-      {/* Blur ellipses — Figma 255:9665 left (-70,1946) 258×258 #df9bff blur:243px op:80%, 255:9666 right (1671,1895) 315×315 #2cc1eb blur:203px op:20% */}
+      {/* Gridlines — Figma node 371:2016. 1920×719 SVG whose paths are filled
+          by two radial gradients (#640DFB) centred at (-25.5, 590.5) and
+          (1828.5, 695.5), so the grid cells naturally fade from purple-tinted
+          near the lower corners to invisible toward the centre. The fade
+          effect lives inside the SVG — no extra mask or opacity wrapper. */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute left-0 right-0 bottom-0 overflow-hidden"
+        style={{ height: "719px" }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/blogs/latest-blogs-gridlines.svg"
+          alt=""
+          aria-hidden
+          className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none select-none"
+          style={{ width: "1920px", height: "719px", maxWidth: "none" }}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      {/* Blur ellipses — Figma Ellipse 46683 left (-70,1946) 258×258 #DF9BFF blur:121.5px op:80%, Ellipse 46692 right (1671,1895) 315×315 #2CC1EB blur:101.5px op:20% */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
@@ -66,7 +88,7 @@ export function LatestBlogs({
           height: "258px",
           borderRadius: "50%",
           background: "#df9bff",
-          filter: "blur(243px)",
+          filter: "blur(121.5px)",
           opacity: 0.8,
         }}
       />
@@ -80,7 +102,7 @@ export function LatestBlogs({
           height: "315px",
           borderRadius: "50%",
           background: "#2cc1eb",
-          filter: "blur(203px)",
+          filter: "blur(101.5px)",
           opacity: 0.2,
         }}
       />
@@ -94,7 +116,7 @@ export function LatestBlogs({
             lineHeight: "normal",
             color: "#111",
             paddingTop: "60px",
-            paddingBottom: "86px",
+            paddingBottom: "40px",
           }}
         >
           Latest Blogs

@@ -55,16 +55,15 @@
      The .bg-cs-hero rule still applies a #151021 fallback bg-color for the
      transparent-tail safety. */
   --bg-hero-mesh: linear-gradient(
-    to bottom,
-    #151021 0%,
-    #14143C 22%,
-    #181A5E 42%,
-    #1F1F88 56%,
-    #2B22B0 68%,
-    #4226D5 80%,
-    #5028E5 89%,
-    rgba(80, 40, 229, 0.62) 95%,
-    rgba(80, 40, 229, 0) 100%
+    180deg,
+    rgba(21, 16, 33, 1) 0%,
+    rgba(16, 18, 62, 1) 31%,
+    rgba(19, 30, 143, 1) 51%,
+    rgba(71, 30, 192, 1) 69%,
+    rgba(71, 31, 195, 1) 80%,
+    rgba(70, 30, 191, 0.85) 85%,
+    rgba(66, 30, 188, 0.4) 94%,
+    rgba(66, 30, 188, 0) 99%
   );
 
   /* Decorative purple radial blobs (Figma "Union" vectors, fill #640DFB radial)
@@ -1503,9 +1502,9 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(16px, 1.2vw, 20px);
+  font-size: 0.875rem; /* 14px at default 16px root */
   line-height: 1.4;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
 }
 
 .article-body .article-table th,
@@ -1517,15 +1516,54 @@ body {
   vertical-align: top;
 }
 
+/* Body cells (default) — Sora regular */
+.article-body .article-table td {
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  color: rgba(17, 17, 17, 0.8);
+}
+
+/* Row header (1st column) — Sora medium.
+   Covers both explicit `th.article-th-row` and positional `td:first-child`
+   for tables authored without headerState in the CMS. */
 .article-body .article-table th.article-th-row,
-.article-body .article-table th.article-th-col {
+.article-body .article-table tr > td:first-child {
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   font-weight: 500;
   color: #000000;
 }
 
-.article-body .article-table td {
-  font-weight: 400;
-  color: rgba(17, 17, 17, 0.8);
+/* Column header (top row) — Sora semibold. Wins over the 1st-column rule
+   so the corner cell reads as a column header. */
+.article-body .article-table th.article-th-col,
+.article-body .article-table tr:first-child > td,
+.article-body .article-table tr:first-child > th {
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  color: #000000;
+}
+
+/* Headings authored inside table cells (editor styled cells as h2/h3 for emphasis)
+   should inherit the cell's typography — they are not document headings. */
+.article-body .article-table th .article-h1,
+.article-body .article-table th .article-h2,
+.article-body .article-table th .article-h3,
+.article-body .article-table th .article-h4,
+.article-body .article-table th .article-h5,
+.article-body .article-table th .article-h6,
+.article-body .article-table td .article-h1,
+.article-body .article-table td .article-h2,
+.article-body .article-table td .article-h3,
+.article-body .article-table td .article-h4,
+.article-body .article-table td .article-h5,
+.article-body .article-table td .article-h6 {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  margin: 0;
 }
 
 /* Strip paragraph spacing inside table cells */
@@ -1536,6 +1574,18 @@ body {
   line-height: inherit;
   letter-spacing: inherit;
   color: inherit;
+}
+
+/* Inline emphasis (strong/b/em/i) inside table cells inherits the cell's
+   weight. Imported content often wraps every cell in <strong>, which would
+   otherwise force 700 across all body cells regardless of the cell's own
+   font-weight. Authors who genuinely want bold inside a cell can set it
+   on the cell itself via a class. */
+.article-body .article-table th strong,
+.article-body .article-table th b,
+.article-body .article-table td strong,
+.article-body .article-table td b {
+  font-weight: inherit;
 }
 
 /* First h2 should have less top margin if it's the very first child */

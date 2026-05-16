@@ -28,6 +28,7 @@ import { Media } from './payload/collections/Media';
 import { News } from './payload/collections/News';
 import { NewsCategories } from './payload/collections/NewsCategories';
 import { Pages } from './payload/collections/Pages';
+import { PodcastEpisodes } from './payload/collections/PodcastEpisodes';
 import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
 import { SearchLog } from './payload/collections/SearchLog';
@@ -53,6 +54,7 @@ import {
   calcomInboundEndpoint,
 } from './payload/endpoints/integrations-inbound';
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
+import { mediaIngestUrlEndpoint } from './payload/endpoints/media-ingest-url';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
 import { robotsEndpoint } from './payload/endpoints/robots';
 import { searchAnalyticsEndpoint } from './payload/endpoints/search-analytics';
@@ -80,6 +82,7 @@ import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
 import { Legal } from './payload/globals/legal';
 import { MainNav } from './payload/globals/mainNav';
+import { PodcastPage } from './payload/globals/podcastPage';
 import { SeoDefaults } from './payload/globals/seoDefaults';
 import { SiteSettings } from './payload/globals/siteSettings';
 
@@ -177,6 +180,12 @@ export default buildConfig({
       actions: [
         './payload/admin/components/SkipLink.tsx#SkipLink',
         './payload/admin/components/SaveShortcut.tsx#SaveShortcut',
+        // Global cross-collection helper — after every failed save /
+        // publish attempt it scrolls the first invalid field into view
+        // and pulses it. Lives in `actions` rather than per-collection
+        // `beforeDocumentControls` so it applies to taxonomy collections
+        // (authors, categories, …) outside the publish-gate set too.
+        './payload/admin/components/ScrollToInvalidField.tsx#ScrollToInvalidField',
         './payload/admin/components/CommandPalette.tsx#CommandPalette',
         './payload/admin/components/FieldDescriptionTooltip.tsx#FieldDescriptionTooltip',
         // SavedStateIndicator removed — the floating "Saved X ago"
@@ -262,6 +271,7 @@ export default buildConfig({
     KnowledgeBase,
     Events,
     Webinars,
+    PodcastEpisodes,
     Jobs,
     AboutGalleries,
     Pages,
@@ -271,7 +281,7 @@ export default buildConfig({
     .map(wireCustomEditView)
     .map(wireAnalyticsTab)
     .map(wireCustomFields),
-  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements]
+  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements, PodcastPage]
     .map(wireCustomEditView)
     .map(wireCustomFields),
   endpoints: [
@@ -281,6 +291,7 @@ export default buildConfig({
     newsSitemapEndpoint,
     imageSitemapEndpoint,
     robotsEndpoint,
+    mediaIngestUrlEndpoint,
     redirectsImportEndpoint,
     canonicalCheckEndpoint,
     searchAnalyticsEndpoint,

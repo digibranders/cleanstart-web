@@ -79,31 +79,28 @@ export function ResourceCenterCTA(): React.ReactElement {
       </div>
 
       <div
-        className="absolute inset-0 flex items-center"
-        style={{ padding: "60px 100px" }}
+        className="absolute inset-0 flex items-center px-6 py-8 lg:px-[100px] lg:py-[60px]"
       >
-        <div className="flex items-center" style={{ gap: "68px" }}>
+        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-[68px] w-full">
           <h2
             id="rc-cta-title"
-            className="font-display font-bold shrink-0"
+            className="font-display font-bold shrink-0 text-center lg:text-left w-full lg:w-[486px]"
             style={{
-              fontSize: "clamp(1.75rem, 2.86vw, 3.4375rem)",
+              fontSize: "clamp(1.5rem, 2.86vw, 3.4375rem)",
               lineHeight: 1,
               letterSpacing: "-0.05em",
               color: "#111",
-              width: "486px",
             }}
           >
             Stop Managing Vulnerabilities. Start Eliminating Them.
           </h2>
 
           <div
-            className="flex flex-col items-start"
-            style={{ width: "564px", gap: "24px" }}
+            className="flex flex-col items-center lg:items-start w-full lg:w-[564px] gap-4 lg:gap-6"
           >
             <p
-              className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em]"
-              style={{ color: "#111", opacity: 0.8, width: "493px" }}
+              className="text-base lg:text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-center lg:text-left w-full lg:w-[493px]"
+              style={{ color: "#111", opacity: 0.8 }}
             >
               Why waste time patching what shouldn&apos;t exist? CleanStart flips
               security from reactive to preventative, giving you cleaner images,

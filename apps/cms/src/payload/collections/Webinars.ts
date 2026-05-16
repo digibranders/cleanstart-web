@@ -13,7 +13,7 @@ import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
 import { firstPublishHook } from '../hooks/first-publish';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
-import { validateOptionalUrl } from '../lib/url-shape';
+import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const Webinars: CollectionConfig = {
   slug: 'webinars',
@@ -199,6 +199,7 @@ export const Webinars: CollectionConfig = {
       admin: {
         description: 'Post-event recording. Surfaces after endsAt < now.',
       },
+      hooks: { beforeValidate: [normalizeOptionalUrlHook] },
       validate: validateOptionalUrl,
     },
     {
@@ -207,6 +208,7 @@ export const Webinars: CollectionConfig = {
       admin: {
         description: 'External slides link. Use the pdf field instead when hosting on R2.',
       },
+      hooks: { beforeValidate: [normalizeOptionalUrlHook] },
       validate: validateOptionalUrl,
     },
     {

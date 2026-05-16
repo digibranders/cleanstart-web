@@ -84,7 +84,7 @@ const ROW_HINTS: Record<string, RowHint> = {
   newsCategories: { primary: ['name', 'title'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
   knowledgeCategories: { primary: ['name', 'title'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
   jobLocations: { primary: ['city'], secondary: ['country'], showThumb: false, showCreate: true, chipLayout: 'inline' },
-  forms: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'inline' },
+  forms: { primary: ['name'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
   redirects: { primary: ['from'], secondary: ['to'], showThumb: false, showCreate: false, chipLayout: 'inline' },
 };
 
@@ -485,7 +485,15 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
           if (quickCreateConfig.supportsDrafts) {
             url.searchParams.set('draft', String(intent === 'draft'));
           }
-          const body: Record<string, unknown> = { ...values };
+          // Strip empty optional fields so we don't write empty strings
+          // for fields the editor left untouched. Required + slug fields
+          // are already gated non-empty by the dialog's submit guard.
+          const body: Record<string, unknown> = {};
+          for (const [key, raw] of Object.entries(values)) {
+            const trimmed = typeof raw === 'string' ? raw.trim() : raw;
+            if (trimmed === '' || trimmed == null) continue;
+            body[key] = trimmed;
+          }
           if (quickCreateConfig.supportsDrafts) {
             body._status = intent === 'draft' ? 'draft' : 'published';
           }

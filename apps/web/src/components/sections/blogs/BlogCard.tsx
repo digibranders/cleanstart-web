@@ -132,7 +132,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
               <div className="flex items-center" style={{ gap: "4px" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/blogs/icon-calendar.svg"
+                  src="/images/blogs/icon-calendar-grey.svg"
                   alt=""
                   aria-hidden
                   width={18}
@@ -153,7 +153,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
               <div className="flex items-center" style={{ gap: "4px" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/blogs/icon-clock.svg"
+                  src="/images/blogs/icon-clock-grey.svg"
                   alt=""
                   aria-hidden
                   width={18}
@@ -193,7 +193,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
                 style={{
                   color: "rgba(17,17,17,0.54)",
                   display: "-webkit-box",
-                  WebkitLineClamp: 3,
+                  WebkitLineClamp: 4,
                   WebkitBoxOrient: "vertical",
                   overflowWrap: "anywhere",
                   wordBreak: "break-word",

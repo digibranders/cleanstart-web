@@ -15,11 +15,26 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
   const ctaLabel = resourceCtaLabel(resource.type, resource.ctaButtonText);
   const coverPoster = resourceCoverPoster(resource.type);
 
+  // Step the overlay title down for longer copy so it never overruns the
+  // dark area between the cover's logo block and the type badge.
+  // Sizing uses `cqw` so the text scales with the cover (card is now fluid),
+  // never pushing past the booklet's visible page edge.
+  const titleLen = resource.title.length;
+  const coverTitleFontSize =
+    titleLen <= 28
+      ? "clamp(0.75rem, 5cqw, 1rem)"
+      : titleLen <= 44
+        ? "clamp(0.7rem, 4.4cqw, 0.9rem)"
+        : titleLen <= 64
+          ? "clamp(0.65rem, 3.8cqw, 0.8rem)"
+          : "clamp(0.6rem, 3.4cqw, 0.72rem)";
+  const coverTitleClamp = titleLen <= 44 ? 3 : 4;
+
   return (
     <article
-      className="relative bg-white overflow-hidden flex flex-col"
+      className="relative bg-white overflow-hidden flex flex-col w-full mx-auto"
       style={{
-        width: "295px",
+        maxWidth: "328px",
         height: "354px",
         borderRadius: "32px",
         boxShadow:
@@ -28,13 +43,14 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
     >
       {/* Cover — booklet poster mapped by type, with the resource title rendered over the dark inner area. */}
       <div
-        className="absolute overflow-hidden"
+        className="absolute"
         style={{
           top: "15px",
           left: "15px",
-          width: "265px",
+          right: "15px",
           height: "138px",
           borderRadius: "16px",
+          containerType: "inline-size",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -42,22 +58,25 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
           src={coverPoster}
           alt=""
           aria-hidden
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none block"
+          style={{ borderRadius: "16px" }}
           loading="lazy"
           decoding="async"
         />
         <span
-          className="absolute font-display font-medium text-white overflow-hidden"
+          className="absolute font-display font-semibold text-white overflow-hidden"
           style={{
-            top: "38px",
-            left: "56px",
-            right: "76px",
-            fontSize: "10px",
-            lineHeight: "1.25",
-            letterSpacing: "-0.02em",
+            top: "44%",
+            left: "22%",
+            right: "30%",
+            fontSize: coverTitleFontSize,
+            lineHeight: "1.18",
+            letterSpacing: "-0.03em",
             display: "-webkit-box",
-            WebkitLineClamp: 3,
+            WebkitLineClamp: coverTitleClamp,
             WebkitBoxOrient: "vertical",
+            textShadow: "0 1px 2px rgba(0,0,0,0.25)",
+            overflowWrap: "anywhere",
           }}
         >
           {resource.title}
@@ -135,16 +154,14 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
           >
             {ctaLabel}
           </span>
-          {/* Rotated arrow icon */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/resource-center/card-arrow.svg"
             alt=""
             aria-hidden
-            width={24}
-            height={24}
+            width={20}
+            height={14}
             className="pointer-events-none select-none"
-            style={{ transform: "rotate(90deg)" }}
             loading="lazy"
             decoding="async"
           />

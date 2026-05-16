@@ -106,8 +106,11 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
           />
         </FadeUp>
 
+        <FadeUp>
+          <PodcastCTACards cards={ctaCards} />
+        </FadeUp>
       </main>
-      <Footer cta={<PodcastCTACards cards={ctaCards} />} />
+      <Footer />
     </>
   );
 }

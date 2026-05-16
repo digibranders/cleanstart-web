@@ -31,7 +31,7 @@ export function AsrProductionEnv(): React.ReactElement {
       aria-label="Built for Modern Production Environments"
       style={{
         background:
-          "linear-gradient(180deg, #151021 0%, #131e8f 67.14%, #471ec0 107.43%)",
+          "linear-gradient(180deg, rgba(21,16,33,1) 0%, rgba(19,30,143,1) 67%, rgba(71,30,192,1) 100%)",
         minHeight: "clamp(400px, 39.5vw, 758px)",
       }}
     >

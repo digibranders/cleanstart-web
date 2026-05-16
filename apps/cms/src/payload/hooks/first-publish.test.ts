@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { firstPublishHook } from './first-publish';
+import {
+  firstPublishBeforeValidateHook,
+  firstPublishHook,
+} from './first-publish';
 
 const run = (
   data: Record<string, unknown>,
@@ -56,5 +59,59 @@ describe('firstPublishHook', () => {
   it('returns data unchanged for non-create/update operations', async () => {
     const out = await run({ _status: 'published' }, { _status: 'draft' }, 'create');
     expect((out as { publishedAt?: string }).publishedAt).toBeDefined();
+  });
+
+  it('stamps a custom field name when `field` is provided', async () => {
+    const hook = firstPublishHook({ field: 'publicationDate' });
+    const out = (await hook({
+      data: { _status: 'published' },
+      originalDoc: { _status: 'draft' },
+      operation: 'update',
+    } as unknown as Parameters<typeof hook>[0])) as { publicationDate?: string };
+    expect(typeof out.publicationDate).toBe('string');
+    expect(Date.parse(out.publicationDate as string)).not.toBeNaN();
+  });
+});
+
+describe('firstPublishBeforeValidateHook', () => {
+  it('stamps the configured field with now() on first publish so required-validation passes', async () => {
+    const hook = firstPublishBeforeValidateHook({ field: 'publicationDate' });
+    const before = Date.now();
+    const out = (await hook({
+      data: { _status: 'published' },
+      originalDoc: { _status: 'draft' },
+      operation: 'update',
+    } as unknown as Parameters<typeof hook>[0])) as { publicationDate: string };
+    const stamp = Date.parse(out.publicationDate);
+    expect(stamp).toBeGreaterThanOrEqual(before);
+    expect(stamp).toBeLessThanOrEqual(Date.now());
+  });
+
+  it('preserves an editor-set publicationDate', async () => {
+    const hook = firstPublishBeforeValidateHook({ field: 'publicationDate' });
+    const out = (await hook({
+      data: { _status: 'published', publicationDate: '2026-01-15T10:00:00.000Z' },
+      originalDoc: { _status: 'draft' },
+      operation: 'update',
+    } as unknown as Parameters<typeof hook>[0])) as { publicationDate: string };
+    expect(out.publicationDate).toBe('2026-01-15T10:00:00.000Z');
+  });
+
+  it('leaves drafts alone (no stamp until publish)', async () => {
+    const hook = firstPublishBeforeValidateHook({ field: 'publicationDate' });
+    const out = (await hook({
+      data: { _status: 'draft' },
+      originalDoc: { _status: 'draft' },
+      operation: 'update',
+    } as unknown as Parameters<typeof hook>[0])) as { publicationDate?: string };
+    expect(out.publicationDate).toBeUndefined();
+  });
+
+  it('handles undefined data (Payload allows it on beforeValidate)', async () => {
+    const hook = firstPublishBeforeValidateHook({ field: 'publicationDate' });
+    const out = await hook({
+      operation: 'update',
+    } as unknown as Parameters<typeof hook>[0]);
+    expect(out).toEqual({});
   });
 });

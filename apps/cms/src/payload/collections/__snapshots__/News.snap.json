@@ -562,7 +562,7 @@
   "hooks": {
     "beforeChange": 1,
     "afterChange": 5,
-    "beforeValidate": 0,
+    "beforeValidate": 1,
     "afterDelete": 1
   }
 }

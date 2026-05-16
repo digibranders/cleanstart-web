@@ -1,7 +1,7 @@
 import type { GlobalConfig } from 'payload';
 
 import { isAdminOrEditor, isAuthenticated } from '../access';
-import { validateOptionalUrl } from '../lib/url-shape';
+import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const Announcements: GlobalConfig = {
   slug: 'announcements',
@@ -60,7 +60,7 @@ export const Announcements: GlobalConfig = {
       label: 'Call to action (optional)',
       fields: [
         { name: 'label', type: 'text' },
-        { name: 'href', type: 'text', validate: validateOptionalUrl },
+        { name: 'href', type: 'text', hooks: { beforeValidate: [normalizeOptionalUrlHook] }, validate: validateOptionalUrl },
       ],
     },
     {

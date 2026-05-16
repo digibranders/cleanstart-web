@@ -2,7 +2,11 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { looksLikeRichDoc, normalizeRichHtml } from './normalize-rich-html';
+import {
+  extractInlineImages,
+  looksLikeRichDoc,
+  normalizeRichHtml,
+} from './normalize-rich-html';
 
 const parse = (html: string): Element => {
   const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -211,5 +215,90 @@ describe('normalizeRichHtml', () => {
     expect(html).toContain('<strong>bold</strong>');
     expect(html).toContain('<em>italic</em>');
     expect(html).not.toMatch(/eop|outlineelement|textrun/i);
+  });
+});
+
+describe('extractInlineImages', () => {
+  it('collects absolute http(s) srcs in document order and removes the tags', () => {
+    const root = parse(
+      '<p>One</p>' +
+        '<img src="https://cdn.example.com/a.png" alt="A">' +
+        '<p>Two</p>' +
+        '<img src="http://cdn.example.com/b.jpg" alt="">' +
+        '<p>Three</p>',
+    );
+    const collected = extractInlineImages(root);
+    expect(collected).toHaveLength(2);
+    expect(collected[0]).toMatchObject({ src: 'https://cdn.example.com/a.png', alt: 'A' });
+    expect(collected[1]).toMatchObject({ src: 'http://cdn.example.com/b.jpg', alt: '' });
+    expect(collected[0]?.placeholderId).toMatch(/^i0-/);
+    expect(collected[1]?.placeholderId).toMatch(/^i1-/);
+    expect(root.querySelectorAll('img')).toHaveLength(0);
+    expect(root.innerHTML).toContain('<p>One</p>');
+    expect(root.innerHTML).toContain('<p>Two</p>');
+    expect(root.innerHTML).toContain('<p>Three</p>');
+  });
+
+  it('inserts placeholder paragraphs at original image positions', () => {
+    const root = parse(
+      '<p>Intro paragraph.</p>' +
+        '<img src="https://cdn.example.com/a.png" alt="A">' +
+        '<p>Middle paragraph.</p>' +
+        '<img src="https://cdn.example.com/b.png" alt="B">' +
+        '<p>Closing paragraph.</p>',
+    );
+    const collected = extractInlineImages(root);
+    // Top-level children, in order, should be:
+    //   p(Intro), p(placeholder0), p(Middle), p(placeholder1), p(Closing)
+    const top = Array.from(root.children).map((el) => ({
+      tag: el.tagName.toLowerCase(),
+      text: (el.textContent || '').trim(),
+    }));
+    expect(top).toHaveLength(5);
+    expect(top[0]).toEqual({ tag: 'p', text: 'Intro paragraph.' });
+    expect(top[1]?.tag).toBe('p');
+    expect(top[1]?.text).toBe(`CS_IMG_PLACEHOLDER:${collected[0]?.placeholderId}`);
+    expect(top[2]).toEqual({ tag: 'p', text: 'Middle paragraph.' });
+    expect(top[3]?.tag).toBe('p');
+    expect(top[3]?.text).toBe(`CS_IMG_PLACEHOLDER:${collected[1]?.placeholderId}`);
+    expect(top[4]).toEqual({ tag: 'p', text: 'Closing paragraph.' });
+  });
+
+  it('lifts an image out of its block ancestor and removes the now-empty parent', () => {
+    const root = parse(
+      '<p>Before</p>' +
+        '<figure><img src="https://cdn.example.com/x.png" alt="X"></figure>' +
+        '<p>After</p>',
+    );
+    const collected = extractInlineImages(root);
+    expect(collected).toHaveLength(1);
+    expect(root.querySelector('figure')).toBeNull();
+    const top = Array.from(root.children).map((el) => el.tagName.toLowerCase());
+    expect(top).toEqual(['p', 'p', 'p']); // Before, placeholder, After
+  });
+
+  it('keeps surrounding text when the block ancestor still has content', () => {
+    const root = parse(
+      '<p>Text before <img src="https://cdn.example.com/inline.png" alt=""> text after</p>',
+    );
+    extractInlineImages(root);
+    // Original paragraph keeps its surrounding text; placeholder is inserted after it.
+    const top = Array.from(root.children).map((el) => (el.textContent || '').trim());
+    expect(top[0]).toMatch(/Text before/);
+    expect(top[0]).toMatch(/text after/);
+    expect(top[1]).toMatch(/^CS_IMG_PLACEHOLDER:/);
+    expect(root.querySelectorAll('img')).toHaveLength(0);
+  });
+
+  it('drops non-http srcs (data:, blob:, relative) but still removes the tag', () => {
+    const root = parse(
+      '<img src="data:image/png;base64,AAAA">' +
+        '<img src="blob:https://example.com/abc">' +
+        '<img src="/local/path.png">' +
+        '<img>',
+    );
+    expect(extractInlineImages(root)).toEqual([]);
+    expect(root.querySelectorAll('img')).toHaveLength(0);
+    expect(root.querySelectorAll('p')).toHaveLength(0);
   });
 });

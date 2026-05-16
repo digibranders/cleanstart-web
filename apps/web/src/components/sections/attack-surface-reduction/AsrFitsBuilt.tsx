@@ -24,7 +24,7 @@ export function AsrFitsBuilt(): React.ReactElement {
   return (
     <section
       data-section="AsrFitsBuilt"
-      className="relative bg-white overflow-hidden"
+      className="relative overflow-hidden"
     >
       <div className="relative mx-auto max-w-[1276px] px-6 py-16 md:py-[88px]">
         {/* Heading row */}

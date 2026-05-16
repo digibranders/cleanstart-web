@@ -1,7 +1,7 @@
 'use client';
 
 import { ConfirmDialog, useDragSort } from '@cleanstart/ui';
-import { RenderFields, useField, useForm } from '@payloadcms/ui';
+import { RenderFields, RowLabelProvider, useField, useForm } from '@payloadcms/ui';
 import type { ArrayFieldClientProps } from 'payload';
 import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -337,7 +337,9 @@ export const ArrayField = (props: ArrayFieldClientProps): ReactElement => {
                   </span>
                   {isDisabled && row.customComponents?.RowLabel ? (
                     <span className="cs-array__row-summary">
-                      {row.customComponents.RowLabel}
+                      <RowLabelProvider path={`${path}.${i}`} rowNumber={i}>
+                        {row.customComponents.RowLabel}
+                      </RowLabelProvider>
                     </span>
                   ) : (
                     <>

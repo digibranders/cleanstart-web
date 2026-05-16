@@ -4,7 +4,7 @@ import { isAdminOrEditor } from '../access';
 import { slugField } from '../fields/slug';
 import { formSchemaVersionHook } from '../hooks/form-schema-version';
 import { formsCoerceHook } from '../hooks/forms-coerce';
-import { validateOptionalUrl } from '../lib/url-shape';
+import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 const VISIBLE_LABEL_TYPES = ['text', 'email', 'textarea', 'select', 'checkbox', 'consent'];
 const PLACEHOLDER_TYPES = ['text', 'email', 'textarea'];
@@ -211,6 +211,7 @@ export const Forms: CollectionConfig = {
           admin: {
             condition: (_data, sibling) => sibling?.kind === 'redirect',
           },
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
         },
       ],

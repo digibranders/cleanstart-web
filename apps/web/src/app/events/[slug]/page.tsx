@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
+import { EventDetailHero } from "@/components/sections/events/EventDetailHero";
 import { getEventBySlug, formatEventDate } from "@/lib/events";
 import { mediaUrl } from "@/lib/blog";
 import { buildPageMetadata, absoluteUrl } from "@/lib/seo/canonical";
@@ -119,66 +119,22 @@ export default async function EventDetailPage({
       <JsonLd id={`event-schema-${event.slug}`} data={eventJsonLd(event)} />
       <Header />
       <main style={{ background: "#f6f6f6" }}>
-        <section
-          className="relative overflow-hidden"
-          style={{
-            background:
-              "linear-gradient(180deg, #151021 0%, #10123e 45%, #131e8f 75%, #471ec0 100%)",
-          }}
-        >
-          <div
-            className="relative mx-auto max-w-[1276px] px-6"
-            style={{ paddingTop: "160px", paddingBottom: "80px" }}
-          >
-            <Link
-              href="/events"
-              className="inline-flex items-center text-white/80 hover:text-white"
-              style={{ fontSize: "0.95rem", marginBottom: "24px", gap: "6px" }}
-            >
-              ← Events
-            </Link>
+        <EventDetailHero
+          title={event.title}
+          venue={event.venue}
+          longDate={longDate}
+          eventStatus={event.eventStatus}
+        />
 
-            <h1
-              className="font-display font-semibold text-white"
-              style={{
-                fontSize: "clamp(2rem,4vw,3.75rem)",
-                lineHeight: "1.05",
-                letterSpacing: "-0.04em",
-                maxWidth: "900px",
-              }}
-            >
-              {event.title}
-            </h1>
-
-            <div
-              className="flex flex-wrap items-center text-white/85"
-              style={{ marginTop: "24px", gap: "24px", fontSize: "1rem" }}
-            >
-              {longDate && <span>📅 {longDate}</span>}
-              <span>📍 {event.venue}</span>
-              {event.eventStatus !== "scheduled" && (
-                <span
-                  className="uppercase tracking-wider"
-                  style={{
-                    fontSize: "0.75rem",
-                    padding: "4px 10px",
-                    borderRadius: "999px",
-                    background: "rgba(255,255,255,0.15)",
-                  }}
-                >
-                  {event.eventStatus}
-                </span>
-              )}
-            </div>
-
+        {(heroImg || (registerHref && event.eventStatus === "scheduled")) && (
+          <section className="relative mx-auto max-w-[1276px] px-6" style={{ paddingTop: "64px" }}>
             {heroImg && (
               <div
                 className="relative overflow-hidden"
                 style={{
-                  marginTop: "48px",
                   borderRadius: "20px",
                   aspectRatio: "16 / 7",
-                  background: "rgba(255,255,255,0.05)",
+                  background: "rgba(0,0,0,0.05)",
                 }}
               >
                 <Image
@@ -193,7 +149,7 @@ export default async function EventDetailPage({
             )}
 
             {registerHref && event.eventStatus === "scheduled" && (
-              <div style={{ marginTop: "32px" }}>
+              <div className="flex justify-center" style={{ marginTop: "32px" }}>
                 <a
                   href={registerHref}
                   target="_blank"
@@ -210,8 +166,8 @@ export default async function EventDetailPage({
                 </a>
               </div>
             )}
-          </div>
-        </section>
+          </section>
+        )}
 
         <section
           className="relative mx-auto max-w-[820px] px-6"
