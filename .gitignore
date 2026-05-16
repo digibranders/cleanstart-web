@@ -62,3 +62,5 @@ apps/cms/.lead-fallback-queue/
 .gstack/
 .vercel
 .env*.local
+
+launch.json
