@@ -89,7 +89,7 @@ page slugs, categories, types, and build status across the dev journey.
 | 12 | Blog – Single Post | `/blog/[slug]` | CMS Detail | ✅ | Route at `src/app/blog/[slug]/` |
 | 14 | Knowledge Hub | `/knowledge-hub` | CMS Listing | ⬜ | Payload `knowledgeBase` collection |
 | 15 | Newsroom | `/news` | CMS Listing | ✅ | Route at `src/app/news/`; press-release detail at `src/app/news/[slug]/` |
-| 16 | Podcast | `/podcast` | CMS Listing | ⬜ | Payload `podcast` collection |
+| 16 | Podcast | `/podcast` | CMS Listing | ✅ | Route at `src/app/podcast/`; Payload `podcastEpisodes` collection + `podcastPage` global (YT embeds) |
 | 17 | Resource Center | `/resource-center` | CMS Listing | ✅ | Route at `src/app/resource-center/` |
 | 17b | Resource Detail | `/resource/[slug]` | CMS Detail | ✅ | Route at `src/app/resource/[slug]/` |
 | — | Author Page | `/author/[slug]` | CMS Detail | ⬜ | Dynamic route, Payload `authors` |
@@ -101,7 +101,7 @@ page slugs, categories, types, and build status across the dev journey.
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
 | 18 | In-Person Events | `/events` | CMS Listing | ✅ | Payload `events` collection |
-| 19 | Webinars | `/webinars` | CMS Listing | ⬜ | Payload `webinars` collection |
+| 19 | Webinars | `/webinars` | CMS Listing | ✅ | Payload `webinars` collection |
 
 ---
 
@@ -145,7 +145,7 @@ Homepage ✅ → About Us ✅ → Book a Demo → Contact Us → Pricing → Pro
 Partners → Careers → Teams → Community → Deal Registration
 
 **Wave 3 — CMS listing pages** (needs CMS live)
-Blogs ✅ → Knowledge Hub → Newsroom → Resource Center → Webinars → Events → Podcast
+Blogs ✅ → Knowledge Hub → Newsroom ✅ → Resource Center ✅ → Webinars ✅ → Events ✅ → Podcast ✅
 
 **Wave 4 — CMS detail / dynamic routes**
 Blog Single Post ✅ → Author Page
