@@ -80,12 +80,8 @@ export default async function NewsPage({
           />
         </FadeUp>
 
-        {/* Newsletter CTA — overlaps footer by 126px (matches blog listing pattern) */}
-        <FadeUp className="relative z-10 mt-[-126px]">
-          <BlogsCTA />
-        </FadeUp>
       </main>
-      <Footer topPadding={225} />
+      <Footer cta={<BlogsCTA />} />
     </>
   );
 }

@@ -91,12 +91,8 @@ export default async function BlogsPage({
           />
         </FadeUp>
 
-        {/* Newsletter CTA — overlaps footer by 126px (matches Figma y=-126 in footer frame) */}
-        <FadeUp className="relative z-10 mt-[-126px]">
-          <BlogsCTA />
-        </FadeUp>
       </main>
-      <Footer topPadding={225} />
+      <Footer cta={<BlogsCTA />} />
     </>
   );
 }

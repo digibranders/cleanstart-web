@@ -100,20 +100,23 @@ export default async function NewsDetailPage({
           <NewsDetailBody item={item} />
         </div>
 
-        {related.length > 0 && (
+        {related.length > 0 ? (
           <div
             style={{
               background:
                 "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)",
+              paddingBottom: "250px",
             }}
           >
             <NewsDetailRelated items={related} />
           </div>
+        ) : (
+          /* NewsDetailBody has internal pb-[80px] → spacer covers remaining 170 */
+          <div aria-hidden className="bg-white" style={{ height: "170px" }} />
         )}
 
-        <BlogDetailCTA />
       </main>
-      <Footer />
+      <Footer cta={<BlogDetailCTA />} />
     </>
   );
 }

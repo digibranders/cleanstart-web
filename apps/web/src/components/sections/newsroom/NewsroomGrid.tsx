@@ -33,7 +33,7 @@ export function NewsroomGrid({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ background: "#f6f6f6", paddingTop: "80px", paddingBottom: "240px" }}
+      style={{ background: "#f6f6f6", paddingTop: "80px", paddingBottom: "250px" }}
       data-section="NewsroomGrid"
     >
       {/* Radial gradient blobs — match blog listing visual language */}

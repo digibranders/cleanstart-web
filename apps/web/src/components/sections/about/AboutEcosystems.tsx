@@ -35,7 +35,7 @@ const PARTNERS = [
 
 export function AboutEcosystems() {
   return (
-    <section className="relative overflow-hidden bg-white py-[100px] pb-5">
+    <section className="relative overflow-hidden bg-white pt-[100px] pb-[250px]">
       {/* Decorative blobs */}
       <div
         aria-hidden

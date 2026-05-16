@@ -79,7 +79,7 @@ function AuthorCard({ author }: { author: BlogAuthor }): React.ReactElement {
             margin: 0,
           }}
         >
-          Blog By
+          Author
         </p>
 
         <h3

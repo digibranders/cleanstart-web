@@ -64,12 +64,8 @@ export default function AboutPage() {
         <FadeUp>
           <AboutEcosystems />
         </FadeUp>
-
-        <FadeUp>
-          <AboutCTA />
-        </FadeUp>
       </main>
-      <Footer />
+      <Footer cta={<AboutCTA />} />
     </>
   );
 }
