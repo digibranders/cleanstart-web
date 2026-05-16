@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ResourceDetail } from "@/lib/resources";
 import { resourceTypeLabel, mediaUrl } from "@/lib/resources";
+import { DETAIL_HERO_TITLE_STYLE } from "@/components/sections/_shared/DetailHero";
 
 interface ResourceDetailHeroProps {
   resource: ResourceDetail;
@@ -193,12 +194,7 @@ export function ResourceDetailHero({
           <h1
             id="rd-hero-title"
             className="font-display font-semibold text-center text-white"
-            style={{
-              fontSize: "clamp(1.75rem, 6vw, 4.5rem)",
-              lineHeight: 1.1,
-              letterSpacing: "-0.05em",
-              maxWidth: "829px",
-            }}
+            style={{ ...DETAIL_HERO_TITLE_STYLE, maxWidth: "829px" }}
           >
             {resource.title}
           </h1>
