@@ -9,7 +9,8 @@
 .collection-list__no-results,
 .list-controls + .no-results,
 .no-results,
-.collection-list .empty-state {
+.collection-list .empty-state,
+.cs-list__empty {
   margin: var(--cs-space-6) auto;
   padding: var(--cs-space-12) var(--cs-space-6);
   max-width: 560px;
@@ -78,5 +79,16 @@
         0 6px 16px -8px rgba(6, 199, 242, 0.4);
     }
   }
+}
+
+.cs-list__empty-title {
+  color: var(--cs-text-heading);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cs-list__empty-sub {
+  color: var(--theme-text-soft);
+  font-size: 13px;
 }
 

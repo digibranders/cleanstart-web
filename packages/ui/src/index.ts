@@ -28,6 +28,16 @@ export {
 } from './primitives/Toast';
 export type { ToastInput, ToastTone } from './primitives/Toast';
 
+export { QuickCreateDialog } from './primitives/QuickCreateDialog';
+export type {
+  QuickCreateDialogProps,
+  QuickCreateField,
+  QuickCreateIntent,
+} from './primitives/QuickCreateDialog';
+
+// Utils
+export { slugify } from './lib/slugify';
+
 // Hooks
 export { useAnchoredPosition } from './hooks/useAnchoredPosition';
 export type { Placement } from './hooks/useAnchoredPosition';

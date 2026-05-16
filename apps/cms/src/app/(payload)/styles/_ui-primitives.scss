@@ -629,6 +629,98 @@
 }
 
 // -----------------------------------------------------------------------------
+// Quick-create dialog — compact "+ New record" form used by the
+// relationship-field picker.
+// -----------------------------------------------------------------------------
+.cs-quick-create {
+  &__form {
+    display: contents;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: var(--cs-space-3);
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--theme-text);
+    line-height: 1.3;
+  }
+
+  &__required {
+    color: var(--color-error-500, #f08f8f);
+    font-weight: 700;
+  }
+
+  &__chip {
+    margin-inline-start: auto;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    color: var(--theme-text-soft);
+
+    &[data-tone='ok'] {
+      color: var(--color-success-500, #00c46a);
+    }
+
+    &[data-tone='error'] {
+      color: var(--color-error-500, #f08f8f);
+    }
+  }
+
+  &__input,
+  &__select {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--theme-input-bg, var(--theme-elevation-50, #0d1117));
+    color: var(--theme-text);
+    border: 1px solid var(--theme-elevation-200, rgba(255, 255, 255, 0.12));
+    border-radius: var(--cs-radius-input, 6px);
+    font-size: 13.5px;
+    line-height: 1.4;
+    transition: border-color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--cs-cyan-500);
+      box-shadow: var(--cs-shadow-input-focus);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__hint {
+    margin: var(--cs-space-2) 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--theme-text-soft, #a4a7af);
+  }
+
+  &__error {
+    margin: var(--cs-space-2) 0 0;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--color-error-500, #f08f8f);
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Relationship picker — multi-select tail.
 // -----------------------------------------------------------------------------
 .cs-relationship-picker__count {
@@ -1594,18 +1686,6 @@
   font-size: 0.75rem;
   color: var(--theme-elevation-600, rgba(0, 0, 0, 0.55));
   line-height: 1.45;
-}
-
-// -----------------------------------------------------------------------------
-// Document picker — embedded edit frame.
-// -----------------------------------------------------------------------------
-.cs-document-picker__frame {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  border: none;
-  background: var(--theme-bg, #fff);
-  min-height: 70vh;
 }
 
 // =============================================================================

@@ -119,6 +119,17 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
     return collectionSlug;
   }, [collectionConfig, collectionSlug]);
 
+  const singularLabel = useMemo(() => {
+    const lbl = collectionConfig?.labels?.singular;
+    if (typeof lbl === 'string') return lbl;
+    if (lbl && typeof lbl === 'object' && 'en' in lbl) {
+      return String((lbl as Record<string, unknown>).en ?? collectionSlug);
+    }
+    return collectionSlug;
+  }, [collectionConfig, collectionSlug]);
+
+  const isEmpty = data !== undefined && (data?.docs?.length ?? 0) === 0;
+
   useEffect(() => {
     setStepNav([{ label: collectionLabel, url: `${adminRoute}/collections/${collectionSlug}` }]);
   }, [setStepNav, collectionLabel, adminRoute, collectionSlug]);
@@ -155,8 +166,25 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
             ) : null}
 
             {BeforeListTable}
-            <section className="cs-list__table" aria-label={`${collectionLabel} list`}>
-              {Table}
+            <section
+              className={`cs-list__table${isEmpty ? ' cs-list__table--empty' : ''}`}
+              aria-label={`${collectionLabel} list`}
+            >
+              {isEmpty ? (
+                <div className="cs-list__empty">
+                  <span className="cs-list__empty-title">
+                    No {collectionLabel.toLowerCase()} yet
+                  </span>
+                  <span className="cs-list__empty-sub">
+                    Create your first one to see it listed here.
+                  </span>
+                  {hasCreatePermission && newDocumentURL ? (
+                    <a href={newDocumentURL}>Create {singularLabel}</a>
+                  ) : null}
+                </div>
+              ) : (
+                Table
+              )}
             </section>
             {AfterListTable}
 

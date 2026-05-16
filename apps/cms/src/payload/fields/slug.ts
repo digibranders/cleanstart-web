@@ -91,7 +91,7 @@ export const slugField = ({ source = 'name', composite = false }: SlugFieldOptio
     components: {
       Field: {
         path: '@/payload/admin/components/SlugField.tsx#SlugField',
-        clientProps: { source },
+        clientProps: { source, required: true },
       },
     },
   },

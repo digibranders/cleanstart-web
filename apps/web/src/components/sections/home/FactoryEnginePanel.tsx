@@ -2,22 +2,30 @@ const LEFT_PILLS = ["Plan", "Analyze", "Orchestrate"];
 const RIGHT_PILLS = ["Spec", "Build", "Attest", "Handoff"];
 
 function EngineArrow() {
-  // Tight viewBox cropped EXACTLY to the arrow shape (path coords 190..341 × 21..92)
-  // No left/right padding so the tail starts at x=0 of the rendered SVG.
+  // viewBox extended ~13px left of the arrow tail (x=190) so the tail-glow
+  // leaf (path coords 179..202) overhangs into the left card and erases the
+  // card-to-arrow seam. Render width matches viewBox width so the arrow body
+  // keeps its original 151px footprint.
   return (
     <svg
-      width="151"
-      height="71"
-      viewBox="190 21 151 71"
+      width="164"
+      height="73"
+      viewBox="177 19 164 73"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
       style={{
         overflow: "visible",
         filter:
-          "drop-shadow(-8px 4px 8px rgba(0,0,0,0.23)) drop-shadow(-33px 16px 18px rgba(0,0,0,0.20))",
+          "drop-shadow(-8px 4px 10px rgba(0,0,0,0.23)) drop-shadow(-33px 16px 18.5px rgba(0,0,0,0.20)) drop-shadow(-74px 37px 24.5px rgba(0,0,0,0.12))",
       }}
     >
+      {/* Tail-glow leaf — sits behind the arrow, blurred 2px, bleeds into the card */}
+      <path
+        d="M202 50.8352L189.766 21.8352L188.486 24.7391C179.857 44.3159 179.429 66.5333 187.297 86.428L187.656 87.3352L202 50.8352Z"
+        fill="#202592"
+        filter="url(#engineArrowTailGlow)"
+      />
       <path
         d="M291.331 35.1945V29.0367C291.331 25.8824 294.811 23.9692 297.475 25.6596L338.68 51.815C341.155 53.3862 341.155 56.9981 338.68 58.5692L297.475 84.7247C294.811 86.4151 291.331 84.5019 291.331 81.3476V74.6151C291.331 72.4059 289.54 70.6151 287.331 70.6151H221.084C207.431 70.6151 195.139 78.889 190 91.5387V21C195.186 32.1005 206.33 39.1945 218.582 39.1945H287.331C289.54 39.1945 291.331 37.4036 291.331 35.1945Z"
         fill="url(#engineArrowFill)"
@@ -25,10 +33,19 @@ function EngineArrow() {
       <path
         d="M292.831 29.0371C292.831 27.0657 295.006 25.8693 296.671 26.9258L337.876 53.0811C339.423 54.063 339.423 56.3207 337.876 57.3027L296.671 83.458C295.006 84.5145 292.831 83.3191 292.831 81.3477V74.6152C292.831 71.5777 290.369 69.1153 287.331 69.1152H221.084C208.952 69.1153 197.851 75.3685 191.5 85.3682V26.585C197.613 35.3295 207.678 40.6943 218.582 40.6943H287.331C290.369 40.6942 292.831 38.2318 292.831 35.1943V29.0371Z"
         stroke="url(#engineArrowStroke)"
-        strokeWidth="2"
+        strokeWidth="3"
         style={{ mixBlendMode: "plus-lighter" }}
       />
       <defs>
+        <filter
+          id="engineArrowTailGlow"
+          x="-50%"
+          y="-50%"
+          width="200%"
+          height="200%"
+        >
+          <feGaussianBlur stdDeviation="2" />
+        </filter>
         <linearGradient
           id="engineArrowFill"
           x1="344"
@@ -79,7 +96,7 @@ export function FactoryEnginePanel() {
              Right border is faded to transparent so there's no hard vertical line where the
              arrow connects — the radial blob (below) handles the smooth color transition. */}
         <div
-          className="cs-engine-card relative flex h-auto w-full flex-col items-center justify-center gap-[18px] px-5 py-6 sm:px-6 lg:h-[188.72px] lg:w-[40.13%]"
+          className="cs-engine-card relative flex h-auto w-full flex-col items-center justify-center gap-[18px] px-5 py-6 sm:px-6 lg:h-[188.72px] lg:w-[43.24%]"
           style={{ borderRightColor: "transparent" }}
         >
           <div className="flex w-full max-w-[343px] flex-col items-start gap-4">
@@ -133,11 +150,14 @@ export function FactoryEnginePanel() {
             }}
           />
 
-          {/* Arrow — only visible on lg+ side-by-side layout */}
+          {/* Arrow — only visible on lg+ side-by-side layout.
+               left offset of -13px aligns the arrow tail (SVG x=190 within
+               viewBox starting at 177) with the card's right edge, so the
+               tail-glow leaf overhangs back into the card and erases the seam. */}
           <div
             className="pointer-events-none absolute z-10 hidden lg:block"
             style={{
-              left: "100%",
+              left: "calc(100% - 13px)",
               top: "50%",
               transform: "translateY(-50%)",
             }}
@@ -148,7 +168,7 @@ export function FactoryEnginePanel() {
         </div>
 
         {/* Right card */}
-        <div className="cs-engine-card flex h-auto w-full flex-col items-center justify-center gap-[18px] px-5 py-6 sm:px-6 lg:h-[188.72px] lg:w-[40.13%]">
+        <div className="cs-engine-card flex h-auto w-full flex-col items-center justify-center gap-[18px] px-5 py-6 sm:px-6 lg:h-[188.72px] lg:w-[43.24%]">
           <div className="flex w-full max-w-[365px] flex-col items-start gap-4">
             <h4
               className="font-display text-white"
@@ -173,7 +193,7 @@ export function FactoryEnginePanel() {
               Hermetic, deterministic builds. Only what you specify.
             </p>
           </div>
-          <div className="flex w-full max-w-[365px] flex-wrap items-center gap-2 lg:gap-4">
+          <div className="flex w-full flex-nowrap items-center justify-start gap-2 lg:gap-4">
             {RIGHT_PILLS.map((p) => (
               <button key={p} type="button" className="cs-pill-cta">
                 {p}

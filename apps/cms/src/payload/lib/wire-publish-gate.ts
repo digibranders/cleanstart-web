@@ -6,6 +6,8 @@ const BANNER_PATH =
   '@/payload/admin/components/PublishChecklistBanner.tsx#PublishChecklistBanner';
 const OVERRIDE_GUARD_PATH =
   '@/payload/admin/components/PublishOverrideGuard.tsx#PublishOverrideGuard';
+const SLUG_GUARD_PATH =
+  '@/payload/admin/components/SlugRequirementGuard.tsx#SlugRequirementGuard';
 
 /**
  * Collections that need the publish-gate beforeChange check.
@@ -50,6 +52,7 @@ export const wirePublishGate = (collection: CollectionConfig): CollectionConfig 
       ...existingBeforeDocControls,
       { path: BANNER_PATH } as CustomComponent,
       { path: OVERRIDE_GUARD_PATH } as CustomComponent,
+      { path: SLUG_GUARD_PATH } as CustomComponent,
     ],
   };
 

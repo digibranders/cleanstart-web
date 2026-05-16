@@ -5,7 +5,9 @@ import type { RelationshipFieldClientProps } from 'payload';
 import type { ChangeEvent, KeyboardEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
-import { DocumentPicker } from '../pickers/DocumentPicker';
+import { QuickCreateDialog } from '@cleanstart/ui';
+
+import { QUICK_CREATE_CONFIG } from '../../lib/quick-create-config';
 import { Popover } from '../ui/Popover';
 import { Spinner } from '../ui/Spinner';
 
@@ -53,7 +55,10 @@ const DEFAULT_HINT: RowHint = {
   primary: ['title', 'name', 'filename', 'label', 'question'],
   secondary: [],
   showThumb: true,
-  showCreate: true,
+  // Default to no "+ New" affordance. Quick-create is the only
+  // supported create path; collections opt in by adding an entry to
+  // `QUICK_CREATE_CONFIG` AND setting `showCreate: true` in `ROW_HINTS`.
+  showCreate: false,
   chipLayout: 'inline',
 };
 
@@ -449,7 +454,88 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
   const chipLayout: ChipLayout = primaryHint.chipLayout ?? 'inline';
   const allowCreate =
     (field.admin as { allowCreate?: boolean } | undefined)?.allowCreate !== false;
-  const showCreate = primaryHint.showCreate !== false && allowCreate;
+  // "+ New" only renders for collections that have a quick-create
+  // config — DEFAULT_HINT.showCreate is `false` so unknown collections
+  // never offer the affordance. This makes the visible "+ New" set
+  // declaratively driven from QUICK_CREATE_CONFIG.
+  const quickCreateTarget = slugs[0] ?? fallbackRelationTo;
+  const quickCreateConfig = QUICK_CREATE_CONFIG[quickCreateTarget];
+  const showCreate = primaryHint.showCreate !== false && allowCreate && quickCreateConfig != null;
+
+  const quickCreateNode =
+    createOpen && quickCreateConfig ? (
+      <QuickCreateDialog
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        title={quickCreateConfig.title}
+        fields={quickCreateConfig.fields}
+        supportsDrafts={quickCreateConfig.supportsDrafts}
+        onCheckSlug={async (slug) => {
+          const url = new URL(`/api/${quickCreateTarget}`, window.location.origin);
+          url.searchParams.set('where[slug][equals]', slug);
+          url.searchParams.set('limit', '1');
+          url.searchParams.set('depth', '0');
+          const res = await fetch(url.toString(), { credentials: 'include' });
+          if (!res.ok) return { available: true };
+          const json = (await res.json()) as { docs?: unknown[] };
+          return { available: (json.docs ?? []).length === 0 };
+        }}
+        onSubmit={async (values, intent) => {
+          const url = new URL(`/api/${quickCreateTarget}`, window.location.origin);
+          if (quickCreateConfig.supportsDrafts) {
+            url.searchParams.set('draft', String(intent === 'draft'));
+          }
+          const body: Record<string, unknown> = { ...values };
+          if (quickCreateConfig.supportsDrafts) {
+            body._status = intent === 'draft' ? 'draft' : 'published';
+          }
+          const res = await fetch(url.toString(), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(body),
+          });
+          if (!res.ok) {
+            const text = await res.text();
+            let message = `Create failed (${res.status})`;
+            try {
+              const parsed = JSON.parse(text) as { errors?: { message?: string }[] };
+              const first = parsed.errors?.[0]?.message;
+              if (first) message = first;
+            } catch {
+              // body wasn't JSON — keep generic message
+            }
+            throw new Error(message);
+          }
+          const json = (await res.json()) as { doc?: { id: string | number }; id?: string | number };
+          const id = json.doc?.id ?? json.id;
+          if (id == null) throw new Error('Create succeeded but no id returned.');
+          return { id };
+        }}
+        onCreated={(id, intent) => {
+          handleCreated(String(id));
+          try {
+            window.dispatchEvent(
+              new CustomEvent('cs-cms:toast', {
+                detail: {
+                  message:
+                    intent === 'draft'
+                      ? `Draft ${quickCreateConfig.title.toLowerCase().replace(/^new /, '')} created.`
+                      : `${quickCreateConfig.title.replace(/^New /, '')} published.`,
+                  type: 'success',
+                  action: {
+                    label: 'Fill in profile →',
+                    href: `/admin/collections/${quickCreateTarget}/${id}`,
+                  },
+                },
+              }),
+            );
+          } catch {
+            // toast is best-effort
+          }
+        }}
+      />
+    ) : null;
 
   // Render a single pill — used only for hasMany stacked layout.
   const renderPill = (pill: ResolvedDoc): ReactElement => {
@@ -680,16 +766,7 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
             </output>
           ) : null)}
 
-        {createOpen ? (
-          <DocumentPicker
-            open={createOpen}
-            onClose={() => setCreateOpen(false)}
-            relationTo={slugs[0] ?? fallbackRelationTo}
-            id={null}
-            title={`New ${slugs[0]}`}
-            onSaved={handleCreated}
-          />
-        ) : null}
+        {quickCreateNode}
       </div>
     );
   }
@@ -871,16 +948,7 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
         </div>
       </Popover>
 
-      {createOpen ? (
-        <DocumentPicker
-          open={createOpen}
-          onClose={() => setCreateOpen(false)}
-          relationTo={slugs[0] ?? fallbackRelationTo}
-          id={null}
-          title={`New ${slugs[0]}`}
-          onSaved={handleCreated}
-        />
-      ) : null}
+      {quickCreateNode}
     </div>
   );
 };
