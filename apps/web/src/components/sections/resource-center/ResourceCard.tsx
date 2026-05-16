@@ -3,6 +3,7 @@ import {
   type Resource,
   resourceTypeLabel,
   resourceCtaLabel,
+  resourceCoverPoster,
 } from "@/lib/resources";
 
 interface ResourceCardProps {
@@ -12,6 +13,7 @@ interface ResourceCardProps {
 export function ResourceCard({ resource }: ResourceCardProps): React.ReactElement {
   const typeLabel = resourceTypeLabel(resource.type);
   const ctaLabel = resourceCtaLabel(resource.type, resource.ctaButtonText);
+  const coverPoster = resourceCoverPoster(resource.type);
 
   return (
     <article
@@ -24,7 +26,7 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
           "0px 81px 23px 0px rgba(0,0,0,0), 0px 52px 21px 0px rgba(0,0,0,0), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 3px 7px 0px rgba(0,0,0,0.02)",
       }}
     >
-      {/* Cover placeholder — auto-generated covers will land here in a follow-up. */}
+      {/* Cover — booklet poster mapped by type, with the resource title rendered over the dark inner area. */}
       <div
         className="absolute overflow-hidden"
         style={{
@@ -33,10 +35,34 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
           width: "265px",
           height: "138px",
           borderRadius: "16px",
-          background: "linear-gradient(135deg, #1a1a4e 0%, #2d1b9e 50%, #471ec0 100%)",
         }}
-        aria-hidden
-      />
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={coverPoster}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+          loading="lazy"
+          decoding="async"
+        />
+        <span
+          className="absolute font-display font-medium text-white overflow-hidden"
+          style={{
+            top: "38px",
+            left: "56px",
+            right: "76px",
+            fontSize: "10px",
+            lineHeight: "1.25",
+            letterSpacing: "-0.02em",
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+          }}
+        >
+          {resource.title}
+        </span>
+      </div>
 
 
       {/* Type badge — overlaps image bottom */}

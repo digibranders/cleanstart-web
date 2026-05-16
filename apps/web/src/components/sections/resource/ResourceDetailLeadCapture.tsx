@@ -22,21 +22,11 @@ export function ResourceDetailLeadCapture({
   }
 
   return (
-    <section
-      className="relative w-full"
-      style={{ marginBottom: "-234px", zIndex: 10, background: "#f6f6f6", paddingTop: "80px" }}
+    <div
+      className="absolute inset-0"
+      style={{ background: "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)" }}
       aria-labelledby="rd-cta-title"
     >
-      <div className="relative px-6">
-        <div
-          className="relative mx-auto overflow-hidden"
-          style={{
-            maxWidth: "1276px",
-            height: "375px",
-            borderRadius: "40px",
-            background: "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)",
-          }}
-        >
           {/* Union pattern */}
           <div
             aria-hidden
@@ -135,7 +125,7 @@ export function ResourceDetailLeadCapture({
           {/* Content row */}
           <div
             className="absolute inset-0 flex items-center"
-            style={{ padding: "80px 100px" }}
+            style={{ padding: "60px 100px" }}
           >
             <div className="flex items-start" style={{ gap: "68px" }}>
               {/* Left: headline */}
@@ -272,8 +262,6 @@ export function ResourceDetailLeadCapture({
               </form>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
+    </div>
   );
 }

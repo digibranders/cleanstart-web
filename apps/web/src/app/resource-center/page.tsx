@@ -13,7 +13,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 const TITLE = "Resource Center";
 const DESCRIPTION =
-  "A curated collection of whitepapers, reports, datasheets, and case studies on container security.";
+  "A curated collection of whitepapers, ebooks, datasheets, architecture insights, and reports on container security.";
 
 interface ResourceCenterPageProps {
   searchParams: Promise<{
@@ -84,7 +84,7 @@ export default async function ResourceCenterPage({
               marginTop: "-32px",
               zIndex: 1,
               paddingTop: "52px",
-              paddingBottom: "80px",
+              paddingBottom: "250px",
             }}
             aria-label="Resources listing"
           >
@@ -116,12 +116,8 @@ export default async function ResourceCenterPage({
           </section>
         </FadeUp>
 
-        {/* CTA — overlaps footer */}
-        <FadeUp className="relative z-10" style={{ marginTop: "80px" }}>
-          <ResourceCenterCTA />
-        </FadeUp>
       </main>
-      <Footer topPadding={225} />
+      <Footer cta={<ResourceCenterCTA />} />
     </>
   );
 }

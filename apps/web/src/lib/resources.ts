@@ -5,10 +5,10 @@ import { cache } from "react";
 
 export type ResourceType =
   | "whitepaper"
-  | "report"
-  | "brief"
+  | "ebook"
   | "datasheet"
-  | "case-study";
+  | "architecture-insights"
+  | "report";
 
 export type ResourceImage = {
   id: string;
@@ -103,14 +103,14 @@ export function resourceTypeLabel(type: ResourceType | null | undefined): string
   switch (type) {
     case "whitepaper":
       return "Whitepaper";
-    case "report":
-      return "Report";
-    case "brief":
-      return "Brief";
+    case "ebook":
+      return "Ebook";
     case "datasheet":
       return "Datasheet";
-    case "case-study":
-      return "Case Study";
+    case "architecture-insights":
+      return "Architecture Insights";
+    case "report":
+      return "Report";
     default:
       return "Resource";
   }
@@ -125,16 +125,33 @@ export function resourceCtaLabel(
   switch (type) {
     case "whitepaper":
       return "Get the Whitepaper";
-    case "report":
-      return "Read the Report";
-    case "brief":
-      return "Get the Brief";
+    case "ebook":
+      return "Get the Ebook";
     case "datasheet":
       return "Get the Datasheet";
-    case "case-study":
-      return "Read the Case Study";
+    case "architecture-insights":
+      return "Read the Insights";
+    case "report":
+      return "Read the Report";
     default:
       return "Get the Resource";
+  }
+}
+
+/** Mapped cover poster for a resource type. Used when the CMS has no per-resource cover image. */
+export function resourceCoverPoster(
+  type: ResourceType | null | undefined,
+): string {
+  switch (type) {
+    case "ebook":
+      return "/images/resource-center/cover-poster/ebook-cover.png";
+    case "datasheet":
+    case "report":
+      return "/images/resource-center/cover-poster/datasheet-report.png";
+    case "whitepaper":
+      return "/images/resource-center/cover-poster/datasheet-cover.png";
+    default:
+      return "/images/resource-center/cover-poster/architecture-insights.png";
   }
 }
 
@@ -145,24 +162,24 @@ export function resourceLeadCaptureHeading(
   switch (type) {
     case "whitepaper":
       return "Get the Complete Whitepaper";
-    case "report":
-      return "Get the Complete Report";
-    case "brief":
-      return "Get the Complete Brief";
+    case "ebook":
+      return "Get the Complete Ebook";
     case "datasheet":
       return "Get the Complete Datasheet";
-    case "case-study":
-      return "Read the Full Case Study";
+    case "architecture-insights":
+      return "Read the Full Insights";
+    case "report":
+      return "Get the Complete Report";
     default:
       return "Get the Complete Resource";
   }
 }
 
-/** All filterable types in sidebar order, matching Figma. */
+/** All filterable types in sidebar order, matching the live site. */
 export const RESOURCE_TYPES: Array<{ value: ResourceType; label: string }> = [
   { value: "whitepaper", label: "Whitepaper" },
-  { value: "report", label: "Report" },
-  { value: "brief", label: "Brief" },
+  { value: "ebook", label: "Ebook" },
   { value: "datasheet", label: "Datasheet" },
-  { value: "case-study", label: "Case Study" },
+  { value: "architecture-insights", label: "Architecture Insights" },
+  { value: "report", label: "Report" },
 ];
