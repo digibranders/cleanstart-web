@@ -37,20 +37,27 @@ export function WebinarsGrid({
       style={{ background: "#F6F6F6", paddingTop: "72px", paddingBottom: "250px" }}
       data-section="WebinarsGrid"
     >
-      {/* Soft grid backdrop (faint) */}
+      {/* Figma bg gridlines — two radial-gradient grids (purple #640DFB @10%)
+          fading from top-left and top-right corners. The fade is baked into
+          the SVG via two radialGradient fills (centers (59.5,82.5) and
+          (1746.5,158.5), r=590.5). Render at intrinsic 1922×749, anchored
+          top-center so the corner blobs sit where Figma placed them. */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(15,23,42,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.04) 1px, transparent 1px)",
-          backgroundSize: "71px 71px",
-          maskImage:
-            "radial-gradient(ellipse 80% 70% at 50% 30%, black 30%, transparent 80%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 80% 70% at 50% 30%, black 30%, transparent 80%)",
-        }}
-      />
+        className="pointer-events-none select-none absolute top-0 left-1/2 -translate-x-1/2"
+        style={{ width: "1922px", height: "749px" }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/webinars/bg-gridlines.svg"
+          alt=""
+          aria-hidden
+          className="block"
+          style={{ width: "1922px", height: "749px", maxWidth: "none" }}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
 
       <div className="relative mx-auto max-w-[1276px] px-6">
         <div
