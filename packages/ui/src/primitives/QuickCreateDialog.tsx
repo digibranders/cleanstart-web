@@ -1,6 +1,6 @@
 'use client';
 
-import type { ChangeEvent, FormEvent, ReactElement } from 'react';
+import type { ChangeEvent, KeyboardEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { slugify } from '../lib/slugify';
@@ -234,12 +234,19 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
     [submitDisabled, onSubmit, onCreated, onClose, values],
   );
 
-  const handleFormSubmit = useCallback(
-    (e: FormEvent<HTMLFormElement>): void => {
+  // Enter-to-submit, scoped to the dialog body. Dialog uses a <div>
+  // wrapper (not <form>) because the consumer may mount this inside a
+  // parent <form> — nested forms are invalid HTML and break React's
+  // hydration. Submit on Enter from any field except <select>.
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLDivElement>): void => {
+      if (e.key !== 'Enter') return;
+      const t = e.target as HTMLElement;
+      if (t.tagName === 'SELECT' || t.tagName === 'BUTTON') return;
       e.preventDefault();
-      void doSubmit(supportsDrafts ? 'publish' : 'publish');
+      void doSubmit('publish');
     },
-    [doSubmit, supportsDrafts],
+    [doSubmit],
   );
 
   return (
@@ -251,7 +258,7 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
       dismissOnBackdrop={!isSubmitting}
     >
       <DialogHeader id={headingId} title={title} onClose={onClose} />
-      <form onSubmit={handleFormSubmit} className="cs-quick-create__form" noValidate>
+      <div className="cs-quick-create__form" onKeyDown={handleKeyDown}>
         <DialogBody>
           {fields.map((f, idx) => {
             const id = `${headingId}-${f.name}`;
@@ -364,8 +371,9 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
             </>
           ) : (
             <button
-              type="submit"
+              type="button"
               className="cs-btn cs-btn--primary"
+              onClick={() => void doSubmit('publish')}
               disabled={submitDisabled}
               title={blockingReason ?? undefined}
             >
@@ -373,7 +381,7 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
             </button>
           )}
         </DialogFooter>
-      </form>
+      </div>
     </Dialog>
   );
 };
