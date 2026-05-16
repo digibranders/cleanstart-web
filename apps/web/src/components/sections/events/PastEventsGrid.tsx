@@ -77,12 +77,12 @@ export function PastEventsGrid({
         <h2
           className="font-display font-bold"
           style={{
-            fontSize: "clamp(2.25rem,4.3vw,3.875rem)",
-            lineHeight: "1.0",
+            fontSize: "clamp(2.25rem,4.3vw,3.25rem)",
+            lineHeight: "1.1",
             letterSpacing: "-0.04em",
-            color: "#0f1729",
-            paddingTop: "80px",
-            paddingBottom: "64px",
+            color: "#111",
+            paddingTop: "60px",
+            paddingBottom: "32px",
           }}
         >
           Past Events
@@ -111,11 +111,11 @@ export function PastEventsGrid({
             </div>
 
             {hasNextPage && (
-              <div className="flex justify-center" style={{ marginTop: "64px" }}>
+              <div className="flex justify-center" style={{ marginTop: "80px" }}>
                 <Link
                   href={`/events?page=${page + 1}`}
                   className="cs-btn-blue gap-2"
-                  style={{ width: "156px", height: "44px", fontSize: "1.0625rem" }}
+                  style={{ width: "156px", height: "44px", fontSize: "18px" }}
                 >
                   View More
                   {/* eslint-disable-next-line @next/next/no-img-element */}

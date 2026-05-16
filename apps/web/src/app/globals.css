@@ -55,16 +55,15 @@
      The .bg-cs-hero rule still applies a #151021 fallback bg-color for the
      transparent-tail safety. */
   --bg-hero-mesh: linear-gradient(
-    to bottom,
-    #151021 0%,
-    #14143C 22%,
-    #181A5E 42%,
-    #1F1F88 56%,
-    #2B22B0 68%,
-    #4226D5 80%,
-    #5028E5 89%,
-    rgba(80, 40, 229, 0.62) 95%,
-    rgba(80, 40, 229, 0) 100%
+    180deg,
+    rgba(21, 16, 33, 1) 0%,
+    rgba(16, 18, 62, 1) 31%,
+    rgba(19, 30, 143, 1) 51%,
+    rgba(71, 30, 192, 1) 69%,
+    rgba(71, 31, 195, 1) 80%,
+    rgba(70, 30, 191, 0.85) 85%,
+    rgba(66, 30, 188, 0.4) 94%,
+    rgba(66, 30, 188, 0) 99%
   );
 
   /* Decorative purple radial blobs (Figma "Union" vectors, fill #640DFB radial)

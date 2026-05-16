@@ -43,13 +43,13 @@ export function AsrBusinessDelivers(): React.ReactElement {
           decoding="async"
         />
 
-        {/* Dark overlay — navy-blue tint */}
+        {/* Dark overlay — exact Figma stops (fill_RJ8WCA) with alpha so photo bleeds through */}
         <div
           aria-hidden
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "linear-gradient(180deg, rgba(10,8,28,0.72) 0%, rgba(10,8,28,0.65) 45%, rgba(71,30,192,0.60) 100%)",
+              "linear-gradient(180deg, rgba(21,16,33,0.82) 0%, rgba(19,30,143,0.78) 71%, rgba(71,30,192,0.72) 100%)",
           }}
         />
 

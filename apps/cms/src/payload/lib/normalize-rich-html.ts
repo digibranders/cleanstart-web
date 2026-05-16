@@ -234,6 +234,113 @@ export const looksLikeRichDoc = (html: string): boolean => {
   );
 };
 
+export type ExtractedInlineImage = {
+  src: string;
+  alt: string;
+  /**
+   * Unique token written into a `<p>CS_IMG_PLACEHOLDER:{id}</p>`
+   * element that takes the original `<img>`'s position in the DOM.
+   * The paste plugin uses this to swap the placeholder paragraph for
+   * a real UploadNode once the image finishes ingesting — preserving
+   * the image's position in the document flow instead of dumping
+   * everything at the end of the editor.
+   */
+  placeholderId: string;
+};
+
+export const INLINE_IMAGE_PLACEHOLDER_PREFIX = 'CS_IMG_PLACEHOLDER:';
+
+const PLACEHOLDER_BLOCK_TAGS: ReadonlySet<string> = new Set([
+  'p',
+  'div',
+  'figure',
+  'li',
+  'blockquote',
+  'pre',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+]);
+
+const generatePlaceholderId = (index: number): string => {
+  const rand = Math.random().toString(36).slice(2, 10);
+  return `i${index}-${Date.now().toString(36)}-${rand}`;
+};
+
+/**
+ * Replace every `<img>` element in `root` with a `<p>` placeholder
+ * whose text is `CS_IMG_PLACEHOLDER:{placeholderId}`. Return the
+ * collected sources (absolute `http(s)` only) in document order so
+ * the paste plugin can ingest each URL server-side and then swap the
+ * matching placeholder paragraph for a real UploadNode at the same
+ * position in the editor.
+ *
+ * Why this exists: Lexical's stock `UploadNode.importDOM()` turns
+ * any `<img>` it sees during `$generateNodesFromDOM` into a
+ * "pending" upload node that the bundled UploadPlugin tries to fetch
+ * from the **browser** via `await fetch(src)`. A third-party CDN
+ * (Webflow, etc.) does not return CORS headers, so that fetch throws
+ * with no try/catch — the pending node renders as a 95×203
+ * ShimmerEffect forever. By stripping `<img>` before
+ * `$generateNodesFromDOM` runs we never enter that broken path; the
+ * paste plugin then ingests each URL server-side via
+ * `POST /api/media-ingest-url` and inserts proper UploadNodes.
+ *
+ * Positional preservation strategy:
+ *   - Walk to the nearest block-level ancestor (p/div/figure/li/h*).
+ *   - Insert a `<p>placeholder</p>` immediately after that ancestor.
+ *   - Remove the `<img>` (and the ancestor if it is now empty,
+ *     avoiding the "trailing empty paragraph where the image was"
+ *     artefact).
+ *
+ * Non-`http(s)` srcs (e.g. `data:`, `blob:`, relative paths) are
+ * dropped with no placeholder — they cannot be ingested via URL
+ * fetch and would never become real upload nodes.
+ */
+export const extractInlineImages = (root: Element): ExtractedInlineImage[] => {
+  const out: ExtractedInlineImage[] = [];
+  const doc = root.ownerDocument;
+  // Snapshot first — we'll be mutating the live HTMLCollection.
+  const imgs = Array.from(root.getElementsByTagName('img'));
+  for (const img of imgs) {
+    const rawSrc = img.getAttribute('src') ?? '';
+    const alt = img.getAttribute('alt') ?? '';
+    if (!/^https?:\/\//i.test(rawSrc)) {
+      img.remove();
+      continue;
+    }
+    const placeholderId = generatePlaceholderId(out.length);
+    out.push({ src: rawSrc, alt, placeholderId });
+    const placeholder = doc.createElement('p');
+    placeholder.textContent = `${INLINE_IMAGE_PLACEHOLDER_PREFIX}${placeholderId}`;
+    // Walk up to the nearest block-level ancestor still inside `root`.
+    let block: Element | null = img.parentElement;
+    while (
+      block &&
+      block !== root &&
+      !PLACEHOLDER_BLOCK_TAGS.has(block.tagName.toLowerCase())
+    ) {
+      block = block.parentElement;
+    }
+    if (block && block !== root && block.parentNode) {
+      block.parentNode.insertBefore(placeholder, block.nextSibling);
+      img.remove();
+      const remainingText = (block.textContent ?? '').trim();
+      const remainingMedia = block.querySelector('img, svg, video, iframe, table, audio');
+      if (remainingText.length === 0 && !remainingMedia) {
+        block.remove();
+      }
+    } else {
+      // No block ancestor inside root — swap the img directly.
+      img.replaceWith(placeholder);
+    }
+  }
+  return out;
+};
+
 /**
  * Mutate `root` in place: drop noisy tags, unwrap spans/fonts into
  * proper inline tags, promote heading-shaped paragraphs to <h{n}>,

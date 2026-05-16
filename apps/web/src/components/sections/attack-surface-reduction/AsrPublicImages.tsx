@@ -1,45 +1,83 @@
-export function AsrPublicImages(): React.ReactElement {
-  const cards: Array<{ title: string; description: string }> = [
-    {
-      title: "Inherited Vulnerabilities",
-      description: "Risk exist before application code is added",
-    },
-    {
-      title: "Too Many Components",
-      description: "Public images include packages most workloads never use.",
-    },
-    {
-      title: "Oversized SBOM's",
-      description: "More components to track, justify, and audit.",
-    },
-    {
-      title: "Constant Patching",
-      description: "The same base issues reappear release after release.",
-    },
-  ];
+/**
+ * Public images are bloated — Figma Group 2085665113 (366:6382).
+ *
+ * Layout (1260×540 in Figma):
+ *  - Center: shipping-container 3D illustration (621×511)
+ *  - 4 small cards (303×166) at the four corners with dashed connector lines
+ *    going to the container:
+ *      TL Inherited Vulnerabilities  ─ ─ →  container top-left
+ *      TR Too Many Components        ← ─ ─  container top-right
+ *      BL Oversized SBOMs            ─ ─ →  container bottom-left
+ *      BR Constant Patching          ← ─ ─  container bottom-right
+ *
+ * Card spec (Figma 366:6388 et al.):
+ *  - Outer: 303×166, radius 20, gradient fill (red→white border halo)
+ *  - Inner: 287×150 (8px inset), white, radius 16, big stacked shadow
+ *  - Text:  Figtree SemiBold 20px title + Figtree Regular 14-15px description
+ *  - Icon:  small red shield on the left
+ */
+const CARDS: Array<{
+  pos: "tl" | "tr" | "bl" | "br";
+  title: string;
+  description: string;
+}> = [
+  {
+    pos: "tl",
+    title: "Inherited Vulnerabilities",
+    description: "Unused packages increase exposure.",
+  },
+  {
+    pos: "tr",
+    title: "Too Many Components",
+    description: "Larger images expand attack paths.",
+  },
+  {
+    pos: "bl",
+    title: "Oversized SBOMs",
+    description: "More dependencies create more noise.",
+  },
+  {
+    pos: "br",
+    title: "Constant Patching",
+    description: "More packages require more fixes.",
+  },
+];
 
+export function AsrPublicImages(): React.ReactElement {
   return (
     <section
       data-section="AsrPublicImages"
-      className="relative bg-white overflow-hidden"
+      className="relative overflow-hidden"
     >
+      {/* White-glow band at top edge — Figma section transition */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0"
+        style={{
+          height: "120px",
+          background:
+            "radial-gradient(ellipse 60% 100% at 50% 0%, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 70%)",
+        }}
+      />
+
       {/* Heading */}
       <div className="relative mx-auto max-w-[1276px] px-6 pt-16 md:pt-[88px]">
         <h2
-          className="text-center text-[#111]"
+          className="text-center text-[#111111]"
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "clamp(28px, 3.23vw, 62px)",
-            fontWeight: 600,
+            fontWeight: 700,
             letterSpacing: "-0.05em",
-            lineHeight: 1.05,
-            marginBottom: "40px",
+            lineHeight: 1.1,
+            marginBottom: "48px",
           }}
         >
-          Public images are{" "}
+          Public images are
+          <br />
           <span
             style={{
-              background: "linear-gradient(95deg, #9A51FF 0%, #2CC1EB 100%)",
+              background: "linear-gradient(99deg, #9A51FF 0%, #2CC1EB 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -50,41 +88,103 @@ export function AsrPublicImages(): React.ReactElement {
         </h2>
       </div>
 
-      {/* Desktop: 2 cards │ hex center │ 2 cards */}
-      <div className="hidden md:block relative mx-auto max-w-[1276px] px-6 pb-16 md:pb-[88px]">
-        <div className="relative" style={{ minHeight: "520px" }}>
-          {/* Center danger-hex illustration */}
+      {/* Desktop diagram: container center, 4 cards at corners, dashed lines */}
+      <div className="hidden md:block relative mx-auto max-w-[1260px] px-6 pb-16 md:pb-[88px]">
+        <div className="relative" style={{ height: "540px" }}>
+          {/* Soft red radial glow under the container */}
+          <div
+            aria-hidden
+            className="absolute pointer-events-none"
+            style={{
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "560px",
+              height: "320px",
+              borderRadius: "50%",
+              background:
+                "radial-gradient(circle, rgba(255,76,76,0.28) 0%, rgba(255,76,76,0) 70%)",
+              filter: "blur(40px)",
+            }}
+          />
+
+          {/* Dashed connector lines (SVG paths from card corners → container corners) */}
+          <svg
+            aria-hidden
+            className="absolute pointer-events-none"
+            viewBox="0 0 1260 540"
+            preserveAspectRatio="none"
+            style={{ inset: 0, width: "100%", height: "100%" }}
+          >
+            {/* TL card → container TL */}
+            <path
+              d="M 303 83 L 405 83 L 405 200 L 470 200"
+              stroke="rgba(255, 76, 76, 0.55)"
+              strokeWidth="1.4"
+              strokeDasharray="4 4"
+              fill="none"
+            />
+            {/* TR card → container TR */}
+            <path
+              d="M 957 83 L 855 83 L 855 200 L 790 200"
+              stroke="rgba(255, 76, 76, 0.55)"
+              strokeWidth="1.4"
+              strokeDasharray="4 4"
+              fill="none"
+            />
+            {/* BL card → container BL */}
+            <path
+              d="M 326 367 L 425 367 L 425 340 L 470 340"
+              stroke="rgba(255, 76, 76, 0.55)"
+              strokeWidth="1.4"
+              strokeDasharray="4 4"
+              fill="none"
+            />
+            {/* BR card → container BR */}
+            <path
+              d="M 924 367 L 835 367 L 835 340 L 790 340"
+              stroke="rgba(255, 76, 76, 0.55)"
+              strokeWidth="1.4"
+              strokeDasharray="4 4"
+              fill="none"
+            />
+          </svg>
+
+          {/* Container illustration — Figma image 583110, 621×511 */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             aria-hidden
-            src="/images/attack-surface-reduction/bloated-hex.svg"
+            src="/images/attack-surface-reduction/bloated-container.png"
             alt=""
             className="absolute pointer-events-none select-none"
             style={{
               left: "50%",
               top: "50%",
               transform: "translate(-50%, -50%)",
-              width: "520px",
-              height: "520px",
+              width: "560px",
+              height: "auto",
               maxWidth: "none",
+              zIndex: 1,
             }}
             loading="lazy"
             decoding="async"
           />
 
-          {/* Quadrant positions: TL, TR, BL, BR */}
-          {(
-            [
-              { style: { left: 0, top: "60px" } },
-              { style: { right: 0, top: "60px" } },
-              { style: { left: 0, bottom: "60px" } },
-              { style: { right: 0, bottom: "60px" } },
-            ] as const
-          ).map((pos, idx) => {
-            const card = cards[idx];
-            if (!card) return null;
+          {/* 4 cards at corner positions — Figma exact coords:
+              TL (0,0), TR (957,0), BL (23,284), BR (924,284) on a 1260 grid */}
+          {CARDS.map((card) => {
+            const positionStyle: React.CSSProperties = {
+              tl: { left: 0, top: 0 },
+              tr: { right: 0, top: 0 },
+              bl: { left: "1.8%", bottom: 0 },
+              br: { right: "2.6%", bottom: 0 },
+            }[card.pos];
             return (
-              <div key={card.title} className="absolute" style={pos.style}>
+              <div
+                key={card.title}
+                className="absolute"
+                style={{ ...positionStyle, zIndex: 2 }}
+              >
                 <BloatedCard title={card.title} description={card.description} />
               </div>
             );
@@ -92,19 +192,19 @@ export function AsrPublicImages(): React.ReactElement {
         </div>
       </div>
 
-      {/* Mobile: hex + stacked cards */}
-      <div className="md:hidden mx-auto px-5 pb-12 flex flex-col items-center gap-4">
+      {/* Mobile: container then stacked cards */}
+      <div className="md:hidden mx-auto px-5 pb-12 flex flex-col items-center gap-5">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/attack-surface-reduction/bloated-hex.svg"
+          src="/images/attack-surface-reduction/bloated-container.png"
           alt=""
           className="pointer-events-none select-none"
-          style={{ width: "200px", height: "200px" }}
+          style={{ width: "min(320px, 90%)", height: "auto" }}
           loading="lazy"
           decoding="async"
         />
-        {cards.map((card) => (
+        {CARDS.map((card) => (
           <BloatedCard
             key={card.title}
             title={card.title}
@@ -126,81 +226,94 @@ function BloatedCard({
   description,
 }: BloatedCardProps): React.ReactElement {
   return (
-    <div className="relative" style={{ width: "388px", maxWidth: "100%" }}>
-      {/* Subtle cyan border halo */}
+    <div className="relative" style={{ width: "303px", maxWidth: "100%" }}>
+      {/* Outer red→white border halo — Figma fill_UB7EN2 [#FF4C4C, #FFFFFF] */}
       <div
         aria-hidden
-        className="absolute inset-0 rounded-[20px] pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          background: "linear-gradient(90deg, #2CC1EB 0%, #2CC1EB 100%)",
-          opacity: 0.4,
+          borderRadius: "20px",
+          background:
+            "linear-gradient(135deg, rgba(255,76,76,0.45) 0%, rgba(255,255,255,0.0) 100%), #FFFFFF",
+          opacity: 0.85,
         }}
       />
-      {/* White card body */}
+      {/* White inner card — Figma Rectangle 1000001830, 8px inset, radius 16 */}
       <div
-        className="relative bg-white rounded-[16px] flex items-center gap-4 px-5 py-5"
+        className="relative bg-white flex items-center gap-3"
         style={{
           margin: "8px",
+          padding: "16px 18px",
+          borderRadius: "16px",
+          minHeight: "150px",
           boxShadow:
-            "0px 64px 64px 0px rgba(22,34,51,0.12), 0px 32px 32px 0px rgba(22,34,51,0.04), 0px 4px 24px 0px rgba(22,34,51,0.04), 0px 4px 4px 0px rgba(22,34,51,0.04)",
+            "0px 4px 4px 0px rgba(22,34,51,0.04), 0px 4px 24px 0px rgba(22,34,51,0.04), 0px 24px 24px 0px rgba(22,34,51,0.04), 0px 32px 32px 0px rgba(22,34,51,0.04), 0px 64px 64px 0px rgba(22,34,51,0.12), 0px 120px 120px 0px rgba(22,34,51,0.08)",
         }}
       >
-        {/* Metallic icon box */}
+        {/* Red shield icon box */}
         <div
-          className="relative shrink-0 rounded-[12px] overflow-hidden"
-          style={{ width: "64px", height: "64px" }}
+          className="relative shrink-0 self-start"
+          style={{
+            width: "44px",
+            height: "44px",
+            borderRadius: "10px",
+            background: "linear-gradient(135deg, #FF4C4C 0%, #FF8A8A 100%)",
+            boxShadow:
+              "0 4px 8px -2px rgba(255,76,76,0.4), inset 0 1px 0 rgba(255,255,255,0.3)",
+          }}
         >
-          <div
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
             aria-hidden
-            className="absolute inset-0 rounded-[12px]"
             style={{
-              background:
-                "linear-gradient(115.5deg, #576265 17.3%, #9EA1A1 74.5%, #848B8A 100%)",
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
             }}
-          />
-          <div
-            aria-hidden
-            className="absolute inset-0 rounded-[12px] mix-blend-overlay"
-            style={{
-              background:
-                "linear-gradient(-21deg, rgba(255,255,255,0) 53%, rgba(255,255,255,1) 96%)",
-            }}
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            src="/images/attack-surface-reduction/public-images-shield-icon.svg"
-            alt=""
-            className="absolute pointer-events-none select-none"
-            style={{ left: "14px", top: "14px", width: "37px", height: "37px" }}
-            loading="lazy"
-            decoding="async"
-          />
+          >
+            <path
+              d="M12 2L3.5 5v7c0 5 3.5 9.5 8.5 11 5-1.5 8.5-6 8.5-11V5L12 2z"
+              stroke="white"
+              strokeWidth="1.8"
+              strokeLinejoin="round"
+              fill="none"
+            />
+            <path
+              d="M12 8v4"
+              stroke="white"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+            <circle cx="12" cy="15" r="1" fill="white" />
+          </svg>
         </div>
 
-        {/* Text group */}
+        {/* Text */}
         <div className="flex flex-col gap-1 min-w-0">
           <p
-            className="text-[#111]"
+            className="text-[#111111]"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "20px",
+              fontSize: "18px",
               fontWeight: 600,
-              letterSpacing: "-0.37px",
-              lineHeight: 1.3,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.2,
             }}
           >
             {title}
           </p>
           <p
-            className="text-[#111]"
+            className="text-[#444444]"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "16px",
+              fontSize: "13px",
               fontWeight: 400,
-              letterSpacing: "-0.37px",
-              lineHeight: 1.3,
-              maxWidth: "210px",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.35,
             }}
           >
             {description}

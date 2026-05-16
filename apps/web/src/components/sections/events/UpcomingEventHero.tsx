@@ -4,7 +4,10 @@ import { type Event, formatEventDate } from "@/lib/events";
 import { mediaUrl } from "@/lib/blog";
 
 const HERO_GRADIENT =
-  "linear-gradient(180deg, #151021 0%, #10123e 45%, #131e8f 61%, #471ec0 75%, #471fc3 84%, rgba(70,30,191,0.85) 88%, rgba(66,30,188,0.40) 95%, rgba(66,30,188,0) 99%)";
+  "linear-gradient(180deg, #151021 0%, #10123E 45%, #131E8F 66%, #471EC0 75%, #471FC3 84%, rgba(70,30,191,0.85) 88%, rgba(66,30,188,0.40) 95%, rgba(66,30,188,0) 99%)";
+
+const DATE_CHIP_GRADIENT =
+  "linear-gradient(102.295deg, #9A51FF 18%, #2CC1EB 286%)";
 
 interface UpcomingEventHeroProps {
   event: Event | null;
@@ -19,49 +22,51 @@ export function UpcomingEventHero({
       style={{ minHeight: "746px", background: HERO_GRADIENT }}
       aria-labelledby="events-hero-title"
     >
-      {/* Decorative glow — left side */}
+      {/* Decorative isometric cube — left side */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
-          left: "-119px",
-          top: "279px",
-          width: "332px",
-          height: "313px",
-          mixBlendMode: "hard-light",
-          opacity: 0.3,
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/blogs/hero-glow-left.png"
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
-
-      {/* Decorative orb — right side */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
-        style={{
-          right: "-119px",
-          top: "279px",
+          left: "-142px",
+          top: "104px",
           width: "346px",
           height: "346px",
           mixBlendMode: "color-dodge",
-          opacity: 0.25,
+          opacity: 0.5,
+          transform: "rotate(-46.54deg)",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/hero-orb-top.png"
+          src="/images/blogs/cta-cube-left.png"
           alt=""
           loading="lazy"
           decoding="async"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-contain"
+        />
+      </div>
+
+      {/* Decorative isometric cube — right side */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden lg:block"
+        style={{
+          right: "-142px",
+          top: "503px",
+          width: "346px",
+          height: "346px",
+          mixBlendMode: "color-dodge",
+          opacity: 0.5,
+          transform: "rotate(-46.54deg)",
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/blogs/cta-cube-right.png"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-contain"
         />
       </div>
 
@@ -89,17 +94,17 @@ export function UpcomingEventHero({
           id="events-hero-title"
           className="font-display font-semibold text-white text-center"
           style={{
-            fontSize: "clamp(3rem,5.6vw,5rem)",
             lineHeight: "1.0",
             letterSpacing: "-0.05em",
             marginBottom: "60px",
           }}
         >
-          Upcoming{" "}
+          <span style={{ fontSize: "clamp(3rem,5.6vw,5rem)" }}>Upcoming </span>
           <span
             style={{
+              fontSize: "clamp(2.75rem,5vw,4.5rem)",
               background:
-                "linear-gradient(180deg, #7faaff 0%, #33baec 100%)",
+                "linear-gradient(105.817deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -128,17 +133,87 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
 
   return (
     <div
-      className="relative w-full mx-auto overflow-hidden"
+      className="relative w-full mx-auto overflow-visible"
       style={{
         maxWidth: "1276px",
         height: "368px",
-        borderRadius: "24px",
-        background:
-          "linear-gradient(135deg, #5949d9 0%, #3d2dae 60%, #2a1b6b 100%)",
+        borderRadius: "20px",
+        backgroundColor: "#A567FF",
+        backgroundImage: [
+          "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
+          "radial-gradient(120% 80% at 0% 0%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)",
+          "linear-gradient(135deg, #A567FF 0%, #7B47D4 100%)",
+        ].join(", "),
+        backgroundBlendMode: "overlay, normal, normal",
         boxShadow:
-          "0 30px 60px rgba(20,12,60,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset",
+          "0 30px 60px rgba(20,12,60,0.45), 0 0 0 1px rgba(255,255,255,0.12) inset",
       }}
     >
+      {/* Corner date chip — ribbon-style tag with corner tails */}
+      {longDate && (
+        <div
+          className="absolute z-10"
+          style={{ top: 0, left: 0 }}
+        >
+          {/* Top-right tail (small folded-corner shadow) */}
+          <div
+            aria-hidden
+            className="absolute"
+            style={{
+              top: 0,
+              right: "-9.92px",
+              width: "9.92px",
+              height: "8px",
+              background: "#9F9F9F",
+              clipPath: "polygon(5% 0, 100% 100%, 0 100%)",
+            }}
+          />
+          {/* Bottom-left tail (small folded-corner shadow) */}
+          <div
+            aria-hidden
+            className="absolute"
+            style={{
+              left: 0,
+              bottom: "-9px",
+              width: "9.92px",
+              height: "9px",
+              background: "#9C9B9B",
+              clipPath: "polygon(100% 0, 100% 100%, 0 0)",
+            }}
+          />
+          {/* Badge body */}
+          <div
+            className="relative flex items-center"
+            style={{
+              height: "36px",
+              padding: "0 16px",
+              gap: "4px",
+              borderRadius: "16px 0 16px 0",
+              background: DATE_CHIP_GRADIENT,
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/blogs/icon-calendar.svg"
+              alt=""
+              aria-hidden
+              width={20}
+              height={20}
+              className="pointer-events-none select-none"
+              style={{ filter: "brightness(0) invert(1)" }}
+              loading="lazy"
+              decoding="async"
+            />
+            <span
+              className="font-display font-semibold text-white leading-none whitespace-nowrap"
+              style={{ fontSize: "16px", letterSpacing: "-0.05em" }}
+            >
+              {longDate}
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="relative flex h-full items-stretch" style={{ padding: "32px" }}>
         {/* Left: image */}
         <div
@@ -146,7 +221,7 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
           style={{
             width: "585px",
             height: "304px",
-            borderRadius: "16px",
+            borderRadius: "12px",
             background: "#251a55",
           }}
         >
@@ -168,41 +243,6 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
               }}
             />
           )}
-
-          {/* Date pill — top-left of image */}
-          {longDate && (
-            <div
-              className="absolute flex items-center"
-              style={{
-                top: "16px",
-                left: "16px",
-                height: "36px",
-                padding: "0 16px",
-                gap: "8px",
-                borderRadius: "999px",
-                background: "rgba(255,255,255,0.92)",
-                boxShadow: "0 4px 12px rgba(20,12,60,0.25)",
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/blogs/icon-calendar.svg"
-                alt=""
-                aria-hidden
-                width={16}
-                height={16}
-                className="pointer-events-none select-none"
-                loading="lazy"
-                decoding="async"
-              />
-              <span
-                className="text-sm font-medium leading-none whitespace-nowrap"
-                style={{ color: "#4a3bf1" }}
-              >
-                {longDate}
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Right: content */}
@@ -216,13 +256,13 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
             minWidth: 0,
           }}
         >
-          <div className="flex flex-col" style={{ gap: "20px" }}>
+          <div className="flex flex-col" style={{ gap: "16px" }}>
             <h2
               className="font-display font-semibold text-white overflow-hidden"
               style={{
-                fontSize: "clamp(1.5rem,2.22vw,2rem)",
-                lineHeight: "1.2",
-                letterSpacing: "-0.04em",
+                fontSize: "clamp(2rem,2.78vw,2.5rem)",
+                lineHeight: "1.1",
+                letterSpacing: "-0.05em",
                 display: "-webkit-box",
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
@@ -242,11 +282,17 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
 
           <Link
             href={`/events/${event.slug}`}
-            className="cs-btn-blue gap-2"
+            className="inline-flex items-center justify-center font-medium transition-colors"
             style={{
-              width: "168px",
-              height: "43px",
-              fontSize: "1rem",
+              alignSelf: "flex-start",
+              padding: "9px 18px",
+              gap: "10px",
+              borderRadius: "8px",
+              border: "1px solid #dab6f3",
+              background: "rgba(255,255,255,0.65)",
+              color: "#111",
+              fontSize: "18px",
+              letterSpacing: "-0.01em",
               marginTop: "24px",
             }}
             aria-label={`Read more about ${event.title}`}
@@ -260,6 +306,7 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
               width={20}
               height={18}
               className="pointer-events-none select-none"
+              style={{ filter: "brightness(0)" }}
               loading="lazy"
               decoding="async"
             />
@@ -277,9 +324,9 @@ function EmptyHeroCard(): React.ReactElement {
       style={{
         maxWidth: "1276px",
         height: "368px",
-        borderRadius: "24px",
+        borderRadius: "20px",
         background:
-          "linear-gradient(135deg, #5949d9 0%, #3d2dae 60%, #2a1b6b 100%)",
+          "linear-gradient(135deg, rgba(89,73,217,0.55) 0%, rgba(61,45,174,0.55) 60%, rgba(42,27,107,0.55) 100%)",
         boxShadow: "0 30px 60px rgba(20,12,60,0.45)",
         padding: "32px",
       }}
@@ -317,35 +364,24 @@ function MetaRow({
   label: string;
 }): React.ReactElement {
   return (
-    <div className="flex items-center" style={{ gap: "12px" }}>
-      <div
-        className="flex items-center justify-center shrink-0"
-        style={{
-          width: "32px",
-          height: "32px",
-          borderRadius: "999px",
-          background: "rgba(255,255,255,0.12)",
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={icon}
-          alt=""
-          aria-hidden
-          width={16}
-          height={16}
-          className="pointer-events-none select-none"
-          style={{ filter: "brightness(0) invert(1)" }}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
+    <div className="flex items-center" style={{ gap: "8px" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={icon}
+        alt=""
+        aria-hidden
+        width={24}
+        height={24}
+        className="pointer-events-none select-none shrink-0"
+        style={{ filter: "brightness(0) invert(1)" }}
+        loading="lazy"
+        decoding="async"
+      />
       <span
-        className="text-white/90"
+        className="text-white font-medium leading-none"
         style={{
-          fontSize: "clamp(0.95rem,1.05vw,1.0625rem)",
-          lineHeight: 1.4,
-          letterSpacing: "-0.01em",
+          fontSize: "20px",
+          letterSpacing: "-0.05em",
         }}
       >
         {label}

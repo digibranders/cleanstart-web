@@ -1,5 +1,6 @@
 import type React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { pickImageUrl } from "@/lib/blog";
 import type { BlogAuthor } from "@/lib/blog";
 
@@ -35,8 +36,39 @@ export function BlogDetailAuthor({
   );
 }
 
+function AuthorName({ author }: { author: BlogAuthor }): React.ReactElement {
+  const nameClasses = "font-display font-bold tracking-[-0.02em]";
+  const nameStyle: React.CSSProperties = {
+    fontSize: "clamp(1.375rem, 2vw, 1.75rem)",
+    color: "#111111",
+    lineHeight: 1.2,
+    margin: 0,
+  };
+
+  if (author.slug) {
+    return (
+      <h3 className={nameClasses} style={nameStyle}>
+        <Link
+          href={`/author/${author.slug}`}
+          className="hover:text-[#4a3bf1] transition-colors"
+        >
+          {author.name}
+        </Link>
+      </h3>
+    );
+  }
+
+  return (
+    <h3 className={nameClasses} style={nameStyle}>
+      {author.name}
+    </h3>
+  );
+}
+
 function AuthorCard({ author }: { author: BlogAuthor }): React.ReactElement {
   const photoSrc = pickImageUrl(author.photo, ["card", "hero", "thumb"]);
+  const bio = author.bioShort;
+  const linkedinUrl = author.social?.linkedin ?? author.linkedin;
 
   return (
     <div
@@ -72,64 +104,57 @@ function AuthorCard({ author }: { author: BlogAuthor }): React.ReactElement {
       </div>
 
       <div className="min-w-0 flex-1 flex flex-col gap-3">
-        <p
-          className="text-sm font-normal"
-          style={{
-            color: "rgba(17,17,17,0.6)",
-            margin: 0,
-          }}
-        >
-          Author
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <p
+            className="text-sm font-normal"
+            style={{
+              color: "rgba(17,17,17,0.6)",
+              margin: 0,
+            }}
+          >
+            Author
+          </p>
 
-        <h3
-          className="font-display font-bold tracking-[-0.02em]"
-          style={{
-            fontSize: "clamp(1.375rem, 2vw, 1.75rem)",
-            color: "#111111",
-            lineHeight: 1.2,
-            margin: 0,
-          }}
-        >
-          {author.name}
-        </h3>
+          {linkedinUrl && (
+            <a
+              href={linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${author.name} on LinkedIn`}
+              className="inline-flex shrink-0 items-center justify-center bg-[#E5E5E5] hover:bg-[#D5D5D5] transition-colors"
+              style={{
+                width: "28px",
+                height: "28px",
+                borderRadius: "4px",
+              }}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="rgba(17,17,17,0.6)"
+                aria-hidden
+              >
+                <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z" />
+              </svg>
+              <span className="sr-only">LinkedIn profile of {author.name}</span>
+            </a>
+          )}
+        </div>
 
-        {author.bio && (
+        <AuthorName author={author} />
+
+        {bio && (
           <p
             className="text-base font-normal leading-[1.6]"
             style={{
               color: "rgba(17,17,17,0.65)",
               margin: 0,
+              whiteSpace: "pre-line",
             }}
           >
-            {author.bio}
+            {bio}
           </p>
-        )}
-
-        {author.linkedin && (
-          <a
-            href={author.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`${author.name} on LinkedIn`}
-            className="inline-flex items-center justify-center bg-[#E5E5E5] hover:bg-[#D5D5D5] transition-colors"
-            style={{
-              width: "28px",
-              height: "28px",
-              borderRadius: "4px",
-            }}
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="rgba(17,17,17,0.6)"
-              aria-hidden
-            >
-              <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z" />
-            </svg>
-            <span className="sr-only">LinkedIn profile of {author.name}</span>
-          </a>
         )}
       </div>
     </div>

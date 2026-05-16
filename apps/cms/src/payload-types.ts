@@ -2251,7 +2251,7 @@ export interface News {
       )[]
     | null;
   /**
-   * Defaults to now on first publish.
+   * Defaults to the current moment on creation. Backdate or schedule by editing the picker.
    */
   publicationDate: string;
   relatedNews?: (number | News)[] | null;

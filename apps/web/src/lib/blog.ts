@@ -9,8 +9,13 @@ export type BlogCategory = {
 export type BlogAuthor = {
   id: string;
   name: string;
+  slug?: string;
   photo?: BlogImage;
-  bio?: string;
+  bioShort?: string;
+  role?: string;
+  social?: {
+    linkedin?: string;
+  };
   linkedin?: string;
 };
 

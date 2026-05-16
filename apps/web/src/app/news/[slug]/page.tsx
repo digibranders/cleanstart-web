@@ -5,7 +5,6 @@ import { getNewsBySlug, getRelatedNews } from "@/lib/news";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
 import { NewsDetailHero } from "@/components/sections/news-detail/NewsDetailHero";
-import { NewsDetailMeta } from "@/components/sections/news-detail/NewsDetailMeta";
 import { NewsDetailBody } from "@/components/sections/news-detail/NewsDetailBody";
 import { NewsDetailRelated } from "@/components/sections/news-detail/NewsDetailRelated";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
@@ -88,15 +87,15 @@ export default async function NewsDetailPage({
       />
       <Header />
       <main>
-        <NewsDetailHero title={item.title} />
+        <NewsDetailHero
+          title={item.title}
+          pressType={item.pressType}
+          publicationDate={item.publicationDate}
+          shareUrl={shareUrl}
+          shareTitle={item.title}
+        />
 
         <div className="bg-white">
-          <NewsDetailMeta
-            pressType={item.pressType}
-            publicationDate={item.publicationDate}
-            shareUrl={shareUrl}
-            shareTitle={item.title}
-          />
           <NewsDetailBody item={item} />
         </div>
 

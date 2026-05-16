@@ -10,6 +10,7 @@ import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
+import { firstPublishBeforeValidateHook } from '../hooks/first-publish';
 import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
@@ -136,8 +137,19 @@ export const News: CollectionConfig = {
       name: 'publicationDate',
       type: 'date',
       required: true,
+      // Pre-populate with `now` at creation time so editors see a real
+      // value in the picker immediately and the client-side `required`
+      // check passes on the first publish click. Backdate / forward-date
+      // by editing the picker — the value is the canonical publish
+      // moment, used by JSON-LD (`datePublished`) and the news sitemap.
+      // `firstPublishBeforeValidateHook` (see `hooks.beforeValidate`)
+      // remains as a server-side safety net for legacy drafts created
+      // before this default landed, or for any path that clears the
+      // value between draft and publish.
+      defaultValue: () => new Date().toISOString(),
       admin: {
-        description: 'Defaults to now on first publish.',
+        description:
+          'Defaults to the current moment on creation. Backdate or schedule by editing the picker.',
         date: { pickerAppearance: 'dayAndTime' },
         position: 'sidebar',
       },
@@ -165,6 +177,13 @@ export const News: CollectionConfig = {
     ...seoFieldsForSidebar('news'),
   ],
   hooks: {
+    // News uses `publicationDate` as its canonical first-publish
+    // stamp (no separate `publishedAt`). The field is `required:true`
+    // and editor-facing, so the stamp must run in `beforeValidate`
+    // (not `beforeChange`) — otherwise the required-check fires
+    // first and the publish click fails before the auto-default lands.
+    // Honours editor backdates and explicit picker edits.
+    beforeValidate: [firstPublishBeforeValidateHook({ field: 'publicationDate' })],
     beforeChange: [
       bodyStatsHook({
         fields: { readingMinutes: 'readingMinutes', wordCount: 'wordCount' },

@@ -104,7 +104,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
 
         {/* Category badge — Figma 330:526, y=190 (22px above image bottom at y=212) */}
         {primaryCategory && (
-          <div className="mx-[32px] mt-[-22px] self-start">
+          <div className="relative z-10 mx-[32px] mt-[-22px] self-start">
             <div
               className="inline-flex items-center whitespace-nowrap text-base font-medium leading-[1.3]"
               style={{
