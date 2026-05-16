@@ -95,6 +95,7 @@ export const NAV_TREE: NavItem[] = [
             label: "Attack Surface Reduction",
             href: "/attack-surface-reduction",
             description: "Distroless-style minimal images shrink your blast radius.",
+            built: true,
           },
         ],
       },
