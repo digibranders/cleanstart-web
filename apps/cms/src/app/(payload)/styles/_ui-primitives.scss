@@ -620,6 +620,28 @@
 }
 
 // -----------------------------------------------------------------------------
+// Invalid-field pulse — applied briefly by ScrollToInvalidField after a
+// failed save / publish so the editor's eye lands on the broken field.
+// Self-clearing via JS (~1.6s) so the field returns to its normal state
+// once the editor starts fixing it.
+// -----------------------------------------------------------------------------
+@keyframes cs-invalid-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(240, 143, 143, 0.55); }
+  40%  { box-shadow: 0 0 0 6px rgba(240, 143, 143, 0.25); }
+  100% { box-shadow: 0 0 0 0 rgba(240, 143, 143, 0); }
+}
+
+.cs-invalid-pulse {
+  border-radius: var(--cs-radius-input, 6px);
+  animation: cs-invalid-pulse 1.4s ease-out 1;
+  // Anchor the box-shadow to the field wrapper so the ring traces its
+  // outer edge regardless of internal padding.
+  position: relative;
+  scroll-margin-top: 96px;
+  scroll-margin-bottom: 96px;
+}
+
+// -----------------------------------------------------------------------------
 // Confirm dialog body description.
 // -----------------------------------------------------------------------------
 .cs-confirm__description {
@@ -682,7 +704,8 @@
   }
 
   &__input,
-  &__select {
+  &__select,
+  &__textarea {
     width: 100%;
     padding: 8px 10px;
     background: var(--theme-input-bg, var(--theme-elevation-50, #0d1117));
@@ -703,6 +726,75 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+  }
+
+  &__textarea {
+    resize: vertical;
+    min-height: 60px;
+    max-height: 240px;
+    font-family: inherit;
+  }
+
+  // Collapsible group ("Add role & bio ▾"). Uses native <details>/<summary>
+  // so keyboard + screen-reader support is automatic. No JS toggle.
+  &__group {
+    margin: var(--cs-space-2) 0 var(--cs-space-3);
+    border-top: 1px solid var(--theme-elevation-150, rgba(255, 255, 255, 0.08));
+    padding-top: var(--cs-space-3);
+
+    &[open] {
+      padding-bottom: var(--cs-space-1);
+    }
+  }
+
+  &__group-summary {
+    cursor: pointer;
+    user-select: none;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--theme-text-soft, #a4a7af);
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 0;
+    transition: color var(--cs-motion-micro);
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    // Chevron — rotates when the group is open. Drawn with a CSS triangle
+    // so we don't pull an inline SVG into the primitive for one glyph.
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid currentColor;
+      transition: transform var(--cs-motion-micro);
+    }
+
+    &:hover {
+      color: var(--theme-text, #fff);
+    }
+  }
+
+  &__group[open] > &__group-summary::before {
+    transform: rotate(180deg);
+  }
+
+  &__group-body {
+    margin-top: var(--cs-space-3);
+  }
+
+  // Payload's admin global CSS overrides native <details> collapse on
+  // some elements. Force the body hidden when the group is closed so we
+  // get reliable progressive-disclosure UX regardless of cascade order.
+  &__group:not([open]) > &__group-body {
+    display: none;
   }
 
   &__hint {

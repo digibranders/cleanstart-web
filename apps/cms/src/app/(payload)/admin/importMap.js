@@ -94,6 +94,7 @@ import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
 import { SkipLink as SkipLink_27a678dd284d4042d03686d8b9a9b8e9 } from '../../../payload/admin/components/SkipLink.tsx'
 import { SaveShortcut as SaveShortcut_add5731a604e577762f1b0196113538b } from '../../../payload/admin/components/SaveShortcut.tsx'
+import { ScrollToInvalidField as ScrollToInvalidField_4291c1b61b43429266b5712959f1cf9e } from '../../../payload/admin/components/ScrollToInvalidField.tsx'
 import { CommandPalette as CommandPalette_9e72795c48aa56bf099ac6d02eb8124e } from '../../../payload/admin/components/CommandPalette.tsx'
 import { FieldDescriptionTooltip as FieldDescriptionTooltip_ba26db738ee9a4c1171ac1c581ba5d08 } from '../../../payload/admin/components/FieldDescriptionTooltip.tsx'
 import { NavBadges as NavBadges_208a0014b2eb9ce6cf95af7e4047b13a } from '../../../payload/admin/components/NavBadges.tsx'
@@ -211,6 +212,7 @@ export const importMap = {
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,
   "./payload/admin/components/SkipLink.tsx#SkipLink": SkipLink_27a678dd284d4042d03686d8b9a9b8e9,
   "./payload/admin/components/SaveShortcut.tsx#SaveShortcut": SaveShortcut_add5731a604e577762f1b0196113538b,
+  "./payload/admin/components/ScrollToInvalidField.tsx#ScrollToInvalidField": ScrollToInvalidField_4291c1b61b43429266b5712959f1cf9e,
   "./payload/admin/components/CommandPalette.tsx#CommandPalette": CommandPalette_9e72795c48aa56bf099ac6d02eb8124e,
   "./payload/admin/components/FieldDescriptionTooltip.tsx#FieldDescriptionTooltip": FieldDescriptionTooltip_ba26db738ee9a4c1171ac1c581ba5d08,
   "./payload/admin/components/NavBadges.tsx#NavBadges": NavBadges_208a0014b2eb9ce6cf95af7e4047b13a,

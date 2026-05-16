@@ -11,7 +11,7 @@ import { contentTitleField } from '../fields/title';
 import { firstPublishHook } from '../hooks/first-publish';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
-import { validateOptionalUrl } from '../lib/url-shape';
+import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const Jobs: CollectionConfig = {
   slug: 'jobs',
@@ -50,6 +50,7 @@ export const Jobs: CollectionConfig = {
         description: 'Deep link into the external ATS. Required when source=ats.',
         condition: (_data, sibling) => sibling?.source === 'ats',
       },
+      hooks: { beforeValidate: [normalizeOptionalUrlHook] },
       validate: (
         value: string | string[] | null | undefined,
         { siblingData }: { siblingData?: { source?: string } },
@@ -168,6 +169,7 @@ export const Jobs: CollectionConfig = {
         description: 'mailto:hire@cleanstart.com is acceptable.',
         condition: (_data, sibling) => sibling?.source === 'cms',
       },
+      hooks: { beforeValidate: [normalizeOptionalUrlHook] },
       validate: validateOptionalUrl,
     },
     {

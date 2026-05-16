@@ -2,7 +2,7 @@ import type { GlobalConfig } from 'payload';
 
 import { isAdmin, isAuthenticated } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
-import { validateOptionalUrl } from '../lib/url-shape';
+import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const SeoDefaults: GlobalConfig = {
   slug: 'seoDefaults',
@@ -198,6 +198,7 @@ export const SeoDefaults: GlobalConfig = {
         {
           name: 'masthead',
           type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
           admin: {
             description:
@@ -208,6 +209,7 @@ export const SeoDefaults: GlobalConfig = {
         {
           name: 'ethicsPolicy',
           type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
           admin: {
             description: 'URL of the editorial-ethics policy page.',
@@ -217,6 +219,7 @@ export const SeoDefaults: GlobalConfig = {
         {
           name: 'correctionsPolicy',
           type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
           admin: {
             description: 'URL of the corrections / retractions policy page.',
@@ -231,6 +234,7 @@ export const SeoDefaults: GlobalConfig = {
           // name) via the emitter — the DB column name is internal.
           name: 'factCheckingPolicy',
           type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
           admin: {
             description: 'URL of the fact-checking / verification policy page.',
@@ -240,6 +244,7 @@ export const SeoDefaults: GlobalConfig = {
         {
           name: 'actionableFeedbackPolicy',
           type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
           admin: {
             description: 'URL of the page describing how readers submit feedback / complaints.',
@@ -249,6 +254,7 @@ export const SeoDefaults: GlobalConfig = {
         {
           name: 'unnamedSourcesPolicy',
           type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
           admin: {
             description: 'URL of the policy page on use of anonymous / unnamed sources.',
@@ -258,6 +264,7 @@ export const SeoDefaults: GlobalConfig = {
         {
           name: 'diversityPolicy',
           type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
           admin: {
             description: 'URL of the diversity / inclusion policy page.',
@@ -267,6 +274,7 @@ export const SeoDefaults: GlobalConfig = {
         {
           name: 'ownershipFundingInfo',
           type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
           admin: {
             description: 'URL of the page disclosing ownership / funding sources.',
@@ -279,6 +287,7 @@ export const SeoDefaults: GlobalConfig = {
           // as `missionCoveragePrioritiesPolicy` (Schema.org name).
           name: 'coveragePolicy',
           type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
           admin: {
             description: 'URL of the page describing editorial mission and coverage priorities.',

@@ -6,7 +6,14 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { slugify } from '../lib/slugify';
 import { Dialog, DialogBody, DialogFooter, DialogHeader } from './Dialog';
 
-export type QuickCreateField =
+// ─── Field schema ───────────────────────────────────────────────────────────
+
+/**
+ * Leaf input field. Renders one labelled control: <input>, <textarea>, or <select>.
+ * Slug type is a specialised <input> that mirrors its `source` sibling and
+ * surfaces a collision chip when the parent provides `onCheckSlug`.
+ */
+export type QuickCreateLeafField =
   | {
       readonly name: string;
       readonly type: 'text';
@@ -14,6 +21,15 @@ export type QuickCreateField =
       readonly required?: boolean;
       readonly placeholder?: string;
       readonly maxLength?: number;
+    }
+  | {
+      readonly name: string;
+      readonly type: 'textarea';
+      readonly label: string;
+      readonly required?: boolean;
+      readonly placeholder?: string;
+      readonly maxLength?: number;
+      readonly rows?: number;
     }
   | {
       readonly name: string;
@@ -30,6 +46,25 @@ export type QuickCreateField =
       readonly required?: boolean;
       readonly options: ReadonlyArray<{ readonly label: string; readonly value: string }>;
     };
+
+/**
+ * Collapsible group of leaf fields. Renders a <details> element with the
+ * group `label` as a clickable summary. Used for progressive disclosure —
+ * e.g. an "Add role & bio ▾" toggle on Authors that hides optional fields
+ * behind one click but keeps them reachable without leaving the modal.
+ *
+ * Nested groups inside groups are not supported. One level of collapsible
+ * is enough for the quick-create surface; deeper hierarchy belongs in
+ * the full edit view.
+ */
+export type QuickCreateGroup = {
+  readonly type: 'group';
+  readonly label: string;
+  readonly defaultOpen?: boolean;
+  readonly fields: ReadonlyArray<QuickCreateLeafField>;
+};
+
+export type QuickCreateField = QuickCreateLeafField | QuickCreateGroup;
 
 export type QuickCreateIntent = 'draft' | 'publish';
 
@@ -58,12 +93,14 @@ export type QuickCreateDialogProps = {
    */
   readonly supportsDrafts: boolean;
   /**
-   * Optional async slug-availability check. Called on slug-field blur
+   * Optional async slug-availability check. Called on slug-field change
    * (debounced). Resolves with `{ available: false }` to surface a
    * collision warning and disable submit.
    */
   readonly onCheckSlug?: (slug: string) => Promise<{ available: boolean }>;
 };
+
+// ─── Internal state types ───────────────────────────────────────────────────
 
 type SubmitState =
   | { readonly kind: 'idle' }
@@ -76,31 +113,63 @@ type SlugStatus =
   | { readonly kind: 'available' }
   | { readonly kind: 'collision' };
 
-const emptyValues = (fields: ReadonlyArray<QuickCreateField>): Record<string, string> => {
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+const isGroup = (f: QuickCreateField): f is QuickCreateGroup => f.type === 'group';
+
+/**
+ * Flatten the field tree (one level — groups can't nest) to the list of
+ * leaf fields that hold values. Used by every helper that iterates over
+ * fields for state / validation purposes; the renderer keeps the
+ * original tree so it can group visually.
+ */
+const flattenFields = (
+  fields: ReadonlyArray<QuickCreateField>,
+): ReadonlyArray<QuickCreateLeafField> => {
+  const out: QuickCreateLeafField[] = [];
+  for (const f of fields) {
+    if (isGroup(f)) out.push(...f.fields);
+    else out.push(f);
+  }
+  return out;
+};
+
+const emptyValues = (
+  fields: ReadonlyArray<QuickCreateField>,
+): Record<string, string> => {
   const out: Record<string, string> = {};
-  for (const f of fields) out[f.name] = '';
+  for (const f of flattenFields(fields)) out[f.name] = '';
   return out;
 };
 
 const findSlugField = (
   fields: ReadonlyArray<QuickCreateField>,
-): Extract<QuickCreateField, { type: 'slug' }> | undefined => {
-  for (const f of fields) if (f.type === 'slug') return f;
+): Extract<QuickCreateLeafField, { type: 'slug' }> | undefined => {
+  for (const f of flattenFields(fields)) if (f.type === 'slug') return f;
   return undefined;
 };
 
+// ─── Component ──────────────────────────────────────────────────────────────
+
 /**
- * Compact "new record" dialog: a tiny form (1–3 fields) for collections
- * where editors create taxonomy-style stubs mid-flow without leaving
- * the page. Used by the relationship-field "+ New" affordance.
+ * Compact "new record" dialog: a tiny form for collections where editors
+ * create taxonomy-style stubs mid-flow without leaving the page. Used by
+ * the relationship-field "+ New" affordance.
  *
  * Design constraints (intentional):
- *  - Bounded surface area — text, slug, and select only. If a
- *    collection needs richer input, the editor opens the full edit
- *    view via the "Fill in profile →" toast action after creation.
+ *  - Bounded surface area — text, textarea, slug, and select only. No
+ *    rich text, no image upload, no array fields. Anything richer
+ *    belongs in the full edit view, reached via the "Fill in profile →"
+ *    toast action after creation.
+ *  - Progressive disclosure — fields can be grouped into a collapsible
+ *    `<details>` so the default modal stays small. Required fields
+ *    should live outside any collapsible group so they're always
+ *    visible.
  *  - Required-field gate — Save Draft and Publish are disabled until
  *    every required field has a non-empty value (and any slug field is
- *    not blocked by a collision).
+ *    not blocked by a collision). Required fields inside a collapsed
+ *    group will force the group open on submit attempt? — no: place
+ *    required fields at the top level instead.
  *  - Slug auto-derivation — when present, the slug mirrors the live
  *    slugified value of its `source` sibling until the editor types
  *    into the slug input directly (which locks it). Same UX as the
@@ -120,13 +189,16 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
 
   const headingId = useId();
   const errorId = useId();
-  const firstFieldRef = useRef<HTMLInputElement | HTMLSelectElement | null>(null);
+  const firstFieldRef = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null>(
+    null,
+  );
 
   const [values, setValues] = useState<Record<string, string>>(() => emptyValues(fields));
   const [slugManual, setSlugManual] = useState<boolean>(false);
   const [slugStatus, setSlugStatus] = useState<SlugStatus>({ kind: 'idle' });
   const [submitState, setSubmitState] = useState<SubmitState>({ kind: 'idle' });
 
+  const flat = useMemo(() => flattenFields(fields), [fields]);
   const slugField = useMemo(() => findSlugField(fields), [fields]);
 
   // Reset whenever the dialog is freshly opened.
@@ -136,8 +208,6 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
     setSlugManual(false);
     setSlugStatus({ kind: 'idle' });
     setSubmitState({ kind: 'idle' });
-    // Focus the first field on next paint so the native dialog's own
-    // autofocus doesn't fight us.
     const t = window.setTimeout(() => firstFieldRef.current?.focus(), 0);
     return () => window.clearTimeout(t);
   }, [open, fields]);
@@ -148,7 +218,9 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
     if (!slugField || slugManual) return;
     const sourceValue = values[slugField.source] ?? '';
     const auto = slugify(sourceValue);
-    setValues((prev) => (prev[slugField.name] === auto ? prev : { ...prev, [slugField.name]: auto }));
+    setValues((prev) =>
+      prev[slugField.name] === auto ? prev : { ...prev, [slugField.name]: auto },
+    );
   }, [values, slugField, slugManual]);
 
   // Debounced slug-availability lookup (when consumer provides the check).
@@ -168,8 +240,7 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
         setSlugStatus({ kind: result.available ? 'available' : 'collision' });
       } catch {
         // Fail open — the server-side `unique` constraint is the
-        // ultimate safety net. We don't want a transient lookup failure
-        // to permanently disable submit.
+        // ultimate safety net.
         if (!cancelled) setSlugStatus({ kind: 'available' });
       }
     }, 350);
@@ -180,10 +251,13 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
   }, [values, slugField, onCheckSlug]);
 
   const handleChange = useCallback(
-    (name: string, type: QuickCreateField['type']) =>
-      (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+    (name: string, type: QuickCreateLeafField['type']) =>
+      (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
         const raw = e.target.value;
-        const next = type === 'slug' ? slugify(raw).replace(/-+$/g, raw.endsWith('-') ? '-' : '') : raw;
+        const next =
+          type === 'slug'
+            ? slugify(raw).replace(/-+$/g, raw.endsWith('-') ? '-' : '')
+            : raw;
         setValues((prev) => ({ ...prev, [name]: next }));
         if (type === 'slug') setSlugManual(true);
       },
@@ -199,12 +273,12 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
   );
 
   const blockingReason = useMemo((): string | null => {
-    for (const f of fields) {
+    for (const f of flat) {
       if (f.required && (values[f.name] ?? '').trim() === '') {
         return `${f.label} is required.`;
       }
-      // Even when not declared required, a slug field must be non-empty —
-      // the consumer relies on it server-side.
+      // A slug field is implicitly required — the consumer relies on
+      // it server-side.
       if (f.type === 'slug' && (values[f.name] ?? '').trim() === '') {
         return `${f.label} is required.`;
       }
@@ -212,7 +286,7 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
     if (slugStatus.kind === 'collision') return 'Slug is already in use.';
     if (slugStatus.kind === 'checking') return 'Checking slug availability…';
     return null;
-  }, [fields, values, slugStatus]);
+  }, [flat, values, slugStatus]);
 
   const isSubmitting = submitState.kind === 'submitting';
   const submitDisabled = blockingReason !== null || isSubmitting;
@@ -234,20 +308,147 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
     [submitDisabled, onSubmit, onCreated, onClose, values],
   );
 
-  // Enter-to-submit, scoped to the dialog body. Dialog uses a <div>
-  // wrapper (not <form>) because the consumer may mount this inside a
-  // parent <form> — nested forms are invalid HTML and break React's
-  // hydration. Submit on Enter from any field except <select>.
+  // Enter-to-submit, scoped to the dialog body. The wrapper is a <div>
+  // (not <form>) because the consumer may mount this inside a parent
+  // <form> — nested forms are invalid HTML and break React's hydration.
+  // Submit on Enter except inside <select> and <textarea> (newlines).
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>): void => {
       if (e.key !== 'Enter') return;
       const t = e.target as HTMLElement;
-      if (t.tagName === 'SELECT' || t.tagName === 'BUTTON') return;
+      if (t.tagName === 'SELECT' || t.tagName === 'TEXTAREA' || t.tagName === 'BUTTON') return;
       e.preventDefault();
       void doSubmit('publish');
     },
     [doSubmit],
   );
+
+  // ─── Leaf renderer (used inline and inside groups) ───────────────────────
+
+  const renderLeaf = (f: QuickCreateLeafField, isFirst: boolean): ReactElement => {
+    const id = `${headingId}-${f.name}`;
+    const value = values[f.name] ?? '';
+    const setRef = (
+      el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null,
+    ): void => {
+      if (isFirst) firstFieldRef.current = el;
+    };
+
+    if (f.type === 'select') {
+      return (
+        <div className="cs-quick-create__field" key={f.name}>
+          <label htmlFor={id} className="cs-quick-create__label">
+            {f.label}
+            {f.required ? (
+              <span className="cs-quick-create__required" aria-hidden> *</span>
+            ) : null}
+          </label>
+          <select
+            id={id}
+            ref={setRef as (el: HTMLSelectElement | null) => void}
+            className="cs-quick-create__select"
+            value={value}
+            required={f.required}
+            onChange={handleChange(f.name, f.type)}
+            disabled={isSubmitting}
+          >
+            <option value="">{f.required ? 'Select…' : 'None'}</option>
+            {f.options.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
+    }
+
+    if (f.type === 'textarea') {
+      return (
+        <div className="cs-quick-create__field" key={f.name}>
+          <label htmlFor={id} className="cs-quick-create__label">
+            {f.label}
+            {f.required ? (
+              <span className="cs-quick-create__required" aria-hidden> *</span>
+            ) : null}
+          </label>
+          <textarea
+            id={id}
+            ref={setRef as (el: HTMLTextAreaElement | null) => void}
+            className="cs-quick-create__textarea"
+            value={value}
+            required={f.required}
+            placeholder={f.placeholder}
+            maxLength={f.maxLength}
+            rows={f.rows ?? 3}
+            onChange={handleChange(f.name, f.type)}
+            disabled={isSubmitting}
+          />
+        </div>
+      );
+    }
+
+    // text or slug
+    return (
+      <div className="cs-quick-create__field" key={f.name}>
+        <label htmlFor={id} className="cs-quick-create__label">
+          {f.label}
+          {f.required || f.type === 'slug' ? (
+            <span className="cs-quick-create__required" aria-hidden> *</span>
+          ) : null}
+          {f.type === 'slug' && slugStatus.kind === 'available' ? (
+            <span className="cs-quick-create__chip" data-tone="ok">Available</span>
+          ) : null}
+          {f.type === 'slug' && slugStatus.kind === 'collision' ? (
+            <span className="cs-quick-create__chip" data-tone="error">In use</span>
+          ) : null}
+        </label>
+        <input
+          id={id}
+          ref={setRef as (el: HTMLInputElement | null) => void}
+          type="text"
+          className="cs-quick-create__input"
+          value={value}
+          required={f.required || f.type === 'slug'}
+          placeholder={f.type === 'text' ? f.placeholder : undefined}
+          maxLength={f.type === 'text' ? f.maxLength : undefined}
+          spellCheck={f.type === 'text'}
+          autoComplete="off"
+          onChange={handleChange(f.name, f.type)}
+          onBlur={f.type === 'slug' ? handleSlugBlur(f.name) : undefined}
+          disabled={isSubmitting}
+        />
+      </div>
+    );
+  };
+
+  // Track whether we've assigned the firstFieldRef yet, since the first
+  // *leaf* may live inside a group when the consumer puts every field
+  // there (unusual but legal).
+  let firstAssigned = false;
+  const renderField = (f: QuickCreateField): ReactElement => {
+    if (isGroup(f)) {
+      return (
+        <details
+          className="cs-quick-create__group"
+          key={`group-${f.label}`}
+          open={f.defaultOpen ?? false}
+        >
+          <summary className="cs-quick-create__group-summary">{f.label}</summary>
+          <div className="cs-quick-create__group-body">
+            {f.fields.map((leaf) => {
+              const isFirst = !firstAssigned;
+              firstAssigned = true;
+              return renderLeaf(leaf, isFirst);
+            })}
+          </div>
+        </details>
+      );
+    }
+    const isFirst = !firstAssigned;
+    firstAssigned = true;
+    return renderLeaf(f, isFirst);
+  };
 
   return (
     <Dialog
@@ -260,73 +461,7 @@ export const QuickCreateDialog = (props: QuickCreateDialogProps): ReactElement =
       <DialogHeader id={headingId} title={title} onClose={onClose} />
       <div className="cs-quick-create__form" onKeyDown={handleKeyDown}>
         <DialogBody>
-          {fields.map((f, idx) => {
-            const id = `${headingId}-${f.name}`;
-            const value = values[f.name] ?? '';
-            const isFirst = idx === 0;
-            const setRef = (el: HTMLInputElement | HTMLSelectElement | null): void => {
-              if (isFirst) firstFieldRef.current = el;
-            };
-
-            if (f.type === 'select') {
-              return (
-                <div className="cs-quick-create__field" key={f.name}>
-                  <label htmlFor={id} className="cs-quick-create__label">
-                    {f.label}
-                    {f.required ? <span className="cs-quick-create__required" aria-hidden> *</span> : null}
-                  </label>
-                  <select
-                    id={id}
-                    ref={setRef}
-                    className="cs-quick-create__select"
-                    value={value}
-                    required={f.required}
-                    onChange={handleChange(f.name, f.type)}
-                    disabled={isSubmitting}
-                  >
-                    <option value="">{f.required ? 'Select…' : 'None'}</option>
-                    {f.options.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              );
-            }
-
-            return (
-              <div className="cs-quick-create__field" key={f.name}>
-                <label htmlFor={id} className="cs-quick-create__label">
-                  {f.label}
-                  {(f.required || f.type === 'slug') ? (
-                    <span className="cs-quick-create__required" aria-hidden> *</span>
-                  ) : null}
-                  {f.type === 'slug' && slugStatus.kind === 'available' ? (
-                    <span className="cs-quick-create__chip" data-tone="ok">Available</span>
-                  ) : null}
-                  {f.type === 'slug' && slugStatus.kind === 'collision' ? (
-                    <span className="cs-quick-create__chip" data-tone="error">In use</span>
-                  ) : null}
-                </label>
-                <input
-                  id={id}
-                  ref={setRef as (el: HTMLInputElement | null) => void}
-                  type="text"
-                  className="cs-quick-create__input"
-                  value={value}
-                  required={f.required || f.type === 'slug'}
-                  placeholder={f.type === 'text' ? f.placeholder : undefined}
-                  maxLength={f.type === 'text' ? f.maxLength : undefined}
-                  spellCheck={f.type === 'text'}
-                  autoComplete="off"
-                  onChange={handleChange(f.name, f.type)}
-                  onBlur={f.type === 'slug' ? handleSlugBlur(f.name) : undefined}
-                  disabled={isSubmitting}
-                />
-              </div>
-            );
-          })}
+          {fields.map((f) => renderField(f))}
 
           {blockingReason ? (
             <p className="cs-quick-create__hint" aria-live="polite">

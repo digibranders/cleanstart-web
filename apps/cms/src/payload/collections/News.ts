@@ -17,7 +17,7 @@ import {
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
-import { validateOptionalUrl } from '../lib/url-shape';
+import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const News: CollectionConfig = {
   slug: 'news',
@@ -114,6 +114,7 @@ export const News: CollectionConfig = {
       admin: {
         description: 'Optional. For press pickups / coverage on external outlets.',
       },
+      hooks: { beforeValidate: [normalizeOptionalUrlHook] },
       validate: validateOptionalUrl,
     },
     {

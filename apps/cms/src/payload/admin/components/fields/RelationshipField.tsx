@@ -485,7 +485,15 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
           if (quickCreateConfig.supportsDrafts) {
             url.searchParams.set('draft', String(intent === 'draft'));
           }
-          const body: Record<string, unknown> = { ...values };
+          // Strip empty optional fields so we don't write empty strings
+          // for fields the editor left untouched. Required + slug fields
+          // are already gated non-empty by the dialog's submit guard.
+          const body: Record<string, unknown> = {};
+          for (const [key, raw] of Object.entries(values)) {
+            const trimmed = typeof raw === 'string' ? raw.trim() : raw;
+            if (trimmed === '' || trimmed == null) continue;
+            body[key] = trimmed;
+          }
           if (quickCreateConfig.supportsDrafts) {
             body._status = intent === 'draft' ? 'draft' : 'published';
           }

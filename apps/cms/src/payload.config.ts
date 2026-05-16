@@ -177,6 +177,12 @@ export default buildConfig({
       actions: [
         './payload/admin/components/SkipLink.tsx#SkipLink',
         './payload/admin/components/SaveShortcut.tsx#SaveShortcut',
+        // Global cross-collection helper — after every failed save /
+        // publish attempt it scrolls the first invalid field into view
+        // and pulses it. Lives in `actions` rather than per-collection
+        // `beforeDocumentControls` so it applies to taxonomy collections
+        // (authors, categories, …) outside the publish-gate set too.
+        './payload/admin/components/ScrollToInvalidField.tsx#ScrollToInvalidField',
         './payload/admin/components/CommandPalette.tsx#CommandPalette',
         './payload/admin/components/FieldDescriptionTooltip.tsx#FieldDescriptionTooltip',
         // SavedStateIndicator removed — the floating "Saved X ago"
