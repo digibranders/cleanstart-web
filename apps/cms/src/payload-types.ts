@@ -2809,7 +2809,7 @@ export interface Resource {
    * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
-  type?: ('whitepaper' | 'report' | 'brief' | 'datasheet' | 'case-study') | null;
+  type?: ('whitepaper' | 'ebook' | 'datasheet' | 'architecture-insights' | 'report') | null;
   summary?: string | null;
   /**
    * PDF or ZIP downloadable. Routed to web/resource/.
@@ -3864,7 +3864,7 @@ export interface Webinar {
     [k: string]: unknown;
   } | null;
   webinarType: 'live' | 'on-demand' | 'panel' | 'demo';
-  region: 'Americas' | 'EMEA' | 'APAC' | 'Global';
+  region: 'north-america' | 'asia-mea' | 'emea' | 'global';
   startsAt?: string | null;
   endsAt?: string | null;
   /**

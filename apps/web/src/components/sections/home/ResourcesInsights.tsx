@@ -188,7 +188,7 @@ export function ResourcesInsights() {
 
   return (
     <section
-      className="relative w-full py-32"
+      className="relative w-full pt-32"
       aria-labelledby="resources-title"
     >
       {/* Figma 108:7625 — soft purple radial bleed off the bottom-left edge (10% opacity, 1101×1101) */}

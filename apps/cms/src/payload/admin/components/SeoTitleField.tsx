@@ -5,7 +5,10 @@ import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
 const TITLE_TARGET = 60;
-const TITLE_HARD_CAP = 70;
+// Color is advisory only — the publish gate no longer hard-blocks on
+// title length. Amber covers the broad "longer than ideal but still
+// reasonable" range; red is reserved for clearly excessive values.
+const TITLE_HARD_CAP = 100;
 
 type SeoTitleFieldProps = {
   path: string;
@@ -42,8 +45,9 @@ const colorForLength = (len: number): string => {
  *     back to the current document title.
  *
  * Plus a character counter with traffic-light coloring (green ≤ 60,
- * amber 60-70, red > 70) — Google typically truncates titles at ~60
- * characters, fully cutting at 70.
+ * amber 61-100, red > 100) — Google typically truncates titles around
+ * 60 characters but this is advisory only; publishing is allowed at
+ * any length (with a confirm prompt outside the recommended range).
  */
 export const SeoTitleField = (props: SeoTitleFieldProps): ReactElement => {
   const { path, sourceField = 'title' } = props;

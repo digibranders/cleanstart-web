@@ -95,6 +95,7 @@ export const NAV_TREE: NavItem[] = [
             label: "Attack Surface Reduction",
             href: "/attack-surface-reduction",
             description: "Distroless-style minimal images shrink your blast radius.",
+            built: true,
           },
         ],
       },
@@ -127,8 +128,8 @@ export const NAV_TREE: NavItem[] = [
         title: "Events",
         items: [
           { label: "In-Person Events", href: "/events", built: true },
-          { label: "Webinars", href: "/webinars" },
-          { label: "Podcast", href: "/podcast" },
+          { label: "Webinars", href: "/webinars", built: true },
+          { label: "Podcast", href: "/podcast", built: true },
         ],
       },
     ],

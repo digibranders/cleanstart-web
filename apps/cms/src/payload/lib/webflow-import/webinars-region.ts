@@ -8,33 +8,43 @@
  * normalized form of `Region` only when Region List is empty.
  */
 
-export type WebinarRegionEnum = 'Americas' | 'EMEA' | 'APAC' | 'Global';
+export type WebinarRegionEnum = 'north-america' | 'asia-mea' | 'emea' | 'global';
 
 const FREE_TEXT_MAP: Record<string, WebinarRegionEnum> = {
-  americas: 'Americas',
-  america: 'Americas',
-  us: 'Americas',
-  usa: 'Americas',
-  'north-america': 'Americas',
-  na: 'Americas',
-  emea: 'EMEA',
-  europe: 'EMEA',
-  eu: 'EMEA',
-  uk: 'EMEA',
-  apac: 'APAC',
-  asia: 'APAC',
-  'asia-pacific': 'APAC',
-  india: 'APAC',
-  global: 'Global',
-  worldwide: 'Global',
-  international: 'Global',
+  americas: 'north-america',
+  america: 'north-america',
+  us: 'north-america',
+  usa: 'north-america',
+  'north-america': 'north-america',
+  na: 'north-america',
+  emea: 'emea',
+  europe: 'emea',
+  eu: 'emea',
+  uk: 'emea',
+  apac: 'asia-mea',
+  asia: 'asia-mea',
+  'asia-pacific': 'asia-mea',
+  'asia-mea': 'asia-mea',
+  india: 'asia-mea',
+  mea: 'asia-mea',
+  global: 'global',
+  worldwide: 'global',
+  international: 'global',
+};
+
+const LEGACY_TO_NEW: Record<string, WebinarRegionEnum> = {
+  Americas: 'north-america',
+  EMEA: 'emea',
+  APAC: 'asia-mea',
+  Global: 'global',
 };
 
 const validEnum = (value: unknown): WebinarRegionEnum | null => {
-  if (value === 'Americas' || value === 'EMEA' || value === 'APAC' || value === 'Global') {
+  if (typeof value !== 'string') return null;
+  if (value === 'north-america' || value === 'asia-mea' || value === 'emea' || value === 'global') {
     return value;
   }
-  return null;
+  return LEGACY_TO_NEW[value] ?? null;
 };
 
 const fromFreeText = (raw: unknown): WebinarRegionEnum | null => {

@@ -11,28 +11,6 @@ import { mediaUploadField } from './media-upload';
 
 const TITLE_CHAR_HINT = 60;
 const DESCRIPTION_CHAR_HINT = 160;
-// Hard caps. Above these, Google reliably truncates the SERP snippet —
-// over-long values waste pixels we already paid for. The sidebar UI
-// shows soft warnings at the hint thresholds; these constants are the
-// last line of defence at save time.
-const TITLE_CHAR_LIMIT = 70;
-const DESCRIPTION_CHAR_LIMIT = 170;
-
-const validateSeoTitleLength = (
-  value: string | string[] | null | undefined,
-): true | string => {
-  if (typeof value !== 'string') return true;
-  if (value.length <= TITLE_CHAR_LIMIT) return true;
-  return `SEO title is ${value.length} characters — Google truncates above ${TITLE_CHAR_LIMIT}. Aim for ≤ ${TITLE_CHAR_HINT}.`;
-};
-
-const validateSeoDescriptionLength = (
-  value: string | string[] | null | undefined,
-): true | string => {
-  if (typeof value !== 'string') return true;
-  if (value.length <= DESCRIPTION_CHAR_LIMIT) return true;
-  return `SEO description is ${value.length} characters — Google truncates above ${DESCRIPTION_CHAR_LIMIT}. Aim for ≤ ${DESCRIPTION_CHAR_HINT}.`;
-};
 
 const indexableField: Field = {
   name: 'indexable',
@@ -66,7 +44,6 @@ const titleField: Field = {
     // via the `seoTitle` sidebar UI field instead.
     hidden: true,
   },
-  validate: validateSeoTitleLength,
 };
 
 const descriptionField: Field = {
@@ -82,7 +59,6 @@ const descriptionField: Field = {
     // via the `seoDescription` sidebar UI field instead.
     hidden: true,
   },
-  validate: validateSeoDescriptionLength,
 };
 
 const ogImageFields: Field[] = [

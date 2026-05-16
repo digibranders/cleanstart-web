@@ -4,6 +4,8 @@ import { publishGateHook } from '../hooks/publish-gate';
 
 const BANNER_PATH =
   '@/payload/admin/components/PublishChecklistBanner.tsx#PublishChecklistBanner';
+const OVERRIDE_GUARD_PATH =
+  '@/payload/admin/components/PublishOverrideGuard.tsx#PublishOverrideGuard';
 
 /**
  * Collections that need the publish-gate beforeChange check.
@@ -47,6 +49,7 @@ export const wirePublishGate = (collection: CollectionConfig): CollectionConfig 
     beforeDocumentControls: [
       ...existingBeforeDocControls,
       { path: BANNER_PATH } as CustomComponent,
+      { path: OVERRIDE_GUARD_PATH } as CustomComponent,
     ],
   };
 

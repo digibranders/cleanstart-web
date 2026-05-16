@@ -87,6 +87,7 @@ import { HiddenField as HiddenField_551417bca9579543e47edbdd4648802b } from '@/p
 import { TocRowLabel as TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b } from '@/payload/admin/components/TocRowLabel.tsx'
 import { AnalyticsTab as AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b } from '@/payload/admin/components/integrations/AnalyticsTab.tsx'
 import { PublishChecklistBanner as PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec } from '@/payload/admin/components/PublishChecklistBanner.tsx'
+import { PublishOverrideGuard as PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02 } from '@/payload/admin/components/PublishOverrideGuard.tsx'
 import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/payload/admin/components/fields/CodeField.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
@@ -202,6 +203,7 @@ export const importMap = {
   "@/payload/admin/components/TocRowLabel.tsx#TocRowLabel": TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b,
   "@/payload/admin/components/integrations/AnalyticsTab.tsx#AnalyticsTab": AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b,
   "@/payload/admin/components/PublishChecklistBanner.tsx#PublishChecklistBanner": PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec,
+  "@/payload/admin/components/PublishOverrideGuard.tsx#PublishOverrideGuard": PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02,
   "@/payload/admin/components/fields/CodeField.tsx#CodeField": CodeField_4aa85fbd783c4d26c5c89ebf383941c1,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,

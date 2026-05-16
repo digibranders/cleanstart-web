@@ -232,7 +232,7 @@ export default async function EventDetailPage({
           )}
         </section>
       </main>
-      <Footer topPadding={120} />
+      <Footer />
     </>
   );
 }

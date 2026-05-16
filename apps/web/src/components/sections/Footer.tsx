@@ -61,48 +61,101 @@ const LEGAL_LINKS = [
   { label: "Security", href: "#security" },
 ];
 
-export function Footer({ topPadding = 179 }: { topPadding?: number } = {}) {
+// CTA-card overlap is owned here, not by callers. Card overhangs the Footer by
+// 170px (Figma 446:1765). Callers pass content only via the `cta` prop. Do not
+// re-add `topPadding` or negative section margins per-page.
+//
+// IMPORTANT — Layout contract:
+//   - The Footer has NO reserved gap above it. The CTA card sits absolutely at
+//     `top: -170px` and visually OVERLAPS the previous section by 170px.
+//   - Every page that uses `<Footer cta=...>` MUST make sure its last section
+//     extends at least 170px below its natural content so the CTA card overlaps
+//     real section bg (gradient, pattern, decorative SVGs — whatever the
+//     section actually paints), NOT empty body white.
+//   - Convention: every last bg-providing element of a CTA page uses
+//     `padding-bottom: 250px` — that's 170px for the CTA overlap + 80px of
+//     breathing room between the page's last content and the CTA card top.
+//     Standardised across all pages so the gap is visually consistent.
+//
+// Locked card container contract (per-page CTAs must fit these bounds):
+//   width: 1276px (max-width: calc(100% - 48px))
+//   height: 330px (overflow: hidden — content that exceeds is clipped)
+//   border-radius: 40px
+//   z-index: 20
+//   The container itself is transparent; per-page CTA renders its own fill.
+export function Footer({
+  cta,
+  ctaOverlay,
+}: { cta?: React.ReactNode; ctaOverlay?: React.ReactNode } = {}) {
+  const hasCta = Boolean(cta);
   return (
     <footer
-      className="relative w-full overflow-hidden text-white"
+      className="relative w-full text-white"
       style={{
-        // Figma 108:8061 fill — top→bottom: #151021 (0%) → #131E8F (70.794%) → #471EC0 (113.28%)
         background:
           "linear-gradient(180deg, #151021 0%, #131E8F 70.794%, #471EC0 113.28%)",
       }}
     >
-      {/* Big purple ellipse — Figma 46640 (974×863) at (308, -358), color #7A59FF, opacity 3%, blur 250px.
-          Very subtle huge soft glow that brightens the upper-left of the footer. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          left: "calc(308 / 1920 * 100%)",
-          top: "-358px",
-          width: "min(974px, 51vw)",
-          height: "863px",
-          borderRadius: "50%",
-          backgroundColor: "rgba(122,89,255,0.03)",
-          filter: "blur(125px)",
-        }}
-      />
-      {/* Small purple ellipse — Figma 46639 (129×313) at (1481, -93), color #7A59FF, opacity 25%, blur 250px.
-          Vertical accent on the right side. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          left: "calc(1481 / 1920 * 100%)",
-          top: "-93px",
-          width: "129px",
-          height: "313px",
-          borderRadius: "50%",
-          backgroundColor: "rgba(122,89,255,0.25)",
-          filter: "blur(125px)",
-        }}
-      />
+      {hasCta && (
+        <div
+          className="pointer-events-none absolute left-1/2 z-20 flex w-full -translate-x-1/2 justify-center px-6"
+          style={{ top: "-170px" }}
+        >
+          {/* Sizing wrapper — NO overflow:hidden so `ctaOverlay` children can
+              break out of the 1276×330 card (e.g. the home page kubr bird
+              peeking above the card top). */}
+          <div
+            className="pointer-events-auto relative w-[1276px] max-w-full"
+            style={{ height: "330px" }}
+          >
+            {/* Clipped card surface — fills the slot and clips inner content
+                to the rounded 1276×330 box. */}
+            <div
+              className="absolute inset-0 overflow-hidden"
+              style={{ borderRadius: "40px" }}
+            >
+              {cta}
+            </div>
+            {/* Optional overlay — rendered ABOVE the clipped card so children
+                positioned outside its bounds (negative tops/lefts/rights)
+                remain visible. Use sparingly. */}
+            {ctaOverlay}
+          </div>
+        </div>
+      )}
+      <div className="relative w-full overflow-hidden">
+        {/* Big purple ellipse — Figma 46640 (974×863) at (308, -358), color #7A59FF, opacity 3%, blur 250px.
+            Very subtle huge soft glow that brightens the upper-left of the footer. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute"
+          style={{
+            left: "calc(308 / 1920 * 100%)",
+            top: "-358px",
+            width: "min(974px, 51vw)",
+            height: "863px",
+            borderRadius: "50%",
+            backgroundColor: "rgba(122,89,255,0.03)",
+            filter: "blur(125px)",
+          }}
+        />
+        {/* Small purple ellipse — Figma 46639 (129×313) at (1481, -93), color #7A59FF, opacity 25%, blur 250px.
+            Vertical accent on the right side. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute"
+          style={{
+            left: "calc(1481 / 1920 * 100%)",
+            top: "-93px",
+            width: "129px",
+            height: "313px",
+            borderRadius: "50%",
+            backgroundColor: "rgba(122,89,255,0.25)",
+            filter: "blur(125px)",
+          }}
+        />
       <div className="relative px-6">
-       <div className="relative mx-auto w-full max-w-[1276px] pb-[80px]" style={{ paddingTop: `${topPadding}px` }}>
+       <div className="relative mx-auto w-full max-w-[1276px] pb-[80px]" style={{ paddingTop: hasCta ? "225px" : "80px" }}>
         {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
         <div className="flex flex-wrap items-start justify-between gap-8">
           <p
@@ -216,6 +269,7 @@ export function Footer({ topPadding = 179 }: { topPadding?: number } = {}) {
           </ul>
         </div>
        </div>
+      </div>
       </div>
     </footer>
   );

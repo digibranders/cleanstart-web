@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
@@ -123,13 +124,13 @@ export const News: CollectionConfig = {
         components: {
           Field: {
             path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
-            clientProps: { pathPrefix: '/news' },
+            clientProps: { pathPrefix: ROUTE_PREFIX.news },
           },
         },
       },
     },
     schemaAddonsField,
-    ...seoSidebarFields({ pathPrefix: '/news', descriptionSource: 'abstract' }),
+    ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.news, descriptionSource: 'abstract' }),
     {
       name: 'publicationDate',
       type: 'date',

@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
@@ -43,10 +44,10 @@ export const Resources: CollectionConfig = {
       type: 'select',
       options: [
         { label: 'Whitepaper', value: 'whitepaper' },
-        { label: 'Report', value: 'report' },
-        { label: 'Brief', value: 'brief' },
+        { label: 'Ebook', value: 'ebook' },
         { label: 'Datasheet', value: 'datasheet' },
-        { label: 'Case study', value: 'case-study' },
+        { label: 'Architecture Insights', value: 'architecture-insights' },
+        { label: 'Report', value: 'report' },
       ],
     },
     { name: 'summary', type: 'textarea' },
@@ -114,14 +115,14 @@ export const Resources: CollectionConfig = {
         components: {
           Field: {
             path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
-            clientProps: { pathPrefix: '/resources' },
+            clientProps: { pathPrefix: ROUTE_PREFIX.resources },
           },
         },
       },
     },
     schemaAddonsField,
     publishedAtField,
-    ...seoSidebarFields({ pathPrefix: '/resources', descriptionSource: 'summary' }),
+    ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.resources, descriptionSource: 'summary' }),
     {
       name: 'downloadCount',
       type: 'number',

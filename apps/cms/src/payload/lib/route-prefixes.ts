@@ -1,17 +1,24 @@
 /**
- * Public URL prefix per collection. Verbatim from the live Webflow site —
- * arch doc §migration hard constraint #1: every URL ships 1:1 with no
- * pluralisation/normalisation drift.
+ * Public URL prefix per collection. Single source of truth — consumed by
+ * the slug-change redirect hook, the SEO sidebar (URL history / inbound /
+ * outbound redirects cards), and any other CMS-side URL composition.
+ *
+ * Values match the actual `apps/web` route segments under
+ * `apps/web/src/app/<prefix>/[slug]/`. They are NOT the legacy Webflow
+ * URLs — the marketing site was rebuilt with redesigned routes
+ * (`/blog/[slug]`, `/events/[slug]`, `/resource/[slug]` etc.), and any
+ * Webflow-era URLs are handled by seeded rows in the `redirects`
+ * collection, not by this map.
  *
  * Pages are absent from this map because their URL is the computed `path`
  * field (handles parent nesting), not a fixed prefix.
  */
-export const ROUTE_PREFIX: Record<string, string> = {
-  blogs: '/blogs',
+export const ROUTE_PREFIX = {
+  blogs: '/blog',
   news: '/news',
   guides: '/guide',
-  resources: '/resources',
-  events: '/event',
+  resources: '/resource',
+  events: '/events',
   webinars: '/webinar',
   jobs: '/job',
   authors: '/author',
@@ -19,10 +26,12 @@ export const ROUTE_PREFIX: Record<string, string> = {
   newsCategories: '/news-categories',
   knowledgeBase: '/knowledge-hub',
   knowledgeCategories: '/knowledge-hub/category',
-};
+} as const satisfies Record<string, string>;
+
+export type RoutePrefixKey = keyof typeof ROUTE_PREFIX;
 
 export const collectionUrlFromSlug = (collection: string, slug: string): string | null => {
-  const prefix = ROUTE_PREFIX[collection];
+  const prefix = (ROUTE_PREFIX as Record<string, string>)[collection];
   if (!prefix) return null;
   return `${prefix}/${slug}`;
 };

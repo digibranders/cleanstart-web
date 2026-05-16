@@ -3,6 +3,9 @@ import * as migration_20260513_130527 from './20260513_130527';
 import * as migration_20260514_075832 from './20260514_075832';
 import * as migration_20260514_081531 from './20260514_081531';
 import * as migration_20260514_135203_remove_resources_hero_image from './20260514_135203_remove_resources_hero_image';
+import * as migration_20260515_100240_rename_webinars_region from './20260515_100240_rename_webinars_region';
+import * as migration_20260515_180000_redirect_prefix_realignment from './20260515_180000_redirect_prefix_realignment';
+import * as migration_20260515_200000_rename_resources_types from './20260515_200000_rename_resources_types';
 
 export const migrations = [
   {
@@ -29,5 +32,20 @@ export const migrations = [
     up: migration_20260514_135203_remove_resources_hero_image.up,
     down: migration_20260514_135203_remove_resources_hero_image.down,
     name: '20260514_135203_remove_resources_hero_image'
+  },
+  {
+    up: migration_20260515_100240_rename_webinars_region.up,
+    down: migration_20260515_100240_rename_webinars_region.down,
+    name: '20260515_100240_rename_webinars_region',
+  },
+  {
+    up: migration_20260515_180000_redirect_prefix_realignment.up,
+    down: migration_20260515_180000_redirect_prefix_realignment.down,
+    name: '20260515_180000_redirect_prefix_realignment',
+  },
+  {
+    up: migration_20260515_200000_rename_resources_types.up,
+    down: migration_20260515_200000_rename_resources_types.down,
+    name: '20260515_200000_rename_resources_types',
   },
 ];

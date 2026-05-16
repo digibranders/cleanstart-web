@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
@@ -53,12 +54,12 @@ export const Webinars: CollectionConfig = {
       name: 'region',
       type: 'select',
       required: true,
-      defaultValue: 'Global',
+      defaultValue: 'global',
       options: [
-        { label: 'Americas', value: 'Americas' },
-        { label: 'EMEA', value: 'EMEA' },
-        { label: 'APAC', value: 'APAC' },
-        { label: 'Global', value: 'Global' },
+        { label: 'North America', value: 'north-america' },
+        { label: 'Asia & MEA', value: 'asia-mea' },
+        { label: 'EMEA', value: 'emea' },
+        { label: 'Global', value: 'global' },
       ],
     },
     {
@@ -216,14 +217,14 @@ export const Webinars: CollectionConfig = {
         components: {
           Field: {
             path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
-            clientProps: { pathPrefix: '/webinar' },
+            clientProps: { pathPrefix: ROUTE_PREFIX.webinars },
           },
         },
       },
     },
     schemaAddonsField,
     publishedAtField,
-    ...seoSidebarFields({ pathPrefix: '/webinar', descriptionSource: 'abstract' }),
+    ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.webinars, descriptionSource: 'abstract' }),
     ...seoFieldsForSidebar('webinars'),
   ],
   hooks: {

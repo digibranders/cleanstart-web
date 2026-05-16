@@ -113,17 +113,26 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
           <BlogDetailFAQ faqs={post.faqs} />
         )}
 
-        {/* Dark zone — Related posts only */}
-        {relatedPosts.length > 0 && (
-          <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)" }}>
+        {/* Trailing buffer ensures 80px visible gap between the last section's
+            content and the CTA card top (CTA card overhangs by 170px, so the
+            section preceding the footer needs +250px below its last content
+            block). Each branch budgets exactly that, accounting for the
+            internal pb already provided by the last rendered section. */}
+        {relatedPosts.length > 0 ? (
+          <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)", paddingBottom: "250px" }}>
             <BlogDetailRelatedPosts posts={relatedPosts} />
           </div>
+        ) : post.faqs && post.faqs.length > 0 ? (
+          /* FAQ section already has pb-20 (80px) → spacer covers remaining 170 */
+          <div aria-hidden className="bg-white" style={{ height: "170px" }} />
+        ) : (
+          /* Author section has internal pb-16 (64px) → spacer covers remaining 186 */
+          <div aria-hidden className="bg-white" style={{ height: "186px" }} />
         )}
 
-        <BlogDetailCTA />
       </main>
 
-      <Footer />
+      <Footer cta={<BlogDetailCTA />} />
     </>
   );
 }

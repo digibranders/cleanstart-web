@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { RenderLexical } from "@/lib/renderLexical";
 import type { ResourceDetail } from "@/lib/resources";
-import { mediaUrl } from "@/lib/resources";
+import { mediaUrl, resourceCoverPoster } from "@/lib/resources";
 
 interface ResourceDetailContentProps {
   resource: ResourceDetail;
@@ -11,6 +11,7 @@ export function ResourceDetailContent({
   resource,
 }: ResourceDetailContentProps): React.ReactElement {
   const coverUrl = mediaUrl(resource.heroImage?.url);
+  const fallbackPoster = resourceCoverPoster(resource.type);
 
   return (
     <section
@@ -21,7 +22,7 @@ export function ResourceDetailContent({
         marginTop: "-32px",
         zIndex: 1,
         paddingTop: "48px",
-        paddingBottom: "80px",
+        paddingBottom: "250px",
       }}
       aria-label="Resource content"
     >
@@ -42,8 +43,8 @@ export function ResourceDetailContent({
             paddingBottom: "80px",
           }}
         >
-          {/* Cover image — flush at card top */}
-          {coverUrl && (
+          {/* Cover image — CMS heroImage if set, otherwise the type-mapped booklet poster with title overlay. */}
+          {coverUrl ? (
             <div className="flex justify-center" style={{ paddingTop: "48px", paddingLeft: "24px", paddingRight: "24px" }}>
               <Image
                 src={coverUrl}
@@ -53,6 +54,39 @@ export function ResourceDetailContent({
                 style={{ borderRadius: "16px", objectFit: "cover" }}
                 priority
               />
+            </div>
+          ) : (
+            <div className="flex justify-center" style={{ paddingTop: "48px", paddingLeft: "24px", paddingRight: "24px" }}>
+              <div
+                className="relative overflow-hidden"
+                style={{ width: "839px", maxWidth: "100%", aspectRatio: "839 / 455", borderRadius: "16px" }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={fallbackPoster}
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+                  loading="eager"
+                  decoding="async"
+                />
+                <span
+                  className="absolute font-display font-medium text-white overflow-hidden"
+                  style={{
+                    top: "26%",
+                    left: "23%",
+                    right: "30%",
+                    fontSize: "clamp(1.25rem, 2.4vw, 2.25rem)",
+                    lineHeight: "1.2",
+                    letterSpacing: "-0.04em",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {resource.title}
+                </span>
+              </div>
             </div>
           )}
 

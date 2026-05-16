@@ -5,7 +5,7 @@ import { HowCleanStartHelp } from "@/components/sections/home/HowCleanStartHelp"
 import { BuiltForTeams } from "@/components/sections/home/BuiltForTeams";
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
-import { ReadyToSecureCTA } from "@/components/sections/home/ReadyToSecureCTA";
+import { ReadyToSecureCTA, ReadyToSecureCTAOverlay } from "@/components/sections/home/ReadyToSecureCTA";
 import { Footer } from "@/components/sections/Footer";
 import { SecurityNotPatching } from "@/components/sections/home/SecurityNotPatching";
 import { CleanStartAdvantage } from "@/components/sections/home/CleanStartAdvantage";
@@ -96,19 +96,10 @@ export default function Home() {
         <FadeUp>
           <BuiltForTeams />
         </FadeUp>
-        {/* FAQ + Resources + CTA share one continuous #F6F6F6 canvas so their
+        {/* FAQ + Resources share one continuous #F6F6F6 canvas so their
             transparent backgrounds and decorative blobs/grids bleed across
-            section boundaries without a hard edge.
-            Three 1101×1101 corner grid SVGs from Figma (nodes 108:8523,
-            108:8524, 108:7625) — each carries its own radial-gradient mask so
-            the grid only renders near the corner anchor and fades to fully
-            transparent at the SVG edges. */}
-        <div className="relative bg-[#F6F6F6]">
-          {/* Decorative grid SVGs live in their own absolute, overflow-hidden
-              layer so they're clipped to the wrapper bounds — but the wrapper
-              itself does NOT clip. That keeps the CTA card free to overflow
-              the wrapper bottom (mb-[-90px]) and stay visually on top of the
-              Footer instead of getting cut off by overflow:hidden. */}
+            section boundaries without a hard edge. */}
+        <div className="relative bg-[#F6F6F6] pb-[250px]">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -156,12 +147,9 @@ export default function Home() {
           <FadeUp>
             <ResourcesInsights />
           </FadeUp>
-          <FadeUp>
-            <ReadyToSecureCTA />
-          </FadeUp>
         </div>
       </main>
-      <Footer />
+      <Footer cta={<ReadyToSecureCTA />} ctaOverlay={<ReadyToSecureCTAOverlay />} />
     </>
   );
 }

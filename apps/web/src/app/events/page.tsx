@@ -75,7 +75,7 @@ export default async function EventsPage({
           />
         </FadeUp>
       </main>
-      <Footer topPadding={120} />
+      <Footer />
     </>
   );
 }

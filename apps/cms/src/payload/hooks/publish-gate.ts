@@ -30,10 +30,19 @@ const HAS_FEATURED_IMAGE = new Set([
   'pages',
 ]);
 
-const SEO_TITLE_MIN = 30;
-const SEO_TITLE_MAX = 60;
-const META_DESC_MIN = 120;
-const META_DESC_MAX = 160;
+const SEO_TITLE_TARGET_MIN = 30;
+const SEO_TITLE_TARGET_MAX = 60;
+const META_DESC_TARGET_MIN = 120;
+const META_DESC_TARGET_MAX = 160;
+
+export const SEO_TITLE_RECOMMENDED_RANGE = {
+  min: SEO_TITLE_TARGET_MIN,
+  max: SEO_TITLE_TARGET_MAX,
+} as const;
+export const META_DESC_RECOMMENDED_RANGE = {
+  min: META_DESC_TARGET_MIN,
+  max: META_DESC_TARGET_MAX,
+} as const;
 
 const resolveString = (raw: unknown): string | null => {
   if (typeof raw === 'string' && raw.trim().length > 0) return raw.trim();
@@ -50,33 +59,35 @@ export const runPublishChecks = (
   // --- SEO title ---
   const seoTitle = resolveString(seo.title) ?? resolveString(data.title) ?? resolveString(data.name);
   const titleLen = seoTitle?.length ?? 0;
-  const titlePass = seoTitle != null && titleLen >= SEO_TITLE_MIN && titleLen <= SEO_TITLE_MAX;
+  const titlePass =
+    seoTitle != null && titleLen >= SEO_TITLE_TARGET_MIN && titleLen <= SEO_TITLE_TARGET_MAX;
   checks.push({
     id: 'seo-title',
-    label: `SEO title (${SEO_TITLE_MIN}–${SEO_TITLE_MAX} chars)`,
-    severity: 'blocker',
+    label: `SEO title (recommended ${SEO_TITLE_TARGET_MIN}–${SEO_TITLE_TARGET_MAX} chars)`,
+    severity: 'warn',
     pass: titlePass,
     message: titlePass
       ? null
       : seoTitle == null
-        ? 'SEO title is missing.'
-        : `SEO title is ${titleLen} chars; must be ${SEO_TITLE_MIN}–${SEO_TITLE_MAX}.`,
+        ? 'SEO title is missing — recommended.'
+        : `SEO title is ${titleLen} chars; recommended ${SEO_TITLE_TARGET_MIN}–${SEO_TITLE_TARGET_MAX}.`,
   });
 
   // --- Meta description ---
   const metaDesc = resolveString(seo.description) ?? resolveString(data.abstract as unknown);
   const descLen = metaDesc?.length ?? 0;
-  const descPass = metaDesc != null && descLen >= META_DESC_MIN && descLen <= META_DESC_MAX;
+  const descPass =
+    metaDesc != null && descLen >= META_DESC_TARGET_MIN && descLen <= META_DESC_TARGET_MAX;
   checks.push({
     id: 'meta-description',
-    label: `Meta description (${META_DESC_MIN}–${META_DESC_MAX} chars)`,
-    severity: 'blocker',
+    label: `Meta description (recommended ${META_DESC_TARGET_MIN}–${META_DESC_TARGET_MAX} chars)`,
+    severity: 'warn',
     pass: descPass,
     message: descPass
       ? null
       : metaDesc == null
-        ? 'Meta description is missing.'
-        : `Meta description is ${descLen} chars; must be ${META_DESC_MIN}–${META_DESC_MAX}.`,
+        ? 'Meta description is missing — recommended.'
+        : `Meta description is ${descLen} chars; recommended ${META_DESC_TARGET_MIN}–${META_DESC_TARGET_MAX}.`,
   });
 
   // --- Slug ---

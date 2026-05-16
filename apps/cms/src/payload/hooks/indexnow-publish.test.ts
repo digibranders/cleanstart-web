@@ -56,7 +56,7 @@ describe('indexNowPublishAfterChangeHook', () => {
       expect.objectContaining({
         key: 'k',
         baseUrl: 'https://cleanstart.com',
-        urls: ['https://cleanstart.com/blogs/launch'],
+        urls: ['https://cleanstart.com/blog/launch'],
       }),
     );
   });

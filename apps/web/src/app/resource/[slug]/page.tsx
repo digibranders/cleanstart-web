@@ -93,12 +93,8 @@ export default async function ResourceDetailPage({
           <ResourceDetailContent resource={resource} />
         </FadeUp>
 
-        {/* Lead capture — overlaps footer */}
-        <FadeUp className="relative z-10">
-          <ResourceDetailLeadCapture resource={resource} />
-        </FadeUp>
       </main>
-      <Footer topPadding={234} />
+      <Footer cta={<ResourceDetailLeadCapture resource={resource} />} />
     </>
   );
 }
