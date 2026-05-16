@@ -24,16 +24,16 @@
           "value": "whitepaper"
         },
         {
-          "value": "report"
-        },
-        {
-          "value": "brief"
+          "value": "ebook"
         },
         {
           "value": "datasheet"
         },
         {
-          "value": "case-study"
+          "value": "architecture-insights"
+        },
+        {
+          "value": "report"
         }
       ]
     },
