@@ -5,6 +5,14 @@ import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
+import {
+  getSlugStatus,
+  resetSlugStatus,
+  setSlugStatus,
+  subscribeSlugStatus,
+  type SlugStatus,
+} from '../lib/slug-status-store';
+
 type SlugFieldProps = {
   /**
    * Sibling field whose value is mirrored when the slug is empty / has
@@ -94,20 +102,25 @@ const matchEditContext = (): EditContext | null => {
  * "detect divergence" effect fires with the pre-update `slugValue`
  * and locks manual mode after the very first title keystroke.
  */
-type CollisionState =
-  | { kind: 'idle' }
-  | { kind: 'checking' }
-  | { kind: 'available' }
-  | { kind: 'collision'; conflictId: string };
-
 export const SlugField = (props: SlugFieldProps): ReactElement => {
-  const { source = 'title', required = false, label } = props;
+  const { source = 'title', required = true, label } = props;
   const path = props.path ?? 'slug';
   const inputId = useId();
 
   const { value: docTitleValue } = useField<string>({ path: source });
   const { value: slugValue, setValue: setSlug } = useField<string>({ path });
-  const [collision, setCollision] = useState<CollisionState>({ kind: 'idle' });
+  const [status, setStatusLocal] = useState<SlugStatus>(getSlugStatus);
+
+  // Mirror the module-level store into local state so React re-renders.
+  // `SlugField` is the sole writer; the guard component is a reader.
+  useEffect(() => subscribeSlugStatus(setStatusLocal), []);
+
+  // Clear any stale state left over from a previous document in the same
+  // SPA session, then again on unmount so list/dashboard views start clean.
+  useEffect(() => {
+    resetSlugStatus();
+    return () => resetSlugStatus();
+  }, []);
 
   /**
    * manualMode = true  → editor has typed a custom slug; auto-sync off.
@@ -175,15 +188,17 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
   useEffect(() => {
     const trimmed = (slugValue ?? '').trim();
     if (trimmed.length === 0) {
-      setCollision({ kind: 'idle' });
+      setSlugStatus({ kind: 'empty' });
       return undefined;
     }
     const ctx = matchEditContext();
     if (!ctx) {
-      setCollision({ kind: 'idle' });
+      // No edit context (e.g. list view) — treat as available so the
+      // gate doesn't disable controls on screens it shouldn't reach.
+      setSlugStatus({ kind: 'available' });
       return undefined;
     }
-    setCollision({ kind: 'checking' });
+    setSlugStatus({ kind: 'checking' });
     let cancelled = false;
     const timer = window.setTimeout(async () => {
       try {
@@ -193,7 +208,10 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
         url.searchParams.set('depth', '0');
         const res = await fetch(url.toString(), { credentials: 'include' });
         if (!res.ok) {
-          if (!cancelled) setCollision({ kind: 'idle' });
+          // Fail open: the server-side `unique` constraint is still the
+          // ultimate safety net. We don't want a transient 5xx during the
+          // lookup to permanently disable saving.
+          if (!cancelled) setSlugStatus({ kind: 'available' });
           return;
         }
         const json = (await res.json()) as { docs?: { id?: string | number }[] };
@@ -202,15 +220,15 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
         );
         if (cancelled) return;
         if (conflicts.length === 0) {
-          setCollision({ kind: 'available' });
+          setSlugStatus({ kind: 'available' });
         } else {
-          setCollision({
+          setSlugStatus({
             kind: 'collision',
-            conflictId: String(conflicts[0]?.id ?? ''),
+            detail: String(conflicts[0]?.id ?? ''),
           });
         }
       } catch {
-        if (!cancelled) setCollision({ kind: 'idle' });
+        if (!cancelled) setSlugStatus({ kind: 'available' });
       }
     }, 400);
     return () => {
@@ -261,7 +279,7 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
             </>
           )}
         </span>
-        {collision.kind === 'available' && (
+        {status.kind === 'available' && (
           <output
             aria-live="polite"
             className="cs-slug__chip"
@@ -284,10 +302,16 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
         required={required}
         className="cs-slug__input"
       />
-      {collision.kind === 'collision' ? (
+      {status.kind === 'collision' ? (
         <output aria-live="polite" className="cs-slug__collision">
           <span aria-hidden="true">!</span>
           This slug is already in use. Save will fail — pick a different one.
+        </output>
+      ) : null}
+      {required && status.kind === 'empty' ? (
+        <output aria-live="polite" className="cs-slug__collision">
+          <span aria-hidden="true">!</span>
+          Slug is required. Save Draft and Publish stay disabled until it's set.
         </output>
       ) : null}
     </div>

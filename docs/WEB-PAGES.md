@@ -63,7 +63,7 @@ page slugs, categories, types, and build status across the dev journey.
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
 | 2 | Attack Surface Reduction | `/attack-surface-reduction` | Static | ✅ | Built on `farheen`; ported from retired `web` branch. |
-| 4 | FIPS Compliance | `/fips` | Static | ⬜ | |
+| 4 | FIPS Compliance | `/fips` | Static | ✅ | All 7 sections built |
 | 5 | Vulnerability Remediation | `/vulnerability-remediation` | Static | ✅ | All 7 sections built |
 | 9 | For CISO | `/for-ciso` | Static | ⬜ | |
 | 10 | For Developers | `/for-developers` | Static | ⬜ | |

@@ -2,6 +2,8 @@ import type { NextConfig } from 'next';
 import { withPayload } from '@payloadcms/next/withPayload';
 import { withSentryConfig } from '@sentry/nextjs';
 
+import { EMBED_FRAME_SRC_ORIGINS } from './src/payload/admin/components/Embed/embed-providers';
+
 const r2PublicHost = (() => {
   const raw = process.env.R2_PUBLIC_BASE;
   if (!raw) return null;
@@ -31,7 +33,17 @@ const csp = [
   `media-src 'self' blob:`,
   `worker-src 'none'`,
   `object-src 'none'`,
-  `frame-ancestors 'none'`,
+  // `frame-src` covers iframes the admin embeds *into* the page —
+  // primarily the Lexical embed feature (YouTube, Vimeo, Loom, …) and
+  // same-origin admin views used by the quick-create modal fallback.
+  // Provider origins live in `embed-providers.ts` so the list stays in
+  // sync with the supported providers; `embed-providers.test.ts`
+  // enforces sync at CI time.
+  `frame-src 'self' ${EMBED_FRAME_SRC_ORIGINS.join(' ')}`,
+  // `frame-ancestors` covers who can embed *us*. 'self' allows the
+  // admin to frame its own pages (used by document-picker fallbacks)
+  // while still blocking external clickjacking.
+  `frame-ancestors 'self'`,
   `base-uri 'self'`,
   `form-action 'self'`,
 ]
@@ -41,7 +53,7 @@ const csp = [
 const securityHeaders = [
   { key: 'Content-Security-Policy', value: csp },
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },

@@ -93,6 +93,10 @@
     border: 1px solid var(--theme-elevation-150);
     border-radius: var(--cs-radius-card);
     overflow: hidden;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 }
 

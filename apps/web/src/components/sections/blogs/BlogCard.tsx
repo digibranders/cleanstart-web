@@ -179,8 +179,10 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
               style={{
                 color: "#111",
                 display: "-webkit-box",
-                WebkitLineClamp: 3,
+                WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
+                overflowWrap: "anywhere",
+                wordBreak: "break-word",
               }}
             >
               {post.title}
@@ -193,6 +195,8 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
                   display: "-webkit-box",
                   WebkitLineClamp: 3,
                   WebkitBoxOrient: "vertical",
+                  overflowWrap: "anywhere",
+                  wordBreak: "break-word",
                 }}
               >
                 {post.abstract}

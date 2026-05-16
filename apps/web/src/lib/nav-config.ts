@@ -79,6 +79,7 @@ export const NAV_TREE: NavItem[] = [
             label: "FIPS Compliance",
             href: "/fips",
             description: "FIPS 140-3 validated cryptography across your stack.",
+            built: true,
           },
           {
             label: "Enhance SCA",

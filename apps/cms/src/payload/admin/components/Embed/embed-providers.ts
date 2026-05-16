@@ -337,6 +337,37 @@ const PROVIDER_CONFIGS: ReadonlyArray<ProviderConfig> = [
   },
 ];
 
+/**
+ * Origins that may appear in iframe `src` attributes for known embed
+ * providers. Sourced from each provider's `toEmbedUrl` output. Imported
+ * by `next.config.ts` to build the `frame-src` CSP directive — keep this
+ * list and the providers above in sync; `embed-providers.test.ts` fails
+ * the suite if a provider is added without an origin entry here.
+ *
+ * Note: the `generic` provider lets editors paste arbitrary URLs and is
+ * NOT covered here. Generic embeds will fail to render unless their
+ * origin is added explicitly by an admin.
+ */
+export const EMBED_FRAME_SRC_ORIGINS: ReadonlyArray<string> = [
+  'https://www.youtube.com',           // youtube
+  'https://player.vimeo.com',          // vimeo
+  'https://www.loom.com',              // loom
+  'https://calendly.com',              // calendly
+  'https://*.typeform.com',            // typeform
+  'https://www.figma.com',             // figma
+  'https://fast.wistia.com',           // wistia
+  'https://player.mux.com',            // mux
+  'https://tidycal.com',               // tidycal
+  'https://tally.so',                  // tally
+  'https://share.descript.com',        // descript
+  'https://demo.arcade.software',      // arcade (demo)
+  'https://app.arcade.software',       // arcade (app)
+  'https://open.spotify.com',          // spotify
+  'https://w.soundcloud.com',          // soundcloud
+  'https://www.google.com',            // google-maps
+  'https://maps.google.com',           // google-maps
+];
+
 export function detectProvider(url: string): EmbedProvider {
   for (const config of PROVIDER_CONFIGS) {
     if (config.pattern.test(url)) return config.id;

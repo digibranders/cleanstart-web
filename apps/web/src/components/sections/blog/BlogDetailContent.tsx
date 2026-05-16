@@ -95,20 +95,29 @@ export function BlogDetailContent({
 
 const HEADER_OFFSET = 88; // fixed header height (72px) + 16px buffer
 
+type RenderedTocEntry = TocEntry & { level: number; text: string };
+
 function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): React.ReactElement | null {
-  // Track by index — avoids ID mismatch between Payload anchors and renderLexical slugs.
+  // Track by index across all rendered heading levels — Payload's anchor slug and
+  // renderLexical's slug aren't guaranteed to agree, so positional matching is load-bearing.
   const [activeIdx, setActiveIdx] = useState<number>(0);
 
-  const h2Entries = toc?.filter((e) => e.level === 2 && e.text) ?? [];
+  const entries: RenderedTocEntry[] = (toc ?? []).filter(
+    (e): e is RenderedTocEntry =>
+      !!e?.text && typeof e.level === "number" && e.level >= 2 && e.level <= 4,
+  );
+
+  const levels = Array.from(new Set(entries.map((e) => e.level))).sort();
+  const selector = levels.map((l) => `.article-body .article-h${l}`).join(", ");
 
   useEffect(() => {
-    if (!h2Entries.length) return;
+    if (!entries.length || !selector) return;
 
-    const getH2Els = (): HTMLElement[] =>
-      Array.from(document.querySelectorAll<HTMLElement>(".article-body .article-h2"));
+    const getHeadingEls = (): HTMLElement[] =>
+      Array.from(document.querySelectorAll<HTMLElement>(selector));
 
     const onScroll = () => {
-      const els = getH2Els();
+      const els = getHeadingEls();
       if (!els.length) return;
       let idx = 0;
       for (let i = 0; i < els.length; i++) {
@@ -128,9 +137,9 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
       window.removeEventListener("scroll", onScroll);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [h2Entries.length]);
+  }, [entries.length, selector]);
 
-  if (!h2Entries.length) return null;
+  if (!entries.length) return null;
 
   return (
     <nav aria-label="Table of contents">
@@ -145,12 +154,13 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
         Contents
       </p>
       <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-        {h2Entries.map((entry, i) => {
-          if (!entry.text) return null;
+        {entries.map((entry, i) => {
           const isActive = i === activeIdx;
+          const indentPx = (entry.level - 2) * 12;
+          const fontSize = entry.level === 2 ? "0.875rem" : "0.8125rem";
           return (
             <li
-              key={entry.id ?? i}
+              key={entry.id ?? `${entry.level}-${i}`}
               style={{
                 borderLeft: `2px solid ${isActive ? "#4a3bf1" : "rgba(17,17,17,0.1)"}`,
                 transition: "border-color 0.2s",
@@ -165,20 +175,18 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
                   background: "none",
                   border: "none",
                   cursor: "pointer",
-                  paddingLeft: "14px",
+                  paddingLeft: `${14 + indentPx}px`,
                   paddingRight: "8px",
                   paddingTop: "7px",
                   paddingBottom: "7px",
-                  fontSize: "0.875rem",
+                  fontSize,
                   lineHeight: 1.55,
                   fontWeight: isActive ? 600 : 400,
                   color: isActive ? "#4a3bf1" : "rgba(17,17,17,0.65)",
                   transition: "color 0.2s",
                 }}
                 onClick={() => {
-                  const els = Array.from(
-                    document.querySelectorAll<HTMLElement>(".article-body .article-h2"),
-                  );
+                  const els = Array.from(document.querySelectorAll<HTMLElement>(selector));
                   const target = els[i];
                   if (target) {
                     const top = target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
