@@ -6,6 +6,10 @@ import {
   buildCsp,
   generateNonce,
 } from "@/lib/security/csp";
+import {
+  lookupRedirect,
+  shouldSkipRedirectLookup,
+} from "@/lib/redirects-cache";
 
 const PRODUCTION_HOST = "www.cleanstart.com";
 const APEX_HOST = "cleanstart.com";
@@ -43,7 +47,7 @@ function shouldLowercase(pathname: string) {
   return pathname !== pathname.toLowerCase();
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { nextUrl, headers } = request;
   const host = headers.get("host");
   const isProduction = process.env.VERCEL_ENV === "production";
@@ -68,6 +72,27 @@ export function proxy(request: NextRequest) {
     const url = nextUrl.clone();
     url.pathname = nextUrl.pathname.toLowerCase();
     return NextResponse.redirect(url, 308);
+  }
+
+  // ---- CMS-managed redirects (slug-change, manual, archive, migration seeds).
+  // Consulted before the request is forwarded so renamed pages don't 404.
+  // Fails open: any lookup error falls through to normal request handling.
+  if (!shouldSkipRedirectLookup(nextUrl.pathname)) {
+    const row = await lookupRedirect(nextUrl.pathname);
+    if (row) {
+      if (row.status === "410") {
+        return new NextResponse(null, { status: 410 });
+      }
+      if (row.to) {
+        const destination = row.to.startsWith("http")
+          ? row.to
+          : new URL(row.to, nextUrl.origin).toString();
+        return NextResponse.redirect(
+          destination,
+          Number.parseInt(row.status, 10) as 301 | 302 | 307 | 308,
+        );
+      }
+    }
   }
 
   // ---- Security headers on the forwarded response.
