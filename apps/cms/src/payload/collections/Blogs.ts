@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
@@ -151,14 +152,14 @@ export const Blogs: CollectionConfig = {
         components: {
           Field: {
             path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
-            clientProps: { pathPrefix: '/blog' },
+            clientProps: { pathPrefix: ROUTE_PREFIX.blogs },
           },
         },
       },
     },
     schemaAddonsField,
     publishedAtField,
-    ...seoSidebarFields({ pathPrefix: '/blog', descriptionSource: 'abstract' }),
+    ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.blogs, descriptionSource: 'abstract' }),
     {
       // Data-only — surfaced via the DocStatusBar in the top status bar.
       // Hidden here so the form doesn't double-render the value as a

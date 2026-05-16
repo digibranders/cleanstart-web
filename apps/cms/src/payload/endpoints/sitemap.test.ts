@@ -53,7 +53,7 @@ describe('GET /api/sitemap.xml', () => {
     });
     const req = { payload } as unknown as Parameters<typeof sitemapHandler>[0];
     const body = await (await sitemapHandler(req)).text();
-    expect(body).toContain('<loc>https://cleanstart.com/blogs/first-post</loc>');
+    expect(body).toContain('<loc>https://cleanstart.com/blog/first-post</loc>');
     expect(body).toContain('<loc>https://cleanstart.com/blogs</loc>');
     expect(body).toContain('<lastmod>2026-05-05T12:00:00Z</lastmod>');
   });

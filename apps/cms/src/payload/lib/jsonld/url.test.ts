@@ -4,15 +4,15 @@ import { absoluteUrl, docCanonicalUrl } from './url';
 
 describe('absoluteUrl', () => {
   it('joins base + path with a single slash', () => {
-    expect(absoluteUrl('https://cleanstart.com', '/blogs/x')).toBe('https://cleanstart.com/blogs/x');
+    expect(absoluteUrl('https://cleanstart.com', '/blog/x')).toBe('https://cleanstart.com/blog/x');
   });
 
   it('strips a single trailing slash from the base', () => {
-    expect(absoluteUrl('https://cleanstart.com/', '/blogs/x')).toBe('https://cleanstart.com/blogs/x');
+    expect(absoluteUrl('https://cleanstart.com/', '/blog/x')).toBe('https://cleanstart.com/blog/x');
   });
 
   it('prepends a slash when path is missing one', () => {
-    expect(absoluteUrl('https://cleanstart.com', 'blogs/x')).toBe('https://cleanstart.com/blogs/x');
+    expect(absoluteUrl('https://cleanstart.com', 'blog/x')).toBe('https://cleanstart.com/blog/x');
   });
 
   it('returns just the base when path is empty', () => {
@@ -21,10 +21,10 @@ describe('absoluteUrl', () => {
 });
 
 describe('docCanonicalUrl', () => {
-  it('builds /blogs/<slug> for blogs', () => {
+  it('builds /blog/<slug> for blogs', () => {
     expect(
       docCanonicalUrl('https://cleanstart.com', 'blogs', { slug: 'hello' }),
-    ).toBe('https://cleanstart.com/blogs/hello');
+    ).toBe('https://cleanstart.com/blog/hello');
   });
 
   it('builds /knowledge-hub/<slug> for knowledgeBase', () => {
@@ -63,7 +63,7 @@ describe('docCanonicalUrl', () => {
           slug: 'self',
           seo: { useCustomCanonical: false, canonicalOverride: 'https://other.example/article' },
         }),
-      ).toBe('https://cleanstart.com/blogs/self');
+      ).toBe('https://cleanstart.com/blog/self');
     });
 
     it('falls back to self-canonical when override is empty', () => {
@@ -72,7 +72,7 @@ describe('docCanonicalUrl', () => {
           slug: 'self',
           seo: { useCustomCanonical: true, canonicalOverride: '   ' },
         }),
-      ).toBe('https://cleanstart.com/blogs/self');
+      ).toBe('https://cleanstart.com/blog/self');
     });
 
     it('falls back to self-canonical when override is not a valid URL', () => {
@@ -81,7 +81,7 @@ describe('docCanonicalUrl', () => {
           slug: 'self',
           seo: { useCustomCanonical: true, canonicalOverride: 'not-a-url' },
         }),
-      ).toBe('https://cleanstart.com/blogs/self');
+      ).toBe('https://cleanstart.com/blog/self');
     });
 
     it('rejects override URLs with query strings', () => {
@@ -90,7 +90,7 @@ describe('docCanonicalUrl', () => {
           slug: 'self',
           seo: { useCustomCanonical: true, canonicalOverride: 'https://other.example/x?utm=1' },
         }),
-      ).toBe('https://cleanstart.com/blogs/self');
+      ).toBe('https://cleanstart.com/blog/self');
     });
 
     it('rejects override URLs with fragments', () => {
@@ -99,7 +99,7 @@ describe('docCanonicalUrl', () => {
           slug: 'self',
           seo: { useCustomCanonical: true, canonicalOverride: 'https://other.example/x#frag' },
         }),
-      ).toBe('https://cleanstart.com/blogs/self');
+      ).toBe('https://cleanstart.com/blog/self');
     });
 
     it('rejects non-http(s) override URLs', () => {
@@ -108,7 +108,7 @@ describe('docCanonicalUrl', () => {
           slug: 'self',
           seo: { useCustomCanonical: true, canonicalOverride: 'ftp://other.example/x' },
         }),
-      ).toBe('https://cleanstart.com/blogs/self');
+      ).toBe('https://cleanstart.com/blog/self');
     });
 
     it('strips trailing slash from a valid override', () => {

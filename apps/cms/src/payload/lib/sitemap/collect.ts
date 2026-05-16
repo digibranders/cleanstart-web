@@ -74,7 +74,7 @@ const buildLoc = (
     return null;
   }
   if (typeof doc.slug !== 'string' || doc.slug.length === 0) return null;
-  const prefix = ROUTE_PREFIX[collection];
+  const prefix = (ROUTE_PREFIX as Record<string, string>)[collection];
   if (!prefix) return null;
   return absoluteUrl(baseUrl, `${prefix}/${doc.slug}`);
 };

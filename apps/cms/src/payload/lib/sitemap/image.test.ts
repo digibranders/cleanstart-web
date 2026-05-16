@@ -32,7 +32,7 @@ describe('collectImageSitemapEntries', () => {
     const entries = await collectImageSitemapEntries(payload, 'https://cleanstart.com');
     expect(entries).toEqual([
       {
-        loc: 'https://cleanstart.com/blogs/first',
+        loc: 'https://cleanstart.com/blog/first',
         images: [
           {
             loc: 'https://cdn.example.com/hero/first.webp',
@@ -67,7 +67,7 @@ describe('collectImageSitemapEntries', () => {
     });
     const entries = await collectImageSitemapEntries(payload, 'https://cleanstart.com');
     expect(entries).toHaveLength(1);
-    expect(entries[0]?.loc).toBe('https://cleanstart.com/blogs/ok');
+    expect(entries[0]?.loc).toBe('https://cleanstart.com/blog/ok');
   });
 
   it('skips docs without a resolved image (number ID or null)', async () => {
@@ -131,7 +131,7 @@ describe('renderImageUrlsetXml', () => {
   it('emits the image-spec namespace and well-formed image:image children', () => {
     const xml = renderImageUrlsetXml([
       {
-        loc: 'https://cleanstart.com/blogs/post',
+        loc: 'https://cleanstart.com/blog/post',
         images: [
           {
             loc: 'https://cdn/hero.webp',

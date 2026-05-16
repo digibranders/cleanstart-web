@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
@@ -203,14 +204,14 @@ export const Events: CollectionConfig = {
         components: {
           Field: {
             path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
-            clientProps: { pathPrefix: '/events' },
+            clientProps: { pathPrefix: ROUTE_PREFIX.events },
           },
         },
       },
     },
     schemaAddonsField,
     publishedAtField,
-    ...seoSidebarFields({ pathPrefix: '/events', descriptionSource: 'abstract' }),
+    ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.events, descriptionSource: 'abstract' }),
     ...seoFieldsForSidebar('events'),
   ],
   hooks: {
