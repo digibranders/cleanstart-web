@@ -281,7 +281,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -289,6 +288,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -2809,7 +2809,7 @@ export interface Resource {
    * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
-  type?: ('whitepaper' | 'report' | 'brief' | 'datasheet' | 'case-study') | null;
+  type?: ('whitepaper' | 'ebook' | 'datasheet' | 'architecture-insights' | 'report') | null;
   summary?: string | null;
   /**
    * PDF or ZIP downloadable. Routed to web/resource/.
@@ -3864,7 +3864,7 @@ export interface Webinar {
     [k: string]: unknown;
   } | null;
   webinarType: 'live' | 'on-demand' | 'panel' | 'demo';
-  region: 'Americas' | 'EMEA' | 'APAC' | 'Global';
+  region: 'north-america' | 'asia-mea' | 'emea' | 'global';
   startsAt?: string | null;
   endsAt?: string | null;
   /**
@@ -6763,13 +6763,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
