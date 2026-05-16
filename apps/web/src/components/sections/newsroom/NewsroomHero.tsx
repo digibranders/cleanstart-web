@@ -5,29 +5,48 @@ export function NewsroomHero(): React.ReactElement {
   return (
     <section
       className="relative overflow-hidden"
-      style={{ minHeight: "420px", background: HERO_GRADIENT }}
+      style={{ minHeight: "498px", background: HERO_GRADIENT }}
       aria-labelledby="newsroom-hero-title"
     >
-      {/* Decorative orb top-right — mirrors blogs hero */}
+      {/* Earth image — large, positioned right, only top curve visible */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute"
         style={{
-          right: "-60px",
-          top: "120px",
-          width: "419px",
-          height: "419px",
-          mixBlendMode: "color-dodge",
-          opacity: 0.25,
+          left: "calc(50% + 436px - 720px)",
+          top: "43px",
+          width: "1457px",
+          height: "1189px",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/hero-orb-top.png"
+          src="/images/newsroom/hero-earth.png"
           alt=""
           loading="lazy"
           decoding="async"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      {/* Grid overlay — pinned over the earth on the right */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute"
+        style={{
+          left: "calc(50% + 604px - 720px)",
+          top: "0px",
+          width: "730px",
+          height: "708px",
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/newsroom/hero-grid.svg"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full"
         />
       </div>
 
