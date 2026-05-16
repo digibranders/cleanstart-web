@@ -26,29 +26,6 @@ export function BlogsHero({
       style={{ minHeight: "1059px", background: HERO_GRADIENT }}
       aria-labelledby="blogs-hero-title"
     >
-      {/* Decorative orb — top right, mix-blend-color-dodge */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
-        style={{
-          left: "1652px",
-          top: "135px",
-          width: "419px",
-          height: "419px",
-          mixBlendMode: "color-dodge",
-          opacity: 0.2,
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/blogs/hero-orb-top.png"
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
-
       {/* Decorative glow — left side, mix-blend-hard-light */}
       <div
         aria-hidden
