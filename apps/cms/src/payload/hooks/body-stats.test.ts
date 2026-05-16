@@ -99,6 +99,25 @@ describe('bodyStatsHook', () => {
     ]);
   });
 
+  it('falls back to the shallowest heading level when the configured depth excludes every heading', async () => {
+    const hook = bodyStatsHook({ tocLevelsField: 'tocDepth' });
+    const body = lexical([heading('h3', 'Alpha'), heading('h3', 'Beta'), heading('h4', 'Gamma')]);
+    const out = (await callHook(hook, { body, tocDepth: 'h2' })) as Record<string, unknown>;
+    expect(out.tableOfContents).toEqual([
+      { level: 3, text: 'Alpha', anchor: 'alpha' },
+      { level: 3, text: 'Beta', anchor: 'beta' },
+    ]);
+  });
+
+  it('does not fall back when the body has no headings at all', async () => {
+    const hook = bodyStatsHook({ tocLevelsField: 'tocDepth' });
+    const out = (await callHook(hook, {
+      body: lexical([paragraph('just prose')]),
+      tocDepth: 'h2',
+    })) as Record<string, unknown>;
+    expect(out.tableOfContents).toEqual([]);
+  });
+
   it('tocLevelsField falls back to H2-only when the field value is absent', async () => {
     const hook = bodyStatsHook({ tocLevelsField: 'tocDepth' });
     const out = (await callHook(hook, {

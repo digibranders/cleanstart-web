@@ -24,6 +24,15 @@ type LexicalNode = {
 const HEADING_TAGS: ReadonlySet<string> = new Set(['h2', 'h3', 'h4', 'h5', 'h6']);
 
 /**
+ * Node types whose subtree must not contribute TOC entries. Editors
+ * sometimes style a table cell as H3/H4 for visual emphasis — those
+ * are not section headings and would flood the sidebar with cell
+ * labels. Word-count walking still recurses through these (table
+ * prose still reads as body content).
+ */
+const TOC_OPAQUE_TYPES: ReadonlySet<string> = new Set(['table', 'tablerow', 'tablecell']);
+
+/**
  * Lexical node types that contribute non-prose content. Skipped from
  * the word-count walk so a 200-line code listing doesn't inflate
  * reading time, and so embed cards (video / iframe / form) don't
@@ -100,14 +109,24 @@ export const extractFromLexical = (
   let totalWords = 0;
   const seenAnchors = new Map<string, number>();
 
-  const walk = (node: LexicalNode): void => {
+  const walk = (node: LexicalNode, opaqueDepth: number): void => {
     if (typeof node.type === 'string' && NON_PROSE_TYPES.has(node.type)) {
       // Code blocks, embeds, inline blocks, etc. don't count toward
       // body word count or reading time. Skip them and their subtree.
       return;
     }
 
-    if (node.type === 'heading' && typeof node.tag === 'string' && HEADING_TAGS.has(node.tag)) {
+    const nextOpaque =
+      typeof node.type === 'string' && TOC_OPAQUE_TYPES.has(node.type)
+        ? opaqueDepth + 1
+        : opaqueDepth;
+
+    if (
+      nextOpaque === 0 &&
+      node.type === 'heading' &&
+      typeof node.tag === 'string' &&
+      HEADING_TAGS.has(node.tag)
+    ) {
       const text = collectText(node).trim();
       if (text.length > 0) {
         const level = headingLevel(node.tag);
@@ -126,11 +145,11 @@ export const extractFromLexical = (
     }
 
     if (node.children) {
-      for (const child of node.children) walk(child);
+      for (const child of node.children) walk(child, nextOpaque);
     }
   };
 
-  for (const child of root.children) walk(child);
+  for (const child of root.children) walk(child, 0);
 
   return {
     wordCount: totalWords,
