@@ -39,6 +39,14 @@ export const submitLeadBodySchema = z.object({
   // don't. The endpoint silently swallows any submission with a non-empty
   // value (returns 200 OK) so the bot doesn't learn it tripped the trap.
   website: z.string().max(2048).optional(),
+  // Optional submission context — used today to signal a gated resource
+  // download. When `resourceId` is present and matches the form's gateForm,
+  // the lead-submit response includes a short-lived signed download token.
+  context: z
+    .object({
+      resourceId: z.union([z.string().min(1), z.number().int().positive()]).optional(),
+    })
+    .optional(),
 });
 
 export type SubmitLeadBody = z.infer<typeof submitLeadBodySchema>;
