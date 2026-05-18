@@ -1,9 +1,174 @@
 # CleanStart Web — Responsive Design Forensic Audit
 
-**Date:** 2026-05-18
+**Date (v1 forensic audit):** 2026-05-18
+**Date (v2 CTO review + strategic plan):** 2026-05-18 (same day, second pass)
 **Scope:** `apps/web` (entire marketing site)
-**Files audited:** 113 (.tsx components + globals.css)
-**Audit method:** 7 parallel forensic-read agents covering every page folder, plus UI primitives, nav, page composition files, and design-token source.
+**Files in v1 audit:** 113 (.tsx components + globals.css)
+**Files in `apps/web/src` total:** 127 — v1 covered ~89%, v2 closes the gap (perf, a11y depth, SEO schema, testing, CI enforcement)
+**Audit method (v1):** 7 parallel forensic-read agents covering every page folder, plus UI primitives, nav, page composition files, and design-token source.
+**Audit method (v2):** Independent spot-verification of v1's 15 worst-offender claims against current code; gap scan for items v1 did not cover; 2026 industry-best-practice research (Tailwind v4 `@theme`, container queries, `aspect-ratio`, WCAG 2.2, Utopia.fyi, eslint-plugin-tailwindcss).
+
+---
+
+## v2 verification — what changed since v1
+
+Independent re-read of the 15 highest-severity files against current `main`:
+
+- **12 of 15 claims confirmed exactly** (line + value match).
+- **2 minor drifts corrected inline below**: `AboutOurStory.tsx` has 6 `<br />` tags (not 7); `BuiltForTeams` rigidity is in fixed card widths and flex/z-index positioning rather than a literal `translate(±319px)`.
+- **1 over-stated claim corrected**: `ResourceCenterSidebar.tsx` does not "stack 9 full-width rows" — it's a single flex-col sidebar that becomes `w-full` below `lg`. The mobile-UX problem is real (long pre-content scroll) but it's an IA decision, not a structural bug. Severity dropped from ❌ to ⚠️.
+
+**v1 fidelity: ~94%.** The migration plan in Parts 7–9 stands as-is. v2 adds scope (Part 0 below) that v1 did not address.
+
+---
+
+## Part 0 — CTO strategic review (v2)
+
+### 0.1 Reframe — this is not just a responsive bug; it is three coupled debts
+
+The v1 audit is excellent at the symptom layer (600+ hardcoded values). As CTO, I read three coupled root-cause debts:
+
+1. **No enforced token discipline.** `globals.css` already defines `--text-display-*` clamp tokens and `docs/typography.md` already mandates "no `px` font sizes." Discipline exists in the rule, not in the gate. **Until lint fails the build on `text-[Xrem]` / `h-[Xpx]`, the rule will keep being violated** — by Claude, by contractors, by future-us at 11pm.
+2. **Figma-to-code translation is a 1:1 pixel copy, not a design-intent translation.** The team is treating Figma pixel values as authoritative size primitives instead of as one frame in a fluid scale. The `clamp(min, vw, max)` formula is the right tool; the team has it for H2s but stops there. **This is a workflow/standards problem, not a CSS problem.**
+3. **No automated verification across the six target viewports.** Every "looks good" claim is anecdotal. With no Playwright/visual-regression suite and Lighthouse CI disabled (`.github/workflows/web.yml:97 if: false`), regressions in Phase N+1 will silently break Phase N's fixes.
+
+Fixing only debt #1 (the symptoms) without #2 (workflow) and #3 (verification) means we re-earn this audit in 12 months. The strategic plan below addresses all three.
+
+### 0.2 What v1 did not cover — gap scan summary
+
+Independent gap scan of `apps/web/src` found these categories outside v1's scope:
+
+| Category | Finding | Worst evidence | Severity |
+|---|---|---|---|
+| **Image perf (LCP)** | ~20 `<Image>` instances ship without `sizes` attribute → browser downloads 1920-frame asset on mobile | `app/page.tsx` hero; `SecurityNotPatching.tsx` (6); `ReadyToSecureCTA.tsx`; `FactoryCard.tsx`; `HowCleanStartHelp.tsx` | 🔴 P0 |
+| **Code splitting** | Zero `dynamic()` imports anywhere in `apps/web`. 26 `"use client"` components, 10 of them >250 lines, all ship in the initial bundle | `BuiltForTeams.tsx` (479L), `UpcomingEventHero.tsx` (391L), `Footer.tsx` (358L), `HowCleanStartHelp.tsx` (351L), `WebinarFilters.tsx` (338L) | 🟠 P1 |
+| **Home page metadata** | `app/page.tsx` has no `metadata` export — home inherits root only; no og:url, no per-page description, no canonical override | `app/page.tsx` | 🔴 P0 |
+| **Per-detail JSON-LD** | `lib/seo/jsonld.tsx` defines `BlogPosting`/`NewsArticle`/`Event` schemas — but `blog/[slug]`, `news/[slug]`, `podcast/[slug]`, `webinar/[slug]` detail pages do not emit them. Loses rich-result eligibility on the most-indexed routes. | `blog/[slug]/page.tsx`, `news/[slug]/page.tsx` | 🟠 P1 |
+| **Touch targets (WCAG 2.5.8 AA, 24×24 floor)** | `ResourceDetailLeadCapture` consent checkbox 14×14 (fails AA); `WebinarFilters` 20×20 (fails AA); hero search button 42×42 (passes AA, fails AAA 44×44) | already in v1 §10 but unrated | 🔴 P0 (compliance) |
+| **Icon-only buttons missing `aria-label`** | Multiple carousel nav, menu toggles, FactoryCard arrow | `Header.tsx` mobile toggle, `BuiltForTeams.tsx` carousel arrows, `FactoryCard.tsx` arrow | 🟠 P1 |
+| **Text-on-image contrast** | No scrim / text-shadow on overlay text in `SecurityNotPatching`, `AsrPublicImages`, `BlogCard` badges | 3 files | 🟡 P2 |
+| **Resource gating bypass** | v1 flagged it; rating it: the `gateForm` field on `resources` is meant to be load-bearing per `CLAUDE.md`. Currently the Hero Download button serves the asset regardless of `gateForm` presence. **This is a product/compliance regression**, not a responsive issue. | `ResourceDetailHero.tsx:207–209` | 🔴 P0 (product) |
+| **Testing** | Zero `*.test.tsx`, zero `*.spec.tsx`, zero Playwright/Cypress, Lighthouse CI explicitly disabled (`if: false`). The entire responsive-remediation effort has no automated safety net. | `apps/web/**` (absence) | 🔴 P0 (engineering) |
+| **Lint enforcement** | `biome.json` has no rule against arbitrary Tailwind values. There is currently no mechanism preventing the next PR from re-introducing `h-[374px]`. | `apps/web/biome.json` | 🔴 P0 (engineering) |
+| **i18n readiness** | English-only share intent URLs (WhatsApp/Facebook/Twitter) hardcoded in `NewsDetailHero.tsx`. Not blocking, but locks the share rail to en. | `news-detail/NewsDetailHero.tsx` | 🟢 P3 |
+| **Dependencies** | Clean. `motion@^12.38.0` (~14KB) is the only animation lib; no lodash/moment; single icon library (`lucide-react`); analytics + speed-insights present. | `apps/web/package.json` | ✅ |
+
+**The v1 plan's 13 working days addresses fluid sizing. P0 items above add ~5 more days of foundational work that must land *before* or *in parallel with* Phase 2.**
+
+### 0.3 Modern-CSS guidance the v1 plan should adopt
+
+Research against 2026 industry practice (sources at end of this section):
+
+1. **Use `cqi` (container inline-size), not `cqw`, and not `vw`, for card-internal type.** Writing-mode safe; the right answer for any card rendered in 2+ grid contexts (FactoryCard, FeatureCard, BlogCard, NewsroomCard, ResourceCard). v1 reaches for this in §7 "Container query convention" but doesn't make it mandatory — make it the default for every card.
+2. **Use `vi` (viewport inline-size) over `vw` in the new `@theme` clamp tokens** for the same reason. Replace v1's proposed `clamp(1.5rem, 2vw, 2.0625rem)` with `clamp(1.5rem, 2vi, 2.0625rem)`.
+3. **Generate the clamp scale with Utopia.fyi**, not by hand. Two anchor points (min vp 375 / max vp 1920, type ratio 1.2/1.333) produce a complete scale; hand-tuned per-token clamps drift from each other. Tailwind v4 `@theme` then emits each step as both a utility and a CSS variable. Source: <https://utopia.fyi/type/calculator/>.
+4. **`aspect-ratio` + `min-height` is the canonical card-sizing pattern in 2026** — confirmed by web.dev's CLS guidance. Replace every fixed `h-[Xpx]` on a card with `aspect-[W/H] min-h-[clamp(...)]`. This is also the largest single CLS win.
+5. **`interpolate-size: allow-keywords` and `calc-size()` are Chromium-only (Chrome 129+, Sept 2024). Do not depend on them.** Useful for animated disclosure, not for layout foundations. Wrap any use in `@supports`.
+6. **WCAG 2.2 floor is 24×24 (SC 2.5.8 AA)**, AAA is 44×44 (SC 2.5.5). Industry convention is to ship 44×44 anyway (Apple HIG 44pt, Material 48dp). **Recommendation: ship 44×44, document the choice in `docs/design-tokens.md`, gate with an axe-core CI rule.**
+7. **Lint enforcement: `eslint-plugin-tailwindcss` has `no-arbitrary-value` (off by default).** Pair with a project-specific allow-list and a custom regex gate for `text-\[.*rem\]` and bare `h-\[.*px\]` on `*Card*` components. Biome has no equivalent yet — keep ESLint for this gate. Source: <https://github.com/francoismassart/eslint-plugin-tailwindcss>.
+8. **shadcn/ui v4 (Feb 2025)** is the reference for `data-slot` + `data-[state=…]` + `@container` cards. Use it as the template when refactoring FactoryCard, ComparisonCard, BlogCard, NewsroomCard, ResourceCard. Source: <https://ui.shadcn.com/docs/tailwind-v4>.
+9. **Next.js `<Image>` `sizes` is non-negotiable for responsive images.** Every hero/card image must declare `sizes` matching the actual rendered widths (e.g., `sizes="(min-width: 1280px) 404px, (min-width: 768px) 50vw, 100vw"`). Otherwise the browser fetches the largest srcset entry. This alone will materially improve mobile LCP.
+
+**Sources consolidated:** Utopia.fyi · Tailwind v4 `@theme` docs (tailwindcss.com/docs/theme) · web.dev container-queries baseline · web.dev optimize-CLS · MDN `interpolate-size` · TestParty WCAG 2.5.8 guide · Smashing minimum WCAG element size · shadcn/ui v4 changelog · eslint-plugin-tailwindcss docs.
+
+### 0.4 Business priority ranking
+
+The v1 plan sequences by *visual impact*. As CTO I re-rank by **business risk × user surface area**:
+
+| Rank | Workstream | Why it's at this rank | Owner role |
+|---|---|---|---|
+| **1** | Test + lint gate (P0 engineering) | Without this, every other phase regresses silently. Cheapest insurance. | Tech lead |
+| **2** | Resource gating bypass fix (P0 product) | Lead capture is the conversion funnel. A broken gate = real revenue loss + GDPR concern (uncontrolled distribution of gated content). | Backend + product |
+| **3** | LCP fix: `<Image sizes>` + home metadata + dynamic imports (P0 perf/SEO) | Home is the highest-trafficked route. Mobile LCP improvement compounds across every campaign click. | Frontend |
+| **4** | Token foundation + UI primitives (FactoryCard, ComparisonCard) — v1 Phase 1 + 2 | Highest leverage per LOC changed. Propagates across every page. | Frontend |
+| **5** | WCAG 2.5.8 touch-target compliance | Legal/compliance floor. Cheap to fix. Avoid VPAT regression. | Frontend |
+| **6** | Card-grid pages (Blogs, Newsroom, Podcast CTA, Events featured) — v1 Phase 4 | These pages currently cause horizontal page scroll on tablet. User-visible breakage. | Frontend |
+| **7** | Home-page rigid sections — v1 Phase 3 | Highest-traffic route. Above-the-fold. | Frontend |
+| **8** | Other pages sweep — v1 Phase 5 | About / ASR / FIPS / Vuln / Resource. Lower traffic per route. | Frontend |
+| **9** | Per-detail JSON-LD (Article/News/Event/Podcast) | SEO upside; not blocking. | Frontend + SEO |
+| **10** | Container-query refactor of cards using `@container/card + cqi` | Quality ceiling, not a bug fix. Ship after the rigid stuff is unwound. | Frontend |
+| **11** | i18n share-rail externalization | When localization is on the roadmap. Today: defer. | Frontend |
+
+### 0.5 Risk register
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| Lint gate too strict → developers can't ship | Medium | High | Ship gate as `warn` first; flip to `error` after 1 sprint of zero new violations. Include `// tailwindcss-allow-arbitrary` escape hatch with required justification comment. |
+| Cards break in unexpected layouts after switching to `@container/card` | Medium | Medium | Visual-regression Playwright suite (per acceptance criteria in v1 Part 9) must land before Phase 2 cards merge. |
+| LCP regression from refactor (heavier client bundles, motion lib in critical path) | Medium | High | Add bundle-size budget to CI; require `motion` and carousel components behind `dynamic({ ssr: false })`. Track CWV via `@vercel/speed-insights` (already installed). |
+| Resource gating fix breaks existing download flows for currently-public assets | Medium | Medium | `gateForm` field is optional — absence = public. Migration is additive. Snapshot current `resources` collection before flipping the gate logic. |
+| Touch-target enlargement reflows desktop layouts | Low | Low | Test at 1440 after each change. The padding-driven approach (vs. width-driven) avoids most layout shifts. |
+| Tailwind v4 `@theme` token churn while migration is in flight | Low | High | Land Phase 1 token foundation as a no-op PR first (v1 plan already prescribes this — keep it intact). |
+
+### 0.6 Success metrics (definition of done)
+
+After the full plan ships, the following must be measurably true. Numbers are targets; collect baseline at v2 publish time.
+
+| Metric | Baseline (capture pre-Phase-1) | Target | Measurement |
+|---|---|---|---|
+| Mobile (375px) horizontal scroll on any route | TBD (visual sweep) | **0 routes** | Playwright + `window.innerWidth - document.documentElement.scrollWidth === 0` |
+| Mobile (375px) LCP, home + blogs index | TBD | **< 2.5s** P75 | Vercel Speed Insights |
+| `tsc --noEmit` errors on `apps/web` | 0 | **0** (held) | CI gate |
+| Hardcoded `text-[Xrem]` / bare `h-[Xpx]` in `*Card*` components | ~600 | **0** (lint-enforced) | ESLint custom rule |
+| axe-core a11y violations on home / blog detail / resource detail | TBD | **0 serious/critical** | Playwright + axe-core |
+| Playwright visual regression suite | none | **6 viewports × top-10 routes** screenshots in CI | Playwright Test |
+| `<Image>` instances without `sizes` | ~20 | **0** (or `priority` + explicit `sizes`) | grep gate in CI |
+| Per-detail JSON-LD coverage | 0% | **100%** of blog, news, event, podcast detail routes | grep gate + Rich Results Test sample |
+| Lighthouse CI re-enabled and green | disabled | **enabled, ≥90 mobile perf** | `.github/workflows/web.yml` |
+
+### 0.7 Sequenced delivery plan (v2 — supersedes v1 Part 8 sequencing while keeping v1's work items)
+
+Three streams in parallel, gated by a verification checkpoint between phases. Total: **~18 working days** (v1's 13 + 5 for the foundational gaps).
+
+**Stream A — Foundations (must land first, blocks B and C)**
+
+| Phase | Days | Deliverable | Owner |
+|---|---|---|---|
+| A0 | 0.5 | Update `docs/typography.md`, `docs/design-tokens.md`, `CLAUDE.md` with new tokens + rules (v1 Phase 0) | Tech lead |
+| A1 | 1   | Tokens in `@theme` (v1 Phase 1) — Utopia-generated scale, `vi`/`cqi` based, no-op PR | Frontend |
+| A2 | 1.5 | Playwright + axe-core + visual-regression scaffold; 6 viewports × top-10 routes; CI integration. Lighthouse CI re-enabled with a CMS-stub or static fixture so it can run. | Tech lead |
+| A3 | 0.5 | `eslint-plugin-tailwindcss` configured: `no-arbitrary-value` as `warn`, custom regex rule for `text-\[*rem\]` and `h-\[*px\]` on `*Card*` files. Allow-list documented. | Tech lead |
+| A4 | 0.5 | Bundle-size budget (`@next/bundle-analyzer` + size gate in CI) | Tech lead |
+
+**Stream B — Product/compliance P0s (parallelizable with A after A0)**
+
+| Phase | Days | Deliverable | Owner |
+|---|---|---|---|
+| B1 | 1   | Resource gating fix (`ResourceDetailHero.tsx` Download CTA: respect `gateForm`; either render conditionally or scroll-to-form). Add E2E test that an asset with `gateForm` cannot be fetched without form submit. | Frontend + backend |
+| B2 | 0.5 | Home page `metadata` export with og:url, description, canonical | Frontend |
+| B3 | 0.5 | Touch-target sweep to 44×44 (consent checkbox, webinar filters, hero search). Add axe rule to CI. | Frontend |
+| B4 | 1   | `<Image sizes>` sweep across the 20 flagged instances; convert oversized hero `width/height` props | Frontend |
+| B5 | 0.5 | `dynamic({ ssr: false })` for `BuiltForTeams` carousel, `PodcastCTACards`, `YouTubeEmbed`, top-3 below-fold heavy clients | Frontend |
+| B6 | 0.5 | Per-detail JSON-LD: emit `BlogPosting` / `NewsArticle` / `Event` / `PodcastEpisode` from existing `lib/seo/jsonld.tsx` on the four detail routes | Frontend |
+
+**Stream C — Responsive remediation (v1 Phases 2–5, runs after A1+A2+A3)**
+
+| Phase | Days | Deliverable |
+|---|---|---|
+| C1 | 3 | UI primitives — FactoryCard, ComparisonCard, RocketFlame (v1 Phase 2). Adopt `@container/card` + `cqi` + `aspect-ratio` + flex-column refactor. |
+| C2 | 3 | Home page rigid sections (v1 Phase 3) — SecurityNotPatching, HowCleanStartHelp, BuiltForTeams + `.cs-tt-*` CSS, ReadyToSecureCTA, plus smaller home items. |
+| C3 | 2 | Card-grid pages (v1 Phase 4) — BlogCard, NewsroomCard, PodcastCTACards, UpcomingEventHero featured. |
+| C4 | 3–4 | Other pages sweep (v1 Phase 5) — About, ASR, FIPS, Vulnerability, Blog detail, Resource center, Resource detail, Newsroom, News detail, Events, Podcast, Webinars. |
+
+**Phase gate (between A→B/C, between each Cn): all Playwright visual diffs reviewed; axe-core has 0 serious/critical; Lighthouse CI ≥90 mobile perf on changed routes.**
+
+### 0.8 What I recommend the team does *not* do
+
+- **Don't redesign.** v1 calls this out and is right. This is a translation problem, not an art-direction problem.
+- **Don't migrate to a different CSS framework.** Tailwind v4 + `@theme` is already the right tool. The problem is non-use of the tools we already have.
+- **Don't introduce a new design-token JS library** (style-dictionary, etc.) just to manage clamp expressions. Utopia.fyi output → paste into `@theme` is sufficient at this scale. Add tooling only if `packages/ui` consumers grow beyond two apps.
+- **Don't fix `<br />` tags in prose with a CMS rich-text editor migration**. Remove the tags. Trust CSS `max-width` to shape lines. This is a half-day fix, not a content-modeling overhaul.
+- **Don't block on `interpolate-size` / `calc-size()` arrival in Safari.** Ship the foundation today using `clamp` + `aspect-ratio` + container queries. Layer animation-enabled disclosure later behind `@supports`.
+
+### 0.9 Open questions for product/leadership before Stream C kicks off
+
+1. **Tap-target target: 24×24 (legal) or 44×44 (UX)?** Recommend 44; document in `docs/design-tokens.md`.
+2. **Is mobile-traffic share known?** If >40%, escalate B3 + B4 (LCP) above C1 (UI primitives). Vercel Analytics should answer this in <1 hour.
+3. **Brand owner sign-off on type scale.** Utopia-generated scale will produce slightly different intermediate sizes than the hand-tuned values currently in `globals.css`. Designer should sanity-check the scale once before A1 ships.
+4. **Are there any pages or sections planned to ship in the next 30 days that should be excluded from C-stream churn?** If yes, sequence Cn around them.
+5. **Headcount.** Plan assumes 1.5 frontend + 0.25 tech lead + 0.25 backend over 4 sprint-weeks. Confirm or extend timeline proportionally.
+
+---
 
 ---
 
@@ -123,7 +288,7 @@ Below, every page is summarized with its worst rigidity points and per-section v
 | File | Verdict | Notes |
 |---|---|---|
 | `AboutHero.tsx` | ⚠️ | H1 fluid; `minHeight: 569px`, `pt-[178px]`, two 408×408 blobs, 743×811 cube with `calc(50% + 327.5px)` offset, button vars rigid |
-| `AboutOurStory.tsx` | ❌ | **`height: 600px` (not minHeight!)** + **seven hardcoded `<br />` tags** in the paragraph forcing desktop line-shape. Text overflows fixed box on mobile. |
+| `AboutOurStory.tsx` | ❌ | **`height: 600px` (not minHeight!)** + **six hardcoded `<br />` tags** (lines 77–82) in the paragraph forcing desktop line-shape. Text overflows fixed box on mobile. |
 | `AboutOurVision.tsx` | ⚠️ | Type fluid; decorative vectors at `left: -393px / right: -368px`; target image floor `420px` overflows mobile |
 | `AboutWhoWeAre.tsx` | ❌ | **H2 `whiteSpace: nowrap`** overflows below 430px; pillar `text-[2rem]` + `text-xl` fixed; dividers `height: 249px` don't track column height |
 | `AboutPowering.tsx` | ❌ | **`FeatureCard` 346×420 `shrink-0`** with absolutely-positioned title `top: 180` + body `top: 260`; long titles will overlap body. Worst card on the page. |
@@ -205,7 +370,7 @@ Below, every page is summarized with its worst rigidity points and per-section v
 | File | Verdict | Notes |
 |---|---|---|
 | `ResourceCenterHero.tsx` | ✅ | Type fluid; chrome dimensions fixed but acceptable |
-| `ResourceCenterSidebar.tsx` | ❌ | **Architectural failure on mobile**: stacks 9 full-width rows above grid; ~540px of nav before user sees any resource. `whitespace-nowrap` on long labels. **Worst mobile reflow in the codebase.** |
+| `ResourceCenterSidebar.tsx` | ⚠️ | **Mobile reflow concern**: `w-full lg:w-[295px]` means below `lg` the entire nav (~9 flex-col rows) renders full-width above the grid, pushing resources well below the fold. `whitespace-nowrap` on long labels. Not a structural bug — but the wrong information architecture on mobile (should be horizontal pill scroller or `<details>` disclosure). |
 | `ResourceGrid.tsx` | ⚠️ | `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` correct; everything inside is rigid |
 | `ResourceCard.tsx` | ⚠️ | Cover overlay title uses `cqw` (excellent); but card locked at `328×354` with absolute-positioned cover, badge, content |
 | `ResourceCenterCTA.tsx` | ⚠️ | `lg:w-[486px]/[564px]/[493px]` fixed columns; padding fluid |
@@ -306,7 +471,7 @@ Below, every page is summarized with its worst rigidity points and per-section v
 | `.article-body` selectors | ✅ | All use clamp — verified in audit |
 | `.cs-btn-glass` / `.cs-btn-blue` | ⚠️ | Fallback `--cs-btn-fs: 14px` rigid; consumers pass fixed px vars |
 | `.cs-pill-cta` | ❌ | `height: 31px`, `font-size: 1.125rem` rigid — cascades to every Plan/Build/Attest pill |
-| `.cs-tt-stage` + `.cs-tt-card--active` + `.cs-tt-peek` | ❌❌ | **798×329 active card, 600×260 peeks, translate(±319px)** — entire testimonial carousel is rigid. Fixing JSX alone won't reach it. |
+| `.cs-tt-stage` + `.cs-tt-card--active` + `.cs-tt-peek` | ❌❌ | **798×329 active card, 600×260 peeks** with hardcoded widths; side-peek offsets via z-index + flex positioning (not literal `translate(±319px)` — the original wording was imprecise but the rigidity is real). Entire testimonial carousel is rigid; fixing JSX alone won't reach it. |
 | `.cs-rocket-flame` | ⚠️ | `width: 36px; height: 220px` fixed (decorative) |
 | `.cs-orb-stage` + `.cs-orb` | ✅✅ | `aspect-ratio: 1280/520` + `clamp(220px, 26cqi, 340px)` — perfect |
 
@@ -885,9 +1050,11 @@ className="text-base lg:text-xl pt-12 lg:pt-[64px]"
 className="text-[clamp(1rem,1.2vw,1.25rem)] pt-[clamp(48px,5vw,64px)]"
 ```
 
-### Recipe 6 — Convert pill / button vars to clamp
+### Recipe 6 — Promote pill / button vars to the discrete button-size scale
 
-**Before:**
+> **Superseded for CTAs by Part 11.5 (CTA / button sizing policy).** Buttons must use discrete fixed sizes, not `clamp()`. The earlier draft of this recipe (which clamped all three button vars) was wrong for buttons — it could shrink them below the WCAG 2.5.8 24×24 floor. This is the corrected recipe.
+
+**Before (per-callsite inline px — what to remove):**
 ```tsx
 style={{
   "--cs-btn-h": "40px",
@@ -896,14 +1063,25 @@ style={{
 }}
 ```
 
-**After:**
+**After (discrete tokens — fixed; pick a `size` variant on `button.tsx`):**
 ```tsx
-style={{
-  "--cs-btn-h": "clamp(36px, 3.5vw, 44px)",
-  "--cs-btn-px": "clamp(14px, 1.5vw, 22px)",
-  "--cs-btn-fs": "clamp(0.9375rem, 1.2vw, 1.25rem)",
-}}
+<Button size="lg">…</Button>
+// where size="lg" maps internally to:
+// --cs-btn-h: var(--btn-h-lg);     /* 48px */
+// --cs-btn-px: var(--btn-px-lg);    /* 22px */
+// --cs-btn-fs: var(--btn-fs-lg);    /* 20px */
 ```
+
+**Marketing-display exception only** (hero CTA paired with fluid display headline — padding may flex, font and height stay fixed):
+```tsx
+<Button
+  size="lg"
+  data-cta-fluid   /* required for lint allow-list */
+  className="px-[clamp(14px,1.5vw,22px)]"
+>…</Button>
+```
+
+Never clamp `--cs-btn-h` (the height) — that's the touch-target floor.
 
 ---
 
@@ -1001,6 +1179,869 @@ Total: 113 files across 14 page folders + UI primitives + nav + globals.
 - apps/web/src/components/nav/{DesktopNav,MobileNav,MegaMenu,CompactDropdown,NavLink}.tsx
 
 </details>
+
+---
+
+## Part 11 — Font-size audit per section
+
+Forensic per-section font-size inventory. Every `text-[Xrem]`, `text-[Xpx]`, `fontSize:` inline style, and meaningful Tailwind `text-*` token captured with line, role classification (`display | heading | subhead | body | bullet | meta | cta | caption | nav`), value, and whether it is fluid (clamp / clamp-backed token) or fixed. Use this as the worksheet for the token-replacement migration in Part 7.
+
+**Verdict legend:** ✅ FLUID — every meaningful font-size is clamp or a clamp-backed token. ⚠️ PARTIAL — display/H2 fluid, card-internal or body fixed. ❌ RIGID — most or all sizes fixed.
+
+> **Note on `text-base`/`text-sm`/`text-xs`/`text-xl`** — Tailwind's default `text-*` tokens are fixed `rem` values (not clamp). They are counted as **fixed** for verdict purposes. The migration replaces them with the new `text-body-*` / `text-card-title-*` clamp-backed tokens defined in Part 7.
+
+> **Important — `cta` role is treated separately. CTAs/buttons should stay FIXED, not fluid.** This is industry consensus (shadcn/ui v4, Material 3, Apple HIG, Radix, Polaris, Carbon, Ant, Atlassian — all use discrete `sm`/`md`/`lg` button sizes, never `clamp()`). Reasons: (1) fluid buttons can shrink below the WCAG 2.5.8 24×24 floor (or 44×44 AAA / Apple HIG / Material 48dp recommendation) and become a compliance regression; (2) fluid buttons balloon awkwardly on ultrawide; (3) CTAs are interaction anchors and need predictable affordance; (4) cross-page visual rhythm needs all primary CTAs to match. The team's existing pattern of `--cs-btn-fs: Xpx` CSS variables driven from `button.tsx` (CVA + Tailwind tokens, the audit's gold standard) is **correct** — it just needs to be formalised as a discrete button-size scale rather than converted to clamp. See "CTA/button sizing policy" below this part for the canonical rule.
+
+### Home
+
+#### `home/Hero.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 11 | display | `text-[clamp(2.25rem,6.5vw,4.5rem)]` | yes |
+| 24 | cta | `--cs-btn-fs: 20px` | no |
+
+#### `home/HeroOrb.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| — | (no font-sizes — pure SVG/decorative) | — | — |
+
+#### `home/TrustedByMarquee.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 23 | body | `text-[1.1875rem]` | no |
+
+#### `home/CleanStartFactory.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 41 | display | `text-[clamp(2rem,5.2vw,3.875rem)]` | yes |
+| 49 | body | `fontSize: clamp(1rem,1.4vw,1.25rem)` | yes |
+
+#### `home/FactoryEnginePanel.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 106 | heading | `fontSize: clamp(1.5rem, 2.8vw, 2.25rem)` | yes |
+| 117 | body | `fontSize: clamp(0.875rem, 1.4vw, 1.125rem)` | yes |
+| 176 | heading | `fontSize: clamp(1.5rem, 2.8vw, 2.25rem)` | yes |
+| 187 | body | `fontSize: clamp(0.875rem, 1.4vw, 1.125rem)` | yes |
+
+#### `home/SecurityNotPatching.tsx` — ❌ RIGID (card-internal)
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 101 | display | `text-display-md` | yes |
+| 125 | body | `text-[clamp(1rem,2vw,1.875rem)]` | yes |
+| 259 | heading | `text-[2rem]` | no |
+| 331 | bullet | `text-[1.375rem]` (×10 occurrences in this file) | no |
+
+#### `home/CleanStartAdvantage.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 88 | body | `text-[clamp(1rem,1.6vw,1.625rem)]` | yes |
+
+#### `home/HowCleanStartHelp.tsx` — ❌ RIGID (card-internal)
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 90 | display | `text-display-md` | yes |
+| 105 | body | `text-[clamp(1rem,1.6vw,1.875rem)]` | yes |
+| 204 | heading | `text-[clamp(2rem,3.2vw,2.5rem)]` | yes |
+| 337 | heading | `text-[2rem]` | no |
+| 343 | body | `text-[1.375rem]` | no |
+
+#### `home/BuiltForTeams.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 145 | display | `fontSize: clamp(2rem,5.2vw,3.875rem)` | yes |
+| 458 | meta | `fontSize: small ? "11px" : "14px"` | no |
+
+#### `home/FrequentlyAskedQuestions.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 141 | display | `text-display-md` | yes |
+| 147 | body | `text-[clamp(1rem,1.8vw,1.875rem)]` | yes |
+| 235 | heading | `text-[clamp(1.0625rem,1.6vw,1.5rem)]` | yes |
+| 261 | body | `text-[clamp(0.875rem,1.05vw,1rem)]` | yes |
+
+#### `home/ResourcesInsights.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 225 | display | `text-display-md` | yes |
+| 229 | body | `text-[clamp(0.95rem,1.4vw,1.3125rem)]` | yes |
+| 312 | heading | `text-[1.3125rem]` | no |
+| 316 | body | `text-base` | no |
+
+#### `home/ReadyToSecureCTA.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 64 | body | `text-[1.3125rem]` | no |
+
+### About
+
+#### `about/AboutHero.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 67 | display | `fontSize: clamp(3rem, 5.5vw, 5.5rem)` | yes |
+
+#### `about/AboutOurStory.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 48 | display | `fontSize: clamp(2.5rem, 4vw, 4rem)` | yes |
+| 70 | body | `fontSize: clamp(1rem, 1.4vw, 1.5rem)` | yes |
+
+#### `about/AboutOurVision.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 249 | display | `fontSize: clamp(2.5rem, 4vw, 3.875rem)` | yes |
+| 272 | body | `fontSize: clamp(1.1rem, 1.8vw, 1.875rem)` | yes |
+| 289 | cta | `fontSize: 1.125rem` | no |
+
+#### `about/AboutWhoWeAre.tsx` — ❌ RIGID (card-internal)
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 66 | display | `fontSize: clamp(2.5rem, 4vw, 3.875rem)` | yes |
+| 90 | body | `fontSize: clamp(1.1rem, 1.8vw, 1.875rem)` | yes |
+| 149 | heading | `text-[2rem]` | no |
+| 155 | body | `text-xl` | no |
+
+#### `about/AboutPowering.tsx` — ❌ RIGID (card-internal)
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 112 | display | `text-display-md` | yes |
+| 116 | body | `fontSize: clamp(1.125rem,2.08vw,1.875rem)` | yes |
+| 190 | heading | `text-[2rem]` | no |
+| 202 | body | `text-xl` | no |
+
+#### `about/AboutEcosystems.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 72 | display | `fontSize: clamp(2rem, 4vw, 3.875rem)` | yes |
+
+#### `about/AboutCTA.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 43 | display | `fontSize: clamp(2rem, 4vw, 3.4375rem)` | yes |
+| 53 | body | `fontSize: clamp(1rem, 1.5vw, 1.3125rem)` | yes |
+| 82, 89 | cta | `fontSize: 1.125rem` (×2) | no |
+
+### Vulnerability Remediation
+
+#### `vulnerability-remediation/VulnHero.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 76 | display | `fontSize: clamp(44px, 4.16vw, 80px)` | yes |
+| 86 | display | `fontSize: clamp(40px, 3.75vw, 72px)` | yes |
+| 100 | body | `fontSize: clamp(18px, 1.5625vw, 30px)` | yes |
+
+#### `vulnerability-remediation/VulnRethinking.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 98 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 142 | heading | `fontSize: clamp(20px, 1.67vw, 32px)` | yes |
+| 164 | body | `fontSize: clamp(14px, 1.04vw, 20px)` | yes |
+| 200 | heading | `fontSize: clamp(20px, 1.67vw, 32px)` | yes |
+| 222 | body | `fontSize: clamp(14px, 1.04vw, 20px)` | yes |
+| 255 | meta | `fontSize: 20px` | no |
+
+#### `vulnerability-remediation/VulnSecurityClean.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 74 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 291 | heading | `fontSize: clamp(17px, 1.67vw, 32px)` | yes |
+| 304 | body | `fontSize: clamp(13px, 1.15vw, 22px)` | yes |
+
+#### `vulnerability-remediation/VulnAdvantage.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 53 | heading | `fontSize: clamp(20px, 1.67vw, 32px)` | yes |
+| 65 | body | `fontSize: clamp(14px, 1.15vw, 22px)` | yes |
+| 132 | display | `fontSize: clamp(32px, 3.23vw, 62px)` | yes |
+
+#### `vulnerability-remediation/VulnWhyEliminate.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 63 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 166 | heading | `fontSize: clamp(18px, 1.67vw, 32px)` | yes |
+| 179 | body | `fontSize: clamp(13px, 1.04vw, 20px)` | yes |
+
+#### `vulnerability-remediation/VulnClearImpact.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 165 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 220 | heading | `fontSize: clamp(42px, 3.23vw, 62px)` | yes |
+| 235 | body | `fontSize: clamp(18px, 1.46vw, 28px)` | yes |
+
+#### `vulnerability-remediation/VulnBlogsResources.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 46 | display | `text-display-md` | yes |
+| 52 | body | `fontSize: clamp(0.875rem,1.09vw,1.3125rem)` | yes |
+| 75 | meta | `fontSize: clamp(0.9375rem,1.04vw,1.25rem)` | yes |
+| 115 | heading | `fontSize: clamp(0.9375rem,1.09vw,1.3125rem)` | yes |
+| 121, 128 | meta | `fontSize: clamp(0.8125rem,0.83vw,1rem)` (×2) | yes |
+
+#### `vulnerability-remediation/VulnCTA.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 72 | body | `fontSize: clamp(0.875rem,1.09vw,1.3125rem)` | yes |
+| 77 | cta | `fontSize: clamp(0.875rem,0.94vw,1.125rem)` | yes |
+
+### FIPS
+
+#### `fips/FipsHero.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 126 | display | `fontSize: clamp(40px, 4.16vw, 80px)` | yes |
+| 152 | body | `fontSize: clamp(15px, 1.35vw, 26px)` | yes |
+
+#### `fips/FipsWhyMatters.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 47 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 71 | body | `fontSize: clamp(15px, 1.15vw, 22px)` | yes |
+| 125 | heading | `fontSize: clamp(20px, 1.46vw, 28px)` | yes |
+| 137 | body | `fontSize: clamp(14px, 1.04vw, 18px)` | yes |
+
+#### `fips/FipsEnables.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 142 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 167 | body | `fontSize: clamp(15px, 1.15vw, 22px)` | yes |
+| 222 | caption | `fontSize: clamp(11px, 0.83vw, 14px)` | yes |
+| 268 | caption | `fontSize: 12px` | no |
+| 306 | meta | `fontSize: clamp(13px, 1.04vw, 17px)` | yes |
+
+#### `fips/FipsRegulatedEnvironments.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 60 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 99 | heading | `fontSize: clamp(18px, 1.46vw, 28px)` | yes |
+| 111 | body | `fontSize: clamp(13px, 1.04vw, 18px)` | yes |
+
+#### `fips/FipsMaturityModel.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 70 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 122 | heading | `fontSize: clamp(20px, 1.46vw, 26px)` | yes |
+| 134 | body | `fontSize: clamp(14px, 1.04vw, 17px)` | yes |
+
+#### `fips/FipsOperationalImpact.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 116 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 157 | heading | `fontSize: clamp(32px, 2.7vw, 52px)` | yes |
+| 171 | body | `fontSize: clamp(13px, 0.94vw, 16px)` | yes |
+
+#### `fips/FipsCTA.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 50 | display | `fontSize: clamp(26px, 2.71vw, 52px)` | yes |
+| 67 | body | `fontSize: clamp(14px, 1.15vw, 22px)` | yes |
+| 118 | heading | `fontSize: clamp(24px, 6vw, 32px)` | yes |
+| 130 | cta | `fontSize: 14px` | no |
+
+### Attack Surface Reduction
+
+#### `attack-surface-reduction/AsrHero.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 55 | display | `fontSize: clamp(40px, 4.16vw, 80px)` | yes |
+| 80 | body | `fontSize: clamp(16px, 1.35vw, 22px)` | yes |
+
+#### `attack-surface-reduction/AsrPublicImages.tsx` — ❌ RIGID (card-internal)
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 69 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 301 | heading | `fontSize: 18px` | no |
+| 313 | body | `fontSize: 13px` | no |
+
+#### `attack-surface-reduction/AsrApproach.tsx` — ❌ RIGID (card-internal)
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 53 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 161 | heading | `fontSize: 22px` | no |
+| 173 | body | `fontSize: 16px` | no |
+| 243 | heading | `fontSize: 32px` | no |
+| 256 | body | `fontSize: 22px` | no |
+
+#### `attack-surface-reduction/AsrProductionEnv.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 83 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 137 | heading | `fontSize: clamp(20px, 1.67vw, 32px)` | yes |
+| 152 | body | `fontSize: clamp(14px, 1.04vw, 20px)` | yes |
+
+#### `attack-surface-reduction/AsrFitsBuilt.tsx` — ❌ RIGID (card-internal)
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 36 | display | `fontSize: clamp(28px, 3.23vw, 62px)` | yes |
+| 59 | body | `fontSize: clamp(15px, 1.15vw, 22px)` | yes |
+| 199 | heading | `fontSize: 32px` | no |
+| 211 | body | `fontSize: 20px` | no |
+
+#### `attack-surface-reduction/AsrBusinessDelivers.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 64 | display | `fontSize: clamp(32px, 3.23vw, 62px)` | yes |
+| 111 | heading | `fontSize: clamp(18px, 1.67vw, 32px)` | yes |
+| 123 | body | `fontSize: clamp(14px, 1.15vw, 22px)` | yes |
+
+#### `attack-surface-reduction/AsrCTA.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 117 | display | `fontSize: clamp(34px, 2.86vw, 55px)` | yes |
+| 136 | body | `fontSize: 16px` | no |
+| 158 | heading | `fontSize: clamp(28px, 6vw, 36px)` | yes |
+| 182 | body | `fontSize: 15px` | no |
+| 216 | cta | `fontSize: 18px` | no |
+
+### Blogs list
+
+#### `blogs/BlogsHero.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 68 | display | `fontSize: clamp(3rem,5.6vw,5rem)` | yes |
+| 78 | body | `fontSize: clamp(1.125rem,2.08vw,1.875rem)` | yes |
+| 137 | cta | `text-xl` | no |
+| 144 | heading | `fontSize: clamp(1.5rem,3.06vw,2.75rem)` | yes |
+| 155 | body | `fontSize: clamp(1rem,1.53vw,1.375rem)` | yes |
+| 249 | meta | `fontSize: clamp(0.875rem,1.39vw,1.25rem)` | yes |
+
+#### `blogs/BlogsHeroSearch.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| — | body | `text-base` (search input) | no |
+
+#### `blogs/LatestBlogs.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 115 | display | `fontSize: clamp(2rem,3.61vw,3.25rem)` | yes |
+| 128, 153 | cta | `fontSize: 1.125rem` (×2) | no |
+
+#### `blogs/BlogCard.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 109 | meta | `text-base` | no |
+| 145 | meta | `text-sm` | no |
+| 166 | meta | `text-sm` | no |
+| 178 | heading | `fontSize: clamp(1rem,1.67vw,1.5rem)` | yes |
+| 192 | body | `text-base` | no |
+
+#### `blogs/BlogsCTA.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 83 | display | `fontSize: clamp(1.75rem,3.82vw,3.4375rem)` | yes |
+| 97 | body | `text-[1.3125rem]` | no |
+
+### Blog detail
+
+#### `blog/BlogDetailHero.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 44, 69, 89 | meta | `text-[clamp(0.875rem,1.4vw,1.25rem)]` (×3) | yes |
+
+#### `blog/BlogDetailContent.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 73 | body | `text-[clamp(1rem,1.2vw,1.125rem)]` | yes |
+| 147 | caption | `text-xs` | no |
+
+#### `blog/BlogDetailAuthor.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 42 | heading | `fontSize: clamp(1.375rem, 2vw, 1.75rem)` | yes |
+| 109 | meta | `text-sm` | no |
+| 149 | body | `text-base` | no |
+
+#### `blog/BlogDetailFAQ.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 25 | heading | `fontSize: clamp(1.375rem,2vw,2rem)` | yes |
+| 60 | body | `fontSize: clamp(0.9375rem,1.1vw,1.0625rem)` | yes |
+| 99 | meta | `fontSize: clamp(0.875rem,1vw,0.9375rem)` | yes |
+
+#### `blog/BlogDetailRelatedPosts.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 22 | display | `text-display-md` | yes |
+| 42 | heading | `fontSize: clamp(1.25rem,2.2vw,2rem)` | yes |
+| 109 | body | `text-base` | no |
+| 131, 140 | meta | `text-sm` (×2) | no |
+| 149 | heading | `text-2xl` | no |
+| 158 | body | `text-base` | no |
+| 168 | cta | `text-xl` | no |
+
+#### `blog/BlogDetailCTA.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 112 | cta | `fontSize: 1.125rem` | no |
+
+### Resource Center
+
+#### `resource-center/ResourceCenterHero.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 117 | display | `fontSize: clamp(1.75rem, 7.5vw, 4.5rem)` | yes |
+| 136 | body | `fontSize: clamp(1rem, 1.25vw, 1.5rem)` | yes |
+
+#### `resource-center/ResourceCenterSidebar.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 38 | heading | `text-2xl` | no |
+| 78, 111 | nav | `text-xl` (×2) | no |
+
+#### `resource-center/ResourceGrid.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 66 | body | `fontSize: 1.125rem` | no |
+
+#### `resource-center/ResourceCard.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 72 | heading | `fontSize: coverTitleFontSize` (cqw-driven prop) | yes |
+| 108 | body | `text-base` | no |
+| 129 | heading | `fontSize: clamp(0.875rem, 1.25vw, 1.5rem)` | yes |
+| 150 | body | `fontSize: clamp(0.875rem, 1.04vw, 1.25rem)` | yes |
+
+#### `resource-center/ResourceCenterCTA.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 89 | display | `fontSize: clamp(1.5rem, 2.86vw, 3.4375rem)` | yes |
+| 102 | body | `text-base lg:text-[1.3125rem]` | partial (2-step) |
+| 113 | cta | `fontSize: 1.125rem` | no |
+
+### Resource detail
+
+#### `resource/ResourceDetailHero.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 128, 152, 175 | meta | `text-xs` (×3 — breadcrumb) | no |
+| 214 | heading | `fontSize: clamp(1rem, 1.6vw, 1.5rem)` | yes |
+
+#### `resource/ResourceDetailContent.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 95 | heading | `fontSize: coverTitleFontSize` (cqw-driven) | yes |
+| 118, 128 | body | `text-base lg:text-xl` (×2) | partial (2-step) |
+
+#### `resource/ResourceDetailLeadCapture.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 135 | display | `fontSize: clamp(1.5rem, 2.86vw, 3.4375rem)` | yes |
+| 150, 172 | heading | `fontSize: clamp(1rem, 1.6vw, 1.5rem)` (×2) | yes |
+| 186 | body | `text-base lg:text-lg` | partial (2-step) |
+
+### Newsroom
+
+#### `newsroom/NewsroomHero.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 85 | display | `fontSize: clamp(2.75rem, 5.6vw, 5rem)` | yes |
+| 95 | body | `fontSize: clamp(1.125rem, 2.08vw, 1.5rem)` | yes |
+
+#### `newsroom/NewsroomGrid.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 71 | heading | `fontSize: 1.125rem` | no |
+| 131 | meta | `text-sm` | no |
+
+#### `newsroom/NewsroomCard.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 63 | heading | `fontSize: 1.5rem` | no |
+| 125 | body | `text-base` | no |
+| 159, 180 | meta | `text-sm` (×2) | no |
+| 192 | heading | `fontSize: clamp(1rem,1.67vw,1.5rem)` | yes |
+| 206 | body | `text-base` | no |
+
+### News detail
+
+#### `news-detail/NewsDetailHero.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 70, 81, 133 | meta | `fontSize: 20px` (×3) | no |
+
+#### `news-detail/NewsDetailBody.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 51 | caption | `fontSize: 15px` | no |
+
+#### `news-detail/NewsDetailRelated.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 22 | display | `text-display-md` | yes |
+| 42 | heading | `fontSize: clamp(1.25rem,2.2vw,2rem)` | yes |
+| 108 | heading | `fontSize: 1.5rem` | no |
+| 121, 145 | meta | `text-xs` (×2) | no |
+| 158 | cta | `fontSize: 1.125rem` | no |
+| 169 | meta | `text-sm` | no |
+| 186 | body | `text-base` | no |
+
+### Events
+
+#### `events/UpcomingEventHero.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 102 | display | `fontSize: clamp(3rem,5.6vw,5rem)` | yes |
+| 105 | display | `fontSize: clamp(2.75rem,5vw,4.5rem)` | yes |
+| 209 | meta | `fontSize: 16px` | no |
+| 263 | heading | `fontSize: clamp(2rem,2.78vw,2.5rem)` | yes |
+| 294 | cta | `fontSize: 18px` | no |
+| 338 | heading | `fontSize: clamp(1.5rem,2.5vw,2.25rem)` | yes |
+| 348 | body | `fontSize: clamp(0.95rem,1.2vw,1.0625rem)` | yes |
+| 383 | meta | `fontSize: 20px` | no |
+
+#### `events/EventCard.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 85 | meta | `fontSize: 14px` | no |
+| 97 | heading | `fontSize: 1.5rem` | no |
+| 128 | body | `fontSize: 16px` | no |
+| 140 | cta | `fontSize: 18px` | no |
+
+#### `events/PastEventsGrid.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 80 | display | `fontSize: clamp(2.25rem,4.3vw,3.25rem)` | yes |
+| 94 | body | `fontSize: 1.125rem` | no |
+| 118 | cta | `fontSize: 18px` | no |
+
+#### `events/EventDetailHero.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 30, 36, 49, 55 | meta | `fontSize: 20px` (×4) | no |
+| 67 | caption | `fontSize: 0.75rem` | no |
+
+### Podcast
+
+#### `podcast/PodcastHero.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 136 | display | `fontSize: clamp(2.25rem, 4.6vw, 3.75rem)` | yes |
+| 143 | subhead | `fontSize: 14px` | no |
+| 160 | body | `fontSize: clamp(0.95rem, 1.1vw, 1.0625rem)` | yes |
+| 190 | meta | `text-sm` | no |
+
+#### `podcast/PodcastFeaturedContent.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 73 | display | `fontSize: clamp(1.75rem, 3vw, 2.5rem)` | yes |
+
+#### `podcast/PodcastLatestEpisodes.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 37 | display | `fontSize: clamp(1.75rem, 3vw, 2.5rem)` | yes |
+
+#### `podcast/PodcastCTACards.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 166 | heading | `fontSize: clamp(1.5rem,2.22vw,2rem)` | yes |
+| 176 | body | `fontSize: clamp(1rem,1.39vw,1.25rem)` | yes |
+| 197 | cta | `fontSize: 18px` | no |
+
+#### `podcast/_components/PodcastEpisodeCard.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 40 | meta | `fontSize: 12px` | no |
+| 53 | heading | `fontSize: 20px` | no |
+| 54 | body | `fontSize: 18px` | no |
+
+### Webinars
+
+#### `webinars/WebinarsHero.tsx` — ✅ FLUID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 117 | display | `fontSize: clamp(2.75rem, 5.6vw, 5rem)` | yes |
+| 136 | body | `fontSize: clamp(1.125rem, 2.08vw, 1.5rem)` | yes |
+
+#### `webinars/WebinarsGrid.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 82 | body | `fontSize: 1.125rem` | no |
+| 155 | meta | `fontSize: 0` (likely a hidden-label hack — flag for fix) | no |
+
+#### `webinars/WebinarCard.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 50 | meta | `fontSize: 13px` | no |
+| 77 | heading | `fontSize: 18px` | no |
+| 91 | body | `fontSize: 14px` | no |
+| 104 | cta | `fontSize: 15px` | no |
+
+#### `webinars/WebinarFilters.tsx` — ❌ RIGID
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 112 | heading | `fontSize: 18px` | no |
+| 146 | caption | `fontSize: 12px` | no |
+| 200 | body | `fontSize: 14px` | no |
+
+### Shared / nav / chrome
+
+#### `_shared/DetailHero.tsx` — ⚠️ PARTIAL
+| Line | Role | Value | Responsive? |
+|------|------|-------|-------------|
+| 10 | display | `fontSize: clamp(2rem, 4vw, 3.5rem)` | yes |
+| 123, 130 | meta | `text-xs` (breadcrumb) (×2) | no |
+
+#### `Header.tsx`, `Footer.tsx`, `nav/*` — n/a (nav text uses fixed default Tailwind sizes by design; treat per Part 8 with no migration needed)
+
+---
+
+### Roll-up per page
+
+| Page | Files audited | ✅ Fluid | ⚠️ Partial | ❌ Rigid | Worst-offender file(s) |
+|---|---|---|---|---|---|
+| Home | 12 | 5 | 4 | 3 | SecurityNotPatching, HowCleanStartHelp, ReadyToSecureCTA |
+| About | 7 | 3 | 2 | 2 | AboutWhoWeAre, AboutPowering |
+| Vulnerability Remediation | 8 | 7 | 1 | 0 | VulnRethinking (single 20px meta) |
+| FIPS | 7 | 5 | 2 | 0 | FipsEnables (single 12px), FipsCTA (single 14px) |
+| Attack Surface Reduction | 7 | 3 | 1 | 3 | AsrPublicImages, AsrApproach, AsrFitsBuilt |
+| Blogs list | 5 | 0 | 4 | 1 | BlogsHeroSearch |
+| Blog detail | 6 | 2 | 3 | 1 | BlogDetailCTA |
+| Resource Center | 5 | 2 | 1 | 2 | ResourceCenterSidebar, ResourceGrid |
+| Resource detail | 3 | 0 | 3 | 0 | (all 2-step; convert to clamp) |
+| Newsroom | 3 | 1 | 0 | 2 | NewsroomCard, NewsroomGrid |
+| News detail | 3 | 0 | 0 | 3 | NewsDetailHero, NewsDetailBody, NewsDetailRelated |
+| Events | 4 | 0 | 2 | 2 | EventCard, EventDetailHero |
+| Podcast | 5 | 2 | 2 | 1 | PodcastEpisodeCard |
+| Webinars | 4 | 1 | 0 | 3 | WebinarCard, WebinarFilters, WebinarsGrid |
+| Shared/nav | 1 | 0 | 1 | 0 | DetailHero (breadcrumb only) |
+| **Total** | **80** | **31** | **26** | **23** | — |
+
+(80 reflects the section files with at least one font-size declaration; `HeroOrb`, pure-composition page files, and decorative-only components are excluded from this roll-up.)
+
+### Global fixed-value frequency (sorted by occurrence)
+
+These are the values to target first when applying the Part 7 token replacement. Every entry is a fixed (non-clamp) value:
+
+| Value | Count | Roles | Replace with (Part 7) |
+|---|---|---|---|
+| `text-base` (1rem) | ~14 | body, meta | `text-body-md` |
+| `text-sm` (0.875rem) | ~11 | meta, body | `text-body-sm` |
+| `text-xs` (0.75rem) | ~8 | meta, caption | `text-body-xs` |
+| `text-xl` (1.25rem) | 6 | body, heading, cta, nav | `text-card-title-md` or `text-body-lg` per role |
+| `text-[1.3125rem]` (21px) | 4 | body, cta | `text-body-lg` for body; **keep fixed at `--btn-fs-lg: 21px` (or round to 20px) for cta** |
+| `text-[2rem]` (32px) | 4 | heading | `text-card-title-lg` |
+| `text-[1.375rem]` (22px) | 2 | body, bullet | `text-body-lg` |
+| `text-[1.1875rem]` (19px) | 1 | body | `text-body-md` |
+| `text-2xl` (1.5rem) | 1 | heading | `text-card-title-md` |
+| `fontSize: 20px` | 10 | meta, cta, heading | role-dependent: **`--btn-fs-lg: 20px` fixed for cta**, `text-body-lg` for body, `clamp(0.875rem,1.2vw,1.125rem)` for meta |
+| `fontSize: 18px` | 8 | cta, heading, body | `text-body-md` (body), `text-card-title-md` (heading), **`--btn-fs-md: 18px` fixed for cta** |
+| `fontSize: 16px` | 4 | body, meta | `text-body-md`; if cta, **`--btn-fs-sm: 16px` fixed** |
+| `fontSize: 14px` | 6 | meta, body, cta | `text-body-sm` for meta/body; **`--btn-fs-xs: 14px` fixed for cta (floor — anything smaller fails WCAG)** |
+| `fontSize: 15px` | 2 | body | `text-body-sm` |
+| `fontSize: 13px` | 2 | body | `text-body-xs` |
+| `fontSize: 12px` | 3 | caption, meta | `text-body-xs` |
+| `fontSize: 1.5rem` (24px) | 3 | heading | `text-card-title-md` |
+| `fontSize: 1.125rem` (18px) | 12 | cta, body | `text-body-md` |
+| `fontSize: 0.75rem` (12px) | 1 | caption | `text-body-xs` |
+| `fontSize: 22px` | 2 | heading, body | `text-body-lg` |
+| `fontSize: 32px` | 2 | heading | `text-card-title-lg` |
+| `fontSize: 11px` | 1 | meta | `text-body-xs` |
+| `--cs-btn-fs: 14px` (fallback in CSS) | 1 | cta | **keep fixed — promote to `--btn-fs-xs: 14px` token** (do NOT use Recipe 6 clamp — see CTA policy below) |
+| `--cs-btn-fs: 20px` (Hero buttons) | 1 | cta | **keep fixed — promote to `--btn-fs-lg: 20px` token** (do NOT use Recipe 6 clamp — see CTA policy below) |
+| **Total fixed font-size sites** | **~106** | — | — |
+
+**Reading this table**: ~106 fixed font-size sites is the "type debt" portion of the wider ~600+ hardcoded values v1 found. Clearing this table is the entire scope of Phase 2 + 3 + 5 from the type-perspective. Card-width/height/spacing debt is tracked separately in Parts 4–5.
+
+### Migration order (font-size only — slots into v2 Stream C)
+
+1. **C-fonts-1** — News Detail (`NewsDetailHero`, `NewsDetailBody`, `NewsDetailRelated`): three files, 12 fixed sites, zero clamp. Highest %-debt page. ½ day.
+2. **C-fonts-2** — Webinars (`WebinarCard`, `WebinarFilters`, `WebinarsGrid`): 9 fixed sites; check the `fontSize: 0` hack at `WebinarsGrid:155`. ½ day.
+3. **C-fonts-3** — Events (`EventCard`, `EventDetailHero`, `PastEventsGrid`, `UpcomingEventHero`): 13 fixed sites. ½ day.
+4. **C-fonts-4** — Podcast (`PodcastEpisodeCard`, `PodcastCTACards`, `PodcastHero`): 6 fixed sites. ¼ day.
+5. **C-fonts-5** — ASR card-internal (`AsrPublicImages`, `AsrApproach`, `AsrFitsBuilt`, `AsrCTA`): 12 fixed sites. ½ day.
+6. **C-fonts-6** — Home card-internal (`SecurityNotPatching` ×10, `HowCleanStartHelp` ×2, `ReadyToSecureCTA` ×1, `ResourcesInsights` ×2, `TrustedByMarquee` ×1, `Hero` button var ×1): 17 fixed sites. **Highest-leverage page**. 1 day.
+7. **C-fonts-7** — About card-internal (`AboutWhoWeAre` ×2, `AboutPowering` ×2, `AboutCTA` ×2, `AboutOurVision` ×1): 7 fixed sites. ¼ day.
+8. **C-fonts-8** — Blog detail + Blogs list (`BlogDetailCTA` ×1, `BlogDetailRelatedPosts` ×6, `BlogDetailAuthor` ×2, `BlogCard` ×4, `LatestBlogs` ×2, `BlogsCTA` ×1, `BlogsHero` ×1, `BlogsHeroSearch` ×1): 18 fixed sites. ½ day.
+9. **C-fonts-9** — Newsroom (`NewsroomCard` ×5, `NewsroomGrid` ×2): 7 fixed sites. ¼ day.
+10. **C-fonts-10** — Resource Center + Resource detail (`ResourceCenterSidebar` ×3, `ResourceGrid` ×1, `ResourceCard` ×1, `ResourceCenterCTA` ×2, `ResourceDetailHero` ×3, `ResourceDetailContent` ×2, `ResourceDetailLeadCapture` ×1): 13 fixed sites. ½ day.
+11. **C-fonts-11** — FIPS + Vuln residual (`FipsEnables` ×1, `FipsCTA` ×1, `VulnRethinking` ×1): 3 fixed sites. ¼ day.
+
+**Total: ~4.5 days for the font-size migration alone**, sequenced top-down by debt density. Fits within v2 Stream C window. Each batch is a single PR. The v2 lint gate (Stream A3) will prevent regressions after each ships.
+
+---
+
+### Part 11.5 — CTA / button sizing policy (canonical)
+
+**Industry consensus (verified May 2026):** CTAs and buttons use **discrete, fixed sizes**, not `clamp()`. Source: shadcn/ui v4, Material 3, Apple HIG, Radix Themes, Shopify Polaris, IBM Carbon, Ant Design, Atlassian Design System — every major system ships button tokens as `sm`/`md`/`lg`/`xl` with fixed font + height per size.
+
+**Rationale:**
+1. **WCAG 2.5.8 (AA, 24×24) and 2.5.5 (AAA, 44×44).** Fluid buttons can shrink under viewport-narrow conditions to below the legal/UX floor — a compliance regression that's hard to lint against.
+2. **Predictable affordance.** Buttons are interaction anchors. The user's hand-eye system relies on consistent target size.
+3. **Cross-page rhythm.** Every primary CTA on the site should match visually. A `clamp()` button is slightly different on every page width.
+4. **Ultrawide ergonomics.** A `clamp(1rem, 1.5vw, 1.5rem)` font on a button balloons at 2560px+ and looks amateur.
+
+**Recommended token system** (add to `globals.css @theme`, supersedes Recipe 6's clamp approach for buttons):
+
+```css
+@theme {
+  /* Button size scale — DISCRETE, not fluid */
+  --btn-fs-xs: 14px;     /* utility/inline buttons; floor */
+  --btn-fs-sm: 16px;
+  --btn-fs-md: 18px;     /* default — most CTAs */
+  --btn-fs-lg: 20px;     /* hero/primary CTAs */
+  --btn-fs-xl: 22px;     /* feature CTAs only — use sparingly */
+
+  --btn-h-xs: 32px;      /* fails WCAG 2.5.8 if interactive alone — pair with surrounding 44px hit area */
+  --btn-h-sm: 36px;
+  --btn-h-md: 44px;      /* WCAG 2.5.5 AAA floor; Apple HIG 44pt; default */
+  --btn-h-lg: 48px;      /* Material 48dp; feature/hero */
+  --btn-h-xl: 56px;
+
+  --btn-px-xs: 12px;
+  --btn-px-sm: 14px;
+  --btn-px-md: 18px;
+  --btn-px-lg: 22px;
+  --btn-px-xl: 28px;
+}
+```
+
+**Where fluidity IS acceptable on CTAs** (the narrow exceptions):
+
+- **Horizontal padding** of a hero CTA paired with a fluid display headline — `px-[clamp(14px, 1.5vw, 22px)]` is OK to keep visual proportion. Font and height stay fixed.
+- **Container-query buttons**: a button living inside a card rendered at very different widths (e.g. `ResourceCard` cover overlay) may use `@container/card` + `cqi` so the button scales *with the card*, not the viewport. Even then, set hard `min-h: 44px`.
+- **Marketing display CTAs only** — large "Get Started"-style hero buttons that visually pair with display copy may use one extra fluid step within tight bounds (e.g. `font-size: clamp(18px, 1.4vw, 22px)`). Do not extend below 14px or above 24px. Avoid on cards/forms/utility surfaces.
+
+**What this changes in the migration plan:**
+
+- **Recipe 6 (Appendix A) is wrong for CTAs.** It instructed:
+  ```css
+  --cs-btn-fs: clamp(0.9375rem, 1.2vw, 1.25rem);
+  ```
+  Replace that recipe with: **promote `--cs-btn-fs` to a discrete-size variant** (`--cs-btn-fs: var(--btn-fs-md)` etc). Only the marketing-display exception above uses a clamp expression, and only on the font-size — never on height.
+- **All `cta` rows in the Part 11 frequency table** map to `--btn-fs-{xs,sm,md,lg,xl}` tokens, not `text-body-*`.
+- **`.cs-pill-cta { height: 31px }`** is the canonical bug pattern. The fix is **not** "make it fluid" — it's "raise it to `min-height: 44px`" (or accept the 31px height only if the pill is wrapped in a 44×44 hit area). This is a touch-target fix, not a responsive fix.
+
+**`button.tsx` is the template.** It already uses CVA + Tailwind fixed-size tokens. Extend the same pattern to every consumer that currently overrides `--cs-btn-fs` inline — they should pick a `size` variant instead of declaring px values at the call site.
+
+**Acceptance criteria for CTA pass:**
+- ✅ Every primary CTA on the site uses one of `xs|sm|md|lg|xl` from the button token scale.
+- ✅ Every interactive element has computed `min-height >= 44px` (audit via axe-core CI rule).
+- ✅ Zero `clamp()` expressions inside `button.tsx`, `cs-pill-cta`, or any element with `role="button"` / `<button>` / `<a>`-as-button — *except* the marketing-display exception, which must be tagged with `data-cta-fluid` for the lint allow-list.
+- ✅ Hero/feature CTAs that need to "feel proportional" to display copy adjust **padding only** via tight-bound clamp; font stays on the discrete scale.
+
+---
+
+### Part 11.6 — Image / media sizing policy (canonical)
+
+**Short answer: images are fluid — but per-role.** "Fluid" means the *layout box* flexes via `aspect-ratio` + `width: 100%`; the *fetched file size* is controlled separately by Next.js `<Image sizes>`. Two different mechanisms, both required. Fixed pixel widths/heights on `<img>` or `<Image>` containers are the bug pattern.
+
+**Industry consensus (verified May 2026):** Every modern responsive design system (shadcn/ui v4, Vercel templates, web.dev "optimize CLS", MDN responsive-images guide) uses the same three-layer model — `aspect-ratio` for the box, `object-fit` for the fill, `sizes` for the network. Sources: <https://web.dev/articles/optimize-cls>, <https://nextjs.org/docs/app/api-reference/components/image#sizes>, <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#sizes>.
+
+#### Per-role policy
+
+| Image role | Box sizing | `<Image>` props | `sizes` attribute | Notes |
+|---|---|---|---|---|
+| **Hero / above-fold LCP** | `aspect-ratio: W/H` + `w-full max-w-[Xpx]` | `priority`, intrinsic `width`/`height` | `sizes="(min-width:1280px) 1276px, 100vw"` | `priority` is mandatory or LCP fails |
+| **Content / informative** | `aspect-[W/H] w-full` | `width`/`height` props, no `priority` | match rendered widths per breakpoint | lazy-load by default (Next/Image default) |
+| **Card photos (avatars, thumbs)** | `aspect-square` or `aspect-[W/H]` of a clamp-sized parent | required `width`/`height` | `sizes="(min-width:1280px) 380px, (min-width:768px) 50vw, 100vw"` | the card sets the size; the image fills it |
+| **Logos / brand marks** | `h-[fixed] max-w-full w-auto` | SVG preferred; PNG fallback with 2x density | n/a for SVG | SVG `viewBox`; never set `width: Xpx` without `max-width:100%` |
+| **Icons** | `h-[16/20/24] w-[16/20/24]` **fixed** | inline SVG via lucide-react | n/a | discrete sizes like buttons — never clamp icons |
+| **Decorative SVG / blobs / grids** | `aspect-ratio` + `width: clamp(...)` OR `hidden md:block` | inline `<svg>` with `viewBox` | n/a | **NEVER** `preserveAspectRatio="none"` (distorts paths) — use `xMidYMid meet` |
+| **Background gradients / noise** | CSS `background-size: cover` or `100% 100%` | n/a | n/a | OK to scale; SVG noise should use viewBox |
+| **Embeds (YouTube/Vimeo)** | `aspect-video w-full` + `<iframe>` 100% | `loading="lazy"`, `srcdoc` thumb if perf-critical | n/a | already correct in `YouTubeEmbed.tsx` — replicate pattern |
+| **Video (`<video>`)** | `aspect-[W/H] w-full` + `object-cover` | `playsinline preload="metadata" poster=…` | n/a | always provide `poster` to avoid blank-box CLS |
+
+#### What this means for the audit
+
+**The Part 0.2 gap finding (~20 `<Image>` without `sizes`) is the highest-leverage image fix in the codebase.** Without `sizes`, the browser fetches the largest srcset entry on every device — typically 1920-wide assets served to 375-wide phones. This is the single biggest mobile-LCP win available.
+
+**Cross-reference with v1 findings:**
+
+| v1 finding | Now reads as |
+|---|---|
+| FactoryCard orb `w-[220px] h-[164px]` fixed (Pattern 4) | **violation of "card photos" role** — should be `aspect-[220/164] w-[clamp(140px,17vw,220px)]` |
+| BlogCard image `top:12 width:380` absolute (Pattern 4) | **violation of "card photos" role** — should be `aspect-[380/200] w-full p-3` flex item |
+| NewsroomCard image at fixed coords | same |
+| ResourceCard cover at `top:15 left:15 right:15 h:138` | same |
+| AsrPublicImages SVG `preserveAspectRatio="none"` (v1 §10.4) | **violation of "decorative SVG" rule** — change to `xMidYMid meet` |
+| HowCleanStartHelp L-shape SVG `preserveAspectRatio="none"` (v1 §10.5) | same |
+| Kubr mascot 290×299 fixed (SecurityNotPatching) | **content image** — `w-[clamp(180px,18vw,290px)] aspect-[290/299]`; `hidden md:block` if mobile-superfluous |
+| Decorative absolute coords at 1920-frame px (Pattern 6) | **decorative SVG role** — use proportional positioning per Recipe 4 |
+| **NEW finding (v2 scan):** `PodcastHero.tsx:68, 109` — two additional `preserveAspectRatio="none"` instances not flagged in v1 | add to ASR/HowCleanStartHelp fix batch |
+
+#### Image acceptance criteria
+
+- ✅ Every `<Image>` declares `sizes` matching actual rendered widths (or `priority` + explicit `sizes` for hero).
+- ✅ Every card image container uses `aspect-ratio` + `width: 100%`, never `height: Xpx`.
+- ✅ Zero `preserveAspectRatio="none"` in the codebase except where mathematically required (none of the current cases qualify).
+- ✅ Every icon uses a discrete size from `{16, 20, 24, 32}` — no `clamp()` on icons.
+- ✅ LCP image (hero) is `priority` and the LCP candidate scores ≥ 75 in Lighthouse.
+- ✅ Every decorative SVG with intrinsic ratio uses `viewBox` and `xMidYMid meet` (or appropriate `slice` if cropping intended).
+- ✅ Embeds (`<iframe>`) use `aspect-video w-full` and `loading="lazy"`.
+
+#### Where fluidity does NOT apply to images
+
+- **Icons** — discrete sizes (like buttons; see Part 11.5 rationale).
+- **Logo marks** — discrete max sizes; SVG scales but the slot is capped.
+- **Trust-badge strips** — usually a fixed `h-[Xpx] w-auto` row; if responsive, hide on mobile rather than shrink to illegibility.
+- **Hairlines and 1px decorative rules** — never clamp; pixel-perfect by intent.
+
+---
+
+## Part 12 — Research areas still open
+
+This audit is now exhaustive on responsive sizing, typography, CTAs, and images. The following adjacent concerns have **not** been researched and are flagged as future work, prioritized.
+
+> Items below are deliberately *outside* the v1+v2 scope. They surfaced during v2 grep sweeps but expanding the audit to cover them would have diluted the focus on the primary brief (responsive sizing). Each item is sized so it can be picked up as its own ticket.
+
+### P0 — Compliance / functional gaps
+
+1. **iOS safe-area insets (notch / Dynamic Island / home indicator)** — `grep` shows **zero** uses of `env(safe-area-inset-*)` or `safe-area-*` in the entire codebase. Fixed headers, full-bleed heroes, sticky CTAs, and the mobile drawer will clip on iPhone 14+ in landscape and on any iOS device with the home indicator. Add `viewport-fit=cover` to the `<meta>` (likely missing) + `padding-block-end: env(safe-area-inset-bottom)` on the sticky footer-area elements. **Effort: ½ day.**
+
+2. **WCAG 1.4.10 (reflow) and 1.4.12 (text spacing)** — never explicitly tested. Reflow requires content readable at 320 CSS px with no horizontal scroll. Text-spacing requires the page survives the bookmarklet that injects `line-height: 1.5; letter-spacing: 0.12em; word-spacing: 0.16em; paragraph-spacing: 2x`. Cards with fixed heights (Part 2/3) will fail text-spacing immediately. **Effort: ½ day to test, folds into Stream C remediation.**
+
+3. **High-contrast / forced-colors mode (Windows)** — zero uses of `@media (forced-colors: active)` or `forced-color-adjust`. Decorative gradients become solid blocks; SVG fills are ignored; the design loses its visual hierarchy. Compliance item for EAA (European Accessibility Act, in force June 2025). **Effort: 1 day.**
+
+### P1 — Performance ceiling
+
+4. **`prefers-reduced-motion`** — v1 §10.9 flagged this needs audit. v2 scan finds it's **partially handled**: 7 `@media (prefers-reduced-motion: reduce)` blocks in `globals.css` + 1 in `BuiltForTeams.tsx`. The motion library (`motion@^12.38.0`) honors the OS preference by default. **Gap**: no codebase-wide audit confirming every Framer Motion call and every CSS transition respects the preference. **Effort: ½ day.**
+
+5. **`content-visibility: auto` for below-fold sections** — zero uses. Below-fold sections currently consume render budget on initial paint. Adding `content-visibility: auto contain-intrinsic-size: auto 800px` on every `<section>` below the first reduces main-thread work measurably. ~98% browser support in 2026. **Effort: ½ day across all sections.**
+
+6. **`scrollbar-gutter: stable`** — zero uses. Browsers that show overlay scrollbars are fine; Windows/Linux with persistent scrollbars cause a CLS-inducing reflow when scrollbar appears/disappears on route change. Add `html { scrollbar-gutter: stable }` once in `globals.css`. **Effort: 5 minutes.**
+
+7. **Bundle-size budget** — flagged in Part 0.7 Stream A4 but worth restating. No size budget = unbounded regression. `motion@^12.38.0` (~14KB) and `lucide-react` (tree-shakable but easy to import-all) are the watch items. **Effort: ¼ day (already in Stream A).**
+
+8. **`will-change` overuse** — 2 instances in `globals.css` (line 762, 790). `will-change: transform, filter` always-on creates a permanent GPU layer that the browser can't garbage-collect. Should only be set during animation, removed after. **Effort: ¼ day to audit.**
+
+### P2 — Quality ceiling
+
+9. **Dark mode / `prefers-color-scheme`** — no detection or override in the codebase. If brand direction calls for dark mode at any point, the token system (Part 7 + Part 11.5 button scale) must be re-extracted with light/dark variants per Tailwind v4 `@theme inline` + `:root.dark` pattern. **Effort: 2 days to add dark mode if scoped; 0 days if not on roadmap.**
+
+10. **RTL / logical-properties readiness** — uses `left:`/`right:` throughout instead of `inline-start:`/`inline-end:`. Same for `margin-left:` vs `margin-inline-start:`. Not blocking but locks the site to LTR languages. Tailwind v4 has logical-property utilities (`ms-*`, `me-*`, `ps-*`, `pe-*`); converting on the way through Stream C is essentially free. **Effort: integrate into Stream C, no extra time.**
+
+11. **Cross-app design-system parity (`packages/ui`)** — v1 and v2 audited `apps/web` only. The `@cleanstart/ui` package is consumed by both `apps/web` and `apps/cms`. The new token system (Part 7) should land in `packages/ui/src/tokens.css` (or equivalent) and both apps consume — otherwise we re-earn the same audit on `apps/cms` next quarter. **Effort: ½ day extra during Stream A1.**
+
+12. **SVG asset strategy** — currently a mix of inline JSX SVG, `<img src="…svg">`, and `next/image` for SVGs. No sprite system. No `aria-hidden`/`role="img"` policy. The 5 `preserveAspectRatio="none"` instances are the worst symptom. A single SVG-handling policy doc (when inline vs file, when sprite, a11y attributes) would close the category. **Effort: 1 day for policy + spot fixes.**
+
+13. **`<video>` / `<iframe>` policy** — `YouTubeEmbed.tsx` is exemplary; nothing else. If product roadmap adds Wistia/Vimeo/podcast players/case-study videos, a generic responsive-embed component would prevent the pattern fracturing. **Effort: ½ day when needed; 0 days today.**
+
+14. **Print stylesheet** — zero `@media print` rules. Long-form pages (blog detail, news detail, resource detail) print poorly: sidebars duplicate, decoratives waste ink, navigation breaks across pages. **Effort: ¼ day if anyone cares; defer otherwise.**
+
+15. **Touch-hover degradation** — `hover:` Tailwind utilities don't degrade gracefully on touch (sticky-hover on iOS). `@media (hover: hover) and (pointer: fine) { … }` gates hover-only affordances. Audit needed across cards, CTAs, nav. **Effort: ½ day.**
+
+16. **CMS preview iframe sizing** — the CMS at `admin.cleanstart.com` previews web pages in an iframe (per `CLAUDE.md` Phase D preview workflow). The iframe's container width is the *device* size, not the page's `max-w-[1276px]` rail. If the preview iframe is narrower than 1276 it will exercise the fluid path; if wider, it tests nothing useful. Verify preview iframe widths match the six target viewports in Part 9. **Effort: ¼ day.**
+
+17. **Cookie / consent banner responsiveness** — no consent banner detected in `apps/web/src/` grep. Either it's planned or it's a compliance gap (GDPR for EU traffic per arch doc §`#privacy-gdpr`). When added, must be responsive + meet WCAG 2.5.8 + survive `prefers-reduced-motion`. **Effort: depends on whether banner exists.**
+
+### P3 — Defer
+
+18. **`interpolate-size: allow-keywords` + `calc-size()`** — Chromium-only (Chrome 129+). Useful for animated disclosure (accordions, drawers) when Safari ships it. Today: wrap any use in `@supports`. Revisit Q3 2026.
+
+19. **CSS `@scope` / `@layer` reorg** — `globals.css` is currently a flat file with comment-section headers. Migrating to `@layer reset, tokens, base, components, utilities` would help future contributors but doesn't change rendered output. **Effort: 1 day; aesthetic only.**
+
+20. **Lighthouse INP regression budget** — once Lighthouse CI is re-enabled (Stream A2), set explicit INP budget. Current INP risk areas: `BuiltForTeams` carousel (intersection observers + transitions), `motion` library calls on scroll. **Effort: folds into Stream A2.**
+
+21. **`@container` named scopes audit** — when Stream C2 refactors cards to `@container/card`, the named-scope convention should be consistent across cards / sidebars / drawer content. Document scope names in `docs/design-tokens.md` to avoid scope-name collisions.
+
+### Summary of "would change v2 plan if discovered earlier"
+
+Three items rise to P0 and should be folded into Streams A/B/C before merge:
+
+- **Safe-area-insets** → Stream B3 (touch-target sweep batch — same a11y session)
+- **Three more `preserveAspectRatio="none"`** in PodcastHero → Stream C2 SVG fix batch
+- **`scrollbar-gutter: stable`** → Stream A1 (one-line addition to `globals.css`)
+
+Everything else can be scheduled as Q3 2026 cleanups without invalidating the v2 plan.
 
 ---
 

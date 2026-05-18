@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope, Sora } from "next/font/google";
+import { JetBrains_Mono, Manrope, Sora } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
@@ -26,6 +26,15 @@ const sora = Sora({
   display: "swap",
   preload: true,
   adjustFontFallback: true,
+});
+
+// Mono family — code blocks, inline code. Not preloaded (below the fold on most pages).
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-mono",
+  display: "swap",
+  preload: false,
 });
 
 const isProduction = process.env.VERCEL_ENV === "production";
@@ -100,7 +109,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("font-sans", manrope.variable, sora.variable)}
+      className={cn("font-sans", manrope.variable, sora.variable, jetbrainsMono.variable)}
       style={{
         ["--font-sans" as string]: "var(--font-sora)",
         ["--font-display" as string]: "var(--font-manrope)",
