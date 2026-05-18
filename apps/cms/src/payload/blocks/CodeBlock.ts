@@ -25,18 +25,19 @@ export const CodeBlock: Block = {
       ],
     },
     {
-      name: 'filename',
-      type: 'text',
-      admin: { description: 'Optional filename rendered as a tab above the code (e.g. Dockerfile).' },
-    },
-    {
       name: 'content',
-      type: 'code',
+      type: 'textarea',
       required: true,
       admin: {
-        editorOptions: {
-          fontSize: 13,
-          lineNumbers: 'on',
+        description: 'Paste code here. Indentation is preserved.',
+        rows: 14,
+        style: {
+          fontFamily:
+            'ui-monospace, "JetBrains Mono", "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace',
+          fontSize: '13px',
+          lineHeight: '1.55',
+          whiteSpace: 'pre',
+          tabSize: 2,
         },
       },
     },
