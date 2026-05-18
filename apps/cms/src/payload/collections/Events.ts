@@ -134,6 +134,66 @@ export const Events: CollectionConfig = {
       },
     },
     {
+      name: 'ctaLabel',
+      type: 'text',
+      admin: {
+        description:
+          'Optional custom label for the registration CTA button. Defaults to "Register" when blank. Examples: "Join the Community", "RSVP", "Save Your Seat".',
+      },
+    },
+    {
+      name: 'postEventCta',
+      type: 'group',
+      admin: {
+        description:
+          'Optional CTA shown on the detail page after the event has ended (startsAt is in the past). The registration button is hidden automatically — use this for "View Photos", "Watch Recording", "View Slides", etc.',
+      },
+      fields: [
+        {
+          name: 'enabled',
+          type: 'checkbox',
+          defaultValue: false,
+          admin: { description: 'Enable to show a CTA on the detail page after the event ends.' },
+        },
+        {
+          name: 'label',
+          type: 'text',
+          admin: {
+            description: 'Button label, e.g. "Watch Recording".',
+            condition: (_data, sibling) => sibling?.enabled === true,
+          },
+          validate: (
+            value: string | string[] | null | undefined,
+            { siblingData }: { siblingData?: { enabled?: boolean } },
+          ): true | string => {
+            if (!siblingData?.enabled) return true;
+            if (typeof value !== 'string' || value.trim().length === 0) {
+              return 'Label is required when the post-event CTA is enabled.';
+            }
+            return true;
+          },
+        },
+        {
+          name: 'url',
+          type: 'text',
+          admin: {
+            description: 'Destination URL for the post-event CTA.',
+            condition: (_data, sibling) => sibling?.enabled === true,
+          },
+          validate: (
+            value: string | string[] | null | undefined,
+            { siblingData }: { siblingData?: { enabled?: boolean } },
+          ): true | string => {
+            if (!siblingData?.enabled) return true;
+            if (typeof value !== 'string' || value.trim().length === 0) {
+              return 'URL is required when the post-event CTA is enabled.';
+            }
+            return true;
+          },
+        },
+      ],
+    },
+    {
       name: 'eventStatus',
       type: 'select',
       defaultValue: 'scheduled',

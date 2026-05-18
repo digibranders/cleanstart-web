@@ -3532,6 +3532,27 @@ export interface Event {
   registrationForm?: (number | null) | Form;
   attendeesCap?: number | null;
   /**
+   * Optional custom label for the registration CTA button. Defaults to "Register" when blank. Examples: "Join the Community", "RSVP", "Save Your Seat".
+   */
+  ctaLabel?: string | null;
+  /**
+   * Optional CTA shown on the detail page after the event has ended (startsAt is in the past). The registration button is hidden automatically — use this for "View Photos", "Watch Recording", "View Slides", etc.
+   */
+  postEventCta?: {
+    /**
+     * Enable to show a CTA on the detail page after the event ends.
+     */
+    enabled?: boolean | null;
+    /**
+     * Button label, e.g. "Watch Recording".
+     */
+    label?: string | null;
+    /**
+     * Destination URL for the post-event CTA.
+     */
+    url?: string | null;
+  };
+  /**
    * Drives the Event JSON-LD eventStatus. Switching to Postponed / Cancelled is required so search engines stop showing the event as still happening.
    */
   eventStatus: 'scheduled' | 'postponed' | 'cancelled';
@@ -5225,9 +5246,8 @@ export interface Page {
                     | 'hcl'
                     | 'text';
                   /**
-                   * Optional filename rendered as a tab above the code (e.g. Dockerfile).
+                   * Paste code here. Indentation is preserved.
                    */
-                  filename?: string | null;
                   content: string;
                   showLineNumbers?: boolean | null;
                   /**
@@ -5998,9 +6018,8 @@ export interface Page {
               | 'hcl'
               | 'text';
             /**
-             * Optional filename rendered as a tab above the code (e.g. Dockerfile).
+             * Paste code here. Indentation is preserved.
              */
-            filename?: string | null;
             content: string;
             showLineNumbers?: boolean | null;
             /**
@@ -8284,6 +8303,14 @@ export interface EventsSelect<T extends boolean = true> {
   registrationUrl?: T;
   registrationForm?: T;
   attendeesCap?: T;
+  ctaLabel?: T;
+  postEventCta?:
+    | T
+    | {
+        enabled?: T;
+        label?: T;
+        url?: T;
+      };
   eventStatus?: T;
   cancelledAt?: T;
   previousStartDate?: T;
@@ -9070,7 +9097,6 @@ export interface PagesSelect<T extends boolean = true> {
                       | T
                       | {
                           language?: T;
-                          filename?: T;
                           content?: T;
                           showLineNumbers?: T;
                           highlightLines?: T;
@@ -9440,7 +9466,6 @@ export interface PagesSelect<T extends boolean = true> {
           | T
           | {
               language?: T;
-              filename?: T;
               content?: T;
               showLineNumbers?: T;
               highlightLines?: T;
