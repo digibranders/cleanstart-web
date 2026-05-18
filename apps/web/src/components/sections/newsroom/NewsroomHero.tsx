@@ -1,6 +1,3 @@
-const HERO_GRADIENT =
-  "linear-gradient(179.99deg, #151021 -25.7%, #10123e 41.22%, #131e8f 71.9%, #471ec0 85.41%, #471fc3 98.5%, rgba(70,30,191,0.85) 104.61%, rgba(66,30,188,0.4) 114.85%, rgba(66,30,188,0) 120.97%)";
-
 export function NewsroomHero(): React.ReactElement {
   return (
     <section
