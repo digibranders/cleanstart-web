@@ -4,6 +4,12 @@ export interface BuildCspOptions {
   nonce: string;
   isProduction: boolean;
   isDraftMode: boolean;
+  /**
+   * True when the request path is part of the preview surface
+   * (`/preview/*` or `/api/preview/*`). These routes need to be
+   * embeddable in the admin's Live Preview iframe.
+   */
+  isPreviewPath?: boolean;
 }
 
 const SENTRY_INGEST = "https://*.ingest.sentry.io";
@@ -12,14 +18,22 @@ const VERCEL_SCRIPTS = "https://va.vercel-scripts.com";
 const GA4_COLLECT = "https://www.google-analytics.com";
 const GA4_REGION = "https://*.analytics.google.com";
 
-// Frame-ancestors override applied only when the page is rendered through Live
-// Preview (draft mode). In every other case, embedding is denied.
+// Frame-ancestors override applied to preview surfaces (cookie-based
+// draft mode AND the new token-based `/preview/*` route). In every
+// other case, embedding is denied.
 const PREVIEW_FRAME_ANCESTORS = [
+  "'self'",
+  "http://localhost:3000",
   "https://cms.cleanstart.com",
   "https://admin.cleanstart.com",
 ];
 
-export function buildCsp({ nonce, isProduction, isDraftMode }: BuildCspOptions): string {
+export function buildCsp({
+  nonce,
+  isProduction,
+  isDraftMode,
+  isPreviewPath = false,
+}: BuildCspOptions): string {
   const scriptSrc = [
     "'self'",
     `'nonce-${nonce}'`,
@@ -55,7 +69,8 @@ export function buildCsp({ nonce, isProduction, isDraftMode }: BuildCspOptions):
     connectSrc.push("http://localhost:3000");
   }
 
-  const frameAncestors = isDraftMode ? PREVIEW_FRAME_ANCESTORS : ["'none'"];
+  const frameAncestors =
+    isDraftMode || isPreviewPath ? PREVIEW_FRAME_ANCESTORS : ["'none'"];
 
   const directives: Array<[string, string]> = [
     ["default-src", "'self'"],

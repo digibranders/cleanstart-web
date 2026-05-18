@@ -52,6 +52,9 @@ export async function proxy(request: NextRequest) {
   const host = headers.get("host");
   const isProduction = process.env.VERCEL_ENV === "production";
   const isDraftMode = request.cookies.has(DRAFT_BYPASS_COOKIE);
+  const isPreviewPath =
+    nextUrl.pathname.startsWith("/preview/") ||
+    nextUrl.pathname.startsWith("/api/preview/");
 
   // ---- 308 redirects (run before headers — saves work on the discarded response).
 
@@ -105,7 +108,7 @@ export async function proxy(request: NextRequest) {
     request: { headers: requestHeaders },
   });
 
-  const csp = buildCsp({ nonce, isProduction, isDraftMode });
+  const csp = buildCsp({ nonce, isProduction, isDraftMode, isPreviewPath });
   const cspHeaderName =
     CSP_MODE === "enforce"
       ? "Content-Security-Policy"
@@ -125,13 +128,26 @@ export async function proxy(request: NextRequest) {
     );
   }
   response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set(
-    "X-Frame-Options",
-    isDraftMode ? "SAMEORIGIN" : "DENY",
-  );
+  // For preview surfaces we rely on CSP `frame-ancestors` (which supports
+  // multiple origins including the cross-origin admin host); omit the
+  // legacy X-Frame-Options header so it doesn't override CSP with DENY.
+  // Modern browsers prefer frame-ancestors when both are present, but
+  // older ones (and proxies that strip CSP) may not — explicit omit is
+  // safer than "DENY but try to allow via CSP".
+  if (!isPreviewPath) {
+    response.headers.set(
+      "X-Frame-Options",
+      isDraftMode ? "SAMEORIGIN" : "DENY",
+    );
+  }
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   response.headers.set("Cross-Origin-Opener-Policy", "same-origin");
-  response.headers.set("Cross-Origin-Resource-Policy", "same-site");
+  // Preview pages are embedded by the cross-origin admin (different host)
+  // — set CORP to cross-origin so the admin iframe can render them.
+  response.headers.set(
+    "Cross-Origin-Resource-Policy",
+    isPreviewPath ? "cross-origin" : "same-site",
+  );
   response.headers.set("Permissions-Policy", PERMISSIONS_POLICY);
 
   if (isDraftMode || !isProduction) {
