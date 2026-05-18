@@ -73,6 +73,7 @@ export interface Config {
     brokenLinks: BrokenLink;
     'audit-log': AuditLog;
     searchLog: SearchLog;
+    previewAudit: PreviewAudit;
     webhooks_dead_letter: WebhooksDeadLetter;
     integrations: Integration;
     analyticsCache: AnalyticsCache;
@@ -108,6 +109,7 @@ export interface Config {
     brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
+    previewAudit: PreviewAuditSelect<false> | PreviewAuditSelect<true>;
     webhooks_dead_letter: WebhooksDeadLetterSelect<false> | WebhooksDeadLetterSelect<true>;
     integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
     analyticsCache: AnalyticsCacheSelect<false> | AnalyticsCacheSelect<true>;
@@ -169,6 +171,7 @@ export interface Config {
       drainLeadQueue: TaskDrainLeadQueue;
       purgeSearchLog: TaskPurgeSearchLog;
       purgeLeadsPii: TaskPurgeLeadsPii;
+      purgePreviewAudit: TaskPurgePreviewAudit;
       checkBrokenLinks: TaskCheckBrokenLinks;
       retryWebhook: TaskRetryWebhook;
       meiliReindex: TaskMeiliReindex;
@@ -458,6 +461,42 @@ export interface SearchLog {
    * User-Agent header. Trimmed at 200 chars.
    */
   userAgent?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Active and revoked preview-share links. Revoke a row to invalidate the link immediately.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "previewAudit".
+ */
+export interface PreviewAudit {
+  id: number;
+  /**
+   * Payload collection slug the token targets.
+   */
+  collection: string;
+  /**
+   * Doc id within the collection.
+   */
+  docId: string;
+  /**
+   * Editor who minted the link.
+   */
+  actor: number | User;
+  /**
+   * Optional human label, e.g. "Legal review – Q2 launch post".
+   */
+  label?: string | null;
+  /**
+   * TTL chosen at mint time.
+   */
+  ttlSeconds: number;
+  expiresAt: string;
+  /**
+   * Set this (or click Revoke in the row actions) to invalidate the link.
+   */
+  revokedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -6579,6 +6618,7 @@ export interface PayloadJob {
           | 'drainLeadQueue'
           | 'purgeSearchLog'
           | 'purgeLeadsPii'
+          | 'purgePreviewAudit'
           | 'checkBrokenLinks'
           | 'retryWebhook'
           | 'meiliReindex'
@@ -6624,6 +6664,7 @@ export interface PayloadJob {
         | 'drainLeadQueue'
         | 'purgeSearchLog'
         | 'purgeLeadsPii'
+        | 'purgePreviewAudit'
         | 'checkBrokenLinks'
         | 'retryWebhook'
         | 'meiliReindex'
@@ -6678,6 +6719,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'searchLog';
         value: number | SearchLog;
+      } | null)
+    | ({
+        relationTo: 'previewAudit';
+        value: number | PreviewAudit;
       } | null)
     | ({
         relationTo: 'webhooks_dead_letter';
@@ -6954,6 +6999,21 @@ export interface SearchLogSelect<T extends boolean = true> {
   locale?: T;
   ip?: T;
   userAgent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "previewAudit_select".
+ */
+export interface PreviewAuditSelect<T extends boolean = true> {
+  collection?: T;
+  docId?: T;
+  actor?: T;
+  label?: T;
+  ttlSeconds?: T;
+  expiresAt?: T;
+  revokedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -10607,6 +10667,14 @@ export interface TaskPurgeSearchLog {
  * via the `definition` "TaskPurgeLeadsPii".
  */
 export interface TaskPurgeLeadsPii {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPurgePreviewAudit".
+ */
+export interface TaskPurgePreviewAudit {
   input?: unknown;
   output?: unknown;
 }
