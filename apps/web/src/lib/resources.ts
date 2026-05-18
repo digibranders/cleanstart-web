@@ -34,7 +34,7 @@ export type ResourceDetail = Resource & {
   body?: import("./blog").LexicalRoot | null;
   heroImage?: ResourceImage | null;
   accessLevel?: "public" | "lead-gated" | "customer-only" | null;
-  gateForm?: { id: string } | null;
+  gateForm?: { id: string | number } | string | number | null;
 };
 
 type PayloadListResponse<T> = {

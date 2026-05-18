@@ -106,8 +106,8 @@ export default async function ResourceCenterPage({
                 {/* Right: 3-col grid */}
                 <ResourceGrid
                   resources={resourcesData.docs}
-                  hasMore={resourcesData.hasNextPage}
                   currentPage={page}
+                  totalPages={resourcesData.totalPages}
                   activeType={activeType}
                   searchQuery={searchQuery}
                 />
