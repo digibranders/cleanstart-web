@@ -20,33 +20,20 @@ export function PastEventsGrid({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ background: "#f6f6f6", paddingBottom: "120px" }}
+      style={{ background: "#f6f6f6", paddingBottom: "250px" }}
       data-section="PastEvents"
     >
-      {/* Decorative radial gradient blobs — Figma Union vectors */}
+      {/* Radial gradient blobs — mirrors LatestBlogs (blogs page) */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
         style={{
-          left: "-531px",
-          top: "-508px",
+          left: "-616px",
+          top: "1407px",
           width: "1181px",
           height: "1181px",
           background:
             "radial-gradient(ellipse 50% 50% at 50% 50%, #640dfb 0%, rgba(100,13,251,0) 100%)",
-          opacity: 0.08,
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute"
-        style={{
-          right: "-531px",
-          top: "-432px",
-          width: "1181px",
-          height: "1181px",
-          background:
-            "radial-gradient(ellipse 50% 50% at 50% 50%, #df9bff 0%, rgba(223,155,255,0) 100%)",
           opacity: 0.1,
         }}
       />
@@ -54,26 +41,59 @@ export function PastEventsGrid({
         aria-hidden
         className="pointer-events-none select-none absolute"
         style={{
-          left: "-435px",
-          bottom: "-508px",
+          left: "1238px",
+          top: "1512px",
           width: "1181px",
           height: "1181px",
           background:
-            "radial-gradient(ellipse 50% 50% at 50% 50%, #2cc1eb 0%, rgba(44,193,235,0) 100%)",
+            "radial-gradient(ellipse 50% 50% at 50% 50%, #640dfb 0%, rgba(100,13,251,0) 100%)",
           opacity: 0.1,
+        }}
+      />
+      {/* Gridlines SVG — fades inside the SVG via radial gradients */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute left-0 right-0 bottom-0 overflow-hidden"
+        style={{ height: "719px" }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/blogs/latest-blogs-gridlines.svg"
+          alt=""
+          aria-hidden
+          className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none select-none"
+          style={{ width: "1920px", height: "719px", maxWidth: "none" }}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      {/* Blur ellipses anchored to bottom — mirrors LatestBlogs */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute"
+        style={{
+          left: "-70px",
+          bottom: "0px",
+          width: "258px",
+          height: "258px",
+          borderRadius: "50%",
+          background: "#df9bff",
+          filter: "blur(121.5px)",
+          opacity: 0.8,
         }}
       />
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
         style={{
-          right: "-435px",
-          bottom: "-508px",
-          width: "1181px",
-          height: "1181px",
-          background:
-            "radial-gradient(ellipse 50% 50% at 50% 50%, #640dfb 0%, rgba(100,13,251,0) 100%)",
-          opacity: 0.08,
+          right: "-66px",
+          bottom: "0px",
+          width: "315px",
+          height: "315px",
+          borderRadius: "50%",
+          background: "#2cc1eb",
+          filter: "blur(101.5px)",
+          opacity: 0.2,
         }}
       />
 
@@ -102,12 +122,8 @@ export function PastEventsGrid({
         ) : (
           <>
             <div
-              className="grid justify-items-center"
-              style={{
-                gridTemplateColumns: "repeat(auto-fit, minmax(320px, 404px))",
-                gap: "32px",
-                justifyContent: "center",
-              }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center"
+              style={{ gap: "32px" }}
             >
               {events.map((event) => (
                 <EventCard key={event.id} event={event} />

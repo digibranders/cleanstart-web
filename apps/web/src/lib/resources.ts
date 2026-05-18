@@ -3,6 +3,8 @@
 
 import { cache } from "react";
 
+import { cmsBaseUrl, fetchCMS } from "./cms-fetch";
+
 export type ResourceType =
   | "whitepaper"
   | "ebook"
@@ -46,18 +48,10 @@ type PayloadListResponse<T> = {
   totalPages: number;
 };
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
-
 export function mediaUrl(url: string | undefined | null): string | undefined {
   if (!url) return undefined;
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return `${CMS_URL}${url}`;
-}
-
-async function fetchCMS<T>(path: string): Promise<T> {
-  const res = await fetch(`${CMS_URL}${path}`, { next: { revalidate: 60 } });
-  if (!res.ok) throw new Error(`CMS fetch failed: ${res.status} ${path}`);
-  return res.json() as Promise<T>;
+  return `${cmsBaseUrl()}${url}`;
 }
 
 const PUBLISHED_FILTER =
@@ -89,97 +83,30 @@ export async function getResources({
   );
 }
 
+async function loadResourceBySlug(slug: string, draft = false): Promise<ResourceDetail | null> {
+  const filter = draft ? "" : `&${PUBLISHED_FILTER}`;
+  const data = await fetchCMS<PayloadListResponse<ResourceDetail>>(
+    `/api/resources?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=3&limit=1`,
+    { draft },
+  );
+  return data.docs[0] ?? null;
+}
+
 export const getResourceBySlug = cache(
-  async (slug: string): Promise<ResourceDetail | null> => {
-    const data = await fetchCMS<PayloadListResponse<ResourceDetail>>(
-      `/api/resources?where[slug][equals]=${encodeURIComponent(slug)}&${PUBLISHED_FILTER}&depth=3&limit=1`,
-    );
-    return data.docs[0] ?? null;
-  },
+  async (slug: string): Promise<ResourceDetail | null> => loadResourceBySlug(slug, false),
 );
 
-/** Human-readable label for a resource type. */
-export function resourceTypeLabel(type: ResourceType | null | undefined): string {
-  switch (type) {
-    case "whitepaper":
-      return "Whitepaper";
-    case "ebook":
-      return "Ebook";
-    case "datasheet":
-      return "Datasheet";
-    case "architecture-insights":
-      return "Architecture Insights";
-    case "report":
-      return "Report";
-    default:
-      return "Resource";
-  }
+/** Draft variant for the `/preview/resources/[slug]` route. Not cached. */
+export async function getResourceBySlugDraft(slug: string): Promise<ResourceDetail | null> {
+  return loadResourceBySlug(slug, true);
 }
 
-/** CTA copy for a resource card / download button. */
-export function resourceCtaLabel(
-  type: ResourceType | null | undefined,
-  overrideText?: string | null,
-): string {
-  if (overrideText) return overrideText;
-  switch (type) {
-    case "whitepaper":
-      return "Get the Whitepaper";
-    case "ebook":
-      return "Get the Ebook";
-    case "datasheet":
-      return "Get the Datasheet";
-    case "architecture-insights":
-      return "Read the Insights";
-    case "report":
-      return "Read the Report";
-    default:
-      return "Get the Resource";
-  }
-}
-
-/** Mapped cover poster for a resource type. Used when the CMS has no per-resource cover image. */
-export function resourceCoverPoster(
-  type: ResourceType | null | undefined,
-): string {
-  switch (type) {
-    case "ebook":
-      return "/images/resource-center/cover-poster/ebook-cover.png";
-    case "datasheet":
-    case "report":
-      return "/images/resource-center/cover-poster/datasheet-report.png";
-    case "whitepaper":
-      return "/images/resource-center/cover-poster/datasheet-cover.png";
-    default:
-      return "/images/resource-center/cover-poster/architecture-insights.png";
-  }
-}
-
-/** "Get the Complete [Type]" label for detail page lead-capture heading. */
-export function resourceLeadCaptureHeading(
-  type: ResourceType | null | undefined,
-): string {
-  switch (type) {
-    case "whitepaper":
-      return "Get the Complete Whitepaper";
-    case "ebook":
-      return "Get the Complete Ebook";
-    case "datasheet":
-      return "Get the Complete Datasheet";
-    case "architecture-insights":
-      return "Read the Full Insights";
-    case "report":
-      return "Get the Complete Report";
-    default:
-      return "Get the Complete Resource";
-  }
-}
-
-/** All filterable types in sidebar order, matching the live site. */
-export const RESOURCE_TYPES: Array<{ value: ResourceType; label: string }> = [
-  { value: "whitepaper", label: "Whitepaper" },
-  { value: "ebook", label: "Ebook" },
-  { value: "datasheet", label: "Datasheet" },
-  { value: "architecture-insights", label: "Architecture Insights" },
-  { value: "report", label: "Report" },
-];
+// Client-safe helpers live in `resources-utils.ts`. Re-exported here
+// for backward compatibility with existing consumers.
+export {
+  RESOURCE_TYPES,
+  resourceCoverPoster,
+  resourceCtaLabel,
+  resourceLeadCaptureHeading,
+  resourceTypeLabel,
+} from "./resources-utils";

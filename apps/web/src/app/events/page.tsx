@@ -3,6 +3,7 @@ import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
 import { UpcomingEventHero } from "@/components/sections/events/UpcomingEventHero";
 import { PastEventsGrid } from "@/components/sections/events/PastEventsGrid";
+import { EventsCTA } from "@/components/sections/events/EventsCTA";
 import { FadeUp } from "@/components/ui/FadeUp";
 import {
   getUpcomingEvents,
@@ -50,7 +51,7 @@ export default async function EventsPage({
 
   const [upcoming, past] = await Promise.all([
     getUpcomingEvents({ limit: 1 }).catch(emptyList),
-    getPastEvents({ page, limit: 12 }).catch(emptyList),
+    getPastEvents({ page, limit: 9 }).catch(emptyList),
   ]);
 
   const upcomingEvent = upcoming.docs[0] ?? null;
@@ -75,7 +76,7 @@ export default async function EventsPage({
           />
         </FadeUp>
       </main>
-      <Footer />
+      <Footer cta={<EventsCTA />} />
     </>
   );
 }

@@ -33,15 +33,23 @@ export function WebinarsGrid({
 }: WebinarsGridProps): React.ReactElement {
   return (
     <section
-      className="relative overflow-hidden"
-      style={{ background: "#F6F6F6", paddingTop: "72px", paddingBottom: "250px" }}
+      className="relative"
+      style={{
+        background: "#F6F6F6",
+        paddingTop: "72px",
+        paddingBottom: "250px",
+        overflowX: "clip",
+      }}
       data-section="WebinarsGrid"
     >
       {/* Figma bg gridlines — two radial-gradient grids (purple #640DFB @10%)
           fading from top-left and top-right corners. The fade is baked into
           the SVG via two radialGradient fills (centers (59.5,82.5) and
           (1746.5,158.5), r=590.5). Render at intrinsic 1922×749, anchored
-          top-center so the corner blobs sit where Figma placed them. */}
+          top-center so the corner blobs sit where Figma placed them.
+          NOTE: section uses overflow-x: clip (not overflow: hidden) so
+          `position: sticky` on the filter sidebar still tracks the window
+          scroll instead of being trapped inside a scroll container. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute top-0 left-1/2 -translate-x-1/2"
@@ -60,55 +68,46 @@ export function WebinarsGrid({
       </div>
 
       <div className="relative mx-auto max-w-[1276px] px-6">
-        <div
-          className="grid"
-          style={{
-            gridTemplateColumns: "minmax(0, 1fr)",
-            gap: "32px",
-          }}
-        >
-          <div className="lg:grid lg:gap-8" style={lgGrid}>
-            <div className="lg:sticky" style={{ alignSelf: "start", top: "96px" }}>
-              <WebinarFilters
-                activeType={activeType}
-                activeRegion={activeRegion}
-              />
-            </div>
+        <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8">
+          <aside
+            className="shrink-0 lg:sticky"
+            style={{ top: "88px", alignSelf: "flex-start" }}
+          >
+            <WebinarFilters
+              activeType={activeType}
+              activeRegion={activeRegion}
+            />
+          </aside>
 
-            <div>
-              {items.length === 0 ? (
-                <p
-                  className="font-sans text-center py-20"
-                  style={{ color: "rgba(17,17,17,0.54)", fontSize: "1.125rem" }}
+          <div className="flex-1 min-w-0">
+            {items.length === 0 ? (
+              <p
+                className="font-sans text-center py-20"
+                style={{ color: "rgba(17,17,17,0.54)", fontSize: "1.125rem" }}
+              >
+                No webinars match these filters yet.
+              </p>
+            ) : (
+              <>
+                <div
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center lg:justify-items-stretch"
+                  style={{ gap: "24px" }}
                 >
-                  No webinars match these filters yet.
-                </p>
-              ) : (
-                <>
-                  <div
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center lg:justify-items-stretch"
-                    style={{ gap: "24px" }}
-                  >
-                    {items.map((item) => (
-                      <WebinarCard key={item.id} item={item} />
-                    ))}
-                  </div>
+                  {items.map((item) => (
+                    <WebinarCard key={item.id} item={item} />
+                  ))}
+                </div>
 
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    buildHref={(p) => buildPageHref(p, activeType, activeRegion)}
-                  />
-                </>
-              )}
-            </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  buildHref={(p) => buildPageHref(p, activeType, activeRegion)}
+                />
+              </>
+            )}
           </div>
         </div>
       </div>
     </section>
   );
 }
-
-const lgGrid: React.CSSProperties = {
-  gridTemplateColumns: "299px minmax(0, 1fr)",
-};

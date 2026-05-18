@@ -1,5 +1,7 @@
 import { cache } from "react";
 
+import { cmsBaseUrl, fetchCMS } from "./cms-fetch";
+
 export type BlogCategory = {
   id: string;
   name: string;
@@ -202,15 +204,12 @@ type PayloadListResponse<T> = {
   totalPages: number;
 };
 
-const CMS_URL =
-  process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
-
 // Payload returns relative URLs (e.g. /api/media/file/...) when serverURL isn't set.
 // Prefix them so Next.js Image can resolve them against the CMS host, not the web app.
 export function mediaUrl(url: string | undefined | null): string | undefined {
   if (!url) return undefined;
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return `${CMS_URL}${url}`;
+  return `${cmsBaseUrl()}${url}`;
 }
 
 // Prefer a generated size variant when present. Payload's Media collection
@@ -228,16 +227,6 @@ export function pickImageUrl(
     if (sized) return mediaUrl(sized);
   }
   return mediaUrl(image.url);
-}
-
-async function fetchCMS<T>(path: string): Promise<T> {
-  const res = await fetch(`${CMS_URL}${path}`, {
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) {
-    throw new Error(`CMS fetch failed: ${res.status} ${path}`);
-  }
-  return res.json() as Promise<T>;
 }
 
 const PUBLISHED_FILTER =
@@ -290,40 +279,64 @@ export async function getBlogCategories(): Promise<BlogCategory[]> {
   return data.docs;
 }
 
-export const getBlogBySlug = cache(
-  async (slug: string): Promise<BlogDetail | null> => {
-    const data = await fetchCMS<PayloadListResponse<BlogDetail>>(
-      `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&${PUBLISHED_FILTER}&depth=3&limit=1`,
-    );
-    const post = data.docs[0] ?? null;
-    if (!post) return null;
+// Shared loader. When `draft` is true, the published-status filter is dropped
+// on the CMS side (via `cms-fetch`) and authenticated draft reads are returned.
+async function loadBlogBySlug(slug: string, draft = false): Promise<BlogDetail | null> {
+  // In draft mode we cannot use the PUBLISHED_FILTER (it would hide drafts) —
+  // `cms-fetch` strips it, but to keep the URL identical between modes we just
+  // omit it here. Published reads still get the filter from PUBLISHED_FILTER.
+  const filter = draft ? "" : `&${PUBLISHED_FILTER}`;
+  const data = await fetchCMS<PayloadListResponse<BlogDetail>>(
+    `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=3&limit=1`,
+    { draft },
+  );
+  const post = data.docs[0] ?? null;
+  if (!post) return null;
 
-    // Payload's R2/S3 storage adapter does not populate `url` for upload fields
-    // nested beyond depth=1 (blog → author → photo). Re-fetch authors directly
-    // at depth=1 so their photo.url is properly resolved.
-    if (post.authors && post.authors.length > 0) {
-      const idParams = post.authors
-        .map((a, i) => `where[id][in][${i}]=${encodeURIComponent(a.id)}`)
-        .join("&");
-      try {
-        const authorsData = await fetchCMS<PayloadListResponse<BlogAuthor>>(
-          `/api/authors?${idParams}&depth=1&limit=10`,
-        );
-        const authorMap = new Map(authorsData.docs.map((a) => [a.id, a]));
-        post.authors = post.authors.map((a) => authorMap.get(a.id) ?? a);
-      } catch {
-        // Non-fatal: fall back to the authors already embedded in the post
-      }
+  // Payload's R2/S3 storage adapter does not populate `url` for upload fields
+  // nested beyond depth=1 (blog → author → photo). Re-fetch authors directly
+  // at depth=1 so their photo.url is properly resolved.
+  if (post.authors && post.authors.length > 0) {
+    const idParams = post.authors
+      .map((a, i) => `where[id][in][${i}]=${encodeURIComponent(a.id)}`)
+      .join("&");
+    try {
+      const authorsData = await fetchCMS<PayloadListResponse<BlogAuthor>>(
+        `/api/authors?${idParams}&depth=1&limit=10`,
+        { draft },
+      );
+      const authorMap = new Map(authorsData.docs.map((a) => [a.id, a]));
+      post.authors = post.authors.map((a) => authorMap.get(a.id) ?? a);
+    } catch {
+      // Non-fatal: fall back to the authors already embedded in the post
     }
+  }
 
-    return post;
-  },
+  return post;
+}
+
+export const getBlogBySlug = cache(
+  async (slug: string): Promise<BlogDetail | null> => loadBlogBySlug(slug, false),
 );
 
-export async function getRelatedBlogs(blogId: string, categoryIds: string[]): Promise<Blog[]> {
+/**
+ * Draft variant for the `/preview/blogs/[slug]` route. Not cached — every
+ * preview render re-fetches so the editor sees their latest save immediately.
+ */
+export async function getBlogBySlugDraft(slug: string): Promise<BlogDetail | null> {
+  return loadBlogBySlug(slug, true);
+}
+
+export async function getRelatedBlogs(
+  blogId: string,
+  categoryIds: string[],
+  { draft = false }: { draft?: boolean } = {},
+): Promise<Blog[]> {
+  const filter = draft ? "" : `${PUBLISHED_FILTER}&`;
   if (categoryIds.length === 0) {
     const data = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?${PUBLISHED_FILTER}&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
+      `/api/blogs?${filter}where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
+      { draft },
     );
     return data.docs;
   }
@@ -331,11 +344,13 @@ export async function getRelatedBlogs(blogId: string, categoryIds: string[]): Pr
     .map((id, i) => `where[categories][in][${i}]=${encodeURIComponent(id)}`)
     .join("&");
   const data = await fetchCMS<PayloadListResponse<Blog>>(
-    `/api/blogs?${PUBLISHED_FILTER}&where[id][not_equals]=${blogId}&${catParam}&depth=2&limit=3&sort=-publishedAt`,
+    `/api/blogs?${filter}where[id][not_equals]=${blogId}&${catParam}&depth=2&limit=3&sort=-publishedAt`,
+    { draft },
   );
   if (data.docs.length < 3) {
     const fallback = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?${PUBLISHED_FILTER}&where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
+      `/api/blogs?${filter}where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
+      { draft },
     );
     return fallback.docs;
   }

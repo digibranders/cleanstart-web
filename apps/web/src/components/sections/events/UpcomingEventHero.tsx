@@ -4,7 +4,7 @@ import { type Event, formatEventDate } from "@/lib/events";
 import { mediaUrl } from "@/lib/blog";
 
 const HERO_GRADIENT =
-  "linear-gradient(180deg, #151021 0%, #10123E 45%, #131E8F 66%, #471EC0 75%, #471FC3 84%, rgba(70,30,191,0.85) 88%, rgba(66,30,188,0.40) 95%, rgba(66,30,188,0) 99%)";
+  "linear-gradient(180deg, #151021 0%, #10123E 45%, #131E8F 66%, #471EC0 75%, #471FC3 100%)";
 
 const DATE_CHIP_GRADIENT =
   "linear-gradient(93.21deg, #9A51FF 18.08%, #2CC1EB 286.32%)";
@@ -324,18 +324,35 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
 function EmptyHeroCard(): React.ReactElement {
   return (
     <div
-      className="relative w-full mx-auto flex items-center justify-center text-center"
+      className="relative w-full mx-auto overflow-visible"
       style={{
         maxWidth: "1276px",
         height: "368px",
         borderRadius: "20px",
-        background:
-          "linear-gradient(135deg, rgba(89,73,217,0.55) 0%, rgba(61,45,174,0.55) 60%, rgba(42,27,107,0.55) 100%)",
-        boxShadow: "0 30px 60px rgba(20,12,60,0.45)",
-        padding: "32px",
+        background: "rgba(165, 103, 255, 0.4)",
+        backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
+        boxShadow:
+          "0 30px 60px rgba(20,12,60,0.45), 0 0 0 1px rgba(255,255,255,0.12) inset",
       }}
     >
-      <div className="flex flex-col items-center" style={{ gap: "12px" }}>
+      {/* Noise texture overlay — matches Figma "Noise" effect (same as FeaturedEventCard) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          borderRadius: "20px",
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='2' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
+          backgroundSize: "120px 120px",
+          opacity: 0.55,
+        }}
+      />
+
+      <div
+        className="relative flex h-full flex-col items-center justify-center text-center"
+        style={{ padding: "32px", gap: "12px" }}
+      >
         <p
           className="font-display font-semibold text-white"
           style={{

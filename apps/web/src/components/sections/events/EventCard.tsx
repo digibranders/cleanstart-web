@@ -115,7 +115,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
             src="/images/events/icon-location.svg"
             alt=""
             aria-hidden
-            width={20}
+            width={18}
             height={20}
             className="pointer-events-none select-none"
             loading="lazy"

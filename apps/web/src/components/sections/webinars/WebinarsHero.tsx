@@ -124,7 +124,7 @@ export function WebinarsHero(): React.ReactElement {
               className="bg-clip-text text-transparent"
               style={{
                 backgroundImage:
-                  "linear-gradient(95deg, #7FAAFF 0%, #33BAEC 100%)",
+                  "linear-gradient(101.688deg, #9A51FF 1.758%, #2CC1EB 98.781%)",
               }}
             >
               Webinar

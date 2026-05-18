@@ -85,13 +85,13 @@ export function LatestBlogs({
         />
       </div>
 
-      {/* Blur ellipses — Figma Ellipse 46683 left (-70,1946) 258×258 #DF9BFF blur:121.5px op:80%, Ellipse 46692 right (1671,1895) 315×315 #2CC1EB blur:101.5px op:20% */}
+      {/* Blur ellipses — Figma Ellipse 46683 left 258×258 #DF9BFF blur:121.5px op:80%, Ellipse 46692 right 315×315 #2CC1EB blur:101.5px op:20%. Anchored to section bottom so they sit just above the CTA/footer regardless of card-grid height. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
         style={{
           left: "-70px",
-          top: "1946px",
+          bottom: "0px",
           width: "258px",
           height: "258px",
           borderRadius: "50%",
@@ -104,8 +104,8 @@ export function LatestBlogs({
         aria-hidden
         className="pointer-events-none select-none absolute"
         style={{
-          left: "1671px",
-          top: "1895px",
+          right: "-66px",
+          bottom: "0px",
           width: "315px",
           height: "315px",
           borderRadius: "50%",

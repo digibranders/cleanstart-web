@@ -4,6 +4,7 @@ import {
   regionLabel,
   type Webinar,
 } from "@/lib/webinars";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 interface WebinarCardProps {
   item: Webinar;
@@ -19,8 +20,21 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
   const imageUrl = item.heroImage?.url ?? FALLBACK_IMAGE;
   const imageAlt = item.heroImage?.alt ?? item.title;
 
-  const cardBody = (
-    <>
+  return (
+    <article
+      className="block group webinar-card relative"
+      style={{
+        width: "100%",
+        maxWidth: "295px",
+        minHeight: "420px",
+        borderRadius: "16px",
+        background: "#FFFFFF",
+        border: "1px solid #F1F5F9",
+        boxShadow: "0 4px 24px rgba(15,23,42,0.06)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <div
         className="relative overflow-hidden"
         style={{
@@ -37,39 +51,21 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
           sizes="(max-width: 768px) 100vw, 295px"
           className="object-cover"
         />
-        {date && (
-          <span
-            className="absolute inline-flex flex-col"
-            style={{
-              top: "12px",
-              left: "12px",
-              padding: "6px 12px 4px",
-              borderRadius: "999px",
-              background: "#EDE9FE",
-              color: "#5B33F3",
-              fontSize: "13px",
-              fontWeight: 600,
-              lineHeight: 1.2,
-              gap: "2px",
-            }}
-          >
-            {date}
-            <span
-              aria-hidden
-              style={{
-                width: "32px",
-                height: "3px",
-                borderRadius: "2px",
-                background: "rgba(91,51,243,0.25)",
-              }}
-            />
-          </span>
-        )}
       </div>
+
+      {/* Date badge — overlaps the bottom of the cover image, mirrors blog card pattern */}
+      {date && (
+        <div
+          className="absolute"
+          style={{ top: "140px", left: "24px", zIndex: 1 }}
+        >
+          <CategoryBadge label={date} />
+        </div>
+      )}
 
       <div
         className="flex flex-col"
-        style={{ padding: "20px 20px 20px", gap: "12px", flex: 1 }}
+        style={{ padding: "28px 20px 20px", gap: "12px", flex: 1 }}
       >
         <h3
           className="font-display line-clamp-3"
@@ -85,7 +81,17 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
         </h3>
 
         <div className="flex items-center gap-2" style={{ marginTop: "auto" }}>
-          <GlobeIcon />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/events/icon-location.svg"
+            alt=""
+            aria-hidden
+            width={16}
+            height={18}
+            className="pointer-events-none select-none shrink-0"
+            loading="lazy"
+            decoding="async"
+          />
           <span
             className="font-sans"
             style={{ fontSize: "14px", color: "#475569", fontWeight: 500 }}
@@ -94,81 +100,44 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
           </span>
         </div>
 
-        <span
-          className="inline-flex items-center justify-center gap-2 font-sans font-medium"
-          style={{
-            height: "45px",
-            borderRadius: "12px",
-            background: hasLink ? "#1F50FF" : "#94A3B8",
-            color: "#FFFFFF",
-            fontSize: "15px",
-            transition: "background 120ms",
-            opacity: hasLink ? 1 : 0.6,
-          }}
-        >
-          Register
-          <ArrowRightIcon />
-        </span>
+        {hasLink ? (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Register for ${item.title}`}
+            className="inline-flex items-center justify-center gap-2 font-sans font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5B33F3] focus-visible:ring-offset-2 transition-[background,opacity] hover:opacity-90"
+            style={{
+              height: "45px",
+              borderRadius: "12px",
+              background: "#1F50FF",
+              color: "#FFFFFF",
+              fontSize: "15px",
+            }}
+          >
+            Register
+            <ArrowRightIcon />
+          </a>
+        ) : (
+          <span
+            aria-disabled="true"
+            className="inline-flex items-center justify-center gap-2 font-sans font-medium select-none"
+            style={{
+              height: "45px",
+              borderRadius: "12px",
+              background: "#94A3B8",
+              color: "#FFFFFF",
+              fontSize: "15px",
+              opacity: 0.6,
+              cursor: "not-allowed",
+            }}
+          >
+            Register
+            <ArrowRightIcon />
+          </span>
+        )}
       </div>
-    </>
-  );
-
-  const wrapperStyle: React.CSSProperties = {
-    width: "100%",
-    maxWidth: "295px",
-    minHeight: "420px",
-    borderRadius: "16px",
-    background: "#FFFFFF",
-    border: "1px solid #F1F5F9",
-    boxShadow: "0 4px 24px rgba(15,23,42,0.06)",
-    display: "flex",
-    flexDirection: "column",
-    overflow: "hidden",
-  };
-
-  if (!hasLink) {
-    return (
-      <article
-        aria-disabled="true"
-        className="block group webinar-card webinar-card--disabled"
-        style={wrapperStyle}
-      >
-        {cardBody}
-      </article>
-    );
-  }
-
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`Register for ${item.title}`}
-      className="block group webinar-card transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5B33F3] focus-visible:ring-offset-2"
-      style={wrapperStyle}
-    >
-      {cardBody}
-    </a>
-  );
-}
-
-function GlobeIcon(): React.ReactElement {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden
-      style={{ color: "#475569", flexShrink: 0 }}
-    >
-      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.3" />
-      <path
-        d="M8 2c1.6 2 1.6 10 0 12M8 2c-1.6 2-1.6 10 0 12M2 8h12"
-        stroke="currentColor"
-        strokeWidth="1.3"
-      />
-    </svg>
+    </article>
   );
 }
 

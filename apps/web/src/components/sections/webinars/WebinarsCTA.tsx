@@ -3,10 +3,11 @@
 import { useRef, useState } from "react";
 
 /**
- * Inner content for the Blogs/News/Webinars newsletter CTA, rendered inside
- * the Footer's fixed 1276×330 / radius-40 slot.
+ * Newsletter CTA for the Webinars page — "Get notified about our upcoming webinar".
+ * Rendered inside the Footer's fixed 1276×330 / radius-40 slot.
+ * Mirrors BlogsCTA structure and styling for visual consistency.
  */
-export function BlogsCTA(): React.ReactElement {
+export function WebinarsCTA(): React.ReactElement {
   const emailRef = useRef<HTMLInputElement>(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -84,7 +85,7 @@ export function BlogsCTA(): React.ReactElement {
               width: "401px",
             }}
           >
-            Stay Ahead of Container Security Threats
+            Get notified about our upcoming webinar.
           </div>
 
           <div
@@ -95,8 +96,8 @@ export function BlogsCTA(): React.ReactElement {
               className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white"
               style={{ opacity: 0.8 }}
             >
-              Get the latest research, insights, and updates straight to your
-              inbox
+              Subscribe to get invites to our next live session and on-demand
+              releases delivered to your inbox.
             </p>
 
             {submitted ? (
@@ -110,7 +111,7 @@ export function BlogsCTA(): React.ReactElement {
               <form
                 onSubmit={handleSubmit}
                 className="relative flex items-center"
-                aria-label="Newsletter subscription"
+                aria-label="Webinars newsletter subscription"
               >
                 <div
                   className="relative overflow-hidden"
