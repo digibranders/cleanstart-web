@@ -4,7 +4,11 @@ import type { Metadata } from "next";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
 import { EventDetailHero } from "@/components/sections/events/EventDetailHero";
-import { getEventBySlug, formatEventDate } from "@/lib/events";
+import {
+  formatEventDate,
+  getEventBySlug,
+  getEventBySlugDraft,
+} from "@/lib/events";
 import { mediaUrl } from "@/lib/blog";
 import { RenderLexical } from "@/lib/renderLexical";
 import { buildPageMetadata, absoluteUrl } from "@/lib/seo/canonical";
@@ -90,11 +94,14 @@ function eventJsonLd(event: {
   };
 }
 
-export default async function EventDetailPage({
-  params,
-}: EventDetailPageProps): Promise<React.ReactElement> {
-  const { slug } = await params;
-  const event = await getEventBySlug(slug);
+export async function renderEventDetail({
+  slug,
+  draft = false,
+}: {
+  slug: string;
+  draft?: boolean;
+}): Promise<React.ReactElement> {
+  const event = draft ? await getEventBySlugDraft(slug) : await getEventBySlug(slug);
   if (!event) notFound();
 
   const heroImg = mediaUrl(event.heroImage?.url);
@@ -222,4 +229,11 @@ export default async function EventDetailPage({
       <Footer />
     </>
   );
+}
+
+export default async function EventDetailPage({
+  params,
+}: EventDetailPageProps): Promise<React.ReactElement> {
+  const { slug } = await params;
+  return renderEventDetail({ slug });
 }

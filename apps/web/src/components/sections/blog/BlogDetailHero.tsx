@@ -49,7 +49,7 @@ export function BlogDetailHero({
           {readingMinutes != null && (
             <div className="flex items-center gap-[8px] shrink-0 text-white">
               <ClockIcon />
-              <span className="whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-medium leading-none tracking-[-0.05em]">
+              <span className="whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-normal leading-none tracking-[-0.05em]">
                 {readingMinutes} min read
               </span>
             </div>
@@ -74,7 +74,7 @@ export function BlogDetailHero({
                   aria-hidden
                 />
               )}
-              <span className="text-white whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-medium leading-[1.3]">
+              <span className="text-white whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-normal leading-[1.3]">
                 By {primaryAuthor.name}
               </span>
             </div>
@@ -94,7 +94,7 @@ export function BlogDetailHero({
                 </span>{" "}
                 <time
                   dateTime={showUpdated && updatedAt ? updatedAt : publishedAt}
-                  className="text-white text-[clamp(0.875rem,1.4vw,1.25rem)] font-semibold"
+                  className="text-white text-[clamp(0.875rem,1.4vw,1.25rem)] font-normal"
                 >
                   {formatBlogDate(showUpdated && updatedAt ? updatedAt : publishedAt)}
                 </time>

@@ -1,11 +1,8 @@
 "use client";
 
 import { useCallback } from "react";
-import {
-  type PressType,
-  formatNewsDate,
-  pressTypeLabel,
-} from "@/lib/news";
+import type { PressType } from "@/lib/news";
+import { formatNewsDate, pressTypeLabel } from "@/lib/news-utils";
 import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
 import { CalendarIcon } from "@/components/sections/_shared/DetailHeroIcons";
 

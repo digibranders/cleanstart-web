@@ -6,7 +6,12 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { ResourceDetailHero } from "@/components/sections/resource/ResourceDetailHero";
 import { ResourceDetailContent } from "@/components/sections/resource/ResourceDetailContent";
 import { ResourceDetailLeadCapture } from "@/components/sections/resource/ResourceDetailLeadCapture";
-import { getResourceBySlug, mediaUrl, resourceTypeLabel } from "@/lib/resources";
+import {
+  getResourceBySlug,
+  getResourceBySlugDraft,
+  mediaUrl,
+  resourceTypeLabel,
+} from "@/lib/resources";
 import { highlightLexical } from "@/lib/highlightLexical";
 import { getFormById, type Form } from "@/lib/forms";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -55,11 +60,16 @@ export async function generateMetadata({
   });
 }
 
-export default async function ResourceDetailPage({
-  params,
-}: ResourceDetailPageProps): Promise<React.ReactElement> {
-  const { slug } = await params;
-  const resource = await getResourceBySlug(slug).catch(() => null);
+export async function renderResourceDetail({
+  slug,
+  draft = false,
+}: {
+  slug: string;
+  draft?: boolean;
+}): Promise<React.ReactElement> {
+  const resource = draft
+    ? await getResourceBySlugDraft(slug).catch(() => null)
+    : await getResourceBySlug(slug).catch(() => null);
   if (!resource) notFound();
 
   const assetAbsolute = mediaUrl(resource.asset?.url);
@@ -118,4 +128,11 @@ export default async function ResourceDetailPage({
       <Footer cta={<ResourceDetailLeadCapture resource={resource} />} />
     </>
   );
+}
+
+export default async function ResourceDetailPage({
+  params,
+}: ResourceDetailPageProps): Promise<React.ReactElement> {
+  const { slug } = await params;
+  return renderResourceDetail({ slug });
 }

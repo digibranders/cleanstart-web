@@ -1,5 +1,7 @@
 // Forms data layer — mirrors lib/resources.ts.
 
+import { fetchCMS } from "./cms-fetch";
+
 export type FormFieldType =
   | "text"
   | "email"
@@ -62,15 +64,9 @@ export interface Form {
   schemaVersion: number;
 }
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
-
 export async function getFormById(id: string | number): Promise<Form | null> {
   try {
-    const res = await fetch(`${CMS_URL}/api/forms/${id}?depth=1`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as Form;
+    return await fetchCMS<Form>(`/api/forms/${id}?depth=1`);
   } catch {
     return null;
   }

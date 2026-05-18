@@ -1,6 +1,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getBlogBySlug, getRelatedBlogs, mediaUrl } from "@/lib/blog";
+import {
+  getBlogBySlug,
+  getBlogBySlugDraft,
+  getRelatedBlogs,
+  mediaUrl,
+} from "@/lib/blog";
 import { highlightLexical } from "@/lib/highlightLexical";
 import { Header } from "@/components/sections/Header";
 import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
@@ -58,15 +63,20 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
   });
 }
 
-export default async function BlogDetailPage({ params }: BlogDetailPageProps): Promise<React.ReactElement> {
-  const { slug } = await params;
-  const post = await getBlogBySlug(slug);
+export async function renderBlogDetail({
+  slug,
+  draft = false,
+}: {
+  slug: string;
+  draft?: boolean;
+}): Promise<React.ReactElement> {
+  const post = draft ? await getBlogBySlugDraft(slug) : await getBlogBySlug(slug);
 
   if (!post) notFound();
 
   const categoryIds = post.categories ? [post.categories.id] : [];
   const [relatedPosts, highlightedBody] = await Promise.all([
-    getRelatedBlogs(post.id, categoryIds),
+    getRelatedBlogs(post.id, categoryIds, { draft }),
     highlightLexical(post.body),
   ]);
 
@@ -126,7 +136,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
             block). Each branch budgets exactly that, accounting for the
             internal pb already provided by the last rendered section. */}
         {relatedPosts.length > 0 ? (
-          <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)", paddingBottom: "250px" }}>
+          <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)", paddingBottom: "230px" }}>
             <BlogDetailRelatedPosts posts={relatedPosts} />
           </div>
         ) : post.faqs && post.faqs.length > 0 ? (
@@ -142,4 +152,9 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
       <Footer cta={<BlogDetailCTA />} />
     </>
   );
+}
+
+export default async function BlogDetailPage({ params }: BlogDetailPageProps): Promise<React.ReactElement> {
+  const { slug } = await params;
+  return renderBlogDetail({ slug });
 }

@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { RenderLexical } from "@/lib/renderLexical";
+import { RenderLexical, slugifyText } from "@/lib/renderLexical";
 import type { LexicalRoot, TocEntry, BlogImage } from "@/lib/blog";
 
 interface BlogDetailContentProps {
@@ -98,33 +98,39 @@ const HEADER_OFFSET = 88; // fixed header height (72px) + 16px buffer
 type RenderedTocEntry = TocEntry & { level: number; text: string };
 
 function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): React.ReactElement | null {
-  // Track by index across all rendered heading levels — Payload's anchor slug and
-  // renderLexical's slug aren't guaranteed to agree, so positional matching is load-bearing.
-  const [activeIdx, setActiveIdx] = useState<number>(0);
+  const [activeId, setActiveId] = useState<string>("");
 
-  const entries: RenderedTocEntry[] = (toc ?? []).filter(
-    (e): e is RenderedTocEntry =>
-      !!e?.text && typeof e.level === "number" && e.level >= 2 && e.level <= 4,
-  );
-
-  const levels = Array.from(new Set(entries.map((e) => e.level))).sort();
-  const selector = levels.map((l) => `.article-body .article-h${l}`).join(", ");
+  const entries: (RenderedTocEntry & { slug: string })[] = (toc ?? [])
+    .filter(
+      (e): e is RenderedTocEntry =>
+        !!e?.text && typeof e.level === "number" && e.level >= 2 && e.level <= 4,
+    )
+    .map((e) => ({ ...e, slug: slugifyText(e.text) }));
 
   useEffect(() => {
-    if (!entries.length || !selector) return;
+    if (!entries.length) return;
 
-    const getHeadingEls = (): HTMLElement[] =>
-      Array.from(document.querySelectorAll<HTMLElement>(selector));
+    const findTargetEl = (slug: string): HTMLElement | null => {
+      // Primary: id match (renderLexical emits id={slugifyText(text)}).
+      const byId = document.getElementById(slug);
+      if (byId) return byId;
+      // Fallback: text-content match across heading levels in the article body.
+      const all = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          ".article-body .article-h2, .article-body .article-h3, .article-body .article-h4",
+        ),
+      );
+      return all.find((h) => slugifyText(h.textContent ?? "") === slug) ?? null;
+    };
 
-    const onScroll = () => {
-      const els = getHeadingEls();
-      if (!els.length) return;
-      let idx = 0;
-      for (let i = 0; i < els.length; i++) {
-        const top = els[i]?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY;
-        if (top <= HEADER_OFFSET) idx = i;
+    const onScroll = (): void => {
+      let current = entries[0]?.slug ?? "";
+      for (const entry of entries) {
+        const el = findTargetEl(entry.slug);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= HEADER_OFFSET) current = entry.slug;
       }
-      setActiveIdx(idx);
+      setActiveId(current);
     };
 
     const t = setTimeout(() => {
@@ -137,9 +143,24 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
       window.removeEventListener("scroll", onScroll);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entries.length, selector]);
+  }, [entries.length]);
 
   if (!entries.length) return null;
+
+  const scrollToEntry = (slug: string): void => {
+    const byId = document.getElementById(slug);
+    const fallback = byId
+      ? null
+      : Array.from(
+          document.querySelectorAll<HTMLElement>(
+            ".article-body .article-h2, .article-body .article-h3, .article-body .article-h4",
+          ),
+        ).find((h) => slugifyText(h.textContent ?? "") === slug) ?? null;
+    const target = byId ?? fallback;
+    if (!target) return;
+    const top = target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+    window.scrollTo({ top, behavior: "smooth" });
+  };
 
   return (
     <nav aria-label="Table of contents">
@@ -155,12 +176,12 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
       </p>
       <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
         {entries.map((entry, i) => {
-          const isActive = i === activeIdx;
+          const isActive = entry.slug === activeId;
           const indentPx = (entry.level - 2) * 12;
           const fontSize = entry.level === 2 ? "0.875rem" : "0.8125rem";
           return (
             <li
-              key={entry.id ?? `${entry.level}-${i}`}
+              key={entry.id ?? `${entry.slug}-${i}`}
               style={{
                 borderLeft: `2px solid ${isActive ? "#4a3bf1" : "rgba(17,17,17,0.1)"}`,
                 transition: "border-color 0.2s",
@@ -185,14 +206,7 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
                   color: isActive ? "#4a3bf1" : "rgba(17,17,17,0.65)",
                   transition: "color 0.2s",
                 }}
-                onClick={() => {
-                  const els = Array.from(document.querySelectorAll<HTMLElement>(selector));
-                  const target = els[i];
-                  if (target) {
-                    const top = target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
-                    window.scrollTo({ top, behavior: "smooth" });
-                  }
-                }}
+                onClick={() => scrollToEntry(entry.slug)}
               >
                 {entry.text}
               </button>

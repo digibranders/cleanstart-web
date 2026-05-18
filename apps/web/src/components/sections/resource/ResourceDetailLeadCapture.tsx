@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { ResourceDetail } from "@/lib/resources";
-import { resourceLeadCaptureHeading } from "@/lib/resources";
+import { resourceLeadCaptureHeading } from "@/lib/resources-utils";
 
 interface ResourceDetailLeadCaptureProps {
   resource: ResourceDetail;

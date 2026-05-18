@@ -256,7 +256,7 @@ function extractText(nodes: LexicalNode[]): string {
     .join("");
 }
 
-function slugifyText(text: string): string {
+export function slugifyText(text: string): string {
   return text
     .toLowerCase()
     .trim()

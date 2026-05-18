@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { mediaUrl } from "@/lib/blog";
-import { getNewsBySlug, getRelatedNews } from "@/lib/news";
+import {
+  getNewsBySlug,
+  getNewsBySlugDraft,
+  getRelatedNews,
+} from "@/lib/news";
 import { highlightLexical } from "@/lib/highlightLexical";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
@@ -51,16 +55,19 @@ export async function generateMetadata({
   });
 }
 
-export default async function NewsDetailPage({
-  params,
-}: NewsDetailPageProps): Promise<React.ReactElement> {
-  const { slug } = await params;
-  const item = await getNewsBySlug(slug);
+export async function renderNewsDetail({
+  slug,
+  draft = false,
+}: {
+  slug: string;
+  draft?: boolean;
+}): Promise<React.ReactElement> {
+  const item = draft ? await getNewsBySlugDraft(slug) : await getNewsBySlug(slug);
   if (!item) notFound();
 
   const categoryIds = item.newsCategories?.map((c) => c.id) ?? [];
   const [related, highlightedBody] = await Promise.all([
-    getRelatedNews(item.id, categoryIds).catch(() => []),
+    getRelatedNews(item.id, categoryIds, 3, { draft }).catch(() => []),
     highlightLexical(item.body ?? null),
   ]);
   const itemWithHighlighted = { ...item, body: highlightedBody ?? null };
@@ -123,4 +130,11 @@ export default async function NewsDetailPage({
       <Footer cta={<BlogDetailCTA />} />
     </>
   );
+}
+
+export default async function NewsDetailPage({
+  params,
+}: NewsDetailPageProps): Promise<React.ReactElement> {
+  const { slug } = await params;
+  return renderNewsDetail({ slug });
 }
