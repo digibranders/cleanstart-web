@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { PreviewBanner } from "@/components/PreviewBanner";
 import { WebVitals } from "@/components/observability/WebVitals";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
 import { JsonLd, organizationSchema } from "@/lib/seo/jsonld";
@@ -118,6 +119,7 @@ export default function RootLayout({
       <body>
         <JsonLd id="org-jsonld" data={organizationSchema()} />
         <WebVitals />
+        <PreviewBanner />
         {children}
         <Analytics />
         <SpeedInsights />
