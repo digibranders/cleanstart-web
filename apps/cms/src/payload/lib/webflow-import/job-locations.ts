@@ -82,6 +82,27 @@ const CURATED: readonly CuratedRow[] = [
     type: 'country',
   },
   {
+    aliases: ['ahmedabad', 'ahmedabad, india'],
+    name: 'Ahmedabad',
+    isoCountry: 'IN',
+    timezone: 'Asia/Kolkata',
+    type: 'city',
+  },
+  {
+    aliases: ['australia', 'au'],
+    name: 'Australia',
+    isoCountry: 'AU',
+    timezone: 'Australia/Sydney',
+    type: 'country',
+  },
+  {
+    aliases: ['south east asia', 'south-east asia', 'southeast asia', 'sea'],
+    name: 'South East Asia',
+    isoCountry: 'SG',
+    timezone: 'Asia/Singapore',
+    type: 'region',
+  },
+  {
     aliases: ['remote', 'remote (global)', 'worldwide', 'anywhere'],
     name: 'Remote',
     isoCountry: 'US',

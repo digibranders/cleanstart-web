@@ -6,6 +6,11 @@ import { ValidationError } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { humaniseFilename } from '../lib/humanise-filename';
+import {
+  buildMediaFilename,
+  canonicalExtensionForMime,
+  shortHash,
+} from '../lib/media-filename';
 import { sanitizeSvgBuffer } from '../lib/sanitize-svg';
 import { ALLOWED_MIME_TYPES, checkUploadSize } from '../lib/upload-limits';
 
@@ -202,7 +207,7 @@ export const Media: CollectionConfig = {
   ],
   hooks: {
     beforeValidate: [
-      ({ data, req }) => {
+      async ({ data, req }) => {
         const file = req.file;
         if (!file) return data;
         const result = checkUploadSize(file.mimetype, file.size);
@@ -221,7 +226,55 @@ export const Media: CollectionConfig = {
           file.data = cleaned;
           file.size = cleaned.byteLength;
         }
-        return data;
+
+        // Rewrite the upload filename to a canonical, slug-safe form
+        // before the s3-storage plugin computes the R2 key. The hook
+        // must run pre-write because rejectFilenameRename blocks any
+        // post-upload rename, and the plugin only PUTs when req.file
+        // is present. We mutate req.file.name and data.filename in
+        // lockstep so downstream consumers (resize derivatives,
+        // media.url, prefix computation) all see the same name.
+        const bytes = Buffer.isBuffer(file.data)
+          ? file.data
+          : Buffer.from(file.data as Uint8Array);
+        const incomingAlt =
+          typeof (data as { alt?: unknown })?.alt === 'string'
+            ? ((data as { alt: string }).alt ?? '').trim()
+            : '';
+        const slugSource =
+          incomingAlt.length > 0 ? incomingAlt : humaniseFilename(file.name);
+        const ext = canonicalExtensionForMime(file.mimetype);
+        const hash = shortHash(bytes);
+        const baseFilename = buildMediaFilename({
+          slugSource,
+          bytes,
+          ext,
+          hashOverride: hash,
+        });
+
+        // Collision check. The short hash in baseFilename means a
+        // collision only happens when two uploads share both slug
+        // source and short hash but differ in the rest of their
+        // bytes — vanishingly rare, but we still iterate `-2`, `-3`
+        // … until a free slot is found rather than overwriting.
+        const dotIdx = baseFilename.lastIndexOf('.');
+        const stem = dotIdx > 0 ? baseFilename.slice(0, dotIdx) : baseFilename;
+        const extWithDot = dotIdx > 0 ? baseFilename.slice(dotIdx) : '';
+        let candidate = baseFilename;
+        for (let suffix = 2; suffix <= 50; suffix += 1) {
+          const existing = await req.payload.find({
+            collection: 'media',
+            where: { filename: { equals: candidate } },
+            limit: 1,
+            depth: 0,
+            pagination: false,
+          });
+          if (existing.docs.length === 0) break;
+          candidate = `${stem}-${suffix}${extWithDot}`;
+        }
+
+        file.name = candidate;
+        return { ...data, filename: candidate };
       },
     ],
     beforeChange: [

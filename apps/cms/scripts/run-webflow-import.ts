@@ -27,19 +27,16 @@ import path from 'node:path';
 import readline from 'node:readline';
 import { fileURLToPath } from 'node:url';
 
+import { Client as PgClient } from 'pg';
 import { getPayload } from 'payload';
-import config from '../../apps/cms/src/payload.config';
-import { humaniseFilename } from '../../apps/cms/src/payload/lib/humanise-filename';
+import config from '../src/payload.config.ts';
 
-// Anchor paths to this file's location, not the process cwd, so the
-// script works whether invoked from the repo root (via tsx) or from
-// apps/cms (via node --experimental-strip-types) — both are needed
-// because Payload Local API requires running from a package that
-// resolves `payload`, but our migration data lives at the repo root.
+// Anchor paths to this file's location. The script lives at
+// apps/cms/scripts/ so that `payload` and `@next/env` resolve through
+// apps/cms/node_modules; the migration data lives at the repo root.
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '..', '..');
+const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const TRANSFORMED_DIR = path.join(REPO_ROOT, 'migrations/webflow-export/transformed');
-const ASSET_PROGRESS = path.join(REPO_ROOT, 'migrations/webflow-export/.asset-progress.json');
 const IMPORT_LOG = path.join(REPO_ROOT, 'migrations/webflow-export/.import-log.jsonl');
 
 const dryRun = process.argv.includes('--dry-run');
@@ -47,17 +44,6 @@ const onlyCollection = (() => {
   const idx = process.argv.indexOf('--collection');
   return idx >= 0 ? process.argv[idx + 1] : null;
 })();
-
-type AssetRecord = {
-  webflowUrl: string;
-  r2Key: string;
-  r2PublicUrl: string;
-  sha256: string;
-  /** Media `folder` enum value (`web/blog`, `web/author`, …). Optional for backwards compatibility with progress files written before H4.5. */
-  folder?: string;
-  /** Webflow `alt` attribute extracted from inline body HTML, when available. */
-  altHint?: string;
-};
 
 type ImportLogEntry = {
   collection: string;
@@ -146,6 +132,16 @@ const refToWebflowKey = (ref: unknown): string | null => {
 };
 
 const resolveOne = (raw: unknown, collection: string): number | null => {
+  // Webflow MultiReference fields (e.g. Blogs.categories) ship as
+  // arrays even when Payload only stores a single ref — take the
+  // first element so we don't drop the relation entirely.
+  if (Array.isArray(raw)) {
+    for (const item of raw) {
+      const id = resolveOne(item, collection);
+      if (id != null) return id;
+    }
+    return null;
+  }
   const key = refToWebflowKey(raw);
   if (!key) return null;
   return lookupId(collection, key);
@@ -161,12 +157,81 @@ const resolveMany = (raw: unknown, collection: string): number[] => {
   return out;
 };
 
+/** Hard cap from the Payload slugField validator (apps/cms/.../fields/slug.ts). */
+const SLUG_LIMIT = 120;
+
+const clampSlug = (value: unknown): unknown => {
+  if (typeof value !== 'string') return value;
+  // Collapse runs of `-` and strip leading/trailing dashes — Webflow
+  // emits patterns like `systems-engineer---research` for em-dashes in
+  // titles, which Payload's slug validator rejects.
+  let cleaned = value.replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+  if (cleaned.length > SLUG_LIMIT) {
+    const cut = cleaned.slice(0, SLUG_LIMIT);
+    const lastDash = cut.lastIndexOf('-');
+    cleaned = lastDash > SLUG_LIMIT - 30 ? cut.slice(0, lastDash) : cut;
+  }
+  return cleaned;
+};
+
+/**
+ * Events.gallery is a per-row array of `{image, caption?}` objects,
+ * not a plain many-ref. The transform emits `_rawGallery` as an array
+ * of Webflow image refs ({url, alt}) — we resolve each to a Payload
+ * media id and emit the wrapped Payload shape.
+ */
+const resolveGallery = (
+  raw: unknown,
+): Array<{ image: number; caption?: string }> => {
+  if (!Array.isArray(raw)) return [];
+  const out: Array<{ image: number; caption?: string }> = [];
+  for (const item of raw) {
+    const id = resolveOne(item, 'media');
+    if (id != null) out.push({ image: id });
+  }
+  return out;
+};
+
+/**
+ * Pull Webflow's `_meta.createdOn` / `_meta.lastUpdated` into Payload's
+ * `createdAt` / `updatedAt`. Payload's create/update API respects
+ * explicit values for these so we preserve the authoring history
+ * instead of stamping every row with the migration's run time.
+ *
+ * `lastPublished` from Webflow is intentionally NOT overwritten on
+ * `publishedAt` here — that value is the editorial publication date
+ * driven by per-collection fields (`date-of-publication`,
+ * `publication-date`, `event-date`, `publish-date`, `webinar-date`)
+ * which the transforms already set.
+ */
+const applyWebflowDates = (
+  row: Record<string, unknown>,
+  out: Record<string, unknown>,
+): void => {
+  const meta = row._meta;
+  if (!meta || typeof meta !== 'object') return;
+  const m = meta as Record<string, unknown>;
+  if (typeof m.createdOn === 'string') out.createdAt = m.createdOn;
+  if (typeof m.lastUpdated === 'string') out.updatedAt = m.lastUpdated;
+};
+
+/**
+ * Underscore-prefixed keys are normally migration scaffolding (e.g.
+ * `_webflowId`, `_rawHeroImage`, `_meta`) — stripped before insert.
+ * The two exceptions are Payload's own draft/publish discriminator
+ * (`_status`) and its first-publish timestamp on the News collection
+ * (`_status` paired with `publishedAt` / `publicationDate`). Keep
+ * these so the import actually promotes rows to published.
+ */
+const PAYLOAD_RESERVED_KEYS = new Set(['_status']);
+
 const resolveRefs = (row: Record<string, unknown>): Record<string, unknown> => {
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(row)) {
-    if (key.startsWith('_')) continue;
-    out[key] = value;
+    if (key.startsWith('_') && !PAYLOAD_RESERVED_KEYS.has(key)) continue;
+    out[key] = key === 'slug' ? clampSlug(value) : value;
   }
+  applyWebflowDates(row, out);
   for (const [rawKey, spec] of Object.entries(REF_MAP)) {
     if (!spec) continue;
     if (!(rawKey in row)) continue;
@@ -179,6 +244,11 @@ const resolveRefs = (row: Record<string, unknown>): Record<string, unknown> => {
       const id = resolveOne(raw, spec.collection);
       if (id != null) out[spec.field] = id;
     }
+  }
+  // Special case: events.gallery — array of {image, caption?} objects.
+  if (Array.isArray(row._rawGallery)) {
+    const gallery = resolveGallery(row._rawGallery);
+    if (gallery.length > 0) out.gallery = gallery;
   }
   return out;
 };
@@ -213,16 +283,25 @@ const upsert = async (
     return null;
   }
 
-  const where = slug ? { slug: { equals: slug } } : { id: { equals: -1 } };
+  // Media collection doesn't carry a `slug` — it dedups by `filename`
+  // (which is unique per upload doc). Everything else dedups by slug.
+  const lookupField = collection === 'media' ? 'filename' : 'slug';
   const existing = slug
     ? await payload.find({
         collection: collection as Parameters<typeof payload.find>[0]['collection'],
-        where,
+        where: { [lookupField]: { equals: slug } },
         limit: 1,
         depth: 0,
         overrideAccess: true,
       })
     : { docs: [] };
+
+  // For drafts-enabled collections, setting `_status: 'published'`
+  // alone isn't enough — Payload's create/update flow needs
+  // `draft: false` to actually promote the new version to live. The
+  // migration uniformly publishes every row it imports; editors can
+  // unpublish later if needed.
+  const shouldPublish = data._status === 'published';
 
   if (existing.docs.length > 0 && existing.docs[0]) {
     const id = (existing.docs[0] as { id: number }).id;
@@ -231,6 +310,7 @@ const upsert = async (
         collection: collection as Parameters<typeof payload.update>[0]['collection'],
         id,
         data: data as Parameters<typeof payload.update>[0]['data'],
+        draft: shouldPublish ? false : undefined,
         overrideAccess: true,
       });
       appendLog({
@@ -261,6 +341,7 @@ const upsert = async (
     const doc = await payload.create({
       collection: collection as Parameters<typeof payload.create>[0]['collection'],
       data: data as Parameters<typeof payload.create>[0]['data'],
+      draft: shouldPublish ? false : undefined,
       overrideAccess: true,
     });
     const id = (doc as { id: number }).id;
@@ -288,6 +369,79 @@ const upsert = async (
   }
 };
 
+/**
+ * Camel-case collection slug → snake-case Postgres table name. Payload
+ * uses camelCase identifiers in the API but generates snake_case tables.
+ */
+const COLLECTION_TO_TABLE: Record<string, string> = {
+  newsCategories: 'news_categories',
+  jobLocations: 'job_locations',
+  aboutGalleries: 'about_galleries',
+};
+
+const tableFor = (slug: string): string => COLLECTION_TO_TABLE[slug] ?? slug;
+
+/**
+ * Payload's create/update path auto-stamps `created_at` / `updated_at`
+ * to the current time, ignoring explicit values for `updatedAt`. To
+ * preserve the authoring history from Webflow we run a raw SQL UPDATE
+ * through a dedicated pg client after every successful upsert.
+ *
+ * The pg client is created lazily on first call (so dry runs and
+ * --collection runs that hit no rows don't open a second connection).
+ */
+
+let pgClient: PgClient | null = null;
+const getPgClient = async (): Promise<PgClient> => {
+  if (pgClient) return pgClient;
+  const uri = process.env.DATABASE_URI;
+  if (!uri) throw new Error('DATABASE_URI not set');
+  pgClient = new PgClient({ connectionString: uri });
+  await pgClient.connect();
+  return pgClient;
+};
+
+const closePgClient = async (): Promise<void> => {
+  if (pgClient) {
+    await pgClient.end();
+    pgClient = null;
+  }
+};
+
+const setWebflowTimestamps = async (
+  collectionSlug: string,
+  id: number,
+  createdOn: unknown,
+  lastUpdated: unknown,
+): Promise<void> => {
+  const created = typeof createdOn === 'string' ? createdOn : null;
+  const updated = typeof lastUpdated === 'string' ? lastUpdated : null;
+  if (!created && !updated) return;
+  const table = tableFor(collectionSlug);
+  const sets: string[] = [];
+  const args: string[] = [];
+  if (created) {
+    args.push(created);
+    sets.push(`created_at = $${args.length}`);
+  }
+  if (updated) {
+    args.push(updated);
+    sets.push(`updated_at = $${args.length}`);
+  }
+  args.push(String(id));
+  try {
+    const client = await getPgClient();
+    await client.query(
+      `UPDATE ${table} SET ${sets.join(', ')} WHERE id = $${args.length}`,
+      args,
+    );
+  } catch (err) {
+    console.warn(
+      `  [import] timestamp restore failed for ${collectionSlug}/${id}: ${err instanceof Error ? err.message : err}`,
+    );
+  }
+};
+
 const importCollection = async (
   payload: Awaited<ReturnType<typeof getPayload>>,
   collectionSlug: string,
@@ -297,44 +451,80 @@ const importCollection = async (
   if (rows.length === 0) return;
   console.log(`[import] ${collectionSlug}: ${rows.length} rows`);
   for (const row of rows) {
-    const slug = typeof row.slug === 'string' ? row.slug : null;
+    const rawSlug = typeof row.slug === 'string' ? row.slug : null;
+    // Clamp/normalise the slug for both lookup and write so the
+    // raw-slug → clean-slug transition is idempotent.
+    const slug = rawSlug ? (clampSlug(rawSlug) as string) : null;
     const webflowId =
       typeof row._webflowId === 'string' ? row._webflowId : `unknown-${Math.random()}`;
     const resolved = resolveRefs(row);
     const id = await upsert(payload, collectionSlug, slug, resolved, webflowId);
     if (id != null) recordMapping(collectionSlug, webflowId, id);
+    if (id != null && row._meta && typeof row._meta === 'object') {
+      const meta = row._meta as Record<string, unknown>;
+      await setWebflowTimestamps(collectionSlug, id, meta.createdOn, meta.lastUpdated);
+    }
   }
 };
 
+const MEDIA_PROGRESS = path.join(REPO_ROOT, 'migrations/webflow-export/.media-progress.json');
+const ASSET_PROGRESS = path.join(REPO_ROOT, 'migrations/webflow-export/.asset-progress.json');
+
+interface MediaMapEntry {
+  webflowUrl: string;
+  mediaId: number;
+  filename: string;
+}
+
+interface AssetCheckpointEntry {
+  webflowUrl: string;
+  r2PublicUrl: string;
+  sha256: string;
+}
+
 const importMedia = async (
-  payload: Awaited<ReturnType<typeof getPayload>>,
+  _payload: Awaited<ReturnType<typeof getPayload>>,
 ): Promise<void> => {
   if (onlyCollection && onlyCollection !== 'media') return;
-  if (!fs.existsSync(ASSET_PROGRESS)) {
-    console.log('[import] No asset progress file — skipping media import');
+
+  // Media docs themselves are registered by the separate
+  // `register-webflow-media.ts` helper (which can re-run safely and
+  // shows per-asset progress). Here we just load the resulting
+  // webflowUrl → mediaId map into the in-memory ref table so the
+  // content import step can resolve `_rawHeroImage` / `_rawPhoto` /
+  // `_rawAsset` references to real Payload Media doc IDs.
+  //
+  // H4 (rewrite-body-urls) rewrites every Webflow CDN URL in the
+  // transformed JSONL to its R2 equivalent, including the ones
+  // inside `_rawHeroImage.url` etc. To resolve the relationship,
+  // we also key the media map by R2 URL — joined via the asset
+  // checkpoint (Webflow URL → R2 URL).
+  if (!fs.existsSync(MEDIA_PROGRESS)) {
+    console.log(
+      '[import] No media-progress.json — content heroImage / photo / asset refs will be empty. Run scripts/register-webflow-media.ts first to populate.',
+    );
     return;
   }
-  const records = JSON.parse(fs.readFileSync(ASSET_PROGRESS, 'utf-8')) as AssetRecord[];
-  console.log(`[import] media: ${records.length} assets`);
-  for (const record of records) {
-    const filename = path.basename(record.r2Key);
-    // Prefer the Webflow alt attribute when the asset-context pre-pass
-    // captured one; otherwise humanise the (now slug-shaped) filename
-    // so editors land on a sane default instead of the SHA-256 hash
-    // alt that the original importer emitted.
-    const alt =
-      typeof record.altHint === 'string' && record.altHint.trim().length > 0
-        ? record.altHint.trim()
-        : humaniseFilename(filename);
-    const folder = record.folder ?? 'web/general';
-    const id = await upsert(
-      payload,
-      'media',
-      filename, // dedup by filename for media so re-runs are idempotent
-      { filename, url: record.r2PublicUrl, alt, folder },
-      record.webflowUrl,
+  const entries = JSON.parse(fs.readFileSync(MEDIA_PROGRESS, 'utf-8')) as MediaMapEntry[];
+  for (const e of entries) recordMapping('media', e.webflowUrl, e.mediaId);
+
+  if (fs.existsSync(ASSET_PROGRESS)) {
+    const assets = JSON.parse(fs.readFileSync(ASSET_PROGRESS, 'utf-8')) as AssetCheckpointEntry[];
+    const wfToR2 = new Map<string, string>();
+    for (const a of assets) wfToR2.set(a.webflowUrl, a.r2PublicUrl);
+    let r2Keys = 0;
+    for (const e of entries) {
+      const r2 = wfToR2.get(e.webflowUrl);
+      if (r2) {
+        recordMapping('media', r2, e.mediaId);
+        r2Keys += 1;
+      }
+    }
+    console.log(
+      `[import] media map: ${entries.length} webflow URLs + ${r2Keys} R2 aliases → Payload media IDs`,
     );
-    if (id != null) recordMapping('media', record.webflowUrl, id);
+  } else {
+    console.log(`[import] media map: ${entries.length} webflow URLs → Payload media IDs`);
   }
 };
 
@@ -350,8 +540,7 @@ const run = async (): Promise<void> => {
     await importCollection(payload, slug);
   }
 
-  // Content collections. AboutGalleries last in this group because it
-  // has no FK dependencies but uses media refs heavily.
+  // Content collections.
   for (const slug of [
     'blogs',
     'news',
@@ -360,14 +549,26 @@ const run = async (): Promise<void> => {
     'events',
     'webinars',
     'jobs',
-    'aboutGalleries',
   ]) {
     await importCollection(payload, slug);
   }
 
+  // AboutGalleries is import-blocked at v1 because the Payload schema
+  // makes `image` required and we haven't registered the R2 assets as
+  // Media docs yet (see the importMedia comment above). The 20 rows
+  // are small and visual — editors will recreate them by drag-and-
+  // dropping the existing R2 URLs into the AboutGalleries collection.
+  // Their R2 assets are already uploaded (H5) and the original
+  // Webflow URLs are preserved in the transformed JSONL for cross-
+  // reference.
+  console.log(
+    '[import] aboutGalleries: 20 rows held back (need Media docs first). See transformed/aboutGalleries.jsonl.',
+  );
+
   // Pages last (may reference other collections).
   await importCollection(payload, 'pages');
 
+  await closePgClient();
   console.log('[import] Done.');
   process.exit(0);
 };

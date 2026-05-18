@@ -17,15 +17,27 @@
 const isFilled = (value: unknown): value is string =>
   typeof value === 'string' && value.trim().length > 0;
 
+/**
+ * Walk `${prefix}${i}` for i = 1..count. Each prefix is tried in
+ * order — the first one that returns a filled string wins. This is
+ * how we accept both the live Webflow slug (e.g. `article-keyword-`)
+ * and the legacy fixture slug (`Article keyword `) without two
+ * separate helpers.
+ */
 const collectSlots = (
   row: Record<string, unknown>,
-  prefix: string,
+  prefixes: readonly string[],
   count: number,
 ): string[] => {
   const out: string[] = [];
   for (let i = 1; i <= count; i += 1) {
-    const value = row[`${prefix}${i}`];
-    if (isFilled(value)) out.push(value.trim());
+    for (const prefix of prefixes) {
+      const value = row[`${prefix}${i}`];
+      if (isFilled(value)) {
+        out.push(value.trim());
+        break;
+      }
+    }
   }
   return out;
 };
@@ -48,8 +60,11 @@ export const collapseGuideFaqs = (
 ): FaqEntry[] => {
   const out: FaqEntry[] = [];
   for (let i = 1; i <= maxSlots; i += 1) {
-    const q = row[`Q${i}`];
-    const a = row[`Ans${i}`];
+    // Webflow's actual API slugs are kebab-singular lowercase
+    // (`q1` / `ans-1`); the upper-cased forms are accepted as a
+    // fallback for synthetic test fixtures and pre-Webflow shapes.
+    const q = row[`q${i}`] ?? row[`Q${i}`];
+    const a = row[`ans-${i}`] ?? row[`Ans${i}`];
     if (isFilled(q) && isFilled(a)) {
       out.push({ question: q.trim(), answer: a.trim() });
     }
@@ -77,7 +92,7 @@ export const collapseArticleSections = (
   row: Record<string, unknown>,
   maxSlots = 8,
 ): ArticleSection[] => {
-  const slots = collectSlots(row, 'Article About ', maxSlots);
+  const slots = collectSlots(row, ['article-about-', 'Article About '], maxSlots);
   return slots.map((raw) => {
     // Try `Heading: body text` first.
     const colon = raw.indexOf(':');
@@ -109,7 +124,9 @@ export const collapseKeywords = (
   row: Record<string, unknown>,
   maxSlots = 10,
 ): KeywordEntry[] =>
-  collectSlots(row, 'Article keyword ', maxSlots).map((keyword) => ({ keyword }));
+  collectSlots(row, ['article-keyword-', 'Article keyword '], maxSlots).map((keyword) => ({
+    keyword,
+  }));
 
 // ─── Citations (Article Mentions 1 … 10) ────────────────────────
 
@@ -139,7 +156,7 @@ export const collapseCitations = (
   row: Record<string, unknown>,
   maxSlots = 10,
 ): CitationEntry[] =>
-  collectSlots(row, 'Article Mentions ', maxSlots).map((raw) => {
+  collectSlots(row, ['article-mentions-', 'Article Mentions '], maxSlots).map((raw) => {
     // Shape 2: bare URL.
     if (URL_PATTERN.test(raw)) {
       try {

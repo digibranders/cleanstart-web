@@ -122,12 +122,15 @@ const EXPERIENCE_LEVEL_MAP: Record<string, ExperienceLevelEnum> = {
   distinguished: 'principal',
 };
 
-// Recognise a few common year-range strings — Webflow editors
-// sometimes wrote "5+ years" instead of a level name.
-const YEARS_PATTERN = /^(\d+)(?:\+|-(\d+))?\s*(?:years?|yrs?|y)/;
+// Recognise common year-range strings — Webflow editors used many
+// shapes for the same idea (`5+ years`, `1-2 Years`, `3–5 years`,
+// `1 Year`, with em-dash / en-dash / hyphen, mixed case, optional
+// trailing whitespace). We pick the LOWER bound and bucket by years.
+const YEARS_PATTERN =
+  /(\d+)\s*[-–—]?\s*(?:(\d+))?\s*\+?\s*(?:years?|yrs?|y)\b/i;
 
 const fromYearString = (raw: string): ExperienceLevelEnum | null => {
-  const match = raw.toLowerCase().match(YEARS_PATTERN);
+  const match = raw.match(YEARS_PATTERN);
   if (!match || !match[1]) return null;
   const years = Number.parseInt(match[1], 10);
   if (!Number.isFinite(years)) return null;
