@@ -30,6 +30,7 @@ import {
 import { InlineImageInsertDialog } from './InlineImageInsertDialog';
 import { InlineImagePreviewDialog } from './InlineImagePreviewDialog';
 import {
+  normalizeUploadValue,
   uploadMediaFile,
   type UploadedMediaDoc,
 } from './upload-media-file';
@@ -115,7 +116,7 @@ export const InlineImagePlugin = (): ReactElement => {
             const current = existing.getData();
             existing.setData({
               ...current,
-              value: doc.id,
+              value: normalizeUploadValue(doc.id),
               fields: {
                 ...(current.fields as InlineImageFields),
                 alt: (current.fields as InlineImageFields)?.alt || doc.alt || '',
@@ -127,7 +128,7 @@ export const InlineImagePlugin = (): ReactElement => {
         const node = $createUploadNode({
           data: {
             relationTo: 'media',
-            value: doc.id,
+            value: normalizeUploadValue(doc.id),
             fields: {
               alt: doc.alt ?? '',
               caption: '',

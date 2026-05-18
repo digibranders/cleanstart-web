@@ -1,6 +1,8 @@
 import { cache } from "react";
 import type { BlogImage, LexicalRoot } from "@/lib/blog";
 
+import { fetchCMS } from "./cms-fetch";
+
 export type WebinarImage = BlogImage;
 
 export type WebinarType = "live" | "on-demand" | "panel" | "demo";
@@ -43,54 +45,17 @@ type PayloadListResponse<T> = {
 
 export type WebinarsListResponse = PayloadListResponse<Webinar>;
 
-export const REGION_LABEL: Record<WebinarRegion, string> = {
-  "north-america": "North America",
-  "asia-mea": "Asia & MEA",
-  emea: "EMEA",
-  global: "Global",
-};
+// Client-safe helpers live in `webinars-utils.ts`. Re-exported for backward compat.
+export {
+  FILTERABLE_REGIONS,
+  FILTERABLE_TYPES,
+  REGION_LABEL,
+  WEBINAR_TYPE_LABEL,
+  parseRegionParam,
+  parseTypeParam,
+  regionLabel,
+} from "./webinars-utils";
 
-// Pre-migration safety: rows in the database may still hold PascalCase enum
-// values until `payload migrate` is run for `20260515_100240_rename_webinars_region`.
-// `regionLabel` normalizes either form so the UI never renders an empty cell.
-const LEGACY_REGION_LABEL: Record<string, string> = {
-  Americas: "North America",
-  APAC: "Asia & MEA",
-  EMEA: "EMEA",
-  Global: "Global",
-};
-
-export function regionLabel(value: string | null | undefined): string {
-  if (!value) return "";
-  if (value in REGION_LABEL) return REGION_LABEL[value as WebinarRegion];
-  return LEGACY_REGION_LABEL[value] ?? value;
-}
-
-export const WEBINAR_TYPE_LABEL: Record<WebinarType, string> = {
-  live: "Live",
-  "on-demand": "On-demand",
-  panel: "Panel",
-  demo: "Demo",
-};
-
-/** Filters shown in the sidebar — only a subset of the enum. */
-export const FILTERABLE_TYPES: ReadonlyArray<WebinarType> = ["live", "on-demand"];
-export const FILTERABLE_REGIONS: ReadonlyArray<WebinarRegion> = [
-  "north-america",
-  "asia-mea",
-];
-
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
-
-async function fetchCMS<T>(path: string): Promise<T> {
-  const res = await fetch(`${CMS_URL}${path}`, {
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) {
-    throw new Error(`CMS fetch failed: ${res.status} ${path}`);
-  }
-  return res.json() as Promise<T>;
-}
 
 export interface WebinarListParams {
   page?: number;
@@ -101,7 +66,7 @@ export interface WebinarListParams {
 
 export async function getWebinars({
   page = 1,
-  limit = 12,
+  limit = 9,
   type,
   region,
 }: WebinarListParams = {}): Promise<WebinarsListResponse> {
@@ -157,18 +122,3 @@ export function formatWebinarDate(
   }
 }
 
-export function parseTypeParam(value: string | undefined): WebinarType | undefined {
-  if (!value) return undefined;
-  return (FILTERABLE_TYPES as ReadonlyArray<string>).includes(value)
-    ? (value as WebinarType)
-    : undefined;
-}
-
-export function parseRegionParam(
-  value: string | undefined,
-): WebinarRegion | undefined {
-  if (!value) return undefined;
-  return (FILTERABLE_REGIONS as ReadonlyArray<string>).includes(value)
-    ? (value as WebinarRegion)
-    : undefined;
-}

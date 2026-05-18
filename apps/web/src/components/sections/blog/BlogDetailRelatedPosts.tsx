@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatBlogDate, mediaUrl } from "@/lib/blog";
 import type { Blog } from "@/lib/blog";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 interface BlogDetailRelatedPostsProps {
   posts: Blog[];
@@ -18,7 +19,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
     >
       <div className="relative mx-auto max-w-[1276px] px-6">
         {/* Header row */}
-        <div className="flex items-center justify-between pt-[80px]">
+        <div className="flex items-center justify-between pt-[60px]">
           <h2 className="font-display text-display-md font-bold leading-none tracking-[-0.05em]">
             <span className="text-white">Related </span>
             <span
@@ -29,7 +30,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
                 backgroundClip: "text",
               }}
             >
-              Posts
+              Blogs
             </span>
           </h2>
 
@@ -58,7 +59,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
         </div>
 
         {/* Cards grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-[80px] pb-[80px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-[60px]">
           {posts.map((post) => (
             <RelatedPostCard key={post.id} post={post} />
           ))}
@@ -72,27 +73,22 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
   const primaryCategory = post.categories ?? undefined;
 
   return (
-    <Link
-      href={`/blog/${post.slug}`}
-      className="block group"
-      aria-label={post.title}
+    <article
+      className="relative overflow-hidden flex flex-col h-full"
+      style={{
+        background: "#fff",
+        borderRadius: "32px",
+        boxShadow: "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
+      }}
     >
-      <article
-        className="relative overflow-hidden flex flex-col h-full"
-        style={{
-          background: "#fff",
-          borderRadius: "32px",
-          boxShadow: "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
-        }}
-      >
-        {/* Hero image */}
-        <div className="relative shrink-0 mx-3 mt-3 rounded-[20px] overflow-hidden" style={{ height: "200px" }}>
+      {/* Hero image */}
+      <div className="relative shrink-0 mx-3 mt-3 rounded-[20px] overflow-hidden" style={{ height: "200px" }}>
           {post.heroImage ? (
             <Image
               src={mediaUrl(post.heroImage.url)!}
               alt={post.heroImage.alt ?? post.title}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover"
             />
           ) : (
             <div
@@ -104,19 +100,8 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
 
         {/* Category badge — Figma 330:526, y=190 (22px above image bottom at y=212) */}
         {primaryCategory && (
-          <div className="mx-[32px] mt-[-22px] self-start">
-            <div
-              className="inline-flex items-center whitespace-nowrap text-base font-medium leading-[1.3]"
-              style={{
-                padding: "6px 12px",
-                borderRadius: "8px",
-                background: "linear-gradient(90deg, #F5F5F9 0%, #EAE5FE 100%)",
-                boxShadow: "0px 3px 0px 0px rgba(74,59,241,0.3)",
-                color: "#4a3bf1",
-              }}
-            >
-              {primaryCategory.name}
-            </div>
+          <div className="relative z-10 mx-[32px] mt-[-22px] self-start">
+            <CategoryBadge label={primaryCategory.name} />
           </div>
         )}
 
@@ -163,7 +148,11 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
           )}
 
           {/* Read more */}
-          <div className="flex items-center gap-2 mt-auto pt-2">
+          <Link
+            href={`/blog/${post.slug}`}
+            aria-label={`Read ${post.title}`}
+            className="group inline-flex items-center gap-2 mt-auto pt-2 self-start"
+          >
             <span
               className="text-xl font-medium leading-[1.5] group-hover:text-[#3928e0] transition-colors duration-200"
               style={{ color: "#4a3bf1" }}
@@ -181,9 +170,8 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
               loading="lazy"
               decoding="async"
             />
-          </div>
+          </Link>
         </div>
       </article>
-    </Link>
   );
 }

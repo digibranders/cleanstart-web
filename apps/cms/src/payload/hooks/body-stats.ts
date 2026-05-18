@@ -73,13 +73,19 @@ export const bodyStatsHook = (options: BodyStatsOptions = {}): CollectionBeforeC
       next[fields.readingMinutes] = summary.readingMinutes;
     }
     if (fields.tableOfContents) {
-      next[fields.tableOfContents] = summary.headings
-        .filter((h) => tocLevels.has(h.level))
-        .map((heading) => ({
-          level: heading.level,
-          text: heading.text,
-          anchor: heading.anchor,
-        }));
+      let picked = summary.headings.filter((h) => tocLevels.has(h.level));
+      // Fallback: when the configured depth excludes every heading in the body
+      // (e.g. editor picked H2-only but the article uses H3s), surface the
+      // shallowest level present so the TOC is never silently empty.
+      if (picked.length === 0 && summary.headings.length > 0) {
+        const shallowest = Math.min(...summary.headings.map((h) => h.level));
+        picked = summary.headings.filter((h) => h.level === shallowest);
+      }
+      next[fields.tableOfContents] = picked.map((heading) => ({
+        level: heading.level,
+        text: heading.text,
+        anchor: heading.anchor,
+      }));
     }
     return next;
   };

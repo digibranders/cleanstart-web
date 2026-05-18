@@ -3,7 +3,7 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
 import { slugify } from '../lib/slugify';
-import { validateOptionalUrl } from '../lib/url-shape';
+import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const AboutGalleries: CollectionConfig = {
   slug: 'aboutGalleries',
@@ -54,6 +54,7 @@ export const AboutGalleries: CollectionConfig = {
         description:
           'Optional click-destination for the gallery image. Site-relative path (/about-us#team) or full URL. Empty = the image is non-interactive.',
       },
+      hooks: { beforeValidate: [normalizeOptionalUrlHook] },
       validate: validateOptionalUrl,
     },
     {

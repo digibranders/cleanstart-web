@@ -29,7 +29,7 @@ export default function AttackSurfaceReductionPage(): React.ReactElement {
         ])}
       />
       <Header />
-      <main>
+      <main style={{ backgroundColor: "#F6F6F6" }}>
         <AsrHero />
         <FadeUp>
           <AsrPublicImages />

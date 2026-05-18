@@ -25,22 +25,27 @@ const WEBFLOW_API_BASE = 'https://api.webflow.com/v2';
 const OUTPUT_DIR = path.resolve('migrations/webflow-export/raw');
 const PROGRESS_FILE = path.resolve('migrations/webflow-export/.progress.json');
 
-/** Webflow slug → local slug (used in output filenames) */
+/**
+ * Webflow slug → local slug (used in output filenames).
+ *
+ * Webflow's collection slugs are singular kebab-case (verified against the
+ * live API on 2026-05-18). Anything not in this map falls back to the raw
+ * Webflow slug, which would break the downstream transformers — so add a
+ * row here when a new Webflow collection appears.
+ */
 const COLLECTION_MAP: Record<string, string> = {
-  blogPosts: 'blogs',
-  newsArticles: 'news',
-  guides: 'guides',
+  blogs: 'blogs',
+  news: 'news',
+  guide: 'guides',
   resources: 'resources',
-  events: 'events',
-  webinars: 'webinars',
-  jobs: 'jobs',
-  teamMembers: 'authors',
-  categories: 'categories',
-  newsCategories: 'newsCategories',
-  jobPositions: 'jobPositions',
-  jobLocations: 'jobLocations',
-  galleries: 'aboutGalleries',
-  pages: 'pages',
+  event: 'events',
+  webinar: 'webinars',
+  job: 'jobs',
+  author: 'authors',
+  category: 'categories',
+  'news-categories': 'newsCategories',
+  'job-location': 'jobLocations',
+  'about-gallery': 'aboutGalleries',
 };
 
 // Token bucket: 50 req/min = 1 per 1.2s
@@ -81,7 +86,17 @@ const throttle = async (): Promise<void> => {
   lastRequestAt = Date.now();
 };
 
-type WebflowItem = { id: string; slug?: string; [key: string]: unknown };
+type WebflowItem = {
+  id: string;
+  cmsLocaleId?: string;
+  lastPublished?: string;
+  lastUpdated?: string;
+  createdOn?: string;
+  isArchived?: boolean;
+  isDraft?: boolean;
+  fieldData?: Record<string, unknown>;
+  [key: string]: unknown;
+};
 type WebflowCollection = { id: string; slug: string; displayName: string };
 
 const get = async <T>(url: string): Promise<T> => {
@@ -142,8 +157,17 @@ const run = async (): Promise<void> => {
 
       const { items, pagination } = resp;
       for (const item of items) {
+        const { id, fieldData, ...meta } = item;
+        const flatFields = fieldData ?? {};
+        const itemSlug = typeof flatFields.slug === 'string' ? flatFields.slug : '';
         writeStream.write(
-          JSON.stringify({ collection: localSlug, webflowId: item.id, slug: item.slug ?? '', ...item }) + '\n',
+          JSON.stringify({
+            collection: localSlug,
+            webflowId: id,
+            slug: itemSlug,
+            ...flatFields,
+            _meta: meta,
+          }) + '\n',
         );
       }
 

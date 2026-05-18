@@ -136,6 +136,59 @@ describe('extractFromLexical', () => {
     expect(result.headings[0]?.text).toBe('Real');
   });
 
+  it('ignores headings nested inside table cells (cell labels are not TOC entries)', () => {
+    const body = lexical([
+      heading('h2', 'Real section'),
+      {
+        type: 'table',
+        children: [
+          {
+            type: 'tablerow',
+            children: [
+              {
+                type: 'tablecell',
+                children: [heading('h3', 'Metric')],
+              },
+              {
+                type: 'tablecell',
+                children: [heading('h3', 'Value')],
+              },
+            ],
+          },
+        ],
+      },
+      heading('h2', 'After table'),
+    ]);
+    const result = extractFromLexical(body);
+    expect(result.headings).toEqual([
+      { level: 2, text: 'Real section', anchor: 'real-section' },
+      { level: 2, text: 'After table', anchor: 'after-table' },
+    ]);
+  });
+
+  it('still counts words inside table cells', () => {
+    const body = lexical([
+      {
+        type: 'table',
+        children: [
+          {
+            type: 'tablerow',
+            children: [
+              {
+                type: 'tablecell',
+                children: [
+                  { type: 'paragraph', children: [{ type: 'text', text: 'one two three' }] },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+    const result = extractFromLexical(body);
+    expect(result.wordCount).toBe(3);
+  });
+
   it('handles nested children inside headings (e.g. bold inside h2)', () => {
     const body = lexical([
       {

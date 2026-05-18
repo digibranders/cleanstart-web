@@ -36,6 +36,34 @@ export const QUICK_CREATE_CONFIG: Record<string, QuickCreateConfig | undefined> 
         maxLength: 120,
       },
       { name: 'slug', type: 'slug', label: 'Slug', source: 'name' },
+      {
+        // Both fields are surfaced live on the public byline + Person
+        // JSON-LD, so filling them now produces a better-looking post
+        // than a bare name. Kept behind a toggle so the 5-second create
+        // case stays 5 seconds. Anything richer (photo, bioLong, social,
+        // arrays) lives in the full edit view — reached via the
+        // "Fill in profile →" toast action.
+        type: 'group',
+        label: 'Add role & bio',
+        defaultOpen: false,
+        fields: [
+          {
+            name: 'role',
+            type: 'text',
+            label: 'Role',
+            placeholder: 'Security Engineer',
+            maxLength: 120,
+          },
+          {
+            name: 'bioShort',
+            type: 'textarea',
+            label: 'Short bio',
+            placeholder: 'One-line bio for cards and SERP snippets.',
+            maxLength: 280,
+            rows: 3,
+          },
+        ],
+      },
     ],
   },
   categories: {
@@ -76,6 +104,25 @@ export const QUICK_CREATE_CONFIG: Record<string, QuickCreateConfig | undefined> 
         type: 'text',
         label: 'Name',
         required: true,
+        maxLength: 120,
+      },
+      { name: 'slug', type: 'slug', label: 'Slug', source: 'name' },
+    ],
+  },
+  forms: {
+    title: 'New form',
+    // Forms.ts sets `versions: { drafts: true }`, so the required
+    // `fields` array doesn't have to be satisfied for the quick-create
+    // draft to save — the editor fills the fields in the full edit
+    // view later (via the "Open form →" toast action).
+    supportsDrafts: true,
+    fields: [
+      {
+        name: 'name',
+        type: 'text',
+        label: 'Form name',
+        required: true,
+        placeholder: 'Whitepaper download gate',
         maxLength: 120,
       },
       { name: 'slug', type: 'slug', label: 'Slug', source: 'name' },

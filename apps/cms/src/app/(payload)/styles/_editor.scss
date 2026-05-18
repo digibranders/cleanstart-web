@@ -67,11 +67,22 @@
     grid-template-columns: 1fr;
     padding: 0 var(--cs-space-6);
 
-    @media (min-width: 1280px) {
-      &:has(.cs-edit__preview-col) {
-        grid-template-columns: 1fr minmax(360px, 480px);
-      }
+    // When Live Preview is open it takes the full content width AND the
+    // SEO sidebar's space — Payload internally hides the form fields in
+    // that mode, so leaving the form column visible (and the sidebar gutter
+    // empty on the right) just wastes pane real estate. The form column
+    // collapses to a 1-column grid; the preview-col stretches edge to edge.
+    &:has(.cs-edit__preview-col) {
+      grid-template-columns: 1fr;
     }
+  }
+
+  // Hide the form column entirely whenever the preview pane is mounted.
+  // The sticky doc bar (Save / Publish / Copy preview link / eye toggle /
+  // Preview-in-new-tab) stays accessible above the preview pane, so
+  // editors can still toggle back to the form via the eye icon.
+  &__body:has(.cs-edit__preview-col) &__form-col {
+    display: none;
   }
 
   &__form-col { min-width: 0; }
@@ -80,6 +91,45 @@
     border: 1px solid var(--theme-elevation-150);
     border-radius: var(--cs-radius-card);
     overflow: hidden;
+    // Stretch tall enough that the iframe pane (which uses 100% height
+    // of its container) fills the visible viewport rather than collapsing
+    // to its content's natural height.
+    min-height: calc(100vh - var(--cs-edit-bar-height) - var(--cs-space-6) * 2);
+  }
+}
+
+// ─── Live Preview full-bleed layout ────────────────────────────────────────
+// When the Live Preview pane is active, Payload swaps our `.cs-edit` chrome
+// for its native `.collection-edit__main-wrapper` flex layout:
+//   ├── .collection-edit__main           ← form (Payload hides its fields)
+//   └── .live-preview-window--is-live-previewing ← iframe pane
+//
+// In stock Payload the form column stays mounted (~1480px wide) and the
+// preview pane is squeezed to ~880px. Since the form fields are invisible
+// in this mode, that's wasted space — collapse the form column and let the
+// preview pane take the full width.
+.collection-edit__main-wrapper:has(.live-preview-window--is-live-previewing) {
+  .collection-edit__main {
+    display: none;
+  }
+  .live-preview-window--is-live-previewing {
+    width: 100%;
+    max-width: none;
+    flex: 1 1 100%;
+  }
+}
+
+// Same treatment for global edit views (settings, navigation, etc.) which
+// use `.global-edit__*` instead of `.collection-edit__*` but the same
+// preview-window class.
+.global-edit__main-wrapper:has(.live-preview-window--is-live-previewing) {
+  .global-edit__main {
+    display: none;
+  }
+  .live-preview-window--is-live-previewing {
+    width: 100%;
+    max-width: none;
+    flex: 1 1 100%;
   }
 }
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { ResourceDetail } from "@/lib/resources";
-import { resourceLeadCaptureHeading } from "@/lib/resources";
+import { resourceLeadCaptureHeading } from "@/lib/resources-utils";
 
 interface ResourceDetailLeadCaptureProps {
   resource: ResourceDetail;
@@ -124,34 +124,31 @@ export function ResourceDetailLeadCapture({
 
           {/* Content row */}
           <div
-            className="absolute inset-0 flex items-center"
-            style={{ padding: "60px 100px" }}
+            className="absolute inset-0 flex items-center px-6 py-8 lg:px-[100px] lg:py-[60px]"
           >
-            <div className="flex items-start" style={{ gap: "68px" }}>
-              {/* Left: headline */}
+            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6 lg:gap-[68px] w-full">
+              {/* Headline */}
               <h2
                 id="rd-cta-title"
-                className="font-display font-bold shrink-0 text-white"
+                className="font-display font-bold shrink-0 text-white text-center lg:text-left w-full lg:w-[486px]"
                 style={{
-                  fontSize: "clamp(1.75rem, 2.86vw, 3.4375rem)",
-                  lineHeight: 1,
+                  fontSize: "clamp(1.5rem, 2.86vw, 3.4375rem)",
+                  lineHeight: 1.1,
                   letterSpacing: "-0.05em",
-                  width: "486px",
                 }}
               >
                 {heading}
               </h2>
 
-              {/* Right: form */}
+              {/* Form */}
               <form
                 onSubmit={handleSubmit}
-                className="flex flex-col items-start shrink-0"
-                style={{ width: "549px", gap: "40px" }}
+                className="flex flex-col items-stretch lg:items-start shrink-0 w-full lg:w-[549px] gap-4 lg:gap-10"
               >
                 {/* Legal teaser */}
                 <p
-                  className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white"
-                  style={{ opacity: 0.8, width: "493px" }}
+                  className="text-sm lg:text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white text-center lg:text-left w-full lg:w-[493px]"
+                  style={{ opacity: 0.8 }}
                 >
                   By checking this box, you agree that CleanStart may use your
                   information to contact you. You may opt out at any time.{" "}
@@ -165,17 +162,15 @@ export function ResourceDetailLeadCapture({
                 </p>
 
                 {/* Email row */}
-                <div className="flex items-center" style={{ gap: "8px" }}>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full">
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter Your Email"
-                    className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] bg-white"
+                    className="text-base lg:text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] bg-white w-full sm:w-[352px] h-[41px]"
                     style={{
-                      width: "352px",
-                      height: "41px",
                       borderRadius: "8px",
                       border: "1px solid #111",
                       paddingLeft: "20px",
@@ -188,9 +183,8 @@ export function ResourceDetailLeadCapture({
                   {/* Glass "Get in Touch" button */}
                   <button
                     type="submit"
-                    className="relative overflow-hidden inline-flex items-center justify-center gap-2 text-lg font-medium tracking-[-0.01em] shrink-0"
+                    className="relative overflow-hidden inline-flex items-center justify-center gap-2 text-base lg:text-lg font-medium tracking-[-0.01em] shrink-0 h-[43px] w-full sm:w-auto"
                     style={{
-                      height: "43px",
                       padding: "9px 18px",
                       borderRadius: "8px",
                       border: "1px solid #dab6f3",
@@ -201,7 +195,6 @@ export function ResourceDetailLeadCapture({
                       cursor: "pointer",
                     }}
                   >
-                    {/* Bottom-center glow — matches Figma Ellipse3938 layer-blur */}
                     <span
                       aria-hidden
                       className="absolute pointer-events-none select-none"
@@ -236,7 +229,7 @@ export function ResourceDetailLeadCapture({
                 </div>
 
                 {/* Consent checkbox */}
-                <div className="flex items-center" style={{ gap: "16px" }}>
+                <div className="flex items-center gap-2 w-full">
                   <input
                     id="rd-consent"
                     type="checkbox"
@@ -244,17 +237,17 @@ export function ResourceDetailLeadCapture({
                     onChange={(e) => setAgreed(e.target.checked)}
                     className="shrink-0"
                     style={{
-                      width: "24px",
-                      height: "24px",
-                      borderRadius: "4px",
+                      width: "14px",
+                      height: "14px",
+                      borderRadius: "3px",
                       accentColor: "#3960f9",
                       cursor: "pointer",
                     }}
                   />
                   <label
                     htmlFor="rd-consent"
-                    className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white"
-                    style={{ opacity: 0.8, width: "504px" }}
+                    className="text-xs lg:text-sm font-normal leading-none tracking-[-0.04em] text-white lg:whitespace-nowrap"
+                    style={{ opacity: 0.8 }}
                   >
                     I agree to receive other communications from CleanStart.*
                   </label>

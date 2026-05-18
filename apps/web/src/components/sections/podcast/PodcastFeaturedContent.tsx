@@ -66,7 +66,7 @@ export function PodcastFeaturedContent({
     >
       <Cube side="left" />
       <Cube side="right" />
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-[80px] pb-[250px]">
+      <div className="relative mx-auto max-w-[1276px] px-6 pt-[80px] pb-[80px]">
         <h2
           id="podcast-featured-title"
           className="text-center text-white font-semibold tracking-[-0.02em]"

@@ -28,6 +28,8 @@ import { Media } from './payload/collections/Media';
 import { News } from './payload/collections/News';
 import { NewsCategories } from './payload/collections/NewsCategories';
 import { Pages } from './payload/collections/Pages';
+import { PodcastEpisodes } from './payload/collections/PodcastEpisodes';
+import { PreviewAudit } from './payload/collections/PreviewAudit';
 import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
 import { SearchLog } from './payload/collections/SearchLog';
@@ -35,6 +37,12 @@ import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
 import { canonicalCheckEndpoint } from './payload/endpoints/canonical-check';
 import { userReassignContentEndpoint } from './payload/endpoints/user-offboard';
+import {
+  previewRedirectEndpoint,
+  previewRevokeEndpoint,
+  previewTokenMintEndpoint,
+  previewVerifyEndpoint,
+} from './payload/endpoints/preview';
 import { publishChecklistEndpoint } from './payload/endpoints/publish-checklist';
 import { dsarFindEndpoint, dsarDeleteEndpoint } from './payload/endpoints/leads-dsar';
 import { retryLeadSyncEndpoint } from './payload/endpoints/retry-lead-sync';
@@ -53,6 +61,7 @@ import {
   calcomInboundEndpoint,
 } from './payload/endpoints/integrations-inbound';
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
+import { mediaIngestUrlEndpoint } from './payload/endpoints/media-ingest-url';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
 import { robotsEndpoint } from './payload/endpoints/robots';
 import { searchAnalyticsEndpoint } from './payload/endpoints/search-analytics';
@@ -64,6 +73,7 @@ import {
 import { checkBrokenLinksTask } from './payload/jobs/check-broken-links';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
+import { purgePreviewAuditTask } from './payload/jobs/purge-preview-audit';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
 import { reindexMeiliTask } from './payload/jobs/reindex-meili';
 import { retryWebhookTask } from './payload/jobs/retry-webhook';
@@ -72,6 +82,7 @@ import { dashboardRefreshDailyTask } from './payload/jobs/dashboard-refresh-dail
 import { dashboardRefreshFrequentTask } from './payload/jobs/dashboard-refresh-frequent';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { wireCustomEditView } from './payload/lib/wire-custom-edit-view';
+import { wirePreviewControls } from './payload/lib/wire-preview';
 import { wireAnalyticsTab } from './payload/lib/wire-analytics-tab';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { wireCustomListView } from './payload/lib/wire-custom-list-view';
@@ -80,6 +91,7 @@ import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
 import { Legal } from './payload/globals/legal';
 import { MainNav } from './payload/globals/mainNav';
+import { PodcastPage } from './payload/globals/podcastPage';
 import { SeoDefaults } from './payload/globals/seoDefaults';
 import { SiteSettings } from './payload/globals/siteSettings';
 
@@ -177,6 +189,12 @@ export default buildConfig({
       actions: [
         './payload/admin/components/SkipLink.tsx#SkipLink',
         './payload/admin/components/SaveShortcut.tsx#SaveShortcut',
+        // Global cross-collection helper — after every failed save /
+        // publish attempt it scrolls the first invalid field into view
+        // and pulses it. Lives in `actions` rather than per-collection
+        // `beforeDocumentControls` so it applies to taxonomy collections
+        // (authors, categories, …) outside the publish-gate set too.
+        './payload/admin/components/ScrollToInvalidField.tsx#ScrollToInvalidField',
         './payload/admin/components/CommandPalette.tsx#CommandPalette',
         './payload/admin/components/FieldDescriptionTooltip.tsx#FieldDescriptionTooltip',
         // SavedStateIndicator removed — the floating "Saved X ago"
@@ -245,6 +263,7 @@ export default buildConfig({
     BrokenLinks,
     AuditLog,
     SearchLog,
+    PreviewAudit,
     WebhookDeadLetter,
     Integrations,
     AnalyticsCache,
@@ -262,16 +281,18 @@ export default buildConfig({
     KnowledgeBase,
     Events,
     Webinars,
+    PodcastEpisodes,
     Jobs,
     AboutGalleries,
     Pages,
   ]
     .map(wirePublishGate)
+    .map(wirePreviewControls)
     .map(wireCustomListView)
     .map(wireCustomEditView)
     .map(wireAnalyticsTab)
     .map(wireCustomFields),
-  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements]
+  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements, PodcastPage]
     .map(wireCustomEditView)
     .map(wireCustomFields),
   endpoints: [
@@ -281,6 +302,7 @@ export default buildConfig({
     newsSitemapEndpoint,
     imageSitemapEndpoint,
     robotsEndpoint,
+    mediaIngestUrlEndpoint,
     redirectsImportEndpoint,
     canonicalCheckEndpoint,
     searchAnalyticsEndpoint,
@@ -292,6 +314,10 @@ export default buildConfig({
     integrationsTestEndpoint,
     integrationsHealthEndpoint,
     integrationsAuditEndpoint,
+    previewTokenMintEndpoint,
+    previewVerifyEndpoint,
+    previewRevokeEndpoint,
+    previewRedirectEndpoint,
     dashboardsGlobalEndpoint,
     dashboardsGscPerDocEndpoint,
     dashboardsGscInspectEndpoint,
@@ -303,6 +329,7 @@ export default buildConfig({
       drainLeadQueueTask,
       purgeSearchLogTask,
       purgeLeadsPiiTask,
+      purgePreviewAuditTask,
       checkBrokenLinksTask,
       retryWebhookTask,
       reindexMeiliTask,
@@ -326,6 +353,10 @@ export default buildConfig({
       {
         cron: '15 3 * * *', // daily at 03:15 UTC — leads PII 365-day redaction
         queue: 'leadsPiiPurge',
+      },
+      {
+        cron: '30 3 * * *', // daily at 03:30 UTC — previewAudit 90-day retention
+        queue: 'previewAuditPurge',
       },
       {
         cron: '30 4 * * *', // daily at 04:30 UTC — broken-link scan

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { type Blog, formatBlogDate, mediaUrl } from "@/lib/blog";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 interface BlogCardProps {
   post: Blog;
@@ -56,61 +57,10 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
       {/* Category badge — overlaps image bottom */}
       {primaryCategory && (
         <div
-          className="absolute flex items-center justify-center overflow-hidden"
-          style={{
-            top: "190px",
-            left: "32px",
-            padding: "6px 12px",
-            borderRadius: "8px",
-            boxShadow: "0px 3px 0px 0px #4a3bf1",
-            zIndex: 1,
-          }}
+          className="absolute"
+          style={{ top: "190px", left: "32px", zIndex: 1 }}
         >
-          {/* Badge background */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/blogs/card-category-badge-bg.png"
-            alt=""
-            aria-hidden
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none rounded-[8px]"
-          />
-          {/* Left cyan glow ellipse */}
-          <div
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            style={{
-              width: "54px",
-              height: "8px",
-              left: "14px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              borderRadius: "50%",
-              background: "#00cfff",
-              filter: "blur(8px)",
-              opacity: 0.75,
-            }}
-          />
-          {/* Right purple blur ellipse — 32×5 #4A3BF1 layer blur */}
-          <div
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            style={{
-              width: "32px",
-              height: "5px",
-              right: "14px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              borderRadius: "50%",
-              background: "#4a3bf1",
-              filter: "blur(5px)",
-            }}
-          />
-          <span
-            className="relative text-base font-medium leading-[1.3] whitespace-nowrap"
-            style={{ color: "#4a3bf1" }}
-          >
-            {primaryCategory.name}
-          </span>
+          <CategoryBadge label={primaryCategory.name} />
         </div>
       )}
 
@@ -132,7 +82,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
               <div className="flex items-center" style={{ gap: "4px" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/blogs/icon-calendar.svg"
+                  src="/images/blogs/icon-calendar-grey.svg"
                   alt=""
                   aria-hidden
                   width={18}
@@ -153,7 +103,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
               <div className="flex items-center" style={{ gap: "4px" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/blogs/icon-clock.svg"
+                  src="/images/blogs/icon-clock-grey.svg"
                   alt=""
                   aria-hidden
                   width={18}
@@ -193,7 +143,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
                 style={{
                   color: "rgba(17,17,17,0.54)",
                   display: "-webkit-box",
-                  WebkitLineClamp: 3,
+                  WebkitLineClamp: 4,
                   WebkitBoxOrient: "vertical",
                   overflowWrap: "anywhere",
                   wordBreak: "break-word",

@@ -19,6 +19,22 @@ const r2PublicHost = (() => {
 // 'self' covers localhost dev.
 const r2ConnectSrc = r2PublicHost ? `https://${r2PublicHost}` : '';
 
+// Web origin embedded by the Live Preview iframe. Falls back to localhost dev
+// when WEB_BASE_URL is unset. Both production hosts are pre-listed so prod
+// images don't depend on the env var being set at admin boot time.
+const webBaseOrigin = (() => {
+  try {
+    return new URL(process.env.WEB_BASE_URL ?? 'http://localhost:3001').origin;
+  } catch {
+    return 'http://localhost:3001';
+  }
+})();
+const PREVIEW_FRAME_SRC_ORIGINS = [
+  webBaseOrigin,
+  'https://www.cleanstart.com',
+  'https://cleanstart.com',
+];
+
 // Content-Security-Policy for the Payload admin shell.
 // 'unsafe-inline' and 'unsafe-eval' are required by the Next.js + React
 // bundle that Payload ships. Tighten to script nonces in a future pass once
@@ -39,7 +55,7 @@ const csp = [
   // Provider origins live in `embed-providers.ts` so the list stays in
   // sync with the supported providers; `embed-providers.test.ts`
   // enforces sync at CI time.
-  `frame-src 'self' ${EMBED_FRAME_SRC_ORIGINS.join(' ')}`,
+  `frame-src 'self' ${[...EMBED_FRAME_SRC_ORIGINS, ...PREVIEW_FRAME_SRC_ORIGINS].join(' ')}`,
   // `frame-ancestors` covers who can embed *us*. 'self' allows the
   // admin to frame its own pages (used by document-picker fallbacks)
   // while still blocking external clickjacking.

@@ -20,8 +20,7 @@ export function ResourceCenterSidebar({
   return (
     <nav
       aria-label="Resource type filter"
-      className="shrink-0"
-      style={{ width: "295px" }}
+      className="shrink-0 w-full lg:w-[295px]"
     >
       {/* White card background */}
       <div
@@ -77,18 +76,7 @@ export function ResourceCenterSidebar({
               />
               <span
                 className="font-display text-xl font-semibold leading-none tracking-[-0.05em] whitespace-nowrap"
-                style={{
-                  ...(
-                    !activeType
-                      ? {
-                          backgroundImage:
-                            "linear-gradient(92.3deg, #9a51ff 1.76%, #2cc1eb 98.78%)",
-                          WebkitBackgroundClip: "text",
-                          WebkitTextFillColor: "transparent",
-                        }
-                      : { color: "#111" }
-                  ),
-                }}
+                style={{ color: !activeType ? "#4a3bf1" : "#111" }}
               >
                 All
               </span>
@@ -121,18 +109,7 @@ export function ResourceCenterSidebar({
                   />
                   <span
                     className="font-display text-xl font-semibold leading-none tracking-[-0.05em] whitespace-nowrap"
-                    style={{
-                      ...(
-                        isActive
-                          ? {
-                              backgroundImage:
-                                "linear-gradient(92.3deg, #9a51ff 1.76%, #2cc1eb 98.78%)",
-                              WebkitBackgroundClip: "text",
-                              WebkitTextFillColor: "transparent",
-                            }
-                          : { color: "#111" }
-                      ),
-                    }}
+                    style={{ color: isActive ? "#4a3bf1" : "#111" }}
                   >
                     {label}
                   </span>

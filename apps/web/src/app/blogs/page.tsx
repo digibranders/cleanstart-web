@@ -84,8 +84,8 @@ export default async function BlogsPage({
         <FadeUp>
           <LatestBlogs
             posts={blogsData.docs}
-            hasMore={blogsData.hasNextPage}
             currentPage={page}
+            totalPages={blogsData.totalPages}
             activeCategory={activeCategory}
             searchQuery={searchQuery}
           />

@@ -1,11 +1,15 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { mediaUrl } from "@/lib/blog";
-import { getNewsBySlug, getRelatedNews } from "@/lib/news";
+import {
+  getNewsBySlug,
+  getNewsBySlugDraft,
+  getRelatedNews,
+} from "@/lib/news";
+import { highlightLexical } from "@/lib/highlightLexical";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
 import { NewsDetailHero } from "@/components/sections/news-detail/NewsDetailHero";
-import { NewsDetailMeta } from "@/components/sections/news-detail/NewsDetailMeta";
 import { NewsDetailBody } from "@/components/sections/news-detail/NewsDetailBody";
 import { NewsDetailRelated } from "@/components/sections/news-detail/NewsDetailRelated";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
@@ -51,15 +55,22 @@ export async function generateMetadata({
   });
 }
 
-export default async function NewsDetailPage({
-  params,
-}: NewsDetailPageProps): Promise<React.ReactElement> {
-  const { slug } = await params;
-  const item = await getNewsBySlug(slug);
+export async function renderNewsDetail({
+  slug,
+  draft = false,
+}: {
+  slug: string;
+  draft?: boolean;
+}): Promise<React.ReactElement> {
+  const item = draft ? await getNewsBySlugDraft(slug) : await getNewsBySlug(slug);
   if (!item) notFound();
 
   const categoryIds = item.newsCategories?.map((c) => c.id) ?? [];
-  const related = await getRelatedNews(item.id, categoryIds).catch(() => []);
+  const [related, highlightedBody] = await Promise.all([
+    getRelatedNews(item.id, categoryIds, 3, { draft }).catch(() => []),
+    highlightLexical(item.body ?? null),
+  ]);
+  const itemWithHighlighted = { ...item, body: highlightedBody ?? null };
 
   const heroAbsolute = mediaUrl(item.heroImage?.url ?? item.publisherLogo?.url);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.cleanstart.com";
@@ -88,16 +99,16 @@ export default async function NewsDetailPage({
       />
       <Header />
       <main>
-        <NewsDetailHero title={item.title} />
+        <NewsDetailHero
+          title={item.title}
+          pressType={item.pressType}
+          publicationDate={item.publicationDate}
+          shareUrl={shareUrl}
+          shareTitle={item.title}
+        />
 
         <div className="bg-white">
-          <NewsDetailMeta
-            pressType={item.pressType}
-            publicationDate={item.publicationDate}
-            shareUrl={shareUrl}
-            shareTitle={item.title}
-          />
-          <NewsDetailBody item={item} />
+          <NewsDetailBody item={itemWithHighlighted} />
         </div>
 
         {related.length > 0 ? (
@@ -119,4 +130,11 @@ export default async function NewsDetailPage({
       <Footer cta={<BlogDetailCTA />} />
     </>
   );
+}
+
+export default async function NewsDetailPage({
+  params,
+}: NewsDetailPageProps): Promise<React.ReactElement> {
+  const { slug } = await params;
+  return renderNewsDetail({ slug });
 }

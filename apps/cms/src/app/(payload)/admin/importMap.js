@@ -35,6 +35,7 @@ import { InlineToolbarFeatureClient as InlineToolbarFeatureClient_e70f5e05f09f93
 import { FixedToolbarFeatureClient as FixedToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { CleanstartInlineImageFeatureClient as CleanstartInlineImageFeatureClient_74586527eb72192e6c6a27300883f3de } from '@/payload/admin/components/InlineImage/CleanstartInlineImageFeatureClient.ts'
 import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { CleanstartAddMenuFeatureClient as CleanstartAddMenuFeatureClient_3bb091ca9ee97b5a57a7d5234ea492d1 } from '@/payload/admin/components/AddMenu/CleanstartAddMenuFeatureClient'
 import { CleanstartEmbedFeatureClient as CleanstartEmbedFeatureClient_0d8d46efc1fc83e23b5f221c6e92ed8f } from '@/payload/admin/components/Embed/CleanstartEmbedFeatureClient.ts'
 import { RelationshipFeatureClient as RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -74,6 +75,7 @@ import { OutboundRedirectField as OutboundRedirectField_6ddb1aebe33d308a1f37b1ba
 import { HeadTagsCard as HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462 } from '@/payload/admin/components/HeadTagsCard.tsx'
 import { UrlChangeHistoryField as UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c } from '@/payload/admin/components/UrlChangeHistoryField.tsx'
 import { SeoAdvancedPanel as SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50 } from '@/payload/admin/components/SeoAdvancedPanel.tsx'
+import { CopyPreviewLink as CopyPreviewLink_07cb4b4086c544d491395a77b113012e } from '@/payload/admin/components/CopyPreviewLink.tsx'
 import { UploadField as UploadField_9a37057695692a15b6c8aaeb6d981611 } from '@/payload/admin/components/fields/UploadField.tsx'
 import { LeadsImmutableBanner as LeadsImmutableBanner_c4273dccee2521e4317461376b79e241 } from '@/payload/admin/components/LeadsImmutableBanner.tsx'
 import { LeadsCsvTruncationBanner as LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb } from '@/payload/admin/components/LeadsCsvTruncationBanner.tsx'
@@ -89,11 +91,12 @@ import { AnalyticsTab as AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b } from '@
 import { PublishChecklistBanner as PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec } from '@/payload/admin/components/PublishChecklistBanner.tsx'
 import { PublishOverrideGuard as PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02 } from '@/payload/admin/components/PublishOverrideGuard.tsx'
 import { SlugRequirementGuard as SlugRequirementGuard_96979dae1465790bd97b2f570fed4659 } from '@/payload/admin/components/SlugRequirementGuard.tsx'
-import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/payload/admin/components/fields/CodeField.tsx'
+import { GateFormLabel as GateFormLabel_c191dd670871074ae1a1cea086f78af8 } from '@/payload/admin/components/GateFormLabel.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
 import { SkipLink as SkipLink_27a678dd284d4042d03686d8b9a9b8e9 } from '../../../payload/admin/components/SkipLink.tsx'
 import { SaveShortcut as SaveShortcut_add5731a604e577762f1b0196113538b } from '../../../payload/admin/components/SaveShortcut.tsx'
+import { ScrollToInvalidField as ScrollToInvalidField_4291c1b61b43429266b5712959f1cf9e } from '../../../payload/admin/components/ScrollToInvalidField.tsx'
 import { CommandPalette as CommandPalette_9e72795c48aa56bf099ac6d02eb8124e } from '../../../payload/admin/components/CommandPalette.tsx'
 import { FieldDescriptionTooltip as FieldDescriptionTooltip_ba26db738ee9a4c1171ac1c581ba5d08 } from '../../../payload/admin/components/FieldDescriptionTooltip.tsx'
 import { NavBadges as NavBadges_208a0014b2eb9ce6cf95af7e4047b13a } from '../../../payload/admin/components/NavBadges.tsx'
@@ -151,6 +154,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#FixedToolbarFeatureClient": FixedToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/payload/admin/components/InlineImage/CleanstartInlineImageFeatureClient.ts#CleanstartInlineImageFeatureClient": CleanstartInlineImageFeatureClient_74586527eb72192e6c6a27300883f3de,
   "@payloadcms/richtext-lexical/client#UploadFeatureClient": UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/payload/admin/components/AddMenu/CleanstartAddMenuFeatureClient#CleanstartAddMenuFeatureClient": CleanstartAddMenuFeatureClient_3bb091ca9ee97b5a57a7d5234ea492d1,
   "@/payload/admin/components/Embed/CleanstartEmbedFeatureClient.ts#CleanstartEmbedFeatureClient": CleanstartEmbedFeatureClient_0d8d46efc1fc83e23b5f221c6e92ed8f,
   "@payloadcms/richtext-lexical/client#RelationshipFeatureClient": RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
@@ -190,6 +194,7 @@ export const importMap = {
   "@/payload/admin/components/HeadTagsCard.tsx#HeadTagsCard": HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462,
   "@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField": UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c,
   "@/payload/admin/components/SeoAdvancedPanel.tsx#SeoAdvancedPanel": SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50,
+  "@/payload/admin/components/CopyPreviewLink.tsx#CopyPreviewLink": CopyPreviewLink_07cb4b4086c544d491395a77b113012e,
   "@/payload/admin/components/fields/UploadField.tsx#UploadField": UploadField_9a37057695692a15b6c8aaeb6d981611,
   "@/payload/admin/components/LeadsImmutableBanner.tsx#LeadsImmutableBanner": LeadsImmutableBanner_c4273dccee2521e4317461376b79e241,
   "@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner": LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb,
@@ -205,11 +210,12 @@ export const importMap = {
   "@/payload/admin/components/PublishChecklistBanner.tsx#PublishChecklistBanner": PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec,
   "@/payload/admin/components/PublishOverrideGuard.tsx#PublishOverrideGuard": PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02,
   "@/payload/admin/components/SlugRequirementGuard.tsx#SlugRequirementGuard": SlugRequirementGuard_96979dae1465790bd97b2f570fed4659,
-  "@/payload/admin/components/fields/CodeField.tsx#CodeField": CodeField_4aa85fbd783c4d26c5c89ebf383941c1,
+  "@/payload/admin/components/GateFormLabel.tsx#GateFormLabel": GateFormLabel_c191dd670871074ae1a1cea086f78af8,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,
   "./payload/admin/components/SkipLink.tsx#SkipLink": SkipLink_27a678dd284d4042d03686d8b9a9b8e9,
   "./payload/admin/components/SaveShortcut.tsx#SaveShortcut": SaveShortcut_add5731a604e577762f1b0196113538b,
+  "./payload/admin/components/ScrollToInvalidField.tsx#ScrollToInvalidField": ScrollToInvalidField_4291c1b61b43429266b5712959f1cf9e,
   "./payload/admin/components/CommandPalette.tsx#CommandPalette": CommandPalette_9e72795c48aa56bf099ac6d02eb8124e,
   "./payload/admin/components/FieldDescriptionTooltip.tsx#FieldDescriptionTooltip": FieldDescriptionTooltip_ba26db738ee9a4c1171ac1c581ba5d08,
   "./payload/admin/components/NavBadges.tsx#NavBadges": NavBadges_208a0014b2eb9ce6cf95af7e4047b13a,

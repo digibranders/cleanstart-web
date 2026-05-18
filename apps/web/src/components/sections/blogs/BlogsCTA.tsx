@@ -25,7 +25,6 @@ export function BlogsCTA(): React.ReactElement {
     <div
       className="absolute inset-0"
       style={{ background: "linear-gradient(180deg, #471ec0 0%, #131e8f 100%)" }}
-      aria-labelledby="blogs-cta-title"
     >
       {/* Left cube */}
       <div
@@ -76,8 +75,7 @@ export function BlogsCTA(): React.ReactElement {
           className="flex items-center"
           style={{ gap: "115px", width: "1047px" }}
         >
-          <h2
-            id="blogs-cta-title"
+          <div
             className="font-display font-bold text-white shrink-0"
             style={{
               fontSize: "clamp(1.75rem,3.82vw,3.4375rem)",
@@ -87,7 +85,7 @@ export function BlogsCTA(): React.ReactElement {
             }}
           >
             Stay Ahead of Container Security Threats
-          </h2>
+          </div>
 
           <div
             className="flex flex-col items-start shrink-0"

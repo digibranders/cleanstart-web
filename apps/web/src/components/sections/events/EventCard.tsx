@@ -23,7 +23,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
         width: "100%",
         maxWidth: "404px",
         height: "496px",
-        borderRadius: "24px",
+        borderRadius: "32px",
         boxShadow:
           "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
       }}
@@ -34,7 +34,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
         style={{
           margin: "12px",
           height: "200px",
-          borderRadius: "16px",
+          borderRadius: "24px",
           background: "#e8e8f0",
         }}
       >
@@ -64,7 +64,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
       >
         {/* Date row */}
         {shortDate && (
-          <div className="flex items-center" style={{ gap: "6px" }}>
+          <div className="flex items-center" style={{ gap: "4px" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/blogs/icon-calendar-grey.svg"
@@ -73,12 +73,16 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
               width={18}
               height={18}
               className="pointer-events-none select-none"
+              style={{
+                filter:
+                  "invert(28%) sepia(94%) saturate(4900%) hue-rotate(238deg) brightness(96%) contrast(94%)",
+              }}
               loading="lazy"
               decoding="async"
             />
             <span
-              className="text-sm font-medium leading-none"
-              style={{ color: "#6b7280" }}
+              className="font-medium leading-none"
+              style={{ color: "#4a3bf1", fontSize: "14px" }}
             >
               {shortDate}
             </span>
@@ -87,12 +91,12 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
 
         {/* Title */}
         <h3
-          className="font-display font-semibold overflow-hidden"
+          className="font-display font-medium overflow-hidden"
           style={{
-            color: "#0f1729",
-            fontSize: "clamp(1.125rem,1.39vw,1.375rem)",
+            color: "#111",
+            fontSize: "1.5rem",
             lineHeight: "1.3",
-            letterSpacing: "-0.03em",
+            letterSpacing: "-0.02em",
             display: "-webkit-box",
             WebkitLineClamp: 3,
             WebkitBoxOrient: "vertical",
@@ -112,15 +116,18 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
             alt=""
             aria-hidden
             width={18}
-            height={18}
+            height={20}
             className="pointer-events-none select-none"
-            style={{ color: "#6b7280" }}
             loading="lazy"
             decoding="async"
           />
           <span
-            className="text-sm leading-none truncate"
-            style={{ color: "#6b7280" }}
+            className="font-medium leading-none truncate"
+            style={{
+              color: "#111",
+              fontSize: "16px",
+              letterSpacing: "-0.05em",
+            }}
           >
             {event.venue}
           </span>
@@ -130,7 +137,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
         <Link
           href={`/events/${event.slug}`}
           className="cs-btn-blue gap-2 w-full"
-          style={{ height: "45px", fontSize: "0.9375rem", marginTop: "8px" }}
+          style={{ height: "45px", fontSize: "18px", marginTop: "8px" }}
           aria-label={`Read more about ${event.title}`}
         >
           Read more
@@ -139,8 +146,8 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
             src="/images/blogs/icon-arrow-right.svg"
             alt=""
             aria-hidden
-            width={20}
-            height={18}
+            width={22}
+            height={20}
             className="pointer-events-none select-none"
             loading="lazy"
             decoding="async"

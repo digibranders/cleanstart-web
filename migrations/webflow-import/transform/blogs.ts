@@ -1,21 +1,50 @@
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
-import { normalizeWebflowGuide } from '../../../apps/cms/src/payload/lib/webflow-import/guides-normalize';
+import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
+
+const asString = (v: unknown): string | null =>
+  typeof v === 'string' && v.trim().length > 0 ? v.trim() : null;
+
+const asNumber = (v: unknown): number | null => {
+  if (typeof v === 'number' && Number.isFinite(v)) return v;
+  if (typeof v === 'string') {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+};
 
 export const transformBlog = (row: Record<string, unknown>): Record<string, unknown> => {
-  const slug = (row.slug as string | undefined) ?? slugify(row.name as string | undefined);
-  const { faqs } = normalizeWebflowGuide(row);
+  const title = asString(row.name) ?? '';
+  const slug = asString(row.slug) ?? slugify(title);
+  const abstract = asString(row['abstract-2']) ?? asString(row['post-summary']);
+  const bodyHtml = asString(row['main-text']) ?? asString(row['post-body']);
+  const publishedAt = asString(row['date-of-publication']) ?? asString(row['date-published']);
+  const readingMinutes = asNumber(row['read-time-2']);
+
   return {
     _webflowId: row.webflowId,
     _status: 'published',
-    title: row.name ?? row.title ?? '',
+    title,
     slug,
-    abstract: row['post-summary'] ?? row.summary ?? null,
-    body: row['post-body'] ?? row.body ?? null,
-    publishedAt: row['date-published'] ?? row.publishedAt ?? null,
-    faqs: faqs.length > 0 ? faqs : undefined,
-    _rawAuthors: row['author-2'] ?? row.authors ?? null,
-    _rawCategories: row.tags ?? row.categories ?? null,
-    _rawHeroImage: row['thumbnail-image'] ?? row['main-image'] ?? row.image ?? null,
-    featured: Boolean(row['featured-post'] ?? false),
+    abstract,
+    body: bodyHtml ? htmlToLexical(bodyHtml) : undefined,
+    publishedAt,
+    readingMinutes: readingMinutes ?? undefined,
+    featured: Boolean(row['featured-post']),
+    seo: buildSeoOverrides(row),
+    _rawAuthors: row.author ?? row['author-2'] ?? row.authors ?? null,
+    _rawReviewedBy: row['review-by-2'] ?? row['review-by'] ?? null,
+    _rawCategories: row.categories ?? row.tags ?? null,
+    _rawHeroImage: row['main-image'] ?? row['thumbnail-image'] ?? row.image ?? null,
   };
+};
+
+const buildSeoOverrides = (row: Record<string, unknown>): Record<string, unknown> | undefined => {
+  const title = asString(row['meta-title']);
+  const description = asString(row['meta-description']);
+  if (!title && !description) return undefined;
+  const seo: Record<string, unknown> = {};
+  if (title) seo.title = title;
+  if (description) seo.description = description;
+  return seo;
 };

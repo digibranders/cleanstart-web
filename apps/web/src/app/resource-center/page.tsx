@@ -96,7 +96,7 @@ export default async function ResourceCenterPage({
                 paddingRight: "24px",
               }}
             >
-              <div className="flex items-start" style={{ gap: "32px" }}>
+              <div className="flex flex-col lg:flex-row items-stretch lg:items-start gap-6 lg:gap-8">
                 {/* Left sidebar */}
                 <ResourceCenterSidebar
                   activeType={activeType}
@@ -106,8 +106,8 @@ export default async function ResourceCenterPage({
                 {/* Right: 3-col grid */}
                 <ResourceGrid
                   resources={resourcesData.docs}
-                  hasMore={resourcesData.hasNextPage}
                   currentPage={page}
+                  totalPages={resourcesData.totalPages}
                   activeType={activeType}
                   searchQuery={searchQuery}
                 />

@@ -23,7 +23,13 @@ const ASSET_PROGRESS = path.resolve('migrations/webflow-export/.asset-progress.j
 
 const dryRun = process.argv.includes('--dry-run');
 
-const WEBFLOW_CDN_RE = /https:\/\/uploads(?:-ssl)?\.webflow\.com\/[^\s"')>]+/g;
+// Matches both the current Webflow CDN host (cdn.prod.website-files.com)
+// and the legacy uploads-* hosts still found in older body HTML. The
+// character class is permissive (only excludes whitespace + quote/angle
+// chars) because Webflow filenames legitimately contain `(`, `)`, `'`,
+// commas, etc.
+const WEBFLOW_CDN_RE =
+  /https:\/\/(?:cdn\.prod\.website-files\.com|uploads(?:-ssl)?\.webflow\.com)\/[^\s"<>]+/g;
 
 type AssetRecord = { webflowUrl: string; r2PublicUrl: string; sha256: string };
 

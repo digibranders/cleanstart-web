@@ -1,6 +1,8 @@
 import { cache } from "react";
 import type { LexicalRoot, BlogImage, TocEntry } from "@/lib/blog";
 
+import { fetchCMS } from "./cms-fetch";
+
 export type NewsCategory = {
   id: string;
   name: string;
@@ -50,18 +52,6 @@ type PayloadListResponse<T> = {
 
 export type NewsListResponse = PayloadListResponse<News>;
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
-
-async function fetchCMS<T>(path: string): Promise<T> {
-  const res = await fetch(`${CMS_URL}${path}`, {
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) {
-    throw new Error(`CMS fetch failed: ${res.status} ${path}`);
-  }
-  return res.json() as Promise<T>;
-}
-
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publicationDate][exists]=true";
 
@@ -100,23 +90,35 @@ export async function getNewsCategories(): Promise<NewsCategory[]> {
   return data.docs;
 }
 
+async function loadNewsBySlug(slug: string, draft = false): Promise<NewsDetail | null> {
+  const filter = draft ? "" : `&${PUBLISHED_FILTER}`;
+  const data = await fetchCMS<PayloadListResponse<NewsDetail>>(
+    `/api/news?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=3&limit=1`,
+    { draft },
+  );
+  return data.docs[0] ?? null;
+}
+
 export const getNewsBySlug = cache(
-  async (slug: string): Promise<NewsDetail | null> => {
-    const data = await fetchCMS<PayloadListResponse<NewsDetail>>(
-      `/api/news?where[slug][equals]=${encodeURIComponent(slug)}&${PUBLISHED_FILTER}&depth=3&limit=1`,
-    );
-    return data.docs[0] ?? null;
-  },
+  async (slug: string): Promise<NewsDetail | null> => loadNewsBySlug(slug, false),
 );
+
+/** Draft variant for the `/preview/news/[slug]` route. Not cached. */
+export async function getNewsBySlugDraft(slug: string): Promise<NewsDetail | null> {
+  return loadNewsBySlug(slug, true);
+}
 
 export async function getRelatedNews(
   newsId: string,
   categoryIds: string[],
   limit = 3,
+  { draft = false }: { draft?: boolean } = {},
 ): Promise<News[]> {
+  const filter = draft ? "" : `${PUBLISHED_FILTER}&`;
   if (categoryIds.length === 0) {
     const data = await fetchCMS<PayloadListResponse<News>>(
-      `/api/news?${PUBLISHED_FILTER}&where[id][not_equals]=${newsId}&depth=2&limit=${limit}&sort=-publicationDate`,
+      `/api/news?${filter}where[id][not_equals]=${newsId}&depth=2&limit=${limit}&sort=-publicationDate`,
+      { draft },
     );
     return data.docs;
   }
@@ -124,33 +126,18 @@ export async function getRelatedNews(
     .map((id, i) => `where[newsCategories][in][${i}]=${encodeURIComponent(id)}`)
     .join("&");
   const data = await fetchCMS<PayloadListResponse<News>>(
-    `/api/news?${PUBLISHED_FILTER}&where[id][not_equals]=${newsId}&${catParam}&depth=2&limit=${limit}&sort=-publicationDate`,
+    `/api/news?${filter}where[id][not_equals]=${newsId}&${catParam}&depth=2&limit=${limit}&sort=-publicationDate`,
+    { draft },
   );
   if (data.docs.length < limit) {
     const fallback = await fetchCMS<PayloadListResponse<News>>(
-      `/api/news?${PUBLISHED_FILTER}&where[id][not_equals]=${newsId}&depth=2&limit=${limit}&sort=-publicationDate`,
+      `/api/news?${filter}where[id][not_equals]=${newsId}&depth=2&limit=${limit}&sort=-publicationDate`,
+      { draft },
     );
     return fallback.docs;
   }
   return data.docs;
 }
 
-const PRESS_TYPE_LABEL: Record<PressType, string> = {
-  "press-release": "Press Release",
-  news: "News",
-  announcement: "Announcement",
-  feature: "Feature",
-};
-
-export function pressTypeLabel(value: PressType | null | undefined): string {
-  return PRESS_TYPE_LABEL[value ?? "press-release"];
-}
-
-export function formatNewsDate(iso?: string | null): string {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
+// Client-safe helpers live in `news-utils.ts`. Re-exported for backward compat.
+export { formatNewsDate, pressTypeLabel } from "./news-utils";

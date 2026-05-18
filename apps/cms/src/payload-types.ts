@@ -73,6 +73,7 @@ export interface Config {
     brokenLinks: BrokenLink;
     'audit-log': AuditLog;
     searchLog: SearchLog;
+    previewAudit: PreviewAudit;
     webhooks_dead_letter: WebhooksDeadLetter;
     integrations: Integration;
     analyticsCache: AnalyticsCache;
@@ -90,6 +91,7 @@ export interface Config {
     knowledgeBase: KnowledgeBase;
     events: Event;
     webinars: Webinar;
+    podcastEpisodes: PodcastEpisode;
     jobs: Job;
     aboutGalleries: AboutGallery;
     pages: Page;
@@ -107,6 +109,7 @@ export interface Config {
     brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
+    previewAudit: PreviewAuditSelect<false> | PreviewAuditSelect<true>;
     webhooks_dead_letter: WebhooksDeadLetterSelect<false> | WebhooksDeadLetterSelect<true>;
     integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
     analyticsCache: AnalyticsCacheSelect<false> | AnalyticsCacheSelect<true>;
@@ -124,6 +127,7 @@ export interface Config {
     knowledgeBase: KnowledgeBaseSelect<false> | KnowledgeBaseSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     webinars: WebinarsSelect<false> | WebinarsSelect<true>;
+    podcastEpisodes: PodcastEpisodesSelect<false> | PodcastEpisodesSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
     aboutGalleries: AboutGalleriesSelect<false> | AboutGalleriesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
@@ -144,6 +148,7 @@ export interface Config {
     footerNav: FooterNav;
     legal: Legal;
     announcements: Announcement;
+    podcastPage: PodcastPage;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
@@ -153,6 +158,7 @@ export interface Config {
     footerNav: FooterNavSelect<false> | FooterNavSelect<true>;
     legal: LegalSelect<false> | LegalSelect<true>;
     announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
+    podcastPage: PodcastPageSelect<false> | PodcastPageSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -165,6 +171,7 @@ export interface Config {
       drainLeadQueue: TaskDrainLeadQueue;
       purgeSearchLog: TaskPurgeSearchLog;
       purgeLeadsPii: TaskPurgeLeadsPii;
+      purgePreviewAudit: TaskPurgePreviewAudit;
       checkBrokenLinks: TaskCheckBrokenLinks;
       retryWebhook: TaskRetryWebhook;
       meiliReindex: TaskMeiliReindex;
@@ -454,6 +461,42 @@ export interface SearchLog {
    * User-Agent header. Trimmed at 200 chars.
    */
   userAgent?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Active and revoked preview-share links. Revoke a row to invalidate the link immediately.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "previewAudit".
+ */
+export interface PreviewAudit {
+  id: number;
+  /**
+   * Payload collection slug the token targets.
+   */
+  collection: string;
+  /**
+   * Doc id within the collection.
+   */
+  docId: string;
+  /**
+   * Editor who minted the link.
+   */
+  actor: number | User;
+  /**
+   * Optional human label, e.g. "Legal review – Q2 launch post".
+   */
+  label?: string | null;
+  /**
+   * TTL chosen at mint time.
+   */
+  ttlSeconds: number;
+  expiresAt: string;
+  /**
+   * Set this (or click Revoke in the row actions) to invalidate the link.
+   */
+  revokedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2251,7 +2294,7 @@ export interface News {
       )[]
     | null;
   /**
-   * Defaults to now on first publish.
+   * Defaults to the current moment on creation. Backdate or schedule by editing the picker.
    */
   publicationDate: string;
   relatedNews?: (number | News)[] | null;
@@ -2835,7 +2878,7 @@ export interface Resource {
    */
   gated?: boolean | null;
   /**
-   * Form the visitor fills to unlock the download. Required when gated.
+   * Form the visitor fills to unlock the download. Required when gated — the validator blocks save until set.
    */
   gateForm?: (number | null) | Form;
   accessLevel?: ('public' | 'lead-gated' | 'customer-only') | null;
@@ -3528,6 +3571,27 @@ export interface Event {
   registrationForm?: (number | null) | Form;
   attendeesCap?: number | null;
   /**
+   * Optional custom label for the registration CTA button. Defaults to "Register" when blank. Examples: "Join the Community", "RSVP", "Save Your Seat".
+   */
+  ctaLabel?: string | null;
+  /**
+   * Optional CTA shown on the detail page after the event has ended (startsAt is in the past). The registration button is hidden automatically — use this for "View Photos", "Watch Recording", "View Slides", etc.
+   */
+  postEventCta?: {
+    /**
+     * Enable to show a CTA on the detail page after the event ends.
+     */
+    enabled?: boolean | null;
+    /**
+     * Button label, e.g. "Watch Recording".
+     */
+    label?: string | null;
+    /**
+     * Destination URL for the post-event CTA.
+     */
+    url?: string | null;
+  };
+  /**
    * Drives the Event JSON-LD eventStatus. Switching to Postponed / Cancelled is required so search engines stop showing the event as still happening.
    */
   eventStatus: 'scheduled' | 'postponed' | 'cancelled';
@@ -4183,6 +4247,57 @@ export interface Webinar {
       | boolean
       | null;
   };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "podcastEpisodes".
+ */
+export interface PodcastEpisode {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  /**
+   * Sequential episode number, rendered as "Episode N" on cards and the hero.
+   */
+  episodeNumber: number;
+  /**
+   * Full YouTube URL (watch / youtu.be / embed / shorts). The 11-char video ID is auto-extracted on save and stored in youtubeVideoId.
+   */
+  youtubeUrl: string;
+  /**
+   * Auto-extracted from youtubeUrl on every save.
+   */
+  youtubeVideoId?: string | null;
+  /**
+   * Optional custom thumbnail. Leave blank to use YouTube’s maxresdefault thumbnail.
+   */
+  thumbnailOverride?: (number | null) | Media;
+  /**
+   * Short summary shown on listing cards and the featured hero. Keep under ~240 characters.
+   */
+  abstract?: string | null;
+  /**
+   * Total runtime in seconds. Surfaced as Schema.org duration / readable runtime badges.
+   */
+  durationSeconds?: number | null;
+  /**
+   * When on, this episode appears in the Featured Content section on /podcast.
+   */
+  featured?: boolean | null;
+  /**
+   * Defaults to the current moment on creation. Drives sort order on /podcast (newest first).
+   */
+  publicationDate: string;
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -5170,9 +5285,8 @@ export interface Page {
                     | 'hcl'
                     | 'text';
                   /**
-                   * Optional filename rendered as a tab above the code (e.g. Dockerfile).
+                   * Paste code here. Indentation is preserved.
                    */
-                  filename?: string | null;
                   content: string;
                   showLineNumbers?: boolean | null;
                   /**
@@ -5943,9 +6057,8 @@ export interface Page {
               | 'hcl'
               | 'text';
             /**
-             * Optional filename rendered as a tab above the code (e.g. Dockerfile).
+             * Paste code here. Indentation is preserved.
              */
-            filename?: string | null;
             content: string;
             showLineNumbers?: boolean | null;
             /**
@@ -6505,6 +6618,7 @@ export interface PayloadJob {
           | 'drainLeadQueue'
           | 'purgeSearchLog'
           | 'purgeLeadsPii'
+          | 'purgePreviewAudit'
           | 'checkBrokenLinks'
           | 'retryWebhook'
           | 'meiliReindex'
@@ -6550,6 +6664,7 @@ export interface PayloadJob {
         | 'drainLeadQueue'
         | 'purgeSearchLog'
         | 'purgeLeadsPii'
+        | 'purgePreviewAudit'
         | 'checkBrokenLinks'
         | 'retryWebhook'
         | 'meiliReindex'
@@ -6604,6 +6719,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'searchLog';
         value: number | SearchLog;
+      } | null)
+    | ({
+        relationTo: 'previewAudit';
+        value: number | PreviewAudit;
       } | null)
     | ({
         relationTo: 'webhooks_dead_letter';
@@ -6672,6 +6791,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'webinars';
         value: number | Webinar;
+      } | null)
+    | ({
+        relationTo: 'podcastEpisodes';
+        value: number | PodcastEpisode;
       } | null)
     | ({
         relationTo: 'jobs';
@@ -6876,6 +6999,21 @@ export interface SearchLogSelect<T extends boolean = true> {
   locale?: T;
   ip?: T;
   userAgent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "previewAudit_select".
+ */
+export interface PreviewAuditSelect<T extends boolean = true> {
+  collection?: T;
+  docId?: T;
+  actor?: T;
+  label?: T;
+  ttlSeconds?: T;
+  expiresAt?: T;
+  revokedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -8225,6 +8363,14 @@ export interface EventsSelect<T extends boolean = true> {
   registrationUrl?: T;
   registrationForm?: T;
   attendeesCap?: T;
+  ctaLabel?: T;
+  postEventCta?:
+    | T
+    | {
+        enabled?: T;
+        label?: T;
+        url?: T;
+      };
   eventStatus?: T;
   cancelledAt?: T;
   previousStartDate?: T;
@@ -8521,6 +8667,26 @@ export interface WebinarsSelect<T extends boolean = true> {
             };
         additionalSchema?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "podcastEpisodes_select".
+ */
+export interface PodcastEpisodesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  episodeNumber?: T;
+  youtubeUrl?: T;
+  youtubeVideoId?: T;
+  thumbnailOverride?: T;
+  abstract?: T;
+  durationSeconds?: T;
+  featured?: T;
+  publicationDate?: T;
+  publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -8991,7 +9157,6 @@ export interface PagesSelect<T extends boolean = true> {
                       | T
                       | {
                           language?: T;
-                          filename?: T;
                           content?: T;
                           showLineNumbers?: T;
                           highlightLines?: T;
@@ -9361,7 +9526,6 @@ export interface PagesSelect<T extends boolean = true> {
           | T
           | {
               language?: T;
-              filename?: T;
               content?: T;
               showLineNumbers?: T;
               highlightLines?: T;
@@ -10121,6 +10285,63 @@ export interface Announcement {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "podcastPage".
+ */
+export interface PodcastPage {
+  id: number;
+  /**
+   * Small tag above the hero title. Optional.
+   */
+  heroEyebrow?: string | null;
+  /**
+   * Full hero title. Use heroTitleHighlight to mark the word(s) that should render in the accent colour.
+   */
+  heroTitle: string;
+  /**
+   * Substring of heroTitle that renders in the accent colour (case-sensitive match).
+   */
+  heroTitleHighlight: string;
+  /**
+   * One- or two-line subtitle shown beneath the hero title.
+   */
+  heroSubtitle?: string | null;
+  /**
+   * Episode shown in the hero embed. Leave empty to fall back to the most recent published episode.
+   */
+  featuredHeroEpisode?: (number | null) | PodcastEpisode;
+  latestEpisodesTitle?: string | null;
+  /**
+   * How many recent episodes to render on the listing grid.
+   */
+  latestEpisodesLimit?: number | null;
+  /**
+   * Heading for the Featured Content section. Pair with featuredSectionHighlight to mark the accent-coloured word(s).
+   */
+  featuredSectionTitle?: string | null;
+  /**
+   * Substring of featuredSectionTitle that renders in the accent colour (case-sensitive match).
+   */
+  featuredSectionHighlight?: string | null;
+  /**
+   * Cards rendered above the footer. Leave empty to fall back to the built-in defaults.
+   */
+  ctaCards?:
+    | {
+        title: string;
+        body: string;
+        ctaLabel: string;
+        /**
+         * Destination URL or path. Accepts `/site-path` or `https://…`.
+         */
+        ctaHref: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -10380,6 +10601,33 @@ export interface AnnouncementsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "podcastPage_select".
+ */
+export interface PodcastPageSelect<T extends boolean = true> {
+  heroEyebrow?: T;
+  heroTitle?: T;
+  heroTitleHighlight?: T;
+  heroSubtitle?: T;
+  featuredHeroEpisode?: T;
+  latestEpisodesTitle?: T;
+  latestEpisodesLimit?: T;
+  featuredSectionTitle?: T;
+  featuredSectionHighlight?: T;
+  ctaCards?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats_select".
  */
 export interface PayloadJobsStatsSelect<T extends boolean = true> {
@@ -10419,6 +10667,14 @@ export interface TaskPurgeSearchLog {
  * via the `definition` "TaskPurgeLeadsPii".
  */
 export interface TaskPurgeLeadsPii {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPurgePreviewAudit".
+ */
+export interface TaskPurgePreviewAudit {
   input?: unknown;
   output?: unknown;
 }
@@ -10506,6 +10762,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'webinars';
           value: number | Webinar;
+        } | null)
+      | ({
+          relationTo: 'podcastEpisodes';
+          value: number | PodcastEpisode;
         } | null)
       | ({
           relationTo: 'jobs';

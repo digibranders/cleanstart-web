@@ -2,6 +2,10 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import {
+  resourceDownloadEndpoint,
+  resourceTokenEndpoint,
+} from '../endpoints/resources-download';
 import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
@@ -72,8 +76,19 @@ export const Resources: CollectionConfig = {
       type: 'relationship',
       relationTo: 'forms',
       admin: {
-        description: 'Form the visitor fills to unlock the download. Required when gated.',
+        description:
+          'Form the visitor fills to unlock the download. Required when gated — the validator blocks save until set.',
         condition: (_data, sibling) => sibling?.gated === true,
+        components: {
+          // Custom label that appends the red `*` only when `gated` is
+          // checked. Required-asterisk is normally driven by
+          // schema-level `required: true`, but we can't set that here:
+          // Payload runs required-validation regardless of
+          // `admin.condition`, which would block saving any non-gated
+          // resource. The validate function below is the source of
+          // truth — this component is just the visual cue.
+          Label: '@/payload/admin/components/GateFormLabel.tsx#GateFormLabel',
+        },
       },
       validate: (
         value: unknown,
@@ -149,6 +164,7 @@ export const Resources: CollectionConfig = {
     ],
     afterDelete: [searchSyncAfterDeleteHook('resources')],
   },
+  endpoints: [resourceDownloadEndpoint, resourceTokenEndpoint],
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,
 };

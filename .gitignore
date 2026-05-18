@@ -27,6 +27,7 @@ next-env.d.ts
 .env
 .env.local
 .env.*.local
+.env.migration
 
 # Logs
 *.log
@@ -64,3 +65,6 @@ apps/cms/.lead-fallback-queue/
 .env*.local
 
 launch.json
+
+# Local scratch space
+tmp/

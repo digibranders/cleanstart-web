@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   youtubeEmbedUrl,
   youtubeThumbnail,
-} from "@/lib/podcast";
+} from "@/lib/podcast-utils";
 
 type Props = {
   videoId: string;

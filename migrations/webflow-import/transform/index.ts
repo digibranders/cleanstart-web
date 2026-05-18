@@ -13,29 +13,42 @@ import fs from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline';
 
-import { transformBlog } from './blogs';
-import { transformNews } from './news';
-import { transformGuide } from './guides';
-import { transformEvent } from './events';
-import { transformWebinar } from './webinars';
-import { transformJob } from './jobs';
+import { transformAboutGallery } from './about-galleries';
 import { transformAuthor } from './authors';
-import { transformResource } from './resources';
+import { transformBlog } from './blogs';
+import { transformCategory } from './categories';
+import { transformEvent } from './events';
+import { transformGuide } from './guides';
+import { transformJob } from './jobs';
+import { transformJobLocation } from './job-locations';
+import { transformNews } from './news';
+import { transformNewsCategory } from './news-categories';
 import { transformPage } from './pages';
+import { transformResource } from './resources';
+import { transformWebinar } from './webinars';
 
 const RAW_DIR = path.resolve('migrations/webflow-export/raw');
 const OUT_DIR = path.resolve('migrations/webflow-export/transformed');
 
 type Transformer = (row: Record<string, unknown>) => Record<string, unknown>;
 
+/**
+ * Ordered so taxonomies and authors are transformed before the content
+ * collections that reference them. The import step relies on the same
+ * ordering — keep it in sync with `import.ts:IMPORT_ORDER`.
+ */
 const TRANSFORMERS: Record<string, Transformer> = {
+  authors: transformAuthor,
+  categories: transformCategory,
+  newsCategories: transformNewsCategory,
+  jobLocations: transformJobLocation,
+  aboutGalleries: transformAboutGallery,
   blogs: transformBlog,
   news: transformNews,
   guides: transformGuide,
   events: transformEvent,
   webinars: transformWebinar,
   jobs: transformJob,
-  authors: transformAuthor,
   resources: transformResource,
   pages: transformPage,
 };
@@ -64,7 +77,27 @@ const transformCollection = async (slug: string, transformer: Transformer): Prom
     if (!line.trim()) continue;
     try {
       const raw = JSON.parse(line) as Record<string, unknown>;
-      const transformed = transformer(raw);
+      const transformed = transformer(raw) as Record<string, unknown>;
+      // Pass Webflow's authoring history (`_meta.createdOn` /
+      // `_meta.lastUpdated` / `_meta.lastPublished`) through to the
+      // import step. Individual transformers only emit the fields
+      // they care about, but the import needs `_meta` to restore
+      // Payload's `created_at` / `updated_at` timestamps after
+      // Payload's auto-stamp.
+      const meta = raw._meta as Record<string, unknown> | undefined;
+      if (meta && transformed._meta === undefined) transformed._meta = meta;
+      // For collections that don't have an explicit editorial
+      // publish date in Webflow (guides, jobs, authors), fall back
+      // to `_meta.lastPublished` so `publishedAt` reflects when the
+      // row last went live in Webflow rather than being null.
+      if (
+        transformed.publishedAt == null &&
+        transformed.publicationDate == null &&
+        meta &&
+        typeof meta.lastPublished === 'string'
+      ) {
+        transformed.publishedAt = meta.lastPublished;
+      }
       writeStream.write(JSON.stringify(transformed) + '\n');
       total += 1;
     } catch (err) {

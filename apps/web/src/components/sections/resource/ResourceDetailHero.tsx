@@ -1,25 +1,26 @@
 import Link from "next/link";
 import type { ResourceDetail } from "@/lib/resources";
 import { resourceTypeLabel, mediaUrl } from "@/lib/resources";
+import type { Form } from "@/lib/forms";
+import { DETAIL_HERO_TITLE_STYLE } from "@/components/sections/_shared/DetailHero";
+import { ResourceDownloadButton } from "@/components/resource/ResourceDownloadButton";
 
 interface ResourceDetailHeroProps {
   resource: ResourceDetail;
+  gateForm?: Form | null;
 }
 
 export function ResourceDetailHero({
   resource,
+  gateForm,
 }: ResourceDetailHeroProps): React.ReactElement {
   const typeLabel = resourceTypeLabel(resource.type);
   const assetHref = resource.asset?.url ? (mediaUrl(resource.asset.url) ?? "#") : "#";
+  const gated = resource.gated === true;
 
   return (
     <section
-      className="relative overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(180deg, #151021 25.7%, #10123e 37.8%, #131e8f 66.9%, #471ec0 79.7%, #471fc3 92.2%, rgba(70,30,191,0.85) 97.9%, rgba(66,30,188,0.4) 107.7%, rgba(66,30,188,0) 113.5%)",
-        minHeight: "519px",
-      }}
+      className="relative overflow-hidden min-h-[440px] lg:min-h-[519px]"
       aria-labelledby="rd-hero-title"
     >
       {/* Background dot grid */}
@@ -96,8 +97,7 @@ export function ResourceDetailHero({
         {/* Breadcrumb */}
         <nav
           aria-label="Breadcrumb"
-          className="flex items-center"
-          style={{ paddingTop: "138px" }}
+          className="flex items-center flex-wrap pt-[120px] lg:pt-[138px]"
         >
           <Link
             href="/"
@@ -199,12 +199,7 @@ export function ResourceDetailHero({
           <h1
             id="rd-hero-title"
             className="font-display font-semibold text-center text-white"
-            style={{
-              fontSize: "clamp(2rem, 3.75vw, 4.5rem)",
-              lineHeight: 1,
-              letterSpacing: "-0.05em",
-              maxWidth: "829px",
-            }}
+            style={{ ...DETAIL_HERO_TITLE_STYLE, maxWidth: "829px" }}
           >
             {resource.title}
           </h1>
@@ -212,18 +207,20 @@ export function ResourceDetailHero({
 
         {/* Download button */}
         <div
-          className="flex justify-center"
-          style={{ marginTop: "30px", paddingBottom: "80px" }}
+          className="flex justify-center mt-6 lg:mt-[30px] pb-12 lg:pb-20"
         >
-          <a
-            href={assetHref}
-            download={assetHref !== "#"}
-            className="cs-btn-blue gap-3 font-bold"
+          <ResourceDownloadButton
+            resourceId={resource.id}
+            resourceTitle={resource.title}
+            resourceSlug={resource.slug}
+            gated={gated}
+            assetHref={assetHref}
+            gateForm={gateForm ?? null}
+            className="cs-btn-blue gap-3 font-bold h-[42px] lg:h-[64px]"
             style={{
               width: "840px",
               maxWidth: "100%",
-              height: "64px",
-              fontSize: "clamp(1.25rem, 1.25vw, 1.5rem)",
+              fontSize: "clamp(1rem, 1.6vw, 1.5rem)",
               letterSpacing: "-0.05em",
             }}
           >
@@ -232,14 +229,12 @@ export function ResourceDetailHero({
               src="/images/resource-center/detail-download-icon.svg"
               alt=""
               aria-hidden
-              width={40}
-              height={40}
-              className="pointer-events-none select-none"
+              className="pointer-events-none select-none w-6 h-6 lg:w-10 lg:h-10"
               loading="eager"
               decoding="async"
             />
             Download
-          </a>
+          </ResourceDownloadButton>
         </div>
       </div>
     </section>

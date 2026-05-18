@@ -11,7 +11,7 @@ import {
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
-import { validateOptionalUrl } from '../lib/url-shape';
+import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const Authors: CollectionConfig = {
   slug: 'authors',
@@ -54,10 +54,13 @@ export const Authors: CollectionConfig = {
       name: 'social',
       label: 'Social',
       fields: [
-        { name: 'twitter', type: 'text', validate: validateOptionalUrl },
-        { name: 'linkedin', type: 'text', validate: validateOptionalUrl },
-        { name: 'github', type: 'text', validate: validateOptionalUrl },
-        { name: 'website', type: 'text', validate: validateOptionalUrl },
+        // `beforeValidate` normalises bare domains (`cleanstart.com`) to
+        // `https://cleanstart.com` so the optional-URL validator stops
+        // blocking publish on a value editors think of as a valid URL.
+        { name: 'twitter',  type: 'text', hooks: { beforeValidate: [normalizeOptionalUrlHook] }, validate: validateOptionalUrl },
+        { name: 'linkedin', type: 'text', hooks: { beforeValidate: [normalizeOptionalUrlHook] }, validate: validateOptionalUrl },
+        { name: 'github',   type: 'text', hooks: { beforeValidate: [normalizeOptionalUrlHook] }, validate: validateOptionalUrl },
+        { name: 'website',  type: 'text', hooks: { beforeValidate: [normalizeOptionalUrlHook] }, validate: validateOptionalUrl },
         { name: 'email', type: 'email' },
       ],
     },

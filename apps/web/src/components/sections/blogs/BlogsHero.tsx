@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { type Blog, type BlogCategory, formatBlogDate, mediaUrl } from "@/lib/blog";
-import { BlogsHeroSearch } from "./BlogsHeroSearch";
+import { SearchBar } from "@/components/sections/_shared/SearchBar";
 
 const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123e 45%, #131e8f 61%, #471ec0 75%, #471fc3 84%, rgba(70,30,191,0.85) 88%, rgba(66,30,188,0.40) 95%, rgba(66,30,188,0) 99%)";
@@ -26,29 +26,6 @@ export function BlogsHero({
       style={{ minHeight: "1059px", background: HERO_GRADIENT }}
       aria-labelledby="blogs-hero-title"
     >
-      {/* Decorative orb — top right, mix-blend-color-dodge */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
-        style={{
-          left: "1652px",
-          top: "135px",
-          width: "419px",
-          height: "419px",
-          mixBlendMode: "color-dodge",
-          opacity: 0.2,
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/blogs/hero-orb-top.png"
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
-
       {/* Decorative glow — left side, mix-blend-hard-light */}
       <div
         aria-hidden
@@ -60,6 +37,30 @@ export function BlogsHero({
           height: "313px",
           mixBlendMode: "hard-light",
           opacity: 0.3,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/blogs/hero-glow-left.png"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
+
+      {/* Decorative glow — right side, mirrored from left */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute"
+        style={{
+          right: "-119px",
+          top: "279px",
+          width: "332px",
+          height: "313px",
+          mixBlendMode: "hard-light",
+          opacity: 0.3,
+          transform: "scaleX(-1)",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -118,14 +119,18 @@ export function BlogsHero({
                 />
               }
             >
-              <BlogsHeroSearch initialQuery={searchQuery} />
+              <SearchBar
+                initialQuery={searchQuery}
+                placeholder="Search blogs..."
+                ariaLabel="Search blogs"
+              />
             </Suspense>
           </div>
 
           {/* Category filter pills */}
           <nav
             className="flex flex-wrap items-center justify-center"
-            style={{ gap: "16px" }}
+            style={{ gap: "10px" }}
             aria-label="Blog categories"
           >
             <CategoryPill
@@ -261,17 +266,17 @@ function CategoryPill({
   return (
     <Link
       href={href}
-      className="cs-category-pill flex items-center justify-center font-sans font-semibold text-white shrink-0"
+      className="cs-category-pill flex items-center justify-center font-sans font-normal text-white shrink-0"
       style={{
-        height: "42px",
-        padding: "8px 32px",
+        height: "32px",
+        padding: "6px 16px",
         borderRadius: "30px",
         background: active
           ? "rgba(196,70,239,0.6)"
           : "rgba(196,70,239,0.2)",
-        fontSize: "clamp(0.875rem,1.39vw,1.25rem)",
+        fontSize: "14px",
         lineHeight: "1.0",
-        letterSpacing: "-0.05em",
+        letterSpacing: "-0.02em",
         whiteSpace: "nowrap",
       }}
       aria-current={active ? "page" : undefined}

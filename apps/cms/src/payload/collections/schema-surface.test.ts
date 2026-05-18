@@ -19,6 +19,7 @@ import { Media } from './Media';
 import { News } from './News';
 import { NewsCategories } from './NewsCategories';
 import { Pages } from './Pages';
+import { PodcastEpisodes } from './PodcastEpisodes';
 import { Redirects } from './Redirects';
 import { Resources } from './Resources';
 import { SearchLog } from './SearchLog';
@@ -99,6 +100,7 @@ const collections: { name: string; config: CollectionConfig }[] = [
   { name: 'News', config: News },
   { name: 'NewsCategories', config: NewsCategories },
   { name: 'Pages', config: Pages },
+  { name: 'PodcastEpisodes', config: PodcastEpisodes },
   { name: 'Redirects', config: Redirects },
   { name: 'Resources', config: Resources },
   { name: 'SearchLog', config: SearchLog },

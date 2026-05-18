@@ -55,16 +55,15 @@
      The .bg-cs-hero rule still applies a #151021 fallback bg-color for the
      transparent-tail safety. */
   --bg-hero-mesh: linear-gradient(
-    to bottom,
-    #151021 0%,
-    #14143C 22%,
-    #181A5E 42%,
-    #1F1F88 56%,
-    #2B22B0 68%,
-    #4226D5 80%,
-    #5028E5 89%,
-    rgba(80, 40, 229, 0.62) 95%,
-    rgba(80, 40, 229, 0) 100%
+    180deg,
+    rgba(21, 16, 33, 1) 0%,
+    rgba(16, 18, 62, 1) 31%,
+    rgba(19, 30, 143, 1) 51%,
+    rgba(71, 30, 192, 1) 69%,
+    rgba(71, 31, 195, 1) 80%,
+    rgba(70, 30, 191, 0.85) 85%,
+    rgba(66, 30, 188, 0.4) 94%,
+    rgba(66, 30, 188, 0) 99%
   );
 
   /* Decorative purple radial blobs (Figma "Union" vectors, fill #640DFB radial)
@@ -1471,17 +1470,129 @@ body {
   line-height: 1.6;
 }
 
-.article-body .article-pre {
-  background: #1a1a2e;
+/* ── CleanStart code block ───────────────────────────────────────────────────
+ * Server-rendered via <CodeBlock> (apps/web/src/components/code/CodeBlock.tsx).
+ * Shiki produces inline-styled <span> token spans; this scope owns layout,
+ * chrome, line numbers, and the highlight accent.
+ */
+.cs-code {
+  --cs-code-surface: #0c131c;
+  --cs-code-border: rgba(255, 255, 255, 0.06);
+  --cs-code-muted: #94a3b8;
+  --cs-code-accent: #2cc1eb;
+
+  position: relative;
+  margin: 1.75rem 0;
+  background: var(--cs-code-surface);
+  border: 1px solid var(--cs-code-border);
+  border-radius: 12px;
+  overflow: hidden;
   color: #e2e8f0;
-  padding: 1.25rem 1.5rem;
-  border-radius: 10px;
-  overflow-x: auto;
-  font-size: 0.9em;
-  line-height: 1.65;
-  margin: 1.5rem 0;
-  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  font-family: var(--font-mono), ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset, 0 12px 32px -16px rgba(8, 12, 22, 0.6);
 }
+
+.cs-code__floating-copy {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  z-index: 2;
+}
+
+.cs-code__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--cs-code-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.cs-code__copy:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.cs-code__copy:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(44, 193, 235, 0.5);
+  border-color: rgba(44, 193, 235, 0.6);
+}
+
+.cs-code__copy[data-copied] {
+  color: #86e1a0;
+  border-color: rgba(134, 225, 160, 0.35);
+  background: rgba(134, 225, 160, 0.08);
+}
+
+.cs-code__copy-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+}
+
+.cs-code__pre {
+  margin: 0;
+  padding: 2.75rem 0 1rem;
+  overflow-x: auto;
+  font-size: 13.5px;
+  line-height: 1.65;
+  tab-size: 2;
+}
+
+.cs-code__code {
+  display: block;
+  min-width: max-content;
+  font-family: inherit;
+  font-size: inherit;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.cs-code__line {
+  display: flex;
+  align-items: flex-start;
+  padding: 0 1.25rem;
+  border-left: 2px solid transparent;
+  white-space: pre;
+}
+
+.cs-code__line[data-highlight] {
+  background: rgba(44, 193, 235, 0.07);
+  border-left-color: rgba(44, 193, 235, 0.55);
+}
+
+.cs-code__line-no {
+  flex: 0 0 auto;
+  width: 2.25rem;
+  margin-right: 1rem;
+  padding-right: 0.75rem;
+  text-align: right;
+  color: rgba(148, 163, 184, 0.5);
+  border-right: 1px solid var(--cs-code-border);
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.cs-code__line-content {
+  flex: 1 1 auto;
+  white-space: pre;
+}
+
+/* Hide the gutter when line numbers are disabled */
+.cs-code__pre:not([data-line-numbers]) .cs-code__line-no {
+  display: none;
+}
+
 
 .article-body .article-hr {
   border: none;
@@ -1503,9 +1614,9 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(16px, 1.2vw, 20px);
+  font-size: 0.875rem; /* 14px at default 16px root */
   line-height: 1.4;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
 }
 
 .article-body .article-table th,
@@ -1517,15 +1628,54 @@ body {
   vertical-align: top;
 }
 
+/* Body cells (default) — Sora regular */
+.article-body .article-table td {
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  color: rgba(17, 17, 17, 0.8);
+}
+
+/* Row header (1st column) — Sora medium.
+   Covers both explicit `th.article-th-row` and positional `td:first-child`
+   for tables authored without headerState in the CMS. */
 .article-body .article-table th.article-th-row,
-.article-body .article-table th.article-th-col {
+.article-body .article-table tr > td:first-child {
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   font-weight: 500;
   color: #000000;
 }
 
-.article-body .article-table td {
-  font-weight: 400;
-  color: rgba(17, 17, 17, 0.8);
+/* Column header (top row) — Sora semibold. Wins over the 1st-column rule
+   so the corner cell reads as a column header. */
+.article-body .article-table th.article-th-col,
+.article-body .article-table tr:first-child > td,
+.article-body .article-table tr:first-child > th {
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  color: #000000;
+}
+
+/* Headings authored inside table cells (editor styled cells as h2/h3 for emphasis)
+   should inherit the cell's typography — they are not document headings. */
+.article-body .article-table th .article-h1,
+.article-body .article-table th .article-h2,
+.article-body .article-table th .article-h3,
+.article-body .article-table th .article-h4,
+.article-body .article-table th .article-h5,
+.article-body .article-table th .article-h6,
+.article-body .article-table td .article-h1,
+.article-body .article-table td .article-h2,
+.article-body .article-table td .article-h3,
+.article-body .article-table td .article-h4,
+.article-body .article-table td .article-h5,
+.article-body .article-table td .article-h6 {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  margin: 0;
 }
 
 /* Strip paragraph spacing inside table cells */
@@ -1536,6 +1686,18 @@ body {
   line-height: inherit;
   letter-spacing: inherit;
   color: inherit;
+}
+
+/* Inline emphasis (strong/b/em/i) inside table cells inherits the cell's
+   weight. Imported content often wraps every cell in <strong>, which would
+   otherwise force 700 across all body cells regardless of the cell's own
+   font-weight. Authors who genuinely want bold inside a cell can set it
+   on the cell itself via a class. */
+.article-body .article-table th strong,
+.article-body .article-table th b,
+.article-body .article-table td strong,
+.article-body .article-table td b {
+  font-weight: inherit;
 }
 
 /* First h2 should have less top margin if it's the very first child */

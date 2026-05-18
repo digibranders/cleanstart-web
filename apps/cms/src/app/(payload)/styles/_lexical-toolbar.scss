@@ -746,3 +746,30 @@
     }
   }
 }
+
+/* ── React-select menus inside Lexical block decorators ─────────────────────
+ * Payload's BlocksFeature renders embedded blocks (e.g. CodeBlock) as Lexical
+ * decorators. The react-select inside those blocks sits in the local stacking
+ * context of the decorator; its menu must paint above the sibling fields
+ * (Filename, Content, etc.) and not bleed transparency.
+ */
+[data-lexical-decorator='true'] {
+  /* Lift the entire field-type that contains an open react-select menu so the
+   * menu paints above later sibling field-type containers (Content textarea,
+   * etc.). z-index on .react-select alone is insufficient — siblings share the
+   * same stacking context and fall back to DOM order.
+   */
+  .field-type:has(.rs__menu) {
+    position: relative;
+    z-index: 5;
+  }
+
+  .rs__menu {
+    background-color: var(--theme-elevation-100, #23242a);
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+  }
+
+  .rs__menu-list {
+    background-color: var(--theme-elevation-100, #23242a);
+  }
+}

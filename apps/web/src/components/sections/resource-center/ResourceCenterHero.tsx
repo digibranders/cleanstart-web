@@ -1,14 +1,5 @@
-"use client";
-
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback, useRef } from "react";
-
-// Popular-search terms shown as pills in Figma
-const POPULAR_SEARCHES = [
-  "Containing Vulnerabilities",
-  "Shell-less",
-  "Replacing",
-];
+import { Suspense } from "react";
+import { SearchBar } from "@/components/sections/_shared/SearchBar";
 
 const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 25.7%, #10123e 37.8%, #131e8f 66.9%, #471ec0 79.7%, #471fc3 92.2%, rgba(70,30,191,0.85) 97.9%, rgba(66,30,188,0.4) 107.7%, rgba(66,30,188,0) 113.5%)";
@@ -20,37 +11,6 @@ interface ResourceCenterHeroProps {
 export function ResourceCenterHero({
   initialQuery,
 }: ResourceCenterHeroProps): React.ReactElement {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleSearch = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const q = inputRef.current?.value.trim() ?? "";
-      const params = new URLSearchParams(searchParams.toString());
-      if (q) {
-        params.set("q", q);
-      } else {
-        params.delete("q");
-      }
-      params.delete("page");
-      router.push(`${pathname}?${params.toString()}`);
-    },
-    [router, pathname, searchParams],
-  );
-
-  const handlePopularSearch = useCallback(
-    (term: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("q", term);
-      params.delete("page");
-      router.push(`${pathname}?${params.toString()}`);
-    },
-    [router, pathname, searchParams],
-  );
-
   return (
     <section
       className="relative overflow-hidden"
@@ -119,7 +79,7 @@ export function ResourceCenterHero({
       <div className="relative mx-auto max-w-[1276px] px-6">
         {/* Title block + search */}
         <div
-          className="flex flex-col items-center gap-8 mx-auto pt-[158px]"
+          className="flex flex-col items-center gap-6 lg:gap-8 mx-auto pt-[120px] lg:pt-[158px]"
           style={{ maxWidth: "955px" }}
         >
           {/* Title + subtitle */}
@@ -131,7 +91,7 @@ export function ResourceCenterHero({
               id="rc-hero-title"
               className="font-display font-semibold leading-none"
               style={{
-                fontSize: "clamp(2.5rem, 3.75vw, 4.5rem)",
+                fontSize: "clamp(1.75rem, 7.5vw, 4.5rem)",
                 letterSpacing: "-0.05em",
               }}
             >
@@ -161,118 +121,20 @@ export function ResourceCenterHero({
           </div>
 
           {/* Search bar */}
-          <search aria-label="Search resources" className="contents">
-          <form
-            onSubmit={handleSearch}
-            className="flex items-center w-full"
-            style={{ maxWidth: "674px" }}
-          >
-            <div
-              className="relative overflow-hidden flex-1"
-              style={{
-                height: "42px",
-                background: "rgba(255,255,255,0.2)",
-                border: "1px solid rgba(237,203,255,0.6)",
-                borderRight: "none",
-                borderRadius: "12px 0 0 12px",
-              }}
-            >
-              <input
-                ref={inputRef}
-                type="search"
-                name="q"
-                defaultValue={initialQuery}
-                placeholder="Search resources..."
-                className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 text-base leading-[1.5] outline-none"
-                style={{ fontWeight: 400 }}
+          <Suspense
+            fallback={
+              <div
+                className="flex items-center"
+                style={{ height: "42px", width: "674px" }}
               />
-            </div>
-            {/* Search button */}
-            <button
-              type="submit"
-              className="shrink-0 flex items-center justify-center"
-              style={{
-                width: "52px",
-                height: "42px",
-                background: "rgba(255,255,255,0.2)",
-                border: "1px solid rgba(237,203,255,0.6)",
-                borderLeft: "none",
-                borderRadius: "0 12px 12px 0",
-              }}
-              aria-label="Submit search"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden
-              >
-                <circle
-                  cx="11"
-                  cy="11"
-                  r="7"
-                  stroke="white"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M16.5 16.5L21 21"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-          </form>
-          </search>
-        </div>
-
-        {/* Popular search pills */}
-        <div
-          className="flex flex-wrap items-center justify-center gap-[27px] mt-8 pb-10"
-        >
-          <span
-            className="font-sans font-semibold text-white whitespace-nowrap"
-            style={{
-              fontSize: "clamp(0.875rem, 1.04vw, 1.25rem)",
-              letterSpacing: "-0.05em",
-            }}
+            }
           >
-            Popular Search:
-          </span>
-          {POPULAR_SEARCHES.map((term) => (
-            <button
-              key={term}
-              type="button"
-              onClick={() => handlePopularSearch(term)}
-              className="relative overflow-hidden text-white font-sans font-semibold whitespace-nowrap"
-              style={{
-                height: "42px",
-                padding: "8px 32px",
-                borderRadius: "30px",
-                background: "rgba(196,70,239,0.2)",
-                backdropFilter: "blur(8px)",
-                WebkitBackdropFilter: "blur(8px)",
-                fontSize: "clamp(0.875rem, 1.04vw, 1.25rem)",
-                letterSpacing: "-0.05em",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              {/* Noise grain overlay — matches Figma "Noise" effect */}
-              <span
-                aria-hidden
-                className="absolute inset-0 pointer-events-none select-none rounded-[30px]"
-                style={{
-                  backgroundImage:
-                    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-                  opacity: 0.08,
-                  mixBlendMode: "overlay",
-                }}
-              />
-              {term}
-            </button>
-          ))}
+            <SearchBar
+              initialQuery={initialQuery}
+              placeholder="Search resources..."
+              ariaLabel="Search resources"
+            />
+          </Suspense>
         </div>
       </div>
     </section>

@@ -1,19 +1,43 @@
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
+import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
 import { newsLinkToCanonicalPatch } from '../../../apps/cms/src/payload/lib/webflow-import/news-canonical';
 
+const asString = (v: unknown): string | null =>
+  typeof v === 'string' && v.trim().length > 0 ? v.trim() : null;
+
 export const transformNews = (row: Record<string, unknown>): Record<string, unknown> => {
-  const slug = (row.slug as string | undefined) ?? slugify(row.name as string | undefined);
-  const canonicalPatch = newsLinkToCanonicalPatch(row['news-link'] as string | undefined);
+  const title = asString(row.name) ?? '';
+  const slug = asString(row.slug) ?? slugify(title);
+  const abstract = asString(row['abstract-2']) ?? asString(row['post-summary']);
+  const bodyHtml = asString(row['main-text']) ?? asString(row['post-body']);
+  const publicationDate =
+    asString(row['publication-date']) ?? asString(row['date-of-publication']) ?? null;
+  const externalUrl = asString(row['news-link-2']) ?? asString(row['news-link']);
+  const canonicalPatch = newsLinkToCanonicalPatch(externalUrl ?? undefined);
+
   return {
     _webflowId: row.webflowId,
     _status: 'published',
-    title: row.name ?? '',
+    title,
     slug,
-    abstract: row['post-summary'] ?? row.summary ?? null,
-    body: row['post-body'] ?? row.body ?? null,
-    publicationDate: row['publication-date'] ?? row.publishedAt ?? null,
+    abstract,
+    body: bodyHtml ? htmlToLexical(bodyHtml) : undefined,
+    publicationDate,
+    externalUrl,
+    seo: buildSeoOverrides(row),
     _canonicalPatch: canonicalPatch ?? null,
-    _rawNewsCategories: row['news-category'] ?? row.newsCategories ?? null,
-    _rawHeroImage: row['thumbnail-image'] ?? row.image ?? null,
+    _rawAuthors: row.author ?? row.authors ?? null,
+    _rawNewsCategories: row['categories-2'] ?? row['news-category'] ?? row.categories ?? null,
+    _rawHeroImage: row['main-image'] ?? row['thumbnail-image'] ?? row.image ?? null,
   };
+};
+
+const buildSeoOverrides = (row: Record<string, unknown>): Record<string, unknown> | undefined => {
+  const title = asString(row['meta-title']);
+  const description = asString(row['meta-description']);
+  if (!title && !description) return undefined;
+  const seo: Record<string, unknown> = {};
+  if (title) seo.title = title;
+  if (description) seo.description = description;
+  return seo;
 };

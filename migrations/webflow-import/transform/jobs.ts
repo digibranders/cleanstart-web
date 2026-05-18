@@ -1,21 +1,55 @@
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
-import { normalizeDepartment, normalizeEmploymentType } from '../../../apps/cms/src/payload/lib/webflow-import/job-normalize';
-import { resolveJobLocation } from '../../../apps/cms/src/payload/lib/webflow-import/job-locations';
+import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
+import {
+  normalizeDepartment,
+  normalizeEmploymentType,
+  normalizeExperienceLevel,
+} from '../../../apps/cms/src/payload/lib/webflow-import/job-normalize';
+
+const asString = (v: unknown): string | null =>
+  typeof v === 'string' && v.trim().length > 0 ? v.trim() : null;
 
 export const transformJob = (row: Record<string, unknown>): Record<string, unknown> => {
-  const slug = (row.slug as string | undefined) ?? slugify(row.name as string | undefined);
+  const title = asString(row.name) ?? '';
+  const slug = asString(row.slug) ?? slugify(title);
+
+  // Webflow's `job-details` is the long HTML description; `job-summary`
+  // is a short one-liner that becomes the SEO description / lead text.
+  // Both are 100%-populated in the live data. Payload Jobs has no
+  // dedicated summary field, so we prepend the summary as an italic
+  // paragraph to the body so it stays visible to the editor.
+  const summary = asString(row['job-summary']);
+  const details = asString(row['job-details']) ?? asString(row.description) ?? asString(row.body);
+  const bodyHtml = summary
+    ? `<p><em>${summary}</em></p>${details ?? ''}`
+    : details;
+
   const department = normalizeDepartment(row.department);
-  const jobType = normalizeEmploymentType(row.type ?? row.jobType);
-  const normalizedLocation = resolveJobLocation(row);
+  const employmentType = normalizeEmploymentType(row.timing ?? row.type);
+  const experienceLevel = normalizeExperienceLevel(row.experience);
+
   return {
     _webflowId: row.webflowId,
     _status: 'published',
-    title: (row.name as string) ?? '',
+    title,
     slug,
-    body: row.description ?? row.body ?? null,
-    department: department ?? null,
-    jobType: jobType ?? null,
-    applyUrl: row['apply-url'] ?? row.applyUrl ?? null,
-    _rawJobLocation: normalizedLocation ?? null,
+    source: 'cms',
+    department: department ?? undefined,
+    employmentType: employmentType ?? undefined,
+    experienceLevel: experienceLevel ?? undefined,
+    body: bodyHtml ? htmlToLexical(bodyHtml) : undefined,
+    applyUrl: asString(row['apply-url']),
+    seo: buildSeoOverrides(row),
+    _rawJobLocation: row['job-location'] ?? row.location ?? null,
   };
+};
+
+const buildSeoOverrides = (row: Record<string, unknown>): Record<string, unknown> | undefined => {
+  const title = asString(row['meta-title']);
+  const description = asString(row['meta-description']) ?? asString(row['job-summary']);
+  if (!title && !description) return undefined;
+  const seo: Record<string, unknown> = {};
+  if (title) seo.title = title;
+  if (description) seo.description = description;
+  return seo;
 };

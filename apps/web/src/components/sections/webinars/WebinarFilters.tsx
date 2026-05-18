@@ -2,14 +2,13 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
+import type { WebinarRegion, WebinarType } from "@/lib/webinars";
 import {
   FILTERABLE_REGIONS,
   FILTERABLE_TYPES,
   REGION_LABEL,
   WEBINAR_TYPE_LABEL,
-  type WebinarRegion,
-  type WebinarType,
-} from "@/lib/webinars";
+} from "@/lib/webinars-utils";
 
 interface WebinarFiltersProps {
   activeType?: WebinarType | undefined;
@@ -173,7 +172,7 @@ function FilterRow({
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className="flex items-center justify-between transition-colors w-full"
+      className="flex items-center justify-between transition-colors w-full cursor-pointer"
       style={{
         height: "44px",
         padding: "0 12px",

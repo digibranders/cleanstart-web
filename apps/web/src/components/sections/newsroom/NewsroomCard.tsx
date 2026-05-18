@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { mediaUrl } from "@/lib/blog";
 import { type News, formatNewsDate, pressTypeLabel } from "@/lib/news";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 interface NewsroomCardProps {
   item: News;
@@ -8,29 +10,33 @@ interface NewsroomCardProps {
 
 export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
   const date = formatNewsDate(item.publicationDate);
-  const logoUrl = mediaUrl(item.publisherLogo?.url);
+  const readTime = item.readingMinutes ? `${item.readingMinutes} min read` : null;
   const pillLabel = pressTypeLabel(item.pressType);
+  const heroUrl = mediaUrl(item.heroImage?.url);
+  const logoUrl = mediaUrl(item.publisherLogo?.url);
 
   return (
     <article
-      className="relative bg-white overflow-hidden flex flex-col"
+      className="relative bg-white overflow-hidden"
       style={{
-        borderRadius: "24px",
-        minHeight: "404px",
+        width: "404px",
+        height: "521px",
+        borderRadius: "32px",
         boxShadow:
-          "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0)",
+          "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
       }}
     >
-      {/* Publisher logo banner */}
+      {/* Card image */}
       <div
-        className="relative flex items-center justify-center"
+        className="absolute overflow-hidden flex items-center justify-center"
         style={{
-          margin: "16px",
-          height: "140px",
-          borderRadius: "16px",
+          top: "12px",
+          left: "12px",
+          width: "380px",
+          height: "200px",
+          borderRadius: "20px",
           background:
-            "linear-gradient(180deg, #F5F1FF 0%, #FFFFFF 100%)",
-          overflow: "hidden",
+            "linear-gradient(180deg, #10123e 0%, #131e8f 38%, #421ebc 100%)",
         }}
       >
         {logoUrl ? (
@@ -39,15 +45,22 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
             src={logoUrl}
             alt={item.publisher ?? item.title}
             className="object-contain pointer-events-none select-none"
-            style={{ maxHeight: "80px", maxWidth: "78%" }}
+            style={{ maxHeight: "96px", maxWidth: "78%" }}
             loading="lazy"
             decoding="async"
           />
+        ) : heroUrl ? (
+          <Image
+            src={heroUrl}
+            alt={item.heroImage?.alt ?? item.title}
+            fill
+            className="object-cover"
+            sizes="380px"
+          />
         ) : (
           <span
-            className="font-display font-bold text-center"
+            className="font-display font-bold text-center text-white"
             style={{
-              color: "#4a3bf1",
               fontSize: "1.5rem",
               letterSpacing: "-0.03em",
               padding: "0 24px",
@@ -58,83 +71,113 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
         )}
       </div>
 
-      {/* Content */}
-      <div className="flex flex-col flex-1 px-6 pb-6" style={{ gap: "12px" }}>
-        {/* Meta row: pill + date */}
-        <div className="flex items-center gap-4">
-          <span
-            className="inline-flex items-center text-xs font-medium leading-none whitespace-nowrap"
-            style={{
-              padding: "6px 10px",
-              borderRadius: "999px",
-              background: "rgba(74, 59, 241, 0.10)",
-              color: "#4a3bf1",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            {pillLabel}
-          </span>
-          {date && (
-            <div className="flex items-center" style={{ gap: "4px" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/blogs/icon-calendar-grey.svg"
-                alt=""
-                aria-hidden
-                width={16}
-                height={16}
-                className="pointer-events-none select-none"
-                loading="lazy"
-                decoding="async"
-              />
-              <span
-                className="text-xs font-medium leading-none whitespace-nowrap"
-                style={{ color: "#666" }}
+      {/* Category badge — overlaps image bottom */}
+      <div
+        className="absolute"
+        style={{ top: "190px", left: "32px", zIndex: 1 }}
+      >
+        <CategoryBadge label={pillLabel} />
+      </div>
+
+      {/* Card content — fills remaining height, Read more pinned to bottom */}
+      <div
+        className="absolute flex flex-col justify-between"
+        style={{
+          top: "247px",
+          left: "32px",
+          right: "32px",
+          bottom: "32px",
+        }}
+      >
+        <div className="flex flex-col" style={{ gap: "12px" }}>
+          {/* Meta row: date + read time */}
+          <div className="flex items-center" style={{ gap: "16px" }}>
+            {date && (
+              <div className="flex items-center" style={{ gap: "4px" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/blogs/icon-calendar-grey.svg"
+                  alt=""
+                  aria-hidden
+                  width={18}
+                  height={18}
+                  className="pointer-events-none select-none"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span
+                  className="text-sm font-medium leading-normal"
+                  style={{ color: "#666" }}
+                >
+                  {date}
+                </span>
+              </div>
+            )}
+            {readTime && (
+              <div className="flex items-center" style={{ gap: "4px" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/blogs/icon-clock-grey.svg"
+                  alt=""
+                  aria-hidden
+                  width={18}
+                  height={18}
+                  className="pointer-events-none select-none"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span
+                  className="text-sm font-medium leading-normal"
+                  style={{ color: "#666" }}
+                >
+                  {readTime}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Title + abstract */}
+          <div className="flex flex-col" style={{ gap: "8px" }}>
+            <h3
+              className="font-display text-[clamp(1rem,1.67vw,1.5rem)] font-medium leading-[1.3] tracking-[-0.05em] overflow-hidden"
+              style={{
+                color: "#111",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflowWrap: "anywhere",
+                wordBreak: "break-word",
+              }}
+            >
+              {item.title}
+            </h3>
+            {item.abstract && (
+              <p
+                className="text-base font-normal leading-[1.3] overflow-hidden"
+                style={{
+                  color: "rgba(17,17,17,0.54)",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: "vertical",
+                  overflowWrap: "anywhere",
+                  wordBreak: "break-word",
+                }}
               >
-                {date}
-              </span>
-            </div>
-          )}
+                {item.abstract}
+              </p>
+            )}
+          </div>
         </div>
-
-        {/* Title */}
-        <h3
-          className="font-display font-medium leading-[1.3] tracking-[-0.04em] overflow-hidden"
-          style={{
-            color: "#111",
-            fontSize: "1.125rem",
-            display: "-webkit-box",
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: "vertical",
-          }}
-        >
-          {item.title}
-        </h3>
-
-        {/* Abstract */}
-        {item.abstract && (
-          <p
-            className="text-sm font-normal leading-[1.45] overflow-hidden"
-            style={{
-              color: "rgba(17,17,17,0.54)",
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
-            }}
-          >
-            {item.abstract}
-          </p>
-        )}
 
         {/* Read more */}
         <Link
           href={`/news/${item.slug}`}
-          className="mt-auto pt-2 inline-flex items-center group"
+          className="flex items-center group"
           style={{ gap: "8px" }}
           aria-label={`Read more about ${item.title}`}
         >
           <span
-            className="text-base font-medium leading-none"
+            className="text-xl font-medium leading-[1.5] text-center whitespace-nowrap"
             style={{ color: "#4a3bf1" }}
           >
             Read more
@@ -144,8 +187,8 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
             src="/images/blogs/icon-arrow-read-more.svg"
             alt=""
             aria-hidden
-            width={20}
-            height={20}
+            width={24}
+            height={24}
             className="pointer-events-none select-none group-hover:translate-x-1 transition-transform duration-200"
             loading="lazy"
             decoding="async"
