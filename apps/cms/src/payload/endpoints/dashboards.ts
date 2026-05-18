@@ -58,13 +58,15 @@ export const dashboardsGlobalEndpoint: Endpoint = {
       return json({ ok: false, error: 'unknown_provider' }, { status: 400 });
     }
     const provider = params.data.provider;
+    const configured = (await findRowsOfKind(req.payload, provider)).length > 0;
     const entry = await readCache(req.payload, provider, 'global', 'default');
     if (!entry) {
-      return json({ ok: true, hasData: false, provider });
+      return json({ ok: true, hasData: false, configured, provider });
     }
     return json({
       ok: true,
       hasData: true,
+      configured,
       provider,
       capturedAt: entry.capturedAt,
       stale: isStale(entry, TTL_MS[provider]),
@@ -96,15 +98,30 @@ export const dashboardsGscPerDocEndpoint: Endpoint = {
       return json({ ok: false, error: 'invalid_url' }, { status: 400 });
     }
     const rows = await findRowsOfKind(req.payload, 'gscSearchAnalyticsApi');
-    if (rows.length === 0) {
-      return json({ ok: true, hasData: false, queries: [] });
+    const inspectionRows = await findRowsOfKind(req.payload, 'gscUrlInspectionApi');
+    const configured = rows.length > 0;
+    const inspectionConfigured = inspectionRows.length > 0;
+    if (!configured) {
+      return json({
+        ok: true,
+        hasData: false,
+        configured,
+        inspectionConfigured,
+        queries: [],
+      });
     }
     for (const row of rows) {
       const creds = getGscCredentialsFromRow(row);
       if (!creds) continue;
       try {
         const queries = await fetchQueriesForUrl(creds, parsed.data.url);
-        return json({ ok: true, hasData: queries.length > 0, queries });
+        return json({
+          ok: true,
+          hasData: queries.length > 0,
+          configured,
+          inspectionConfigured,
+          queries,
+        });
       } catch (err) {
         req.payload.logger.warn(
           { error: err instanceof Error ? err.message : String(err), url: parsed.data.url },
@@ -112,7 +129,13 @@ export const dashboardsGscPerDocEndpoint: Endpoint = {
         );
       }
     }
-    return json({ ok: true, hasData: false, queries: [] });
+    return json({
+      ok: true,
+      hasData: false,
+      configured,
+      inspectionConfigured,
+      queries: [],
+    });
   },
 };
 

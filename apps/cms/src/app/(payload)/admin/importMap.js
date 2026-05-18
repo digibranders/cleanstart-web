@@ -35,6 +35,7 @@ import { InlineToolbarFeatureClient as InlineToolbarFeatureClient_e70f5e05f09f93
 import { FixedToolbarFeatureClient as FixedToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { CleanstartInlineImageFeatureClient as CleanstartInlineImageFeatureClient_74586527eb72192e6c6a27300883f3de } from '@/payload/admin/components/InlineImage/CleanstartInlineImageFeatureClient.ts'
 import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { CleanstartAddMenuFeatureClient as CleanstartAddMenuFeatureClient_3bb091ca9ee97b5a57a7d5234ea492d1 } from '@/payload/admin/components/AddMenu/CleanstartAddMenuFeatureClient'
 import { CleanstartEmbedFeatureClient as CleanstartEmbedFeatureClient_0d8d46efc1fc83e23b5f221c6e92ed8f } from '@/payload/admin/components/Embed/CleanstartEmbedFeatureClient.ts'
 import { RelationshipFeatureClient as RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -90,7 +91,6 @@ import { PublishChecklistBanner as PublishChecklistBanner_efcc6882ba9cb24c59d6b4
 import { PublishOverrideGuard as PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02 } from '@/payload/admin/components/PublishOverrideGuard.tsx'
 import { SlugRequirementGuard as SlugRequirementGuard_96979dae1465790bd97b2f570fed4659 } from '@/payload/admin/components/SlugRequirementGuard.tsx'
 import { GateFormLabel as GateFormLabel_c191dd670871074ae1a1cea086f78af8 } from '@/payload/admin/components/GateFormLabel.tsx'
-import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/payload/admin/components/fields/CodeField.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
 import { SkipLink as SkipLink_27a678dd284d4042d03686d8b9a9b8e9 } from '../../../payload/admin/components/SkipLink.tsx'
@@ -154,6 +154,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#FixedToolbarFeatureClient": FixedToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/payload/admin/components/InlineImage/CleanstartInlineImageFeatureClient.ts#CleanstartInlineImageFeatureClient": CleanstartInlineImageFeatureClient_74586527eb72192e6c6a27300883f3de,
   "@payloadcms/richtext-lexical/client#UploadFeatureClient": UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/payload/admin/components/AddMenu/CleanstartAddMenuFeatureClient#CleanstartAddMenuFeatureClient": CleanstartAddMenuFeatureClient_3bb091ca9ee97b5a57a7d5234ea492d1,
   "@/payload/admin/components/Embed/CleanstartEmbedFeatureClient.ts#CleanstartEmbedFeatureClient": CleanstartEmbedFeatureClient_0d8d46efc1fc83e23b5f221c6e92ed8f,
   "@payloadcms/richtext-lexical/client#RelationshipFeatureClient": RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
@@ -209,7 +210,6 @@ export const importMap = {
   "@/payload/admin/components/PublishOverrideGuard.tsx#PublishOverrideGuard": PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02,
   "@/payload/admin/components/SlugRequirementGuard.tsx#SlugRequirementGuard": SlugRequirementGuard_96979dae1465790bd97b2f570fed4659,
   "@/payload/admin/components/GateFormLabel.tsx#GateFormLabel": GateFormLabel_c191dd670871074ae1a1cea086f78af8,
-  "@/payload/admin/components/fields/CodeField.tsx#CodeField": CodeField_4aa85fbd783c4d26c5c89ebf383941c1,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,
   "./payload/admin/components/SkipLink.tsx#SkipLink": SkipLink_27a678dd284d4042d03686d8b9a9b8e9,
