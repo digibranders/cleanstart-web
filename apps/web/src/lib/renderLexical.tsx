@@ -1,6 +1,30 @@
 import React from "react";
 import Image from "next/image";
 import type { LexicalNode, LexicalRoot, LexicalTableNode } from "@/lib/blog";
+import { CodeBlock } from "@/components/code/CodeBlock";
+
+type LexicalBlockNode = {
+  type: "block";
+  fields: {
+    blockType: string;
+    [key: string]: unknown;
+  };
+  version: number;
+  _lines?: string[];
+};
+
+type CodeBlockFields = {
+  blockType: "codeBlock";
+  language?: string | null;
+  content?: string | null;
+  showLineNumbers?: boolean | null;
+  highlightLines?: string | null;
+};
+
+type LexicalCodeNodeWithLines = Extract<LexicalNode, { type: "code" }> & {
+  _lines?: string[];
+  _content?: string;
+};
 
 // TEXT_FORMAT bitmask constants
 const FORMAT_BOLD = 1;
@@ -18,8 +42,11 @@ function renderTextNode(node: Extract<LexicalNode, { type: "text" }>, key: strin
   if (fmt & FORMAT_CODE) {
     el = (
       <code
-        className="rounded px-1 py-0.5 text-[0.9em]"
-        style={{ background: "rgba(17,17,17,0.08)", fontFamily: "monospace" }}
+        className="rounded px-1 py-0.5 text-[0.875em]"
+        style={{
+          background: "rgba(17,17,17,0.08)",
+          fontFamily: "var(--font-mono), ui-monospace, monospace",
+        }}
       >
         {el}
       </code>
@@ -119,13 +146,36 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
     }
 
     case "code": {
-      const cNode = node as Extract<LexicalNode, { type: "code" }>;
-      const codeText = extractText(cNode.children ?? []);
+      const cNode = node as LexicalCodeNodeWithLines;
+      const codeText = cNode._content ?? extractText(cNode.children ?? []);
       return (
-        <pre key={key} className="article-pre">
-          <code>{codeText}</code>
-        </pre>
+        <CodeBlock
+          key={key}
+          language={cNode.language ?? "text"}
+          content={codeText}
+          lines={cNode._lines}
+          showLineNumbers={false}
+        />
       );
+    }
+
+    case "block": {
+      const bNode = node as unknown as LexicalBlockNode;
+      const fields = bNode.fields;
+      if (fields?.blockType === "codeBlock") {
+        const cb = fields as CodeBlockFields;
+        return (
+          <CodeBlock
+            key={key}
+            language={cb.language}
+            content={typeof cb.content === "string" ? cb.content : ""}
+            lines={bNode._lines}
+            showLineNumbers={cb.showLineNumbers}
+            highlightLines={cb.highlightLines}
+          />
+        );
+      }
+      return null;
     }
 
     case "horizontalrule":

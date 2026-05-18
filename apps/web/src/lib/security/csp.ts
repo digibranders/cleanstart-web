@@ -49,6 +49,11 @@ export function buildCsp({ nonce, isProduction, isDraftMode }: BuildCspOptions):
     GA4_COLLECT,
     GA4_REGION,
   ];
+  if (!isProduction) {
+    // Local dev: web (3010/3001) calls the CMS at localhost:3000 for
+    // /api/leads/submit and /api/resources/:slug/{token,download}.
+    connectSrc.push("http://localhost:3000");
+  }
 
   const frameAncestors = isDraftMode ? PREVIEW_FRAME_ANCESTORS : ["'none'"];
 
