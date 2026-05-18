@@ -1,17 +1,21 @@
-import Link from "next/link";
 import type { Event } from "@/lib/events";
+import { Pagination } from "@/components/ui/Pagination";
 import { EventCard } from "./EventCard";
 
 interface PastEventsGridProps {
   events: Event[];
-  page: number;
-  hasNextPage: boolean;
+  currentPage: number;
+  totalPages: number;
+}
+
+function buildPageHref(page: number): string {
+  return page > 1 ? `/events?page=${page}` : "/events";
 }
 
 export function PastEventsGrid({
   events,
-  page,
-  hasNextPage,
+  currentPage,
+  totalPages,
 }: PastEventsGridProps): React.ReactElement {
   return (
     <section
@@ -110,28 +114,11 @@ export function PastEventsGrid({
               ))}
             </div>
 
-            {hasNextPage && (
-              <div className="flex justify-center" style={{ marginTop: "80px" }}>
-                <Link
-                  href={`/events?page=${page + 1}`}
-                  className="cs-btn-blue gap-2"
-                  style={{ width: "156px", height: "44px", fontSize: "18px" }}
-                >
-                  View More
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/blogs/icon-arrow-right.svg"
-                    alt=""
-                    aria-hidden
-                    width={22}
-                    height={20}
-                    className="pointer-events-none select-none"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </Link>
-              </div>
-            )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              buildHref={buildPageHref}
+            />
           </>
         )}
       </div>

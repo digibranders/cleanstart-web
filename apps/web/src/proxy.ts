@@ -114,10 +114,16 @@ export async function proxy(request: NextRequest) {
   response.headers.set(cspHeaderName, csp);
   response.headers.set("Reporting-Endpoints", REPORTING_ENDPOINTS);
 
-  response.headers.set(
-    "Strict-Transport-Security",
-    "max-age=63072000; includeSubDomains; preload",
-  );
+  // HSTS only in production. In dev, localhost is served over HTTP and
+  // HSTS would pin the browser to upgrade `http://localhost:*` → `https://`
+  // for two years, breaking cross-port fetches between the web (3001/3010)
+  // and the CMS (3000) — which are http-only locally.
+  if (isProduction) {
+    response.headers.set(
+      "Strict-Transport-Security",
+      "max-age=63072000; includeSubDomains; preload",
+    );
+  }
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set(
     "X-Frame-Options",

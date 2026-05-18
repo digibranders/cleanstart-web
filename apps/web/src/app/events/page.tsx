@@ -70,8 +70,8 @@ export default async function EventsPage({
         <FadeUp>
           <PastEventsGrid
             events={past.docs}
-            page={past.page}
-            hasNextPage={past.hasNextPage}
+            currentPage={past.page}
+            totalPages={past.totalPages}
           />
         </FadeUp>
       </main>

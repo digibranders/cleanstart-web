@@ -21,6 +21,12 @@ export type Event = {
   registrationUrl?: string | null;
   registrationForm?: { id: string; title?: string } | string | null;
   attendeesCap?: number | null;
+  ctaLabel?: string | null;
+  postEventCta?: {
+    enabled?: boolean | null;
+    label?: string | null;
+    url?: string | null;
+  } | null;
   eventStatus: EventStatus;
   cancelledAt?: string | null;
   previousStartDate?: string | null;
@@ -77,7 +83,7 @@ export async function getUpcomingEvents({
 
 export async function getPastEvents({
   page = 1,
-  limit = 12,
+  limit = 9,
 }: { page?: number; limit?: number } = {}): Promise<EventsListResponse> {
   const nowIso = new Date().toISOString();
   const params = new URLSearchParams({

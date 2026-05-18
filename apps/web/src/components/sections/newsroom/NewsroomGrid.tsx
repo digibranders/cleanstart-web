@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { News } from "@/lib/news";
+import { Pagination } from "@/components/ui/Pagination";
 import { NewsroomCard } from "./NewsroomCard";
 
 interface NewsroomGridProps {
@@ -83,65 +83,14 @@ export function NewsroomGrid({
               ))}
             </div>
 
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                activeCategory={activeCategory}
-                searchQuery={searchQuery}
-              />
-            )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              buildHref={(p) => buildPageHref(p, activeCategory, searchQuery)}
+            />
           </>
         )}
       </div>
     </section>
-  );
-}
-
-interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  activeCategory: string;
-  searchQuery: string;
-}
-
-function Pagination({
-  currentPage,
-  totalPages,
-  activeCategory,
-  searchQuery,
-}: PaginationProps): React.ReactElement {
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-
-  return (
-    <nav
-      aria-label="Pagination"
-      className="flex items-center justify-center mt-[64px]"
-      style={{ gap: "12px" }}
-    >
-      {pages.map((p) => {
-        const active = p === currentPage;
-        const href = buildPageHref(p, activeCategory, searchQuery);
-        return (
-          <Link
-            key={p}
-            href={href}
-            aria-current={active ? "page" : undefined}
-            aria-label={`Go to page ${p}`}
-            className="flex items-center justify-center text-sm font-medium leading-none transition-colors"
-            style={{
-              width: active ? "32px" : "12px",
-              height: "12px",
-              borderRadius: "999px",
-              background: active ? "#4a3bf1" : "rgba(17,17,17,0.18)",
-              color: active ? "#fff" : "transparent",
-              fontSize: "0",
-            }}
-          >
-            {p}
-          </Link>
-        );
-      })}
-    </nav>
   );
 }

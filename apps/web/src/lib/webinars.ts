@@ -101,7 +101,7 @@ export interface WebinarListParams {
 
 export async function getWebinars({
   page = 1,
-  limit = 12,
+  limit = 9,
   type,
   region,
 }: WebinarListParams = {}): Promise<WebinarsListResponse> {

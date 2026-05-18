@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { Webinar, WebinarRegion, WebinarType } from "@/lib/webinars";
+import { Pagination } from "@/components/ui/Pagination";
 import { WebinarCard } from "./WebinarCard";
 import { WebinarFilters } from "./WebinarFilters";
 
@@ -94,14 +94,11 @@ export function WebinarsGrid({
                     ))}
                   </div>
 
-                  {totalPages > 1 && (
-                    <Pagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      activeType={activeType}
-                      activeRegion={activeRegion}
-                    />
-                  )}
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    buildHref={(p) => buildPageHref(p, activeType, activeRegion)}
+                  />
                 </>
               )}
             </div>
@@ -115,50 +112,3 @@ export function WebinarsGrid({
 const lgGrid: React.CSSProperties = {
   gridTemplateColumns: "299px minmax(0, 1fr)",
 };
-
-interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  activeType?: WebinarType | undefined;
-  activeRegion?: WebinarRegion | undefined;
-}
-
-function Pagination({
-  currentPage,
-  totalPages,
-  activeType,
-  activeRegion,
-}: PaginationProps): React.ReactElement {
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  return (
-    <nav
-      aria-label="Webinar pagination"
-      className="flex items-center justify-center mt-[64px]"
-      style={{ gap: "12px" }}
-    >
-      {pages.map((p) => {
-        const active = p === currentPage;
-        const href = buildPageHref(p, activeType, activeRegion);
-        return (
-          <Link
-            key={p}
-            href={href}
-            aria-current={active ? "page" : undefined}
-            aria-label={`Go to page ${p}`}
-            className="flex items-center justify-center transition-colors"
-            style={{
-              width: active ? "32px" : "12px",
-              height: "12px",
-              borderRadius: "999px",
-              background: active ? "#4A3BF1" : "rgba(17,17,17,0.18)",
-              color: active ? "#fff" : "transparent",
-              fontSize: "0",
-            }}
-          >
-            {p}
-          </Link>
-        );
-      })}
-    </nav>
-  );
-}

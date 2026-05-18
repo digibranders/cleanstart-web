@@ -1,27 +1,35 @@
-import Link from "next/link";
 import type { Blog } from "@/lib/blog";
+import { Pagination } from "@/components/ui/Pagination";
 import { BlogCard } from "./BlogCard";
 
 interface LatestBlogsProps {
   posts: Blog[];
-  hasMore: boolean;
   currentPage: number;
+  totalPages: number;
   activeCategory: string;
   searchQuery: string;
 }
 
+function buildPageHref(
+  page: number,
+  activeCategory: string,
+  searchQuery: string,
+): string {
+  const params = new URLSearchParams();
+  if (activeCategory) params.set("category", activeCategory);
+  if (searchQuery) params.set("q", searchQuery);
+  if (page > 1) params.set("page", String(page));
+  const qs = params.toString();
+  return qs ? `/blogs?${qs}` : "/blogs";
+}
+
 export function LatestBlogs({
   posts,
-  hasMore,
   currentPage,
+  totalPages,
   activeCategory,
   searchQuery,
 }: LatestBlogsProps): React.ReactElement {
-  const nextPageParams = new URLSearchParams();
-  if (activeCategory) nextPageParams.set("category", activeCategory);
-  if (searchQuery) nextPageParams.set("q", searchQuery);
-  nextPageParams.set("page", String(currentPage + 1));
-
   return (
     <section
       className="relative overflow-hidden"
@@ -144,29 +152,11 @@ export function LatestBlogs({
               ))}
             </div>
 
-            {/* View More button */}
-            {hasMore && (
-              <div className="flex justify-center mt-[60px]">
-                <Link
-                  href={`/blogs?${nextPageParams.toString()}`}
-                  className="cs-btn-blue gap-2"
-                  style={{ width: "156px", height: "44px", fontSize: "1.125rem" }}
-                >
-                  View More
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/blogs/icon-arrow-right.svg"
-                    alt=""
-                    aria-hidden
-                    width={25}
-                    height={22}
-                    className="pointer-events-none select-none"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </Link>
-              </div>
-            )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              buildHref={(p) => buildPageHref(p, activeCategory, searchQuery)}
+            />
           </>
         )}
       </div>
