@@ -59,7 +59,7 @@ export function BlogDetailContent({
           <aside className="hidden lg:block shrink-0" style={{ width: "260px" }}>
             <div
               className="sticky"
-              style={{ top: "72px", maxHeight: "calc(100vh - 80px)", overflowY: "auto" }}
+              style={{ top: "96px", maxHeight: "calc(100vh - 112px)", overflowY: "auto" }}
             >
               <TableOfContents toc={tableOfContents} />
             </div>

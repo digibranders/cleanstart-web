@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getBlogBySlug, getRelatedBlogs, mediaUrl } from "@/lib/blog";
+import { highlightLexical } from "@/lib/highlightLexical";
 import { Header } from "@/components/sections/Header";
 import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
 import { BlogDetailContent } from "@/components/sections/blog/BlogDetailContent";
@@ -42,6 +43,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
     path: `/blog/${post.slug}`,
     type: "article",
     publishedTime: post.publishedAt,
+    modifiedTime: post.updatedAt,
     authors: post.authors?.map((a) => a.name),
     ...(heroAbsolute && post.heroImage
       ? {
@@ -63,7 +65,10 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
   if (!post) notFound();
 
   const categoryIds = post.categories ? [post.categories.id] : [];
-  const relatedPosts = await getRelatedBlogs(post.id, categoryIds);
+  const [relatedPosts, highlightedBody] = await Promise.all([
+    getRelatedBlogs(post.id, categoryIds),
+    highlightLexical(post.body),
+  ]);
 
   const heroAbsolute = mediaUrl(post.heroImage?.url);
 
@@ -84,6 +89,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
           description: post.abstract ?? undefined,
           path: `/blog/${post.slug}`,
           publishedAt: post.publishedAt,
+          modifiedAt: post.updatedAt,
           imageUrl: heroAbsolute,
           authors: post.authors?.map((a) => ({ name: a.name })),
           category: post.categories?.name,
@@ -96,12 +102,13 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
           categories={post.categories}
           authors={post.authors}
           publishedAt={post.publishedAt ?? undefined}
+          updatedAt={post.updatedAt ?? undefined}
           readingMinutes={post.readingMinutes ?? undefined}
           heroImage={post.heroImage}
         />
 
         <BlogDetailContent
-          body={post.body}
+          body={highlightedBody}
           tableOfContents={post.tableOfContents}
           heroImage={post.heroImage}
           abstract={post.abstract ?? undefined}

@@ -7,7 +7,7 @@ const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123E 45%, #131E8F 66%, #471EC0 75%, #471FC3 84%, rgba(70,30,191,0.85) 88%, rgba(66,30,188,0.40) 95%, rgba(66,30,188,0) 99%)";
 
 const DATE_CHIP_GRADIENT =
-  "linear-gradient(102.295deg, #9A51FF 18%, #2CC1EB 286%)";
+  "linear-gradient(93.21deg, #9A51FF 18.08%, #2CC1EB 286.32%)";
 
 interface UpcomingEventHeroProps {
   event: Event | null;
@@ -138,22 +138,30 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
         maxWidth: "1276px",
         height: "368px",
         borderRadius: "20px",
-        backgroundColor: "#A567FF",
-        backgroundImage: [
-          "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
-          "radial-gradient(120% 80% at 0% 0%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)",
-          "linear-gradient(135deg, #A567FF 0%, #7B47D4 100%)",
-        ].join(", "),
-        backgroundBlendMode: "overlay, normal, normal",
+        background: "rgba(165, 103, 255, 0.4)",
+        backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
         boxShadow:
           "0 30px 60px rgba(20,12,60,0.45), 0 0 0 1px rgba(255,255,255,0.12) inset",
       }}
     >
-      {/* Corner date chip — ribbon-style tag with corner tails */}
+      {/* Noise texture overlay — matches Figma "Noise" effect */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          borderRadius: "20px",
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='2' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
+          backgroundSize: "120px 120px",
+          opacity: 0.55,
+        }}
+      />
+      {/* Corner date chip — sits above-left of the card per Figma */}
       {longDate && (
         <div
           className="absolute z-10"
-          style={{ top: 0, left: 0 }}
+          style={{ top: "-8px", left: "-9.92px" }}
         >
           {/* Top-right tail (small folded-corner shadow) */}
           <div
@@ -161,11 +169,13 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
             className="absolute"
             style={{
               top: 0,
-              right: "-9.92px",
+              right: "-7.84px",
               width: "9.92px",
               height: "8px",
               background: "#9F9F9F",
-              clipPath: "polygon(5% 0, 100% 100%, 0 100%)",
+              clipPath:
+                "polygon(0 0, 100% 0, 100% 100%, 94.11% 100%)",
+              transform: "rotate(180deg)",
             }}
           />
           {/* Bottom-left tail (small folded-corner shadow) */}
@@ -194,13 +204,12 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/blogs/icon-calendar.svg"
+              src="/images/events/icon-calendar-badge.svg"
               alt=""
               aria-hidden
-              width={20}
-              height={20}
+              width={15}
+              height={17}
               className="pointer-events-none select-none"
-              style={{ filter: "brightness(0) invert(1)" }}
               loading="lazy"
               decoding="async"
             />
@@ -282,18 +291,13 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
 
           <Link
             href={`/events/${event.slug}`}
-            className="inline-flex items-center justify-center font-medium transition-colors"
+            className="cs-btn-glass"
             style={{
               alignSelf: "flex-start",
-              padding: "9px 18px",
-              gap: "10px",
-              borderRadius: "8px",
-              border: "1px solid #dab6f3",
-              background: "rgba(255,255,255,0.65)",
-              color: "#111",
-              fontSize: "18px",
-              letterSpacing: "-0.01em",
               marginTop: "24px",
+              ["--cs-btn-h" as string]: "42px",
+              ["--cs-btn-px" as string]: "18px",
+              ["--cs-btn-fs" as string]: "18px",
             }}
             aria-label={`Read more about ${event.title}`}
           >
@@ -305,7 +309,7 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
               aria-hidden
               width={20}
               height={18}
-              className="pointer-events-none select-none"
+              className="cs-cta-arrow pointer-events-none select-none"
               style={{ filter: "brightness(0)" }}
               loading="lazy"
               decoding="async"

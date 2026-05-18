@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { mediaUrl } from "@/lib/blog";
 import { getNewsBySlug, getRelatedNews } from "@/lib/news";
+import { highlightLexical } from "@/lib/highlightLexical";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
 import { NewsDetailHero } from "@/components/sections/news-detail/NewsDetailHero";
@@ -58,7 +59,11 @@ export default async function NewsDetailPage({
   if (!item) notFound();
 
   const categoryIds = item.newsCategories?.map((c) => c.id) ?? [];
-  const related = await getRelatedNews(item.id, categoryIds).catch(() => []);
+  const [related, highlightedBody] = await Promise.all([
+    getRelatedNews(item.id, categoryIds).catch(() => []),
+    highlightLexical(item.body ?? null),
+  ]);
+  const itemWithHighlighted = { ...item, body: highlightedBody ?? null };
 
   const heroAbsolute = mediaUrl(item.heroImage?.url ?? item.publisherLogo?.url);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.cleanstart.com";
@@ -96,7 +101,7 @@ export default async function NewsDetailPage({
         />
 
         <div className="bg-white">
-          <NewsDetailBody item={item} />
+          <NewsDetailBody item={itemWithHighlighted} />
         </div>
 
         {related.length > 0 ? (

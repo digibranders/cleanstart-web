@@ -4,7 +4,7 @@ import type { CSSProperties, ReactNode } from "react";
 export const DETAIL_HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123E 38%, #131E8F 67%, #471EC0 80%, #471FC3 100%)";
 
-export const DETAIL_HERO_MIN_HEIGHT = "480px";
+export const DETAIL_HERO_MIN_HEIGHT = "auto";
 
 export const DETAIL_HERO_TITLE_STYLE: CSSProperties = {
   fontSize: "clamp(2rem, 4vw, 3.5rem)",

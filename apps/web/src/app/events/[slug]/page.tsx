@@ -6,6 +6,7 @@ import { Footer } from "@/components/sections/Footer";
 import { EventDetailHero } from "@/components/sections/events/EventDetailHero";
 import { getEventBySlug, formatEventDate } from "@/lib/events";
 import { mediaUrl } from "@/lib/blog";
+import { RenderLexical } from "@/lib/renderLexical";
 import { buildPageMetadata, absoluteUrl } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
@@ -103,8 +104,26 @@ export default async function EventDetailPage({
     event.customDateLabel,
     "long",
   );
+  const isPast =
+    !!event.startsAt && new Date(event.startsAt).getTime() < Date.now();
+  const isCancelled = event.eventStatus === "cancelled";
   const registerHref =
     event.registrationMode === "external" ? event.registrationUrl ?? null : null;
+  const showRegisterCta =
+    !isPast && !isCancelled && event.eventStatus === "scheduled" && !!registerHref;
+  const registerLabel =
+    event.ctaLabel && event.ctaLabel.trim().length > 0
+      ? event.ctaLabel.trim()
+      : "Register";
+  const postCtaEnabled = event.postEventCta?.enabled === true;
+  const postCtaLabel = event.postEventCta?.label?.trim() ?? "";
+  const postCtaUrl = event.postEventCta?.url?.trim() ?? "";
+  const showPostEventCta =
+    isPast &&
+    !isCancelled &&
+    postCtaEnabled &&
+    postCtaLabel.length > 0 &&
+    postCtaUrl.length > 0;
 
   return (
     <>
@@ -124,31 +143,32 @@ export default async function EventDetailPage({
           venue={event.venue}
           longDate={longDate}
           eventStatus={event.eventStatus}
+          isPast={isPast}
         />
 
-        {(heroImg || (registerHref && event.eventStatus === "scheduled")) && (
-          <section className="relative mx-auto max-w-[1276px] px-6" style={{ paddingTop: "64px" }}>
-            {heroImg && (
+        {(heroImg || showRegisterCta || showPostEventCta) && (
+          <section className="relative mx-auto max-w-[820px] px-6" style={{ paddingTop: "64px" }}>
+            {heroImg && event.heroImage?.width && event.heroImage?.height && (
               <div
-                className="relative overflow-hidden"
+                className="relative overflow-hidden mx-auto"
                 style={{
-                  borderRadius: "20px",
-                  aspectRatio: "16 / 7",
+                  borderRadius: "16px",
                   background: "rgba(0,0,0,0.05)",
                 }}
               >
                 <Image
                   src={heroImg}
                   alt={event.heroImage?.alt ?? event.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1276px) 100vw, 1276px"
+                  width={event.heroImage.width}
+                  height={event.heroImage.height}
+                  className="w-full h-auto block"
+                  sizes="(max-width: 820px) 100vw, 820px"
                   priority
                 />
               </div>
             )}
 
-            {registerHref && event.eventStatus === "scheduled" && (
+            {showRegisterCta && registerHref && (
               <div className="flex justify-center" style={{ marginTop: "32px" }}>
                 <a
                   href={registerHref}
@@ -162,7 +182,26 @@ export default async function EventDetailPage({
                     fontSize: "1rem",
                   }}
                 >
-                  Register
+                  {registerLabel}
+                </a>
+              </div>
+            )}
+
+            {showPostEventCta && (
+              <div className="flex justify-center" style={{ marginTop: "32px" }}>
+                <a
+                  href={postCtaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cs-btn-blue gap-2"
+                  style={{
+                    minWidth: "180px",
+                    height: "48px",
+                    padding: "0 24px",
+                    fontSize: "1rem",
+                  }}
+                >
+                  {postCtaLabel}
                 </a>
               </div>
             )}
@@ -173,18 +212,10 @@ export default async function EventDetailPage({
           className="relative mx-auto max-w-[820px] px-6"
           style={{ paddingTop: "80px", paddingBottom: "120px" }}
         >
-          {event.abstract && (
-            <p
-              className="font-sans"
-              style={{
-                color: "#1f2937",
-                fontSize: "clamp(1.0625rem,1.3vw,1.25rem)",
-                lineHeight: 1.6,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              {event.abstract}
-            </p>
+          {event.body && (
+            <div className="article-body">
+              <RenderLexical content={event.body} />
+            </div>
           )}
         </section>
       </main>

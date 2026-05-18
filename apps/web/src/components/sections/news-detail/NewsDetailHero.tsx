@@ -7,6 +7,7 @@ import {
   pressTypeLabel,
 } from "@/lib/news";
 import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
+import { CalendarIcon } from "@/components/sections/_shared/DetailHeroIcons";
 
 interface NewsDetailHeroProps {
   title: string;
@@ -115,22 +116,11 @@ export function NewsDetailHero({
           <DetailHeroMetaSeparator />
 
           {publicationDate && (
-            <div className="flex items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/news-detail/icon-calendar-hero.svg"
-                alt=""
-                aria-hidden
-                width={40}
-                height={40}
-                className="pointer-events-none select-none"
-                loading="lazy"
-                decoding="async"
-              />
+            <div className="flex items-center gap-[8px] text-white">
+              <CalendarIcon />
               <time
                 dateTime={publicationDate}
-                className="font-medium leading-none text-white whitespace-nowrap"
-                style={{ fontSize: "20px", letterSpacing: "-1px" }}
+                className="font-medium leading-none whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] tracking-[-0.05em]"
               >
                 {formatNewsDate(publicationDate)}
               </time>
