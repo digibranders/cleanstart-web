@@ -1,12 +1,19 @@
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
 import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
+import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
 import {
   normalizeDepartment,
   normalizeEmploymentType,
   normalizeExperienceLevel,
 } from '../../../apps/cms/src/payload/lib/webflow-import/job-normalize';
 
-const asString = (v: unknown): string | null =>
+const asString = (v: unknown): string | null => {
+  if (typeof v !== 'string') return null;
+  const stripped = htmlToPlainText(v);
+  return stripped.length > 0 ? stripped : null;
+};
+
+const asHtmlString = (v: unknown): string | null =>
   typeof v === 'string' && v.trim().length > 0 ? v.trim() : null;
 
 export const transformJob = (row: Record<string, unknown>): Record<string, unknown> => {
@@ -19,7 +26,8 @@ export const transformJob = (row: Record<string, unknown>): Record<string, unkno
   // dedicated summary field, so we prepend the summary as an italic
   // paragraph to the body so it stays visible to the editor.
   const summary = asString(row['job-summary']);
-  const details = asString(row['job-details']) ?? asString(row.description) ?? asString(row.body);
+  const details =
+    asHtmlString(row['job-details']) ?? asHtmlString(row.description) ?? asHtmlString(row.body);
   const bodyHtml = summary
     ? `<p><em>${summary}</em></p>${details ?? ''}`
     : details;

@@ -1,7 +1,14 @@
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
 import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
+import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
 
-const asString = (v: unknown): string | null =>
+const asString = (v: unknown): string | null => {
+  if (typeof v !== 'string') return null;
+  const stripped = htmlToPlainText(v);
+  return stripped.length > 0 ? stripped : null;
+};
+
+const asHtmlString = (v: unknown): string | null =>
   typeof v === 'string' && v.trim().length > 0 ? v.trim() : null;
 
 /**
@@ -39,7 +46,7 @@ export const transformResource = (row: Record<string, unknown>): Record<string, 
   const title = asString(row.name) ?? '';
   const slug = asString(row.slug) ?? slugify(title);
   const summary = asString(row['resource-detail']) ?? asString(row.description);
-  const bodyHtml = asString(row['resource-detail']);
+  const bodyHtml = asHtmlString(row['resource-detail']);
   const type = normalizeType(row['resources-type']) ?? normalizeType(row['resource-type']);
   const publishedAt = asString(row['publish-date']) ?? asString(row['publishedAt']);
   const ctaButtonText = asString(row['button-text']);

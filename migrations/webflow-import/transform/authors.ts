@@ -1,7 +1,14 @@
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
 import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
+import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
 
-const asString = (v: unknown): string | null =>
+const asString = (v: unknown): string | null => {
+  if (typeof v !== 'string') return null;
+  const stripped = htmlToPlainText(v);
+  return stripped.length > 0 ? stripped : null;
+};
+
+const asHtmlString = (v: unknown): string | null =>
   typeof v === 'string' && v.trim().length > 0 ? v.trim() : null;
 
 /**
@@ -18,7 +25,7 @@ export const transformAuthor = (row: Record<string, unknown>): Record<string, un
   const role = asString(row['professional-title']) ?? asString(row.title) ?? null;
   const location = asString(row.location);
   const bioShort = asString(row['bio-summary']) ?? asString(row.description);
-  const bioLongHtml = asString(row.description);
+  const bioLongHtml = asHtmlString(row.description);
 
   const legacyBio: Record<string, string> = {};
   for (const k of [

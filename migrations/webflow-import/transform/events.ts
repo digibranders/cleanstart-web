@@ -1,7 +1,14 @@
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
 import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
+import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
 
-const asString = (v: unknown): string | null =>
+const asString = (v: unknown): string | null => {
+  if (typeof v !== 'string') return null;
+  const stripped = htmlToPlainText(v);
+  return stripped.length > 0 ? stripped : null;
+};
+
+const asHtmlString = (v: unknown): string | null =>
   typeof v === 'string' && v.trim().length > 0 ? v.trim() : null;
 
 interface WebflowGalleryItem {
@@ -20,7 +27,7 @@ export const transformEvent = (row: Record<string, unknown>): Record<string, unk
   // checklist; we don't want a validation failure to stop the import.
   const venue = asString(row.venue) ?? asString(row.location) ?? '—';
   const abstract = asString(row['abstract-2']) ?? asString(row.description);
-  const bodyHtml = asString(row['main-text']) ?? asString(row.body);
+  const bodyHtml = asHtmlString(row['main-text']) ?? asHtmlString(row.body);
   const startsAt = asString(row['event-date']) ?? asString(row['start-date']);
   const endsAt = asString(row['end-date']);
   const customDateLabel = asString(row['event-custom-date']);

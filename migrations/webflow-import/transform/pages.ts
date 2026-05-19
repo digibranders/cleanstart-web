@@ -1,17 +1,25 @@
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
+import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
+
+const asString = (v: unknown): string | null => {
+  if (typeof v !== 'string') return null;
+  const stripped = htmlToPlainText(v);
+  return stripped.length > 0 ? stripped : null;
+};
 
 export const transformPage = (row: Record<string, unknown>): Record<string, unknown> => {
-  const slug = (row.slug as string | undefined) ?? slugify(row.name as string | undefined);
+  const title = asString(row.name) ?? '';
+  const slug = (row.slug as string | undefined) ?? slugify(title);
   return {
     _webflowId: row.webflowId,
     _status: 'published',
-    title: row.name ?? '',
+    title,
     slug,
     _rawBody: row.body ?? row.content ?? null,
     _rawHeroImage: row.image ?? row['hero-image'] ?? null,
     seo: {
-      title: row['seo-title'] ?? row['meta-title'] ?? null,
-      description: row['seo-description'] ?? row['meta-description'] ?? null,
+      title: asString(row['seo-title']) ?? asString(row['meta-title']),
+      description: asString(row['seo-description']) ?? asString(row['meta-description']),
     },
   };
 };
