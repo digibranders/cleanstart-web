@@ -207,7 +207,7 @@ export const Media: CollectionConfig = {
   ],
   hooks: {
     beforeValidate: [
-      async ({ data, req }) => {
+      async ({ data, operation, originalDoc, req }) => {
         const file = req.file;
         if (!file) return data;
         const result = checkUploadSize(file.mimetype, file.size);
@@ -227,12 +227,33 @@ export const Media: CollectionConfig = {
           file.size = cleaned.byteLength;
         }
 
-        // Rewrite the upload filename to a canonical, slug-safe form
-        // before the s3-storage plugin computes the R2 key. The hook
-        // must run pre-write because rejectFilenameRename blocks any
-        // post-upload rename, and the plugin only PUTs when req.file
-        // is present. We mutate req.file.name and data.filename in
-        // lockstep so downstream consumers (resize derivatives,
+        // URL stability: on UPDATE (crop, replace file, focal-point save)
+        // we preserve the existing filename. The cloud-storage plugin's
+        // afterChange hook would otherwise delete the OLD R2 keys and PUT
+        // new ones — but stale Next.js ISR pages, Cloudflare edge cache,
+        // and browser cache would still reference the old URL and 404
+        // until cache TTLs expire. Keeping the filename stable means the
+        // plugin overwrites the same R2 key in place, and every consumer
+        // continues to resolve. Editors who want a different filename
+        // use the explicit /api/media/:id/rename endpoint which moves
+        // R2 keys with proper copy-then-delete semantics.
+        if (operation === 'update') {
+          const previousFilename =
+            typeof (originalDoc as { filename?: unknown } | undefined)?.filename === 'string'
+              ? (originalDoc as { filename: string }).filename
+              : undefined;
+          if (previousFilename) {
+            file.name = previousFilename;
+            return { ...data, filename: previousFilename };
+          }
+        }
+
+        // CREATE path: rewrite the upload filename to a canonical,
+        // slug-safe form before the s3-storage plugin computes the R2
+        // key. The hook must run pre-write because rejectFilenameRename
+        // blocks any post-upload rename, and the plugin only PUTs when
+        // req.file is present. We mutate req.file.name and data.filename
+        // in lockstep so downstream consumers (resize derivatives,
         // media.url, prefix computation) all see the same name.
         const bytes = Buffer.isBuffer(file.data)
           ? file.data
