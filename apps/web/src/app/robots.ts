@@ -1,11 +1,16 @@
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
 
 const PRODUCTION_HOST = "https://www.cleanstart.com";
+const NOINDEX_HOSTS = new Set(["staging.cleanstart.com"]);
 
-export default function robots(): MetadataRoute.Robots {
+export default async function robots(): Promise<MetadataRoute.Robots> {
   const isProduction = process.env.VERCEL_ENV === "production";
+  const headerList = await headers();
+  const host = headerList.get("host")?.split(":")[0]?.toLowerCase() ?? "";
+  const isNoindexHost = NOINDEX_HOSTS.has(host);
 
-  if (!isProduction) {
+  if (!isProduction || isNoindexHost) {
     return {
       rules: [{ userAgent: "*", disallow: "/" }],
     };
