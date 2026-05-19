@@ -1,32 +1,21 @@
 # syntax=docker/dockerfile:1
 
-# ─── Stage 1: deps ───────────────────────────────────────────────────────────
-# Install ALL workspace dependencies from the monorepo root so that
-# @cleanstart/ui, @cleanstart/types, and @cleanstart/config resolve correctly.
-FROM node:22-alpine AS deps
-RUN corepack enable && corepack prepare pnpm@10.30.3 --activate
-WORKDIR /app
-
-# Copy workspace manifests first for layer caching
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY apps/cms/package.json ./apps/cms/
-COPY packages/ui/package.json ./packages/ui/
-COPY packages/types/package.json ./packages/types/
-COPY packages/config/package.json ./packages/config/
-
-RUN pnpm install --frozen-lockfile --prefer-offline
-
-# ─── Stage 2: builder ────────────────────────────────────────────────────────
+# ─── Stage 1: builder ─────────────────────────────────────────────────────────
+# Install + build in a single stage. The previous split (deps + builder) tried
+# to cache `pnpm install` across rebuilds, but cross-stage `COPY --from=deps`
+# of `packages/*/node_modules` lost the pnpm workspace symlinks, so the build
+# couldn't resolve `react` from inside `@cleanstart/ui`. Combining them is the
+# correct primitive — pnpm's content-addressed `.pnpm` store + lockfile gives
+# us reproducibility without depending on Docker layer cache mechanics.
 FROM node:22-alpine AS builder
 RUN corepack enable && corepack prepare pnpm@10.30.3 --activate
 WORKDIR /app
 
-# Copy installed node_modules from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/cms/node_modules ./apps/cms/node_modules
-
-# Copy full source (needed for build + generate:types)
+# Copy full source (needed for pnpm workspace install + build)
 COPY . .
+
+# Install — uses lockfile for reproducibility, prefers offline cache when present
+RUN pnpm install --frozen-lockfile --prefer-offline
 
 # Build args become env vars only during the build step.
 # These are the public/static values baked into the Next.js bundle —
@@ -55,7 +44,7 @@ ENV SHARP_CONCURRENCY=1
 
 RUN pnpm --filter @cleanstart/cms build
 
-# ─── Stage 3: runner ─────────────────────────────────────────────────────────
+# ─── Stage 2: runner ─────────────────────────────────────────────────────────
 FROM node:22-alpine AS runner
 RUN corepack enable && corepack prepare pnpm@10.30.3 --activate
 
@@ -69,7 +58,10 @@ ENV PORT=3000
 # Suppress Node.js deprecation warnings in production logs
 ENV NODE_OPTIONS=--no-deprecation
 
-# Copy only what the production server needs
+# Copy only what the production server needs. Workspace package node_modules
+# (packages/*/node_modules with pnpm symlinks) are brought over via the full
+# `packages` copy below — necessary for runtime resolution from inside
+# @cleanstart/ui, @cleanstart/types, @cleanstart/config.
 COPY --from=builder --chown=payload:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=payload:nodejs /app/apps/cms/node_modules ./apps/cms/node_modules
 COPY --from=builder --chown=payload:nodejs /app/apps/cms/.next ./apps/cms/.next
