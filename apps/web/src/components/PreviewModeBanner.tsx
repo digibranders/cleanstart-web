@@ -29,9 +29,24 @@ export function PreviewModeBanner(): React.ReactElement {
       <span>
         Preview link — you are viewing draft content. This URL expires and is not indexed by search engines.
       </span>
-      <span style={{ opacity: 0.7, fontSize: "0.75rem", whiteSpace: "nowrap" }}>
-        Not the live page
-      </span>
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <span style={{ opacity: 0.7, fontSize: "0.75rem", whiteSpace: "nowrap" }}>
+          Not the live page · Links disabled
+        </span>
+        <a
+          href="/api/preview/disable"
+          data-preview-allow="true"
+          style={{
+            color: "#111",
+            textDecoration: "underline",
+            fontWeight: 600,
+            whiteSpace: "nowrap",
+            fontSize: "0.8rem",
+          }}
+        >
+          Exit preview
+        </a>
+      </div>
     </output>
   );
 }
