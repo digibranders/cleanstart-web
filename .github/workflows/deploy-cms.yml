@@ -30,12 +30,23 @@ jobs:
         with:
           ref: ${{ inputs.sha || github.sha }}
 
+      # Buildx + GHA cache shaves ~1–2 min off subsequent builds by reusing
+      # pnpm install + intermediate Next.js layers across runs. First build
+      # after this change populates the cache (no speedup); every later
+      # source-only change benefits. Cache lives in the repo's Actions cache
+      # (10 GB cap, LRU-evicted by GitHub).
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build image (cms:${{ github.sha }})
-        run: |
-          docker build \
-            -f apps/cms/Dockerfile \
-            -t cms:${{ github.sha }} \
-            .
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/cms/Dockerfile
+          tags: cms:${{ github.sha }}
+          load: true
+          cache-from: type=gha,scope=cms-deploy
+          cache-to: type=gha,scope=cms-deploy,mode=max
 
       - name: Save image tarball
         run: docker save cms:${{ github.sha }} | gzip > /tmp/cms.tar.gz
