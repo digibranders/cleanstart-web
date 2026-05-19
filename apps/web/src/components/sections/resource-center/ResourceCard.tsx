@@ -5,6 +5,7 @@ import {
   resourceCtaLabel,
   resourceCoverPoster,
 } from "@/lib/resources";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 interface ResourceCardProps {
   resource: Resource;
@@ -86,30 +87,10 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
 
       {/* Type badge — overlaps image bottom */}
       <div
-        className="absolute flex items-center justify-center overflow-hidden"
-        style={{
-          top: "133px",
-          left: "26px",
-          padding: "6px 12px",
-          borderRadius: "8px",
-          boxShadow: "0px 3px 0px 0px #4a3bf1",
-          zIndex: 1,
-        }}
+        className="absolute"
+        style={{ top: "133px", left: "26px", zIndex: 1 }}
       >
-        {/* Badge background image */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/resource-center/card-badge-bg.png"
-          alt=""
-          aria-hidden
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none rounded-[8px]"
-        />
-        <span
-          className="relative text-base font-medium leading-[1.3] whitespace-nowrap"
-          style={{ color: "#4a3bf1" }}
-        >
-          {typeLabel}
-        </span>
+        <CategoryBadge label={typeLabel} />
       </div>
 
       {/* Content area */}

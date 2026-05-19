@@ -6,7 +6,14 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { ResourceDetailHero } from "@/components/sections/resource/ResourceDetailHero";
 import { ResourceDetailContent } from "@/components/sections/resource/ResourceDetailContent";
 import { ResourceDetailLeadCapture } from "@/components/sections/resource/ResourceDetailLeadCapture";
-import { getResourceBySlug, mediaUrl, resourceTypeLabel } from "@/lib/resources";
+import {
+  getResourceBySlug,
+  getResourceBySlugDraft,
+  mediaUrl,
+  resourceTypeLabel,
+} from "@/lib/resources";
+import { highlightLexical } from "@/lib/highlightLexical";
+import { getFormById, type Form } from "@/lib/forms";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import {
   JsonLd,
@@ -53,14 +60,33 @@ export async function generateMetadata({
   });
 }
 
-export default async function ResourceDetailPage({
-  params,
-}: ResourceDetailPageProps): Promise<React.ReactElement> {
-  const { slug } = await params;
-  const resource = await getResourceBySlug(slug).catch(() => null);
+export async function renderResourceDetail({
+  slug,
+  draft = false,
+}: {
+  slug: string;
+  draft?: boolean;
+}): Promise<React.ReactElement> {
+  const resource = draft
+    ? await getResourceBySlugDraft(slug).catch(() => null)
+    : await getResourceBySlug(slug).catch(() => null);
   if (!resource) notFound();
 
   const assetAbsolute = mediaUrl(resource.asset?.url);
+
+  const highlightedBody = await highlightLexical(resource.body ?? null);
+  const resourceWithHighlighted = { ...resource, body: highlightedBody ?? null };
+
+  let gateForm: Form | null = null;
+  if (resource.gated === true && resource.gateForm != null) {
+    const gateFormId =
+      typeof resource.gateForm === "object"
+        ? resource.gateForm.id
+        : resource.gateForm;
+    if (gateFormId != null) {
+      gateForm = await getFormById(gateFormId);
+    }
+  }
 
   return (
     <>
@@ -91,15 +117,22 @@ export default async function ResourceDetailPage({
         }}
       >
         {/* Hero — dark gradient, breadcrumb, title, download button */}
-        <ResourceDetailHero resource={resource} />
+        <ResourceDetailHero resource={resource} gateForm={gateForm} />
 
         {/* Content — cover image + rich-text body */}
         <FadeUp>
-          <ResourceDetailContent resource={resource} />
+          <ResourceDetailContent resource={resourceWithHighlighted} />
         </FadeUp>
 
       </main>
       <Footer cta={<ResourceDetailLeadCapture resource={resource} />} />
     </>
   );
+}
+
+export default async function ResourceDetailPage({
+  params,
+}: ResourceDetailPageProps): Promise<React.ReactElement> {
+  const { slug } = await params;
+  return renderResourceDetail({ slug });
 }

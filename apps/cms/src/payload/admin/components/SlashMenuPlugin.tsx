@@ -17,7 +17,10 @@ import {
   type LexicalEditor,
 } from 'lexical';
 import { $setBlocksType } from '@lexical/selection';
-import { ENABLE_SLASH_MENU_COMMAND } from '@payloadcms/richtext-lexical/client';
+import {
+  ENABLE_SLASH_MENU_COMMAND,
+  INSERT_BLOCK_COMMAND,
+} from '@payloadcms/richtext-lexical/client';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -86,6 +89,11 @@ const ICON = {
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <rect x="1" y="3" width="14" height="10" rx="1.5" {...stroke} />
       <path {...stroke} d="M5.5 6.5L3 8l2.5 1.5M10.5 6.5L13 8l-2.5 1.5M7.5 10l1-4" />
+    </svg>
+  ),
+  code: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path {...stroke} d="M6 5L3 8l3 3M10 5l3 3-3 3" />
     </svg>
   ),
 } as const;
@@ -159,6 +167,21 @@ const ITEMS: ReadonlyArray<SlashItem> = [
     keywords: ['embed', 'video', 'youtube', 'vimeo', 'loom', 'iframe',
                'script', 'calendly', 'typeform', 'figma', 'wistia', 'widget'],
     run: (editor) => editor.dispatchCommand(OPEN_EMBED_DIALOG_COMMAND, {}),
+  },
+  {
+    id: 'code',
+    label: 'Code block',
+    icon: ICON.code,
+    keywords: ['code', 'snippet', 'pre', 'mono', 'shell', 'bash', 'json',
+               'typescript', 'javascript', 'python', 'yaml', 'dockerfile', 'sql'],
+    run: (editor) =>
+      editor.dispatchCommand(INSERT_BLOCK_COMMAND, {
+        blockName: '',
+        blockType: 'codeBlock',
+        language: 'bash',
+        content: '',
+        showLineNumbers: true,
+      }),
   },
 ];
 

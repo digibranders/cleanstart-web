@@ -1,7 +1,5 @@
-"use client";
-
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback, useRef } from "react";
+import { Suspense } from "react";
+import { SearchBar } from "@/components/sections/_shared/SearchBar";
 
 const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 25.7%, #10123e 37.8%, #131e8f 66.9%, #471ec0 79.7%, #471fc3 92.2%, rgba(70,30,191,0.85) 97.9%, rgba(66,30,188,0.4) 107.7%, rgba(66,30,188,0) 113.5%)";
@@ -13,27 +11,6 @@ interface ResourceCenterHeroProps {
 export function ResourceCenterHero({
   initialQuery,
 }: ResourceCenterHeroProps): React.ReactElement {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleSearch = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const q = inputRef.current?.value.trim() ?? "";
-      const params = new URLSearchParams(searchParams.toString());
-      if (q) {
-        params.set("q", q);
-      } else {
-        params.delete("q");
-      }
-      params.delete("page");
-      router.push(`${pathname}?${params.toString()}`);
-    },
-    [router, pathname, searchParams],
-  );
-
   return (
     <section
       className="relative overflow-hidden"
@@ -144,70 +121,20 @@ export function ResourceCenterHero({
           </div>
 
           {/* Search bar */}
-          <search aria-label="Search resources" className="contents">
-          <form
-            onSubmit={handleSearch}
-            className="flex items-center w-full"
-            style={{ maxWidth: "674px" }}
-          >
-            <div
-              className="relative overflow-hidden flex-1"
-              style={{
-                height: "42px",
-                background: "rgba(255,255,255,0.2)",
-                border: "1px solid rgba(237,203,255,0.6)",
-                borderRight: "none",
-                borderRadius: "12px 0 0 12px",
-              }}
-            >
-              <input
-                ref={inputRef}
-                type="search"
-                name="q"
-                defaultValue={initialQuery}
-                placeholder="Search resources..."
-                className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 text-base leading-[1.5] outline-none"
-                style={{ fontWeight: 400 }}
+          <Suspense
+            fallback={
+              <div
+                className="flex items-center"
+                style={{ height: "42px", width: "674px" }}
               />
-            </div>
-            {/* Search button */}
-            <button
-              type="submit"
-              className="shrink-0 flex items-center justify-center"
-              style={{
-                width: "52px",
-                height: "42px",
-                background: "rgba(255,255,255,0.2)",
-                border: "1px solid rgba(237,203,255,0.6)",
-                borderLeft: "none",
-                borderRadius: "0 12px 12px 0",
-              }}
-              aria-label="Submit search"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden
-              >
-                <circle
-                  cx="11"
-                  cy="11"
-                  r="7"
-                  stroke="white"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M16.5 16.5L21 21"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-          </form>
-          </search>
+            }
+          >
+            <SearchBar
+              initialQuery={initialQuery}
+              placeholder="Search resources..."
+              ariaLabel="Search resources"
+            />
+          </Suspense>
         </div>
       </div>
     </section>

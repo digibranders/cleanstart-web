@@ -2,6 +2,10 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import {
+  resourceDownloadEndpoint,
+  resourceTokenEndpoint,
+} from '../endpoints/resources-download';
 import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
@@ -160,6 +164,7 @@ export const Resources: CollectionConfig = {
     ],
     afterDelete: [searchSyncAfterDeleteHook('resources')],
   },
+  endpoints: [resourceDownloadEndpoint, resourceTokenEndpoint],
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,
 };

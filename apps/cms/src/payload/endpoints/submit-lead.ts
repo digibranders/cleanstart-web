@@ -7,6 +7,8 @@ import { submitLead } from '../lib/lead-handlers/registry';
 import type { LeadSubmission } from '../lib/lead-handlers/types';
 import { type FormFieldDef, validateFields } from '../lib/lead-handlers/validate-fields';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
+import { signDownloadToken } from '../lib/resources/download-token';
+import { buildUnlockCookieHeader } from '../lib/resources/unlock-cookie';
 import { verifyTurnstileToken } from '../lib/turnstile';
 import { dispatchEvent } from '../lib/webhooks/dispatch';
 
@@ -42,6 +44,10 @@ const corsHeaders = (origin: string): Record<string, string> => ({
   'access-control-allow-origin': origin,
   'access-control-allow-methods': 'POST, OPTIONS',
   'access-control-allow-headers': 'content-type',
+  // Required because the lead-submit response can carry a Set-Cookie
+  // (cs_gate_unlock) that the browser must store cross-origin; credentialed
+  // CORS demands this header alongside an explicit origin.
+  'access-control-allow-credentials': 'true',
   vary: 'Origin',
 });
 
@@ -319,12 +325,71 @@ export const submitLeadEndpoint: Endpoint = {
         );
       }
 
+      // Gated-resource flow: if the submission was made in the context of
+      // a Resources row whose gateForm matches this form, mint a short-
+      // lived signed download token and append it (plus an unlock cookie)
+      // to the response. Non-gated submissions fall through unchanged.
+      const responseHeaders: Record<string, string> = { ...responseCors };
+      let downloadPayload: { url: string; expiresAt: number } | undefined;
+      const resourceIdRaw = data.context?.resourceId;
+      if (resourceIdRaw != null) {
+        try {
+          const resourceDoc = (await req.payload.findByID({
+            collection: 'resources',
+            id: resourceIdRaw as string | number,
+            depth: 0,
+            overrideAccess: true,
+          })) as {
+            id: string | number;
+            slug?: string | null;
+            gated?: boolean | null;
+            gateForm?: number | string | { id?: number | string } | null;
+          } | null;
+
+          if (resourceDoc && resourceDoc.gated === true && resourceDoc.slug) {
+            const gateFormId =
+              typeof resourceDoc.gateForm === 'object' && resourceDoc.gateForm !== null
+                ? resourceDoc.gateForm.id
+                : resourceDoc.gateForm;
+            const gateFormNumeric =
+              typeof gateFormId === 'number'
+                ? gateFormId
+                : Number.parseInt(String(gateFormId ?? ''), 10);
+            if (Number.isInteger(gateFormNumeric) && gateFormNumeric === numericFormId) {
+              const secret = process.env.PAYLOAD_SECRET;
+              if (secret) {
+                const { token, expiresAt } = signDownloadToken({
+                  resourceId: resourceDoc.id,
+                  secret,
+                });
+                downloadPayload = {
+                  url: `/api/resources/${resourceDoc.slug}/download?token=${token}`,
+                  expiresAt,
+                };
+                responseHeaders['set-cookie'] = buildUnlockCookieHeader({
+                  resourceId: resourceDoc.id,
+                  cookieHeader: req.headers.get('cookie'),
+                  secret,
+                  secure: process.env.NODE_ENV === 'production',
+                });
+              }
+            }
+          }
+        } catch (err) {
+          req.payload.logger.warn(
+            { err: err instanceof Error ? err.message : String(err), resourceIdRaw },
+            'Gated resource lookup failed — lead saved, no token issued',
+          );
+        }
+      }
+
       return json(
         {
           ok: true,
           duplicate: result.duplicateOfLeadId != null,
+          ...(downloadPayload ? { download: downloadPayload } : {}),
         },
-        { headers: responseCors },
+        { headers: responseHeaders },
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : 'unknown';

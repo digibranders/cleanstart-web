@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
-import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { WebinarsHero } from "@/components/sections/webinars/WebinarsHero";
 import { WebinarsGrid } from "@/components/sections/webinars/WebinarsGrid";
+import { WebinarsCTA } from "@/components/sections/webinars/WebinarsCTA";
 import { FadeUp } from "@/components/ui/FadeUp";
 import {
   getWebinars,
@@ -85,7 +85,7 @@ export default async function WebinarsPage({
         </FadeUp>
 
       </main>
-      <Footer cta={<BlogsCTA />} />
+      <Footer cta={<WebinarsCTA />} />
     </>
   );
 }

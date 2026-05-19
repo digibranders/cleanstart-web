@@ -73,6 +73,7 @@ export interface Config {
     brokenLinks: BrokenLink;
     'audit-log': AuditLog;
     searchLog: SearchLog;
+    previewAudit: PreviewAudit;
     webhooks_dead_letter: WebhooksDeadLetter;
     integrations: Integration;
     analyticsCache: AnalyticsCache;
@@ -108,6 +109,7 @@ export interface Config {
     brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
+    previewAudit: PreviewAuditSelect<false> | PreviewAuditSelect<true>;
     webhooks_dead_letter: WebhooksDeadLetterSelect<false> | WebhooksDeadLetterSelect<true>;
     integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
     analyticsCache: AnalyticsCacheSelect<false> | AnalyticsCacheSelect<true>;
@@ -169,6 +171,7 @@ export interface Config {
       drainLeadQueue: TaskDrainLeadQueue;
       purgeSearchLog: TaskPurgeSearchLog;
       purgeLeadsPii: TaskPurgeLeadsPii;
+      purgePreviewAudit: TaskPurgePreviewAudit;
       checkBrokenLinks: TaskCheckBrokenLinks;
       retryWebhook: TaskRetryWebhook;
       meiliReindex: TaskMeiliReindex;
@@ -285,6 +288,7 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
+  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -292,7 +296,6 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -458,6 +461,42 @@ export interface SearchLog {
    * User-Agent header. Trimmed at 200 chars.
    */
   userAgent?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Active and revoked preview-share links. Revoke a row to invalidate the link immediately.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "previewAudit".
+ */
+export interface PreviewAudit {
+  id: number;
+  /**
+   * Payload collection slug the token targets.
+   */
+  collection: string;
+  /**
+   * Doc id within the collection.
+   */
+  docId: string;
+  /**
+   * Editor who minted the link.
+   */
+  actor: number | User;
+  /**
+   * Optional human label, e.g. "Legal review – Q2 launch post".
+   */
+  label?: string | null;
+  /**
+   * TTL chosen at mint time.
+   */
+  ttlSeconds: number;
+  expiresAt: string;
+  /**
+   * Set this (or click Revoke in the row actions) to invalidate the link.
+   */
+  revokedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -3532,6 +3571,27 @@ export interface Event {
   registrationForm?: (number | null) | Form;
   attendeesCap?: number | null;
   /**
+   * Optional custom label for the registration CTA button. Defaults to "Register" when blank. Examples: "Join the Community", "RSVP", "Save Your Seat".
+   */
+  ctaLabel?: string | null;
+  /**
+   * Optional CTA shown on the detail page after the event has ended (startsAt is in the past). The registration button is hidden automatically — use this for "View Photos", "Watch Recording", "View Slides", etc.
+   */
+  postEventCta?: {
+    /**
+     * Enable to show a CTA on the detail page after the event ends.
+     */
+    enabled?: boolean | null;
+    /**
+     * Button label, e.g. "Watch Recording".
+     */
+    label?: string | null;
+    /**
+     * Destination URL for the post-event CTA.
+     */
+    url?: string | null;
+  };
+  /**
    * Drives the Event JSON-LD eventStatus. Switching to Postponed / Cancelled is required so search engines stop showing the event as still happening.
    */
   eventStatus: 'scheduled' | 'postponed' | 'cancelled';
@@ -5225,9 +5285,8 @@ export interface Page {
                     | 'hcl'
                     | 'text';
                   /**
-                   * Optional filename rendered as a tab above the code (e.g. Dockerfile).
+                   * Paste code here. Indentation is preserved.
                    */
-                  filename?: string | null;
                   content: string;
                   showLineNumbers?: boolean | null;
                   /**
@@ -5998,9 +6057,8 @@ export interface Page {
               | 'hcl'
               | 'text';
             /**
-             * Optional filename rendered as a tab above the code (e.g. Dockerfile).
+             * Paste code here. Indentation is preserved.
              */
-            filename?: string | null;
             content: string;
             showLineNumbers?: boolean | null;
             /**
@@ -6560,6 +6618,7 @@ export interface PayloadJob {
           | 'drainLeadQueue'
           | 'purgeSearchLog'
           | 'purgeLeadsPii'
+          | 'purgePreviewAudit'
           | 'checkBrokenLinks'
           | 'retryWebhook'
           | 'meiliReindex'
@@ -6605,6 +6664,7 @@ export interface PayloadJob {
         | 'drainLeadQueue'
         | 'purgeSearchLog'
         | 'purgeLeadsPii'
+        | 'purgePreviewAudit'
         | 'checkBrokenLinks'
         | 'retryWebhook'
         | 'meiliReindex'
@@ -6659,6 +6719,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'searchLog';
         value: number | SearchLog;
+      } | null)
+    | ({
+        relationTo: 'previewAudit';
+        value: number | PreviewAudit;
       } | null)
     | ({
         relationTo: 'webhooks_dead_letter';
@@ -6822,13 +6886,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
+  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -6935,6 +6999,21 @@ export interface SearchLogSelect<T extends boolean = true> {
   locale?: T;
   ip?: T;
   userAgent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "previewAudit_select".
+ */
+export interface PreviewAuditSelect<T extends boolean = true> {
+  collection?: T;
+  docId?: T;
+  actor?: T;
+  label?: T;
+  ttlSeconds?: T;
+  expiresAt?: T;
+  revokedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -8284,6 +8363,14 @@ export interface EventsSelect<T extends boolean = true> {
   registrationUrl?: T;
   registrationForm?: T;
   attendeesCap?: T;
+  ctaLabel?: T;
+  postEventCta?:
+    | T
+    | {
+        enabled?: T;
+        label?: T;
+        url?: T;
+      };
   eventStatus?: T;
   cancelledAt?: T;
   previousStartDate?: T;
@@ -9070,7 +9157,6 @@ export interface PagesSelect<T extends boolean = true> {
                       | T
                       | {
                           language?: T;
-                          filename?: T;
                           content?: T;
                           showLineNumbers?: T;
                           highlightLines?: T;
@@ -9440,7 +9526,6 @@ export interface PagesSelect<T extends boolean = true> {
           | T
           | {
               language?: T;
-              filename?: T;
               content?: T;
               showLineNumbers?: T;
               highlightLines?: T;
@@ -10582,6 +10667,14 @@ export interface TaskPurgeSearchLog {
  * via the `definition` "TaskPurgeLeadsPii".
  */
 export interface TaskPurgeLeadsPii {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPurgePreviewAudit".
+ */
+export interface TaskPurgePreviewAudit {
   input?: unknown;
   output?: unknown;
 }

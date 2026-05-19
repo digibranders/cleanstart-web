@@ -61,9 +61,18 @@ interface Ga4Payload {
 interface CardResponse<T> {
   ok: boolean;
   hasData: boolean;
+  configured?: boolean;
   stale?: boolean;
   capturedAt?: string;
   payload?: T;
+}
+
+interface GscQueriesResponse {
+  ok: boolean;
+  hasData: boolean;
+  configured: boolean;
+  inspectionConfigured: boolean;
+  queries: GscQuery[];
 }
 
 const useDocUrl = (): string | null => {
@@ -105,7 +114,7 @@ const Sparkline = ({
   );
 };
 
-export const AnalyticsTab = (): ReactElement => {
+export const AnalyticsTab = (): ReactElement | null => {
   const { id } = useDocumentInfo();
   const { config } = useConfig();
   const serverURL = config?.serverURL ?? '';
@@ -113,7 +122,7 @@ export const AnalyticsTab = (): ReactElement => {
 
   const [ga4, setGa4] = useState<CardResponse<Ga4Payload> | null>(null);
   const [clarity, setClarity] = useState<CardResponse<ClarityPayload> | null>(null);
-  const [queries, setQueries] = useState<GscQuery[] | null>(null);
+  const [gsc, setGsc] = useState<GscQueriesResponse | null>(null);
   const [inspect, setInspect] = useState<InspectionResult | null | 'loading'>(null);
 
   useEffect(() => {
@@ -153,10 +162,17 @@ export const AnalyticsTab = (): ReactElement => {
           `${serverURL}/api/dashboards/per-doc/gsc-queries?url=${encodeURIComponent(url)}`,
           { credentials: 'include' },
         );
-        const body = (await res.json()) as { queries?: GscQuery[] };
-        if (!cancelled) setQueries(body.queries ?? []);
+        const body = (await res.json()) as GscQueriesResponse;
+        if (!cancelled) setGsc(body);
       } catch {
-        if (!cancelled) setQueries([]);
+        if (!cancelled)
+          setGsc({
+            ok: false,
+            hasData: false,
+            configured: false,
+            inspectionConfigured: false,
+            queries: [],
+          });
       }
     })();
     return () => {
@@ -193,8 +209,22 @@ export const AnalyticsTab = (): ReactElement => {
   const clarityRow =
     url && clarity?.payload?.worstByDeadClicks?.find((r) => r.url === url);
 
+  // Hide each section when its integration isn't configured + enabled.
+  // While the request is in flight `configured` is undefined → section
+  // stays hidden, so editors never see a flash of empty scaffolding
+  // before the response arrives. When none of the three resolve to
+  // configured, the whole panel collapses to nothing.
+  const showGa4 = ga4?.configured === true;
+  const showGsc = gsc?.configured === true;
+  const showClarity = clarity?.configured === true;
+
+  if (!showGa4 && !showGsc && !showClarity) {
+    return null;
+  }
+
   return (
     <div className="cs-analytics-tab">
+      {showGa4 ? (
       <section className="cs-analytics-tab__section" aria-label="GA4 last 28 days">
         <h3 className="cs-analytics-tab__heading">
           Google Analytics — last 28 days
@@ -223,17 +253,19 @@ export const AnalyticsTab = (): ReactElement => {
             <Sparkline values={ga4Body.daily.map((d) => d.sessions)} />
           </>
         ) : (
-          <p className="cs-analytics-tab__empty">No GA4 data cached yet. Add a GA4 integration row to enable.</p>
+          <p className="cs-analytics-tab__empty">No GA4 data cached yet — the next cron tick will populate it.</p>
         )}
       </section>
+      ) : null}
 
+      {showGsc ? (
       <section className="cs-analytics-tab__section" aria-label="GSC top queries">
         <h3 className="cs-analytics-tab__heading">Top Google Search queries</h3>
-        {queries === null ? (
+        {gsc === null ? (
           <p className="cs-analytics-tab__empty">Loading…</p>
-        ) : queries.length === 0 ? (
+        ) : gsc.queries.length === 0 ? (
           <p className="cs-analytics-tab__empty">
-            No query data for this URL. (Either GSC isn't configured or this URL has no impressions in the last 28 days.)
+            No impressions recorded for this URL in the last 28 days.
           </p>
         ) : (
           <table className="cs-analytics-tab__table">
@@ -247,7 +279,7 @@ export const AnalyticsTab = (): ReactElement => {
               </tr>
             </thead>
             <tbody>
-              {queries.map((q) => (
+              {gsc.queries.map((q) => (
                 <tr key={q.query}>
                   <td>{q.query}</td>
                   <td>{q.impressions.toLocaleString()}</td>
@@ -260,6 +292,7 @@ export const AnalyticsTab = (): ReactElement => {
           </table>
         )}
         <div className="cs-analytics-tab__inspect">
+          {gsc?.inspectionConfigured ? (
           <button
             type="button"
             className="cs-btn cs-btn--subtle"
@@ -268,6 +301,7 @@ export const AnalyticsTab = (): ReactElement => {
           >
             {inspect === 'loading' ? 'Inspecting…' : 'Inspect URL in GSC'}
           </button>
+          ) : null}
           {inspect && inspect !== 'loading' ? (
             <dl className="cs-analytics-tab__inspection">
               <div>
@@ -290,7 +324,9 @@ export const AnalyticsTab = (): ReactElement => {
           ) : inspect === null && url ? null : null}
         </div>
       </section>
+      ) : null}
 
+      {showClarity ? (
       <section className="cs-analytics-tab__section" aria-label="MS Clarity UX signals">
         <h3 className="cs-analytics-tab__heading">
           UX signals (MS Clarity)
@@ -321,6 +357,7 @@ export const AnalyticsTab = (): ReactElement => {
           </p>
         )}
       </section>
+      ) : null}
     </div>
   );
 };

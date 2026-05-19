@@ -42,8 +42,21 @@ export function AsrHero(): React.ReactElement {
         }}
       />
 
+      {/* Bottom fade — Figma node 366-5158 fades the hero's last ~200px from
+          peak purple into pure white where AsrPublicImages (bg-white) begins.
+          Same pattern as FipsHero. */}
       <div
-        className="relative mx-auto max-w-[1276px] px-6"
+        aria-hidden
+        className="pointer-events-none select-none absolute inset-x-0 bottom-0 z-[1]"
+        style={{
+          height: "200px",
+          background:
+            "linear-gradient(180deg, rgba(246,246,246,0) 0%, rgba(246,246,246,0.45) 55%, rgba(246,246,246,0.92) 88%, #F6F6F6 100%)",
+        }}
+      />
+
+      <div
+        className="relative z-10 mx-auto max-w-[1276px] px-6"
         style={{ paddingTop: "168px", paddingBottom: "96px" }}
       >
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-10">

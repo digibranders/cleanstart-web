@@ -1,6 +1,12 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getBlogBySlug, getRelatedBlogs, mediaUrl } from "@/lib/blog";
+import {
+  getBlogBySlug,
+  getBlogBySlugDraft,
+  getRelatedBlogs,
+  mediaUrl,
+} from "@/lib/blog";
+import { highlightLexical } from "@/lib/highlightLexical";
 import { Header } from "@/components/sections/Header";
 import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
 import { BlogDetailContent } from "@/components/sections/blog/BlogDetailContent";
@@ -42,6 +48,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
     path: `/blog/${post.slug}`,
     type: "article",
     publishedTime: post.publishedAt,
+    modifiedTime: post.updatedAt,
     authors: post.authors?.map((a) => a.name),
     ...(heroAbsolute && post.heroImage
       ? {
@@ -56,14 +63,22 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
   });
 }
 
-export default async function BlogDetailPage({ params }: BlogDetailPageProps): Promise<React.ReactElement> {
-  const { slug } = await params;
-  const post = await getBlogBySlug(slug);
+export async function renderBlogDetail({
+  slug,
+  draft = false,
+}: {
+  slug: string;
+  draft?: boolean;
+}): Promise<React.ReactElement> {
+  const post = draft ? await getBlogBySlugDraft(slug) : await getBlogBySlug(slug);
 
   if (!post) notFound();
 
   const categoryIds = post.categories ? [post.categories.id] : [];
-  const relatedPosts = await getRelatedBlogs(post.id, categoryIds);
+  const [relatedPosts, highlightedBody] = await Promise.all([
+    getRelatedBlogs(post.id, categoryIds, { draft }),
+    highlightLexical(post.body),
+  ]);
 
   const heroAbsolute = mediaUrl(post.heroImage?.url);
 
@@ -84,6 +99,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
           description: post.abstract ?? undefined,
           path: `/blog/${post.slug}`,
           publishedAt: post.publishedAt,
+          modifiedAt: post.updatedAt,
           imageUrl: heroAbsolute,
           authors: post.authors?.map((a) => ({ name: a.name })),
           category: post.categories?.name,
@@ -96,12 +112,13 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
           categories={post.categories}
           authors={post.authors}
           publishedAt={post.publishedAt ?? undefined}
+          updatedAt={post.updatedAt ?? undefined}
           readingMinutes={post.readingMinutes ?? undefined}
           heroImage={post.heroImage}
         />
 
         <BlogDetailContent
-          body={post.body}
+          body={highlightedBody}
           tableOfContents={post.tableOfContents}
           heroImage={post.heroImage}
           abstract={post.abstract ?? undefined}
@@ -119,7 +136,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
             block). Each branch budgets exactly that, accounting for the
             internal pb already provided by the last rendered section. */}
         {relatedPosts.length > 0 ? (
-          <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)", paddingBottom: "250px" }}>
+          <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)", paddingBottom: "230px" }}>
             <BlogDetailRelatedPosts posts={relatedPosts} />
           </div>
         ) : post.faqs && post.faqs.length > 0 ? (
@@ -135,4 +152,9 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps): P
       <Footer cta={<BlogDetailCTA />} />
     </>
   );
+}
+
+export default async function BlogDetailPage({ params }: BlogDetailPageProps): Promise<React.ReactElement> {
+  const { slug } = await params;
+  return renderBlogDetail({ slug });
 }

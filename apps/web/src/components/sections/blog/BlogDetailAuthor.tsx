@@ -1,6 +1,5 @@
 import type React from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { pickImageUrl } from "@/lib/blog";
 import type { BlogAuthor } from "@/lib/blog";
 
@@ -45,19 +44,6 @@ function AuthorName({ author }: { author: BlogAuthor }): React.ReactElement {
     margin: 0,
   };
 
-  if (author.slug) {
-    return (
-      <h3 className={nameClasses} style={nameStyle}>
-        <Link
-          href={`/author/${author.slug}`}
-          className="hover:text-[#4a3bf1] transition-colors"
-        >
-          {author.name}
-        </Link>
-      </h3>
-    );
-  }
-
   return (
     <h3 className={nameClasses} style={nameStyle}>
       {author.name}
@@ -76,10 +62,10 @@ function AuthorCard({ author }: { author: BlogAuthor }): React.ReactElement {
       style={{ borderRadius: "12px" }}
     >
       <div
-        className="shrink-0 overflow-hidden relative"
+        className="shrink-0 self-stretch overflow-hidden relative"
         style={{
           width: "clamp(96px, 12vw, 144px)",
-          height: "clamp(96px, 12vw, 144px)",
+          minHeight: "clamp(96px, 12vw, 144px)",
           borderRadius: "8px",
         }}
       >
@@ -121,18 +107,20 @@ function AuthorCard({ author }: { author: BlogAuthor }): React.ReactElement {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${author.name} on LinkedIn`}
-              className="inline-flex shrink-0 items-center justify-center bg-[#E5E5E5] hover:bg-[#D5D5D5] transition-colors"
+              className="group inline-flex shrink-0 items-center justify-center bg-[#E5E5E5] hover:bg-[#0A66C2] transition-colors"
               style={{
                 width: "28px",
                 height: "28px",
                 borderRadius: "4px",
+                color: "rgba(17,17,17,0.6)",
               }}
             >
               <svg
                 width="14"
                 height="14"
                 viewBox="0 0 24 24"
-                fill="rgba(17,17,17,0.6)"
+                fill="currentColor"
+                className="group-hover:text-white transition-colors"
                 aria-hidden
               >
                 <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z" />

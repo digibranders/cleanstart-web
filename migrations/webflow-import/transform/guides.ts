@@ -1,22 +1,55 @@
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
+import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
 import { normalizeWebflowGuide } from '../../../apps/cms/src/payload/lib/webflow-import/guides-normalize';
 
+const asString = (v: unknown): string | null =>
+  typeof v === 'string' && v.trim().length > 0 ? v.trim() : null;
+
+const asNumber = (v: unknown): number | null => {
+  if (typeof v === 'number' && Number.isFinite(v)) return v;
+  if (typeof v === 'string') {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+};
+
 export const transformGuide = (row: Record<string, unknown>): Record<string, unknown> => {
-  const slug = (row.slug as string | undefined) ?? slugify(row.name as string | undefined);
-  const { faqs, keywords, citations } = normalizeWebflowGuide(row);
+  const title = asString(row.name) ?? '';
+  const slug = asString(row.slug) ?? slugify(title);
+  const bodyHtml = asString(row['main-text']) ?? asString(row.body);
+  const abstract = asString(row['meta-description']) ?? asString(row.summary);
+  const wordCount = asNumber(row['word-count']);
+  const { faqs, keywords, citations, articleSections } = normalizeWebflowGuide(row);
+
   return {
     _webflowId: row.webflowId,
     _status: 'published',
-    title: row.name ?? '',
+    title,
     slug,
-    abstract: row.summary ?? row.description ?? null,
-    body: row.body ?? row['post-body'] ?? null,
-    publishedAt: row['date-published'] ?? row.publishedAt ?? null,
+    body: bodyHtml ? htmlToLexical(bodyHtml) : undefined,
+    abstract,
+    wordCount: wordCount ?? undefined,
     faqs: faqs.length > 0 ? faqs : undefined,
     keywords: keywords.length > 0 ? keywords : undefined,
     citations: citations.length > 0 ? citations : undefined,
-    _rawAuthors: row.authors ?? null,
-    _rawCategories: row['guide-category'] ?? row.categories ?? null,
-    _rawHeroImage: row.image ?? row.thumbnail ?? null,
+    articleSections:
+      articleSections.length > 0
+        ? articleSections.map((s) => ({ heading: s.heading, body: htmlToLexical(s.body) }))
+        : undefined,
+    seo: buildSeoOverrides(row),
+    _rawAuthors: row.author ?? row.authors ?? null,
+    _rawReviewedBy: row['review-by'] ?? row['review-by-2'] ?? null,
+    _rawHeroImage: row['main-image'] ?? row.image ?? null,
   };
+};
+
+const buildSeoOverrides = (row: Record<string, unknown>): Record<string, unknown> | undefined => {
+  const title = asString(row['meta-title']);
+  const description = asString(row['meta-description']);
+  if (!title && !description) return undefined;
+  const seo: Record<string, unknown> = {};
+  if (title) seo.title = title;
+  if (description) seo.description = description;
+  return seo;
 };

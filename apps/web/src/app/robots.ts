@@ -16,7 +16,7 @@ export default function robots(): MetadataRoute.Robots {
   // backed by a Vercel Firewall rule on User-Agent.
   return {
     rules: [
-      { userAgent: "*", allow: "/" },
+      { userAgent: "*", allow: "/", disallow: ["/preview/", "/api/preview/"] },
       { userAgent: "Bytespider", disallow: "/" },
     ],
     sitemap: `${PRODUCTION_HOST}/sitemap.xml`,

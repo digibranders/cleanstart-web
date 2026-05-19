@@ -1,17 +1,22 @@
 import Link from "next/link";
 import type { ResourceDetail } from "@/lib/resources";
 import { resourceTypeLabel, mediaUrl } from "@/lib/resources";
+import type { Form } from "@/lib/forms";
 import { DETAIL_HERO_TITLE_STYLE } from "@/components/sections/_shared/DetailHero";
+import { ResourceDownloadButton } from "@/components/resource/ResourceDownloadButton";
 
 interface ResourceDetailHeroProps {
   resource: ResourceDetail;
+  gateForm?: Form | null;
 }
 
 export function ResourceDetailHero({
   resource,
+  gateForm,
 }: ResourceDetailHeroProps): React.ReactElement {
   const typeLabel = resourceTypeLabel(resource.type);
   const assetHref = resource.asset?.url ? (mediaUrl(resource.asset.url) ?? "#") : "#";
+  const gated = resource.gated === true;
 
   return (
     <section
@@ -204,9 +209,13 @@ export function ResourceDetailHero({
         <div
           className="flex justify-center mt-6 lg:mt-[30px] pb-12 lg:pb-20"
         >
-          <a
-            href={assetHref}
-            download={assetHref !== "#"}
+          <ResourceDownloadButton
+            resourceId={resource.id}
+            resourceTitle={resource.title}
+            resourceSlug={resource.slug}
+            gated={gated}
+            assetHref={assetHref}
+            gateForm={gateForm ?? null}
             className="cs-btn-blue gap-3 font-bold h-[42px] lg:h-[64px]"
             style={{
               width: "840px",
@@ -225,7 +234,7 @@ export function ResourceDetailHero({
               decoding="async"
             />
             Download
-          </a>
+          </ResourceDownloadButton>
         </div>
       </div>
     </section>

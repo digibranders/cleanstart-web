@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { mediaUrl } from "@/lib/blog";
-import { type News, formatNewsDate, pressTypeLabel } from "@/lib/news";
+import type { News } from "@/lib/news";
+import { NewsroomCard } from "@/components/sections/newsroom/NewsroomCard";
 
 interface NewsDetailRelatedProps {
   items: News[];
@@ -30,7 +30,7 @@ export function NewsDetailRelated({
                 backgroundClip: "text",
               }}
             >
-              Posts
+              News
             </span>
           </h2>
 
@@ -56,152 +56,15 @@ export function NewsDetailRelated({
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-[60px] pb-[100px]">
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-[60px] pb-[40px]"
+          style={{ gap: "24px" }}
+        >
           {items.map((item) => (
-            <RelatedNewsCard key={item.id} item={item} />
+            <NewsroomCard key={item.id} item={item} />
           ))}
         </div>
       </div>
     </section>
-  );
-}
-
-function RelatedNewsCard({ item }: { item: News }): React.ReactElement {
-  const date = formatNewsDate(item.publicationDate);
-  const logoUrl = mediaUrl(item.publisherLogo?.url);
-
-  return (
-    <Link href={`/news/${item.slug}`} className="block group" aria-label={item.title}>
-      <article
-        className="relative bg-white overflow-hidden flex flex-col h-full"
-        style={{
-          borderRadius: "24px",
-          boxShadow:
-            "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01)",
-        }}
-      >
-        <div
-          className="relative flex items-center justify-center"
-          style={{
-            margin: "16px",
-            height: "140px",
-            borderRadius: "16px",
-            background: "linear-gradient(180deg, #F5F1FF 0%, #FFFFFF 100%)",
-            overflow: "hidden",
-          }}
-        >
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={logoUrl}
-              alt={item.publisher ?? item.title}
-              className="object-contain pointer-events-none select-none group-hover:scale-105 transition-transform duration-500"
-              style={{ maxHeight: "80px", maxWidth: "78%" }}
-              loading="lazy"
-              decoding="async"
-            />
-          ) : (
-            <span
-              className="font-display font-bold text-center"
-              style={{
-                color: "#4a3bf1",
-                fontSize: "1.5rem",
-                letterSpacing: "-0.03em",
-                padding: "0 24px",
-              }}
-            >
-              {item.publisher ?? "CleanStart"}
-            </span>
-          )}
-        </div>
-
-        <div className="flex flex-col flex-1 px-6 pb-6" style={{ gap: "12px" }}>
-          <div className="flex items-center gap-4">
-            <span
-              className="inline-flex items-center text-xs font-medium leading-none whitespace-nowrap"
-              style={{
-                padding: "6px 10px",
-                borderRadius: "999px",
-                background: "rgba(74, 59, 241, 0.10)",
-                color: "#4a3bf1",
-              }}
-            >
-              {pressTypeLabel(item.pressType)}
-            </span>
-            {date && (
-              <div className="flex items-center" style={{ gap: "4px" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/blogs/icon-calendar-grey.svg"
-                  alt=""
-                  aria-hidden
-                  width={16}
-                  height={16}
-                  className="pointer-events-none select-none"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <span
-                  className="text-xs font-medium leading-none whitespace-nowrap"
-                  style={{ color: "#666" }}
-                >
-                  {date}
-                </span>
-              </div>
-            )}
-          </div>
-
-          <h3
-            className="font-display font-medium leading-[1.3] tracking-[-0.04em] overflow-hidden flex-1"
-            style={{
-              color: "#111",
-              fontSize: "1.125rem",
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
-            }}
-          >
-            {item.title}
-          </h3>
-
-          {item.abstract && (
-            <p
-              className="text-sm font-normal leading-[1.45] overflow-hidden"
-              style={{
-                color: "rgba(17,17,17,0.54)",
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-              }}
-            >
-              {item.abstract}
-            </p>
-          )}
-
-          <span
-            className="mt-auto inline-flex items-center group-hover:translate-x-1 transition-transform duration-200"
-            style={{ gap: "8px" }}
-          >
-            <span
-              className="text-base font-medium leading-none"
-              style={{ color: "#4a3bf1" }}
-            >
-              Read more
-            </span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/blogs/icon-arrow-read-more.svg"
-              alt=""
-              aria-hidden
-              width={20}
-              height={20}
-              className="pointer-events-none select-none"
-              loading="lazy"
-              decoding="async"
-            />
-          </span>
-        </div>
-      </article>
-    </Link>
   );
 }

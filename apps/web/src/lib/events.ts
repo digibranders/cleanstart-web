@@ -1,6 +1,8 @@
 import { cache } from "react";
 import type { BlogImage, LexicalRoot } from "@/lib/blog";
 
+import { fetchCMS } from "./cms-fetch";
+
 export type EventImage = BlogImage;
 
 export type EventStatus = "scheduled" | "postponed" | "cancelled";
@@ -21,6 +23,12 @@ export type Event = {
   registrationUrl?: string | null;
   registrationForm?: { id: string; title?: string } | string | null;
   attendeesCap?: number | null;
+  ctaLabel?: string | null;
+  postEventCta?: {
+    enabled?: boolean | null;
+    label?: string | null;
+    url?: string | null;
+  } | null;
   eventStatus: EventStatus;
   cancelledAt?: string | null;
   previousStartDate?: string | null;
@@ -44,18 +52,6 @@ type PayloadListResponse<T> = {
 
 export type EventsListResponse = PayloadListResponse<Event>;
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
-
-async function fetchCMS<T>(path: string): Promise<T> {
-  const res = await fetch(`${CMS_URL}${path}`, {
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) {
-    throw new Error(`CMS fetch failed: ${res.status} ${path}`);
-  }
-  return res.json() as Promise<T>;
-}
-
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publishedAt][exists]=true";
 
@@ -77,7 +73,7 @@ export async function getUpcomingEvents({
 
 export async function getPastEvents({
   page = 1,
-  limit = 12,
+  limit = 9,
 }: { page?: number; limit?: number } = {}): Promise<EventsListResponse> {
   const nowIso = new Date().toISOString();
   const params = new URLSearchParams({
@@ -92,14 +88,23 @@ export async function getPastEvents({
   return fetchCMS<EventsListResponse>(`/api/events?${params.toString()}`);
 }
 
+async function loadEventBySlug(slug: string, draft = false): Promise<EventDetail | null> {
+  const filter = draft ? "" : `&${PUBLISHED_FILTER}`;
+  const data = await fetchCMS<PayloadListResponse<EventDetail>>(
+    `/api/events?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=3&limit=1`,
+    { draft },
+  );
+  return data.docs[0] ?? null;
+}
+
 export const getEventBySlug = cache(
-  async (slug: string): Promise<EventDetail | null> => {
-    const data = await fetchCMS<PayloadListResponse<EventDetail>>(
-      `/api/events?where[slug][equals]=${encodeURIComponent(slug)}&${PUBLISHED_FILTER}&depth=3&limit=1`,
-    );
-    return data.docs[0] ?? null;
-  },
+  async (slug: string): Promise<EventDetail | null> => loadEventBySlug(slug, false),
 );
+
+/** Draft variant for the `/preview/events/[slug]` route. Not cached. */
+export async function getEventBySlugDraft(slug: string): Promise<EventDetail | null> {
+  return loadEventBySlug(slug, true);
+}
 
 type FormatStyle = "long" | "short";
 

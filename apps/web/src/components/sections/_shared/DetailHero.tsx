@@ -4,7 +4,7 @@ import type { CSSProperties, ReactNode } from "react";
 export const DETAIL_HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123E 38%, #131E8F 67%, #471EC0 80%, #471FC3 100%)";
 
-export const DETAIL_HERO_MIN_HEIGHT = "480px";
+export const DETAIL_HERO_MIN_HEIGHT = "auto";
 
 export const DETAIL_HERO_TITLE_STYLE: CSSProperties = {
   fontSize: "clamp(2rem, 4vw, 3.5rem)",
@@ -50,6 +50,26 @@ export function DetailHero({
         decoding="async"
       />
 
+      {/* Decorative cube — left side, mirrored from right orb. Hidden below xl to match the right orb's breakpoint. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/blogs/hero-orb-top.png"
+        alt=""
+        className="pointer-events-none select-none absolute hidden xl:block"
+        style={{
+          width: "265px",
+          height: "265px",
+          left: "-60px",
+          bottom: "-40px",
+          mixBlendMode: "lighten",
+          opacity: 0.4,
+          transform: "scaleX(-1)",
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+
       <div className="relative mx-auto max-w-[1276px] px-6">
         <Breadcrumb items={breadcrumb} />
 
@@ -77,12 +97,12 @@ export function DetailHero({
         )}
 
         {meta && (
-          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-3 pt-[22px] pb-[40px] sm:justify-between">
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-3 pt-[12px] pb-[20px] sm:justify-between">
             {meta}
           </div>
         )}
 
-        {!meta && <div className="pb-[40px]" aria-hidden />}
+        {!meta && <div className="pb-[20px]" aria-hidden />}
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 import {
   AlignFeature,
   BlockquoteFeature,
+  BlocksFeature,
   BoldFeature,
   ChecklistFeature,
   EXPERIMENTAL_TableFeature,
@@ -24,6 +25,7 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical';
 
+import { CodeBlock } from '../../blocks/CodeBlock';
 import { cleanstartAddMenuFeature } from './add-menu-feature';
 import { cleanstartEmbedFeature } from './embed-feature';
 import { cleanstartInlineImageFeature } from './inline-image-feature';
@@ -75,6 +77,12 @@ export const cleanstartLexicalEditor = () =>
       RelationshipFeature(),
       cleanstartEmbedFeature(),
       cleanstartAddMenuFeature(),
+
+      // Embedded blocks inside rich text. CodeBlock is the only block
+      // exposed here; the page-builder block schema is reused 1:1 so
+      // authoring is identical whether the block sits inline in a body
+      // field or as a top-level page section.
+      BlocksFeature({ blocks: [CodeBlock] }),
 
       // Per-placement metadata fields. They live on each upload node's
       // `fields` object inside the Lexical JSON — no Media collection

@@ -58,11 +58,13 @@ export const NAV_TREE: NavItem[] = [
             label: "CleanStart SBOM",
             href: "/software-bill-materials",
             description: "Signed SBOMs and provenance for every artifact you ship.",
+            built: true,
           },
           {
             label: "CleanSight",
             href: "/cleansight",
             description: "Runtime visibility into vulnerabilities and drift.",
+            built: true,
           },
         ],
       },

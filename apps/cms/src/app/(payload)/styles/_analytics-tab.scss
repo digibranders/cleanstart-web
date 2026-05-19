@@ -1,0 +1,198 @@
+// =============================================================================
+// Per-document Analytics panel (Phase J2 L2)
+// =============================================================================
+// Component: payload/admin/components/integrations/AnalyticsTab.tsx
+// Mounted as a `ui` field appended to the main column on pages, blogs,
+// news, guides, resources, knowledgeBase, webinars, events.
+//
+// Visual contract: a single card with three labelled sections (GA4,
+// GSC, MS Clarity). Sits below the body editor — the card frame and
+// top divider make the section read as intentional rather than as
+// trailing scaffolding.
+
+.cs-analytics-tab {
+  margin-top: var(--cs-space-8);
+  padding: var(--cs-space-6);
+  border: 1px solid var(--cs-border-subtle);
+  border-radius: var(--cs-radius-card);
+  background: var(--cs-surface-raised);
+  box-shadow: var(--cs-shadow-lift-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-6);
+
+  &--empty {
+    color: var(--cs-text-muted);
+    font-size: 13px;
+    padding: var(--cs-space-4) var(--cs-space-6);
+    border-style: dashed;
+    background: var(--cs-surface-canvas);
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
+
+    & + & {
+      padding-top: var(--cs-space-6);
+      border-top: 1px solid var(--cs-border-subtle);
+    }
+  }
+
+  &__heading {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--cs-text-heading);
+    display: flex;
+    align-items: baseline;
+    gap: var(--cs-space-2);
+  }
+
+  &__stale {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--cs-status-warning);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  &__metrics {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--cs-space-4);
+
+    @media (max-width: 720px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: var(--cs-space-1);
+      padding: var(--cs-space-3) var(--cs-space-4);
+      border: 1px solid var(--cs-border-subtle);
+      border-radius: var(--cs-radius-input);
+      background: var(--cs-surface-canvas);
+    }
+
+    dt {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--cs-text-secondary);
+    }
+
+    dd {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--cs-text-heading);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  &__sparkline {
+    display: block;
+    width: 100%;
+    max-width: 220px;
+    height: 36px;
+    color: var(--cs-text-accent);
+  }
+
+  &__empty {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--cs-text-secondary);
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    thead th {
+      text-align: left;
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--cs-text-secondary);
+      padding: var(--cs-space-2) var(--cs-space-3);
+      border-bottom: 1px solid var(--cs-border-subtle);
+    }
+
+    tbody td {
+      padding: var(--cs-space-2) var(--cs-space-3);
+      border-bottom: 1px solid var(--cs-border-subtle);
+      color: var(--cs-text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    tbody td:first-child {
+      font-variant-numeric: normal;
+      color: var(--cs-text-input);
+    }
+
+    th:not(:first-child),
+    td:not(:first-child) {
+      text-align: right;
+      width: 1%;
+      white-space: nowrap;
+    }
+  }
+
+  &__inspect {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
+    align-items: flex-start;
+  }
+
+  &__inspection {
+    margin: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--cs-space-3);
+
+    @media (max-width: 720px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: var(--cs-space-1);
+      padding: var(--cs-space-2) var(--cs-space-3);
+      border: 1px solid var(--cs-border-subtle);
+      border-radius: var(--cs-radius-input);
+      background: var(--cs-surface-canvas);
+    }
+
+    dt {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--cs-text-secondary);
+    }
+
+    dd {
+      margin: 0;
+      font-size: 13px;
+      color: var(--cs-text-primary);
+    }
+  }
+}
