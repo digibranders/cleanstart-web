@@ -36,6 +36,7 @@ import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
 import { canonicalCheckEndpoint } from './payload/endpoints/canonical-check';
+import { mediaRenameEndpoint } from './payload/endpoints/media-rename';
 import { userReassignContentEndpoint } from './payload/endpoints/user-offboard';
 import {
   previewRedirectEndpoint,
@@ -303,6 +304,7 @@ export default buildConfig({
     imageSitemapEndpoint,
     robotsEndpoint,
     mediaIngestUrlEndpoint,
+    mediaRenameEndpoint,
     redirectsImportEndpoint,
     canonicalCheckEndpoint,
     searchAnalyticsEndpoint,

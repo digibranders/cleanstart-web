@@ -1,8 +1,13 @@
 import type { PodcastEpisode } from "@/lib/podcast";
 import { PodcastEpisodeCard } from "./_components/PodcastEpisodeCard";
 
+// Exact Figma background (node 373:3284): #151021 → #131e8f @ 62.5% → #471ec0
 const FEATURED_GRADIENT =
-  "linear-gradient(180deg, #1a134d 0%, #2a1f8a 45%, #3924b8 80%, #4422c9 100%)";
+  "linear-gradient(180deg, #151021 0%, #131e8f 62.5%, #471ec0 100%)";
+
+// Exact Figma highlight gradient on "Content" text (node 373:3285)
+const HIGHLIGHT_GRADIENT =
+  "linear-gradient(105.128deg, rgb(154, 81, 255) 1.7578%, rgb(44, 193, 235) 98.781%)";
 
 function splitHighlight(title: string, highlight: string): [string, string, string] {
   if (!highlight) return [title, "", ""];
@@ -44,6 +49,7 @@ function Cube({ side }: { side: "left" | "right" }): React.ReactElement {
   );
 }
 
+
 type Props = {
   title: string;
   highlight: string;
@@ -69,24 +75,25 @@ export function PodcastFeaturedContent({
       <div className="relative mx-auto max-w-[1276px] px-6 pt-[80px] pb-[80px]">
         <h2
           id="podcast-featured-title"
-          className="text-center text-white font-semibold tracking-[-0.02em]"
-          style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)" }}
+          className="text-center text-white font-bold"
+          style={{
+            fontSize: "clamp(2.25rem, 4.3vw, 3.875rem)",
+            lineHeight: 1,
+            letterSpacing: "-0.05em",
+          }}
         >
           {before}
           <span
             className="bg-clip-text text-transparent"
-            style={{
-              backgroundImage:
-                "linear-gradient(180deg, #6cb6ff 0%, #239cff 55%, #005be3 100%)",
-            }}
+            style={{ backgroundImage: HIGHLIGHT_GRADIENT }}
           >
             {mark}
           </span>
           {after}
         </h2>
         <div
-          className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-[32px]"
-          style={{ maxWidth: "1040px", marginInline: "auto" }}
+          className="mt-[60px] grid grid-cols-1 lg:grid-cols-2 gap-[32px]"
+          style={{ maxWidth: "1280px", marginInline: "auto" }}
         >
           {episodes.map((ep) => (
             <PodcastEpisodeCard key={ep.id} episode={ep} size="featured" />

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import {
   youtubeEmbedUrl,
   youtubeThumbnail,
 } from "@/lib/podcast-utils";
+
+const PLAY_EVENT = "cleanstart:youtube-play";
 
 type Props = {
   videoId: string;
@@ -21,7 +23,27 @@ export function YouTubeEmbed({
   className,
   rounded = "16px",
 }: Props): React.ReactElement {
+  const instanceId = useId();
   const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!playing) return;
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ id: string }>).detail;
+      if (detail?.id !== instanceId) {
+        setPlaying(false);
+      }
+    };
+    window.addEventListener(PLAY_EVENT, handler);
+    return () => window.removeEventListener(PLAY_EVENT, handler);
+  }, [playing, instanceId]);
+
+  const startPlaying = () => {
+    window.dispatchEvent(
+      new CustomEvent(PLAY_EVENT, { detail: { id: instanceId } }),
+    );
+    setPlaying(true);
+  };
   const [thumbSrc, setThumbSrc] = useState(
     thumbnailUrl ?? youtubeThumbnail(videoId, "maxresdefault"),
   );
@@ -44,7 +66,7 @@ export function YouTubeEmbed({
       ) : (
         <button
           type="button"
-          onClick={() => setPlaying(true)}
+          onClick={startPlaying}
           aria-label={`Play ${title}`}
           className="group absolute inset-0 w-full h-full cursor-pointer"
         >

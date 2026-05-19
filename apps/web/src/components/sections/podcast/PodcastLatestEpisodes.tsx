@@ -16,6 +16,19 @@ export function PodcastLatestEpisodes({
       style={{ background: "#f6f6f6" }}
       aria-labelledby="podcast-latest-title"
     >
+      {/* White blending overlay at the top — pure white at the very top edge fading down
+          to transparent so the section's #f6f6f6 resumes. Paired with the hero's matching
+          bottom overlay, the two sections meet on a continuous white band that the embed
+          card (with its transparent bg) straddles seamlessly. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0"
+        style={{
+          height: "260px",
+          background:
+            "linear-gradient(180deg, #ffffff 0%, rgba(246,246,246,0.65) 55%, rgba(246,246,246,0) 100%)",
+        }}
+      />
       {/* Subtle grid pattern */}
       <div
         aria-hidden
@@ -30,20 +43,22 @@ export function PodcastLatestEpisodes({
             "radial-gradient(ellipse 80% 60% at 50% 40%, #000 40%, transparent 80%)",
         }}
       />
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-[80px] pb-[250px]">
+      <div className="relative mx-auto max-w-[1276px] px-6 pt-[260px] pb-[160px]">
         <h2
           id="podcast-latest-title"
-          className="text-center text-[#0b0c1a] font-semibold tracking-[-0.02em]"
-          style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)" }}
+          className="text-left text-[#111111] font-bold"
+          style={{
+            fontSize: "clamp(2rem, 3.6vw, 3.25rem)",
+            lineHeight: 1.1,
+            letterSpacing: "-0.02em",
+          }}
         >
           {title}
         </h2>
         {episodes.length === 0 ? (
-          <p className="mt-10 text-center text-[#475569]">
-            New episodes coming soon.
-          </p>
+          <p className="mt-10 text-[#475569]">New episodes coming soon.</p>
         ) : (
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[24px] gap-y-[32px]">
+          <div className="mt-[44px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[32px] gap-y-[32px]">
             {episodes.map((ep) => (
               <PodcastEpisodeCard key={ep.id} episode={ep} size="card" />
             ))}

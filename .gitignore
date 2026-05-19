@@ -68,3 +68,5 @@ launch.json
 
 # Local scratch space
 tmp/
+
+.env.bak

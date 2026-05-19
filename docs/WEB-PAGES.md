@@ -77,7 +77,7 @@ page slugs, categories, types, and build status across the dev journey.
 |---|-----------|----------|------|--------|-------|
 | 6 | CleanSight | `/cleansight` | Static | ✅ | All 8 sections built |
 | 7 | CleanStart SBOM | `/software-bill-materials` | Static | ✅ | All 4 sections built |
-| 8 | CleanStart Images | `/cleanstart-images` | Static | ⬜ | |
+| 8 | CleanStart Images | `/cleanstart-images` | Static | ✅ | All 5 sections built (Hero, Browse, EasyStart, UVP, Environment) |
 
 ---
 

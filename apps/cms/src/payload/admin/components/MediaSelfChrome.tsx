@@ -149,20 +149,38 @@ export const MediaSelfChrome = (): ReactElement | null => {
     }
     setFilenameSaving(true);
     try {
-      const res = await fetch(`/api/media/${id}?depth=0`, {
-        method: 'PATCH',
+      // Use the dedicated /rename endpoint rather than a bare PATCH.
+      // The endpoint copies every R2 object (main + size derivatives)
+      // to the new key, updates the DB, then deletes the old keys —
+      // so URLs in cached blog pages and elsewhere keep resolving
+      // until the next ISR refresh, instead of 404'ing the instant
+      // the rename lands. Bare PATCH is blocked by `rejectFilenameRename`
+      // because it would diverge `media.url` from R2.
+      const res = await fetch(`/api/media/${id}/rename`, {
+        method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: next }),
+        body: JSON.stringify({ filename: cleaned }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = (await res.json()) as { doc?: MediaDoc };
-      if (json?.doc) setDoc(json.doc);
-      else void refetch();
+      const payload = (await res.json().catch(() => null)) as
+        | { ok?: boolean; error?: string; filename?: string }
+        | null;
+      if (!res.ok || !payload?.ok) {
+        const reason =
+          payload?.error === 'filename_taken'
+            ? 'That filename is already used by another media item.'
+            : payload?.error === 'storage_unavailable'
+              ? 'Storage is unavailable. Try again in a moment.'
+              : payload?.error === 'invalid_filename'
+                ? 'That filename contains no slug-safe characters.'
+                : 'Could not rename file. Please try again.';
+        throw new Error(reason);
+      }
+      void refetch();
       setEditingFilename(false);
       setError(null);
-    } catch {
-      setError('Could not rename file. The original filename is still in use.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not rename file.');
     } finally {
       setFilenameSaving(false);
     }

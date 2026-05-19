@@ -11,9 +11,9 @@ export function CategoryBadge({ label }: { label: string }): React.ReactElement 
       className="relative inline-flex items-center justify-center overflow-hidden whitespace-nowrap"
       style={{
         padding: "4px 10px",
-        borderRadius: "6px",
-        background: "linear-gradient(90deg, #F5F5F9 0%, #EAE5FE 100%)",
-        boxShadow: "0px 3px 0px 0px rgba(74,59,241,0.3)",
+        borderRadius: "10px",
+        background: "linear-gradient(180deg, #FFFFFF 0%, #E8E4FF 60%, #D9D2FF 100%)",
+        boxShadow: "0px 3px 0px 0px #3D3DF5",
       }}
     >
       {/* Left cyan glow */}

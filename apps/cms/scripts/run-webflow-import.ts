@@ -485,7 +485,11 @@ interface AssetCheckpointEntry {
 const importMedia = async (
   _payload: Awaited<ReturnType<typeof getPayload>>,
 ): Promise<void> => {
-  if (onlyCollection && onlyCollection !== 'media') return;
+  // The media map is the ref-resolution backbone for every content
+  // collection — always load it, even when `--collection X` narrows
+  // the import. Otherwise a partial re-run (e.g. `--collection
+  // aboutGalleries`) would skip the map and leave required image
+  // refs unresolved, failing Payload's validation.
 
   // Media docs themselves are registered by the separate
   // `register-webflow-media.ts` helper (which can re-run safely and
@@ -540,7 +544,11 @@ const run = async (): Promise<void> => {
     await importCollection(payload, slug);
   }
 
-  // Content collections.
+  // Content collections. aboutGalleries goes last in this group
+  // because every row's required `image` field is a media ref —
+  // running it before media-progress.json is populated would fail.
+  // Now that register-webflow-media.ts is part of the pipeline,
+  // those Media docs exist and the resolver can wire `image_id`.
   for (const slug of [
     'blogs',
     'news',
@@ -549,21 +557,10 @@ const run = async (): Promise<void> => {
     'events',
     'webinars',
     'jobs',
+    'aboutGalleries',
   ]) {
     await importCollection(payload, slug);
   }
-
-  // AboutGalleries is import-blocked at v1 because the Payload schema
-  // makes `image` required and we haven't registered the R2 assets as
-  // Media docs yet (see the importMedia comment above). The 20 rows
-  // are small and visual — editors will recreate them by drag-and-
-  // dropping the existing R2 URLs into the AboutGalleries collection.
-  // Their R2 assets are already uploaded (H5) and the original
-  // Webflow URLs are preserved in the transformed JSONL for cross-
-  // reference.
-  console.log(
-    '[import] aboutGalleries: 20 rows held back (need Media docs first). See transformed/aboutGalleries.jsonl.',
-  );
 
   // Pages last (may reference other collections).
   await importCollection(payload, 'pages');

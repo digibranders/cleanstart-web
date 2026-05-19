@@ -8,18 +8,27 @@ type Props = {
 
 const CARD_ICON_SRC = "/images/podcast/cta-card-icon-54efec.png";
 
-const BUTTON_GRADIENT = "linear-gradient(180deg, #3960F9 0%, #2B97D1 100%)";
+// Exact Figma tokens (node 373:3328 / card 373:3331)
+// Outer ring: 1.5px solid `#076eff`-like cyan tint with 0.3 alpha — rendered as a padded
+// container with a cyan-tinted gradient background so the inner white card sits inside it.
+const RING_BG =
+  "linear-gradient(90deg, rgba(44, 193, 235, 0.30) 0%, rgba(44, 193, 235, 0.30) 100%)";
+
+// Button gradient (node 373:3344): `linear-gradient(90deg, #3960F9, #3960F9)` flat,
+// with crisp 1px outline `#3960F9` and a small shadow for elevation.
+const BUTTON_BG = "#3960F9";
 const BUTTON_SHADOW =
-  "0 0 0 1px rgba(57,96,249,1), 0 1px 2px -1px rgba(9,6,63,0.4), inset 0 1px 0 rgba(255,255,255,0.16)";
+  "0 1px 2px -1px rgba(9,6,63,0.4), 0 0 0 1px #3960F9, inset 0 1px 0 rgba(255,255,255,0.16)";
 
-const CARD_GRADIENT_BLOB =
-  "linear-gradient(90deg, rgba(6,182,212,1) 0%, rgba(99,102,241,1) 75%)";
+// Glow blobs behind each card (node 373:3332 / 373:3357)
+const GLOW_GRADIENT =
+  "linear-gradient(90deg, #06b6d4 0%, #6366f1 75%, #6366f1 100%)";
 
-const DIVIDER_FADE =
-  "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 51%, rgba(255,255,255,0) 100%)";
-
-const VERTICAL_GUIDE =
-  "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 51%, rgba(255,255,255,0) 100%)";
+// Inner card grid lines (node 373:3352–3355): vertical fade lines at fractional positions
+const VERTICAL_LINE_FADE =
+  "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%)";
+const HORIZONTAL_LINE_FADE =
+  "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%)";
 
 function ArrowRight(): React.ReactElement {
   return (
@@ -45,163 +54,182 @@ function ArrowRight(): React.ReactElement {
 
 function ResourceCard({ card }: { card: PodcastCtaCard }): React.ReactElement {
   return (
-    <div
-      className="relative shrink-0"
-      style={{ width: "404px", height: "435px" }}
-    >
+    <div className="relative flex w-full h-full">
+      {/* Glow blob behind the card */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
         style={{
-          left: "6px",
-          top: "169px",
-          width: "359.79px",
-          height: "180px",
-          borderRadius: "135px",
-          background: CARD_GRADIENT_BLOB,
+          left: "8%",
+          top: "38%",
+          width: "84%",
+          height: "42%",
+          borderRadius: "9999px",
+          background: GLOW_GRADIENT,
           opacity: 0.25,
-          filter: "blur(64px)",
+          filter: "blur(48px)",
         }}
       />
 
+      {/* Outer ring (cyan-tinted gradient frame) — flex so inner card fills it. */}
       <div
-        aria-hidden
-        className="absolute"
+        className="relative flex w-full"
         style={{
-          left: "8px",
-          top: "7px",
-          width: "388px",
-          height: "420px",
-          background: "#FFFFFF",
-          borderRadius: "32px",
-          boxShadow:
-            "0 4px 4px rgba(22,34,51,0.04), 0 4px 24px rgba(22,34,51,0.04), 0 24px 24px rgba(22,34,51,0.04), 0 32px 32px rgba(22,34,51,0.04), 0 64px 64px rgba(22,34,51,0.12)",
+          borderRadius: "clamp(28px, 2.8vw, 40px)",
+          background: RING_BG,
+          padding: "clamp(6px, 0.6vw, 8px)",
         }}
-      />
-
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          left: "16px",
-          top: "50px",
-          width: "360px",
-          height: "153px",
-          background: "#DF9BFF",
-          opacity: 0.5,
-          filter: "blur(133px)",
-          borderRadius: "50%",
-        }}
-      />
-
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          left: "-91.5px",
-          top: "74.5px",
-          width: "574px",
-          height: "1px",
-          background: DIVIDER_FADE,
-          opacity: 0.3,
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          left: "-91.5px",
-          top: "190.5px",
-          width: "574px",
-          height: "1px",
-          background: DIVIDER_FADE,
-          opacity: 0.3,
-        }}
-      />
-
-      {[68, 166, 224, 322].map((x) => (
+      >
+        {/* Inner card — flex column. Content flows naturally, CTA pinned to bottom. */}
         <div
-          key={x}
-          aria-hidden
-          className="pointer-events-none absolute"
+          className="relative flex w-full flex-col overflow-hidden bg-white"
           style={{
-            left: `${x}px`,
-            top: "7px",
-            width: "1px",
-            height: "264px",
-            background: VERTICAL_GUIDE,
-            opacity: 0.8,
-          }}
-        />
-      ))}
-
-      <div
-        className="absolute"
-        style={{ left: "32px", top: "31px", width: "160px", height: "160px" }}
-      >
-        <Image
-          src={CARD_ICON_SRC}
-          alt=""
-          width={200}
-          height={200}
-          aria-hidden
-          className="select-none pointer-events-none"
-          style={{
-            marginLeft: "-20px",
-            marginTop: "-20px",
-            width: "200px",
-            height: "200px",
-          }}
-        />
-      </div>
-
-      <div
-        className="absolute flex flex-col"
-        style={{ left: "48px", top: "215px", width: "324px", gap: "24px" }}
-      >
-        <div className="flex flex-col" style={{ gap: "16px" }}>
-          <h3
-            className="font-display font-bold text-[#111111]"
-            style={{
-              fontSize: "clamp(1.5rem,2.22vw,2rem)",
-              lineHeight: 1,
-              letterSpacing: "-0.05em",
-            }}
-          >
-            {card.title}
-          </h3>
-          <p
-            className="font-display font-normal text-[#555555]"
-            style={{
-              fontSize: "clamp(1rem,1.39vw,1.25rem)",
-              lineHeight: 1.4,
-              letterSpacing: "-0.05em",
-            }}
-          >
-            {card.body}
-          </p>
-        </div>
-        <Link
-          href={card.ctaHref}
-          className="inline-flex items-center text-white"
-          style={{
-            height: "44px",
-            paddingLeft: "14px",
-            paddingRight: "14px",
-            gap: "8px",
-            background: BUTTON_GRADIENT,
-            borderRadius: "8px",
-            boxShadow: BUTTON_SHADOW,
-            fontFamily: "Inter, sans-serif",
-            fontWeight: 500,
-            fontSize: "18px",
-            letterSpacing: "-0.01em",
-            width: "fit-content",
+            borderRadius: "clamp(22px, 2.2vw, 32px)",
+            boxShadow:
+              "0 3px 4px rgba(22,34,51,0.04), 0 12px 24px rgba(22,34,51,0.06), 0 30px 60px rgba(22,34,51,0.08)",
+            padding:
+              "clamp(28px, 3vw, 40px) clamp(28px, 3vw, 40px) clamp(32px, 3.2vw, 40px)",
+            gap: "clamp(16px, 1.6vw, 24px)",
+            minHeight: "clamp(360px, 30vw, 435px)",
           }}
         >
-          <span>{card.ctaLabel}</span>
-          <ArrowRight />
-        </Link>
+          {/* Purple glow inside card */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute"
+            style={{
+              left: "4%",
+              top: "10%",
+              width: "92%",
+              height: "35%",
+              background: "#df9bff",
+              opacity: 0.45,
+              filter: "blur(64px)",
+              borderRadius: "50%",
+            }}
+          />
+
+          {/* Decorative grid lines */}
+          {[20, 40, 56, 80].map((pct) => (
+            <div
+              key={pct}
+              aria-hidden
+              className="pointer-events-none absolute"
+              style={{
+                left: `${pct}%`,
+                top: "2%",
+                width: "1px",
+                height: "55%",
+                background: VERTICAL_LINE_FADE,
+                opacity: 0.6,
+              }}
+            />
+          ))}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute"
+            style={{
+              left: "-6%",
+              top: "20%",
+              width: "112%",
+              height: "1px",
+              background: HORIZONTAL_LINE_FADE,
+              opacity: 0.4,
+            }}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute"
+            style={{
+              left: "-6%",
+              top: "44%",
+              width: "112%",
+              height: "1px",
+              background: HORIZONTAL_LINE_FADE,
+              opacity: 0.4,
+            }}
+          />
+
+          {/* Icon */}
+          <div
+            className="relative"
+            style={{
+              width: "clamp(96px, 9.5vw, 140px)",
+              height: "clamp(96px, 9.5vw, 140px)",
+            }}
+          >
+            <Image
+              src={CARD_ICON_SRC}
+              alt=""
+              width={200}
+              height={200}
+              aria-hidden
+              className="select-none pointer-events-none object-contain"
+              style={{
+                width: "120%",
+                height: "120%",
+                marginLeft: "-10%",
+                marginTop: "-10%",
+              }}
+            />
+          </div>
+
+          {/* Text block — title + body, grows naturally */}
+          <div
+            className="relative flex flex-col"
+            style={{ gap: "clamp(10px, 1.1vw, 16px)" }}
+          >
+            <h3
+              className="text-[#111111]"
+              style={{
+                fontFamily: "Figtree, sans-serif",
+                fontWeight: 700,
+                fontSize: "clamp(1.25rem, 1.65vw, 1.75rem)",
+                lineHeight: 1.1,
+                letterSpacing: "-0.04em",
+              }}
+            >
+              {card.title}
+            </h3>
+            <p
+              className="text-[#555555]"
+              style={{
+                fontFamily: "Figtree, sans-serif",
+                fontWeight: 400,
+                fontSize: "clamp(0.875rem, 1.05vw, 1.125rem)",
+                lineHeight: 1.4,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              {card.body}
+            </p>
+          </div>
+
+          {/* Button — pushed to bottom of card so CTAs align horizontally across cards */}
+          <div className="relative mt-auto">
+            <Link
+              href={card.ctaHref}
+              className="inline-flex items-center text-white transition-transform duration-200 hover:-translate-y-px active:translate-y-0"
+              style={{
+                height: "clamp(36px, 3vw, 44px)",
+                paddingLeft: "14px",
+                paddingRight: "14px",
+                gap: "8px",
+                background: BUTTON_BG,
+                borderRadius: "8px",
+                boxShadow: BUTTON_SHADOW,
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 500,
+                fontSize: "clamp(0.875rem, 1.05vw, 1.125rem)",
+                letterSpacing: "-0.01em",
+                width: "fit-content",
+              }}
+            >
+              <span>{card.ctaLabel}</span>
+              <ArrowRight />
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -214,9 +242,9 @@ export function PodcastCTACards({ cards }: Props): React.ReactElement | null {
   return (
     <section
       className="relative overflow-hidden bg-white"
-      style={{ minHeight: "635px" }}
       aria-label="Explore more from CleanStart"
     >
+      {/* Top-right decorative vector arc — large quarter-circle radial */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -227,44 +255,79 @@ export function PodcastCTACards({ cards }: Props): React.ReactElement | null {
           height: "1101px",
           borderRadius: "50%",
           background:
-            "radial-gradient(circle at 50% 50%, rgba(100,13,251,1) 0%, rgba(100,13,251,0) 100%)",
-          opacity: 0.1,
+            "radial-gradient(circle at 50% 50%, rgba(100,13,251,0.12) 0%, rgba(100,13,251,0) 70%)",
         }}
       />
 
+      {/* Bottom-left soft cyan glow */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden md:block"
         style={{
           left: "-81px",
-          top: "496px",
-          width: "315px",
-          height: "315px",
+          bottom: "-160px",
+          width: "420px",
+          height: "420px",
           borderRadius: "50%",
           background: "#2CC1EB",
-          filter: "blur(203px)",
-          opacity: 0.2,
+          filter: "blur(180px)",
+          opacity: 0.25,
         }}
       />
+      {/* Top-right soft purple glow */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden md:block"
         style={{
-          right: "-15px",
-          top: "-64px",
-          width: "258px",
-          height: "258px",
+          right: "-60px",
+          top: "-80px",
+          width: "360px",
+          height: "360px",
           borderRadius: "50%",
           background: "#DF9BFF",
-          filter: "blur(243px)",
-          opacity: 0.8,
+          filter: "blur(200px)",
+          opacity: 0.7,
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6 py-[100px]">
+      {/* Background SVG grid (subtle) */}
+      <svg
+        aria-hidden
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.18]"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <title>grid</title>
+        <defs>
+          <pattern
+            id="cta-grid"
+            x="0"
+            y="0"
+            width="44"
+            height="44"
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d="M 44 0 L 0 0 0 44"
+              fill="none"
+              stroke="rgba(15, 23, 42, 0.08)"
+              strokeWidth="1"
+            />
+          </pattern>
+          <radialGradient id="cta-grid-mask" cx="50%" cy="40%" r="60%">
+            <stop offset="0%" stopColor="white" stopOpacity="1" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
+          </radialGradient>
+          <mask id="cta-grid-fade">
+            <rect width="100%" height="100%" fill="url(#cta-grid-mask)" />
+          </mask>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#cta-grid)" mask="url(#cta-grid-fade)" />
+      </svg>
+
+      <div className="relative mx-auto max-w-[1276px] px-6 py-[clamp(60px,7vw,100px)]">
         <div
-          className="flex flex-wrap items-start justify-center"
-          style={{ gap: "33px" }}
+          className="grid grid-cols-1 md:grid-cols-3 items-stretch"
+          style={{ gap: "clamp(20px, 2.3vw, 33px)" }}
         >
           {visible.map((card) => (
             <ResourceCard key={card.title} card={card} />
