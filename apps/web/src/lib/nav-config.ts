@@ -53,6 +53,7 @@ export const NAV_TREE: NavItem[] = [
             label: "CleanStart Images",
             href: "/cleanstart-images",
             description: "Hardened, minimal container images with near-zero CVEs.",
+            built: true,
           },
           {
             label: "CleanStart SBOM",
