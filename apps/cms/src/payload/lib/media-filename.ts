@@ -6,6 +6,41 @@ const DEFAULT_MAX_SLUG_LEN = 64;
 const FALLBACK_SLUG = 'asset';
 const SHORT_HASH_LEN = 8;
 
+/**
+ * Patterns that signal a slug source carries no meaningful semantics —
+ * Word's clipboard sends `image001.png` / `clip_image002.png`, the
+ * ingest endpoint falls back to `ingested-{Date.now()}`, the paste
+ * helper renames empty `image.png` to `pasted-{Date.now()}`, etc.
+ * When the primary source matches one of these, the caller's context
+ * hint (host doc slug) is preferred so the R2 key actually carries
+ * page provenance instead of `image001-a1b2c3d4.webp` × N.
+ */
+const JUNK_SLUG_PATTERNS: readonly RegExp[] = [
+  /^image[-_]?\d+$/i,
+  /^img[-_]?\d+$/i,
+  /^clip[-_]?image\d+$/i,
+  /^picture\s*\d*$/i,
+  /^pasted[-_]\d+$/i,
+  /^ingested[-_]\d+$/i,
+  /^untitled[-_]?\d*$/i,
+  /^screenshot[-_]?.*$/i,
+  /^[a-f0-9]{6,}$/i, // bare hex (Webflow CDN basenames)
+  /^\d+$/, // pure numeric
+];
+
+/**
+ * True when the candidate slug source is one of the well-known
+ * useless names that the clipboard / paste / ingest pipelines emit.
+ * Editors never typed these — they're machine-generated noise.
+ */
+export const looksLikeJunkSlug = (raw: string | null | undefined): boolean => {
+  if (!raw) return true;
+  const trimmed = raw.trim();
+  if (trimmed.length === 0) return true;
+  if (trimmed.length < 3) return true;
+  return JUNK_SLUG_PATTERNS.some((re) => re.test(trimmed));
+};
+
 const RASTER_MIME_TO_EXT: Record<string, string> = {
   'image/jpeg': 'jpg',
   'image/jpg': 'jpg',
@@ -46,6 +81,39 @@ const truncateSlug = (slug: string, max: number): string => {
 
 export const shortHash = (bytes: Buffer | Uint8Array): string =>
   crypto.createHash('sha256').update(bytes).digest('hex').slice(0, SHORT_HASH_LEN);
+
+export interface SlugSourceInputs {
+  /** Alt text supplied with the upload, if any. Editor's words win. */
+  alt?: string | null | undefined;
+  /** Humanised original filename (after `humaniseFilename`). */
+  filename?: string | null | undefined;
+  /** Host-document context (e.g. `blog-getting-started-with-sbom-inline`). */
+  contextHint?: string | null | undefined;
+}
+
+/**
+ * Choose the strongest meaningful slug source. Priority:
+ *   1. Alt text — if not junk.
+ *   2. Humanised filename — if not junk.
+ *   3. Context hint (host doc) — always wins over junk.
+ *   4. Alt or filename even if junky — last-ditch.
+ *   5. Empty string — caller falls back to `'asset'`.
+ *
+ * The function only RANKS sources; `buildMediaFilename` does the
+ * slugify + hash + truncate.
+ */
+export const pickSlugSource = (inputs: SlugSourceInputs): string => {
+  const alt = inputs.alt?.trim() ?? '';
+  const filename = inputs.filename?.trim() ?? '';
+  const hint = inputs.contextHint?.trim() ?? '';
+
+  if (alt.length > 0 && !looksLikeJunkSlug(alt)) return alt;
+  if (filename.length > 0 && !looksLikeJunkSlug(filename)) return filename;
+  if (hint.length > 0) return hint;
+  if (alt.length > 0) return alt;
+  if (filename.length > 0) return filename;
+  return '';
+};
 
 export interface BuildMediaFilenameOptions {
   /** Strongest human signal — alt, doc title, or humanised original. */

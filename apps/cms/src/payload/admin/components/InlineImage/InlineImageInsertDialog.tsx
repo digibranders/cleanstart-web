@@ -16,6 +16,13 @@ type Props = {
   readonly open: boolean;
   readonly folder: string;
   /**
+   * `x-media-context-hint` header forwarded to upload + ingest helpers.
+   * The Media beforeValidate uses this to derive a meaningful R2 key
+   * when the clipboard's alt + filename are noise. See
+   * `InlineImage/context-hint.ts` for how the plugin builds it.
+   */
+  readonly contextHint?: string;
+  /**
    * `insert` — the picked/uploaded media is inserted as a new inline
    * image at the editor's current selection.
    * `swap`  — the picked/uploaded media replaces the `value` of an
@@ -45,7 +52,7 @@ type Props = {
  * outer shell with tab switching above it.
  */
 export const InlineImageInsertDialog = (props: Props): ReactElement => {
-  const { open, folder, mode = 'insert', onClose, onInsert } = props;
+  const { open, folder, contextHint, mode = 'insert', onClose, onInsert } = props;
   const titleText = mode === 'swap' ? 'Replace image' : 'Insert image';
   const [tab, setTab] = useState<Tab>('device');
   const [busy, setBusy] = useState(false);
@@ -85,7 +92,7 @@ export const InlineImageInsertDialog = (props: Props): ReactElement => {
     async (file: File) => {
       setBusy(true);
       setError(null);
-      const result = await uploadMediaFile(file, { folder });
+      const result = await uploadMediaFile(file, { folder, ...(contextHint ? { contextHint } : {}) });
       setBusy(false);
       if (result.ok) {
         onInsert(result.doc);
@@ -93,7 +100,7 @@ export const InlineImageInsertDialog = (props: Props): ReactElement => {
         setError(result.error);
       }
     },
-    [folder, onInsert],
+    [folder, contextHint, onInsert],
   );
 
   const handleUrlSubmit = useCallback(async () => {
@@ -101,11 +108,14 @@ export const InlineImageInsertDialog = (props: Props): ReactElement => {
     if (!url) return;
     setBusy(true);
     setError(null);
-    const result = await uploadMediaFromUrl(url, { folder });
+    const result = await uploadMediaFromUrl(url, {
+      folder,
+      ...(contextHint ? { contextHint } : {}),
+    });
     setBusy(false);
     if (result.ok) onInsert(result.doc);
     else setError(result.error);
-  }, [folder, onInsert, urlValue]);
+  }, [folder, contextHint, onInsert, urlValue]);
 
   return (
     <>

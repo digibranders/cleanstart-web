@@ -27,6 +27,7 @@ import {
   DEFAULT_INLINE_IMAGE_FIELDS,
   type InlineImageFields,
 } from './InlineImageEditDialog';
+import { buildInlineMediaContextHint } from './context-hint';
 import { InlineImageInsertDialog } from './InlineImageInsertDialog';
 import { InlineImagePreviewDialog } from './InlineImagePreviewDialog';
 import {
@@ -80,8 +81,9 @@ const extractImageFiles = (list: FileList | DataTransferItemList | null | undefi
  */
 export const InlineImagePlugin = (): ReactElement => {
   const [editor] = useLexicalComposerContext();
-  const { collectionSlug } = useDocumentInfo();
+  const { collectionSlug, id, title } = useDocumentInfo();
   const folder = inlineImageFolderForCollection(collectionSlug);
+  const contextHint = buildInlineMediaContextHint(collectionSlug, title, id);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   // When non-null the insert dialog runs in "swap" mode: a successful
@@ -148,7 +150,7 @@ export const InlineImagePlugin = (): ReactElement => {
     async (files: File[]) => {
       setError(null);
       for (const file of files) {
-        const result = await uploadMediaFile(file, { folder });
+        const result = await uploadMediaFile(file, { folder, contextHint });
         if (result.ok) {
           insertUploadedDoc(result.doc, null);
         } else {
@@ -159,7 +161,7 @@ export const InlineImagePlugin = (): ReactElement => {
         }
       }
     },
-    [folder, insertUploadedDoc],
+    [folder, contextHint, insertUploadedDoc],
   );
 
   // Resolve the upload-node key that a clicked toolbar button (Edit
@@ -419,6 +421,7 @@ export const InlineImagePlugin = (): ReactElement => {
       <InlineImageInsertDialog
         open={dialogOpen}
         folder={folder}
+        contextHint={contextHint}
         mode={swapNodeKey ? 'swap' : 'insert'}
         onClose={() => {
           setDialogOpen(false);

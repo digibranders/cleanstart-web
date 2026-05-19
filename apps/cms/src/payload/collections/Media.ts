@@ -9,6 +9,7 @@ import { humaniseFilename } from '../lib/humanise-filename';
 import {
   buildMediaFilename,
   canonicalExtensionForMime,
+  pickSlugSource,
   shortHash,
 } from '../lib/media-filename';
 import { sanitizeSvgBuffer } from '../lib/sanitize-svg';
@@ -262,8 +263,23 @@ export const Media: CollectionConfig = {
           typeof (data as { alt?: unknown })?.alt === 'string'
             ? ((data as { alt: string }).alt ?? '').trim()
             : '';
-        const slugSource =
-          incomingAlt.length > 0 ? incomingAlt : humaniseFilename(file.name);
+        // Inline-paste / clipboard / data-URI ingest paths supply
+        // `image001.png`, `Picture 1`, or `ingested-{ts}` as the
+        // file name and alt — useless as a slug. The editor surface
+        // (RichPastePlugin, InlineImagePlugin, MediaField) attaches
+        // the host doc's slug as a context hint on the `x-media-
+        // context-hint` request header so the R2 key carries page
+        // provenance: `blog-getting-started-with-sbom-inline-{hash}.webp`
+        // instead of `image001-{hash}.webp` × N.
+        const contextHint =
+          typeof req.headers?.get === 'function'
+            ? (req.headers.get('x-media-context-hint') ?? '').trim()
+            : '';
+        const slugSource = pickSlugSource({
+          alt: incomingAlt,
+          filename: humaniseFilename(file.name),
+          contextHint,
+        });
         const ext = canonicalExtensionForMime(file.mimetype);
         const hash = shortHash(bytes);
         const baseFilename = buildMediaFilename({
