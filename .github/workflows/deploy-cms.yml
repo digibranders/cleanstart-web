@@ -1,0 +1,87 @@
+name: Deploy CMS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/cms/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - 'apps/cms/Dockerfile'
+      - '.github/workflows/deploy-cms.yml'
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: 'Optional git SHA to deploy (defaults to the branch HEAD this run was triggered from)'
+        required: false
+
+# Serialize deploys to the prod droplet — no two builds racing the same `cms:current` tag.
+concurrency:
+  group: deploy-cms-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha || github.sha }}
+
+      - name: Build image (cms:${{ github.sha }})
+        run: |
+          docker build \
+            -f apps/cms/Dockerfile \
+            -t cms:${{ github.sha }} \
+            .
+
+      - name: Save image tarball
+        run: docker save cms:${{ github.sha }} | gzip > /tmp/cms.tar.gz
+
+      - name: Set up SSH to droplet
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DROPLET_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan ${{ secrets.DROPLET_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Ship image to droplet
+        run: |
+          scp -i ~/.ssh/id_deploy /tmp/cms.tar.gz \
+            ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/tmp/cms.tar.gz
+
+      - name: Write .env to droplet
+        env:
+          CMS_ENV_FILE: ${{ secrets.CMS_ENV_FILE }}
+        run: |
+          printf '%s\n' "$CMS_ENV_FILE" | ssh -i ~/.ssh/id_deploy \
+            ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} \
+            'umask 077 && cat > /opt/cleanstart/.env && chmod 600 /opt/cleanstart/.env'
+
+      - name: Load image + restart cms
+        run: |
+          ssh -i ~/.ssh/id_deploy \
+            ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} \
+            'set -e
+             cd /opt/cleanstart
+             docker load < /tmp/cms.tar.gz
+             docker tag cms:${{ github.sha }} cms:current
+             docker compose --profile cms up -d --wait cms
+             docker image prune -f
+             rm -f /tmp/cms.tar.gz
+             echo "--- cms container status ---"
+             docker ps --filter name=cleanstart-cms-1 --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+             echo "--- last 20 lines of cms log ---"
+             docker logs --tail 20 cleanstart-cms-1'
+
+      - name: Smoke probe
+        run: |
+          ssh -i ~/.ssh/id_deploy \
+            ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} \
+            'curl -sS -o /dev/null -w "local 127.0.0.1:3000 -> HTTP %{http_code}\n" --max-time 10 http://127.0.0.1:3000/api/health'
+          curl -sS -o /dev/null -w "public cms.cleanstart.com -> HTTP %{http_code}\n" --max-time 10 https://cms.cleanstart.com/api/health || true
