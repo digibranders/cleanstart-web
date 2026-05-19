@@ -35,6 +35,7 @@ import config from '../src/payload.config.ts';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 const ASSET_PROGRESS = path.join(REPO_ROOT, 'migrations/webflow-export/.asset-progress.json');
+const ASSET_CONTEXT = path.join(REPO_ROOT, 'migrations/webflow-export/.asset-context.json');
 const MEDIA_PROGRESS = path.join(REPO_ROOT, 'migrations/webflow-export/.media-progress.json');
 
 interface AssetRecord {
@@ -42,6 +43,20 @@ interface AssetRecord {
   r2Key: string;
   r2PublicUrl: string;
   sha256: string;
+  folder?: string;
+}
+
+interface AssetContextPrimary {
+  collection: string;
+  docSlug: string;
+  role: string;
+  altHint?: string;
+}
+
+interface AssetContext {
+  webflowUrl: string;
+  primary: AssetContextPrimary;
+  otherRefs: number;
 }
 
 interface MediaMapEntry {
@@ -49,6 +64,67 @@ interface MediaMapEntry {
   mediaId: number;
   filename: string;
 }
+
+// Mirror of upload-assets.ts so the Media.ts beforeValidate hook
+// produces the SAME canonical filename → both pipelines end up at
+// the same R2 base key (modulo the raster→webp extension swap).
+const COLLECTION_TO_FOLDER: Record<string, string> = {
+  authors: 'web/author',
+  blogs: 'web/blog',
+  news: 'web/news',
+  guides: 'web/guide',
+  resources: 'web/resource',
+  events: 'web/event',
+  webinars: 'web/webinar',
+  jobs: 'web/job',
+  aboutGalleries: 'web/about',
+  pages: 'web/page',
+};
+
+const COLLECTION_SHORT: Record<string, string> = {
+  authors: 'author',
+  blogs: 'blog',
+  news: 'news',
+  guides: 'guide',
+  resources: 'resource',
+  events: 'event',
+  webinars: 'webinar',
+  jobs: 'job',
+  aboutGalleries: 'about',
+  pages: 'page',
+};
+
+const folderForCollection = (collection: string): string =>
+  COLLECTION_TO_FOLDER[collection] ?? 'web/general';
+
+const shortCollection = (collection: string): string =>
+  COLLECTION_SHORT[collection] ?? 'general';
+
+const slugSourceForContext = (ctx: AssetContext | undefined, fallback: string): string => {
+  if (ctx) {
+    const altHint = ctx.primary.altHint?.trim();
+    if (altHint) return altHint;
+    return `${shortCollection(ctx.primary.collection)}-${ctx.primary.docSlug}-${ctx.primary.role}`;
+  }
+  return fallback;
+};
+
+const loadContextMap = (): Map<string, AssetContext> => {
+  const map = new Map<string, AssetContext>();
+  if (!fs.existsSync(ASSET_CONTEXT)) {
+    console.warn(
+      `[register-media] No .asset-context.json — falling back to generic naming. Run build-asset-context-map.ts first for semantic filenames.`,
+    );
+    return map;
+  }
+  try {
+    const entries = JSON.parse(fs.readFileSync(ASSET_CONTEXT, 'utf-8')) as AssetContext[];
+    for (const e of entries) map.set(e.webflowUrl, e);
+  } catch {
+    /* ignore */
+  }
+  return map;
+};
 
 const limitArg = (() => {
   const idx = process.argv.indexOf('--limit');
@@ -130,8 +206,9 @@ const downloadBuffer = async (url: string): Promise<Buffer> => {
 const run = async (): Promise<void> => {
   const assets = loadAssetProgress();
   const progress = loadMediaProgress();
+  const contextMap = loadContextMap();
   console.log(
-    `[register-media] ${assets.length} assets total · ${progress.size} already registered`,
+    `[register-media] ${assets.length} assets · ${progress.size} already registered · ${contextMap.size} context entries`,
   );
 
   const payload = await getPayload({ config });
@@ -151,9 +228,20 @@ const run = async (): Promise<void> => {
   let done = 0;
   for (const asset of slice) {
     done += 1;
+    // `filename` here is only used as a stable lookup key for prior
+    // registrations + the upload pipeline's `file.name` (which the
+    // Media.ts `beforeValidate` hook then rewrites). The on-disk
+    // filename in Payload is what the hook computes from `alt`.
     const filename = deriveFilename(asset.webflowUrl, asset.sha256);
     const ext = path.extname(filename).toLowerCase();
     const mimetype = MIME_BY_EXT[ext] ?? 'application/octet-stream';
+    const ctx = contextMap.get(asset.webflowUrl);
+    // The Media.ts hook uses `data.alt` as the slug source when it's
+    // a non-empty string; here we use the asset-context's semantic
+    // `{shortCollection}-{docSlug}-{role}` form so the resulting R2
+    // filename carries SEO meaning (e.g. `blog-openclaw-...-hero`).
+    const slugSource = slugSourceForContext(ctx, path.basename(filename, ext));
+    const folder = ctx ? folderForCollection(ctx.primary.collection) : 'web/general';
 
     // 1) Same content already registered? Alias to that media doc.
     const existingMediaId = shaToMediaId.get(asset.sha256);
@@ -201,8 +289,8 @@ const run = async (): Promise<void> => {
       const doc = await payload.create({
         collection: 'media',
         data: {
-          alt: filename,
-          folder: 'web/general',
+          alt: slugSource,
+          folder,
         } as Parameters<typeof payload.create>[0]['data'],
         file: {
           data: buf,
