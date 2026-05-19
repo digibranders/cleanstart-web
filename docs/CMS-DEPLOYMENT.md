@@ -444,17 +444,20 @@ After the round-3 CTO review, the droplet was wiped clean of Coolify + all appli
 
 **To do from clean baseline:**
 
-- [x] Phase 4 — Caddy v2.11.3 installed, `/etc/caddy/Caddyfile` deployed, log dir at `/var/log/caddy`, LE cert issued (HTTPS probe through CF returns 502 = origin reachable + valid cert)
+- [x] Phase 4 — Caddy v2.11.3 installed, `/etc/caddy/Caddyfile` deployed, log dir at `/var/log/caddy`, LE cert issued
 - [x] Phase 5 — `/opt/cleanstart/{compose.yml,.env}` written (`.env` chmod 600); `/var/lib/cleanstart/lead-fallback-queue` owned by uid 1001
-- [x] Phase 6 — Postgres 16 + Meilisearch via unified compose; both `(healthy)`; all 5 Postgres tunables verified (`shared_buffers=128MB`, `max_connections=20`, etc.)
-- [ ] Phase 8 — GHA deploy workflow + repo secrets + dedicated `gha-deploy` key
+- [x] Phase 6 — Postgres 16 + Meilisearch via unified compose; both `(healthy)`; all 5 Postgres tunables verified
+- [x] Phase 8 — GHA deploy workflow + 4 repo secrets + 27 repo variables + `gha-deploy` SSH key
+- [x] Phase 9 — **First CMS deploy GREEN** at 2026-05-19 13:32 UTC. Container `Up (healthy)`. `https://cms.cleanstart.com/admin` returns 200; `/api/health` returns 200 `ok`. All 9 migrations applied. RAM 879 MB used / 1.08 GB available.
 - [ ] Phase 9 — First CMS deploy via workflow_dispatch
-- [ ] Phase 10 — Payload admin user + 2FA
+- [ ] Phase 10 — Payload admin user + 2FA (visit `https://cms.cleanstart.com/admin`)
 - [ ] Phase 11 — Backups + R2 lifecycle + BetterStack
 - [ ] Phase 12 — Smoke test
-- [ ] Phase 13 — Push-to-main confirmation
+- [x] Phase 13 — Push-to-main auto-deploy confirmed (run `26099849969` triggered by `254a3eb` push to main, succeeded)
 
-**RAM baseline after wipe:** 456 MB used / 1.5 GB available / 0 swap. Forecast at peak (Phase 9+): ~1.4 GB used, ~600 MB headroom.
+**RAM baseline after wipe:** 456 MB used / 1.5 GB available / 0 swap.
+
+**Live RAM with CMS running (2026-05-19 13:33):** 879 MB used / 1.08 GB available / 0 swap. Within forecast (~1.3 GB idle predicted). Comfortable headroom.
 
 ### Deviations from locked decisions (audit trail)
 
@@ -700,7 +703,8 @@ Open items, in priority order. Move into the per-droplet checklist or close out 
 - **B2 — Resolve backup time (L2).** Lock at **02:00 UTC** in this doc and in the cron snippet. (Phase 11.3 closes this.)
 - **B3 — First restore drill.** Per arch doc §`#restore-runbook`: "first drill must complete *before* the migration cutover, not after." `docs/RESTORE-LOG.md` is currently empty.
 - **B4 — Configure R2 lifecycle rules.** Locked row 22 says 7/4/3 daily/weekly/monthly. Not yet enforced on the R2 bucket. Phase 11.5.
-- **B5 — Coolify uninstall** (round-3 cleanup on the current droplet). One-time: `cd /data/coolify/source && docker compose down -v && rm -rf /data/coolify`. ~450 MB RAM returns.
+- ~~B5 — Coolify uninstall~~ **CLOSED 2026-05-19** — wiped during round-3 cleanup.
+- **B6 — Migration vs schema audit.** The 9th migration (`20260519_120000_strip_html_from_text_fields`) currently skips the `news` and `events` collections at boot because their `_v` shadow tables don't include columns the source-tree collections reference (`version_publisher`, etc.). This means a `news.publisher` field exists in the source code but no corresponding migration created the column. Symptoms today: defensive try/catch in the migration logs a warning; the app still boots and admin works. Risk: any `payload.find({ collection: 'news', draft: true })` from app code (e.g. listing latest news drafts in the admin) will fail at runtime. Fix: run `pnpm --filter @cleanstart/cms migrate:create publisher_field` against a dev DB that's caught up via `push: true`, commit the generated migration, redeploy. Once that lands, remove the try/catch from the strip-html migration.
 
 ### Post-launch (within 30 days)
 
