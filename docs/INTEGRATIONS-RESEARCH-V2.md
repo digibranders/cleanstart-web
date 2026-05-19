@@ -118,7 +118,7 @@ v1 is exclusively *outbound*. Editors today have no way to see how a published p
 | Plausible (self-hosted)  | yes        | yes       | yes               | drop GA4 entirely (deferred — row #23)                                                                         |
 | Umami (self-hosted)      | yes        | yes       | yes               | smaller footprint than Plausible (deferred — row #24)                                                          |
 | Fathom (cloud)           | yes        | no        | yes               | rejected — adds vendor with no advantage over CF WA                                                            |
-| Vercel Analytics         | yes        | no        | n/a               | rejected — we deploy on Coolify, not Vercel                                                                    |
+| Vercel Analytics         | yes        | no        | n/a               | rejected — `apps/cms` doesn't run on Vercel (it's on the droplet); Vercel Web Analytics covers `apps/web` separately |
 
 ### 2.7 Product analytics (rows #28, #29)
 
@@ -158,7 +158,7 @@ These four are uniform — same React component, parameterised by `kind`.
 
 ## §4 Inbound integrations (new in v2)
 
-v1 only covers CMS-as-sender. §4 covers CMS-as-receiver: third parties POST to `admin.cleanstart.com/api/integrations/[provider]`, we verify, normalise, and write through the existing `LeadHandler` chain or a domain-specific handler.
+v1 only covers CMS-as-sender. §4 covers CMS-as-receiver: third parties POST to `cms.cleanstart.com/api/integrations/[provider]`, we verify, normalise, and write through the existing `LeadHandler` chain or a domain-specific handler.
 
 ### 4.1 Generic inbound shape
 
@@ -220,7 +220,7 @@ Lives in the existing `admin/components/Dashboard.tsx`. Each card is a Payload-a
 |  +--- Open in Clarity --> +  +--- Open in CF -------->  +  +--- Open admin --------->  +    |
 |                                                                                              |
 |  +--- Status (BetterStack) -------+  +--- Recent publishes (7d) -----------------------+    |
-|  |  admin.cleanstart.com  ● up    |  |  Pages   12   Blogs    8   News   3            |    |
+|  |  cms.cleanstart.com  ● up    |  |  Pages   12   Blogs    8   News   3            |    |
 |  |  www.cleanstart.com    ● up    |  |  Latest: "How we …"  · Marc · 2h ago           |    |
 |  +-------------------------------+  +-------------------------------------------------+    |
 +----------------------------------------------------------------------------------------------+
@@ -302,7 +302,7 @@ Phase J ships the `integrations` collection. Existing env-var-driven integration
 
 Decision: **app-layer `node:crypto` AES-256-GCM**, key derived from `PAYLOAD_SECRET` via HKDF, IV per row.
 
-- Pros: portable across Postgres providers (no `pgcrypto` extension dependency on Coolify droplet); rotation = update `PAYLOAD_SECRET` + re-encrypt; isolated test seam.
+- Pros: portable across Postgres providers (no `pgcrypto` extension dependency on the deploy droplet); rotation = update `PAYLOAD_SECRET` + re-encrypt; isolated test seam.
 - Cons: encrypted column is opaque to SQL — accept it; we never query inside `config`.
 
 Library: stdlib only. Helper at `lib/integrations/secrets.ts` exports `encrypt(plain): string` / `decrypt(cipher): string`. Stored as base64 with version prefix `v1:` to allow future algorithm migration.
@@ -389,7 +389,7 @@ Cal.com inbound (#34), Brevo bounce (#36), additional CRMs. Trigger: editor dema
 
 ## §11 Pruned shortlist (what actually ships) + droplet load analysis
 
-The §1 catalog lists 34 rows for completeness — most are *catalog entries*, not commitments. §11.1 ranks the keep list by editor value across J1/J2/J3. §11.2 answers the harder question: **what burns droplet CPU/RAM/disk?** Coolify on one droplet means every cron, every cached payload, and every custom admin component runs on the same box as Postgres + Payload + Meilisearch — free APIs are not free at runtime.
+The §1 catalog lists 34 rows for completeness — most are *catalog entries*, not commitments. §11.1 ranks the keep list by editor value across J1/J2/J3. §11.2 answers the harder question: **what burns droplet CPU/RAM/disk?** Running everything on one droplet means every cron, every cached payload, and every custom admin component runs on the same box as Postgres + Payload + Meilisearch — free APIs are not free at runtime.
 
 ### 11.1 Keep list — ranked by editor value
 
@@ -417,7 +417,7 @@ The §1 catalog lists 34 rows for completeness — most are *catalog entries*, n
 
 ### 11.2 Droplet load — what each integration actually costs
 
-Coolify droplet runs Payload (Next.js) + Postgres + Meilisearch + cron. Sizing assumption: 2 vCPU / 4 GB droplet (typical Coolify single-node). Anything that adds steady CPU% or a meaningful Postgres row count needs to be called out.
+The production droplet runs Payload (Next.js) + Postgres + Meilisearch + cron. Sizing assumption: 2 vCPU / 4 GB droplet (single-node). Anything that adds steady CPU% or a meaningful Postgres row count needs to be called out.
 
 | #     | row                     | CPU steady       | RAM   | Postgres rows / day            | Disk  | Network egress | Notes                                                                                                                            |
 | ----- | ----------------------- | ---------------- | ----- | ------------------------------ | ----- | -------------- | -------------------------------------------------------------------------------------------------------------------------------- |

@@ -250,7 +250,7 @@ Things this research note is deliberately silent on, because they need a product
 
 - **Default channel routing on day 1**: ship with one Teams row pre-seeded from `siteSettings.webhooks[]` (back-fill from existing config), or make the editor add the first row by hand?
 - **Per-form routing in the admin**: surface `formSlugs[]` as a multi-select on Teams/Slack rows, or keep per-form routing in the form's `crmHandlers[]` field and have the dashboard read-only show "this form fires X destinations"?
-- **OAuth callback hosting**: HubSpot/Salesforce OAuth needs a stable redirect URI on `admin.cleanstart.com`. Settle on `/api/oauth/callback/[provider]` route shape before any CRM row lands.
+- **OAuth callback hosting**: HubSpot/Salesforce OAuth needs a stable redirect URI on `cms.cleanstart.com`. Settle on `/api/oauth/callback/[provider]` route shape before any CRM row lands.
 - **Lead-score field for the `minLeadScore` routing predicate**: arch doc §`#forms` doesn't define a lead-score column today. Either drop the predicate or land it together with whatever first scoring rule (form type, domain enrichment quality, UTM source) the editor cares about.
 
 ---

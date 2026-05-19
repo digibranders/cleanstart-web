@@ -26,7 +26,11 @@ const json = (data: unknown, init?: ResponseInit): Response =>
  * so a header-only abuse can't penalise the IP or exhaust memory. */
 export const LEAD_SUBMIT_MAX_BYTES = 64 * 1024;
 
-const DEFAULT_ALLOWED_ORIGINS = ['https://cleanstart.com', 'https://www.cleanstart.com'];
+const DEFAULT_ALLOWED_ORIGINS = [
+  'https://cleanstart.com',
+  'https://www.cleanstart.com',
+  'https://staging.cleanstart.com',
+];
 
 const allowedOrigins = (): string[] => {
   const raw = process.env.LEAD_SUBMIT_ALLOWED_ORIGINS;

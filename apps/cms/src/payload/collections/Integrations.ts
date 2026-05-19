@@ -15,7 +15,7 @@ import { encrypt, isEncrypted } from '../lib/integrations/secrets';
  * Each kind exposes a small set of friendly fields. Secret tokens
  * (HubSpot, GA4 service account, Clarity, Cloudflare, Cal.com, Brevo)
  * are NOT in the row at all — they live in env vars set by ops via
- * Coolify, and the handler reads them at run time via
+ * the droplet `.env`, and the handler reads them at run time via
  * `lib/integrations/credentials.ts`. The admin row only carries the
  * non-secret destination details (Teams URL, GA4 property ID, GSC
  * site URL, etc.).

@@ -125,6 +125,12 @@ const serverURL = process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:300
  * narrower CORS gating inside the handlers, so they aren't affected
  * by this list.
  */
+const DEFAULT_ADMIN_ALLOWED_ORIGINS = [
+  'https://cleanstart.com',
+  'https://www.cleanstart.com',
+  'https://staging.cleanstart.com',
+];
+
 const adminAllowedOrigins = (): string[] => {
   const raw = process.env.PAYLOAD_CORS_ORIGINS;
   if (raw && raw.trim().length > 0) {
@@ -133,7 +139,7 @@ const adminAllowedOrigins = (): string[] => {
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
   }
-  return [serverURL];
+  return Array.from(new Set([serverURL, ...DEFAULT_ADMIN_ALLOWED_ORIGINS]));
 };
 
 // Top-level folder prefix for all R2 uploads.

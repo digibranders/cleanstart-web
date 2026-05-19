@@ -1,7 +1,14 @@
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
 import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
+import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
 
-const asString = (v: unknown): string | null =>
+const asString = (v: unknown): string | null => {
+  if (typeof v !== 'string') return null;
+  const stripped = htmlToPlainText(v);
+  return stripped.length > 0 ? stripped : null;
+};
+
+const asHtmlString = (v: unknown): string | null =>
   typeof v === 'string' && v.trim().length > 0 ? v.trim() : null;
 
 const asNumber = (v: unknown): number | null => {
@@ -17,7 +24,7 @@ export const transformBlog = (row: Record<string, unknown>): Record<string, unkn
   const title = asString(row.name) ?? '';
   const slug = asString(row.slug) ?? slugify(title);
   const abstract = asString(row['abstract-2']) ?? asString(row['post-summary']);
-  const bodyHtml = asString(row['main-text']) ?? asString(row['post-body']);
+  const bodyHtml = asHtmlString(row['main-text']) ?? asHtmlString(row['post-body']);
   const publishedAt = asString(row['date-of-publication']) ?? asString(row['date-published']);
   const readingMinutes = asNumber(row['read-time-2']);
 

@@ -24,6 +24,7 @@ import {
   looksLikeRichDoc,
   normalizeRichHtml,
 } from '../../lib/normalize-rich-html';
+import { buildInlineMediaContextHint } from './InlineImage/context-hint';
 import { inlineImageFolderForCollection } from './InlineImage/folder';
 import {
   ingestMediaFromUrl,
@@ -86,6 +87,7 @@ const ingestImagesAfterPaste = async (
   editor: LexicalEditor,
   images: ExtractedInlineImage[],
   folder: string,
+  contextHint: string,
 ): Promise<void> => {
   if (images.length === 0) return;
   toast(`Pasted text — ingesting ${images.length} image${images.length === 1 ? '' : 's'}…`);
@@ -96,6 +98,7 @@ const ingestImagesAfterPaste = async (
     const result = await ingestMediaFromUrl(img.src, {
       folder,
       ...(img.alt ? { alt: img.alt } : {}),
+      ...(contextHint ? { contextHint } : {}),
     });
     if (result.ok) {
       succeeded += 1;
@@ -265,6 +268,7 @@ const handlePaste = (
   event: ClipboardEvent,
   ownEditor: LexicalEditor,
   folder: string,
+  contextHint: string,
 ): void => {
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
@@ -335,7 +339,7 @@ const handlePaste = (
   insertCleanedNodes(ownEditor, parsed);
 
   if (collectedImages.length > 0) {
-    void ingestImagesAfterPaste(ownEditor, collectedImages, folder);
+    void ingestImagesAfterPaste(ownEditor, collectedImages, folder, contextHint);
   } else {
     toast('Rich text pasted and cleaned.');
   }
@@ -406,12 +410,13 @@ const guardDecoratorInputKeys = (event: KeyboardEvent): void => {
 
 export const RichPastePlugin = (): null => {
   const [editor] = useLexicalComposerContext();
-  const { collectionSlug } = useDocumentInfo();
+  const { collectionSlug, id, title } = useDocumentInfo();
   const folder = inlineImageFolderForCollection(collectionSlug);
+  const contextHint = buildInlineMediaContextHint(collectionSlug, title, id);
 
   useEffect(() => {
     const handler = (event: ClipboardEvent): void => {
-      handlePaste(event, editor, folder);
+      handlePaste(event, editor, folder, contextHint);
     };
     document.addEventListener('paste', handler, true);
     document.addEventListener('keydown', guardDecoratorInputKeys, true);
@@ -419,6 +424,6 @@ export const RichPastePlugin = (): null => {
       document.removeEventListener('paste', handler, true);
       document.removeEventListener('keydown', guardDecoratorInputKeys, true);
     };
-  }, [editor, folder]);
+  }, [editor, folder, contextHint]);
   return null;
 };

@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   buildMediaFilename,
   canonicalExtensionForMime,
+  looksLikeJunkSlug,
+  pickSlugSource,
   shortHash,
 } from './media-filename';
 
@@ -111,5 +113,68 @@ describe('buildMediaFilename', () => {
       ext: '',
     });
     expect(name.endsWith('.bin')).toBe(true);
+  });
+});
+
+describe('looksLikeJunkSlug', () => {
+  it.each([
+    'image001',
+    'IMG_3492',
+    'clip_image002',
+    'Picture 1',
+    'picture',
+    'pasted-1700000000000',
+    'ingested-1234567890',
+    'Untitled',
+    'Untitled-1',
+    'screenshot 2026-05-04 at 12.13',
+    'a1b2c3d4e5f6',
+    '00000',
+    '',
+    '   ',
+    'ab',
+  ])('flags %s as junk', (input) => {
+    expect(looksLikeJunkSlug(input)).toBe(true);
+  });
+
+  it.each([
+    'SBOM 101 cover',
+    'Dhanush VM portrait',
+    'Hero illustration for the resource',
+    'attack-surface-diagram',
+  ])('accepts %s as meaningful', (input) => {
+    expect(looksLikeJunkSlug(input)).toBe(false);
+  });
+});
+
+describe('pickSlugSource', () => {
+  it('prefers alt when meaningful', () => {
+    expect(
+      pickSlugSource({ alt: 'SBOM cover', filename: 'image001', contextHint: 'blog-foo' }),
+    ).toBe('SBOM cover');
+  });
+
+  it('falls through to filename when alt is junk', () => {
+    expect(
+      pickSlugSource({ alt: 'image001', filename: 'Real description', contextHint: 'blog-foo' }),
+    ).toBe('Real description');
+  });
+
+  it('falls through to context hint when alt + filename are both junk', () => {
+    expect(
+      pickSlugSource({
+        alt: 'image001',
+        filename: 'clip_image003',
+        contextHint: 'blog-getting-started-inline',
+      }),
+    ).toBe('blog-getting-started-inline');
+  });
+
+  it('uses junk alt as last-resort when nothing else is available', () => {
+    expect(pickSlugSource({ alt: 'image001' })).toBe('image001');
+  });
+
+  it('returns empty when no source is provided', () => {
+    expect(pickSlugSource({})).toBe('');
   });
 });

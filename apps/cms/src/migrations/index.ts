@@ -6,6 +6,7 @@ import * as migration_20260514_135203_remove_resources_hero_image from './202605
 import * as migration_20260515_100240_rename_webinars_region from './20260515_100240_rename_webinars_region';
 import * as migration_20260515_180000_redirect_prefix_realignment from './20260515_180000_redirect_prefix_realignment';
 import * as migration_20260515_200000_rename_resources_types from './20260515_200000_rename_resources_types';
+import * as migration_20260519_120000_strip_html_from_text_fields from './20260519_120000_strip_html_from_text_fields';
 
 export const migrations = [
   {
@@ -31,7 +32,7 @@ export const migrations = [
   {
     up: migration_20260514_135203_remove_resources_hero_image.up,
     down: migration_20260514_135203_remove_resources_hero_image.down,
-    name: '20260514_135203_remove_resources_hero_image'
+    name: '20260514_135203_remove_resources_hero_image',
   },
   {
     up: migration_20260515_100240_rename_webinars_region.up,
@@ -47,5 +48,10 @@ export const migrations = [
     up: migration_20260515_200000_rename_resources_types.up,
     down: migration_20260515_200000_rename_resources_types.down,
     name: '20260515_200000_rename_resources_types',
+  },
+  {
+    up: migration_20260519_120000_strip_html_from_text_fields.up,
+    down: migration_20260519_120000_strip_html_from_text_fields.down,
+    name: '20260519_120000_strip_html_from_text_fields'
   },
 ];

@@ -1,8 +1,15 @@
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
 import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
+import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
 import { normalizeWebflowGuide } from '../../../apps/cms/src/payload/lib/webflow-import/guides-normalize';
 
-const asString = (v: unknown): string | null =>
+const asString = (v: unknown): string | null => {
+  if (typeof v !== 'string') return null;
+  const stripped = htmlToPlainText(v);
+  return stripped.length > 0 ? stripped : null;
+};
+
+const asHtmlString = (v: unknown): string | null =>
   typeof v === 'string' && v.trim().length > 0 ? v.trim() : null;
 
 const asNumber = (v: unknown): number | null => {
@@ -17,7 +24,7 @@ const asNumber = (v: unknown): number | null => {
 export const transformGuide = (row: Record<string, unknown>): Record<string, unknown> => {
   const title = asString(row.name) ?? '';
   const slug = asString(row.slug) ?? slugify(title);
-  const bodyHtml = asString(row['main-text']) ?? asString(row.body);
+  const bodyHtml = asHtmlString(row['main-text']) ?? asHtmlString(row.body);
   const abstract = asString(row['meta-description']) ?? asString(row.summary);
   const wordCount = asNumber(row['word-count']);
   const { faqs, keywords, citations, articleSections } = normalizeWebflowGuide(row);

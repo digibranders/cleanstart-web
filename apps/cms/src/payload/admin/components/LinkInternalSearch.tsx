@@ -39,7 +39,7 @@ const looksLikePath = (raw: string): boolean => {
 
 // "Internal" hostnames are matched in three layers:
 //   1. The admin's own host (covers production + any same-origin paste).
-//   2. The admin's registrable parent (admin.cleanstart.com → cleanstart.com),
+//   2. The admin's registrable parent (cms.cleanstart.com → cleanstart.com),
 //      so a URL pasted from the live site resolves automatically.
 //   3. An explicit allowlist driven by `NEXT_PUBLIC_SITE_HOSTS` (comma
 //      separated). Required in local dev because `localhost` has no

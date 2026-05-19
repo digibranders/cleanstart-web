@@ -82,7 +82,7 @@ const namedClipboardFile = (file: File): File => {
 
 export const uploadMediaFile = async (
   rawFile: File,
-  options: { folder: string; alt?: string },
+  options: { folder: string; alt?: string; contextHint?: string },
 ): Promise<UploadMediaFileResult> => {
   const file = namedClipboardFile(rawFile);
   const validationError = validate(file);
@@ -95,12 +95,21 @@ export const uploadMediaFile = async (
   fd.append('file', file, file.name);
   fd.append('_payload', JSON.stringify(payload));
 
+  // Forward the host doc's slug as a context hint so the Media
+  // collection's beforeValidate can fall back to it when the
+  // clipboard's filename (`image001.png`, `pasted-...`) and alt
+  // are junk. See lib/media-filename.ts#pickSlugSource.
+  const headers: Record<string, string> = { Accept: 'application/json' };
+  if (options.contextHint && options.contextHint.trim().length > 0) {
+    headers['x-media-context-hint'] = options.contextHint.trim();
+  }
+
   try {
     const res = await fetch('/api/media', {
       method: 'POST',
       body: fd,
       credentials: 'include',
-      headers: { Accept: 'application/json' },
+      headers,
     });
     const text = await res.text();
     if (!res.ok) {
@@ -154,18 +163,26 @@ const FRIENDLY_INGEST_ERRORS: Record<string, string> = {
  */
 export const ingestMediaFromUrl = async (
   sourceUrl: string,
-  options: { folder: string; alt?: string },
+  options: { folder: string; alt?: string; contextHint?: string },
 ): Promise<UploadMediaFileResult> => {
   if (!/^https?:\/\//i.test(sourceUrl)) {
     return { ok: false, error: UNSUPPORTED_PROTOCOL_MESSAGE };
   }
   const body: Record<string, unknown> = { url: sourceUrl, folder: options.folder };
   if (options.alt) body.alt = options.alt;
+  // Forward the host doc slug — see uploadMediaFile above.
+  const headers: Record<string, string> = {
+    'content-type': 'application/json',
+    Accept: 'application/json',
+  };
+  if (options.contextHint && options.contextHint.trim().length > 0) {
+    headers['x-media-context-hint'] = options.contextHint.trim();
+  }
   try {
     const res = await fetch('/api/media-ingest-url', {
       method: 'POST',
       credentials: 'include',
-      headers: { 'content-type': 'application/json', Accept: 'application/json' },
+      headers,
       body: JSON.stringify(body),
     });
     const text = await res.text();

@@ -20,12 +20,15 @@ export function ResourceCenterSidebar({
   return (
     <nav
       aria-label="Resource type filter"
-      className="shrink-0 w-full lg:w-[295px]"
+      className="shrink-0 w-full lg:sticky lg:w-[295px] lg:self-start"
+      style={{ top: "96px" }}
     >
       {/* White card background */}
       <div
         className="relative"
         style={{
+          maxHeight: "calc(100vh - 112px)",
+          overflowY: "auto",
           background: "white",
           borderRadius: "16px",
           padding: "24px 16px",

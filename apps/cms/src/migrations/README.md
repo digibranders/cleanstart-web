@@ -23,7 +23,7 @@ pnpm --filter @cleanstart/cms migrate:create <descriptive_name>
 pnpm --filter @cleanstart/cms migrate
 ```
 
-The Coolify production deploy hook runs `pnpm migrate` before `next start` so the schema is always current before the app boots.
+The production Dockerfile `CMD` runs `pnpm migrate && pnpm start`, so the GitHub Actions deploy workflow gets schema-current behavior for free — every container boot runs migrations before the app listens.
 
 ## One-time setup: existing environments
 
