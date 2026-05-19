@@ -7,6 +7,7 @@ import * as migration_20260515_100240_rename_webinars_region from './20260515_10
 import * as migration_20260515_180000_redirect_prefix_realignment from './20260515_180000_redirect_prefix_realignment';
 import * as migration_20260515_200000_rename_resources_types from './20260515_200000_rename_resources_types';
 import * as migration_20260519_120000_strip_html_from_text_fields from './20260519_120000_strip_html_from_text_fields';
+import * as migration_20260519_140010_catchup_schema_drift from './20260519_140010_catchup_schema_drift';
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20260519_120000_strip_html_from_text_fields.up,
     down: migration_20260519_120000_strip_html_from_text_fields.down,
     name: '20260519_120000_strip_html_from_text_fields'
+  },
+  {
+    up: migration_20260519_140010_catchup_schema_drift.up,
+    down: migration_20260519_140010_catchup_schema_drift.down,
+    name: '20260519_140010_catchup_schema_drift',
   },
 ];
