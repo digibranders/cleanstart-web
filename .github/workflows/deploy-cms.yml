@@ -103,6 +103,7 @@ jobs:
           WEBHOOK_TEAMS_EVENTS: ${{ vars.WEBHOOK_TEAMS_EVENTS }}
           WEBHOOK_GENERIC_EVENTS: ${{ vars.WEBHOOK_GENERIC_EVENTS }}
           TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+          PAYLOAD_DB_PUSH: ${{ vars.PAYLOAD_DB_PUSH }}
           # Secrets
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
@@ -169,6 +170,7 @@ jobs:
             echo "WEB_REVALIDATE_URL=${WEB_REVALIDATE_URL}"
             echo "WEB_REVALIDATE_SECRET=${WEB_REVALIDATE_SECRET}"
             echo "TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}"
+            echo "PAYLOAD_DB_PUSH=${PAYLOAD_DB_PUSH}"
             echo "TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}"
             echo "BREVO_API_KEY=${BREVO_API_KEY}"
             echo "BREVO_TEMPLATE_ID=${BREVO_TEMPLATE_ID}"

@@ -415,7 +415,15 @@ export default buildConfig({
     // without minting a migration on every save — the change is then
     // captured via `pnpm migrate:create <name>` when it settles. See
     // src/payload/migrations/README.md.
-    push: process.env.NODE_ENV !== 'production' && process.env.PAYLOAD_DB_PUSH !== 'false',
+    //
+    // Escape hatch: `PAYLOAD_DB_PUSH=force` enables push even in
+    // production. Reserve for one-time schema-drift recovery when
+    // migrations have fallen behind source. Set once, deploy, verify
+    // schema, then unset and redeploy. Leaving it on in prod silently
+    // overrides migrations every boot.
+    push:
+      process.env.PAYLOAD_DB_PUSH === 'force' ||
+      (process.env.NODE_ENV !== 'production' && process.env.PAYLOAD_DB_PUSH !== 'false'),
   }),
   sharp,
   graphQL: {
