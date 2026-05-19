@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RenderLexical, slugifyText } from "@/lib/renderLexical";
 import type { LexicalRoot, TocEntry, BlogImage } from "@/lib/blog";
 
@@ -100,12 +100,18 @@ type RenderedTocEntry = TocEntry & { level: number; text: string };
 function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): React.ReactElement | null {
   const [activeId, setActiveId] = useState<string>("");
 
-  const entries: (RenderedTocEntry & { slug: string })[] = (toc ?? [])
-    .filter(
-      (e): e is RenderedTocEntry =>
-        !!e?.text && typeof e.level === "number" && e.level >= 2 && e.level <= 4,
-    )
-    .map((e) => ({ ...e, slug: slugifyText(e.text) }));
+  // Memoized so the effect below depends on a reference-stable array
+  // and re-attaches the scroll listener only when `toc` actually changes.
+  const entries: (RenderedTocEntry & { slug: string })[] = useMemo(
+    () =>
+      (toc ?? [])
+        .filter(
+          (e): e is RenderedTocEntry =>
+            !!e?.text && typeof e.level === "number" && e.level >= 2 && e.level <= 4,
+        )
+        .map((e) => ({ ...e, slug: slugifyText(e.text) })),
+    [toc],
+  );
 
   useEffect(() => {
     if (!entries.length) return;
@@ -142,8 +148,7 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
       clearTimeout(t);
       window.removeEventListener("scroll", onScroll);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entries.length]);
+  }, [entries]);
 
   if (!entries.length) return null;
 
