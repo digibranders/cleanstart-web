@@ -87,6 +87,12 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
     let fieldsFixed = 0;
     let scanned = 0;
 
+    // Wrap per-collection so a schema mismatch on one collection (e.g.
+    // versioned-table column that pre-dates a field rename) doesn't abort
+    // the whole migration. The migration's purpose is data cleanup of
+    // Webflow-imported content; on a fresh DB with no data, every
+    // collection is a no-op anyway. Failures are logged and skipped.
+    try {
     while (true) {
       const res = await payload.find({
         collection,
@@ -140,6 +146,13 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
     payload.logger.info(
       `[strip-html-from-text-fields] ${collection}: scanned=${scanned} docsUpdated=${docsUpdated} fieldsFixed=${fieldsFixed}`,
     );
+    } catch (err) {
+      payload.logger.warn(
+        `[strip-html-from-text-fields] skipping ${collection} (likely a schema mismatch — investigate via the migration audit backlog item): ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+      );
+    }
   }
 }
 

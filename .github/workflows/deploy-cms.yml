@@ -198,7 +198,7 @@ jobs:
              cd /opt/cleanstart
              docker load < /tmp/cms.tar.gz
              docker tag cms:${{ github.sha }} cms:current
-             docker compose --profile cms up -d --wait cms
+             docker compose --profile cms up -d --wait --wait-timeout 300 cms
              docker image prune -f
              rm -f /tmp/cms.tar.gz
              echo "--- cms container status ---"
