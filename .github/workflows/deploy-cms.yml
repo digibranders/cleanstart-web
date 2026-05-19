@@ -55,11 +55,127 @@ jobs:
           scp -i ~/.ssh/id_deploy /tmp/cms.tar.gz \
             ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/tmp/cms.tar.gz
 
-      - name: Write .env to droplet
+      # Render /opt/cleanstart/.env on the droplet from individual GitHub
+      # Variables (non-secret config) and Secrets (sensitive tokens). One
+      # source of truth per key — to update a value, edit it in the GitHub
+      # UI and re-run this workflow.
+      #
+      # GOOGLE_APPLICATION_CREDENTIALS_JSON must be single-line (compact
+      # JSON) in the secret; line breaks break dotenv parsing.
+      - name: Render .env to droplet
         env:
-          CMS_ENV_FILE: ${{ secrets.CMS_ENV_FILE }}
+          # Variables
+          NODE_ENV: ${{ vars.NODE_ENV }}
+          PORT: ${{ vars.PORT }}
+          PAYLOAD_AUTO_RUN: ${{ vars.PAYLOAD_AUTO_RUN }}
+          PAYLOAD_PUBLIC_ENV: ${{ vars.PAYLOAD_PUBLIC_ENV }}
+          PAYLOAD_PUBLIC_SERVER_URL: ${{ vars.PAYLOAD_PUBLIC_SERVER_URL }}
+          PAYLOAD_PUBLIC_ROBOTS_DISALLOW: ${{ vars.PAYLOAD_PUBLIC_ROBOTS_DISALLOW }}
+          PAYLOAD_CORS_ORIGINS: ${{ vars.PAYLOAD_CORS_ORIGINS }}
+          TRUSTED_PROXY_HOPS: ${{ vars.TRUSTED_PROXY_HOPS }}
+          WEB_CONCURRENCY: ${{ vars.WEB_CONCURRENCY }}
+          RATE_LIMIT_BACKEND: ${{ vars.RATE_LIMIT_BACKEND }}
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+          R2_ENDPOINT: ${{ vars.R2_ENDPOINT }}
+          R2_PUBLIC_BASE: ${{ vars.R2_PUBLIC_BASE }}
+          R2_UPLOAD_PREFIX: ${{ vars.R2_UPLOAD_PREFIX }}
+          MEILISEARCH_URL: ${{ vars.MEILISEARCH_URL }}
+          LEAD_QUEUE_LOCAL_DIR: ${{ vars.LEAD_QUEUE_LOCAL_DIR }}
+          LEAD_SUBMIT_ALLOWED_ORIGINS: ${{ vars.LEAD_SUBMIT_ALLOWED_ORIGINS }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_SITE_ORIGIN: ${{ vars.NEXT_PUBLIC_SITE_ORIGIN }}
+          NEXT_PUBLIC_SITE_HOSTS: ${{ vars.NEXT_PUBLIC_SITE_HOSTS }}
+          WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
+          WEB_REVALIDATE_URL: ${{ vars.WEB_REVALIDATE_URL }}
+          BREVO_TEMPLATE_ID: ${{ vars.BREVO_TEMPLATE_ID }}
+          CLOUDFLARE_ACCOUNT_TAG: ${{ vars.CLOUDFLARE_ACCOUNT_TAG }}
+          WEBHOOK_TEAMS_EVENTS: ${{ vars.WEBHOOK_TEAMS_EVENTS }}
+          WEBHOOK_GENERIC_EVENTS: ${{ vars.WEBHOOK_GENERIC_EVENTS }}
+          TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+          # Secrets
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          MEILISEARCH_API_KEY: ${{ secrets.MEILISEARCH_API_KEY }}
+          MEILISEARCH_MASTER_KEY: ${{ secrets.MEILISEARCH_MASTER_KEY }}
+          LIVE_PREVIEW_SECRET: ${{ secrets.LIVE_PREVIEW_SECRET }}
+          PREVIEW_JWT_SECRET: ${{ secrets.PREVIEW_JWT_SECRET }}
+          WEB_REVALIDATE_SECRET: ${{ secrets.WEB_REVALIDATE_SECRET }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_INBOUND_TOKEN: ${{ secrets.BREVO_INBOUND_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          WEBHOOK_TEAMS_URL: ${{ secrets.WEBHOOK_TEAMS_URL }}
+          WEBHOOK_GENERIC_URL: ${{ secrets.WEBHOOK_GENERIC_URL }}
+          WEBHOOK_GENERIC_SIGNING_SECRET: ${{ secrets.WEBHOOK_GENERIC_SIGNING_SECRET }}
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+          HUBSPOT_PRIVATE_APP_TOKEN: ${{ secrets.HUBSPOT_PRIVATE_APP_TOKEN }}
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+          CLARITY_API_TOKEN: ${{ secrets.CLARITY_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CALCOM_SIGNING_SECRET: ${{ secrets.CALCOM_SIGNING_SECRET }}
         run: |
-          printf '%s\n' "$CMS_ENV_FILE" | ssh -i ~/.ssh/id_deploy \
+          # Compute DATABASE_URI from POSTGRES_PASSWORD + the well-known
+          # compose service hostname so we never store two secrets that
+          # could drift out of sync.
+          DATABASE_URI="postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/cleanstart"
+
+          # Render .env line-by-line; multi-line values (none expected
+          # at runtime — JSON must be compact) would break dotenv parsing,
+          # so we explicitly avoid printf %s and use single-line `key=value`.
+          {
+            echo "NODE_ENV=${NODE_ENV}"
+            echo "PORT=${PORT}"
+            echo "PAYLOAD_AUTO_RUN=${PAYLOAD_AUTO_RUN}"
+            echo "PAYLOAD_PUBLIC_ENV=${PAYLOAD_PUBLIC_ENV}"
+            echo "PAYLOAD_PUBLIC_SERVER_URL=${PAYLOAD_PUBLIC_SERVER_URL}"
+            echo "PAYLOAD_PUBLIC_ROBOTS_DISALLOW=${PAYLOAD_PUBLIC_ROBOTS_DISALLOW}"
+            echo "PAYLOAD_CORS_ORIGINS=${PAYLOAD_CORS_ORIGINS}"
+            echo "TRUSTED_PROXY_HOPS=${TRUSTED_PROXY_HOPS}"
+            echo "WEB_CONCURRENCY=${WEB_CONCURRENCY}"
+            echo "RATE_LIMIT_BACKEND=${RATE_LIMIT_BACKEND}"
+            echo "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+            echo "DATABASE_URI=${DATABASE_URI}"
+            echo "PAYLOAD_SECRET=${PAYLOAD_SECRET}"
+            echo "R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}"
+            echo "R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}"
+            echo "R2_BUCKET=${R2_BUCKET}"
+            echo "R2_ENDPOINT=${R2_ENDPOINT}"
+            echo "R2_PUBLIC_BASE=${R2_PUBLIC_BASE}"
+            echo "R2_UPLOAD_PREFIX=${R2_UPLOAD_PREFIX}"
+            echo "MEILISEARCH_URL=${MEILISEARCH_URL}"
+            echo "MEILISEARCH_API_KEY=${MEILISEARCH_API_KEY}"
+            echo "MEILISEARCH_MASTER_KEY=${MEILISEARCH_MASTER_KEY}"
+            echo "LEAD_QUEUE_LOCAL_DIR=${LEAD_QUEUE_LOCAL_DIR}"
+            echo "LEAD_SUBMIT_ALLOWED_ORIGINS=${LEAD_SUBMIT_ALLOWED_ORIGINS}"
+            echo "NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}"
+            echo "NEXT_PUBLIC_SITE_ORIGIN=${NEXT_PUBLIC_SITE_ORIGIN}"
+            echo "NEXT_PUBLIC_SITE_HOSTS=${NEXT_PUBLIC_SITE_HOSTS}"
+            echo "WEB_BASE_URL=${WEB_BASE_URL}"
+            echo "LIVE_PREVIEW_SECRET=${LIVE_PREVIEW_SECRET}"
+            echo "PREVIEW_JWT_SECRET=${PREVIEW_JWT_SECRET}"
+            echo "WEB_REVALIDATE_URL=${WEB_REVALIDATE_URL}"
+            echo "WEB_REVALIDATE_SECRET=${WEB_REVALIDATE_SECRET}"
+            echo "TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}"
+            echo "TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}"
+            echo "BREVO_API_KEY=${BREVO_API_KEY}"
+            echo "BREVO_TEMPLATE_ID=${BREVO_TEMPLATE_ID}"
+            echo "BREVO_INBOUND_TOKEN=${BREVO_INBOUND_TOKEN}"
+            echo "SENTRY_DSN=${SENTRY_DSN}"
+            echo "WEBHOOK_TEAMS_URL=${WEBHOOK_TEAMS_URL}"
+            echo "WEBHOOK_TEAMS_EVENTS=${WEBHOOK_TEAMS_EVENTS}"
+            echo "WEBHOOK_GENERIC_URL=${WEBHOOK_GENERIC_URL}"
+            echo "WEBHOOK_GENERIC_EVENTS=${WEBHOOK_GENERIC_EVENTS}"
+            echo "WEBHOOK_GENERIC_SIGNING_SECRET=${WEBHOOK_GENERIC_SIGNING_SECRET}"
+            echo "INDEXNOW_KEY=${INDEXNOW_KEY}"
+            echo "HUBSPOT_PRIVATE_APP_TOKEN=${HUBSPOT_PRIVATE_APP_TOKEN}"
+            echo "GOOGLE_APPLICATION_CREDENTIALS_JSON=${GOOGLE_APPLICATION_CREDENTIALS_JSON}"
+            echo "CLARITY_API_TOKEN=${CLARITY_API_TOKEN}"
+            echo "CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}"
+            echo "CLOUDFLARE_ACCOUNT_TAG=${CLOUDFLARE_ACCOUNT_TAG}"
+            echo "CALCOM_SIGNING_SECRET=${CALCOM_SIGNING_SECRET}"
+          } | ssh -i ~/.ssh/id_deploy \
             ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} \
             'umask 077 && cat > /opt/cleanstart/.env && chmod 600 /opt/cleanstart/.env'
 
