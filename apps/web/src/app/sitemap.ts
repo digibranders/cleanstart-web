@@ -61,9 +61,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const isProduction = process.env.VERCEL_ENV === "production";
   if (!isProduction) return [];
 
-  const [blogs, resources] = await Promise.all([
+  const [blogs, resources, authors] = await Promise.all([
     fetchPublished("blogs"),
     fetchPublished("resources"),
+    fetchPublished("authors"),
   ]);
 
   return [
@@ -73,6 +74,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
     ...resources.map((r) =>
       entry(`/resource/${r.slug}`, r.updatedAt ?? r.publishedAt ?? undefined),
+    ),
+    ...authors.map((a) =>
+      entry(`/author/${a.slug}`, a.updatedAt ?? a.publishedAt ?? undefined),
     ),
   ];
 }

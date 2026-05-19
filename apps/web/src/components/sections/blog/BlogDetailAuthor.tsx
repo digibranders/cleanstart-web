@@ -1,5 +1,6 @@
 import type React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { pickImageUrl } from "@/lib/blog";
 import type { BlogAuthor } from "@/lib/blog";
 
@@ -35,6 +36,42 @@ export function BlogDetailAuthor({
   );
 }
 
+function PhotoWrapper({
+  slug,
+  name,
+  children,
+}: {
+  slug: string | undefined;
+  name: string;
+  children: React.ReactNode;
+}): React.ReactElement {
+  const sharedStyle: React.CSSProperties = {
+    width: "clamp(96px, 12vw, 144px)",
+    minHeight: "clamp(96px, 12vw, 144px)",
+    borderRadius: "8px",
+  };
+  if (slug) {
+    return (
+      <Link
+        href={`/author/${slug}`}
+        aria-label={`Read more about ${name}`}
+        className="shrink-0 self-stretch overflow-hidden relative block"
+        style={sharedStyle}
+      >
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <div
+      className="shrink-0 self-stretch overflow-hidden relative"
+      style={sharedStyle}
+    >
+      {children}
+    </div>
+  );
+}
+
 function AuthorName({ author }: { author: BlogAuthor }): React.ReactElement {
   const nameClasses = "font-display font-bold tracking-[-0.02em]";
   const nameStyle: React.CSSProperties = {
@@ -43,6 +80,20 @@ function AuthorName({ author }: { author: BlogAuthor }): React.ReactElement {
     lineHeight: 1.2,
     margin: 0,
   };
+
+  if (author.slug) {
+    return (
+      <h3 className={nameClasses} style={nameStyle}>
+        <Link
+          href={`/author/${author.slug}`}
+          className="hover:underline underline-offset-4 decoration-1"
+          style={{ color: "inherit" }}
+        >
+          {author.name}
+        </Link>
+      </h3>
+    );
+  }
 
   return (
     <h3 className={nameClasses} style={nameStyle}>
@@ -61,14 +112,7 @@ function AuthorCard({ author }: { author: BlogAuthor }): React.ReactElement {
       className="flex gap-5 sm:gap-6 bg-[#F5F5F5] p-5 sm:p-6"
       style={{ borderRadius: "12px" }}
     >
-      <div
-        className="shrink-0 self-stretch overflow-hidden relative"
-        style={{
-          width: "clamp(96px, 12vw, 144px)",
-          minHeight: "clamp(96px, 12vw, 144px)",
-          borderRadius: "8px",
-        }}
-      >
+      <PhotoWrapper slug={author.slug} name={author.name}>
         {photoSrc ? (
           <Image
             src={photoSrc}
@@ -87,7 +131,7 @@ function AuthorCard({ author }: { author: BlogAuthor }): React.ReactElement {
             aria-hidden
           />
         )}
-      </div>
+      </PhotoWrapper>
 
       <div className="min-w-0 flex-1 flex flex-col gap-3">
         <div className="flex items-start justify-between gap-3">
@@ -134,11 +178,14 @@ function AuthorCard({ author }: { author: BlogAuthor }): React.ReactElement {
 
         {bio && (
           <p
-            className="text-base font-normal leading-[1.6]"
+            className="text-base font-normal leading-[1.6] overflow-hidden"
             style={{
               color: "rgba(17,17,17,0.65)",
               margin: 0,
               whiteSpace: "pre-line",
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 5,
             }}
           >
             {bio}
