@@ -25,7 +25,6 @@ const PREVIEW_FRAME_ANCESTORS = [
   "'self'",
   "http://localhost:3000",
   "https://cms.cleanstart.com",
-  "https://admin.cleanstart.com",
 ];
 
 export function buildCsp({

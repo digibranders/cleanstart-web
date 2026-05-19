@@ -2019,7 +2019,7 @@ This audit is now exhaustive on responsive sizing, typography, CTAs, and images.
 
 15. **Touch-hover degradation** — `hover:` Tailwind utilities don't degrade gracefully on touch (sticky-hover on iOS). `@media (hover: hover) and (pointer: fine) { … }` gates hover-only affordances. Audit needed across cards, CTAs, nav. **Effort: ½ day.**
 
-16. **CMS preview iframe sizing** — the CMS at `admin.cleanstart.com` previews web pages in an iframe (per `CLAUDE.md` Phase D preview workflow). The iframe's container width is the *device* size, not the page's `max-w-[1276px]` rail. If the preview iframe is narrower than 1276 it will exercise the fluid path; if wider, it tests nothing useful. Verify preview iframe widths match the six target viewports in Part 9. **Effort: ¼ day.**
+16. **CMS preview iframe sizing** — the CMS at `cms.cleanstart.com` previews web pages in an iframe (per `CLAUDE.md` Phase D preview workflow). The iframe's container width is the *device* size, not the page's `max-w-[1276px]` rail. If the preview iframe is narrower than 1276 it will exercise the fluid path; if wider, it tests nothing useful. Verify preview iframe widths match the six target viewports in Part 9. **Effort: ¼ day.**
 
 17. **Cookie / consent banner responsiveness** — no consent banner detected in `apps/web/src/` grep. Either it's planned or it's a compliance gap (GDPR for EU traffic per arch doc §`#privacy-gdpr`). When added, must be responsive + meet WCAG 2.5.8 + survive `prefers-reduced-motion`. **Effort: depends on whether banner exists.**
 

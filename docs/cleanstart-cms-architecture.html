@@ -661,7 +661,7 @@
         <strong>Vercel Pro</strong> ($20/mo per dev — Vercel Hobby's ToS prohibits commercial use, including
         "advertising the sale of a product or service"; see §<a href="#hosting">Hosting</a>); everything else
         (Postgres 16, Payload admin, Meilisearch) runs on a single
-        <strong>$12/mo DigitalOcean droplet</strong> via Coolify for git-push deploys, with a
+        <strong>$12/mo DigitalOcean droplet</strong> with GitHub Actions for git-push deploys, with a
         <strong>2 GB swap file + explicit tuning spec</strong> (Postgres / Sharp / Meilisearch / kernel) so the
         2 GB / 1 vCPU box doesn't OOM under upload bursts. Media and DB backups go to
         <strong>Cloudflare R2</strong>; failed lead writes also fall back to R2 with a 5-min drain cron so
@@ -3171,7 +3171,7 @@ livePreview: {
           <tr><td>"Now-live" detection</td><td>If the doc gets published while the stakeholder still has the preview tab open, the page detects it via a stale-while-revalidate fetch and swaps the banner to <em>"This page is now live · view production →"</em> with a one-click jump to the canonical URL (no <code>?token=</code>).</td></tr>
           <tr><td>Indexing</td><td>Preview routes always emit <code>X-Robots-Tag: noindex, nofollow</code> + <code>&lt;meta name="robots" content="noindex"&gt;</code> · Google never indexes a preview URL even if accidentally shared.</td></tr>
           <tr><td>Analytics</td><td>Vercel Analytics + Speed Insights skip <code>/preview/*</code> and any route under <code>draftMode()</code>. Preview never pollutes production metrics.</td></tr>
-          <tr><td>iframe-ancestor policy</td><td>Site CSP <code>frame-ancestors 'self' https://admin.cleanstart.com</code> — supersedes the legacy <code>X-Frame-Options: SAMEORIGIN</code> on modern browsers, scoped to <code>/preview/*</code> only. Other routes still emit <code>X-Frame-Options: DENY</code>.</td></tr>
+          <tr><td>iframe-ancestor policy</td><td>Site CSP <code>frame-ancestors 'self' https://cms.cleanstart.com</code> — supersedes the legacy <code>X-Frame-Options: SAMEORIGIN</code> on modern browsers, scoped to <code>/preview/*</code> only. Other routes still emit <code>X-Frame-Options: DENY</code>.</td></tr>
         </tbody>
       </table>
 
@@ -3887,7 +3887,7 @@ class DbLeadHandler implements LeadHandler { /* Postgres + Brevo email */ }
         <tbody>
           <tr><td>Framework</td><td><strong>Next.js 16.2</strong> (App Router, RSC, Turbopack default, React Compiler)</td><td>SEO, ISR, edge rendering. 25–60% faster Payload rendering on 16.2 specifically.</td></tr>
           <tr><td>Repo structure</td><td><strong>Monorepo</strong> · <code>apps/web</code> + <code>apps/cms</code> · pnpm workspaces + Turborepo</td><td>Two Next.js apps in one repo · shared types via <code>packages/types</code> · independent deploys</td></tr>
-          <tr><td>CMS</td><td><strong>Payload 3.81+</strong> in <code>apps/cms</code>, served at <code>admin.cleanstart.com</code></td><td>TypeScript-first, fully overridable React admin, blocks/relations/arrays native, drafts+versions+scheduled publish, MIT, self-hostable</td></tr>
+          <tr><td>CMS</td><td><strong>Payload 3.81+</strong> in <code>apps/cms</code>, served at <code>cms.cleanstart.com</code></td><td>TypeScript-first, fully overridable React admin, blocks/relations/arrays native, drafts+versions+scheduled publish, MIT, self-hostable</td></tr>
           <tr><td>Language</td><td>TypeScript (strict)</td><td>Type safety end-to-end via <code>payload generate:types</code></td></tr>
           <tr><td>Database</td><td>Postgres 16 (self-hosted on droplet)</td><td>localhost-bound, sub-ms queries from Payload</td></tr>
           <tr><td>Media</td><td><strong>Cloudflare R2</strong> via Payload <code>cloudStorage</code></td><td>S3-compatible, egress-free</td></tr>
@@ -3896,14 +3896,14 @@ class DbLeadHandler implements LeadHandler { /* Postgres + Brevo email */ }
           <tr><td>Email</td><td><strong>Brevo</strong></td><td>Transactional + future newsletters in one platform; free 300/day</td></tr>
           <tr><td>Analytics</td><td>Vercel Analytics + Speed Insights (free)</td><td>Cookie-less, no consent banner; Plausible Cloud added later when 2.5K cap hits</td></tr>
           <tr><td>Error monitoring</td><td>Sentry (free tier)</td><td>Frontend + Payload server errors</td></tr>
-          <tr><td>Uptime monitoring</td><td><strong>BetterStack Uptime</strong> (free tier)</td><td>5 monitors at launch: <code>cleanstart.com</code>, <code>admin.cleanstart.com</code>, Meilisearch health, SSL/domain expiry, backup-cron heartbeat · public status page at <code>status.cleanstart.com</code></td></tr>
+          <tr><td>Uptime monitoring</td><td><strong>BetterStack Uptime</strong> (free tier)</td><td>5 monitors at launch: <code>cleanstart.com</code>, <code>cms.cleanstart.com</code>, Meilisearch health, SSL/domain expiry, backup-cron heartbeat · public status page at <code>status.cleanstart.com</code></td></tr>
           <tr><td>Auth</td><td>Payload built-in</td><td>Sessions + RBAC for admin and dashboard</td></tr>
           <tr><td>Forms / leads</td><td>Payload Form Builder + custom <code>LeadHandler</code></td><td>Marketer-defined; CRM-swappable</td></tr>
           <tr><td>Styling</td><td>Tailwind CSS v4 + shadcn/ui primitives</td><td>Marketer-editable design tokens via globals</td></tr>
           <tr><td>Rich text</td><td>Lexical (Payload default)</td><td>Block-aware, extensible, RSC-renderable</td></tr>
           <tr><td>Validation</td><td>Zod</td><td>Form schemas, API boundaries</td></tr>
           <tr><td>Testing</td><td>Vitest (unit) + Playwright (e2e)</td><td>Lighthouse + visual diff in CI</td></tr>
-          <tr><td>CI/CD</td><td>GitHub Actions + Coolify auto-deploy</td><td>Lint, typecheck, build, e2e, Lighthouse budget</td></tr>
+          <tr><td>CI/CD</td><td>GitHub Actions: CI (lint/typecheck/test/build) + deploy workflow (build → ship → restart)</td><td>Lint, typecheck, build, e2e, Lighthouse budget</td></tr>
           <tr><td>Package manager</td><td>pnpm</td><td>Faster, deterministic, disk-efficient</td></tr>
           <tr><td>Linting</td><td>Biome (or ESLint + Prettier)</td><td>Fast, single config</td></tr>
         </tbody>
@@ -3975,9 +3975,8 @@ class DbLeadHandler implements LeadHandler { /* Postgres + Brevo email */ }
         <li><strong>apps/web (Vercel)</strong>: one-click <em>"Promote previous deployment"</em> in the Vercel
             UI; &lt; 30 s wall time. Always note the previous deployment ID before deploying so rollback is
             zero-think.</li>
-        <li><strong>apps/cms (Coolify)</strong>: pin a known-good Docker image tag (git SHA, never
-            <code>latest</code>); rollback = Coolify <em>"Deploy"</em> with the previous tag, ~2 min.</li>
-        <li><strong>Manual SSH fallback</strong>: when Coolify itself is broken, runbook at
+        <li><strong>apps/cms (GitHub Actions)</strong>: each deploy ships a git-SHA-tagged image (never <code>latest</code>); rollback = re-run the deploy workflow with the previous SHA as <code>workflow_dispatch</code> input, ~2 min.</li>
+        <li><strong>Manual SSH fallback</strong>: when GitHub Actions itself is broken, runbook at
             <code>docs/runbooks/manual-deploy.md</code> covers
             <code>docker pull cleanstart-cms:&lt;sha&gt; &amp;&amp; docker stop cms &amp;&amp; docker run …</code>
             on the droplet.</li>
@@ -4154,7 +4153,7 @@ Content-Security-Policy:
   object-src 'none';
   base-uri   'self';
   form-action 'self' https://*.brevo.com;
-  frame-ancestors 'self' https://admin.cleanstart.com;
+  frame-ancestors 'self' https://cms.cleanstart.com;
   upgrade-insecure-requests;
   report-to csp-endpoint;</code></pre>
       <p class="small">
@@ -4222,7 +4221,7 @@ Report-To:
           <tr><td><code>Cross-Origin-Resource-Policy</code> <span class="pill new">NEW</span></td><td><code>same-origin</code> on CMS API responses · <code>cross-origin</code> on CDN-served public assets</td><td>Prevents cross-origin sites from loading our CMS API responses; allows the CDN to serve images cross-origin to legitimate consumers</td></tr>
           <tr><td><code>Origin-Agent-Cluster</code> <span class="pill new">NEW</span></td><td><code>?1</code></td><td>Opts the origin into per-origin process isolation · completes the cross-origin isolation set with COOP + COEP + CORP · one header line, zero ongoing cost</td></tr>
           <tr><td><code>Reporting-Endpoints</code> + <code>Report-To</code> <span class="pill new">NEW</span></td><td>see config above</td><td>Modern reporting API for CSP + COEP violations · routed to Sentry</td></tr>
-          <tr><td><code>X-Robots-Tag</code></td><td><code>noindex, nofollow</code> on <code>/preview/*</code> and <code>admin.cleanstart.com</code></td><td>Keeps drafts and admin out of Google</td></tr>
+          <tr><td><code>X-Robots-Tag</code></td><td><code>noindex, nofollow</code> on <code>/preview/*</code> and <code>cms.cleanstart.com</code></td><td>Keeps drafts and admin out of Google</td></tr>
           <tr><td><code>Clear-Site-Data</code> <span class="pill new">NEW</span></td><td><code>"cache", "cookies", "storage"</code> · emitted on the admin logout response</td><td>Wipes all session data on logout — defense against session-fixation and shared-machine leakage</td></tr>
         </tbody>
       </table>
@@ -4250,9 +4249,9 @@ Report-To:
         <thead><tr><th>Route pattern</th><th>Variation from public default</th></tr></thead>
         <tbody>
           <tr><td><code>/*</code> (public site)</td><td>Default policy as documented above</td></tr>
-          <tr><td><code>/preview/*</code></td><td><code>X-Frame-Options: SAMEORIGIN</code> · CSP <code>frame-ancestors 'self' https://admin.cleanstart.com</code> · <code>X-Robots-Tag: noindex, nofollow</code> · analytics-tracker domains removed from <code>connect-src</code></td></tr>
+          <tr><td><code>/preview/*</code></td><td><code>X-Frame-Options: SAMEORIGIN</code> · CSP <code>frame-ancestors 'self' https://cms.cleanstart.com</code> · <code>X-Robots-Tag: noindex, nofollow</code> · analytics-tracker domains removed from <code>connect-src</code></td></tr>
           <tr><td><code>/api/*</code></td><td>CSP simpler (no script/style/font directives — JSON responses don't run scripts) · <code>Cross-Origin-Resource-Policy: same-origin</code> · <code>X-Robots-Tag: noindex</code></td></tr>
-          <tr><td><code>admin.cleanstart.com/*</code></td><td>CSP allows Payload's admin bundle origin · <code>X-Robots-Tag: noindex, nofollow</code> · <code>Clear-Site-Data</code> on logout endpoint</td></tr>
+          <tr><td><code>cms.cleanstart.com/*</code></td><td>CSP allows Payload's admin bundle origin · <code>X-Robots-Tag: noindex, nofollow</code> · <code>Clear-Site-Data</code> on logout endpoint</td></tr>
         </tbody>
       </table>
 
@@ -4290,7 +4289,7 @@ Report-To:
         <li><strong><code>/api/leads</code></strong> — per-form <code>rateLimit</code> from the <code>forms</code> schema (default 5/min/IP, 50/day/IP). Server-side enforced at the route handler; returns <code>429 Too Many Requests</code>. Honeypot field is always added (silent reject); Cloudflare Turnstile challenge defaults ON for any form on a public-facing page.</li>
         <li><strong><code>/api/revalidate</code></strong> (ISR webhook) — secret-token auth via <code>X-Revalidate-Secret</code> header (rotated quarterly); rejects without 401. Not rate-limited because it's only called from <code>apps/cms</code>.</li>
         <li><strong><code>/preview</code></strong> — JWT validation only (no rate limit); short-exp tokens supersede leaked long-exp ones (see §<a href="#preview-workflow">preview workflow</a>).</li>
-        <li><strong>Cloudflare WAF</strong> — free-tier rules block obvious scrapers, brute-force login attempts, and known-bad IPs. <code>admin.cleanstart.com</code> is protected by Payload's built-in auth + Cloudflare WAF + mandatory 2FA on every Admin/Publisher account.</li>
+        <li><strong>Cloudflare WAF</strong> — free-tier rules block obvious scrapers, brute-force login attempts, and known-bad IPs. <code>cms.cleanstart.com</code> is protected by Payload's built-in auth + Cloudflare WAF + mandatory 2FA on every Admin/Publisher account.</li>
       </ul>
 
       <h3 id="privacy-gdpr">Privacy, cookies &amp; lead retention</h3>
@@ -4741,8 +4740,8 @@ export async function POST(req: Request) {
         <li>Provision a fresh DO droplet (or use the standby snapshot). Apply the §<a href="#droplet-tuning">droplet tuning spec</a> (Postgres / Sharp / Meilisearch / swap / sysctl) before bringing services up.</li>
         <li>Pull the latest <code>pg_dump</code> from R2 → <code>pg_restore --clean --if-exists</code> into a fresh Postgres 16.</li>
         <li><strong>Skip the Meilisearch dump restore</strong> — drop the search index entirely and rebuild from Postgres via the existing <code>afterChange</code> indexers (typically &lt; 2 min for ~290 docs). The <code>meili-dump</code> from a non-atomic snapshot can be inconsistent with Postgres; rebuilding from the restored DB is the only safe path. The Meilisearch dump remains in R2 only as a dev-time convenience.</li>
-        <li>Re-deploy <code>apps/cms</code> via Coolify pointing at the restored DB; run <code>payload migrate</code> to ensure schema parity.</li>
-        <li>Update DNS at Cloudflare (TTL is 60 s) → <code>admin.cleanstart.com</code> points at new droplet.</li>
+        <li>Re-deploy <code>apps/cms</code> by re-running the GitHub Actions deploy workflow against the restored DB; the Dockerfile's <code>CMD</code> already runs <code>payload migrate</code> before <code>next start</code>, ensuring schema parity.</li>
+        <li>Update DNS at Cloudflare (TTL is 60 s) → <code>cms.cleanstart.com</code> points at new droplet.</li>
         <li>Trigger an ISR purge from <code>apps/web</code> (full revalidate).</li>
         <li>Drain any leads sitting in the R2 fallback queue (see §<a href="#lead-durability">Lead durability</a>) — the 5-min cron picks these up automatically once the CMS is back, but verify the queue empties before declaring restore complete.</li>
       </ol>
@@ -4985,7 +4984,7 @@ export async function POST(req: Request) {
       <h2><span class="num">06</span>Hosting &amp; pricing</h2>
 
       <h3>Architecture overview</h3>
-      <p>Two domains, one monorepo, one droplet. Public site runs on Vercel; everything stateful runs on the droplet behind <code>admin.cleanstart.com</code>. Cloudflare fronts both.</p>
+      <p>Two domains, one monorepo, one droplet. Public site runs on Vercel; everything stateful runs on the droplet behind <code>cms.cleanstart.com</code>. Cloudflare fronts both.</p>
       <p>Sentry catches in-process exceptions; <strong>BetterStack</strong> catches everything Sentry can&rsquo;t see &mdash; droplet down, Caddy down, Postgres down, DNS broken, SSL expired, backup cron silently failed. External probes hit both domains every 3 minutes from 30+ regions, with a heartbeat monitor on the 03:00 backup cron.</p>
 
       <div class="mermaid-wrap">
@@ -4996,7 +4995,7 @@ flowchart TB
 
     subgraph Edge["Cloudflare · DNS · WAF · CDN"]
       direction LR
-      DNS["cleanstart.com<br/>admin.cleanstart.com"]:::edge
+      DNS["cleanstart.com<br/>cms.cleanstart.com"]:::edge
       R2["R2 bucket<br/>media + backups"]:::storage
     end
 
@@ -5007,7 +5006,7 @@ flowchart TB
     subgraph Droplet["DigitalOcean droplet · $12 · 2 GB + 2 GB swap · Bangalore"]
       direction TB
       Caddy["Caddy<br/>reverse proxy + SSL"]:::infra
-      CMS["apps/cms<br/>Next.js + Payload 3<br/>admin.cleanstart.com"]:::droplet
+      CMS["apps/cms<br/>Next.js + Payload 3<br/>cms.cleanstart.com"]:::droplet
       PG[("Postgres 16<br/>localhost-bound")]:::db
       Meili[("Meilisearch")]:::db
       Caddy --> CMS
@@ -5028,7 +5027,7 @@ flowchart TB
     Visitor -->|HTTPS| DNS
     Marketer -->|HTTPS| DNS
     DNS -->|cleanstart.com| Web
-    DNS -->|admin.cleanstart.com| Caddy
+    DNS -->|cms.cleanstart.com| Caddy
     Web -.->|REST<br/>ISR cached| CMS
     Web --> R2
     CMS --> R2
@@ -5055,12 +5054,12 @@ flowchart TB
       <table>
         <thead><tr><th>Surface</th><th>Host</th><th>Domain</th><th>Contains</th></tr></thead>
         <tbody>
-          <tr><td>Public marketing site</td><td>Vercel · <strong>Pro</strong> ($20/mo per dev)</td><td><code>cleanstart.com</code></td><td><code>apps/web</code> — Next.js 16.2, ISR-cached pages, fetches content from <code>admin.cleanstart.com/api/*</code> · Hobby is non-commercial only per Vercel ToS, so Pro is required (see warning below)</td></tr>
-          <tr><td>CMS admin + content API</td><td>DO $12 droplet · Bangalore</td><td><code>admin.cleanstart.com</code></td><td><code>apps/cms</code> — Next.js + Payload 3 admin, REST API + Local API, always warm (no cold starts) · GraphQL disabled in <code>payload.config.ts</code> (one frontend, native fetch+tag caching favours REST; re-enable on first external-consumer ask)</td></tr>
+          <tr><td>Public marketing site</td><td>Vercel · <strong>Pro</strong> ($20/mo per dev)</td><td><code>cleanstart.com</code></td><td><code>apps/web</code> — Next.js 16.2, ISR-cached pages, fetches content from <code>cms.cleanstart.com/api/*</code> · Hobby is non-commercial only per Vercel ToS, so Pro is required (see warning below)</td></tr>
+          <tr><td>CMS admin + content API</td><td>DO $12 droplet · Bangalore</td><td><code>cms.cleanstart.com</code></td><td><code>apps/cms</code> — Next.js + Payload 3 admin, REST API + Local API, always warm (no cold starts) · GraphQL disabled in <code>payload.config.ts</code> (one frontend, native fetch+tag caching favours REST; re-enable on first external-consumer ask)</td></tr>
           <tr><td>Database</td><td>Same droplet</td><td>localhost</td><td>Postgres 16 — bound to <code>127.0.0.1</code>, never public</td></tr>
           <tr><td>Site search</td><td>Same droplet</td><td>localhost</td><td>Meilisearch — indexed via Payload <code>afterChange</code> hooks</td></tr>
           <tr><td>Reverse proxy + SSL</td><td>Same droplet</td><td>—</td><td>Caddy — automatic Let's Encrypt</td></tr>
-          <tr><td>Deploy + git-push CI</td><td>Same droplet</td><td>—</td><td>Coolify — watches <code>apps/cms/Dockerfile</code> on push to <code>main</code></td></tr>
+          <tr><td>Deploy + git-push CI</td><td>GitHub Actions</td><td>—</td><td><code>.github/workflows/deploy-cms.yml</code> builds <code>apps/cms/Dockerfile</code> on push to <code>main</code>, ships via SSH, restarts compose</td></tr>
           <tr><td>Backups</td><td>Cron 03:00 daily</td><td>—</td><td><code>pg_dump</code> + <code>meili-dump</code> → R2</td></tr>
           <tr><td>Media + backup storage</td><td>Cloudflare R2</td><td>—</td><td>Egress-free; signed URLs from Payload</td></tr>
           <tr><td>DNS · WAF · CDN front</td><td>Cloudflare</td><td>cleanstart.com + admin subdomain</td><td>Free tier — sits in front of both Vercel and the droplet</td></tr>
@@ -5135,7 +5134,7 @@ flowchart TB
 
       <h3 id="droplet-tuning">Droplet tuning spec — required for 2 GB / 1 vCPU</h3>
       <p>
-        The 2 GB / 1 vCPU droplet runs Postgres + Payload + Meilisearch + Sharp + Coolify + OS. With factory
+        The 2 GB / 1 vCPU droplet runs Postgres + Payload + Meilisearch + Sharp + Caddy + OS. With factory
         defaults each component assumes it owns the whole machine; they will fight for memory and OOM-kill
         under upload bursts or initial Meilisearch indexing. The five tweaks below make the workload fit
         cleanly with ~500 MB headroom, plus 2 GB swap as a panic buffer.
@@ -5205,28 +5204,20 @@ sysctl --system</code></pre>
           <tr><td>Payload + Node runtime</td><td>~250 MB</td><td>~500 MB</td></tr>
           <tr><td>Meilisearch (290 docs, capped)</td><td>~100 MB</td><td>~300 MB</td></tr>
           <tr><td>Sharp (per concurrent op)</td><td>~0</td><td>+50–150 MB</td></tr>
-          <tr><td>Coolify + Caddy + OS</td><td>~250 MB</td><td>~350 MB</td></tr>
+          <tr><td>Caddy + OS</td><td>~80 MB</td><td>~120 MB</td></tr>
           <tr><td><strong>Total</strong></td><td><strong>~850 MB</strong></td><td><strong>~1.5 GB</strong></td></tr>
           <tr><td><strong>Headroom on 2 GB</strong></td><td colspan="2"><strong>~500 MB</strong> (plus 2 GB swap as panic buffer)</td></tr>
         </tbody>
       </table>
 
-      <h3>Coolify pinning + manual deploy fallback</h3>
+      <h3>Deploy mechanism + manual fallback</h3>
+      <p><strong>Updated 2026-05-19 — CTO review.</strong> The pre-stand-up plan was Coolify-on-droplet for git-push deploys. After the first install we discovered Coolify GA consumed ~450 MB RAM on the 2 GB box (~22% of memory) and its defaults (port bindings, Traefik-vs-Caddy, beta-vs-GA churn) repeatedly conflicted with the locked decisions in this doc. The deploy mechanism was switched to <strong>GitHub Actions</strong> before any production traffic landed. Current sequence lives in <code>docs/CMS-DEPLOYMENT.md</code>.</p>
       <ul>
-        <li><strong>Coolify pinned to <code>v4.0.0-beta.470</code> indefinitely.</strong> Auto-update
-            disabled at the Coolify level + Renovate ignored for the Coolify image tag. When v4.0 stable
-            ships, manual upgrade scheduled within 30 days of the stable release with an explicit drill
-            against staging first (provision a throwaway droplet, install v4.0 stable, redeploy
-            <code>apps/cms</code> against it, run the restore-runbook smoke checklist) — only after the
-            staging drill passes does the production droplet upgrade. <strong>"Or current stable when v4.0
-            ships" is NOT auto-applied</strong> — that earlier wording was ambiguous; the upgrade is always
-            a deliberate human decision against a tested target. Coolify v4 is still in beta as of
-            March 2026 (~94% to stable); pinning prevents surprise regressions.</li>
-        <li>Separate BetterStack monitor on Coolify's own admin URL — if Coolify itself dies, you get paged
-            before discovering it during a deploy.</li>
-        <li>Manual SSH-deploy runbook at <code>docs/runbooks/manual-deploy.md</code> covers the case where
-            Coolify can't deploy: <code>docker pull cleanstart-cms:&lt;sha&gt; &amp;&amp; docker stop cms &amp;&amp; docker run …</code>
-            on the droplet. Image tags are git-SHAs, never <code>latest</code>.</li>
+        <li><strong>GitHub Actions deploy</strong> (<code>.github/workflows/deploy-cms.yml</code>) builds the Docker image on the GHA runner, ships it to the droplet via SSH (<code>docker save | gzip | scp</code>), then runs <code>docker compose up -d --wait</code>. Image tags are git SHAs, never <code>latest</code>. Triggers on push to <code>main</code>; manual runs via <em>workflow_dispatch</em> with a SHA input.</li>
+        <li><strong>Caddy on host</strong> terminates TLS (auto-Let's Encrypt) and reverse-proxies to the CMS container on <code>localhost:3000</code>. Config in <code>/etc/caddy/Caddyfile</code> on the droplet.</li>
+        <li><strong>Rollback = previous SHA.</strong> Either re-run the workflow with <code>workflow_dispatch</code> targeting the previous SHA, or SSH to the droplet and <code>docker tag cms:&lt;prev-sha&gt; cms:current &amp;&amp; docker compose up -d --wait</code>. ~2 min recovery.</li>
+        <li><strong>Manual SSH-deploy runbook</strong> at <code>docs/runbooks/manual-deploy.md</code> (TBD) covers the case where GHA itself is unavailable: pull a previously shipped image still in the droplet's local Docker cache, or build the image on the operator's laptop and <code>scp</code> the tarball up.</li>
+        <li><strong>BetterStack monitor on the public health endpoint</strong> (<code>https://cms.cleanstart.com/api/health</code>) — if the CMS itself dies, you get paged. No separate "Coolify-up" monitor is needed because there is no Coolify.</li>
       </ul>
 
       <h3 id="capacity-triggers">Capacity triggers — when to spend more</h3>
@@ -5578,7 +5569,7 @@ sysctl --system</code></pre>
         <tbody>
           <tr><td>Framework version</td><td>Next.js 16.2+ (Turbopack default, React Compiler stable). Skips 15.5–16.1 per Payload's official guidance.</td></tr>
           <tr><td>Repo structure</td><td>Monorepo · pnpm workspaces + Turborepo · <code>apps/web</code> (public) + <code>apps/cms</code> (Payload) + <code>packages/{types,ui,config}</code></td></tr>
-          <tr><td>Domain split</td><td><code>cleanstart.com</code> → Vercel (public) · <code>admin.cleanstart.com</code> → Droplet (Payload admin + REST API)</td></tr>
+          <tr><td>Domain split</td><td><code>cleanstart.com</code> → Vercel (public) · <code>cms.cleanstart.com</code> → Droplet (Payload admin + REST API)</td></tr>
           <tr><td>Hosting</td><td>Self-hosted Payload on DO $12 droplet (2 GB RAM / 1 vCPU + 2 GB swap, Bangalore region) with explicit tuning spec for Postgres / Sharp / Meilisearch (see §<a href="#droplet-tuning">Droplet tuning</a>)</td></tr>
           <tr><td>Public site host</td><td><strong>Vercel Pro</strong> · $20/mo per dev (<code>apps/web</code> only). Hobby is non-commercial-only per Vercel ToS — using it for cleanstart.com would be a suspension risk; see §<a href="#hosting">Hosting</a>.</td></tr>
           <tr><td>Database</td><td>Postgres 16 self-hosted on droplet, localhost-bound</td></tr>
@@ -5652,7 +5643,7 @@ sysctl --system</code></pre>
 │   │   ├── next.config.ts            Next.js 16.2
 │   │   └── package.json
 │   │
-│   └── cms/                          ▶ Droplet · admin.cleanstart.com
+│   └── cms/                          ▶ Droplet · cms.cleanstart.com
 │       ├── src/
 │       │   ├── app/
 │       │   │   ├── (payload)/admin/                     Payload admin UI
@@ -5672,7 +5663,7 @@ sysctl --system</code></pre>
 │       │       ├── lib/              leadHandlers · search · seo/structuredData · revalidate
 │       │       ├── access/           roles + rules
 │       │       └── payload.config.ts
-│       ├── Dockerfile                for Coolify
+│       ├── Dockerfile                built by GitHub Actions, run on droplet
 │       ├── next.config.ts
 │       └── package.json
 │

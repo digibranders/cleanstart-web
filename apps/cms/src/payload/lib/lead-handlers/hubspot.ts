@@ -10,7 +10,7 @@ import type { LeadHandler, LeadHandlerResult, LeadSubmission } from './types';
  *
  * Auth: HubSpot **Private App** access token from
  *   `HUBSPOT_PRIVATE_APP_TOKEN` env var. The token is set once via
- *   Coolify; the per-row admin UI carries only optional mapping +
+ *   the droplet `.env`; the per-row admin UI carries only optional mapping +
  *   default-property overrides.
  *
  * Write path: `POST /crm/v3/objects/contacts/batch/upsert` with

@@ -5,19 +5,23 @@ This runbook covers the H10 rollback procedure for reverting to Webflow after a 
 ## Prerequisites
 
 - Access to Cloudflare dashboard (DNS)
-- Access to Coolify dashboard (deployments)
+- SSH access to the production droplet (`root@<droplet-ip>`)
 - `ALLOW_RESTORE=yes` and R2 credentials available in the terminal session
 - The timestamp of the pre-migration Postgres backup (should be recorded in `docs/RESTORE-LOG.md`)
 
 ---
 
-## Step 1 — Stop the CMS deployment (5 min)
+## Step 1 — Stop the CMS container (5 min)
 
-1. Open Coolify → select the `cleanstart-cms` service.
-2. Click **Stop** (not Delete — preserve the environment and volumes).
-3. Confirm the container stops. The admin URL will return 502 — expected.
+```bash
+ssh root@<droplet-ip>
+cd /opt/cleanstart
+docker compose -f cms.compose.yml stop cms
+```
 
-> Do NOT destroy the Coolify environment. It preserves the Postgres volume for inspection.
+The admin URL will return 502 from Caddy — expected.
+
+> Do NOT `docker compose down -v` — that would remove the named volumes. Use `stop` so the container can be restarted for post-mortem.
 
 ---
 
@@ -77,7 +81,7 @@ Add an entry to `docs/RESTORE-LOG.md`:
 
 ## After rollback
 
-- Do not delete the CMS Coolify environment — retain it for post-mortem.
+- Do not delete the stopped CMS container or its volumes — retain them for post-mortem.
 - Schedule a post-mortem within 48 hours.
 - Identify what caused the rollback before scheduling a second cutover attempt.
 - The pre-migration backup snapshot in R2 should be retained until the next successful cutover.

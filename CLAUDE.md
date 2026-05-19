@@ -31,7 +31,7 @@ This directory (`cleanstart-website/`) is the monorepo root. The arch doc's §09
 ```
 cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 ├── apps/
-│   ├── cms/                         Payload 3 admin + REST API · admin.cleanstart.com · port 3000
+│   ├── cms/                         Payload 3 admin + REST API · cms.cleanstart.com · port 3000
 │   │   └── src/payload/{collections,globals,blocks,fields,access,lib,jobs,endpoints,hooks}/
 │   └── web/                         @cleanstart/web marketing site · Next.js 16 · Tailwind v4 · port 3001
 │       ├── src/{app,components,lib}/
@@ -183,6 +183,8 @@ When a CTA card overlaps the Footer's dark background (standard pattern across a
 
 ### Visual verification workflow
 
+- **Always lock Claude Preview to desktop viewport (1440×900) when running `preview_start` / `preview_resize`** — never verify `apps/web` at mobile or tablet widths unless explicitly asked.
+
 `preview_screenshot` only captures at `scrollY=0`. To bring any section into view:
 
 ```js
@@ -215,7 +217,7 @@ These are hard rules. Do not work around them — flag and stop instead.
 - **Never bypass the `LeadHandler` adapter** for lead writes. Even one-off scripts go through it. Arch doc §`#forms` makes the R2 fallback queue load-bearing for "no lead lost during outage" — bypassing it breaks that guarantee.
 - **Never hand-edit the `config` column in the `integrations` table.** Values are encrypted blobs produced by `lib/integrations/secrets.ts`. Use the admin UI or the `encryptJson` helper.
 - **Never rename a Next.js route segment post-launch** (e.g. `/webinar/[slug]` → `/webinars/[slug]`). It breaks every indexed URL. Arch doc §`#migration` last subsection is explicit.
-- **Never commit `.env*`, secrets, R2 keys, Brevo keys, Webflow tokens, or 2FA seeds.** They live in 1Password vault `cleanstart-migration` and Coolify env-vars panel.
+- **Never commit `.env*`, secrets, R2 keys, Brevo keys, Webflow tokens, or 2FA seeds.** They live in 1Password vault `cleanstart-migration`, GitHub Actions repository secrets, and `/opt/cleanstart/.env` on the production droplet (chmod 600).
 - **Never enable GraphQL on the Payload admin.** Arch doc §`#decisions`: `graphQL: { disable: true }` at launch.
 - **Never `git add -A` or `git add .`** at repo root. Stage specific paths.
 - **Never `--no-verify`** on commits. If a hook fails, fix it.
@@ -286,10 +288,10 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 
 ## Deploy rules
 
-- `apps/cms` deploys via **Coolify** on push to `main` (production). Staging deployment tracks `development`.
+- `apps/cms` deploys via **GitHub Actions** (`.github/workflows/deploy-cms.yml`) on push to `main` (production). The workflow builds the Docker image, ships it to the droplet over SSH, and runs `docker compose up -d --wait`. Caddy on the droplet handles TLS termination. Staging tracks `development` on a separate droplet at `cms-dev.cleanstart.com`.
 - `apps/web` has no production deployment yet.
 - Postgres lives on the same droplet, localhost-bound. Migrations run via Payload's migration runner, never raw SQL.
-- Cloudflare WAF sits in front of `admin.cleanstart.com`. 2FA is mandatory for every admin user.
+- Cloudflare WAF sits in front of `cms.cleanstart.com`. 2FA is mandatory for every admin user.
 - Staging is a separate droplet (or DB) per arch doc §`#staging`. Never point staging at prod data.
 - Backup-cron heartbeat is monitored as a P1 alert (arch doc §`#logging-alerting`). If a backup script is changed, verify the heartbeat fires.
 

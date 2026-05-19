@@ -175,7 +175,7 @@ report-to csp-endpoint;
 
 CMS embeds `apps/web` pages in Live Preview iframes. For routes hit while `draftMode().isEnabled`, override CSP to:
 ```
-frame-ancestors https://cms.cleanstart.com https://admin.cleanstart.com;
+frame-ancestors https://cms.cleanstart.com https://cms.cleanstart.com;
 ```
 And set `X-Frame-Options: SAMEORIGIN` (overridden from default `DENY`). All other headers unchanged. See §6.
 

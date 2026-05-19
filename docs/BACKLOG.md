@@ -46,8 +46,8 @@ Goal: empty repo → working Payload admin running locally and on the droplet, w
 | A8  | Auth + RBAC base:`users` collection with `roles: string[]`                                                                            | §`#rbac`, §`#decisions` (RBAC row) | One bootstrap admin seeded via migration                                                                               |
 | A9  | ~~Mandatory 2FA on admin login~~ **DEFERRED** to Phase I hardening — admin sits behind Cloudflare WAF + strong-password meanwhile | §`#decisions` (admin access row)      | Plugin choice still open:`payload-2fa-plugin` vs custom auth strategy with TOTP                                      |
 | A10 | Provision droplet (DO Bangalore, 2 GB / 1 vCPU + 2 GB swap)                                                                               | §`#hosting`, §`#droplet-tuning`    | Apply tuning spec verbatim                                                                                             |
-| A11 | Coolify install on droplet, repo connected, auto-deploy on `main` push                                                                  | §`#hosting`                           | Pinned Coolify version                                                                                                 |
-| A12 | Caddy reverse proxy in front of admin (`admin.cleanstart.com`) with auto-SSL                                                            | §`#hosting`                           | `infra/caddy/Caddyfile`                                                                                              |
+| A11 | GitHub Actions deploy workflow (`.github/workflows/deploy-cms.yml`): build image, ship via SSH, `docker compose up -d --wait` on push to `main` | §`#hosting`                           | Repo secrets: `DROPLET_IP`, `DROPLET_SSH_KEY`, `CMS_ENV_FILE`                                                          |
+| A12 | Caddy reverse proxy in front of admin (`cms.cleanstart.com`) with auto-SSL                                                            | §`#hosting`                           | `/etc/caddy/Caddyfile` on droplet (host install, not in Docker)                                                       |
 | A13 | Cloudflare in front of admin, WAF rules enabled                                                                                           | §`#decisions` (admin access row)      | Bot fight mode + rate limit on `/api/users/login`                                                                    |
 | A14 | GitHub Actions: lint + typecheck + build on PR                                                                                            | §`#stack`                             | One workflow file; matrix scoped to `apps/cms` for now                                                               |
 | A15 | Sentry wired (frontend + Payload server)                                                                                                  | §`#stack`                             | DSN from env; PII redaction config                                                                                     |
@@ -56,8 +56,8 @@ Goal: empty repo → working Payload admin running locally and on the droplet, w
 
 - `pnpm install && pnpm dev` brings up admin locally at `http://localhost:3000/admin`
 - Bootstrap admin can log in with 2FA enabled
-- `https://admin.cleanstart.com/admin` reachable, served via Cloudflare → Caddy → Payload, with valid SSL
-- Push to `main` triggers Coolify deploy and the new container takes over without admin downtime > 60s
+- `https://cms.cleanstart.com/admin` reachable, served via Cloudflare → Caddy → Payload, with valid SSL
+- Push to `main` triggers the GitHub Actions deploy workflow; `docker compose up -d --wait` swaps the container without admin downtime > 60s
 - CI green on a no-op PR; failing lint/typecheck/build fails CI as designed
 
 ---
@@ -287,7 +287,7 @@ Goal: prod-quality posture; ready for cutover-day runbook.
 **Phase I exit criteria:**
 
 - Restore drill: yesterday's backup restored to a fresh droplet within documented RTO
-- Security-headers scan (e.g. securityheaders.com) returns A+ for `admin.cleanstart.com`
+- Security-headers scan (e.g. securityheaders.com) returns A+ for `cms.cleanstart.com`
 - Admin Lighthouse score above target on 5 representative routes
 - Smoke test suite green on staging
 
@@ -339,7 +339,7 @@ OAuth-based, deeper config surface; Zoho is the active CRM and the canonical ada
 - **HubSpot / Salesforce / Pipedrive** — same shape as Zoho, different object models. Future / on-demand only — build when sales tooling actually changes.
 - **Google Sheets** — append-row sink via service-account JSON. Useful as an audit trail alongside Zoho or as a fallback during a Zoho outage.
 
-Settle on `/api/oauth/callback/[provider]` route shape on `admin.cleanstart.com` before the first row lands.
+Settle on `/api/oauth/callback/[provider]` route shape on `cms.cleanstart.com` before the first row lands.
 
 ### Tier 3 — server-side analytics / SEO
 
@@ -397,7 +397,7 @@ Trigger to start: when a real editor surfaces a need (e.g. "I want lead pings in
 
 ## Phase G — Sentry project setup note
 
-When wiring Phase G observability, create a fresh Sentry project at <https://fynix-digital.sentry.io/projects/new/> for the Next.js + Payload runtime. Suggested project name: `cleanstart-cms`. DSN goes into `SENTRY_DSN` in `apps/cms/.env` for local; production DSN lives in the Coolify env-vars panel, never committed.
+When wiring Phase G observability, create a fresh Sentry project at <https://fynix-digital.sentry.io/projects/new/> for the Next.js + Payload runtime. Suggested project name: `cleanstart-cms`. DSN goes into `SENTRY_DSN` in `apps/cms/.env` for local; production DSN lives in `/opt/cleanstart/.env` on the droplet (chmod 600), never committed.
 
 ---
 
