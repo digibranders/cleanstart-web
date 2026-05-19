@@ -1,0 +1,88 @@
+import { Suspense } from "react";
+import { SearchBar } from "@/components/sections/_shared/SearchBar";
+
+const HERO_GRADIENT =
+  "linear-gradient(180deg, #151021 0%, #10123e 38%, #131e8f 67%, #471ec0 80%, #471fc3 100%)";
+
+export function KnowledgeHubArticleHero(): React.ReactElement {
+  return (
+    <section
+      className="relative w-full overflow-hidden"
+      style={{ minHeight: "418px", background: HERO_GRADIENT }}
+      aria-labelledby="knowledge-hub-hero-title"
+    >
+      {/* Decorative cube — top-left, mirrored */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/blogs/hero-orb-top.png"
+        alt=""
+        className="pointer-events-none select-none absolute hidden xl:block"
+        style={{
+          width: "265px",
+          height: "265px",
+          left: "-60px",
+          top: "20px",
+          mixBlendMode: "lighten",
+          opacity: 0.4,
+          transform: "scaleX(-1)",
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+
+      {/* Decorative cube — top-right */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/blogs/hero-orb-top.png"
+        alt=""
+        className="pointer-events-none select-none absolute top-5 right-0 hidden xl:block"
+        style={{
+          width: "265px",
+          height: "265px",
+          mixBlendMode: "lighten",
+          opacity: 0.4,
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+
+      <div className="relative mx-auto max-w-[1276px] px-6">
+        <div
+          className="flex flex-col items-center mx-auto"
+          style={{ paddingTop: "120px", paddingBottom: "80px", maxWidth: "864px" }}
+        >
+          <h1
+            id="knowledge-hub-hero-title"
+            className="font-display font-semibold text-white text-center"
+            style={{
+              fontSize: "clamp(3rem, 5.6vw, 5rem)",
+              lineHeight: 1.0,
+              letterSpacing: "-0.05em",
+            }}
+          >
+            Knowledge <span style={{ color: "#C446EF" }}>Hub</span>
+          </h1>
+
+          <div className="mt-10 w-full flex justify-center">
+            <Suspense
+              fallback={
+                <div
+                  className="flex items-center"
+                  style={{ height: "42px", width: "674px" }}
+                />
+              }
+            >
+              <SearchBar
+                initialQuery=""
+                placeholder="Search blogs..."
+                ariaLabel="Search knowledge hub"
+              />
+            </Suspense>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

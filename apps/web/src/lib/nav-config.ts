@@ -124,7 +124,7 @@ export const NAV_TREE: NavItem[] = [
           { label: "Blogs", href: "/blogs", built: true },
           { label: "Resource Center", href: "/resource-center", built: true },
           { label: "Newsroom", href: "/news", built: true },
-          { label: "Knowledge Hub", href: "/knowledge-hub" },
+          { label: "Knowledge Hub", href: "/knowledge-hub/vex-documents", built: true },
         ],
       },
       {
