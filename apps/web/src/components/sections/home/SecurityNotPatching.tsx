@@ -155,7 +155,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
 
   return (
     <div
-      className="relative"
+      className="relative mx-auto w-full lg:max-w-[clamp(440px,40vw,560px)]"
       style={{
         borderRadius: 40,
         background: "#2CC1EB", // outer cyan border (visible 10px around inner)
@@ -280,7 +280,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
         </div>
 
         {/* White content area — Figma inner body rect 108:7965/108:7903 is 441px tall. */}
-        <div className="relative min-h-[clamp(300px,24vw,380px)] overflow-hidden bg-white">
+        <div className="relative min-h-[clamp(300px,24vw,380px)] overflow-hidden bg-white py-[clamp(20px,2.5vw,36px)]">
           {/* Decorative blobs (Figma Ellipse 46681 #DF9BFF + 46682 #2CC1EB) */}
           <div
             aria-hidden
