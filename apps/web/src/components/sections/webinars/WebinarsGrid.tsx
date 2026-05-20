@@ -87,8 +87,8 @@ export function WebinarsGrid({
           <div className="flex-1 min-w-0">
             {items.length === 0 ? (
               <p
-                className="font-sans text-center py-20"
-                style={{ color: "rgba(17,17,17,0.54)", fontSize: "1.125rem" }}
+                className="font-sans text-body-lg text-center py-20"
+                style={{ color: "rgba(17,17,17,0.54)" }}
               >
                 No webinars match these filters yet.
               </p>

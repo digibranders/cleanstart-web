@@ -64,8 +64,8 @@ export function NewsDetailHero({
               decoding="async"
             />
             <span
-              className="font-medium leading-[1.3] text-white whitespace-nowrap"
-              style={{ fontSize: "20px", letterSpacing: "-0.01em" }}
+              className="text-body-lg font-medium leading-[1.3] text-white whitespace-nowrap"
+              style={{ letterSpacing: "-0.01em" }}
             >
               {pressTypeLabel(pressType)}
             </span>
@@ -75,8 +75,8 @@ export function NewsDetailHero({
 
           <div className="flex items-center gap-2">
             <span
-              className="font-medium leading-[1.3] text-white whitespace-nowrap"
-              style={{ fontSize: "20px", letterSpacing: "-0.01em" }}
+              className="text-body-lg font-medium leading-[1.3] text-white whitespace-nowrap"
+              style={{ letterSpacing: "-0.01em" }}
             >
               Share
             </span>

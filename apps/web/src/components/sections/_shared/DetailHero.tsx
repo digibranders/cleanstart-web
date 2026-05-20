@@ -110,7 +110,7 @@ export function DetailHero({
 
 function Breadcrumb({ items }: { items: DetailHeroCrumb[] }): React.ReactElement {
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center gap-0 pt-[58px]">
+    <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-y-1 gap-0 pt-[clamp(40px,6vw,58px)]">
       <Link
         href="/"
         className="flex items-center justify-center w-11 h-11 rounded-full"

@@ -126,7 +126,7 @@ export function FipsCTA(): React.ReactElement {
         <p
           className="font-display"
           style={{
-            fontSize: "14px",
+            fontSize: "clamp(13px, 1vw, 15px)",
             fontWeight: 400,
             letterSpacing: "-0.03em",
             lineHeight: 1.4,

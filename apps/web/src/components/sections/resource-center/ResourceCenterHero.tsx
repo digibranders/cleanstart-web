@@ -14,7 +14,7 @@ export function ResourceCenterHero({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ minHeight: "521px", background: HERO_GRADIENT }}
+      style={{ minHeight: "clamp(420px, 37vw, 521px)", background: HERO_GRADIENT }}
       aria-labelledby="rc-hero-title"
     >
       {/* Background dot grid */}
@@ -125,7 +125,7 @@ export function ResourceCenterHero({
             fallback={
               <div
                 className="flex items-center"
-                style={{ height: "42px", width: "674px" }}
+                style={{ height: "42px", width: "100%", maxWidth: "674px" }}
               />
             }
           >

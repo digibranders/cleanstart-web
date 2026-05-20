@@ -21,7 +21,7 @@ export function FipsHero(): React.ReactElement {
     <section
       data-section="FipsHero"
       className="relative overflow-hidden bg-cs-hero bg-cs-grid"
-      style={{ minHeight: "741px" }}
+      style={{ minHeight: "clamp(560px, 51vw, 741px)" }}
     >
       {/*
        * Bottom fade — Figma renders the last ~14% of the hero (~104px @ 741h)
@@ -50,7 +50,7 @@ export function FipsHero(): React.ReactElement {
           maxWidth: "1276px",
           paddingLeft: "24px",
           paddingRight: "24px",
-          paddingTop: "186px",
+          paddingTop: "clamp(110px, 13vw, 186px)",
           paddingBottom: "0",
           minHeight: "741px",
         }}

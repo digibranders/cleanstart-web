@@ -4,7 +4,7 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
       data-section="CleanStartImagesEnvironment"
       className="relative overflow-hidden"
       style={{
-        minHeight: "594px",
+        minHeight: "clamp(440px, 41vw, 594px)",
         background:
           "linear-gradient(180deg, #0B0820 0%, #131448 40%, #1F1D7F 75%, #2A2BA8 100%)",
       }}
@@ -24,7 +24,7 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
 
       <div
         className="relative mx-auto max-w-[1361px] px-6 flex flex-col items-center"
-        style={{ paddingTop: "100px", paddingBottom: "120px" }}
+        style={{ paddingTop: "var(--spacing-section-md)", paddingBottom: "var(--spacing-section-md)" }}
       >
         <h2
           className="text-white text-center"
