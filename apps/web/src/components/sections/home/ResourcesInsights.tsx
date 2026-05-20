@@ -309,6 +309,7 @@ function ArticleCard({ article }: { article: Article }) {
         />
       </div>
       {/* Figma: title Manrope Bold 21px, color #000 */}
+      {/* eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained card title. See RESPONSIVE-AUDIT.md §14.3. */}
       <h3 className="font-display text-[1.3125rem] font-bold leading-[1.3] tracking-[-0.02em] text-black transition-colors duration-200 group-hover:text-[#1B1F4F]">
         {article.title}
       </h3>

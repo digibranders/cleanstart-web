@@ -147,6 +147,7 @@ export function ResourceDetailLeadCapture({
               >
                 {/* Legal teaser */}
                 <p
+                  // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
                   className="text-sm lg:text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white text-center lg:text-left w-full lg:w-[493px]"
                   style={{ opacity: 0.8 }}
                 >
@@ -169,6 +170,7 @@ export function ResourceDetailLeadCapture({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter Your Email"
+                    // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
                     className="text-base lg:text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] bg-white w-full sm:w-[352px] h-[41px]"
                     style={{
                       borderRadius: "8px",

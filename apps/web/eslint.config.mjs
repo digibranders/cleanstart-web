@@ -5,8 +5,11 @@
  * Scope: ONLY the seven rules that biome cannot express. General TS/React/
  * formatting lint stays on biome (see apps/web/package.json `lint`).
  *
- * All rules are `warn` in Sprint 1. They get flipped to `error` in
- * Sprint 5 Day 5 (the lockdown phase of ~/.claude/plans/lovely-honking-milner.md).
+ * Rules are flipped to `error` (lockdown landed 2026-05-20 — see
+ * apps/web/docs/RESPONSIVE-AUDIT.md §14.4). Legitimate Figma-anchored
+ * exceptions inside constrained components (buttons, pills, badges,
+ * card internals) are suppressed inline with
+ * `eslint-disable-next-line no-restricted-syntax -- v3 exception: <reason>`.
  *
  * Escape hatches:
  *   - `data-cta-utility`  on a Button / link-as-button: opts out of the 44x44
@@ -84,7 +87,7 @@ export default [
     },
     rules: {
       "no-restricted-syntax": [
-        "warn",
+        "error",
         // 1. text-[Xrem] in className strings. Caught at the literal level.
         {
           selector: "Literal[value=/(?:^|[ ])(?:[a-z]+:)*text-\\[[\\d.]+rem\\]/]",
@@ -140,7 +143,7 @@ export default [
     },
     rules: {
       "no-restricted-syntax": [
-        "warn",
+        "error",
         {
           selector: "Literal[value=/(?:^|[ ])(?:[a-z]+:)*h-\\[\\d+(?:\\.\\d+)?px\\]/]",
           message: MSG_CARD_HEIGHT,
@@ -165,7 +168,7 @@ export default [
     },
     rules: {
       "no-restricted-syntax": [
-        "warn",
+        "error",
         // Matches className literals that contain `w-[Xpx]` AND do not contain
         // `max-w` anywhere in the same string.
         {

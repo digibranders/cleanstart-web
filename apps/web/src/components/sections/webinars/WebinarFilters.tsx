@@ -112,16 +112,16 @@ export function WebinarFilters({
           <span className="flex items-center gap-2">
             <FilterIcon />
             <span
-              className="font-display font-semibold"
-              style={{ fontSize: "16px", color: "#0F172A", letterSpacing: "-0.01em" }}
+              className="font-display font-semibold text-body-md"
+              style={{ color: "#0F172A", letterSpacing: "-0.01em" }}
             >
               Filter
             </span>
             {activeCount > 0 && (
               <span
                 aria-label={`${activeCount} active filter${activeCount === 1 ? "" : "s"}`}
-                className="flex items-center justify-center rounded-full bg-[#5B33F3] text-white"
-                style={{ width: "20px", height: "20px", fontSize: "12px", fontWeight: 600 }}
+                className="flex items-center justify-center rounded-full bg-[#5B33F3] text-white text-body-xs"
+                style={{ width: "20px", height: "20px", fontWeight: 600 }}
               >
                 {activeCount}
               </span>
@@ -169,8 +169,8 @@ export function WebinarFilters({
         <div className="flex items-center gap-2" style={{ marginBottom: "24px" }}>
           <FilterIcon />
           <span
-            className="font-display font-semibold"
-            style={{ fontSize: "18px", color: "#0F172A", letterSpacing: "-0.01em" }}
+            className="font-display font-semibold text-body-lg"
+            style={{ color: "#0F172A", letterSpacing: "-0.01em" }}
           >
             Filter BY
           </span>
@@ -203,9 +203,8 @@ function FilterSectionLabel({
 }): React.ReactElement {
   return (
     <p
-      className="font-sans uppercase"
+      className="font-sans uppercase text-body-xs"
       style={{
-        fontSize: "12px",
         letterSpacing: "0.08em",
         color: "#1A1A1A",
         marginBottom: "12px",
@@ -258,8 +257,8 @@ function FilterRow({
           {icon}
         </span>
         <span
-          className="font-sans"
-          style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1 }}
+          className="font-sans text-body-sm"
+          style={{ fontWeight: 500, lineHeight: 1 }}
         >
           {label}
         </span>

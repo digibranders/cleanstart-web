@@ -186,6 +186,7 @@ export function CleanSightComparison(): React.ReactElement {
               className="relative z-10 text-white text-center"
               style={{
                 fontFamily: "var(--font-display)",
+                // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
                 fontSize: "32px",
                 fontWeight: 700,
                 letterSpacing: "-1.6px",
@@ -229,6 +230,7 @@ export function CleanSightComparison(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
+                    // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
                     fontSize: "22px",
                     fontWeight: 600,
                     letterSpacing: "-1.1px",
@@ -319,6 +321,7 @@ export function CleanSightComparison(): React.ReactElement {
               className="relative z-10 text-white text-center"
               style={{
                 fontFamily: "var(--font-display)",
+                // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
                 fontSize: "32px",
                 fontWeight: 700,
                 letterSpacing: "-1.6px",
@@ -362,6 +365,7 @@ export function CleanSightComparison(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
+                    // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
                     fontSize: "22px",
                     fontWeight: 700,
                     letterSpacing: "-1.1px",

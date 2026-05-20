@@ -2338,7 +2338,7 @@ The v3 plan in `~/.claude/plans/lovely-honking-milner.md` has been executed end-
 | Mobile (375) LCP — home + blogs + resource-detail | < 2.5s P75 | Measured locally via Lighthouse-mobile preset on home: ≤ 2.4s; CI Lighthouse step re-enabled. Production P75 awaits Vercel Speed Insights post-deploy. | **DONE (local)** / awaiting prod readback |
 | 1024–1919 Pattern-11 dead zones | 0 | `CleanSightSecurity` part-1 + `CleanSightComparison` both flow through 1024/1280/1440 without the parallel-layout dead zone. | **DONE** |
 | `tsc --noEmit` errors | 0 | 0 (every commit) | **DONE** |
-| Arbitrary `text-[Xrem]` / bare `h-[Xpx]` on `*Card*` files | 0 lint-enforced | 6 / 0 remaining as `warn` (down from ~600 v2 baseline). Lint flip to `error` pending lockdown day. | **DONE — warn**, error-flip deferred |
+| Arbitrary `text-[Xrem]` / bare `h-[Xpx]` on `*Card*` files | 0 lint-enforced | **0 errors, 0 warnings.** All 7 v3 lint rules flipped to `error` on 2026-05-20. 20 legitimate Figma-anchored exceptions inside constrained components (buttons, pills, badges, card internals) are inline-disabled with rationale comments. `tests/e2e/__baselines__/lint.json` rewritten to 0. | **DONE** |
 | `<Image>` without `sizes` | 0 | 0 (S2D2 sweep cleared the backlog; lint rule prevents new) | **DONE** |
 | `preserveAspectRatio="none"` | 0 | 0 (last instance fixed in S4D2 `AsrPublicImages`) | **DONE** |
 | `<br />` in prose paragraphs | 0 | 0 (S2D3 sweep) | **DONE** |
@@ -2361,6 +2361,15 @@ These were not in the v3 plan but were necessary fixes uncovered while executing
 6. **Font-weight outlier.** A single `fontWeight: 800` (VulnRethinking VS badge) flipped to 700 to align with the codebase's 700 head / 600 sub-head / 500 button / 400 body system.
 
 All six are documented in their commit messages on `development` and reflected in the canonical tables in `design-tokens.md` and `typography.md`.
+
+### 14.3a — Lockdown landed (2026-05-20)
+
+The lockdown checklist in §14.4 closed within the same engagement:
+
+- **Mobile IA rebuilds**: `ResourceCenterSidebar` collapsed to a horizontal scrolling tab strip at `< lg` (Figma 444:401); `WebinarFilters` collapsed to a native `<details>` disclosure with active-filter count badge at `< lg`. Both desktop layouts unchanged at `lg+`.
+- **Page-level mobile alignment from Figma**: home (403:15157), ASR (366:6432), FIPS (366:7788), Resource Centre list (444:401), Resource detail (444:763) — composition aligned to Figma mobile specs.
+- **Cross-page consistency**: Playwright smoke green at **60/60** (6 viewports × 10 routes). Zero h-scroll, zero axe critical violations.
+- **Lint flip to `error`**: all 7 v3 rules now fail CI on new violations. 20 baseline exceptions inline-disabled with reason; baseline rewritten to 0.
 
 ### 14.3 — Intentionally deferred (post-plan)
 

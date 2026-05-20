@@ -297,6 +297,7 @@ function BloatedCard({
             className="text-[#111111]"
             style={{
               fontFamily: "var(--font-display)",
+              // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
               fontSize: "18px",
               fontWeight: 600,
               letterSpacing: "-0.04em",
@@ -309,6 +310,7 @@ function BloatedCard({
             className="text-[#444444]"
             style={{
               fontFamily: "var(--font-display)",
+              // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
               fontSize: "13px",
               fontWeight: 400,
               letterSpacing: "-0.02em",

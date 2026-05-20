@@ -150,6 +150,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
       </div>
 
       {/* Text frame — y=184, w=169, gap=12 between title and description */}
+      {/* eslint-disable-next-line no-restricted-syntax -- v3 exception: 169px text-frame anchored to absolute Figma position inside 374px card (sm+ desktop variant). See RESPONSIVE-AUDIT.md §14.3. */}
       <div className="absolute left-1/2 top-[184px] flex w-[169px] -translate-x-1/2 flex-col items-center gap-3 text-center">
         <h3 className="font-display text-[2.0625rem] font-medium leading-none tracking-[-0.05em] text-white">
           {renderTitle(title)}
