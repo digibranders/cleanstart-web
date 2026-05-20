@@ -123,8 +123,8 @@ export function LatestBlogs({
             fontSize: "clamp(2rem,3.61vw,3.25rem)",
             lineHeight: "normal",
             color: "#111",
-            paddingTop: "60px",
-            paddingBottom: "40px",
+            paddingTop: "var(--spacing-section-sm)",
+            paddingBottom: "clamp(28px, 3.5vw, 56px)",
           }}
         >
           Latest Blogs

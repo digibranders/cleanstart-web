@@ -14,7 +14,7 @@ export function AuthorBio({ author }: AuthorBioProps): React.ReactElement | null
 
   return (
     <section className="relative w-full bg-white">
-      <div className="relative mx-auto max-w-[1120px] px-6 pt-16 pb-12">
+      <div className="relative mx-auto max-w-[1120px] px-6 pt-section-md pb-section-sm">
         {hasTopics && (
           <div className="flex flex-col gap-3 pb-10">
             <h2

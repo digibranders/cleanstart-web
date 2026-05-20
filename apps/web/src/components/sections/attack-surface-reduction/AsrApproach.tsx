@@ -45,7 +45,7 @@ export function AsrApproach(): React.ReactElement {
       className="relative overflow-hidden"
     >
       {/* Heading — centered, "Approach" gradient */}
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-16 md:pt-[88px] text-center">
+      <div className="relative mx-auto max-w-[1276px] px-6 pt-section-md text-center">
         <h2
           className="text-[#111111] inline-block"
           style={{
@@ -72,7 +72,7 @@ export function AsrApproach(): React.ReactElement {
       </div>
 
       {/* Desktop 2×2 grid with cross dividers */}
-      <div className="hidden md:block relative mx-auto max-w-[1276px] px-6 pb-16 md:pb-[88px]">
+      <div className="hidden md:block relative mx-auto max-w-[1276px] px-6 pb-section-md">
         <div className="relative">
           {/* Horizontal hairline */}
           <div

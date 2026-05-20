@@ -83,10 +83,7 @@ export function CleanSightSecurity(): React.ReactElement {
       />
 
       {/* ════ PART 1: Feature Cards + Shield ════ */}
-      <div
-        className="relative mx-auto max-w-[1276px] px-4 sm:px-6"
-        style={{ paddingTop: "120px" }}
-      >
+      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6 pt-section-md">
         {/* Heading — 744px wide, centered */}
         <h2
           className="text-white text-center mx-auto"

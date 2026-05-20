@@ -41,7 +41,7 @@ export function WebinarsGrid({
       className="relative"
       style={{
         background: "#F6F6F6",
-        paddingTop: "72px",
+        paddingTop: "var(--spacing-section-md)",
         paddingBottom: "250px",
         overflowX: "clip",
       }}

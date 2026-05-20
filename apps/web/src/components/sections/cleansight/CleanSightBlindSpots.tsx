@@ -94,7 +94,7 @@ export function CleanSightBlindSpots(): React.ReactElement {
       {/* Heading — top:80px per Figma, centered over 686px width */}
       <div
         className="relative text-center mx-auto"
-        style={{ paddingTop: "80px", maxWidth: "686px", paddingLeft: "16px", paddingRight: "16px" }}
+        style={{ paddingTop: "var(--spacing-section-md)", maxWidth: "686px", paddingLeft: "16px", paddingRight: "16px" }}
       >
         <h2
           className="text-white"

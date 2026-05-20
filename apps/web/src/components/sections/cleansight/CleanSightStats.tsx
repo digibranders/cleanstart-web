@@ -28,7 +28,7 @@ export function CleanSightStats(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6 py-16 md:py-20 xl:py-[100px]">
+      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6 py-section-md">
         {/* Heading */}
         <div className="text-center mb-12 xl:mb-[80px]">
           <h2

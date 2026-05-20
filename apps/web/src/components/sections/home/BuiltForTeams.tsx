@@ -136,7 +136,7 @@ export function BuiltForTeams() {
           "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
     >
-      <div className="relative z-[2] mx-auto w-full max-w-[1276px] px-6 py-20 sm:py-24 lg:py-[120px]">
+      <div className="relative z-[2] mx-auto w-full max-w-[1276px] px-6 py-section-md">
         <header className="mx-auto max-w-[760px] text-center">
           <h2
             id="testimonials-title"

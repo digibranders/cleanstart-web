@@ -61,7 +61,7 @@ export function AsrPublicImages(): React.ReactElement {
       />
 
       {/* Heading */}
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-16 md:pt-[88px]">
+      <div className="relative mx-auto max-w-[1276px] px-6 pt-section-md">
         <h2
           className="text-center text-[#111111]"
           style={{
@@ -88,7 +88,7 @@ export function AsrPublicImages(): React.ReactElement {
       </div>
 
       {/* Desktop diagram: container center, 4 cards at corners, dashed lines */}
-      <div className="hidden md:block relative mx-auto max-w-[1260px] px-6 pb-16 md:pb-[88px]">
+      <div className="hidden md:block relative mx-auto max-w-[1260px] px-6 pb-section-md">
         <div className="relative" style={{ aspectRatio: "1260 / 540" }}>
           {/* Soft red radial glow under the container */}
           <div

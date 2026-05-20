@@ -70,7 +70,7 @@ export function CleanSightUnified(): React.ReactElement {
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6 py-16 md:py-20 xl:py-[120px]">
+      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6 py-section-md">
         {/* Heading row */}
         <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-8 xl:gap-[60px]">
           <h2
