@@ -2,7 +2,8 @@ import { decrypt, isEncrypted } from './secrets';
 
 /**
  * "Authenticated client" resolver. Credentials live in env vars (set
- * once per environment via the droplet `.env` + 1Password); the per-row admin UI
+ * once per environment via the droplet `.env`, with a backup copy in
+ * the operator secrets store); the per-row admin UI
  * is just the non-secret destination details. This module merges env
  * + row into one "effective config" object per kind so handlers don't
  * have to know about the auth path.

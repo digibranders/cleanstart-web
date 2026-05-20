@@ -217,7 +217,7 @@ These are hard rules. Do not work around them — flag and stop instead.
 - **Never bypass the `LeadHandler` adapter** for lead writes. Even one-off scripts go through it. Arch doc §`#forms` makes the R2 fallback queue load-bearing for "no lead lost during outage" — bypassing it breaks that guarantee.
 - **Never hand-edit the `config` column in the `integrations` table.** Values are encrypted blobs produced by `lib/integrations/secrets.ts`. Use the admin UI or the `encryptJson` helper.
 - **Never rename a Next.js route segment post-launch** (e.g. `/webinar/[slug]` → `/webinars/[slug]`). It breaks every indexed URL. Arch doc §`#migration` last subsection is explicit.
-- **Never commit `.env*`, secrets, R2 keys, Brevo keys, Webflow tokens, or 2FA seeds.** They live in 1Password vault `cleanstart-migration`, GitHub Actions repository secrets, and `/opt/cleanstart/.env` on the production droplet (chmod 600).
+- **Never commit `.env*`, secrets, R2 keys, Brevo keys, Webflow tokens, or 2FA seeds.** They live in the operator's secrets store (1Password / Bitwarden / macOS Keychain — whichever the team uses), GitHub Actions repository secrets, and `/opt/cleanstart/.env` on the production droplet (chmod 600).
 - **Never enable GraphQL on the Payload admin.** Arch doc §`#decisions`: `graphQL: { disable: true }` at launch.
 - **Never `git add -A` or `git add .`** at repo root. Stage specific paths.
 - **Never `--no-verify`** on commits. If a hook fails, fix it.

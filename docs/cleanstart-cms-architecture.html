@@ -5338,7 +5338,7 @@ sysctl --system</code></pre>
         new work — not "verify the existing setup."
       </p>
       <ol class="numbered">
-        <li><strong>Mint Webflow CMS API v2 token</strong> under Settings → Apps &amp; Integrations → API access. ETL scripts in Phase 2 require this. Token stored in 1Password vault <code>cleanstart-migration</code>; never committed. <em>(Verified empty in Webflow today: "No API tokens generated.")</em></li>
+        <li><strong>Mint Webflow CMS API v2 token</strong> under Settings → Apps &amp; Integrations → API access. ETL scripts in Phase 2 require this. Token stored in the operator's secrets store (1Password / Bitwarden / Keychain); never committed. <em>(Verified empty in Webflow today: "No API tokens generated.")</em></li>
         <li><strong>Verify cleanstart.com in Google Search Console</strong> as a fresh property (DNS-TXT verification recommended over meta-tag — survives layout/component refactors). The current Webflow workspace has <strong>no GSC verification</strong> (verified empty in Settings → SEO); there is nothing to inherit. Verifying now ensures the property is indexed and crawl-stat baseline is captured well before cutover.</li>
         <li><strong>Add cleanstart.com to Bing Webmaster Tools</strong> + generate IndexNow key. Same rationale as #2. Powers the IndexNow ping cron (§<a href="#cron-jobs">Cron jobs</a>).</li>
         <li><strong>Create GTM container</strong> + GA4 property; configure GTM's GA4 Configuration tag firing on All Pages (per §<a href="#marketing-tags">Marketing &amp; analytics tag strategy</a>). <em>(Verified empty in Webflow today: Google Tag IDs blank.)</em></li>

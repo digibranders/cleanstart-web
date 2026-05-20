@@ -53,13 +53,13 @@ Every row here is a decision we will not relitigate during the deploy. Each link
 | 22  | Backup retention          | 7 daily, 4 weekly, 3 monthly (lifecycle rules on R2; **not yet configured** — backlog B4)                                   | arch doc §`#restore-runbook`                            |
 | 23  | Backup heartbeat          | BetterStack heartbeat URL, **alert on missing ping** (not on success)                                                       | arch doc §`#restore-runbook`                            |
 | 24  | RTO / RPO                 | RTO 30 min, RPO 24 h                                                                                                        | arch doc §`#restore-runbook`                            |
-| 25  | 2FA                       | Mandatory for every admin user; recovery seeds in `cleanstart-migration` 1Password vault                                    | `CLAUDE.md`                                             |
+| 25  | 2FA                       | Mandatory for every admin user; recovery seeds in the operator's secrets store (1Password / Bitwarden / Keychain)           | `CLAUDE.md`                                             |
 | 26  | Branch → env mapping      | `main` → prod (`cms.cleanstart.com`, this droplet) · `development` → staging (`cms-dev.cleanstart.com`, separate machine)   | `CLAUDE.md`, arch doc §`#staging`, `.github/workflows/web.yml` |
 | 27  | Deploy mechanism          | **Pull-based via GitHub Actions.** `.github/workflows/deploy-cms.yml` builds the image on the GHA runner, ships via SSH (`docker save \| gzip \| scp`), and runs `docker compose up -d --wait`. Image tags are git SHAs; never `:latest`. No GHA → server SSH happens outside this workflow. | 2026-05-19 round 3 review |
 | 28  | Image storage             | **Local Docker cache on the droplet.** No external registry. The deploy workflow retains the last 5 SHAs for fast rollback (`docker tag cms:<prev-sha> cms:current`). Locks single-host architecture. | 2026-05-19 round 3 review |
 | 29  | Droplet access            | **SSH key auth only** (`mac-mini-gaurav-jadhav` ED25519 key). UFW allows 22/80/443 only. GitHub Actions uses a dedicated deploy key (`gha-deploy`, separate from operator keys). | 2026-05-19 round 3 review |
 | 30  | Host metrics              | **DigitalOcean `do-agent`** (ships pre-installed) is primary for RAM/CPU/swap/disk. BetterStack adds only the HTTP probe + backup heartbeat. | 2026-05-19 round 2 review                               |
-| 31  | App-config backup         | **App DB only** (`infra/scripts/backup.sh` → R2). Caddyfile, compose files, and `.env` are reproducible from this doc + 1Password. No platform UI config exists to back up. | 2026-05-19 round 3 review                               |
+| 31  | App-config backup         | **App DB only** (`infra/scripts/backup.sh` → R2). Caddyfile, compose files, and `.env` are reproducible from this doc + the operator's secrets store. No platform UI config exists to back up. | 2026-05-19 round 3 review                               |
 | 32  | Secret rotation           | Manual, on incident only. No calendar. Known list lives at §6 of this doc.                                                  | 2026-05-19 round 2 review                               |
 | 33  | DNS TTL during failover   | **Effective 0s.** Cloudflare proxied = TTL belongs to CF's anycast, not DNS. Rollback DNS changes propagate within seconds. | 2026-05-19 round 2 review                               |
 
@@ -216,7 +216,7 @@ docker stats --no-stream --format 'table {{.Name}}\t{{.MemUsage}}'   # per-conta
 
 ## 3. Prerequisites — gather before starting
 
-Check each off before touching the droplet. Most live in 1Password vault `cleanstart-migration`.
+Check each off before touching the droplet. Most live in the operator's **secrets store** — pick one and stick with it (1Password, Bitwarden, macOS Keychain, etc.). The doc treats "secrets store" as the abstract location; the actual product is operator choice. Anything called out as `<from-secrets>` below is something you'll paste from that store.
 
 ### Accounts + access
 
@@ -245,7 +245,7 @@ Check each off before touching the droplet. Most live in 1Password vault `cleans
 - [ ] Google service-account JSON (GA4 + GSC)
 - [ ] Microsoft Clarity API token
 
-### Generated secrets in 1Password
+### Generated secrets in the operator's secrets store
 
 - [ ] `POSTGRES_PASSWORD`
 - [ ] `PAYLOAD_SECRET`
@@ -328,7 +328,7 @@ The droplet needs (a) the compose file that runs Postgres + Meilisearch + the (y
 | #   | Step                                                                                                                              | Done when             |
 | --- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
 | 5.1 | `mkdir -p /opt/cleanstart && cd /opt/cleanstart`                                                                                  | dir exists            |
-| 5.2 | Generate secrets: `openssl rand -base64 32` for each of `POSTGRES_PASSWORD`, `MEILISEARCH_API_KEY`, `PAYLOAD_SECRET`, `LIVE_PREVIEW_SECRET`, `PREVIEW_JWT_SECRET`, `WEB_REVALIDATE_SECRET` | all saved to 1Password |
+| 5.2 | Generate secrets: `openssl rand -base64 32` for each of `POSTGRES_PASSWORD`, `MEILISEARCH_API_KEY`, `PAYLOAD_SECRET`, `LIVE_PREVIEW_SECRET`, `PREVIEW_JWT_SECRET`, `WEB_REVALIDATE_SECRET` | all saved to operator secrets store |
 | 5.3 | Write `/opt/cleanstart/.env` from the template at §6 below (chmod 600). Long-term: this file is overwritten by GHA on every deploy from the `CMS_ENV_FILE` repo secret. | file exists, mode 600 |
 | 5.4 | Write `/opt/cleanstart/compose.yml` from the template at §6.1 below                                                               | file present          |
 | 5.5 | `mkdir -p /var/lib/cleanstart/lead-fallback-queue && chown 1001:1001 /var/lib/cleanstart/lead-fallback-queue`                     | dir exists, uid 1001  |
@@ -378,7 +378,7 @@ This is the heart of the new approach. One workflow file, one droplet SSH key, t
 | #    | Step                                                                                           | Done when      |
 | ---- | ---------------------------------------------------------------------------------------------- | -------------- |
 | 10.1 | First-run wizard creates initial Payload superadmin (personal email + hardware-key-backed account) | login works    |
-| 10.2 | Enable TOTP immediately; save recovery seed in 1Password                                       | 2FA active     |
+| 10.2 | Enable TOTP immediately; save recovery seed in operator secrets store                          | 2FA active     |
 | 10.3 | Add teammates as users; require 2FA on each                                                    | every user 2FA |
 
 ### Phase 11 — Backups + monitoring
@@ -386,7 +386,7 @@ This is the heart of the new approach. One workflow file, one droplet SSH key, t
 | #    | Step                                                                                                                            | Done when             |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
 | 11.1 | `apt-get install -y awscli postgresql-client-16`                                                                                | both installed        |
-| 11.2 | Create BetterStack heartbeat monitor (grace 26 h); copy URL                                                                     | URL in 1Password      |
+| 11.2 | Create BetterStack heartbeat monitor (grace 26 h); copy URL                                                                     | URL in operator store |
 | 11.3 | Write `/etc/cron.d/cleanstart-backup` invoking `infra/scripts/backup.sh` at **02:00 UTC** (L2 → locked) with all required env vars | cron registered       |
 | 11.4 | `DRY_RUN=1 /opt/cleanstart/scripts/backup.sh` then real run                                                                     | first `.dump` in R2   |
 | 11.5 | Configure R2 lifecycle rules: keep 7 daily / 4 weekly / 3 monthly (locked row 22 / backlog B4)                                  | rule confirmed in R2  |
@@ -613,7 +613,7 @@ jobs:
 
 ### 6.3 `/opt/cleanstart/.env` template
 
-Paste this template, replace `<from-1pw>` with values from the `cleanstart-migration` vault, then mirror the full contents into the GitHub repo secret `CMS_ENV_FILE` so deploys can re-render it.
+Paste this template, replace `<from-secrets>` with values from the operator secrets store, then make sure the corresponding GitHub Secret (per-key) is set for each (see Phase 8 — every `${{ secrets.X }}` reference in the workflow expects a matching repo secret).
 
 ```ini
 # ─── Runtime ───────────────────────────────────────────────
@@ -628,13 +628,13 @@ WEB_CONCURRENCY=1
 RATE_LIMIT_BACKEND=memory
 
 # ─── Database (uses compose service DNS) ───────────────────
-POSTGRES_PASSWORD=<from-1pw>
-DATABASE_URI=postgres://postgres:<from-1pw>@postgres:5432/cleanstart
-PAYLOAD_SECRET=<from-1pw>
+POSTGRES_PASSWORD=<from-secrets>
+DATABASE_URI=postgres://postgres:<from-secrets>@postgres:5432/cleanstart
+PAYLOAD_SECRET=<from-secrets>
 
 # ─── R2 (media + backups) ──────────────────────────────────
-R2_ACCESS_KEY_ID=<from-1pw>
-R2_SECRET_ACCESS_KEY=<from-1pw>
+R2_ACCESS_KEY_ID=<from-secrets>
+R2_SECRET_ACCESS_KEY=<from-secrets>
 R2_BUCKET=cleanstart
 R2_ENDPOINT=https://394d5e2bbba246d392071093599eba52.r2.cloudflarestorage.com
 R2_PUBLIC_BASE=https://cdn.cleanstart.com
@@ -642,8 +642,8 @@ R2_UPLOAD_PREFIX=web
 
 # ─── Meilisearch (compose service DNS) ─────────────────────
 MEILISEARCH_URL=http://meilisearch:7700
-MEILISEARCH_API_KEY=<from-1pw>
-MEILISEARCH_MASTER_KEY=<from-1pw>
+MEILISEARCH_API_KEY=<from-secrets>
+MEILISEARCH_MASTER_KEY=<from-secrets>
 
 # ─── Lead fallback queue (host-mounted) ────────────────────
 LEAD_QUEUE_LOCAL_DIR=/var/lib/cleanstart/lead-fallback-queue
@@ -653,10 +653,10 @@ NEXT_PUBLIC_SITE_URL=https://cleanstart.com
 NEXT_PUBLIC_SITE_ORIGIN=https://cleanstart.com
 NEXT_PUBLIC_SITE_HOSTS=cleanstart.com,www.cleanstart.com
 WEB_BASE_URL=https://cleanstart.com
-LIVE_PREVIEW_SECRET=<from-1pw>
-PREVIEW_JWT_SECRET=<from-1pw>
+LIVE_PREVIEW_SECRET=<from-secrets>
+PREVIEW_JWT_SECRET=<from-secrets>
 WEB_REVALIDATE_URL=https://cleanstart.com/api/revalidate
-WEB_REVALIDATE_SECRET=<from-1pw>
+WEB_REVALIDATE_SECRET=<from-secrets>
 
 # ─── Integrations (fill in as channels go live) ────────────
 TURNSTILE_SITE_KEY=

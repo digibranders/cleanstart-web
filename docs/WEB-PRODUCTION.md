@@ -552,7 +552,7 @@ Out of scope for this doc — see arch HTML §`#deploy-rollback`.
 | `NEXT_PUBLIC_GA4_ID` | Production only | `G-XXXXXXXXXX` |
 | `CONSENT_LOG_HMAC_SECRET` | All | HMAC for `/api/consent` audit |
 
-**Rotation:** `CMS_API_KEY`, `REVALIDATE_SECRET`, `PREVIEW_SECRET`, `CONSENT_LOG_HMAC_SECRET`, `SENTRY_AUTH_TOKEN` rotate every **90 days**. Documented in 1Password vault `cleanstart-migration` (existing per CLAUDE.md).
+**Rotation:** `CMS_API_KEY`, `REVALIDATE_SECRET`, `PREVIEW_SECRET`, `CONSENT_LOG_HMAC_SECRET`, `SENTRY_AUTH_TOKEN` rotate every **90 days**. Recorded in the operator's secrets store of choice (1Password / Bitwarden / Keychain).
 
 **Scanning:** `gitleaks` pre-commit + CI scan on all branches.
 
