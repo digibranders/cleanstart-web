@@ -130,9 +130,7 @@ export function FipsHero(): React.ReactElement {
               marginBottom: "32px", // gap between h1 (h=160) and subhead frame (y=192) = 32
             }}
           >
-            FIPS-Validated.
-            <br />
-            Always{" "}
+            FIPS-Validated. Always{" "}
             <span
               style={{
                 background:

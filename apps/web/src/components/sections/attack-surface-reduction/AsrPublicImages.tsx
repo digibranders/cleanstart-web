@@ -73,8 +73,7 @@ export function AsrPublicImages(): React.ReactElement {
             marginBottom: "48px",
           }}
         >
-          Public images are
-          <br />
+          Public images are{" "}
           <span
             style={{
               background: "linear-gradient(99deg, #9A51FF 0%, #2CC1EB 100%)",

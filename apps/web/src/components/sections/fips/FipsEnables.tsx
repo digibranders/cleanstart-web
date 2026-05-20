@@ -226,9 +226,7 @@ export function FipsEnables(): React.ReactElement {
                 color: "#FFFFFF",
               }}
             >
-              Validated
-              <br />
-              Foundation
+              Validated Foundation
             </span>
           </div>
 
@@ -271,9 +269,7 @@ export function FipsEnables(): React.ReactElement {
                 lineHeight: 1.2,
               }}
             >
-              Validated
-              <br />
-              Foundation
+              Validated Foundation
             </span>
           </div>
           <div className="grid grid-cols-2 gap-3 w-full max-w-[400px]">

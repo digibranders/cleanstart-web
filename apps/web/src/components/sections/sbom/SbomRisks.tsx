@@ -91,9 +91,7 @@ export function SbomRisks(): React.ReactElement {
               color: "#111",
             }}
           >
-            {"When SBOMs Fall Short, "}
-            <br />
-            {"Risk "}
+            {"When SBOMs Fall Short, Risk "}
             <span
               style={{
                 background:

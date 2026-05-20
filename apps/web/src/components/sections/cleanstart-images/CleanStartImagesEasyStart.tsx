@@ -110,9 +110,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 color: "rgba(255,255,255,0.85)",
               }}
             >
-              Just replace your base image with CleanStart.
-              <br />
-              No code changes, no hassle.
+              Just replace your base image with CleanStart. No code changes, no hassle.
             </p>
 
             <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-6">

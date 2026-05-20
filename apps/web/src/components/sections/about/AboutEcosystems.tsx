@@ -74,7 +74,7 @@ export function AboutEcosystems() {
             letterSpacing: "-0.05em",
           }}
         >
-          Built for The <br /> Ecosystems{" "}
+          Built for The Ecosystems{" "}
           <span
             style={{
               background:

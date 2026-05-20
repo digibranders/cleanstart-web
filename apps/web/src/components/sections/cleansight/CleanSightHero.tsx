@@ -45,9 +45,7 @@ export function CleanSightHero(): React.ReactElement {
             lineHeight: 1.0,
           }}
         >
-          Continuous Visibility.{" "}
-          <br className="hidden sm:block" />
-          Continuous Remediation.
+          Continuous Visibility. Continuous Remediation.
         </h1>
 
         <p

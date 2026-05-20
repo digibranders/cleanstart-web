@@ -99,9 +99,7 @@ export function CleanSightCTA(): React.ReactElement {
           zIndex: 1,
         }}
       >
-        See Everything.{" "}
-        <br />
-        Fix Everything.
+        See Everything. Fix Everything.
       </h2>
 
       {/* Right: description + CTA */}

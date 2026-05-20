@@ -1,6 +1,9 @@
+import dynamic from "next/dynamic";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { formatEpisodeNumber, type PodcastEpisode, resolveVideoId } from "@/lib/podcast";
-import { YouTubeEmbed } from "./YouTubeEmbed";
+const YouTubeEmbed = dynamic(() =>
+  import("./YouTubeEmbed").then((m) => ({ default: m.YouTubeEmbed })),
+);
 
 type Size = "card" | "featured";
 

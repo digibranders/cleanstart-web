@@ -2,11 +2,10 @@
   "measuredAt": "2026-05-20",
   "totals": {
     "files": 206,
-    "warnings": 107,
+    "warnings": 79,
     "errors": 0
   },
   "byRule": {
-    "`<br />` inside prose breaks responsive line shape": 28,
     "arbitrary `text-[Xrem]` is forbidden": 16,
     "flat-px `fontSize:` in inline style is forbidden outside the documented allow-list": 57,
     "`preserveAspectRatio=\"none\"` distorts paths": 2,

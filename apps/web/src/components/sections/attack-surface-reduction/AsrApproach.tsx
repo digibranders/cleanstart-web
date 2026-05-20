@@ -58,7 +58,6 @@ export function AsrApproach(): React.ReactElement {
           }}
         >
           The CleanStart{" "}
-          <br />
           <span
             style={{
               background: "linear-gradient(99deg, #9A51FF 0%, #2CC1EB 100%)",

@@ -1,7 +1,12 @@
+import dynamic from "next/dynamic";
 import type { Webinar, WebinarRegion, WebinarType } from "@/lib/webinars";
 import { Pagination } from "@/components/ui/Pagination";
 import { WebinarCard } from "./WebinarCard";
-import { WebinarFilters } from "./WebinarFilters";
+// WebinarFilters is a "use client" interactive sidebar; code-split so it
+// does not ship in the initial /webinars client bundle.
+const WebinarFilters = dynamic(() =>
+  import("./WebinarFilters").then((m) => ({ default: m.WebinarFilters })),
+);
 
 interface WebinarsGridProps {
   items: Webinar[];

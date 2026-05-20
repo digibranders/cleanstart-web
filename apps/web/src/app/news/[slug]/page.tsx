@@ -14,7 +14,7 @@ import { NewsDetailBody } from "@/components/sections/news-detail/NewsDetailBody
 import { NewsDetailRelated } from "@/components/sections/news-detail/NewsDetailRelated";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, articleSchema, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, newsArticleSchema } from "@/lib/seo/jsonld";
 
 interface NewsDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -88,13 +88,13 @@ export async function renderNewsDetail({
       />
       <JsonLd
         id={`news-article-${item.slug}`}
-        data={articleSchema({
+        data={newsArticleSchema({
           title: item.title,
           description: item.abstract ?? undefined,
           path: `/news/${item.slug}`,
           publishedAt: item.publicationDate ?? undefined,
           imageUrl: heroAbsolute,
-          type: "NewsArticle",
+          section: item.pressType ?? undefined,
         })}
       />
       <Header />

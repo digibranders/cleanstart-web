@@ -72,8 +72,7 @@ export function CleanStartAdvantage() {
             id="advantage-title"
             className="font-display text-display-md font-semibold leading-[1.05] tracking-[-0.05em] text-white"
           >
-            CleanStart
-            <br />
+            CleanStart{" "}
             <span
               className="bg-clip-text text-transparent"
               style={{

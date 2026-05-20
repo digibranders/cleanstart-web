@@ -68,10 +68,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
                 maxWidth: "519px",
               }}
             >
-              What this{" "}
-              <br className="hidden md:block" />
-              delivers for{" "}
-              <br className="hidden md:block" />
+              What this delivers for{" "}
               <span
                 style={{
                   background:

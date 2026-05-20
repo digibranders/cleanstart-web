@@ -148,9 +148,7 @@ export function BuiltForTeams() {
               letterSpacing: "-0.05em",
             }}
           >
-            Built for Teams That Can&rsquo;t
-            <br />
-            Afford{" "}
+            Built for Teams That Can&rsquo;t Afford{" "}
             <span
               className="bg-clip-text text-transparent"
               style={{

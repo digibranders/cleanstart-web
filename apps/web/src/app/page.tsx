@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { Header } from "@/components/sections/Header";
 import { Hero } from "@/components/sections/home/Hero";
 import { CleanStartFactory } from "@/components/sections/home/CleanStartFactory";
 import { HowCleanStartHelp } from "@/components/sections/home/HowCleanStartHelp";
-import { BuiltForTeams } from "@/components/sections/home/BuiltForTeams";
+// BuiltForTeams (~480L "use client" testimonial carousel) sits below the fold;
+// code-split so it does not ship in the initial home-page client bundle.
+const BuiltForTeams = dynamic(() =>
+  import("@/components/sections/home/BuiltForTeams").then((m) => ({ default: m.BuiltForTeams })),
+);
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
 import { ReadyToSecureCTA, ReadyToSecureCTAOverlay } from "@/components/sections/home/ReadyToSecureCTA";

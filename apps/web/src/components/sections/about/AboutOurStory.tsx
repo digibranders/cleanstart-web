@@ -74,11 +74,11 @@ export function AboutOurStory() {
               opacity: 0.8,
             }}
           >
-            Our founders spent decades in cybersecurity and <br /> engineering and saw
-            a recurring flaw: security was <br /> always added after software was
-            built. CleanStart <br /> began with a simple belief, trust must start at
-            the <br /> foundation.That belief drives everything we do, <br /> helping
-            organizations move fast, stay compliant, and <br /> deliver software the
+            Our founders spent decades in cybersecurity and engineering and saw
+            a recurring flaw: security was always added after software was
+            built. CleanStart began with a simple belief, trust must start at
+            the foundation. That belief drives everything we do, helping
+            organizations move fast, stay compliant, and deliver software the
             world can trust.
           </p>
         </div>

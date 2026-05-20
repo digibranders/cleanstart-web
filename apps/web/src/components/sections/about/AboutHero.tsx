@@ -69,7 +69,7 @@ export function AboutHero() {
                 letterSpacing: "-0.05em",
               }}
             >
-              Security Begins at <br /> The Source
+              Security Begins at The Source
             </h1>
 
             <a

@@ -141,3 +141,52 @@ export function articleSchema({
     publisher: { "@id": ORGANIZATION_ID },
   };
 }
+
+export interface NewsArticleSchemaInput {
+  title: string;
+  description?: string | undefined;
+  path: string;
+  publishedAt?: string | undefined;
+  modifiedAt?: string | undefined;
+  imageUrl?: string | undefined;
+  /** Section (e.g. "Press release", "Product update") — maps to schema.org/articleSection. */
+  section?: string | undefined;
+  /** Author names — added as a `Person[]` array per Google news rich-result guidance. */
+  authors?: Array<{ name: string }> | undefined;
+}
+
+/**
+ * NewsArticle is the schema.org subtype Google Search prefers for newsroom /
+ * press-release posts; it unlocks the "Top stories" rich-result eligibility
+ * that the generic Article type does not. Use this on `app/news/[slug]/page.tsx`
+ * — keep `articleSchema` for evergreen / non-newsroom long-form.
+ */
+export function newsArticleSchema({
+  title,
+  description,
+  path,
+  publishedAt,
+  modifiedAt,
+  imageUrl,
+  section,
+  authors,
+}: NewsArticleSchemaInput) {
+  const lastModified = modifiedAt ?? publishedAt;
+  return {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    mainEntityOfPage: { "@type": "WebPage", "@id": absoluteUrl(path) },
+    headline: title,
+    ...(description ? { description } : {}),
+    ...(imageUrl ? { image: [imageUrl] } : {}),
+    ...(publishedAt ? { datePublished: publishedAt } : {}),
+    ...(lastModified ? { dateModified: lastModified } : {}),
+    ...(section ? { articleSection: section } : {}),
+    ...(authors && authors.length > 0
+      ? {
+          author: authors.map((a) => ({ "@type": "Person", name: a.name })),
+        }
+      : {}),
+    publisher: { "@id": ORGANIZATION_ID },
+  };
+}

@@ -73,8 +73,7 @@ export function AsrHero(): React.ReactElement {
                 marginBottom: "24px",
               }}
             >
-              Bigger Images,
-              <br />
+              Bigger Images,{" "}
               <span
                 style={{
                   background:

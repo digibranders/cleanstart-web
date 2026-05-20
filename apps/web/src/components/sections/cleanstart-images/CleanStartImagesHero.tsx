@@ -31,8 +31,7 @@ export function CleanStartImagesHero(): React.ReactElement {
             maxWidth: "820px",
           }}
         >
-          Approach to CVE Free <br className="hidden sm:block" />
-          Container Images
+          Approach to CVE Free Container Images
         </h1>
 
         {/* Diagram — Figma group 161:23277, 1244×466 at y=424 (relative to hero 1084) */}

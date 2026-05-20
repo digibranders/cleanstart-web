@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
+// Aliased to avoid the name collision with the route-segment `export const dynamic`.
+import nextDynamic from "next/dynamic";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { PodcastHero } from "@/components/sections/podcast/PodcastHero";
 import { PodcastLatestEpisodes } from "@/components/sections/podcast/PodcastLatestEpisodes";
 import { PodcastFeaturedContent } from "@/components/sections/podcast/PodcastFeaturedContent";
-import { PodcastCTACards } from "@/components/sections/podcast/PodcastCTACards";
+// PodcastCTACards sits below all the listing content; code-split out of the
+// initial podcast client bundle.
+const PodcastCTACards = nextDynamic(() =>
+  import("@/components/sections/podcast/PodcastCTACards").then((m) => ({ default: m.PodcastCTACards })),
+);
 import {
   getFeaturedPodcastEpisodes,
   getPodcastEpisodes,

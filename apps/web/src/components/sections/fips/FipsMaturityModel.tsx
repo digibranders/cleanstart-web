@@ -73,9 +73,7 @@ export function FipsMaturityModel(): React.ReactElement {
             lineHeight: 1.05,
           }}
         >
-          CleanStart FIPS 140-3{" "}
-          <br className="hidden md:block" />
-          Maturity{" "}
+          CleanStart FIPS 140-3 Maturity{" "}
           <span
             style={{
               background:
