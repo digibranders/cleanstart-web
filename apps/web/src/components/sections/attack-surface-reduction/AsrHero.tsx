@@ -43,15 +43,16 @@ export function AsrHero(): React.ReactElement {
       />
 
       {/* Bottom fade — Figma node 366-5158 fades the hero's last ~200px from
-          peak purple into pure white where AsrPublicImages (bg-white) begins.
-          Same pattern as FipsHero. */}
+          peak purple into pure white where AsrPublicImages (no bg = body white)
+          begins. Terminating color MUST match the body bg (#FFFFFF) — using
+          #F6F6F6 here produced a visible grey seam under the hero. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute inset-x-0 bottom-0 z-[1]"
         style={{
           height: "200px",
           background:
-            "linear-gradient(180deg, rgba(246,246,246,0) 0%, rgba(246,246,246,0.45) 55%, rgba(246,246,246,0.92) 88%, #F6F6F6 100%)",
+            "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 55%, rgba(255,255,255,0.92) 88%, #FFFFFF 100%)",
         }}
       />
 
