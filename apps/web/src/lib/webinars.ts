@@ -26,6 +26,7 @@ export type Webinar = {
   registrationForm?: { id: string; title?: string } | string | null;
   eventStatus: WebinarEventStatus;
   publishedAt?: string | null;
+  displayPublishedAt?: string | null;
 };
 
 export type WebinarDetail = Webinar & {

@@ -17,6 +17,7 @@ type CmsDoc = {
   slug: string;
   updatedAt?: string | null;
   publishedAt?: string | null;
+  displayPublishedAt?: string | null;
 };
 
 type CmsList<T> = { docs: T[] };
@@ -70,13 +71,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...STATIC_ROUTES.map((r) => entry(r.path)),
     ...blogs.map((b) =>
-      entry(`/blog/${b.slug}`, b.updatedAt ?? b.publishedAt ?? undefined),
+      entry(
+        `/blog/${b.slug}`,
+        b.updatedAt ?? b.displayPublishedAt ?? b.publishedAt ?? undefined,
+      ),
     ),
     ...resources.map((r) =>
-      entry(`/resource/${r.slug}`, r.updatedAt ?? r.publishedAt ?? undefined),
+      entry(
+        `/resource/${r.slug}`,
+        r.updatedAt ?? r.displayPublishedAt ?? r.publishedAt ?? undefined,
+      ),
     ),
     ...authors.map((a) =>
-      entry(`/author/${a.slug}`, a.updatedAt ?? a.publishedAt ?? undefined),
+      entry(
+        `/author/${a.slug}`,
+        a.updatedAt ?? a.displayPublishedAt ?? a.publishedAt ?? undefined,
+      ),
     ),
   ];
 }

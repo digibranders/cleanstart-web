@@ -3,12 +3,15 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { mediaUploadField } from '../fields/media-upload';
+import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
+import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
+import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import {
@@ -132,6 +135,7 @@ export const KnowledgeBase: CollectionConfig = {
     },
     schemaAddonsField,
     publishedAtField,
+    displayPublishedAtField,
     ...seoSidebarFields({ pathPrefix: '/knowledge-hub', descriptionSource: 'abstract' }),
     {
       // Data-only — surfaced via the DocStatusBar in the top status bar.
@@ -188,6 +192,7 @@ export const KnowledgeBase: CollectionConfig = {
   hooks: {
     beforeChange: [
       firstPublishHook(),
+      displayPublishedAtBackfillHook,
       bodyStatsHook({
         fields: {
           readingMinutes: 'readingMinutes',
@@ -199,6 +204,7 @@ export const KnowledgeBase: CollectionConfig = {
     afterChange: [
       slugChangeRedirectHook('knowledgeBase'),
       schemaOverrideAuditHook('knowledgeBase'),
+      displayPublishedAtAuditHook('knowledgeBase'),
       searchSyncAfterChangeHook('knowledgeBase'),
       webhooksPublishAfterChangeHook('knowledgeBase'),
       indexNowPublishAfterChangeHook('knowledgeBase'),

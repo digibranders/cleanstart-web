@@ -49,6 +49,7 @@ export type Blog = {
   categories?: BlogCategory | null;
   authors?: BlogAuthor[];
   publishedAt?: string;
+  displayPublishedAt?: string | null;
   updatedAt?: string;
   readingMinutes?: number;
   featured?: boolean;

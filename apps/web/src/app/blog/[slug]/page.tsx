@@ -16,6 +16,7 @@ import { BlogDetailRelatedPosts } from "@/components/sections/blog/BlogDetailRel
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { Footer } from "@/components/sections/Footer";
 import { buildPageMetadata } from "@/lib/seo/canonical";
+import { effectivePublishedAt } from "@/lib/published-date";
 import {
   JsonLd,
   blogPostingSchema,
@@ -47,7 +48,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
       "Insights and writings from the CleanStart team on container security, DevOps, and compliance.",
     path: `/blog/${post.slug}`,
     type: "article",
-    publishedTime: post.publishedAt,
+    publishedTime: effectivePublishedAt(post) ?? post.publishedAt,
     modifiedTime: post.updatedAt,
     authors: post.authors?.map((a) => a.name),
     ...(heroAbsolute && post.heroImage
@@ -81,6 +82,7 @@ export async function renderBlogDetail({
   ]);
 
   const heroAbsolute = mediaUrl(post.heroImage?.url);
+  const publishedAt = effectivePublishedAt(post);
 
   return (
     <>
@@ -98,7 +100,7 @@ export async function renderBlogDetail({
           title: post.title,
           description: post.abstract ?? undefined,
           path: `/blog/${post.slug}`,
-          publishedAt: post.publishedAt,
+          publishedAt,
           modifiedAt: post.updatedAt,
           imageUrl: heroAbsolute,
           authors: post.authors?.map((a) => ({ name: a.name })),
@@ -111,7 +113,7 @@ export async function renderBlogDetail({
           title={post.title}
           categories={post.categories}
           authors={post.authors}
-          publishedAt={post.publishedAt ?? undefined}
+          publishedAt={publishedAt}
           updatedAt={post.updatedAt ?? undefined}
           readingMinutes={post.readingMinutes ?? undefined}
           heroImage={post.heroImage}

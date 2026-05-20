@@ -3,9 +3,12 @@ import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { mediaUploadField } from '../fields/media-upload';
+import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
+import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
+import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
 
 const YT_ID_RE = /^[A-Za-z0-9_-]{11}$/;
@@ -166,9 +169,11 @@ export const PodcastEpisodes: CollectionConfig = {
       },
     },
     publishedAtField,
+    displayPublishedAtField,
   ],
   hooks: {
-    beforeChange: [stampYoutubeVideoIdHook, firstPublishHook()],
+    beforeChange: [stampYoutubeVideoIdHook, firstPublishHook(), displayPublishedAtBackfillHook],
+    afterChange: [displayPublishedAtAuditHook('podcastEpisodes')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,
