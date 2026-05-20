@@ -272,7 +272,7 @@ export function FipsEnables(): React.ReactElement {
               Validated Foundation
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-3 w-full max-w-[400px]">
+          <div className="flex flex-col gap-3 w-full max-w-[400px]">
             {PILLS.map((p) => (
               <HubPill key={p.label} label={p.label} />
             ))}
