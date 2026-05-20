@@ -4,6 +4,7 @@ import type React from "react";
 
 import type { Blog } from "@/lib/blog";
 import { formatBlogDate, pickImageUrl } from "@/lib/blog";
+import { effectivePublishedAt } from "@/lib/published-date";
 
 interface AuthorPostsProps {
   posts: Blog[];
@@ -118,8 +119,11 @@ function PostCard({ post }: { post: Blog }): React.ReactElement {
           className="flex items-center gap-2 text-xs mt-auto pt-2"
           style={{ color: "rgba(255,255,255,0.55)" }}
         >
-          {post.publishedAt && <span>{formatBlogDate(post.publishedAt)}</span>}
-          {post.publishedAt && post.readingMinutes != null && <span>•</span>}
+          {(() => {
+            const displayDate = effectivePublishedAt(post);
+            return displayDate ? <span>{formatBlogDate(displayDate)}</span> : null;
+          })()}
+          {effectivePublishedAt(post) && post.readingMinutes != null && <span>•</span>}
           {post.readingMinutes != null && (
             <span>{post.readingMinutes} min read</span>
           )}

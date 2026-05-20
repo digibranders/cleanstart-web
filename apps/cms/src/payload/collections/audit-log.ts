@@ -52,6 +52,7 @@ export const AuditLog: CollectionConfig = {
         { label: 'Schema override changed', value: 'schema_override_changed' },
         { label: 'User disabled', value: 'user_disabled' },
         { label: 'Content reassigned', value: 'content_reassigned' },
+        { label: 'Display publish date overridden', value: 'display_publish_date_overridden' },
       ],
       admin: { readOnly: true },
     },

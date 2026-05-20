@@ -4,11 +4,14 @@ import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
+import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
+import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
+import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
 import { firstPublishHook } from '../hooks/first-publish';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
@@ -226,14 +229,16 @@ export const Webinars: CollectionConfig = {
     },
     schemaAddonsField,
     publishedAtField,
+    displayPublishedAtField,
     ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.webinars, descriptionSource: 'abstract' }),
     ...seoFieldsForSidebar('webinars'),
   ],
   hooks: {
-    beforeChange: [firstPublishHook(), eventStatusTimestampsHook],
+    beforeChange: [firstPublishHook(), displayPublishedAtBackfillHook, eventStatusTimestampsHook],
     afterChange: [
       slugChangeRedirectHook('webinars'),
       schemaOverrideAuditHook('webinars'),
+      displayPublishedAtAuditHook('webinars'),
     ],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },

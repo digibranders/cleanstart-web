@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatBlogDate, mediaUrl } from "@/lib/blog";
 import type { Blog } from "@/lib/blog";
+import { effectivePublishedAt } from "@/lib/published-date";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 interface BlogDetailRelatedPostsProps {
@@ -109,15 +110,19 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
         <div className="flex flex-col gap-[12px] px-[32px] pt-[24px] pb-[32px] flex-1">
           {/* Meta: date + read time */}
           <div className="flex items-center gap-4">
-            {post.publishedAt && (
-              <div className="flex items-center gap-1">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/blogs/icon-calendar-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0" />
-                <span className="text-sm font-medium leading-normal" style={{ color: "#666" }}>
-                  {formatBlogDate(post.publishedAt)}
-                </span>
-              </div>
-            )}
+            {(() => {
+              const displayDate = effectivePublishedAt(post);
+              if (!displayDate) return null;
+              return (
+                <div className="flex items-center gap-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/blogs/icon-calendar-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0" />
+                  <span className="text-sm font-medium leading-normal" style={{ color: "#666" }}>
+                    {formatBlogDate(displayDate)}
+                  </span>
+                </div>
+              );
+            })()}
             {post.readingMinutes != null && (
               <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

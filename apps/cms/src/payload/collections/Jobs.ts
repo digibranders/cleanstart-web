@@ -3,11 +3,14 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { mediaUploadField } from '../fields/media-upload';
+import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
+import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
+import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
@@ -231,14 +234,16 @@ export const Jobs: CollectionConfig = {
     },
     schemaAddonsField,
     publishedAtField,
+    displayPublishedAtField,
     ...seoSidebarFields({ pathPrefix: '/jobs', descriptionSource: 'abstract' }),
     ...seoFieldsForSidebar('jobs'),
   ],
   hooks: {
-    beforeChange: [firstPublishHook()],
+    beforeChange: [firstPublishHook(), displayPublishedAtBackfillHook],
     afterChange: [
       slugChangeRedirectHook('jobs'),
       schemaOverrideAuditHook('jobs'),
+      displayPublishedAtAuditHook('jobs'),
     ],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },

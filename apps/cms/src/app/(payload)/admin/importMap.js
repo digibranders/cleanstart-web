@@ -85,6 +85,7 @@ import { FaqBulkPaste as FaqBulkPaste_34cc49081ef861ac2f0f2bcdbdf5a9d4 } from '@
 import { FaqRowLabel as FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3 } from '@/payload/admin/components/FaqRowLabel.tsx'
 import { RelationshipCell as RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f } from '@/payload/admin/components/RelationshipCell.tsx'
 import { BlocksField as BlocksField_81821d6c72d1fc3a46ee03c3fb264707 } from '@/payload/admin/components/fields/BlocksField.tsx'
+import { DisplayPublishedAtField as DisplayPublishedAtField_674dd1fe267834f856a037d2738a80d1 } from '@/payload/admin/components/DisplayPublishedAtField.tsx'
 import { HiddenField as HiddenField_551417bca9579543e47edbdd4648802b } from '@/payload/admin/components/HiddenField.tsx'
 import { TocRowLabel as TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b } from '@/payload/admin/components/TocRowLabel.tsx'
 import { AnalyticsTab as AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b } from '@/payload/admin/components/integrations/AnalyticsTab.tsx'
@@ -205,6 +206,7 @@ export const importMap = {
   "@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel": FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3,
   "@/payload/admin/components/RelationshipCell.tsx#RelationshipCell": RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f,
   "@/payload/admin/components/fields/BlocksField.tsx#BlocksField": BlocksField_81821d6c72d1fc3a46ee03c3fb264707,
+  "@/payload/admin/components/DisplayPublishedAtField.tsx#DisplayPublishedAtField": DisplayPublishedAtField_674dd1fe267834f856a037d2738a80d1,
   "@/payload/admin/components/HiddenField.tsx#HiddenField": HiddenField_551417bca9579543e47edbdd4648802b,
   "@/payload/admin/components/TocRowLabel.tsx#TocRowLabel": TocRowLabel_78171b8b574c1f3ba9edec9842dd5d0b,
   "@/payload/admin/components/integrations/AnalyticsTab.tsx#AnalyticsTab": AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b,

@@ -84,9 +84,14 @@ const readHeroImage = (doc: AnyDoc): ResolvedMedia | null => {
  * Precedence:
  *   1. `publicationDate` — News uses this (editor-set, signals story
  *      time rather than first-publish time).
- *   2. `publishedAt` — auto-set by `firstPublishHook` on the first
- *      draft → published transition. Editor-overridable for backdating.
- *   3. `createdAt` — defensive fallback so legacy rows that predate
+ *   2. `displayPublishedAt` — editor-controlled SEO surface on the
+ *      other versioned collections. Defaults to `publishedAt` via
+ *      `displayPublishedAtBackfillHook` but editors can backdate or
+ *      override it from the SEO sidebar.
+ *   3. `publishedAt` — auto-set by `firstPublishHook` on the first
+ *      draft → published transition. System "first went live" stamp,
+ *      immutable through the API.
+ *   4. `createdAt` — defensive fallback so legacy rows that predate
  *      the `publishedAt` field still emit a non-null `datePublished`
  *      and pass schema.org Article validation. Approximate: `createdAt`
  *      is row-creation time, which is at-or-before first publish — so
@@ -96,9 +101,11 @@ const readPublishedAt = (doc: AnyDoc): string | null => {
   const explicit = (doc as {
     publishedAt?: string | null;
     publicationDate?: string | null;
+    displayPublishedAt?: string | null;
     createdAt?: string | null;
   });
   if (typeof explicit.publicationDate === 'string') return explicit.publicationDate;
+  if (typeof explicit.displayPublishedAt === 'string') return explicit.displayPublishedAt;
   if (typeof explicit.publishedAt === 'string') return explicit.publishedAt;
   if (typeof explicit.createdAt === 'string') return explicit.createdAt;
   return null;
@@ -532,6 +539,7 @@ const dispatchJob = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   ];
 
   const datePosted =
+    (doc as { displayPublishedAt?: string | null }).displayPublishedAt ??
     (doc as { publishedAt?: string | null }).publishedAt ??
     (doc as { createdAt?: string | null }).createdAt ??
     null;

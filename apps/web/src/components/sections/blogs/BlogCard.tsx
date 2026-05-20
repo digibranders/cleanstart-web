@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { type Blog, formatBlogDate, mediaUrl } from "@/lib/blog";
+import { effectivePublishedAt } from "@/lib/published-date";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 interface BlogCardProps {
@@ -8,7 +9,7 @@ interface BlogCardProps {
 }
 
 export function BlogCard({ post }: BlogCardProps): React.ReactElement {
-  const date = formatBlogDate(post.publishedAt);
+  const date = formatBlogDate(effectivePublishedAt(post));
   const readTime = post.readingMinutes ? `${post.readingMinutes} min read` : null;
   const primaryCategory = post.categories ?? undefined;
 

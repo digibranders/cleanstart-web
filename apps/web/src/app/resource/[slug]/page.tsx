@@ -15,6 +15,7 @@ import {
 import { highlightLexical } from "@/lib/highlightLexical";
 import { getFormById, type Form } from "@/lib/forms";
 import { buildPageMetadata } from "@/lib/seo/canonical";
+import { effectivePublishedAt } from "@/lib/published-date";
 import {
   JsonLd,
   articleSchema,
@@ -46,7 +47,7 @@ export async function generateMetadata({
       "Whitepapers, reports, datasheets, and case studies from CleanStart.",
     path: `/resource/${resource.slug}`,
     type: "article",
-    publishedTime: resource.publishedAt ?? undefined,
+    publishedTime: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
     ...(assetAbsolute && resource.asset
       ? {
           image: {
@@ -104,7 +105,7 @@ export async function renderResourceDetail({
           title: resource.title,
           description: resource.summary ?? undefined,
           path: `/resource/${resource.slug}`,
-          publishedAt: resource.publishedAt ?? undefined,
+          publishedAt: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
           imageUrl: assetAbsolute,
           type: resourceTypeLabel(resource.type),
         })}

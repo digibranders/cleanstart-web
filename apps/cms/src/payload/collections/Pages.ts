@@ -3,11 +3,14 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { pageBuilderBlocks } from '../blocks';
+import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
+import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
+import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { pagesPathBuilderHook } from '../hooks/pages-path-builder';
@@ -180,14 +183,16 @@ export const Pages: CollectionConfig = {
     },
     schemaAddonsField,
     publishedAtField,
+    displayPublishedAtField,
     ...seoSidebarFields({ pathPrefix: '', descriptionSource: 'abstract', urlSource: 'path' }),
     ...seoFieldsForSidebar('pages'),
   ],
   hooks: {
-    beforeChange: [firstPublishHook(), pagesPathBuilderHook],
+    beforeChange: [firstPublishHook(), displayPublishedAtBackfillHook, pagesPathBuilderHook],
     afterChange: [
       slugChangeRedirectHook('pages'),
       schemaOverrideAuditHook('pages'),
+      displayPublishedAtAuditHook('pages'),
       searchSyncAfterChangeHook('pages'),
       webhooksPublishAfterChangeHook('pages'),
       indexNowPublishAfterChangeHook('pages'),

@@ -407,7 +407,8 @@ export interface AuditLog {
     | 'dsar_erasure'
     | 'schema_override_changed'
     | 'user_disabled'
-    | 'content_reassigned';
+    | 'content_reassigned'
+    | 'display_publish_date_overridden';
   targetCollection: string;
   targetId: string;
   /**
@@ -1950,6 +1951,10 @@ export interface Blog {
    * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
    */
   publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
   /**
@@ -2691,6 +2696,10 @@ export interface Guide {
    * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
    */
   publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
   tableOfContents?:
@@ -3027,6 +3036,10 @@ export interface Resource {
    * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
    */
   publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
   /**
    * Incremented by the resource-download endpoint when added (Phase F). Always 0 today.
    */
@@ -3368,6 +3381,10 @@ export interface KnowledgeBase {
    * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
    */
   publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
   tableOfContents?:
@@ -4112,6 +4129,10 @@ export interface Webinar {
    */
   publishedAt?: string | null;
   /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
+  /**
    * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
@@ -4298,6 +4319,10 @@ export interface PodcastEpisode {
    * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
    */
   publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -4510,6 +4535,10 @@ export interface Job {
    * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
    */
   publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
   /**
    * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
@@ -6405,6 +6434,10 @@ export interface Page {
    */
   publishedAt?: string | null;
   /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
+  /**
    * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
   seo?: {
@@ -7635,6 +7668,7 @@ export interface BlogsSelect<T extends boolean = true> {
             };
       };
   publishedAt?: T;
+  displayPublishedAt?: T;
   readingMinutes?: T;
   wordCount?: T;
   tocDepth?: T;
@@ -7980,6 +8014,7 @@ export interface GuidesSelect<T extends boolean = true> {
             };
       };
   publishedAt?: T;
+  displayPublishedAt?: T;
   readingMinutes?: T;
   wordCount?: T;
   tableOfContents?:
@@ -8136,6 +8171,7 @@ export interface ResourcesSelect<T extends boolean = true> {
             };
       };
   publishedAt?: T;
+  displayPublishedAt?: T;
   downloadCount?: T;
   seo?:
     | T
@@ -8289,6 +8325,7 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
             };
       };
   publishedAt?: T;
+  displayPublishedAt?: T;
   readingMinutes?: T;
   wordCount?: T;
   tableOfContents?:
@@ -8626,6 +8663,7 @@ export interface WebinarsSelect<T extends boolean = true> {
             };
       };
   publishedAt?: T;
+  displayPublishedAt?: T;
   seo?:
     | T
     | {
@@ -8687,6 +8725,7 @@ export interface PodcastEpisodesSelect<T extends boolean = true> {
   featured?: T;
   publicationDate?: T;
   publishedAt?: T;
+  displayPublishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -8805,6 +8844,7 @@ export interface JobsSelect<T extends boolean = true> {
             };
       };
   publishedAt?: T;
+  displayPublishedAt?: T;
   seo?:
     | T
     | {
@@ -9717,6 +9757,7 @@ export interface PagesSelect<T extends boolean = true> {
             };
       };
   publishedAt?: T;
+  displayPublishedAt?: T;
   seo?:
     | T
     | {

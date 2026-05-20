@@ -27,6 +27,8 @@ export type Resource = {
   type?: ResourceType | null;
   summary?: string | null;
   publishedAt?: string | null;
+  displayPublishedAt?: string | null;
+  updatedAt?: string | null;
   gated?: boolean;
   ctaButtonText?: string | null;
   asset?: ResourceImage | null;
