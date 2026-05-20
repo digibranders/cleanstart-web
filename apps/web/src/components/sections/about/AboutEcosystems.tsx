@@ -35,7 +35,7 @@ const PARTNERS = [
 
 export function AboutEcosystems() {
   return (
-    <section className="relative overflow-hidden bg-white pt-[100px] pb-[250px]">
+    <section className="relative overflow-hidden bg-white pt-section-md pb-section-cta">
       {/* Decorative blobs */}
       <div
         aria-hidden
@@ -111,7 +111,7 @@ export function AboutEcosystems() {
           }}
         />
 
-        <div className="flex items-center justify-center gap-x-[120px] px-[180px]">
+        <div className="flex flex-wrap items-center justify-center gap-x-[clamp(32px,8vw,120px)] gap-y-10 px-[clamp(24px,12vw,180px)]">
           {PARTNERS.map((p) => (
             <div key={p.name} className="flex shrink-0 items-center justify-center">
               <Image

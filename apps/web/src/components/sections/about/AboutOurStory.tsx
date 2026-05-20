@@ -2,7 +2,7 @@ export function AboutOurStory() {
   return (
     <section
       className="relative overflow-hidden"
-      style={{ height: "600px" }}
+      style={{ minHeight: "clamp(420px, 40vw, 600px)" }}
     >
       {/* Full-width founders photo as background */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -39,7 +39,7 @@ export function AboutOurStory() {
       {/* Text content — left-aligned */}
       <div className="relative mx-auto max-w-[1276px] px-6">
         <div
-          className="flex flex-col gap-6 py-[150px]"
+          className="flex flex-col gap-6 py-[clamp(72px,11vw,150px)]"
           style={{ maxWidth: "514px" }}
         >
           <h2

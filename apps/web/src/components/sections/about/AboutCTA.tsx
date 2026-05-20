@@ -78,14 +78,14 @@ export function AboutCTA() {
         <a
           href="#how-it-works"
           className="cs-btn-blue"
-          style={{ width: "163px", height: "44px", fontSize: "1.125rem" }}
+          style={{ minWidth: "163px" }}
         >
           How it works
         </a>
         <a
           href="#careers"
           className="cs-btn-blue"
-          style={{ width: "111px", height: "44px", fontSize: "1.125rem" }}
+          style={{ minWidth: "111px" }}
         >
           Careers
         </a>
