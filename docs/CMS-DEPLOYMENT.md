@@ -53,7 +53,7 @@ Every row here is a decision we will not relitigate during the deploy. Each link
 | 22  | Backup retention          | 7 daily, 4 weekly, 3 monthly (lifecycle rules on R2; **not yet configured** — backlog B4)                                   | arch doc §`#restore-runbook`                            |
 | 23  | Backup heartbeat          | BetterStack heartbeat URL, **alert on missing ping** (not on success)                                                       | arch doc §`#restore-runbook`                            |
 | 24  | RTO / RPO                 | RTO 30 min, RPO 24 h                                                                                                        | arch doc §`#restore-runbook`                            |
-| 25  | 2FA                       | Mandatory for every admin user; recovery seeds in the operator's secrets store (1Password / Bitwarden / Keychain)           | `CLAUDE.md`                                             |
+| 25  | 2FA                       | **Deferred** — admin access is password-only at v1. TOTP backend reserved in `apps/cms/src/payload/admin/components/auth/`; enrollment becomes mandatory once that lands (backlog A9). | `CLAUDE.md`, `docs/BACKLOG.md` A9                       |
 | 26  | Branch → env mapping      | `main` → prod (`cms.cleanstart.com`, this droplet) · `development` → staging (`cms-dev.cleanstart.com`, separate machine)   | `CLAUDE.md`, arch doc §`#staging`, `.github/workflows/web.yml` |
 | 27  | Deploy mechanism          | **Pull-based via GitHub Actions.** `.github/workflows/deploy-cms.yml` builds the image on the GHA runner, ships via SSH (`docker save \| gzip \| scp`), and runs `docker compose up -d --wait`. Image tags are git SHAs; never `:latest`. No GHA → server SSH happens outside this workflow. | 2026-05-19 round 3 review |
 | 28  | Image storage             | **Local Docker cache on the droplet.** No external registry. The deploy workflow retains the last 5 SHAs for fast rollback (`docker tag cms:<prev-sha> cms:current`). Locks single-host architecture. | 2026-05-19 round 3 review |
@@ -373,13 +373,13 @@ This is the heart of the new approach. One workflow file, one droplet SSH key, t
 | 9.3 | Append Phase 9 RAM snapshot to §2.2 table                                                              | row added                                |
 | 9.4 | Verify the lead-fallback queue volume is writable by uid 1001 inside the container                    | `docker exec cms touch /var/lib/cleanstart/lead-fallback-queue/.ok` exits 0 |
 
-### Phase 10 — Bootstrap Payload admin + 2FA
+### Phase 10 — Bootstrap Payload admin (2FA deferred)
 
 | #    | Step                                                                                           | Done when      |
 | ---- | ---------------------------------------------------------------------------------------------- | -------------- |
 | 10.1 | First-run wizard creates initial Payload superadmin (personal email + hardware-key-backed account) | login works    |
-| 10.2 | Enable TOTP immediately; save recovery seed in operator secrets store                          | 2FA active     |
-| 10.3 | Add teammates as users; require 2FA on each                                                    | every user 2FA |
+| 10.2 | Save the admin email + password to the operator's secrets store                                | credentials saved |
+| 10.3 | Add teammates as users (password-only at v1; revisit 2FA when the TOTP backend ships — backlog A9) | each user can log in |
 
 ### Phase 11 — Backups + monitoring
 
@@ -397,7 +397,7 @@ This is the heart of the new approach. One workflow file, one droplet SSH key, t
 
 Walk every external integration end-to-end. Failure on any one of these blocks "live" — fix before letting editors in.
 
-- [ ] Admin login + 2FA at `https://cms.cleanstart.com/admin`
+- [ ] Admin login (password-only at v1) at `https://cms.cleanstart.com/admin`
 - [ ] Create + publish a Blog → row appears in `blogs` table
 - [ ] Upload an image → object at `s3://cleanstart/web/general/<slug>.webp` in R2, public URL resolves on `cdn.cleanstart.com`
 - [ ] `curl -X POST https://cms.cleanstart.com/api/leads/submit …` with a Turnstile token → row in `leads` + Brevo email sent
@@ -450,7 +450,7 @@ After the round-3 CTO review, the droplet was wiped clean of Coolify + all appli
 - [x] Phase 8 — GHA deploy workflow + 4 repo secrets + 27 repo variables + `gha-deploy` SSH key
 - [x] Phase 9 — **First CMS deploy GREEN** at 2026-05-19 13:32 UTC. Container `Up (healthy)`. `https://cms.cleanstart.com/admin` returns 200; `/api/health` returns 200 `ok`. All 9 migrations applied. RAM 879 MB used / 1.08 GB available.
 - [ ] Phase 9 — First CMS deploy via workflow_dispatch
-- [ ] Phase 10 — Payload admin user + 2FA (visit `https://cms.cleanstart.com/admin`)
+- [ ] Phase 10 — Payload admin user (2FA deferred; see backlog A9)
 - [ ] Phase 11 — Backups + R2 lifecycle + BetterStack
 - [ ] Phase 12 — Smoke test
 - [x] Phase 13 — Push-to-main auto-deploy confirmed (run `26099849969` triggered by `254a3eb` push to main, succeeded)

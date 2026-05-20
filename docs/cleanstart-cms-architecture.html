@@ -4289,7 +4289,7 @@ Report-To:
         <li><strong><code>/api/leads</code></strong> — per-form <code>rateLimit</code> from the <code>forms</code> schema (default 5/min/IP, 50/day/IP). Server-side enforced at the route handler; returns <code>429 Too Many Requests</code>. Honeypot field is always added (silent reject); Cloudflare Turnstile challenge defaults ON for any form on a public-facing page.</li>
         <li><strong><code>/api/revalidate</code></strong> (ISR webhook) — secret-token auth via <code>X-Revalidate-Secret</code> header (rotated quarterly); rejects without 401. Not rate-limited because it's only called from <code>apps/cms</code>.</li>
         <li><strong><code>/preview</code></strong> — JWT validation only (no rate limit); short-exp tokens supersede leaked long-exp ones (see §<a href="#preview-workflow">preview workflow</a>).</li>
-        <li><strong>Cloudflare WAF</strong> — free-tier rules block obvious scrapers, brute-force login attempts, and known-bad IPs. <code>cms.cleanstart.com</code> is protected by Payload's built-in auth + Cloudflare WAF + mandatory 2FA on every Admin/Publisher account.</li>
+        <li><strong>Cloudflare WAF</strong> — free-tier rules block obvious scrapers, brute-force login attempts, and known-bad IPs. <code>cms.cleanstart.com</code> is protected by Payload's built-in auth + Cloudflare WAF. <strong>2FA is deferred</strong> at v1 (admin access is password-only); the TOTP backend lands in the Phase I hardening pass (see <code>docs/BACKLOG.md</code> A9 and the reserved auth components under <code>apps/cms/src/payload/admin/components/auth/</code>).</li>
       </ul>
 
       <h3 id="privacy-gdpr">Privacy, cookies &amp; lead retention</h3>
@@ -5593,7 +5593,7 @@ sysctl --system</code></pre>
           <tr><td>Cache invalidation</td><td>Per-collection cache tags via Next.js 16 <code>revalidateTag()</code>.</td></tr>
           <tr><td>Alt-text assist</td><td>Humanized-filename starter — pre-fills the alt field on upload, editor confirms before publish. No external API call.</td></tr>
           <tr><td>Cookie consent (CMP)</td><td>Added the moment the first cookie-setting tracker is configured. Until then there are no cookies that require gating.</td></tr>
-          <tr><td>Admin access control</td><td>Strong password + mandatory 2FA + Cloudflare WAF.</td></tr>
+          <tr><td>Admin access control</td><td>Strong password + Cloudflare WAF at v1. 2FA deferred (backlog A9 — TOTP backend lands in Phase I hardening, then mandatory).</td></tr>
           <tr><td>Restore drill cadence</td><td>Quarterly manual drill, logged in <code>docs/RESTORE-LOG.md</code>.</td></tr>
           <tr><td>Preview revocation</td><td>JWT <code>exp</code> only (1h / 1d / 7d / 30d).</td></tr>
           <tr><td>News inclusion posture</td><td><code>/sitemap-news.xml</code> + <code>isAccessibleForFree: true</code> on every NewsArticle + a site-level NewsMediaOrganization schema. Eligible for Google News from day 1.</td></tr>

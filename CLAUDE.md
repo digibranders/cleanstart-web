@@ -291,7 +291,7 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 - `apps/cms` deploys via **GitHub Actions** (`.github/workflows/deploy-cms.yml`) on push to `main` (production). The workflow builds the Docker image, ships it to the droplet over SSH, and runs `docker compose up -d --wait`. Caddy on the droplet handles TLS termination. Staging tracks `development` on a separate droplet at `cms-dev.cleanstart.com`.
 - `apps/web` has no production deployment yet.
 - Postgres lives on the same droplet, localhost-bound. Migrations run via Payload's migration runner, never raw SQL.
-- Cloudflare WAF sits in front of `cms.cleanstart.com`. 2FA is mandatory for every admin user.
+- Cloudflare WAF sits in front of `cms.cleanstart.com`. Admin access is password-only at v1 — 2FA enrollment is deferred to a later hardening phase (see `docs/BACKLOG.md` A9, and the TOTP backend reserved in `apps/cms/src/payload/admin/components/auth/`). Once the TOTP backend lands, 2FA becomes mandatory for every admin user.
 - Staging is a separate droplet (or DB) per arch doc §`#staging`. Never point staging at prod data.
 - Backup-cron heartbeat is monitored as a P1 alert (arch doc §`#logging-alerting`). If a backup script is changed, verify the heartbeat fires.
 

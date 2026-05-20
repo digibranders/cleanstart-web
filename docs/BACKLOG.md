@@ -55,7 +55,7 @@ Goal: empty repo → working Payload admin running locally and on the droplet, w
 **Phase A exit criteria:**
 
 - `pnpm install && pnpm dev` brings up admin locally at `http://localhost:3000/admin`
-- Bootstrap admin can log in with 2FA enabled
+- Bootstrap admin can log in (password-only at v1; 2FA deferred per A9)
 - `https://cms.cleanstart.com/admin` reachable, served via Cloudflare → Caddy → Payload, with valid SSL
 - Push to `main` triggers the GitHub Actions deploy workflow; `docker compose up -d --wait` swaps the container without admin downtime > 60s
 - CI green on a no-op PR; failing lint/typecheck/build fails CI as designed
