@@ -144,6 +144,7 @@ export function SbomSelfUpdating(): React.ReactElement {
           alt="CleanStart SBOM dashboard"
           width={872}
           height={468}
+          sizes="(min-width: 1280px) 872px, 100vw"
           className="w-full h-full object-contain"
           style={{ display: "block" }}
           loading="lazy"
@@ -212,6 +213,7 @@ export function SbomSelfUpdating(): React.ReactElement {
           alt="CleanStart SBOM dashboard"
           width={872}
           height={468}
+          sizes="(min-width: 768px) 672px, 100vw"
           className="w-full max-w-2xl h-auto object-contain"
           loading="lazy"
         />

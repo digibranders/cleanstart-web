@@ -8,6 +8,7 @@ export function Logo({ className = "" }: { className?: string }) {
       alt="CleanStart"
       width={153}
       height={32}
+      sizes="153px"
       priority
       className={className}
     />

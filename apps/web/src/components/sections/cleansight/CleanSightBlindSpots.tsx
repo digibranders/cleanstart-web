@@ -63,6 +63,7 @@ export function CleanSightBlindSpots(): React.ReactElement {
           alt=""
           width={415}
           height={413}
+          sizes="591px"
           className="object-contain"
         />
       </div>
@@ -85,6 +86,7 @@ export function CleanSightBlindSpots(): React.ReactElement {
           alt=""
           width={415}
           height={413}
+          sizes="591px"
           className="object-contain"
         />
       </div>

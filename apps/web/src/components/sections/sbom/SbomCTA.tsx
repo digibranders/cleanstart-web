@@ -136,6 +136,7 @@ export function SbomCTA(): React.ReactElement {
         aria-hidden
         width={304}
         height={206}
+        sizes="304px"
         className="hidden md:block absolute pointer-events-none select-none object-contain"
         style={{ left: "308px", top: "221.5px", width: "304px", height: "206px" }}
         loading="lazy"

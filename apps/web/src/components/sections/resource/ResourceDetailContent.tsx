@@ -59,6 +59,7 @@ export function ResourceDetailContent({
                 alt={resource.heroImage?.alt ?? resource.title}
                 width={839}
                 height={455}
+                sizes="(min-width: 1024px) 839px, 100vw"
                 className="w-full h-auto"
                 style={{ borderRadius: "24px", objectFit: "cover", maxWidth: "839px" }}
                 priority

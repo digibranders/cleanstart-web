@@ -66,6 +66,7 @@ export function SecurityNotPatching() {
             alt=""
             width={1101}
             height={1101}
+            sizes="1101px"
             className="pointer-events-none absolute"
             style={{
               left: "-707px",
@@ -84,6 +85,7 @@ export function SecurityNotPatching() {
             alt=""
             width={374}
             height={332}
+            sizes="374px"
             className="pointer-events-none absolute"
             style={{
               left: "1086px",
@@ -200,6 +202,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
               alt=""
               width={162}
               height={186}
+              sizes="162px"
               className="pointer-events-none absolute"
               style={{
                 right: "-37px",
@@ -218,6 +221,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
               alt=""
               width={258}
               height={236}
+              sizes="258px"
               className="pointer-events-none absolute mix-blend-soft-light"
               style={{
                 right: "-120px",
@@ -254,6 +258,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                   alt=""
                   width={41}
                   height={48}
+                  sizes="41px"
                   className="h-[47px] w-[41px]"
                 />
                 <span className="font-display text-[2rem] font-bold leading-none tracking-[-0.05em] text-white">
@@ -266,6 +271,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                 alt="CleanStart"
                 width={227}
                 height={47}
+                sizes="227px"
                 className="h-[47px] w-auto"
                 priority={false}
               />
@@ -316,6 +322,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                     alt=""
                     width={24}
                     height={24}
+                    sizes="24px"
                     className="h-6 w-6 shrink-0"
                   />
                 ) : (
@@ -324,6 +331,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                     alt=""
                     width={31}
                     height={27}
+                    sizes="31px"
                     className="h-[27px] w-[31px] shrink-0"
                   />
                 )}
@@ -384,6 +392,7 @@ function KubrMascot() {
           alt=""
           width={KUBR_W}
           height={KUBR_H}
+          sizes="290px"
           className="h-full w-full object-contain"
         />
       </div>
@@ -410,6 +419,7 @@ function KubrMascot() {
           alt="Kubr mascot"
           width={KUBR_W}
           height={KUBR_H}
+          sizes="290px"
           className="h-full w-full object-contain drop-shadow-[0_24px_40px_rgba(60,40,180,0.30)]"
         />
       </div>

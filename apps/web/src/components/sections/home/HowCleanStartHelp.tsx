@@ -326,6 +326,7 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
             alt=""
             width={161}
             height={160}
+            sizes="161px"
             className="h-full w-full object-contain"
           />
         </div>

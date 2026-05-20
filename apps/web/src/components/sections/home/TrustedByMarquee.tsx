@@ -37,6 +37,7 @@ export function TrustedByMarquee() {
                 alt=""
                 width={120}
                 height={32}
+                sizes="120px"
                 className="h-8 max-w-[120px] object-contain opacity-80 [filter:grayscale(1)_brightness(2)_contrast(1.1)]"
               />
             </div>

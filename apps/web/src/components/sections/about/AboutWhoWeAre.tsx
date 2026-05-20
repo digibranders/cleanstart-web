@@ -140,6 +140,7 @@ export function AboutWhoWeAre() {
                     alt={pillar.title}
                     width={100}
                     height={100}
+                    sizes="100px"
                     className="h-full w-full object-contain"
                   />
                 </div>

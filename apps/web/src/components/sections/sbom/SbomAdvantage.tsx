@@ -248,6 +248,7 @@ export function SbomAdvantage(): React.ReactElement {
           alt="CleanStart 3D logo"
           width={264}
           height={319}
+          sizes="264px"
           className="w-full h-full object-contain relative z-10"
           loading="lazy"
         />
@@ -362,6 +363,7 @@ export function SbomAdvantage(): React.ReactElement {
           alt="CleanStart 3D logo"
           width={200}
           height={241}
+          sizes="200px"
           className="w-40 h-auto object-contain"
           loading="lazy"
         />

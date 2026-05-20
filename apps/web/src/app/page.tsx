@@ -120,6 +120,7 @@ export default function Home() {
               alt=""
               width={1101}
               height={1101}
+              sizes="1101px"
               unoptimized
               loading="eager"
               className="absolute"
@@ -132,6 +133,7 @@ export default function Home() {
               alt=""
               width={1101}
               height={1101}
+              sizes="1101px"
               unoptimized
               loading="eager"
               className="absolute"
@@ -144,6 +146,7 @@ export default function Home() {
               alt=""
               width={1101}
               height={1101}
+              sizes="1101px"
               unoptimized
               loading="eager"
               className="absolute"

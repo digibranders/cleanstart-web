@@ -89,6 +89,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
               src={mediaUrl(post.heroImage.url)!}
               alt={post.heroImage.alt ?? post.title}
               fill
+              sizes="(min-width: 1280px) 380px, (min-width: 768px) 50vw, 100vw"
               className="object-cover"
             />
           ) : (

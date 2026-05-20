@@ -133,6 +133,7 @@ export function CleanSightProblems(): React.ReactElement {
                   alt={p.alt}
                   width={220}
                   height={165}
+                  sizes="220px"
                   className="relative object-contain w-full h-full"
                   loading="lazy"
                 />

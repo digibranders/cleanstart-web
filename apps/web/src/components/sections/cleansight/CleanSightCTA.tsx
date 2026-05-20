@@ -80,6 +80,7 @@ export function CleanSightCTA(): React.ReactElement {
           alt=""
           width={213}
           height={213}
+          sizes="260px"
           className="object-cover"
         />
       </div>
@@ -178,6 +179,7 @@ export function CleanSightAwards(): React.ReactElement {
               src={a.src}
               alt={a.alt}
               fill
+              sizes="97px"
               className="object-contain"
               loading="lazy"
             />

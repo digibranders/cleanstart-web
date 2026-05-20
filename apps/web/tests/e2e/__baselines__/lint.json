@@ -2,11 +2,10 @@
   "measuredAt": "2026-05-20",
   "totals": {
     "files": 206,
-    "warnings": 144,
+    "warnings": 107,
     "errors": 0
   },
   "byRule": {
-    "every `<Image>` requires a `sizes` prop matching the rendered widths per breakpoint, or an": 37,
     "`<br />` inside prose breaks responsive line shape": 28,
     "arbitrary `text-[Xrem]` is forbidden": 16,
     "flat-px `fontSize:` in inline style is forbidden outside the documented allow-list": 57,

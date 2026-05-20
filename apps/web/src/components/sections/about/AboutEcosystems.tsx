@@ -119,6 +119,7 @@ export function AboutEcosystems() {
                 alt={p.name}
                 width={p.width}
                 height={p.height}
+                sizes="200px"
                 className="h-auto object-contain opacity-80 transition-opacity hover:opacity-100"
                 style={{ maxHeight: "88px", maxWidth: p.width }}
                 loading="lazy"

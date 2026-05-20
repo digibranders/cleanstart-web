@@ -17,6 +17,7 @@ export function ReadyToSecureCTAOverlay() {
         alt=""
         width={304}
         height={206}
+        sizes="304px"
         className="h-full w-full object-contain"
       />
     </div>

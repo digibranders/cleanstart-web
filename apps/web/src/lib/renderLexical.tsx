@@ -225,6 +225,7 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
             alt={val.alt ?? ""}
             width={val.width ?? 800}
             height={val.height ?? 450}
+            sizes="(min-width: 1024px) 680px, 100vw"
             className="rounded-lg w-full h-auto"
           />
         </figure>
