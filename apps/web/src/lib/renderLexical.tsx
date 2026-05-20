@@ -92,7 +92,13 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
     case "paragraph": {
       const pNode = node as Extract<LexicalNode, { type: "paragraph" }>;
       const children = pNode.children ?? [];
-      if (children.length === 0) return <br key={key} />;
+      // Empty paragraphs from Lexical editor output render as a single spacer
+      // line; this is structural (preserving authored vertical rhythm), not a
+      // prose line-break, so the v3 Consistency Layer no-br rule does not apply.
+      if (children.length === 0) {
+        // eslint-disable-next-line no-restricted-syntax -- structural editor spacer, not prose
+        return <br key={key} />;
+      }
       return (
         <p key={key} className="article-paragraph">
           {renderNodes(children, key)}
@@ -225,6 +231,7 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
             alt={val.alt ?? ""}
             width={val.width ?? 800}
             height={val.height ?? 450}
+            sizes="(min-width: 1024px) 680px, 100vw"
             className="rounded-lg w-full h-auto"
           />
         </figure>

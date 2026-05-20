@@ -1,0 +1,62 @@
+[
+  {
+    "route": "/",
+    "scrollWidth": 1425,
+    "clientWidth": 1440,
+    "delta": -15
+  },
+  {
+    "route": "/about-us",
+    "scrollWidth": 1425,
+    "clientWidth": 1440,
+    "delta": -15
+  },
+  {
+    "route": "/attack-surface-reduction",
+    "scrollWidth": 1425,
+    "clientWidth": 1440,
+    "delta": -15
+  },
+  {
+    "route": "/blogs",
+    "scrollWidth": 1425,
+    "clientWidth": 1440,
+    "delta": -15
+  },
+  {
+    "route": "/cleansight",
+    "scrollWidth": 1425,
+    "clientWidth": 1440,
+    "delta": -15
+  },
+  {
+    "route": "/cleanstart-images",
+    "scrollWidth": 1425,
+    "clientWidth": 1440,
+    "delta": -15
+  },
+  {
+    "route": "/fips",
+    "scrollWidth": 1425,
+    "clientWidth": 1440,
+    "delta": -15
+  },
+  {
+    "route": "/news",
+    "scrollWidth": 1425,
+    "clientWidth": 1440,
+    "delta": -15
+  },
+  {
+    "route": "/resource-center",
+    "scrollWidth": 1425,
+    "clientWidth": 1440,
+    "delta": -15
+  },
+  {
+    "route": "/vulnerability-remediation",
+    "scrollWidth": 1425,
+    "clientWidth": 1440,
+    "delta": -15
+  }
+]

@@ -105,12 +105,7 @@ export function BlogDetailCTA(): React.ReactElement {
         <button
           type="button"
           className="cs-btn-blue relative overflow-hidden gap-2"
-          style={{
-            width: "168px",
-            height: "44px",
-            padding: "0 14px",
-            fontSize: "1.125rem",
-          }}
+          style={{ minWidth: "168px", padding: "0 14px" }}
         >
           <span style={{ position: "relative", zIndex: 1 }}>Get in Touch</span>
           {/* eslint-disable-next-line @next/next/no-img-element */}

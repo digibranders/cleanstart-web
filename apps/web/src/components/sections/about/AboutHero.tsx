@@ -1,8 +1,8 @@
 export function AboutHero() {
   return (
     <section
-      className="relative bg-cs-hero bg-cs-grid"
-      style={{ minHeight: "569px" }}
+      className="relative bg-cs-hero bg-cs-grid overflow-hidden"
+      style={{ minHeight: "clamp(440px, 40vw, 569px)" }}
     >
       {/* Purple radial blobs — matching Figma ellipse overlays */}
       <div
@@ -59,7 +59,7 @@ export function AboutHero() {
 
       <div className="relative mx-auto max-w-[1276px] px-6">
         {/* Text at top: 178px from section top, matching Figma node 248:2066 */}
-        <div className="pt-[178px] pb-[80px]">
+        <div className="pt-[clamp(96px,11vw,178px)] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col items-start gap-14 lg:max-w-[436px]">
             <h1
               className="font-display font-semibold text-white"
@@ -69,14 +69,13 @@ export function AboutHero() {
                 letterSpacing: "-0.05em",
               }}
             >
-              Security Begins at <br /> The Source
+              Security Begins at The Source
             </h1>
 
             <a
               href="#contact"
               className="cs-btn-glass"
               style={{
-                ["--cs-btn-h" as string]: "40px",
                 ["--cs-btn-px" as string]: "18px",
                 ["--cs-btn-fs" as string]: "20px",
                 color: "#111111",

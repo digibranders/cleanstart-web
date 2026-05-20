@@ -4,7 +4,7 @@ export function CleanStartImagesHero(): React.ReactElement {
       data-section="CleanStartImagesHero"
       className="relative overflow-hidden"
       style={{
-        minHeight: "1084px",
+        minHeight: "clamp(720px, 75vw, 1084px)",
         backgroundColor: "#0B0820",
         backgroundImage: [
           "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
@@ -18,7 +18,7 @@ export function CleanStartImagesHero(): React.ReactElement {
       {/* Content wrapper — Figma frame 1920×1084, title at y=175 */}
       <div
         className="relative mx-auto max-w-[1276px] px-6 flex flex-col items-center text-center"
-        style={{ paddingTop: "160px", paddingBottom: "80px" }}
+        style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(48px, 6vw, 80px)" }}
       >
         <h1
           className="text-white"
@@ -31,8 +31,7 @@ export function CleanStartImagesHero(): React.ReactElement {
             maxWidth: "820px",
           }}
         >
-          Approach to CVE Free <br className="hidden sm:block" />
-          Container Images
+          Approach to CVE Free Container Images
         </h1>
 
         {/* Diagram — Figma group 161:23277, 1244×466 at y=424 (relative to hero 1084) */}

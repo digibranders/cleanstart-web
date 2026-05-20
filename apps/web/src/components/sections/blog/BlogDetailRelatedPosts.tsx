@@ -89,6 +89,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
               src={mediaUrl(post.heroImage.url)!}
               alt={post.heroImage.alt ?? post.title}
               fill
+              sizes="(min-width: 1280px) 380px, (min-width: 768px) 50vw, 100vw"
               className="object-cover"
             />
           ) : (
@@ -136,7 +137,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
 
           {/* Title */}
           <h3
-            className="line-clamp-3 flex-1 font-display text-2xl font-medium leading-[1.3]"
+            className="line-clamp-3 flex-1 font-display text-card-title-md font-medium leading-[1.3]"
             style={{ color: "#111" }}
           >
             {post.title}
@@ -145,7 +146,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
           {/* Abstract */}
           {post.abstract && (
             <p
-              className="line-clamp-3 text-base font-normal leading-[1.3]"
+              className="line-clamp-3 text-body-md font-normal leading-[1.3]"
               style={{ color: "rgba(17,17,17,0.54)" }}
             >
               {post.abstract}
@@ -159,7 +160,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
             className="group inline-flex items-center gap-2 mt-auto pt-2 self-start"
           >
             <span
-              className="text-xl font-medium leading-[1.5] group-hover:text-[#3928e0] transition-colors duration-200"
+              className="text-body-lg font-medium leading-[1.5] group-hover:text-[#3928e0] transition-colors duration-200"
               style={{ color: "#4a3bf1" }}
             >
               Read more

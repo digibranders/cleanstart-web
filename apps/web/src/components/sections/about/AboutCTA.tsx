@@ -48,9 +48,8 @@ export function AboutCTA() {
           Start Clean. Stay Secure.
         </h2>
         <p
-          className="font-sans text-white/80"
+          className="font-sans text-body-lg text-white/80"
           style={{
-            fontSize: "clamp(1rem, 1.5vw, 1.3125rem)",
             fontWeight: 400,
             lineHeight: "1.4",
             letterSpacing: "-0.04em",
@@ -66,7 +65,6 @@ export function AboutCTA() {
           href="#contact"
           className="cs-btn-glass"
           style={{
-            ["--cs-btn-h" as string]: "43px",
             ["--cs-btn-px" as string]: "18px",
             ["--cs-btn-fs" as string]: "18px",
             color: "#111111",
@@ -79,14 +77,14 @@ export function AboutCTA() {
         <a
           href="#how-it-works"
           className="cs-btn-blue"
-          style={{ width: "163px", height: "43px", fontSize: "1.125rem" }}
+          style={{ minWidth: "163px" }}
         >
           How it works
         </a>
         <a
           href="#careers"
           className="cs-btn-blue"
-          style={{ width: "111px", height: "43px", fontSize: "1.125rem" }}
+          style={{ minWidth: "111px" }}
         >
           Careers
         </a>

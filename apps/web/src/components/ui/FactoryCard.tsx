@@ -15,6 +15,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           left: "-141px",
           top: "-168px",
           width: "344px",
+          maxWidth: "calc(100% + 200px)",
           height: "406px",
           borderRadius: "50%",
           background:
@@ -23,13 +24,17 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
         }}
       />
 
-      {/* Layer 2 — cyan ellipse (large, dominant, like Figma Ellipse 46684 #04C7F2) */}
+      {/* Layer 2 — cyan ellipse (large, dominant, like Figma Ellipse 46684 #04C7F2).
+          maxWidth caps the wrapper so on narrow grid cells it doesn't bleed
+          past the card edge into body.scrollWidth (the card's overflow-hidden
+          already kept it visually clean, but the bbox propagated). */}
       <div
         className="pointer-events-none absolute"
         style={{
           left: "-136px",
           top: "-22px",
           width: "552px",
+          maxWidth: "calc(100% + 200px)",
           height: "652px",
           borderRadius: "50%",
           background:
@@ -69,8 +74,13 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
         }}
       />
 
-      {/* Orb icon — Figma "Point" rect at x=6.6, y=19, 220×164 */}
-      <div className="pointer-events-none absolute left-[6px] top-[19px] flex h-[164px] w-[220px] items-center justify-center">
+      {/* Orb icon — Figma "Point" rect at x=6.6, y=19, 220×164.
+          `max-w-[calc(100%-12px)]` caps the wrapper to the card's inner
+          width on narrow viewports (mobile grid cells are ~155 wide;
+          the unconstrained 220px wrapper used to bleed past the card
+          and inflate body.scrollWidth even though overflow-hidden on
+          the card root kept it visually clean). */}
+      <div className="pointer-events-none absolute left-[6px] top-[19px] flex h-[164px] w-[220px] max-w-[calc(100%-12px)] items-center justify-center">
         <Image
           src="/images/factory-orb.png"
           alt=""

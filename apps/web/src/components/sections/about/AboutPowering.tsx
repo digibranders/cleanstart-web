@@ -122,7 +122,7 @@ export function AboutPowering() {
         </div>
 
         {/* Cards row — Figma top=412 → 80px gap below title block */}
-        <div className="mt-20 flex flex-wrap items-stretch justify-center gap-y-16 gap-x-[91px]">
+        <div className="mt-20 grid grid-cols-1 items-stretch gap-y-16 gap-x-[clamp(24px,6vw,91px)] md:grid-cols-2 xl:grid-cols-3 place-items-center">
           {CARDS.map((card) => (
             <FeatureCard key={card.title} {...card} />
           ))}
@@ -136,8 +136,8 @@ export function AboutPowering() {
 function FeatureCard({ title, description }: Card) {
   return (
     <div
-      className="relative shrink-0"
-      style={{ width: "346px", height: "420px" }}
+      className="relative w-full"
+      style={{ maxWidth: "346px", minHeight: "clamp(360px, 30vw, 420px)" }}
     >
       {/* Outer shadow — 248:2159 (404×478, 29px halo, top-rounded glow PNG) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -145,7 +145,7 @@ function FeatureCard({ title, description }: Card) {
         aria-hidden
         src="/images/about/powering-card-glow.svg"
         alt=""
-        className="pointer-events-none absolute -inset-x-[29px] -top-[29px] h-[478px] w-[404px] max-w-none select-none"
+        className="pointer-events-none absolute -inset-x-[29px] -top-[29px] h-[calc(100%+58px)] w-[calc(100%+58px)] max-w-none select-none"
         loading="lazy"
         decoding="async"
       />
@@ -157,16 +157,14 @@ function FeatureCard({ title, description }: Card) {
         style={{ backgroundColor: "#2CC1EB", opacity: 0.3 }}
       />
 
-      {/* White card — 248:2162 (346×420, rounded-16) */}
-      <div className="relative h-full w-full overflow-hidden rounded-[16px] bg-white">
+      {/* White card — flex column, no absolute internals */}
+      <div className="relative flex h-full w-full flex-col gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[16px] bg-white p-card-md">
         {/* Ball — 248:2163 (96×96, blue gradient, inset highlight) */}
         <div
-          className="absolute flex items-center justify-center overflow-hidden"
+          className="flex shrink-0 items-center justify-center overflow-hidden"
           style={{
-            top: "24px",
-            left: "24px",
-            width: "96px",
-            height: "96px",
+            width: "clamp(72px, 7vw, 96px)",
+            aspectRatio: "1 / 1",
             borderRadius: "160px",
             background: "linear-gradient(180deg, #239CFF 0%, #005BE3 100%)",
             boxShadow:
@@ -179,35 +177,21 @@ function FeatureCard({ title, description }: Card) {
             alt=""
             width={54}
             height={54}
-            className="h-[54px] w-[54px] object-contain"
+            className="object-contain"
+            style={{ width: "56%", height: "56%" }}
             loading="lazy"
             decoding="async"
           />
         </div>
 
-        {/* Title — 248:2182 (32px Manrope Bold, tracking -0.05em, #111) */}
-        <h3
-          className="absolute font-display text-[2rem] font-bold leading-none tracking-[-0.05em] text-[#111]"
-          style={{
-            top: "180px",
-            left: "24px",
-            right: "24px",
-          }}
-        >
-          {title}
-        </h3>
-
-        {/* Body — 248:2183 (20px Sora Regular, leading 1.4, tracking -0.05em, #555) */}
-        <p
-          className="absolute text-xl font-normal leading-[1.4] tracking-[-0.05em] text-[#555]"
-          style={{
-            top: "260px",
-            left: "24px",
-            right: "24px",
-          }}
-        >
-          {description}
-        </p>
+        <div className="flex flex-col gap-3">
+          <h3 className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em] text-[#111]">
+            {title}
+          </h3>
+          <p className="text-body-lg font-normal leading-[1.4] tracking-[-0.05em] text-[#555]">
+            {description}
+          </p>
+        </div>
       </div>
     </div>
   );

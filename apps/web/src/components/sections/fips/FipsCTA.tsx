@@ -84,7 +84,6 @@ export function FipsCTA(): React.ReactElement {
             {
               left: "50.00%",
               top: "60.91%",
-              "--cs-btn-h": "43px",
               "--cs-btn-px": "30px",
               "--cs-btn-fs": "16px",
             } as React.CSSProperties
@@ -127,7 +126,7 @@ export function FipsCTA(): React.ReactElement {
         <p
           className="font-display"
           style={{
-            fontSize: "14px",
+            fontSize: "clamp(13px, 1vw, 15px)",
             fontWeight: 400,
             letterSpacing: "-0.03em",
             lineHeight: 1.4,
@@ -142,7 +141,6 @@ export function FipsCTA(): React.ReactElement {
           className="cs-btn-glass self-start"
           style={
             {
-              "--cs-btn-h": "40px",
               "--cs-btn-px": "22px",
               "--cs-btn-fs": "14px",
             } as React.CSSProperties

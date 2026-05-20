@@ -61,7 +61,7 @@ export function CleanSightProblems(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6 py-16 md:py-20 xl:py-[120px]">
+      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6 py-section-md">
         {/* Heading */}
         <div className="text-center">
           <h2
@@ -133,6 +133,7 @@ export function CleanSightProblems(): React.ReactElement {
                   alt={p.alt}
                   width={220}
                   height={165}
+                  sizes="220px"
                   className="relative object-contain w-full h-full"
                   loading="lazy"
                 />

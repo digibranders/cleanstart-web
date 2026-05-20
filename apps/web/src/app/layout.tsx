@@ -100,6 +100,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#151021",
+  // Required for env(safe-area-inset-*) to resolve to non-zero on notched devices.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

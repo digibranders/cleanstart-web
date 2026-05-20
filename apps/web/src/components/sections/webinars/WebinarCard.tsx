@@ -68,10 +68,9 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
         style={{ padding: "28px 20px 20px", gap: "12px", flex: 1 }}
       >
         <h3
-          className="font-display line-clamp-3"
+          className="font-display text-card-title-sm line-clamp-3"
           style={{
-            fontSize: "18px",
-            lineHeight: "24px",
+            lineHeight: "1.3",
             color: "#0F172A",
             fontWeight: 600,
             letterSpacing: "-0.01em",
@@ -93,8 +92,8 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
             decoding="async"
           />
           <span
-            className="font-sans"
-            style={{ fontSize: "14px", color: "#475569", fontWeight: 500 }}
+            className="font-sans text-body-sm"
+            style={{ color: "#475569", fontWeight: 500 }}
           >
             {region}
           </span>
@@ -112,7 +111,7 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
               borderRadius: "12px",
               background: "#1F50FF",
               color: "#FFFFFF",
-              fontSize: "15px",
+              fontSize: "clamp(14px, 1.05vw, 16px)",
             }}
           >
             Register
@@ -127,7 +126,7 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
               borderRadius: "12px",
               background: "#94A3B8",
               color: "#FFFFFF",
-              fontSize: "15px",
+              fontSize: "clamp(14px, 1.05vw, 16px)",
               opacity: 0.6,
               cursor: "not-allowed",
             }}

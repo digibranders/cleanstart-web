@@ -65,7 +65,7 @@ export function SbomCTA(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "55px",
+              fontSize: "clamp(34px, 2.86vw, 55px)",
               fontWeight: 700,
               letterSpacing: "-0.05em",
               lineHeight: 1.05,
@@ -85,7 +85,7 @@ export function SbomCTA(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "21px",
+              fontSize: "clamp(15px, 1.15vw, 22px)",
               fontWeight: 400,
               letterSpacing: "-0.04em",
               lineHeight: 1.5,
@@ -102,7 +102,7 @@ export function SbomCTA(): React.ReactElement {
             className="cs-btn-glass self-start"
             style={
               {
-                "--cs-btn-h": "48px",
+                "--cs-btn-h": "var(--btn-h-xl)",
                 "--cs-btn-px": "32px",
                 "--cs-btn-fs": "17px",
               } as React.CSSProperties
@@ -136,6 +136,7 @@ export function SbomCTA(): React.ReactElement {
         aria-hidden
         width={304}
         height={206}
+        sizes="304px"
         className="hidden md:block absolute pointer-events-none select-none object-contain"
         style={{ left: "308px", top: "221.5px", width: "304px", height: "206px" }}
         loading="lazy"
@@ -159,7 +160,7 @@ export function SbomCTA(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "14px",
+            fontSize: "clamp(13px, 1vw, 15px)",
             fontWeight: 400,
             letterSpacing: "-0.03em",
             lineHeight: 1.4,
@@ -173,7 +174,6 @@ export function SbomCTA(): React.ReactElement {
           className="cs-btn-glass self-start"
           style={
             {
-              "--cs-btn-h": "40px",
               "--cs-btn-px": "22px",
               "--cs-btn-fs": "14px",
             } as React.CSSProperties

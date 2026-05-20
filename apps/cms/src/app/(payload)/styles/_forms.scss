@@ -935,7 +935,15 @@
 // =============================================================================
 .cs-datetime {
   display: inline-block;
+  position: relative;
   width: 100%;
+
+  // Reserve space on the right inside the trigger for the clear button
+  // when one is shown. The trigger keeps full width; the clear button is
+  // absolutely positioned on top of the trailing padding zone.
+  &--has-clear &__trigger {
+    padding-right: calc(var(--cs-space-3) + 22px);
+  }
 
   &__trigger {
     align-items: center;
@@ -973,14 +981,34 @@
     color: var(--theme-text-soft);
   }
 
+  // Pinned to the right edge of the trigger (visually inside the input
+  // bezel). Without this, the bare `×` drops onto its own line below
+  // the input and looks like an orphan widget.
   &__clear {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
     color: var(--theme-text-soft);
     cursor: pointer;
-    font-size: 16px;
+    display: inline-flex;
+    font-size: 14px;
+    height: 18px;
+    justify-content: center;
     line-height: 1;
+    padding: 0;
+    position: absolute;
+    right: var(--cs-space-2);
+    top: 50%;
+    transform: translateY(-50%);
+    transition: color var(--cs-motion-micro), background var(--cs-motion-micro);
+    width: 18px;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       color: var(--color-error-500);
+      background: var(--theme-elevation-150);
+      outline: none;
     }
   }
 

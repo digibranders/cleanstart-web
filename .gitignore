@@ -48,6 +48,15 @@ pnpm-debug.log*
 coverage/
 .nyc_output/
 
+# Playwright (apps/web responsive e2e gate)
+apps/web/playwright-report/
+apps/web/test-results/
+apps/web/tests/e2e/**/__screenshots__/
+apps/web/tests/e2e/**/*-snapshots/
+
+# Lighthouse CI local output
+.lighthouseci/
+
 # Migrations local artefacts (ETL outputs are gitignored; scripts are committed)
 migrations/webflow-export/
 migrations/webflow-import/.cache/

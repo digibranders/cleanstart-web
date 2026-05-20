@@ -1,0 +1,14 @@
+{
+  "measuredAt": "2026-05-20",
+  "totals": {
+    "files": 206,
+    "warnings": 64,
+    "errors": 0
+  },
+  "byRule": {
+    "arbitrary `text-[Xrem]` is forbidden": 10,
+    "flat-px `fontSize:` in inline style is forbidden outside the documented allow-list": 49,
+    "`preserveAspectRatio=\"none\"` distorts paths": 1,
+    "bare `w-[Xpx]` without a `max-w-[*]` qualifier is forbidden": 4
+  }
+}

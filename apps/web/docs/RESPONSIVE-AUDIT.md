@@ -688,16 +688,19 @@ This is the foundation. Add to `apps/web/src/app/globals.css` `@theme` block. Th
   --text-body-sm: clamp(0.875rem, 0.9vw, 1rem);     /* 14→16px — meta text */
   --text-body-xs: clamp(0.75rem, 0.85vw, 0.875rem); /* 12→14px — captions */
 
-  /* === NEW — fluid section padding scale === */
-  --space-section-sm: clamp(3rem, 6vw, 5rem);        /* 48→80px — tight sections */
-  --space-section-md: clamp(4rem, 8vw, 7.5rem);      /* 64→120px — standard */
-  --space-section-lg: clamp(5rem, 10vw, 9.375rem);   /* 80→150px — feature sections */
-  --space-section-cta: clamp(10rem, 18vw, 15.625rem); /* 160→250px — CTA-overlap reservation */
+  /* === NEW — fluid section padding scale ===
+     Tailwind v4 derives `py-*`, `p-*`, `m-*`, `gap-*` etc. from the
+     `--spacing-*` namespace, NOT `--space-*`. Use the `--spacing-` prefix
+     so `py-section-md` resolves to the clamp() expression at build time. */
+  --spacing-section-sm: clamp(3rem, 6vw, 5rem);        /* 48→80px — tight sections */
+  --spacing-section-md: clamp(4rem, 8vw, 7.5rem);      /* 64→120px — standard */
+  --spacing-section-lg: clamp(5rem, 10vw, 9.375rem);   /* 80→150px — feature sections */
+  --spacing-section-cta: clamp(10rem, 18vw, 15.625rem); /* 160→250px — CTA-overlap reservation */
 
-  /* === NEW — fluid card padding scale === */
-  --space-card-sm: clamp(1rem, 1.5vw, 1.5rem);       /* 16→24px */
-  --space-card-md: clamp(1.25rem, 2vw, 2rem);        /* 20→32px */
-  --space-card-lg: clamp(1.5rem, 2.5vw, 2.5rem);     /* 24→40px */
+  /* === NEW — fluid card padding scale (same namespace caveat as above) === */
+  --spacing-card-sm: clamp(1rem, 1.5vw, 1.5rem);       /* 16→24px */
+  --spacing-card-md: clamp(1.25rem, 2vw, 2rem);        /* 20→32px */
+  --spacing-card-lg: clamp(1.5rem, 2.5vw, 2.5rem);     /* 24→40px */
 
   /* === EXISTING container === */
   --container-cs: 1276px;
@@ -2089,7 +2092,7 @@ Independent re-read of all 20 Part 5 worst-offenders against current `developmen
 
 | Flag | Status | Note |
 |---|---|---|
-| Resource Detail download bypass | **CONFIRMED — still bypasses** | `ResourceDetailHero.tsx` passes `assetHref` + `gated` to `ResourceDownloadButton` but the download fires when `assetHref !== "#"` regardless of `gateForm`. Form renderer landed (`3f009c4`) and a `ResourceGateModal.tsx` exists — but the Hero CTA path is not wired through it. This is a **product/compliance regression** that has now been open for >14 calendar days since first reported. |
+| Resource Detail download bypass | **RESOLVED (v3.1 re-verification, 2026-05-20)** | First-pass v3 verification was wrong. `ResourceDownloadButton.tsx` (added in `3f009c4`) IS wired correctly: when `gated && gateForm` it renders a button (not an `<a>`), the button's onClick checks `/api/resources/:slug/token`; on 200 the asset streams via the unlock cookie, on 403/404 the `ResourceGateModal` opens for form submit. `ResourceDetailHero.tsx:212` correctly threads `gated` + `gateForm` through. **No remediation needed.** Sprint 1 Day 5 adds the E2E regression test to keep it that way. |
 | BlogDetailFAQ `xl:` vs `lg:` mismatch | **RESOLVED** | Consistent `xl:` across siblings. Retire the flag. |
 | ResourceDetailLeadCapture checkbox 14×14 | CONFIRMED | line 240–241. WCAG 2.5.8 AA fail. |
 | PodcastHero `preserveAspectRatio="none"` ×2 | CONFIRMED | line 68, 109. |

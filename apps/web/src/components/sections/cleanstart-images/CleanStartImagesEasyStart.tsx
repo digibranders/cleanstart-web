@@ -54,7 +54,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
       data-section="CleanStartImagesEasyStart"
       className="relative overflow-hidden"
       style={{
-        minHeight: "626px",
+        minHeight: "clamp(480px, 44vw, 626px)",
         background:
           "linear-gradient(180deg, #0B0820 0%, #1A1248 35%, #2E1B8C 75%, #3A20B0 100%)",
       }}
@@ -73,7 +73,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
 
       <div
         className="relative mx-auto max-w-[1276px] px-6"
-        style={{ paddingTop: "120px", paddingBottom: "120px" }}
+        style={{ paddingTop: "var(--spacing-section-md)", paddingBottom: "var(--spacing-section-md)" }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_512px] gap-12 lg:gap-16 items-start">
           {/* Left column — title + subtitle + 3 features */}
@@ -110,9 +110,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 color: "rgba(255,255,255,0.85)",
               }}
             >
-              Just replace your base image with CleanStart.
-              <br />
-              No code changes, no hassle.
+              Just replace your base image with CleanStart. No code changes, no hassle.
             </p>
 
             <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -124,10 +122,9 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 >
                   <GlowBall />
                   <h3
-                    className="mt-3 text-white"
+                    className="mt-3 text-card-title-sm text-white"
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "18px",
                       fontWeight: 600,
                       letterSpacing: "-0.01em",
                     }}
@@ -135,10 +132,9 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                     {f.title}
                   </h3>
                   <p
-                    className="mt-2"
+                    className="mt-2 text-body-sm"
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "14px",
                       fontWeight: 400,
                       lineHeight: 1.5,
                       color: "rgba(255,255,255,0.75)",

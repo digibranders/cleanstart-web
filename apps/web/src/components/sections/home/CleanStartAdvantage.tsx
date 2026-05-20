@@ -65,15 +65,14 @@ export function CleanStartAdvantage() {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-[1276px] px-6 py-20 sm:py-24 lg:py-[150px]">
+      <div className="relative mx-auto w-full max-w-[1276px] px-6 py-section-lg">
         {/* Intro: title + description (Figma Frame 10 at 316,3438 — 517×265) */}
         <div className="max-w-[517px]">
           <h2
             id="advantage-title"
             className="font-display text-display-md font-semibold leading-[1.05] tracking-[-0.05em] text-white"
           >
-            CleanStart
-            <br />
+            CleanStart{" "}
             <span
               className="bg-clip-text text-transparent"
               style={{

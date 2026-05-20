@@ -26,6 +26,51 @@
   --text-display-md: clamp(2rem, 5.2vw, 3.875rem);
   --text-display-lg: clamp(2.25rem, 6.5vw, 4.5rem);
 
+  /* Card-title scale — fills the gap between display-sm and text-3xl.
+     Use per the role->token map in apps/web/docs/design-tokens.md. */
+  --text-card-title-xl: clamp(1.5rem, 2vw, 2.0625rem);     /* 24→33px — FactoryCard, AboutPowering hero feature cards */
+  --text-card-title-lg: clamp(1.375rem, 1.8vw, 2rem);      /* 22→32px — Security headers, HowCleanStartHelp, AsrApproach, AsrFitsBuilt, AboutWhoWeAre pillars */
+  --text-card-title-md: clamp(1.125rem, 1.4vw, 1.5rem);    /* 18→24px — Blog/News/Resource/Event/Webinar/PodcastEpisode card titles */
+  --text-card-title-sm: clamp(1rem, 1.1vw, 1.3125rem);     /* 16→21px — pill/tab labels */
+
+  /* Body scale (inside cards & marketing copy — NOT for CMS prose; see .article-body below) */
+  --text-body-xl: clamp(1.0625rem, 1.4vw, 1.5rem);         /* 17→24px — section lead paragraph below H2 */
+  --text-body-lg: clamp(1rem, 1.2vw, 1.375rem);            /* 16→22px — standard card body, bullet items */
+  --text-body-md: clamp(0.9375rem, 1vw, 1.125rem);         /* 15→18px — secondary text, compact card body */
+  --text-body-sm: clamp(0.875rem, 0.9vw, 1rem);            /* 14→16px — meta, table cells */
+  --text-body-xs: clamp(0.75rem, 0.85vw, 0.875rem);        /* 12→14px — eyebrow, breadcrumb, caption */
+
+  /* Section vertical-padding scale (fluid) */
+  --spacing-section-sm: clamp(3rem, 6vw, 5rem);              /* 48→80px — tight/sequential grids */
+  --spacing-section-md: clamp(4rem, 8vw, 7.5rem);            /* 64→120px — standard sections */
+  --spacing-section-lg: clamp(5rem, 10vw, 9.375rem);         /* 80→150px — feature/hero-adjacent */
+  --spacing-section-cta: clamp(10rem, 18vw, 15.625rem);      /* 160→250px — CTA-overlap reservation above Footer */
+
+  /* Card padding scale (fluid) */
+  --spacing-card-sm: clamp(1rem, 1.5vw, 1.5rem);             /* 16→24px — compact cards */
+  --spacing-card-md: clamp(1.25rem, 2vw, 2rem);              /* 20→32px — standard cards */
+  --spacing-card-lg: clamp(1.5rem, 2.5vw, 2.5rem);           /* 24→40px — hero/feature cards */
+
+  /* Discrete button size scale — buttons MUST stay fixed (WCAG 2.5.8 floor); never clamp height.
+     Minimum CTA target is 44px (lg). Smaller variants are utility-only and require data-cta-utility. */
+  --btn-fs-xl: 1.25rem;   /* 20px */
+  --btn-fs-lg: 1.25rem;   /* 20px — primary hero CTA */
+  --btn-fs-md: 1rem;      /* 16px — secondary inline */
+  --btn-fs-sm: 0.875rem;  /* 14px — utility (data-cta-utility) */
+  --btn-fs-xs: 0.8125rem; /* 13px — utility (data-cta-utility) */
+
+  --btn-h-xl: 3rem;       /* 48px — hero-feature CTA */
+  --btn-h-lg: 2.75rem;    /* 44px — WCAG 2.5.8 floor; default for every primary CTA */
+  --btn-h-md: 2.25rem;    /* 36px — utility only (requires data-cta-utility) */
+  --btn-h-sm: 2rem;       /* 32px — utility only (requires data-cta-utility) */
+  --btn-h-xs: 1.75rem;    /* 28px — utility only (requires data-cta-utility) */
+
+  --btn-px-xl: 1.75rem;   /* 28px */
+  --btn-px-lg: 1.375rem;  /* 22px */
+  --btn-px-md: 1rem;      /* 16px */
+  --btn-px-sm: 0.75rem;   /* 12px */
+  --btn-px-xs: 0.625rem;  /* 10px */
+
   --color-cs-navy-0: #151021;
   --color-cs-navy-1: #10123e;
   --color-cs-blue-1: #131e8f;
@@ -228,6 +273,12 @@ body {
   font-weight: 500;
   letter-spacing: -0.01em;
   border-radius: 8px;
+  /* WCAG 2.5.8 floor for primary CTAs. Callsites may override
+     --cs-btn-h to var(--btn-h-xl) for hero-feature CTAs, or to a utility
+     value with `data-cta-utility`. See apps/web/docs/design-tokens.md. */
+  height: var(--cs-btn-h, 2.75rem);
+  padding: 0 var(--cs-btn-px, 22px);
+  font-size: var(--cs-btn-fs, 16px);
   background: #3960F9;
   box-shadow:
     0 0 0 1.002px #3960F9,
@@ -275,8 +326,13 @@ body {
   font-weight: 600;
   letter-spacing: -0.01em;
   color: #1B1F4F;
-  /* Default size — overridden via --cs-btn-h / --cs-btn-px on each instance */
-  height: var(--cs-btn-h, 40px);
+  /* Default size — every primary CTA inherits the WCAG 2.5.8 floor (44px).
+     Callsites may override --cs-btn-h to var(--btn-h-xl) for hero-feature CTAs,
+     or to a utility value (--btn-h-md/sm/xs) ONLY when the element also
+     carries `data-cta-utility` (per the v3 Consistency Layer).
+     Padding and font-size keep their pre-v3 defaults so this is a height-only
+     bump (S2D1 is the WCAG-target-size fix; visual rhythm work is later). */
+  height: var(--cs-btn-h, 2.75rem);
   padding: 0 var(--cs-btn-px, 18px);
   font-size: var(--cs-btn-fs, 14px);
   border-radius: 8px;
@@ -900,7 +956,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 360px;
+  /* v3 Consistency Layer: fluid stage height so the active card + peeks
+     scale together (was: flat 360px). Container-query context lets the
+     peek translate use % of the stage rather than absolute -319px. */
+  container-type: inline-size;
+  container-name: tt-stage;
+  height: clamp(280px, 28vw, 360px);
 }
 
 /* ---- Card base ---------------------------------------------------------- */
@@ -975,8 +1036,10 @@ body {
    deck pattern — keeps the active card clearly dominant while the sides
    overlap behind. */
 .cs-tt-card--active {
-  width: 798px;
-  height: 329px;
+  /* v3 Consistency Layer: active card scales between 480px and 798px wide
+     (was: flat 798px), height clamps between 280 and 329 (was: flat 329). */
+  width: min(798px, 100%);
+  height: clamp(280px, 24vw, 329px);
   max-width: 100%;
   z-index: 30;
   border-radius: 24px;
@@ -993,16 +1056,23 @@ body {
      FadeUp wrapper. Float is purely vertical and doesn't break centering. */
   animation: cs-tt-float 7s ease-in-out infinite;
 }
-.cs-tt-card--active .cs-tt-card__photo { width: 264px; height: 329px; border-radius: 24px 0 0 24px; }
-.cs-tt-card--active .cs-tt-card__body  { padding: 28px 36px 24px; gap: 18px; }
-.cs-tt-card--active .cs-tt-card__name  { font-size: 1.25rem; }
-.cs-tt-card--active .cs-tt-card__role  { font-size: 0.875rem; }
+.cs-tt-card--active .cs-tt-card__photo {
+  width: clamp(200px, 20vw, 264px);
+  height: 100%;
+  border-radius: 24px 0 0 24px;
+}
+.cs-tt-card--active .cs-tt-card__body  {
+  padding: clamp(20px, 2.2vw, 28px) clamp(24px, 2.8vw, 36px) clamp(20px, 2vw, 24px);
+  gap: clamp(12px, 1.4vw, 18px);
+}
+.cs-tt-card--active .cs-tt-card__name  { font-size: clamp(1.0625rem, 1.1vw, 1.25rem); }
+.cs-tt-card--active .cs-tt-card__role  { font-size: clamp(0.8125rem, 0.85vw, 0.9375rem); }
 .cs-tt-card--active .cs-tt-card__quote {
-  font-size: 1.3125rem;
+  font-size: clamp(1.0625rem, 1.3vw, 1.3125rem);
   line-height: 1.35;
   margin-top: -6px;
 }
-.cs-tt-card--active .cs-tt-card__cta   { font-size: 1rem; }
+.cs-tt-card--active .cs-tt-card__cta   { font-size: clamp(0.875rem, 0.95vw, 1rem); }
 .cs-tt-card__quote-mark { display: block; margin-bottom: -8px; }
 
 /* ---- Side peek cards (stacked-deck depth) ------------------------------
@@ -1013,8 +1083,9 @@ body {
 .cs-tt-peek {
   position: absolute;
   top: 50%;
-  width: 600px;
-  height: 260px;
+  /* v3 Consistency Layer: peeks scale with the stage (was: flat 600x260). */
+  width: clamp(380px, 46vw, 600px);
+  height: clamp(200px, 21vw, 260px);
   z-index: 10;
   cursor: pointer;
   border: 0;
@@ -1033,20 +1104,21 @@ body {
     filter 360ms ease-out,
     transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-/* Active card is 798 wide centred. We want each peek's INNER edge to sit
-   ~80 px INSIDE the active card so part of it visually tucks behind.
-     left peek inner (right) edge at stage_center - 319 → translate(-319px)
-     right peek inner (left)  edge at stage_center + 319 → translate(+319px)
-   With scale 0.74 origin at the inner edge, the peek's outer edge sits at
-   stage_center ∓ 319 ∓ 600·0.74 ≈ stage_center ∓ 763. */
+/* v3 Consistency Layer: peek inner-edge sits ~80px inside the active card.
+   Active card is min(798px, 100%) wide → its half-width = min(399px, 50cqi).
+   Left peek's right edge sits at stage_center − (active_half − 80).
+     wide stage  (≥798): active_half = 399px → translate = -319px (original)
+     narrow stage:       active_half = 50cqi → translate = 80 − 50cqi  (less negative)
+   Use max() so the value clamps to -319 at wide stages and walks toward
+   zero at narrow stages — keeping the peek's outer edge inside the stage. */
 .cs-tt-peek[data-pos="left"] {
   right: 50%;
-  transform: translate(-319px, -50%) scale(0.74);
+  transform: translate(max(-319px, calc(80px - 50cqi)), -50%) scale(0.74);
   transform-origin: right center;
 }
 .cs-tt-peek[data-pos="right"] {
   left: 50%;
-  transform: translate(319px, -50%) scale(0.74);
+  transform: translate(min(319px, calc(50cqi - 80px)), -50%) scale(0.74);
   transform-origin: left center;
 }
 .cs-tt-peek:hover,
@@ -1055,11 +1127,11 @@ body {
 }
 .cs-tt-peek[data-pos="left"]:hover,
 .cs-tt-peek[data-pos="left"]:focus-visible {
-  transform: translate(-300px, -50%) scale(0.77);
+  transform: translate(max(-300px, calc(99px - 50cqi)), -50%) scale(0.77);
 }
 .cs-tt-peek[data-pos="right"]:hover,
 .cs-tt-peek[data-pos="right"]:focus-visible {
-  transform: translate(300px, -50%) scale(0.77);
+  transform: translate(min(300px, calc(50cqi - 99px)), -50%) scale(0.77);
 }
 .cs-tt-peek:focus-visible {
   outline: 2px solid rgb(132 188 255 / 0.7);
@@ -1068,8 +1140,8 @@ body {
 .cs-tt-peek__photo {
   position: relative;
   flex-shrink: 0;
-  width: 208px;
-  height: 260px;
+  width: clamp(160px, 16vw, 208px);
+  height: 100%;
   overflow: hidden;
   border-radius: 22px 0 0 22px;
 }
@@ -1085,7 +1157,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   min-width: 0;
-  padding: 22px 24px;
+  padding: clamp(16px, 2vw, 22px) clamp(18px, 2.2vw, 24px);
   color: white;
 }
 .cs-tt-peek__head {
@@ -1097,13 +1169,13 @@ body {
 .cs-tt-peek__name {
   display: block;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 0.95vw, 1rem);
   letter-spacing: -0.02em;
 }
 .cs-tt-peek__role {
   display: block;
   margin-top: 2px;
-  font-size: 0.75rem;
+  font-size: clamp(0.6875rem, 0.75vw, 0.75rem);
   color: rgb(255 255 255 / 0.7);
 }
 .cs-tt-peek__quote {
@@ -1111,7 +1183,7 @@ body {
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 0.95vw, 1rem);
   font-weight: 700;
   line-height: 1.3;
   letter-spacing: -0.02em;
@@ -1121,7 +1193,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.8125rem;
+  font-size: clamp(0.75rem, 0.8vw, 0.8125rem);
   font-weight: 600;
   letter-spacing: -0.01em;
   color: rgb(255 255 255 / 0.95);
@@ -1187,7 +1259,10 @@ body {
 
 /* ---- Mobile / narrow: hide side cards entirely ------------------------- */
 @media (max-width: 1023px) {
-  .cs-tt-card--side { display: none; }
+  /* `.cs-tt-card--side` is a legacy class; the live JSX renders `.cs-tt-peek`.
+     Hide both so the active card has the stage to itself on stacked layouts. */
+  .cs-tt-card--side,
+  .cs-tt-peek { display: none; }
   .cs-tt-card--active {
     width: 100%;
     height: auto;
@@ -1715,5 +1790,14 @@ body {
   }
   html {
     @apply font-sans;
+    /* Reserve scrollbar space so route changes that add/remove a scrollable
+       overflow do not cause a layout shift (Windows/Linux persistent scrollbars). */
+    scrollbar-gutter: stable;
+    /* `overflow-x: clip` (not `hidden`) prevents stray decorative absolutes
+       from inflating documentElement.scrollWidth even when their card
+       ancestor already has overflow-hidden. Unlike `hidden`, `clip` does
+       NOT create a new containing block, so the fixed-position Header
+       continues to escape `<html>` naturally. */
+    overflow-x: clip;
   }
 }

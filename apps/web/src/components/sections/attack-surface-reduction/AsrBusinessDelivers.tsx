@@ -54,7 +54,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
         />
 
         {/* Content */}
-        <div className="relative mx-auto max-w-[1276px] px-6 py-14 md:py-[88px] flex flex-col justify-between h-full">
+        <div className="relative mx-auto max-w-[1276px] px-6 py-section-md flex flex-col justify-between h-full">
           {/* Heading */}
           <div>
             <p
@@ -68,10 +68,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
                 maxWidth: "519px",
               }}
             >
-              What this{" "}
-              <br className="hidden md:block" />
-              delivers for{" "}
-              <br className="hidden md:block" />
+              What this delivers for{" "}
               <span
                 style={{
                   background:

@@ -2,6 +2,8 @@
 
 Canonical reference for fonts, type scale, and per-role usage on `apps/web`. This doc is the source of truth; if Figma and this doc disagree on a token name, this doc wins.
 
+> **For role → token mapping on component work** (which token a given card title / lead body / section padding uses), the canonical source is the **v3 Consistency Layer** section in [design-tokens.md](./design-tokens.md). The tables there supersede the role rows in this file for any component touched after 2026-05-20. This file remains canonical for the font *families*, the underlying *scale*, and the long-form CMS-prose typography research.
+
 ---
 
 ## Families
@@ -38,6 +40,15 @@ Defined in [src/app/globals.css](../src/app/globals.css) `@theme` block. All val
 | `--text-display-sm`| `clamp(1.75rem, 4.6vw, 3.4375rem)` | 28→55px | CTA / mid-page display |
 | `--text-display-md`| `clamp(2rem, 5.2vw, 3.875rem)`     | 32→62px | Standard section title (Figma "Display 62") |
 | `--text-display-lg`| `clamp(2.25rem, 6.5vw, 4.5rem)`    | 36→72px | Hero H1                            |
+| `--text-card-title-xl` | `clamp(1.5rem, 2vw, 2.0625rem)`  | 24→33px | Feature-card title (hero rank) — `FactoryCard`, `AboutPowering FeatureCard` |
+| `--text-card-title-lg` | `clamp(1.375rem, 1.8vw, 2rem)`   | 22→32px | Standard card title — Security headers, HowCleanStartHelp, AsrApproach, AsrFitsBuilt, AboutWhoWeAre pillars |
+| `--text-card-title-md` | `clamp(1.125rem, 1.4vw, 1.5rem)` | 18→24px | Compact card title — Blog/News/Resource/Event/Webinar/PodcastEpisode |
+| `--text-card-title-sm` | `clamp(1rem, 1.1vw, 1.3125rem)`  | 16→21px | Pill / tab label |
+| `--text-body-xl`   | `clamp(1.0625rem, 1.4vw, 1.5rem)`  | 17→24px | Lead body (section intro paragraph below H2) |
+| `--text-body-lg`   | `clamp(1rem, 1.2vw, 1.375rem)`     | 16→22px | Standard card body, bullet items |
+| `--text-body-md`   | `clamp(0.9375rem, 1vw, 1.125rem)`  | 15→18px | Secondary text, compact card body, marquee strap |
+| `--text-body-sm`   | `clamp(0.875rem, 0.9vw, 1rem)`     | 14→16px | Meta, table cells, share-rail labels |
+| `--text-body-xs`   | `clamp(0.75rem, 0.85vw, 0.875rem)` | 12→14px | Eyebrow, breadcrumb, caption |
 
 ---
 

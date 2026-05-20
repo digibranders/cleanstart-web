@@ -21,7 +21,7 @@ export function FipsHero(): React.ReactElement {
     <section
       data-section="FipsHero"
       className="relative overflow-hidden bg-cs-hero bg-cs-grid"
-      style={{ minHeight: "741px" }}
+      style={{ minHeight: "clamp(560px, 51vw, 741px)" }}
     >
       {/*
        * Bottom fade — Figma renders the last ~14% of the hero (~104px @ 741h)
@@ -50,7 +50,7 @@ export function FipsHero(): React.ReactElement {
           maxWidth: "1276px",
           paddingLeft: "24px",
           paddingRight: "24px",
-          paddingTop: "186px",
+          paddingTop: "clamp(110px, 13vw, 186px)",
           paddingBottom: "0",
           minHeight: "741px",
         }}
@@ -130,9 +130,7 @@ export function FipsHero(): React.ReactElement {
               marginBottom: "32px", // gap between h1 (h=160) and subhead frame (y=192) = 32
             }}
           >
-            FIPS-Validated.
-            <br />
-            Always{" "}
+            FIPS-Validated. Always{" "}
             <span
               style={{
                 background:
@@ -183,8 +181,7 @@ export function FipsHero(): React.ReactElement {
             className="cs-btn-glass"
             style={
               {
-                // Figma button: w=221, h=38, padding 18px both sides, font 16/20
-                "--cs-btn-h": "38px",
+                // Figma button: w=221, h=38 -> raised to 44 (WCAG 2.5.8); padding 18, font 16/20
                 "--cs-btn-px": "18px",
                 "--cs-btn-fs": "16px",
               } as React.CSSProperties

@@ -1,7 +1,12 @@
+import dynamic from "next/dynamic";
 import type { Webinar, WebinarRegion, WebinarType } from "@/lib/webinars";
 import { Pagination } from "@/components/ui/Pagination";
 import { WebinarCard } from "./WebinarCard";
-import { WebinarFilters } from "./WebinarFilters";
+// WebinarFilters is a "use client" interactive sidebar; code-split so it
+// does not ship in the initial /webinars client bundle.
+const WebinarFilters = dynamic(() =>
+  import("./WebinarFilters").then((m) => ({ default: m.WebinarFilters })),
+);
 
 interface WebinarsGridProps {
   items: Webinar[];
@@ -36,7 +41,7 @@ export function WebinarsGrid({
       className="relative"
       style={{
         background: "#F6F6F6",
-        paddingTop: "72px",
+        paddingTop: "var(--spacing-section-md)",
         paddingBottom: "250px",
         overflowX: "clip",
       }}
@@ -82,8 +87,8 @@ export function WebinarsGrid({
           <div className="flex-1 min-w-0">
             {items.length === 0 ? (
               <p
-                className="font-sans text-center py-20"
-                style={{ color: "rgba(17,17,17,0.54)", fontSize: "1.125rem" }}
+                className="font-sans text-body-lg text-center py-20"
+                style={{ color: "rgba(17,17,17,0.54)" }}
               >
                 No webinars match these filters yet.
               </p>

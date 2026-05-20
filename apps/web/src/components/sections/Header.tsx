@@ -12,10 +12,10 @@ export function Header() {
   return (
     <header
       className={
-        `fixed inset-x-0 top-0 z-40 transition-[background-color,backdrop-filter,box-shadow] duration-200 ${scrolled ? "cs-nav-shadow" : "bg-transparent"}`
+        `fixed inset-x-0 top-0 z-40 pt-[env(safe-area-inset-top)] transition-[background-color,backdrop-filter,box-shadow] duration-200 ${scrolled ? "cs-nav-shadow" : "bg-transparent"}`
       }
     >
-      <div className="mx-auto flex h-[72px] max-w-[1276px] items-center justify-between gap-6 px-6">
+      <div className="mx-auto flex h-[72px] max-w-[1276px] items-center justify-between gap-6 ps-[max(1.5rem,env(safe-area-inset-left))] pe-[max(1.5rem,env(safe-area-inset-right))]">
         <Link
           href="/"
           aria-label="CleanStart home"
@@ -31,7 +31,6 @@ export function Header() {
             type="button"
             className="cs-btn-glass hidden lg:inline-flex"
             style={{
-              ["--cs-btn-h" as string]: "38px",
               ["--cs-btn-px" as string]: "22px",
               ["--cs-btn-fs" as string]: "14px",
             }}

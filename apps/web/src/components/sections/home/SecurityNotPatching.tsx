@@ -43,7 +43,7 @@ const CLEANSTART_FEATURES = [
 export function SecurityNotPatching() {
   return (
     <section
-      className="relative w-full overflow-hidden bg-[#F6F6F6] py-32"
+      className="relative w-full overflow-hidden bg-[#F6F6F6] py-section-md"
       aria-labelledby="security-title"
     >
       <div className="relative mx-auto w-full max-w-[1276px] px-6">
@@ -66,6 +66,7 @@ export function SecurityNotPatching() {
             alt=""
             width={1101}
             height={1101}
+            sizes="1101px"
             className="pointer-events-none absolute"
             style={{
               left: "-707px",
@@ -84,6 +85,7 @@ export function SecurityNotPatching() {
             alt=""
             width={374}
             height={332}
+            sizes="374px"
             className="pointer-events-none absolute"
             style={{
               left: "1086px",
@@ -153,7 +155,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
 
   return (
     <div
-      className="relative"
+      className="relative mx-auto w-full lg:max-w-[clamp(380px,32vw,480px)]"
       style={{
         borderRadius: 40,
         background: "#2CC1EB", // outer cyan border (visible 10px around inner)
@@ -178,13 +180,13 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
              the visible outcome with two distinct CSS gradients tuned to the
              eyeball colors of the rendered Figma textures. */}
         <div
-          className="relative flex h-[130px] w-full items-center justify-center gap-3 overflow-hidden"
+          className="relative flex h-[clamp(80px,7vw,110px)] w-full items-center justify-center gap-3 overflow-hidden"
           style={{
             background: isPublic
               ? // LEFT (Public Images) — desaturated texture overlay → reads black
-                "linear-gradient(135deg, #151021 0%, #1A1733 60%, #221A3D 100%)"
+              "linear-gradient(135deg, #151021 0%, #1A1733 60%, #221A3D 100%)"
               : // RIGHT (CleanStart) — full-color texture overlay → reads vivid purple
-                "linear-gradient(135deg, #1B0E33 0%, #2B1456 40%, #471EC0 100%)",
+              "linear-gradient(135deg, #1B0E33 0%, #2B1456 40%, #471EC0 100%)",
           }}
         >
           {/* Decorative right-side watermark (Figma 34% white SOFT_LIGHT)
@@ -200,6 +202,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
               alt=""
               width={162}
               height={186}
+              sizes="162px"
               className="pointer-events-none absolute"
               style={{
                 right: "-37px",
@@ -218,6 +221,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
               alt=""
               width={258}
               height={236}
+              sizes="258px"
               className="pointer-events-none absolute mix-blend-soft-light"
               style={{
                 right: "-120px",
@@ -246,7 +250,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
               section-rel x=198 / y=258, and CleanStart logo (108:7934) sits at
               section-rel x=852 / y=258 — both 198px from their card outer left,
               i.e. 188px from the inner header's left after the 10px cyan border. */}
-          <div className="relative z-10 flex w-full items-center gap-3 pl-[188px]">
+          <div className="relative z-10 flex w-full items-center justify-center gap-3">
             {isPublic ? (
               <>
                 <Image
@@ -254,9 +258,10 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                   alt=""
                   width={41}
                   height={48}
+                  sizes="41px"
                   className="h-[47px] w-[41px]"
                 />
-                <span className="font-display text-[2rem] font-bold leading-none tracking-[-0.05em] text-white">
+                <span className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em] text-white">
                   Public Images
                 </span>
               </>
@@ -266,6 +271,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                 alt="CleanStart"
                 width={227}
                 height={47}
+                sizes="227px"
                 className="h-[47px] w-auto"
                 priority={false}
               />
@@ -274,7 +280,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
         </div>
 
         {/* White content area — Figma inner body rect 108:7965/108:7903 is 441px tall. */}
-        <div className="relative h-[441px] overflow-hidden bg-white">
+        <div className="relative min-h-[clamp(300px,24vw,380px)] overflow-hidden bg-white py-[clamp(20px,2.5vw,36px)]">
           {/* Decorative blobs (Figma Ellipse 46681 #DF9BFF + 46682 #2CC1EB) */}
           <div
             aria-hidden
@@ -307,7 +313,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
 
           {/* Bullet list — Figma bullets are 31px-tall rows with 71px top-to-top
               spacing → 40px gap between rows (same for both cards). */}
-          <ul className="relative z-10 mx-auto flex h-full max-w-[320px] flex-col justify-center gap-[40px]">
+          <ul className="relative z-10 mx-auto flex h-full max-w-[320px] flex-col justify-center gap-[clamp(20px,2.2vw,32px)]">
             {features.map((label) => (
               <li key={label} className="flex items-center gap-6">
                 {isPublic ? (
@@ -316,6 +322,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                     alt=""
                     width={24}
                     height={24}
+                    sizes="24px"
                     className="h-6 w-6 shrink-0"
                   />
                 ) : (
@@ -324,11 +331,12 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                     alt=""
                     width={31}
                     height={27}
+                    sizes="31px"
                     className="h-[27px] w-[31px] shrink-0"
                   />
                 )}
                 <span
-                  className="text-[1.375rem] tracking-[-0.01em] text-[#333333]"
+                  className="text-body-lg tracking-[-0.01em] text-[#333333]"
                   style={{ fontWeight: isPublic ? 600 : 700 }}
                 >
                   {label}
@@ -356,27 +364,36 @@ function KubrMascot() {
   const KUBR_W = 290;
   const KUBR_H = 299;
   // Section-relative left edge: 525 / 1276 ≈ 41.14%
-  const KUBR_LEFT = "41.14%";
+  const KUBR_LEFT = "39%";
   const KUBR_BOTTOM = "-15px";
+  // Mascot is a decorative accent that overlaps the card gap. On narrow
+  // viewports the cards stack vertically and the mascot would land in the
+  // wrong gap, so we hide it below `md` per the v3 Consistency Layer
+  // decorative-element rules (see apps/web/docs/design-tokens.md).
+  const MASCOT_WIDTH = "clamp(180px, 18vw, 290px)";
+
+  // Hard-edged split at 33%: no transition zone → no purple seam.
+  // (The earlier 33→36% gradient blend bled the cards' dark gradient
+  // through the mask transition, which read as a purple overlay.)
+  const TAIL_MASK = "linear-gradient(90deg, #000 0%, #000 33%, transparent 33%, transparent 100%)";
+  const BODY_MASK = "linear-gradient(90deg, transparent 0%, transparent 33%, #000 33%, #000 100%)";
 
   return (
     <>
-      {/* Tail layer — z=1, behind cards. Only the leftmost ~33% of the bird
-          renders here so the LEFT card's white body + border occludes the
-          wing/tail tucked behind it. */}
+      {/* Tail layer — z=1, behind the LEFT card. The 33% hard cut
+          stops exactly where the body layer starts, so the two halves
+          stitch back into one visually-continuous bird. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute hidden md:block"
         style={{
           left: KUBR_LEFT,
           bottom: KUBR_BOTTOM,
-          width: KUBR_W,
-          height: KUBR_H,
+          width: MASCOT_WIDTH,
+          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
           zIndex: 1,
-          WebkitMaskImage:
-            "linear-gradient(90deg, #000 0%, #000 33%, transparent 36%, transparent 100%)",
-          maskImage:
-            "linear-gradient(90deg, #000 0%, #000 33%, transparent 36%, transparent 100%)",
+          WebkitMaskImage: TAIL_MASK,
+          maskImage: TAIL_MASK,
         }}
       >
         <Image
@@ -384,25 +401,23 @@ function KubrMascot() {
           alt=""
           width={KUBR_W}
           height={KUBR_H}
+          sizes="290px"
           className="h-full w-full object-contain"
         />
       </div>
 
-      {/* Body + head layer — z=30, above cards. The leftmost ~33% is masked
-          OUT (drawn by the tail layer behind the cards instead). */}
+      {/* Body + head — z=30, in front of both cards. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute hidden md:block"
         style={{
           left: KUBR_LEFT,
           bottom: KUBR_BOTTOM,
-          width: KUBR_W,
-          height: KUBR_H,
+          width: MASCOT_WIDTH,
+          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
           zIndex: 30,
-          WebkitMaskImage:
-            "linear-gradient(90deg, transparent 0%, transparent 33%, #000 36%, #000 100%)",
-          maskImage:
-            "linear-gradient(90deg, transparent 0%, transparent 33%, #000 36%, #000 100%)",
+          WebkitMaskImage: BODY_MASK,
+          maskImage: BODY_MASK,
         }}
       >
         <Image
@@ -410,7 +425,8 @@ function KubrMascot() {
           alt="Kubr mascot"
           width={KUBR_W}
           height={KUBR_H}
-          className="h-full w-full object-contain drop-shadow-[0_24px_40px_rgba(60,40,180,0.30)]"
+          sizes="290px"
+          className="h-full w-full object-contain"
         />
       </div>
     </>

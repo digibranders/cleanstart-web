@@ -9,17 +9,13 @@ export function Hero() {
       <div className="mx-auto max-w-[1276px] px-6">
         <div className="mx-auto flex max-w-[1201px] flex-col items-center gap-6 text-center sm:gap-8">
           <h1 className="font-display text-[clamp(2.25rem,6.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.05em] text-white lg:leading-[1]">
-            Secure by Design. Built from Source.
-            <br className="hidden sm:inline" />
-            <span className="sm:hidden"> </span>
-            Verified Container Images
+            Secure by Design. Built from Source. Verified Container Images
           </h1>
 
           <a
             href="#browse-images"
             className="cs-btn-glass"
             style={{
-              ["--cs-btn-h" as string]: "40px",
               ["--cs-btn-px" as string]: "18px",
               ["--cs-btn-fs" as string]: "20px",
               color: "#111111",

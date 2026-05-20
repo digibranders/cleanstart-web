@@ -70,7 +70,7 @@ export function CleanSightUnified(): React.ReactElement {
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6 py-16 md:py-20 xl:py-[120px]">
+      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6 py-section-md">
         {/* Heading row */}
         <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-8 xl:gap-[60px]">
           <h2
@@ -146,17 +146,17 @@ export function CleanSightUnified(): React.ReactElement {
                 }}
               />
 
-              {/* Decorative vertical gradient lines */}
-              {[48.47, 120.03, 162.38, 233.94].map((left) => (
+              {/* Decorative vertical gradient lines — percentages of the 287px Figma card */}
+              {[16.9, 41.8, 56.6, 81.5].map((pct) => (
                 <div
-                  key={left}
+                  key={pct}
                   aria-hidden
                   className="pointer-events-none select-none absolute"
                   style={{
-                    left: `${left}px`,
+                    left: `${pct}%`,
                     top: 0,
                     width: "1px",
-                    height: "264px",
+                    height: "76%",
                     background:
                       "linear-gradient(to bottom, transparent 0%, white 50.77%, transparent 100%)",
                     opacity: 0.8,
@@ -164,15 +164,15 @@ export function CleanSightUnified(): React.ReactElement {
                 />
               ))}
 
-              {/* Decorative horizontal gradient lines */}
-              {[67.54, 183.54].map((top) => (
+              {/* Decorative horizontal gradient lines — percentages of the 264px Figma stripe area */}
+              {[25.6, 69.5].map((pct) => (
                 <div
-                  key={top}
+                  key={pct}
                   aria-hidden
                   className="pointer-events-none select-none absolute"
                   style={{
                     left: 0,
-                    top: `${top}px`,
+                    top: `${pct}%`,
                     width: "100%",
                     height: "1px",
                     background:

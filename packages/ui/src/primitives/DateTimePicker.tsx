@@ -119,9 +119,10 @@ export const DateTimePicker = (props: Props): ReactElement => {
   };
 
   const display = formatDisplay(value, mode, timezone);
+  const showClear = Boolean(value) && !required && !disabled;
 
   return (
-    <div className="cs-datetime">
+    <div className={showClear ? 'cs-datetime cs-datetime--has-clear' : 'cs-datetime'}>
       <button
         ref={triggerRef}
         id={triggerId}
@@ -137,7 +138,7 @@ export const DateTimePicker = (props: Props): ReactElement => {
           {display || placeholder}
         </span>
       </button>
-      {value && !required && !disabled ? (
+      {showClear ? (
         <button
           type="button"
           className="cs-datetime__clear"

@@ -26,8 +26,8 @@ export function AuthorDetails({
                 {author.experience!.map((e, i) => (
                   <li key={e.id ?? `${e.company}-${i}`} className="flex flex-col gap-1">
                     <span
-                      className="font-medium"
-                      style={{ color: "#111111", fontSize: "1rem" }}
+                      className="text-body-md font-medium"
+                      style={{ color: "#111111" }}
                     >
                       {e.role ? `${e.role}, ${e.company}` : e.company}
                     </span>
@@ -56,8 +56,8 @@ export function AuthorDetails({
                     className="flex flex-col gap-1"
                   >
                     <span
-                      className="font-medium"
-                      style={{ color: "#111111", fontSize: "1rem" }}
+                      className="text-body-md font-medium"
+                      style={{ color: "#111111" }}
                     >
                       {e.institution}
                     </span>
@@ -103,8 +103,8 @@ export function AuthorDetails({
                 {author.awards!.map((a, i) => (
                   <li key={a.id ?? `${a.title}-${i}`} className="flex flex-col gap-1">
                     <span
-                      className="font-medium"
-                      style={{ color: "#111111", fontSize: "1rem" }}
+                      className="text-body-md font-medium"
+                      style={{ color: "#111111" }}
                     >
                       {a.title}
                     </span>

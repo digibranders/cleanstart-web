@@ -45,7 +45,7 @@ export function AsrApproach(): React.ReactElement {
       className="relative overflow-hidden"
     >
       {/* Heading — centered, "Approach" gradient */}
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-16 md:pt-[88px] text-center">
+      <div className="relative mx-auto max-w-[1276px] px-6 pt-section-md text-center">
         <h2
           className="text-[#111111] inline-block"
           style={{
@@ -58,7 +58,6 @@ export function AsrApproach(): React.ReactElement {
           }}
         >
           The CleanStart{" "}
-          <br />
           <span
             style={{
               background: "linear-gradient(99deg, #9A51FF 0%, #2CC1EB 100%)",
@@ -73,7 +72,7 @@ export function AsrApproach(): React.ReactElement {
       </div>
 
       {/* Desktop 2×2 grid with cross dividers */}
-      <div className="hidden md:block relative mx-auto max-w-[1276px] px-6 pb-16 md:pb-[88px]">
+      <div className="hidden md:block relative mx-auto max-w-[1276px] px-6 pb-section-md">
         <div className="relative">
           {/* Horizontal hairline */}
           <div
@@ -155,10 +154,9 @@ export function AsrApproach(): React.ReactElement {
             </div>
             <div className="flex flex-col gap-2">
               <p
-                className="text-[#111111]"
+                className="text-card-title-md text-[#111111]"
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "22px",
                   fontWeight: 700,
                   letterSpacing: "-0.05em",
                   lineHeight: 1.1,
@@ -167,10 +165,9 @@ export function AsrApproach(): React.ReactElement {
                 {item.title}
               </p>
               <p
-                className="text-[#333333]"
+                className="text-body-md text-[#333333]"
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "16px",
                   fontWeight: 400,
                   letterSpacing: "-0.05em",
                   lineHeight: 1.4,
@@ -194,13 +191,13 @@ interface ApproachCellProps {
 function ApproachCell({ item, padLeft }: ApproachCellProps): React.ReactElement {
   return (
     <div
-      className="relative flex items-center gap-6 py-12"
+      className="relative flex items-center gap-[clamp(12px,1.5vw,24px)] py-[clamp(32px,4vw,48px)]"
       style={{
-        paddingLeft: padLeft ? "56px" : "0",
-        paddingRight: padLeft ? "0" : "56px",
+        paddingLeft: padLeft ? "clamp(24px,4vw,56px)" : "0",
+        paddingRight: padLeft ? "0" : "clamp(24px,4vw,56px)",
       }}
     >
-      <div className="relative shrink-0" style={{ width: "220px", height: "220px" }}>
+      <div className="relative shrink-0" style={{ width: "clamp(140px, 16vw, 220px)", aspectRatio: "1 / 1" }}>
         {/* Soft purple radial halo behind icon — Figma Ellipse 46681
             165×165 #DF9BFF blur(43px) opacity 0.35 */}
         <div
@@ -224,23 +221,21 @@ function ApproachCell({ item, padLeft }: ApproachCellProps): React.ReactElement 
           src={item.icon}
           alt=""
           aria-hidden
-          className="relative pointer-events-none select-none"
+          className="relative pointer-events-none select-none object-contain"
           style={{
-            width: "220px",
-            height: "220px",
-            objectFit: "contain",
+            width: "100%",
+            aspectRatio: "1 / 1",
           }}
           loading="lazy"
           decoding="async"
         />
       </div>
 
-      <div className="flex flex-col gap-[18px] flex-1 min-w-0">
+      <div className="flex flex-col gap-[clamp(10px,1.2vw,18px)] flex-1 min-w-0">
         <p
-          className="text-[#111111]"
+          className="text-card-title-lg text-[#111111]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "32px",
             fontWeight: 700,
             letterSpacing: "-0.05em",
             lineHeight: 1.0,
@@ -250,10 +245,9 @@ function ApproachCell({ item, padLeft }: ApproachCellProps): React.ReactElement 
           {item.title}
         </p>
         <p
-          className="text-[#333333]"
+          className="text-body-lg text-[#333333]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "22px",
             fontWeight: 400,
             letterSpacing: "-0.05em",
             lineHeight: 1.4,

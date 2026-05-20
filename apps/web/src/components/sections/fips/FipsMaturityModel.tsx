@@ -73,9 +73,7 @@ export function FipsMaturityModel(): React.ReactElement {
             lineHeight: 1.05,
           }}
         >
-          CleanStart FIPS 140-3{" "}
-          <br className="hidden md:block" />
-          Maturity{" "}
+          CleanStart FIPS 140-3 Maturity{" "}
           <span
             style={{
               background:
@@ -109,7 +107,7 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
         border: "1px solid rgba(218, 182, 243, 0.55)",
         boxShadow:
           "0 20px 36px -22px rgba(132, 80, 255, 0.18), 0 1px 0 rgba(255,255,255,0.85) inset",
-        minHeight: "320px",
+        minHeight: "clamp(260px, 24vw, 320px)",
       }}
     >
       <FipsBall size={84} />

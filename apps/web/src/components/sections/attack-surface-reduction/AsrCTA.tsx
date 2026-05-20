@@ -130,15 +130,13 @@ export function AsrCTA(): React.ReactElement {
           style={{ maxWidth: "493px", gap: "16px" }}
         >
           <p
-            className="text-[#111111]"
+            className="text-body-md text-[#111111]"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "16px",
               fontWeight: 400,
               letterSpacing: "-0.04em",
               lineHeight: 1.4,
               opacity: 0.8,
-              whiteSpace: "nowrap",
             }}
           >
             Build with only what production needs.
@@ -176,10 +174,9 @@ export function AsrCTA(): React.ReactElement {
         />
 
         <p
-          className="text-[#111111]"
+          className="text-body-md text-[#111111]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "15px",
             fontWeight: 400,
             letterSpacing: "-0.04em",
             lineHeight: 1.4,

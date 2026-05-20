@@ -40,7 +40,7 @@ export function MobileNav() {
           Browse CleanStart products, solutions, resources, and company links.
         </SheetDescription>
 
-        <div className="flex-1 overflow-y-auto px-2 pt-16 pb-6">
+        <div className="flex-1 overflow-y-auto px-2 pt-16 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           <Accordion className="flex w-full flex-col gap-1" >
             {NAV_TREE.map((item) => {
               if (item.kind === "flat") {

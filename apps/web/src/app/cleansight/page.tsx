@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
@@ -5,8 +6,15 @@ import { CleanSightHero } from "@/components/sections/cleansight/CleanSightHero"
 import { CleanSightProblems } from "@/components/sections/cleansight/CleanSightProblems";
 import { CleanSightBlindSpots } from "@/components/sections/cleansight/CleanSightBlindSpots";
 import { CleanSightUnified } from "@/components/sections/cleansight/CleanSightUnified";
-import { CleanSightSecurity } from "@/components/sections/cleansight/CleanSightSecurity";
-import { CleanSightComparison } from "@/components/sections/cleansight/CleanSightComparison";
+// CleanSightSecurity (~900L) and CleanSightComparison are the heaviest sections
+// on this page (Pattern-11 desktop-absolute layouts). Code-split so they do
+// not ship in the initial cleansight client bundle.
+const CleanSightSecurity = dynamic(() =>
+  import("@/components/sections/cleansight/CleanSightSecurity").then((m) => ({ default: m.CleanSightSecurity })),
+);
+const CleanSightComparison = dynamic(() =>
+  import("@/components/sections/cleansight/CleanSightComparison").then((m) => ({ default: m.CleanSightComparison })),
+);
 import { CleanSightStats } from "@/components/sections/cleansight/CleanSightStats";
 import { CleanSightCTA } from "@/components/sections/cleansight/CleanSightCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";

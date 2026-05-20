@@ -73,9 +73,13 @@ export function CleanStartFactory() {
       <div className="relative mx-auto mt-12 max-w-[1276px] px-6">
         {/* Top 5 flames — bulb sits at the bottom of each card. Container offset = -mt-12 (48px)
              so flame top = card bottom. Flame height 130px = 48 (gap) + 82 (into panel).
-             z-0 so panel content sits above the lower portion of the flames. */}
+             z-0 so panel content sits above the lower portion of the flames.
+             Hidden below `lg`: the flame x-offsets (calc(50% ± 539.6px ...)) are
+             calibrated to the 5-up Figma layout that only renders at lg+; on
+             narrower viewports the cards stack and the flames would point
+             nowhere. */}
         <div
-          className="pointer-events-none absolute inset-x-0 z-0 mx-auto h-[140px]"
+          className="pointer-events-none absolute inset-x-0 z-0 mx-auto hidden h-[140px] lg:block"
           style={{ top: "-48px" }}
           aria-hidden
         >
@@ -87,9 +91,10 @@ export function CleanStartFactory() {
         <FactoryEnginePanel />
 
         {/* Bottom 4 flames — emerge from BOTTOM EDGE of engine panel, stream DOWN.
-             Top of this container = panel bottom edge. */}
+             Top of this container = panel bottom edge. Same lg-only constraint
+             as the top flames (x-offsets only align with the 1276 engine panel). */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-full z-0 mx-auto h-[180px]"
+          className="pointer-events-none absolute inset-x-0 top-full z-0 mx-auto hidden h-[180px] lg:block"
           aria-hidden
         >
           {BOTTOM_FLAMES.map((left, i) => (

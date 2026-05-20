@@ -226,9 +226,7 @@ export function FipsEnables(): React.ReactElement {
                 color: "#FFFFFF",
               }}
             >
-              Validated
-              <br />
-              Foundation
+              Validated Foundation
             </span>
           </div>
 
@@ -265,15 +263,13 @@ export function FipsEnables(): React.ReactElement {
               className="absolute inset-0 flex items-center justify-center text-center text-white"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "12px",
+                fontSize: "clamp(11px, 0.85vw, 13px)",
                 fontWeight: 600,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.2,
               }}
             >
-              Validated
-              <br />
-              Foundation
+              Validated Foundation
             </span>
           </div>
           <div className="grid grid-cols-2 gap-3 w-full max-w-[400px]">

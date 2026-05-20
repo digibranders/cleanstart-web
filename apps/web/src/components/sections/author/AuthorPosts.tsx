@@ -26,7 +26,7 @@ export function AuthorPosts({
         paddingBottom: "230px",
       }}
     >
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-20">
+      <div className="relative mx-auto max-w-[1276px] px-6 pt-section-md">
         <div className="flex items-end justify-between gap-6 pb-10">
           <h2
             className="font-display font-semibold text-white"
@@ -106,9 +106,8 @@ function PostCard({ post }: { post: Blog }): React.ReactElement {
           </span>
         )}
         <h3
-          className="font-display font-semibold text-white line-clamp-2"
+          className="font-display text-card-title-sm font-semibold text-white line-clamp-2"
           style={{
-            fontSize: "1.125rem",
             lineHeight: 1.3,
             letterSpacing: "-0.01em",
           }}

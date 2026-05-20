@@ -97,7 +97,6 @@ export function SbomHero(): React.ReactElement {
           className="cs-btn-glass"
           style={
             {
-              "--cs-btn-h": "38px",
               "--cs-btn-px": "18px",
               "--cs-btn-fs": "16px",
             } as React.CSSProperties

@@ -144,6 +144,7 @@ export function SbomSelfUpdating(): React.ReactElement {
           alt="CleanStart SBOM dashboard"
           width={872}
           height={468}
+          sizes="(min-width: 1280px) 872px, 100vw"
           className="w-full h-full object-contain"
           style={{ display: "block" }}
           loading="lazy"
@@ -212,6 +213,7 @@ export function SbomSelfUpdating(): React.ReactElement {
           alt="CleanStart SBOM dashboard"
           width={872}
           height={468}
+          sizes="(min-width: 768px) 672px, 100vw"
           className="w-full max-w-2xl h-auto object-contain"
           loading="lazy"
         />
@@ -219,10 +221,10 @@ export function SbomSelfUpdating(): React.ReactElement {
           {MOBILE_FEATURES.map((f) => (
             <div key={f.num} className="flex flex-col items-center gap-3">
               <MobileCircle num={f.num} />
-              <p style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 600, letterSpacing: "-0.02em", color: "#fff" }}>
+              <p className="text-body-md" style={{ fontFamily: "var(--font-display)", fontWeight: 600, letterSpacing: "-0.02em", color: "#fff" }}>
                 {f.title}
               </p>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 400, lineHeight: 1.4, color: "rgba(255,255,255,0.75)" }}>
+              <p className="text-body-sm" style={{ fontFamily: "var(--font-display)", fontWeight: 400, lineHeight: 1.4, color: "rgba(255,255,255,0.75)" }}>
                 {f.body}
               </p>
             </div>
@@ -344,7 +346,7 @@ function MobileCircle({ num }: { num: number }): React.ReactElement {
     >
       <span
         style={{
-          fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 700,
+          fontFamily: "var(--font-display)", fontSize: "clamp(16px, 1.25vw, 20px)", fontWeight: 700,
           background: "linear-gradient(128.67deg, #9A51FF 35.82%, #2CC1EB 78.3%)",
           WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
         }}

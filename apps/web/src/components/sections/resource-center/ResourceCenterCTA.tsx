@@ -84,7 +84,7 @@ export function ResourceCenterCTA(): React.ReactElement {
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-[68px] w-full">
           <h2
             id="rc-cta-title"
-            className="font-display font-bold shrink-0 text-center lg:text-left w-full lg:w-[486px]"
+            className="font-display font-bold text-center lg:text-left w-full lg:max-w-[486px]"
             style={{
               fontSize: "clamp(1.5rem, 2.86vw, 3.4375rem)",
               lineHeight: 1,
@@ -96,10 +96,10 @@ export function ResourceCenterCTA(): React.ReactElement {
           </h2>
 
           <div
-            className="flex flex-col items-center lg:items-start w-full lg:w-[564px] gap-4 lg:gap-6"
+            className="flex flex-col items-center lg:items-start w-full lg:max-w-[564px] gap-4 lg:gap-6"
           >
             <p
-              className="text-base lg:text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-center lg:text-left w-full lg:w-[493px]"
+              className="text-body-md lg:text-body-lg font-normal leading-[1.4] tracking-[-0.04em] text-center lg:text-left w-full lg:max-w-[493px]"
               style={{ color: "#111", opacity: 0.8 }}
             >
               Why waste time patching what shouldn&apos;t exist? CleanStart flips
@@ -110,7 +110,7 @@ export function ResourceCenterCTA(): React.ReactElement {
             <Link
               href="/book-a-demo"
               className="cs-btn-blue relative overflow-hidden gap-2"
-              style={{ height: "44px", padding: "0 20px", fontSize: "1.125rem" }}
+              style={{ padding: "0 20px" }}
             >
               <span
                 aria-hidden

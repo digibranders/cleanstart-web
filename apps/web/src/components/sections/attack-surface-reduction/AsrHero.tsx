@@ -5,7 +5,7 @@ export function AsrHero(): React.ReactElement {
     <section
       data-section="AsrHero"
       className="relative overflow-hidden bg-cs-hero bg-cs-grid"
-      style={{ minHeight: "720px" }}
+      style={{ minHeight: "clamp(560px, 50vw, 720px)" }}
     >
       {/* Yellow/blue cross flare behind cards */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -43,21 +43,25 @@ export function AsrHero(): React.ReactElement {
       />
 
       {/* Bottom fade — Figma node 366-5158 fades the hero's last ~200px from
-          peak purple into pure white where AsrPublicImages (bg-white) begins.
-          Same pattern as FipsHero. */}
+          peak purple into pure white where AsrPublicImages (no bg = body white)
+          begins. Terminating color MUST match the body bg (#FFFFFF) — using
+          #F6F6F6 here produced a visible grey seam under the hero. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute inset-x-0 bottom-0 z-[1]"
         style={{
           height: "200px",
           background:
-            "linear-gradient(180deg, rgba(246,246,246,0) 0%, rgba(246,246,246,0.45) 55%, rgba(246,246,246,0.92) 88%, #F6F6F6 100%)",
+            "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 55%, rgba(255,255,255,0.92) 88%, #FFFFFF 100%)",
         }}
       />
 
       <div
         className="relative z-10 mx-auto max-w-[1276px] px-6"
-        style={{ paddingTop: "168px", paddingBottom: "96px" }}
+        style={{
+          paddingTop: "clamp(96px, 12vw, 168px)",
+          paddingBottom: "clamp(56px, 7vw, 96px)",
+        }}
       >
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-10">
           {/* Left: Headline + paragraph + CTA */}
@@ -73,8 +77,7 @@ export function AsrHero(): React.ReactElement {
                 marginBottom: "24px",
               }}
             >
-              Bigger Images,
-              <br />
+              Bigger Images,{" "}
               <span
                 style={{
                   background:
@@ -109,7 +112,7 @@ export function AsrHero(): React.ReactElement {
               className="cs-btn-glass"
               style={
                 {
-                  "--cs-btn-h": "48px",
+                  "--cs-btn-h": "var(--btn-h-xl)",
                   "--cs-btn-px": "24px",
                   "--cs-btn-fs": "16px",
                 } as React.CSSProperties
@@ -139,7 +142,10 @@ export function AsrHero(): React.ReactElement {
           <div
             aria-hidden
             className="relative hidden md:block shrink-0"
-            style={{ width: "560px", height: "500px" }}
+            style={{
+              width: "clamp(380px, 38vw, 560px)",
+              aspectRatio: "560 / 500",
+            }}
           >
             {/* BLOATED card (back) */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -150,7 +156,7 @@ export function AsrHero(): React.ReactElement {
               style={{
                 left: 0,
                 top: 0,
-                width: "344px",
+                width: "61.4%",
                 height: "auto",
                 filter: "drop-shadow(-30px 20px 40px rgba(0,0,0,0.35))",
               }}
@@ -166,8 +172,8 @@ export function AsrHero(): React.ReactElement {
               className="absolute pointer-events-none select-none"
               style={{
                 right: 0,
-                top: "90px",
-                width: "324px",
+                top: "18%",
+                width: "57.9%",
                 height: "auto",
                 filter: "drop-shadow(-30px 20px 40px rgba(0,0,0,0.45))",
               }}

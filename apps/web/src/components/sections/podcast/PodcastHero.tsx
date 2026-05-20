@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import {
   isHydratedEpisode,
   resolveVideoId,
@@ -5,7 +6,11 @@ import {
   type PodcastPage,
 } from "@/lib/podcast";
 import { Waveform } from "./_components/Waveform";
-import { YouTubeEmbed } from "./_components/YouTubeEmbed";
+// YouTubeEmbed wraps an <iframe>; defer it so the iframe code does not ship
+// in the initial podcast client bundle and does not block first paint.
+const YouTubeEmbed = dynamic(() =>
+  import("./_components/YouTubeEmbed").then((m) => ({ default: m.YouTubeEmbed })),
+);
 
 // Exact Figma gradient (node 373:2909).
 const HERO_GRADIENT =

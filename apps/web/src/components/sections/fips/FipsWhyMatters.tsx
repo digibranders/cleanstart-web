@@ -109,7 +109,7 @@ function MatterTile({ card }: { card: MatterCard }): React.ReactElement {
           "linear-gradient(160deg, #E9F1FF 0%, #FFFFFF 65%, #FFFFFF 100%)",
         boxShadow:
           "0 24px 48px -24px rgba(35, 90, 220, 0.18), 0 1px 0 rgba(255,255,255,0.85) inset",
-        minHeight: "284px",
+        minHeight: "clamp(240px, 22vw, 284px)",
       }}
     >
       {/* Top-right ball icon */}

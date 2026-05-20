@@ -11,7 +11,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
     <section
       data-section="CleanStartImagesBrowse"
       className="relative overflow-hidden bg-white"
-      style={{ minHeight: "1184px" }}
+      style={{ minHeight: "clamp(820px, 82vw, 1184px)" }}
     >
       {/* Decorative grid (faint) */}
       <div
@@ -86,7 +86,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
               color: "#ffffff",
               fontFamily: "var(--font-display)",
               fontWeight: 500,
-              fontSize: "16px",
+              fontSize: "clamp(14px, 1.1vw, 17px)",
               letterSpacing: "-0.01em",
             }}
           >
@@ -120,7 +120,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
               color: "#ffffff",
               fontFamily: "var(--font-display)",
               fontWeight: 500,
-              fontSize: "16px",
+              fontSize: "clamp(14px, 1.1vw, 17px)",
               letterSpacing: "-0.01em",
             }}
           >

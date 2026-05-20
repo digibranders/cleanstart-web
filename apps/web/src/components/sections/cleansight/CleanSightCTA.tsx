@@ -80,6 +80,7 @@ export function CleanSightCTA(): React.ReactElement {
           alt=""
           width={213}
           height={213}
+          sizes="260px"
           className="object-cover"
         />
       </div>
@@ -98,17 +99,15 @@ export function CleanSightCTA(): React.ReactElement {
           zIndex: 1,
         }}
       >
-        See Everything.{" "}
-        <br />
-        Fix Everything.
+        See Everything. Fix Everything.
       </h2>
 
       {/* Right: description + CTA */}
       <div className="relative flex flex-col gap-10 flex-1" style={{ zIndex: 1 }}>
         <p
+          className="text-body-lg"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(14px, 1.09vw, 21px)",
             fontWeight: 400,
             letterSpacing: "-0.04em",
             lineHeight: 1.4,
@@ -126,7 +125,7 @@ export function CleanSightCTA(): React.ReactElement {
           className="self-start inline-flex items-center gap-2 rounded-[8px] text-white font-medium"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(14px, 0.94vw, 18px)",
+            fontSize: "var(--btn-fs-md)",
             letterSpacing: "-0.01em",
             background: "#3960F9",
             padding: "11px 20px",
@@ -178,6 +177,7 @@ export function CleanSightAwards(): React.ReactElement {
               src={a.src}
               alt={a.alt}
               fill
+              sizes="97px"
               className="object-contain"
               loading="lazy"
             />

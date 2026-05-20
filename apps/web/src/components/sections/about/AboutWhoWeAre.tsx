@@ -20,7 +20,7 @@ const PILLARS = [
 
 export function AboutWhoWeAre() {
   return (
-    <section className="relative overflow-hidden bg-white py-[120px]">
+    <section className="relative overflow-hidden bg-white py-section-md">
       {/* Decorative vector — Figma left edge, x=38 y=-244, 701×680 */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -67,7 +67,6 @@ export function AboutWhoWeAre() {
               lineHeight: "1.0",
               letterSpacing: "-0.05em",
               color: "#111",
-              whiteSpace: "nowrap",
             }}
           >
             Who We{" "}
@@ -114,7 +113,7 @@ export function AboutWhoWeAre() {
               left: "calc(33.33% - 0.75px)",
               top: "0",
               width: "1.5px",
-              height: "249px",
+              height: "clamp(160px, 18vw, 249px)",
             }}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -127,7 +126,7 @@ export function AboutWhoWeAre() {
               left: "calc(66.67% - 0.75px)",
               top: "0",
               width: "1.5px",
-              height: "249px",
+              height: "clamp(160px, 18vw, 249px)",
             }}
           />
 
@@ -140,19 +139,20 @@ export function AboutWhoWeAre() {
                     alt={pillar.title}
                     width={100}
                     height={100}
+                    sizes="100px"
                     className="h-full w-full object-contain"
                   />
                 </div>
 
                 <div className="flex flex-col gap-3">
                   <h3
-                    className="font-display text-[2rem] font-bold leading-none tracking-[-0.05em]"
+                    className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em]"
                     style={{ color: "#333" }}
                   >
                     {pillar.title}
                   </h3>
                   <p
-                    className="text-xl font-normal leading-[1.4] tracking-[-0.05em]"
+                    className="text-body-lg font-normal leading-[1.4] tracking-[-0.05em]"
                     style={{ color: "#333" }}
                   >
                     {pillar.description}

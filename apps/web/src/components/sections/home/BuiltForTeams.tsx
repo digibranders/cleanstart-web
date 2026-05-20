@@ -136,7 +136,7 @@ export function BuiltForTeams() {
           "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
     >
-      <div className="relative z-[2] mx-auto w-full max-w-[1276px] px-6 py-20 sm:py-24 lg:py-[120px]">
+      <div className="relative z-[2] mx-auto w-full max-w-[1276px] px-6 py-section-md">
         <header className="mx-auto max-w-[760px] text-center">
           <h2
             id="testimonials-title"
@@ -148,9 +148,7 @@ export function BuiltForTeams() {
               letterSpacing: "-0.05em",
             }}
           >
-            Built for Teams That Can&rsquo;t
-            <br />
-            Afford{" "}
+            Built for Teams That Can&rsquo;t Afford{" "}
             <span
               className="bg-clip-text text-transparent"
               style={{
@@ -162,7 +160,7 @@ export function BuiltForTeams() {
             </span>
           </h2>
           <p
-            className="mx-auto mt-6 text-xl font-normal leading-[1.5] tracking-[-0.02em] text-white/85"
+            className="mx-auto mt-6 text-body-lg font-normal leading-[1.5] tracking-[-0.02em] text-white/85"
             style={{ maxWidth: "620px" }}
           >
             CleanStart replaces unpredictable builds with verified, secure
@@ -453,9 +451,8 @@ function CompanyMark({
 }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 font-sans text-white/85"
+      className={`inline-flex items-center gap-1.5 font-sans text-white/85 ${small ? "text-body-xs" : "text-body-sm"}`}
       style={{
-        fontSize: small ? "11px" : "14px",
         fontWeight: 600,
         letterSpacing: "0.02em",
       }}

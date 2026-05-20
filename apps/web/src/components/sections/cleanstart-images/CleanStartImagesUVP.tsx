@@ -31,7 +31,7 @@ export function CleanStartImagesUVP(): React.ReactElement {
     <section
       data-section="CleanStartImagesUVP"
       className="relative overflow-hidden bg-white"
-      style={{ minHeight: "855px" }}
+      style={{ minHeight: "clamp(640px, 60vw, 855px)" }}
     >
       {/* Decorative grid */}
       <div
@@ -75,7 +75,7 @@ export function CleanStartImagesUVP(): React.ReactElement {
 
       <div
         className="relative mx-auto max-w-[1276px] px-6"
-        style={{ paddingTop: "120px", paddingBottom: "120px" }}
+        style={{ paddingTop: "var(--spacing-section-md)", paddingBottom: "var(--spacing-section-md)" }}
       >
         <h2
           className="text-center mx-auto"

@@ -45,9 +45,7 @@ export function CleanSightHero(): React.ReactElement {
             lineHeight: 1.0,
           }}
         >
-          Continuous Visibility.{" "}
-          <br className="hidden sm:block" />
-          Continuous Remediation.
+          Continuous Visibility. Continuous Remediation.
         </h1>
 
         <p
@@ -70,7 +68,6 @@ export function CleanSightHero(): React.ReactElement {
           className="cs-btn-glass mt-10 self-center"
           style={
             {
-              "--cs-btn-h": "38px",
               "--cs-btn-px": "18px",
               "--cs-btn-fs": "20px",
             } as React.CSSProperties

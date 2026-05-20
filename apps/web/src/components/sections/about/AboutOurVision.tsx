@@ -3,7 +3,7 @@ import Image from "next/image";
 export function AboutOurVision() {
   return (
     <section
-      className="relative overflow-hidden py-[100px]"
+      className="relative overflow-hidden py-section-md"
       style={{
         background:
           "linear-gradient(180deg, #ffffff 0%, #f3f0ff 35%, #eaf1ff 100%)",
@@ -17,10 +17,10 @@ export function AboutOurVision() {
         alt=""
         className="pointer-events-none absolute select-none"
         style={{
-          left: "-393px",
+          left: "calc(-393px / 1920 * 100%)",
           top: "306px",
-          width: "755px",
-          height: "755px",
+          width: "min(755px, 50vw)",
+          aspectRatio: "1 / 1",
         }}
         loading="lazy"
         decoding="async"
@@ -33,10 +33,10 @@ export function AboutOurVision() {
         alt=""
         className="pointer-events-none absolute select-none"
         style={{
-          right: "-368px",
+          right: "calc(-368px / 1920 * 100%)",
           top: "-428px",
-          width: "727px",
-          height: "727px",
+          width: "min(727px, 48vw)",
+          aspectRatio: "1 / 1",
         }}
         loading="lazy"
         decoding="async"
@@ -227,6 +227,7 @@ export function AboutOurVision() {
                 alt="Our Vision — target"
                 width={418}
                 height={353}
+                sizes="(min-width: 1024px) 418px, 50vw"
                 className="absolute object-contain"
                 style={{
                   left: "33%",
@@ -286,7 +287,7 @@ export function AboutOurVision() {
             <a
               href="#contact"
               className="cs-btn-blue"
-              style={{ width: "131px", height: "44px", fontSize: "1.125rem" }}
+              style={{ minWidth: "131px" }}
             >
               Contact Us
             </a>

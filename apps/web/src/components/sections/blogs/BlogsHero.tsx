@@ -23,7 +23,7 @@ export function BlogsHero({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ minHeight: "1059px", background: HERO_GRADIENT }}
+      style={{ minHeight: "clamp(820px, 75vw, 1059px)", background: HERO_GRADIENT }}
       aria-labelledby="blogs-hero-title"
     >
       {/* Decorative glow — left side, mix-blend-hard-light */}
@@ -77,7 +77,7 @@ export function BlogsHero({
         {/* Title + search + categories — centered block */}
         <div
           className="flex flex-col items-center gap-10 mx-auto"
-          style={{ paddingTop: "122px", maxWidth: "864px" }}
+          style={{ paddingTop: "clamp(72px, 9vw, 122px)", maxWidth: "864px" }}
         >
           {/* Title + subtitle + search */}
           <div
@@ -103,7 +103,6 @@ export function BlogsHero({
                   lineHeight: "1.4",
                   letterSpacing: "-0.04em",
                   opacity: 0.8,
-                  whiteSpace: "nowrap",
                 }}
               >
                 A Curated Collection of Writings, Research, and Solutions
@@ -115,7 +114,7 @@ export function BlogsHero({
               fallback={
                 <div
                   className="flex items-center"
-                  style={{ height: "36px", width: "674px" }}
+                  style={{ height: "36px", width: "100%", maxWidth: "674px" }}
                 />
               }
             >
@@ -152,17 +151,14 @@ export function BlogsHero({
         {/* Featured Blog — 2-column: text left, image right */}
         {featuredPost ? (
           <div
-            className="grid mt-[102px]"
-            style={{
-              gridTemplateColumns: "513px 1fr",
-              gap: "32px",
-            }}
+            className="grid grid-cols-1 lg:grid-cols-[minmax(280px,513px)_1fr] mt-[clamp(56px,7vw,102px)]"
+            style={{ gap: "32px" }}
           >
             {/* Left: text */}
             <div className="flex flex-col gap-6 items-start">
               <div className="flex flex-col gap-6 w-full">
                 <p
-                  className="text-xl font-medium leading-[1.5] tracking-[-0.04em]"
+                  className="text-body-lg font-medium leading-[1.5] tracking-[-0.04em]"
                   style={{ color: "#d8d8d8" }}
                 >
                   FEATURED BLOGS
@@ -192,7 +188,7 @@ export function BlogsHero({
               {/* Read more link */}
               <Link
                 href={`/blog/${featuredPost.slug}`}
-                className="flex items-center gap-2 text-xl font-medium leading-[1.5] text-white text-center"
+                className="flex items-center gap-2 text-body-lg font-medium leading-[1.5] text-white text-center"
               >
                 Read more
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -209,9 +205,9 @@ export function BlogsHero({
 
             {/* Right: featured image — outer purple border + inset image */}
             <div
-              className="relative shrink-0"
+              className="relative w-full"
               style={{
-                height: "349px",
+                aspectRatio: "711 / 349",
                 borderRadius: "20px",
                 background: "rgba(165,103,255,0.4)",
               }}

@@ -61,7 +61,7 @@ export function AsrPublicImages(): React.ReactElement {
       />
 
       {/* Heading */}
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-16 md:pt-[88px]">
+      <div className="relative mx-auto max-w-[1276px] px-6 pt-section-md">
         <h2
           className="text-center text-[#111111]"
           style={{
@@ -73,8 +73,7 @@ export function AsrPublicImages(): React.ReactElement {
             marginBottom: "48px",
           }}
         >
-          Public images are
-          <br />
+          Public images are{" "}
           <span
             style={{
               background: "linear-gradient(99deg, #9A51FF 0%, #2CC1EB 100%)",
@@ -89,8 +88,8 @@ export function AsrPublicImages(): React.ReactElement {
       </div>
 
       {/* Desktop diagram: container center, 4 cards at corners, dashed lines */}
-      <div className="hidden md:block relative mx-auto max-w-[1260px] px-6 pb-16 md:pb-[88px]">
-        <div className="relative" style={{ height: "540px" }}>
+      <div className="hidden md:block relative mx-auto max-w-[1260px] px-6 pb-section-md">
+        <div className="relative" style={{ aspectRatio: "1260 / 540" }}>
           {/* Soft red radial glow under the container */}
           <div
             aria-hidden
@@ -113,7 +112,7 @@ export function AsrPublicImages(): React.ReactElement {
             aria-hidden
             className="absolute pointer-events-none"
             viewBox="0 0 1260 540"
-            preserveAspectRatio="none"
+            preserveAspectRatio="xMidYMid meet"
             style={{ inset: 0, width: "100%", height: "100%" }}
           >
             {/* TL card → container TL */}
@@ -226,7 +225,7 @@ function BloatedCard({
   description,
 }: BloatedCardProps): React.ReactElement {
   return (
-    <div className="relative" style={{ width: "303px", maxWidth: "100%" }}>
+    <div className="relative" style={{ width: "clamp(240px, 24vw, 303px)", maxWidth: "100%" }}>
       {/* Outer red→white border halo — Figma fill_UB7EN2 [#FF4C4C, #FFFFFF] */}
       <div
         aria-hidden

@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
+import dynamic from "next/dynamic";
+import { buildPageMetadata } from "@/lib/seo/canonical";
 import { Header } from "@/components/sections/Header";
 import { Hero } from "@/components/sections/home/Hero";
 import { CleanStartFactory } from "@/components/sections/home/CleanStartFactory";
 import { HowCleanStartHelp } from "@/components/sections/home/HowCleanStartHelp";
-import { BuiltForTeams } from "@/components/sections/home/BuiltForTeams";
+// BuiltForTeams (~480L "use client" testimonial carousel) sits below the fold;
+// code-split so it does not ship in the initial home-page client bundle.
+const BuiltForTeams = dynamic(() =>
+  import("@/components/sections/home/BuiltForTeams").then((m) => ({ default: m.BuiltForTeams })),
+);
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
 import { ReadyToSecureCTA, ReadyToSecureCTAOverlay } from "@/components/sections/home/ReadyToSecureCTA";
@@ -11,6 +18,13 @@ import { SecurityNotPatching } from "@/components/sections/home/SecurityNotPatch
 import { CleanStartAdvantage } from "@/components/sections/home/CleanStartAdvantage";
 import { FadeUp } from "@/components/ui/FadeUp";
 import Image from "next/image";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "CleanStart — Secure by Design. Built from Source.",
+  description:
+    "Verified container images. Built from source, hardened, signed, and continuously verified.",
+  path: "/",
+});
 
 export default function Home() {
   return (
@@ -99,7 +113,7 @@ export default function Home() {
         {/* FAQ + Resources share one continuous #F6F6F6 canvas so their
             transparent backgrounds and decorative blobs/grids bleed across
             section boundaries without a hard edge. */}
-        <div className="relative bg-[#F6F6F6] pb-[250px]">
+        <div className="relative overflow-hidden bg-[#F6F6F6] pb-[250px]">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -111,6 +125,7 @@ export default function Home() {
               alt=""
               width={1101}
               height={1101}
+              sizes="1101px"
               unoptimized
               loading="eager"
               className="absolute"
@@ -123,6 +138,7 @@ export default function Home() {
               alt=""
               width={1101}
               height={1101}
+              sizes="1101px"
               unoptimized
               loading="eager"
               className="absolute"
@@ -135,6 +151,7 @@ export default function Home() {
               alt=""
               width={1101}
               height={1101}
+              sizes="1101px"
               unoptimized
               loading="eager"
               className="absolute"

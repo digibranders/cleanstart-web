@@ -22,7 +22,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
       style={{
         width: "100%",
         maxWidth: "404px",
-        height: "496px",
+        minHeight: "clamp(420px, 36vw, 496px)",
         borderRadius: "32px",
         boxShadow:
           "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
@@ -33,7 +33,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
         className="relative overflow-hidden shrink-0"
         style={{
           margin: "12px",
-          height: "200px",
+          aspectRatio: "380 / 200",
           borderRadius: "24px",
           background: "#e8e8f0",
         }}
@@ -44,7 +44,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
             alt={event.heroImage?.alt ?? event.title}
             fill
             className="object-cover"
-            sizes="380px"
+            sizes="(min-width: 1280px) 380px, (min-width: 768px) 45vw, 90vw"
           />
         ) : (
           <div
@@ -81,8 +81,8 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
               decoding="async"
             />
             <span
-              className="font-medium leading-none"
-              style={{ color: "#4a3bf1", fontSize: "14px" }}
+              className="text-body-sm font-medium leading-none"
+              style={{ color: "#4a3bf1" }}
             >
               {shortDate}
             </span>
@@ -91,10 +91,9 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
 
         {/* Title */}
         <h3
-          className="font-display font-medium overflow-hidden"
+          className="font-display text-card-title-md font-medium overflow-hidden"
           style={{
             color: "#111",
-            fontSize: "1.5rem",
             lineHeight: "1.3",
             letterSpacing: "-0.02em",
             display: "-webkit-box",
@@ -122,10 +121,9 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
             decoding="async"
           />
           <span
-            className="font-medium leading-none truncate"
+            className="text-body-md font-medium leading-none truncate"
             style={{
               color: "#111",
-              fontSize: "16px",
               letterSpacing: "-0.05em",
             }}
           >
@@ -137,7 +135,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
         <Link
           href={`/events/${event.slug}`}
           className="cs-btn-blue gap-2 w-full"
-          style={{ height: "45px", fontSize: "18px", marginTop: "8px" }}
+          style={{ marginTop: "8px" }}
           aria-label={`Read more about ${event.title}`}
         >
           Read more

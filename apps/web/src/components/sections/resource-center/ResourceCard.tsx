@@ -36,7 +36,7 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
       className="relative bg-white overflow-hidden flex flex-col w-full mx-auto"
       style={{
         maxWidth: "328px",
-        height: "354px",
+        minHeight: "clamp(300px, 26vw, 354px)",
         borderRadius: "32px",
         boxShadow:
           "0px 81px 23px 0px rgba(0,0,0,0), 0px 52px 21px 0px rgba(0,0,0,0), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 3px 7px 0px rgba(0,0,0,0.02)",
