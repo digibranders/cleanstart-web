@@ -294,8 +294,8 @@ function TabPill({
 function FeatureCardItem({ card }: { card: FeatureCard }) {
   return (
     <article
-      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full items-center gap-6"
-      style={{ paddingLeft: "clamp(16px, 5vw, 70px)", paddingRight: "clamp(16px, 5vw, 70px)" }}
+      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col items-center text-center gap-3 sm:flex-row sm:text-left sm:items-center sm:gap-6"
+      style={{ paddingLeft: "clamp(16px, 5vw, 70px)", paddingRight: "clamp(16px, 5vw, 70px)", paddingTop: "clamp(16px, 3vw, 32px)", paddingBottom: "clamp(16px, 3vw, 32px)" }}
     >
       {/* Gear orb — Figma-exact: solid lavender ellipse #DF9BFF (165×165 at (-3, 1))
           BLURRED to be a soft glow, with gear image (161×160 at (20, 11)) on top.

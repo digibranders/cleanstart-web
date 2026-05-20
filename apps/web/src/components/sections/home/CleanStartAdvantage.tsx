@@ -93,7 +93,7 @@ export function CleanStartAdvantage() {
 
         {/* Stats row — 5 stats with 4 vertical gradient separators between them.
             On mobile, stats wrap into a 2-col grid (separators hide). */}
-        <div className="mt-16 grid grid-cols-2 gap-y-10 sm:grid-cols-3 lg:mt-[120px] lg:flex lg:items-start lg:justify-between lg:gap-6">
+        <div className="mt-12 grid grid-cols-1 gap-y-8 sm:mt-16 sm:grid-cols-3 sm:gap-y-10 lg:mt-[120px] lg:flex lg:items-start lg:justify-between lg:gap-6">
           {STATS.map((stat, i) => (
             <React.Fragment key={stat.value}>
               <StatBlock stat={stat} />
