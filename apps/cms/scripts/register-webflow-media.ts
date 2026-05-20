@@ -31,6 +31,10 @@ import { fileURLToPath } from 'node:url';
 
 import { getPayload } from 'payload';
 import config from '../src/payload.config.ts';
+import {
+  buildMediaFilename,
+  canonicalExtensionForMime,
+} from '../src/payload/lib/media-filename.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -145,31 +149,37 @@ const MIME_BY_EXT: Record<string, string> = {
 };
 
 /**
- * Derive a clean, deduped filename from a Webflow CDN URL.
+ * Compute the canonical Media filename matching what Media.ts
+ * beforeValidate would produce — `{slug}-{sha8}.{canonicalExt}`.
  *
- * Webflow encodes the original filename in the path after a `_`
- * separator: `<r2hash>_<originalName>.<ext>`. We keep the original
- * name (URL-decoded, spaces collapsed to dashes) and prefix the
- * sha256 hash so duplicates by content don't collide on filename.
+ * Important: we set this as `file.name` BEFORE calling payload.create
+ * so Payload's sharp variant pipeline picks it up as the base stem.
+ * If we left `file.name` as the raw Webflow basename, variants would
+ * land in R2 with messy `<webflow-id>_original-name-WxH.ext` keys
+ * even though the main doc's `filename` got renamed by the hook —
+ * a known asymmetry between the hook and the sharp pipeline.
+ *
+ * Output matches buildMediaFilename's contract: same bytes + same
+ * slug source → same filename. The hook re-derives the same result
+ * from `data.alt` (which we pass as the slugSource), so file.name +
+ * data.alt + the hook output all converge on one canonical name.
  */
-const deriveFilename = (webflowUrl: string, sha256: string): string => {
-  const urlPath = new URL(webflowUrl).pathname;
-  const base = path.basename(urlPath);
-  // Decode, collapse whitespace to dashes, and strip any character
-  // that isn't alphanumeric / dash / dot / underscore. Editors used
-  // semicolons (`;`) and parens in their Webflow filenames, both of
-  // which trip Payload's PDF validator (and would land on R2 with
-  // ugly URL-encoded paths anyway).
-  const decoded = decodeURIComponent(base)
-    .replace(/\s+/g, '-')
-    .replace(/[^A-Za-z0-9._-]/g, '-');
-  // Strip the Webflow hash prefix (32-char hex + underscore).
-  const stripped = decoded.replace(/^[a-f0-9]{32}_/i, '');
-  // Prefix our own sha256 (first 12 chars) so two distinct sources
-  // with the same human filename don't collide.
-  const ext = path.extname(stripped) || '.bin';
-  const name = path.basename(stripped, ext).slice(0, 80);
-  return `${sha256.slice(0, 12)}-${name}${ext}`;
+const deriveFilename = (
+  webflowUrl: string,
+  sha256: string,
+  slugSource: string,
+  mimetype: string,
+): string => {
+  const fallbackExt = path.extname(new URL(webflowUrl).pathname).replace(/^\.+/, '').toLowerCase();
+  // Mirror the Media hook: rasters → webp, svg/pdf pass-through, otherwise
+  // fall back to the source ext (PDFs come through as application/pdf).
+  const ext = canonicalExtensionForMime(mimetype) || fallbackExt || 'bin';
+  return buildMediaFilename({
+    slugSource,
+    bytes: Buffer.alloc(0), // ignored when hashOverride is set
+    ext,
+    hashOverride: sha256.slice(0, 8),
+  });
 };
 
 const loadAssetProgress = (): AssetRecord[] => {
@@ -228,20 +238,19 @@ const run = async (): Promise<void> => {
   let done = 0;
   for (const asset of slice) {
     done += 1;
-    // `filename` here is only used as a stable lookup key for prior
-    // registrations + the upload pipeline's `file.name` (which the
-    // Media.ts `beforeValidate` hook then rewrites). The on-disk
-    // filename in Payload is what the hook computes from `alt`.
-    const filename = deriveFilename(asset.webflowUrl, asset.sha256);
-    const ext = path.extname(filename).toLowerCase();
-    const mimetype = MIME_BY_EXT[ext] ?? 'application/octet-stream';
+    // Determine mimetype from the URL extension (Webflow CDN URLs end
+    // with the original ext — Webflow never serves webp-converted
+    // images for raster sources). Then derive a canonical filename
+    // that matches what Media.ts beforeValidate would compute, so
+    // sharp variant generation inherits the canonical stem instead
+    // of the raw Webflow basename.
     const ctx = contextMap.get(asset.webflowUrl);
-    // The Media.ts hook uses `data.alt` as the slug source when it's
-    // a non-empty string; here we use the asset-context's semantic
-    // `{shortCollection}-{docSlug}-{role}` form so the resulting R2
-    // filename carries SEO meaning (e.g. `blog-openclaw-...-hero`).
-    const slugSource = slugSourceForContext(ctx, path.basename(filename, ext));
+    const slugSource = slugSourceForContext(ctx, path.basename(new URL(asset.webflowUrl).pathname));
     const folder = ctx ? folderForCollection(ctx.primary.collection) : 'web/general';
+    const urlExt = path.extname(new URL(asset.webflowUrl).pathname).toLowerCase();
+    const mimetype = MIME_BY_EXT[urlExt] ?? 'application/octet-stream';
+    const filename = deriveFilename(asset.webflowUrl, asset.sha256, slugSource, mimetype);
+    const ext = path.extname(filename).toLowerCase();
 
     // 1) Same content already registered? Alias to that media doc.
     const existingMediaId = shaToMediaId.get(asset.sha256);
