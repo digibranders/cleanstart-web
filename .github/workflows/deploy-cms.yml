@@ -30,12 +30,23 @@ jobs:
         with:
           ref: ${{ inputs.sha || github.sha }}
 
+      # Buildx + GHA cache shaves ~1–2 min off subsequent builds by reusing
+      # pnpm install + intermediate Next.js layers across runs. First build
+      # after this change populates the cache (no speedup); every later
+      # source-only change benefits. Cache lives in the repo's Actions cache
+      # (10 GB cap, LRU-evicted by GitHub).
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build image (cms:${{ github.sha }})
-        run: |
-          docker build \
-            -f apps/cms/Dockerfile \
-            -t cms:${{ github.sha }} \
-            .
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/cms/Dockerfile
+          tags: cms:${{ github.sha }}
+          load: true
+          cache-from: type=gha,scope=cms-deploy
+          cache-to: type=gha,scope=cms-deploy,mode=max
 
       - name: Save image tarball
         run: docker save cms:${{ github.sha }} | gzip > /tmp/cms.tar.gz
@@ -92,6 +103,7 @@ jobs:
           WEBHOOK_TEAMS_EVENTS: ${{ vars.WEBHOOK_TEAMS_EVENTS }}
           WEBHOOK_GENERIC_EVENTS: ${{ vars.WEBHOOK_GENERIC_EVENTS }}
           TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+          PAYLOAD_DB_PUSH: ${{ vars.PAYLOAD_DB_PUSH }}
           # Secrets
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
@@ -158,6 +170,7 @@ jobs:
             echo "WEB_REVALIDATE_URL=${WEB_REVALIDATE_URL}"
             echo "WEB_REVALIDATE_SECRET=${WEB_REVALIDATE_SECRET}"
             echo "TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}"
+            echo "PAYLOAD_DB_PUSH=${PAYLOAD_DB_PUSH}"
             echo "TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}"
             echo "BREVO_API_KEY=${BREVO_API_KEY}"
             echo "BREVO_TEMPLATE_ID=${BREVO_TEMPLATE_ID}"
@@ -187,7 +200,7 @@ jobs:
              cd /opt/cleanstart
              docker load < /tmp/cms.tar.gz
              docker tag cms:${{ github.sha }} cms:current
-             docker compose --profile cms up -d --wait cms
+             docker compose --profile cms up -d --wait --wait-timeout 300 cms
              docker image prune -f
              rm -f /tmp/cms.tar.gz
              echo "--- cms container status ---"

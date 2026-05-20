@@ -71,8 +71,21 @@ COPY --from=builder --chown=payload:nodejs /app/packages ./packages
 COPY --from=builder --chown=payload:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=payload:nodejs /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
-# Payload migration files — needed for `payload migrate` on startup
-COPY --from=builder --chown=payload:nodejs /app/apps/cms/src/migrations ./apps/cms/src/migrations
+# Payload + Next.js need these at runtime to bootstrap.
+# - tsconfig.json: payload's `findConfig` reads it to compute ts-path aliases
+# - next.config.ts: next start reads it for headers/redirects/etc
+# - instrumentation.ts: Next.js loads it for OpenTelemetry / Sentry init
+# - sentry.{client,edge,server}.config.ts: Sentry's wizard-generated configs
+# - src/: payload.config.ts + collections + everything the config imports
+#   transitively. Payload resolves these at runtime, not at build time.
+COPY --from=builder --chown=payload:nodejs /app/apps/cms/tsconfig.json ./apps/cms/tsconfig.json
+COPY --from=builder --chown=payload:nodejs /app/apps/cms/next.config.ts ./apps/cms/next.config.ts
+COPY --from=builder --chown=payload:nodejs /app/apps/cms/next-env.d.ts ./apps/cms/next-env.d.ts
+COPY --from=builder --chown=payload:nodejs /app/apps/cms/instrumentation.ts ./apps/cms/instrumentation.ts
+COPY --from=builder --chown=payload:nodejs /app/apps/cms/sentry.client.config.ts ./apps/cms/sentry.client.config.ts
+COPY --from=builder --chown=payload:nodejs /app/apps/cms/sentry.edge.config.ts ./apps/cms/sentry.edge.config.ts
+COPY --from=builder --chown=payload:nodejs /app/apps/cms/sentry.server.config.ts ./apps/cms/sentry.server.config.ts
+COPY --from=builder --chown=payload:nodejs /app/apps/cms/src ./apps/cms/src
 
 USER payload
 WORKDIR /app/apps/cms
