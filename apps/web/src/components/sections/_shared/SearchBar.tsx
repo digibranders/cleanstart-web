@@ -89,15 +89,12 @@ export function SearchBar({
     borderRight: "none",
     borderRadius: "12px 0 0 12px",
   };
-  if (!inputWidthClassName) {
-    inputWrapperStyle.width = "622px";
-  }
 
   return (
-    <search aria-label={ariaLabel} className="contents">
-      <form onSubmit={handleSubmit} className="flex items-center">
+    <search aria-label={ariaLabel} className="contents w-full">
+      <form onSubmit={handleSubmit} className="flex items-center w-full max-w-[674px] mx-auto">
         <div
-          className={`relative overflow-hidden${
+          className={`relative overflow-hidden flex-1 min-w-0${
             inputWidthClassName ? ` ${inputWidthClassName}` : ""
           }`}
           style={inputWrapperStyle}
