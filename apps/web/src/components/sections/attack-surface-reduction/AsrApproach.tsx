@@ -113,19 +113,19 @@ export function AsrApproach(): React.ReactElement {
         </div>
       </div>
 
-      {/* Mobile stacked */}
-      <div className="md:hidden relative mx-auto px-5 pb-12">
-        {items.map((item, idx) => (
+      {/* Mobile stacked — per Figma 366:6432 (centred icon over title + body
+          inside a white rounded card; vertical 1-col stack). */}
+      <div className="md:hidden relative mx-auto px-5 pb-12 flex flex-col gap-4">
+        {items.map((item) => (
           <div
             key={item.title}
-            className="flex items-center gap-5 py-7"
-            style={
-              idx < items.length - 1
-                ? { borderBottom: "1px solid rgba(217,217,217,0.7)" }
-                : undefined
-            }
+            className="relative flex flex-col items-center text-center gap-3 rounded-[20px] bg-white px-6 py-8"
+            style={{
+              boxShadow:
+                "0px 2px 4px rgba(22,34,51,0.04), 0px 8px 16px rgba(22,34,51,0.05)",
+            }}
           >
-            <div className="relative shrink-0" style={{ width: "120px", height: "120px" }}>
+            <div className="relative" style={{ width: "120px", height: "120px" }}>
               <div
                 aria-hidden
                 className="absolute pointer-events-none"
@@ -146,36 +146,34 @@ export function AsrApproach(): React.ReactElement {
                 src={item.icon}
                 alt=""
                 aria-hidden
-                className="relative pointer-events-none select-none"
-                style={{ width: "120px", height: "120px", objectFit: "contain" }}
+                className="relative pointer-events-none select-none object-contain"
+                style={{ width: "120px", height: "120px" }}
                 loading="lazy"
                 decoding="async"
               />
             </div>
-            <div className="flex flex-col gap-2">
-              <p
-                className="text-card-title-md text-[#111111]"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 700,
-                  letterSpacing: "-0.05em",
-                  lineHeight: 1.1,
-                }}
-              >
-                {item.title}
-              </p>
-              <p
-                className="text-body-md text-[#333333]"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 400,
-                  letterSpacing: "-0.05em",
-                  lineHeight: 1.4,
-                }}
-              >
-                {item.description}
-              </p>
-            </div>
+            <p
+              className="text-card-title-md text-[#111111]"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                letterSpacing: "-0.05em",
+                lineHeight: 1.1,
+              }}
+            >
+              {item.title}
+            </p>
+            <p
+              className="text-body-md text-[#333333]"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 400,
+                letterSpacing: "-0.05em",
+                lineHeight: 1.4,
+              }}
+            >
+              {item.description}
+            </p>
           </div>
         ))}
       </div>
