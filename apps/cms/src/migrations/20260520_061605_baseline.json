@@ -371,6 +371,13 @@
           "notNull": false,
           "default": 50
         },
+        "prefix": {
+          "name": "prefix",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'dev'"
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp(3) with time zone",
@@ -1194,6 +1201,141 @@
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.preview_audit": {
+      "name": "preview_audit",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "collection": {
+          "name": "collection",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "doc_id": {
+          "name": "doc_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_id": {
+          "name": "actor_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "label": {
+          "name": "label",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ttl_seconds": {
+          "name": "ttl_seconds",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "preview_audit_actor_idx": {
+          "name": "preview_audit_actor_idx",
+          "columns": [
+            {
+              "expression": "actor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "preview_audit_updated_at_idx": {
+          "name": "preview_audit_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "preview_audit_created_at_idx": {
+          "name": "preview_audit_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "preview_audit_actor_id_users_id_fk": {
+          "name": "preview_audit_actor_id_users_id_fk",
+          "tableFrom": "preview_audit",
+          "tableTo": "users",
+          "columnsFrom": [
+            "actor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -10967,6 +11109,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "display_published_at": {
+          "name": "display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "reading_minutes": {
           "name": "reading_minutes",
           "type": "numeric",
@@ -11249,6 +11397,21 @@
           "columns": [
             {
               "expression": "categories_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "blogs_display_published_at_idx": {
+          "name": "blogs_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -13069,6 +13232,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version_display_published_at": {
+          "name": "version_display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "version_reading_minutes": {
           "name": "version_reading_minutes",
           "type": "numeric",
@@ -13384,6 +13553,21 @@
           "columns": [
             {
               "expression": "version_categories_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_blogs_v_version_version_display_published_at_idx": {
+          "name": "_blogs_v_version_version_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "version_display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -14972,6 +15156,32 @@
           "primaryKey": false,
           "notNull": false
         },
+        "publisher": {
+          "name": "publisher",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "publisher_logo_id": {
+          "name": "publisher_logo_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "press_type": {
+          "name": "press_type",
+          "type": "enum_news_press_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'press-release'"
+        },
+        "location": {
+          "name": "location",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "body": {
           "name": "body",
           "type": "jsonb",
@@ -15230,6 +15440,21 @@
           "method": "btree",
           "with": {}
         },
+        "news_publisher_logo_idx": {
+          "name": "news_publisher_logo_idx",
+          "columns": [
+            {
+              "expression": "publisher_logo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "news_seo_seo_og_image_idx": {
           "name": "news_seo_seo_og_image_idx",
           "columns": [
@@ -15313,6 +15538,19 @@
           "tableTo": "media",
           "columnsFrom": [
             "hero_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "news_publisher_logo_id_media_id_fk": {
+          "name": "news_publisher_logo_id_media_id_fk",
+          "tableFrom": "news",
+          "tableTo": "media",
+          "columnsFrom": [
+            "publisher_logo_id"
           ],
           "columnsTo": [
             "id"
@@ -16824,6 +17062,32 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version_publisher": {
+          "name": "version_publisher",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_publisher_logo_id": {
+          "name": "version_publisher_logo_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_press_type": {
+          "name": "version_press_type",
+          "type": "enum__news_v_version_press_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'press-release'"
+        },
+        "version_location": {
+          "name": "version_location",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "version_body": {
           "name": "version_body",
           "type": "jsonb",
@@ -17115,6 +17379,21 @@
           "method": "btree",
           "with": {}
         },
+        "_news_v_version_version_publisher_logo_idx": {
+          "name": "_news_v_version_version_publisher_logo_idx",
+          "columns": [
+            {
+              "expression": "version_publisher_logo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "_news_v_version_seo_version_seo_og_image_idx": {
           "name": "_news_v_version_seo_version_seo_og_image_idx",
           "columns": [
@@ -17256,6 +17535,19 @@
           "tableTo": "media",
           "columnsFrom": [
             "version_hero_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_news_v_version_publisher_logo_id_media_id_fk": {
+          "name": "_news_v_version_publisher_logo_id_media_id_fk",
+          "tableFrom": "_news_v",
+          "tableTo": "media",
+          "columnsFrom": [
+            "version_publisher_logo_id"
           ],
           "columnsTo": [
             "id"
@@ -19196,6 +19488,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "display_published_at": {
+          "name": "display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "reading_minutes": {
           "name": "reading_minutes",
           "type": "numeric",
@@ -19441,6 +19739,21 @@
           "columns": [
             {
               "expression": "reviewed_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "guides_display_published_at_idx": {
+          "name": "guides_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -21549,6 +21862,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version_display_published_at": {
+          "name": "version_display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "version_reading_minutes": {
           "name": "version_reading_minutes",
           "type": "numeric",
@@ -21827,6 +22146,21 @@
           "columns": [
             {
               "expression": "version_reviewed_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_guides_v_version_version_display_published_at_idx": {
+          "name": "_guides_v_version_version_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "version_display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -23397,27 +23731,21 @@
           "primaryKey": false,
           "notNull": false
         },
-        "hero_image_id": {
-          "name": "hero_image_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
         "summary": {
           "name": "summary",
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
-        "body": {
-          "name": "body",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
         "asset_id": {
           "name": "asset_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "body": {
+          "name": "body",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -23450,6 +23778,12 @@
         },
         "published_at": {
           "name": "published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_published_at": {
+          "name": "display_published_at",
           "type": "timestamp(3) with time zone",
           "primaryKey": false,
           "notNull": false
@@ -23674,21 +24008,6 @@
           "method": "btree",
           "with": {}
         },
-        "resources_hero_image_idx": {
-          "name": "resources_hero_image_idx",
-          "columns": [
-            {
-              "expression": "hero_image_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "resources_asset_idx": {
           "name": "resources_asset_idx",
           "columns": [
@@ -23709,6 +24028,21 @@
           "columns": [
             {
               "expression": "gate_form_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "resources_display_published_at_idx": {
+          "name": "resources_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -23796,19 +24130,6 @@
         }
       },
       "foreignKeys": {
-        "resources_hero_image_id_media_id_fk": {
-          "name": "resources_hero_image_id_media_id_fk",
-          "tableFrom": "resources",
-          "tableTo": "media",
-          "columnsFrom": [
-            "hero_image_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
         "resources_asset_id_media_id_fk": {
           "name": "resources_asset_id_media_id_fk",
           "tableFrom": "resources",
@@ -25135,27 +25456,21 @@
           "primaryKey": false,
           "notNull": false
         },
-        "version_hero_image_id": {
-          "name": "version_hero_image_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
         "version_summary": {
           "name": "version_summary",
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
-        "version_body": {
-          "name": "version_body",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
         "version_asset_id": {
           "name": "version_asset_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_body": {
+          "name": "version_body",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -25188,6 +25503,12 @@
         },
         "version_published_at": {
           "name": "version_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_display_published_at": {
+          "name": "version_display_published_at",
           "type": "timestamp(3) with time zone",
           "primaryKey": false,
           "notNull": false
@@ -25445,21 +25766,6 @@
           "method": "btree",
           "with": {}
         },
-        "_resources_v_version_version_hero_image_idx": {
-          "name": "_resources_v_version_version_hero_image_idx",
-          "columns": [
-            {
-              "expression": "version_hero_image_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "_resources_v_version_version_asset_idx": {
           "name": "_resources_v_version_version_asset_idx",
           "columns": [
@@ -25480,6 +25786,21 @@
           "columns": [
             {
               "expression": "version_gate_form_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_resources_v_version_version_display_published_at_idx": {
+          "name": "_resources_v_version_version_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "version_display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -25618,19 +25939,6 @@
           "tableTo": "resources",
           "columnsFrom": [
             "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
-        "_resources_v_version_hero_image_id_media_id_fk": {
-          "name": "_resources_v_version_hero_image_id_media_id_fk",
-          "tableFrom": "_resources_v",
-          "tableTo": "media",
-          "columnsFrom": [
-            "version_hero_image_id"
           ],
           "columnsTo": [
             "id"
@@ -27115,6 +27423,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "display_published_at": {
+          "name": "display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "reading_minutes": {
           "name": "reading_minutes",
           "type": "numeric",
@@ -27375,6 +27689,21 @@
           "columns": [
             {
               "expression": "reviewed_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "knowledge_base_display_published_at_idx": {
+          "name": "knowledge_base_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -29161,6 +29490,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version_display_published_at": {
+          "name": "version_display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "version_reading_minutes": {
           "name": "version_reading_minutes",
           "type": "numeric",
@@ -29454,6 +29789,21 @@
           "columns": [
             {
               "expression": "version_reviewed_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_knowledge_base_v_version_version_display_published_at_idx": {
+          "name": "_knowledge_base_v_version_version_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "version_display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -31183,6 +31533,31 @@
         "attendees_cap": {
           "name": "attendees_cap",
           "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cta_label": {
+          "name": "cta_label",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "post_event_cta_enabled": {
+          "name": "post_event_cta_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "post_event_cta_label": {
+          "name": "post_event_cta_label",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "post_event_cta_url": {
+          "name": "post_event_cta_url",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
@@ -33212,6 +33587,31 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version_cta_label": {
+          "name": "version_cta_label",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_post_event_cta_enabled": {
+          "name": "version_post_event_cta_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "version_post_event_cta_label": {
+          "name": "version_post_event_cta_label",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_post_event_cta_url": {
+          "name": "version_post_event_cta_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "version_event_status": {
           "name": "version_event_status",
           "type": "enum__events_v_version_event_status",
@@ -35099,7 +35499,7 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
-          "default": "'Global'"
+          "default": "'global'"
         },
         "starts_at": {
           "name": "starts_at",
@@ -35185,6 +35585,12 @@
         },
         "published_at": {
           "name": "published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_published_at": {
+          "name": "display_published_at",
           "type": "timestamp(3) with time zone",
           "primaryKey": false,
           "notNull": false
@@ -35437,6 +35843,21 @@
           "columns": [
             {
               "expression": "pdf_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "webinars_display_published_at_idx": {
+          "name": "webinars_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -37019,7 +37440,7 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
-          "default": "'Global'"
+          "default": "'global'"
         },
         "version_starts_at": {
           "name": "version_starts_at",
@@ -37105,6 +37526,12 @@
         },
         "version_published_at": {
           "name": "version_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_display_published_at": {
+          "name": "version_display_published_at",
           "type": "timestamp(3) with time zone",
           "primaryKey": false,
           "notNull": false
@@ -37390,6 +37817,21 @@
           "columns": [
             {
               "expression": "version_pdf_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_webinars_v_version_version_display_published_at_idx": {
+          "name": "_webinars_v_version_version_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "version_display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -37729,6 +38171,541 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.podcast_episodes": {
+      "name": "podcast_episodes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "episode_number": {
+          "name": "episode_number",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "youtube_url": {
+          "name": "youtube_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "youtube_video_id": {
+          "name": "youtube_video_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "thumbnail_override_id": {
+          "name": "thumbnail_override_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "abstract": {
+          "name": "abstract",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration_seconds": {
+          "name": "duration_seconds",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "featured": {
+          "name": "featured",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "publication_date": {
+          "name": "publication_date",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_published_at": {
+          "name": "display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "_status": {
+          "name": "_status",
+          "type": "enum_podcast_episodes_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'draft'"
+        }
+      },
+      "indexes": {
+        "podcast_episodes_slug_idx": {
+          "name": "podcast_episodes_slug_idx",
+          "columns": [
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_thumbnail_override_idx": {
+          "name": "podcast_episodes_thumbnail_override_idx",
+          "columns": [
+            {
+              "expression": "thumbnail_override_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_display_published_at_idx": {
+          "name": "podcast_episodes_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "display_published_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_updated_at_idx": {
+          "name": "podcast_episodes_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_created_at_idx": {
+          "name": "podcast_episodes_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes__status_idx": {
+          "name": "podcast_episodes__status_idx",
+          "columns": [
+            {
+              "expression": "_status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_episodes_thumbnail_override_id_media_id_fk": {
+          "name": "podcast_episodes_thumbnail_override_id_media_id_fk",
+          "tableFrom": "podcast_episodes",
+          "tableTo": "media",
+          "columnsFrom": [
+            "thumbnail_override_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_episodes_v": {
+      "name": "_podcast_episodes_v",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_title": {
+          "name": "version_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_slug": {
+          "name": "version_slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_episode_number": {
+          "name": "version_episode_number",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_youtube_url": {
+          "name": "version_youtube_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_youtube_video_id": {
+          "name": "version_youtube_video_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_thumbnail_override_id": {
+          "name": "version_thumbnail_override_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_abstract": {
+          "name": "version_abstract",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_duration_seconds": {
+          "name": "version_duration_seconds",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_featured": {
+          "name": "version_featured",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "version_publication_date": {
+          "name": "version_publication_date",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_published_at": {
+          "name": "version_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_display_published_at": {
+          "name": "version_display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_updated_at": {
+          "name": "version_updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_created_at": {
+          "name": "version_created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version__status": {
+          "name": "version__status",
+          "type": "enum__podcast_episodes_v_version_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'draft'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "latest": {
+          "name": "latest",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_episodes_v_parent_idx": {
+          "name": "_podcast_episodes_v_parent_idx",
+          "columns": [
+            {
+              "expression": "parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_version_version_slug_idx": {
+          "name": "_podcast_episodes_v_version_version_slug_idx",
+          "columns": [
+            {
+              "expression": "version_slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_version_version_thumbnail_override_idx": {
+          "name": "_podcast_episodes_v_version_version_thumbnail_override_idx",
+          "columns": [
+            {
+              "expression": "version_thumbnail_override_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_version_version_display_published_at_idx": {
+          "name": "_podcast_episodes_v_version_version_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "version_display_published_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_version_version_updated_at_idx": {
+          "name": "_podcast_episodes_v_version_version_updated_at_idx",
+          "columns": [
+            {
+              "expression": "version_updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_version_version_created_at_idx": {
+          "name": "_podcast_episodes_v_version_version_created_at_idx",
+          "columns": [
+            {
+              "expression": "version_created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_version_version__status_idx": {
+          "name": "_podcast_episodes_v_version_version__status_idx",
+          "columns": [
+            {
+              "expression": "version__status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_created_at_idx": {
+          "name": "_podcast_episodes_v_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_updated_at_idx": {
+          "name": "_podcast_episodes_v_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_latest_idx": {
+          "name": "_podcast_episodes_v_latest_idx",
+          "columns": [
+            {
+              "expression": "latest",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_episodes_v_parent_id_podcast_episodes_id_fk": {
+          "name": "_podcast_episodes_v_parent_id_podcast_episodes_id_fk",
+          "tableFrom": "_podcast_episodes_v",
+          "tableTo": "podcast_episodes",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_podcast_episodes_v_version_thumbnail_override_id_media_id_fk": {
+          "name": "_podcast_episodes_v_version_thumbnail_override_id_media_id_fk",
+          "tableFrom": "_podcast_episodes_v",
+          "tableTo": "media",
+          "columnsFrom": [
+            "version_thumbnail_override_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -39045,6 +40022,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "display_published_at": {
+          "name": "display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "seo_title": {
           "name": "seo_title",
           "type": "varchar",
@@ -39263,6 +40246,21 @@
           "columns": [
             {
               "expression": "description_pdf_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "jobs_display_published_at_idx": {
+          "name": "jobs_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -40900,6 +41898,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version_display_published_at": {
+          "name": "version_display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "version_seo_title": {
           "name": "version_seo_title",
           "type": "varchar",
@@ -41151,6 +42155,21 @@
           "columns": [
             {
               "expression": "version_description_pdf_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_jobs_v_version_version_display_published_at_idx": {
+          "name": "_jobs_v_version_version_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "version_display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -44896,12 +45915,6 @@
           "notNull": false,
           "default": "'bash'"
         },
-        "filename": {
-          "name": "filename",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
         "content": {
           "name": "content",
           "type": "varchar",
@@ -47306,6 +48319,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "display_published_at": {
+          "name": "display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "seo_title": {
           "name": "seo_title",
           "type": "varchar",
@@ -47539,6 +48558,21 @@
           "columns": [
             {
               "expression": "path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "pages_display_published_at_idx": {
+          "name": "pages_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -51314,12 +52348,6 @@
           "notNull": false,
           "default": "'bash'"
         },
-        "filename": {
-          "name": "filename",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
         "content": {
           "name": "content",
           "type": "varchar",
@@ -53850,6 +54878,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version_display_published_at": {
+          "name": "version_display_published_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "version_seo_title": {
           "name": "version_seo_title",
           "type": "varchar",
@@ -54116,6 +55150,21 @@
           "columns": [
             {
               "expression": "version_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_pages_v_version_version_display_published_at_idx": {
+          "name": "_pages_v_version_version_display_published_at_idx",
+          "columns": [
+            {
+              "expression": "version_display_published_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -55389,6 +56438,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "preview_audit_id": {
+          "name": "preview_audit_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "webhooks_dead_letter_id": {
           "name": "webhooks_dead_letter_id",
           "type": "integer",
@@ -55487,6 +56542,12 @@
         },
         "webinars_id": {
           "name": "webinars_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "podcast_episodes_id": {
+          "name": "podcast_episodes_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -55636,6 +56697,21 @@
           "columns": [
             {
               "expression": "search_log_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "payload_locked_documents_rels_preview_audit_id_idx": {
+          "name": "payload_locked_documents_rels_preview_audit_id_idx",
+          "columns": [
+            {
+              "expression": "preview_audit_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -55901,6 +56977,21 @@
           "method": "btree",
           "with": {}
         },
+        "payload_locked_documents_rels_podcast_episodes_id_idx": {
+          "name": "payload_locked_documents_rels_podcast_episodes_id_idx",
+          "columns": [
+            {
+              "expression": "podcast_episodes_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "payload_locked_documents_rels_jobs_id_idx": {
           "name": "payload_locked_documents_rels_jobs_id_idx",
           "columns": [
@@ -56032,6 +57123,19 @@
           "tableTo": "search_log",
           "columnsFrom": [
             "search_log_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_preview_audit_fk": {
+          "name": "payload_locked_documents_rels_preview_audit_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "preview_audit",
+          "columnsFrom": [
+            "preview_audit_id"
           ],
           "columnsTo": [
             "id"
@@ -56253,6 +57357,19 @@
           "tableTo": "webinars",
           "columnsFrom": [
             "webinars_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_podcast_episodes_fk": {
+          "name": "payload_locked_documents_rels_podcast_episodes_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "podcast_episodes",
+          "columnsFrom": [
+            "podcast_episodes_id"
           ],
           "columnsTo": [
             "id"
@@ -60764,6 +61881,498 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.podcast_page_cta_cards": {
+      "name": "podcast_page_cta_cards",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "body": {
+          "name": "body",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cta_label": {
+          "name": "cta_label",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cta_href": {
+          "name": "cta_href",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "podcast_page_cta_cards_order_idx": {
+          "name": "podcast_page_cta_cards_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_page_cta_cards_parent_id_idx": {
+          "name": "podcast_page_cta_cards_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_page_cta_cards_parent_id_fk": {
+          "name": "podcast_page_cta_cards_parent_id_fk",
+          "tableFrom": "podcast_page_cta_cards",
+          "tableTo": "podcast_page",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.podcast_page": {
+      "name": "podcast_page",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "hero_eyebrow": {
+          "name": "hero_eyebrow",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hero_title": {
+          "name": "hero_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Leadership Exchange'"
+        },
+        "hero_title_highlight": {
+          "name": "hero_title_highlight",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Exchange'"
+        },
+        "hero_subtitle": {
+          "name": "hero_subtitle",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "featured_hero_episode_id": {
+          "name": "featured_hero_episode_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latest_episodes_title": {
+          "name": "latest_episodes_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Latest Episodes'"
+        },
+        "latest_episodes_limit": {
+          "name": "latest_episodes_limit",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 6
+        },
+        "featured_section_title": {
+          "name": "featured_section_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Featured Content'"
+        },
+        "featured_section_highlight": {
+          "name": "featured_section_highlight",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Content'"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "podcast_page_featured_hero_episode_idx": {
+          "name": "podcast_page_featured_hero_episode_idx",
+          "columns": [
+            {
+              "expression": "featured_hero_episode_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_page_featured_hero_episode_id_podcast_episodes_id_fk": {
+          "name": "podcast_page_featured_hero_episode_id_podcast_episodes_id_fk",
+          "tableFrom": "podcast_page",
+          "tableTo": "podcast_episodes",
+          "columnsFrom": [
+            "featured_hero_episode_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_page_v_version_cta_cards": {
+      "name": "_podcast_page_v_version_cta_cards",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "body": {
+          "name": "body",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cta_label": {
+          "name": "cta_label",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cta_href": {
+          "name": "cta_href",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_page_v_version_cta_cards_order_idx": {
+          "name": "_podcast_page_v_version_cta_cards_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_page_v_version_cta_cards_parent_id_idx": {
+          "name": "_podcast_page_v_version_cta_cards_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_page_v_version_cta_cards_parent_id_fk": {
+          "name": "_podcast_page_v_version_cta_cards_parent_id_fk",
+          "tableFrom": "_podcast_page_v_version_cta_cards",
+          "tableTo": "_podcast_page_v",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_page_v": {
+      "name": "_podcast_page_v",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "version_hero_eyebrow": {
+          "name": "version_hero_eyebrow",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_hero_title": {
+          "name": "version_hero_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Leadership Exchange'"
+        },
+        "version_hero_title_highlight": {
+          "name": "version_hero_title_highlight",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Exchange'"
+        },
+        "version_hero_subtitle": {
+          "name": "version_hero_subtitle",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_featured_hero_episode_id": {
+          "name": "version_featured_hero_episode_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_latest_episodes_title": {
+          "name": "version_latest_episodes_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Latest Episodes'"
+        },
+        "version_latest_episodes_limit": {
+          "name": "version_latest_episodes_limit",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 6
+        },
+        "version_featured_section_title": {
+          "name": "version_featured_section_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Featured Content'"
+        },
+        "version_featured_section_highlight": {
+          "name": "version_featured_section_highlight",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Content'"
+        },
+        "version_updated_at": {
+          "name": "version_updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_created_at": {
+          "name": "version_created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "_podcast_page_v_version_version_featured_hero_episode_idx": {
+          "name": "_podcast_page_v_version_version_featured_hero_episode_idx",
+          "columns": [
+            {
+              "expression": "version_featured_hero_episode_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_page_v_created_at_idx": {
+          "name": "_podcast_page_v_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_page_v_updated_at_idx": {
+          "name": "_podcast_page_v_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_page_v_version_featured_hero_episode_id_podcast_episodes_id_fk": {
+          "name": "_podcast_page_v_version_featured_hero_episode_id_podcast_episodes_id_fk",
+          "tableFrom": "_podcast_page_v",
+          "tableTo": "podcast_episodes",
+          "columnsFrom": [
+            "version_featured_hero_episode_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.payload_jobs_stats": {
       "name": "payload_jobs_stats",
       "schema": "",
@@ -60870,7 +62479,8 @@
         "dsar_erasure",
         "schema_override_changed",
         "user_disabled",
-        "content_reassigned"
+        "content_reassigned",
+        "display_publish_date_overridden"
       ]
     },
     "public.enum_webhooks_dead_letter_event": {
@@ -61536,6 +63146,16 @@
         "replace"
       ]
     },
+    "public.enum_news_press_type": {
+      "name": "enum_news_press_type",
+      "schema": "public",
+      "values": [
+        "press-release",
+        "news",
+        "announcement",
+        "feature"
+      ]
+    },
     "public.enum_news_seo_indexable": {
       "name": "enum_news_seo_indexable",
       "schema": "public",
@@ -61597,6 +63217,16 @@
       "values": [
         "suppress",
         "replace"
+      ]
+    },
+    "public.enum__news_v_version_press_type": {
+      "name": "enum__news_v_version_press_type",
+      "schema": "public",
+      "values": [
+        "press-release",
+        "news",
+        "announcement",
+        "feature"
       ]
     },
     "public.enum__news_v_version_seo_indexable": {
@@ -61793,10 +63423,10 @@
       "schema": "public",
       "values": [
         "whitepaper",
-        "report",
-        "brief",
+        "ebook",
         "datasheet",
-        "case-study"
+        "architecture-insights",
+        "report"
       ]
     },
     "public.enum_resources_access_level": {
@@ -61876,10 +63506,10 @@
       "schema": "public",
       "values": [
         "whitepaper",
-        "report",
-        "brief",
+        "ebook",
         "datasheet",
-        "case-study"
+        "architecture-insights",
+        "report"
       ]
     },
     "public.enum__resources_v_version_access_level": {
@@ -62254,10 +63884,10 @@
       "name": "enum_webinars_region",
       "schema": "public",
       "values": [
-        "Americas",
-        "EMEA",
-        "APAC",
-        "Global"
+        "north-america",
+        "asia-mea",
+        "emea",
+        "global"
       ]
     },
     "public.enum_webinars_registration_mode": {
@@ -62354,10 +63984,10 @@
       "name": "enum__webinars_v_version_region",
       "schema": "public",
       "values": [
-        "Americas",
-        "EMEA",
-        "APAC",
-        "Global"
+        "north-america",
+        "asia-mea",
+        "emea",
+        "global"
       ]
     },
     "public.enum__webinars_v_version_registration_mode": {
@@ -62396,6 +64026,22 @@
     },
     "public.enum__webinars_v_version_status": {
       "name": "enum__webinars_v_version_status",
+      "schema": "public",
+      "values": [
+        "draft",
+        "published"
+      ]
+    },
+    "public.enum_podcast_episodes_status": {
+      "name": "enum_podcast_episodes_status",
+      "schema": "public",
+      "values": [
+        "draft",
+        "published"
+      ]
+    },
+    "public.enum__podcast_episodes_v_version_status": {
+      "name": "enum__podcast_episodes_v_version_status",
       "schema": "public",
       "values": [
         "draft",
@@ -63432,6 +65078,7 @@
         "drainLeadQueue",
         "purgeSearchLog",
         "purgeLeadsPii",
+        "purgePreviewAudit",
         "checkBrokenLinks",
         "retryWebhook",
         "meiliReindex",
@@ -63457,6 +65104,7 @@
         "drainLeadQueue",
         "purgeSearchLog",
         "purgeLeadsPii",
+        "purgePreviewAudit",
         "checkBrokenLinks",
         "retryWebhook",
         "meiliReindex",
@@ -63643,6 +65291,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "c63e0cd3-50a8-4c5a-a0c6-00f0993a0482",
+  "id": "e7a5b0a0-14ed-4917-bd1a-bc97ae6bdb88",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

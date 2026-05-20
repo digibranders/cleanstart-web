@@ -1,4 +1,4 @@
-import { sql, type MigrateDownArgs, type MigrateUpArgs } from '@payloadcms/db-postgres';
+import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
@@ -7,13 +7,16 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_redirects_status" AS ENUM('301', '302', '307', '308', '410');
   CREATE TYPE "public"."enum_redirects_source" AS ENUM('manual', 'slug-change', 'archive-with-redirect', 'migration-seed');
   CREATE TYPE "public"."enum_broken_links_status" AS ENUM('ok', 'broken', 'redirect', 'network');
-  CREATE TYPE "public"."enum_audit_log_action" AS ENUM('lead_deleted', 'lead_exported', 'dsar_export', 'dsar_erasure', 'schema_override_changed', 'user_disabled', 'content_reassigned');
+  CREATE TYPE "public"."enum_audit_log_action" AS ENUM('lead_deleted', 'lead_exported', 'dsar_export', 'dsar_erasure', 'schema_override_changed', 'user_disabled', 'content_reassigned', 'display_publish_date_overridden');
   CREATE TYPE "public"."enum_webhooks_dead_letter_event" AS ENUM('document.published', 'lead.submitted');
   CREATE TYPE "public"."enum_webhooks_dead_letter_destination_kind" AS ENUM('teams', 'generic');
   CREATE TYPE "public"."enum_integrations_routing_events" AS ENUM('document.published', 'lead.submitted');
+  CREATE TYPE "public"."enum_integrations_routing_collections" AS ENUM('blogs', 'news', 'guides', 'resources', 'knowledgeBase', 'events', 'webinars', 'jobs', 'pages');
   CREATE TYPE "public"."enum_integrations_teams_config_mentions_trigger_on" AS ENUM('document.published', 'lead.submitted');
   CREATE TYPE "public"."enum_integrations_kind" AS ENUM('teamsWorkflow', 'genericWebhook', 'hubspotCrm', 'ga4DataApi', 'gscSearchAnalyticsApi', 'gscUrlInspectionApi', 'msClarity', 'cloudflareWebAnalytics', 'calComInbound', 'brevoBounceCallback', 'zohoCrm');
   CREATE TYPE "public"."enum_integrations_hubspot_config_write_mode" AS ENUM('contactOnly', 'contactAndLead');
+  CREATE TYPE "public"."enum_integrations_hubspot_config_default_lifecycle_stage" AS ENUM('subscriber', 'lead', 'marketingqualifiedlead', 'salesqualifiedlead', 'opportunity', 'customer', 'evangelist', 'other');
+  CREATE TYPE "public"."enum_integrations_hubspot_config_default_lead_status" AS ENUM('NEW', 'OPEN', 'IN_PROGRESS', 'OPEN_DEAL', 'UNQUALIFIED', 'ATTEMPTED_TO_CONTACT', 'CONNECTED', 'BAD_TIMING');
   CREATE TYPE "public"."enum_integrations_source" AS ENUM('db', 'env');
   CREATE TYPE "public"."enum_analytics_cache_env" AS ENUM('production', 'staging', 'development');
   CREATE TYPE "public"."enum_analytics_cache_provider" AS ENUM('ga4DataApi', 'gscSearchAnalyticsApi', 'gscUrlInspectionApi', 'msClarity', 'cloudflareWebAnalytics');
@@ -62,6 +65,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_blogs_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
   CREATE TYPE "public"."enum_blogs_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum_blogs_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
+  CREATE TYPE "public"."enum_blogs_toc_depth" AS ENUM('h2', 'h2_h3', 'h2_h3_h4');
   CREATE TYPE "public"."enum_blogs_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum_blogs_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum_blogs_status" AS ENUM('draft', 'published');
@@ -69,6 +73,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__blogs_v_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
   CREATE TYPE "public"."enum__blogs_v_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum__blogs_v_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
+  CREATE TYPE "public"."enum__blogs_v_version_toc_depth" AS ENUM('h2', 'h2_h3', 'h2_h3_h4');
   CREATE TYPE "public"."enum__blogs_v_version_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum__blogs_v_version_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum__blogs_v_version_status" AS ENUM('draft', 'published');
@@ -76,6 +81,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_news_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
   CREATE TYPE "public"."enum_news_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum_news_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
+  CREATE TYPE "public"."enum_news_press_type" AS ENUM('press-release', 'news', 'announcement', 'feature');
   CREATE TYPE "public"."enum_news_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum_news_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum_news_status" AS ENUM('draft', 'published');
@@ -83,6 +89,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__news_v_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
   CREATE TYPE "public"."enum__news_v_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum__news_v_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
+  CREATE TYPE "public"."enum__news_v_version_press_type" AS ENUM('press-release', 'news', 'announcement', 'feature');
   CREATE TYPE "public"."enum__news_v_version_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum__news_v_version_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum__news_v_version_status" AS ENUM('draft', 'published');
@@ -104,7 +111,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_resources_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
   CREATE TYPE "public"."enum_resources_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum_resources_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
-  CREATE TYPE "public"."enum_resources_type" AS ENUM('whitepaper', 'report', 'brief', 'datasheet', 'case-study');
+  CREATE TYPE "public"."enum_resources_type" AS ENUM('whitepaper', 'ebook', 'datasheet', 'architecture-insights', 'report');
   CREATE TYPE "public"."enum_resources_access_level" AS ENUM('public', 'lead-gated', 'customer-only');
   CREATE TYPE "public"."enum_resources_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum_resources_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
@@ -113,7 +120,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__resources_v_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
   CREATE TYPE "public"."enum__resources_v_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum__resources_v_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
-  CREATE TYPE "public"."enum__resources_v_version_type" AS ENUM('whitepaper', 'report', 'brief', 'datasheet', 'case-study');
+  CREATE TYPE "public"."enum__resources_v_version_type" AS ENUM('whitepaper', 'ebook', 'datasheet', 'architecture-insights', 'report');
   CREATE TYPE "public"."enum__resources_v_version_access_level" AS ENUM('public', 'lead-gated', 'customer-only');
   CREATE TYPE "public"."enum__resources_v_version_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum__resources_v_version_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
@@ -155,7 +162,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_webinars_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum_webinars_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
   CREATE TYPE "public"."enum_webinars_webinar_type" AS ENUM('live', 'on-demand', 'panel', 'demo');
-  CREATE TYPE "public"."enum_webinars_region" AS ENUM('Americas', 'EMEA', 'APAC', 'Global');
+  CREATE TYPE "public"."enum_webinars_region" AS ENUM('north-america', 'asia-mea', 'emea', 'global');
   CREATE TYPE "public"."enum_webinars_registration_mode" AS ENUM('internal', 'external');
   CREATE TYPE "public"."enum_webinars_event_status" AS ENUM('scheduled', 'postponed', 'cancelled');
   CREATE TYPE "public"."enum_webinars_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
@@ -166,12 +173,14 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__webinars_v_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum__webinars_v_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
   CREATE TYPE "public"."enum__webinars_v_version_webinar_type" AS ENUM('live', 'on-demand', 'panel', 'demo');
-  CREATE TYPE "public"."enum__webinars_v_version_region" AS ENUM('Americas', 'EMEA', 'APAC', 'Global');
+  CREATE TYPE "public"."enum__webinars_v_version_region" AS ENUM('north-america', 'asia-mea', 'emea', 'global');
   CREATE TYPE "public"."enum__webinars_v_version_registration_mode" AS ENUM('internal', 'external');
   CREATE TYPE "public"."enum__webinars_v_version_event_status" AS ENUM('scheduled', 'postponed', 'cancelled');
   CREATE TYPE "public"."enum__webinars_v_version_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum__webinars_v_version_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum__webinars_v_version_status" AS ENUM('draft', 'published');
+  CREATE TYPE "public"."enum_podcast_episodes_status" AS ENUM('draft', 'published');
+  CREATE TYPE "public"."enum__podcast_episodes_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_jobs_blocks_review_item_reviewed_type" AS ENUM('Product', 'Service', 'SoftwareApplication', 'Organization');
   CREATE TYPE "public"."enum_jobs_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
   CREATE TYPE "public"."enum_jobs_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
@@ -280,9 +289,9 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_version_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum__pages_v_version_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum__pages_v_version_status" AS ENUM('draft', 'published');
-  CREATE TYPE "public"."enum_payload_jobs_log_task_slug" AS ENUM('inline', 'drainLeadQueue', 'purgeSearchLog', 'purgeLeadsPii', 'checkBrokenLinks', 'retryWebhook', 'meiliReindex', 'dashboardRefreshFrequent', 'dashboardRefreshDaily', 'analyticsCachePrune', 'schedulePublish');
+  CREATE TYPE "public"."enum_payload_jobs_log_task_slug" AS ENUM('inline', 'drainLeadQueue', 'purgeSearchLog', 'purgeLeadsPii', 'purgePreviewAudit', 'checkBrokenLinks', 'retryWebhook', 'meiliReindex', 'dashboardRefreshFrequent', 'dashboardRefreshDaily', 'analyticsCachePrune', 'schedulePublish');
   CREATE TYPE "public"."enum_payload_jobs_log_state" AS ENUM('failed', 'succeeded');
-  CREATE TYPE "public"."enum_payload_jobs_task_slug" AS ENUM('inline', 'drainLeadQueue', 'purgeSearchLog', 'purgeLeadsPii', 'checkBrokenLinks', 'retryWebhook', 'meiliReindex', 'dashboardRefreshFrequent', 'dashboardRefreshDaily', 'analyticsCachePrune', 'schedulePublish');
+  CREATE TYPE "public"."enum_payload_jobs_task_slug" AS ENUM('inline', 'drainLeadQueue', 'purgeSearchLog', 'purgeLeadsPii', 'purgePreviewAudit', 'checkBrokenLinks', 'retryWebhook', 'meiliReindex', 'dashboardRefreshFrequent', 'dashboardRefreshDaily', 'analyticsCachePrune', 'schedulePublish');
   CREATE TYPE "public"."enum_main_nav_items_mega_menu_columns_items_kind" AS ENUM('internal-doc', 'external-url', 'cta');
   CREATE TYPE "public"."enum_main_nav_items_mega_menu_columns_items_variant" AS ENUM('primary', 'secondary', 'ghost');
   CREATE TYPE "public"."enum_main_nav_items_kind" AS ENUM('internal-doc', 'external-url', 'cta');
@@ -341,6 +350,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"credit" varchar,
   	"focal_point_x" numeric DEFAULT 50,
   	"focal_point_y" numeric DEFAULT 50,
+  	"prefix" varchar DEFAULT 'dev',
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"url" varchar,
@@ -427,6 +437,19 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
   
+  CREATE TABLE "preview_audit" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"collection" varchar NOT NULL,
+  	"doc_id" varchar NOT NULL,
+  	"actor_id" integer NOT NULL,
+  	"label" varchar,
+  	"ttl_seconds" numeric NOT NULL,
+  	"expires_at" timestamp(3) with time zone NOT NULL,
+  	"revoked_at" timestamp(3) with time zone,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+  );
+  
   CREATE TABLE "webhooks_dead_letter" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"webhook_id" varchar NOT NULL,
@@ -448,6 +471,13 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"order" integer NOT NULL,
   	"parent_id" integer NOT NULL,
   	"value" "enum_integrations_routing_events",
+  	"id" serial PRIMARY KEY NOT NULL
+  );
+  
+  CREATE TABLE "integrations_routing_collections" (
+  	"order" integer NOT NULL,
+  	"parent_id" integer NOT NULL,
+  	"value" "enum_integrations_routing_collections",
   	"id" serial PRIMARY KEY NOT NULL
   );
   
@@ -485,8 +515,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"generic_config_signing_secret" varchar,
   	"generic_config_signing_key_id" varchar,
   	"hubspot_config_write_mode" "enum_integrations_hubspot_config_write_mode" DEFAULT 'contactOnly',
-  	"hubspot_config_default_lifecycle_stage" varchar DEFAULT 'lead',
-  	"hubspot_config_default_lead_status" varchar DEFAULT 'NEW',
+  	"hubspot_config_default_lifecycle_stage" "enum_integrations_hubspot_config_default_lifecycle_stage" DEFAULT 'lead',
+  	"hubspot_config_default_lead_status" "enum_integrations_hubspot_config_default_lead_status" DEFAULT 'NEW',
   	"ga4_config_property_id" varchar,
   	"gsc_config_site_url" varchar,
   	"cloudflare_config_account_tag" varchar,
@@ -1334,9 +1364,12 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"body" jsonb,
   	"reviewed_by_id" integer,
   	"last_reviewed_at" timestamp(3) with time zone,
+  	"categories_id" integer,
   	"published_at" timestamp(3) with time zone,
+  	"display_published_at" timestamp(3) with time zone,
   	"reading_minutes" numeric,
   	"word_count" numeric,
+  	"toc_depth" "enum_blogs_toc_depth" DEFAULT 'h2',
   	"seo_title" varchar,
   	"seo_description" varchar,
   	"seo_indexable" "enum_blogs_seo_indexable" DEFAULT 'index',
@@ -1377,7 +1410,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"parent_id" integer NOT NULL,
   	"path" varchar NOT NULL,
   	"authors_id" integer,
-  	"categories_id" integer,
   	"blogs_id" integer
   );
   
@@ -1523,9 +1555,12 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_body" jsonb,
   	"version_reviewed_by_id" integer,
   	"version_last_reviewed_at" timestamp(3) with time zone,
+  	"version_categories_id" integer,
   	"version_published_at" timestamp(3) with time zone,
+  	"version_display_published_at" timestamp(3) with time zone,
   	"version_reading_minutes" numeric,
   	"version_word_count" numeric,
+  	"version_toc_depth" "enum__blogs_v_version_toc_depth" DEFAULT 'h2',
   	"version_seo_title" varchar,
   	"version_seo_description" varchar,
   	"version_seo_indexable" "enum__blogs_v_version_seo_indexable" DEFAULT 'index',
@@ -1569,7 +1604,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"parent_id" integer NOT NULL,
   	"path" varchar NOT NULL,
   	"authors_id" integer,
-  	"categories_id" integer,
   	"blogs_id" integer
   );
   
@@ -1682,6 +1716,10 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"slug" varchar,
   	"abstract" varchar,
   	"hero_image_id" integer,
+  	"publisher" varchar,
+  	"publisher_logo_id" integer,
+  	"press_type" "enum_news_press_type" DEFAULT 'press-release',
+  	"location" varchar,
   	"body" jsonb,
   	"external_url" varchar,
   	"publication_date" timestamp(3) with time zone,
@@ -1849,6 +1887,10 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_slug" varchar,
   	"version_abstract" varchar,
   	"version_hero_image_id" integer,
+  	"version_publisher" varchar,
+  	"version_publisher_logo_id" integer,
+  	"version_press_type" "enum__news_v_version_press_type" DEFAULT 'press-release',
+  	"version_location" varchar,
   	"version_body" jsonb,
   	"version_external_url" varchar,
   	"version_publication_date" timestamp(3) with time zone,
@@ -2057,6 +2099,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"how_to_perform_time" varchar,
   	"how_to_estimated_cost" varchar,
   	"published_at" timestamp(3) with time zone,
+  	"display_published_at" timestamp(3) with time zone,
   	"reading_minutes" numeric,
   	"word_count" numeric,
   	"seo_title" varchar,
@@ -2274,6 +2317,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_how_to_perform_time" varchar,
   	"version_how_to_estimated_cost" varchar,
   	"version_published_at" timestamp(3) with time zone,
+  	"version_display_published_at" timestamp(3) with time zone,
   	"version_reading_minutes" numeric,
   	"version_word_count" numeric,
   	"version_seo_title" varchar,
@@ -2428,15 +2472,15 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"title" varchar,
   	"slug" varchar,
   	"type" "enum_resources_type",
-  	"hero_image_id" integer,
   	"summary" varchar,
-  	"body" jsonb,
   	"asset_id" integer,
+  	"body" jsonb,
   	"gated" boolean DEFAULT false,
   	"gate_form_id" integer,
   	"access_level" "enum_resources_access_level" DEFAULT 'public',
   	"cta_button_text" varchar,
   	"published_at" timestamp(3) with time zone,
+  	"display_published_at" timestamp(3) with time zone,
   	"download_count" numeric DEFAULT 0,
   	"seo_title" varchar,
   	"seo_description" varchar,
@@ -2589,15 +2633,15 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_title" varchar,
   	"version_slug" varchar,
   	"version_type" "enum__resources_v_version_type",
-  	"version_hero_image_id" integer,
   	"version_summary" varchar,
-  	"version_body" jsonb,
   	"version_asset_id" integer,
+  	"version_body" jsonb,
   	"version_gated" boolean DEFAULT false,
   	"version_gate_form_id" integer,
   	"version_access_level" "enum__resources_v_version_access_level" DEFAULT 'public',
   	"version_cta_button_text" varchar,
   	"version_published_at" timestamp(3) with time zone,
+  	"version_display_published_at" timestamp(3) with time zone,
   	"version_download_count" numeric DEFAULT 0,
   	"version_seo_title" varchar,
   	"version_seo_description" varchar,
@@ -2765,6 +2809,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"reviewed_by_id" integer,
   	"last_reviewed_at" timestamp(3) with time zone,
   	"published_at" timestamp(3) with time zone,
+  	"display_published_at" timestamp(3) with time zone,
   	"reading_minutes" numeric,
   	"word_count" numeric,
   	"seo_title" varchar,
@@ -2951,6 +2996,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_reviewed_by_id" integer,
   	"version_last_reviewed_at" timestamp(3) with time zone,
   	"version_published_at" timestamp(3) with time zone,
+  	"version_display_published_at" timestamp(3) with time zone,
   	"version_reading_minutes" numeric,
   	"version_word_count" numeric,
   	"version_seo_title" varchar,
@@ -3123,6 +3169,10 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"registration_url" varchar,
   	"registration_form_id" integer,
   	"attendees_cap" numeric,
+  	"cta_label" varchar,
+  	"post_event_cta_enabled" boolean DEFAULT false,
+  	"post_event_cta_label" varchar,
+  	"post_event_cta_url" varchar,
   	"event_status" "enum_events_event_status" DEFAULT 'scheduled',
   	"cancelled_at" timestamp(3) with time zone,
   	"previous_start_date" timestamp(3) with time zone,
@@ -3307,6 +3357,10 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_registration_url" varchar,
   	"version_registration_form_id" integer,
   	"version_attendees_cap" numeric,
+  	"version_cta_label" varchar,
+  	"version_post_event_cta_enabled" boolean DEFAULT false,
+  	"version_post_event_cta_label" varchar,
+  	"version_post_event_cta_url" varchar,
   	"version_event_status" "enum__events_v_version_event_status" DEFAULT 'scheduled',
   	"version_cancelled_at" timestamp(3) with time zone,
   	"version_previous_start_date" timestamp(3) with time zone,
@@ -3466,7 +3520,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"abstract" varchar,
   	"body" jsonb,
   	"webinar_type" "enum_webinars_webinar_type" DEFAULT 'live',
-  	"region" "enum_webinars_region" DEFAULT 'Global',
+  	"region" "enum_webinars_region" DEFAULT 'global',
   	"starts_at" timestamp(3) with time zone,
   	"ends_at" timestamp(3) with time zone,
   	"timezone" varchar,
@@ -3481,6 +3535,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"recording_url" varchar,
   	"slides_url" varchar,
   	"published_at" timestamp(3) with time zone,
+  	"display_published_at" timestamp(3) with time zone,
   	"seo_title" varchar,
   	"seo_description" varchar,
   	"seo_indexable" "enum_webinars_seo_indexable" DEFAULT 'index',
@@ -3643,7 +3698,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_abstract" varchar,
   	"version_body" jsonb,
   	"version_webinar_type" "enum__webinars_v_version_webinar_type" DEFAULT 'live',
-  	"version_region" "enum__webinars_v_version_region" DEFAULT 'Global',
+  	"version_region" "enum__webinars_v_version_region" DEFAULT 'global',
   	"version_starts_at" timestamp(3) with time zone,
   	"version_ends_at" timestamp(3) with time zone,
   	"version_timezone" varchar,
@@ -3658,6 +3713,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_recording_url" varchar,
   	"version_slides_url" varchar,
   	"version_published_at" timestamp(3) with time zone,
+  	"version_display_published_at" timestamp(3) with time zone,
   	"version_seo_title" varchar,
   	"version_seo_description" varchar,
   	"version_seo_indexable" "enum__webinars_v_version_seo_indexable" DEFAULT 'index',
@@ -3699,6 +3755,48 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"parent_id" integer NOT NULL,
   	"path" varchar NOT NULL,
   	"authors_id" integer
+  );
+  
+  CREATE TABLE "podcast_episodes" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"title" varchar,
+  	"slug" varchar,
+  	"episode_number" numeric,
+  	"youtube_url" varchar,
+  	"youtube_video_id" varchar,
+  	"thumbnail_override_id" integer,
+  	"abstract" varchar,
+  	"duration_seconds" numeric,
+  	"featured" boolean DEFAULT false,
+  	"publication_date" timestamp(3) with time zone,
+  	"published_at" timestamp(3) with time zone,
+  	"display_published_at" timestamp(3) with time zone,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"_status" "enum_podcast_episodes_status" DEFAULT 'draft'
+  );
+  
+  CREATE TABLE "_podcast_episodes_v" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"parent_id" integer,
+  	"version_title" varchar,
+  	"version_slug" varchar,
+  	"version_episode_number" numeric,
+  	"version_youtube_url" varchar,
+  	"version_youtube_video_id" varchar,
+  	"version_thumbnail_override_id" integer,
+  	"version_abstract" varchar,
+  	"version_duration_seconds" numeric,
+  	"version_featured" boolean DEFAULT false,
+  	"version_publication_date" timestamp(3) with time zone,
+  	"version_published_at" timestamp(3) with time zone,
+  	"version_display_published_at" timestamp(3) with time zone,
+  	"version_updated_at" timestamp(3) with time zone,
+  	"version_created_at" timestamp(3) with time zone,
+  	"version__status" "enum__podcast_episodes_v_version_status" DEFAULT 'draft',
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"latest" boolean
   );
   
   CREATE TABLE "jobs_blocks_how_to_steps" (
@@ -3825,6 +3923,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"expires_at" timestamp(3) with time zone,
   	"closed_at" timestamp(3) with time zone,
   	"published_at" timestamp(3) with time zone,
+  	"display_published_at" timestamp(3) with time zone,
   	"seo_title" varchar,
   	"seo_description" varchar,
   	"seo_indexable" "enum_jobs_seo_indexable" DEFAULT 'index',
@@ -4000,6 +4099,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_expires_at" timestamp(3) with time zone,
   	"version_closed_at" timestamp(3) with time zone,
   	"version_published_at" timestamp(3) with time zone,
+  	"version_display_published_at" timestamp(3) with time zone,
   	"version_seo_title" varchar,
   	"version_seo_description" varchar,
   	"version_seo_indexable" "enum__jobs_v_version_seo_indexable" DEFAULT 'index',
@@ -4330,7 +4430,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"_path" text NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
   	"language" "enum_pages_blocks_code_block_language" DEFAULT 'bash',
-  	"filename" varchar,
   	"content" varchar,
   	"show_line_numbers" boolean DEFAULT true,
   	"highlight_lines" varchar,
@@ -4550,6 +4649,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"page_layout" "enum_pages_page_layout" DEFAULT 'default',
   	"schema_type" "enum_pages_schema_type" DEFAULT 'auto',
   	"published_at" timestamp(3) with time zone,
+  	"display_published_at" timestamp(3) with time zone,
   	"seo_title" varchar,
   	"seo_description" varchar,
   	"seo_indexable" "enum_pages_seo_indexable" DEFAULT 'index',
@@ -4879,7 +4979,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"_path" text NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
   	"language" "enum__pages_v_blocks_code_block_language" DEFAULT 'bash',
-  	"filename" varchar,
   	"content" varchar,
   	"show_line_numbers" boolean DEFAULT true,
   	"highlight_lines" varchar,
@@ -5120,6 +5219,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_page_layout" "enum__pages_v_version_page_layout" DEFAULT 'default',
   	"version_schema_type" "enum__pages_v_version_schema_type" DEFAULT 'auto',
   	"version_published_at" timestamp(3) with time zone,
+  	"version_display_published_at" timestamp(3) with time zone,
   	"version_seo_title" varchar,
   	"version_seo_description" varchar,
   	"version_seo_indexable" "enum__pages_v_version_seo_indexable" DEFAULT 'index',
@@ -5228,6 +5328,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"broken_links_id" integer,
   	"audit_log_id" integer,
   	"search_log_id" integer,
+  	"preview_audit_id" integer,
   	"webhooks_dead_letter_id" integer,
   	"integrations_id" integer,
   	"analytics_cache_id" integer,
@@ -5245,6 +5346,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"knowledge_base_id" integer,
   	"events_id" integer,
   	"webinars_id" integer,
+  	"podcast_episodes_id" integer,
   	"jobs_id" integer,
   	"about_galleries_id" integer,
   	"pages_id" integer
@@ -5671,6 +5773,59 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
   
+  CREATE TABLE "podcast_page_cta_cards" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"title" varchar NOT NULL,
+  	"body" varchar NOT NULL,
+  	"cta_label" varchar NOT NULL,
+  	"cta_href" varchar NOT NULL
+  );
+  
+  CREATE TABLE "podcast_page" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"hero_eyebrow" varchar,
+  	"hero_title" varchar DEFAULT 'Leadership Exchange' NOT NULL,
+  	"hero_title_highlight" varchar DEFAULT 'Exchange' NOT NULL,
+  	"hero_subtitle" varchar,
+  	"featured_hero_episode_id" integer,
+  	"latest_episodes_title" varchar DEFAULT 'Latest Episodes',
+  	"latest_episodes_limit" numeric DEFAULT 6,
+  	"featured_section_title" varchar DEFAULT 'Featured Content',
+  	"featured_section_highlight" varchar DEFAULT 'Content',
+  	"updated_at" timestamp(3) with time zone,
+  	"created_at" timestamp(3) with time zone
+  );
+  
+  CREATE TABLE "_podcast_page_v_version_cta_cards" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"title" varchar NOT NULL,
+  	"body" varchar NOT NULL,
+  	"cta_label" varchar NOT NULL,
+  	"cta_href" varchar NOT NULL,
+  	"_uuid" varchar
+  );
+  
+  CREATE TABLE "_podcast_page_v" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"version_hero_eyebrow" varchar,
+  	"version_hero_title" varchar DEFAULT 'Leadership Exchange' NOT NULL,
+  	"version_hero_title_highlight" varchar DEFAULT 'Exchange' NOT NULL,
+  	"version_hero_subtitle" varchar,
+  	"version_featured_hero_episode_id" integer,
+  	"version_latest_episodes_title" varchar DEFAULT 'Latest Episodes',
+  	"version_latest_episodes_limit" numeric DEFAULT 6,
+  	"version_featured_section_title" varchar DEFAULT 'Featured Content',
+  	"version_featured_section_highlight" varchar DEFAULT 'Content',
+  	"version_updated_at" timestamp(3) with time zone,
+  	"version_created_at" timestamp(3) with time zone,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+  );
+  
   CREATE TABLE "payload_jobs_stats" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"stats" jsonb,
@@ -5681,7 +5836,9 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "users_roles" ADD CONSTRAINT "users_roles_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "users_sessions" ADD CONSTRAINT "users_sessions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "audit_log" ADD CONSTRAINT "audit_log_actor_user_id_id_users_id_fk" FOREIGN KEY ("actor_user_id_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "preview_audit" ADD CONSTRAINT "preview_audit_actor_id_users_id_fk" FOREIGN KEY ("actor_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "integrations_routing_events" ADD CONSTRAINT "integrations_routing_events_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."integrations"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "integrations_routing_collections" ADD CONSTRAINT "integrations_routing_collections_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."integrations"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "integrations_teams_config_mentions_trigger_on" ADD CONSTRAINT "integrations_teams_config_mentions_trigger_on_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."integrations_teams_config_mentions"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "integrations_teams_config_mentions" ADD CONSTRAINT "integrations_teams_config_mentions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."integrations"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "integrations_hubspot_config_field_mapping" ADD CONSTRAINT "integrations_hubspot_config_field_mapping_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."integrations"("id") ON DELETE cascade ON UPDATE no action;
@@ -5769,11 +5926,11 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "blogs_seo_speakable_path" ADD CONSTRAINT "blogs_seo_speakable_path_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."blogs"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "blogs" ADD CONSTRAINT "blogs_hero_image_id_media_id_fk" FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "blogs" ADD CONSTRAINT "blogs_reviewed_by_id_authors_id_fk" FOREIGN KEY ("reviewed_by_id") REFERENCES "public"."authors"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "blogs" ADD CONSTRAINT "blogs_categories_id_categories_id_fk" FOREIGN KEY ("categories_id") REFERENCES "public"."categories"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "blogs" ADD CONSTRAINT "blogs_seo_og_image_id_media_id_fk" FOREIGN KEY ("seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "blogs" ADD CONSTRAINT "blogs_seo_twitter_image_id_media_id_fk" FOREIGN KEY ("seo_twitter_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "blogs_rels" ADD CONSTRAINT "blogs_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."blogs"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "blogs_rels" ADD CONSTRAINT "blogs_rels_authors_fk" FOREIGN KEY ("authors_id") REFERENCES "public"."authors"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "blogs_rels" ADD CONSTRAINT "blogs_rels_categories_fk" FOREIGN KEY ("categories_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "blogs_rels" ADD CONSTRAINT "blogs_rels_blogs_fk" FOREIGN KEY ("blogs_id") REFERENCES "public"."blogs"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_blogs_v_version_faqs" ADD CONSTRAINT "_blogs_v_version_faqs_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_blogs_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_blogs_v_blocks_how_to_steps" ADD CONSTRAINT "_blogs_v_blocks_how_to_steps_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
@@ -5792,11 +5949,11 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_parent_id_blogs_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."blogs"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_hero_image_id_media_id_fk" FOREIGN KEY ("version_hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_reviewed_by_id_authors_id_fk" FOREIGN KEY ("version_reviewed_by_id") REFERENCES "public"."authors"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_categories_id_categories_id_fk" FOREIGN KEY ("version_categories_id") REFERENCES "public"."categories"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_seo_og_image_id_media_id_fk" FOREIGN KEY ("version_seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_seo_twitter_image_id_media_id_fk" FOREIGN KEY ("version_seo_twitter_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_blogs_v_rels" ADD CONSTRAINT "_blogs_v_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."_blogs_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_blogs_v_rels" ADD CONSTRAINT "_blogs_v_rels_authors_fk" FOREIGN KEY ("authors_id") REFERENCES "public"."authors"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "_blogs_v_rels" ADD CONSTRAINT "_blogs_v_rels_categories_fk" FOREIGN KEY ("categories_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_blogs_v_rels" ADD CONSTRAINT "_blogs_v_rels_blogs_fk" FOREIGN KEY ("blogs_id") REFERENCES "public"."blogs"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "news_blocks_how_to_steps" ADD CONSTRAINT "news_blocks_how_to_steps_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "news_blocks_how_to_steps" ADD CONSTRAINT "news_blocks_how_to_steps_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."news_blocks_how_to"("id") ON DELETE cascade ON UPDATE no action;
@@ -5811,6 +5968,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "news_blocks_breadcrumb_list" ADD CONSTRAINT "news_blocks_breadcrumb_list_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."news"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "news_seo_speakable_path" ADD CONSTRAINT "news_seo_speakable_path_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."news"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "news" ADD CONSTRAINT "news_hero_image_id_media_id_fk" FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "news" ADD CONSTRAINT "news_publisher_logo_id_media_id_fk" FOREIGN KEY ("publisher_logo_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "news" ADD CONSTRAINT "news_seo_og_image_id_media_id_fk" FOREIGN KEY ("seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "news" ADD CONSTRAINT "news_seo_twitter_image_id_media_id_fk" FOREIGN KEY ("seo_twitter_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "news_rels" ADD CONSTRAINT "news_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."news"("id") ON DELETE cascade ON UPDATE no action;
@@ -5831,6 +5989,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_news_v_version_seo_speakable_path" ADD CONSTRAINT "_news_v_version_seo_speakable_path_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_news_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_news_v" ADD CONSTRAINT "_news_v_parent_id_news_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."news"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_news_v" ADD CONSTRAINT "_news_v_version_hero_image_id_media_id_fk" FOREIGN KEY ("version_hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_news_v" ADD CONSTRAINT "_news_v_version_publisher_logo_id_media_id_fk" FOREIGN KEY ("version_publisher_logo_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_news_v" ADD CONSTRAINT "_news_v_version_seo_og_image_id_media_id_fk" FOREIGN KEY ("version_seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_news_v" ADD CONSTRAINT "_news_v_version_seo_twitter_image_id_media_id_fk" FOREIGN KEY ("version_seo_twitter_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_news_v_rels" ADD CONSTRAINT "_news_v_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."_news_v"("id") ON DELETE cascade ON UPDATE no action;
@@ -5898,7 +6057,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "resources_blocks_breadcrumb_list_crumbs" ADD CONSTRAINT "resources_blocks_breadcrumb_list_crumbs_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."resources_blocks_breadcrumb_list"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "resources_blocks_breadcrumb_list" ADD CONSTRAINT "resources_blocks_breadcrumb_list_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."resources"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "resources_seo_speakable_path" ADD CONSTRAINT "resources_seo_speakable_path_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."resources"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "resources" ADD CONSTRAINT "resources_hero_image_id_media_id_fk" FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "resources" ADD CONSTRAINT "resources_asset_id_media_id_fk" FOREIGN KEY ("asset_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "resources" ADD CONSTRAINT "resources_gate_form_id_forms_id_fk" FOREIGN KEY ("gate_form_id") REFERENCES "public"."forms"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "resources" ADD CONSTRAINT "resources_seo_og_image_id_media_id_fk" FOREIGN KEY ("seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
@@ -5916,7 +6074,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_resources_v_blocks_breadcrumb_list" ADD CONSTRAINT "_resources_v_blocks_breadcrumb_list_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_resources_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_resources_v_version_seo_speakable_path" ADD CONSTRAINT "_resources_v_version_seo_speakable_path_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_resources_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_resources_v" ADD CONSTRAINT "_resources_v_parent_id_resources_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."resources"("id") ON DELETE set null ON UPDATE no action;
-  ALTER TABLE "_resources_v" ADD CONSTRAINT "_resources_v_version_hero_image_id_media_id_fk" FOREIGN KEY ("version_hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_resources_v" ADD CONSTRAINT "_resources_v_version_asset_id_media_id_fk" FOREIGN KEY ("version_asset_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_resources_v" ADD CONSTRAINT "_resources_v_version_gate_form_id_forms_id_fk" FOREIGN KEY ("version_gate_form_id") REFERENCES "public"."forms"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_resources_v" ADD CONSTRAINT "_resources_v_version_seo_og_image_id_media_id_fk" FOREIGN KEY ("version_seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
@@ -6046,6 +6203,9 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_webinars_v" ADD CONSTRAINT "_webinars_v_version_seo_twitter_image_id_media_id_fk" FOREIGN KEY ("version_seo_twitter_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_webinars_v_rels" ADD CONSTRAINT "_webinars_v_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."_webinars_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_webinars_v_rels" ADD CONSTRAINT "_webinars_v_rels_authors_fk" FOREIGN KEY ("authors_id") REFERENCES "public"."authors"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_episodes" ADD CONSTRAINT "podcast_episodes_thumbnail_override_id_media_id_fk" FOREIGN KEY ("thumbnail_override_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v" ADD CONSTRAINT "_podcast_episodes_v_parent_id_podcast_episodes_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v" ADD CONSTRAINT "_podcast_episodes_v_version_thumbnail_override_id_media_id_fk" FOREIGN KEY ("version_thumbnail_override_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "jobs_blocks_how_to_steps" ADD CONSTRAINT "jobs_blocks_how_to_steps_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "jobs_blocks_how_to_steps" ADD CONSTRAINT "jobs_blocks_how_to_steps_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."jobs_blocks_how_to"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "jobs_blocks_how_to" ADD CONSTRAINT "jobs_blocks_how_to_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."jobs"("id") ON DELETE cascade ON UPDATE no action;
@@ -6239,6 +6399,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_broken_links_fk" FOREIGN KEY ("broken_links_id") REFERENCES "public"."broken_links"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_audit_log_fk" FOREIGN KEY ("audit_log_id") REFERENCES "public"."audit_log"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_search_log_fk" FOREIGN KEY ("search_log_id") REFERENCES "public"."search_log"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_preview_audit_fk" FOREIGN KEY ("preview_audit_id") REFERENCES "public"."preview_audit"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_webhooks_dead_letter_fk" FOREIGN KEY ("webhooks_dead_letter_id") REFERENCES "public"."webhooks_dead_letter"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_integrations_fk" FOREIGN KEY ("integrations_id") REFERENCES "public"."integrations"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_analytics_cache_fk" FOREIGN KEY ("analytics_cache_id") REFERENCES "public"."analytics_cache"("id") ON DELETE cascade ON UPDATE no action;
@@ -6256,6 +6417,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_knowledge_base_fk" FOREIGN KEY ("knowledge_base_id") REFERENCES "public"."knowledge_base"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_events_fk" FOREIGN KEY ("events_id") REFERENCES "public"."events"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_webinars_fk" FOREIGN KEY ("webinars_id") REFERENCES "public"."webinars"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_podcast_episodes_fk" FOREIGN KEY ("podcast_episodes_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_jobs_fk" FOREIGN KEY ("jobs_id") REFERENCES "public"."jobs"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_about_galleries_fk" FOREIGN KEY ("about_galleries_id") REFERENCES "public"."about_galleries"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_pages_fk" FOREIGN KEY ("pages_id") REFERENCES "public"."pages"("id") ON DELETE cascade ON UPDATE no action;
@@ -6309,6 +6471,10 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_footer_nav_v_version_badges" ADD CONSTRAINT "_footer_nav_v_version_badges_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_footer_nav_v_version_badges" ADD CONSTRAINT "_footer_nav_v_version_badges_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_footer_nav_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_footer_nav_v" ADD CONSTRAINT "_footer_nav_v_version_newsletter_signup_id_forms_id_fk" FOREIGN KEY ("version_newsletter_signup_id") REFERENCES "public"."forms"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "podcast_page_cta_cards" ADD CONSTRAINT "podcast_page_cta_cards_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."podcast_page"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_page" ADD CONSTRAINT "podcast_page_featured_hero_episode_id_podcast_episodes_id_fk" FOREIGN KEY ("featured_hero_episode_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_podcast_page_v_version_cta_cards" ADD CONSTRAINT "_podcast_page_v_version_cta_cards_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_page_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_podcast_page_v" ADD CONSTRAINT "_podcast_page_v_version_featured_hero_episode_id_podcast_episodes_id_fk" FOREIGN KEY ("version_featured_hero_episode_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE set null ON UPDATE no action;
   CREATE INDEX "users_roles_order_idx" ON "users_roles" USING btree ("order");
   CREATE INDEX "users_roles_parent_idx" ON "users_roles" USING btree ("parent_id");
   CREATE INDEX "users_sessions_order_idx" ON "users_sessions" USING btree ("_order");
@@ -6336,10 +6502,15 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "audit_log_created_at_idx" ON "audit_log" USING btree ("created_at");
   CREATE INDEX "search_log_updated_at_idx" ON "search_log" USING btree ("updated_at");
   CREATE INDEX "search_log_created_at_idx" ON "search_log" USING btree ("created_at");
+  CREATE INDEX "preview_audit_actor_idx" ON "preview_audit" USING btree ("actor_id");
+  CREATE INDEX "preview_audit_updated_at_idx" ON "preview_audit" USING btree ("updated_at");
+  CREATE INDEX "preview_audit_created_at_idx" ON "preview_audit" USING btree ("created_at");
   CREATE INDEX "webhooks_dead_letter_updated_at_idx" ON "webhooks_dead_letter" USING btree ("updated_at");
   CREATE INDEX "webhooks_dead_letter_created_at_idx" ON "webhooks_dead_letter" USING btree ("created_at");
   CREATE INDEX "integrations_routing_events_order_idx" ON "integrations_routing_events" USING btree ("order");
   CREATE INDEX "integrations_routing_events_parent_idx" ON "integrations_routing_events" USING btree ("parent_id");
+  CREATE INDEX "integrations_routing_collections_order_idx" ON "integrations_routing_collections" USING btree ("order");
+  CREATE INDEX "integrations_routing_collections_parent_idx" ON "integrations_routing_collections" USING btree ("parent_id");
   CREATE INDEX "integrations_teams_config_mentions_trigger_on_order_idx" ON "integrations_teams_config_mentions_trigger_on" USING btree ("order");
   CREATE INDEX "integrations_teams_config_mentions_trigger_on_parent_idx" ON "integrations_teams_config_mentions_trigger_on" USING btree ("parent_id");
   CREATE INDEX "integrations_teams_config_mentions_order_idx" ON "integrations_teams_config_mentions" USING btree ("_order");
@@ -6544,6 +6715,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE UNIQUE INDEX "blogs_slug_idx" ON "blogs" USING btree ("slug");
   CREATE INDEX "blogs_hero_image_idx" ON "blogs" USING btree ("hero_image_id");
   CREATE INDEX "blogs_reviewed_by_idx" ON "blogs" USING btree ("reviewed_by_id");
+  CREATE INDEX "blogs_categories_idx" ON "blogs" USING btree ("categories_id");
+  CREATE INDEX "blogs_display_published_at_idx" ON "blogs" USING btree ("display_published_at");
   CREATE INDEX "blogs_seo_seo_og_image_idx" ON "blogs" USING btree ("seo_og_image_id");
   CREATE INDEX "blogs_seo_seo_twitter_image_idx" ON "blogs" USING btree ("seo_twitter_image_id");
   CREATE INDEX "blogs_updated_at_idx" ON "blogs" USING btree ("updated_at");
@@ -6553,7 +6726,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "blogs_rels_parent_idx" ON "blogs_rels" USING btree ("parent_id");
   CREATE INDEX "blogs_rels_path_idx" ON "blogs_rels" USING btree ("path");
   CREATE INDEX "blogs_rels_authors_id_idx" ON "blogs_rels" USING btree ("authors_id");
-  CREATE INDEX "blogs_rels_categories_id_idx" ON "blogs_rels" USING btree ("categories_id");
   CREATE INDEX "blogs_rels_blogs_id_idx" ON "blogs_rels" USING btree ("blogs_id");
   CREATE INDEX "_blogs_v_version_faqs_order_idx" ON "_blogs_v_version_faqs" USING btree ("_order");
   CREATE INDEX "_blogs_v_version_faqs_parent_id_idx" ON "_blogs_v_version_faqs" USING btree ("_parent_id");
@@ -6591,6 +6763,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_blogs_v_version_version_slug_idx" ON "_blogs_v" USING btree ("version_slug");
   CREATE INDEX "_blogs_v_version_version_hero_image_idx" ON "_blogs_v" USING btree ("version_hero_image_id");
   CREATE INDEX "_blogs_v_version_version_reviewed_by_idx" ON "_blogs_v" USING btree ("version_reviewed_by_id");
+  CREATE INDEX "_blogs_v_version_version_categories_idx" ON "_blogs_v" USING btree ("version_categories_id");
+  CREATE INDEX "_blogs_v_version_version_display_published_at_idx" ON "_blogs_v" USING btree ("version_display_published_at");
   CREATE INDEX "_blogs_v_version_seo_version_seo_og_image_idx" ON "_blogs_v" USING btree ("version_seo_og_image_id");
   CREATE INDEX "_blogs_v_version_seo_version_seo_twitter_image_idx" ON "_blogs_v" USING btree ("version_seo_twitter_image_id");
   CREATE INDEX "_blogs_v_version_version_updated_at_idx" ON "_blogs_v" USING btree ("version_updated_at");
@@ -6603,7 +6777,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_blogs_v_rels_parent_idx" ON "_blogs_v_rels" USING btree ("parent_id");
   CREATE INDEX "_blogs_v_rels_path_idx" ON "_blogs_v_rels" USING btree ("path");
   CREATE INDEX "_blogs_v_rels_authors_id_idx" ON "_blogs_v_rels" USING btree ("authors_id");
-  CREATE INDEX "_blogs_v_rels_categories_id_idx" ON "_blogs_v_rels" USING btree ("categories_id");
   CREATE INDEX "_blogs_v_rels_blogs_id_idx" ON "_blogs_v_rels" USING btree ("blogs_id");
   CREATE INDEX "news_blocks_how_to_steps_order_idx" ON "news_blocks_how_to_steps" USING btree ("_order");
   CREATE INDEX "news_blocks_how_to_steps_parent_id_idx" ON "news_blocks_how_to_steps" USING btree ("_parent_id");
@@ -6635,6 +6808,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "news_seo_speakable_path_parent_id_idx" ON "news_seo_speakable_path" USING btree ("_parent_id");
   CREATE UNIQUE INDEX "news_slug_idx" ON "news" USING btree ("slug");
   CREATE INDEX "news_hero_image_idx" ON "news" USING btree ("hero_image_id");
+  CREATE INDEX "news_publisher_logo_idx" ON "news" USING btree ("publisher_logo_id");
   CREATE INDEX "news_seo_seo_og_image_idx" ON "news" USING btree ("seo_og_image_id");
   CREATE INDEX "news_seo_seo_twitter_image_idx" ON "news" USING btree ("seo_twitter_image_id");
   CREATE INDEX "news_updated_at_idx" ON "news" USING btree ("updated_at");
@@ -6677,6 +6851,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_news_v_parent_idx" ON "_news_v" USING btree ("parent_id");
   CREATE INDEX "_news_v_version_version_slug_idx" ON "_news_v" USING btree ("version_slug");
   CREATE INDEX "_news_v_version_version_hero_image_idx" ON "_news_v" USING btree ("version_hero_image_id");
+  CREATE INDEX "_news_v_version_version_publisher_logo_idx" ON "_news_v" USING btree ("version_publisher_logo_id");
   CREATE INDEX "_news_v_version_seo_version_seo_og_image_idx" ON "_news_v" USING btree ("version_seo_og_image_id");
   CREATE INDEX "_news_v_version_seo_version_seo_twitter_image_idx" ON "_news_v" USING btree ("version_seo_twitter_image_id");
   CREATE INDEX "_news_v_version_version_updated_at_idx" ON "_news_v" USING btree ("version_updated_at");
@@ -6732,6 +6907,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE UNIQUE INDEX "guides_slug_idx" ON "guides" USING btree ("slug");
   CREATE INDEX "guides_hero_image_idx" ON "guides" USING btree ("hero_image_id");
   CREATE INDEX "guides_reviewed_by_idx" ON "guides" USING btree ("reviewed_by_id");
+  CREATE INDEX "guides_display_published_at_idx" ON "guides" USING btree ("display_published_at");
   CREATE INDEX "guides_seo_seo_og_image_idx" ON "guides" USING btree ("seo_og_image_id");
   CREATE INDEX "guides_seo_seo_twitter_image_idx" ON "guides" USING btree ("seo_twitter_image_id");
   CREATE INDEX "guides_updated_at_idx" ON "guides" USING btree ("updated_at");
@@ -6784,6 +6960,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_guides_v_version_version_slug_idx" ON "_guides_v" USING btree ("version_slug");
   CREATE INDEX "_guides_v_version_version_hero_image_idx" ON "_guides_v" USING btree ("version_hero_image_id");
   CREATE INDEX "_guides_v_version_version_reviewed_by_idx" ON "_guides_v" USING btree ("version_reviewed_by_id");
+  CREATE INDEX "_guides_v_version_version_display_published_at_idx" ON "_guides_v" USING btree ("version_display_published_at");
   CREATE INDEX "_guides_v_version_seo_version_seo_og_image_idx" ON "_guides_v" USING btree ("version_seo_og_image_id");
   CREATE INDEX "_guides_v_version_seo_version_seo_twitter_image_idx" ON "_guides_v" USING btree ("version_seo_twitter_image_id");
   CREATE INDEX "_guides_v_version_version_updated_at_idx" ON "_guides_v" USING btree ("version_updated_at");
@@ -6826,9 +7003,9 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "resources_seo_speakable_path_order_idx" ON "resources_seo_speakable_path" USING btree ("_order");
   CREATE INDEX "resources_seo_speakable_path_parent_id_idx" ON "resources_seo_speakable_path" USING btree ("_parent_id");
   CREATE UNIQUE INDEX "resources_slug_idx" ON "resources" USING btree ("slug");
-  CREATE INDEX "resources_hero_image_idx" ON "resources" USING btree ("hero_image_id");
   CREATE INDEX "resources_asset_idx" ON "resources" USING btree ("asset_id");
   CREATE INDEX "resources_gate_form_idx" ON "resources" USING btree ("gate_form_id");
+  CREATE INDEX "resources_display_published_at_idx" ON "resources" USING btree ("display_published_at");
   CREATE INDEX "resources_seo_seo_og_image_idx" ON "resources" USING btree ("seo_og_image_id");
   CREATE INDEX "resources_seo_seo_twitter_image_idx" ON "resources" USING btree ("seo_twitter_image_id");
   CREATE INDEX "resources_updated_at_idx" ON "resources" USING btree ("updated_at");
@@ -6864,9 +7041,9 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_resources_v_version_seo_speakable_path_parent_id_idx" ON "_resources_v_version_seo_speakable_path" USING btree ("_parent_id");
   CREATE INDEX "_resources_v_parent_idx" ON "_resources_v" USING btree ("parent_id");
   CREATE INDEX "_resources_v_version_version_slug_idx" ON "_resources_v" USING btree ("version_slug");
-  CREATE INDEX "_resources_v_version_version_hero_image_idx" ON "_resources_v" USING btree ("version_hero_image_id");
   CREATE INDEX "_resources_v_version_version_asset_idx" ON "_resources_v" USING btree ("version_asset_id");
   CREATE INDEX "_resources_v_version_version_gate_form_idx" ON "_resources_v" USING btree ("version_gate_form_id");
+  CREATE INDEX "_resources_v_version_version_display_published_at_idx" ON "_resources_v" USING btree ("version_display_published_at");
   CREATE INDEX "_resources_v_version_seo_version_seo_og_image_idx" ON "_resources_v" USING btree ("version_seo_og_image_id");
   CREATE INDEX "_resources_v_version_seo_version_seo_twitter_image_idx" ON "_resources_v" USING btree ("version_seo_twitter_image_id");
   CREATE INDEX "_resources_v_version_version_updated_at_idx" ON "_resources_v" USING btree ("version_updated_at");
@@ -6911,6 +7088,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "knowledge_base_hero_image_idx" ON "knowledge_base" USING btree ("hero_image_id");
   CREATE INDEX "knowledge_base_category_idx" ON "knowledge_base" USING btree ("category_id");
   CREATE INDEX "knowledge_base_reviewed_by_idx" ON "knowledge_base" USING btree ("reviewed_by_id");
+  CREATE INDEX "knowledge_base_display_published_at_idx" ON "knowledge_base" USING btree ("display_published_at");
   CREATE INDEX "knowledge_base_seo_seo_og_image_idx" ON "knowledge_base" USING btree ("seo_og_image_id");
   CREATE INDEX "knowledge_base_seo_seo_twitter_image_idx" ON "knowledge_base" USING btree ("seo_twitter_image_id");
   CREATE INDEX "knowledge_base_updated_at_idx" ON "knowledge_base" USING btree ("updated_at");
@@ -6957,6 +7135,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_knowledge_base_v_version_version_hero_image_idx" ON "_knowledge_base_v" USING btree ("version_hero_image_id");
   CREATE INDEX "_knowledge_base_v_version_version_category_idx" ON "_knowledge_base_v" USING btree ("version_category_id");
   CREATE INDEX "_knowledge_base_v_version_version_reviewed_by_idx" ON "_knowledge_base_v" USING btree ("version_reviewed_by_id");
+  CREATE INDEX "_knowledge_base_v_version_version_display_published_at_idx" ON "_knowledge_base_v" USING btree ("version_display_published_at");
   CREATE INDEX "_knowledge_base_v_version_seo_version_seo_og_image_idx" ON "_knowledge_base_v" USING btree ("version_seo_og_image_id");
   CREATE INDEX "_knowledge_base_v_version_seo_version_seo_twitter_image_idx" ON "_knowledge_base_v" USING btree ("version_seo_twitter_image_id");
   CREATE INDEX "_knowledge_base_v_version_version_updated_at_idx" ON "_knowledge_base_v" USING btree ("version_updated_at");
@@ -7093,6 +7272,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "webinars_hero_image_idx" ON "webinars" USING btree ("hero_image_id");
   CREATE INDEX "webinars_registration_form_idx" ON "webinars" USING btree ("registration_form_id");
   CREATE INDEX "webinars_pdf_idx" ON "webinars" USING btree ("pdf_id");
+  CREATE INDEX "webinars_display_published_at_idx" ON "webinars" USING btree ("display_published_at");
   CREATE INDEX "webinars_seo_seo_og_image_idx" ON "webinars" USING btree ("seo_og_image_id");
   CREATE INDEX "webinars_seo_seo_twitter_image_idx" ON "webinars" USING btree ("seo_twitter_image_id");
   CREATE INDEX "webinars_updated_at_idx" ON "webinars" USING btree ("updated_at");
@@ -7135,6 +7315,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_webinars_v_version_version_hero_image_idx" ON "_webinars_v" USING btree ("version_hero_image_id");
   CREATE INDEX "_webinars_v_version_version_registration_form_idx" ON "_webinars_v" USING btree ("version_registration_form_id");
   CREATE INDEX "_webinars_v_version_version_pdf_idx" ON "_webinars_v" USING btree ("version_pdf_id");
+  CREATE INDEX "_webinars_v_version_version_display_published_at_idx" ON "_webinars_v" USING btree ("version_display_published_at");
   CREATE INDEX "_webinars_v_version_seo_version_seo_og_image_idx" ON "_webinars_v" USING btree ("version_seo_og_image_id");
   CREATE INDEX "_webinars_v_version_seo_version_seo_twitter_image_idx" ON "_webinars_v" USING btree ("version_seo_twitter_image_id");
   CREATE INDEX "_webinars_v_version_version_updated_at_idx" ON "_webinars_v" USING btree ("version_updated_at");
@@ -7147,6 +7328,22 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_webinars_v_rels_parent_idx" ON "_webinars_v_rels" USING btree ("parent_id");
   CREATE INDEX "_webinars_v_rels_path_idx" ON "_webinars_v_rels" USING btree ("path");
   CREATE INDEX "_webinars_v_rels_authors_id_idx" ON "_webinars_v_rels" USING btree ("authors_id");
+  CREATE UNIQUE INDEX "podcast_episodes_slug_idx" ON "podcast_episodes" USING btree ("slug");
+  CREATE INDEX "podcast_episodes_thumbnail_override_idx" ON "podcast_episodes" USING btree ("thumbnail_override_id");
+  CREATE INDEX "podcast_episodes_display_published_at_idx" ON "podcast_episodes" USING btree ("display_published_at");
+  CREATE INDEX "podcast_episodes_updated_at_idx" ON "podcast_episodes" USING btree ("updated_at");
+  CREATE INDEX "podcast_episodes_created_at_idx" ON "podcast_episodes" USING btree ("created_at");
+  CREATE INDEX "podcast_episodes__status_idx" ON "podcast_episodes" USING btree ("_status");
+  CREATE INDEX "_podcast_episodes_v_parent_idx" ON "_podcast_episodes_v" USING btree ("parent_id");
+  CREATE INDEX "_podcast_episodes_v_version_version_slug_idx" ON "_podcast_episodes_v" USING btree ("version_slug");
+  CREATE INDEX "_podcast_episodes_v_version_version_thumbnail_override_idx" ON "_podcast_episodes_v" USING btree ("version_thumbnail_override_id");
+  CREATE INDEX "_podcast_episodes_v_version_version_display_published_at_idx" ON "_podcast_episodes_v" USING btree ("version_display_published_at");
+  CREATE INDEX "_podcast_episodes_v_version_version_updated_at_idx" ON "_podcast_episodes_v" USING btree ("version_updated_at");
+  CREATE INDEX "_podcast_episodes_v_version_version_created_at_idx" ON "_podcast_episodes_v" USING btree ("version_created_at");
+  CREATE INDEX "_podcast_episodes_v_version_version__status_idx" ON "_podcast_episodes_v" USING btree ("version__status");
+  CREATE INDEX "_podcast_episodes_v_created_at_idx" ON "_podcast_episodes_v" USING btree ("created_at");
+  CREATE INDEX "_podcast_episodes_v_updated_at_idx" ON "_podcast_episodes_v" USING btree ("updated_at");
+  CREATE INDEX "_podcast_episodes_v_latest_idx" ON "_podcast_episodes_v" USING btree ("latest");
   CREATE INDEX "jobs_blocks_how_to_steps_order_idx" ON "jobs_blocks_how_to_steps" USING btree ("_order");
   CREATE INDEX "jobs_blocks_how_to_steps_parent_id_idx" ON "jobs_blocks_how_to_steps" USING btree ("_parent_id");
   CREATE INDEX "jobs_blocks_how_to_steps_image_idx" ON "jobs_blocks_how_to_steps" USING btree ("image_id");
@@ -7177,6 +7374,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "jobs_seo_speakable_path_parent_id_idx" ON "jobs_seo_speakable_path" USING btree ("_parent_id");
   CREATE UNIQUE INDEX "jobs_slug_idx" ON "jobs" USING btree ("slug");
   CREATE INDEX "jobs_description_pdf_idx" ON "jobs" USING btree ("description_pdf_id");
+  CREATE INDEX "jobs_display_published_at_idx" ON "jobs" USING btree ("display_published_at");
   CREATE INDEX "jobs_seo_seo_og_image_idx" ON "jobs" USING btree ("seo_og_image_id");
   CREATE INDEX "jobs_seo_seo_twitter_image_idx" ON "jobs" USING btree ("seo_twitter_image_id");
   CREATE INDEX "jobs_updated_at_idx" ON "jobs" USING btree ("updated_at");
@@ -7217,6 +7415,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_jobs_v_parent_idx" ON "_jobs_v" USING btree ("parent_id");
   CREATE INDEX "_jobs_v_version_version_slug_idx" ON "_jobs_v" USING btree ("version_slug");
   CREATE INDEX "_jobs_v_version_version_description_pdf_idx" ON "_jobs_v" USING btree ("version_description_pdf_id");
+  CREATE INDEX "_jobs_v_version_version_display_published_at_idx" ON "_jobs_v" USING btree ("version_display_published_at");
   CREATE INDEX "_jobs_v_version_seo_version_seo_og_image_idx" ON "_jobs_v" USING btree ("version_seo_og_image_id");
   CREATE INDEX "_jobs_v_version_seo_version_seo_twitter_image_idx" ON "_jobs_v" USING btree ("version_seo_twitter_image_id");
   CREATE INDEX "_jobs_v_version_version_updated_at_idx" ON "_jobs_v" USING btree ("version_updated_at");
@@ -7368,6 +7567,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "pages_slug_idx" ON "pages" USING btree ("slug");
   CREATE INDEX "pages_parent_idx" ON "pages" USING btree ("parent_id");
   CREATE INDEX "pages_path_idx" ON "pages" USING btree ("path");
+  CREATE INDEX "pages_display_published_at_idx" ON "pages" USING btree ("display_published_at");
   CREATE INDEX "pages_seo_seo_og_image_idx" ON "pages" USING btree ("seo_og_image_id");
   CREATE INDEX "pages_seo_seo_twitter_image_idx" ON "pages" USING btree ("seo_twitter_image_id");
   CREATE INDEX "pages_updated_at_idx" ON "pages" USING btree ("updated_at");
@@ -7515,6 +7715,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_pages_v_version_version_slug_idx" ON "_pages_v" USING btree ("version_slug");
   CREATE INDEX "_pages_v_version_version_parent_idx" ON "_pages_v" USING btree ("version_parent_id");
   CREATE INDEX "_pages_v_version_version_path_idx" ON "_pages_v" USING btree ("version_path");
+  CREATE INDEX "_pages_v_version_version_display_published_at_idx" ON "_pages_v" USING btree ("version_display_published_at");
   CREATE INDEX "_pages_v_version_seo_version_seo_og_image_idx" ON "_pages_v" USING btree ("version_seo_og_image_id");
   CREATE INDEX "_pages_v_version_seo_version_seo_twitter_image_idx" ON "_pages_v" USING btree ("version_seo_twitter_image_id");
   CREATE INDEX "_pages_v_version_version_updated_at_idx" ON "_pages_v" USING btree ("version_updated_at");
@@ -7563,6 +7764,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "payload_locked_documents_rels_broken_links_id_idx" ON "payload_locked_documents_rels" USING btree ("broken_links_id");
   CREATE INDEX "payload_locked_documents_rels_audit_log_id_idx" ON "payload_locked_documents_rels" USING btree ("audit_log_id");
   CREATE INDEX "payload_locked_documents_rels_search_log_id_idx" ON "payload_locked_documents_rels" USING btree ("search_log_id");
+  CREATE INDEX "payload_locked_documents_rels_preview_audit_id_idx" ON "payload_locked_documents_rels" USING btree ("preview_audit_id");
   CREATE INDEX "payload_locked_documents_rels_webhooks_dead_letter_id_idx" ON "payload_locked_documents_rels" USING btree ("webhooks_dead_letter_id");
   CREATE INDEX "payload_locked_documents_rels_integrations_id_idx" ON "payload_locked_documents_rels" USING btree ("integrations_id");
   CREATE INDEX "payload_locked_documents_rels_analytics_cache_id_idx" ON "payload_locked_documents_rels" USING btree ("analytics_cache_id");
@@ -7580,6 +7782,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "payload_locked_documents_rels_knowledge_base_id_idx" ON "payload_locked_documents_rels" USING btree ("knowledge_base_id");
   CREATE INDEX "payload_locked_documents_rels_events_id_idx" ON "payload_locked_documents_rels" USING btree ("events_id");
   CREATE INDEX "payload_locked_documents_rels_webinars_id_idx" ON "payload_locked_documents_rels" USING btree ("webinars_id");
+  CREATE INDEX "payload_locked_documents_rels_podcast_episodes_id_idx" ON "payload_locked_documents_rels" USING btree ("podcast_episodes_id");
   CREATE INDEX "payload_locked_documents_rels_jobs_id_idx" ON "payload_locked_documents_rels" USING btree ("jobs_id");
   CREATE INDEX "payload_locked_documents_rels_about_galleries_id_idx" ON "payload_locked_documents_rels" USING btree ("about_galleries_id");
   CREATE INDEX "payload_locked_documents_rels_pages_id_idx" ON "payload_locked_documents_rels" USING btree ("pages_id");
@@ -7669,7 +7872,15 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_legal_v_created_at_idx" ON "_legal_v" USING btree ("created_at");
   CREATE INDEX "_legal_v_updated_at_idx" ON "_legal_v" USING btree ("updated_at");
   CREATE INDEX "_announcements_v_created_at_idx" ON "_announcements_v" USING btree ("created_at");
-  CREATE INDEX "_announcements_v_updated_at_idx" ON "_announcements_v" USING btree ("updated_at");`)
+  CREATE INDEX "_announcements_v_updated_at_idx" ON "_announcements_v" USING btree ("updated_at");
+  CREATE INDEX "podcast_page_cta_cards_order_idx" ON "podcast_page_cta_cards" USING btree ("_order");
+  CREATE INDEX "podcast_page_cta_cards_parent_id_idx" ON "podcast_page_cta_cards" USING btree ("_parent_id");
+  CREATE INDEX "podcast_page_featured_hero_episode_idx" ON "podcast_page" USING btree ("featured_hero_episode_id");
+  CREATE INDEX "_podcast_page_v_version_cta_cards_order_idx" ON "_podcast_page_v_version_cta_cards" USING btree ("_order");
+  CREATE INDEX "_podcast_page_v_version_cta_cards_parent_id_idx" ON "_podcast_page_v_version_cta_cards" USING btree ("_parent_id");
+  CREATE INDEX "_podcast_page_v_version_version_featured_hero_episode_idx" ON "_podcast_page_v" USING btree ("version_featured_hero_episode_id");
+  CREATE INDEX "_podcast_page_v_created_at_idx" ON "_podcast_page_v" USING btree ("created_at");
+  CREATE INDEX "_podcast_page_v_updated_at_idx" ON "_podcast_page_v" USING btree ("updated_at");`)
 }
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {
@@ -7682,8 +7893,10 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TABLE "broken_links" CASCADE;
   DROP TABLE "audit_log" CASCADE;
   DROP TABLE "search_log" CASCADE;
+  DROP TABLE "preview_audit" CASCADE;
   DROP TABLE "webhooks_dead_letter" CASCADE;
   DROP TABLE "integrations_routing_events" CASCADE;
+  DROP TABLE "integrations_routing_collections" CASCADE;
   DROP TABLE "integrations_teams_config_mentions_trigger_on" CASCADE;
   DROP TABLE "integrations_teams_config_mentions" CASCADE;
   DROP TABLE "integrations_hubspot_config_field_mapping" CASCADE;
@@ -7918,6 +8131,8 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TABLE "_webinars_v_version_seo_speakable_path" CASCADE;
   DROP TABLE "_webinars_v" CASCADE;
   DROP TABLE "_webinars_v_rels" CASCADE;
+  DROP TABLE "podcast_episodes" CASCADE;
+  DROP TABLE "_podcast_episodes_v" CASCADE;
   DROP TABLE "jobs_blocks_how_to_steps" CASCADE;
   DROP TABLE "jobs_blocks_how_to" CASCADE;
   DROP TABLE "jobs_blocks_video_object" CASCADE;
@@ -8068,6 +8283,10 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TABLE "_legal_v" CASCADE;
   DROP TABLE "announcements" CASCADE;
   DROP TABLE "_announcements_v" CASCADE;
+  DROP TABLE "podcast_page_cta_cards" CASCADE;
+  DROP TABLE "podcast_page" CASCADE;
+  DROP TABLE "_podcast_page_v_version_cta_cards" CASCADE;
+  DROP TABLE "_podcast_page_v" CASCADE;
   DROP TABLE "payload_jobs_stats" CASCADE;
   DROP TYPE "public"."enum_users_roles";
   DROP TYPE "public"."enum_media_folder";
@@ -8078,9 +8297,12 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "public"."enum_webhooks_dead_letter_event";
   DROP TYPE "public"."enum_webhooks_dead_letter_destination_kind";
   DROP TYPE "public"."enum_integrations_routing_events";
+  DROP TYPE "public"."enum_integrations_routing_collections";
   DROP TYPE "public"."enum_integrations_teams_config_mentions_trigger_on";
   DROP TYPE "public"."enum_integrations_kind";
   DROP TYPE "public"."enum_integrations_hubspot_config_write_mode";
+  DROP TYPE "public"."enum_integrations_hubspot_config_default_lifecycle_stage";
+  DROP TYPE "public"."enum_integrations_hubspot_config_default_lead_status";
   DROP TYPE "public"."enum_integrations_source";
   DROP TYPE "public"."enum_analytics_cache_env";
   DROP TYPE "public"."enum_analytics_cache_provider";
@@ -8129,6 +8351,7 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "public"."enum_blogs_blocks_software_app_category";
   DROP TYPE "public"."enum_blogs_blocks_software_app_currency";
   DROP TYPE "public"."enum_blogs_blocks_breadcrumb_list_mode";
+  DROP TYPE "public"."enum_blogs_toc_depth";
   DROP TYPE "public"."enum_blogs_seo_indexable";
   DROP TYPE "public"."enum_blogs_seo_twitter_card";
   DROP TYPE "public"."enum_blogs_status";
@@ -8136,6 +8359,7 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "public"."enum__blogs_v_blocks_software_app_category";
   DROP TYPE "public"."enum__blogs_v_blocks_software_app_currency";
   DROP TYPE "public"."enum__blogs_v_blocks_breadcrumb_list_mode";
+  DROP TYPE "public"."enum__blogs_v_version_toc_depth";
   DROP TYPE "public"."enum__blogs_v_version_seo_indexable";
   DROP TYPE "public"."enum__blogs_v_version_seo_twitter_card";
   DROP TYPE "public"."enum__blogs_v_version_status";
@@ -8143,6 +8367,7 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "public"."enum_news_blocks_software_app_category";
   DROP TYPE "public"."enum_news_blocks_software_app_currency";
   DROP TYPE "public"."enum_news_blocks_breadcrumb_list_mode";
+  DROP TYPE "public"."enum_news_press_type";
   DROP TYPE "public"."enum_news_seo_indexable";
   DROP TYPE "public"."enum_news_seo_twitter_card";
   DROP TYPE "public"."enum_news_status";
@@ -8150,6 +8375,7 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "public"."enum__news_v_blocks_software_app_category";
   DROP TYPE "public"."enum__news_v_blocks_software_app_currency";
   DROP TYPE "public"."enum__news_v_blocks_breadcrumb_list_mode";
+  DROP TYPE "public"."enum__news_v_version_press_type";
   DROP TYPE "public"."enum__news_v_version_seo_indexable";
   DROP TYPE "public"."enum__news_v_version_seo_twitter_card";
   DROP TYPE "public"."enum__news_v_version_status";
@@ -8239,6 +8465,8 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "public"."enum__webinars_v_version_seo_indexable";
   DROP TYPE "public"."enum__webinars_v_version_seo_twitter_card";
   DROP TYPE "public"."enum__webinars_v_version_status";
+  DROP TYPE "public"."enum_podcast_episodes_status";
+  DROP TYPE "public"."enum__podcast_episodes_v_version_status";
   DROP TYPE "public"."enum_jobs_blocks_review_item_reviewed_type";
   DROP TYPE "public"."enum_jobs_blocks_software_app_category";
   DROP TYPE "public"."enum_jobs_blocks_software_app_currency";
