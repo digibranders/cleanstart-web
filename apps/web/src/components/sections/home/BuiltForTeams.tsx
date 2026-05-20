@@ -160,7 +160,7 @@ export function BuiltForTeams() {
             </span>
           </h2>
           <p
-            className="mx-auto mt-6 text-xl font-normal leading-[1.5] tracking-[-0.02em] text-white/85"
+            className="mx-auto mt-6 text-body-lg font-normal leading-[1.5] tracking-[-0.02em] text-white/85"
             style={{ maxWidth: "620px" }}
           >
             CleanStart replaces unpredictable builds with verified, secure
@@ -451,9 +451,8 @@ function CompanyMark({
 }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 font-sans text-white/85"
+      className={`inline-flex items-center gap-1.5 font-sans text-white/85 ${small ? "text-body-xs" : "text-body-sm"}`}
       style={{
-        fontSize: small ? "11px" : "14px",
         fontWeight: 600,
         letterSpacing: "0.02em",
       }}
