@@ -120,6 +120,11 @@ Everything in this section applies only to `apps/web`. It does not override the 
 > - **No `<br />` in prose** (`<p>`, `<h1>`, `<h2>`, `<h3>`). Trust `max-width` and natural wrap.
 > - **Buttons use the discrete `--btn-fs-*` / `--btn-h-*` / `--btn-px-*` scale**, never `clamp()`. Primary CTAs are 44px tall minimum; smaller variants require `data-cta-utility` and are exempt from the axe-core `target-size` rule.
 > - **CMS prose (`.article-body`, Lexical render) uses the long-form subtable in `design-tokens.md`**, not the marketing card-body tokens — the two regimes are not interchangeable.
+> - **Section vertical padding uses one of the four `--spacing-section-*` tokens** (`py-section-sm` 48→80, `py-section-md` 64→120, `py-section-lg` 80→150, `py-section-cta` 160→250). Raw `paddingTop: 80px` / `py-16 md:py-20 xl:py-[120px]` shapes are forbidden in new code; heros are excluded (header-offset clamps). Default token for a new section is `py-section-md`.
+> - **Footer CTA-card geometry is owned by `Footer.tsx`**, not by per-page CTAs. Per-page CTAs paint *inside* the 1200 × {420 sm:360 lg:300} slot via the `cta` prop and never set their own width/height/border-radius. See "Footer CTA slot contract" in `design-tokens.md`.
+> - **Newsletter input boxes** (BlogsCTA / EventsCTA / WebinarsCTA pattern): wrapper is `flex-1 min-w-0` inside a `w-full` form. Never hardcode `width: 427px` — it overflows the 1200 slot at narrow desktops.
+> - **Font weights follow the role scale**: 400 body / 500 button/nav/meta / 600 sub-head + card title / 700 section head + hero head. No `fontWeight: 800` anywhere on marketing pages.
+> - **The closing artifact and measured v3.8 metrics** live in `apps/web/docs/RESPONSIVE-AUDIT.md` Part 14. The Lockdown checklist in §14.4 is the gate before `development` → `main` merge.
 
 ### Component structure
 

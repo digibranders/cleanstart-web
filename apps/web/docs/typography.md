@@ -135,6 +135,38 @@ Apply these consistently across every page.
 
 ---
 
+## Font weight system (locked)
+
+The codebase follows a strict role-based weight scale. The 2026-05-20 audit found this convention substantially in place already; one outlier (`fontWeight: 800` on `VulnRethinking` VS badge) was normalised to 700.
+
+| Weight | Role | Used by |
+|---:|---|---|
+| **400** | Body, captions, eyebrows, footer body | every `<p>` / lead body / card body / meta |
+| **500** | Buttons, nav links, card meta rows, pills | `cs-btn-*`, `<nav>` links, blog card meta |
+| **600** | Sub-headings, card titles, footer column heads | `<h3>`, card title (compact), footer headings, eyebrows-with-emphasis |
+| **700** | Section H2, hero H1, in-page heading-class elements, badges | every section title, page title, feature-card title in heroes |
+
+**Rules:**
+
+- **No `fontWeight: 800`** anywhere in the marketing site (CMS-prose excepted — `.article-body` may go to 800 only if a future authored markdown explicitly requests `<strong>` inside an `<h1>` and the renderer chooses to honor it).
+- **Card-level titles** are 500 (`BlogCard`, `FactoryCard`) or 600 (`WebinarCard`, `NewsroomCard`) — intentionally lighter than section heads so the visual hierarchy stays legible.
+- **Buttons are 500** even on display-class CTAs; only label colour + size separate primary from secondary, not weight.
+- **Inline-strong inside body** uses 600, never 700, to keep the in-paragraph emphasis distinct from a heading entering the reading flow.
+
+**CMS-prose weights** (locked in `globals.css` `.article-body`; do not override per-page):
+
+| Element | Weight |
+|---|---:|
+| paragraph, `ul`/`ol` | 400 |
+| `<h1>` (article title, in DetailHero) | 700 |
+| `<h2>` | 700 |
+| `<h3>` | 600 |
+| `<h4>` / `<h5>` / `<h6>` | 600 |
+| `<blockquote>` | 400 (italic) |
+| `<code>` / `<pre>` | inherits (monospace) |
+
+---
+
 ## Adding a new size
 
 1. Add the token to the `@theme` block in [src/app/globals.css](../src/app/globals.css):
