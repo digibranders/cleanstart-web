@@ -2396,3 +2396,49 @@ These sit outside the v3 plan and are queued for a follow-up sprint, primarily b
 ### 14.5 — One-paragraph TL;DR (closing)
 
 The v3 plan landed. All twelve non-deferred v3.8 metrics are green at the local-measurement level. The ESLint warn-count went from a baseline near 600 inferred violations to **96**, with the floor pinned as a CI ratchet. Every non-hero section now sits on the same `py-section-md` rhythm; every CTA card on the same 1200×{420/360/300} slot with viewport-scaled gutters; every CMS-prose page on the locked Butterick-anchored 17→19px body inside a 680px reading column. The two architectural mobile rebuilds (`ResourceCenterSidebar`, `WebinarFilters`) and the lint flip to `error` are explicitly deferred behind the Figma mobile work that the user signalled would arrive next. With that work, the lockdown checklist in §14.4 closes the engagement.
+
+---
+
+### 14.6 — farheen-branch integration (2026-05-20)
+
+Team member **`farheen`** branched from `4b4ff28` (one commit before v3 work landed) and shipped 6 commits of new pages + section redesigns. Brought onto `development` via integration branch `integration/farheen-merge`:
+
+**New routes (3):** `/for-ciso` · `/software-composition-analysis` · `/teams` — all now marked ✅ in `docs/WEB-PAGES.md`.
+
+**New section components (23):**
+- `sections/ciso/` — Hero · HeroAnimation (Lottie) · Risks · Solution · Comparison · Enterprise · Outcomes · CTA (8 files)
+- `sections/sca/` — Hero · Problems · SecurityOutcomes · Transform · BuiltForDev · ReduceNoise · CTA (7 files)
+- `sections/teams/` — Hero · Leadership · HowWeWork · Insiders · CTA (5 files)
+- Plus all backing public assets (`public/images/{ciso,sca,teams}/`) and `public/animations/ciso-hero.json`
+
+**Redesigned existing files (her version wins, then v3-tokenised):**
+- `CleanSightCTA.tsx` · `CleanSightComparison.tsx` · `CleanSightStats.tsx` — new Figma design (1053 lines combined), brought onto integration verbatim, then `<br />` removed from prose + Image `sizes` added + flat-px `fontSize` either tokenised or inline-disabled with rationale.
+
+**Quality fixes carried over from farheen:**
+- `BlogDetailContent.tsx` TOC entries now `useMemo` + outer container `suppressHydrationWarning`.
+- `ResourceGateModal.tsx` keyboard-a11y improvements.
+- `<body suppressHydrationWarning>` in `layout.tsx`.
+- `next.config.ts` webpack polling (dev-only) for OneDrive workspaces.
+- `lottie-react@^2.4.1` added to `apps/web/package.json` (used by `CisoHeroAnimation`).
+
+**Lint compliance work on the imported files:**
+- 7 `<br />` removed from prose (CisoCTA hero, CisoRisks H2, CleanSightCTA H2, SCASecurityOutcomes H2, SCATransform body ×2, and others).
+- 3 `<Image>` `sizes` added (CisoComparison VS-badge 80px, CleanSightComparison VS-badge 80px, SCABuiltForDev workflows-hero responsive).
+- 38 Figma-anchored flat-px `fontSize:` sites inline-disabled with `// eslint-disable-next-line no-restricted-syntax -- v3 exception: …` and pointer to §14.3. Concentration: `SCATransform` 30, `CleanSightComparison` 2, others 1–2 each.
+- Smoke spec extended: `tests/e2e/smoke.spec.ts` now covers 13 routes (added `/for-ciso`, `/software-composition-analysis`, `/teams`), so Playwright runs 13 × 6 = **78 tests**.
+
+**Gates after integration commits:**
+- `pnpm lint` (biome) ✓
+- `pnpm typecheck` (`tsc --noEmit`) ✓
+- `pnpm lint:eslint` (v3 rules at **error** mode) → 0/0 ✓
+- `pnpm build` ✓
+- `pnpm exec playwright test tests/e2e/smoke.spec.ts` → 78/78 ✓
+
+**Merge + sync:**
+- `integration/farheen-merge` merged into `development` (merge commit, no squash, so the 3 integration commits — F2 import, F3 lint sweep, this audit-doc patch — stay visible in history).
+- `farheen` force-synced to the merge commit (`git push --force-with-lease origin development:farheen`). Both refs now point at the same SHA.
+
+**What we deliberately did NOT do:**
+- Did not apply Figma-mobile composition to the 3 new pages — none have mobile-Figma yet; sections use generic 1-col stacks below `md`.
+- Did not re-design farheen's CleanSight redesign — preserved her visual intent verbatim and only patched the lint-rule violations.
+- Did not gate the merge on production-Lighthouse readback; that follows the deploy.
