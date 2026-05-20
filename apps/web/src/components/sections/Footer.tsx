@@ -98,14 +98,16 @@ export function Footer({
     >
       {hasCta && (
         <div
-          className="pointer-events-none absolute left-1/2 z-20 flex w-full -translate-x-1/2 justify-center px-6"
+          className="pointer-events-none absolute left-1/2 z-20 flex w-full -translate-x-1/2 justify-center px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20"
           style={{ top: "-170px" }}
         >
           {/* Sizing wrapper — NO overflow:hidden so `ctaOverlay` children can
-              break out of the 1276×330 card (e.g. the home page kubr bird
-              peeking above the card top). */}
+              break out of the card (e.g. the home page kubr bird peeking
+              above the card top).
+              max-w reduced 1276→1200 so the card has clear side gutters at
+              xl/2xl instead of kissing the viewport edges. */}
           <div
-            className="pointer-events-auto relative w-[1276px] max-w-full h-[460px] sm:h-[400px] lg:h-[330px]"
+            className="pointer-events-auto relative w-[1200px] max-w-full h-[420px] sm:h-[360px] lg:h-[300px]"
           >
             {/* Clipped card surface — fills the slot and clips inner content
                 to the rounded 1276×330 box. */}

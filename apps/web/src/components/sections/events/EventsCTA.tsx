@@ -71,29 +71,28 @@ export function EventsCTA(): React.ReactElement {
         />
       </div>
 
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center px-6">
         <div
-          className="flex items-center"
-          style={{ gap: "115px", width: "1047px" }}
+          className="flex flex-col lg:flex-row items-center gap-y-8 lg:gap-x-[clamp(40px,9vw,115px)] w-full"
+          style={{ maxWidth: "1047px" }}
         >
           <div
-            className="font-display font-bold text-white shrink-0"
+            className="font-display font-bold text-white w-full lg:w-auto lg:max-w-[401px] text-center lg:text-left"
             style={{
               fontSize: "clamp(1.75rem,3.82vw,3.4375rem)",
               lineHeight: "1.0",
               letterSpacing: "-0.05em",
-              width: "401px",
             }}
           >
             Never Miss an Upcoming Event
           </div>
 
           <div
-            className="flex flex-col items-start shrink-0"
-            style={{ width: "493px", gap: "24px" }}
+            className="flex flex-col items-start w-full lg:max-w-[493px]"
+            style={{ gap: "24px" }}
           >
             <p
-              className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white"
+              className="text-body-lg font-normal leading-[1.4] tracking-[-0.04em] text-white"
               style={{ opacity: 0.8 }}
             >
               Be the first to get notified about upcoming events.
@@ -109,13 +108,12 @@ export function EventsCTA(): React.ReactElement {
             ) : (
               <form
                 onSubmit={handleSubmit}
-                className="relative flex items-center"
+                className="relative flex items-center w-full"
                 aria-label="Events newsletter subscription"
               >
                 <div
-                  className="relative overflow-hidden"
+                  className="relative overflow-hidden flex-1 min-w-0"
                   style={{
-                    width: "427px",
                     height: "44px",
                     background: "rgba(255,255,255,0.2)",
                     border: "1px solid rgba(237,203,255,0.6)",

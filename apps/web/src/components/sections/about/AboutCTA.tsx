@@ -48,9 +48,8 @@ export function AboutCTA() {
           Start Clean. Stay Secure.
         </h2>
         <p
-          className="font-sans text-white/80"
+          className="font-sans text-body-lg text-white/80"
           style={{
-            fontSize: "clamp(1rem, 1.5vw, 1.3125rem)",
             fontWeight: 400,
             lineHeight: "1.4",
             letterSpacing: "-0.04em",
