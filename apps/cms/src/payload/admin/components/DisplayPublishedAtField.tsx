@@ -1,6 +1,6 @@
 'use client';
 
-import { DateTimePicker } from '@cleanstart/ui';
+import { DateTimePicker, Tooltip } from '@cleanstart/ui';
 import { useDocumentInfo, useField, useFormFields } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 import { useCallback, useId, useMemo, useState } from 'react';
@@ -59,6 +59,24 @@ export const DisplayPublishedAtField = (
       <div className="cs-display-pub__label">
         <span className="cs-display-pub__label-text">
           <label htmlFor={inputId}>{props.label ?? 'Publish date'}</label>
+          <Tooltip
+            placement="bottom-start"
+            content={
+              <>
+                Sets <b>datePublished</b> in JSON-LD and the date shown on the public site.
+                <br />
+                Leave empty to use the actual publish time.
+              </>
+            }
+          >
+            <button
+              type="button"
+              className="cs-display-pub__info"
+              aria-label="What is the publish date?"
+            >
+              i
+            </button>
+          </Tooltip>
         </span>
         {state.kind === 'near-now' && (
           <output
@@ -108,13 +126,6 @@ export const DisplayPublishedAtField = (
           ariaLabel="Display publish date"
         />
       </div>
-
-      {state.kind === 'empty' && (
-        <p className="cs-display-pub__hint">
-          Leave empty to use the actual publish time. Set a value to override what
-          Google sees as the original publish date.
-        </p>
-      )}
 
       {state.kind === 'backdate-soft' && (
         <p className="cs-display-pub__hint cs-display-pub__hint--warn">
