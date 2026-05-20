@@ -14,7 +14,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
+    "generate:types": "node --experimental-strip-types --no-warnings scripts/generate-types.ts",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "verify:types": "node --experimental-strip-types --no-warnings scripts/check-types-drift.ts",
     "verify:payload-ui": "node --experimental-strip-types --no-warnings scripts/check-payload-ui-allowlist.ts",

@@ -3,9 +3,13 @@
  * Regenerates Payload types and asserts they match what's committed.
  * Fails CI when a collection / global / block schema changed without
  * the generated payload-types.ts being updated alongside.
+ *
+ * `generate:types` (scripts/generate-types.ts) owns the env-stripping
+ * needed to make output deterministic across machines — this script
+ * just invokes it and compares before/after.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, renameSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,43 +20,10 @@ const typesFile = path.resolve(cmsRoot, 'src/payload-types.ts');
 
 const before = readFileSync(typesFile, 'utf8');
 
-// Some Payload plugins reshape collection field order based on env vars
-// (e.g. @payloadcms/storage-s3 splices and re-pushes Media.prefix when R2
-// credentials are present). Generation must yield the same schema whether
-// or not those credentials are configured, so both this check and the
-// committed payload-types.ts reflect the unplugged baseline.
-//
-// Payload boots through @next/env, which overrides process.env from
-// .env / .env.local at child-process startup — so passing empty values
-// down through `env:` doesn't suppress them. Temporarily rename any local
-// dotenv files for the duration of generation, then restore unconditionally.
-const ENV_FILES = ['.env', '.env.local', '.env.development', '.env.development.local'];
-const renamed: { from: string; to: string }[] = [];
-for (const name of ENV_FILES) {
-  const from = path.join(cmsRoot, name);
-  if (existsSync(from)) {
-    const to = `${from}.types-drift.bak`;
-    renameSync(from, to);
-    renamed.push({ from, to });
-  }
-}
-
-try {
-  execFileSync('pnpm', ['--filter', '@cleanstart/cms', 'run', 'generate:types'], {
-    stdio: 'inherit',
-    cwd: repoRoot,
-    env: {
-      ...process.env,
-      // Stubs so Payload's config can boot without the real .env present.
-      DATABASE_URI: process.env.DATABASE_URI ?? 'postgres://stub@localhost:5432/stub',
-      PAYLOAD_SECRET: process.env.PAYLOAD_SECRET ?? 'stub',
-    },
-  });
-} finally {
-  for (const { from, to } of renamed) {
-    if (existsSync(to)) renameSync(to, from);
-  }
-}
+execFileSync('pnpm', ['--filter', '@cleanstart/cms', 'run', 'generate:types'], {
+  stdio: 'inherit',
+  cwd: repoRoot,
+});
 
 const after = readFileSync(typesFile, 'utf8');
 
