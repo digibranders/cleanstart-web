@@ -120,10 +120,18 @@ export function HowCleanStartHelp() {
               Cutout: top-left 654×340 — CISO card (308px) + gap (32px) so the gap zone
               shows as section background (#F6F6F6), not white.
               All corners: 40px radius (r=40 → koff=22.09px). */}
+          {/* preserveAspectRatio="none" is intentional here: the L-shape has
+              CONCAVE corners that meet at coordinates calibrated to the
+              container's two card rows. Switching to `xMidYMid meet` would
+              shrink the SVG and leave whitespace where the L should reach
+              card edges, and a two-rounded-divs alternative cannot render
+              the concave junction without an SVG mask. The minor corner-
+              radius skew at off-1276 widths is the lesser-evil trade. */}
           <svg
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-full w-full hidden md:block"
             viewBox="0 0 1276 678"
+            // eslint-disable-next-line no-restricted-syntax -- see comment above
             preserveAspectRatio="none"
             style={{ zIndex: 0 }}
           >
@@ -164,12 +172,12 @@ function CisoCard({
 }) {
   return (
     <article
-      className="relative flex h-[308px] w-full flex-col overflow-hidden"
+      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col overflow-hidden"
       style={{
         borderRadius: "40px",
         background:
           "linear-gradient(135deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
-        padding: "32px 52px",
+        padding: "clamp(20px, 3vw, 32px) clamp(24px, 4vw, 52px)",
       }}
     >
       {/* Tab pill at top-left */}
@@ -286,8 +294,8 @@ function TabPill({
 function FeatureCardItem({ card }: { card: FeatureCard }) {
   return (
     <article
-      className="relative flex h-[308px] w-full items-center gap-6"
-      style={{ paddingLeft: "70px", paddingRight: "70px" }}
+      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full items-center gap-6"
+      style={{ paddingLeft: "clamp(16px, 5vw, 70px)", paddingRight: "clamp(16px, 5vw, 70px)" }}
     >
       {/* Gear orb — Figma-exact: solid lavender ellipse #DF9BFF (165×165 at (-3, 1))
           BLURRED to be a soft glow, with gear image (161×160 at (20, 11)) on top.
@@ -335,13 +343,13 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
       {/* Title + description */}
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         <h3
-          className="font-display text-[2rem] font-bold leading-none tracking-[-0.05em] text-[#111111]"
+          className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em] text-[#111111]"
           style={{ maxWidth: "234px" }}
         >
           {card.title}
         </h3>
         <p
-          className="text-[1.375rem] font-normal leading-[1.4] tracking-[-0.05em] text-[#333333]"
+          className="text-body-lg font-normal leading-[1.4] tracking-[-0.05em] text-[#333333]"
           style={{ maxWidth: "244px" }}
         >
           {card.description}

@@ -2,13 +2,13 @@
   "measuredAt": "2026-05-20",
   "totals": {
     "files": 206,
-    "warnings": 79,
+    "warnings": 74,
     "errors": 0
   },
   "byRule": {
-    "arbitrary `text-[Xrem]` is forbidden": 16,
+    "arbitrary `text-[Xrem]` is forbidden": 12,
     "flat-px `fontSize:` in inline style is forbidden outside the documented allow-list": 57,
-    "`preserveAspectRatio=\"none\"` distorts paths": 2,
+    "`preserveAspectRatio=\"none\"` distorts paths": 1,
     "bare `w-[Xpx]` without a `max-w-[*]` qualifier is forbidden": 4
   }
 }

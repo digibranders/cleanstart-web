@@ -43,7 +43,7 @@ const CLEANSTART_FEATURES = [
 export function SecurityNotPatching() {
   return (
     <section
-      className="relative w-full overflow-hidden bg-[#F6F6F6] py-32"
+      className="relative w-full overflow-hidden bg-[#F6F6F6] py-section-md"
       aria-labelledby="security-title"
     >
       <div className="relative mx-auto w-full max-w-[1276px] px-6">
@@ -180,7 +180,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
              the visible outcome with two distinct CSS gradients tuned to the
              eyeball colors of the rendered Figma textures. */}
         <div
-          className="relative flex h-[130px] w-full items-center justify-center gap-3 overflow-hidden"
+          className="relative flex h-[clamp(96px,9vw,130px)] w-full items-center justify-center gap-3 overflow-hidden"
           style={{
             background: isPublic
               ? // LEFT (Public Images) — desaturated texture overlay → reads black
@@ -261,7 +261,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                   sizes="41px"
                   className="h-[47px] w-[41px]"
                 />
-                <span className="font-display text-[2rem] font-bold leading-none tracking-[-0.05em] text-white">
+                <span className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em] text-white">
                   Public Images
                 </span>
               </>
@@ -280,7 +280,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
         </div>
 
         {/* White content area — Figma inner body rect 108:7965/108:7903 is 441px tall. */}
-        <div className="relative h-[441px] overflow-hidden bg-white">
+        <div className="relative min-h-[clamp(360px,32vw,441px)] overflow-hidden bg-white">
           {/* Decorative blobs (Figma Ellipse 46681 #DF9BFF + 46682 #2CC1EB) */}
           <div
             aria-hidden
@@ -336,7 +336,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                   />
                 )}
                 <span
-                  className="text-[1.375rem] tracking-[-0.01em] text-[#333333]"
+                  className="text-body-lg tracking-[-0.01em] text-[#333333]"
                   style={{ fontWeight: isPublic ? 600 : 700 }}
                 >
                   {label}
@@ -366,6 +366,11 @@ function KubrMascot() {
   // Section-relative left edge: 525 / 1276 ≈ 41.14%
   const KUBR_LEFT = "41.14%";
   const KUBR_BOTTOM = "-15px";
+  // Mascot is a decorative accent that overlaps the card gap. On narrow
+  // viewports the cards stack vertically and the mascot would land in the
+  // wrong gap, so we hide it below `md` per the v3 Consistency Layer
+  // decorative-element rules (see apps/web/docs/design-tokens.md).
+  const MASCOT_WIDTH = "clamp(180px, 18vw, 290px)";
 
   return (
     <>
@@ -374,12 +379,12 @@ function KubrMascot() {
           wing/tail tucked behind it. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute hidden md:block"
         style={{
           left: KUBR_LEFT,
           bottom: KUBR_BOTTOM,
-          width: KUBR_W,
-          height: KUBR_H,
+          width: MASCOT_WIDTH,
+          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
           zIndex: 1,
           WebkitMaskImage:
             "linear-gradient(90deg, #000 0%, #000 33%, transparent 36%, transparent 100%)",
@@ -401,12 +406,12 @@ function KubrMascot() {
           OUT (drawn by the tail layer behind the cards instead). */}
       <div
         aria-hidden
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute hidden md:block"
         style={{
           left: KUBR_LEFT,
           bottom: KUBR_BOTTOM,
-          width: KUBR_W,
-          height: KUBR_H,
+          width: MASCOT_WIDTH,
+          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
           zIndex: 30,
           WebkitMaskImage:
             "linear-gradient(90deg, transparent 0%, transparent 33%, #000 36%, #000 100%)",
