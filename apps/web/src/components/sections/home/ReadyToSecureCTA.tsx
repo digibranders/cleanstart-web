@@ -10,7 +10,12 @@ export function ReadyToSecureCTAOverlay() {
     <div
       aria-hidden
       className="pointer-events-none absolute z-10"
-      style={{ left: "63px", top: "-154px", width: "304px", height: "206px" }}
+      style={{
+        left: "clamp(20px, 5vw, 63px)",
+        top: "clamp(-154px, -10vw, -90px)",
+        width: "clamp(180px, 18vw, 304px)",
+        aspectRatio: "304 / 206",
+      }}
     >
       <Image
         src="/images/cta-kubr.png"
@@ -33,7 +38,7 @@ export function ReadyToSecureCTAOverlay() {
 export function ReadyToSecureCTA() {
   return (
     <div
-      className="absolute inset-0 grid grid-cols-1 items-start gap-y-8 p-8 md:gap-y-0 md:p-12 lg:items-start lg:[grid-template-columns:401px_493px] lg:[column-gap:115px] lg:[padding:80px_145px_80px_122px]"
+      className="absolute inset-0 grid grid-cols-1 items-start gap-y-8 p-8 md:gap-y-0 md:p-12 lg:items-start lg:grid-cols-[minmax(280px,401px)_minmax(360px,493px)] lg:gap-x-[clamp(40px,9vw,115px)] lg:p-[clamp(40px,6vw,80px)_clamp(48px,10vw,145px)_clamp(40px,6vw,80px)_clamp(48px,8vw,122px)]"
       style={{
         background: "linear-gradient(180deg, #131E8F 0%, #471EC0 100%)",
       }}
@@ -62,7 +67,7 @@ export function ReadyToSecureCTA() {
 
       <div className="relative z-10 flex flex-col items-start gap-[18px]">
         <p
-          className="text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white/80"
+          className="text-body-lg font-normal leading-[1.4] tracking-[-0.04em] text-white/80"
           style={{ maxWidth: "493px" }}
         >
           Start with zero-CVE hardened images. Deploy faster with confidence
