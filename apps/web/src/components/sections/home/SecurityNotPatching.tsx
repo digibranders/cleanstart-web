@@ -184,9 +184,9 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
           style={{
             background: isPublic
               ? // LEFT (Public Images) — desaturated texture overlay → reads black
-                "linear-gradient(135deg, #151021 0%, #1A1733 60%, #221A3D 100%)"
+              "linear-gradient(135deg, #151021 0%, #1A1733 60%, #221A3D 100%)"
               : // RIGHT (CleanStart) — full-color texture overlay → reads vivid purple
-                "linear-gradient(135deg, #1B0E33 0%, #2B1456 40%, #471EC0 100%)",
+              "linear-gradient(135deg, #1B0E33 0%, #2B1456 40%, #471EC0 100%)",
           }}
         >
           {/* Decorative right-side watermark (Figma 34% white SOFT_LIGHT)
@@ -364,7 +364,7 @@ function KubrMascot() {
   const KUBR_W = 290;
   const KUBR_H = 299;
   // Section-relative left edge: 525 / 1276 ≈ 41.14%
-  const KUBR_LEFT = "41.14%";
+  const KUBR_LEFT = "39%";
   const KUBR_BOTTOM = "-15px";
   // Mascot is a decorative accent that overlaps the card gap. On narrow
   // viewports the cards stack vertically and the mascot would land in the

@@ -1,3 +1,19 @@
+/**
+ * Pattern-11 partial collapse (Sprint 3 Day 4):
+ *   - Lowered `hidden xl:block` / `xl:hidden` -> `lg:block` / `lg:hidden`.
+ *     The 1024-1279 dead zone (where neither the desktop chart nor the
+ *     mobile fallback rendered cleanly) now picks up the desktop layout.
+ *   - Replaced the 8 flat-px `fontSize: 20px / 16px` workflow labels with
+ *     `text-body-lg` / `text-body-md` tokens (v3 Consistency Layer).
+ *
+ * Still owed (v3 plan Sprint 3 follow-up): the workflow-chart geometry
+ * (wavy line + 4 nodes + 4 connector lines + 4 labels) is still drawn
+ * with 1276-frame absolute coordinates inside a `width: 1276px` chart
+ * container. At lg+ (>=1024) the container is wider than 1276 px only
+ * at >=1440 viewports, so between 1024-1439 the chart visually overflows
+ * the content rail until viewport >= 1440 where it fits. Full collapse
+ * to a proportional-scaled (transform: scale(min(1, container/1276)))
+ * or percent-coordinate layout is the next step. */
 const WORKFLOW = [
   {
     label: "Continuous Visibility",
@@ -32,7 +48,7 @@ export function CleanSightSecurity(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/cleansight/security-crystal.png"
         alt=""
         style={{
@@ -51,7 +67,7 @@ export function CleanSightSecurity(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/cleansight/security-crystal.png"
         alt=""
         style={{
@@ -103,7 +119,7 @@ export function CleanSightSecurity(): React.ReactElement {
             Right cards: left=682px, width=595, height=207
             Shield:      left=427px, width=444, height=470  */}
         <div
-          className="relative hidden xl:block"
+          className="relative hidden lg:block"
           style={{ marginTop: "84px", height: "510px" }}
         >
           {/* Left card — top row */}
@@ -350,7 +366,7 @@ export function CleanSightSecurity(): React.ReactElement {
         </div>
 
         {/* ── Mobile: shield + 2×2 card grid ── */}
-        <div className="xl:hidden mt-10">
+        <div className="lg:hidden mt-10">
           <div className="flex justify-center mb-8">
             <div
               className="relative overflow-hidden"
@@ -435,7 +451,7 @@ export function CleanSightSecurity(): React.ReactElement {
       {/* Divider — 1px hairline, 1280px wide, centred (xl only) */}
       <div
         aria-hidden
-        className="hidden xl:block mx-auto"
+        className="hidden lg:block mx-auto"
         style={{ marginTop: "80px", maxWidth: "1280px", height: "1px", overflow: "hidden" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -475,7 +491,7 @@ export function CleanSightSecurity(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          className="pointer-events-none select-none absolute hidden xl:block"
+          className="pointer-events-none select-none absolute hidden lg:block"
           src="/images/cleansight/security-union-right.svg"
           alt=""
           style={{
@@ -492,7 +508,7 @@ export function CleanSightSecurity(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          className="pointer-events-none select-none absolute hidden xl:block"
+          className="pointer-events-none select-none absolute hidden lg:block"
           src="/images/cleansight/security-union-left.svg"
           alt=""
           style={{
@@ -554,7 +570,7 @@ export function CleanSightSecurity(): React.ReactElement {
 
         {/* ── Desktop chart — 1276px content box absolutely centred ── */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 hidden xl:block"
+          className="absolute left-1/2 -translate-x-1/2 hidden lg:block"
           style={{ top: "0px", width: "1276px", height: "814px" }}
         >
           {/* Wavy line: left=9, top=342, w=1255, h=511 */}
@@ -712,9 +728,9 @@ export function CleanSightSecurity(): React.ReactElement {
             }}
           >
             <p
+              className="text-body-lg"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "20px",
                 fontWeight: 600,
                 letterSpacing: "-0.037em",
                 lineHeight: 1.3,
@@ -723,9 +739,9 @@ export function CleanSightSecurity(): React.ReactElement {
               Continuous Visibility
             </p>
             <p
+              className="text-body-md"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "16px",
                 fontWeight: 400,
                 letterSpacing: "-0.037em",
                 lineHeight: 1.3,
@@ -749,9 +765,9 @@ export function CleanSightSecurity(): React.ReactElement {
             }}
           >
             <p
+              className="text-body-lg"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "20px",
                 fontWeight: 600,
                 letterSpacing: "-0.037em",
                 lineHeight: 1.3,
@@ -760,9 +776,9 @@ export function CleanSightSecurity(): React.ReactElement {
               Risk Prioritization
             </p>
             <p
+              className="text-body-md"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "16px",
                 fontWeight: 400,
                 letterSpacing: "-0.037em",
                 lineHeight: 1.3,
@@ -786,9 +802,9 @@ export function CleanSightSecurity(): React.ReactElement {
             }}
           >
             <p
+              className="text-body-lg"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "20px",
                 fontWeight: 600,
                 letterSpacing: "-0.037em",
                 lineHeight: 1.3,
@@ -797,9 +813,9 @@ export function CleanSightSecurity(): React.ReactElement {
               Built-In Compliance
             </p>
             <p
+              className="text-body-md"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "16px",
                 fontWeight: 400,
                 letterSpacing: "-0.037em",
                 lineHeight: 1.3,
@@ -823,9 +839,9 @@ export function CleanSightSecurity(): React.ReactElement {
             }}
           >
             <p
+              className="text-body-lg"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "20px",
                 fontWeight: 600,
                 letterSpacing: "-0.037em",
                 lineHeight: 1.3,
@@ -834,9 +850,9 @@ export function CleanSightSecurity(): React.ReactElement {
               Faster Remediation
             </p>
             <p
+              className="text-body-md"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "16px",
                 fontWeight: 400,
                 letterSpacing: "-0.037em",
                 lineHeight: 1.3,
@@ -850,7 +866,7 @@ export function CleanSightSecurity(): React.ReactElement {
 
         {/* Mobile fallback */}
         <div
-          className="xl:hidden relative mx-auto max-w-[1276px] px-4 sm:px-6"
+          className="lg:hidden relative mx-auto max-w-[1276px] px-4 sm:px-6"
           style={{ paddingTop: "240px", paddingBottom: "64px" }}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
