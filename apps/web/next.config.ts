@@ -10,6 +10,17 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(process.cwd(), "..", ".."),
   },
+  webpack: (config, { dev }) => {
+    if (dev) {
+      // Force polling on OneDrive/network drives where native fs events don't fire.
+      config.watchOptions = {
+        ...config.watchOptions,
+        poll: 800,
+        aggregateTimeout: 300,
+      };
+    }
+    return config;
+  },
   async redirects() {
     return [
       {

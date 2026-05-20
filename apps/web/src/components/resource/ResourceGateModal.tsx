@@ -99,9 +99,6 @@ export function ResourceGateModal({
           justify-content: center;
         }
       `}</style>
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: backdrop-click-to-close.
-          Keyboard users dismiss via Escape, handled by the native dialog's
-          onCancel above — no keyboard-only navigation gap. */}
       <dialog
         ref={dialogRef}
         onClose={onClose}
@@ -110,13 +107,22 @@ export function ResourceGateModal({
           onClose();
         }}
         onClick={(e) => {
+          // Backdrop click — close when the click landed on the dialog
+          // surface itself, not the inner panel.
           if (e.target === e.currentTarget) onClose();
+        }}
+        onKeyDown={(e) => {
+          if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
+            onClose();
+          }
         }}
         className="cs-gate-modal"
         aria-labelledby="rgm-title"
       >
         <div
           role="document"
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
           style={{
             width: "min(520px, calc(100vw - 32px))",
             maxHeight: "calc(100dvh - 32px)",
