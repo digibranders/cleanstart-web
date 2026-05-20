@@ -1,6 +1,7 @@
 {
   "name": "@cleanstart/web",
   "version": "0.0.1",
+  "description": "CleanStart marketing site — Next.js 16 + Tailwind v4. Consumes @cleanstart/ui primitives and reads content from @cleanstart/cms.",
   "private": true,
   "type": "module",
   "scripts": {
