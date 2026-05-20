@@ -155,7 +155,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
 
   return (
     <div
-      className="relative mx-auto w-full lg:max-w-[clamp(440px,40vw,560px)]"
+      className="relative mx-auto w-full lg:max-w-[clamp(380px,32vw,480px)]"
       style={{
         borderRadius: 40,
         background: "#2CC1EB", // outer cyan border (visible 10px around inner)
