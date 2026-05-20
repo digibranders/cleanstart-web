@@ -58,6 +58,12 @@ const ALLOW_LIST = new Set<string>([
   'ListQueryProvider',
   'SelectionProvider',
   'TableColumnsProvider',
+  // `RowLabelProvider` is the context-side counterpart of `useRowLabel`
+  // (already allowed): it threads `path` and `rowNumber` down to nested
+  // field components so they can resolve the row label without prop
+  // drilling. Pure context wiring, no render surface — same shape as the
+  // other *Provider entries above.
+  'RowLabelProvider',
   'FieldPathContext',
   'Gutter',
   // Phase D primitives still allowed during the multi-wave migration —
