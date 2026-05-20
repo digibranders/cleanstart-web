@@ -33,7 +33,7 @@ export function LatestBlogs({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ background: "#f6f6f6", paddingBottom: "250px" }}
+      style={{ background: "#f6f6f6", paddingBottom: "var(--spacing-section-cta)" }}
       data-section="LatestBlogs"
     >
       {/* Radial gradient blobs — Figma 255:9352 left (-616,1407) 1181×1181, 255:9353 right (1238,1512) 1181×1181 */}
@@ -141,11 +141,8 @@ export function LatestBlogs({
           <>
             {/* 3-column grid of cards */}
             <div
-              className="grid"
-              style={{
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: "32px",
-              }}
+              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+              style={{ gap: "32px", justifyItems: "center" }}
             >
               {posts.map((post) => (
                 <BlogCard key={post.id} post={post} />

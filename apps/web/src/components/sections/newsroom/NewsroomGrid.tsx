@@ -33,7 +33,7 @@ export function NewsroomGrid({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ background: "#f6f6f6", paddingTop: "80px", paddingBottom: "250px" }}
+      style={{ background: "#f6f6f6", paddingTop: "clamp(48px, 6vw, 80px)", paddingBottom: "var(--spacing-section-cta)" }}
       data-section="NewsroomGrid"
     >
       {/* Radial gradient unions — Figma node 402:5013, four 1181×1181 #640DFB blobs at 10% opacity.
@@ -154,8 +154,8 @@ export function NewsroomGrid({
         ) : (
           <>
             <div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-              style={{ gap: "24px" }}
+              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+              style={{ gap: "24px", justifyItems: "center" }}
             >
               {items.map((item) => (
                 <NewsroomCard key={item.id} item={item} />

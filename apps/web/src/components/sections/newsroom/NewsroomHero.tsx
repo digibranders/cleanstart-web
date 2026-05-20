@@ -2,7 +2,7 @@ export function NewsroomHero(): React.ReactElement {
   return (
     <section
       className="relative overflow-hidden"
-      style={{ height: "498px", background: "#151021" }}
+      style={{ minHeight: "clamp(380px, 35vw, 498px)", background: "#151021" }}
       aria-labelledby="newsroom-hero-title"
     >
       {/* Grid mask — 71.11px squares with #2A1F56 borders; full-section width so it scales with the viewport (1280, 1440, …). Masked so the pattern only appears at the four corners and fades toward the centre */}
@@ -170,7 +170,7 @@ export function NewsroomHero(): React.ReactElement {
       <div className="relative mx-auto max-w-[1276px] px-6">
         <div
           className="flex flex-col items-center gap-6 mx-auto text-center"
-          style={{ paddingTop: "146px", maxWidth: "623px" }}
+          style={{ paddingTop: "clamp(88px, 11vw, 146px)", paddingBottom: "clamp(40px, 5vw, 80px)", maxWidth: "623px" }}
         >
           <h1
             id="newsroom-hero-title"

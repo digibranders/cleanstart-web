@@ -106,9 +106,8 @@ function PostCard({ post }: { post: Blog }): React.ReactElement {
           </span>
         )}
         <h3
-          className="font-display font-semibold text-white line-clamp-2"
+          className="font-display text-card-title-sm font-semibold text-white line-clamp-2"
           style={{
-            fontSize: "1.125rem",
             lineHeight: 1.3,
             letterSpacing: "-0.01em",
           }}

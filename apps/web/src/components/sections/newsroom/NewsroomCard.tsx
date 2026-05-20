@@ -17,10 +17,9 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
 
   return (
     <article
-      className="relative bg-white overflow-hidden"
+      className="relative flex w-full max-w-[404px] flex-col bg-white overflow-hidden"
       style={{
-        width: "404px",
-        height: "521px",
+        minHeight: "clamp(440px, 38vw, 521px)",
         borderRadius: "32px",
         boxShadow:
           "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
@@ -28,12 +27,9 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
     >
       {/* Card image */}
       <div
-        className="absolute overflow-hidden flex items-center justify-center"
+        className="relative shrink-0 overflow-hidden flex items-center justify-center m-3"
         style={{
-          top: "12px",
-          left: "12px",
-          width: "380px",
-          height: "200px",
+          aspectRatio: "380 / 200",
           borderRadius: "20px",
           background:
             "linear-gradient(180deg, #10123e 0%, #131e8f 38%, #421ebc 100%)",
@@ -55,7 +51,7 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
             alt={item.heroImage?.alt ?? item.title}
             fill
             className="object-cover"
-            sizes="380px"
+            sizes="(min-width: 1280px) 380px, (min-width: 768px) 45vw, 90vw"
           />
         ) : (
           <span
@@ -72,22 +68,13 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
       </div>
 
       {/* Category badge — overlaps image bottom */}
-      <div
-        className="absolute"
-        style={{ top: "190px", left: "32px", zIndex: 1 }}
-      >
+      <div className="relative px-8" style={{ marginTop: "-12px", zIndex: 1 }}>
         <CategoryBadge label={pillLabel} />
       </div>
 
       {/* Card content — fills remaining height, Read more pinned to bottom */}
       <div
-        className="absolute flex flex-col justify-between"
-        style={{
-          top: "247px",
-          left: "32px",
-          right: "32px",
-          bottom: "32px",
-        }}
+        className="relative flex flex-1 flex-col justify-between pt-4 pb-8 px-8"
       >
         <div className="flex flex-col" style={{ gap: "12px" }}>
           {/* Meta row: date + read time */}
@@ -139,7 +126,7 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
           {/* Title + abstract */}
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <h3
-              className="font-display text-[clamp(1rem,1.67vw,1.5rem)] font-medium leading-[1.3] tracking-[-0.05em] overflow-hidden"
+              className="font-display text-card-title-md font-medium leading-[1.3] tracking-[-0.05em] overflow-hidden"
               style={{
                 color: "#111",
                 display: "-webkit-box",
@@ -153,7 +140,7 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
             </h3>
             {item.abstract && (
               <p
-                className="text-base font-normal leading-[1.3] overflow-hidden"
+                className="text-body-md font-normal leading-[1.3] overflow-hidden"
                 style={{
                   color: "rgba(17,17,17,0.54)",
                   display: "-webkit-box",
@@ -177,7 +164,7 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
           aria-label={`Read more about ${item.title}`}
         >
           <span
-            className="text-xl font-medium leading-[1.5] text-center whitespace-nowrap"
+            className="text-body-lg font-medium leading-[1.5] text-center whitespace-nowrap"
             style={{ color: "#4a3bf1" }}
           >
             Read more

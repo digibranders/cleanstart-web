@@ -19,7 +19,7 @@ export function UpcomingEventHero({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ minHeight: "746px", background: HERO_GRADIENT }}
+      style={{ minHeight: "clamp(560px, 52vw, 746px)", background: HERO_GRADIENT }}
       aria-labelledby="events-hero-title"
     >
       {/* Decorative isometric cube — left side */}
@@ -87,7 +87,7 @@ export function UpcomingEventHero({
 
       <div
         className="relative mx-auto max-w-[1276px] px-6"
-        style={{ paddingTop: "160px", paddingBottom: "80px" }}
+        style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(48px, 6vw, 80px)" }}
       >
         {/* Page title */}
         <h1
@@ -136,7 +136,7 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
       className="relative w-full mx-auto overflow-visible"
       style={{
         maxWidth: "1276px",
-        height: "368px",
+        minHeight: "clamp(300px, 30vw, 368px)",
         borderRadius: "20px",
         background: "rgba(165, 103, 255, 0.4)",
         backdropFilter: "blur(4px)",
@@ -214,8 +214,8 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
               decoding="async"
             />
             <span
-              className="font-display font-semibold text-white leading-none whitespace-nowrap"
-              style={{ fontSize: "16px", letterSpacing: "-0.05em" }}
+              className="font-display text-body-md font-semibold text-white leading-none whitespace-nowrap"
+              style={{ letterSpacing: "-0.05em" }}
             >
               {longDate}
             </span>
@@ -223,13 +223,12 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
         </div>
       )}
 
-      <div className="relative flex h-full items-stretch" style={{ padding: "32px" }}>
+      <div className="relative flex h-full flex-col lg:flex-row items-stretch" style={{ padding: "32px", gap: "44px" }}>
         {/* Left: image */}
         <div
-          className="relative shrink-0 overflow-hidden"
+          className="relative w-full lg:max-w-[585px] shrink-0 overflow-hidden"
           style={{
-            width: "585px",
-            height: "304px",
+            aspectRatio: "585 / 304",
             borderRadius: "12px",
             background: "#251a55",
           }}
@@ -258,7 +257,6 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
         <div
           className="flex flex-col justify-between"
           style={{
-            marginLeft: "44px",
             paddingTop: "12px",
             paddingBottom: "12px",
             flex: 1,
@@ -326,7 +324,7 @@ function EmptyHeroCard(): React.ReactElement {
       className="relative w-full mx-auto overflow-visible"
       style={{
         maxWidth: "1276px",
-        height: "368px",
+        minHeight: "clamp(300px, 30vw, 368px)",
         borderRadius: "20px",
         background: "rgba(165, 103, 255, 0.4)",
         backdropFilter: "blur(4px)",
@@ -398,9 +396,8 @@ function MetaRow({
         decoding="async"
       />
       <span
-        className="text-white font-medium leading-none"
+        className="text-body-lg text-white font-medium leading-none"
         style={{
-          fontSize: "20px",
           letterSpacing: "-0.05em",
         }}
       >

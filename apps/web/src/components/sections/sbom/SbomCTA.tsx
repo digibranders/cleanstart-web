@@ -65,7 +65,7 @@ export function SbomCTA(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "55px",
+              fontSize: "clamp(34px, 2.86vw, 55px)",
               fontWeight: 700,
               letterSpacing: "-0.05em",
               lineHeight: 1.05,
@@ -85,7 +85,7 @@ export function SbomCTA(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "21px",
+              fontSize: "clamp(15px, 1.15vw, 22px)",
               fontWeight: 400,
               letterSpacing: "-0.04em",
               lineHeight: 1.5,
@@ -160,7 +160,7 @@ export function SbomCTA(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "14px",
+            fontSize: "clamp(13px, 1vw, 15px)",
             fontWeight: 400,
             letterSpacing: "-0.03em",
             lineHeight: 1.4,
