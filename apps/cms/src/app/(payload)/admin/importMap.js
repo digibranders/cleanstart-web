@@ -84,6 +84,7 @@ import { FlaggedLeadsTab as FlaggedLeadsTab_e23fb65ad956ac1ee9fd221fde0635a2 } f
 import { FaqBulkPaste as FaqBulkPaste_34cc49081ef861ac2f0f2bcdbdf5a9d4 } from '@/payload/admin/components/FaqBulkPaste.tsx'
 import { FaqRowLabel as FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3 } from '@/payload/admin/components/FaqRowLabel.tsx'
 import { RelationshipCell as RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f } from '@/payload/admin/components/RelationshipCell.tsx'
+import { JourneyMirrorWarning as JourneyMirrorWarning_3abda007c0ebfa53802167f8b499d469 } from '@/payload/admin/components/JourneyMirrorWarning.tsx'
 import { BlocksField as BlocksField_81821d6c72d1fc3a46ee03c3fb264707 } from '@/payload/admin/components/fields/BlocksField.tsx'
 import { DisplayPublishedAtField as DisplayPublishedAtField_674dd1fe267834f856a037d2738a80d1 } from '@/payload/admin/components/DisplayPublishedAtField.tsx'
 import { HiddenField as HiddenField_551417bca9579543e47edbdd4648802b } from '@/payload/admin/components/HiddenField.tsx'
@@ -205,6 +206,7 @@ export const importMap = {
   "@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste": FaqBulkPaste_34cc49081ef861ac2f0f2bcdbdf5a9d4,
   "@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel": FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3,
   "@/payload/admin/components/RelationshipCell.tsx#RelationshipCell": RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f,
+  "@/payload/admin/components/JourneyMirrorWarning.tsx#JourneyMirrorWarning": JourneyMirrorWarning_3abda007c0ebfa53802167f8b499d469,
   "@/payload/admin/components/fields/BlocksField.tsx#BlocksField": BlocksField_81821d6c72d1fc3a46ee03c3fb264707,
   "@/payload/admin/components/DisplayPublishedAtField.tsx#DisplayPublishedAtField": DisplayPublishedAtField_674dd1fe267834f856a037d2738a80d1,
   "@/payload/admin/components/HiddenField.tsx#HiddenField": HiddenField_551417bca9579543e47edbdd4648802b,

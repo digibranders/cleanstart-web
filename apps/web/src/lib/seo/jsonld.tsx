@@ -76,6 +76,8 @@ export interface BlogPostingSchemaInput {
   imageUrl?: string | undefined;
   authors?: Array<{ name: string }> | undefined;
   category?: string | undefined;
+  /** Site-relative paths (`/blog/foo`) for editorially-linked sibling posts. */
+  relatedLinks?: string[] | undefined;
 }
 
 export function blogPostingSchema({
@@ -87,8 +89,13 @@ export function blogPostingSchema({
   imageUrl,
   authors,
   category,
+  relatedLinks,
 }: BlogPostingSchemaInput) {
   const lastModified = modifiedAt ?? publishedAt;
+  const cleanRelatedLinks =
+    relatedLinks && relatedLinks.length > 0
+      ? relatedLinks.map((p) => absoluteUrl(p))
+      : undefined;
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -104,6 +111,7 @@ export function blogPostingSchema({
         }
       : {}),
     ...(category ? { articleSection: category } : {}),
+    ...(cleanRelatedLinks ? { relatedLink: cleanRelatedLinks } : {}),
     publisher: { "@id": ORGANIZATION_ID },
   };
 }

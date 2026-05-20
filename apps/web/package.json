@@ -13,6 +13,7 @@
     "lint:eslint": "eslint 'src/**/*.{ts,tsx}'",
     "lint:eslint:count": "node scripts/lint-warn-count.mjs",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
     "test:e2e:ui": "playwright test --ui",
@@ -49,6 +50,7 @@
     "eslint": "^10.4.0",
     "shadcn": "^4.7.0",
     "tailwindcss": "^4",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.9"
   }
 }

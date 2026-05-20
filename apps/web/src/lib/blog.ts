@@ -193,6 +193,8 @@ export type BlogDetail = Blog & {
   body?: LexicalRoot | null;
   tableOfContents?: TocEntry[] | null;
   relatedPosts?: Blog[] | null;
+  previousPost?: Blog | string | null;
+  nextPost?: Blog | string | null;
   faqs?: BlogFaqItem[] | null;
 };
 
@@ -328,34 +330,187 @@ export async function getBlogBySlugDraft(slug: string): Promise<BlogDetail | nul
   return loadBlogBySlug(slug, true);
 }
 
+const RELATED_TARGET = 3;
+// Fill queries overshoot the remaining-slots count so client-side dedupe
+// against already-picked ids has headroom without a second round-trip.
+const RELATED_FILL_OVERSHOOT = 5;
+
+/**
+ * Builds the Related Blogs grid for the blog detail page using a merge
+ * strategy that honors editor intent first, then fills with freshness:
+ *
+ *   1. Curated `relatedPosts` (in editor order, published-only).
+ *   2. Latest published in the same category, excluding self + already-picked.
+ *   3. Latest published site-wide, excluding self + already-picked.
+ *
+ * Capped at 3. Curated picks are never re-sorted by date.
+ *
+ * `curated` accepts the raw `relatedPosts` field from the parent post —
+ * Payload may return it as an array of ids (depth=0) or hydrated docs
+ * (depth >= 1). Both shapes are handled.
+ */
 export async function getRelatedBlogs(
   blogId: string,
   categoryIds: string[],
+  curated: Array<Blog | string | number> | null | undefined,
   { draft = false }: { draft?: boolean } = {},
 ): Promise<Blog[]> {
   const filter = draft ? "" : `${PUBLISHED_FILTER}&`;
-  if (categoryIds.length === 0) {
+  const picked: Blog[] = [];
+  const excluded = new Set<string>([String(blogId)]);
+
+  // 1. Curated. Fetch by id with the published filter so unpublished
+  //    picks silently drop out and the fill stages compensate.
+  //    `curated` may be hydrated docs (depth >= 1) or raw ids (depth=0);
+  //    Payload's Postgres adapter uses numeric ids, normalize to string.
+  const curatedIds = (curated ?? [])
+    .map((c): string | null => {
+      if (c == null) return null;
+      if (typeof c === "object") return c.id != null ? String(c.id) : null;
+      return String(c);
+    })
+    .filter((id): id is string => Boolean(id) && id !== String(blogId));
+
+  if (curatedIds.length > 0) {
+    const idParams = curatedIds
+      .map((id, i) => `where[id][in][${i}]=${encodeURIComponent(id)}`)
+      .join("&");
     const data = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?${filter}where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
+      `/api/blogs?${filter}${idParams}&depth=2&limit=${curatedIds.length}`,
       { draft },
     );
-    return data.docs;
+    const byId = new Map(data.docs.map((d) => [String(d.id), d]));
+    for (const id of curatedIds) {
+      if (picked.length >= RELATED_TARGET) break;
+      const doc = byId.get(id);
+      if (doc && !excluded.has(String(doc.id))) {
+        picked.push(doc);
+        excluded.add(String(doc.id));
+      }
+    }
   }
-  const catParam = categoryIds
-    .map((id, i) => `where[categories][in][${i}]=${encodeURIComponent(id)}`)
-    .join("&");
+
+  if (picked.length >= RELATED_TARGET) return picked;
+
+  // 2. Category fill. Excludes only `blogId` server-side; remaining
+  //    dedupe (against curated picks) happens client-side.
+  if (categoryIds.length > 0) {
+    const catParam = categoryIds
+      .map((id, i) => `where[categories][in][${i}]=${encodeURIComponent(id)}`)
+      .join("&");
+    const remaining = RELATED_TARGET - picked.length;
+    const data = await fetchCMS<PayloadListResponse<Blog>>(
+      `/api/blogs?${filter}where[id][not_equals]=${encodeURIComponent(blogId)}&${catParam}&depth=2&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
+      { draft },
+    );
+    for (const doc of data.docs) {
+      if (picked.length >= RELATED_TARGET) break;
+      const id = String(doc.id);
+      if (excluded.has(id)) continue;
+      picked.push(doc);
+      excluded.add(id);
+    }
+  }
+
+  if (picked.length >= RELATED_TARGET) return picked;
+
+  // 3. Site-wide fill.
+  const remaining = RELATED_TARGET - picked.length;
   const data = await fetchCMS<PayloadListResponse<Blog>>(
-    `/api/blogs?${filter}where[id][not_equals]=${blogId}&${catParam}&depth=2&limit=3&sort=-publishedAt`,
+    `/api/blogs?${filter}where[id][not_equals]=${encodeURIComponent(blogId)}&depth=2&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
     { draft },
   );
-  if (data.docs.length < 3) {
-    const fallback = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?${filter}where[id][not_equals]=${blogId}&depth=2&limit=3&sort=-publishedAt`,
-      { draft },
-    );
-    return fallback.docs;
+  for (const doc of data.docs) {
+    if (picked.length >= RELATED_TARGET) break;
+    const id = String(doc.id);
+    if (excluded.has(id)) continue;
+    picked.push(doc);
+    excluded.add(id);
   }
-  return data.docs;
+
+  return picked;
+}
+
+/**
+ * Auto fallback for the editorial Previous/Next pagination. Returns the
+ * chronologically-adjacent blogs (by `publishedAt`), preferring the same
+ * category and falling back to the full blog timeline when the category
+ * has no neighbor on that side.
+ *
+ *   previous = latest published blog with `publishedAt < current.publishedAt`
+ *   next     = earliest published blog with `publishedAt > current.publishedAt`
+ *
+ * Used by `/blog/[slug]` when the editor has left one or both journey fields
+ * blank. Editorial intent (manual fields) always wins; this resolver is only
+ * consulted for the unset side.
+ *
+ * Returns `{ previous: null, next: null }` when the current post has no
+ * `publishedAt` (cannot anchor a chronological query).
+ */
+export async function getAutoJourneyTargets(
+  currentId: string,
+  publishedAt: string | undefined,
+  categoryIds: string[],
+  { draft = false }: { draft?: boolean } = {},
+): Promise<{ previous: Blog | null; next: Blog | null }> {
+  if (!publishedAt) return { previous: null, next: null };
+  const filter = draft ? "" : `${PUBLISHED_FILTER}&`;
+  const notSelf = `where[id][not_equals]=${encodeURIComponent(currentId)}`;
+  const anchor = encodeURIComponent(publishedAt);
+
+  const catParam =
+    categoryIds.length > 0
+      ? `&${categoryIds
+          .map(
+            (id, i) =>
+              `where[categories][in][${i}]=${encodeURIComponent(id)}`,
+          )
+          .join("&")}`
+      : "";
+
+  // 1. Same-category neighbors (when categories are set). Two parallel queries.
+  let previous: Blog | null = null;
+  let next: Blog | null = null;
+  if (categoryIds.length > 0) {
+    const [prevCat, nextCat] = await Promise.all([
+      fetchCMS<PayloadListResponse<Blog>>(
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}${catParam}&depth=2&limit=1&sort=-publishedAt`,
+        { draft },
+      ),
+      fetchCMS<PayloadListResponse<Blog>>(
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}${catParam}&depth=2&limit=1&sort=publishedAt`,
+        { draft },
+      ),
+    ]);
+    previous = prevCat.docs[0] ?? null;
+    next = nextCat.docs[0] ?? null;
+  }
+
+  // 2. Site-wide fallback for either side that still has no neighbor.
+  const fillTasks: Array<Promise<void>> = [];
+  if (!previous) {
+    fillTasks.push(
+      fetchCMS<PayloadListResponse<Blog>>(
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}&depth=2&limit=1&sort=-publishedAt`,
+        { draft },
+      ).then((d) => {
+        previous = d.docs[0] ?? null;
+      }),
+    );
+  }
+  if (!next) {
+    fillTasks.push(
+      fetchCMS<PayloadListResponse<Blog>>(
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}&depth=2&limit=1&sort=publishedAt`,
+        { draft },
+      ).then((d) => {
+        next = d.docs[0] ?? null;
+      }),
+    );
+  }
+  if (fillTasks.length > 0) await Promise.all(fillTasks);
+
+  return { previous, next };
 }
 
 export function formatBlogDate(iso?: string): string {
