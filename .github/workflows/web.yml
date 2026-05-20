@@ -67,8 +67,11 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Lint
+      - name: Lint (biome)
         run: pnpm --filter @cleanstart/web lint
+
+      - name: Lint (eslint - v3 Consistency Layer ratchet)
+        run: pnpm --filter @cleanstart/web lint:eslint:count
 
       - name: Typecheck
         run: pnpm --filter @cleanstart/web typecheck

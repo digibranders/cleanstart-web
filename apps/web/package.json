@@ -10,6 +10,8 @@
     "analyze": "ANALYZE=1 next build",
     "start": "next start --port 3001",
     "lint": "biome lint src",
+    "lint:eslint": "eslint 'src/**/*.{ts,tsx}'",
+    "lint:eslint:count": "node scripts/lint-warn-count.mjs",
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
@@ -42,6 +44,8 @@
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@typescript-eslint/parser": "^8.59.4",
+    "eslint": "^10.4.0",
     "shadcn": "^4.7.0",
     "tailwindcss": "^4",
     "typescript": "^5.7.3"
