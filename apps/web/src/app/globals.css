@@ -1793,5 +1793,11 @@ body {
     /* Reserve scrollbar space so route changes that add/remove a scrollable
        overflow do not cause a layout shift (Windows/Linux persistent scrollbars). */
     scrollbar-gutter: stable;
+    /* `overflow-x: clip` (not `hidden`) prevents stray decorative absolutes
+       from inflating documentElement.scrollWidth even when their card
+       ancestor already has overflow-hidden. Unlike `hidden`, `clip` does
+       NOT create a new containing block, so the fixed-position Header
+       continues to escape `<html>` naturally. */
+    overflow-x: clip;
   }
 }
