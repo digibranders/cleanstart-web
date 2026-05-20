@@ -1,10 +1,23 @@
 name: CMS CI
 
+# Skip CI for changes that can't affect the built artifact (markdown docs,
+# license, top-level READMEs). Mixed PRs that touch any non-doc path still
+# run the full suite. When branch protection is later enabled with CMS CI
+# as a required check, add an always-running "ci-passed" aggregator job
+# so docs-only PRs don't get stuck on an expected-but-skipped check.
 on:
   push:
     branches: [main, development]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'LICENSE'
   pull_request:
     branches: [main, development]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'LICENSE'
 
 concurrency:
   group: ci-${{ github.ref }}
