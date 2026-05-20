@@ -172,6 +172,21 @@ The shared `SearchBar` at `src/components/sections/_shared/SearchBar.tsx` defaul
 - Submit button: 52×44 fixed (touch-target floor; matches `--btn-h-lg`).
 - Callers may override the input wrapper via `inputWidthClassName` only if the input needs an explicit cap (e.g. compact hero variants); the default is correct for every standard listing-page hero.
 
+### Sticky-sidebar offset contract (CMS-listing + article TOC)
+
+Every page with a sticky-on-scroll sidebar (`lg:sticky`) uses the **same top offset** so the sidebar aligns to the same screen position across the site:
+
+| Surface | Offset | File |
+|---|---:|---|
+| Resource Center categories sidebar | **96px** | `ResourceCenterSidebar.tsx` |
+| Webinars filter sidebar | **96px** | `WebinarsGrid.tsx` |
+| Blog detail TOC | **96px** | `BlogDetailContent.tsx` |
+| Knowledge Hub categories sidebar | **96px** (`lg:top-24` = 6rem) | `KnowledgeHubArticle.tsx` |
+
+The Header row is `h-[72px]` and is `fixed top-0 z-40`. The 96px sticky offset gives 24px of breathing room between the Header bottom edge and the sticky sidebar top.
+
+**TOC anchor scroll-margin:** every `.article-body .article-h1` through `.article-h6` carries `scroll-margin-top: clamp(80px, 10vw, 120px)` so clicking a TOC link lands the heading 24–48px below the Header instead of underneath it. Defined once in `globals.css` (`.article-body` selectors).
+
 ### Section padding normalization commitment (2026-05-20)
 
 Every non-hero section on the marketing site uses **one** of the four `--spacing-section-*` tokens documented above. Hardcoded raw paddings (60 / 72 / 80 / 88 / 100 / 120 px) and the Tailwind triplet `py-16 md:py-20 xl:py-[120px]` shape are forbidden in new code; the lint gate's `flat-px paddingTop:` and `arbitrary py-[Xpx]` rules catch new additions.

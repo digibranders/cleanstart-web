@@ -1481,6 +1481,18 @@ body {
 }
 .article-body .article-paragraph:last-child { margin-bottom: 0; }
 
+/* Sticky-header offset for TOC anchor jumps. Matches the 96px sticky
+   contract (Header row is 72px tall; 24px breathing room). Applied to
+   every in-article heading so #anchor links don't land under the
+   fixed Header. */
+.article-body .article-h1,
+.article-body .article-h2,
+.article-body .article-h3,
+.article-body .article-h4,
+.article-body .article-h5,
+.article-body .article-h6 {
+  scroll-margin-top: clamp(80px, 10vw, 120px);
+}
 .article-body .article-h1 {
   font-size: clamp(24px, 2vw, 32px);
   font-weight: 700;

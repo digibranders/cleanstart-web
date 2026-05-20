@@ -76,7 +76,7 @@ export function WebinarsGrid({
         <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8">
           <aside
             className="shrink-0 lg:sticky"
-            style={{ top: "88px", alignSelf: "flex-start" }}
+            style={{ top: "96px", alignSelf: "flex-start" }}
           >
             <WebinarFilters
               activeType={activeType}
