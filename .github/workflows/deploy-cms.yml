@@ -1,14 +1,19 @@
 name: Deploy CMS
 
+# Gate prod deploys on a successful CMS CI run for the same commit.
+#
+# `workflow_run` fires after CMS CI completes — pass or fail — so the job
+# below guards on `conclusion == 'success'` to skip failed runs. We deploy
+# the exact SHA CI verified (`workflow_run.head_sha`), not the moving
+# branch HEAD, to keep CI evidence and the deployed artifact in lockstep.
+#
+# Manual override stays via workflow_dispatch (input SHA, no CI check) for
+# incidents where CI is wedged but a forward-only fix must ship.
 on:
-  push:
+  workflow_run:
+    workflows: ['CMS CI']
+    types: [completed]
     branches: [main]
-    paths:
-      - 'apps/cms/**'
-      - 'packages/**'
-      - 'pnpm-lock.yaml'
-      - 'apps/cms/Dockerfile'
-      - '.github/workflows/deploy-cms.yml'
   workflow_dispatch:
     inputs:
       sha:
@@ -22,13 +27,29 @@ concurrency:
 
 jobs:
   deploy:
+    # workflow_run fires on every CI completion, including failures. Only
+    # ship green ones. workflow_dispatch has no workflow_run context, so
+    # the second clause keeps manual deploys functional.
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' ||
+          github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Single source of truth for the SHA to deploy. `github.sha` is the
+    # right value for workflow_dispatch (branch HEAD), but for
+    # workflow_run it points at the default-branch tip — not the commit
+    # CI verified. Image tags, docker tag operations, and the checkout
+    # all reference DEPLOY_SHA so the artifact and the CI evidence match.
+    env:
+      DEPLOY_SHA: >-
+        ${{ inputs.sha
+            || github.event.workflow_run.head_sha
+            || github.sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.sha || github.sha }}
+          ref: ${{ env.DEPLOY_SHA }}
 
       # Buildx + GHA cache shaves ~1–2 min off subsequent builds by reusing
       # pnpm install + intermediate Next.js layers across runs. First build
@@ -38,18 +59,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image (cms:${{ github.sha }})
+      - name: Build image (cms:${{ env.DEPLOY_SHA }})
         uses: docker/build-push-action@v5
         with:
           context: .
           file: apps/cms/Dockerfile
-          tags: cms:${{ github.sha }}
+          tags: cms:${{ env.DEPLOY_SHA }}
           load: true
           cache-from: type=gha,scope=cms-deploy
           cache-to: type=gha,scope=cms-deploy,mode=max
 
       - name: Save image tarball
-        run: docker save cms:${{ github.sha }} | gzip > /tmp/cms.tar.gz
+        run: docker save cms:${{ env.DEPLOY_SHA }} | gzip > /tmp/cms.tar.gz
 
       - name: Set up SSH to droplet
         env:
@@ -201,7 +222,7 @@ jobs:
             'set -e
              cd /opt/cleanstart
              docker load < /tmp/cms.tar.gz
-             docker tag cms:${{ github.sha }} cms:current
+             docker tag cms:${{ env.DEPLOY_SHA }} cms:current
              docker compose --profile cms up -d --wait --wait-timeout 300 cms
 
              # Retention: keep cms:current + 2 most recent SHA tags for fast

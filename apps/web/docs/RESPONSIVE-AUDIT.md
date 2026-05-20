@@ -2049,4 +2049,274 @@ Everything else can be scheduled as Q3 2026 cleanups without invalidating the v2
 
 This audit is exhaustive but it's still just the map. The territory — actually fixing 600+ values across 113 files — is the work ahead. The token system in Part 7 is the lever. Build the lever first, then the rest is mechanical.
 
+---
+
+## Part 13 — v3 supplement (2026-05-20)
+
+**Authors:** CTO + senior UI/UX engineering review.
+**Scope:** delta against v2. Re-verifies the 20 worst-offender claims at HEAD, audits the **6 page surfaces shipped after 2026-05-18** (cleansight, cleanstart-images, software-bill-materials, knowledge-hub, author, podcast Waveform), and re-rates the Stream-A foundation. Methodology: 4 parallel forensic-read agents (new-surface audit, v2 re-verification, globals/primitives re-audit, CI/lint gate audit).
+
+> The v2 strategic plan in Part 0.7 stands. v3 expands its scope (more surface area to remediate) and **retitles Stream-A from "should land first" to "has not landed."** Nothing from Stream A (test scaffold, lint gate, Lighthouse CI re-enable, visual regression) shipped between 2026-05-18 and 2026-05-20. The same is true of Stream-B foundations: home metadata, `<Image sizes>` sweep, `dynamic()` imports, touch-target compliance, per-detail JSON-LD. **Treat the v3 plan below as "the v2 plan still owes everything except the audit document itself."**
+
+### 13.1 — v3 verification: what changed since v2
+
+Independent re-read of all 20 Part 5 worst-offenders against current `development` HEAD:
+
+| # | File | Status | Note |
+|---|---|---|---|
+| 1 | `ui/FactoryCard.tsx` | CONFIRMED | `h-[374px]`:10 + absolute orb/text/arrow + `text-[2.0625rem]`:86 |
+| 2 | `podcast/PodcastCTACards.tsx` | **PARTIAL-FIX** | `minHeight: clamp(360px, 30vw, 435px)`:93; guide lines now `[20,40,56,80]%`:125–139. ❌→⚠️ |
+| 3 | `home/BuiltForTeams.tsx` + `globals.css .cs-tt-*` | CONFIRMED (CSS side) | JSX uses clamp; CSS still 798×329 / 600×260 fixed (globals.css L903, L978–979, L1016, L1044, L1071–1072) |
+| 4 | `blogs/BlogCard.tsx` + `LatestBlogs.tsx` | CONFIRMED | `width: 404, height: 528` + `repeat(3, 1fr)` no md/lg variant |
+| 5 | `newsroom/NewsroomCard.tsx` + `NewsroomGrid.tsx` | CONFIRMED | `width: 404, height: 521` + absolute internals |
+| 6 | `ui/ComparisonCard.tsx` | CONFIRMED | `w-[622px]` no `max-w` qualifier:18 |
+| 7 | `home/SecurityNotPatching.tsx` | CONFIRMED | `h-[441px]`:277 + 10× `text-[1.375rem]` |
+| 8 | `home/HowCleanStartHelp.tsx` | CONFIRMED | `h-[308px]`:167 + `paddingLeft: 70px`:290 + `preserveAspectRatio="none"`:127 |
+| 9 | `home/ReadyToSecureCTA.tsx` | CONFIRMED | `lg:[grid-template-columns:401px_493px]` + `lg:[padding:80px_145px_80px_122px]`:35 |
+| 10 | `attack-surface-reduction/AsrPublicImages.tsx` | CONFIRMED | `width: 303px` corner cards:229 + `preserveAspectRatio="none"`:116 |
+| 11 | `resource-center/ResourceCenterSidebar.tsx` | PARTIAL (architectural) | `lg:w-[295px]`:23; the mobile-IA decision is unchanged. ❌→⚠️ |
+| 12 | `vulnerability-remediation/VulnAdvantage.tsx` | CONFIRMED | `gridTemplateColumns: "606px 595px"`:166 |
+| 13 | `about/AboutPowering.tsx` | CONFIRMED | `width: 346, height: 420`:140 + absolute internals |
+| 14 | `about/AboutOurStory.tsx` | CONFIRMED | `height: 600px`:5 + `<br />` × 6 (L77–82) |
+| 15 | `events/UpcomingEventHero.tsx` | CONFIRMED | Featured card `height: 368`:139 + `width: 585 shrink-0`:231; no `flex-col` breakpoint |
+| 16 | `attack-surface-reduction/AsrHero.tsx` | CONFIRMED | `minHeight: 720`:8 + `560×500 shrink-0`:142 |
+| 17 | `attack-surface-reduction/AsrFitsBuilt.tsx` | CONFIRMED | `minHeight: 352`:90 + `fontSize: 32/20`:199,211 + lines `[68,166,224,322]`:125–139 |
+| 18 | `about/AboutWhoWeAre.tsx` | CONFIRMED | `whiteSpace: nowrap`:70 + `shrink-0`:64 |
+| 19 | `attack-surface-reduction/AsrApproach.tsx` | CONFIRMED | `fontSize: 32/22`:243,256 + `paddingLeft/Right: 56`:199–201 |
+| 20 | `webinars/WebinarFilters.tsx` | CONFIRMED | `width: 299px` when stacked |
+
+**Part 10 architectural-flag re-verification:**
+
+| Flag | Status | Note |
+|---|---|---|
+| Resource Detail download bypass | **CONFIRMED — still bypasses** | `ResourceDetailHero.tsx` passes `assetHref` + `gated` to `ResourceDownloadButton` but the download fires when `assetHref !== "#"` regardless of `gateForm`. Form renderer landed (`3f009c4`) and a `ResourceGateModal.tsx` exists — but the Hero CTA path is not wired through it. This is a **product/compliance regression** that has now been open for >14 calendar days since first reported. |
+| BlogDetailFAQ `xl:` vs `lg:` mismatch | **RESOLVED** | Consistent `xl:` across siblings. Retire the flag. |
+| ResourceDetailLeadCapture checkbox 14×14 | CONFIRMED | line 240–241. WCAG 2.5.8 AA fail. |
+| PodcastHero `preserveAspectRatio="none"` ×2 | CONFIRMED | line 68, 109. |
+
+**v2 fidelity at v3:** ~96%. Two items retired (BlogDetailFAQ flag, PodcastCTACards severity dropped), one item upgraded to product P0 (ResourceDetailHero gating, still open after two weeks).
+
+### 13.2 — Stream-A foundation: zero of five landed
+
+| Stream-A item (v2 plan) | v3 status | Evidence |
+|---|---|---|
+| A0 — docs updated with new tokens + rules | ✅ DONE | v2 audit is itself the doc |
+| A1 — `@theme` tokens added (Utopia, `vi`/`cqi`) | ❌ NOT DONE | `globals.css @theme` still has only `--text-display-{sm,md,lg}` from v1; no `--text-card-title-*`, no `--text-body-*`, no `--space-section-*` |
+| A2 — Playwright + axe-core + visual regression + Lighthouse re-enable | ❌ NOT DONE | Zero test files in `apps/web/`; no `playwright.config.*`; Lighthouse CI still `if: false` at `.github/workflows/web.yml:97` |
+| A3 — `eslint-plugin-tailwindcss` + custom rule | ❌ NOT DONE | Not in `apps/web/package.json` deps; no `.eslintrc*` in `apps/web/`; root `biome.json` has no arbitrary-value rule |
+| A4 — Bundle-size budget | ❌ NOT DONE | `@next/bundle-analyzer` installed; no threshold; report only |
+
+| Stream-B foundation | v3 status | Evidence |
+|---|---|---|
+| B1 — Resource gating fix | ❌ STILL BROKEN | `ResourceDetailHero` Download CTA bypasses gate (see 13.1) |
+| B2 — Home metadata export | ❌ NOT DONE | `apps/web/src/app/page.tsx` has no `metadata` / no `viewport` override / no canonical |
+| B3 — Touch-target sweep to 44×44 | ❌ NOT DONE | `button.tsx` variants compute to 24/28/32/36 px heights; `DetailHero` home crumb 32×32; `ResourceDetailLeadCapture` checkbox 14×14; viewport-fit cover missing |
+| B4 — `<Image sizes>` sweep | ❌ NOT DONE | 20+ instances v2 flagged; v3 finds 5 more in CleanStart Images surface — none have `sizes` |
+| B5 — `dynamic({ ssr: false })` for heavy clients | ❌ NOT DONE | Zero `dynamic()` imports in `apps/web/src/` |
+| B6 — Per-detail JSON-LD | ❌ NOT DONE | `BlogPosting/NewsArticle/Event/PodcastEpisode` schemas not emitted on the 4 detail routes |
+
+**Conclusion:** the v2 plan's 18-working-day estimate is intact — none of the spend has been booked. **The plan now starts from day 1 of v2's calendar, on 2026-05-20.**
+
+### 13.3 — New page surfaces audited at v3
+
+Six page surfaces shipped after v2. Their verdict table follows the Part 3 format. Lines reference current HEAD.
+
+#### CleanSight (`apps/web/src/app/cleansight/page.tsx`)
+
+| File | Verdict | Notes |
+|---|---|---|
+| `CleanSightHero.tsx` | ⚠️ | H1 clamp; `minHeight: 652px`, `paddingTop: 186px`, decorative blob at bare 1920-frame coords |
+| `CleanSightStats.tsx` | ✅ | All type clamp; `minHeight: 550px` rigid; only minor decorative drift |
+| `CleanSightProblems.tsx` | ⚠️ | Card title/body clamp; decorative coords bare px; `py-[120px]` flat |
+| `CleanSightBlindSpots.tsx` | ⚠️ | Uses the *correct* `calc(X / 1920 * 100%)` formula for some decoratives — best example on this surface — but `minHeight: 908px` rigid |
+| `CleanSightUnified.tsx` | ❌ | Cards `minHeight: 346px`; **6 absolute decorative lines positioned via template-literal `${left}px` and `${top}px`** — looks fluid, is not (new **Pattern 12**) |
+| `CleanSightSecurity.tsx` | ❌❌ | **900 LOC. `hidden xl:block` desktop section with 50+ absolutely-positioned children, hardcoded `top: 0/87/180/etc`, hardcoded `width: 606/444/126`, flat-px labels `fontSize: 20px / 16px`.** Renders nothing intentional at 1024–1919. New **Pattern 11**. |
+| `CleanSightComparison.tsx` | ❌❌ | Desktop: `1276×582` absolute layout at `top: 324px`, cards `602×571 left:10 top:11`, flat-px `fontSize: 32px / 22px`. Mobile: separate flex block. 1024–1919 gap. |
+| `CleanSightCTA.tsx` | ⚠️ | Type clamp; `padding: 80/100px`, `gap: 68px`, decorative bare 1920-frame coords |
+
+#### CleanStart Images (`apps/web/src/app/cleanstart-images/page.tsx`)
+
+| File | Verdict | Notes |
+|---|---|---|
+| `CleanStartImagesHero.tsx` | ⚠️ | H1 clamp; `minHeight: 1084px`; **no `sizes` on hero image** |
+| `CleanStartImagesUVP.tsx` | ⚠️ | Type clamp; `minHeight: 855px`; **no `sizes` on images** |
+| `CleanStartImagesEnvironment.tsx` | ⚠️ | Type clamp; `minHeight: 594px`; **2 images without `sizes`** |
+| `CleanStartImagesBrowse.tsx` | ❌ | Tab bar `width: 478px height: 64px`; underline indicator `50×3`; flat `fontSize: 16px` on tab buttons; dashboard `<img>` 1274×732 with no `sizes`; `borderRadius: 16px` flat |
+| `CleanStartImagesEasyStart.tsx` | ❌ | Feature title `fontSize: 18px` / body `14px` (flat); GlowBall `46×46` (borderline WCAG); `maxWidth: 219px` on feature divs; `<br />`:114; `paddingTop/Bottom: 120px` flat; 512×386 image without `sizes` |
+
+**Cross-surface pattern (CleanStart Images):** 5 of 5 image files ship **zero** `sizes` attributes. Highest-leverage single-file fix on this surface.
+
+#### Software Bill of Materials (`apps/web/src/app/software-bill-materials/page.tsx`)
+#### Knowledge Hub (`apps/web/src/app/knowledge-hub/page.tsx` + article)
+#### Author landing (`apps/web/src/app/author/[slug]/page.tsx`)
+#### Podcast Waveform component (`apps/web/src/components/sections/podcast/_components/Waveform.tsx`)
+
+> **v3.1 work item.** Forensic per-section audit for SBOM (5 files), Knowledge Hub (2+), Author landing (4), and Podcast Waveform (1) is **deferred to a v3.1 supplement** to keep this revision shippable. Spot-read at v3 surfaced the same patterns as CleanSight/CleanStart Images (rigid `minHeight`, flat-px utility typography, missing `sizes`). The remediation plan in 13.7 treats these surfaces as **C5 work** (one focused day per surface) and the v3.1 audit can sequence them precisely. Schedule the v3.1 audit *before* C5 begins.
+
+### 13.4 — Net-new rigidity patterns (extending Part 4)
+
+#### Pattern 11 — "Hidden-tier desktop section as parallel layout"
+A component renders a desktop layout inside `hidden xl:block` (or `lg:block`) using absolute positioning at hardcoded 1920-frame coordinates, *plus* a separate `xl:hidden` mobile block built with flex/grid. The two blocks have **incompatible typography** (desktop flat px, mobile clamp). Result: nothing intentional renders in the 1024–1919 gap.
+
+**Where:** `CleanSightSecurity.tsx`, `CleanSightComparison.tsx`.
+
+**Fix:** collapse to a *single* responsive layout per component. If the desktop composition cannot survive `lg:` reflow, the section is mis-architected and needs a real grid (`@container` + `cqi` for card-internal type). Stop using `hidden xl:block` as an escape hatch.
+
+#### Pattern 12 — "Template-literal hardcoded coords"
+Decorative geometry uses `style={{ left: \`${x}px\` }}` where `x` is a frame-locked pixel value held in component state or a constant array. Appears responsive (JS variable) but is identical to a hardcoded `px` coord — fails the same way under viewport change.
+
+**Where:** `CleanSightUnified.tsx` lines 150–183 (6 lines: `[48.47, 120.03, ...]` px).
+
+**Fix:** convert the array values to percentages of the container, **or** generate the lines inside an SVG `viewBox` so they scale with the parent. Same rule as Recipe 4 in Appendix A.
+
+#### Pattern 13 — "Mixed clamp + flat-px in one component"
+The display heading uses `clamp()`. Internal card titles, labels, or buttons in the same file are hardcoded `fontSize: 20px`. This is a regression from the v1 rule "no `px` font sizes". v2 caught it at scale; v3 finds it still happening on every new surface.
+
+**Where:** all five worst-offenders in 13.3; ubiquitous.
+
+**Fix:** map every flat-px text node to a `--text-body-*` or `--text-card-title-*` token from Part 7 the moment the file is touched. **Treat any new flat-px text instance as a build-break candidate once the lint gate ships (A3).**
+
+### 13.5 — Net-new architectural flags (extending Part 10)
+
+11. **`button.tsx` variant scale is non-compliant.** The discrete scale prescribed by Part 11.5 is present (CVA + Tailwind, no clamp ✓), but the actual sizes compute to **heights of 24/28/32/36 px** for `xs/sm/default/lg`. Per Part 11.5 the floor is **44 px** for primary CTAs and 24 px for "utility/inline" only. Either (a) raise the minimum step to 44px, or (b) explicitly document which `size` variants are utility-only and disallow them as primary CTAs via ESLint. The icon-only variants (`icon-xs/sm/default/lg`) at 24–36 px square **fail WCAG 2.5.8 AA without an enlarged hit area**. Same fix.
+
+12. **`viewportFit: "cover"` missing.** `apps/web/src/app/layout.tsx:18` exports a `Viewport` object without `viewportFit: "cover"`. Combined with the absence of any `env(safe-area-inset-*)` usage in the codebase (Part 12 #1 still open), the fixed-header `Header.tsx` and full-bleed heroes clip on iPhone 14+ landscape and any device with a home indicator.
+
+13. **`DetailHero.tsx` breadcrumb home link 32×32.** `w-8 h-8` (line 116). Below WCAG 2.5.8 AA (24×24 minimum) only if surrounded padding is absent; needs verification *with* surrounding padding. Either way below the Part 11.5 recommended 44×44.
+
+14. **`AboutOurStory.tsx` v3 line-count update.** The element is **6** `<br />` tags (lines 77–82), not 7. Doc text in v1 referred to "seven" in one place — corrected.
+
+15. **`CleanStartImagesEasyStart.tsx:114` new `<br />`.** Add to the prose-`<br />` removal batch.
+
+16. **CSS-side `.cs-tt-*` carousel is unchanged from v1.** `BuiltForTeams.tsx` JSX got nicer (clamp on display headline) but the rigidity sits in `globals.css` L903–1214. JSX-only fixes will continue to miss this. **The carousel cannot be "fixed" in JSX — it must be CSS-refactored.**
+
+17. **Image `sizes` coverage worsened.** v2 estimated ~20 instances missing `sizes`. v3 finds **5 additional instances on the CleanStart Images surface** + the home FAQ grids at `page.tsx:109, 121, 133` (which are 1101×1101 decoratives served at full size to every viewport).
+
+18. **Zero `dynamic()` imports anywhere in `apps/web`.** Still true. `BuiltForTeams` (479L), `CleanSightSecurity` (900L), `UpcomingEventHero` (391L), `Footer` (358L), `HowCleanStartHelp` (351L) all ship in the initial bundle.
+
+### 13.6 — Revised "worst offenders" — Top 25 at v3
+
+The v2 list still stands. v3 adds five entries from the new surfaces and one previously-deferred CSS-side item. Sorted by impact × surface area.
+
+| New rank | File | Why |
+|---|---|---|
+| **1 (new)** | `home/BuiltForTeams.tsx` + **`globals.css` `.cs-tt-*` block** | Highest single non-fix in the codebase. Two weeks since flagged; zero CSS-side movement. Visible on every home-page session. |
+| **2 (new)** | `cleansight/CleanSightSecurity.tsx` | 900-LOC parallel-layout file; 1024–1919 dead zone; flat-px desktop type. Pattern 11 exemplar. |
+| **3 (new)** | `cleansight/CleanSightComparison.tsx` | Same Pattern 11 dead zone; the page's most visually-loaded section. |
+| **4** | `ui/FactoryCard.tsx` | Unchanged from v2 #1. Site-wide impact. |
+| **5** | `ui/ComparisonCard.tsx` | Unchanged. |
+| **6** | `resource/ResourceDetailHero.tsx` (gating bypass) | **Open product P0** for 14+ days. Conversion + GDPR. |
+| **7** | `blogs/BlogCard.tsx` + `blogs/LatestBlogs.tsx` | Unchanged. |
+| **8** | `newsroom/NewsroomCard.tsx` + `newsroom/NewsroomGrid.tsx` | Unchanged. |
+| **9** | `home/SecurityNotPatching.tsx` | Unchanged. |
+| **10** | `home/HowCleanStartHelp.tsx` | Unchanged. |
+| **11** | `home/ReadyToSecureCTA.tsx` | Unchanged. |
+| **12** | `attack-surface-reduction/AsrPublicImages.tsx` | Unchanged. |
+| **13 (new)** | `cleanstart-images/CleanStartImagesEasyStart.tsx` | Compound: flat px + GlowBall touch target + `<br />` + no `sizes`. |
+| **14 (new)** | `cleanstart-images/CleanStartImagesBrowse.tsx` | Rigid tab bar; flat-px buttons; 1274×732 image without `sizes`. |
+| **15** | `vulnerability-remediation/VulnAdvantage.tsx` | Unchanged. |
+| **16** | `about/AboutPowering.tsx` | Unchanged. |
+| **17** | `about/AboutOurStory.tsx` | Unchanged (6 `<br />`, not 7). |
+| **18** | `events/UpcomingEventHero.tsx` | Unchanged. |
+| **19** | `attack-surface-reduction/AsrHero.tsx` | Unchanged. |
+| **20** | `attack-surface-reduction/AsrFitsBuilt.tsx` | Unchanged. |
+| **21** | `about/AboutWhoWeAre.tsx` | Unchanged. |
+| **22** | `attack-surface-reduction/AsrApproach.tsx` | Unchanged. |
+| **23** | `webinars/WebinarFilters.tsx` | Unchanged. |
+| **24 (new)** | `cleansight/CleanSightUnified.tsx` | Pattern 12 exemplar. |
+| **25 (new)** | `ui/button.tsx` (size scale) | Variants below 44×44 floor; fixes touch-target compliance across entire site. |
+
+### 13.7 — v3 sequenced delivery plan (supersedes Part 0.7)
+
+Three streams in parallel, gated by verification between phases. Total ≈ **23 working days** (v2's 18 + 5 for the additional new surfaces + audit-debt on SBOM/Knowledge Hub/Author/Waveform).
+
+**Stream A — Foundations (must land first, blocks B and C).** *Still owed in full from v2.*
+
+| Phase | Days | Deliverable |
+|---|---|---|
+| A1 | 1 | Tokens in `@theme` — Utopia-generated, `vi`/`cqi`-based, no-op PR. Card-title + body + section-padding tokens from Part 7. Land in `apps/web/src/app/globals.css` AND mirror into `packages/ui/src/tokens.css` so `apps/cms` consumes (Part 12 #11). |
+| A2 | 1.5 | Playwright + axe-core + visual-regression scaffold (6 viewports × top-10 routes); land Lighthouse-CI re-enable behind a **static-fixture flag** that skips CMS-fetching routes (so `if: false` becomes `if: ${{ github.event_name == 'pull_request' }}` with the CMS-route allowlist trimmed). Lighthouse threshold: **mobile perf ≥ 85**, a11y ≥ 95, BP ≥ 95, SEO ≥ 95. |
+| A3 | 0.5 | `eslint-plugin-tailwindcss` + custom regex rule. Phase 1 ships as `warn`; flip to `error` after one sprint of zero new violations. Allow-list documented in `docs/typography.md`. Custom rules: `text-\[.*rem\]` and `h-\[.*px\]` on `*Card*` files; bare `w-\[.*px\]` without `max-w` qualifier; `preserveAspectRatio="none"`; flat-px `fontSize:` style values outside an allow-list. |
+| A4 | 0.5 | Bundle-size budget in CI: hard ceiling **220 KB gzipped per route**; warn at 180 KB. Wire to `@next/bundle-analyzer`. |
+| A5 | 0.25 | One-line `globals.css` additions: `html { scrollbar-gutter: stable }`; `viewportFit: "cover"` in `layout.tsx`; `safe-area-inset-bottom` padding on `MobileNav` sheet + `Header`. |
+| A6 | 0.5 | Re-establish CWV baseline: capture pre-Phase-1 Mobile LCP / CLS / INP on home + blogs + resource-detail via Vercel Speed Insights. Numbers become the v3 targets in 13.8. |
+
+**Stream B — Product/compliance P0s (parallelizable with A after A0).**
+
+| Phase | Days | Deliverable |
+|---|---|---|
+| B1 | 1 | **Resource gating fix** (open >14 days). `ResourceDetailHero.tsx` Download CTA must respect `gateForm` on the resource — render conditionally, scroll-to-form, or open `ResourceGateModal`. Add Playwright E2E: an asset with `gateForm` cannot be fetched without form submit. |
+| B2 | 0.5 | `apps/web/src/app/page.tsx` `metadata` export: title, description, og:url, og:image, canonical, twitter:card. |
+| B3 | 1 | Touch-target sweep to 44×44: `ResourceDetailLeadCapture` checkbox 14→24+ padded to 44; `WebinarFilters` checkbox; `DetailHero` breadcrumb home; **`button.tsx` minimum size variant raised to 44 high (or `sm`/`xs` reclassified as utility-only, with ESLint preventing primary-CTA use)**. Axe rule in CI: `target-size`. |
+| B4 | 1 | `<Image sizes>` sweep across all instances (v2's 20 + v3's CleanStart Images 5 + home FAQ 3). Convert oversized hero `width/height` to explicit responsive `sizes`. Grep gate added in A3. |
+| B5 | 0.5 | `dynamic({ ssr: false })` for `BuiltForTeams` carousel, `CleanSightSecurity` (after C2 collapses it), `CleanSightComparison`, `PodcastCTACards`, `YouTubeEmbed`, `WebinarFilters`. |
+| B6 | 0.5 | Per-detail JSON-LD: emit `BlogPosting / NewsArticle / Event / PodcastEpisode` from `lib/seo/jsonld.tsx` on the four detail routes. Validate with Rich Results Test on one sample per route. |
+| B7 | 0.25 | Remove all `<br />` in prose: `AboutHero`, `AboutOurStory` (×6), `AboutEcosystems`, `CleanStartImagesEasyStart:114`. |
+
+**Stream C — Responsive remediation (v1 Phases 2–5 + new surfaces).**
+
+| Phase | Days | Deliverable |
+|---|---|---|
+| C1 | 3 | **UI primitives** — `FactoryCard`, `ComparisonCard`, `RocketFlame` (v1 Phase 2). Adopt `@container/card` + `cqi` + `aspect-ratio` + flex-column refactor per Recipe 1. **Also raises `button.tsx` minimums** if not already handled by B3. |
+| C2 | 4 | **Home + new-surface "Pattern 11" collapse.** Original home page rigid sections (`SecurityNotPatching`, `HowCleanStartHelp`, `BuiltForTeams` + `globals.css .cs-tt-*`, `ReadyToSecureCTA`) **plus** the two CleanSight Pattern-11 offenders (`CleanSightSecurity`, `CleanSightComparison`). The two CleanSight files collapse from desktop+mobile parallel layouts into single responsive grids — non-trivial; each gets a dedicated day. |
+| C3 | 2 | **Card-grid pages** (v1 Phase 4) — `BlogCard`, `NewsroomCard`, `PodcastCTACards` finish, `UpcomingEventHero` featured row. |
+| C4 | 3 | **Other pages sweep** (v1 Phase 5) — About (8 sections), ASR (7), FIPS (8), Vulnerability remaining (1: VulnAdvantage), Blog detail, Resource Center sidebar IA rebuild, Resource detail typography, Newsroom hero `calc()` re-key, Events, Webinars filter rebuild. |
+| C5 | 2 | **New surfaces v3.1 audit + remediation** — SBOM (5), Knowledge Hub (2+), Author landing (4), Podcast Waveform (1). Audit pass produces v3.1 supplement; remediation lands in the same phase. |
+| C6 | 1 | **CleanStart Images surface** — 5 files; primary debt is missing `<Image sizes>` (handled in B4) + flat-px typography + `<br />`. Smaller than the others; sequence after C2. |
+| C7 | 1 | **Pattern 12 + Pattern 13 sweep** — `CleanSightUnified` template-literal coords + any remaining mixed clamp/flat-px sites the lint gate (A3) flags. |
+| C8 | 0.5 | **Lock the system** (v1 Phase 6) — flip lint rules from `warn` to `error`. Update `CLAUDE.md` `apps/web` section with the new rules. |
+
+**Phase gate (between A→B/C, between each Cn):** Playwright visual diffs reviewed; axe-core 0 serious/critical; Lighthouse CI ≥85 mobile perf on changed routes; bundle-budget green; no new `<Image>` without `sizes`; no new arbitrary-value violations in lint.
+
+### 13.8 — v3 success metrics (supersedes 0.6)
+
+| Metric | v2 baseline-to-capture | v3 target | Measurement |
+|---|---|---|---|
+| Mobile (375px) horizontal scroll on any route | unknown | **0 routes (including new surfaces)** | Playwright per-route assertion |
+| Mobile (375px) LCP — home + blogs + resource-detail | unknown | **< 2.5s P75** | Vercel Speed Insights (baseline in A6) |
+| 1024–1919 "dead-zone" sections (Pattern 11) | 2 known | **0** | Visual regression at 1024 + 1280 + 1440 |
+| `tsc --noEmit` errors | 0 | **0** held | CI |
+| Hardcoded `text-[Xrem]` / bare `h-[Xpx]` on `*Card*` | ~600 | **0** lint-enforced | A3 ESLint |
+| `<Image>` without `sizes` | ~28 (v2:20 + v3:8) | **0** | grep gate |
+| `preserveAspectRatio="none"` | 4–5 instances | **0** | grep gate |
+| `<br />` in prose paragraphs | 9 known | **0** | grep gate |
+| Touch targets < 44×44 on interactive elements | many (button variants + breadcrumb + checkbox) | **0 critical**, documented utility-only exceptions | axe-core `target-size` |
+| Per-detail JSON-LD coverage | 0% | **100%** | grep + Rich Results sample |
+| Lighthouse CI mobile perf — home / blog detail / resource detail | disabled | **≥85**, **a11y ≥95** | `.lighthouserc.json` re-enabled |
+| Bundle size — top-3 routes (home, blog detail, resource detail) | unknown | **≤ 220 KB gz P50, 260 KB P99** | A4 budget |
+| `viewportFit: "cover"` + safe-area-inset coverage | absent | **present in `layout.tsx` + sticky elements** | A5 |
+| New surfaces (cleansight, cleanstart-images, sbom, kh, author) audited in this doc | partial | **all 6 surfaces in v3.1 with worst-offender list** | C5 |
+
+### 13.9 — Risks newly visible at v3
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| Lighthouse CI cannot run on CMS-fetching routes (the existing reason it's `if: false`) | High | Medium | Stream A2 ships a **route allowlist** for Lighthouse — only run on routes safe to render without CMS (home, blogs index, static legal pages). Detail pages get a deferred Lighthouse audit when staging CMS is reachable from CI. |
+| CleanSight Pattern-11 collapse may regress a designer-approved look at 1920 | Medium | Medium | C2 budget includes a designer review at the 1920 anchor *and* a 1440 review against Figma. Approvals captured in PR before merge. |
+| Visual regression noise from typography re-token | High | Low | Tokens are mostly extensions of existing `--text-display-*` scale; baseline screenshots are taken **after** A1 so the token PR is a no-op visual diff. |
+| `button.tsx` minimum-size raise breaks dense layouts (filter chips, breadcrumbs) | Medium | Medium | Reclassify the smaller sizes as `utility` variants with `data-cta-utility` attribute, allowed via lint allow-list and excluded from the `target-size` axe rule. Document in `docs/design-tokens.md`. |
+| C2 day-4 over-runs because `BuiltForTeams .cs-tt-*` CSS refactor is hard | High | Medium | Plan budgets a full day for it. If it slips, ship the JSX-side improvements + put a feature-flag on the carousel that falls back to a static testimonial grid below `lg`. |
+| New surfaces (SBOM/KH/Author/Waveform) ship more pages while C-stream is mid-flight | Medium | Medium | Open question 13.10 #2. Recommend a temporary moratorium on new `apps/web` page work for the duration of Stream C (≈3 sprint-weeks). |
+
+### 13.10 — Open questions for product/leadership at v3
+
+1. **Why has Stream A not started after two weeks?** This is the blocker. The plan is shippable; nothing about it is contentious. Identify the owner; assign or escalate.
+2. **Can new `apps/web` page work pause for 3 sprint-weeks** while C-stream runs? Continuing to ship rigid Pattern-11/12/13 surfaces while we remediate the existing ones is the principal scope-creep risk.
+3. **Is the `button.tsx` minimum-size raise (24→44) acceptable as a brand decision**, or should we ship the utility-variant escape hatch? Recommend the latter — minimum is 44, utility variants are an opt-in.
+4. **`ResourceDetailHero` gating is open product P0 for >14 days.** Is this owned? It is the highest-business-impact item in the doc and the cheapest to fix.
+5. **CleanSight Pattern-11 collapse changes the visual composition at 1920.** Designer should sign off on the C2 result before merge.
+
+### 13.11 — What v3 deliberately does *not* change
+
+- **No new audit content for surfaces we have not read forensically.** SBOM, Knowledge Hub, Author, Podcast Waveform get a v3.1 supplement once the C5 audit pass completes.
+- **No new tokens beyond Part 7.** v2's token scale is sufficient. Adding more tokens without applying the existing ones is what got us here.
+- **No re-litigation of v1/v2 architectural decisions** — `max-w-[1276px]` rail, Tailwind v4 `@theme`, no GraphQL admin, etc. all stand.
+- **No CMS-side audit.** The `packages/ui` parity work in A1 is the only `apps/cms` touch.
+- **No motion-library swap.** `motion@^12.38.0` is fine; reduced-motion coverage audit folds into B-stream's existing scope.
+
+### 13.12 — One-paragraph TL;DR
+
+v2 was an excellent map. v3 confirms the territory has not been crossed: zero of five Stream-A foundations and zero of six Stream-B P0s landed in the two weeks since v2 published. Meanwhile six new page surfaces shipped, of which two (`CleanSightSecurity`, `CleanSightComparison`) introduce a new and worse failure mode (Pattern 11: parallel desktop/mobile layouts with a 1024–1919 dead zone) and five more ship without `<Image sizes>`. The v3 plan keeps the v2 work intact, adds 5 days for the new-surface remediation and v3.1 audit, raises `button.tsx` to the WCAG 44×44 floor as part of C1, fixes the still-open `ResourceDetailHero` gating regression as B1, and adds a CI/lint gate (A3) without which we will be auditing the same patterns again in Q3.
+
+
 When you're ready, the recommended first PR is Phase 1 alone (10 lines of CSS to `globals.css` `@theme`). Zero risk, validates the foundation, unblocks every subsequent phase.

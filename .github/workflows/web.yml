@@ -1,11 +1,17 @@
 name: Web CI
 
+# `!` patterns subtract from the allow-list above them. GitHub Actions
+# disallows mixing `paths` and `paths-ignore` on the same event, so
+# doc-only exclusions live inline here.
 on:
   push:
     branches: [main, development]
     paths:
       - "apps/web/**"
+      - "!apps/web/docs/**"
+      - "!apps/web/**/*.md"
       - "packages/ui/**"
+      - "!packages/ui/**/*.md"
       - "packages/types/**"
       - "packages/config/**"
       - "pnpm-lock.yaml"
@@ -15,7 +21,10 @@ on:
     branches: [main, development]
     paths:
       - "apps/web/**"
+      - "!apps/web/docs/**"
+      - "!apps/web/**/*.md"
       - "packages/ui/**"
+      - "!packages/ui/**/*.md"
       - "packages/types/**"
       - "packages/config/**"
       - "pnpm-lock.yaml"
