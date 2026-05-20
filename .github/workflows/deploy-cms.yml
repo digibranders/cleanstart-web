@@ -201,12 +201,27 @@ jobs:
              docker load < /tmp/cms.tar.gz
              docker tag cms:${{ github.sha }} cms:current
              docker compose --profile cms up -d --wait --wait-timeout 300 cms
+
+             # Retention: keep cms:current + 2 most recent SHA tags for fast
+             # rollback (~13 GB on the droplet). Each cms image is ~4.4 GB;
+             # without pruning, daily deploys would fill the 48 GB disk in
+             # under 2 weeks. docker image prune alone misses these because
+             # they are tagged, not dangling.
+             docker images cms --format "{{.Tag}}\t{{.CreatedAt}}" \
+               | grep -v "^current\b" \
+               | sort -k2 -r \
+               | tail -n +3 \
+               | awk "{print \$1}" \
+               | xargs -r -I{} docker rmi "cms:{}" || true
              docker image prune -f
+
              rm -f /tmp/cms.tar.gz
              echo "--- cms container status ---"
              docker ps --filter name=cleanstart-cms-1 --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
              echo "--- last 20 lines of cms log ---"
-             docker logs --tail 20 cleanstart-cms-1'
+             docker logs --tail 20 cleanstart-cms-1
+             echo "--- droplet disk after deploy ---"
+             df -h / | tail -1'
 
       - name: Smoke probe
         run: |
