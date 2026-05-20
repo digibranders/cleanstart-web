@@ -107,6 +107,20 @@ pnpm --filter @cleanstart/web build
 
 Everything in this section applies only to `apps/web`. It does not override the global code conventions above — it extends them.
 
+### v3 Consistency Layer (canonical for sizing)
+
+> Active responsive-remediation plan: `~/.claude/plans/lovely-honking-milner.md` (5 × 1-week sprints, started 2026-05-20).
+> Sizing/spacing/typography source of truth: **`apps/web/docs/design-tokens.md` § "v3 Consistency Layer — role → token mapping"**. Every component touched must pick its sizes from those tables; the lint gate (Sprint 1 Day 4) enforces "no arbitrary values" and the mapping table enforces *which* token.
+> Rules in short:
+> - **Use tokens, not arbitrary values.** No new `text-[Xrem]`, no bare `h-[Xpx]` on `*Card*` files, no bare `w-[Xpx]` without a `max-w` qualifier, no flat-px `fontSize:` in inline styles outside the documented allow-list.
+> - **Card heights → `min-h-[clamp()]` or `aspect-ratio`**, never `h-[Xpx]`.
+> - **Card widths → `w-full max-w-[Xpx]`**, never bare `w-[Xpx]`.
+> - **Every `<Image>` requires `sizes`** matching its actual rendered widths per breakpoint.
+> - **SVG with intrinsic ratio uses `preserveAspectRatio="xMidYMid meet"`** (never `"none"`).
+> - **No `<br />` in prose** (`<p>`, `<h1>`, `<h2>`, `<h3>`). Trust `max-width` and natural wrap.
+> - **Buttons use the discrete `--btn-fs-*` / `--btn-h-*` / `--btn-px-*` scale**, never `clamp()`. Primary CTAs are 44px tall minimum; smaller variants require `data-cta-utility` and are exempt from the axe-core `target-size` rule.
+> - **CMS prose (`.article-body`, Lexical render) uses the long-form subtable in `design-tokens.md`**, not the marketing card-body tokens — the two regimes are not interchangeable.
+
 ### Component structure
 
 - One section per file: `src/components/sections/[page]/SectionName.tsx`

@@ -1,6 +1,150 @@
 # CleanStart Design Tokens (extracted from Figma)
 
-File: `doWR9Xbwgkz6dqR9n4m3BB` — Home page (node 108:7624) — frame 1920×9276
+> **v3 Consistency Layer is canonical for component work.** Every component touched after 2026-05-20 must pick its sizes from the **role → token mapping tables** in the section below. The lint gate (Sprint 1 Day 4 of the v3 plan) enforces "no arbitrary values"; this section enforces *which* token. Figma values live in this file's later sections for re-extraction reference; the *role assignments* below are the source of truth.
+
+---
+
+## v3 Consistency Layer — role → token mapping (canonical)
+
+This is the contract. Every PR touching a component must quote the rows below it honors. The mapping is locked across every page, every section, every card; never invented per-file.
+
+Backed by research summary at the end of this section (Butterick, NN/g 2024, WCAG 2.2 SC 1.4.4/1.4.12, web.dev typography-for-reading, Apple HIG, Material 3, established CMS reference sizes).
+
+### Typography role → token
+
+| Role | Token | Anchor 375 → 1920 |
+|---|---|---|
+| Page display H1 (hero) | `text-display-lg` | 36→72px |
+| Section H2 | `text-display-md` | 32→62px |
+| Sub-section H3 / mid-CTA | `text-display-sm` | 28→55px |
+| Feature-card title (hero rank — `FactoryCard`, `AboutPowering` `FeatureCard`) | `text-card-title-xl` | 24→33px |
+| Standard card title (Security headers, HowCleanStartHelp, AsrApproach, AsrFitsBuilt, AboutWhoWeAre pillars) | `text-card-title-lg` | 22→32px |
+| Compact card title (blog/news/podcast/event/resource/webinar cards) | `text-card-title-md` | 18→24px |
+| Pill / tab / micro-heading (`ResourcesInsights` tabs, site-wide pills) | `text-card-title-sm` | 16→21px |
+| Lead body (section intro paragraph below H2) | `text-body-xl` | 17→24px |
+| Card body (default — `SecurityNotPatching` bullets, `HowCleanStartHelp` feature body, `ReadyToSecureCTA` body) | `text-body-lg` | 16→22px |
+| Card body (compact — secondary text, compact grids, marquee strap) | `text-body-md` | 15→18px |
+| Meta / caption (timestamps, author meta, share rail, table cells) | `text-body-sm` | 14→16px |
+| Eyebrow / breadcrumb / tag (kicker labels) | `text-body-xs` | 12→14px |
+| Primary CTA label | discrete `--btn-fs-lg` (20px fixed) | fixed |
+| Secondary CTA label | discrete `--btn-fs-md` (16px fixed) | fixed |
+| Utility CTA label (`data-cta-utility` opt-out) | discrete `--btn-fs-sm` (14px) | fixed |
+
+### Section vertical-padding role → token
+
+| Section type | Token | Anchor 375 → 1920 | Where |
+|---|---|---|---|
+| CTA-overlap reservation (sits above `<Footer />`) | `py-section-cta` | 160→250px | every page's last section before the Footer |
+| Feature / hero-adjacent | `py-section-lg` | 80→150px | high-prominence sections (`CleanStartAdvantage`, ASR hero-pair, `VulnHero` second pane) |
+| Standard | `py-section-md` | 64→120px | the majority of body sections |
+| Tight / sequential grid | `py-section-sm` | 48→80px | grid sections needing denser rhythm (`PastEventsGrid`, `LatestBlogs`, `NewsroomGrid`) |
+
+### Card-padding role → token
+
+| Card type | Token | Anchor 375 → 1920 | Where |
+|---|---|---|---|
+| Hero / feature card | `p-card-lg` | 24→40px | `FactoryCard`, `AboutPowering FeatureCard`, `ReadyToSecureCTA` Kubr card |
+| Standard card | `p-card-md` | 20→32px | `BlogCard`, `NewsroomCard`, `ResourceCard`, `EventCard`, `WebinarCard`, `PodcastEpisodeCard`, `PodcastCTACards`, `ComparisonCard` |
+| Compact card | `p-card-sm` | 16→24px | pill cards, dense lists, sidebar items |
+
+### Radius (locked — NOT fluid)
+
+| Element | Token | Value |
+|---|---|---|
+| Hero / feature cards | `rounded-cs-card-lg` (`--radius-cs-card-lg`) | 40px |
+| Standard cards | `rounded-cs-card` (`--radius-cs-card`) | 24px |
+| Pills / buttons | `rounded-cs-pill` (`--radius-cs-pill`) | 8px |
+| Round (full) | `rounded-full` | n/a |
+
+### Decorative-position formula (locked)
+
+| Element scope | Formula |
+|---|---|
+| Inside the `max-w-[1276px]` content rail | `(figmaPx / 1276) × 100%` |
+| Spans beyond the rail (full-bleed blobs, hero grids) | `(figmaPx / 1920) × 100%` |
+| Hide below `md` if decorative-only | `hidden md:block` |
+| SVG with intrinsic ratio | `viewBox` + `preserveAspectRatio="xMidYMid meet"` (NEVER `"none"`) |
+
+### Grid-reflow breakpoints (locked)
+
+| Grid type | Template |
+|---|---|
+| 3-up card grid | `grid-cols-1 md:grid-cols-2 xl:grid-cols-3` |
+| 2-up content + sidebar | `grid-cols-1 lg:grid-cols-[1fr_1fr]` or `lg:grid-cols-[Xpx_1fr]` |
+| Auto-fit card grid | `grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 404px))` — copy from `PastEventsGrid.tsx` |
+
+### Touch-target floor (WCAG 2.5.8)
+
+- Primary CTAs (every `<Button>` without `data-cta-utility`): **height ≥ 44px**.
+- Icon-only buttons: **44×44** hit area.
+- Form checkboxes: **24×24** visual minimum, wrapped in **44×44** hit area.
+- Utility / dense controls (filter chips, breadcrumbs, inline secondary): may use the smaller scale steps with explicit `data-cta-utility` attribute; lint allows.
+
+### CMS-prose typography (`.article-body` and any Lexical-render container)
+
+CMS long-form prose uses **different sizes** than marketing card body. Body is *larger* because the page's job is sustained reading, not scanning. Line length is constrained to 60–75 ch via 680px reading column (`BlogDetailContent.tsx` gold standard).
+
+| Element | Clamp range | Anchor 375 → 1920 | Line-height | Rationale |
+|---|---|---|---|---|
+| `h1` (article title — DetailHero, not body) | `clamp(2rem, 4.8vw, 3.5rem)` | 32→56px | 1.1 | Largest hierarchy stop |
+| `h2` (section heading) | `clamp(1.5rem, 2.6vw, 2.25rem)` | 24→36px | 1.2 | ~2× body |
+| `h3` (sub-section) | `clamp(1.25rem, 1.9vw, 1.75rem)` | 20→28px | 1.25 | ~1.5× body |
+| `h4` | `clamp(1.125rem, 1.4vw, 1.375rem)` | 18→22px | 1.3 | ~1.2× body |
+| `p` (body) | `clamp(1.0625rem, 1.2vw, 1.1875rem)` | 17→19px | 1.65 | Inside Medium / Substack / NYT consensus |
+| `blockquote` | `clamp(1.125rem, 1.5vw, 1.375rem)` | 18→22px | 1.5 | Signals pull-quote |
+| `code` / `pre` | `clamp(0.875rem, 1.05vw, 1rem)` | 14→16px | 1.55 | Monospace renders ~10% smaller optically |
+| `figcaption` | `clamp(0.875rem, 0.95vw, 1rem)` | 14→16px | 1.45 | Below body; never below 14 |
+| Inline `<a>` | inherits `<p>` | n/a | n/a | Underline at all sizes per WCAG 1.4.1 |
+| `ul`/`ol` `li` | inherits `<p>`; `gap: 0.5em` | n/a | 1.6 | Match prose rhythm |
+| Heading-anchor scroll-offset | `scroll-margin-top: clamp(80px, 10vw, 120px)` | 80→120px | n/a | Compensates for sticky `<Header />` |
+
+**Reading column widths (locked):**
+
+- Blog / Resource / Knowledge-Hub article body: `max-width: 680px` (≈66ch at 1rem). Gold standard: `BlogDetailContent.tsx`.
+- News article outer: 820px with embedded 680px reading column. Gold standard: `NewsDetailBody.tsx`.
+- Mobile: edge-to-edge minus `px-6` gutter (`100vw - 48px`), giving 50–55ch at 375px — still inside the 45–75ch comfort band.
+
+**Paragraph spacing rules (locked, derived from WCAG 1.4.12 + Butterick):**
+
+- Paragraph-to-paragraph: `margin-block: 1em` (with `line-height: 1.65`, this satisfies the SC 1.4.12 2em paragraph-spacing requirement automatically).
+- Heading-to-following-paragraph: `margin-block-start: 1.8em` on the heading, `margin-block-end: 0.4em`.
+- Heading-to-heading: `margin-block-start: 2em` on the lower-level heading.
+- Lists: `padding-inline-start: 1.5em`.
+- Letter-spacing on `<h1>`/`<h2>`: `-0.02em` (tight, matches marketing display rhythm). Body: `0`.
+
+**Card body vs CMS prose body — non-confusion rule:**
+
+| Surface | Token | At 1440 | Why |
+|---|---|---|---|
+| Card body (scanning) | `text-body-lg` | ~22px | Cards scanned, not read; short lines |
+| CMS prose body (reading) | `.article-body p` clamp | ~18px | Sustained reading; 60–66ch in 680px column |
+
+A 22px body inside a 680px column produces ~50ch (below comfort); 18px delivers 60–66ch (in the band). Two distinct optima, two distinct tokens, never confused.
+
+### Research sources (industry consensus, May 2026)
+
+- Butterick, *Practical Typography* — body 15–25px; 45–90ch per line; line-height 1.2–1.45× type for body.
+- Nielsen Norman Group, *Legibility, Readability, and Comprehension* (2024) — minimum 16px primary body web; 18px+ improves long-form comprehension measurably.
+- WCAG 2.2 — SC 1.4.4 (resize to 200%), SC 1.4.12 (paragraph spacing ≥ 2× font, line-height ≥ 1.5×).
+- web.dev *typography for reading on the web* (2024) — `clamp()` with line-height correlation; body 1rem–1.25rem; line-height 1.5–1.7 for prose.
+- Reference CMS body sizes at 100% desktop zoom: Medium ≈ 21px, Substack ≈ 20px, NYT ≈ 17–18px, The Verge ≈ 18px, Stripe blog ≈ 19px.
+- Smashing / A List Apart — H1 ~2.5–3× body; H2 ~1.8–2.2× body; H3 ~1.4–1.6× body; H4 ~1.2× body.
+- Apple HIG / Material 3 — minimum interactive text 14px; minimum non-interactive body 12px (caption only); minimum touch target 44pt (HIG) / 48dp (Material).
+
+### Lint allow-list and escape hatches
+
+The lint gate (`apps/web/eslint.config.mjs`, Sprint 1 Day 4) forbids arbitrary `text-[*rem]`, bare `h-[*px]` on `*Card*` files, bare `w-[*px]` without `max-w`, `preserveAspectRatio="none"`, flat-px `fontSize:` inline styles, `<Image>` without `sizes`, `<br />` in prose.
+
+Two opt-out attributes are allowed:
+
+- **`data-cta-utility`** — on `<Button>` or `<a>`-as-button to declare the element is a *utility* control (filter chip, breadcrumb home, inline secondary) and therefore exempt from the 44×44 axe-core `target-size` rule. Only use when the control is densely-clustered and not a primary conversion CTA.
+- **`data-cta-fluid`** — on a marketing-display CTA paired with a fluid display headline. Permits `padding` clamp (font and height stay on the discrete scale per Part 11.5 of the audit). Document the reason in a sibling comment.
+
+Both attributes are PR-visible; reviewers must justify their use.
+
+---
+
+## Original Figma extraction (reference, not canonical for component sizing)
 
 ## Layout
 - Frame width: **1920px**
