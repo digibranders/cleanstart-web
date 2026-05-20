@@ -1,9 +1,9 @@
 [
   {
     "route": "/",
-    "scrollWidth": 1309,
+    "scrollWidth": 1009,
     "clientWidth": 1024,
-    "delta": 285
+    "delta": -15
   },
   {
     "route": "/about-us",
