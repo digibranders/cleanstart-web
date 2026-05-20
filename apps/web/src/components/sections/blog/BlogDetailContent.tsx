@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { RenderLexical, slugifyText } from "@/lib/renderLexical";
 import type { LexicalRoot, TocEntry, BlogImage } from "@/lib/blog";
 
@@ -100,8 +100,6 @@ type RenderedTocEntry = TocEntry & { level: number; text: string };
 function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): React.ReactElement | null {
   const [activeId, setActiveId] = useState<string>("");
 
-  // Memoized so the effect below depends on a reference-stable array
-  // and re-attaches the scroll listener only when `toc` actually changes.
   const entries: (RenderedTocEntry & { slug: string })[] = useMemo(
     () =>
       (toc ?? [])

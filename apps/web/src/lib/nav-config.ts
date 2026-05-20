@@ -88,6 +88,7 @@ export const NAV_TREE: NavItem[] = [
             label: "Enhance SCA",
             href: "/software-composition-analysis",
             description: "Cut SCA noise with cleaner base images and signed SBOMs.",
+            built: true,
           },
           {
             label: "Vulnerability Remediation",
@@ -111,7 +112,7 @@ export const NAV_TREE: NavItem[] = [
     width: 260,
     items: [
       { label: "For Developers", href: "/for-developers" },
-      { label: "For CISO", href: "/for-ciso" },
+      { label: "For CISO", href: "/for-ciso", built: true },
     ],
   },
   {
@@ -144,7 +145,7 @@ export const NAV_TREE: NavItem[] = [
     width: 260,
     items: [
       { label: "About Us", href: "/about-us", built: true },
-      { label: "Teams", href: "/teams" },
+      { label: "Teams", href: "/teams", built: true },
       { label: "Community", href: "/community" },
       { label: "Careers", href: "/careers" },
       { label: "Contact Us", href: "/contact-us" },

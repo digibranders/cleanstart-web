@@ -118,7 +118,7 @@ export default function RootLayout({
         ["--font-display" as string]: "var(--font-manrope)",
       }}
     >
-      <body>
+      <body suppressHydrationWarning>
         <JsonLd id="org-jsonld" data={organizationSchema()} />
         <WebVitals />
         <PreviewBanner />

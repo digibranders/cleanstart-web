@@ -1,188 +1,154 @@
-import Image from "next/image";
-import Link from "next/link";
+/*
+ * Figma node 446:2377 — 1276×330 px card (positioned by Footer at top:-170px)
+ *
+ * Card background: linear-gradient(to bottom, #131e8f → #471ec0 at 111.05%)
+ * Heading: 55px Figtree Bold, white, letter-spacing -0.05em, w=401px
+ * Description: 21px, white 80% opacity, letter-spacing -0.04em, w=607px
+ * Gap between columns: 68px; padding: 80px 100px
+ * Button: glassmorphic — border #dab6f3, bg rgba(255,255,255,0.65), text #111
+ * Union decoration: 1101×1101 at left=547, top=-220 (absolute within card)
+ * Ellipse right: 511×511 at left=1159, top=244, blur soft radial
+ * Ellipse left: 320×320 at left=-139, top=-168, blur soft radial
+ */
 
-const AWARDS = [
-  { src: "/images/cleansight/award-1.png", alt: "Cyber Security award badge" },
-  { src: "/images/cleansight/award-2.png", alt: "Security vendor award badge" },
-  { src: "/images/cleansight/award-3.png", alt: "ISO 27001 award badge" },
-  { src: "/images/cleansight/award-4.png", alt: "AICPA SOC 2 award badge" },
-];
+import Link from "next/link";
 
 export function CleanSightCTA(): React.ReactElement {
   return (
     <div
-      className="relative mx-auto overflow-hidden rounded-[40px] bg-white"
+      className="relative w-full h-full overflow-hidden"
       style={{
-        maxWidth: "1276px",
-        padding: "80px 100px",
-        display: "flex",
-        gap: "68px",
-        alignItems: "flex-start",
+        background: "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)",
       }}
     >
-      {/* Decorative Union blob */}
-      <div
+      {/* ── Union decoration — top-centre-right ── */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        src="/images/cleansight/cta-union.svg"
+        alt=""
+        className="absolute pointer-events-none select-none hidden xl:block"
         style={{
           left: "547px",
           top: "-220px",
           width: "1101px",
           height: "1101px",
-          background:
-            "radial-gradient(ellipse at 50% 50%, rgba(154,81,255,0.06) 0%, transparent 60%)",
         }}
+        loading="lazy"
+        decoding="async"
       />
-      {/* Purple glow right */}
+
+      {/* ── Purple glow — right ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
         style={{
-          right: "-120px",
-          top: "100px",
+          left: "1159px",
+          top: "244px",
           width: "511px",
           height: "511px",
           borderRadius: "50%",
-          background: "rgba(154, 81, 255, 0.08)",
-          filter: "blur(80px)",
+          background: "rgba(154, 81, 255, 0.18)",
+          filter: "blur(100px)",
         }}
       />
-      {/* Purple glow top-left */}
+
+      {/* ── Cyan glow — top-left ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
         style={{
-          left: "-70px",
-          top: "-84px",
+          left: "-139px",
+          top: "-168px",
           width: "320px",
           height: "320px",
           borderRadius: "50%",
-          background: "rgba(44, 193, 235, 0.06)",
-          filter: "blur(60px)",
+          background: "rgba(44, 193, 235, 0.12)",
+          filter: "blur(80px)",
         }}
       />
 
-      {/* Floating product screenshot (desktop decorative) */}
+      {/* ── Content row ── */}
       <div
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="relative flex flex-col lg:flex-row items-start"
         style={{
-          left: "330px",
-          bottom: "0px",
-          width: "259px",
-          height: "260px",
-          transform: "rotate(-15deg)",
-          opacity: 0.9,
+          padding: "80px 100px",
+          gap: "68px",
         }}
       >
-        <Image
-          src="/images/cleansight/cta-screenshot.png"
-          alt=""
-          width={213}
-          height={213}
-          sizes="260px"
-          className="object-cover"
-        />
-      </div>
-
-      {/* Left: headline */}
-      <h2
-        className="relative flex-shrink-0"
-        style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "clamp(28px, 2.86vw, 55px)",
-          fontWeight: 700,
-          letterSpacing: "-0.05em",
-          lineHeight: 1.0,
-          color: "#111",
-          width: "401px",
-          zIndex: 1,
-        }}
-      >
-        See Everything. Fix Everything.
-      </h2>
-
-      {/* Right: description + CTA */}
-      <div className="relative flex flex-col gap-10 flex-1" style={{ zIndex: 1 }}>
-        <p
-          className="text-body-lg"
+        {/* Left: headline */}
+        <h2
+          className="relative flex-shrink-0 text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontWeight: 400,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.4,
-            color: "#111",
-            opacity: 0.8,
-            maxWidth: "607px",
+            fontSize: "clamp(28px, 2.86vw, 55px)",
+            fontWeight: 700,
+            letterSpacing: "-0.05em",
+            lineHeight: 1.0,
+            width: "min(401px, 100%)",
+            zIndex: 1,
           }}
         >
-          Continuous container visibility with integrated remediation across
-          modern environments.
-        </p>
+          See Everything. Fix Everything.
+        </h2>
 
-        <Link
-          href="/contact-us"
-          className="self-start inline-flex items-center gap-2 rounded-[8px] text-white font-medium"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--btn-fs-md)",
-            letterSpacing: "-0.01em",
-            background: "#3960F9",
-            padding: "11px 20px",
-            boxShadow: "0 0 0 1px #3960F9",
-          }}
-        >
-          Book a Container Scan
-          <svg
-            aria-hidden
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        {/* Right: description + CTA button */}
+        <div className="relative flex flex-col flex-1" style={{ gap: "40px", zIndex: 1 }}>
+          <p
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(14px, 1.09vw, 21px)",
+              fontWeight: 400,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.4,
+              color: "rgba(255, 255, 255, 0.8)",
+              maxWidth: "607px",
+            }}
           >
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        </Link>
-      </div>
-    </div>
-  );
-}
+            Continuous container visibility with integrated remediation across
+            modern environments.
+          </p>
 
-export function CleanSightAwards(): React.ReactElement {
-  return (
-    <div className="flex flex-col items-center gap-4 mt-16 xl:mt-[80px]">
-      <p
-        className="text-white text-center font-semibold"
-        style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "clamp(14px, 1.04vw, 20px)",
-          letterSpacing: "-0.04em",
-          opacity: 0.9,
-        }}
-      >
-        Awarded with
-      </p>
-      <div className="flex gap-6 items-center flex-wrap justify-center">
-        {AWARDS.map((a) => (
-          <div
-            key={a.alt}
-            className="relative rounded-[8px] overflow-hidden"
-            style={{ width: "97px", height: "120px" }}
+          {/* Glass button — Figma: border #dab6f3, bg white 65%, dark text */}
+          <Link
+            href="/contact-us"
+            className="self-start inline-flex items-center gap-2 rounded-[8px] overflow-hidden"
+            style={{
+              padding: "9px 18px",
+              border: "1px solid #dab6f3",
+              background: "rgba(255, 255, 255, 0.65)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
           >
-            <Image
-              src={a.src}
-              alt={a.alt}
-              fill
-              sizes="97px"
-              className="object-contain"
-              loading="lazy"
-            />
-          </div>
-        ))}
+            <span
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(14px, 0.94vw, 18px)",
+                fontWeight: 500,
+                letterSpacing: "-0.01em",
+                color: "#111",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Book a Container Scan
+            </span>
+            <svg
+              aria-hidden
+              role="presentation"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#111"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
       </div>
     </div>
   );
