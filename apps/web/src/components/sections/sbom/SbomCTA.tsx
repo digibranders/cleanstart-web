@@ -73,7 +73,7 @@ export function SbomCTA(): React.ReactElement {
               margin: 0,
             }}
           >
-            See Everything. Trust Every Component.
+            Verify Every Component You Ship
           </h2>
         </div>
 
@@ -93,9 +93,8 @@ export function SbomCTA(): React.ReactElement {
               margin: 0,
             }}
           >
-            Generate signed, complete SBOMs automatically on every build.
-            Meet EO 14028, EU CRA, and FIPS requirements without the manual
-            overhead.
+            Continuously updated, cryptographically verifiable software
+            inventories built for modern software supply chains.
           </p>
           <Link
             href="/contact-us"
@@ -108,7 +107,7 @@ export function SbomCTA(): React.ReactElement {
               } as React.CSSProperties
             }
           >
-            Contact us
+            Download the SBOM Datasheet
             <svg
               className="cs-cta-arrow"
               width="22"
@@ -155,7 +154,7 @@ export function SbomCTA(): React.ReactElement {
             maxWidth: "280px",
           }}
         >
-          See Everything. Trust Every Component.
+          Verify Every Component You Ship
         </h2>
         <p
           style={{
@@ -167,7 +166,8 @@ export function SbomCTA(): React.ReactElement {
             color: "rgba(255,255,255,0.80)",
           }}
         >
-          Generate signed, complete SBOMs automatically on every build.
+          Continuously updated, cryptographically verifiable software
+          inventories built for modern software supply chains.
         </p>
         <Link
           href="/contact-us"
@@ -179,7 +179,7 @@ export function SbomCTA(): React.ReactElement {
             } as React.CSSProperties
           }
         >
-          Contact us
+          Download the SBOM Datasheet
           <svg
             className="cs-cta-arrow"
             width="18"
