@@ -373,61 +373,29 @@ function KubrMascot() {
   const MASCOT_WIDTH = "clamp(180px, 18vw, 290px)";
 
   return (
-    <>
-      {/* Tail layer — z=1, behind cards. Only the leftmost ~33% of the bird
-          renders here so the LEFT card's white body + border occludes the
-          wing/tail tucked behind it. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute hidden md:block"
-        style={{
-          left: KUBR_LEFT,
-          bottom: KUBR_BOTTOM,
-          width: MASCOT_WIDTH,
-          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
-          zIndex: 1,
-          WebkitMaskImage:
-            "linear-gradient(90deg, #000 0%, #000 33%, transparent 36%, transparent 100%)",
-          maskImage:
-            "linear-gradient(90deg, #000 0%, #000 33%, transparent 36%, transparent 100%)",
-        }}
-      >
-        <Image
-          src="/images/kubr-bird.png"
-          alt=""
-          width={KUBR_W}
-          height={KUBR_H}
-          sizes="290px"
-          className="h-full w-full object-contain"
-        />
-      </div>
-
-      {/* Body + head layer — z=30, above cards. The leftmost ~33% is masked
-          OUT (drawn by the tail layer behind the cards instead). */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute hidden md:block"
-        style={{
-          left: KUBR_LEFT,
-          bottom: KUBR_BOTTOM,
-          width: MASCOT_WIDTH,
-          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
-          zIndex: 30,
-          WebkitMaskImage:
-            "linear-gradient(90deg, transparent 0%, transparent 33%, #000 36%, #000 100%)",
-          maskImage:
-            "linear-gradient(90deg, transparent 0%, transparent 33%, #000 36%, #000 100%)",
-        }}
-      >
-        <Image
-          src="/images/kubr-bird.png"
-          alt="Kubr mascot"
-          width={KUBR_W}
-          height={KUBR_H}
-          sizes="290px"
-          className="h-full w-full object-contain drop-shadow-[0_24px_40px_rgba(60,40,180,0.30)]"
-        />
-      </div>
-    </>
+    /* Single layer at z=30 — sits in front of both cards. The previous
+       two-layer split (tail z=1 behind cards / body z=30 in front, joined
+       by a 33→36% mask) created a visible purple-overlay seam where the
+       cards' dark gradient bled through the mask transition zone. */
+    <div
+      aria-hidden
+      className="pointer-events-none absolute hidden md:block"
+      style={{
+        left: KUBR_LEFT,
+        bottom: KUBR_BOTTOM,
+        width: MASCOT_WIDTH,
+        aspectRatio: `${KUBR_W} / ${KUBR_H}`,
+        zIndex: 30,
+      }}
+    >
+      <Image
+        src="/images/kubr-bird.png"
+        alt="Kubr mascot"
+        width={KUBR_W}
+        height={KUBR_H}
+        sizes="290px"
+        className="h-full w-full object-contain drop-shadow-[0_24px_40px_rgba(60,40,180,0.30)]"
+      />
+    </div>
   );
 }
