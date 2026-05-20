@@ -426,7 +426,7 @@ function KubrMascot() {
           width={KUBR_W}
           height={KUBR_H}
           sizes="290px"
-          className="h-full w-full object-contain drop-shadow-[0_24px_40px_rgba(60,40,180,0.30)]"
+          className="h-full w-full object-contain"
         />
       </div>
     </>
