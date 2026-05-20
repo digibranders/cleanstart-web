@@ -308,7 +308,7 @@ export const SlugField = (props: SlugFieldProps): ReactElement => {
           This slug is already in use. Save will fail — pick a different one.
         </output>
       ) : null}
-      {required && status.kind === 'empty' ? (
+      {required && status.kind === 'empty' && !docTitleEmpty ? (
         <output aria-live="polite" className="cs-slug__collision">
           <span aria-hidden="true">!</span>
           Slug is required. Save Draft and Publish stay disabled until it's set.
