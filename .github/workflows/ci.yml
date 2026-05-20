@@ -1,23 +1,39 @@
 name: CMS CI
 
-# Skip CI for changes that can't affect the built artifact (markdown docs,
-# license, top-level READMEs). Mixed PRs that touch any non-doc path still
-# run the full suite. When branch protection is later enabled with CMS CI
-# as a required check, add an always-running "ci-passed" aggregator job
-# so docs-only PRs don't get stuck on an expected-but-skipped check.
+# Only fire when something the CMS build/test path can actually be
+# affected by changes. Mirrors Web CI's allow-list pattern. `!` patterns
+# subtract from the allow-list above them. Branch-protection follow-up
+# (when CMS CI becomes a required check) still needs an always-running
+# `ci-passed` aggregator job so paths-filtered PRs don't get stuck.
 on:
   push:
     branches: [main, development]
-    paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - 'LICENSE'
+    paths:
+      - 'apps/cms/**'
+      - '!apps/cms/docs/**'
+      - '!apps/cms/**/*.md'
+      - 'packages/ui/**'
+      - '!packages/ui/**/*.md'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
+      - '.github/workflows/ci.yml'
+      - 'migrations/**'
   pull_request:
     branches: [main, development]
-    paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - 'LICENSE'
+    paths:
+      - 'apps/cms/**'
+      - '!apps/cms/docs/**'
+      - '!apps/cms/**/*.md'
+      - 'packages/ui/**'
+      - '!packages/ui/**/*.md'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
+      - '.github/workflows/ci.yml'
+      - 'migrations/**'
 
 concurrency:
   group: ci-${{ github.ref }}
