@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo/canonical";
 import { Header } from "@/components/sections/Header";
 import { Hero } from "@/components/sections/home/Hero";
 import { CleanStartFactory } from "@/components/sections/home/CleanStartFactory";
@@ -11,6 +13,13 @@ import { SecurityNotPatching } from "@/components/sections/home/SecurityNotPatch
 import { CleanStartAdvantage } from "@/components/sections/home/CleanStartAdvantage";
 import { FadeUp } from "@/components/ui/FadeUp";
 import Image from "next/image";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "CleanStart — Secure by Design. Built from Source.",
+  description:
+    "Verified container images. Built from source, hardened, signed, and continuously verified.",
+  path: "/",
+});
 
 export default function Home() {
   return (

@@ -2089,7 +2089,7 @@ Independent re-read of all 20 Part 5 worst-offenders against current `developmen
 
 | Flag | Status | Note |
 |---|---|---|
-| Resource Detail download bypass | **CONFIRMED — still bypasses** | `ResourceDetailHero.tsx` passes `assetHref` + `gated` to `ResourceDownloadButton` but the download fires when `assetHref !== "#"` regardless of `gateForm`. Form renderer landed (`3f009c4`) and a `ResourceGateModal.tsx` exists — but the Hero CTA path is not wired through it. This is a **product/compliance regression** that has now been open for >14 calendar days since first reported. |
+| Resource Detail download bypass | **RESOLVED (v3.1 re-verification, 2026-05-20)** | First-pass v3 verification was wrong. `ResourceDownloadButton.tsx` (added in `3f009c4`) IS wired correctly: when `gated && gateForm` it renders a button (not an `<a>`), the button's onClick checks `/api/resources/:slug/token`; on 200 the asset streams via the unlock cookie, on 403/404 the `ResourceGateModal` opens for form submit. `ResourceDetailHero.tsx:212` correctly threads `gated` + `gateForm` through. **No remediation needed.** Sprint 1 Day 5 adds the E2E regression test to keep it that way. |
 | BlogDetailFAQ `xl:` vs `lg:` mismatch | **RESOLVED** | Consistent `xl:` across siblings. Retire the flag. |
 | ResourceDetailLeadCapture checkbox 14×14 | CONFIRMED | line 240–241. WCAG 2.5.8 AA fail. |
 | PodcastHero `preserveAspectRatio="none"` ×2 | CONFIRMED | line 68, 109. |
