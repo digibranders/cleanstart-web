@@ -7,7 +7,65 @@ export interface FactoryCardProps {
 
 export function FactoryCard({ title, description }: FactoryCardProps) {
   return (
-    <div className="cs-factory-card relative h-[374px] w-full overflow-hidden rounded-[24px]">
+    <>
+      {/* MOBILE (< sm) — horizontal list-row per Figma 403:15244 (orb left,
+          title + description middle, arrow right). The decorative gradient
+          chrome is preserved at lower intensity so the brand identity stays. */}
+      <div className="cs-factory-card relative flex w-full overflow-hidden rounded-[20px] sm:hidden" style={{ minHeight: "84px" }}>
+        {/* Cyan + purple gradient bg (simplified for the row layout) */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(95deg, #5D04D7 0%, #1B0B6E 45%, #04C7F2 100%)",
+            opacity: 0.9,
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-[20px]"
+          style={{ boxShadow: "inset 0 0 0 1px rgba(218,182,243,0.35)" }}
+        />
+
+        <div className="relative flex w-full items-center gap-3 px-3 py-3">
+          {/* Orb icon — small */}
+          <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
+            <Image
+              src="/images/factory-orb.png"
+              alt=""
+              width={56}
+              height={56}
+              className="h-14 w-14 object-contain drop-shadow-[0_4px_8px_rgba(20,15,60,0.45)]"
+              sizes="56px"
+            />
+          </div>
+
+          {/* Title + description */}
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <h3 className="font-display text-base font-semibold leading-tight tracking-[-0.03em] text-white">
+              {title}
+            </h3>
+            <p className="text-sm leading-snug tracking-[-0.03em] text-white/85">
+              {description}
+            </p>
+          </div>
+
+          {/* Arrow chevron */}
+          <button
+            type="button"
+            aria-label={`Learn more about ${title}`}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/80 text-white"
+          >
+            <svg width="9" height="12" viewBox="0 0 9 12" fill="none" aria-hidden>
+              <path d="M2 1L7 6L2 11" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* DESKTOP (sm+) — existing absolute-positioned card */}
+      <div className="cs-factory-card relative hidden h-[374px] w-full overflow-hidden rounded-[24px] sm:block">
       {/* Layer 1 — purple ellipse (upper-left accent, like Figma Ellipse 46683 #5D04D7) */}
       <div
         className="pointer-events-none absolute"
@@ -117,7 +175,8 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           />
         </svg>
       </button>
-    </div>
+      </div>
+    </>
   );
 }
 
