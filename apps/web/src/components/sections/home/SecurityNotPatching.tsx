@@ -250,7 +250,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
               section-rel x=198 / y=258, and CleanStart logo (108:7934) sits at
               section-rel x=852 / y=258 — both 198px from their card outer left,
               i.e. 188px from the inner header's left after the 10px cyan border. */}
-          <div className="relative z-10 flex w-full items-center gap-3 pl-[188px]">
+          <div className="relative z-10 flex w-full items-center justify-center gap-3">
             {isPublic ? (
               <>
                 <Image
@@ -372,30 +372,63 @@ function KubrMascot() {
   // decorative-element rules (see apps/web/docs/design-tokens.md).
   const MASCOT_WIDTH = "clamp(180px, 18vw, 290px)";
 
+  // Hard-edged split at 33%: no transition zone → no purple seam.
+  // (The earlier 33→36% gradient blend bled the cards' dark gradient
+  // through the mask transition, which read as a purple overlay.)
+  const TAIL_MASK = "linear-gradient(90deg, #000 0%, #000 33%, transparent 33%, transparent 100%)";
+  const BODY_MASK = "linear-gradient(90deg, transparent 0%, transparent 33%, #000 33%, #000 100%)";
+
   return (
-    /* Single layer at z=30 — sits in front of both cards. The previous
-       two-layer split (tail z=1 behind cards / body z=30 in front, joined
-       by a 33→36% mask) created a visible purple-overlay seam where the
-       cards' dark gradient bled through the mask transition zone. */
-    <div
-      aria-hidden
-      className="pointer-events-none absolute hidden md:block"
-      style={{
-        left: KUBR_LEFT,
-        bottom: KUBR_BOTTOM,
-        width: MASCOT_WIDTH,
-        aspectRatio: `${KUBR_W} / ${KUBR_H}`,
-        zIndex: 30,
-      }}
-    >
-      <Image
-        src="/images/kubr-bird.png"
-        alt="Kubr mascot"
-        width={KUBR_W}
-        height={KUBR_H}
-        sizes="290px"
-        className="h-full w-full object-contain drop-shadow-[0_24px_40px_rgba(60,40,180,0.30)]"
-      />
-    </div>
+    <>
+      {/* Tail layer — z=1, behind the LEFT card. The 33% hard cut
+          stops exactly where the body layer starts, so the two halves
+          stitch back into one visually-continuous bird. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden md:block"
+        style={{
+          left: KUBR_LEFT,
+          bottom: KUBR_BOTTOM,
+          width: MASCOT_WIDTH,
+          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
+          zIndex: 1,
+          WebkitMaskImage: TAIL_MASK,
+          maskImage: TAIL_MASK,
+        }}
+      >
+        <Image
+          src="/images/kubr-bird.png"
+          alt=""
+          width={KUBR_W}
+          height={KUBR_H}
+          sizes="290px"
+          className="h-full w-full object-contain"
+        />
+      </div>
+
+      {/* Body + head — z=30, in front of both cards. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden md:block"
+        style={{
+          left: KUBR_LEFT,
+          bottom: KUBR_BOTTOM,
+          width: MASCOT_WIDTH,
+          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
+          zIndex: 30,
+          WebkitMaskImage: BODY_MASK,
+          maskImage: BODY_MASK,
+        }}
+      >
+        <Image
+          src="/images/kubr-bird.png"
+          alt="Kubr mascot"
+          width={KUBR_W}
+          height={KUBR_H}
+          sizes="290px"
+          className="h-full w-full object-contain drop-shadow-[0_24px_40px_rgba(60,40,180,0.30)]"
+        />
+      </div>
+    </>
   );
 }
