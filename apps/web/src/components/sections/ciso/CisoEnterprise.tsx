@@ -174,6 +174,7 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           <p
             style={{
               fontFamily: "var(--font-sans)",
+              // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
               fontSize: "20px",
               fontWeight: 400,
               letterSpacing: "-0.05em",

@@ -431,6 +431,7 @@ export function CisoComparison(): React.ReactElement {
             alt="VS"
             width={80}
             height={80}
+            sizes="80px"
             className="object-contain"
           />
         </div>

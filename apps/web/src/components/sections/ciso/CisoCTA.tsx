@@ -86,11 +86,7 @@ export function CisoCTA(): React.ReactElement {
             zIndex: 1,
           }}
         >
-          Strengthen Your{" "}
-          <br className="hidden xl:block" />
-          Software Supply Chain{" "}
-          <br className="hidden xl:block" />
-          Foundations
+          Strengthen Your Software Supply Chain Foundations
         </h2>
 
         {/* Right: description + CTA */}

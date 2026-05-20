@@ -41,6 +41,7 @@ function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
       <span
         aria-hidden
         className="pointer-events-none select-none absolute right-12 top-8 font-display font-bold leading-none text-[#250800]/20"
+        // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
         style={{ fontSize: "40px", lineHeight: 1 }}
       >
         &rdquo;
@@ -162,6 +163,7 @@ export function TeamsInsiders() {
           <span
             aria-hidden
             className="pointer-events-none select-none font-display font-bold leading-none text-[#111]/20"
+            // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
             style={{ fontSize: "72px", lineHeight: 1 }}
           >
             &ldquo;

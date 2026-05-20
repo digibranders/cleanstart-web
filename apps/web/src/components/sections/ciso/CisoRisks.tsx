@@ -104,9 +104,7 @@ export function CisoRisks(): React.ReactElement {
             marginBottom: "98px",
           }}
         >
-          Most Container Risk Is
-          <br />
-          Inherited
+          Most Container Risk Is Inherited
         </h2>
 
         {/* 2×2 grid — full 1276px, no horizontal padding */}

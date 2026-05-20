@@ -192,8 +192,7 @@ export function SCASecurityOutcomes(): React.ReactElement {
             lineHeight: 1.1,
           }}
         >
-          <span style={{ color: "#ffffff" }}>Security</span>
-          <br />
+          <span style={{ color: "#ffffff" }}>Security </span>
           <span
             style={{
               backgroundImage:

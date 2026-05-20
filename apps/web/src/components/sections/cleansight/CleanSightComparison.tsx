@@ -225,6 +225,7 @@ function Card({
               <p
                 style={{
                   fontFamily: "var(--font-display)",
+                  // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
                   fontSize: "22px",
                   fontWeight,
                   letterSpacing: "-1.1px",
@@ -249,6 +250,7 @@ function Card({
           className="relative z-10 text-white text-center"
           style={{
             fontFamily: "var(--font-display)",
+            // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
             fontSize: "32px",
             fontWeight: 700,
             letterSpacing: "-1.6px",
@@ -466,6 +468,7 @@ export function CleanSightComparison(): React.ReactElement {
             alt="VS"
             width={80}
             height={80}
+            sizes="80px"
             className="object-contain"
           />
         </div>

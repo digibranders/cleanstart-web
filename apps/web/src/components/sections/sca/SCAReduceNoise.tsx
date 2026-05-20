@@ -284,6 +284,7 @@ export function SCAReduceNoise(): React.ReactElement {
                   <span
                     style={{
                       fontFamily: "var(--font-body)",
+                      // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
                       fontSize: "16px",
                       fontWeight: 600,
                       letterSpacing: "-0.04em",
