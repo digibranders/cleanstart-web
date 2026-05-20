@@ -1,0 +1,46 @@
+[
+  {
+    "route": "/",
+    "violationIds": [
+      "aria-hidden-focus"
+    ]
+  },
+  {
+    "route": "/about-us",
+    "violationIds": []
+  },
+  {
+    "route": "/attack-surface-reduction",
+    "violationIds": []
+  },
+  {
+    "route": "/blogs",
+    "violationIds": []
+  },
+  {
+    "route": "/cleansight",
+    "violationIds": []
+  },
+  {
+    "route": "/cleanstart-images",
+    "violationIds": []
+  },
+  {
+    "route": "/fips",
+    "violationIds": []
+  },
+  {
+    "route": "/news",
+    "violationIds": []
+  },
+  {
+    "route": "/resource-center",
+    "violationIds": [
+      "color-contrast"
+    ]
+  },
+  {
+    "route": "/vulnerability-remediation",
+    "violationIds": []
+  }
+]

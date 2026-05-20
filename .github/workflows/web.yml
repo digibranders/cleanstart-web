@@ -97,6 +97,73 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+  web-e2e:
+    name: apps/web · Playwright (responsive + axe smoke)
+    needs: web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Download Next.js build
+        uses: actions/download-artifact@v4
+        with:
+          name: web-next-build
+          path: apps/web/.next
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('apps/web/package.json', 'pnpm-lock.yaml') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @cleanstart/web exec playwright install --with-deps chromium
+
+      - name: Start production server
+        run: pnpm --filter @cleanstart/web start &
+        env:
+          PORT: 3001
+
+      - name: Wait for server
+        run: |
+          for i in {1..30}; do
+            if curl -sf http://localhost:3001/api/health > /dev/null 2>&1 || curl -sf http://localhost:3001/ > /dev/null 2>&1; then
+              echo "Server ready"; exit 0
+            fi
+            sleep 2
+          done
+          echo "Server did not become ready"; exit 1
+
+      - name: Run Playwright
+        run: pnpm --filter @cleanstart/web test:e2e
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3001
+          CI: "1"
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-playwright-report
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+            apps/web/tests/e2e/__baselines__/
+          if-no-files-found: ignore
+          retention-days: 14
+
   web-lhci:
     name: apps/web · Lighthouse CI (mobile + desktop)
     needs: web
