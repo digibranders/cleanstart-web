@@ -86,8 +86,7 @@ interface FitsCardProps {
 function FitsCard({ card }: FitsCardProps): React.ReactElement {
   return (
     <div
-      className="relative overflow-hidden rounded-[32px]"
-      style={{ minHeight: "352px" }}
+      className="relative overflow-hidden rounded-[32px] min-h-[clamp(260px,26vw,352px)]"
     >
       {/* Outer cyan border glow */}
       <div
@@ -102,7 +101,7 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
 
       {/* White card with subtle shadow */}
       <div
-        className="absolute rounded-[32px] bg-white overflow-hidden"
+        className="absolute rounded-[32px] bg-white overflow-hidden flex flex-col"
         style={{ inset: "8px" }}
       >
         {/* Purple glow blob */}
@@ -113,6 +112,7 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
             left: "8px",
             top: "43px",
             width: "360px",
+            maxWidth: "calc(100% + 80px)",
             height: "153px",
             background: "#df9bff",
             borderRadius: "50%",
@@ -121,33 +121,34 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
           }}
         />
 
-        {/* Subtle grid lines */}
-        {[68, 166, 224, 322].map((x) => (
+        {/* Subtle grid lines — vertical, percentage-positioned so they scale
+            with card width instead of clipping at narrow widths. */}
+        {[20, 49, 66, 95].map((pct) => (
           <div
-            key={x}
+            key={pct}
             aria-hidden
             className="absolute pointer-events-none"
             style={{
-              left: x,
+              left: `${pct}%`,
               top: 0,
               width: "1px",
-              height: "264px",
+              height: "60%",
               background:
                 "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%)",
             }}
           />
         ))}
 
-        {/* Horizontal grid lines */}
-        {[75, 191].map((y) => (
+        {/* Horizontal grid lines — percentage Y so they track icon-area height */}
+        {[22, 56].map((pct) => (
           <div
-            key={y}
+            key={pct}
             aria-hidden
             className="absolute pointer-events-none"
             style={{
               left: 0,
               right: 0,
-              top: y,
+              top: `${pct}%`,
               height: "1px",
               background:
                 "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%)",
@@ -155,24 +156,18 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
           />
         ))}
 
-        {/* 3D icon */}
-        <div
-          className="relative overflow-hidden"
-          style={{ height: "200px" }}
-        >
+        {/* 3D icon — fluid height, icon vertically centred so the gap to
+            title is consistent at all viewports. */}
+        <div className="relative flex items-center justify-center h-[clamp(120px,14vw,180px)] shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={card.icon}
             alt=""
             aria-hidden
-            className="absolute pointer-events-none select-none"
+            className="pointer-events-none select-none object-contain"
             style={{
-              top: "24px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "160px",
-              height: "160px",
-              objectFit: "contain",
+              width: "clamp(110px, 12vw, 160px)",
+              aspectRatio: "1 / 1",
             }}
             loading="lazy"
             decoding="async"
@@ -182,7 +177,7 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
         {/* Divider */}
         <div
           aria-hidden
-          className="pointer-events-none"
+          className="pointer-events-none shrink-0"
           style={{
             height: "1px",
             background:
@@ -190,13 +185,12 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
           }}
         />
 
-        {/* Text */}
-        <div className="px-10 py-8 flex flex-col gap-4">
+        {/* Text — fluid padding + token typography */}
+        <div className="flex flex-col gap-[clamp(8px,1vw,16px)] p-[clamp(20px,2.5vw,40px)]">
           <p
-            className="text-[#111]"
+            className="text-card-title-lg text-[#111]"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "32px",
               fontWeight: 700,
               letterSpacing: "-0.05em",
               lineHeight: 1.0,
@@ -205,10 +199,9 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
             {card.title}
           </p>
           <p
-            className="text-[#555]"
+            className="text-body-lg text-[#555]"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "20px",
               fontWeight: 400,
               letterSpacing: "-0.05em",
               lineHeight: 1.4,
