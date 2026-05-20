@@ -1,0 +1,49 @@
+name: Debug — dump CMS container logs
+
+# Manual-only diagnostic. SSHes the prod droplet and prints recent CMS
+# container logs + container status + last admin request. Use when a
+# blank-page / runtime error needs the actual server-side stack trace.
+on:
+  workflow_dispatch:
+    inputs:
+      tail:
+        description: 'How many log lines to dump'
+        required: false
+        default: '300'
+
+jobs:
+  logs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Set up SSH to droplet
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DROPLET_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan ${{ secrets.DROPLET_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Dump container status + logs + last admin request
+        run: |
+          ssh -i ~/.ssh/id_deploy \
+            ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} \
+            "set -e
+             echo '=== cms container ==='
+             docker ps --filter name=cleanstart-cms-1 --format 'table {{.Names}}\t{{.Status}}\t{{.Image}}\t{{.Ports}}'
+             echo
+             echo '=== cms image tags on droplet ==='
+             docker images cms --format 'table {{.Tag}}\t{{.CreatedAt}}\t{{.Size}}'
+             echo
+             echo '=== last ${{ inputs.tail }} log lines ==='
+             docker logs --tail ${{ inputs.tail }} cleanstart-cms-1 2>&1
+             echo
+             echo '=== probe /admin/create-first-user from inside droplet ==='
+             curl -sS -o /tmp/probe.html -w 'HTTP %{http_code} | size %{size_download}B | TTFB %{time_starttransfer}s\\n' --max-time 15 http://127.0.0.1:3000/admin/create-first-user
+             echo '=== first 600 bytes of probe body ==='
+             head -c 600 /tmp/probe.html
+             echo
+             echo '=== container logs since probe ==='
+             docker logs --since 10s cleanstart-cms-1 2>&1 | tail -50"
