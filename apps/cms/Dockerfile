@@ -39,6 +39,22 @@ ARG PAYLOAD_SECRET=build-time-placeholder-not-used-at-runtime
 ENV DATABASE_URI=$DATABASE_URI
 ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 
+# R2 placeholders — never used at runtime (real values are in /opt/cleanstart/.env
+# on the droplet), but must be non-empty during `payload generate:importmap`
+# so r2EnvComplete() returns true and the s3Storage plugin registers
+# S3ClientUploadHandler in importMap.js. Without these, the prebuild step
+# emits an importMap missing that client component; at runtime the plugin
+# *is* active (real R2 envs present), it references S3ClientUploadHandler,
+# and the lookup fails — breaking admin hydration with a blank screen.
+ARG R2_BUCKET=build-placeholder
+ARG R2_ENDPOINT=https://build-placeholder.r2.cloudflarestorage.com
+ARG R2_ACCESS_KEY_ID=build-placeholder
+ARG R2_SECRET_ACCESS_KEY=build-placeholder
+ENV R2_BUCKET=$R2_BUCKET
+ENV R2_ENDPOINT=$R2_ENDPOINT
+ENV R2_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID
+ENV R2_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY
+
 # Sharp memory tuning for the constrained droplet (2 GB / 1 vCPU)
 ENV SHARP_CONCURRENCY=1
 
