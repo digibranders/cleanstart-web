@@ -93,41 +93,104 @@ export function WebinarFilters({
     [activeRegion, setRegion],
   );
 
+  const activeCount =
+    (activeType !== undefined ? 1 : 0) + (activeRegion !== undefined ? 1 : 0);
+
   return (
     <aside
       aria-label="Filter webinars"
-      className="rounded-2xl bg-white"
-      style={{
-        width: "299px",
-        padding: "24px",
-        border: "1px solid #E5E7EB",
-        boxShadow: "0 1px 2px rgba(15,23,42,0.04)",
-      }}
+      // Mobile: full-width <details> disclosure; collapses by default so the
+      // listing isn't crushed by the 299px sidebar. lg+: sticky white-card
+      // sidebar as before.
+      className="w-full lg:w-[299px] rounded-2xl bg-white lg:p-6 lg:border lg:border-[#E5E7EB] lg:shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
     >
-      <div className="flex items-center gap-2" style={{ marginBottom: "24px" }}>
-        <FilterIcon />
-        <span
-          className="font-display font-semibold"
-          style={{ fontSize: "18px", color: "#0F172A", letterSpacing: "-0.01em" }}
+      {/* MOBILE (< lg) — native <details> disclosure */}
+      <details className="lg:hidden group rounded-2xl border border-[#E5E7EB] bg-white">
+        <summary
+          className="flex items-center justify-between gap-2 px-4 py-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden"
         >
-          Filter BY
-        </span>
-      </div>
+          <span className="flex items-center gap-2">
+            <FilterIcon />
+            <span
+              className="font-display font-semibold"
+              style={{ fontSize: "16px", color: "#0F172A", letterSpacing: "-0.01em" }}
+            >
+              Filter
+            </span>
+            {activeCount > 0 && (
+              <span
+                aria-label={`${activeCount} active filter${activeCount === 1 ? "" : "s"}`}
+                className="flex items-center justify-center rounded-full bg-[#5B33F3] text-white"
+                style={{ width: "20px", height: "20px", fontSize: "12px", fontWeight: 600 }}
+              >
+                {activeCount}
+              </span>
+            )}
+          </span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden
+            className="transition-transform group-open:rotate-180"
+          >
+            <path
+              d="M4 6l4 4 4-4"
+              stroke="#0F172A"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </summary>
 
-      <FilterSectionLabel>CATEGORIES</FilterSectionLabel>
-      <div className="flex flex-col" style={{ gap: "10px" }}>
-        {typeRows.map(({ key, ...row }) => (
-          <FilterRow key={key} {...row} />
-        ))}
-      </div>
+        <div className="px-4 pb-4 pt-2">
+          <FilterSectionLabel>CATEGORIES</FilterSectionLabel>
+          <div className="flex flex-col" style={{ gap: "10px" }}>
+            {typeRows.map(({ key, ...row }) => (
+              <FilterRow key={key} {...row} />
+            ))}
+          </div>
 
-      <div style={{ height: "1px", background: "#E5E7EB", margin: "20px 0" }} />
+          <div style={{ height: "1px", background: "#E5E7EB", margin: "20px 0" }} />
 
-      <FilterSectionLabel>REGION</FilterSectionLabel>
-      <div className="flex flex-col" style={{ gap: "10px" }}>
-        {regionRows.map(({ key, ...row }) => (
-          <FilterRow key={key} {...row} />
-        ))}
+          <FilterSectionLabel>REGION</FilterSectionLabel>
+          <div className="flex flex-col" style={{ gap: "10px" }}>
+            {regionRows.map(({ key, ...row }) => (
+              <FilterRow key={key} {...row} />
+            ))}
+          </div>
+        </div>
+      </details>
+
+      {/* DESKTOP (lg+) — existing sticky sidebar layout */}
+      <div className="hidden lg:block">
+        <div className="flex items-center gap-2" style={{ marginBottom: "24px" }}>
+          <FilterIcon />
+          <span
+            className="font-display font-semibold"
+            style={{ fontSize: "18px", color: "#0F172A", letterSpacing: "-0.01em" }}
+          >
+            Filter BY
+          </span>
+        </div>
+
+        <FilterSectionLabel>CATEGORIES</FilterSectionLabel>
+        <div className="flex flex-col" style={{ gap: "10px" }}>
+          {typeRows.map(({ key, ...row }) => (
+            <FilterRow key={key} {...row} />
+          ))}
+        </div>
+
+        <div style={{ height: "1px", background: "#E5E7EB", margin: "20px 0" }} />
+
+        <FilterSectionLabel>REGION</FilterSectionLabel>
+        <div className="flex flex-col" style={{ gap: "10px" }}>
+          {regionRows.map(({ key, ...row }) => (
+            <FilterRow key={key} {...row} />
+          ))}
+        </div>
       </div>
     </aside>
   );
