@@ -77,6 +77,28 @@
       "name": "attendeesCap"
     },
     {
+      "type": "text",
+      "name": "ctaLabel"
+    },
+    {
+      "type": "group",
+      "name": "postEventCta",
+      "fields": [
+        {
+          "type": "checkbox",
+          "name": "enabled"
+        },
+        {
+          "type": "text",
+          "name": "label"
+        },
+        {
+          "type": "text",
+          "name": "url"
+        }
+      ]
+    },
+    {
       "type": "select",
       "name": "eventStatus",
       "required": true,

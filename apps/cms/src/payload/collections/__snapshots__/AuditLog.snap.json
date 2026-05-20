@@ -32,6 +32,9 @@
         },
         {
           "value": "content_reassigned"
+        },
+        {
+          "value": "display_publish_date_overridden"
         }
       ]
     },

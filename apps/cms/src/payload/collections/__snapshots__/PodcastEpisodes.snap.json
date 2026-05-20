@@ -55,11 +55,15 @@
     {
       "type": "date",
       "name": "publishedAt"
+    },
+    {
+      "type": "date",
+      "name": "displayPublishedAt"
     }
   ],
   "hooks": {
-    "beforeChange": 2,
-    "afterChange": 0,
+    "beforeChange": 3,
+    "afterChange": 1,
     "beforeValidate": 0,
     "afterDelete": 0
   }
