@@ -76,7 +76,6 @@ export function AboutHero() {
               href="#contact"
               className="cs-btn-glass"
               style={{
-                ["--cs-btn-h" as string]: "40px",
                 ["--cs-btn-px" as string]: "18px",
                 ["--cs-btn-fs" as string]: "20px",
                 color: "#111111",

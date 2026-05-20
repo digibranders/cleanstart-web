@@ -228,8 +228,13 @@ export function ResourceDetailLeadCapture({
                   </button>
                 </div>
 
-                {/* Consent checkbox */}
-                <div className="flex items-center gap-2 w-full">
+                {/* Consent checkbox — input visual is 20x20 inside a 44px-tall
+                    label so the whole row meets WCAG 2.5.8 (target-size). */}
+                <label
+                  htmlFor="rd-consent"
+                  className="flex items-center gap-2 w-full text-xs lg:text-sm font-normal leading-none tracking-[-0.04em] text-white lg:whitespace-nowrap cursor-pointer"
+                  style={{ minHeight: "44px", opacity: 0.8 }}
+                >
                   <input
                     id="rd-consent"
                     type="checkbox"
@@ -237,21 +242,15 @@ export function ResourceDetailLeadCapture({
                     onChange={(e) => setAgreed(e.target.checked)}
                     className="shrink-0"
                     style={{
-                      width: "14px",
-                      height: "14px",
+                      width: "20px",
+                      height: "20px",
                       borderRadius: "3px",
                       accentColor: "#3960f9",
                       cursor: "pointer",
                     }}
                   />
-                  <label
-                    htmlFor="rd-consent"
-                    className="text-xs lg:text-sm font-normal leading-none tracking-[-0.04em] text-white lg:whitespace-nowrap"
-                    style={{ opacity: 0.8 }}
-                  >
-                    I agree to receive other communications from CleanStart.*
-                  </label>
-                </div>
+                  <span>I agree to receive other communications from CleanStart.*</span>
+                </label>
               </form>
             </div>
           </div>

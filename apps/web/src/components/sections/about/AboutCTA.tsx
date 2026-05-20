@@ -66,7 +66,6 @@ export function AboutCTA() {
           href="#contact"
           className="cs-btn-glass"
           style={{
-            ["--cs-btn-h" as string]: "43px",
             ["--cs-btn-px" as string]: "18px",
             ["--cs-btn-fs" as string]: "18px",
             color: "#111111",
@@ -79,14 +78,14 @@ export function AboutCTA() {
         <a
           href="#how-it-works"
           className="cs-btn-blue"
-          style={{ width: "163px", height: "43px", fontSize: "1.125rem" }}
+          style={{ width: "163px", height: "44px", fontSize: "1.125rem" }}
         >
           How it works
         </a>
         <a
           href="#careers"
           className="cs-btn-blue"
-          style={{ width: "111px", height: "43px", fontSize: "1.125rem" }}
+          style={{ width: "111px", height: "44px", fontSize: "1.125rem" }}
         >
           Careers
         </a>

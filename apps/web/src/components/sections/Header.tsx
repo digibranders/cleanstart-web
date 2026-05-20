@@ -31,7 +31,6 @@ export function Header() {
             type="button"
             className="cs-btn-glass hidden lg:inline-flex"
             style={{
-              ["--cs-btn-h" as string]: "38px",
               ["--cs-btn-px" as string]: "22px",
               ["--cs-btn-fs" as string]: "14px",
             }}

@@ -102,7 +102,7 @@ export function SbomCTA(): React.ReactElement {
             className="cs-btn-glass self-start"
             style={
               {
-                "--cs-btn-h": "48px",
+                "--cs-btn-h": "var(--btn-h-xl)",
                 "--cs-btn-px": "32px",
                 "--cs-btn-fs": "17px",
               } as React.CSSProperties
@@ -173,7 +173,6 @@ export function SbomCTA(): React.ReactElement {
           className="cs-btn-glass self-start"
           style={
             {
-              "--cs-btn-h": "40px",
               "--cs-btn-px": "22px",
               "--cs-btn-fs": "14px",
             } as React.CSSProperties

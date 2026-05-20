@@ -70,7 +70,6 @@ export function CleanSightHero(): React.ReactElement {
           className="cs-btn-glass mt-10 self-center"
           style={
             {
-              "--cs-btn-h": "38px",
               "--cs-btn-px": "18px",
               "--cs-btn-fs": "20px",
             } as React.CSSProperties

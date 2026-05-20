@@ -71,7 +71,6 @@ export function ReadyToSecureCTA() {
           href="#get-a-demo"
           className="cs-btn-glass"
           style={{
-            ["--cs-btn-h" as string]: "43px",
             ["--cs-btn-px" as string]: "18px",
             ["--cs-btn-fs" as string]: "18px",
           }}

@@ -295,7 +295,6 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
             style={{
               alignSelf: "flex-start",
               marginTop: "24px",
-              ["--cs-btn-h" as string]: "42px",
               ["--cs-btn-px" as string]: "18px",
               ["--cs-btn-fs" as string]: "18px",
             }}

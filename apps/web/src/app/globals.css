@@ -59,11 +59,11 @@
   --btn-fs-sm: 0.875rem;  /* 14px — utility (data-cta-utility) */
   --btn-fs-xs: 0.8125rem; /* 13px — utility (data-cta-utility) */
 
-  --btn-h-xl: 3.5rem;     /* 56px */
-  --btn-h-lg: 2.75rem;    /* 44px — WCAG 2.5.8 floor for primary CTAs */
-  --btn-h-md: 2.25rem;    /* 36px — utility only */
-  --btn-h-sm: 2rem;       /* 32px — utility only */
-  --btn-h-xs: 1.75rem;    /* 28px — utility only */
+  --btn-h-xl: 3rem;       /* 48px — hero-feature CTA */
+  --btn-h-lg: 2.75rem;    /* 44px — WCAG 2.5.8 floor; default for every primary CTA */
+  --btn-h-md: 2.25rem;    /* 36px — utility only (requires data-cta-utility) */
+  --btn-h-sm: 2rem;       /* 32px — utility only (requires data-cta-utility) */
+  --btn-h-xs: 1.75rem;    /* 28px — utility only (requires data-cta-utility) */
 
   --btn-px-xl: 1.75rem;   /* 28px */
   --btn-px-lg: 1.375rem;  /* 22px */
@@ -273,6 +273,12 @@ body {
   font-weight: 500;
   letter-spacing: -0.01em;
   border-radius: 8px;
+  /* WCAG 2.5.8 floor for primary CTAs. Callsites may override
+     --cs-btn-h to var(--btn-h-xl) for hero-feature CTAs, or to a utility
+     value with `data-cta-utility`. See apps/web/docs/design-tokens.md. */
+  height: var(--cs-btn-h, 2.75rem);
+  padding: 0 var(--cs-btn-px, 22px);
+  font-size: var(--cs-btn-fs, 16px);
   background: #3960F9;
   box-shadow:
     0 0 0 1.002px #3960F9,
@@ -320,8 +326,13 @@ body {
   font-weight: 600;
   letter-spacing: -0.01em;
   color: #1B1F4F;
-  /* Default size — overridden via --cs-btn-h / --cs-btn-px on each instance */
-  height: var(--cs-btn-h, 40px);
+  /* Default size — every primary CTA inherits the WCAG 2.5.8 floor (44px).
+     Callsites may override --cs-btn-h to var(--btn-h-xl) for hero-feature CTAs,
+     or to a utility value (--btn-h-md/sm/xs) ONLY when the element also
+     carries `data-cta-utility` (per the v3 Consistency Layer).
+     Padding and font-size keep their pre-v3 defaults so this is a height-only
+     bump (S2D1 is the WCAG-target-size fix; visual rhythm work is later). */
+  height: var(--cs-btn-h, 2.75rem);
   padding: 0 var(--cs-btn-px, 18px);
   font-size: var(--cs-btn-fs, 14px);
   border-radius: 8px;

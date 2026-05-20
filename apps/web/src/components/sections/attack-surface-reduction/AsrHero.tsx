@@ -109,7 +109,7 @@ export function AsrHero(): React.ReactElement {
               className="cs-btn-glass"
               style={
                 {
-                  "--cs-btn-h": "48px",
+                  "--cs-btn-h": "var(--btn-h-xl)",
                   "--cs-btn-px": "24px",
                   "--cs-btn-fs": "16px",
                 } as React.CSSProperties

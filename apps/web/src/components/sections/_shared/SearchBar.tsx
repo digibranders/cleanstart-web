@@ -83,7 +83,7 @@ export function SearchBar({
   );
 
   const inputWrapperStyle: React.CSSProperties = {
-    height: "42px",
+    height: "44px",
     background: "rgba(255,255,255,0.2)",
     border: "1px solid rgba(237,203,255,0.6)",
     borderRight: "none",
@@ -119,7 +119,7 @@ export function SearchBar({
           className="shrink-0 flex items-center justify-center cursor-pointer"
           style={{
             width: "52px",
-            height: "42px",
+            height: "44px",
             background: "rgba(255,255,255,0.15)",
             border: "1px solid rgba(237,203,255,0.6)",
             borderLeft: "none",

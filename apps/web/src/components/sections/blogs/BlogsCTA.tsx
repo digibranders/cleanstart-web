@@ -116,7 +116,7 @@ export function BlogsCTA(): React.ReactElement {
                   className="relative overflow-hidden"
                   style={{
                     width: "427px",
-                    height: "43px",
+                    height: "44px",
                     background: "rgba(255,255,255,0.2)",
                     border: "1px solid rgba(237,203,255,0.6)",
                     borderRight: "none",
@@ -138,7 +138,6 @@ export function BlogsCTA(): React.ReactElement {
                   type="submit"
                   className="cs-btn-glass cs-btn-glass--no-lift shrink-0"
                   style={{
-                    ["--cs-btn-h" as string]: "43px",
                     ["--cs-btn-px" as string]: "16px",
                     ["--cs-btn-fs" as string]: "18px",
                     borderRadius: "0 12px 12px 0",

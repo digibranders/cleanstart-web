@@ -183,8 +183,7 @@ export function FipsHero(): React.ReactElement {
             className="cs-btn-glass"
             style={
               {
-                // Figma button: w=221, h=38, padding 18px both sides, font 16/20
-                "--cs-btn-h": "38px",
+                // Figma button: w=221, h=38 -> raised to 44 (WCAG 2.5.8); padding 18, font 16/20
                 "--cs-btn-px": "18px",
                 "--cs-btn-fs": "16px",
               } as React.CSSProperties

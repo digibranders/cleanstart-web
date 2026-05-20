@@ -216,7 +216,7 @@ export function ResourceDetailHero({
             gated={gated}
             assetHref={assetHref}
             gateForm={gateForm ?? null}
-            className="cs-btn-blue gap-3 font-bold h-[42px] lg:h-[64px]"
+            className="cs-btn-blue gap-3 font-bold h-11 lg:h-[64px]"
             style={{
               width: "840px",
               maxWidth: "100%",
