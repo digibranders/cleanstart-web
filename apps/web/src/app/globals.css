@@ -41,15 +41,15 @@
   --text-body-xs: clamp(0.75rem, 0.85vw, 0.875rem);        /* 12→14px — eyebrow, breadcrumb, caption */
 
   /* Section vertical-padding scale (fluid) */
-  --space-section-sm: clamp(3rem, 6vw, 5rem);              /* 48→80px — tight/sequential grids */
-  --space-section-md: clamp(4rem, 8vw, 7.5rem);            /* 64→120px — standard sections */
-  --space-section-lg: clamp(5rem, 10vw, 9.375rem);         /* 80→150px — feature/hero-adjacent */
-  --space-section-cta: clamp(10rem, 18vw, 15.625rem);      /* 160→250px — CTA-overlap reservation above Footer */
+  --spacing-section-sm: clamp(3rem, 6vw, 5rem);              /* 48→80px — tight/sequential grids */
+  --spacing-section-md: clamp(4rem, 8vw, 7.5rem);            /* 64→120px — standard sections */
+  --spacing-section-lg: clamp(5rem, 10vw, 9.375rem);         /* 80→150px — feature/hero-adjacent */
+  --spacing-section-cta: clamp(10rem, 18vw, 15.625rem);      /* 160→250px — CTA-overlap reservation above Footer */
 
   /* Card padding scale (fluid) */
-  --space-card-sm: clamp(1rem, 1.5vw, 1.5rem);             /* 16→24px — compact cards */
-  --space-card-md: clamp(1.25rem, 2vw, 2rem);              /* 20→32px — standard cards */
-  --space-card-lg: clamp(1.5rem, 2.5vw, 2.5rem);           /* 24→40px — hero/feature cards */
+  --spacing-card-sm: clamp(1rem, 1.5vw, 1.5rem);             /* 16→24px — compact cards */
+  --spacing-card-md: clamp(1.25rem, 2vw, 2rem);              /* 20→32px — standard cards */
+  --spacing-card-lg: clamp(1.5rem, 2.5vw, 2.5rem);           /* 24→40px — hero/feature cards */
 
   /* Discrete button size scale — buttons MUST stay fixed (WCAG 2.5.8 floor); never clamp height.
      Minimum CTA target is 44px (lg). Smaller variants are utility-only and require data-cta-utility. */

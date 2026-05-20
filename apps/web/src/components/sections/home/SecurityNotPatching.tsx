@@ -180,7 +180,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
              the visible outcome with two distinct CSS gradients tuned to the
              eyeball colors of the rendered Figma textures. */}
         <div
-          className="relative flex h-[clamp(96px,9vw,130px)] w-full items-center justify-center gap-3 overflow-hidden"
+          className="relative flex h-[clamp(80px,7vw,110px)] w-full items-center justify-center gap-3 overflow-hidden"
           style={{
             background: isPublic
               ? // LEFT (Public Images) — desaturated texture overlay → reads black
@@ -280,7 +280,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
         </div>
 
         {/* White content area — Figma inner body rect 108:7965/108:7903 is 441px tall. */}
-        <div className="relative min-h-[clamp(360px,32vw,441px)] overflow-hidden bg-white">
+        <div className="relative min-h-[clamp(300px,24vw,380px)] overflow-hidden bg-white">
           {/* Decorative blobs (Figma Ellipse 46681 #DF9BFF + 46682 #2CC1EB) */}
           <div
             aria-hidden
@@ -313,7 +313,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
 
           {/* Bullet list — Figma bullets are 31px-tall rows with 71px top-to-top
               spacing → 40px gap between rows (same for both cards). */}
-          <ul className="relative z-10 mx-auto flex h-full max-w-[320px] flex-col justify-center gap-[40px]">
+          <ul className="relative z-10 mx-auto flex h-full max-w-[320px] flex-col justify-center gap-[clamp(20px,2.2vw,32px)]">
             {features.map((label) => (
               <li key={label} className="flex items-center gap-6">
                 {isPublic ? (
