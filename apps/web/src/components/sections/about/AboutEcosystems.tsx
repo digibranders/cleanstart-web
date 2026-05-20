@@ -90,37 +90,24 @@ export function AboutEcosystems() {
 
       </div>
 
-      {/* Logo strip — full-width, single row, faded edges */}
-      <div className="relative mt-[60px] overflow-hidden">
-        {/* Left fade */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[180px]"
-          style={{
-            background:
-              "linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)",
-          }}
-        />
-        {/* Right fade */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-[180px]"
-          style={{
-            background:
-              "linear-gradient(270deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)",
-          }}
-        />
-
-        <div className="flex flex-wrap items-center justify-center gap-x-[clamp(32px,8vw,120px)] gap-y-10 px-[clamp(24px,12vw,180px)]">
-          {PARTNERS.map((p) => (
-            <div key={p.name} className="flex shrink-0 items-center justify-center">
+      {/* Logo strip — infinite RTL marquee, single line, faded edges */}
+      <div
+        className="relative mt-[60px] w-full overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]"
+      >
+        <div className="cs-marquee items-center gap-x-[clamp(48px,8vw,120px)] py-2">
+          {[...PARTNERS, ...PARTNERS].map((p, i) => (
+            <div
+              key={`${p.name}-${i}`}
+              className="flex shrink-0 items-center justify-center"
+              style={{ height: "88px" }}
+            >
               <Image
                 src={p.src}
                 alt={p.name}
                 width={p.width}
                 height={p.height}
                 sizes="200px"
-                className="h-auto object-contain opacity-80 transition-opacity hover:opacity-100"
+                className="h-auto object-contain opacity-80"
                 style={{ maxHeight: "88px", maxWidth: p.width }}
                 loading="lazy"
               />
