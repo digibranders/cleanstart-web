@@ -114,7 +114,7 @@ export function AsrCTA(): React.ReactElement {
           className="text-[#111111]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(34px, 2.86vw, 55px)",
+            fontSize: "clamp(28px, 3vw, 42px)",
             fontWeight: 700,
             letterSpacing: "-0.05em",
             lineHeight: 1.0,

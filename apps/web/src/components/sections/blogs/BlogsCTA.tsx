@@ -31,8 +31,8 @@ export function BlogsCTA(): React.ReactElement {
         aria-hidden
         className="pointer-events-none select-none absolute"
         style={{
-          left: "-45px",
-          top: "230px",
+          left: "-20px",
+          top: "180px",
           width: "176px",
           height: "178px",
           opacity: 0.8,
@@ -53,8 +53,8 @@ export function BlogsCTA(): React.ReactElement {
         aria-hidden
         className="pointer-events-none select-none absolute"
         style={{
-          left: "1145px",
-          top: "-40px",
+          left: "1070px",
+          top: "-20px",
           width: "176px",
           height: "178px",
           opacity: 0.8,
@@ -72,13 +72,13 @@ export function BlogsCTA(): React.ReactElement {
 
       <div className="absolute inset-0 flex items-center justify-center px-6">
         <div
-          className="flex flex-col lg:flex-row items-center gap-y-8 lg:gap-x-[clamp(40px,9vw,115px)] w-full"
+          className="flex flex-col lg:flex-row items-start lg:items-center gap-y-4 lg:gap-y-0 lg:gap-x-[clamp(40px,9vw,115px)] w-full"
           style={{ maxWidth: "1047px" }}
         >
           <div
-            className="font-display font-bold text-white w-full lg:w-auto lg:max-w-[401px] text-center lg:text-left"
+            className="font-display font-bold text-white w-full lg:w-auto lg:max-w-[401px] text-left"
             style={{
-              fontSize: "clamp(1.75rem,3.82vw,3.4375rem)",
+              fontSize: "clamp(1.75rem,3vw,2.625rem)",
               lineHeight: "1.0",
               letterSpacing: "-0.05em",
             }}
@@ -87,7 +87,7 @@ export function BlogsCTA(): React.ReactElement {
           </div>
 
           <div
-            className="flex flex-col items-start w-full lg:max-w-[493px]"
+            className="flex flex-col items-start w-full max-w-[493px]"
             style={{ gap: "24px" }}
           >
             <p

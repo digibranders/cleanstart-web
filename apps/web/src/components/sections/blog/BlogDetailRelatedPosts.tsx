@@ -83,7 +83,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
       }}
     >
       {/* Hero image */}
-      <div className="relative shrink-0 mx-3 mt-3 rounded-[20px] overflow-hidden" style={{ height: "200px" }}>
+      <div className="relative shrink-0 mx-3 mt-3 rounded-[24px] overflow-hidden" style={{ height: "200px" }}>
           {post.heroImage ? (
             <Image
               src={mediaUrl(post.heroImage.url)!}

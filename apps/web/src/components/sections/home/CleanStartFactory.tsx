@@ -43,19 +43,6 @@ export function CleanStartFactory() {
         >
           The CleanStart Factory
         </h2>
-        <p
-          className="mx-auto mt-5 max-w-[640px] font-sans text-white/75"
-          style={{
-            fontSize: "clamp(1rem,1.4vw,1.25rem)",
-            fontWeight: 400,
-            lineHeight: "150%",
-            letterSpacing: "-0.02em",
-          }}
-        >
-          A continuous, AI-orchestrated pipeline that turns open-source software
-          into hardened, signed, deterministic container images — every build,
-          end-to-end.
-        </p>
       </div>
 
       <ul

@@ -202,7 +202,7 @@ export function HeroOrb() {
                     className={`cs-flow-chip ${chip.dir === "in" ? "is-in" : "is-out"}`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={`/images/trusted/${chip.logo}`} alt="" />
+                    <img src={`/images/hero-tech-logos/${chip.logo}`} alt="" />
                   </div>
                 </foreignObject>
               </g>

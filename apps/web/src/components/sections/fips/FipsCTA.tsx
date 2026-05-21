@@ -47,7 +47,7 @@ export function FipsCTA(): React.ReactElement {
             left: "9.56%",
             top: "25.76%",
             width: "31.43%",
-            fontSize: "clamp(26px, 2.71vw, 52px)",
+            fontSize: "clamp(28px, 3vw, 42px)",
             fontWeight: 700,
             letterSpacing: "-0.05em",
             lineHeight: 1.05,

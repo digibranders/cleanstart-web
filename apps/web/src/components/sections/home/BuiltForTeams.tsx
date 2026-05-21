@@ -281,7 +281,11 @@ function ActiveCard({ testimonial }: { testimonial: Testimonial }) {
         <img
           src={TESTIMONIAL_PHOTO}
           alt={`${testimonial.name}, ${testimonial.role}`}
-          loading="lazy"
+          width={160}
+          height={160}
+          decoding="async"
+          loading="eager"
+          style={{ aspectRatio: "1 / 1" }}
         />
       </div>
 
@@ -367,7 +371,15 @@ function SidePeek({
     >
       <span className="cs-tt-peek__photo" aria-hidden>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={TESTIMONIAL_PHOTO} alt="" loading="lazy" />
+        <img
+          src={TESTIMONIAL_PHOTO}
+          alt=""
+          width={120}
+          height={120}
+          decoding="async"
+          loading="eager"
+          style={{ aspectRatio: "1 / 1" }}
+        />
       </span>
       <span className="cs-tt-peek__body" aria-hidden>
         <span className="cs-tt-peek__head">

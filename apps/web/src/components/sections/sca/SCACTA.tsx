@@ -58,113 +58,97 @@ export function SCACTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/sca/cta-cube.svg"
+        src="/images/sca/cta-cube.png"
         alt=""
         className="absolute pointer-events-none select-none hidden lg:block"
         style={{
-          left: "84.81%",
-          top: "58.07%",
-          right: "-1.32%",
-          bottom: "-16.2%",
-          width: "auto",
-          height: "auto",
-          maxWidth: "none",
+          right: "-20px",
+          bottom: "-80px",
+          width: "220px",
+          height: "220px",
+          objectFit: "contain",
+          opacity: 0.9,
+          zIndex: 0,
         }}
         loading="lazy"
         decoding="async"
       />
 
       {/* ══════════════════════════════════════════
-          Desktop layout (md+) — centred content block
+          Desktop layout (md+) — heading left, desc+button right
       ══════════════════════════════════════════ */}
-      <div className="hidden md:flex absolute inset-0 items-center justify-center">
-        <div
+      <div
+        className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 items-start"
+        style={{
+          paddingLeft: "clamp(32px, 5vw, 100px)",
+          paddingRight: "clamp(32px, 5vw, 100px)",
+          paddingTop: "clamp(40px, 5vw, 80px)",
+          columnGap: "clamp(24px, 4vw, 68px)",
+        }}
+      >
+        {/* Left column — heading */}
+        <h2
+          className="relative lg:flex-1 min-w-0 w-full text-white"
           style={{
-            width: "min(571px, 85%)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "32px",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(28px, 3vw, 42px)",
+            fontWeight: 700,
+            letterSpacing: "-0.05em",
+            lineHeight: 1.05,
+            maxWidth: "401px",
+            margin: 0,
+            zIndex: 1,
           }}
         >
-          {/* Heading + description */}
-          <div
+          From Findings to Action
+        </h2>
+
+        {/* Right column — description + button */}
+        <div
+          className="flex flex-col lg:flex-1 min-w-0 w-full"
+          style={{ maxWidth: "607px", gap: "clamp(20px, 2vw, 32px)", zIndex: 1 }}
+        >
+          <p
             style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "19px",
-              width: "100%",
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(14px, 1.09vw, 21px)",
+              fontWeight: 400,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.4,
+              color: "rgba(255,255,255,0.8)",
+              margin: 0,
             }}
           >
-            <h2
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(28px, 2.86vw, 55px)",
-                fontWeight: 700,
-                letterSpacing: "-0.05em",
-                lineHeight: 1,
-                color: "#ffffff",
-                textAlign: "center",
-                margin: 0,
-              }}
-            >
-              From Findings to Action
-            </h2>
-            <p
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(14px, 1.09vw, 21px)",
-                fontWeight: 400,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.4,
-                color: "rgba(255,255,255,0.8)",
-                textAlign: "center",
-                margin: 0,
-              }}
-            >
-              Reduce inherited risk and improve software composition analysis
-              outcomes with hardened container foundations and contextualized
-              insights.
-            </p>
-          </div>
-
-          {/* CTA button */}
+            Reduce inherited risk and improve software composition analysis
+            outcomes with hardened container foundations and contextualized
+            insights.
+          </p>
           <Link
             href="/contact-us"
-            className="inline-flex items-center gap-2 rounded-[8px] overflow-hidden"
-            style={{
-              padding: "9px 18px",
-              border: "1px solid #dab6f3",
-              background: "rgba(255,255,255,0.65)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-            }}
+            className="cs-btn-glass self-start"
+            style={
+              {
+                "--cs-btn-px": "18px",
+                "--cs-btn-fs": "18px",
+              } as React.CSSProperties
+            }
           >
-            <span
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(14px, 0.94vw, 18px)",
-                fontWeight: 500,
-                letterSpacing: "-0.01em",
-                color: "#111",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Make SCA Actionable
-            </span>
+            <span>Make SCA Actionable</span>
             <svg
-              aria-hidden
-              role="presentation"
+              className="cs-cta-arrow"
               width="18"
               height="18"
-              viewBox="0 0 24 24"
+              viewBox="0 0 18 18"
               fill="none"
-              stroke="#111"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              aria-hidden
             >
-              <path d="M5 12h14M12 5l7 7-7 7" />
+              <path
+                d="M3 9h11m0 0l-4-4m4 4l-4 4"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </Link>
         </div>

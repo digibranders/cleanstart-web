@@ -33,7 +33,7 @@ export function LatestBlogs({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ background: "#f6f6f6", paddingBottom: "var(--spacing-section-cta)" }}
+      style={{ background: "#f6f6f6", paddingBottom: "250px" }}
       data-section="LatestBlogs"
     >
       {/* Radial gradient blobs — Figma 255:9352 left (-616,1407) 1181×1181, 255:9353 right (1238,1512) 1181×1181 */}

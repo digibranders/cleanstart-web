@@ -96,11 +96,11 @@ export function SecurityNotPatching() {
           />
         </div>
 
-        {/* Title row — title left, vertical separator, description right */}
-        <div className="flex flex-col items-start gap-6 md:flex-row md:gap-12">
+        {/* Title row — heading flush-left, separator dead-center, description flush-right */}
+        <div className="flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="security-title"
-            className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
+            className="justify-self-start font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
             style={{ maxWidth: "444px" }}
           >
             Security isn&rsquo;t just{" "}
@@ -117,14 +117,14 @@ export function SecurityNotPatching() {
           {/* 1×90 vertical fading-gray separator (Figma Rectangle 1000001787 #D9D9D9) */}
           <div
             aria-hidden
-            className="hidden h-[90px] w-px shrink-0 md:mt-3 md:block"
+            className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
             style={{
               background:
                 "linear-gradient(180deg, rgba(217,217,217,0) 0%, rgba(217,217,217,1) 47.2%, rgba(217,217,217,0) 100%)",
             }}
           />
           <p
-            className="text-[clamp(1rem,2vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.04em] text-[#111111] md:mt-3"
+            className="text-[clamp(1rem,2vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.04em] text-[#111111] md:justify-self-end md:text-right"
             style={{ maxWidth: "576px" }}
           >
             Recognized for innovation in secure software supply chain and
@@ -209,7 +209,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                 top: "-13px",
                 width: "162px",
                 height: "186.4px",
-                opacity: 0.34,
+                opacity: 0.7,
               }}
             />
           ) : (
@@ -229,7 +229,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                 top: "-2px",
                 width: "258px",
                 height: "236px",
-                opacity: 0.34,
+                opacity: 0.7,
               }}
             />
           )}

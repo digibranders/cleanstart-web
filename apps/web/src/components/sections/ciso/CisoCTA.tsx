@@ -35,34 +35,36 @@ export function CisoCTA(): React.ReactElement {
         }}
       />
 
-      {/* Purple glow — right */}
+      {/* Purple glow — right (subtle, behind cube) */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
         style={{
-          right: "300px",
-          top: "244px",
-          width: "400px",
-          height: "400px",
+          right: "0",
+          bottom: "-80px",
+          width: "320px",
+          height: "320px",
           borderRadius: "50%",
-          background: "rgba(154, 81, 255, 0.18)",
-          filter: "blur(100px)",
+          background: "rgba(154, 81, 255, 0.2)",
+          filter: "blur(80px)",
         }}
       />
 
-      {/* Cube decoration — right */}
+      {/* Cube decoration — overflows bottom-right corner at 80% opacity */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/ciso/cta-cube.png"
+        src="/images/ciso/cta-cube-noise.png"
         alt=""
         className="absolute pointer-events-none select-none hidden xl:block"
         style={{
-          right: "40px",
-          top: "-30px",
-          width: "380px",
-          height: "380px",
+          right: "-60px",
+          bottom: "-100px",
+          width: "300px",
+          height: "300px",
           objectFit: "contain",
+          opacity: 0.8,
+          zIndex: 0,
         }}
         loading="lazy"
         decoding="async"
@@ -78,11 +80,11 @@ export function CisoCTA(): React.ReactElement {
           className="relative flex-shrink-0 text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 2.86vw, 55px)",
+            fontSize: "clamp(28px, 3vw, 42px)",
             fontWeight: 700,
             letterSpacing: "-0.05em",
-            lineHeight: 1.0,
-            width: "min(520px, 100%)",
+            lineHeight: 1.1,
+            width: "min(401px, 100%)",
             zIndex: 1,
           }}
         >
@@ -108,40 +110,30 @@ export function CisoCTA(): React.ReactElement {
 
           <Link
             href="/contact-us"
-            className="self-start inline-flex items-center gap-2 rounded-[8px] overflow-hidden"
-            style={{
-              padding: "9px 18px",
-              border: "1px solid #dab6f3",
-              background: "rgba(255, 255, 255, 0.65)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-            }}
+            className="cs-btn-glass self-start"
+            style={
+              {
+                "--cs-btn-px": "18px",
+                "--cs-btn-fs": "18px",
+              } as React.CSSProperties
+            }
           >
-            <span
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(14px, 0.94vw, 18px)",
-                fontWeight: 500,
-                letterSpacing: "-0.01em",
-                color: "#111",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Read the Executive Brief
-            </span>
+            <span>Read the Executive Brief</span>
             <svg
-              aria-hidden
-              role="presentation"
+              className="cs-cta-arrow"
               width="18"
               height="18"
-              viewBox="0 0 24 24"
+              viewBox="0 0 18 18"
               fill="none"
-              stroke="#111"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              aria-hidden
             >
-              <path d="M5 12h14M12 5l7 7-7 7" />
+              <path
+                d="M3 9h11m0 0l-4-4m4 4l-4 4"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </Link>
         </div>

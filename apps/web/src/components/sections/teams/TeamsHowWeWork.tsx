@@ -1,8 +1,12 @@
 export function TeamsHowWeWork() {
   return (
     <section
-      className="relative overflow-hidden bg-cs-hero bg-cs-grid"
-      style={{ paddingBottom: "250px" }}
+      className="relative overflow-hidden bg-cs-grid"
+      style={{
+        paddingBottom: "250px",
+        background:
+          "linear-gradient(180deg, #151021 0%, #131E8F 67.14%, #471EC0 107.43%)",
+      }}
     >
       {/* Decorative line accents */}
       <div
@@ -30,6 +34,79 @@ export function TeamsHowWeWork() {
         }}
       />
 
+      {/* ── Center-top purple radial blob (Figma Vector 583:3601) ── */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden md:block"
+        style={{
+          left: "calc(679px / 1920 * 100%)",
+          top: "-10px",
+          width: "571px",
+          height: "554px",
+          background:
+            "radial-gradient(50% 50% at 50% 50%, #640DFB 0%, rgba(100,13,251,0) 100%)",
+          opacity: 0.25,
+        }}
+      />
+
+      {/* ── Top-right cube outline (Figma Union 583:3596) ── */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden md:block"
+        style={{
+          right: "-70px",
+          top: "-206px",
+          width: "323.83px",
+          height: "376.84px",
+          transform: "matrix(-0.87, -0.5, -0.5, 0.87, 0, 0)",
+          opacity: 0.6,
+          mixBlendMode: "overlay",
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/teams/union-shape.svg"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "block",
+            filter:
+              "drop-shadow(0 0 0 #fff) drop-shadow(0 0 0 #9A51FF)",
+          }}
+        />
+      </div>
+
+      {/* ── Bottom-left cube outline (Figma Union 583:3597) ── */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden md:block"
+        style={{
+          left: "-110px",
+          top: "243px",
+          width: "323.83px",
+          height: "376.84px",
+          transform: "matrix(-0.87, -0.5, -0.5, 0.87, 0, 0)",
+          opacity: 0.6,
+          mixBlendMode: "overlay",
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/teams/union-shape.svg"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "block",
+          }}
+        />
+      </div>
+
       <div className="relative mx-auto max-w-[1276px] px-6 pt-[100px]">
         <div className="flex flex-col items-center gap-6 text-center">
           <h2
@@ -45,7 +122,7 @@ export function TeamsHowWeWork() {
               className="bg-clip-text text-transparent"
               style={{
                 backgroundImage:
-                  "linear-gradient(102.46deg, rgb(154,81,255) 65.66%, rgb(44,193,235) 93.65%)",
+                  "linear-gradient(102.46deg, #9A51FF 66%, #2CC1EB 95%)",
               }}
             >
               Work

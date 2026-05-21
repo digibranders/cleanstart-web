@@ -24,9 +24,41 @@ export function EventsCTA(): React.ReactElement {
 
   return (
     <div
-      className="absolute inset-0"
+      className="absolute inset-0 overflow-hidden"
       style={{ background: "linear-gradient(180deg, #471ec0 0%, #131e8f 100%)" }}
     >
+      {/* ── Ellipse — top-left ── */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden xl:block"
+        style={{
+          left: "-139px",
+          top: "-168px",
+          width: "320px",
+          height: "320px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
+        }}
+      />
+
+      {/* ── Ellipse — bottom-right ── */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden xl:block"
+        style={{
+          left: "1159px",
+          top: "244px",
+          width: "511px",
+          height: "511px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
+        }}
+      />
+
       {/* Left cube */}
       <div
         aria-hidden
@@ -79,7 +111,7 @@ export function EventsCTA(): React.ReactElement {
           <div
             className="font-display font-bold text-white w-full lg:w-auto lg:max-w-[401px] text-center lg:text-left"
             style={{
-              fontSize: "clamp(1.75rem,3.82vw,3.4375rem)",
+              fontSize: "clamp(1.75rem,3vw,2.625rem)",
               lineHeight: "1.0",
               letterSpacing: "-0.05em",
             }}

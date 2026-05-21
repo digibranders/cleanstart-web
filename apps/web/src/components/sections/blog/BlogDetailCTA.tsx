@@ -1,138 +1,190 @@
-import type React from "react";
+"use client";
+
+import { useRef, useState } from "react";
 
 /**
- * Inner content for the Blog/News detail CTA, rendered inside the Footer's
- * fixed 1276×330 / radius-40 slot.
+ * Blog/News detail CTA — Figma 516:4898.
+ *
+ * White-background newsletter capture card with cubes and union grids in the
+ * corners, plus a solid blue→teal "Subscribe" gradient button.
  */
 export function BlogDetailCTA(): React.ReactElement {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+    e.preventDefault();
+    const email = emailRef.current?.value.trim();
+    if (!email) return;
+    setSubmitted(true);
+    setTimeout(() => {
+      setSubmitted(false);
+      if (emailRef.current) emailRef.current.value = "";
+    }, 3000);
+  }
+
   return (
-    <div
-      className="absolute inset-0 flex items-center justify-center"
-      style={{ background: "#fff", padding: "80px 100px" }}
-    >
+    <div className="absolute inset-0 overflow-hidden" style={{ background: "#fff" }}>
+      {/* ── Union grid (right) ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/blog-detail/cta/cta-union.svg"
         alt=""
-        className="pointer-events-none select-none absolute"
+        className="absolute pointer-events-none select-none hidden xl:block"
         style={{ left: "547px", top: "-220px", width: "1101px", height: "1101px" }}
         loading="lazy"
         decoding="async"
       />
+      {/* ── Union grid (left) ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/blog-detail/cta/cta-union.svg"
         alt=""
-        className="pointer-events-none select-none absolute"
+        className="absolute pointer-events-none select-none hidden xl:block"
         style={{ left: "-496px", top: "-239px", width: "1101px", height: "1101px" }}
         loading="lazy"
         decoding="async"
       />
 
+      {/* ── Ellipse — top-left ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute rounded-full"
+        className="pointer-events-none select-none absolute hidden xl:block"
         style={{
-          left: "1159px",
-          top: "244px",
-          width: "511px",
-          height: "511px",
+          left: "-158px",
+          top: "-148px",
+          width: "316px",
+          height: "316px",
+          borderRadius: "50%",
           background: "#DF9BFF",
           opacity: 0.8,
-          filter: "blur(243px)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute rounded-full"
-        style={{
-          left: "-139px",
-          top: "-168px",
-          width: "320px",
-          height: "320px",
-          background: "#DF9BFF",
-          opacity: 0.8,
-          filter: "blur(243px)",
+          filter: "blur(121.5px)",
         }}
       />
 
+      {/* ── Ellipse — bottom-right ── */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden xl:block"
+        style={{
+          left: "1151px",
+          top: "165px",
+          width: "316px",
+          height: "316px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
+        }}
+      />
+
+      {/* ── Cube — bottom-left ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/blog-detail/cta/cta-cube.png"
         alt=""
-        className="pointer-events-none select-none absolute object-contain"
-        style={{
-          left: "-90px",
-          top: "214px",
-          width: "259px",
-          height: "260px",
-          transform: "rotate(-15deg)",
-        }}
+        className="absolute pointer-events-none select-none hidden xl:block object-contain"
+        style={{ left: "-63px", top: "220px", width: "206px", height: "207px" }}
         loading="lazy"
         decoding="async"
       />
+
+      {/* ── Cube — top-right ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/blog-detail/cta/cta-cube.png"
         alt=""
-        className="pointer-events-none select-none absolute object-contain"
-        style={{
-          left: "1130px",
-          top: "-63px",
-          width: "259px",
-          height: "260px",
-          transform: "rotate(-15deg)",
-        }}
+        className="absolute pointer-events-none select-none hidden xl:block object-contain"
+        style={{ left: "1130px", top: "-63px", width: "259px", height: "260px" }}
         loading="lazy"
         decoding="async"
       />
 
-      <div
-        className="relative z-10 flex flex-col items-center"
-        style={{ gap: "32px", width: "634px", maxWidth: "100%" }}
-      >
-        <h2
-          className="font-display text-display-lg font-bold leading-[1.05] tracking-[-0.05em] text-center"
-          style={{ color: "#111111" }}
+      {/* ── Content ── */}
+      <div className="absolute inset-0 flex items-center justify-center px-6">
+        <div
+          className="flex flex-col lg:flex-row items-start lg:items-center gap-y-4 lg:gap-y-0 lg:gap-x-[clamp(40px,9vw,115px)] w-full"
+          style={{ maxWidth: "1047px" }}
         >
-          Built. Tested. Trusted.
-        </h2>
-
-        <button
-          type="button"
-          className="cs-btn-blue relative overflow-hidden gap-2"
-          style={{ minWidth: "168px", padding: "0 14px" }}
-        >
-          <span style={{ position: "relative", zIndex: 1 }}>Get in Touch</span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/blog-detail/cta/cta-arrow.svg"
-            alt=""
-            aria-hidden
-            width={25}
-            height={22}
-            style={{ display: "block", position: "relative", zIndex: 1 }}
-          />
           <div
-            aria-hidden
+            className="font-display font-bold w-full lg:w-auto lg:max-w-[401px] text-left"
             style={{
-              position: "absolute",
-              left: "calc(50% + 3.2px)",
-              top: "41.1px",
-              width: "30.073px",
-              height: "30.073px",
-              transform: "translateX(-50%)",
-              background: "rgba(255,255,255,0.6)",
-              borderRadius: "50%",
-              filter: "blur(10px)",
-              pointerEvents: "none",
+              color: "#111111",
+              fontSize: "clamp(1.75rem,3vw,2.625rem)",
+              lineHeight: "1.0",
+              letterSpacing: "-0.05em",
             }}
-          />
-        </button>
+          >
+            Stay Ahead of Container Security Threats
+          </div>
+
+          <div
+            className="flex flex-col items-start w-full max-w-[493px]"
+            style={{ gap: "24px" }}
+          >
+            <p
+              className="text-body-lg font-normal leading-[1.4] tracking-[-0.04em]"
+              style={{ color: "#111111", opacity: 0.8 }}
+            >
+              Get the latest research, insights, and updates straight to your
+              inbox
+            </p>
+
+            {submitted ? (
+              <p className="text-base font-medium" style={{ color: "#111111", opacity: 0.9 }}>
+                Thanks! You&apos;re subscribed.
+              </p>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                className="relative flex items-center w-full"
+                aria-label="Newsletter subscription"
+              >
+                <div
+                  className="relative overflow-hidden flex-1 min-w-0"
+                  style={{
+                    height: "44px",
+                    background: "rgba(0,0,0,0.05)",
+                    border: "1px solid rgba(156,149,160,0.6)",
+                    borderRight: "none",
+                    borderRadius: "12px 0 0 12px",
+                  }}
+                >
+                  <input
+                    ref={emailRef}
+                    type="email"
+                    name="email"
+                    required
+                    placeholder="Enter your email"
+                    className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-[#111] placeholder:text-[#7E7E7E] text-base leading-[1.5] outline-none"
+                    style={{ fontWeight: 400 }}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="shrink-0 inline-flex cursor-pointer items-center justify-center font-medium text-white"
+                  style={{
+                    height: "44px",
+                    padding: "0 18px",
+                    fontSize: "18px",
+                    letterSpacing: "-0.01em",
+                    background:
+                      "linear-gradient(180deg, #3960F9 0%, #2B97D1 100%)",
+                    borderRadius: "0 12px 12px 0",
+                    boxShadow:
+                      "0 0 0 1px #3960F9, 0 1px 2px -1px rgba(9,6,63,0.4), inset 0 1px 0 0 rgba(255,255,255,0.16)",
+                  }}
+                >
+                  Subscribe
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

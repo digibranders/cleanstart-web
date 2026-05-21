@@ -40,7 +40,7 @@ export function AboutCTA() {
         <h2
           className="font-display font-bold"
           style={{
-            fontSize: "clamp(2rem, 4vw, 3.4375rem)",
+            fontSize: "clamp(1.75rem, 3vw, 2.625rem)",
             lineHeight: "1.0",
             letterSpacing: "-0.05em",
           }}

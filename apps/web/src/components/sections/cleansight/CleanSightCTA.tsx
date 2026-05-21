@@ -21,38 +21,6 @@ export function CleanSightCTA(): React.ReactElement {
         background: "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)",
       }}
     >
-      {/* ── Union decoration — top-centre-right ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/cleansight/cta-union.svg"
-        alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
-        style={{
-          left: "547px",
-          top: "-220px",
-          width: "1101px",
-          height: "1101px",
-        }}
-        loading="lazy"
-        decoding="async"
-      />
-
-      {/* ── Purple glow — right ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
-        style={{
-          left: "1159px",
-          top: "244px",
-          width: "511px",
-          height: "511px",
-          borderRadius: "50%",
-          background: "rgba(154, 81, 255, 0.18)",
-          filter: "blur(100px)",
-        }}
-      />
-
       {/* ── Cyan glow — top-left ── */}
       <div
         aria-hidden
@@ -68,6 +36,41 @@ export function CleanSightCTA(): React.ReactElement {
         }}
       />
 
+      {/* ── Purple glow — bottom-right behind cube ── */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden xl:block"
+        style={{
+          right: "0",
+          bottom: "-80px",
+          width: "320px",
+          height: "320px",
+          borderRadius: "50%",
+          background: "rgba(154, 81, 255, 0.2)",
+          filter: "blur(80px)",
+        }}
+      />
+
+      {/* ── Cube decoration — overflows bottom-right corner at 80% opacity (matches CISO/SBOM CTA) ── */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/ciso/cta-cube-noise.png"
+        alt=""
+        className="absolute pointer-events-none select-none hidden xl:block"
+        style={{
+          right: "-60px",
+          bottom: "-100px",
+          width: "300px",
+          height: "300px",
+          objectFit: "contain",
+          opacity: 0.8,
+          zIndex: 0,
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+
       {/* ── Content row ── */}
       <div
         className="relative flex flex-col lg:flex-row items-start"
@@ -81,7 +84,7 @@ export function CleanSightCTA(): React.ReactElement {
           className="relative flex-shrink-0 text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 2.86vw, 55px)",
+            fontSize: "clamp(28px, 3vw, 42px)",
             fontWeight: 700,
             letterSpacing: "-0.05em",
             lineHeight: 1.0,
@@ -109,43 +112,32 @@ export function CleanSightCTA(): React.ReactElement {
             modern environments.
           </p>
 
-          {/* Glass button — Figma: border #dab6f3, bg white 65%, dark text */}
           <Link
             href="/contact-us"
-            className="self-start inline-flex items-center gap-2 rounded-[8px] overflow-hidden"
-            style={{
-              padding: "9px 18px",
-              border: "1px solid #dab6f3",
-              background: "rgba(255, 255, 255, 0.65)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-            }}
+            className="cs-btn-glass self-start"
+            style={
+              {
+                "--cs-btn-px": "18px",
+                "--cs-btn-fs": "18px",
+              } as React.CSSProperties
+            }
           >
-            <span
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(14px, 0.94vw, 18px)",
-                fontWeight: 500,
-                letterSpacing: "-0.01em",
-                color: "#111",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Book a Container Scan
-            </span>
+            <span>Book a Container Scan</span>
             <svg
-              aria-hidden
-              role="presentation"
+              className="cs-cta-arrow"
               width="18"
               height="18"
-              viewBox="0 0 24 24"
+              viewBox="0 0 18 18"
               fill="none"
-              stroke="#111"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              aria-hidden
             >
-              <path d="M5 12h14M12 5l7 7-7 7" />
+              <path
+                d="M3 9h11m0 0l-4-4m4 4l-4 4"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </Link>
         </div>

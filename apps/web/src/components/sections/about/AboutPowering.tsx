@@ -158,7 +158,7 @@ function FeatureCard({ title, description }: Card) {
       />
 
       {/* White card — flex column, no absolute internals */}
-      <div className="relative flex h-full w-full flex-col gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[16px] bg-white p-card-md">
+      <div className="relative flex h-full w-full flex-col gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[24px] bg-white p-card-md">
         {/* Ball — 248:2163 (96×96, blue gradient, inset highlight) */}
         <div
           className="flex shrink-0 items-center justify-center overflow-hidden"
