@@ -188,7 +188,7 @@ function FeatureCard({ title, description }: Card) {
           <h3 className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em] text-[#111]">
             {title}
           </h3>
-          <p className="text-body-lg font-normal leading-[1.4] tracking-[-0.05em] text-[#555]">
+          <p className="text-body-lg font-normal leading-[1.5] text-[#555]">
             {description}
           </p>
         </div>

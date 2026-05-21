@@ -351,6 +351,7 @@ function MobileCircle({ num }: { num: number }): React.ReactElement {
       <span
         style={{
           fontFamily: "var(--font-display)",
+          // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored badge inside numbered circle, fixed 18px. See RESPONSIVE-AUDIT.md §14.3.
           fontSize: "18px",
           fontWeight: 700,
           background: "linear-gradient(128.05deg, #9A51FF 35.82%, #2CC1EB 78.3%)",

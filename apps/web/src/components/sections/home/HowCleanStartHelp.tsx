@@ -184,6 +184,7 @@ function CisoCard({
       <div
         role="tablist"
         aria-label="Audience"
+        data-cta-utility
         className="flex h-[42px] w-fit items-center gap-1 rounded-[999px] p-1"
         style={{
           background:
@@ -270,6 +271,7 @@ function TabPill({
       role="tab"
       id={`ciso-tab-${id}`}
       aria-selected={active}
+      data-cta-utility
       onClick={onClick}
       className="relative h-[34px] cursor-pointer rounded-[999px] px-3 text-lg font-medium text-white transition-all duration-200"
       style={{
@@ -349,7 +351,7 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
           {card.title}
         </h3>
         <p
-          className="text-body-lg font-normal leading-[1.4] tracking-[-0.05em] text-[#333333]"
+          className="text-body-lg font-normal leading-[1.5] text-[#333333]"
           style={{ maxWidth: "244px" }}
         >
           {card.description}

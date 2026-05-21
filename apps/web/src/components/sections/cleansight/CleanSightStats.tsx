@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { useInView } from "motion/react";
+import { useInView, useReducedMotion } from "motion/react";
 
 interface StatDef {
   prefix: string;
@@ -32,14 +32,22 @@ const STATS: StatDef[] = [
   { prefix: "",  end: 100, suffix: "%",   label: "Compliance visibility", labelSize: "clamp(12px,1.042vw,20px)", labelTracking: "-1px"    },
 ];
 
-/** Counts from 0 → end when `active` flips true. Fires once. */
+/** Counts from 0 → end when `active` flips true. Fires once. Honors
+ *  prefers-reduced-motion: when the user has motion reduced, jumps
+ *  straight to the final value instead of animating. */
 function useCountUp(end: number, active: boolean, duration = 1400): number {
   const [count, setCount] = useState(0);
   const fired = useRef(false);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!active || fired.current) return;
     fired.current = true;
+
+    if (reduceMotion) {
+      setCount(end);
+      return;
+    }
 
     const startTime = performance.now();
 
@@ -53,7 +61,7 @@ function useCountUp(end: number, active: boolean, duration = 1400): number {
     };
 
     requestAnimationFrame(tick);
-  }, [active, end, duration]);
+  }, [active, end, duration, reduceMotion]);
 
   return count;
 }
