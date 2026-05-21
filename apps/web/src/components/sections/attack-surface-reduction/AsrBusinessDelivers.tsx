@@ -29,7 +29,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
       {/* Background photo */}
       <div
         className="relative"
-        style={{ minHeight: "clamp(460px, 37vw, 711px)" }}
+        style={{ minHeight: "clamp(400px, 32vw, 580px)" }}
       >
         {/* Background image */}
         {/* eslint-disable-next-line @next/next/no-img-element */}

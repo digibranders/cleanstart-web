@@ -28,7 +28,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
       data-section="FipsRegulatedEnvironments"
       className="relative overflow-hidden"
       aria-label="Built for Regulated Environments"
-      style={{ minHeight: "clamp(460px, 35vw, 669px)" }}
+      style={{ minHeight: "clamp(400px, 30vw, 550px)" }}
     >
       {/* Background photo (Figma 1:586 — bare 1922×669 image, no text overlay) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}

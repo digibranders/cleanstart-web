@@ -31,7 +31,7 @@ export function CleanStartImagesUVP(): React.ReactElement {
     <section
       data-section="CleanStartImagesUVP"
       className="relative overflow-hidden bg-white"
-      style={{ minHeight: "clamp(640px, 60vw, 855px)" }}
+      style={{ minHeight: "clamp(540px, 50vw, 720px)" }}
     >
       {/* Decorative grid */}
       <div

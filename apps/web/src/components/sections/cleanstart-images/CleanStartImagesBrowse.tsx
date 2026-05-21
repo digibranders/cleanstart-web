@@ -11,7 +11,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
     <section
       data-section="CleanStartImagesBrowse"
       className="relative overflow-hidden bg-white"
-      style={{ minHeight: "clamp(820px, 82vw, 1184px)" }}
+      style={{ minHeight: "clamp(720px, 60vw, 880px)" }}
     >
       {/* Decorative grid (faint) */}
       <div

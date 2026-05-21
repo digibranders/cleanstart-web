@@ -54,7 +54,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
       data-section="CleanStartImagesEasyStart"
       className="relative overflow-hidden"
       style={{
-        minHeight: "clamp(480px, 44vw, 626px)",
+        minHeight: "clamp(420px, 36vw, 520px)",
         background:
           "linear-gradient(180deg, #0B0820 0%, #1A1248 35%, #2E1B8C 75%, #3A20B0 100%)",
       }}

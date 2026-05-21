@@ -70,7 +70,7 @@ export function FipsEnables(): React.ReactElement {
       style={{
         background:
           "linear-gradient(180deg, #151021 0%, #131e8f 67%, #471ec0 107%)",
-        minHeight: "clamp(900px, 68.2vw, 1310px)",
+        minHeight: "clamp(780px, 58vw, 1050px)",
       }}
     >
       {/* -------------------- Figma flare assets -------------------- */}
