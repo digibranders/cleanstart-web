@@ -386,6 +386,10 @@ export default buildConfig({
         cron: '0 7 * * *', // daily at 07:00 UTC — analyticsCache 90-day prune
         queue: 'analyticsCachePrune',
       },
+      {
+        cron: '* * * * *', // every minute — Payload built-in schedulePublish jobs land in the `default` queue; wait_until gates actual execution
+        queue: 'default',
+      },
     ],
     // Positive opt-in: cron tasks register only when PAYLOAD_AUTO_RUN
     // is exactly 'true'. Vitest worker subprocesses (and CI runners
