@@ -1512,7 +1512,7 @@ body {
 }
 .article-body .article-h2 {
   font-size: clamp(20px, 1.6vw, 26px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.03em;
   color: #111111;
