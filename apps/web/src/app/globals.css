@@ -82,11 +82,53 @@
   --color-cs-lavender: #dab6f3;
   --color-cs-text-dark: #111111;
 
-  --container-cs: 1276px;
+  /* Container family — see RESPONSIVE-SYSTEM-AUDIT.md §6.3.
+     --container-default widened from 1276 → 1440 (2026-05-21).
+     --container-cs kept as alias for any legacy consumer. */
+  --container-default: 1440px;
+  --container-prose:    720px;
+  --container-wide:    1600px;
+  --container-cs: var(--container-default);
 
   --radius-cs-card: 24px;
   --radius-cs-card-lg: 40px;
   --radius-cs-pill: 8px;
+
+  /* Hero role tokens — see RESPONSIVE-SYSTEM-AUDIT.md §5.3.
+     Clamp below lg; locked at lg+ via the @media (min-width: 64rem) :root
+     override below the :root block. */
+  --text-hero-marketing: clamp(2.5rem, 5.5vw, 4.5rem);  /* 40 → 72  — home, about-us, teams */
+  --text-hero-product:   clamp(2.25rem, 4vw, 3.5rem);   /* 36 → 56  — product pages */
+  --text-hero-utility:   clamp(2rem, 3.5vw, 3rem);      /* 32 → 48  — listing + article-detail */
+  --text-hero-marketing-ls: -0.04em;
+  --text-hero-product-ls:   -0.04em;
+  --text-hero-utility-ls:   -0.03em;
+  --text-hero-lh:           1.05;
+
+  /* Section H2 alias (== --text-display-md, named for clarity in markup) */
+  --text-section-h2: var(--text-display-md);
+
+  /* Prose tokens for .prose-cs (long-form article body — see RESPONSIVE-SYSTEM-AUDIT.md §9.3).
+     Body 17 → 18, H3 ≥ 22 (fixes the prior H3 < body inversion). */
+  --prose-h1: clamp(2.25rem, 4vw, 3.5rem);              /* 36 → 56 */
+  --prose-h2: clamp(1.625rem, 2.5vw, 2.25rem);          /* 26 → 36 */
+  --prose-h3: clamp(1.25rem, 1.6vw, 1.5rem);            /* 20 → 24 */
+  --prose-h4: clamp(1.125rem, 1.3vw, 1.25rem);          /* 18 → 20 */
+  --prose-body: clamp(1.0625rem, 1.2vw, 1.125rem);      /* 17 → 18 */
+  --prose-blockquote: clamp(1.1875rem, 1.4vw, 1.25rem); /* 19 → 20 */
+  --prose-code: 0.9rem;
+  --prose-figcaption: 0.9375rem;
+  --prose-h1-lh: 1.1;
+  --prose-h2-lh: 1.2;
+  --prose-h3-lh: 1.3;
+  --prose-body-lh: 1.6;
+  --prose-h2-mt: 3rem;
+  --prose-h2-mb: 1rem;
+  --prose-h3-mt: 2.5rem;
+  --prose-h3-mb: 0.75rem;
+  --prose-h4-mt: 2rem;
+  --prose-h4-mb: 0.5rem;
+  --prose-column-max: 720px;
 }
 
 :root {
@@ -147,6 +189,17 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* Hero role tokens lock to fixed px at lg+ (≥ 1024px viewport).
+   Below lg, the clamp() values in @theme provide the fluid mobile→tablet bridge.
+   See RESPONSIVE-SYSTEM-AUDIT.md §17 decision 2 ("Hybrid: clamp <lg, stepped ≥lg"). */
+@media (min-width: 64rem) {
+  :root {
+    --text-hero-marketing: 4.5rem;  /* 72px */
+    --text-hero-product:   3.5rem;  /* 56px */
+    --text-hero-utility:   3rem;    /* 48px */
+  }
 }
 
 html, body {
