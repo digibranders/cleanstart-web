@@ -8,7 +8,14 @@ export function Hero() {
 
       <div className="mx-auto max-w-[var(--container-default)] px-6">
         <div className="mx-auto flex max-w-[1201px] flex-col items-center gap-6 text-center sm:gap-8">
-          <h1 className="font-display text-[clamp(2.25rem,6.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.05em] text-white lg:leading-[1]">
+          <h1
+            className="font-display font-semibold text-white"
+            style={{
+              fontSize: "var(--text-hero-marketing)",
+              letterSpacing: "var(--text-hero-marketing-ls)",
+              lineHeight: "var(--text-hero-lh)",
+            }}
+          >
             Secure by Design. Built from Source. Verified Container Images
           </h1>
 

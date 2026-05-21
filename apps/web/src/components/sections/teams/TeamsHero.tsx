@@ -142,9 +142,9 @@ export function TeamsHero() {
           <h1
             className="w-full font-display font-semibold text-white"
             style={{
-              fontSize: "clamp(2.5rem, 5.5vw, 5rem)",
-              lineHeight: "1.0",
-              letterSpacing: "-0.05em",
+              fontSize: "var(--text-hero-marketing)",
+              lineHeight: "var(--text-hero-lh)",
+              letterSpacing: "var(--text-hero-marketing-ls)",
             }}
           >
             {"United by "}

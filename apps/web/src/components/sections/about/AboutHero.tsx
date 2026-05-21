@@ -64,9 +64,9 @@ export function AboutHero() {
             <h1
               className="font-display font-semibold text-white"
               style={{
-                fontSize: "clamp(3rem, 5.5vw, 5.5rem)",
-                lineHeight: "1.0",
-                letterSpacing: "-0.05em",
+                fontSize: "var(--text-hero-marketing)",
+                lineHeight: "var(--text-hero-lh)",
+                letterSpacing: "var(--text-hero-marketing-ls)",
               }}
             >
               Security Begins at The Source
