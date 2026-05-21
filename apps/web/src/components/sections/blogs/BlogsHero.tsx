@@ -165,10 +165,10 @@ export function BlogsHero({
                 </p>
                 <div className="flex flex-col gap-4 w-full">
                   <h2
-                    className="font-display text-[clamp(1.5rem,3.06vw,2.75rem)] font-bold leading-none tracking-[-0.05em] text-white overflow-hidden"
+                    className="font-display text-[clamp(1.5rem,3.06vw,2.75rem)] font-bold leading-tight tracking-[-0.05em] text-white overflow-hidden"
                     style={{
                       display: "-webkit-box",
-                      WebkitLineClamp: 3,
+                      WebkitLineClamp: 4,
                       WebkitBoxOrient: "vertical",
                     }}
                   >
