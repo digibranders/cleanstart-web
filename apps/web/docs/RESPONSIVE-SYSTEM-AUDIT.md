@@ -1148,3 +1148,70 @@ Walked every homepage section and screenshot-checked the proportional rendering.
 - TrustedByMarquee gradient mask: already applied in source, no action needed
 
 These are best handled after the user's visual review surfaces the highest-priority sections.
+
+---
+
+## Appendix D — Phase 9.4 + Phase 11 expansion (2026-05-21, continued)
+
+After the initial 11-phase pass, two additional commits landed to close the deferred whitespace audit and pick up three listing-page heroes the original Phase 5 inventory missed.
+
+### Additional commits
+
+| Phase | Commit | Title |
+|---:|---|---|
+| 9.4 | `fca6981` | fix(web): trim oversized minHeight clamps on product-page sections |
+| 5d | `bfcf76e` | refactor(web): migrate ResourceCenter/Webinars/Podcast heroes to utility token |
+
+### Whitespace trims (Phase 9.4)
+
+Eight `minHeight: clamp(...)` upper-bounds reduced because they were 1920-artboard derived and produced visible empty space at 1440:
+
+| File | Before | After |
+|---|---:|---:|
+| CleanStartImagesBrowse | 1184 | 880 |
+| CleanStartImagesEasyStart | 626 | 520 |
+| CleanStartImagesUVP | 855 | 720 |
+| CleanStartImagesEnvironment | 594 | 500 |
+| AsrProductionEnv | 758 | 620 |
+| AsrBusinessDelivers | 711 | 580 |
+| FipsEnables | 1310 | 1050 |
+| FipsRegulatedEnvironments | 669 | 550 |
+
+Verified on /cleanstart-images at 1440: doc height shrank 5057 → 4892 (165 px of dead air removed). The gap between the Browse-Images and Easy-to-Start sections is now tight and natural.
+
+### Hero migration round 2 (Phase 5d)
+
+Three listing-page heroes that used their own inline `clamp()` instead of the shared DetailHero were migrated to the utility token:
+
+- ResourceCenterHero: `clamp(1.75rem, 7.5vw, 4.5rem)` → `--text-hero-utility`
+- WebinarsHero: `clamp(2.75rem, 5.6vw, 5rem)` → `--text-hero-utility`
+- PodcastHero: `clamp(1.75rem, 7.5vw, 4.5rem)` → `--text-hero-utility`
+
+Verified on /resource-center, /webinars, /news, /events at 1440 — every listing-page H1 measures exactly 48 px. At 320 px viewport every listing H1 measures 32 px. Logo aspect ratio remains 4.79:1 at every tested viewport.
+
+### Section-padding consolidation (Phase 9.5) — final status
+
+Deliberately not landed as a wholesale refactor. The current parallel systems coexist functionally:
+
+- **Token system** (`py-section-md`, `--spacing-section-*`): used by all newly-touched sections and recommended for new code.
+- **Hand-coded utility shapes** (`pt-X sm:pt-Y lg:pt-Z`): used by ~70 existing sections. Functional but not DRY.
+
+Touching all 70 files for marginal stylistic gain was judged disproportionate. **The recommendation going forward is: when a section is touched for any other reason, migrate its padding to the token system at the same time.** New code must use the token system from the start.
+
+### Final state — verified
+
+| Property | Value |
+|---|---|
+| Total commits across all phases | **16** (audit doc + 13 phase commits + 2 expansion commits) |
+| `max-w-[1276px]` remaining | 0 (verified via grep) |
+| `text-[2.0625rem]` remaining | 0 (Factory card title hardcoded value gone) |
+| Logo aspect ratio | 4.79:1 at every viewport 320 → 1920 |
+| Hero H1 sizes | 3 role-based values: 72 px (marketing), 56 px (product), 48 px (listing/detail) |
+| Factory card title:card ratio | 10.9 % at every desktop viewport (was 14.8–19.5 %) |
+| Blog prose body | 17.1 px / lh 1.6 / column 680 px |
+| Blog prose H3 | 22.8 px (hierarchy restored above body) |
+| Form input font-size | 16 px (iOS Safari zoom-safe) |
+| Horizontal overflow | None at any viewport 320 → 1920 |
+| `pnpm lint` | ✓ clean (241 files) |
+| `pnpm typecheck` | ✓ clean |
+| `pnpm build` | ✓ succeeds |
