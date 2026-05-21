@@ -21,7 +21,7 @@ export function CompactDropdown({
                 {item.label}
               </Link>
             ) : (
-              <span className="block rounded-[10px] px-3 py-2.5 text-sm font-medium leading-tight text-white/90 cursor-default">
+              <span className="block cursor-pointer rounded-[10px] px-3 py-2.5 text-sm font-medium leading-tight text-white/90 transition-colors hover:bg-white/[0.06] hover:text-white">
                 {item.label}
               </span>
             )}

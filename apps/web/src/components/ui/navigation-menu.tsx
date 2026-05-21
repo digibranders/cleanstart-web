@@ -56,7 +56,7 @@ function NavigationMenuItem({
 }
 
 const navigationMenuTriggerStyle = cva(
-  "group/navigation-menu-trigger inline-flex h-9 w-max items-center justify-center px-0 py-1.5 text-base font-medium leading-none text-white/85 transition-colors outline-none hover:text-white focus-visible:text-white focus-visible:ring-2 focus-visible:ring-[#33BAEC] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent focus-visible:rounded-sm disabled:pointer-events-none disabled:opacity-50 data-popup-open:text-white data-open:text-white"
+  "group/navigation-menu-trigger inline-flex h-9 w-max cursor-pointer items-center justify-center px-0 py-1.5 text-base font-medium leading-none text-white/85 transition-colors outline-none hover:text-white focus-visible:text-white focus-visible:ring-2 focus-visible:ring-[#33BAEC] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent focus-visible:rounded-sm disabled:pointer-events-none disabled:opacity-50 data-popup-open:text-white data-open:text-white"
 )
 
 function NavigationMenuTrigger({
@@ -150,7 +150,7 @@ function NavigationMenuIndicator({
       )}
       {...props}
     >
-      <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
+      <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border" />
     </NavigationMenuPrimitive.Icon>
   )
 }

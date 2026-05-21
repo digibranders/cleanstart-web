@@ -53,7 +53,7 @@ export function MegaMenu({
                         {inner}
                       </Link>
                     ) : (
-                      <span className="block rounded-[12px] px-3 py-2.5 cursor-default">
+                      <span className="block cursor-pointer rounded-[12px] px-3 py-2.5 transition-colors hover:bg-white/[0.06]">
                         {inner}
                       </span>
                     )}

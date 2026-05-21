@@ -47,7 +47,7 @@ export function MobileNav() {
                 return (
                   <span
                     key={item.label}
-                    className="block rounded-[10px] px-3 py-3 text-base font-medium text-white/90 cursor-default"
+                    className="block cursor-pointer rounded-[10px] px-3 py-3 text-base font-medium text-white/90 transition-colors hover:bg-white/[0.06] hover:text-white"
                   >
                     {item.label}
                   </span>
@@ -91,7 +91,7 @@ export function MobileNav() {
                                 {leaf.label}
                               </Link>
                             ) : (
-                              <span className="block rounded-[8px] px-3 py-2 text-sm text-white/80 cursor-default">
+                              <span className="block cursor-pointer rounded-[8px] px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/[0.06] hover:text-white">
                                 {leaf.label}
                               </span>
                             )}
