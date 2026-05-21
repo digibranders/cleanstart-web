@@ -85,10 +85,11 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
           ) : null}
           <h1
             id="podcast-hero-title"
-            className="font-display font-semibold text-white leading-none"
+            className="font-display font-semibold text-white"
             style={{
-              fontSize: "clamp(1.75rem, 7.5vw, 4.5rem)",
-              letterSpacing: "-0.05em",
+              fontSize: "var(--text-hero-utility)",
+              lineHeight: "var(--text-hero-lh)",
+              letterSpacing: "var(--text-hero-utility-ls)",
             }}
           >
             {before}

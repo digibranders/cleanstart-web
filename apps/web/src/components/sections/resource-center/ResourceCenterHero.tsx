@@ -91,8 +91,9 @@ export function ResourceCenterHero({
               id="rc-hero-title"
               className="font-display font-semibold leading-none"
               style={{
-                fontSize: "clamp(1.75rem, 7.5vw, 4.5rem)",
-                letterSpacing: "-0.05em",
+                fontSize: "var(--text-hero-utility)",
+                letterSpacing: "var(--text-hero-utility-ls)",
+                lineHeight: "var(--text-hero-lh)",
               }}
             >
               {"Resource "}
