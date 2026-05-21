@@ -1072,3 +1072,79 @@ This audit used:
 | Letter-spacing on display | -0.03em to -0.05em (negative tracking) |
 
 This is the system the recommendations are calibrated against.
+
+---
+
+## Appendix C — Phase implementation log (2026-05-21)
+
+The 11-phase implementation plan in `~/.claude/plans/parallel-stirring-hamster.md` was executed overnight. All foundational and bug-fix phases (0–10) landed; Phase 11 (subjective per-section reconciliation) was completed in conservative-pass mode pending user review tomorrow morning.
+
+### Commits landed (in order)
+
+| Phase | Commit | Title |
+|---:|---|---|
+| pre | `5ae5482` | docs(web): add responsive system audit and target state |
+| 1 | `494002a` | chore(web): add hero, prose, and container tokens to globals.css |
+| 2 | `de86ff4` | feat(web): add Container and Section layout primitives |
+| 3 | `f700719` | fix(web): preserve navbar logo aspect ratio at narrow viewports |
+| 4 | `ef00ce0` | refactor(web): widen container max-width from 1276 to 1440 site-wide |
+| 5a | `4ee3a1b` | refactor(web): unify marketing hero H1 via --text-hero-marketing |
+| 5b | `48309f6` | refactor(web): unify product hero H1 via --text-hero-product |
+| 5c | `5581517` | refactor(web): unify listing and detail hero H1 via --text-hero-utility |
+| 6 | `f7bb9ae` | fix(web): scale Factory card interior with container queries |
+| 7 | `619595b` | feat(web): unify blog prose typography via --prose-* tokens |
+| 8 | `f5ff26a` | fix(web): unclip BlogsHero featured-card title (line-clamp 3 → 4) |
+| 9 | `0901a37` | chore(web): polish — text-wrap balance + form input iOS-safe sizes |
+| 10 | `d6dc86d` | docs(web): archive legacy responsive system docs |
+
+### Verified state at 1440 viewport (homepage)
+
+- **Logo**: 134 × 28 px (4.79:1, exact natural aspect ratio) at every viewport from 320 to 1920
+- **Hero H1**: 72 px (was a per-page mix of 36–80 across pages)
+- **Section H2** (Factory, How CleanStart Will Help, etc.): 62 px
+- **Factory cards**: title 27.6 px on 253 px card = 10.9 % ratio (was 14.8 %)
+- **Container**: 1440 px hard cap (was 1276)
+- **Blog article body**: 17.1 px / lh 1.6 / column 680 px
+- **Blog article H3**: 22.8 px (was 19.95 — below body, now above)
+- **Form inputs**: 16 px font-size (iOS Safari zoom-safe)
+- **No horizontal overflow** at any viewport 320 → 1920
+
+### Phase 11 conservative-pass findings (homepage at 1440)
+
+Walked every homepage section and screenshot-checked the proportional rendering. All sections render with balanced proportions post-Phases 1–10:
+
+| Section | Status | Notes |
+|---|---|---|
+| Hero | ✓ correct | H1 72 px wraps cleanly to 2 lines; orb + floating-icons stage centered |
+| TrustedByMarquee | ✓ correct | mask gradient already applied; no clipping |
+| CleanStartFactory | ✓ correct (Phase 6) | container queries scale interior; 5-col grid breathes at 1024 → 1920 |
+| Security Isn't Just Patching | ✓ correct | 2-card comparison balanced; H2 62 px proportional |
+| CleanStart Advantage | ✓ correct | stat row, hero image; H2 + lead paragraph balanced |
+| How CleanStart Will Help | ✓ correct | tabbed CISO card + 3 feature cards; card-title-lg token used |
+| Built for Teams | ✓ correct | testimonial carousel; active card + side-peek balance |
+| FAQ | ✓ correct | 2-col accordion items; H2 62 px |
+| Resources & Insights | ✓ correct | filter pills + 3-col article cards |
+| Footer | ✓ correct | CTA card with decreasing-height step; nav + bottom-strip clean |
+
+**No further objective oversizing identified.** Per-element subjective design preferences (e.g. "this stat number could be smaller", "this card image could be more prominent") are left for the user's tomorrow-morning review session. Examples of the kind of call that needs the user's judgment, not engineering's:
+
+- The Hero orb illustration is 600 × 600 ish at 1440 — could be 480 to feel more 1440-native, but currently looks intentional
+- The Factory section padding-bottom is generous (the engine panel + flames eat space) — could trim, but the dramatic-pipeline feeling is a brand choice
+- The Resources article cards have 231 px tall images — could be 200 ish for tighter rhythm, but the 1.55:1 ratio is good
+- The CleanStart Advantage section background image is full-width — could be panel-style, but full-bleed feels intentional
+- Section-padding values (`pt-32`, `py-section-md`) are not yet unified to one system — Phase 9.5 was deferred; per-section walk needed
+
+### Recommended next steps for the user
+
+1. **Visual sweep at 1440** (laptop / external monitor) of every page. Note any per-section sizing that still feels off. The audit doc + this appendix can be amended with specific corrections.
+2. **Visual sweep at 320 and 768** to confirm mobile/tablet still works (per-phase verification already covered the homepage at these widths).
+3. **Decide on remaining Phase 9 items**: section-padding token consolidation across all sections, excess-whitespace audit on product pages. These are larger per-section refactors better done after a focused design walkthrough.
+4. **Run `git log --oneline` since the audit doc commit** to inspect the per-phase change set and revert any individual commit if it produced unexpected results.
+
+### Open Phase 9 items (intentionally deferred)
+
+- Per-section padding migration to `--spacing-section-*` tokens (touches ~80 section files)
+- Product-page whitespace audit (`min-h-screen` overuse on `/cleanstart-images`, `/cleansight`, etc.)
+- TrustedByMarquee gradient mask: already applied in source, no action needed
+
+These are best handled after the user's visual review surfaces the highest-priority sections.
