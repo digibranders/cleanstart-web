@@ -198,7 +198,12 @@ export function FactoryEnginePanel() {
               Hermetic, deterministic builds. Only what you specify.
             </p>
           </div>
-          <div className="flex w-full max-w-[365px] flex-wrap items-center justify-start gap-2 lg:gap-4">
+          {/* No max-w cap here: the 4 pills sum to ~370px at lg gap-4, which
+              would force "Handoff" onto a second row inside the 365px title
+              column. Let them use the full card width (≈504px at lg/1024)
+              so they stay on one line; flex-wrap stays as a fallback if the
+              card ever gets squeezed below the pill-row width. */}
+          <div className="flex w-full flex-wrap items-center justify-start gap-2 lg:gap-4">
             {RIGHT_PILLS.map((p) => (
               <button key={p} type="button" className="cs-pill-cta">
                 {p}
