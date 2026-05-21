@@ -102,12 +102,18 @@ COPY --from=builder --chown=payload:nodejs /app/apps/cms/sentry.client.config.ts
 COPY --from=builder --chown=payload:nodejs /app/apps/cms/sentry.edge.config.ts ./apps/cms/sentry.edge.config.ts
 COPY --from=builder --chown=payload:nodejs /app/apps/cms/sentry.server.config.ts ./apps/cms/sentry.server.config.ts
 COPY --from=builder --chown=payload:nodejs /app/apps/cms/src ./apps/cms/src
+# Single runtime-only script. Other scripts/ entries are dev/migration
+# tooling and intentionally not shipped into the prod image.
+COPY --from=builder --chown=payload:nodejs /app/apps/cms/scripts/preflight-migrate.cjs ./apps/cms/scripts/preflight-migrate.cjs
 
 USER payload
 WORKDIR /app/apps/cms
 
 EXPOSE 3000
 
-# Run migrations then start the server.
-# Migrations are idempotent — safe to run on every container start.
-CMD ["sh", "-c", "pnpm migrate && pnpm start"]
+# Run preflight cleanup, then migrations, then start the server.
+# The preflight step removes any leftover db.push sentinel rows
+# (batch=-1) from payload_migrations — see scripts/preflight-migrate.cjs
+# for the full failure mode that motivates it. Migrations themselves
+# are idempotent, so running them on every container start is safe.
+CMD ["sh", "-c", "node scripts/preflight-migrate.cjs && pnpm migrate && pnpm start"]
