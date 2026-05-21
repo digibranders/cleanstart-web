@@ -102,10 +102,10 @@ export function WebinarFilters({
       // Mobile: full-width <details> disclosure; collapses by default so the
       // listing isn't crushed by the 299px sidebar. lg+: sticky white-card
       // sidebar as before.
-      className="w-full lg:w-[299px] rounded-2xl bg-white lg:p-6 lg:border lg:border-[#E5E7EB] lg:shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+      className="w-full lg:w-[299px] rounded-[24px] bg-white lg:p-6 lg:border lg:border-[#E5E7EB] lg:shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
     >
       {/* MOBILE (< lg) — native <details> disclosure */}
-      <details className="lg:hidden group rounded-2xl border border-[#E5E7EB] bg-white">
+      <details className="lg:hidden group rounded-[24px] border border-[#E5E7EB] bg-white">
         <summary
           className="flex items-center justify-between gap-2 px-4 py-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden"
         >

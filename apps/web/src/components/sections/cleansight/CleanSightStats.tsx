@@ -95,6 +95,7 @@ export function CleanSightStats(): React.ReactElement {
     <section
       ref={sectionRef}
       data-section="CleanSightStats"
+      aria-labelledby="cleansight-stats-heading"
       className="relative overflow-hidden"
       style={{
         minHeight: "550px",
@@ -126,6 +127,7 @@ export function CleanSightStats(): React.ReactElement {
         {/* ── Heading ── */}
         <div className="text-center" style={{ marginBottom: "62px" }}>
           <h2
+            id="cleansight-stats-heading"
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",

@@ -119,7 +119,7 @@ export function AsrApproach(): React.ReactElement {
         {items.map((item) => (
           <div
             key={item.title}
-            className="relative flex flex-col items-center text-center gap-3 rounded-[20px] bg-white px-6 py-8"
+            className="relative flex flex-col items-center text-center gap-3 rounded-[24px] bg-white px-6 py-8"
             style={{
               boxShadow:
                 "0px 2px 4px rgba(22,34,51,0.04), 0px 8px 16px rgba(22,34,51,0.05)",

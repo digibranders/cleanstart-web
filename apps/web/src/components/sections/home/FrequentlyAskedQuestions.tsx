@@ -187,7 +187,7 @@ function FaqColumn({
 }) {
   return (
     <div
-      className="flex flex-col gap-5 self-start rounded-[32px] bg-white p-6 sm:rounded-[40px] sm:p-8"
+      className="flex flex-col gap-5 self-start rounded-[24px] bg-white p-6 sm:rounded-[40px] sm:p-8"
       style={{
         boxShadow:
           "0 1px 0 rgba(0,0,0,0.04), 0 24px 48px -24px rgba(60,30,150,0.08)",

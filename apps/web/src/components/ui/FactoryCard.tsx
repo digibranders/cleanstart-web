@@ -11,7 +11,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
       {/* MOBILE (< sm) — horizontal list-row per Figma 403:15244 (orb left,
           title + description middle, arrow right). The decorative gradient
           chrome is preserved at lower intensity so the brand identity stays. */}
-      <div className="cs-factory-card relative flex w-full overflow-hidden rounded-[20px] sm:hidden" style={{ minHeight: "84px" }}>
+      <div className="cs-factory-card relative flex w-full overflow-hidden rounded-[24px] sm:hidden" style={{ minHeight: "84px" }}>
         {/* Cyan + purple gradient bg (simplified for the row layout) */}
         <div
           aria-hidden
@@ -24,7 +24,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-[20px]"
+          className="pointer-events-none absolute inset-0 rounded-[24px]"
           style={{ boxShadow: "inset 0 0 0 1px rgba(218,182,243,0.35)" }}
         />
 
