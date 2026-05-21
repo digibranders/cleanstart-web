@@ -89,9 +89,9 @@ export function BlogsHero({
                 id="blogs-hero-title"
                 className="font-display font-semibold text-white text-center w-full"
                 style={{
-                  fontSize: "clamp(3rem,5.6vw,5rem)",
-                  lineHeight: "1.0",
-                  letterSpacing: "-0.05em",
+                  fontSize: "var(--text-hero-utility)",
+                  lineHeight: "var(--text-hero-lh)",
+                  letterSpacing: "var(--text-hero-utility-ls)",
                 }}
               >
                 Blogs

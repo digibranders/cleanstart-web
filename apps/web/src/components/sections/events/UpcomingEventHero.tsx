@@ -94,15 +94,15 @@ export function UpcomingEventHero({
           id="events-hero-title"
           className="font-display font-semibold text-white text-center"
           style={{
-            lineHeight: "1.0",
-            letterSpacing: "-0.05em",
+            fontSize: "var(--text-hero-utility)",
+            lineHeight: "var(--text-hero-lh)",
+            letterSpacing: "var(--text-hero-utility-ls)",
             marginBottom: "60px",
           }}
         >
-          <span style={{ fontSize: "clamp(3rem,5.6vw,5rem)" }}>Upcoming </span>
+          <span>Upcoming </span>
           <span
             style={{
-              fontSize: "clamp(2.75rem,5vw,4.5rem)",
               background:
                 "linear-gradient(105.817deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
               WebkitBackgroundClip: "text",
