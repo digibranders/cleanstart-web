@@ -1,6 +1,11 @@
 import Image from "next/image";
+import { cn } from "@/lib/cn";
 
 // CleanStart wordmark lockup — gradient cube mark + "cleanstart" wordmark. 153×32 native.
+// Defensive: `shrink-0` + `object-contain` prevents the parent flex container
+// from squashing the image below its natural aspect ratio at narrow viewports
+// (the prior bug rendered the logo at ~57×28 = 2.04:1 at 320 px viewport
+// vs. the correct ~134×28 = 4.78:1).
 export function Logo({ className = "" }: { className?: string }) {
   return (
     <Image
@@ -10,7 +15,7 @@ export function Logo({ className = "" }: { className?: string }) {
       height={32}
       sizes="153px"
       priority
-      className={className}
+      className={cn("shrink-0 object-contain", className)}
     />
   );
 }

@@ -19,7 +19,7 @@ export function Header() {
         <Link
           href="/"
           aria-label="CleanStart home"
-          className="flex items-center text-white outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-[#33BAEC] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          className="flex shrink-0 items-center text-white outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-[#33BAEC] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
         >
           <Logo className="h-7 w-auto" />
         </Link>
