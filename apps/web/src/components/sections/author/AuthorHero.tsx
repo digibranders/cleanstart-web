@@ -37,7 +37,7 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 pt-[58px]">
           <Link
             href="/"

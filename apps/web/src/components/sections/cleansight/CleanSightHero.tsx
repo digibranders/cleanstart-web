@@ -32,7 +32,7 @@ export function CleanSightHero(): React.ReactElement {
 
       {/* Content */}
       <div
-        className="relative mx-auto max-w-[1276px] px-6 flex flex-col items-center text-center"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 flex flex-col items-center text-center"
         style={{ paddingTop: "clamp(96px, 11vw, 186px)", paddingBottom: "clamp(72px, 8vw, 120px)" }}
       >
         <h1

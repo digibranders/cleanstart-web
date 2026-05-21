@@ -324,7 +324,7 @@ export function PodcastCTACards({ cards }: Props): React.ReactElement | null {
         <rect width="100%" height="100%" fill="url(#cta-grid)" mask="url(#cta-grid-fade)" />
       </svg>
 
-      <div className="relative mx-auto max-w-[1276px] px-6 py-[clamp(60px,7vw,100px)]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 py-[clamp(60px,7vw,100px)]">
         <div
           className="grid grid-cols-1 md:grid-cols-3 items-stretch"
           style={{ gap: "clamp(20px, 2.3vw, 33px)" }}

@@ -38,7 +38,7 @@ export function ASRDelivers(): React.ReactElement {
 
       {/* Content */}
       <div
-        className="relative mx-auto max-w-[1276px] px-4 sm:px-6 py-section-md"
+        className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-6 py-section-md"
       >
         {/* Heading */}
         <h2

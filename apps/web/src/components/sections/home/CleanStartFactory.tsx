@@ -47,7 +47,7 @@ export function CleanStartFactory() {
 
       <ul
         aria-labelledby="cleanstart-factory-title"
-        className="mx-auto mt-10 grid w-full max-w-[1276px] grid-cols-1 gap-3 px-6 sm:mt-12 sm:gap-4 lg:mt-14 lg:grid-cols-5 lg:gap-7 list-none p-0"
+        className="mx-auto mt-10 grid w-full max-w-[var(--container-default)] grid-cols-1 gap-3 px-6 sm:mt-12 sm:gap-4 lg:mt-14 lg:grid-cols-5 lg:gap-7 list-none p-0"
       >
         {CARDS.map((card) => (
           <li key={card.title}>
@@ -57,7 +57,7 @@ export function CleanStartFactory() {
       </ul>
 
       {/* Engine panel + flames */}
-      <div className="relative mx-auto mt-12 max-w-[1276px] px-6">
+      <div className="relative mx-auto mt-12 max-w-[var(--container-default)] px-6">
         {/* Top 5 flames — bulb sits at the bottom of each card. Container offset = -mt-12 (48px)
              so flame top = card bottom. Flame height 130px = 48 (gap) + 82 (into panel).
              z-0 so panel content sits above the lower portion of the flames.

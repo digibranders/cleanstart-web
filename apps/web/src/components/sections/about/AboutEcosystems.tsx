@@ -64,7 +64,7 @@ export function AboutEcosystems() {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         {/* Heading */}
         <h2
           className="text-center font-display font-bold text-black"

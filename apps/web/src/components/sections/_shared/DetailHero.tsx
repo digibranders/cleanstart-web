@@ -70,7 +70,7 @@ export function DetailHero({
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         <Breadcrumb items={breadcrumb} />
 
         <div className="flex justify-center mt-10">

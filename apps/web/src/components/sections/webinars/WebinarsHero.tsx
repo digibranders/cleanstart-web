@@ -105,7 +105,7 @@ export function WebinarsHero(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         <div
           className="flex flex-col items-center gap-6 mx-auto text-center"
           style={{ paddingTop: "140px", paddingBottom: "80px", maxWidth: "864px" }}

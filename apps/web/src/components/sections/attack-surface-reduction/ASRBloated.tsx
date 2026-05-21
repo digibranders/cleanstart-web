@@ -38,7 +38,7 @@ export function ASRBloated(): React.ReactElement {
       className="relative bg-white overflow-hidden"
     >
       {/* ── Heading ── */}
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-16 md:pt-[88px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-16 md:pt-[88px]">
         <h2
           className="text-center text-[#111]"
           style={{
@@ -67,7 +67,7 @@ export function ASRBloated(): React.ReactElement {
       </div>
 
       {/* ── Desktop layout ── */}
-      <div className="hidden md:block relative mx-auto max-w-[1276px] px-6 pb-[88px]">
+      <div className="hidden md:block relative mx-auto max-w-[var(--container-default)] px-6 pb-[88px]">
         <div className="relative" style={{ minHeight: "443px" }}>
 
           {/* Pink radial glow behind container */}

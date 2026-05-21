@@ -107,7 +107,7 @@ export function TeamsHowWeWork() {
         />
       </div>
 
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-[100px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-[100px]">
         <div className="flex flex-col items-center gap-6 text-center">
           <h2
             className="font-display font-bold text-white"

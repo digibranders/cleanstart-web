@@ -54,7 +54,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
         />
 
         {/* Content */}
-        <div className="relative mx-auto max-w-[1276px] px-6 py-section-md flex flex-col justify-between h-full">
+        <div className="relative mx-auto max-w-[var(--container-default)] px-6 py-section-md flex flex-col justify-between h-full">
           {/* Heading */}
           <div>
             <p

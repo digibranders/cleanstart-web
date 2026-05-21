@@ -26,7 +26,7 @@ export function AsrFitsBuilt(): React.ReactElement {
       data-section="AsrFitsBuilt"
       className="relative overflow-hidden"
     >
-      <div className="relative mx-auto max-w-[1276px] px-6 py-section-md">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 py-section-md">
         {/* Heading row */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 md:mb-16">
           <h2

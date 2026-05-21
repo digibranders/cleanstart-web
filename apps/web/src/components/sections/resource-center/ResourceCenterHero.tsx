@@ -76,7 +76,7 @@ export function ResourceCenterHero({
       </div>
 
       {/* Content */}
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         {/* Title block + search */}
         <div
           className="flex flex-col items-center gap-6 lg:gap-8 mx-auto pt-[120px] lg:pt-[158px]"

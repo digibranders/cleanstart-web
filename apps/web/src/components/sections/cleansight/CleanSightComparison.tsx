@@ -403,7 +403,7 @@ export function CleanSightComparison(): React.ReactElement {
 
       {/* ════════════════════════ MOBILE ════════════════════════ */}
       <div
-        className="xl:hidden relative mx-auto max-w-[1276px] px-4 sm:px-6"
+        className="xl:hidden relative mx-auto max-w-[var(--container-default)] px-4 sm:px-6"
         style={{ paddingTop: "180px", paddingBottom: "60px" }}
       >
         {/* Traditional card */}

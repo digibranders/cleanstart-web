@@ -57,7 +57,7 @@ export function AboutWhoWeAre() {
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         {/* Heading row */}
         <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-start lg:gap-[106px]">
           <h2

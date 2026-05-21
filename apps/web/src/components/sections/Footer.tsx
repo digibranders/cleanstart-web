@@ -156,7 +156,7 @@ export function Footer({
           }}
         />
       <div className="relative px-6">
-       <div className={`relative mx-auto w-full max-w-[1276px] pb-[80px] ${hasCta ? "pt-[320px] sm:pt-[260px] lg:pt-[225px]" : "pt-[80px]"}`}>
+       <div className={`relative mx-auto w-full max-w-[var(--container-default)] pb-[80px] ${hasCta ? "pt-[320px] sm:pt-[260px] lg:pt-[225px]" : "pt-[80px]"}`}>
         {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
         <div className="flex flex-wrap items-start justify-between gap-8">
           <p

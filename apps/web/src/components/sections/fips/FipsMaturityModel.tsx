@@ -62,7 +62,7 @@ export function FipsMaturityModel(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-16 md:pt-[80px] pb-16 md:pb-[88px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-16 md:pt-[80px] pb-16 md:pb-[88px]">
         <h2
           className="text-center text-[#111] mb-12 md:mb-[64px]"
           style={{

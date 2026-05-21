@@ -161,7 +161,7 @@ export function SbomSelfUpdating(): React.ReactElement {
       <FeatureLabel x={1234} y={728} title="Validate" body="Continuously assess inventory accuracy and integrity." />
 
       {/* ═════════════ MOBILE (< lg) ═════════════ */}
-      <div className="lg:hidden mx-auto max-w-[1276px] px-6 py-section-md flex flex-col items-center text-center gap-8">
+      <div className="lg:hidden mx-auto max-w-[var(--container-default)] px-6 py-section-md flex flex-col items-center text-center gap-8">
         <h2
           className="text-white"
           style={{

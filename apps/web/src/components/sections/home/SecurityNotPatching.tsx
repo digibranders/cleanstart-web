@@ -46,7 +46,7 @@ export function SecurityNotPatching() {
       className="relative w-full overflow-hidden bg-[#F6F6F6] py-section-md"
       aria-labelledby="security-title"
     >
-      <div className="relative mx-auto w-full max-w-[1276px] px-6">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
         {/* Background decorations — positioned in the 1276-wide Figma section
              coordinate space. */}
         <div

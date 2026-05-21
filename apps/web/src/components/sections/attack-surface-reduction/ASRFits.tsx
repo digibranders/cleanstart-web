@@ -27,7 +27,7 @@ export function ASRFits(): React.ReactElement {
       data-section="ASRFits"
       className="bg-white py-section-md"
     >
-      <div className="mx-auto max-w-[1276px] px-4 sm:px-6">
+      <div className="mx-auto max-w-[var(--container-default)] px-4 sm:px-6">
         {/* Heading row: heading left, subtitle right */}
         <div
           className="flex flex-col xl:flex-row xl:items-end xl:justify-between"

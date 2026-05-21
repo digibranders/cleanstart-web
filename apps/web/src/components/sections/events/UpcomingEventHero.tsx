@@ -86,7 +86,7 @@ export function UpcomingEventHero({
       />
 
       <div
-        className="relative mx-auto max-w-[1276px] px-6"
+        className="relative mx-auto max-w-[var(--container-default)] px-6"
         style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(48px, 6vw, 80px)" }}
       >
         {/* Page title */}

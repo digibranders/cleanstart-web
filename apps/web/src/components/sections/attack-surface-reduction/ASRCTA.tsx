@@ -21,7 +21,7 @@ export function ASRCTA(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-6">
         <div className="flex flex-col xl:flex-row items-center justify-between" style={{ gap: "48px" }}>
           {/* Left: heading + bird */}
           <div className="flex items-end" style={{ gap: "24px" }}>

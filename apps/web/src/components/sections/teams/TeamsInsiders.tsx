@@ -135,7 +135,7 @@ export function TeamsInsiders() {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         {/* Section title */}
         <h2
           className="mb-[80px] text-center font-display font-bold text-[#111]"

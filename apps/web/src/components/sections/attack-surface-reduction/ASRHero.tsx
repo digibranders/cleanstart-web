@@ -24,7 +24,7 @@ export function ASRHero(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-6">
         {/* Heading + subtext — left column */}
         <div
           className="flex flex-col xl:flex-row items-start xl:items-center"
