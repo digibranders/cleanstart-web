@@ -193,7 +193,7 @@ export function FactoryEnginePanel() {
               Hermetic, deterministic builds. Only what you specify.
             </p>
           </div>
-          <div className="flex w-full flex-nowrap items-center justify-start gap-2 lg:gap-4">
+          <div className="flex w-full max-w-[365px] flex-wrap items-center justify-start gap-2 lg:gap-4">
             {RIGHT_PILLS.map((p) => (
               <button key={p} type="button" className="cs-pill-cta">
                 {p}
