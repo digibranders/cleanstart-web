@@ -84,7 +84,7 @@ function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
 }
 
 export function TeamsInsiders() {
-  const trackRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
 
@@ -221,16 +221,19 @@ export function TeamsInsiders() {
         </div>
 
         {/* Scrollable track */}
-        <div
+        <section
           ref={trackRef}
           onScroll={onScroll}
-          className="flex gap-6 overflow-x-auto pb-2"
+          aria-label="Testimonials carousel"
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region requires keyboard access per WCAG 2.1.1 (axe rule scrollable-region-focusable).
+          tabIndex={0}
+          className="flex gap-6 overflow-x-auto pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9A51FF]/40 focus-visible:ring-offset-2 rounded-[24px]"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {TESTIMONIALS.map((t, i) => (
             <TestimonialCard key={i} {...t} />
           ))}
-        </div>
+        </section>
       </div>
     </section>
   );
