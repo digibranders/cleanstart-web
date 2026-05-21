@@ -133,6 +133,54 @@
   }
 }
 
+// Shared split-button geometry — same width, padding, height-stretch,
+// border-radius, and focus ring for every chevron slice on the toolbar.
+// Only the colour follows the adjacent primary button (cyan when it's
+// next to a primary `Publish`, subtle when next to a secondary `Preview`).
+%cs-split-chevron {
+  align-items: center;
+  border: none;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  border-bottom-right-radius: var(--cs-radius-input);
+  border-top-right-radius: var(--cs-radius-input);
+  cursor: pointer;
+  display: inline-flex;
+  // Lock the chevron's footprint so it's identical whether it sits next
+  // to a Payload `.btn` (which carries its own padding) or a bare custom
+  // button. 36px matches the medium-button height for a square cap.
+  flex: 0 0 36px;
+  height: auto;
+  justify-content: center;
+  min-width: 36px;
+  padding: 0;
+  position: relative;
+  transition: background var(--cs-motion-micro);
+  width: 36px;
+
+  // The chevron sits at margin-left: -1px so its left border overlaps the
+  // primary's right border. Without z-index management, the chevron's
+  // paint order clips the primary's hover/focus outline on its right edge.
+  // Lift whichever element is hovered/focused so its ring paints on top.
+  &:hover,
+  &:focus-visible {
+    z-index: 1;
+  }
+}
+
+// Same z-index management for the primary buttons in a split-button —
+// when they're hovered/focused, lift them above the chevron so the ring
+// is continuous around the whole element.
+.cs-publish-menu__inline,
+.cs-preview-menu__primary {
+  position: relative;
+
+  &:hover,
+  &:focus-visible {
+    z-index: 1;
+  }
+}
+
 .cs-publish-menu {
   align-items: stretch;
   display: inline-flex;
@@ -146,25 +194,62 @@
     }
   }
 
-  &__chevron {
-    align-items: center;
-    background: var(--cs-cyan-500);
-    border: none;
-    border-bottom-right-radius: var(--cs-radius-input);
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
-    border-top-right-radius: var(--cs-radius-input);
-    color: white;
-    cursor: pointer;
-    display: inline-flex;
-    height: auto;
-    justify-content: center;
-    padding: 0 8px;
-    transition: background var(--cs-motion-micro);
+  // Inline variant — when the primary button is a direct child of
+  // .cs-publish-menu (no slot wrapper, e.g. CmsPublishButton's "Publish"
+  // primary submit). Squares off the right edge so the chevron snugs in.
+  &__inline {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+  }
 
-    &:hover { background: var(--cs-cyan-600); }
+  &__chevron {
+    @extend %cs-split-chevron;
+    // Match the Preview chevron exactly — secondary `.btn` classes on the
+    // element supply the dark fill/text colour; we only neutralise the
+    // join with the primary on its left.
+    border-left: 1px solid var(--theme-elevation-200, rgba(255, 255, 255, 0.1));
+    margin-left: -1px;
+
     &:focus-visible {
-      outline: none;
-      box-shadow: inset 0 0 0 2px white;
+      outline: 2px solid var(--cs-cyan-500);
+      outline-offset: -2px;
+    }
+  }
+}
+
+// Hide Payload's stock preview affordances — the toolbar Preview link
+// (#preview-button) and Live-Preview toggler (#live-preview-toggler).
+// PreviewMenu (cs-preview-menu) unifies both behind a single split-button
+// and still delegates the iframe toggle to #live-preview-toggler via a
+// scripted click, so we keep the stock button mounted-but-hidden.
+#preview-button,
+#live-preview-toggler {
+  display: none !important;
+}
+
+.cs-preview-menu {
+  align-items: stretch;
+  display: inline-flex;
+
+  &__primary {
+    align-items: center;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    display: inline-flex;
+    gap: 6px;
+  }
+
+  &__chevron {
+    @extend %cs-split-chevron;
+    // Inherit the secondary button background/colour from the .btn cascade
+    // already on the element. Only override the join so it visually slots
+    // into the primary on its left.
+    border-left: 1px solid var(--theme-elevation-200, rgba(255, 255, 255, 0.1));
+    margin-left: -1px;
+
+    &:focus-visible {
+      outline: 2px solid var(--cs-cyan-500);
+      outline-offset: -2px;
     }
   }
 }

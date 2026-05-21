@@ -1,7 +1,8 @@
 'use client';
 
 import type { KeyboardEvent, ReactElement, ReactNode, RefObject } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { useDismiss } from '../hooks/useDismiss';
 import { type Placement, useAnchoredPosition } from '../hooks/useAnchoredPosition';
@@ -38,6 +39,16 @@ type Props = {
 export const DropdownMenu = (props: Props): ReactElement | null => {
   const { open, onClose, anchorRef, items, placement = 'bottom-start', ariaLabel } = props;
   const floatingRef = useRef<HTMLDivElement | null>(null);
+  // Portal to <body> so `position: fixed` is computed against the
+  // viewport's initial containing block, not whatever ancestor
+  // happens to establish one (e.g. an element with `backdrop-filter`,
+  // `transform`, `filter`, `contain: paint`, or `will-change` —
+  // any of which silently break fixed positioning per CSS spec).
+  // SSR-safe: the portal node is only resolved after mount.
+  const [portalNode, setPortalNode] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setPortalNode(typeof document !== 'undefined' ? document.body : null);
+  }, []);
 
   const pos = useAnchoredPosition({
     anchorRef,
@@ -68,7 +79,7 @@ export const DropdownMenu = (props: Props): ReactElement | null => {
     }
   }, [open]);
 
-  if (!open) return null;
+  if (!open || !portalNode) return null;
 
   const focusAt = (idx: number): void => {
     itemRefs.current[idx]?.focus();
@@ -104,7 +115,7 @@ export const DropdownMenu = (props: Props): ReactElement | null => {
     ? { position: 'fixed', top: `${pos.top}px`, left: `${pos.left}px` }
     : { position: 'fixed', top: '-9999px', left: '-9999px' };
 
-  return (
+  return createPortal(
     <div
       ref={floatingRef}
       role="menu"
@@ -152,6 +163,7 @@ export const DropdownMenu = (props: Props): ReactElement | null => {
           </button>
         );
       })}
-    </div>
+    </div>,
+    portalNode,
   );
 };

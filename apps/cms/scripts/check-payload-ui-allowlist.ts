@@ -110,6 +110,12 @@ const ALLOW_LIST = new Set<string>([
   // breadcrumb stays stale on SPA nav and blank on hard refresh.
   // Functionally equivalent to useListQuery (already allowed).
   'useStepNav',
+  // `useServerFunctions` is a pure data-layer hook — it exposes the
+  // server-action seam (incl. `schedulePublish`) Payload uses internally,
+  // and renders nothing. CmsSchedulePublishDialog calls it so the
+  // `payload-jobs` row shape stays identical to Payload's stock drawer
+  // (correct input shape + `waitUntil`). No render surface touched.
+  'useServerFunctions',
 ]);
 
 const TARGET = '@payloadcms/ui';

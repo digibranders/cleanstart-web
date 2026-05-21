@@ -8,10 +8,11 @@ export interface FactoryCardProps {
 export function FactoryCard({ title, description }: FactoryCardProps) {
   return (
     <>
-      {/* MOBILE (< sm) — horizontal list-row per Figma 403:15244 (orb left,
-          title + description middle, arrow right). The decorative gradient
-          chrome is preserved at lower intensity so the brand identity stays. */}
-      <div className="cs-factory-card relative flex w-full overflow-hidden rounded-[24px] sm:hidden" style={{ minHeight: "84px" }}>
+      {/* MOBILE + TABLET (< lg) — horizontal list-row per Figma 403:15244 (orb
+          left, title + description middle, arrow right). Stacks vertically all
+          the way through tablet; the absolute-positioned desktop variant only
+          kicks in at lg+ where the 5-up grid + engine flames can fit. */}
+      <div className="cs-factory-card relative flex w-full overflow-hidden rounded-[24px] lg:hidden" style={{ minHeight: "84px" }}>
         {/* Cyan + purple gradient bg (simplified for the row layout) */}
         <div
           aria-hidden
@@ -64,8 +65,8 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
         </div>
       </div>
 
-      {/* DESKTOP (sm+) — existing absolute-positioned card */}
-      <div className="cs-factory-card relative hidden h-[374px] w-full overflow-hidden rounded-[24px] sm:block">
+      {/* DESKTOP (lg+) — existing absolute-positioned card */}
+      <div className="cs-factory-card relative hidden h-[374px] w-full overflow-hidden rounded-[24px] lg:block">
       {/* Layer 1 — purple ellipse (upper-left accent, like Figma Ellipse 46683 #5D04D7) */}
       <div
         className="pointer-events-none absolute"

@@ -136,7 +136,7 @@ export function FactoryEnginePanel() {
                the arrow tail color exactly so they merge as one continuous color. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute"
+            className="pointer-events-none absolute hidden xl:block"
             style={{
               right: "-60px",
               top: "50%",
@@ -154,8 +154,13 @@ export function FactoryEnginePanel() {
                left offset of -13px aligns the arrow tail (SVG x=190 within
                viewBox starting at 177) with the card's right edge, so the
                tail-glow leaf overhangs back into the card and erases the seam. */}
+          {/* Arrow SVG is 164px wide but the inter-card gap is a percentage
+              (~6.3% of the panel) that shrinks with viewport: 160px at the
+              1276 Figma anchor, ~64px at lg/1024. Below xl the arrow head
+              overlaps the right card, so only render it at xl+ where the
+              gap actually fits its 151px footprint. */}
           <div
-            className="pointer-events-none absolute z-10 hidden lg:block"
+            className="pointer-events-none absolute z-10 hidden xl:block"
             style={{
               left: "calc(100% - 13px)",
               top: "50%",
@@ -193,7 +198,12 @@ export function FactoryEnginePanel() {
               Hermetic, deterministic builds. Only what you specify.
             </p>
           </div>
-          <div className="flex w-full flex-nowrap items-center justify-start gap-2 lg:gap-4">
+          {/* No max-w cap here: the 4 pills sum to ~370px at lg gap-4, which
+              would force "Handoff" onto a second row inside the 365px title
+              column. Let them use the full card width (≈504px at lg/1024)
+              so they stay on one line; flex-wrap stays as a fallback if the
+              card ever gets squeezed below the pill-row width. */}
+          <div className="flex w-full flex-wrap items-center justify-start gap-2 lg:gap-4">
             {RIGHT_PILLS.map((p) => (
               <button key={p} type="button" className="cs-pill-cta">
                 {p}

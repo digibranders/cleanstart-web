@@ -1858,6 +1858,177 @@
   padding: var(--cs-space-2) var(--cs-space-3);
 }
 
+.cs-schedule {
+  display: grid;
+  gap: var(--cs-space-6);
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, 1.2fr);
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cs-schedule__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-4);
+}
+
+.cs-schedule__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-2);
+}
+
+.cs-schedule__label {
+  color: var(--theme-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.cs-schedule__req {
+  color: var(--color-error-500);
+  margin-left: 2px;
+}
+
+.cs-schedule__select {
+  appearance: none;
+  background: var(--theme-input-bg);
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%;
+  background-repeat: no-repeat;
+  background-size: 5px 5px;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  border-radius: var(--cs-radius-input);
+  color: var(--theme-text);
+  font-size: 0.875rem;
+  height: 36px;
+  padding: 0 var(--cs-space-8) 0 var(--cs-space-3);
+
+  &:focus-visible {
+    border-color: var(--cs-cyan-500);
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: 1px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.cs-schedule__upcoming {
+  border-left: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+  display: flex;
+  flex-direction: column;
+  gap: var(--cs-space-3);
+  padding-left: var(--cs-space-6);
+
+  @media (max-width: 720px) {
+    border-left: none;
+    border-top: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+    padding-left: 0;
+    padding-top: var(--cs-space-4);
+  }
+}
+
+.cs-schedule__upcoming-title {
+  color: var(--theme-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.cs-schedule__upcoming-empty {
+  align-items: center;
+  color: var(--theme-text-soft, rgba(0, 0, 0, 0.55));
+  display: flex;
+  font-size: 0.8125rem;
+  gap: var(--cs-space-2);
+  padding: var(--cs-space-3) 0;
+}
+
+.cs-schedule__table {
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  width: 100%;
+
+  th,
+  td {
+    border-bottom: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
+    padding: var(--cs-space-2) var(--cs-space-2);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  th {
+    color: var(--theme-text-soft, rgba(0, 0, 0, 0.55));
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  td:last-child {
+    text-align: right;
+    width: 32px;
+  }
+}
+
+.cs-schedule__pill {
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 8px;
+  text-transform: uppercase;
+
+  &--publish {
+    background: var(--cs-tint-brand-medium, rgba(34, 197, 250, 0.15));
+    color: var(--cs-cyan-600, #0284c7);
+  }
+
+  &--unpublish {
+    background: rgba(220, 38, 38, 0.12);
+    color: var(--color-error-500, #dc2626);
+  }
+}
+
+.cs-schedule__tz {
+  color: var(--theme-text-soft, rgba(0, 0, 0, 0.55));
+  font-family: var(--cs-font-mono, ui-monospace, monospace);
+  font-size: 0.75rem;
+}
+
+.cs-schedule__delete {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--cs-radius-input, 6px);
+  color: var(--theme-text-soft, rgba(0, 0, 0, 0.55));
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 1.125rem;
+  height: 28px;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  transition: background var(--cs-motion-micro), color var(--cs-motion-micro);
+  width: 28px;
+
+  &:hover:not(:disabled) {
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--color-error-500, #dc2626);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
 // =============================================================================
 // Lexical block handle (Wave 7 part 2) — left-rail drag grip
 // =============================================================================
