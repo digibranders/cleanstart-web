@@ -102,7 +102,9 @@ const fieldInputStyle: React.CSSProperties = {
   background: "white",
   height: "44px",
   width: "100%",
-  fontSize: "0.9375rem",
+  // 1rem (16px) — iOS Safari zooms in on focus for inputs sized below
+  // 16px. Stay at ≥ 16px to avoid the zoom shift.
+  fontSize: "1rem",
 };
 
 export function FormRenderer({
@@ -296,7 +298,6 @@ export function FormRenderer({
                   value={String(values[f.name] ?? "")}
                   onChange={(e) => setValue(f.name, e.target.value)}
                   style={{ ...fieldInputStyle, height: "96px", paddingTop: "10px" }}
-                  className="text-sm"
                 />
                 {helpEl}
                 {errorEl}
@@ -314,7 +315,6 @@ export function FormRenderer({
                   value={String(values[f.name] ?? "")}
                   onChange={(e) => setValue(f.name, e.target.value)}
                   style={fieldInputStyle}
-                  className="text-sm"
                 >
                   <option value="">Select…</option>
                   {(f.options ?? []).map((opt) => (
@@ -368,7 +368,6 @@ export function FormRenderer({
                 value={String(values[f.name] ?? "")}
                 onChange={(e) => setValue(f.name, e.target.value)}
                 style={fieldInputStyle}
-                className="text-sm"
               />
               {helpEl}
               {errorEl}

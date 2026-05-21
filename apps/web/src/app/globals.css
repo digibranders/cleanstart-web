@@ -1874,6 +1874,16 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+  /* Modern browsers (Chrome 114+, Safari 17.5+, Firefox 121+) render
+     evenly-balanced headings with this declaration. Free polish; no
+     fallback needed in older browsers (they get the default behavior).
+     Apply broadly so every heading inherits the editorial treatment
+     without per-component opt-in. Article-body headings already set
+     text-wrap: balance explicitly — this just makes everywhere else
+     consistent. */
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
   html {
     @apply font-sans;
     /* Reserve scrollbar space so route changes that add/remove a scrollable
