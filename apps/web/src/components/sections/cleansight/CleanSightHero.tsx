@@ -39,10 +39,10 @@ export function CleanSightHero(): React.ReactElement {
           className="text-white max-w-[840px]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(36px, 4.17vw, 80px)",
+            fontSize: "var(--text-hero-product)",
             fontWeight: 600,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.0,
+            letterSpacing: "var(--text-hero-product-ls)",
+            lineHeight: "var(--text-hero-lh)",
           }}
         >
           Continuous Visibility. Continuous Remediation.

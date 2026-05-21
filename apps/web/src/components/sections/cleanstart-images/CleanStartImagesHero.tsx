@@ -24,10 +24,10 @@ export function CleanStartImagesHero(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(40px, 4.17vw, 80px)",
+            fontSize: "var(--text-hero-product)",
             fontWeight: 600,
             letterSpacing: "-0.03em",
-            lineHeight: 1.0,
+            lineHeight: "var(--text-hero-lh)",
             maxWidth: "820px",
           }}
         >

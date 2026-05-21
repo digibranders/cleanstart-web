@@ -72,10 +72,10 @@ export function SCAHero(): React.ReactElement {
         <h1
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(36px, 4.17vw, 80px)",
+            fontSize: "var(--text-hero-product)",
             fontWeight: 600,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.0,
+            letterSpacing: "var(--text-hero-product-ls)",
+            lineHeight: "var(--text-hero-lh)",
             color: "#ffffff",
             maxWidth: "805px",
             margin: 0,

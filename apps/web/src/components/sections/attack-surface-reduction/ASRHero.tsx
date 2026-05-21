@@ -35,9 +35,9 @@ export function ASRHero(): React.ReactElement {
             <h1
               style={{
                 fontFamily: "var(--font-figtree)",
-                fontSize: "clamp(40px, 4.17vw, 80px)",
+                fontSize: "var(--text-hero-product)",
                 fontWeight: 600,
-                letterSpacing: "-0.05em",
+                letterSpacing: "var(--text-hero-product-ls)",
                 lineHeight: 1.05,
                 color: "white",
               }}

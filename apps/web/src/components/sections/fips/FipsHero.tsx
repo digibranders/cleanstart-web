@@ -123,10 +123,10 @@ export function FipsHero(): React.ReactElement {
             style={{
               fontFamily: "var(--font-display)",
               // Figma h1 is 80px at 1920w. clamp scales down to 40px on mobile.
-              fontSize: "clamp(40px, 4.16vw, 80px)",
+              fontSize: "var(--text-hero-product)",
               fontWeight: 600,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.0,
+              letterSpacing: "var(--text-hero-product-ls)",
+              lineHeight: "var(--text-hero-lh)",
               marginBottom: "32px", // gap between h1 (h=160) and subhead frame (y=192) = 32
             }}
           >
