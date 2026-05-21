@@ -135,16 +135,18 @@ Apply these consistently across every page.
 
 ---
 
-## Font weight system (locked)
+## Font weight system (locked — 2026-05-21 critic-review revision)
 
-The codebase follows a strict role-based weight scale. The 2026-05-20 audit found this convention substantially in place already; one outlier (`fontWeight: 800` on `VulnRethinking` VS badge) was normalised to 700.
+The codebase follows a strict role-based weight scale. Empirical survey of 21 hero H1s, 15 section H2s, 6 compact card titles, and the 4 standard card titles produced this canonical mapping. Rationale: Manrope SemiBold (600) at large display reads cleaner than Bold (700) — matches the modern 2024–2026 tech-brand convention (Linear, Vercel, Stripe, GitHub). Section H2 stays at Bold (700) to provide hierarchy contrast against the lighter hero. Compact card titles stay at Medium (500) because cards are scanning surfaces (short lines, small type) — heavier weights feel cramped.
 
 | Weight | Role | Used by |
 |---:|---|---|
 | **400** | Body, captions, eyebrows, footer body | every `<p>` / lead body / card body / meta |
-| **500** | Buttons, nav links, card meta rows, pills | `cs-btn-*`, `<nav>` links, blog card meta |
-| **600** | Sub-headings, card titles, footer column heads | `<h3>`, card title (compact), footer headings, eyebrows-with-emphasis |
-| **700** | Section H2, hero H1, in-page heading-class elements, badges | every section title, page title, feature-card title in heroes |
+| **500** | Buttons, nav links, card meta rows, pills, **compact card titles** | `cs-btn-*`, `<nav>` links, card meta, **BlogCard / NewsroomCard / EventCard / ResourceCard / PodcastEpisodeCard / WebinarCard / AuthorPosts card titles** |
+| **600** | **Hero H1**, sub-headings, footer column heads, in-page H3, eyebrows-with-emphasis | **every hero H1 site-wide** (Manrope SemiBold; 21/21 already correct), `<h3>` in body content, footer column heads |
+| **700** | **Section H2**, mid-CTA, in-page heading-class elements, standard card titles (FactoryCard / AboutPowering FeatureCard / ComparisonCard), badges | every section title, mid-CTA title, feature-card title outside heroes |
+
+**Strict rule: no `font-extrabold` (800), `font-black` (900), or `fontWeight: 800`+ anywhere on marketing pages.** The single historic offender (`VulnRethinking` VS badge) was normalised to 700 on 2026-05-20.
 
 **Rules:**
 

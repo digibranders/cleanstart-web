@@ -66,7 +66,7 @@ export function SCAHero(): React.ReactElement {
       {/* ── Text content ── */}
       <div
         className="relative mx-auto max-w-[1276px] px-6"
-        style={{ paddingTop: "180px", paddingBottom: "100px" }}
+        style={{ paddingTop: "clamp(96px, 11vw, 180px)", paddingBottom: "clamp(56px, 7vw, 100px)" }}
       >
         {/* Headline — Figma node 604:2428, 805×160px */}
         <h1

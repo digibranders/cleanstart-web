@@ -434,7 +434,7 @@ export function CleanSightComparison(): React.ReactElement {
               Traditional Visibility Tools
             </h3>
           </div>
-          <div className="bg-white flex flex-col" style={{ padding: "32px 28px", gap: "28px" }}>
+          <div className="bg-white flex flex-col" style={{ padding: "32px", gap: "28px" }}>
             {TRADITIONAL.map((item) => (
               <div key={item} className="flex items-center" style={{ gap: "16px" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -501,7 +501,7 @@ export function CleanSightComparison(): React.ReactElement {
               CleanSight
             </h3>
           </div>
-          <div className="bg-white flex flex-col" style={{ padding: "32px 28px", gap: "28px" }}>
+          <div className="bg-white flex flex-col" style={{ padding: "32px", gap: "28px" }}>
             {CLEANSIGHT.map((item) => (
               <div key={item} className="flex items-center" style={{ gap: "16px" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}

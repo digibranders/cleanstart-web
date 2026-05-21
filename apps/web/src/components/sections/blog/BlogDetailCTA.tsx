@@ -96,7 +96,7 @@ export function BlogDetailCTA(): React.ReactElement {
         style={{ gap: "32px", width: "634px", maxWidth: "100%" }}
       >
         <h2
-          className="font-display text-display-lg font-bold leading-none tracking-[-0.05em] text-center"
+          className="font-display text-display-lg font-bold leading-[1.05] tracking-[-0.05em] text-center"
           style={{ color: "#111111" }}
         >
           Built. Tested. Trusted.

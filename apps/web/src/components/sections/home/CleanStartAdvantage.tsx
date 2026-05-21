@@ -70,7 +70,7 @@ export function CleanStartAdvantage() {
         <div className="max-w-[517px]">
           <h2
             id="advantage-title"
-            className="font-display text-display-md font-semibold leading-[1.05] tracking-[-0.05em] text-white"
+            className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-white"
           >
             CleanStart{" "}
             <span

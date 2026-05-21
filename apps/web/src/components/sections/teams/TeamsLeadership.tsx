@@ -138,7 +138,7 @@ function TeamCard({ name, role, photo, linkedIn }: TeamMember) {
 
 export function TeamsLeadership() {
   return (
-    <section className="relative overflow-hidden bg-white py-[120px]">
+    <section className="relative overflow-hidden bg-white py-section-md">
       {/* ── Left vector blob (Figma Vector 583:3476) ── */}
       <div
         aria-hidden

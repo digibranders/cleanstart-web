@@ -104,7 +104,7 @@ export function TeamsInsiders() {
 
   return (
     <section
-      className="relative overflow-hidden py-[120px]"
+      className="relative overflow-hidden py-section-md"
       style={{ background: "#f6f6f6" }}
     >
       {/* Decorative corner blobs */}

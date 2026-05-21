@@ -100,7 +100,7 @@ export function SecurityNotPatching() {
         <div className="flex flex-col items-start gap-6 md:flex-row md:gap-12">
           <h2
             id="security-title"
-            className="font-display text-display-md font-bold leading-none tracking-[-0.05em] text-[#111111]"
+            className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
             style={{ maxWidth: "444px" }}
           >
             Security isn&rsquo;t just{" "}
@@ -203,12 +203,13 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
               width={162}
               height={186}
               sizes="162px"
-              className="pointer-events-none absolute"
+              className="pointer-events-none absolute mix-blend-soft-light"
               style={{
                 right: "-37px",
                 top: "-13px",
                 width: "162px",
                 height: "186.4px",
+                opacity: 0.34,
               }}
             />
           ) : (

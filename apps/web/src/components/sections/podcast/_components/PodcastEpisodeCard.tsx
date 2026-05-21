@@ -85,11 +85,8 @@ export function PodcastEpisodeCard({
       </div>
       <h3
         id={`episode-${episode.slug}`}
-        className="text-[#111111]"
+        className="font-display text-card-title-md font-medium text-[#111111]"
         style={{
-          fontFamily: "Figtree, sans-serif",
-          fontWeight: 500,
-          fontSize: "24px",
           lineHeight: 1.3,
           letterSpacing: "-0.01em",
           marginTop: "32px",

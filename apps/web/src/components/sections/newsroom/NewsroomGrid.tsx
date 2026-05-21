@@ -155,7 +155,7 @@ export function NewsroomGrid({
           <>
             <div
               className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
-              style={{ gap: "24px", justifyItems: "center" }}
+              style={{ gap: "32px", justifyItems: "center" }}
             >
               {items.map((item) => (
                 <NewsroomCard key={item.id} item={item} />

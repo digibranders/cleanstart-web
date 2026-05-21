@@ -59,7 +59,7 @@ export function ReadyToSecureCTA() {
 
       <h2
         id="cta-title"
-        className="relative z-10 font-display text-display-sm font-bold leading-none tracking-[-0.05em] text-white"
+        className="relative z-10 font-display text-display-sm font-bold leading-[1.1] tracking-[-0.05em] text-white"
         style={{ maxWidth: "401px" }}
       >
         Ready to Secure Your Container Infrastructure?

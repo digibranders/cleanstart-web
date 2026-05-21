@@ -96,7 +96,7 @@ export function WebinarsGrid({
               <>
                 <div
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center lg:justify-items-stretch"
-                  style={{ gap: "24px" }}
+                  style={{ gap: "32px" }}
                 >
                   {items.map((item) => (
                     <WebinarCard key={item.id} item={item} />
