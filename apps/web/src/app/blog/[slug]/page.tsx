@@ -17,6 +17,7 @@ import { BlogDetailFAQ } from "@/components/sections/blog/BlogDetailFAQ";
 import { BlogDetailRelatedPosts } from "@/components/sections/blog/BlogDetailRelatedPosts";
 import { BlogDetailJourneyNav } from "@/components/sections/blog/BlogDetailJourneyNav";
 import type { JourneyNavTarget } from "@/components/sections/blog/BlogDetailJourneyNav";
+import { BlogScrollReset } from "@/components/sections/blog/BlogScrollReset";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { Footer } from "@/components/sections/Footer";
 import { absoluteUrl, buildPageMetadata } from "@/lib/seo/canonical";
@@ -113,6 +114,7 @@ export async function renderBlogDetail({
 
   return (
     <>
+      <BlogScrollReset />
       {previousTarget ? (
         <link rel="prev" href={absoluteUrl(`/blog/${previousTarget.slug}`)} />
       ) : null}

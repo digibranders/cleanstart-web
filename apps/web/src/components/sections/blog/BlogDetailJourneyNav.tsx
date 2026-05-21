@@ -31,7 +31,7 @@ export function BlogDetailJourneyNav({
     >
       <div className="relative mx-auto max-w-[1120px] px-6">
         <div
-          className="grid grid-cols-1 md:grid-cols-2 gap-y-8 md:gap-x-12 py-10 md:py-12"
+          className="grid grid-cols-1 md:grid-cols-2 gap-y-6 md:gap-x-12 py-6 md:py-8"
           style={{
             borderTop: `1px solid ${RULE_COLOR}`,
             borderBottom: `1px solid ${RULE_COLOR}`,
@@ -99,13 +99,13 @@ function JourneyCell({
         .join(" ")}
     >
       <span
-        className="text-sm md:text-base font-semibold leading-none tracking-tight"
+        className="text-xs md:text-sm font-medium leading-none tracking-tight"
         style={{ color: labelColor }}
       >
         {label}
       </span>
       <span
-        className="text-body-lg font-medium leading-[1.4] line-clamp-2 group-hover:underline"
+        className="text-body-md font-normal leading-[1.4] line-clamp-2 text-balance group-hover:underline"
         style={{ color: "#111" }}
       >
         {target.title}

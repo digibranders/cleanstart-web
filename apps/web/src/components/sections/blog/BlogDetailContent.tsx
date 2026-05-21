@@ -19,7 +19,7 @@ export function BlogDetailContent({
   abstract,
 }: BlogDetailContentProps): React.ReactElement {
   return (
-    <section className="relative w-full bg-white overflow-clip" data-section="BlogDetailContent">
+    <section className="relative w-full bg-white overflow-x-clip" data-section="BlogDetailContent">
       {/* Subtle decorative blobs — keep visual continuity from hero */}
       <div
         aria-hidden
