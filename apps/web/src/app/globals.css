@@ -693,8 +693,14 @@ body {
   }
 }
 
-/* Factory card body — glassy blue */
+/* Factory card body — glassy blue.
+   `container-type: inline-size` enables card-scoped container queries so
+   the desktop variant's interior (title, orb, padding) can scale with
+   the card's own width via cqi units. See RESPONSIVE-SYSTEM-AUDIT.md §8.3
+   Option A. */
 .cs-factory-card {
+  container-type: inline-size;
+  container-name: factory-card;
   background:
     radial-gradient(140% 90% at 50% 0%, rgba(135, 200, 255, 0.55), rgba(46, 78, 200, 0.25) 60%, rgba(20, 30, 100, 0.6) 100%);
   border: 1px solid rgba(180, 210, 255, 0.35);
