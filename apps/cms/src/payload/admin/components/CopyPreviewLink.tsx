@@ -19,18 +19,23 @@ const TTL_PRESETS: ReadonlyArray<Preset> = [
 
 const DEFAULT_TTL_SECONDS = 24 * 60 * 60;
 
+type ShareLinkDialogProps = {
+  readonly open: boolean;
+  readonly onClose: () => void;
+};
+
 /**
- * Doc-header button — opens a small dialog with a TTL picker and an
- * optional label, mints a preview-share JWT via the CMS endpoint,
- * copies the resulting URL to the clipboard, and confirms via toast.
+ * Controlled "mint shareable preview link" dialog. The standalone
+ * trigger button was retired when the three preview affordances
+ * collapsed into the PreviewMenu split-button — this dialog is now
+ * opened from the menu's "Copy shareable link…" item.
  *
- * Mounted via `wirePreviewControls` on every draft-enabled
- * collection. Hidden when the doc has no id yet (unsaved new doc) —
- * the URL needs a docId to point at.
+ * Mints a preview-share JWT via `/api/preview/token`, copies the
+ * resulting URL to the clipboard, and confirms via toast. Returns null
+ * when there is no saved doc (the URL needs a docId to point at).
  */
-export const CopyPreviewLink = (): ReactElement | null => {
+export const ShareLinkDialog = ({ open, onClose }: ShareLinkDialogProps): ReactElement | null => {
   const { id, collectionSlug } = useDocumentInfo();
-  const [open, setOpen] = useState(false);
   const [ttl, setTtl] = useState<number>(DEFAULT_TTL_SECONDS);
   const [label, setLabel] = useState<string>('');
   const [busy, setBusy] = useState(false);
@@ -72,88 +77,77 @@ export const CopyPreviewLink = (): ReactElement | null => {
           type: 'info',
         });
       }
-      setOpen(false);
+      onClose();
       setLabel('');
     } finally {
       setBusy(false);
     }
   };
 
+  if (!open) return null;
+
   return (
-    <>
-      <button
-        type="button"
-        className="btn btn--style-secondary btn--size-small"
-        onClick={() => setOpen(true)}
-        title="Mint a shareable preview link for this draft"
-      >
-        Copy preview link
-      </button>
-      {open ? (
-        <Dialog open={open} onClose={() => (busy ? undefined : setOpen(false))}>
-          <DialogHeader title="Copy preview link" onClose={() => (busy ? undefined : setOpen(false))} />
-          <DialogBody>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 500 }}>Expires after</span>
-                <select
-                  value={ttl}
-                  onChange={(e) => setTtl(Number(e.target.value))}
-                  disabled={busy}
-                  style={{ padding: '0.4rem', borderRadius: 4 }}
-                >
-                  {TTL_PRESETS.map((p) => (
-                    <option key={p.seconds} value={p.seconds}>
-                      {p.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 500 }}>
-                  Label <span style={{ opacity: 0.6 }}>(optional)</span>
-                </span>
-                <input
-                  type="text"
-                  value={label}
-                  onChange={(e) => setLabel(e.target.value)}
-                  placeholder="e.g. Legal review – Q2 launch"
-                  maxLength={120}
-                  disabled={busy}
-                  style={{ padding: '0.4rem', borderRadius: 4 }}
-                />
-              </label>
-              <p style={{ fontSize: '0.8rem', opacity: 0.7, margin: 0 }}>
-                The link lets anyone view this draft until it expires. Revoke any time at
-                {' '}
-                <code>/admin/collections/previewAudit</code>.
-              </p>
-            </div>
-          </DialogBody>
-          <DialogFooter>
-            <button
-              type="button"
-              className="btn btn--style-secondary btn--size-small"
-              onClick={() => setOpen(false)}
+    <Dialog open={open} onClose={() => (busy ? undefined : onClose())}>
+      <DialogHeader
+        title="Copy preview link"
+        onClose={() => (busy ? undefined : onClose())}
+        description="Mint a shareable preview link with an expiry. Revoke any time from the Preview Audit collection."
+      />
+      <DialogBody>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 500 }}>Expires after</span>
+            <select
+              value={ttl}
+              onChange={(e) => setTtl(Number(e.target.value))}
               disabled={busy}
+              style={{ padding: '0.4rem', borderRadius: 4 }}
             >
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="btn btn--style-primary btn--size-small"
-              onClick={() => {
-                void mint();
-              }}
+              {TTL_PRESETS.map((p) => (
+                <option key={p.seconds} value={p.seconds}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 500 }}>
+              Label <span style={{ opacity: 0.6 }}>(optional)</span>
+            </span>
+            <input
+              type="text"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="e.g. Legal review – Q2 launch"
+              maxLength={120}
               disabled={busy}
-            >
-              {busy ? 'Minting…' : 'Mint & copy'}
-            </button>
-          </DialogFooter>
-        </Dialog>
-      ) : null}
-    </>
+              style={{ padding: '0.4rem', borderRadius: 4 }}
+            />
+          </label>
+        </div>
+      </DialogBody>
+      <DialogFooter>
+        <button
+          type="button"
+          className="cs-btn cs-btn--subtle"
+          onClick={() => onClose()}
+          disabled={busy}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="cs-btn cs-btn--primary"
+          onClick={() => {
+            void mint();
+          }}
+          disabled={busy}
+        >
+          {busy ? 'Minting…' : 'Mint & copy'}
+        </button>
+      </DialogFooter>
+    </Dialog>
   );
 };
 
-export default CopyPreviewLink;
+export default ShareLinkDialog;

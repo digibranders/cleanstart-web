@@ -2,7 +2,7 @@ import type { CollectionConfig, CustomComponent, LivePreviewConfig } from 'paylo
 
 import { isPreviewableCollection, previewPathForDoc } from './preview/paths';
 
-const COPY_BUTTON_PATH = '@/payload/admin/components/CopyPreviewLink.tsx#CopyPreviewLink';
+const PREVIEW_MENU_PATH = '@/payload/admin/components/PreviewMenu.tsx#PreviewMenu';
 
 type EditConfig = NonNullable<
   NonNullable<NonNullable<CollectionConfig['admin']>['components']>['edit']
@@ -24,8 +24,9 @@ const getEnv = (): { webBaseUrl: string } => ({
  *
  * 1. Adds `admin.livePreview` so Payload renders the iframe tab.
  * 2. Adds `admin.preview` so the toolbar Preview button gets a URL.
- * 3. Appends `CopyPreviewLink` to `beforeDocumentControls` so the
- *    "Copy preview link" button sits alongside Publish.
+ * 3. Appends `PreviewMenu` (split-button) to `beforeDocumentControls`,
+ *    which subsumes the legacy "Copy preview link" affordance and also
+ *    drives Payload's hidden Preview / Live-Preview toggler buttons.
  *
  * Skips collections not in the previewable allowlist (e.g. system
  * tables like searchLog, auditLog, integrations).
@@ -62,7 +63,7 @@ export const wirePreviewControls = (collection: CollectionConfig): CollectionCon
     ...editCfg,
     beforeDocumentControls: [
       ...existingBeforeDocControls,
-      { path: COPY_BUTTON_PATH } as CustomComponent,
+      { path: PREVIEW_MENU_PATH } as CustomComponent,
     ],
   };
 

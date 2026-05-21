@@ -36,5 +36,11 @@ export const docStatusBarEditConfig = (args: DocStatusBarMountArgs = {}): EditCo
         path: '@/payload/admin/components/DocKebabExtras.tsx#DocKebabExtras',
       },
     ],
+    // Replace Payload's stock PublishButton (whose built-in submenu opens
+    // the default ScheduleDrawer) with our minimal submit-only button.
+    // The schedule entry point lives in PublishMenu and routes to
+    // SchedulePublishDialog. Payload silently ignores this override on
+    // collections without drafts enabled, so it's safe to apply globally.
+    PublishButton: '@/payload/admin/components/CmsPublishButton.tsx#CmsPublishButton',
   };
 };

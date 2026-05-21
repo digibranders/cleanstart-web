@@ -6,6 +6,7 @@ import { DocHeader as DocHeader_ad90301af1277969698538615cf842dc } from '@/paylo
 import { DocKebabExtras as DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0 } from '@/payload/admin/components/DocKebabExtras.tsx'
 import { DisableUserAction as DisableUserAction_6c8d4d4a3960948e585eb302bcb89460 } from '@/payload/admin/components/DisableUserAction.tsx'
 import { ReassignContentAction as ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca } from '@/payload/admin/components/ReassignContentAction.tsx'
+import { CmsPublishButton as CmsPublishButton_c651128bf4837d4639a448413057b93f } from '@/payload/admin/components/CmsPublishButton.tsx'
 import { CmsListView as CmsListView_339f71bcd64a39b547313d733bae8857 } from '@/payload/admin/components/views/list/CmsListView.tsx'
 import { MediaSelfChrome as MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56 } from '@/payload/admin/components/MediaSelfChrome.tsx'
 import { MediaSizeWarningField as MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2 } from '@/payload/admin/components/MediaSizeWarningField.tsx'
@@ -75,7 +76,7 @@ import { OutboundRedirectField as OutboundRedirectField_6ddb1aebe33d308a1f37b1ba
 import { HeadTagsCard as HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462 } from '@/payload/admin/components/HeadTagsCard.tsx'
 import { UrlChangeHistoryField as UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c } from '@/payload/admin/components/UrlChangeHistoryField.tsx'
 import { SeoAdvancedPanel as SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50 } from '@/payload/admin/components/SeoAdvancedPanel.tsx'
-import { CopyPreviewLink as CopyPreviewLink_07cb4b4086c544d491395a77b113012e } from '@/payload/admin/components/CopyPreviewLink.tsx'
+import { PreviewMenu as PreviewMenu_50b93d8a0176cb6161ede3dcf4f0f442 } from '@/payload/admin/components/PreviewMenu.tsx'
 import { UploadField as UploadField_9a37057695692a15b6c8aaeb6d981611 } from '@/payload/admin/components/fields/UploadField.tsx'
 import { LeadsImmutableBanner as LeadsImmutableBanner_c4273dccee2521e4317461376b79e241 } from '@/payload/admin/components/LeadsImmutableBanner.tsx'
 import { LeadsCsvTruncationBanner as LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb } from '@/payload/admin/components/LeadsCsvTruncationBanner.tsx'
@@ -128,6 +129,7 @@ export const importMap = {
   "@/payload/admin/components/DocKebabExtras.tsx#DocKebabExtras": DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0,
   "@/payload/admin/components/DisableUserAction.tsx#DisableUserAction": DisableUserAction_6c8d4d4a3960948e585eb302bcb89460,
   "@/payload/admin/components/ReassignContentAction.tsx#ReassignContentAction": ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca,
+  "@/payload/admin/components/CmsPublishButton.tsx#CmsPublishButton": CmsPublishButton_c651128bf4837d4639a448413057b93f,
   "@/payload/admin/components/views/list/CmsListView.tsx#CmsListView": CmsListView_339f71bcd64a39b547313d733bae8857,
   "@/payload/admin/components/MediaSelfChrome.tsx#MediaSelfChrome": MediaSelfChrome_14d24e8b41ad83caf3d5514c2c38fc56,
   "@/payload/admin/components/MediaSizeWarningField.tsx#MediaSizeWarningField": MediaSizeWarningField_0c9614c3c830a18c245bf1df52fd2eb2,
@@ -197,7 +199,7 @@ export const importMap = {
   "@/payload/admin/components/HeadTagsCard.tsx#HeadTagsCard": HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462,
   "@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField": UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c,
   "@/payload/admin/components/SeoAdvancedPanel.tsx#SeoAdvancedPanel": SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50,
-  "@/payload/admin/components/CopyPreviewLink.tsx#CopyPreviewLink": CopyPreviewLink_07cb4b4086c544d491395a77b113012e,
+  "@/payload/admin/components/PreviewMenu.tsx#PreviewMenu": PreviewMenu_50b93d8a0176cb6161ede3dcf4f0f442,
   "@/payload/admin/components/fields/UploadField.tsx#UploadField": UploadField_9a37057695692a15b6c8aaeb6d981611,
   "@/payload/admin/components/LeadsImmutableBanner.tsx#LeadsImmutableBanner": LeadsImmutableBanner_c4273dccee2521e4317461376b79e241,
   "@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner": LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb,
