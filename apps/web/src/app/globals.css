@@ -159,7 +159,12 @@ html, body {
 
 body {
   min-height: 100vh;
-  overflow-x: hidden;
+  /* `overflow-x: clip` instead of `hidden` — `hidden` turns <body> into a
+     scroll container, which traps every descendant `position: sticky` to
+     scroll relative to <body>'s (non-existent) overflow box, breaking
+     section TOCs and filter sidebars. `clip` clips horizontally without
+     establishing a scroll container, so sticky tracks the viewport. */
+  overflow-x: clip;
 }
 
 /* Hero gradient mesh — solid #151021 fallback under the gradient so the

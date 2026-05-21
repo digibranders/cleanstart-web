@@ -40,7 +40,7 @@ export function KnowledgeHubArticle(): React.ReactElement {
     <section className="bg-white">
       <div className="mx-auto max-w-[1276px] px-6 py-16 lg:py-24">
         <div className="grid gap-10 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-16">
-          <aside className="lg:sticky lg:top-24 lg:self-start">
+          <aside className="lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-112px)] lg:overflow-y-auto">
             <nav aria-label="Knowledge Hub categories" className="flex flex-col gap-8">
               {SIDEBAR_GROUPS.map((group) => (
                 <div key={group.title} className="flex flex-col gap-4">
