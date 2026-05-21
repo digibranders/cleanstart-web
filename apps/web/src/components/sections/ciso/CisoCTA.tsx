@@ -76,7 +76,7 @@ export function CisoCTA(): React.ReactElement {
         style={{ padding: "80px 100px", gap: "68px" }}
       >
         {/* Left: headline */}
-        <h2
+        <p
           className="relative flex-shrink-0 text-white"
           style={{
             fontFamily: "var(--font-display)",
@@ -89,7 +89,7 @@ export function CisoCTA(): React.ReactElement {
           }}
         >
           Strengthen Your Software Supply Chain Foundations
-        </h2>
+        </p>
 
         {/* Right: description + CTA */}
         <div className="relative flex flex-col flex-1" style={{ gap: "40px", zIndex: 1 }}>

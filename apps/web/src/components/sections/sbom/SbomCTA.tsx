@@ -80,7 +80,7 @@ export function SbomCTA(): React.ReactElement {
       >
         {/* Left column — heading, up to 401px wide, shrinks on narrow viewports */}
         <div className="relative lg:flex-1 min-w-0 w-full" style={{ maxWidth: "401px" }}>
-          <h2
+          <p
             style={{
               fontFamily: "var(--font-display)",
               fontSize: "clamp(28px, 3vw, 42px)",
@@ -92,7 +92,7 @@ export function SbomCTA(): React.ReactElement {
             }}
           >
             Verify Every Component You Ship
-          </h2>
+          </p>
         </div>
 
         {/* Right column — body + button, up to 607px wide, shrinks on narrow viewports */}
@@ -168,7 +168,7 @@ export function SbomCTA(): React.ReactElement {
 
       {/* ── Mobile fallback ── */}
       <div className="md:hidden relative h-full px-6 py-10 flex flex-col gap-5 justify-center">
-        <h2
+        <p
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "clamp(24px, 6vw, 36px)",
@@ -180,7 +180,7 @@ export function SbomCTA(): React.ReactElement {
           }}
         >
           Verify Every Component You Ship
-        </h2>
+        </p>
         <p
           style={{
             fontFamily: "var(--font-display)",

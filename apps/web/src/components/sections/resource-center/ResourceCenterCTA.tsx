@@ -82,7 +82,7 @@ export function ResourceCenterCTA(): React.ReactElement {
         className="absolute inset-0 flex items-center px-6 py-8 lg:px-[100px] lg:py-[60px]"
       >
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-[68px] w-full">
-          <h2
+          <p
             id="rc-cta-title"
             className="font-display font-bold text-center lg:text-left w-full lg:max-w-[486px]"
             style={{
@@ -93,7 +93,7 @@ export function ResourceCenterCTA(): React.ReactElement {
             }}
           >
             Stop Managing Vulnerabilities. Start Eliminating Them.
-          </h2>
+          </p>
 
           <div
             className="flex flex-col items-center lg:items-start w-full lg:max-w-[564px] gap-4 lg:gap-6"

@@ -87,7 +87,7 @@ export function SCACTA(): React.ReactElement {
         }}
       >
         {/* Left column — heading */}
-        <h2
+        <p
           className="relative lg:flex-1 min-w-0 w-full text-white"
           style={{
             fontFamily: "var(--font-display)",
@@ -101,7 +101,7 @@ export function SCACTA(): React.ReactElement {
           }}
         >
           From Findings to Action
-        </h2>
+        </p>
 
         {/* Right column — description + button */}
         <div
@@ -158,7 +158,7 @@ export function SCACTA(): React.ReactElement {
           Mobile fallback (under md)
       ══════════════════════════════════════════ */}
       <div className="md:hidden relative h-full flex flex-col items-center justify-center gap-5 p-6 text-center">
-        <h2
+        <p
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "clamp(24px, 7vw, 36px)",
@@ -169,7 +169,7 @@ export function SCACTA(): React.ReactElement {
           }}
         >
           From Findings to Action
-        </h2>
+        </p>
         <p
           style={{
             fontFamily: "var(--font-display)",

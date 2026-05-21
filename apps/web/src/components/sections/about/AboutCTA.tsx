@@ -37,7 +37,7 @@ export function AboutCTA() {
       />
 
       <div className="relative flex flex-col items-center gap-5">
-        <h2
+        <p
           className="font-display font-bold"
           style={{
             fontSize: "clamp(1.75rem, 3vw, 2.625rem)",
@@ -46,7 +46,7 @@ export function AboutCTA() {
           }}
         >
           Start Clean. Stay Secure.
-        </h2>
+        </p>
         <p
           className="font-sans text-body-lg text-white/80"
           style={{
@@ -74,13 +74,13 @@ export function AboutCTA() {
         >
           Contact Sales
         </a>
-        <a
+        {/* <a
           href="#how-it-works"
           className="cs-btn-blue"
           style={{ minWidth: "163px" }}
         >
           How it works
-        </a>
+        </a> */}
         <a
           href="#careers"
           className="cs-btn-blue"

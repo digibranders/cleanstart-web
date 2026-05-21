@@ -80,7 +80,7 @@ export function CleanSightCTA(): React.ReactElement {
         }}
       >
         {/* Left: headline */}
-        <h2
+        <p
           className="relative flex-shrink-0 text-white"
           style={{
             fontFamily: "var(--font-display)",
@@ -93,7 +93,7 @@ export function CleanSightCTA(): React.ReactElement {
           }}
         >
           See Everything. Fix Everything.
-        </h2>
+        </p>
 
         {/* Right: description + CTA button */}
         <div className="relative flex flex-col flex-1" style={{ gap: "40px", zIndex: 1 }}>

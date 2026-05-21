@@ -110,7 +110,7 @@ export function AsrCTA(): React.ReactElement {
 
       {/* Desktop content row: heading │ (paragraph + button) */}
       <div className="relative hidden md:flex h-full items-center justify-between gap-[clamp(40px,7vw,90px)]">
-        <h2
+        <p
           className="text-[#111111]"
           style={{
             fontFamily: "var(--font-display)",
@@ -123,7 +123,7 @@ export function AsrCTA(): React.ReactElement {
           }}
         >
           Reduce Attack Surface at the Source
-        </h2>
+        </p>
 
         <div
           className="flex flex-col items-start"
@@ -149,7 +149,7 @@ export function AsrCTA(): React.ReactElement {
       {/* Mobile content stack — bird inline since the overflow trick doesn't
           translate well at narrow widths. */}
       <div className="relative md:hidden flex flex-col items-center text-center gap-6 h-full justify-center">
-        <h2
+        <p
           className="text-[#111111]"
           style={{
             fontFamily: "var(--font-display)",
@@ -160,7 +160,7 @@ export function AsrCTA(): React.ReactElement {
           }}
         >
           Reduce Attack Surface at the Source
-        </h2>
+        </p>
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

@@ -86,7 +86,7 @@ export function TeamsCTA() {
           width: "min(607px, calc(100% - clamp(24px, 45%, 547px) - 24px))",
         }}
       >
-        <h2
+        <p
           className="font-display font-bold text-[#111]"
           style={{
             fontSize: "clamp(1.75rem, 3vw, 2.625rem)",
@@ -95,7 +95,7 @@ export function TeamsCTA() {
           }}
         >
           Join the Team
-        </h2>
+        </p>
 
         <div className="flex flex-col gap-10">
           <p

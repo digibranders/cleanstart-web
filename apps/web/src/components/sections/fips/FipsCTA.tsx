@@ -41,7 +41,7 @@ export function FipsCTA(): React.ReactElement {
         />
 
         {/* Heading — absolute at exact Figma coords (1276×330 slot). */}
-        <h2
+        <p
           className="font-display text-white absolute"
           style={{
             left: "9.56%",
@@ -55,7 +55,7 @@ export function FipsCTA(): React.ReactElement {
           }}
         >
           Ready to Secure Your Container Infrastructure?
-        </h2>
+        </p>
 
         {/* Body text — absolute. */}
         <p
@@ -111,7 +111,7 @@ export function FipsCTA(): React.ReactElement {
 
       {/* -------------------- Mobile fallback (under md) -------------------- */}
       <div className="md:hidden relative h-full p-6 flex flex-col gap-5 justify-center">
-        <h2
+        <p
           className="font-display text-white"
           style={{
             fontSize: "clamp(24px, 6vw, 32px)",
@@ -122,7 +122,7 @@ export function FipsCTA(): React.ReactElement {
           }}
         >
           Ready to Secure Your Container Infrastructure?
-        </h2>
+        </p>
         <p
           className="font-display"
           style={{
