@@ -1807,9 +1807,17 @@ export interface Blog {
   lastReviewedAt?: string | null;
   categories?: (number | null) | Category;
   /**
-   * Manually curated. Empty = listing component picks by category.
+   * Pin up to 3 posts the reader should see next. Curated picks appear first, in this order. Empty slots auto-fill with the latest from this post's category, then with the latest site-wide.
    */
   relatedPosts?: (number | Blog)[] | null;
+  /**
+   * Optional. The post the reader should have read before this one. If unset, the page auto-fills with the chronologically previous published blog (same category preferred). Renders below the author card and adds <link rel="prev"> for SEO.
+   */
+  previousPost?: (number | null) | Blog;
+  /**
+   * Optional. The post the reader should read after this one. If unset, the page auto-fills with the chronologically next published blog (same category preferred). Renders below the author card and adds <link rel="next"> for SEO.
+   */
+  nextPost?: (number | null) | Blog;
   /**
    * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
    */
@@ -7582,6 +7590,8 @@ export interface BlogsSelect<T extends boolean = true> {
   lastReviewedAt?: T;
   categories?: T;
   relatedPosts?: T;
+  previousPost?: T;
+  nextPost?: T;
   schemaAddons?:
     | T
     | {

@@ -142,6 +142,62 @@ Two opt-out attributes are allowed:
 
 Both attributes are PR-visible; reviewers must justify their use.
 
+### Footer CTA slot contract (locked)
+
+Every page's last-section-before-`<Footer />` renders its CTA into the slot defined in `apps/web/src/components/sections/Footer.tsx`. The slot is the single source of truth for CTA-card geometry; per-page CTAs paint *inside* it via the `cta` prop and never set their own width/height/border-radius.
+
+| Property | Value | Why |
+|---|---|---|
+| Outer wrapper padding | `px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20` | Scales the side-gutter with the viewport. Measured at 1440: 113+128 px gutters. At 1920: 353+368 (≈18.7% each side). At 375: the default `px-6` matches the page rail. |
+| Card max-width | **1200px** | Reduced from 1276 so the card no longer kisses the viewport edges at xl/2xl. |
+| Card height | `420 sm:360 lg:300` px | Tightened from 460/400/330 to match the reduced width visually. |
+| Card border-radius | 40px | Locked. |
+| Card z-index | 20 | Sits above the Footer's gradient. |
+| Card overlap | `top: -170px` (absolute) | The card overhangs the page's last section by 170px. Every page's last bg-providing element must extend ≥170px below its natural content so the overlap lands on real bg, not body white. Convention: `padding-bottom: 250px` on the last section. |
+
+**Inner CTA content rules:**
+
+- Heading: `clamp(28px, 2.86vw, 55px)` (or the equivalent `text-display-sm` token) — 28→55px range; longer heading copy may extend the floor to 34→55.
+- Body: `text-body-lg` token (16→22px). Never inline-flat `1.3125rem` or one-off clamps.
+- Buttons: `--btn-fs-md` (16) for inline secondary; `--btn-fs-lg` (20) for primary CTA labels. Height defaults via `cs-btn-*` classes — no inline `height` override.
+- Newsletter inputs (BlogsCTA / EventsCTA / WebinarsCTA): the email input wrapper is `flex-1 min-w-0` inside a `w-full` form. **Never** set a fixed `width: 427px` (the historic value) — it overflows the 1200 slot at narrow desktops.
+- Below `lg`: every column-split CTA stacks via `flex-col lg:flex-row` (BlogsCTA, EventsCTA, WebinarsCTA pattern). Fixed `w-[401px]` / `w-[493px]` columns become `lg:max-w-[401px]` / `lg:max-w-[493px]`.
+
+### Shared `SearchBar` primitive contract
+
+The shared `SearchBar` at `src/components/sections/_shared/SearchBar.tsx` defaults to fluid sizing for every CMS-listing caller (BlogsHero, KnowledgeHubArticleHero, ResourceCenterHero).
+
+- Form wrapper: `w-full max-w-[674px] mx-auto`.
+- Input wrapper: `flex-1 min-w-0` — fills the available form width minus the 52px submit button.
+- Submit button: 52×44 fixed (touch-target floor; matches `--btn-h-lg`).
+- Callers may override the input wrapper via `inputWidthClassName` only if the input needs an explicit cap (e.g. compact hero variants); the default is correct for every standard listing-page hero.
+
+### Sticky-sidebar offset contract (CMS-listing + article TOC)
+
+Every page with a sticky-on-scroll sidebar (`lg:sticky`) uses the **same top offset** so the sidebar aligns to the same screen position across the site:
+
+| Surface | Offset | File |
+|---|---:|---|
+| Resource Center categories sidebar | **96px** | `ResourceCenterSidebar.tsx` |
+| Webinars filter sidebar | **96px** | `WebinarsGrid.tsx` |
+| Blog detail TOC | **96px** | `BlogDetailContent.tsx` |
+| Knowledge Hub categories sidebar | **96px** (`lg:top-24` = 6rem) | `KnowledgeHubArticle.tsx` |
+
+The Header row is `h-[72px]` and is `fixed top-0 z-40`. The 96px sticky offset gives 24px of breathing room between the Header bottom edge and the sticky sidebar top.
+
+**TOC anchor scroll-margin:** every `.article-body .article-h1` through `.article-h6` carries `scroll-margin-top: clamp(80px, 10vw, 120px)` so clicking a TOC link lands the heading 24–48px below the Header instead of underneath it. Defined once in `globals.css` (`.article-body` selectors).
+
+### Section padding normalization commitment (2026-05-20)
+
+Every non-hero section on the marketing site uses **one** of the four `--spacing-section-*` tokens documented above. Hardcoded raw paddings (60 / 72 / 80 / 88 / 100 / 120 px) and the Tailwind triplet `py-16 md:py-20 xl:py-[120px]` shape are forbidden in new code; the lint gate's `flat-px paddingTop:` and `arbitrary py-[Xpx]` rules catch new additions.
+
+- `py-section-md` (64→120) is the **default** for every section that doesn't have a specific role.
+- `py-section-sm` (48→80) for tighter card-grid heading bands.
+- `py-section-lg` (80→150) reserved for feature/hero-adjacent prominence.
+- `py-section-cta` (160→250) reserved for the last section before `<Footer />` so the CTA-card overlap lands cleanly.
+
+Heros are explicitly excluded from this rule: their top padding includes the fixed-header offset and uses a clamp like `clamp(96px, 11vw, 178px)` to absorb the header height + breathing room.
+
 ---
 
 ## Original Figma extraction (reference, not canonical for component sizing)

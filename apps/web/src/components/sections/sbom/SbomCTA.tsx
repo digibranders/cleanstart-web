@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 /**
@@ -10,7 +9,7 @@ import Link from "next/link";
  * Bird sits at left-[308px] top-[221.5px], partially clipped at bottom.
  */
 
-const CARD_BG = "linear-gradient(105deg, #131E8F 0%, #471EC0 100%)";
+const CARD_BG = "linear-gradient(180deg, #131E8F 0%, #471EC0 100%)";
 
 export function SbomCTA(): React.ReactElement {
   return (
@@ -19,53 +18,72 @@ export function SbomCTA(): React.ReactElement {
       className="absolute inset-0 overflow-hidden"
       style={{ background: CARD_BG }}
     >
-      {/* Decorative glow — right edge */}
-      <div
+      {/* ── SVG grid union (radial gradient pattern) ── */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        src="/images/cleansight/cta-union.svg"
+        alt=""
+        className="absolute pointer-events-none select-none hidden xl:block"
         style={{
-          left: "1159px",
-          top: "244px",
-          width: "511px",
-          height: "511px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(closest-side, rgba(154,81,255,0.50) 0%, rgba(154,81,255,0) 70%)",
-          filter: "blur(60px)",
+          left: "547px",
+          top: "-220px",
+          width: "1101px",
+          height: "1101px",
+          opacity: 0.08,
         }}
+        loading="lazy"
+        decoding="async"
       />
-      {/* Decorative glow — left edge */}
+
+      {/* ── Ellipse — top-left ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        className="pointer-events-none select-none absolute hidden xl:block"
         style={{
           left: "-139px",
           top: "-168px",
           width: "320px",
           height: "320px",
           borderRadius: "50%",
-          background:
-            "radial-gradient(closest-side, rgba(44,193,235,0.35) 0%, rgba(44,193,235,0) 70%)",
-          filter: "blur(50px)",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
         }}
       />
 
-      {/* ── Desktop layout (md+) ── */}
+      {/* ── Ellipse — bottom-right ── */}
       <div
-        className="hidden md:flex absolute inset-0 items-start"
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden xl:block"
         style={{
-          paddingLeft: "100px",
-          paddingRight: "100px",
-          paddingTop: "80px",
-          gap: "68px",
+          left: "1159px",
+          top: "244px",
+          width: "511px",
+          height: "511px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
+        }}
+      />
+
+      {/* ── Desktop layout (md+) — vertical stack until lg, then 2-col ── */}
+      <div
+        className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 items-start"
+        style={{
+          paddingLeft: "clamp(32px, 5vw, 100px)",
+          paddingRight: "clamp(32px, 5vw, 100px)",
+          paddingTop: "clamp(40px, 5vw, 80px)",
+          columnGap: "clamp(24px, 4vw, 68px)",
         }}
       >
-        {/* Left column — heading, 401px wide */}
-        <div className="relative" style={{ width: "401px", flexShrink: 0 }}>
-          <h2
+        {/* Left column — heading, up to 401px wide, shrinks on narrow viewports */}
+        <div className="relative lg:flex-1 min-w-0 w-full" style={{ maxWidth: "401px" }}>
+          <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(34px, 2.86vw, 55px)",
+              fontSize: "clamp(28px, 3vw, 42px)",
               fontWeight: 700,
               letterSpacing: "-0.05em",
               lineHeight: 1.05,
@@ -73,14 +91,14 @@ export function SbomCTA(): React.ReactElement {
               margin: 0,
             }}
           >
-            See Everything. Trust Every Component.
-          </h2>
+            Verify Every Component You Ship
+          </p>
         </div>
 
-        {/* Right column — body + button, 607px wide */}
+        {/* Right column — body + button, up to 607px wide, shrinks on narrow viewports */}
         <div
-          className="flex flex-col"
-          style={{ width: "607px", gap: "32px", flexShrink: 0 }}
+          className="flex flex-col lg:flex-1 min-w-0 w-full"
+          style={{ maxWidth: "607px", gap: "clamp(20px, 2vw, 32px)" }}
         >
           <p
             style={{
@@ -93,9 +111,8 @@ export function SbomCTA(): React.ReactElement {
               margin: 0,
             }}
           >
-            Generate signed, complete SBOMs automatically on every build.
-            Meet EO 14028, EU CRA, and FIPS requirements without the manual
-            overhead.
+            Continuously updated, cryptographically verifiable software
+            inventories built for modern software supply chains.
           </p>
           <Link
             href="/contact-us"
@@ -108,7 +125,7 @@ export function SbomCTA(): React.ReactElement {
               } as React.CSSProperties
             }
           >
-            Contact us
+            Download the SBOM Datasheet
             <svg
               className="cs-cta-arrow"
               width="22"
@@ -129,22 +146,29 @@ export function SbomCTA(): React.ReactElement {
         </div>
       </div>
 
-      {/* Bird — absolute, bottom-left of card, partially clipped by slot */}
-      <Image
-        src="/images/sbom/cta-bird.png"
-        alt=""
+      {/* Cube decoration — overflows bottom-right corner at 80% opacity (matches CISO CTA) */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         aria-hidden
-        width={304}
-        height={206}
-        sizes="304px"
-        className="hidden md:block absolute pointer-events-none select-none object-contain"
-        style={{ left: "308px", top: "221.5px", width: "304px", height: "206px" }}
+        src="/images/ciso/cta-cube-noise.png"
+        alt=""
+        className="absolute pointer-events-none select-none hidden xl:block"
+        style={{
+          right: "-60px",
+          bottom: "-100px",
+          width: "300px",
+          height: "300px",
+          objectFit: "contain",
+          opacity: 0.8,
+          zIndex: 0,
+        }}
         loading="lazy"
+        decoding="async"
       />
 
       {/* ── Mobile fallback ── */}
       <div className="md:hidden relative h-full px-6 py-10 flex flex-col gap-5 justify-center">
-        <h2
+        <p
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "clamp(24px, 6vw, 36px)",
@@ -155,8 +179,8 @@ export function SbomCTA(): React.ReactElement {
             maxWidth: "280px",
           }}
         >
-          See Everything. Trust Every Component.
-        </h2>
+          Verify Every Component You Ship
+        </p>
         <p
           style={{
             fontFamily: "var(--font-display)",
@@ -167,7 +191,8 @@ export function SbomCTA(): React.ReactElement {
             color: "rgba(255,255,255,0.80)",
           }}
         >
-          Generate signed, complete SBOMs automatically on every build.
+          Continuously updated, cryptographically verifiable software
+          inventories built for modern software supply chains.
         </p>
         <Link
           href="/contact-us"
@@ -179,7 +204,7 @@ export function SbomCTA(): React.ReactElement {
             } as React.CSSProperties
           }
         >
-          Contact us
+          Download the SBOM Datasheet
           <svg
             className="cs-cta-arrow"
             width="18"

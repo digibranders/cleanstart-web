@@ -74,7 +74,7 @@ export function AsrProductionEnv(): React.ReactElement {
       />
 
       {/* Content */}
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-14 md:pt-[88px] pb-14 md:pb-[88px] xl:pb-[250px]">
+      <div className="relative mx-auto max-w-[1276px] px-6 pt-section-md pb-section-cta">
         {/* Heading */}
         <p
           className="text-white mb-14 md:mb-[88px]"

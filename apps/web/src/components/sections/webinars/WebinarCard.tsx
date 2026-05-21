@@ -65,14 +65,13 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
 
       <div
         className="flex flex-col"
-        style={{ padding: "28px 20px 20px", gap: "12px", flex: 1 }}
+        style={{ padding: "32px", gap: "12px", flex: 1 }}
       >
         <h3
-          className="font-display text-card-title-sm line-clamp-3"
+          className="font-display text-card-title-sm font-medium line-clamp-3"
           style={{
             lineHeight: "1.3",
             color: "#0F172A",
-            fontWeight: 600,
             letterSpacing: "-0.01em",
           }}
         >

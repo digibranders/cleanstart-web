@@ -75,8 +75,8 @@ export function WebinarsGrid({
       <div className="relative mx-auto max-w-[1276px] px-6">
         <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8">
           <aside
-            className="shrink-0 lg:sticky"
-            style={{ top: "88px", alignSelf: "flex-start" }}
+            className="shrink-0 lg:sticky lg:max-h-[calc(100vh-112px)] lg:overflow-y-auto"
+            style={{ top: "96px", alignSelf: "flex-start" }}
           >
             <WebinarFilters
               activeType={activeType}
@@ -96,7 +96,7 @@ export function WebinarsGrid({
               <>
                 <div
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center lg:justify-items-stretch"
-                  style={{ gap: "24px" }}
+                  style={{ gap: "32px" }}
                 >
                   {items.map((item) => (
                     <WebinarCard key={item.id} item={item} />

@@ -41,6 +41,9 @@ const ROUTES = [
   "/blogs",
   "/news",
   "/resource-center",
+  "/for-ciso",
+  "/software-composition-analysis",
+  "/teams",
 ] as const;
 
 const baselineDir = join(process.cwd(), "tests", "e2e", "__baselines__");

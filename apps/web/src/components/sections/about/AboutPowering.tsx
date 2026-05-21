@@ -109,7 +109,7 @@ export function AboutPowering() {
       <div className="relative mx-auto max-w-[1276px] px-6 pt-[100px] pb-[20px]">
         {/* Title group — 248:2152 (centered, max-w 969px) */}
         <div className="mx-auto flex max-w-[969px] flex-col items-center gap-6 text-center text-white">
-          <h2 className="font-display text-display-md font-bold leading-none tracking-[-0.05em]">
+          <h2 className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em]">
             Powering Trusted Software Delivery for Global Leaders.
           </h2>
           <p
@@ -158,7 +158,7 @@ function FeatureCard({ title, description }: Card) {
       />
 
       {/* White card — flex column, no absolute internals */}
-      <div className="relative flex h-full w-full flex-col gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[16px] bg-white p-card-md">
+      <div className="relative flex h-full w-full flex-col gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[24px] bg-white p-card-md">
         {/* Ball — 248:2163 (96×96, blue gradient, inset highlight) */}
         <div
           className="flex shrink-0 items-center justify-center overflow-hidden"
@@ -188,7 +188,7 @@ function FeatureCard({ title, description }: Card) {
           <h3 className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em] text-[#111]">
             {title}
           </h3>
-          <p className="text-body-lg font-normal leading-[1.4] tracking-[-0.05em] text-[#555]">
+          <p className="text-body-lg font-normal leading-[1.5] text-[#555]">
             {description}
           </p>
         </div>

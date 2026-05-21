@@ -21,7 +21,7 @@ export const DisplayPublishedAtField = (
 ): ReactElement => {
   const path = props.path ?? 'displayPublishedAt';
   const inputId = useId();
-  const { value, setValue } = useField<string | null>({ path });
+  const { value, initialValue, setValue } = useField<string | null>({ path });
 
   // Read the draft/published status from the form so we can branch on
   // future-date semantics. `_status` is always present in Payload's
@@ -40,8 +40,8 @@ export const DisplayPublishedAtField = (
   const [scheduleOpen, setScheduleOpen] = useState(false);
 
   const state = useMemo(
-    () => resolveDisplayPublishedAtState(value ?? null, status),
-    [value, status],
+    () => resolveDisplayPublishedAtState(value ?? null, initialValue ?? null, status),
+    [value, initialValue, status],
   );
 
   const handleChange = useCallback(

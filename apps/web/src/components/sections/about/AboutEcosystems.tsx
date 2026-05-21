@@ -74,17 +74,20 @@ export function AboutEcosystems() {
             letterSpacing: "-0.05em",
           }}
         >
-          Built for The Ecosystems{" "}
-          <span
-            style={{
-              background:
-                "linear-gradient(-12.5deg, #2CC1EB 0%, #9A51FF 64%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            You Trust
+          <span style={{ display: "block" }}>Built for The</span>
+          <span style={{ display: "block" }}>
+            Ecosystems{" "}
+            <span
+              style={{
+                background:
+                  "linear-gradient(-12.5deg, #2CC1EB 0%, #9A51FF 64%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              You Trust
+            </span>
           </span>
         </h2>
 

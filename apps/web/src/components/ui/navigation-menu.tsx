@@ -56,7 +56,7 @@ function NavigationMenuItem({
 }
 
 const navigationMenuTriggerStyle = cva(
-  "group/navigation-menu-trigger inline-flex h-9 w-max items-center justify-center px-0 py-1.5 text-base font-medium leading-none text-white/85 transition-colors outline-none hover:text-white focus-visible:text-white focus-visible:ring-2 focus-visible:ring-[#33BAEC] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent focus-visible:rounded-sm disabled:pointer-events-none disabled:opacity-50 data-popup-open:text-white data-open:text-white"
+  "group/navigation-menu-trigger inline-flex h-9 w-max cursor-pointer items-center justify-center px-0 py-1.5 text-base font-medium leading-none text-white/85 transition-colors outline-none hover:text-white focus-visible:text-white focus-visible:ring-2 focus-visible:ring-[#33BAEC] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent focus-visible:rounded-sm disabled:pointer-events-none disabled:opacity-50 data-popup-open:text-white data-open:text-white"
 )
 
 function NavigationMenuTrigger({
@@ -113,7 +113,7 @@ function NavigationMenuPositioner({
         )}
         {...props}
       >
-        <NavigationMenuPrimitive.Popup className="data-[ending-style]:easing-[ease] xs:w-(--popup-width) relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) rounded-[20px] text-white transition-[opacity,transform,width,height,scale,translate] duration-[220ms] ease-[cubic-bezier(0.22,1,0.36,1)] outline-none data-ending-style:scale-95 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:scale-95 data-starting-style:opacity-0">
+        <NavigationMenuPrimitive.Popup className="data-[ending-style]:easing-[ease] xs:w-(--popup-width) relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) rounded-[24px] text-white transition-[opacity,transform,width,height,scale,translate] duration-[220ms] ease-[cubic-bezier(0.22,1,0.36,1)] outline-none data-ending-style:scale-95 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:scale-95 data-starting-style:opacity-0">
           <NavigationMenuPrimitive.Viewport className="relative size-full overflow-hidden" />
         </NavigationMenuPrimitive.Popup>
       </NavigationMenuPrimitive.Positioner>
@@ -145,12 +145,12 @@ function NavigationMenuIndicator({
     <NavigationMenuPrimitive.Icon
       data-slot="navigation-menu-indicator"
       className={cn(
-        "top-full z-1 flex h-1.5 items-end justify-center overflow-hidden data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:animate-in data-[state=visible]:fade-in",
+        "top-full z-10 flex h-1.5 items-end justify-center overflow-hidden data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:animate-in data-[state=visible]:fade-in",
         className
       )}
       {...props}
     >
-      <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
+      <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border" />
     </NavigationMenuPrimitive.Icon>
   )
 }

@@ -43,24 +43,11 @@ export function CleanStartFactory() {
         >
           The CleanStart Factory
         </h2>
-        <p
-          className="mx-auto mt-5 max-w-[640px] font-sans text-white/75"
-          style={{
-            fontSize: "clamp(1rem,1.4vw,1.25rem)",
-            fontWeight: 400,
-            lineHeight: "150%",
-            letterSpacing: "-0.02em",
-          }}
-        >
-          A continuous, AI-orchestrated pipeline that turns open-source software
-          into hardened, signed, deterministic container images — every build,
-          end-to-end.
-        </p>
       </div>
 
       <ul
         aria-labelledby="cleanstart-factory-title"
-        className="mx-auto mt-10 grid w-full max-w-[1276px] grid-cols-2 gap-4 px-6 sm:mt-12 sm:grid-cols-3 sm:gap-5 lg:mt-14 lg:grid-cols-5 lg:gap-7 list-none p-0"
+        className="mx-auto mt-10 grid w-full max-w-[1276px] grid-cols-1 gap-3 px-6 sm:mt-12 sm:grid-cols-3 sm:gap-5 lg:mt-14 lg:grid-cols-5 lg:gap-7 list-none p-0"
       >
         {CARDS.map((card) => (
           <li key={card.title}>

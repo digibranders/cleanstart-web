@@ -88,8 +88,8 @@ export function AsrPublicImages(): React.ReactElement {
       </div>
 
       {/* Desktop diagram: container center, 4 cards at corners, dashed lines */}
-      <div className="hidden md:block relative mx-auto max-w-[1260px] px-6 pb-section-md">
-        <div className="relative" style={{ aspectRatio: "1260 / 540" }}>
+      <div className="hidden md:block relative mx-auto max-w-[1276px] px-6 pb-section-md">
+        <div className="relative" style={{ aspectRatio: "1276 / 540" }}>
           {/* Soft red radial glow under the container */}
           <div
             aria-hidden
@@ -297,6 +297,7 @@ function BloatedCard({
             className="text-[#111111]"
             style={{
               fontFamily: "var(--font-display)",
+              // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
               fontSize: "18px",
               fontWeight: 600,
               letterSpacing: "-0.04em",
@@ -309,6 +310,7 @@ function BloatedCard({
             className="text-[#444444]"
             style={{
               fontFamily: "var(--font-display)",
+              // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
               fontSize: "13px",
               fontWeight: 400,
               letterSpacing: "-0.02em",

@@ -60,7 +60,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
       {/* Content */}
       <div
         className="flex flex-col flex-1"
-        style={{ padding: "20px 32px 32px", gap: "12px" }}
+        style={{ padding: "32px", gap: "12px" }}
       >
         {/* Date row */}
         {shortDate && (

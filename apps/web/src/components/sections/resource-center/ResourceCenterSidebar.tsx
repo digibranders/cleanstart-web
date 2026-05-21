@@ -23,9 +23,47 @@ export function ResourceCenterSidebar({
       className="shrink-0 w-full lg:sticky lg:w-[295px] lg:self-start"
       style={{ top: "96px" }}
     >
-      {/* White card background */}
+      {/* MOBILE (< lg) — horizontal scrolling tab strip per Figma 444:401.
+          No icons, no card chrome; underline marks the active tab. */}
+      <div className="lg:hidden -mx-6 px-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ul className="flex items-center gap-6 border-b border-[rgba(17,17,17,0.10)] min-w-max">
+          <li className="shrink-0">
+            <Link
+              href={hrefFor("")}
+              aria-current={!activeType ? "page" : undefined}
+              className="block py-3 font-display text-base font-medium tracking-[-0.02em] relative"
+              style={{ color: !activeType ? "#4a3bf1" : "rgba(17,17,17,0.7)" }}
+            >
+              All
+              {!activeType && (
+                <span aria-hidden className="absolute inset-x-0 -bottom-px h-[2px] bg-[#4a3bf1]" />
+              )}
+            </Link>
+          </li>
+          {RESOURCE_TYPES.map(({ value, label }) => {
+            const isActive = activeType === value;
+            return (
+              <li key={value} className="shrink-0">
+                <Link
+                  href={hrefFor(value)}
+                  aria-current={isActive ? "page" : undefined}
+                  className="block py-3 font-display text-base font-medium tracking-[-0.02em] relative whitespace-nowrap"
+                  style={{ color: isActive ? "#4a3bf1" : "rgba(17,17,17,0.7)" }}
+                >
+                  {label}
+                  {isActive && (
+                    <span aria-hidden className="absolute inset-x-0 -bottom-px h-[2px] bg-[#4a3bf1]" />
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      {/* DESKTOP (lg+) — existing white card sidebar */}
       <div
-        className="relative"
+        className="relative hidden lg:block"
         style={{
           maxHeight: "calc(100vh - 112px)",
           overflowY: "auto",

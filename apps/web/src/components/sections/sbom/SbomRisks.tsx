@@ -13,30 +13,30 @@ const RISKS = [
   {
     id: "incomplete",
     icon: "/images/sbom/risk-icon-incomplete.png",
-    iconAlt: "Incomplete Insight icon",
-    title: "Incomplete Insight",
-    body: "NOASSERTION fields indicate missing supplier, license, or timestamp details, leaving critical risks undetected.",
+    iconAlt: "Incomplete Visibility icon",
+    title: "Incomplete Visibility",
+    body: "Missing packages and dependencies hide risk.",
   },
   {
     id: "traceability",
     icon: "/images/sbom/risk-icon-traceability.png",
     iconAlt: "Broken Traceability icon",
     title: "Broken Traceability",
-    body: "Without commit-level provenance, teams cannot verify authenticity or trace vulnerabilities to their exact source.",
+    body: "Disconnected inventories weaken provenance tracking.",
   },
   {
     id: "stale",
     icon: "/images/sbom/risk-icon-stale.png",
     iconAlt: "Stale Data icon",
     title: "Stale Data",
-    body: "Manually generated SBOMs become outdated within days, missing version drift and new dependency exposures.",
+    body: "Static SBOMs quickly become outdated.",
   },
   {
     id: "compliance",
     icon: "/images/sbom/risk-icon-compliance.png",
-    iconAlt: "Compliance Risk icon",
-    title: "Compliance Risk",
-    body: "Incomplete or unsigned SBOMs fail to meet mandates such as EO 14028, EU CRA, and RBI/DORA.",
+    iconAlt: "Compliance Exposure icon",
+    title: "Compliance Exposure",
+    body: "Incomplete inventories increase audit complexity.",
   },
 ] as const;
 
@@ -91,7 +91,7 @@ export function SbomRisks(): React.ReactElement {
               color: "#111",
             }}
           >
-            {"When SBOMs Fall Short, Risk "}
+            {"Static SBOMs Create Blind "}
             <span
               style={{
                 background:
@@ -101,7 +101,7 @@ export function SbomRisks(): React.ReactElement {
                 backgroundClip: "text",
               }}
             >
-              Grows
+              Spots
             </span>
           </h2>
         </div>

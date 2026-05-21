@@ -21,7 +21,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
       <div className="relative mx-auto max-w-[1276px] px-6">
         {/* Header row */}
         <div className="flex items-center justify-between pt-[60px]">
-          <h2 className="font-display text-display-md font-bold leading-none tracking-[-0.05em]">
+          <h2 className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em]">
             <span className="text-white">Related </span>
             <span
               style={{
@@ -83,7 +83,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
       }}
     >
       {/* Hero image */}
-      <div className="relative shrink-0 mx-3 mt-3 rounded-[20px] overflow-hidden" style={{ height: "200px" }}>
+      <div className="relative shrink-0 mx-3 mt-3 rounded-[24px] overflow-hidden" style={{ height: "200px" }}>
           {post.heroImage ? (
             <Image
               src={mediaUrl(post.heroImage.url)!}
@@ -108,7 +108,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
         )}
 
         {/* Card content */}
-        <div className="flex flex-col gap-[12px] px-[32px] pt-[24px] pb-[32px] flex-1">
+        <div className="flex flex-col gap-[12px] p-[32px] flex-1">
           {/* Meta: date + read time */}
           <div className="flex items-center gap-4">
             {(() => {

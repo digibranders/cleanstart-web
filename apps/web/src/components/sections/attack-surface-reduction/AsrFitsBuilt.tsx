@@ -86,7 +86,7 @@ interface FitsCardProps {
 function FitsCard({ card }: FitsCardProps): React.ReactElement {
   return (
     <div
-      className="relative overflow-hidden rounded-[32px] min-h-[clamp(260px,26vw,352px)]"
+      className="relative overflow-hidden rounded-[40px] min-h-[clamp(260px,26vw,352px)]"
     >
       {/* Outer cyan border glow */}
       <div
@@ -101,7 +101,7 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
 
       {/* White card with subtle shadow */}
       <div
-        className="absolute rounded-[32px] bg-white overflow-hidden flex flex-col"
+        className="absolute rounded-[40px] bg-white overflow-hidden flex flex-col"
         style={{ inset: "8px" }}
       >
         {/* Purple glow blob */}

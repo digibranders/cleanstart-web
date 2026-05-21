@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
+  getAutoJourneyTargets,
   getBlogBySlug,
   getBlogBySlugDraft,
   getRelatedBlogs,
   mediaUrl,
 } from "@/lib/blog";
+import type { Blog } from "@/lib/blog";
 import { highlightLexical } from "@/lib/highlightLexical";
 import { Header } from "@/components/sections/Header";
 import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
@@ -13,9 +15,12 @@ import { BlogDetailContent } from "@/components/sections/blog/BlogDetailContent"
 import { BlogDetailAuthor } from "@/components/sections/blog/BlogDetailAuthor";
 import { BlogDetailFAQ } from "@/components/sections/blog/BlogDetailFAQ";
 import { BlogDetailRelatedPosts } from "@/components/sections/blog/BlogDetailRelatedPosts";
+import { BlogDetailJourneyNav } from "@/components/sections/blog/BlogDetailJourneyNav";
+import type { JourneyNavTarget } from "@/components/sections/blog/BlogDetailJourneyNav";
+import { BlogScrollReset } from "@/components/sections/blog/BlogScrollReset";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { Footer } from "@/components/sections/Footer";
-import { buildPageMetadata } from "@/lib/seo/canonical";
+import { absoluteUrl, buildPageMetadata } from "@/lib/seo/canonical";
 import { effectivePublishedAt } from "@/lib/published-date";
 import {
   JsonLd,
@@ -76,16 +81,46 @@ export async function renderBlogDetail({
   if (!post) notFound();
 
   const categoryIds = post.categories ? [post.categories.id] : [];
-  const [relatedPosts, highlightedBody] = await Promise.all([
-    getRelatedBlogs(post.id, categoryIds, { draft }),
+  const publishedAt = effectivePublishedAt(post);
+
+  // Editorial picks win when set; missing sides fall back to chronological
+  // neighbors (same category preferred, then site-wide). Auto fetch is skipped
+  // entirely when both sides are manually pinned to avoid wasted round-trips.
+  const manualPrevious = toJourneyTarget(post.previousPost);
+  const manualNext = toJourneyTarget(post.nextPost);
+  const needAutoJourney = !manualPrevious || !manualNext;
+
+  const [relatedPosts, highlightedBody, autoJourney] = await Promise.all([
+    getRelatedBlogs(post.id, categoryIds, post.relatedPosts, { draft }),
     highlightLexical(post.body),
+    needAutoJourney
+      ? getAutoJourneyTargets(
+          String(post.id),
+          publishedAt ?? undefined,
+          categoryIds,
+          { draft },
+        )
+      : Promise.resolve({ previous: null, next: null }),
   ]);
 
+  const previousTarget = manualPrevious ?? toJourneyTarget(autoJourney.previous);
+  const nextTarget = manualNext ?? toJourneyTarget(autoJourney.next);
+
   const heroAbsolute = mediaUrl(post.heroImage?.url);
-  const publishedAt = effectivePublishedAt(post);
+  const journeyLinks = [
+    ...(previousTarget ? [`/blog/${previousTarget.slug}`] : []),
+    ...(nextTarget ? [`/blog/${nextTarget.slug}`] : []),
+  ];
 
   return (
     <>
+      <BlogScrollReset />
+      {previousTarget ? (
+        <link rel="prev" href={absoluteUrl(`/blog/${previousTarget.slug}`)} />
+      ) : null}
+      {nextTarget ? (
+        <link rel="next" href={absoluteUrl(`/blog/${nextTarget.slug}`)} />
+      ) : null}
       <JsonLd
         id={`blog-breadcrumbs-${post.slug}`}
         data={breadcrumbSchema([
@@ -105,6 +140,7 @@ export async function renderBlogDetail({
           imageUrl: heroAbsolute,
           authors: post.authors?.map((a) => ({ name: a.name })),
           category: post.categories?.name,
+          relatedLinks: journeyLinks.length > 0 ? journeyLinks : undefined,
         })}
       />
       <Header />
@@ -128,6 +164,8 @@ export async function renderBlogDetail({
 
         <BlogDetailAuthor authors={post.authors} />
 
+        <BlogDetailJourneyNav previous={previousTarget} next={nextTarget} />
+
         {post.faqs && post.faqs.length > 0 && (
           <BlogDetailFAQ faqs={post.faqs} />
         )}
@@ -144,6 +182,9 @@ export async function renderBlogDetail({
         ) : post.faqs && post.faqs.length > 0 ? (
           /* FAQ section already has pb-20 (80px) → spacer covers remaining 170 */
           <div aria-hidden className="bg-white" style={{ height: "170px" }} />
+        ) : previousTarget || nextTarget ? (
+          /* JourneyNav has py-10/12 (40/48px) bottom → spacer covers ~200px */
+          <div aria-hidden className="bg-white" style={{ height: "200px" }} />
         ) : (
           /* Author section has internal pb-16 (64px) → spacer covers remaining 186 */
           <div aria-hidden className="bg-white" style={{ height: "186px" }} />
@@ -159,4 +200,18 @@ export async function renderBlogDetail({
 export default async function BlogDetailPage({ params }: BlogDetailPageProps): Promise<React.ReactElement> {
   const { slug } = await params;
   return renderBlogDetail({ slug });
+}
+
+/**
+ * Normalize a Payload relationship field (string/number id or hydrated doc) into
+ * a JourneyNavTarget. Returns null when the field is unset, a bare id (cannot
+ * render without title), or missing a slug/title.
+ */
+function toJourneyTarget(
+  value: Blog | string | number | null | undefined,
+): JourneyNavTarget | null {
+  if (value == null) return null;
+  if (typeof value !== "object") return null;
+  if (!value.slug || !value.title) return null;
+  return { slug: value.slug, title: value.title };
 }

@@ -4,6 +4,7 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { SbomHero } from "@/components/sections/sbom/SbomHero";
 import { SbomRisks } from "@/components/sections/sbom/SbomRisks";
 import { SbomSelfUpdating } from "@/components/sections/sbom/SbomSelfUpdating";
+import { SbomIntelligence } from "@/components/sections/sbom/SbomIntelligence";
 import { SbomAdvantage } from "@/components/sections/sbom/SbomAdvantage";
 import { SbomCTA } from "@/components/sections/sbom/SbomCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -34,6 +35,9 @@ export default function SoftwareBillOfMaterialsPage(): React.ReactElement {
         </FadeUp>
         <FadeUp>
           <SbomSelfUpdating />
+        </FadeUp>
+        <FadeUp>
+          <SbomIntelligence />
         </FadeUp>
         <FadeUp>
           <SbomAdvantage />

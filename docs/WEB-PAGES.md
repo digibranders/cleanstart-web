@@ -54,7 +54,7 @@ page slugs, categories, types, and build status across the dev journey.
 | 23 | Careers | `/careers` | Static | ⬜ | |
 | 24 | Community | `/community` | Static | ⬜ | |
 | 25 | Contact Us | `/contact-us` | Static | ⬜ | |
-| 26 | Teams | `/teams` | Static | ⬜ | |
+| 26 | Teams | `/teams` | Static | ✅ | All 5 sections built (farheen integration 2026-05-20) |
 
 ---
 
@@ -65,9 +65,9 @@ page slugs, categories, types, and build status across the dev journey.
 | 2 | Attack Surface Reduction | `/attack-surface-reduction` | Static | ✅ | Built on `farheen`; ported from retired `web` branch. |
 | 4 | FIPS Compliance | `/fips` | Static | ✅ | All 7 sections built |
 | 5 | Vulnerability Remediation | `/vulnerability-remediation` | Static | ✅ | All 7 sections built |
-| 9 | For CISO | `/for-ciso` | Static | ⬜ | |
+| 9 | For CISO | `/for-ciso` | Static | ✅ | All 8 sections built (farheen integration 2026-05-20) |
 | 10 | For Developers | `/for-developers` | Static | ⬜ | |
-| 3 | Enhance SCA | `/software-composition-analysis` | Static | ⬜ | |
+| 3 | Enhance SCA | `/software-composition-analysis` | Static | ✅ | All 7 sections built (farheen integration 2026-05-20) |
 
 ---
 

@@ -1,66 +1,48 @@
 import Image from "next/image";
 
 /**
- * Figma frame 161:21184 — 1920 × 965px "The CleanStart SBOM Advantage"
+ * Figma frame 516:5494 — 1920 × 889 "Built for Modern Software Supply Chains"
  *
- * White background. Centred heading at top. Left: 3D CleanStart logo with
- * layered glow ellipses and union grid. Right: scrollable benefit list with
- * mask-fade at top/bottom showing one category at a time.
+ * Light-gray (#f7f7f7) backdrop. Centred heading, then a two-column layout:
+ *   • Left  — infinity-loop circuit photo, 512 × 384, blue 1.5px border, r=20
+ *   • Right — 2 × 2 card grid (each 354 × 180). The inner corner of every card
+ *             is rounded 62px so the cut faces a central infinity-icon ball
+ *             that sits at the grid's geometric centre.
  *
- * All desktop values vw-scaled from the 1920px canvas.
- * vw(n) = n / 1920 * 100
+ * Card copy:
+ *   CI/CD Pipelines           — "Integrate into existing workflows."
+ *   Container Environments    — "Track software inventories across images."
+ *   Compliance Programs       — "Support modern regulatory requirements."
+ *   Enterprise Security Teams — "Improve software supply chain visibility."
  *
- * Key Figma coords (1920 × 965 frame):
- *   Heading block    x=588  y=120  w=744  (centred)
- *   Union grid       x=calc(50%-364) y=259  w=630  h=634
- *   Ellipse1 (lg)    x=482  y=424  w=439  h=442   rotate 19.43deg
- *   Ellipse2 (lg)    x=254  y=313  w=439  h=442   rotate 19.43deg
- *   Ellipse3 (med)   x=468  y=374  w=391  h=373   rotate -5.75deg
- *   Ellipse4 (med)   x=352  y=384  w=374  h=380   rotate -5.75deg
- *   3D Logo          x=494  y=433  w=264  h=319
- *   Right panel      x=975  y=474  w=640  h=280
- *   Blob R           x=1380 y=-281 size=927
- *   Blob L           x=-339 y=-393 size=927
+ * Responsive: 2-column on lg, image-then-stacked-cards on smaller screens.
+ * Uses py-section-md vertical padding token and standard max-w-[1276px] rail.
  */
 
-const vw = (n: number): string => `${(n / 1920) * 100}vw`;
-
-const TABS = [
+const CARDS = [
   {
-    id: "coverage",
-    label: "Complete Coverage",
-    bullets: [
-      "99.2% field completeness with enriched metadata",
-      "Transitive and shared dependency mapping across all ecosystems",
-      "Scales to 5,000+ containers per hour",
-    ],
+    id: "cicd",
+    title: "CI/CD Pipelines",
+    body: "Integrate into existing workflows.",
+    cornerRadius: "8px 8px 62px 8px", // br rounded → points down-right toward centre
   },
   {
-    id: "provenance",
-    label: "Provenance & Integrity",
-    bullets: [
-      "Commit-level tracking with build timestamps",
-      "Cryptographic signing for every SBOM and image",
-      "Immutable records prevent tampering or drift",
-    ],
+    id: "container",
+    title: "Container Environments",
+    body: "Track software inventories across images.",
+    cornerRadius: "8px 8px 8px 62px", // bl rounded → down-left toward centre
   },
   {
     id: "compliance",
-    label: "Continuous Compliance",
-    bullets: [
-      "Native alignment with FIPS 140-3, SLSA Level 4, and RBI/DORA",
-      "Automatic evidence collection for EO 14028 and EU CRA audits",
-      "Always-current audit trails and no manual updates",
-    ],
+    title: "Compliance Programs",
+    body: "Support modern regulatory requirements.",
+    cornerRadius: "8px 62px 8px 8px", // tr rounded → up-right toward centre
   },
   {
-    id: "visibility",
-    label: "Unified Visibility",
-    bullets: [
-      "Central dashboard for developers, security, and compliance teams",
-      "Exports in SPDX, CycloneDX, and JSON formats",
-      "Integration with CI/CD pipelines and vulnerability management tools",
-    ],
+    id: "security",
+    title: "Enterprise Security Teams",
+    body: "Improve software supply chain visibility.",
+    cornerRadius: "62px 8px 8px 8px", // tl rounded → up-left toward centre
   },
 ] as const;
 
@@ -68,348 +50,131 @@ export function SbomAdvantage(): React.ReactElement {
   return (
     <section
       data-section="SbomAdvantage"
-      className="relative overflow-hidden bg-white w-full"
-      style={{ minHeight: "calc(250px + 42vw)" }}
+      className="relative overflow-hidden bg-[#f7f7f7] w-full"
     >
-      {/* ── Decorative blobs (Union1) ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/sbom/adv-blob.svg"
-        alt=""
-        className="pointer-events-none select-none absolute hidden lg:block"
-        style={{ left: vw(1380), top: vw(-281), width: vw(927), height: vw(927) }}
-        loading="lazy"
-        decoding="async"
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/sbom/adv-blob.svg"
-        alt=""
-        className="pointer-events-none select-none absolute hidden lg:block"
-        style={{ left: vw(-339), top: vw(-393), width: vw(927), height: vw(927) }}
-        loading="lazy"
-        decoding="async"
-      />
-
-      {/* ── Centred heading — x=588 y=120 w=744 ── */}
+      {/* Decorative cyan halo bottom-right */}
       <div
-        className="hidden lg:flex absolute flex-col items-center text-center"
-        style={{
-          left: "50%",
-          transform: "translateX(-50%)",
-          top: vw(120),
-          width: vw(744),
-          gap: vw(24),
-        }}
-      >
-        <h2
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: vw(62),
-            fontWeight: 600,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
-            color: "#111",
-          }}
-        >
-          {"The CleanStart SBOM "}
-          <span
-            style={{
-              background:
-                "linear-gradient(102.33deg, #9A51FF 45.14%, #2CC1EB 98.78%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Advantage
-          </span>
-        </h2>
-        <p
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: vw(26),
-            fontWeight: 400,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.5,
-            color: "#111",
-            width: "100%",
-          }}
-        >
-          From data completeness to compliance automation, CleanStart turns
-          SBOMs into actionable intelligence.
-        </p>
-      </div>
-
-      {/* ── Left: Union grid shape ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
         aria-hidden
-        src="/images/sbom/adv-union.svg"
-        alt=""
-        className="pointer-events-none select-none absolute hidden lg:block"
+        className="pointer-events-none select-none absolute hidden md:block"
         style={{
-          left: `calc(50% - ${vw(364.43)})`,
-          top: vw(258.77),
-          width: vw(629.66),
-          height: vw(634.01),
-          transform: "rotate(-0.14deg) skewX(-0.47deg)",
+          right: "-220px",
+          bottom: "-140px",
+          width: "600px",
+          height: "600px",
+          borderRadius: "50%",
+          background:
+            "radial-gradient(closest-side, rgba(44,193,235,0.18) 0%, rgba(44,193,235,0) 70%)",
         }}
-        loading="lazy"
-        decoding="async"
       />
 
-      {/* ── Glow Ellipse 2 (large, outer spread) — x=254 y=313 ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/sbom/adv-ellipse-2.svg"
-        alt=""
-        className="pointer-events-none select-none absolute hidden lg:block"
-        style={{
-          left: vw(254.32),
-          top: vw(312.53),
-          width: vw(439.45),
-          height: vw(442.22),
-          transform: "rotate(19.43deg)",
-        }}
-        loading="lazy"
-        decoding="async"
-      />
-
-      {/* ── Glow Ellipse 4 (medium, blue spread) — x=352 y=384 ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/sbom/adv-ellipse-4.svg"
-        alt=""
-        className="pointer-events-none select-none absolute hidden lg:block"
-        style={{
-          left: vw(351.63),
-          top: vw(383.99),
-          width: vw(373.68),
-          height: vw(380.11),
-          transform: "rotate(-5.75deg) skewX(-0.57deg)",
-        }}
-        loading="lazy"
-        decoding="async"
-      />
-
-      {/* ── Glow Ellipse 3 (medium, purple-pink) — x=468 y=374 ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/sbom/adv-ellipse-3.svg"
-        alt=""
-        className="pointer-events-none select-none absolute hidden lg:block"
-        style={{
-          left: vw(468.11),
-          top: vw(373.8),
-          width: vw(390.93),
-          height: vw(372.80),
-          transform: "rotate(-5.75deg) skewX(-0.57deg)",
-        }}
-        loading="lazy"
-        decoding="async"
-      />
-
-      {/* ── Glow Ellipse 1 (large, inner warm) — x=482 y=424 ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/sbom/adv-ellipse-1.svg"
-        alt=""
-        className="pointer-events-none select-none absolute hidden lg:block"
-        style={{
-          left: vw(482.26),
-          top: vw(424.41),
-          width: vw(439.45),
-          height: vw(442.22),
-          transform: "rotate(19.43deg)",
-        }}
-        loading="lazy"
-        decoding="async"
-      />
-
-      {/* ── 3D CleanStart Logo — x=494 y=433 w=264 h=319 ── */}
-      <div
-        className="hidden lg:block absolute"
-        style={{
-          left: vw(494),
-          top: vw(433),
-          width: vw(264),
-          height: vw(319),
-        }}
-      >
-        <Image
-          src="/images/sbom/adv-logo.png"
-          alt="CleanStart 3D logo"
-          width={264}
-          height={319}
-          sizes="264px"
-          className="w-full h-full object-contain relative z-10"
-          loading="lazy"
-        />
-      </div>
-
-      {/* ── Right: static benefit list — x=975 y=474 w=640 ── */}
-      <div
-        className="hidden lg:flex absolute flex-col"
-        style={{
-          left: vw(975),
-          top: vw(474),
-          width: vw(640),
-          gap: vw(24),
-        }}
-      >
-        <p
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: vw(32),
-            fontWeight: 700,
-            lineHeight: 1.2,
-            letterSpacing: "-0.05em",
-            color: "#111",
-          }}
-        >
-          {TABS[0].label}
-        </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: vw(16) }}>
-          {TABS[0].bullets.map((bullet) => (
-            <div
-              key={bullet}
-              style={{ display: "flex", gap: vw(12), alignItems: "flex-start" }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/sbom/adv-check.svg"
-                alt=""
-                aria-hidden
-                style={{
-                  width: vw(32),
-                  height: vw(32),
-                  flexShrink: 0,
-                  marginTop: "0.1em",
-                }}
-                loading="lazy"
-                decoding="async"
-              />
-              <p
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: vw(30),
-                  fontWeight: 400,
-                  lineHeight: 1.35,
-                  letterSpacing: "-0.05em",
-                  color: "#111",
-                  opacity: 0.8,
-                }}
-              >
-                {bullet}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════════════
-          MOBILE LAYOUT  (< lg) — stacked
-          ══════════════════════════════════════════════════════════════════ */}
-      <div className="lg:hidden flex flex-col items-center gap-8 sm:gap-10 px-4 sm:px-6 py-12 sm:py-16">
-        <div className="text-center">
+      <div className="relative mx-auto max-w-[1276px] px-6 py-section-md" style={{ paddingBottom: "250px" }}>
+        {/* Heading */}
+        <div className="text-center mb-10 md:mb-14">
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(28px, 8vw, 48px)",
-              fontWeight: 600,
+              fontSize: "clamp(28px, 3.23vw, 62px)",
+              fontWeight: 700,
               letterSpacing: "-0.05em",
-              lineHeight: 1.05,
+              lineHeight: 1.1,
               color: "#111",
-              marginBottom: "16px",
             }}
           >
-            {"The CleanStart SBOM "}
+            {"Built for Modern Software "}
             <span
               style={{
                 background:
-                  "linear-gradient(102.33deg, #9A51FF 45.14%, #2CC1EB 98.78%)",
+                  "linear-gradient(103.5deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
               }}
             >
-              Advantage
+              Supply Chains
             </span>
           </h2>
-          <p
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "clamp(14px, 4vw, 20px)",
-              fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.5,
-              color: "#111",
-            }}
-          >
-            From data completeness to compliance automation, CleanStart turns
-            SBOMs into actionable intelligence.
-          </p>
         </div>
 
-        <Image
-          src="/images/sbom/adv-logo.png"
-          alt="CleanStart 3D logo"
-          width={200}
-          height={241}
-          sizes="200px"
-          className="w-40 h-auto object-contain"
-          loading="lazy"
-        />
+        {/* Image + 2×2 cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-[512fr_708fr] gap-6 lg:gap-8 items-stretch">
+          {/* Left: infinity circuit image */}
+          <div
+            className="relative overflow-hidden w-full"
+            style={{
+              borderRadius: "20px",
+              border: "1.5px solid #076eff",
+              aspectRatio: "512/384",
+              minHeight: "260px",
+            }}
+          >
+            <Image
+              src="/images/sbom/infinity-circuit.png"
+              alt="CleanStart SBOM continuous delivery loop"
+              fill
+              sizes="(min-width: 1024px) 512px, 100vw"
+              className="object-cover"
+              loading="lazy"
+            />
+          </div>
 
-        <div className="w-full max-w-2xl flex flex-col gap-10">
-          {TABS.map((tab) => (
-            <div key={tab.id} className="flex flex-col gap-4">
-              <p
+          {/* Right: 2×2 grid with central infinity ball icon */}
+          <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+            {CARDS.map((card) => (
+              <article
+                key={card.id}
+                className="bg-white w-full"
                 style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "clamp(18px, 5vw, 24px)",
-                  fontWeight: 700,
-                  letterSpacing: "-0.04em",
-                  color: "#111",
+                  borderRadius: card.cornerRadius,
+                  border: "1.5px solid rgba(0,0,0,0.06)",
+                  padding: "clamp(20px, 1.67vw, 32px)",
+                  minHeight: "clamp(150px, 11.5vw, 180px)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
                 }}
               >
-                {tab.label}
-              </p>
-              <div className="flex flex-col gap-3">
-                {tab.bullets.map((bullet) => (
-                  <div key={bullet} className="flex gap-3 items-start">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src="/images/sbom/adv-check.svg"
-                      alt=""
-                      aria-hidden
-                      style={{ width: "20px", height: "20px", flexShrink: 0, marginTop: "2px" }}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <p
-                      style={{
-                        fontFamily: "var(--font-display)",
-                        fontSize: "clamp(13px, 3.5vw, 16px)",
-                        fontWeight: 400,
-                        lineHeight: 1.4,
-                        color: "rgba(17,17,17,0.8)",
-                      }}
-                    >
-                      {bullet}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                <p
+                  className="text-card-title-lg text-[#111]"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  {card.title}
+                </p>
+                <p
+                  className="text-body-md text-[#333]"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  {card.body}
+                </p>
+              </article>
+            ))}
+
+            {/* Central infinity ball — hidden below sm to avoid overlap */}
+            <div
+              aria-hidden
+              className="hidden sm:flex absolute items-center justify-center"
+              style={{
+                left: "50%",
+                top: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "72px",
+                height: "72px",
+                borderRadius: "50%",
+                background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
+                boxShadow:
+                  "0 4.63px 10.9px rgba(28,60,142,0.33), inset 0 -0.17px 0.22px rgba(0,44,179,0.5), inset 0 0.09px 0.44px rgba(255,255,255,0.81)",
+                zIndex: 2,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/sbom/icon-infinity.svg"
+                alt=""
+                style={{ width: "34px", height: "40px", display: "block" }}
+                loading="lazy"
+                decoding="async"
+              />
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>

@@ -12,64 +12,130 @@ const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
 describe('resolveDisplayPublishedAtState', () => {
-  it('returns `empty` for null / undefined / empty string', () => {
-    expect(resolveDisplayPublishedAtState(null, 'draft', NOW)).toEqual({ kind: 'empty' });
-    expect(resolveDisplayPublishedAtState(undefined, 'draft', NOW)).toEqual({ kind: 'empty' });
-    expect(resolveDisplayPublishedAtState('', 'draft', NOW)).toEqual({ kind: 'empty' });
+  describe('empty / unparseable', () => {
+    it('returns `empty` for null / undefined / empty string', () => {
+      expect(resolveDisplayPublishedAtState(null, null, 'draft', NOW)).toEqual({ kind: 'empty' });
+      expect(resolveDisplayPublishedAtState(undefined, null, 'draft', NOW)).toEqual({ kind: 'empty' });
+      expect(resolveDisplayPublishedAtState('', null, 'draft', NOW)).toEqual({ kind: 'empty' });
+    });
+
+    it('returns `empty` for unparseable strings (defensive)', () => {
+      expect(resolveDisplayPublishedAtState('not-a-date', null, 'draft', NOW)).toEqual({
+        kind: 'empty',
+      });
+    });
   });
 
-  it('returns `empty` for unparseable strings (defensive)', () => {
-    expect(resolveDisplayPublishedAtState('not-a-date', 'draft', NOW)).toEqual({ kind: 'empty' });
+  describe('unchanged (the original bug fix — opening an existing post)', () => {
+    it('stays silent on an 8-month-old published post the editor has not touched', () => {
+      const eightMonthsAgo = ISO(NOW - 240 * DAY);
+      expect(
+        resolveDisplayPublishedAtState(eightMonthsAgo, eightMonthsAgo, 'published', NOW),
+      ).toEqual({ kind: 'unchanged' });
+    });
+
+    it('stays silent on a freshly-set future value the editor has not re-touched', () => {
+      const tomorrow = ISO(NOW + 1 * DAY);
+      expect(resolveDisplayPublishedAtState(tomorrow, tomorrow, 'draft', NOW)).toEqual({
+        kind: 'unchanged',
+      });
+    });
   });
 
-  it('returns `near-now` within ±24h of now', () => {
-    expect(resolveDisplayPublishedAtState(ISO(NOW), 'draft', NOW)).toEqual({ kind: 'near-now' });
-    expect(
-      resolveDisplayPublishedAtState(ISO(NOW - 23 * HOUR), 'published', NOW),
-    ).toEqual({ kind: 'near-now' });
-    expect(
-      resolveDisplayPublishedAtState(ISO(NOW + 23 * HOUR), 'draft', NOW),
-    ).toEqual({ kind: 'near-now' });
-    // Boundary: exactly 24h is still near-now (inclusive)
-    expect(
-      resolveDisplayPublishedAtState(ISO(NOW - PICKER_NEAR_NOW_HOURS * HOUR), 'published', NOW),
-    ).toEqual({ kind: 'near-now' });
+  describe('near-now (small adjustments)', () => {
+    it('treats values within ±24h of now as near-now on new drafts (no initial)', () => {
+      expect(resolveDisplayPublishedAtState(ISO(NOW), null, 'draft', NOW)).toEqual({
+        kind: 'near-now',
+      });
+      expect(
+        resolveDisplayPublishedAtState(ISO(NOW - 23 * HOUR), null, 'published', NOW),
+      ).toEqual({ kind: 'near-now' });
+    });
+
+    it('1-day typo cleanup on an existing 8-month-old post stays near-now', () => {
+      const eightMonthsAgo = ISO(NOW - 240 * DAY);
+      const oneDayEarlier = ISO(NOW - 241 * DAY);
+      expect(
+        resolveDisplayPublishedAtState(oneDayEarlier, eightMonthsAgo, 'published', NOW),
+      ).toEqual({ kind: 'near-now' });
+    });
+
+    it('moving the date FORWARD (un-backdating) never warns', () => {
+      const oneYearAgo = ISO(NOW - 365 * DAY);
+      const sixMonthsAgo = ISO(NOW - 180 * DAY);
+      expect(
+        resolveDisplayPublishedAtState(sixMonthsAgo, oneYearAgo, 'published', NOW),
+      ).toEqual({ kind: 'near-now' });
+    });
   });
 
-  it('returns `backdate-soft` for past values within 30 days', () => {
-    const result = resolveDisplayPublishedAtState(ISO(NOW - 10 * DAY), 'published', NOW);
-    expect(result.kind).toBe('backdate-soft');
-    expect(result.kind === 'backdate-soft' && result.days).toBe(10);
+  describe('backdate-soft (editor moved date earlier within 30 days)', () => {
+    it('new draft, declared date 10 days ago', () => {
+      const result = resolveDisplayPublishedAtState(ISO(NOW - 10 * DAY), null, 'draft', NOW);
+      expect(result.kind).toBe('backdate-soft');
+      if (result.kind === 'backdate-soft') expect(result.days).toBe(10);
+    });
+
+    it('existing post moved 10 days earlier than saved value', () => {
+      const saved = ISO(NOW - 200 * DAY);
+      const moved = ISO(NOW - 210 * DAY);
+      const result = resolveDisplayPublishedAtState(moved, saved, 'published', NOW);
+      expect(result.kind).toBe('backdate-soft');
+      if (result.kind === 'backdate-soft') expect(result.days).toBe(10);
+    });
+
+    it('boundary: exactly 30 days earlier than baseline stays soft', () => {
+      const result = resolveDisplayPublishedAtState(ISO(NOW - 30 * DAY), null, 'published', NOW);
+      expect(result.kind).toBe('backdate-soft');
+      if (result.kind === 'backdate-soft') expect(result.days).toBe(30);
+    });
   });
 
-  it('returns `backdate-soft` at exactly the boundary (30 days)', () => {
-    const result = resolveDisplayPublishedAtState(ISO(NOW - 30 * DAY), 'published', NOW);
-    expect(result.kind).toBe('backdate-soft');
-    expect(result.kind === 'backdate-soft' && result.days).toBe(30);
+  describe('backdate-hard (>30 days backward — Google spam-policy zone)', () => {
+    it('new draft, declared date 90 days ago', () => {
+      const result = resolveDisplayPublishedAtState(ISO(NOW - 90 * DAY), null, 'draft', NOW);
+      expect(result.kind).toBe('backdate-hard');
+      if (result.kind === 'backdate-hard') expect(result.days).toBe(90);
+    });
+
+    it('existing post moved 90 days earlier than saved value', () => {
+      const saved = ISO(NOW - 30 * DAY);
+      const moved = ISO(NOW - 120 * DAY);
+      const result = resolveDisplayPublishedAtState(moved, saved, 'published', NOW);
+      expect(result.kind).toBe('backdate-hard');
+      if (result.kind === 'backdate-hard') expect(result.days).toBe(90);
+    });
+
+    it('hard threshold constant is 30 days', () => {
+      expect(PICKER_HARD_WARN_DAYS).toBe(30);
+    });
   });
 
-  it('returns `backdate-hard` past the 30-day spam-policy boundary', () => {
-    const result = resolveDisplayPublishedAtState(ISO(NOW - 90 * DAY), 'published', NOW);
-    expect(result.kind).toBe('backdate-hard');
-    expect(result.kind === 'backdate-hard' && result.days).toBe(90);
-    expect(PICKER_HARD_WARN_DAYS).toBe(30);
-  });
+  describe('future', () => {
+    it('returns `future-draft` for tomorrow-or-later on a draft', () => {
+      expect(resolveDisplayPublishedAtState(ISO(NOW + 3 * DAY), null, 'draft', NOW)).toEqual({
+        kind: 'future-draft',
+      });
+      expect(
+        resolveDisplayPublishedAtState(ISO(NOW + 3 * DAY), null, undefined, NOW),
+      ).toEqual({ kind: 'future-draft' });
+    });
 
-  it('returns `future-draft` for future values when status is draft / null', () => {
-    expect(
-      resolveDisplayPublishedAtState(ISO(NOW + 3 * DAY), 'draft', NOW),
-    ).toEqual({ kind: 'future-draft' });
-    expect(
-      resolveDisplayPublishedAtState(ISO(NOW + 3 * DAY), null, NOW),
-    ).toEqual({ kind: 'future-draft' });
-    expect(
-      resolveDisplayPublishedAtState(ISO(NOW + 3 * DAY), undefined, NOW),
-    ).toEqual({ kind: 'future-draft' });
-  });
+    it('returns `future-published` for future values on already-published docs', () => {
+      expect(
+        resolveDisplayPublishedAtState(ISO(NOW + 3 * DAY), null, 'published', NOW),
+      ).toEqual({ kind: 'future-published' });
+    });
 
-  it('returns `future-published` for future values when status is published', () => {
-    expect(
-      resolveDisplayPublishedAtState(ISO(NOW + 3 * DAY), 'published', NOW),
-    ).toEqual({ kind: 'future-published' });
+    it('values within +24h of now stay near-now (not future), regardless of status', () => {
+      expect(
+        resolveDisplayPublishedAtState(
+          ISO(NOW + PICKER_NEAR_NOW_HOURS * HOUR),
+          null,
+          'draft',
+          NOW,
+        ),
+      ).toEqual({ kind: 'near-now' });
+    });
   });
 });

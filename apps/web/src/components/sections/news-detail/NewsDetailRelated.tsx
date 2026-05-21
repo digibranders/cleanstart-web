@@ -19,7 +19,7 @@ export function NewsDetailRelated({
     >
       <div className="relative mx-auto max-w-[1276px] px-6">
         <div className="flex items-center justify-between pt-[80px]">
-          <h2 className="font-display text-display-md font-bold leading-none tracking-[-0.05em]">
+          <h2 className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em]">
             <span className="text-white">Related </span>
             <span
               style={{

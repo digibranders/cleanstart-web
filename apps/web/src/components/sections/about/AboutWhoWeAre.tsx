@@ -152,7 +152,7 @@ export function AboutWhoWeAre() {
                     {pillar.title}
                   </h3>
                   <p
-                    className="text-body-lg font-normal leading-[1.4] tracking-[-0.05em]"
+                    className="text-body-lg font-normal leading-[1.5]"
                     style={{ color: "#333" }}
                   >
                     {pillar.description}

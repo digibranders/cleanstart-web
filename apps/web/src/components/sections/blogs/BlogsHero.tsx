@@ -270,6 +270,7 @@ function CategoryPill({
         background: active
           ? "rgba(196,70,239,0.6)"
           : "rgba(196,70,239,0.2)",
+        // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
         fontSize: "14px",
         lineHeight: "1.0",
         letterSpacing: "-0.02em",

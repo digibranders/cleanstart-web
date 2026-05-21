@@ -145,7 +145,40 @@ export const Blogs: CollectionConfig = {
       type: 'relationship',
       relationTo: 'blogs',
       hasMany: true,
-      admin: { description: 'Manually curated. Empty = listing component picks by category.' },
+      admin: {
+        description:
+          'Pin up to 3 posts the reader should see next. Curated picks appear first, in this order. Empty slots auto-fill with the latest from this post\'s category, then with the latest site-wide.',
+      },
+    },
+    {
+      name: 'previousPost',
+      type: 'relationship',
+      relationTo: 'blogs',
+      hasMany: false,
+      admin: {
+        description:
+          'Optional. The post the reader should have read before this one. If unset, the page auto-fills with the chronologically previous published blog (same category preferred). Renders below the author card and adds <link rel="prev"> for SEO.',
+      },
+    },
+    {
+      name: 'nextPost',
+      type: 'relationship',
+      relationTo: 'blogs',
+      hasMany: false,
+      admin: {
+        description:
+          'Optional. The post the reader should read after this one. If unset, the page auto-fills with the chronologically next published blog (same category preferred). Renders below the author card and adds <link rel="next"> for SEO.',
+      },
+    },
+    {
+      name: 'journeyMirrorWarning',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/payload/admin/components/JourneyMirrorWarning.tsx#JourneyMirrorWarning',
+        },
+      },
     },
     {
       name: 'permalink',

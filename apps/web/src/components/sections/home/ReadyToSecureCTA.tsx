@@ -57,13 +57,16 @@ export function ReadyToSecureCTA() {
         }}
       />
 
-      <h2
+      <p
         id="cta-title"
-        className="relative z-10 font-display text-display-sm font-bold leading-none tracking-[-0.05em] text-white"
-        style={{ maxWidth: "401px" }}
+        className="relative z-10 font-display font-bold leading-[1.1] tracking-[-0.05em] text-white"
+        style={{
+          maxWidth: "401px",
+          fontSize: "clamp(1.75rem, 3vw, 2.625rem)",
+        }}
       >
         Ready to Secure Your Container Infrastructure?
-      </h2>
+      </p>
 
       <div className="relative z-10 flex flex-col items-start gap-[18px]">
         <p

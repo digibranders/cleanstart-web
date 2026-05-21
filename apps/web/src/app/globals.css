@@ -159,7 +159,12 @@ html, body {
 
 body {
   min-height: 100vh;
-  overflow-x: hidden;
+  /* `overflow-x: clip` instead of `hidden` — `hidden` turns <body> into a
+     scroll container, which traps every descendant `position: sticky` to
+     scroll relative to <body>'s (non-existent) overflow box, breaking
+     section TOCs and filter sidebars. `clip` clips horizontally without
+     establishing a scroll container, so sticky tracks the viewport. */
+  overflow-x: clip;
 }
 
 /* Hero gradient mesh — solid #151021 fallback under the gradient so the
@@ -567,9 +572,16 @@ body {
   background-color: rgba(21, 16, 33, 0.72);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
-  box-shadow:
-    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
-    0 10px 30px -16px rgba(8, 4, 24, 0.55);
+  /* Pin the backdrop-filter onto a single stable compositor layer.
+     Without these, browsers re-tile the blur on every scroll frame and the
+     tile seams show through as faint vertical bands that appear to jitter
+     "randomly" as the page scrolls. translateZ promotes the layer; the
+     `will-change` + `isolation` keep the blur sampling self-contained so
+     subpixel-aligned seams don't leak through. */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+  isolation: isolate;
 }
 
 /* Mega-menu / compact dropdown surface — dark glass card */
@@ -579,9 +591,6 @@ body {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
-  box-shadow:
-    0 24px 64px -16px rgba(8, 4, 24, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 /* Hover state for individual menu items — subtle gradient left bar + soft fill */
@@ -1361,6 +1370,10 @@ body {
 
 .cs-marquee:hover { animation-play-state: paused; }
 
+@media (prefers-reduced-motion: reduce) {
+  .cs-marquee { animation: none; }
+}
+
 /* Gradient text used in section headings ("patching", "Advantage") */
 .cs-text-gradient-purple {
   background: linear-gradient(90deg, #5a3df0 0%, #a06bff 100%);
@@ -1481,6 +1494,18 @@ body {
 }
 .article-body .article-paragraph:last-child { margin-bottom: 0; }
 
+/* Sticky-header offset for TOC anchor jumps. Matches the 96px sticky
+   contract (Header row is 72px tall; 24px breathing room). Applied to
+   every in-article heading so #anchor links don't land under the
+   fixed Header. */
+.article-body .article-h1,
+.article-body .article-h2,
+.article-body .article-h3,
+.article-body .article-h4,
+.article-body .article-h5,
+.article-body .article-h6 {
+  scroll-margin-top: clamp(80px, 10vw, 120px);
+}
 .article-body .article-h1 {
   font-size: clamp(24px, 2vw, 32px);
   font-weight: 700;
@@ -1492,7 +1517,7 @@ body {
 }
 .article-body .article-h2 {
   font-size: clamp(20px, 1.6vw, 26px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.03em;
   color: #111111;

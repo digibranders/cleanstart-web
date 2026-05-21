@@ -74,7 +74,7 @@ export function SbomHero(): React.ReactElement {
             maxWidth: "623px",
           }}
         >
-          Software Bill of Materials
+          continuously Verifiable SBOMs
         </h1>
 
         <p
@@ -85,11 +85,11 @@ export function SbomHero(): React.ReactElement {
             letterSpacing: "-0.04em",
             lineHeight: 1.4,
             color: "rgba(255,255,255,0.80)",
-            maxWidth: "540px",
+            maxWidth: "623px",
             marginBottom: "32px",
           }}
         >
-          Know What you Ship. Verify Component Integrity.
+          Know what you ship with continuously updated, cryptographically verifiable software inventories.
         </p>
 
         <Link
@@ -102,7 +102,7 @@ export function SbomHero(): React.ReactElement {
             } as React.CSSProperties
           }
         >
-          Learn More
+          Watch How SBOM Works
           <svg
             className="cs-cta-arrow"
             width="18"

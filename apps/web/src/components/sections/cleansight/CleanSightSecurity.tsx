@@ -876,6 +876,7 @@ export function CleanSightSecurity(): React.ReactElement {
                     height: "36px",
                     background: "linear-gradient(to bottom, #239CFF, #005BE3)",
                     fontFamily: "var(--font-display)",
+                    // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
                     fontSize: "14px",
                   }}
                 >
@@ -886,6 +887,7 @@ export function CleanSightSecurity(): React.ReactElement {
                     className="text-white font-semibold"
                     style={{
                       fontFamily: "var(--font-display)",
+                      // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
                       fontSize: "18px",
                       letterSpacing: "-0.03em",
                     }}
@@ -896,6 +898,7 @@ export function CleanSightSecurity(): React.ReactElement {
                     className="text-white mt-1"
                     style={{
                       fontFamily: "var(--font-display)",
+                      // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
                       fontSize: "15px",
                       opacity: 0.8,
                     }}

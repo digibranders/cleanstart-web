@@ -135,6 +135,40 @@ Apply these consistently across every page.
 
 ---
 
+## Font weight system (locked — 2026-05-21 critic-review revision)
+
+The codebase follows a strict role-based weight scale. Empirical survey of 21 hero H1s, 15 section H2s, 6 compact card titles, and the 4 standard card titles produced this canonical mapping. Rationale: Manrope SemiBold (600) at large display reads cleaner than Bold (700) — matches the modern 2024–2026 tech-brand convention (Linear, Vercel, Stripe, GitHub). Section H2 stays at Bold (700) to provide hierarchy contrast against the lighter hero. Compact card titles stay at Medium (500) because cards are scanning surfaces (short lines, small type) — heavier weights feel cramped.
+
+| Weight | Role | Used by |
+|---:|---|---|
+| **400** | Body, captions, eyebrows, footer body | every `<p>` / lead body / card body / meta |
+| **500** | Buttons, nav links, card meta rows, pills, **compact card titles** | `cs-btn-*`, `<nav>` links, card meta, **BlogCard / NewsroomCard / EventCard / ResourceCard / PodcastEpisodeCard / WebinarCard / AuthorPosts card titles** |
+| **600** | **Hero H1**, sub-headings, footer column heads, in-page H3, eyebrows-with-emphasis | **every hero H1 site-wide** (Manrope SemiBold; 21/21 already correct), `<h3>` in body content, footer column heads |
+| **700** | **Section H2**, mid-CTA, in-page heading-class elements, standard card titles (FactoryCard / AboutPowering FeatureCard / ComparisonCard), badges | every section title, mid-CTA title, feature-card title outside heroes |
+
+**Strict rule: no `font-extrabold` (800), `font-black` (900), or `fontWeight: 800`+ anywhere on marketing pages.** The single historic offender (`VulnRethinking` VS badge) was normalised to 700 on 2026-05-20.
+
+**Rules:**
+
+- **No `fontWeight: 800`** anywhere in the marketing site (CMS-prose excepted — `.article-body` may go to 800 only if a future authored markdown explicitly requests `<strong>` inside an `<h1>` and the renderer chooses to honor it).
+- **Card-level titles** are 500 (`BlogCard`, `FactoryCard`) or 600 (`WebinarCard`, `NewsroomCard`) — intentionally lighter than section heads so the visual hierarchy stays legible.
+- **Buttons are 500** even on display-class CTAs; only label colour + size separate primary from secondary, not weight.
+- **Inline-strong inside body** uses 600, never 700, to keep the in-paragraph emphasis distinct from a heading entering the reading flow.
+
+**CMS-prose weights** (locked in `globals.css` `.article-body`; do not override per-page):
+
+| Element | Weight |
+|---|---:|
+| paragraph, `ul`/`ol` | 400 |
+| `<h1>` (article title, in DetailHero) | 700 |
+| `<h2>` | 700 |
+| `<h3>` | 600 |
+| `<h4>` / `<h5>` / `<h6>` | 600 |
+| `<blockquote>` | 400 (italic) |
+| `<code>` / `<pre>` | inherits (monospace) |
+
+---
+
 ## Adding a new size
 
 1. Add the token to the `@theme` block in [src/app/globals.css](../src/app/globals.css):

@@ -76,6 +76,20 @@
       "relationTo": "blogs"
     },
     {
+      "type": "relationship",
+      "name": "previousPost",
+      "relationTo": "blogs"
+    },
+    {
+      "type": "relationship",
+      "name": "nextPost",
+      "relationTo": "blogs"
+    },
+    {
+      "type": "ui",
+      "name": "journeyMirrorWarning"
+    },
+    {
       "type": "ui",
       "name": "permalink"
     },

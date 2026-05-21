@@ -4,7 +4,7 @@ import { TrustedByMarquee } from "@/components/sections/home/TrustedByMarquee";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-[88px] sm:pt-[110px] lg:pt-[126px]">
+    <section className="relative overflow-hidden pt-[clamp(96px,11vw,178px)]">
 
       <div className="mx-auto max-w-[1276px] px-6">
         <div className="mx-auto flex max-w-[1201px] flex-col items-center gap-6 text-center sm:gap-8">

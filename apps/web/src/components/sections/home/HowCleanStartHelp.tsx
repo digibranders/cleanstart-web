@@ -184,6 +184,7 @@ function CisoCard({
       <div
         role="tablist"
         aria-label="Audience"
+        data-cta-utility
         className="flex h-[42px] w-fit items-center gap-1 rounded-[999px] p-1"
         style={{
           background:
@@ -270,6 +271,7 @@ function TabPill({
       role="tab"
       id={`ciso-tab-${id}`}
       aria-selected={active}
+      data-cta-utility
       onClick={onClick}
       className="relative h-[34px] cursor-pointer rounded-[999px] px-3 text-lg font-medium text-white transition-all duration-200"
       style={{
@@ -294,8 +296,8 @@ function TabPill({
 function FeatureCardItem({ card }: { card: FeatureCard }) {
   return (
     <article
-      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full items-center gap-6"
-      style={{ paddingLeft: "clamp(16px, 5vw, 70px)", paddingRight: "clamp(16px, 5vw, 70px)" }}
+      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col items-center text-center gap-3 sm:flex-row sm:text-left sm:items-center sm:gap-6"
+      style={{ paddingLeft: "clamp(16px, 5vw, 70px)", paddingRight: "clamp(16px, 5vw, 70px)", paddingTop: "clamp(16px, 3vw, 32px)", paddingBottom: "clamp(16px, 3vw, 32px)" }}
     >
       {/* Gear orb — Figma-exact: solid lavender ellipse #DF9BFF (165×165 at (-3, 1))
           BLURRED to be a soft glow, with gear image (161×160 at (20, 11)) on top.
@@ -349,7 +351,7 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
           {card.title}
         </h3>
         <p
-          className="text-body-lg font-normal leading-[1.4] tracking-[-0.05em] text-[#333333]"
+          className="text-body-lg font-normal leading-[1.5] text-[#333333]"
           style={{ maxWidth: "244px" }}
         >
           {card.description}

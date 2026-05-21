@@ -82,18 +82,18 @@ export function ResourceCenterCTA(): React.ReactElement {
         className="absolute inset-0 flex items-center px-6 py-8 lg:px-[100px] lg:py-[60px]"
       >
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-[68px] w-full">
-          <h2
+          <p
             id="rc-cta-title"
             className="font-display font-bold text-center lg:text-left w-full lg:max-w-[486px]"
             style={{
-              fontSize: "clamp(1.5rem, 2.86vw, 3.4375rem)",
+              fontSize: "clamp(1.75rem, 3vw, 2.625rem)",
               lineHeight: 1,
               letterSpacing: "-0.05em",
               color: "#111",
             }}
           >
             Stop Managing Vulnerabilities. Start Eliminating Them.
-          </h2>
+          </p>
 
           <div
             className="flex flex-col items-center lg:items-start w-full lg:max-w-[564px] gap-4 lg:gap-6"
@@ -116,14 +116,13 @@ export function ResourceCenterCTA(): React.ReactElement {
                 aria-hidden
                 className="absolute pointer-events-none select-none"
                 style={{
-                  width: "100px",
-                  height: "30px",
-                  bottom: "-8px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
+                  width: "30.07px",
+                  height: "30.07px",
+                  left: "calc(50% - 30.07px/2 - 2.3px)",
+                  top: "41.1px",
                   borderRadius: "50%",
                   background: "rgba(255,255,255,0.6)",
-                  filter: "blur(10px)",
+                  filter: "blur(10.0245px)",
                 }}
               />
               Get in Touch
