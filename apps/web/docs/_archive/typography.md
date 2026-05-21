@@ -1,3 +1,5 @@
+> **ARCHIVED 2026-05-21.** This document is superseded by [`../RESPONSIVE-SYSTEM-AUDIT.md`](../RESPONSIVE-SYSTEM-AUDIT.md). Kept for historical reference only.
+
 # CleanStart Web — Typography
 
 Canonical reference for fonts, type scale, and per-role usage on `apps/web`. This doc is the source of truth; if Figma and this doc disagree on a token name, this doc wins.
