@@ -58,36 +58,27 @@ export function CleanStartImagesBrowse(): React.ReactElement {
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col items-center"
         style={{ paddingTop: "80px" }}
       >
-        {/* Tab bar — Figma 161:23557, 478×64, pill shape */}
+        {/* Tab bar — matches home Resources & Insights tab dimensions
+            (h-10 buttons + p-1.5 container, text-base SemiBold). Active tab
+            uses the page's purple gradient instead of the Resources blue
+            gradient to fit this section's palette. */}
         <div
           role="tablist"
           aria-label="Distribution channel"
-          className="relative flex items-center"
-          style={{
-            width: "478px",
-            maxWidth: "100%",
-            height: "64px",
-            borderRadius: "9999px",
-            background: "#0B0820",
-            padding: "8px",
-          }}
+          className="inline-flex items-center gap-2 rounded-full p-1.5"
+          style={{ background: "#0B0820", maxWidth: "100%" }}
         >
           <button
             type="button"
             role="tab"
             aria-selected={tab === "portal"}
             onClick={() => setTab("portal")}
-            className="flex-1 h-full rounded-full transition-all"
+            className="relative flex h-10 cursor-pointer items-center justify-center rounded-full px-6 text-base font-semibold leading-[1] tracking-[-0.01em] text-white transition-all"
             style={{
               background:
                 tab === "portal"
                   ? "linear-gradient(135deg,#5B3DF5 0%,#2E1CB6 100%)"
                   : "transparent",
-              color: "#ffffff",
-              fontFamily: "var(--font-display)",
-              fontWeight: 500,
-              fontSize: "clamp(14px, 1.1vw, 17px)",
-              letterSpacing: "-0.01em",
             }}
           >
             CleanStart Portal
@@ -97,17 +88,12 @@ export function CleanStartImagesBrowse(): React.ReactElement {
             role="tab"
             aria-selected={tab === "repository"}
             onClick={() => setTab("repository")}
-            className="flex-1 h-full rounded-full transition-all"
+            className="relative flex h-10 cursor-pointer items-center justify-center rounded-full px-6 text-base font-semibold leading-[1] tracking-[-0.01em] text-white transition-all"
             style={{
               background:
                 tab === "repository"
                   ? "linear-gradient(135deg,#5B3DF5 0%,#2E1CB6 100%)"
                   : "transparent",
-              color: "#ffffff",
-              fontFamily: "var(--font-display)",
-              fontWeight: 500,
-              fontSize: "clamp(14px, 1.1vw, 17px)",
-              letterSpacing: "-0.01em",
             }}
           >
             CleanStart Repository
@@ -119,10 +105,10 @@ export function CleanStartImagesBrowse(): React.ReactElement {
           className="text-center mt-8 max-w-[843px]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(16px, 1.04vw, 20px)",
+            fontSize: "var(--text-t-heading-sm)",
             fontWeight: 400,
-            lineHeight: 1.6,
-            letterSpacing: "-0.01em",
+            lineHeight: "var(--text-t-heading-sm-lh)",
+            letterSpacing: "var(--text-t-heading-sm-ls)",
             color: "#1A1A2E",
           }}
         >
