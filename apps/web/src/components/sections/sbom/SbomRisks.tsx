@@ -86,10 +86,10 @@ export function SbomRisks(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(30px, 3.22vw, 62px)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.05,
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               color: "#111",
             }}
           >
@@ -176,10 +176,10 @@ export function SbomRisks(): React.ReactElement {
                   <h3
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(18px, 1.67vw, 32px)",
+                      fontSize: "var(--text-t-heading-lg)",
                       fontWeight: 700,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1.1,
+                      letterSpacing: "var(--text-t-heading-lg-ls)",
+                      lineHeight: "var(--text-t-heading-lg-lh)",
                       color: "#111",
                     }}
                   >
@@ -188,10 +188,10 @@ export function SbomRisks(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(13px, 1.14vw, 22px)",
+                      fontSize: "var(--text-t-body-lg)",
                       fontWeight: 400,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1.4,
+                      letterSpacing: "var(--text-t-body-lg-ls)",
+                      lineHeight: "var(--text-t-body-lg-lh)",
                       color: "#333",
                     }}
                   >

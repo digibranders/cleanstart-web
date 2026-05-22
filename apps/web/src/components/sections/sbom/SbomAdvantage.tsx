@@ -73,10 +73,10 @@ export function SbomAdvantage(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(28px, 3.23vw, 62px)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.1,
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               color: "#111",
             }}
           >

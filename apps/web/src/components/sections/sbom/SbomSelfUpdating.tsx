@@ -100,10 +100,10 @@ export function SbomSelfUpdating(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 3.23vw, 62px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.1,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             width: vw(593),
           }}
         >
@@ -112,10 +112,10 @@ export function SbomSelfUpdating(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(15px, 1.35vw, 26px)",
+            fontSize: "var(--text-t-subhead)",
             fontWeight: 400,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.5,
+            letterSpacing: "var(--text-t-subhead-ls)",
+            lineHeight: "var(--text-t-subhead-lh)",
             color: "rgba(255,255,255,0.88)",
             width: "100%",
           }}
@@ -166,10 +166,10 @@ export function SbomSelfUpdating(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 8vw, 48px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.1,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
           }}
         >
           Generate. Verify. Validate.
@@ -177,10 +177,10 @@ export function SbomSelfUpdating(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(14px, 4vw, 20px)",
+            fontSize: "var(--text-t-subhead)",
             fontWeight: 400,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.5,
+            letterSpacing: "var(--text-t-subhead-ls)",
+            lineHeight: "var(--text-t-subhead-lh)",
             color: "rgba(255,255,255,0.85)",
             maxWidth: "600px",
           }}
@@ -308,10 +308,10 @@ function FeatureLabel({ x, y, title, body, bodyWidth }: FeatureLabelProps): Reac
       <p
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(14px, 1.04vw, 20px)",
+          fontSize: "var(--text-t-heading-sm)",
           fontWeight: 600,
-          lineHeight: 1.3,
-          letterSpacing: "-0.02em",
+          lineHeight: "var(--text-t-heading-sm-lh)",
+          letterSpacing: "var(--text-t-heading-sm-ls)",
           width: "100%",
         }}
       >
@@ -320,10 +320,10 @@ function FeatureLabel({ x, y, title, body, bodyWidth }: FeatureLabelProps): Reac
       <p
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(12px, 0.83vw, 16px)",
+          fontSize: "var(--text-t-body-md)",
           fontWeight: 400,
-          lineHeight: 1.3,
-          letterSpacing: "-0.02em",
+          lineHeight: "var(--text-t-body-md-lh)",
+          letterSpacing: "var(--text-t-body-md-ls)",
           color: "rgba(255,255,255,0.80)",
           width: bodyWidth ? vw(bodyWidth) : "100%",
         }}
