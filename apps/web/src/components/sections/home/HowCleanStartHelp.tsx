@@ -110,11 +110,14 @@ export function HowCleanStartHelp() {
           </p>
         </div>
 
-        {/* Cards container — break out of px-6 on desktop so SVG coordinates
-            are in true 1276px space matching Figma (node 108:8008, 1276×678).
+        {/* Cards container — stays inside the container's px-6 padding so the
+            L-shape doesn't run flush to the viewport edge at the 1440-default
+            container width. The L-shape SVG uses preserveAspectRatio="none" so
+            it stretches to whatever inner width the section provides
+            (1392 px at 1440 viewport, less below).
             pb-[30px] adds the 30px extension below the card grid that connects
             this section to the next. */}
-        <div className="relative pb-[30px] md:-mx-6 mb-[-30px]">
+        <div className="relative pb-[30px] mb-[-30px]">
           {/* White L-shape SVG (Figma Vector 1194233942, 1276×678).
               viewBox: 1276 wide × 678 tall (308 row1 + 32 gap + 308 row2 + 30px extension).
               Cutout: top-left 654×340 — CISO card (308px) + gap (32px) so the gap zone
