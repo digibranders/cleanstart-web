@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type Feature = {
   title: string;
   body: string;
@@ -19,30 +21,20 @@ const FEATURES: Feature[] = [
 ];
 
 function GlowBall(): React.ReactElement {
-  // Figma "Ball" 46×46 — purple gradient sphere with inner highlight + soft glow
+  // Brand 3D ball asset (replaces the prior CSS-only purple sphere).
   return (
     <div
       aria-hidden
       className="relative shrink-0"
-      style={{ width: "46px", height: "46px" }}
+      style={{ width: "56px", height: "56px" }}
     >
-      {/* outer glow */}
-      <div
-        className="absolute inset-0 rounded-full"
-        style={{
-          background:
-            "radial-gradient(circle at 35% 30%, #B89CFF 0%, #7B5CFA 35%, #4527B8 75%, #2E1A78 100%)",
-          boxShadow:
-            "0 0 24px rgba(123,92,250,0.55), inset -4px -6px 12px rgba(0,0,0,0.35), inset 4px 6px 8px rgba(255,255,255,0.25)",
-        }}
-      />
-      {/* dot pattern subtle highlight (Figma "Pattern") */}
-      <div
-        className="absolute inset-[6px] rounded-full"
-        style={{
-          background:
-            "radial-gradient(circle at 30% 25%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 35%)",
-        }}
+      <Image
+        src="/images/cleanstart-images/feature-ball.png"
+        alt=""
+        width={112}
+        height={112}
+        sizes="56px"
+        className="h-full w-full object-contain"
       />
     </div>
   );
@@ -72,7 +64,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto max-w-[var(--container-default)] px-6"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{ paddingTop: "var(--spacing-section-md)", paddingBottom: "var(--spacing-section-md)" }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_512px] gap-12 lg:gap-16 items-start">
@@ -82,10 +74,10 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               className="text-white"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(36px, 3.33vw, 64px)",
+                fontSize: "var(--text-t-display-2)",
                 fontWeight: 600,
-                letterSpacing: "-0.03em",
-                lineHeight: 1.05,
+                letterSpacing: "var(--text-t-display-2-ls)",
+                lineHeight: "var(--text-t-display-2-lh)",
               }}
             >
               Easy to{" "}
@@ -104,9 +96,10 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               className="mt-8 max-w-[596px]"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(16px, 1.04vw, 20px)",
+                fontSize: "var(--text-t-heading-sm)",
                 fontWeight: 400,
-                lineHeight: 1.5,
+                lineHeight: "var(--text-t-heading-sm-lh)",
+                letterSpacing: "var(--text-t-heading-sm-ls)",
                 color: "rgba(255,255,255,0.85)",
               }}
             >

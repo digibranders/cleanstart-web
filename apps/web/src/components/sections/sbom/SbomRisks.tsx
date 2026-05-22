@@ -40,6 +40,8 @@ const RISKS = [
   },
 ] as const;
 
+const vw = (n: number): string => `${(n / 1920) * 100}vw`;
+
 export function SbomRisks(): React.ReactElement {
   return (
     <section
@@ -47,31 +49,31 @@ export function SbomRisks(): React.ReactElement {
       className="relative overflow-hidden bg-white"
       style={{ paddingTop: "clamp(56px, 8vw, 120px)", paddingBottom: "clamp(56px, 8vw, 120px)" }}
     >
-      {/* Decorative blobs — purple radial blobs from Figma (top-right and bottom-left) */}
+      {/* Decorative radial halos — Figma 1920 coords (top-right + bottom-left) */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
         style={{
-          right: "-200px",
-          top: "-400px",
-          width: "700px",
-          height: "700px",
-          borderRadius: "50%",
+          left: vw(1347),
+          top: vw(-565),
+          width: vw(1101),
+          height: vw(1101),
+          opacity: 0.1,
           background:
-            "radial-gradient(closest-side, rgba(100, 13, 251, 0.07) 0%, rgba(100, 13, 251, 0) 70%)",
+            "radial-gradient(50% 50% at 50% 50%, #640DFB 0%, rgba(100, 13, 251, 0) 100%)",
         }}
       />
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
         style={{
-          left: "-300px",
-          bottom: "100px",
-          width: "800px",
-          height: "800px",
-          borderRadius: "50%",
+          left: vw(-621),
+          top: vw(509),
+          width: vw(1181),
+          height: vw(1181),
+          opacity: 0.1,
           background:
-            "radial-gradient(closest-side, rgba(100, 13, 251, 0.06) 0%, rgba(100, 13, 251, 0) 70%)",
+            "radial-gradient(50% 50% at 50% 50%, #640DFB 0%, rgba(100, 13, 251, 0) 100%)",
         }}
       />
 
@@ -84,10 +86,10 @@ export function SbomRisks(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(30px, 3.22vw, 62px)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.05,
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               color: "#111",
             }}
           >
@@ -174,10 +176,10 @@ export function SbomRisks(): React.ReactElement {
                   <h3
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(18px, 1.67vw, 32px)",
+                      fontSize: "var(--text-t-heading-lg)",
                       fontWeight: 700,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1.1,
+                      letterSpacing: "var(--text-t-heading-lg-ls)",
+                      lineHeight: "var(--text-t-heading-lg-lh)",
                       color: "#111",
                     }}
                   >
@@ -186,10 +188,10 @@ export function SbomRisks(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(13px, 1.14vw, 22px)",
+                      fontSize: "var(--text-t-body-lg)",
                       fontWeight: 400,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1.4,
+                      letterSpacing: "var(--text-t-body-lg-ls)",
+                      lineHeight: "var(--text-t-body-lg-lh)",
                       color: "#333",
                     }}
                   >

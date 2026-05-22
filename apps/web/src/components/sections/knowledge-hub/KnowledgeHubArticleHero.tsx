@@ -48,7 +48,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
           className="flex flex-col items-center mx-auto"
           style={{ paddingTop: "120px", paddingBottom: "80px", maxWidth: "864px" }}

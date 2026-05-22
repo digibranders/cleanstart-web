@@ -40,19 +40,20 @@ export function AboutCTA() {
         <p
           className="font-display font-bold"
           style={{
-            fontSize: "clamp(1.75rem, 3vw, 2.625rem)",
-            lineHeight: "1.0",
-            letterSpacing: "-0.05em",
+            fontSize: "var(--text-t-display-2)",
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
           }}
         >
           Start Clean. Stay Secure.
         </p>
         <p
-          className="font-sans text-body-lg text-white/80"
+          className="font-sans text-white/80"
           style={{
             fontWeight: 400,
-            lineHeight: "1.4",
-            letterSpacing: "-0.04em",
+            fontSize: "var(--text-t-body-lg)",
+            letterSpacing: "var(--text-t-body-lg-ls)",
+            lineHeight: "var(--text-t-body-lg-lh)",
             maxWidth: "480px",
           }}
         >

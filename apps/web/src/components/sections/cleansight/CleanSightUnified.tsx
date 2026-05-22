@@ -70,16 +70,16 @@ export function CleanSightUnified(): React.ReactElement {
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-6 py-section-md">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         {/* Heading row */}
         <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-8 xl:gap-[60px]">
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(28px, 3.23vw, 62px)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.05,
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               color: "#111",
               maxWidth: "654px",
               flexShrink: 0,
@@ -210,10 +210,10 @@ export function CleanSightUnified(): React.ReactElement {
                 <h3
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "clamp(16px, 1.67vw, 32px)",
+                    fontSize: "var(--text-t-heading-lg)",
                     fontWeight: 700,
-                    letterSpacing: "-0.05em",
-                    lineHeight: 1.1,
+                    letterSpacing: "var(--text-t-heading-lg-ls)",
+                    lineHeight: "var(--text-t-heading-lg-lh)",
                     color: "#111",
                   }}
                 >
@@ -224,10 +224,10 @@ export function CleanSightUnified(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "clamp(12px, 1.04vw, 20px)",
+                    fontSize: "var(--text-t-heading-sm)",
                     fontWeight: 400,
-                    letterSpacing: "-0.05em",
-                    lineHeight: 1.4,
+                    letterSpacing: "var(--text-t-heading-sm-ls)",
+                    lineHeight: "var(--text-t-heading-sm-lh)",
                     color: "#555",
                   }}
                 >

@@ -133,19 +133,41 @@ export function FrequentlyAskedQuestions() {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
-        {/* Title bar — Figma: title left (493w), description right (585w) */}
-        <div className="mb-8 flex flex-col items-start justify-between gap-5 md:mb-10 md:flex-row md:gap-12">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
+        {/* Title row — title flush-left, separator centered, description right-aligned.
+            Same 1fr_auto_1fr grid pattern used by SecurityNotPatching and
+            HowCleanStartHelp for visual parity. */}
+        <div className="mb-8 flex flex-col items-start gap-5 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="faq-title"
-            className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
-            style={{ maxWidth: "493px" }}
+            className="justify-self-start font-display font-bold text-[#111111]"
+            style={{
+              maxWidth: "493px",
+              fontSize: "var(--text-t-display-2)",
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
+            }}
           >
             Frequently Asked Questions
           </h2>
+          {/* Vertical 1×90 fading-gray separator */}
+          <div
+            aria-hidden
+            className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(204,204,204,0) 0%, rgba(204,204,204,1) 47.2%, rgba(204,204,204,0) 100%)",
+            }}
+          />
           <p
-            className="text-[clamp(1rem,1.8vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.03em] text-[#111111]"
-            style={{ maxWidth: "585px" }}
+            className="font-normal text-[#111111] md:justify-self-end md:text-right"
+            style={{
+              fontSize: "var(--text-t-subhead)",
+              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "var(--text-t-subhead-ls)",
+              maxWidth: "585px",
+              opacity: 0.8,
+            }}
           >
             Common questions about CleanStart&apos;s hardened container images,
             security, and integrations.
@@ -232,7 +254,12 @@ function FaqItemRow({
         className="group flex w-full items-start justify-between gap-6 text-left cursor-pointer md:gap-12"
       >
         <span
-          className="flex-1 font-display text-[clamp(1.0625rem,1.6vw,1.5rem)] font-bold leading-[1.25] tracking-[-0.03em] text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
+          className="flex-1 font-display font-bold text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
+          style={{
+            fontSize: "var(--text-t-heading-md)",
+            lineHeight: "var(--text-t-heading-md-lh)",
+            letterSpacing: "var(--text-t-heading-md-ls)",
+          }}
         >
           {item.q}
         </span>
@@ -258,7 +285,12 @@ function FaqItemRow({
         }}
       >
         <p
-          className="pt-3 text-[clamp(0.875rem,1.05vw,1rem)] font-normal leading-[1.55] tracking-[-0.01em] text-[#333333]"
+          className="pt-3 font-normal text-[#333333]"
+          style={{
+            fontSize: "var(--text-t-body-md)",
+            lineHeight: "var(--text-t-body-md-lh)",
+            letterSpacing: "var(--text-t-body-md-ls)",
+          }}
         >
           {item.a}
         </p>

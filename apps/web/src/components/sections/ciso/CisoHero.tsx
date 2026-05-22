@@ -26,7 +26,7 @@ export function CisoHero(): React.ReactElement {
   return (
     <section
       data-section="CisoHero"
-      className="relative overflow-hidden bg-cs-hero bg-cs-grid"
+      className="relative overflow-hidden bg-cs-hero"
       style={{ minHeight: "682px" }}
     >
       {/* Bottom fade — blends hero into the white Risks section below */}
@@ -89,10 +89,10 @@ export function CisoHero(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(16px, 1.56vw, 30px)",
+              fontSize: "var(--text-t-subhead)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.4,
+              letterSpacing: "var(--text-t-subhead-ls)",
+              lineHeight: "var(--text-t-subhead-lh)",
               color: "rgba(255,255,255,0.8)",
               maxWidth: "620px",
               marginBottom: "32px",

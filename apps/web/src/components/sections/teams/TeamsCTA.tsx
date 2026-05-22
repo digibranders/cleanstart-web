@@ -89,9 +89,9 @@ export function TeamsCTA() {
         <p
           className="font-display font-bold text-[#111]"
           style={{
-            fontSize: "clamp(1.75rem, 3vw, 2.625rem)",
-            lineHeight: "1.0",
-            letterSpacing: "-0.05em",
+            fontSize: "var(--text-t-display-2)",
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
           }}
         >
           Join the Team
@@ -101,9 +101,9 @@ export function TeamsCTA() {
           <p
             className="font-sans text-[#111]/80"
             style={{
-              fontSize: "clamp(0.875rem, 1.4vw, 1.3125rem)",
-              lineHeight: "1.4",
-              letterSpacing: "-0.04em",
+              fontSize: "var(--text-t-body-lg)",
+              letterSpacing: "var(--text-t-body-lg-ls)",
+              lineHeight: "var(--text-t-body-lg-lh)",
               whiteSpace: "nowrap",
             }}
           >

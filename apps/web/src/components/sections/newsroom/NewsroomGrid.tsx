@@ -143,7 +143,7 @@ export function NewsroomGrid({
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {items.length === 0 ? (
           <p
             className="font-sans text-center py-20"

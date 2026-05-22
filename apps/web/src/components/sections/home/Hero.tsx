@@ -4,18 +4,16 @@ import { TrustedByMarquee } from "@/components/sections/home/TrustedByMarquee";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-[clamp(96px,11vw,178px)]">
+    <section className="relative overflow-hidden pt-[clamp(72px,8vw,128px)]">
 
-      <div className="mx-auto max-w-[var(--container-default)] px-6">
+      <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div className="mx-auto flex max-w-[1201px] flex-col items-center gap-6 text-center sm:gap-8">
           <h1
             className="font-display font-semibold text-white"
             style={{
-              // Figma node 763:3567 exact spec (1440 home design):
-              // Manrope SemiBold 72px / line-none / tracking -3.6px (= -0.05em)
-              fontSize: "var(--text-hero-marketing)",
-              letterSpacing: "-0.05em",
-              lineHeight: 1,
+              fontSize: "var(--text-t-display-1)",
+              letterSpacing: "var(--text-t-display-1-ls)",
+              lineHeight: "var(--text-t-display-1-lh)",
             }}
           >
             Secure by Design. Built from Source. Verified Container Images

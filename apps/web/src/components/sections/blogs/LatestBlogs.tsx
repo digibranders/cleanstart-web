@@ -115,13 +115,14 @@ export function LatestBlogs({
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Section heading */}
         <h2
           className="font-display font-bold"
           style={{
-            fontSize: "clamp(2rem,3.61vw,3.25rem)",
-            lineHeight: "normal",
+            fontSize: "var(--text-t-display-2)",
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             color: "#111",
             paddingTop: "var(--spacing-section-sm)",
             paddingBottom: "clamp(28px, 3.5vw, 56px)",

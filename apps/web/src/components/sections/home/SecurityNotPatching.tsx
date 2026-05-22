@@ -46,7 +46,7 @@ export function SecurityNotPatching() {
       className="relative w-full overflow-hidden bg-[#F6F6F6] py-section-md"
       aria-labelledby="security-title"
     >
-      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Background decorations — positioned in the 1276-wide Figma section
              coordinate space. */}
         <div
@@ -100,8 +100,13 @@ export function SecurityNotPatching() {
         <div className="flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="security-title"
-            className="justify-self-start font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
-            style={{ maxWidth: "444px" }}
+            className="justify-self-start font-display font-bold text-[#111111]"
+            style={{
+              maxWidth: "444px",
+              fontSize: "var(--text-t-display-2)",
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
+            }}
           >
             Security isn&rsquo;t just{" "}
             <span
@@ -124,21 +129,30 @@ export function SecurityNotPatching() {
             }}
           />
           <p
-            className="text-[clamp(1rem,2vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.04em] text-[#111111] md:justify-self-end md:text-right"
-            style={{ maxWidth: "576px" }}
+            className="font-normal text-[#111111] md:justify-self-end md:text-right"
+            style={{
+              fontSize: "var(--text-t-subhead)",
+              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "var(--text-t-subhead-ls)",
+              maxWidth: "541px",
+              opacity: 0.8,
+            }}
           >
             Recognized for innovation in secure software supply chain and
             hardened container images.
           </p>
         </div>
 
-        {/* Cards grid + kubr mascot */}
-        <div className="relative mt-16 grid grid-cols-1 gap-8 md:mt-[100px] md:grid-cols-2">
+        {/* Cards row + VS badge centerpiece.
+            Flex with a small gap keeps the two cards visually coupled with
+            the VS badge bridging them; `justify-center` keeps the pair centered
+            in the section's content area with symmetric breathing room. */}
+        <div className="relative mt-16 flex flex-col items-center gap-6 md:mt-[80px] md:flex-row md:justify-center md:gap-10">
           <SecurityCard kind="public" features={PUBLIC_IMAGES} />
           <SecurityCard kind="cleanstart" features={CLEANSTART_FEATURES} />
 
-          {/* Kubr — tail BEHIND left card, body IN FRONT */}
-          <KubrMascot />
+          {/* VS badge — centered between the two cards, above both */}
+          <VsBadge />
         </div>
       </div>
     </section>
@@ -155,12 +169,13 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
 
   return (
     <div
-      className="relative mx-auto flex h-full w-full flex-col lg:max-w-[clamp(380px,32vw,480px)]"
+      className="relative flex h-full w-full flex-col lg:max-w-[500px]"
       style={{
+        // Figma 1440: outer card 622×600, cyan border 10 px, radius 40
         borderRadius: 40,
-        background: "#2CC1EB", // outer cyan border (visible 10px around inner)
+        background: "#2CC1EB",
         padding: 10,
-        zIndex: 10, // above kubr tail layer (z=1) so tail goes behind the card
+        zIndex: 10,
       }}
     >
       <div
@@ -180,7 +195,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
              the visible outcome with two distinct CSS gradients tuned to the
              eyeball colors of the rendered Figma textures. */}
         <div
-          className="relative flex h-[clamp(80px,7vw,110px)] w-full items-center justify-center gap-3 overflow-hidden"
+          className="relative flex h-[clamp(76px,7vw,100px)] w-full items-center justify-center gap-3 overflow-hidden"
           style={{
             background: isPublic
               ? // LEFT (Public Images) — desaturated texture overlay → reads black
@@ -262,7 +277,14 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                   sizes="41px"
                   className="h-[47px] w-[41px]"
                 />
-                <span className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em] text-white">
+                <span
+                  className="font-display font-bold text-white"
+                  style={{
+                    fontSize: "var(--text-t-heading-lg)",
+                    lineHeight: "var(--text-t-heading-lg-lh)",
+                    letterSpacing: "var(--text-t-heading-lg-ls)",
+                  }}
+                >
                   Public Images
                 </span>
               </>
@@ -284,7 +306,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
             `flex-1` lets this area absorb the grid-row's stretched height so both
             cards' visible bottoms stay aligned regardless of which card's text
             wraps to two lines at any given viewport. */}
-        <div className="relative flex flex-1 flex-col overflow-hidden bg-white py-[clamp(20px,2.5vw,36px)]" style={{ minHeight: "clamp(300px, 24vw, 380px)" }}>
+        <div className="relative flex flex-1 flex-col overflow-hidden bg-white py-[clamp(24px,2.5vw,36px)]" style={{ minHeight: "clamp(260px, 22vw, 340px)" }}>
           {/* Decorative blobs (Figma Ellipse 46681 #DF9BFF + 46682 #2CC1EB) */}
           <div
             aria-hidden
@@ -317,7 +339,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
 
           {/* Bullet list — Figma bullets are 31px-tall rows with 71px top-to-top
               spacing → 40px gap between rows (same for both cards). */}
-          <ul className="relative z-10 mx-auto flex h-full max-w-[320px] flex-col justify-center gap-[clamp(20px,2.2vw,32px)]">
+          <ul className="relative z-10 mx-auto flex h-full max-w-[400px] flex-col justify-center gap-[clamp(20px,2.5vw,36px)]">
             {features.map((label) => (
               <li key={label} className="flex items-center gap-6">
                 {isPublic ? (
@@ -340,8 +362,13 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                   />
                 )}
                 <span
-                  className="text-body-lg tracking-[-0.01em] text-[#333333]"
-                  style={{ fontWeight: isPublic ? 600 : 700 }}
+                  className="font-display text-[#333333]"
+                  style={{
+                    fontSize: "var(--text-t-heading-sm)",
+                    fontWeight: 600,
+                    lineHeight: "var(--text-t-heading-sm-lh)",
+                    letterSpacing: "var(--text-t-heading-sm-ls)",
+                  }}
                 >
                   {label}
                 </span>
@@ -354,85 +381,39 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
   );
 }
 
-/** Kubr mascot — Figma node 108:7953 (290×299 at section-relative 525, 520).
- *  Live plugin coords: bird straddles the gap between cards — its left edge
- *  (x=525) sits 97px inside the LEFT card (left card right edge = x=622),
- *  so ~33.4% of the bird's width overlaps the left card. Per Figma's
- *  z-order, Kubr is drawn after both card outers but before the left
- *  card's white content — i.e. tail behind left card, body in front of
- *  the right card. We mirror that with a two-layer z-split + 33→36%
- *  mask blend: leftmost 33% at z=1 (behind cards), the rest at z=30
- *  (above cards). Bottom is -15px so the bird's feet hang ~15px below
- *  the cards' bottom edge (matches Figma section-bottom flush). */
-function KubrMascot() {
-  const KUBR_W = 290;
-  const KUBR_H = 299;
-  // Section-relative left edge: 525 / 1276 ≈ 41.14%
-  const KUBR_LEFT = "39%";
-  const KUBR_BOTTOM = "-15px";
-  // Mascot is a decorative accent that overlaps the card gap. On narrow
-  // viewports the cards stack vertically and the mascot would land in the
-  // wrong gap, so we hide it below `md` per the v3 Consistency Layer
-  // decorative-element rules (see apps/web/docs/design-tokens.md).
-  const MASCOT_WIDTH = "clamp(180px, 18vw, 290px)";
-
-  // Hard-edged split at 33%: no transition zone → no purple seam.
-  // (The earlier 33→36% gradient blend bled the cards' dark gradient
-  // through the mask transition, which read as a purple overlay.)
-  const TAIL_MASK = "linear-gradient(90deg, #000 0%, #000 33%, transparent 33%, transparent 100%)";
-  const BODY_MASK = "linear-gradient(90deg, transparent 0%, transparent 33%, #000 33%, #000 100%)";
-
+/** VS badge — glossy 3D "VS" letterform (252 × 252 source asset) centered
+ *  in the gap between the Public Images and CleanStart comparison cards.
+ *  Replaces the previous Kubr mascot per the Figma 1440 home design.
+ *  Hidden below `md` since the cards stack vertically and the gap
+ *  disappears. Centered horizontally via left:50% + translateX(-50%);
+ *  vertically centered between card rows via top:50% + translateY(-50%).
+ *  z-30 keeps it above both cards. */
+function VsBadge() {
+  // Smaller on mobile where the badge sits in the narrow gap between the
+  // vertically stacked cards; full size on tablet/desktop where it bridges
+  // the two side-by-side cards.
+  const SIZE = "clamp(72px, 11vw, 160px)";
   return (
-    <>
-      {/* Tail layer — z=1, behind the LEFT card. The 33% hard cut
-          stops exactly where the body layer starts, so the two halves
-          stitch back into one visually-continuous bird. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute hidden md:block"
-        style={{
-          left: KUBR_LEFT,
-          bottom: KUBR_BOTTOM,
-          width: MASCOT_WIDTH,
-          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
-          zIndex: 1,
-          WebkitMaskImage: TAIL_MASK,
-          maskImage: TAIL_MASK,
-        }}
-      >
-        <Image
-          src="/images/kubr-bird.png"
-          alt=""
-          width={KUBR_W}
-          height={KUBR_H}
-          sizes="290px"
-          className="h-full w-full object-contain"
-        />
-      </div>
-
-      {/* Body + head — z=30, in front of both cards. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute hidden md:block"
-        style={{
-          left: KUBR_LEFT,
-          bottom: KUBR_BOTTOM,
-          width: MASCOT_WIDTH,
-          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
-          zIndex: 30,
-          WebkitMaskImage: BODY_MASK,
-          maskImage: BODY_MASK,
-        }}
-      >
-        <Image
-          src="/images/kubr-bird.png"
-          alt="Kubr mascot"
-          width={KUBR_W}
-          height={KUBR_H}
-          sizes="290px"
-          className="h-full w-full object-contain"
-        />
-      </div>
-    </>
+    <div
+      aria-hidden
+      className="pointer-events-none absolute"
+      style={{
+        left: "50%",
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+        width: SIZE,
+        aspectRatio: "1 / 1",
+        zIndex: 30,
+      }}
+    >
+      <Image
+        src="/images/security/vs-badge.png"
+        alt=""
+        width={252}
+        height={252}
+        sizes="200px"
+        className="h-full w-full object-contain"
+      />
+    </div>
   );
 }

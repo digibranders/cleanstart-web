@@ -88,7 +88,7 @@ export function FipsOperationalImpact(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-14 md:pt-[100px] pb-14 md:pb-[100px] xl:pb-[250px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-14 md:pt-[100px] pb-14 md:pb-[100px] xl:pb-[250px]">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-10 md:gap-12 items-center">
           {/* Cube */}
           <div className="flex justify-center md:justify-start">
@@ -113,10 +113,10 @@ export function FipsOperationalImpact(): React.ReactElement {
               className="text-[#111] mb-10 md:mb-[40px]"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(28px, 3.23vw, 62px)",
+                fontSize: "var(--text-t-display-2)",
                 fontWeight: 600,
-                letterSpacing: "-0.05em",
-                lineHeight: 1.05,
+                letterSpacing: "var(--text-t-display-2-ls)",
+                lineHeight: "var(--text-t-display-2-lh)",
                 maxWidth: "654px",
               }}
             >
@@ -154,10 +154,10 @@ export function FipsOperationalImpact(): React.ReactElement {
                     className="text-[#111]"
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(32px, 2.7vw, 52px)",
+                      fontSize: "var(--text-t-display-2)",
                       fontWeight: 700,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1.0,
+                      letterSpacing: "var(--text-t-display-2-ls)",
+                      lineHeight: "var(--text-t-display-2-lh)",
                       marginBottom: "10px",
                       fontVariantNumeric: "tabular-nums",
                     }}
@@ -168,10 +168,10 @@ export function FipsOperationalImpact(): React.ReactElement {
                     className="text-[#333]"
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(13px, 0.94vw, 16px)",
+                      fontSize: "var(--text-t-body-md)",
                       fontWeight: 400,
-                      letterSpacing: "-0.03em",
-                      lineHeight: 1.35,
+                      letterSpacing: "var(--text-t-body-md-ls)",
+                      lineHeight: "var(--text-t-body-md-lh)",
                       opacity: 0.85,
                       maxWidth: "176px",
                     }}

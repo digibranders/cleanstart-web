@@ -1,82 +1,90 @@
+import Image from "next/image";
+import { Section, Container } from "@/components/layout";
+
 /**
- * Figma frame 1:378 — section 1922 × 1310.
+ * "How CleanStart Enables FIPS 140-3 Compliance" — Figma node 787:2093.
  *
- * Decorative flares (PNG with transparent corners):
- *   1:379 flare-top-right  x=1573 y=32   w=328  h=328
- *   1:380 flare-bottom     x=1601 y=951  w=1280 h=360   (extends past section)
- *   1:381 flare-left       x=-59  y=511  w=328  h=328   (extends past left edge)
+ * Composition:
+ *   • Wheel visual = single PNG exported from Figma node 787:2100
+ *     (donut, wedges with gradients/glows, inner light-blue ring,
+ *     center dark core — all baked in). Lives at /images/fips/hub-wheel.png.
+ *   • All text (numbers 01-07, capability labels, "Validated Foundation") is
+ *     real, selectable HTML on top of the image. The text is positioned with
+ *     percentages of the wheel box and sized with container queries (`cqi`),
+ *     so each piece is locked to the wheel — it scales with the image at
+ *     every viewport. The HTML text sits over the burned-in text in the PNG
+ *     at the exact same coordinates, so the visible text becomes the
+ *     sharp, selectable HTML version.
  *
- * Heading group 1:382 — x=585 y=120 w=752 h=240
- *   title  x=629 y=120 w=664 h=124
- *   body   x=585 y=276 w=752 h=84
- *
- * Hub group 1:385 — x=454 y=412 w=1014 h=788  (contains orb + pills)
- *   hub orb (1:386)         local x=133 y=33  w=745 h=745
- *   center label (1:425)    local x=453 y=359 w=110 h=110
- *
- * Pill positions in the 1014×788 hub-group local space:
- *   Build Integrity         x=606 y=0
- *   Runtime Security        x=949 y=167
- *   Compliance Automation   x=1014 y=430
- *   Crypto Validation       x=746 y=680
- *   Hardened Configurations x=448 y=680
- *   Secure Deployment       x=180 y=430
- *   Continuous Monitoring   x=245 y=175
+ * Surrounding chrome (heading, subhead, padding, container, flares) uses
+ * the project's design tokens (`--color-cs-*`, `--text-*`, `--spacing-*`)
+ * and primitives (<Section>, <Container>).
  */
 
-interface HubPillData {
+/* ---------- Figma hub geometry (used to compute % positions) ---------- */
+const HUB_W = 932.26;
+const HUB_H = 896.08;
+
+/** Wheel PNG native dimensions (Figma export at 2× includes a few px of bleed). */
+const HUB_PNG_W = 1773;
+const HUB_PNG_H = 1793;
+
+/** Wheel display cap — Figma node 787:2100 is 932.26 px, expressed in rem. */
+const HUB_MAX_REM = "58.27rem"; // 932.26 / 16
+
+/**
+ * Wheel slices. Each row maps to a wedge in clockwise order from 12 o'clock.
+ * Positions and sizes are the Figma TEXT-BOX rects (top-left + size) for the
+ * burned-in number and label inside that wedge — taken verbatim from
+ * the hub group (787:2107) layout data so the overlay sits exactly on top
+ * of the burned-in artwork.
+ */
+const SLICES: ReadonlyArray<{
+  num: string;
   label: string;
-  /** Local x within 1014-wide hub group, in pixels. */
-  x: number;
-  /** Local y within 788-tall hub group, in pixels. */
-  y: number;
-}
-
-const PILL_W = 180;
-const PILL_H = 108;
-const HUB_W = 1014;
-const HUB_H = 788;
-
-/**
- * Pill positions normalized for left/right symmetry around the orb center.
- *
- * Figma's raw coordinates are right-biased (5 pills right-of-center, 2 left).
- * To keep the visual hierarchy/labels Figma intended but balance the layout,
- * we redistribute 7 pills on an ellipse around the center at evenly spaced
- * angles (51.43° apart, gap at the top), so all pill CENTERS are mirrored
- * across the container's vertical axis at x = 507 (HUB_W / 2).
- *
- * Resulting symmetric pairs (centers around x=507):
- *   Build Integrity (688) ↔ Continuous Monitoring (326)
- *   Runtime Security (913) ↔ Secure Deployment (101)
- *   Compliance Automation (833) ↔ Hardened Configurations (181)
- *   Crypto Validation (507) — bottom center
- */
-const PILLS: HubPillData[] = [
-  { label: "Continuous Monitoring", x: 236, y: 34 },
-  { label: "Build Integrity", x: 598, y: 34 },
-  { label: "Runtime Security", x: 823, y: 264 },
-  { label: "Compliance Automation", x: 743, y: 552 },
-  { label: "Crypto Validation", x: 417, y: 680 },
-  { label: "Hardened Configurations", x: 91, y: 552 },
-  { label: "Secure Deployment", x: 11, y: 264 },
+  numX: number;
+  numY: number;
+  numW: number;
+  numH: number;
+  labelX: number;
+  labelY: number;
+  labelW: number;
+  labelH: number;
+}> = [
+  { num: "01", label: "Build Integrity",         numX: 499.18, numY: 102, numW: 27, numH: 36, labelX: 503.18, labelY: 175, labelW: 145, labelH: 72 },
+  { num: "02", label: "Runtime Security",        numX: 737.18, numY: 271, numW: 32, numH: 36, labelX: 651.18, labelY: 354, labelW: 151, labelH: 72 },
+  { num: "03", label: "Compliance Automation",   numX: 764.18, numY: 553, numW: 32, numH: 36, labelX: 597.18, labelY: 590, labelW: 159, labelH: 72 },
+  { num: "04", label: "Crypto Validation",       numX: 550.18, numY: 770, numW: 33, numH: 36, labelX: 399.18, labelY: 698, labelW: 127, labelH: 72 },
+  { num: "05", label: "Hardened Configurations", numX: 252.18, numY: 726, numW: 33, numH: 36, labelX: 146.18, labelY: 582, labelW: 191, labelH: 72 },
+  { num: "06", label: "Secure Deployment",       numX: 102.18, numY: 477, numW: 34, numH: 36, labelX: 110.18, labelY: 352, labelW: 159, labelH: 72 },
+  { num: "07", label: "Continuous Monitoring",   numX: 205.18, numY: 190, numW: 32, numH: 36, labelX: 255.18, labelY: 167, labelW: 165, labelH: 72 },
 ];
+
+/** Center "Validated Foundation" text-box from Figma (Manrope SemiBold 32 px). */
+const CENTER_LABEL = { x: 378.18, y: 422, w: 164, h: 70 };
+
+/** Convert a top-left px rect in the Figma hub box to CSS top/left/width/height %. */
+function rectToPct(x: number, y: number, w: number, h: number) {
+  return {
+    left: `${(x / HUB_W) * 100}%`,
+    top: `${(y / HUB_H) * 100}%`,
+    width: `${(w / HUB_W) * 100}%`,
+    height: `${(h / HUB_H) * 100}%`,
+  };
+}
 
 export function FipsEnables(): React.ReactElement {
   return (
-    <section
+    <Section
+      padding="lg"
       data-section="FipsEnables"
       className="relative overflow-hidden"
       style={{
         background:
-          "linear-gradient(180deg, #151021 0%, #131e8f 67%, #471ec0 107%)",
-        minHeight: "clamp(780px, 58vw, 1050px)",
+          "linear-gradient(180deg, #151021 0%, #131e8f 62%, #471ec0 100%)",
       }}
     >
-      {/* -------------------- Figma flare assets -------------------- */}
-      {/* Top-right cyan flare (1:379) — 328×328 at section x=1573 y=32.
-          Right edge sits ~21px from section right; we mirror that with
-          right ≈ 1.09% of 1922. */}
+      {/* ---------- Ambient flares (md+) ---------- */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -84,18 +92,15 @@ export function FipsEnables(): React.ReactElement {
         alt=""
         className="pointer-events-none select-none absolute hidden md:block"
         style={{
-          right: "1.09%", // (1922-(1573+328))/1922
-          top: "32px",
-          width: "17.07%", // 328/1922
+          right: "clamp(0px, 1.5%, 1.5rem)",
+          top: "1.25rem",
+          width: "clamp(11.25rem, 22%, 20.5rem)",
           height: "auto",
           mixBlendMode: "screen",
         }}
         loading="lazy"
         decoding="async"
       />
-
-      {/* Left-edge cyan flare (1:381) — 328×328 starting at x=-59
-          (peeking from left edge) so visible portion is 269px wide. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -104,16 +109,14 @@ export function FipsEnables(): React.ReactElement {
         className="pointer-events-none select-none absolute hidden md:block"
         style={{
           left: 0,
-          top: "39%", // 511/1310
-          width: "14%", // 269/1922 visible portion
+          top: "39%",
+          width: "clamp(10rem, 18.5%, 16.8125rem)",
           height: "auto",
           mixBlendMode: "screen",
         }}
         loading="lazy"
         decoding="async"
       />
-
-      {/* Bottom flare (1:380) — 1280×360, centered at bottom of section. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -124,7 +127,7 @@ export function FipsEnables(): React.ReactElement {
           left: "50%",
           bottom: 0,
           transform: "translateX(-50%)",
-          width: "66.6%", // 1280/1922
+          width: "min(88%, 80rem)",
           height: "auto",
           mixBlendMode: "screen",
         }}
@@ -132,43 +135,47 @@ export function FipsEnables(): React.ReactElement {
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-16 md:pt-[120px] pb-16 md:pb-[100px]">
-        {/* Heading group (Figma 1:382 — 752w × 240h, centered) */}
-        <div className="text-center mx-auto mb-12 md:mb-[52px]" style={{ maxWidth: "752px" }}>
+      <Container className="relative">
+        {/* ---------- Heading + subhead (Figma 787:2097) ---------- */}
+        <div
+          className="mx-auto text-center"
+          style={{
+            maxWidth: "47rem", // Figma 752 / 16
+            marginBottom: "clamp(2rem, 5vw, 3.25rem)",
+          }}
+        >
           <h2
-            className="text-white mx-auto"
+            className="mx-auto text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(28px, 3.23vw, 62px)",
-              fontWeight: 600,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.05,
-              maxWidth: "664px",
-              marginBottom: "32px", // (276-244) gap between title bottom and body top
+              fontSize: "clamp(2rem, 4.2vw, 3.875rem)", // 32→62 px — Figma 62 px
+              fontWeight: 700,
+              letterSpacing: "-0.05em", // Figma -5%
+              lineHeight: 1, // Figma 100%
+              maxWidth: "41.5rem", // Figma 664 / 16
+              marginBottom: "clamp(1rem, 2.2vw, 2rem)",
             }}
           >
             How CleanStart Enables{" "}
             <span
+              className="bg-clip-text text-transparent"
               style={{
-                background:
-                  "linear-gradient(95deg, #239CFF 0%, #82AEFF 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
+                backgroundImage:
+                  "linear-gradient(99deg, #9A51FF 0%, #2CC1EB 100%)",
               }}
             >
               FIPS 140-3 Compliance
             </span>
           </h2>
           <p
-            className="text-white mx-auto"
+            className="mx-auto text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(15px, 1.15vw, 22px)",
+              fontSize: "clamp(1.0625rem, 2vw, 1.875rem)", // 17→30 px — Figma 30 px
               fontWeight: 400,
-              letterSpacing: "-0.03em",
-              lineHeight: 1.5,
-              opacity: 0.85,
+              letterSpacing: "-0.04em", // Figma -4%
+              lineHeight: 1.4, // Figma 140%
+              opacity: 0.8,
             }}
           >
             CleanStart embeds validated cryptographic foundations directly into
@@ -176,138 +183,109 @@ export function FipsEnables(): React.ReactElement {
           </p>
         </div>
 
-        {/* -------------------- Hub diagram (desktop) -------------------- */}
-        {/* 1014×788 box, centered. Pills positioned at exact Figma local coords.
-            overflow-visible so pills can extend slightly past the box edges
-            (Compliance Automation sits flush with the 1014px right edge in Figma). */}
-        <div
-          className="hidden md:block relative mx-auto"
-          style={{
-            width: "100%",
-            maxWidth: `${HUB_W}px`,
-            aspectRatio: `${HUB_W} / ${HUB_H}`,
-          }}
-        >
-          {/* Center orb (1:386 — 745×745 at local x=133 y=33).
-              Width 745/1014 = 73.47%, top 33/788 = 4.19%, left 133/1014 = 13.12%. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            src="/images/fips/hub-orb.png"
-            alt=""
-            className="absolute pointer-events-none select-none"
-            style={{
-              left: `${(133 / HUB_W) * 100}%`,
-              top: `${(33 / HUB_H) * 100}%`,
-              width: `${(745 / HUB_W) * 100}%`,
-              height: "auto",
-            }}
-            loading="lazy"
-            decoding="async"
-          />
-
-          {/* Center label (1:425 — 110×110 at local x=453 y=359). */}
-          <div
-            className="absolute flex items-center justify-center text-center"
-            style={{
-              left: `${(453 / HUB_W) * 100}%`,
-              top: `${(359 / HUB_H) * 100}%`,
-              width: `${(110 / HUB_W) * 100}%`,
-              aspectRatio: "1 / 1",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(11px, 0.83vw, 14px)",
-                fontWeight: 600,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.2,
-                color: "#FFFFFF",
-              }}
-            >
-              Validated Foundation
-            </span>
-          </div>
-
-          {/* Orbiting pills */}
-          {PILLS.map((pill) => (
-            <div
-              key={pill.label}
-              className="absolute"
-              style={{
-                left: `${(pill.x / HUB_W) * 100}%`,
-                top: `${(pill.y / HUB_H) * 100}%`,
-                width: `${(PILL_W / HUB_W) * 100}%`,
-                aspectRatio: `${PILL_W} / ${PILL_H}`,
-              }}
-            >
-              <HubPill label={pill.label} />
-            </div>
-          ))}
-        </div>
-
-        {/* -------------------- Mobile: orb + pill grid -------------------- */}
-        <div className="md:hidden flex flex-col items-center gap-8">
-          <div className="relative" style={{ width: "260px", height: "260px" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              aria-hidden
-              src="/images/fips/hub-orb.png"
-              alt=""
-              className="absolute inset-0 w-full h-full pointer-events-none select-none"
-              loading="lazy"
-              decoding="async"
-            />
-            <span
-              className="absolute inset-0 flex items-center justify-center text-center text-white"
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(11px, 0.85vw, 13px)",
-                fontWeight: 600,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.2,
-              }}
-            >
-              Validated Foundation
-            </span>
-          </div>
-          <div className="flex flex-col gap-3 w-full max-w-[400px]">
-            {PILLS.map((p) => (
-              <HubPill key={p.label} label={p.label} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
+        {/* ---------- Wheel (Figma render as background) + selectable text overlay ---------- */}
+        <HubWheel />
+      </Container>
+    </Section>
   );
 }
 
-function HubPill({ label }: { label: string }): React.ReactElement {
+function HubWheel(): React.ReactElement {
+  const centerPos = rectToPct(
+    CENTER_LABEL.x,
+    CENTER_LABEL.y,
+    CENTER_LABEL.w,
+    CENTER_LABEL.h,
+  );
+
   return (
     <div
-      className="relative inline-flex w-full h-full items-center justify-center text-center px-3"
+      className="relative mx-auto"
       style={{
-        borderRadius: "12px",
-        background:
-          "linear-gradient(180deg, rgba(255,255,255,0.97) 0%, rgba(245,247,255,0.95) 100%)",
-        boxShadow:
-          "0 12px 28px -10px rgba(35, 60, 160, 0.45), 0 0 0 1px rgba(255,255,255,0.20) inset",
-        minHeight: "88px",
+        width: "100%",
+        maxWidth: `min(100%, ${HUB_MAX_REM})`,
+        aspectRatio: `${HUB_PNG_W} / ${HUB_PNG_H}`,
+        containerType: "inline-size",
       }}
     >
-      <span
-        style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "clamp(13px, 1.04vw, 17px)",
-          fontWeight: 600,
-          letterSpacing: "-0.02em",
-          lineHeight: 1.2,
-          color: "#111",
-        }}
-      >
-        {label}
-      </span>
+      {/* Wheel image — background visual. Selectable HTML text sits on top. */}
+      <Image
+        src="/images/fips/hub-wheel.png"
+        alt=""
+        aria-hidden
+        width={HUB_PNG_W}
+        height={HUB_PNG_H}
+        sizes="(min-width: 1024px) 932px, (min-width: 640px) 90vw, calc(100vw - 48px)"
+        className="absolute inset-0 block h-full w-full select-none"
+        priority={false}
+      />
+
+      {/* Selectable text overlay — positions and sizes lock to the wheel via
+          % + cqi so every label moves and scales with the image. */}
+      <div className="absolute inset-0">
+        {SLICES.map((s) => {
+          const numRect = rectToPct(s.numX, s.numY, s.numW, s.numH);
+          const lblRect = rectToPct(s.labelX, s.labelY, s.labelW, s.labelH);
+          return (
+            <div key={s.num}>
+              {/* Number — Figma style_W3RXBI: Sora Bold 24px / 150% / -7% */}
+              <span
+                className="absolute flex items-start text-white"
+                style={{
+                  left: numRect.left,
+                  top: numRect.top,
+                  width: numRect.width,
+                  height: numRect.height,
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "clamp(0.75rem, 2.57cqi, 1.5rem)", // 12 → 24 px
+                  fontWeight: 700,
+                  letterSpacing: "-0.07em",
+                  lineHeight: 1.5,
+                }}
+              >
+                {s.num}
+              </span>
+
+              {/* Label — Figma style_UHZRHP: Figtree SemiBold 28px / 130% / -1.32% */}
+              <span
+                className="absolute flex items-center justify-center text-center text-white"
+                style={{
+                  left: lblRect.left,
+                  top: lblRect.top,
+                  width: lblRect.width,
+                  height: lblRect.height,
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(0.8125rem, 3cqi, 1.75rem)", // 13 → 28 px
+                  fontWeight: 600,
+                  letterSpacing: "-0.0132em",
+                  lineHeight: 1.3,
+                }}
+              >
+                {s.label}
+              </span>
+            </div>
+          );
+        })}
+
+        {/* Center label — Figma style_TX6HWE: Manrope SemiBold 32px / 110% / -4% */}
+        <span
+          className="absolute flex items-center justify-center text-center text-white"
+          style={{
+            left: centerPos.left,
+            top: centerPos.top,
+            width: centerPos.width,
+            height: centerPos.height,
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(0.9375rem, 3.43cqi, 2rem)", // 15 → 32 px
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
+            opacity: 0.85,
+          }}
+        >
+          Validated Foundation
+        </span>
+      </div>
     </div>
   );
 }

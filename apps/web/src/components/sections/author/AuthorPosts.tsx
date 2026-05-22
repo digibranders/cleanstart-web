@@ -26,7 +26,7 @@ export function AuthorPosts({
         paddingBottom: "230px",
       }}
     >
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-section-md">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md">
         <div className="flex items-end justify-between gap-6 pb-10">
           <h2
             className="font-display font-semibold text-white"

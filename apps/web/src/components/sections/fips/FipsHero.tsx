@@ -20,7 +20,7 @@ export function FipsHero(): React.ReactElement {
   return (
     <section
       data-section="FipsHero"
-      className="relative overflow-hidden bg-cs-hero bg-cs-grid"
+      className="relative overflow-hidden bg-cs-hero"
       style={{ minHeight: "clamp(560px, 51vw, 741px)" }}
     >
       {/*
@@ -50,7 +50,7 @@ export function FipsHero(): React.ReactElement {
           maxWidth: "1276px",
           paddingLeft: "24px",
           paddingRight: "24px",
-          paddingTop: "clamp(110px, 13vw, 186px)",
+          paddingTop: "clamp(72px, 8vw, 128px)",
           paddingBottom: "0",
           minHeight: "741px",
         }}
@@ -147,10 +147,10 @@ export function FipsHero(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(15px, 1.35vw, 26px)",
+              fontSize: "var(--text-t-subhead)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.5,
+              letterSpacing: "var(--text-t-subhead-ls)",
+              lineHeight: "var(--text-t-subhead-lh)",
               color: "rgba(255,255,255,0.85)",
               maxWidth: "545px",
               marginBottom: "32px", // gap between body (h=84) and button (y=116) = 32

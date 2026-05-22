@@ -23,17 +23,17 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto max-w-[1361px] px-6 flex flex-col items-center"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col items-center"
         style={{ paddingTop: "var(--spacing-section-md)", paddingBottom: "var(--spacing-section-md)" }}
       >
         <h2
           className="text-white text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(36px, 3.33vw, 64px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 600,
-            letterSpacing: "-0.03em",
-            lineHeight: 1.05,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             maxWidth: "672px",
           }}
         >
@@ -53,40 +53,21 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
           className="mt-5 text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(14px, 0.94vw, 18px)",
+            fontSize: "var(--text-t-body-lg)",
             fontWeight: 400,
-            lineHeight: 1.4,
+            lineHeight: "var(--text-t-body-lg-lh)",
+            letterSpacing: "var(--text-t-body-lg-ls)",
             color: "rgba(255,255,255,0.7)",
           }}
         >
           Works seamlessly across all major platforms
         </p>
 
-        {/* Logo rows — Figma 161:23837 and 161:23846 */}
-        <div className="mt-14 w-full flex flex-col items-center gap-10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/cleanstart-images/env-logos-row1.png"
-            alt="Supported platforms: Azure, Nexus, Quay, Red Hat, Harbor, Azure"
-            width={1361}
-            height={55}
-            className="w-full max-w-[1361px] h-auto select-none opacity-90"
-            loading="lazy"
-            decoding="async"
-            draggable={false}
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/cleanstart-images/env-logos-row2.png"
-            alt="Supported platforms: Google Cloud, AWS, GitHub, JFrog, Docker, Google Cloud"
-            width={1319}
-            height={55}
-            className="w-full max-w-[1319px] h-auto select-none opacity-90"
-            loading="lazy"
-            decoding="async"
-            draggable={false}
-          />
-        </div>
+        {/* Logo marquee removed until clean exports arrive — the prior
+            env-logos-row{1,2}.png strips had a Figma selection highlight
+            baked into the artwork. Re-export the rows or add per-logo SVGs
+            and the marquee scaffolding (helper component + cs-marquee CSS)
+            can be re-introduced. */}
       </div>
     </section>
   );

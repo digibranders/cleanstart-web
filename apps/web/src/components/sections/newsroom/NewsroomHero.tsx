@@ -167,7 +167,7 @@ export function NewsroomHero(): React.ReactElement {
         />
       </div>
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
           className="flex flex-col items-center gap-6 mx-auto text-center"
           style={{ paddingTop: "clamp(88px, 11vw, 146px)", paddingBottom: "clamp(40px, 5vw, 80px)", maxWidth: "623px" }}

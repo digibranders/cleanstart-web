@@ -41,9 +41,9 @@
   --text-body-xs: clamp(0.75rem, 0.85vw, 0.875rem);        /* 12→14px — eyebrow, breadcrumb, caption */
 
   /* Section vertical-padding scale (fluid) */
-  --spacing-section-sm: clamp(3rem, 6vw, 5rem);              /* 48→80px — tight/sequential grids */
-  --spacing-section-md: clamp(4rem, 8vw, 7.5rem);            /* 64→120px — standard sections */
-  --spacing-section-lg: clamp(5rem, 10vw, 9.375rem);         /* 80→150px — feature/hero-adjacent */
+  --spacing-section-sm: clamp(2.5rem, 5vw, 4rem);            /* 40→64px — tight/sequential grids */
+  --spacing-section-md: clamp(3rem, 6vw, 5.5rem);            /* 48→88px — standard sections */
+  --spacing-section-lg: clamp(4rem, 8vw, 7rem);              /* 64→112px — feature/hero-adjacent */
   --spacing-section-cta: clamp(10rem, 18vw, 15.625rem);      /* 160→250px — CTA-overlap reservation above Footer */
 
   /* Card padding scale (fluid) */
@@ -83,7 +83,14 @@
   --color-cs-text-dark: #111111;
 
   /* Container family — see RESPONSIVE-SYSTEM-AUDIT.md §6.3.
-     --container-default widened from 1276 → 1440 (2026-05-21).
+     --container-default returned to 1440 (2026-05-22, second pass) so
+     the side gutter stays constant at every viewport up to 1440. With
+     `px-6` (24 px) inside the Container, every section gets exactly
+     24 px of breathing room on each side at 1280, 1366, 1440 alike.
+     Above 1440 the cap kicks in and auto-margins grow the gutter
+     uniformly. The 1276-with-82-px-gutter Figma reading was correct
+     for the artboard but felt over-gutter'd in product — the team
+     chose visual consistency across desktop widths instead.
      --container-cs kept as alias for any legacy consumer. */
   --container-default: 1440px;
   --container-prose:    720px;
@@ -107,6 +114,59 @@
 
   /* Section H2 alias (== --text-display-md, named for clarity in markup) */
   --text-section-h2: var(--text-display-md);
+
+  /* ─────────────────────────────────────────────────────────────────────
+     UNIFIED TYPE SCALE — 8 roles total. Every consumer must read these
+     tokens. No inline clamp(), no `text-[Xpx]`, no fontSize: "Npx".
+     See TYPOGRAPHY.md for the migration map.
+
+     Display (large headlines):
+       --text-t-display-1   40 → 72   Hero H1
+       --text-t-display-2   32 → 56   Section H2, CTA title
+
+     Headings (cards, sub-titles, stat numbers):
+       --text-t-heading-lg  22 → 32   Card titles, FAQ question, stat number
+       --text-t-heading-md  20 → 24   Stat label, Resources article title
+       --text-t-heading-sm  18 → 20   Tab labels, pills
+
+     Body:
+       --text-t-body-lg     16 → 18   Subhead next to H2, card body, CISO body
+       --text-t-body-md     14 → 16   Card description, FAQ answer, footer headings
+       --text-t-body-sm     12 → 14   Meta, footer links
+
+     Locked at ≥lg via @media block below (paired tokens stay constant).
+     ───────────────────────────────────────────────────────────────────── */
+  --text-t-display-1:  clamp(2.5rem, 5.5vw, 4.5rem);
+  --text-t-display-2:  clamp(2rem, 4.2vw, 3.5rem);
+  --text-t-heading-lg: clamp(1.375rem, 2.1vw, 2rem);
+  --text-t-heading-md: clamp(1.25rem, 1.6vw, 1.5rem);
+  --text-t-heading-sm: clamp(1.125rem, 1.3vw, 1.25rem);
+  --text-t-subhead:    clamp(1.0625rem, 1.5vw, 1.375rem); /* 17 → 22 — section intro paragraph next to H2 */
+  --text-t-body-lg:    clamp(1rem, 1.2vw, 1.125rem);
+  --text-t-body-md:    clamp(0.875rem, 1vw, 1rem);
+  --text-t-body-sm:    clamp(0.75rem, 0.85vw, 0.875rem);
+
+  /* Letter-spacing per role (paired with sizes above) */
+  --text-t-display-1-ls:  -0.04em;
+  --text-t-display-2-ls:  -0.04em;
+  --text-t-heading-lg-ls: -0.04em;
+  --text-t-heading-md-ls: -0.03em;
+  --text-t-heading-sm-ls: -0.02em;
+  --text-t-subhead-ls:    -0.02em;
+  --text-t-body-lg-ls:    -0.02em;
+  --text-t-body-md-ls:    -0.01em;
+  --text-t-body-sm-ls:    0;
+
+  /* Line-height per role */
+  --text-t-display-1-lh:  1.0;
+  --text-t-display-2-lh:  1.05;
+  --text-t-heading-lg-lh: 1.1;
+  --text-t-heading-md-lh: 1.2;
+  --text-t-heading-sm-lh: 1.3;
+  --text-t-subhead-lh:    1.45;
+  --text-t-body-lg-lh:    1.5;
+  --text-t-body-md-lh:    1.55;
+  --text-t-body-sm-lh:    1.5;
 
   /* Prose tokens for .prose-cs (long-form article body — see RESPONSIVE-SYSTEM-AUDIT.md §9.3).
      Body 17 → 18, H3 ≥ 22 (fixes the prior H3 < body inversion). */
@@ -199,6 +259,17 @@
     --text-hero-marketing: 4.5rem;  /* 72px */
     --text-hero-product:   3.5rem;  /* 56px */
     --text-hero-utility:   3rem;    /* 48px */
+
+    /* Unified type-scale locks */
+    --text-t-display-1:  4.5rem;    /* 72 */
+    --text-t-display-2:  3.5rem;    /* 56 */
+    --text-t-heading-lg: 2rem;      /* 32 */
+    --text-t-heading-md: 1.5rem;    /* 24 */
+    --text-t-heading-sm: 1.25rem;   /* 20 */
+    --text-t-subhead:    1.375rem;  /* 22 — section intro paragraph */
+    --text-t-body-lg:    1.125rem;  /* 18 */
+    --text-t-body-md:    1rem;      /* 16 */
+    --text-t-body-sm:    0.875rem;  /* 14 */
   }
 }
 
@@ -250,17 +321,13 @@ body {
   background-repeat: repeat, repeat, no-repeat;
 }
 
-/* Engine panel gradient */
+/* Engine panel background */
 .bg-cs-engine {
-  background: linear-gradient(180deg, #151021 0%, #131e8f 71%, #551ec3 100%);
+  background: #151021;
 }
 
 .shadow-cs-engine {
-  box-shadow:
-    -8px 4px 20px 0 rgba(0, 0, 0, 0.23),
-    -33px 16px 37px 0 rgba(0, 0, 0, 0.20),
-    -74px 37px 49px 0 rgba(0, 0, 0, 0.12),
-    -131px 65px 59px 0 rgba(0, 0, 0, 0.03);
+  box-shadow: none;
 }
 
 /* Diagonal stripe pattern for engine panel inner */
@@ -275,11 +342,9 @@ body {
 
 /* Engine panel inner cards (AI Logic Engine / CleanCompile Factory) */
 .cs-engine-card {
-  background: linear-gradient(180deg, rgba(217, 217, 217, 0.25) 0%, rgba(50, 50, 50, 0) 100%);
+  background: #151021;
   border: 1px solid rgba(218, 182, 243, 0.35);
   border-radius: 24px;
-  backdrop-filter: blur(2px);
-  box-shadow: inset 1px 1px 0 0 rgba(218, 182, 243, 0.45);
 }
 
 /* ===========================================================================
@@ -338,11 +403,7 @@ body {
   padding: 0 var(--cs-btn-px, 22px);
   font-size: var(--cs-btn-fs, 16px);
   background: #3960F9;
-  box-shadow:
-    0 0 0 1.002px #3960F9,
-    0 1px 2px rgba(9, 6, 63, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
-  transition: transform 200ms ease, filter 200ms ease, box-shadow 200ms ease;
+  transition: transform 200ms ease, filter 200ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 .cs-btn-blue:hover {
@@ -409,19 +470,12 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.95);
   /* Lavender top-left rim glow (Figma 2nd stroke #DAB6F3 LINEAR_DODGE) +
      subtle drop shadow + inner highlight */
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 1px 1px 0 rgba(218, 182, 243, 0.45),
-    inset -1px -1px 0 rgba(218, 182, 243, 0.20),
-    0 4px 18px -4px rgba(57, 30, 192, 0.30),
-    0 2px 6px -2px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   overflow: hidden;
   isolation: isolate;
   transition:
     transform 220ms cubic-bezier(.2, .9, .3, 1),
-    box-shadow 220ms ease-out,
     background-color 200ms ease-out;
   -webkit-tap-highlight-color: transparent;
 }
@@ -444,12 +498,6 @@ body {
     radial-gradient(120% 110% at 100% 0%, rgba(60, 0, 255, 0.36) 0%, rgba(60, 0, 255, 0) 60%),
     radial-gradient(110% 90% at 0% 100%,  rgba(60, 0, 255, 0.24) 0%, rgba(60, 0, 255, 0) 60%),
     rgba(255, 255, 255, 0.92);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 1px 1px 0 rgba(218, 182, 243, 0.65),
-    inset -1px -1px 0 rgba(218, 182, 243, 0.30),
-    0 12px 28px -6px rgba(57, 30, 192, 0.55),
-    0 4px 10px -2px rgba(0, 0, 0, 0.25);
 }
 .cs-btn-glass:hover::after { opacity: 1; animation: cs-cta-shine 900ms ease-out 1; }
 .cs-btn-glass:active { transform: translateY(0) scale(0.97); transition-duration: 80ms; }
@@ -553,19 +601,12 @@ body {
   border: 1.3px solid rgba(205, 228, 255, 0.55);
   background:
     radial-gradient(ellipse 70% 110% at 43% 31%, #000000 0%, #000000 19%, #1E5AFF 100%);
-  box-shadow:
-    inset 0 0 0 0.5px rgba(205, 228, 255, 0.35),
-    0 1px 2px rgba(0, 0, 0, 0.4);
   cursor: pointer;
-  transition: filter 180ms ease, transform 180ms cubic-bezier(.2,.9,.3,1), box-shadow 220ms ease;
+  transition: filter 180ms ease, transform 180ms cubic-bezier(.2,.9,.3,1);
 }
 .cs-pill-cta:hover {
   filter: brightness(1.15);
   transform: translateY(-1px);
-  box-shadow:
-    inset 0 0 0 0.5px rgba(205, 228, 255, 0.55),
-    0 6px 16px -4px rgba(30, 90, 255, 0.55),
-    0 1px 2px rgba(0, 0, 0, 0.4);
 }
 .cs-pill-cta:active { transform: translateY(0) scale(0.97); transition-duration: 80ms; }
 .cs-pill-cta:focus-visible { outline: 2px solid #CDE4FF; outline-offset: 2px; }
@@ -699,13 +740,8 @@ body {
 .cs-factory-card {
   container-type: inline-size;
   container-name: factory-card;
-  background: linear-gradient(to bottom, #151021 0%, #131e8f 71.2%, #551ece 100%);
+  background: #151021;
   border: 3px solid #dab6f3;
-  box-shadow:
-    -8px 4px 20px 0 rgba(0, 0, 0, 0.23),
-    -33px 16px 37px 0 rgba(0, 0, 0, 0.20),
-    -74px 37px 49px 0 rgba(0, 0, 0, 0.12),
-    -131px 65px 59px 0 rgba(0, 0, 0, 0.03);
 }
 
 /* Comparison card outer (Public Images / CleanStart) */
@@ -741,7 +777,33 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [style*="cs-fade-slide-in"] { animation: none !important; }
+  [style*="cs-fade-slide-in"]   { animation: none !important; }
+  [style*="cs-pulse-glow"]      { animation: none !important; }
+  [style*="cs-pulse-glow-flare"]{ animation: none !important; }
+}
+
+/* Vertical-pipeline pulse for the mobile Factory cards' left guide-line dots. */
+@keyframes cs-pulse-glow {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.55);
+    opacity: 1;
+  }
+}
+
+/* Slow-breathing brightness for the mobile Factory cards' Figma flares.
+   Preserves the translateY(-50%) the flare uses for vertical centering;
+   only opacity changes so the cyan glow gently pulses behind each card. */
+@keyframes cs-pulse-glow-flare {
+  0%, 100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* FAQ answer drawer — kept minimal; height + opacity are driven by inline
@@ -867,7 +929,12 @@ body {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: clamp(220px, 26cqi, 340px);
+  /* Min lowered (220 → 140) so the orb scales down properly on mobile —
+     at narrow stages it was hitting the floor and dominating the frame.
+     Multiplier tightened (26 → 22cqi) so even mid stages feel balanced;
+     max trimmed slightly (340 → 320) so the orb stays sphere-prominent
+     without ballooning at the widest stages. */
+  width: clamp(140px, 22cqi, 320px);
   height: auto;
   z-index: 3;
   pointer-events: none;
@@ -1339,10 +1406,17 @@ body {
   .cs-tt-card--active .cs-tt-card__photo {
     width: 100%;
     height: 220px;
+    border-radius: 24px 24px 0 0;
   }
   .cs-tt-card--active .cs-tt-card__body {
-    padding: 24px 0 0 0;
-    gap: 16px;
+    /* L/R padding so quote text doesn't clip against the card's
+       overflow:hidden walls when the layout stacks (photo on top). */
+    padding: 20px 20px 24px;
+    gap: 14px;
+  }
+  .cs-tt-card--active .cs-tt-card__quote {
+    font-size: 16px;
+    line-height: 1.45;
   }
   .cs-tt-stage { height: auto; min-height: 480px; }
 }

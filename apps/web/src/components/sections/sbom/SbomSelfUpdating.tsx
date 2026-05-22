@@ -100,10 +100,10 @@ export function SbomSelfUpdating(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 3.23vw, 62px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.1,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             width: vw(593),
           }}
         >
@@ -112,10 +112,10 @@ export function SbomSelfUpdating(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(15px, 1.35vw, 26px)",
+            fontSize: "var(--text-t-subhead)",
             fontWeight: 400,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.5,
+            letterSpacing: "var(--text-t-subhead-ls)",
+            lineHeight: "var(--text-t-subhead-lh)",
             color: "rgba(255,255,255,0.88)",
             width: "100%",
           }}
@@ -161,15 +161,15 @@ export function SbomSelfUpdating(): React.ReactElement {
       <FeatureLabel x={1234} y={728} title="Validate" body="Continuously assess inventory accuracy and integrity." />
 
       {/* ═════════════ MOBILE (< lg) ═════════════ */}
-      <div className="lg:hidden mx-auto max-w-[var(--container-default)] px-6 py-section-md flex flex-col items-center text-center gap-8">
+      <div className="lg:hidden mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md flex flex-col items-center text-center gap-8">
         <h2
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 8vw, 48px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.1,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
           }}
         >
           Generate. Verify. Validate.
@@ -177,10 +177,10 @@ export function SbomSelfUpdating(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(14px, 4vw, 20px)",
+            fontSize: "var(--text-t-subhead)",
             fontWeight: 400,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.5,
+            letterSpacing: "var(--text-t-subhead-ls)",
+            lineHeight: "var(--text-t-subhead-lh)",
             color: "rgba(255,255,255,0.85)",
             maxWidth: "600px",
           }}
@@ -274,9 +274,9 @@ function FigmaCircle({ size, x, y, glowSize, glowOffset, num, numGradient, small
         className="relative"
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(22px, 2.29vw, 44px)",
+          fontSize: "clamp(15px, 1.56vw, 30px)",
           fontWeight: 700,
-          letterSpacing: "-0.05em",
+          letterSpacing: "-0.02em",
           lineHeight: 1,
           background: numGradient,
           WebkitBackgroundClip: "text",
@@ -308,10 +308,10 @@ function FeatureLabel({ x, y, title, body, bodyWidth }: FeatureLabelProps): Reac
       <p
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(14px, 1.04vw, 20px)",
+          fontSize: "var(--text-t-heading-sm)",
           fontWeight: 600,
-          lineHeight: 1.3,
-          letterSpacing: "-0.02em",
+          lineHeight: "var(--text-t-heading-sm-lh)",
+          letterSpacing: "var(--text-t-heading-sm-ls)",
           width: "100%",
         }}
       >
@@ -320,10 +320,10 @@ function FeatureLabel({ x, y, title, body, bodyWidth }: FeatureLabelProps): Reac
       <p
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(12px, 0.83vw, 16px)",
+          fontSize: "var(--text-t-body-md)",
           fontWeight: 400,
-          lineHeight: 1.3,
-          letterSpacing: "-0.02em",
+          lineHeight: "var(--text-t-body-md-lh)",
+          letterSpacing: "var(--text-t-body-md-ls)",
           color: "rgba(255,255,255,0.80)",
           width: bodyWidth ? vw(bodyWidth) : "100%",
         }}

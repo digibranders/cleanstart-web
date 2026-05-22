@@ -18,7 +18,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
       data-section="BlogDetailRelatedPosts"
       style={{ minHeight: "580px" }}
     >
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Header row */}
         <div className="flex items-center justify-between pt-[60px]">
           <h2 className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em]">

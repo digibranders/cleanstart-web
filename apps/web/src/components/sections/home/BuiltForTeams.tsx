@@ -136,16 +136,16 @@ export function BuiltForTeams() {
           "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
     >
-      <div className="relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 py-section-md">
-        <header className="mx-auto max-w-[760px] text-center">
+      <div className="relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
+        <header className="mx-auto max-w-[867px] text-center">
           <h2
             id="testimonials-title"
             className="font-display"
             style={{
-              fontSize: "clamp(2rem,5.2vw,3.875rem)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 700,
-              lineHeight: "105%",
-              letterSpacing: "-0.05em",
+              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "var(--text-t-display-2-ls)",
             }}
           >
             Built for Teams That Can&rsquo;t Afford{" "}
@@ -153,15 +153,20 @@ export function BuiltForTeams() {
               className="bg-clip-text text-transparent"
               style={{
                 backgroundImage:
-                  "linear-gradient(90deg, #33BAEC 0%, #6F8DFF 50%, #B19CFF 100%)",
+                  "linear-gradient(101.56deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
               }}
             >
               Uncertainty
             </span>
           </h2>
           <p
-            className="mx-auto mt-6 text-body-lg font-normal leading-[1.5] tracking-[-0.02em] text-white/85"
-            style={{ maxWidth: "620px" }}
+            className="mx-auto mt-8 font-normal text-white"
+            style={{
+              fontSize: "var(--text-t-subhead)",
+              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "var(--text-t-subhead-ls)",
+              opacity: 0.8,
+            }}
           >
             CleanStart replaces unpredictable builds with verified, secure
             images — helping engineering teams cut response times and prevent

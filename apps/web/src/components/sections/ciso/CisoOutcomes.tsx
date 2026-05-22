@@ -115,10 +115,10 @@ function StatCard({
           top: "106px",
           transform: "translateY(-100%)",
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(40px, 3.23vw, 62px)",
+          fontSize: "var(--text-t-display-2)",
           fontWeight: 700,
-          letterSpacing: "-0.04em",
-          lineHeight: 1.2,
+          letterSpacing: "var(--text-t-display-2-ls)",
+          lineHeight: "var(--text-t-display-2-lh)",
           color: "#111",
         }}
       >
@@ -138,10 +138,10 @@ function StatCard({
         <p
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(13px, 1.15vw, 22px)",
+            fontSize: "var(--text-t-subhead)",
             fontWeight: 400,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.4,
+            letterSpacing: "var(--text-t-subhead-ls)",
+            lineHeight: "var(--text-t-subhead-lh)",
             color: "#333",
           }}
         >
@@ -360,10 +360,10 @@ export function CisoOutcomes(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(28px, 3.23vw, 62px)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1,
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               color: "#fff",
             }}
           >
@@ -405,10 +405,10 @@ export function CisoOutcomes(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "clamp(32px, 8vw, 52px)",
+                  fontSize: "var(--text-t-display-2)",
                   fontWeight: 700,
-                  letterSpacing: "-0.04em",
-                  lineHeight: 1.1,
+                  letterSpacing: "var(--text-t-display-2-ls)",
+                  lineHeight: "var(--text-t-display-2-lh)",
                   color: "#111",
                 }}
               >
@@ -417,10 +417,10 @@ export function CisoOutcomes(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "clamp(12px, 3vw, 16px)",
+                  fontSize: "var(--text-t-body-md)",
                   fontWeight: 400,
-                  letterSpacing: "-0.04em",
-                  lineHeight: 1.4,
+                  letterSpacing: "var(--text-t-body-md-ls)",
+                  lineHeight: "var(--text-t-body-md-lh)",
                   color: "#333",
                 }}
               >

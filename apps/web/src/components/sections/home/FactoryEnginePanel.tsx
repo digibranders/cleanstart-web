@@ -18,8 +18,6 @@ function EngineArrow() {
         width: "clamp(108px, 11vw, 164px)",
         height: "auto",
         overflow: "visible",
-        filter:
-          "drop-shadow(-8px 4px 10px rgba(0,0,0,0.23)) drop-shadow(-33px 16px 18.5px rgba(0,0,0,0.20)) drop-shadow(-74px 37px 24.5px rgba(0,0,0,0.12))",
       }}
     >
       {/* Tail-glow leaf — sits behind the arrow, blurred 2px, bleeds into the card */}
@@ -82,12 +80,7 @@ export function FactoryEnginePanel() {
       {/* Diagonal stripes overlay */}
       <div className="absolute inset-0 bg-cs-diagonal opacity-90" aria-hidden />
 
-      {/* Lavender top-left highlight border */}
-      <div
-        className="pointer-events-none absolute inset-0 rounded-[24px]"
-        style={{ boxShadow: "inset 1px 1px 0 0 rgba(218, 182, 243, 0.45)" }}
-        aria-hidden
-      />
+
 
       {/* Inner layout — Figma exact: panel 1276px wide.
            L pad 46 (3.61%) | left card 512 (40.13%) | arrow 154 (12.07%) | right card 512 (40.13%) | R pad 50 (3.92%)
@@ -105,10 +98,10 @@ export function FactoryEnginePanel() {
             <h4
               className="font-display text-white"
               style={{
-                fontSize: "clamp(1.5rem, 2.8vw, 2.25rem)",
+                fontSize: "var(--text-t-heading-lg)",
                 fontWeight: 500,
-                lineHeight: "100%",
-                letterSpacing: "-0.05em",
+                lineHeight: "var(--text-t-heading-lg-lh)",
+                letterSpacing: "var(--text-t-heading-lg-ls)",
               }}
             >
               AI Logic Engine
@@ -116,10 +109,10 @@ export function FactoryEnginePanel() {
             <p
               className="font-sans text-white opacity-80"
               style={{
-                fontSize: "clamp(0.875rem, 1.4vw, 1.125rem)",
+                fontSize: "var(--text-t-body-lg)",
                 fontWeight: 400,
-                lineHeight: "110%",
-                letterSpacing: "-0.04em",
+                lineHeight: "var(--text-t-body-lg-lh)",
+                letterSpacing: "var(--text-t-body-lg-ls)",
               }}
             >
               Multi-agent orchestration that plans, analyzes, and optimizes every build.
@@ -180,10 +173,10 @@ export function FactoryEnginePanel() {
             <h4
               className="font-display text-white"
               style={{
-                fontSize: "clamp(1.5rem, 2.8vw, 2.25rem)",
+                fontSize: "var(--text-t-heading-lg)",
                 fontWeight: 500,
-                lineHeight: "100%",
-                letterSpacing: "-0.05em",
+                lineHeight: "var(--text-t-heading-lg-lh)",
+                letterSpacing: "var(--text-t-heading-lg-ls)",
               }}
             >
               CleanCompile Factory
@@ -191,10 +184,10 @@ export function FactoryEnginePanel() {
             <p
               className="font-sans text-white opacity-80"
               style={{
-                fontSize: "clamp(0.875rem, 1.4vw, 1.125rem)",
+                fontSize: "var(--text-t-body-lg)",
                 fontWeight: 400,
-                lineHeight: "110%",
-                letterSpacing: "-0.04em",
+                lineHeight: "var(--text-t-body-lg-lh)",
+                letterSpacing: "var(--text-t-body-lg-ls)",
               }}
             >
               Hermetic, deterministic builds. Only what you specify.

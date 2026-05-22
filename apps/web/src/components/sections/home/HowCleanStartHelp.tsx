@@ -62,7 +62,7 @@ export function HowCleanStartHelp() {
 
   return (
     <section
-      className="relative w-full pb-0 pt-32"
+      className="relative w-full pb-16 pt-20 sm:pb-20 lg:pb-0 lg:pt-24"
       aria-labelledby="how-cleanstart-title"
       style={{ backgroundColor: "#F6F6F6" }}
     >
@@ -82,28 +82,41 @@ export function HowCleanStartHelp() {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
-        {/* Title row + 1×90 vertical separator + description */}
-        <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:flex-row md:gap-[70px]">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
+        {/* Title row — title flush-left, separator centered, description right-aligned.
+            Same 1fr auto 1fr grid pattern used by SecurityNotPatching for visual
+            parity. */}
+        <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="how-cleanstart-title"
-            className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
-            style={{ maxWidth: "444px" }}
+            className="justify-self-start font-display font-bold text-[#111111]"
+            style={{
+              maxWidth: "444px",
+              fontSize: "var(--text-t-display-2)",
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
+            }}
           >
             How CleanStart Will Help
           </h2>
           {/* Vertical 1×90 fading-gray separator (Figma Rectangle 1000001788) */}
           <div
             aria-hidden
-            className="hidden h-[90px] w-px shrink-0 md:mt-3 md:block"
+            className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
             style={{
               background:
                 "linear-gradient(180deg, rgba(204,204,204,0) 0%, rgba(204,204,204,1) 47.2%, rgba(204,204,204,0) 100%)",
             }}
           />
           <p
-            className="text-[clamp(1rem,1.6vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.04em] text-[#111111] md:mt-3"
-            style={{ maxWidth: "604px", opacity: 0.8 }}
+            className="font-normal text-[#111111] md:justify-self-end md:text-right"
+            style={{
+              fontSize: "var(--text-t-subhead)",
+              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "var(--text-t-subhead-ls)",
+              maxWidth: "604px",
+              opacity: 0.8,
+            }}
           >
             Help Tailored solutions for every role in your organization — from
             security leaders to engineering teams.
@@ -211,20 +224,28 @@ function CisoCard({
         />
       </div>
 
-      {/* Title — Figma 40px Bold; falls back to 36px on narrow viewports so it stays one line */}
       <h3
-        className="mt-[28px] font-display text-[clamp(2rem,3.2vw,2.5rem)] font-bold leading-[1.1] tracking-[-0.05em] text-white"
-        style={{ maxWidth: "504px" }}
+        className="mt-[28px] font-display font-bold text-white"
+        style={{
+          fontSize: "var(--text-t-heading-lg)",
+          lineHeight: "var(--text-t-heading-lg-lh)",
+          letterSpacing: "var(--text-t-heading-lg-ls)",
+          maxWidth: "504px",
+        }}
       >
         {activeTab === "ciso"
           ? "Security leadership that scales"
           : "Build pipelines you can trust"}
       </h3>
 
-      {/* Description */}
       <p
-        className="mt-[22px] text-xl font-normal leading-[1.4] tracking-[-0.05em] text-white/95"
-        style={{ maxWidth: "504px" }}
+        className="mt-[22px] font-normal text-white"
+        style={{
+          fontSize: "var(--text-t-body-lg)",
+          lineHeight: "var(--text-t-body-lg-lh)",
+          letterSpacing: "var(--text-t-body-lg-ls)",
+          maxWidth: "504px",
+        }}
       >
         Without deterministic builds, artifacts can change across environments.
       </p>
@@ -293,14 +314,22 @@ function TabPill({
 }
 
 /* ============================================================================
-   Feature Card — gear orb + title + description, NO background.
-   The card sits on the section grid pattern (transparent base).
+   Feature Card — gear orb + title + description on a white card surface.
+   White fill, 24 px radius, soft elevation so the card lifts off the grid
+   background; reads as a proper card on every viewport.
    ========================================================================== */
 function FeatureCardItem({ card }: { card: FeatureCard }) {
   return (
     <article
-      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col items-center text-center gap-3 sm:flex-row sm:text-left sm:items-center sm:gap-6"
-      style={{ paddingLeft: "clamp(16px, 5vw, 70px)", paddingRight: "clamp(16px, 5vw, 70px)", paddingTop: "clamp(16px, 3vw, 32px)", paddingBottom: "clamp(16px, 3vw, 32px)" }}
+      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col items-center text-center gap-3 rounded-[24px] bg-white sm:flex-row sm:text-left sm:items-center sm:gap-6"
+      style={{
+        paddingLeft: "clamp(16px, 5vw, 70px)",
+        paddingRight: "clamp(16px, 5vw, 70px)",
+        paddingTop: "clamp(16px, 3vw, 32px)",
+        paddingBottom: "clamp(16px, 3vw, 32px)",
+        boxShadow:
+          "0 1px 0 rgba(0,0,0,0.04), 0 24px 48px -24px rgba(60,30,150,0.08)",
+      }}
     >
       {/* Gear orb — Figma-exact: solid lavender ellipse #DF9BFF (165×165 at (-3, 1))
           BLURRED to be a soft glow, with gear image (161×160 at (20, 11)) on top.
@@ -345,17 +374,26 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
         </div>
       </div>
 
-      {/* Title + description */}
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         <h3
-          className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em] text-[#111111]"
-          style={{ maxWidth: "234px" }}
+          className="font-display font-bold text-[#111111]"
+          style={{
+            fontSize: "var(--text-t-heading-lg)",
+            lineHeight: "var(--text-t-heading-lg-lh)",
+            letterSpacing: "var(--text-t-heading-lg-ls)",
+            maxWidth: "234px",
+          }}
         >
           {card.title}
         </h3>
         <p
-          className="text-body-lg font-normal leading-[1.5] text-[#333333]"
-          style={{ maxWidth: "244px" }}
+          className="font-normal text-[#333333]"
+          style={{
+            fontSize: "var(--text-t-body-lg)",
+            lineHeight: "var(--text-t-body-lg-lh)",
+            letterSpacing: "var(--text-t-body-lg-ls)",
+            maxWidth: "263px",
+          }}
         >
           {card.description}
         </p>

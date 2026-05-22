@@ -31,16 +31,16 @@ export function SCAProblems(): React.ReactElement {
       className="relative overflow-hidden bg-white"
       style={{ paddingTop: "120px", paddingBottom: "120px" }}
     >
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Section heading */}
         <h2
           className="text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 3.23vw, 62px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             color: "#111",
           }}
         >
@@ -169,10 +169,10 @@ export function SCAProblems(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(20px, 1.56vw, 30px)",
+                      fontSize: "var(--text-t-heading-lg)",
                       fontWeight: 700,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1.0,
+                      letterSpacing: "var(--text-t-heading-lg-ls)",
+                      lineHeight: "var(--text-t-heading-lg-lh)",
                       color: "#111",
                     }}
                   >
@@ -181,10 +181,10 @@ export function SCAProblems(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-body)",
-                      fontSize: "clamp(14px, 0.94vw, 18px)",
+                      fontSize: "var(--text-t-body-lg)",
                       fontWeight: 400,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1.4,
+                      letterSpacing: "var(--text-t-body-lg-ls)",
+                      lineHeight: "var(--text-t-body-lg-lh)",
                       color: "#555",
                     }}
                   >

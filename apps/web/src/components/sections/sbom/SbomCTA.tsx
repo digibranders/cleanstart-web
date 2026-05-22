@@ -83,10 +83,10 @@ export function SbomCTA(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(28px, 3vw, 42px)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.05,
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               color: "#fff",
               margin: 0,
             }}
@@ -103,10 +103,10 @@ export function SbomCTA(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(15px, 1.15vw, 22px)",
+              fontSize: "var(--text-t-body-lg)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.5,
+              letterSpacing: "var(--text-t-body-lg-ls)",
+              lineHeight: "var(--text-t-body-lg-lh)",
               color: "rgba(255,255,255,0.80)",
               margin: 0,
             }}
@@ -171,10 +171,10 @@ export function SbomCTA(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(24px, 6vw, 36px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             color: "#fff",
             maxWidth: "280px",
           }}
@@ -184,10 +184,10 @@ export function SbomCTA(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(13px, 1vw, 15px)",
+            fontSize: "var(--text-t-body-md)",
             fontWeight: 400,
-            letterSpacing: "-0.03em",
-            lineHeight: 1.4,
+            letterSpacing: "var(--text-t-body-md-ls)",
+            lineHeight: "var(--text-t-body-md-lh)",
             color: "rgba(255,255,255,0.80)",
           }}
         >

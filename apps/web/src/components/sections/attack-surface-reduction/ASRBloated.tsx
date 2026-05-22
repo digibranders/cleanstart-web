@@ -7,25 +7,25 @@ const CARDS = [
     id: "tl",
     title: "Inherited Vulnerabilities",
     description: "Unused packages increase exposure.",
-    haloColor: "#ff4c4c",
+    haloColor: "#239CFF",
   },
   {
     id: "tr",
     title: "Too Many Components",
     description: "Larger images expand attack paths.",
-    haloColor: "#ff8f8f",
+    haloColor: "#239CFF",
   },
   {
     id: "bl",
     title: "Oversized SBOM's",
     description: "More dependencies create more noise.",
-    haloColor: "#ff4c4c",
+    haloColor: "#239CFF",
   },
   {
     id: "br",
     title: "Constant Patching",
     description: "More packages require more fixes",
-    haloColor: "#ff4c4c",
+    haloColor: "#239CFF",
   },
 ] as const;
 
@@ -38,7 +38,7 @@ export function ASRBloated(): React.ReactElement {
       className="relative bg-white overflow-hidden"
     >
       {/* ── Heading ── */}
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-16 md:pt-[88px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 md:pt-[88px]">
         <h2
           className="text-center text-[#111]"
           style={{
@@ -67,7 +67,7 @@ export function ASRBloated(): React.ReactElement {
       </div>
 
       {/* ── Desktop layout ── */}
-      <div className="hidden md:block relative mx-auto max-w-[var(--container-default)] px-6 pb-[88px]">
+      <div className="hidden md:block relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[88px]">
         <div className="relative" style={{ minHeight: "443px" }}>
 
           {/* Pink radial glow behind container */}

@@ -57,9 +57,9 @@ export function AboutHero() {
         />
       </div>
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Text at top: 178px from section top, matching Figma node 248:2066 */}
-        <div className="pt-[clamp(96px,11vw,178px)] pb-[clamp(40px,5vw,80px)]">
+        <div className="pt-[clamp(72px,8vw,128px)] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col items-start gap-14 lg:max-w-[436px]">
             <h1
               className="font-display font-semibold text-white"

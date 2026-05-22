@@ -27,7 +27,7 @@ export function ASRFits(): React.ReactElement {
       data-section="ASRFits"
       className="bg-white py-section-md"
     >
-      <div className="mx-auto max-w-[var(--container-default)] px-4 sm:px-6">
+      <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Heading row: heading left, subtitle right */}
         <div
           className="flex flex-col xl:flex-row xl:items-end xl:justify-between"
@@ -36,10 +36,10 @@ export function ASRFits(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-figtree)",
-              fontSize: "clamp(28px, 3.23vw, 62px)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.05,
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               color: "#111111",
               maxWidth: "560px",
             }}
@@ -90,10 +90,10 @@ export function ASRFits(): React.ReactElement {
               <h3
                 style={{
                   fontFamily: "var(--font-figtree)",
-                  fontSize: "clamp(18px, 1.67vw, 32px)",
+                  fontSize: "var(--text-t-heading-lg)",
                   fontWeight: 700,
-                  letterSpacing: "-0.05em",
-                  lineHeight: 1.1,
+                  letterSpacing: "var(--text-t-heading-lg-ls)",
+                  lineHeight: "var(--text-t-heading-lg-lh)",
                   color: "#111111",
                 }}
               >
@@ -102,10 +102,10 @@ export function ASRFits(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-figtree)",
-                  fontSize: "clamp(13px, 1.04vw, 20px)",
+                  fontSize: "var(--text-t-heading-sm)",
                   fontWeight: 400,
-                  letterSpacing: "-0.03em",
-                  lineHeight: 1.5,
+                  letterSpacing: "var(--text-t-heading-sm-ls)",
+                  lineHeight: "var(--text-t-heading-sm-lh)",
                   color: "#555555",
                 }}
               >

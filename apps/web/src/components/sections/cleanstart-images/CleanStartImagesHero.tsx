@@ -17,8 +17,8 @@ export function CleanStartImagesHero(): React.ReactElement {
     >
       {/* Content wrapper — Figma frame 1920×1084, title at y=175 */}
       <div
-        className="relative mx-auto max-w-[var(--container-default)] px-6 flex flex-col items-center text-center"
-        style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(48px, 6vw, 80px)" }}
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col items-center text-center"
+        style={{ paddingTop: "clamp(72px, 8vw, 128px)", paddingBottom: "clamp(48px, 6vw, 80px)" }}
       >
         <h1
           className="text-white"

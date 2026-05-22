@@ -98,16 +98,16 @@ export function Footer({
     >
       {hasCta && (
         <div
-          className="pointer-events-none absolute left-1/2 z-20 flex w-full -translate-x-1/2 justify-center px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20"
+          className="pointer-events-none absolute left-1/2 z-20 w-full max-w-[var(--container-default)] -translate-x-1/2 px-6 sm:px-10"
           style={{ top: "-170px" }}
         >
           {/* Sizing wrapper — NO overflow:hidden so `ctaOverlay` children can
-              break out of the card (e.g. the home page kubr bird peeking
-              above the card top).
-              max-w reduced 1276→1200 so the card has clear side gutters at
-              xl/2xl instead of kissing the viewport edges. */}
+              break out of the card. The wrapper sits INSIDE the outer's
+              padding, so the card surface aligns with section content edges
+              (the H2 / body that lives inside `<Container>` on every section
+              above and below this CTA). */}
           <div
-            className="pointer-events-auto relative w-[1200px] max-w-full h-[420px] sm:h-[360px] lg:h-[300px]"
+            className="pointer-events-auto relative w-full h-[420px] sm:h-[360px] lg:h-[300px]"
           >
             {/* Clipped card surface — fills the slot and clips inner content
                 to the rounded 1276×330 box. */}
@@ -155,8 +155,8 @@ export function Footer({
             filter: "blur(125px)",
           }}
         />
-      <div className="relative px-6">
-       <div className={`relative mx-auto w-full max-w-[var(--container-default)] pb-[80px] ${hasCta ? "pt-[320px] sm:pt-[260px] lg:pt-[225px]" : "pt-[80px]"}`}>
+      <div className="relative">
+       <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[320px] sm:pt-[260px] lg:pt-[225px]" : "pt-[80px]"}`}>
         {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
         <div className="flex flex-wrap items-start justify-between gap-8">
           <p

@@ -84,10 +84,10 @@ export function CleanSightCTA(): React.ReactElement {
           className="relative flex-shrink-0 text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 3vw, 42px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.0,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             width: "min(401px, 100%)",
             zIndex: 1,
           }}
@@ -100,10 +100,10 @@ export function CleanSightCTA(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(14px, 1.09vw, 21px)",
+              fontSize: "var(--text-t-body-lg)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.4,
+              letterSpacing: "var(--text-t-body-lg-ls)",
+              lineHeight: "var(--text-t-body-lg-lh)",
               color: "rgba(255, 255, 255, 0.8)",
               maxWidth: "607px",
             }}

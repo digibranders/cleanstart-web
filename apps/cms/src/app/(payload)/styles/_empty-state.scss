@@ -92,3 +92,26 @@
   font-size: 13px;
 }
 
+// Filtered empty state — a search/filter is active but matched zero rows.
+// Swap the empty-folder glyph for a magnifying-glass glyph and render the
+// "Clear" action as a subtle outline button rather than the primary CTA,
+// because creating a new record is not the resolution editors want here.
+.cs-list__empty--filtered {
+  &::before {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none'><circle cx='11' cy='11' r='6.5' stroke='black' stroke-width='1.4'/><path d='M16 16l4 4' stroke='black' stroke-width='1.4' stroke-linecap='round'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none'><circle cx='11' cy='11' r='6.5' stroke='black' stroke-width='1.4'/><path d='M16 16l4 4' stroke='black' stroke-width='1.4' stroke-linecap='round'/></svg>");
+  }
+
+  .cs-list__empty-action {
+    background: transparent;
+    color: var(--theme-text);
+    border: 1px solid var(--theme-elevation-200);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--theme-elevation-100);
+      box-shadow: none;
+    }
+  }
+}
+

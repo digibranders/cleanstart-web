@@ -74,17 +74,17 @@ export function CleanStartImagesUVP(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto max-w-[var(--container-default)] px-6"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{ paddingTop: "var(--spacing-section-md)", paddingBottom: "var(--spacing-section-md)" }}
       >
         <h2
           className="text-center mx-auto"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(36px, 3.33vw, 64px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 600,
-            letterSpacing: "-0.03em",
-            lineHeight: 1.05,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             color: "#1A1A2E",
             maxWidth: "744px",
           }}
@@ -123,9 +123,10 @@ export function CleanStartImagesUVP(): React.ReactElement {
             <h3
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(22px, 1.67vw, 32px)",
+                fontSize: "var(--text-t-heading-lg)",
                 fontWeight: 700,
-                letterSpacing: "-0.02em",
+                letterSpacing: "var(--text-t-heading-lg-ls)",
+                lineHeight: "var(--text-t-heading-lg-lh)",
                 color: "#1A1A2E",
               }}
             >
@@ -138,9 +139,10 @@ export function CleanStartImagesUVP(): React.ReactElement {
                   className="flex items-start gap-3"
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "clamp(16px, 1.04vw, 20px)",
+                    fontSize: "var(--text-t-heading-sm)",
                     fontWeight: 400,
-                    lineHeight: 1.5,
+                    lineHeight: "var(--text-t-heading-sm-lh)",
+                    letterSpacing: "var(--text-t-heading-sm-ls)",
                     color: "#1A1A2E",
                   }}
                 >

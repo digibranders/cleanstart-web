@@ -54,7 +54,7 @@ export function ASRModern(): React.ReactElement {
   return (
     <section
       data-section="ASRModern"
-      className="relative overflow-hidden py-section-md"
+      className="relative overflow-hidden pt-section-md pb-[var(--spacing-section-cta)]"
       style={{
         background: "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
@@ -86,15 +86,15 @@ export function ASRModern(): React.ReactElement {
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Heading */}
         <h2
           style={{
             fontFamily: "var(--font-figtree)",
-            fontSize: "clamp(28px, 3.23vw, 62px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             color: "white",
             maxWidth: "700px",
             marginBottom: "64px",
@@ -135,10 +135,10 @@ export function ASRModern(): React.ReactElement {
               <h3
                 style={{
                   fontFamily: "var(--font-figtree)",
-                  fontSize: "clamp(16px, 1.67vw, 32px)",
+                  fontSize: "var(--text-t-heading-lg)",
                   fontWeight: 700,
-                  letterSpacing: "-0.04em",
-                  lineHeight: 1.2,
+                  letterSpacing: "var(--text-t-heading-lg-ls)",
+                  lineHeight: "var(--text-t-heading-lg-lh)",
                   color: "white",
                 }}
               >
@@ -147,10 +147,10 @@ export function ASRModern(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-figtree)",
-                  fontSize: "clamp(13px, 1.04vw, 20px)",
+                  fontSize: "var(--text-t-heading-sm)",
                   fontWeight: 400,
-                  letterSpacing: "-0.03em",
-                  lineHeight: 1.5,
+                  letterSpacing: "var(--text-t-heading-sm-ls)",
+                  lineHeight: "var(--text-t-heading-sm-lh)",
                   color: "rgba(255,255,255,0.75)",
                 }}
               >

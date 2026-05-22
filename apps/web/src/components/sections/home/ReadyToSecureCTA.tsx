@@ -1,34 +1,3 @@
-import Image from "next/image";
-
-/**
- * Kubr bird — escapes the CTA card's overflow:hidden so it peeks above the
- * card top edge per the Figma reference. Passed to `<Footer ctaOverlay=...>`,
- * which renders it on top of the clipped CTA surface.
- */
-export function ReadyToSecureCTAOverlay() {
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute z-10"
-      style={{
-        left: "clamp(20px, 5vw, 63px)",
-        top: "clamp(-154px, -10vw, -90px)",
-        width: "clamp(180px, 18vw, 304px)",
-        aspectRatio: "304 / 206",
-      }}
-    >
-      <Image
-        src="/images/cta-kubr.png"
-        alt=""
-        width={304}
-        height={206}
-        sizes="304px"
-        className="h-full w-full object-contain"
-      />
-    </div>
-  );
-}
-
 /**
  * Inner content for the Home page CTA, rendered inside the Footer's fixed
  * 1276×330 / radius-40 slot. The Footer owns the container, position, overlap,
@@ -38,7 +7,7 @@ export function ReadyToSecureCTAOverlay() {
 export function ReadyToSecureCTA() {
   return (
     <div
-      className="absolute inset-0 grid grid-cols-1 items-start gap-y-8 p-8 md:gap-y-0 md:p-12 lg:items-start lg:grid-cols-[minmax(280px,401px)_minmax(360px,493px)] lg:gap-x-[clamp(40px,9vw,115px)] lg:p-[clamp(40px,6vw,80px)_clamp(48px,10vw,145px)_clamp(40px,6vw,80px)_clamp(48px,8vw,122px)]"
+      className="absolute inset-0 grid grid-cols-1 items-start gap-y-8 p-8 md:gap-y-0 md:p-12 lg:items-start lg:grid-cols-[470px_1fr] lg:gap-x-[clamp(32px,7vw,90px)] lg:p-[clamp(28px,4.2vw,56px)_clamp(48px,10vw,145px)_clamp(40px,6vw,80px)_clamp(48px,8vw,122px)]"
       style={{
         background: "linear-gradient(180deg, #131E8F 0%, #471EC0 100%)",
       }}
@@ -59,10 +28,12 @@ export function ReadyToSecureCTA() {
 
       <p
         id="cta-title"
-        className="relative z-10 font-display font-bold leading-[1.1] tracking-[-0.05em] text-white"
+        className="relative z-10 font-display font-bold text-white"
         style={{
-          maxWidth: "401px",
-          fontSize: "clamp(1.75rem, 3vw, 2.625rem)",
+          maxWidth: "470px",
+          fontSize: "var(--text-t-display-2)",
+          lineHeight: "var(--text-t-display-2-lh)",
+          letterSpacing: "var(--text-t-display-2-ls)",
         }}
       >
         Ready to Secure Your Container Infrastructure?
@@ -70,8 +41,14 @@ export function ReadyToSecureCTA() {
 
       <div className="relative z-10 flex flex-col items-start gap-[18px]">
         <p
-          className="text-body-lg font-normal leading-[1.4] tracking-[-0.04em] text-white/80"
-          style={{ maxWidth: "493px" }}
+          className="font-normal text-white"
+          style={{
+            maxWidth: "493px",
+            fontSize: "var(--text-t-body-lg)",
+            lineHeight: "var(--text-t-body-lg-lh)",
+            letterSpacing: "var(--text-t-body-lg-ls)",
+            opacity: 0.8,
+          }}
         >
           Start with zero-CVE hardened images. Deploy faster with confidence
           knowing your containers are secured from the ground up.

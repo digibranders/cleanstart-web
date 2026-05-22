@@ -61,15 +61,15 @@ export function AsrPublicImages(): React.ReactElement {
       />
 
       {/* Heading */}
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-section-md">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md">
         <h2
           className="text-center text-[#111111]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 3.23vw, 62px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.1,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             marginBottom: "48px",
           }}
         >
@@ -88,7 +88,7 @@ export function AsrPublicImages(): React.ReactElement {
       </div>
 
       {/* Desktop diagram: container center, 4 cards at corners, dashed lines */}
-      <div className="hidden md:block relative mx-auto max-w-[var(--container-default)] px-6 pb-section-md">
+      <div className="hidden md:block relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-section-md">
         <div className="relative" style={{ aspectRatio: "1276 / 540" }}>
           {/* Soft red radial glow under the container */}
           <div

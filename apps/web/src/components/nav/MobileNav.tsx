@@ -112,9 +112,9 @@ export function MobileNav() {
             onClick={close}
             className="cs-btn-glass w-full"
             style={{
-              ["--cs-btn-h" as string]: "44px",
-              ["--cs-btn-px" as string]: "22px",
-              ["--cs-btn-fs" as string]: "15px",
+              ["--cs-btn-h" as string]: "40px",
+              ["--cs-btn-px" as string]: "18px",
+              ["--cs-btn-fs" as string]: "13px",
             }}
           >
             Book a Demo

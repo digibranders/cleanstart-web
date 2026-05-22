@@ -38,7 +38,7 @@ const SUB_HEADING_STYLE = {
 export function KnowledgeHubArticle(): React.ReactElement {
   return (
     <section className="bg-white">
-      <div className="mx-auto max-w-[var(--container-default)] px-6 py-16 lg:py-24">
+      <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-16 lg:py-24">
         <div className="grid gap-10 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-16">
           <aside className="lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-112px)] lg:overflow-y-auto">
             <nav aria-label="Knowledge Hub categories" className="flex flex-col gap-8">

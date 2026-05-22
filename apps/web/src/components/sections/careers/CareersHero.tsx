@@ -73,9 +73,9 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
       </div>
 
       {/* Content */}
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
-          className="flex flex-col items-center gap-6 lg:gap-8 mx-auto pt-[120px] lg:pt-[158px]"
+          className="flex flex-col items-center gap-6 lg:gap-8 mx-auto pt-[clamp(72px,8vw,128px)]"
           style={{ maxWidth: "955px" }}
         >
           <div

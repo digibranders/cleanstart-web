@@ -54,17 +54,17 @@ export function AsrBusinessDelivers(): React.ReactElement {
         />
 
         {/* Content */}
-        <div className="relative mx-auto max-w-[var(--container-default)] px-6 py-section-md flex flex-col justify-between h-full">
+        <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md flex flex-col justify-between h-full">
           {/* Heading */}
           <div>
             <p
               className="text-white"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(32px, 3.23vw, 62px)",
+                fontSize: "var(--text-t-display-2)",
                 fontWeight: 700,
-                letterSpacing: "-0.05em",
-                lineHeight: 1.05,
+                letterSpacing: "var(--text-t-display-2-ls)",
+                lineHeight: "var(--text-t-display-2-lh)",
                 maxWidth: "519px",
               }}
             >
@@ -105,10 +105,10 @@ export function AsrBusinessDelivers(): React.ReactElement {
                   className="text-white"
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "clamp(18px, 1.67vw, 32px)",
+                    fontSize: "var(--text-t-heading-lg)",
                     fontWeight: 700,
-                    letterSpacing: "-0.05em",
-                    lineHeight: 1.1,
+                    letterSpacing: "var(--text-t-heading-lg-ls)",
+                    lineHeight: "var(--text-t-heading-lg-lh)",
                     marginBottom: "10px",
                   }}
                 >
@@ -117,10 +117,10 @@ export function AsrBusinessDelivers(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "clamp(14px, 1.15vw, 22px)",
+                    fontSize: "var(--text-t-heading-md)",
                     fontWeight: 400,
-                    letterSpacing: "-0.05em",
-                    lineHeight: 1.3,
+                    letterSpacing: "var(--text-t-heading-md-ls)",
+                    lineHeight: "var(--text-t-heading-md-lh)",
                     color: "#dddddd",
                   }}
                 >

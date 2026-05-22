@@ -86,9 +86,9 @@ export function ResourceCenterCTA(): React.ReactElement {
             id="rc-cta-title"
             className="font-display font-bold text-center lg:text-left w-full lg:max-w-[486px]"
             style={{
-              fontSize: "clamp(1.75rem, 3vw, 2.625rem)",
-              lineHeight: 1,
-              letterSpacing: "-0.05em",
+              fontSize: "var(--text-t-display-2)",
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               color: "#111",
             }}
           >
@@ -99,8 +99,14 @@ export function ResourceCenterCTA(): React.ReactElement {
             className="flex flex-col items-center lg:items-start w-full lg:max-w-[564px] gap-4 lg:gap-6"
           >
             <p
-              className="text-body-md lg:text-body-lg font-normal leading-[1.4] tracking-[-0.04em] text-center lg:text-left w-full lg:max-w-[493px]"
-              style={{ color: "#111", opacity: 0.8 }}
+              className="font-normal text-center lg:text-left w-full lg:max-w-[493px]"
+              style={{
+                fontSize: "var(--text-t-body-lg)",
+                letterSpacing: "var(--text-t-body-lg-ls)",
+                lineHeight: "var(--text-t-body-lg-lh)",
+                color: "#111",
+                opacity: 0.8,
+              }}
             >
               Why waste time patching what shouldn&apos;t exist? CleanStart flips
               security from reactive to preventative, giving you cleaner images,

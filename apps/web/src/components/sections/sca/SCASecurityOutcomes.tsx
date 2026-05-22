@@ -91,39 +91,39 @@ const BOTTOM_CARD: React.CSSProperties = {
 
 const STAT_NUM: React.CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "clamp(32px,4.44vw,64px)",
+  fontSize: "var(--text-t-display-1)",
   fontWeight: 700,
-  letterSpacing: "-0.05em",
-  lineHeight: 1,
+  letterSpacing: "var(--text-t-display-1-ls)",
+  lineHeight: "var(--text-t-display-1-lh)",
   color: "#ffffff",
 };
 
 const STAT_LABEL: React.CSSProperties = {
   marginTop: "clamp(6px,0.83vw,12px)",
   fontFamily: "var(--font-body)",
-  fontSize: "clamp(12px,1.67vw,24px)",
+  fontSize: "var(--text-t-heading-md)",
   fontWeight: 400,
-  letterSpacing: "-0.07em",
-  lineHeight: 1.1,
+  letterSpacing: "var(--text-t-heading-md-ls)",
+  lineHeight: "var(--text-t-heading-md-lh)",
   color: "rgba(255,255,255,0.8)",
 };
 
 const FEAT_TITLE: React.CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "clamp(16px,2.22vw,32px)",
+  fontSize: "var(--text-t-heading-lg)",
   fontWeight: 700,
-  letterSpacing: "-0.05em",
-  lineHeight: 1,
+  letterSpacing: "var(--text-t-heading-lg-ls)",
+  lineHeight: "var(--text-t-heading-lg-lh)",
   color: "#111111",
 };
 
 const FEAT_DESC: React.CSSProperties = {
   marginTop: "clamp(6px,0.83vw,12px)",
   fontFamily: "var(--font-body)",
-  fontSize: "clamp(12px,1.67vw,24px)",
+  fontSize: "var(--text-t-heading-md)",
   fontWeight: 400,
-  letterSpacing: "-0.05em",
-  lineHeight: 1.3,
+  letterSpacing: "var(--text-t-heading-md-ls)",
+  lineHeight: "var(--text-t-heading-md-lh)",
   color: "#111111",
 };
 
@@ -186,10 +186,10 @@ export function SCASecurityOutcomes(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px,4.31vw,62px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.1,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
           }}
         >
           <span style={{ color: "#ffffff" }}>Security </span>

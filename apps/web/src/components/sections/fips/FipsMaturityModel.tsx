@@ -62,15 +62,15 @@ export function FipsMaturityModel(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-16 md:pt-[80px] pb-16 md:pb-[88px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 md:pt-[80px] pb-16 md:pb-[88px]">
         <h2
           className="text-center text-[#111] mb-12 md:mb-[64px]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 3.23vw, 62px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 600,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
           }}
         >
           CleanStart FIPS 140-3 Maturity{" "}
@@ -117,10 +117,10 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
           className="text-[#111] mb-2"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(20px, 1.46vw, 26px)",
+            fontSize: "var(--text-t-heading-md)",
             fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.15,
+            letterSpacing: "var(--text-t-heading-md-ls)",
+            lineHeight: "var(--text-t-heading-md-lh)",
           }}
         >
           {stage.title}
@@ -129,10 +129,10 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
           className="text-[#333]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(14px, 1.04vw, 17px)",
+            fontSize: "var(--text-t-body-lg)",
             fontWeight: 400,
-            letterSpacing: "-0.03em",
-            lineHeight: 1.45,
+            letterSpacing: "var(--text-t-body-lg-ls)",
+            lineHeight: "var(--text-t-body-lg-lh)",
             opacity: 0.85,
           }}
         >

@@ -26,17 +26,17 @@ export function AsrFitsBuilt(): React.ReactElement {
       data-section="AsrFitsBuilt"
       className="relative overflow-hidden"
     >
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 py-section-md">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         {/* Heading row */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 md:mb-16">
           <h2
             className="text-[#111]"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(28px, 3.23vw, 62px)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 600,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.05,
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               maxWidth: "562px",
             }}
           >
@@ -56,10 +56,10 @@ export function AsrFitsBuilt(): React.ReactElement {
             className="text-[#111]/70"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(15px, 1.15vw, 22px)",
+              fontSize: "var(--text-t-subhead)",
               fontWeight: 400,
-              letterSpacing: "-0.03em",
-              lineHeight: 1.4,
+              letterSpacing: "var(--text-t-subhead-ls)",
+              lineHeight: "var(--text-t-subhead-lh)",
               maxWidth: "458px",
             }}
           >

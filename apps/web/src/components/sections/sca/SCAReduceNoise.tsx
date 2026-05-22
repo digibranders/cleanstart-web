@@ -62,7 +62,7 @@ export function SCAReduceNoise(): React.ReactElement {
 
       {/* Content: two columns */}
       <div
-        className="relative mx-auto max-w-[var(--container-default)] px-6 flex flex-col lg:flex-row items-start justify-between"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col lg:flex-row items-start justify-between"
         style={{ paddingTop: "120px", paddingBottom: "120px", gap: "40px" }}
       >
         {/* Left — heading + subtitle + 4 feature rows */}
@@ -76,10 +76,10 @@ export function SCAReduceNoise(): React.ReactElement {
               className="text-white"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(28px, 3.23vw, 62px)",
+                fontSize: "var(--text-t-display-2)",
                 fontWeight: 700,
-                letterSpacing: "-0.05em",
-                lineHeight: 1.05,
+                letterSpacing: "var(--text-t-display-2-ls)",
+                lineHeight: "var(--text-t-display-2-lh)",
               }}
             >
               Reduce Noise{" "}
@@ -99,10 +99,10 @@ export function SCAReduceNoise(): React.ReactElement {
             <p
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: "clamp(14px, 1.25vw, 24px)",
+                fontSize: "var(--text-t-subhead)",
                 fontWeight: 400,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.4,
+                letterSpacing: "var(--text-t-subhead-ls)",
+                lineHeight: "var(--text-t-subhead-lh)",
                 color: "rgba(255,255,255,0.8)",
               }}
             >
@@ -142,10 +142,10 @@ export function SCAReduceNoise(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(14px, 1.04vw, 20px)",
+                      fontSize: "var(--text-t-heading-sm)",
                       fontWeight: 600,
-                      letterSpacing: "-0.019em",
-                      lineHeight: 1.3,
+                      letterSpacing: "var(--text-t-heading-sm-ls)",
+                      lineHeight: "var(--text-t-heading-sm-lh)",
                       color: "#fff",
                     }}
                   >
@@ -154,10 +154,10 @@ export function SCAReduceNoise(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-body)",
-                      fontSize: "clamp(12px, 0.83vw, 16px)",
+                      fontSize: "var(--text-t-body-md)",
                       fontWeight: 400,
-                      letterSpacing: "-0.019em",
-                      lineHeight: 1.3,
+                      letterSpacing: "var(--text-t-body-md-ls)",
+                      lineHeight: "var(--text-t-body-md-lh)",
                       color: "#cdcdcd",
                     }}
                   >
@@ -240,10 +240,10 @@ export function SCAReduceNoise(): React.ReactElement {
               <span
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "clamp(13px, 0.94vw, 18px)",
+                  fontSize: "var(--text-t-body-lg)",
                   fontWeight: 600,
-                  letterSpacing: "-0.019em",
-                  lineHeight: 1.3,
+                  letterSpacing: "var(--text-t-body-lg-ls)",
+                  lineHeight: "var(--text-t-body-lg-lh)",
                   color: "#fff",
                   marginLeft: "8px",
                 }}

@@ -18,9 +18,27 @@ export function SbomHero(): React.ReactElement {
   return (
     <section
       data-section="SbomHero"
-      className="relative overflow-hidden bg-cs-hero bg-cs-grid"
+      className="relative overflow-hidden bg-cs-hero"
       style={{ minHeight: "clamp(480px, 40vw, 652px)" }}
     >
+      {/* SVG grid overlay — Figma Vector 730×708 centered at top, radial fade
+          (white → #DBD8E0 transparent), opacity 0.15 baked into the SVG path.
+          Replaces the section-wide .bg-cs-grid CSS line pattern. */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute left-1/2 -translate-x-1/2 hidden md:block"
+        style={{ top: 0, width: "730px", maxWidth: "100%", aspectRatio: "730 / 708" }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/newsroom/hero-grid.svg"
+          alt=""
+          loading="eager"
+          decoding="async"
+          className="w-full h-full"
+        />
+      </div>
+
       {/* Light-ray decorative vector (x=603 of 1920 ≈ 31.4%, y=0, w=730/1920=38%) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -58,7 +76,7 @@ export function SbomHero(): React.ReactElement {
           maxWidth: "1276px",
           paddingLeft: "24px",
           paddingRight: "24px",
-          paddingTop: "clamp(90px, 12vw, 186px)",
+          paddingTop: "clamp(72px, 8vw, 128px)",
           paddingBottom: "clamp(40px, 5vw, 80px)",
         }}
       >
@@ -74,7 +92,7 @@ export function SbomHero(): React.ReactElement {
             maxWidth: "623px",
           }}
         >
-          continuously Verifiable SBOMs
+          Continuously Verifiable SBOMs
         </h1>
 
         <p

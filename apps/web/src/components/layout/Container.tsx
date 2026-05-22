@@ -32,9 +32,15 @@ const variantClass: Record<Variant, string> = {
   prose: "max-w-[var(--container-prose)]",
 };
 
+/**
+ * Side-gutter map. `px=6` is the default and bumps from 24 → 40 px at
+ * ≥sm so every desktop viewport gets a 40 px gutter while narrow phones
+ * keep the tighter 24 px. `px=4` and `px=8` stay flat for callers that
+ * need a specific value.
+ */
 const paddingClass: Record<Exclude<Padding, "none">, string> = {
   4: "px-4",
-  6: "px-6",
+  6: "px-6 sm:px-10",
   8: "px-8",
 };
 

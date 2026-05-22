@@ -76,7 +76,7 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
     [config, collectionSlug],
   );
 
-  const { data } = useListQuery();
+  const { data, query, refineListData } = useListQuery();
   const { setStepNav } = useStepNav();
 
   const [columnPickerOpen, setColumnPickerOpen] = useState(false);
@@ -130,6 +130,29 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
 
   const isEmpty = data !== undefined && (data?.docs?.length ?? 0) === 0;
 
+  const activeSearch =
+    typeof query.search === 'string' && query.search.trim().length > 0
+      ? query.search.trim()
+      : '';
+  const hasActiveFilters =
+    query.where !== undefined &&
+    query.where !== null &&
+    typeof query.where === 'object' &&
+    Object.keys(query.where as Record<string, unknown>).length > 0;
+  const isFiltered = activeSearch !== '' || hasActiveFilters;
+
+  const clearLabel =
+    activeSearch !== '' && hasActiveFilters
+      ? 'Clear search and filters'
+      : activeSearch !== ''
+        ? 'Clear search'
+        : 'Clear filters';
+
+  const onClearFilters = (): void => {
+    if (!refineListData) return;
+    void refineListData({ search: '', where: {}, page: 1 });
+  };
+
   useEffect(() => {
     setStepNav([{ label: collectionLabel, url: `${adminRoute}/collections/${collectionSlug}` }]);
   }, [setStepNav, collectionLabel, adminRoute, collectionSlug]);
@@ -171,17 +194,39 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
               aria-label={`${collectionLabel} list`}
             >
               {isEmpty ? (
-                <div className="cs-list__empty">
-                  <span className="cs-list__empty-title">
-                    No {collectionLabel.toLowerCase()} yet
-                  </span>
-                  <span className="cs-list__empty-sub">
-                    Create your first one to see it listed here.
-                  </span>
-                  {hasCreatePermission && newDocumentURL ? (
-                    <a href={newDocumentURL}>Create {singularLabel}</a>
-                  ) : null}
-                </div>
+                isFiltered ? (
+                  <div className="cs-list__empty cs-list__empty--filtered">
+                    <span className="cs-list__empty-title">
+                      No matching {collectionLabel.toLowerCase()}
+                    </span>
+                    <span className="cs-list__empty-sub">
+                      {activeSearch !== ''
+                        ? `No ${collectionLabel.toLowerCase()} match “${activeSearch}”. Try a different term${
+                            hasActiveFilters ? ' or adjust your filters' : ''
+                          }.`
+                        : `No ${collectionLabel.toLowerCase()} match the current filters. Try adjusting or clearing them.`}
+                    </span>
+                    <button
+                      type="button"
+                      className="cs-list__empty-action"
+                      onClick={onClearFilters}
+                    >
+                      {clearLabel}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="cs-list__empty">
+                    <span className="cs-list__empty-title">
+                      No {collectionLabel.toLowerCase()} yet
+                    </span>
+                    <span className="cs-list__empty-sub">
+                      Create your first {singularLabel.toLowerCase()} to see it listed here.
+                    </span>
+                    {hasCreatePermission && newDocumentURL ? (
+                      <a href={newDocumentURL}>Create {singularLabel.toLowerCase()}</a>
+                    ) : null}
+                  </div>
+                )
               ) : (
                 Table
               )}
