@@ -7,7 +7,7 @@
 export function ReadyToSecureCTA() {
   return (
     <div
-      className="absolute inset-0 grid grid-cols-1 items-start gap-y-8 p-8 md:gap-y-0 md:p-12 lg:items-start lg:grid-cols-[minmax(280px,401px)_minmax(360px,493px)] lg:gap-x-[clamp(40px,9vw,115px)] lg:p-[clamp(40px,6vw,80px)_clamp(48px,10vw,145px)_clamp(40px,6vw,80px)_clamp(48px,8vw,122px)]"
+      className="absolute inset-0 grid grid-cols-1 items-start gap-y-8 p-8 md:gap-y-0 md:p-12 lg:items-start lg:grid-cols-[470px_1fr] lg:gap-x-[clamp(32px,7vw,90px)] lg:p-[clamp(28px,4.2vw,56px)_clamp(48px,10vw,145px)_clamp(40px,6vw,80px)_clamp(48px,8vw,122px)]"
       style={{
         background: "linear-gradient(180deg, #131E8F 0%, #471EC0 100%)",
       }}
@@ -30,8 +30,10 @@ export function ReadyToSecureCTA() {
         id="cta-title"
         className="relative z-10 font-display font-bold text-white"
         style={{
-          // Figma 1440 node 763:3053: Manrope Bold 55 px / lh 1.0 / -2.75 px / w-401
-          maxWidth: "401px",
+          // Title widened from Figma's 401 → 470 so the copy lands in 3 lines
+          // (Ready to Secure / Your Container / Infrastructure?) instead of 4.
+          // Card top padding pulled in to 56 px to shift the heading slightly up.
+          maxWidth: "470px",
           fontSize: "clamp(1.75rem, 3.82vw, 3.4375rem)",
           lineHeight: 1,
           letterSpacing: "-0.05em",
