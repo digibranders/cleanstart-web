@@ -132,7 +132,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
         </p>
 
         {/* Dashboard mockup — Figma 161:23567, 1274×732 */}
-        <div className="relative mt-14 w-full flex justify-center">
+        <div className="relative mt-14 mb-16 sm:mb-20 lg:mb-24 w-full flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/cleanstart-images/browse-dashboard.png"
