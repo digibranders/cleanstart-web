@@ -98,7 +98,7 @@ export function FactoryEnginePanel() {
              Right border is faded to transparent so there's no hard vertical line where the
              arrow connects — the radial blob (below) handles the smooth color transition. */}
         <div
-          className="cs-engine-card relative flex h-auto w-full flex-col items-center justify-center gap-[18px] px-5 py-6 sm:px-6 lg:h-[188.72px] lg:w-[43.24%]"
+          className="cs-engine-card relative flex h-auto w-full flex-col items-start justify-center gap-[18px] px-5 py-6 sm:px-6 lg:h-[188.72px] lg:w-[43.24%]"
           style={{ borderRightColor: "transparent" }}
         >
           <div className="flex w-full max-w-[343px] flex-col items-start gap-4">
@@ -175,7 +175,7 @@ export function FactoryEnginePanel() {
         </div>
 
         {/* Right card */}
-        <div className="cs-engine-card flex h-auto w-full flex-col items-center justify-center gap-[18px] px-5 py-6 sm:px-6 lg:h-[188.72px] lg:w-[43.24%]">
+        <div className="cs-engine-card flex h-auto w-full flex-col items-start justify-center gap-[18px] px-5 py-6 sm:px-6 lg:h-[188.72px] lg:w-[43.24%]">
           <div className="flex w-full max-w-[365px] flex-col items-start gap-4">
             <h4
               className="font-display text-white"
