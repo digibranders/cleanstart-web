@@ -57,10 +57,10 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
           className="text-white mb-10 md:mb-[64px]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 3.23vw, 62px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 600,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             maxWidth: "770px",
           }}
         >
@@ -96,10 +96,10 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
                 className="text-white mb-3"
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "clamp(18px, 1.46vw, 28px)",
+                  fontSize: "var(--text-t-heading-lg)",
                   fontWeight: 700,
-                  letterSpacing: "-0.04em",
-                  lineHeight: 1.15,
+                  letterSpacing: "var(--text-t-heading-lg-ls)",
+                  lineHeight: "var(--text-t-heading-lg-lh)",
                   maxWidth: "219px",
                 }}
               >
@@ -108,10 +108,10 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "clamp(13px, 1.04vw, 18px)",
+                  fontSize: "var(--text-t-body-lg)",
                   fontWeight: 400,
-                  letterSpacing: "-0.03em",
-                  lineHeight: 1.4,
+                  letterSpacing: "var(--text-t-body-lg-ls)",
+                  lineHeight: "var(--text-t-body-lg-lh)",
                   color: "rgba(255,255,255,0.78)",
                   maxWidth: "219px",
                 }}

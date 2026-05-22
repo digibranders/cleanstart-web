@@ -44,10 +44,10 @@ export function FipsWhyMatters(): React.ReactElement {
             className="text-[#111]"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(28px, 3.23vw, 62px)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 600,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.05,
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               maxWidth: "444px",
             }}
           >
@@ -68,10 +68,10 @@ export function FipsWhyMatters(): React.ReactElement {
             className="text-[#333]"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(15px, 1.15vw, 22px)",
+              fontSize: "var(--text-t-subhead)",
               fontWeight: 400,
-              letterSpacing: "-0.03em",
-              lineHeight: 1.5,
+              letterSpacing: "var(--text-t-subhead-ls)",
+              lineHeight: "var(--text-t-subhead-lh)",
               maxWidth: "731px",
             }}
           >
@@ -122,10 +122,10 @@ function MatterTile({ card }: { card: MatterCard }): React.ReactElement {
           className="text-[#111] mb-2"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(20px, 1.46vw, 28px)",
+            fontSize: "var(--text-t-heading-lg)",
             fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.15,
+            letterSpacing: "var(--text-t-heading-lg-ls)",
+            lineHeight: "var(--text-t-heading-lg-lh)",
           }}
         >
           {card.title}
@@ -134,10 +134,10 @@ function MatterTile({ card }: { card: MatterCard }): React.ReactElement {
           className="text-[#333]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(14px, 1.04vw, 18px)",
+            fontSize: "var(--text-t-body-lg)",
             fontWeight: 400,
-            letterSpacing: "-0.03em",
-            lineHeight: 1.45,
+            letterSpacing: "var(--text-t-body-lg-ls)",
+            lineHeight: "var(--text-t-body-lg-lh)",
             opacity: 0.85,
           }}
         >

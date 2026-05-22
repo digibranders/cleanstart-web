@@ -113,10 +113,10 @@ export function FipsOperationalImpact(): React.ReactElement {
               className="text-[#111] mb-10 md:mb-[40px]"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(28px, 3.23vw, 62px)",
+                fontSize: "var(--text-t-display-2)",
                 fontWeight: 600,
-                letterSpacing: "-0.05em",
-                lineHeight: 1.05,
+                letterSpacing: "var(--text-t-display-2-ls)",
+                lineHeight: "var(--text-t-display-2-lh)",
                 maxWidth: "654px",
               }}
             >
@@ -154,10 +154,10 @@ export function FipsOperationalImpact(): React.ReactElement {
                     className="text-[#111]"
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(32px, 2.7vw, 52px)",
+                      fontSize: "var(--text-t-display-2)",
                       fontWeight: 700,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1.0,
+                      letterSpacing: "var(--text-t-display-2-ls)",
+                      lineHeight: "var(--text-t-display-2-lh)",
                       marginBottom: "10px",
                       fontVariantNumeric: "tabular-nums",
                     }}
@@ -168,10 +168,10 @@ export function FipsOperationalImpact(): React.ReactElement {
                     className="text-[#333]"
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(13px, 0.94vw, 16px)",
+                      fontSize: "var(--text-t-body-md)",
                       fontWeight: 400,
-                      letterSpacing: "-0.03em",
-                      lineHeight: 1.35,
+                      letterSpacing: "var(--text-t-body-md-ls)",
+                      lineHeight: "var(--text-t-body-md-lh)",
                       opacity: 0.85,
                       maxWidth: "176px",
                     }}
