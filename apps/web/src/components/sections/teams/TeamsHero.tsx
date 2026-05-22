@@ -138,7 +138,7 @@ export function TeamsHero() {
 
       {/* ── Content ── */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <div className="flex flex-col items-center gap-6 pb-[80px] pt-[180px] text-center">
+        <div className="flex flex-col items-center gap-6 pb-[80px] pt-[clamp(72px,8vw,128px)] text-center">
           <h1
             className="w-full font-display font-semibold text-white"
             style={{
