@@ -4,17 +4,19 @@ const RIGHT_PILLS = ["Spec", "Build", "Attest", "Handoff"];
 function EngineArrow() {
   // viewBox extended ~13px left of the arrow tail (x=190) so the tail-glow
   // leaf (path coords 179..202) overhangs into the left card and erases the
-  // card-to-arrow seam. Render width matches viewBox width so the arrow body
-  // keeps its original 151px footprint.
+  // card-to-arrow seam. Width scales between 108 and 164 px so the arrow
+  // body always fits the inter-card gap from lg (1024) up. Height auto-
+  // scales via the 164:73 viewBox aspect ratio.
   return (
     <svg
-      width="164"
-      height="73"
       viewBox="177 19 164 73"
+      preserveAspectRatio="xMidYMid meet"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
       style={{
+        width: "clamp(108px, 11vw, 164px)",
+        height: "auto",
         overflow: "visible",
         filter:
           "drop-shadow(-8px 4px 10px rgba(0,0,0,0.23)) drop-shadow(-33px 16px 18.5px rgba(0,0,0,0.20)) drop-shadow(-74px 37px 24.5px rgba(0,0,0,0.12))",
@@ -150,17 +152,17 @@ export function FactoryEnginePanel() {
             }}
           />
 
-          {/* Arrow — only visible on lg+ side-by-side layout.
-               left offset of -13px aligns the arrow tail (SVG x=190 within
-               viewBox starting at 177) with the card's right edge, so the
-               tail-glow leaf overhangs back into the card and erases the seam. */}
-          {/* Arrow SVG is 164px wide but the inter-card gap is a percentage
-              (~6.3% of the panel) that shrinks with viewport: 160px at the
-              1276 Figma anchor, ~64px at lg/1024. Below xl the arrow head
-              overlaps the right card, so only render it at xl+ where the
-              gap actually fits its 151px footprint. */}
+          {/* Arrow — visible on every side-by-side layout (lg+).
+              left offset of -13px aligns the arrow tail (SVG x=190 within
+              viewBox starting at 177) with the card's right edge, so the
+              tail-glow leaf overhangs back into the card and erases the seam.
+              SVG width scales clamp(108px, 11vw, 164px) so it always fits
+              the inter-card gap (which itself scales as a % of the panel
+              width). At lg/1024 the gap is ~138px and the arrow is ~112px;
+              at xl/1280 the gap is ~173px and the arrow is ~140px; at the
+              1440+ desktop the arrow reaches its 164px max. */}
           <div
-            className="pointer-events-none absolute z-10 hidden xl:block"
+            className="pointer-events-none absolute z-10 hidden lg:block"
             style={{
               left: "calc(100% - 13px)",
               top: "50%",
