@@ -222,7 +222,8 @@ export function ResourcesInsights() {
         {/* Title + description (stacked, left-aligned) */}
         <h2
           id="resources-title"
-          className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
+          className="font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
+          style={{ lineHeight: 1 }}
         >
           Resources &amp; Insights
         </h2>
