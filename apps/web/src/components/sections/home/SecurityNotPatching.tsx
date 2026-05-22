@@ -100,8 +100,8 @@ export function SecurityNotPatching() {
         <div className="flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="security-title"
-            className="justify-self-start font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
-            style={{ maxWidth: "444px" }}
+            className="justify-self-start font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
+            style={{ maxWidth: "444px", lineHeight: 1 }}
           >
             Security isn&rsquo;t just{" "}
             <span
@@ -124,8 +124,15 @@ export function SecurityNotPatching() {
             }}
           />
           <p
-            className="text-[clamp(1rem,2vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.04em] text-[#111111] md:justify-self-end md:text-right"
-            style={{ maxWidth: "576px" }}
+            className="font-normal text-[#111111] md:justify-self-end md:text-right"
+            style={{
+              // Figma 1440 (node 763:2350): Sora Regular 30 px / lh 1.4 / -1.2 px / w 541 / opacity 0.8
+              fontSize: "clamp(1rem, 2.1vw, 1.875rem)",
+              lineHeight: 1.4,
+              letterSpacing: "-0.04em",
+              maxWidth: "541px",
+              opacity: 0.8,
+            }}
           >
             Recognized for innovation in secure software supply chain and
             hardened container images.
