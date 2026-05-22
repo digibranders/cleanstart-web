@@ -70,7 +70,8 @@ export function CleanStartAdvantage() {
         <div className="max-w-[517px]">
           <h2
             id="advantage-title"
-            className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-white"
+            className="font-display text-display-md font-semibold tracking-[-0.05em] text-white"
+            style={{ lineHeight: 1 }}
           >
             CleanStart{" "}
             <span
@@ -119,7 +120,7 @@ function StatBlock({ stat }: { stat: Stat }) {
       >
         {stat.value}
       </div>
-      <div className="mt-5 max-w-[180px] text-2xl font-medium leading-[1.1] tracking-[-0.05em] text-white">
+      <div className="mt-5 max-w-[180px] text-2xl font-normal leading-[1.1] tracking-[-0.05em] text-white">
         {stat.label}
       </div>
     </div>
