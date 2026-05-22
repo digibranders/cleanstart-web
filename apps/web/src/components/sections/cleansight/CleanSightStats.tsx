@@ -122,7 +122,7 @@ export function CleanSightStats(): React.ReactElement {
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-6 py-section-md" style={{ paddingBottom: "250px" }}>
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md" style={{ paddingBottom: "250px" }}>
 
         {/* ── Heading ── */}
         <div className="text-center" style={{ marginBottom: "62px" }}>
@@ -131,10 +131,10 @@ export function CleanSightStats(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(28px, 3.23vw, 62px)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.05,
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               whiteSpace: "nowrap",
             }}
           >
@@ -208,10 +208,10 @@ export function CleanSightStats(): React.ReactElement {
                 active={inView}
                 style={{
                   fontFamily: "'Rethink Sans', var(--font-display), sans-serif",
-                  fontSize: "clamp(32px, 3.23vw, 62px)",
+                  fontSize: "var(--text-t-display-2)",
                   fontWeight: 700,
-                  lineHeight: 1.2,
-                  letterSpacing: "-0.02em",
+                  lineHeight: "var(--text-t-display-2-lh)",
+                  letterSpacing: "var(--text-t-display-2-ls)",
                 }}
               />
               {/* Label */}
