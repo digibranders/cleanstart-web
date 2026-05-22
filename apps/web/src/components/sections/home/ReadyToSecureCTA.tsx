@@ -59,10 +59,13 @@ export function ReadyToSecureCTA() {
 
       <p
         id="cta-title"
-        className="relative z-10 font-display font-bold leading-[1.1] tracking-[-0.05em] text-white"
+        className="relative z-10 font-display font-bold text-white"
         style={{
+          // Figma 1440 node 763:3053: Manrope Bold 55 px / lh 1.0 / -2.75 px / w-401
           maxWidth: "401px",
-          fontSize: "clamp(1.75rem, 3vw, 2.625rem)",
+          fontSize: "clamp(1.75rem, 3.82vw, 3.4375rem)",
+          lineHeight: 1,
+          letterSpacing: "-0.05em",
         }}
       >
         Ready to Secure Your Container Infrastructure?
@@ -70,8 +73,15 @@ export function ReadyToSecureCTA() {
 
       <div className="relative z-10 flex flex-col items-start gap-[18px]">
         <p
-          className="text-body-lg font-normal leading-[1.4] tracking-[-0.04em] text-white/80"
-          style={{ maxWidth: "493px" }}
+          className="font-normal text-white"
+          style={{
+            // Figma 1440 node 763:3054: Sora Regular 20 px / lh 1.4 / -0.8 px / opacity 0.8 / w-493
+            maxWidth: "493px",
+            fontSize: "20px",
+            lineHeight: 1.4,
+            letterSpacing: "-0.04em",
+            opacity: 0.8,
+          }}
         >
           Start with zero-CVE hardened images. Deploy faster with confidence
           knowing your containers are secured from the ground up.
