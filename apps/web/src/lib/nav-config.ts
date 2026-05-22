@@ -147,7 +147,7 @@ export const NAV_TREE: NavItem[] = [
       { label: "About Us", href: "/about-us", built: true },
       { label: "Teams", href: "/teams", built: true },
       { label: "Community", href: "/community" },
-      { label: "Careers", href: "/careers" },
+      { label: "Careers", href: "/careers", built: true },
       { label: "Contact Us", href: "/contact-us" },
     ],
   },
