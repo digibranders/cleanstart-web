@@ -114,9 +114,9 @@ export function BlogDetailCTA(): React.ReactElement {
             className="font-display font-bold w-full lg:w-auto lg:max-w-[401px] text-left"
             style={{
               color: "#111111",
-              fontSize: "clamp(1.75rem,3vw,2.625rem)",
-              lineHeight: "1.0",
-              letterSpacing: "-0.05em",
+              fontSize: "var(--text-t-display-2)",
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
             }}
           >
             Stay Ahead of Container Security Threats
@@ -127,8 +127,14 @@ export function BlogDetailCTA(): React.ReactElement {
             style={{ gap: "24px" }}
           >
             <p
-              className="text-body-lg font-normal leading-[1.4] tracking-[-0.04em]"
-              style={{ color: "#111111", opacity: 0.8 }}
+              className="font-normal"
+              style={{
+                fontSize: "var(--text-t-body-lg)",
+                letterSpacing: "var(--text-t-body-lg-ls)",
+                lineHeight: "var(--text-t-body-lg-lh)",
+                color: "#111111",
+                opacity: 0.8,
+              }}
             >
               Get the latest research, insights, and updates straight to your
               inbox
