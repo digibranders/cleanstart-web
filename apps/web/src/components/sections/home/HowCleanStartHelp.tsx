@@ -87,8 +87,8 @@ export function HowCleanStartHelp() {
         <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:flex-row md:gap-[70px]">
           <h2
             id="how-cleanstart-title"
-            className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
-            style={{ maxWidth: "444px" }}
+            className="font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
+            style={{ maxWidth: "444px", lineHeight: 1 }}
           >
             How CleanStart Will Help
           </h2>
@@ -102,8 +102,15 @@ export function HowCleanStartHelp() {
             }}
           />
           <p
-            className="text-[clamp(1rem,1.6vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.04em] text-[#111111] md:mt-3"
-            style={{ maxWidth: "604px", opacity: 0.8 }}
+            className="font-normal text-[#111111] md:mt-3"
+            style={{
+              // Figma 1440 (node 763:2462): Sora Regular 30px / lh 1.4 / -1.2 px / w-604 / opacity 0.8
+              fontSize: "clamp(1rem, 2.1vw, 1.875rem)",
+              lineHeight: 1.4,
+              letterSpacing: "-0.04em",
+              maxWidth: "604px",
+              opacity: 0.8,
+            }}
           >
             Help Tailored solutions for every role in your organization — from
             security leaders to engineering teams.
@@ -211,20 +218,30 @@ function CisoCard({
         />
       </div>
 
-      {/* Title — Figma 40px Bold; falls back to 36px on narrow viewports so it stays one line */}
+      {/* Title — Figma 1440 node 763:4101: Manrope Bold 40 px / lh 1.0 / -2 px */}
       <h3
-        className="mt-[28px] font-display text-[clamp(2rem,3.2vw,2.5rem)] font-bold leading-[1.1] tracking-[-0.05em] text-white"
-        style={{ maxWidth: "504px" }}
+        className="mt-[28px] font-display font-bold text-white"
+        style={{
+          fontSize: "clamp(2rem, 3.2vw, 2.5rem)",
+          lineHeight: 1,
+          letterSpacing: "-2px",
+          maxWidth: "504px",
+        }}
       >
         {activeTab === "ciso"
           ? "Security leadership that scales"
           : "Build pipelines you can trust"}
       </h3>
 
-      {/* Description */}
+      {/* Description — Figma 1440 node 763:4102: Sora Regular 20 px / lh 1.4 / -1 px */}
       <p
-        className="mt-[22px] text-xl font-normal leading-[1.4] tracking-[-0.05em] text-white/95"
-        style={{ maxWidth: "504px" }}
+        className="mt-[22px] font-normal text-white"
+        style={{
+          fontSize: "20px",
+          lineHeight: 1.4,
+          letterSpacing: "-1px",
+          maxWidth: "504px",
+        }}
       >
         Without deterministic builds, artifacts can change across environments.
       </p>
@@ -345,17 +362,29 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
         </div>
       </div>
 
-      {/* Title + description */}
+      {/* Title + description — Figma 1440 nodes 763:4089/4119/4128 + 763:4090/4120/4129
+          Title: Manrope Bold 32 px / lh 1.0 / -1.6 px / color #111
+          Desc:  Sora Regular 20 px / lh 1.4 / -1 px / color #333 / w 263 */}
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         <h3
-          className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em] text-[#111111]"
-          style={{ maxWidth: "234px" }}
+          className="font-display font-bold text-[#111111]"
+          style={{
+            fontSize: "32px",
+            lineHeight: 1,
+            letterSpacing: "-1.6px",
+            maxWidth: "234px",
+          }}
         >
           {card.title}
         </h3>
         <p
-          className="text-body-lg font-normal leading-[1.5] text-[#333333]"
-          style={{ maxWidth: "244px" }}
+          className="font-normal text-[#333333]"
+          style={{
+            fontSize: "20px",
+            lineHeight: 1.4,
+            letterSpacing: "-1px",
+            maxWidth: "263px",
+          }}
         >
           {card.description}
         </p>
