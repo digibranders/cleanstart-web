@@ -66,7 +66,7 @@ export function SCAHero(): React.ReactElement {
       {/* ── Text content ── */}
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
-        style={{ paddingTop: "clamp(96px, 11vw, 180px)", paddingBottom: "clamp(56px, 7vw, 100px)" }}
+        style={{ paddingTop: "clamp(72px, 8vw, 128px)", paddingBottom: "clamp(56px, 7vw, 100px)" }}
       >
         {/* Headline — Figma node 604:2428, 805×160px */}
         <h1
@@ -112,53 +112,43 @@ export function SCAHero(): React.ReactElement {
           hardened container foundations and contextualized risk insights.
         </p>
 
-        {/* Glass CTA button — Figma node 604:2430 */}
+        {/* Glass CTA button — Figma node 604:2430.
+            Uses the shared .cs-btn-glass utility (same style as every other hero
+            CTA on the site) — play-icon prefix kept because this is a
+            "Watch How..." CTA, arrow slides on hover via .cs-cta-arrow. */}
         <Link
           href="/contact-us"
-          className="inline-flex items-center gap-2 rounded-[8px] overflow-hidden"
+          className="cs-btn-glass self-start"
           style={{
             marginTop: "clamp(28px, 2.5vw, 48px)",
-            padding: "9px 18px",
-            border: "1px solid #dab6f3",
-            background: "rgba(255,255,255,0.65)",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-          }}
+            ["--cs-btn-px" as string]: "18px",
+            ["--cs-btn-fs" as string]: "16px",
+          } as React.CSSProperties}
         >
           {/* Play icon */}
           <svg
             aria-hidden
             role="presentation"
-            width="24"
-            height="24"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
-            fill="#111"
+            fill="currentColor"
           >
             <polygon points="6,4 20,12 6,20" />
           </svg>
 
-          <span
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "clamp(14px, 0.94vw, 18px)",
-              fontWeight: 500,
-              letterSpacing: "-0.01em",
-              color: "#111",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Watch How SCA Works
-          </span>
+          <span>Watch How SCA Works</span>
 
-          {/* Arrow right */}
+          {/* Arrow right — animated via .cs-cta-arrow on hover */}
           <svg
+            className="cs-cta-arrow"
             aria-hidden
             role="presentation"
-            width="22"
-            height="22"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#111"
+            stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"

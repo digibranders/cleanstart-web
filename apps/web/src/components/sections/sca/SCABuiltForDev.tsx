@@ -45,20 +45,20 @@ const CARDS = [
 
 const CARD_TITLE: React.CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "clamp(16px, 1.67vw, 32px)",
+  fontSize: "var(--text-t-heading-lg)",
   fontWeight: 700,
-  letterSpacing: "-0.05em",
-  lineHeight: 1.1,
+  letterSpacing: "var(--text-t-heading-lg-ls)",
+  lineHeight: "var(--text-t-heading-lg-lh)",
   color: "#111111",
 };
 
 const CARD_DESC: React.CSSProperties = {
   marginTop: "clamp(6px, 0.625vw, 12px)",
   fontFamily: "var(--font-body)",
-  fontSize: "clamp(12px, 1.04vw, 20px)",
+  fontSize: "var(--text-t-body-lg)",
   fontWeight: 400,
-  letterSpacing: "-0.05em",
-  lineHeight: 1.4,
+  letterSpacing: "var(--text-t-body-lg-ls)",
+  lineHeight: "var(--text-t-body-lg-lh)",
   color: "#333333",
 };
 
@@ -110,10 +110,10 @@ export function SCABuiltForDev(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 3.23vw, 62px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             color: "#111111",
           }}
         >

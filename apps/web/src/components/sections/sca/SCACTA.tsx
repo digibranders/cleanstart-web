@@ -91,10 +91,10 @@ export function SCACTA(): React.ReactElement {
           className="relative lg:flex-1 min-w-0 w-full text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 3vw, 42px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             maxWidth: "401px",
             margin: 0,
             zIndex: 1,
@@ -111,10 +111,10 @@ export function SCACTA(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(14px, 1.09vw, 21px)",
+              fontSize: "var(--text-t-body-lg)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.4,
+              letterSpacing: "var(--text-t-body-lg-ls)",
+              lineHeight: "var(--text-t-body-lg-lh)",
               color: "rgba(255,255,255,0.8)",
               margin: 0,
             }}
@@ -161,10 +161,10 @@ export function SCACTA(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(24px, 7vw, 36px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             color: "#ffffff",
           }}
         >
