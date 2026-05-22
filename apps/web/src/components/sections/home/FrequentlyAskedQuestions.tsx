@@ -138,14 +138,21 @@ export function FrequentlyAskedQuestions() {
         <div className="mb-8 flex flex-col items-start justify-between gap-5 md:mb-10 md:flex-row md:gap-12">
           <h2
             id="faq-title"
-            className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em] text-[#111111]"
-            style={{ maxWidth: "493px" }}
+            className="font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
+            style={{ maxWidth: "493px", lineHeight: 1 }}
           >
             Frequently Asked Questions
           </h2>
           <p
-            className="text-[clamp(1rem,1.8vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.03em] text-[#111111]"
-            style={{ maxWidth: "585px" }}
+            className="font-normal text-[#111111]"
+            style={{
+              // Figma 1440 node 763:2984: Sora Regular 30 px / lh 1.4 / -1.2 px / opacity 0.8
+              fontSize: "clamp(1rem, 2.1vw, 1.875rem)",
+              lineHeight: 1.4,
+              letterSpacing: "-0.04em",
+              maxWidth: "585px",
+              opacity: 0.8,
+            }}
           >
             Common questions about CleanStart&apos;s hardened container images,
             security, and integrations.
@@ -232,7 +239,13 @@ function FaqItemRow({
         className="group flex w-full items-start justify-between gap-6 text-left cursor-pointer md:gap-12"
       >
         <span
-          className="flex-1 font-display text-[clamp(1.0625rem,1.6vw,1.5rem)] font-bold leading-[1.25] tracking-[-0.03em] text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
+          className="flex-1 font-display font-bold text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
+          style={{
+            // Figma 1440 node 763:3015: Manrope Bold 32 px / lh 1.0 / -1.6 px
+            fontSize: "clamp(1.125rem, 2.2vw, 2rem)",
+            lineHeight: 1,
+            letterSpacing: "-0.05em",
+          }}
         >
           {item.q}
         </span>
