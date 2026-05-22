@@ -139,13 +139,13 @@ export function SecurityNotPatching() {
           </p>
         </div>
 
-        {/* Cards grid + kubr mascot */}
+        {/* Cards grid + VS badge centerpiece */}
         <div className="relative mt-16 grid grid-cols-1 gap-8 md:mt-[100px] md:grid-cols-2">
           <SecurityCard kind="public" features={PUBLIC_IMAGES} />
           <SecurityCard kind="cleanstart" features={CLEANSTART_FEATURES} />
 
-          {/* Kubr — tail BEHIND left card, body IN FRONT */}
-          <KubrMascot />
+          {/* VS badge — centered between the two cards, above both */}
+          <VsBadge />
         </div>
       </div>
     </section>
@@ -361,85 +361,36 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
   );
 }
 
-/** Kubr mascot — Figma node 108:7953 (290×299 at section-relative 525, 520).
- *  Live plugin coords: bird straddles the gap between cards — its left edge
- *  (x=525) sits 97px inside the LEFT card (left card right edge = x=622),
- *  so ~33.4% of the bird's width overlaps the left card. Per Figma's
- *  z-order, Kubr is drawn after both card outers but before the left
- *  card's white content — i.e. tail behind left card, body in front of
- *  the right card. We mirror that with a two-layer z-split + 33→36%
- *  mask blend: leftmost 33% at z=1 (behind cards), the rest at z=30
- *  (above cards). Bottom is -15px so the bird's feet hang ~15px below
- *  the cards' bottom edge (matches Figma section-bottom flush). */
-function KubrMascot() {
-  const KUBR_W = 290;
-  const KUBR_H = 299;
-  // Section-relative left edge: 525 / 1276 ≈ 41.14%
-  const KUBR_LEFT = "39%";
-  const KUBR_BOTTOM = "-15px";
-  // Mascot is a decorative accent that overlaps the card gap. On narrow
-  // viewports the cards stack vertically and the mascot would land in the
-  // wrong gap, so we hide it below `md` per the v3 Consistency Layer
-  // decorative-element rules (see apps/web/docs/design-tokens.md).
-  const MASCOT_WIDTH = "clamp(180px, 18vw, 290px)";
-
-  // Hard-edged split at 33%: no transition zone → no purple seam.
-  // (The earlier 33→36% gradient blend bled the cards' dark gradient
-  // through the mask transition, which read as a purple overlay.)
-  const TAIL_MASK = "linear-gradient(90deg, #000 0%, #000 33%, transparent 33%, transparent 100%)";
-  const BODY_MASK = "linear-gradient(90deg, transparent 0%, transparent 33%, #000 33%, #000 100%)";
-
+/** VS badge — glossy 3D "VS" letterform (252 × 252 source asset) centered
+ *  in the gap between the Public Images and CleanStart comparison cards.
+ *  Replaces the previous Kubr mascot per the Figma 1440 home design.
+ *  Hidden below `md` since the cards stack vertically and the gap
+ *  disappears. Centered horizontally via left:50% + translateX(-50%);
+ *  vertically centered between card rows via top:50% + translateY(-50%).
+ *  z-30 keeps it above both cards. */
+function VsBadge() {
+  const SIZE = "clamp(120px, 14vw, 200px)";
   return (
-    <>
-      {/* Tail layer — z=1, behind the LEFT card. The 33% hard cut
-          stops exactly where the body layer starts, so the two halves
-          stitch back into one visually-continuous bird. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute hidden md:block"
-        style={{
-          left: KUBR_LEFT,
-          bottom: KUBR_BOTTOM,
-          width: MASCOT_WIDTH,
-          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
-          zIndex: 1,
-          WebkitMaskImage: TAIL_MASK,
-          maskImage: TAIL_MASK,
-        }}
-      >
-        <Image
-          src="/images/kubr-bird.png"
-          alt=""
-          width={KUBR_W}
-          height={KUBR_H}
-          sizes="290px"
-          className="h-full w-full object-contain"
-        />
-      </div>
-
-      {/* Body + head — z=30, in front of both cards. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute hidden md:block"
-        style={{
-          left: KUBR_LEFT,
-          bottom: KUBR_BOTTOM,
-          width: MASCOT_WIDTH,
-          aspectRatio: `${KUBR_W} / ${KUBR_H}`,
-          zIndex: 30,
-          WebkitMaskImage: BODY_MASK,
-          maskImage: BODY_MASK,
-        }}
-      >
-        <Image
-          src="/images/kubr-bird.png"
-          alt="Kubr mascot"
-          width={KUBR_W}
-          height={KUBR_H}
-          sizes="290px"
-          className="h-full w-full object-contain"
-        />
-      </div>
-    </>
+    <div
+      aria-hidden
+      className="pointer-events-none absolute hidden md:block"
+      style={{
+        left: "50%",
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+        width: SIZE,
+        aspectRatio: "1 / 1",
+        zIndex: 30,
+      }}
+    >
+      <Image
+        src="/images/security/vs-badge.png"
+        alt=""
+        width={252}
+        height={252}
+        sizes="200px"
+        className="h-full w-full object-contain"
+      />
+    </div>
   );
 }
