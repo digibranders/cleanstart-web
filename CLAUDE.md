@@ -114,7 +114,7 @@ Everything in this section applies only to `apps/web`. It does not override the 
 > All earlier docs (`apps/web/docs/_archive/RESPONSIVE-AUDIT.md`, `design-tokens.md`, `typography.md`, `web-responsiveness plan.md`) are archived. **Do NOT copy patterns from them**, do not reference them in new code or PRs, do not treat their "v3 Consistency Layer" tables as binding. Anything in those archived docs is historical.
 
 **Layout primitives (use these, do not hand-roll wrappers):**
-> - `<Container variant="default|wide|prose">` (`apps/web/src/components/layout/Container.tsx`) — wraps page content with the correct `--container-{default|wide|prose}` max-width (1440 / 1600 / 720). **Never hardcode `max-w-[1276px]`** — that magic number is gone from the codebase and must not return.
+> - `<Container variant="default|wide|prose">` (`apps/web/src/components/layout/Container.tsx`) — wraps page content with the correct `--container-{default|wide|prose}` max-width (1276 / 1600 / 720). The 1276 cap matches the Figma 1440 artboard's content frame (x=82 / w=1276); at ≥1276 viewports auto-margins produce the 82 px outer gutter at exactly the 1440 viewport. **Never hardcode `max-w-[1276px]` or `max-w-[1440px]`** — consume the token via `<Container>`.
 > - `<Section padding="sm|md|lg|cta|none">` (`apps/web/src/components/layout/Section.tsx`) — wraps a section with one of the `--spacing-section-*` tokens. Default `padding="md"` (64 → 120 px fluid).
 
 **Hero H1 (consume the role token, do not inline clamp):**
