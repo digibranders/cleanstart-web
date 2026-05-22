@@ -77,11 +77,11 @@ export function CleanStartImagesBrowse(): React.ReactElement {
             role="tab"
             aria-selected={tab === "portal"}
             onClick={() => setTab("portal")}
-            className="flex-1 h-full rounded-full transition-colors relative"
+            className="flex-1 h-full rounded-full transition-all"
             style={{
               background:
                 tab === "portal"
-                  ? "transparent"
+                  ? "linear-gradient(135deg,#5B3DF5 0%,#2E1CB6 100%)"
                   : "transparent",
               color: "#ffffff",
               fontFamily: "var(--font-display)",
@@ -91,20 +91,6 @@ export function CleanStartImagesBrowse(): React.ReactElement {
             }}
           >
             CleanStart Portal
-            {tab === "portal" && (
-              <span
-                aria-hidden
-                className="absolute left-1/2 -translate-x-1/2"
-                style={{
-                  bottom: "8px",
-                  width: "50px",
-                  height: "3px",
-                  borderRadius: "9999px",
-                  background:
-                    "linear-gradient(90deg,#7B5CFA 0%,#5B8DFF 100%)",
-                }}
-              />
-            )}
           </button>
           <button
             type="button"
