@@ -83,7 +83,7 @@ const ROW_HINTS: Record<string, RowHint> = {
   categories: { primary: ['name', 'title'], secondary: [], showThumb: false, showCreate: true, chipLayout: 'inline' },
   newsCategories: { primary: ['name', 'title'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
   knowledgeCategories: { primary: ['name', 'title'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
-  jobLocations: { primary: ['city'], secondary: ['country'], showThumb: false, showCreate: true, chipLayout: 'inline' },
+  jobLocations: { primary: ['name'], secondary: ['type', 'isoCountry'], showThumb: false, showCreate: true, chipLayout: 'inline' },
   forms: { primary: ['name'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
   redirects: { primary: ['from'], secondary: ['to'], showThumb: false, showCreate: false, chipLayout: 'inline' },
 };

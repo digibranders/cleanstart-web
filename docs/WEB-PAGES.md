@@ -51,7 +51,7 @@ page slugs, categories, types, and build status across the dev journey.
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
 | 22 | About Us | `/about-us` | Static | ✅ | Route at `src/app/about-us/` |
-| 23 | Careers | `/careers` | Static | ⬜ | |
+| 23 | Careers | `/careers` | CMS Listing | ✅ | Backed by Payload `jobs` + `jobLocations` collections; published roles only. |
 | 24 | Community | `/community` | Static | ⬜ | |
 | 25 | Contact Us | `/contact-us` | Static | ⬜ | |
 | 26 | Teams | `/teams` | Static | ✅ | All 5 sections built (farheen integration 2026-05-20) |

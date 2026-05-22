@@ -283,10 +283,12 @@ export function AboutOurVision() {
               </p>
             </div>
 
-            {/* Blue "Contact Us" button */}
+            {/* Blue "Contact Us" button — `self-start` keeps the button at
+                its content width (left-aligned with the heading + paragraph)
+                instead of stretching to the parent flex column's 622 px. */}
             <a
               href="#contact"
-              className="cs-btn-blue"
+              className="cs-btn-blue self-start"
               style={{ minWidth: "131px" }}
             >
               Contact Us
