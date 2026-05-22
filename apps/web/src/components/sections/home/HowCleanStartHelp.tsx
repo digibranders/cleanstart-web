@@ -62,7 +62,7 @@ export function HowCleanStartHelp() {
 
   return (
     <section
-      className="relative w-full pb-0 pt-32"
+      className="relative w-full pb-16 pt-20 sm:pb-20 lg:pb-0 lg:pt-24"
       aria-labelledby="how-cleanstart-title"
       style={{ backgroundColor: "#F6F6F6" }}
     >
@@ -82,15 +82,20 @@ export function HowCleanStartHelp() {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Title row — title flush-left, separator centered, description right-aligned.
             Same 1fr auto 1fr grid pattern used by SecurityNotPatching for visual
             parity. */}
         <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="how-cleanstart-title"
-            className="justify-self-start font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
-            style={{ maxWidth: "444px", lineHeight: 1 }}
+            className="justify-self-start font-display font-bold text-[#111111]"
+            style={{
+              maxWidth: "444px",
+              fontSize: "var(--text-t-display-2)",
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
+            }}
           >
             How CleanStart Will Help
           </h2>
@@ -106,10 +111,9 @@ export function HowCleanStartHelp() {
           <p
             className="font-normal text-[#111111] md:justify-self-end md:text-right"
             style={{
-              // Figma 1440 (node 763:2462): Sora Regular 30 px / lh 1.4 / -1.2 px / w-604 / opacity 0.8
-              fontSize: "clamp(1rem, 2.1vw, 1.875rem)",
-              lineHeight: 1.4,
-              letterSpacing: "-0.04em",
+              fontSize: "var(--text-t-subhead)",
+              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "var(--text-t-subhead-ls)",
               maxWidth: "604px",
               opacity: 0.8,
             }}
@@ -220,13 +224,12 @@ function CisoCard({
         />
       </div>
 
-      {/* Title — Figma 1440 node 763:4101: Manrope Bold 40 px / lh 1.0 / -2 px */}
       <h3
         className="mt-[28px] font-display font-bold text-white"
         style={{
-          fontSize: "clamp(2rem, 3.2vw, 2.5rem)",
-          lineHeight: 1,
-          letterSpacing: "-2px",
+          fontSize: "var(--text-t-heading-lg)",
+          lineHeight: "var(--text-t-heading-lg-lh)",
+          letterSpacing: "var(--text-t-heading-lg-ls)",
           maxWidth: "504px",
         }}
       >
@@ -235,13 +238,12 @@ function CisoCard({
           : "Build pipelines you can trust"}
       </h3>
 
-      {/* Description — Figma 1440 node 763:4102: Sora Regular 20 px / lh 1.4 / -1 px */}
       <p
         className="mt-[22px] font-normal text-white"
         style={{
-          fontSize: "20px",
-          lineHeight: 1.4,
-          letterSpacing: "-1px",
+          fontSize: "var(--text-t-body-lg)",
+          lineHeight: "var(--text-t-body-lg-lh)",
+          letterSpacing: "var(--text-t-body-lg-ls)",
           maxWidth: "504px",
         }}
       >
@@ -312,14 +314,22 @@ function TabPill({
 }
 
 /* ============================================================================
-   Feature Card — gear orb + title + description, NO background.
-   The card sits on the section grid pattern (transparent base).
+   Feature Card — gear orb + title + description on a white card surface.
+   White fill, 24 px radius, soft elevation so the card lifts off the grid
+   background; reads as a proper card on every viewport.
    ========================================================================== */
 function FeatureCardItem({ card }: { card: FeatureCard }) {
   return (
     <article
-      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col items-center text-center gap-3 sm:flex-row sm:text-left sm:items-center sm:gap-6"
-      style={{ paddingLeft: "clamp(16px, 5vw, 70px)", paddingRight: "clamp(16px, 5vw, 70px)", paddingTop: "clamp(16px, 3vw, 32px)", paddingBottom: "clamp(16px, 3vw, 32px)" }}
+      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col items-center text-center gap-3 rounded-[24px] bg-white sm:flex-row sm:text-left sm:items-center sm:gap-6"
+      style={{
+        paddingLeft: "clamp(16px, 5vw, 70px)",
+        paddingRight: "clamp(16px, 5vw, 70px)",
+        paddingTop: "clamp(16px, 3vw, 32px)",
+        paddingBottom: "clamp(16px, 3vw, 32px)",
+        boxShadow:
+          "0 1px 0 rgba(0,0,0,0.04), 0 24px 48px -24px rgba(60,30,150,0.08)",
+      }}
     >
       {/* Gear orb — Figma-exact: solid lavender ellipse #DF9BFF (165×165 at (-3, 1))
           BLURRED to be a soft glow, with gear image (161×160 at (20, 11)) on top.
@@ -364,16 +374,13 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
         </div>
       </div>
 
-      {/* Title + description — Figma 1440 nodes 763:4089/4119/4128 + 763:4090/4120/4129
-          Title: Manrope Bold 32 px / lh 1.0 / -1.6 px / color #111
-          Desc:  Sora Regular 20 px / lh 1.4 / -1 px / color #333 / w 263 */}
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         <h3
           className="font-display font-bold text-[#111111]"
           style={{
-            fontSize: "32px",
-            lineHeight: 1,
-            letterSpacing: "-1.6px",
+            fontSize: "var(--text-t-heading-lg)",
+            lineHeight: "var(--text-t-heading-lg-lh)",
+            letterSpacing: "var(--text-t-heading-lg-ls)",
             maxWidth: "234px",
           }}
         >
@@ -382,9 +389,9 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
         <p
           className="font-normal text-[#333333]"
           style={{
-            fontSize: "20px",
-            lineHeight: 1.4,
-            letterSpacing: "-1px",
+            fontSize: "var(--text-t-body-lg)",
+            lineHeight: "var(--text-t-body-lg-lh)",
+            letterSpacing: "var(--text-t-body-lg-ls)",
             maxWidth: "263px",
           }}
         >

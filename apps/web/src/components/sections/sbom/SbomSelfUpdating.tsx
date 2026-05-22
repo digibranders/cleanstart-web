@@ -161,7 +161,7 @@ export function SbomSelfUpdating(): React.ReactElement {
       <FeatureLabel x={1234} y={728} title="Validate" body="Continuously assess inventory accuracy and integrity." />
 
       {/* ═════════════ MOBILE (< lg) ═════════════ */}
-      <div className="lg:hidden mx-auto max-w-[var(--container-default)] px-6 py-section-md flex flex-col items-center text-center gap-8">
+      <div className="lg:hidden mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md flex flex-col items-center text-center gap-8">
         <h2
           className="text-white"
           style={{
@@ -274,9 +274,9 @@ function FigmaCircle({ size, x, y, glowSize, glowOffset, num, numGradient, small
         className="relative"
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(22px, 2.29vw, 44px)",
+          fontSize: "clamp(15px, 1.56vw, 30px)",
           fontWeight: 700,
-          letterSpacing: "-0.05em",
+          letterSpacing: "-0.02em",
           lineHeight: 1,
           background: numGradient,
           WebkitBackgroundClip: "text",

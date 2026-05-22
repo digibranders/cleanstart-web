@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 /**
@@ -186,9 +186,32 @@ export function ResourcesInsights() {
   const [activeTab, setActiveTab] = useState<TabId>("blogs");
   const articles = ARTICLES_BY_TAB[activeTab];
 
+  // Auto-center the active tab in the horizontal scroller (mobile/tablet).
+  // First tab ("blogs") stays at scroll position 0 so the bar reads from
+  // the left edge by default; every other tab smoothly scrolls to center.
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    if (activeTab === "blogs") {
+      scroller.scrollTo({ left: 0, behavior: "smooth" });
+      return;
+    }
+    const btn = scroller.querySelector<HTMLButtonElement>(
+      `#tab-${activeTab}`,
+    );
+    if (!btn) return;
+    const target =
+      btn.offsetLeft - (scroller.clientWidth - btn.offsetWidth) / 2;
+    scroller.scrollTo({
+      left: Math.max(0, target),
+      behavior: "smooth",
+    });
+  }, [activeTab]);
+
   return (
     <section
-      className="relative w-full pt-32"
+      className="relative w-full pt-20 lg:pt-24"
       aria-labelledby="resources-title"
     >
       {/* Figma 108:7625 — soft purple radial bleed off the bottom-left edge (10% opacity, 1101×1101) */}
@@ -218,26 +241,42 @@ export function ResourcesInsights() {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Title + description (stacked, left-aligned) */}
         <h2
           id="resources-title"
-          className="font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
-          style={{ lineHeight: 1 }}
+          className="font-display font-bold text-[#111111]"
+          style={{
+            fontSize: "var(--text-t-display-2)",
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
+          }}
         >
           Resources &amp; Insights
         </h2>
-        <p className="mt-5 max-w-[622px] text-[clamp(0.95rem,1.4vw,1.3125rem)] font-normal leading-[1.5] tracking-[-0.02em] text-[#333333]">
+        <p
+          className="mt-5 max-w-[622px] font-normal text-[#333333]"
+          style={{
+            fontSize: "var(--text-t-subhead)",
+            lineHeight: "var(--text-t-subhead-lh)",
+            letterSpacing: "var(--text-t-subhead-ls)",
+          }}
+        >
           Stay informed with the latest research, threat intelligence reports,
           and expert analysis from our security team.
         </p>
 
-        {/* Tab bar — Figma 108:8529: 929×64, padding 8, gap 12, white bg, radius 30 */}
-        <div className="mt-12 -mx-6 overflow-x-auto px-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        {/* Tab bar — Figma 108:8529: 929×64, padding 8, gap 12, white bg, radius 30.
+            Horizontal scroller; clicking a tab smoothly centers it (handled by
+            the useEffect above; first tab "Blogs" stays at scrollLeft 0). */}
+        <div
+          ref={scrollerRef}
+          className="mt-12 -mx-6 overflow-x-auto px-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
         <div
           role="tablist"
           aria-label="Resource categories"
-          className="inline-flex items-center gap-3 rounded-[30px] bg-white p-2"
+          className="inline-flex items-center gap-2 rounded-full bg-white p-1.5"
           style={{
             boxShadow:
               "0 1px 0 rgba(0,0,0,0.04), 0 24px 48px -24px rgba(60,30,150,0.06)",
@@ -254,7 +293,7 @@ export function ResourcesInsights() {
                 aria-controls="resources-articles"
                 id={`tab-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative flex h-12 cursor-pointer items-center justify-center rounded-full px-8 text-xl font-semibold leading-[1] tracking-[-0.05em] transition-colors duration-200 ease-out ${
+                className={`relative flex h-10 cursor-pointer items-center justify-center rounded-full px-6 text-base font-semibold leading-[1] tracking-[-0.04em] transition-colors duration-200 ease-out ${
                   isActive
                     ? "text-white"
                     : "text-[#666666] hover:text-[#111111]"
@@ -309,13 +348,24 @@ function ArticleCard({ article }: { article: Article }) {
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
-      {/* Figma: title Manrope Bold 21px, color #000 */}
-      {/* eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained card title. See RESPONSIVE-AUDIT.md §14.3. */}
-      <h3 className="font-display text-[1.3125rem] font-bold leading-[1.3] tracking-[-0.02em] text-black transition-colors duration-200 group-hover:text-[#1B1F4F]">
+      <h3
+        className="font-display font-bold text-black transition-colors duration-200 group-hover:text-[#1B1F4F]"
+        style={{
+          fontSize: "var(--text-t-heading-md)",
+          lineHeight: "var(--text-t-heading-md-lh)",
+          letterSpacing: "var(--text-t-heading-md-ls)",
+        }}
+      >
         {article.title}
       </h3>
-      {/* Figma: description Sora Regular 16px, color #333 */}
-      <p className="text-base font-normal leading-[1.5] tracking-[-0.01em] text-[#333333]">
+      <p
+        className="font-normal text-[#333333]"
+        style={{
+          fontSize: "var(--text-t-body-md)",
+          lineHeight: "var(--text-t-body-md-lh)",
+          letterSpacing: "var(--text-t-body-md-ls)",
+        }}
+      >
         {article.description}
       </p>
       {/* Figma: "Explore" Sora Bold 16px, color #000, with filled chevron arrow */}

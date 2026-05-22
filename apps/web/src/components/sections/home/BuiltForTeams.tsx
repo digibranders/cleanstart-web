@@ -136,17 +136,16 @@ export function BuiltForTeams() {
           "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
     >
-      <div className="relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 py-section-md">
+      <div className="relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         <header className="mx-auto max-w-[867px] text-center">
           <h2
             id="testimonials-title"
             className="font-display"
             style={{
-              // Figma 1440 node 763:2909: Manrope Bold 62 px / lh 1.0 / -3.1 px / w-696
-              fontSize: "clamp(2rem,5.2vw,3.875rem)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 700,
-              lineHeight: 1,
-              letterSpacing: "-0.05em",
+              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "var(--text-t-display-2-ls)",
             }}
           >
             Built for Teams That Can&rsquo;t Afford{" "}
@@ -163,10 +162,9 @@ export function BuiltForTeams() {
           <p
             className="mx-auto mt-8 font-normal text-white"
             style={{
-              // Figma 1440 node 763:2910: Sora Regular 30 px / lh 1.4 / -1.2 px / opacity 0.8
-              fontSize: "clamp(1rem, 2.1vw, 1.875rem)",
-              lineHeight: 1.4,
-              letterSpacing: "-0.04em",
+              fontSize: "var(--text-t-subhead)",
+              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "var(--text-t-subhead-ls)",
               opacity: 0.8,
             }}
           >

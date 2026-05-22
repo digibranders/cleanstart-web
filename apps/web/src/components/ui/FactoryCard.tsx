@@ -12,57 +12,98 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           left, title + description middle, arrow right). Stacks vertically all
           the way through tablet; the absolute-positioned desktop variant only
           kicks in at lg+ where the 5-up grid + engine flames can fit. */}
-      <div className="cs-factory-card relative flex w-full overflow-hidden rounded-[24px] lg:hidden" style={{ minHeight: "84px" }}>
-        {/* Cyan + purple gradient bg (simplified for the row layout) */}
+      {/* MOBILE + TABLET (< lg) — Figma 403:15301 exact:
+          Card 295×88, radius 18, 2.24 px lavender (#DAB6F3) border, dark→purple
+          gradient (top-to-bottom: #151021 → #131E8F at 71.2% → #551ECE).
+          Orb 97×72 on the left, title (Manrope Medium 20 / lh 1 / -1 px) +
+          desc (Sora Regular 14 / lh 1.1 / -0.98 px / opacity 0.8) middle,
+          chevron 28×28 on the right. */}
+      <div
+        className="relative lg:hidden"
+        style={{
+          width: "295px",
+          height: "88px",
+          borderRadius: "18px",
+          border: "2.24px solid #DAB6F3",
+          background: "#151021",
+        }}
+      >
+
+        {/* Orb — 97×72 area, blends into the dark gradient via color-dodge.
+            Positioned absolutely outside the overflow-hidden wrapper at left: -7px, top: 8px. */}
         <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
+          className="absolute mix-blend-color-dodge pointer-events-none"
           style={{
-            background:
-              "linear-gradient(95deg, #5D04D7 0%, #1B0B6E 45%, #04C7F2 100%)",
-            opacity: 0.9,
+            left: "-7px",
+            top: "8px",
+            width: "97px",
+            height: "72px",
           }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-[24px]"
-          style={{ boxShadow: "inset 0 0 0 1px rgba(218,182,243,0.35)" }}
-        />
-
-        <div className="relative flex w-full items-center gap-3 px-3 py-3">
-          {/* Orb icon — small */}
-          <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
-            <Image
-              src="/images/factory-orb.png"
-              alt=""
-              width={56}
-              height={56}
-              className="h-14 w-14 object-contain drop-shadow-[0_4px_8px_rgba(20,15,60,0.45)]"
-              sizes="56px"
-            />
-          </div>
-
-          {/* Title + description */}
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <h3 className="font-display text-base font-semibold leading-tight tracking-[-0.03em] text-white">
-              {title}
-            </h3>
-            <p className="text-sm leading-snug tracking-[-0.03em] text-white/85">
-              {description}
-            </p>
-          </div>
-
-          {/* Arrow chevron */}
-          <button
-            type="button"
-            aria-label={`Learn more about ${title}`}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/80 text-white"
-          >
-            <svg width="9" height="12" viewBox="0 0 9 12" fill="none" aria-hidden>
-              <path d="M2 1L7 6L2 11" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+        >
+          <Image
+            src="/images/factory-orb.png"
+            alt=""
+            width={97}
+            height={72}
+            className="w-full h-full object-contain"
+            sizes="97px"
+            priority
+          />
         </div>
+
+        {/* Title + description — Figma 4 px gap. Centered vertically, offset left 85px, right 64px. */}
+        <div
+          className="absolute flex flex-col gap-1 justify-center text-white"
+          style={{
+            left: "85px",
+            right: "64px",
+            top: "50%",
+            transform: "translateY(-50%)",
+          }}
+        >
+          <h3
+            className="font-display font-medium"
+            style={{
+              fontSize: "20px",
+              lineHeight: 1,
+              letterSpacing: "-1px",
+            }}
+          >
+            {title}
+          </h3>
+          <p
+            className="font-normal"
+            style={{
+              fontSize: "14px",
+              lineHeight: 1.1,
+              letterSpacing: "-0.98px",
+              opacity: 0.8,
+            }}
+          >
+            {description}
+          </p>
+        </div>
+
+        {/* Arrow chevron — 28×28 circle outline. Absolute positioned at right: 24px, top: 30px. */}
+        <button
+          type="button"
+          aria-label={`Learn more about ${title}`}
+          className="absolute flex h-7 w-7 items-center justify-center rounded-full border border-white/80 text-white transition hover:bg-white/10"
+          style={{
+            right: "24px",
+            top: "30px",
+          }}
+        >
+          <svg width="8" height="11" viewBox="0 0 9 12" fill="none" aria-hidden>
+            <path
+              d="M2 1L7 6L2 11"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
       </div>
 
       {/* DESKTOP (lg+) — Figma 1440 spec (node 763:3610..3742):
@@ -72,66 +113,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
         className="cs-factory-card relative hidden w-full overflow-hidden rounded-[24px] lg:flex lg:flex-col lg:items-center lg:gap-3 lg:pt-4 lg:pb-4"
         style={{ height: "374px" }}
       >
-        {/* Layer 1 — purple ellipse (upper-left accent) */}
-        <div
-          className="pointer-events-none absolute"
-          style={{
-            left: "-141px",
-            top: "-168px",
-            width: "344px",
-            maxWidth: "calc(100% + 200px)",
-            height: "406px",
-            borderRadius: "50%",
-            background:
-              "radial-gradient(closest-side, #5D04D7 0%, rgba(93,4,215,0.85) 35%, rgba(93,4,215,0) 70%)",
-            filter: "blur(14px)",
-          }}
-        />
 
-        {/* Layer 2 — cyan ellipse (large, dominant) */}
-        <div
-          className="pointer-events-none absolute"
-          style={{
-            left: "-136px",
-            top: "-22px",
-            width: "552px",
-            maxWidth: "calc(100% + 200px)",
-            height: "652px",
-            borderRadius: "50%",
-            background:
-              "radial-gradient(closest-side, #04C7F2 0%, rgba(4,199,242,0.78) 50%, rgba(4,199,242,0) 100%)",
-            mixBlendMode: "screen",
-          }}
-        />
-
-        {/* Layer 3 — bottom-edge dark glow */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(225deg, rgba(85,30,206,0) 0%, rgba(19,30,143,0.45) 60%, rgba(21,16,33,0.85) 100%)",
-          }}
-        />
-
-        {/* Layer 4 — lavender top-right highlight */}
-        <div
-          className="pointer-events-none absolute"
-          style={{
-            right: "-30px",
-            top: "-30px",
-            width: "200px",
-            height: "200px",
-            background:
-              "radial-gradient(closest-side, rgba(218,182,243,0.55) 0%, rgba(218,182,243,0) 70%)",
-            mixBlendMode: "screen",
-          }}
-        />
-
-        {/* Inner stroke (1.5px lavender) */}
-        <div
-          className="pointer-events-none absolute inset-0 rounded-[24px]"
-          style={{ boxShadow: "inset 0 0 0 1.5px rgba(218,182,243,0.35)" }}
-        />
 
         {/* Orb icon — Figma 1440 spec: 220 × 164 px (placed top-aligned). */}
         <div className="pointer-events-none relative flex w-full items-center justify-center">
@@ -142,7 +124,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
             height={164}
             priority
             sizes="168px"
-            className="object-contain drop-shadow-[0_10px_20px_rgba(20,15,60,0.55)]"
+            className="object-contain"
             style={{ height: "164px", width: "auto" }}
           />
         </div>
@@ -154,9 +136,9 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           <h3
             className="font-display font-normal text-white"
             style={{
-              fontSize: "32px",
-              lineHeight: 1,
-              letterSpacing: "-1.6px",
+              fontSize: "var(--text-t-heading-lg)",
+              lineHeight: "var(--text-t-heading-lg-lh)",
+              letterSpacing: "var(--text-t-heading-lg-ls)",
             }}
           >
             {renderTitle(title)}
@@ -164,9 +146,9 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           <p
             className="font-normal text-white"
             style={{
-              fontSize: "16px",
-              lineHeight: 1.1,
-              letterSpacing: "-0.64px",
+              fontSize: "var(--text-t-body-md)",
+              lineHeight: "var(--text-t-body-md-lh)",
+              letterSpacing: "var(--text-t-body-md-ls)",
               opacity: 0.8,
             }}
           >

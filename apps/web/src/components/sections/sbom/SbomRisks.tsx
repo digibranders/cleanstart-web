@@ -40,6 +40,8 @@ const RISKS = [
   },
 ] as const;
 
+const vw = (n: number): string => `${(n / 1920) * 100}vw`;
+
 export function SbomRisks(): React.ReactElement {
   return (
     <section
@@ -47,31 +49,31 @@ export function SbomRisks(): React.ReactElement {
       className="relative overflow-hidden bg-white"
       style={{ paddingTop: "clamp(56px, 8vw, 120px)", paddingBottom: "clamp(56px, 8vw, 120px)" }}
     >
-      {/* Decorative blobs — purple radial blobs from Figma (top-right and bottom-left) */}
+      {/* Decorative radial halos — Figma 1920 coords (top-right + bottom-left) */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
         style={{
-          right: "-200px",
-          top: "-400px",
-          width: "700px",
-          height: "700px",
-          borderRadius: "50%",
+          left: vw(1347),
+          top: vw(-565),
+          width: vw(1101),
+          height: vw(1101),
+          opacity: 0.1,
           background:
-            "radial-gradient(closest-side, rgba(100, 13, 251, 0.07) 0%, rgba(100, 13, 251, 0) 70%)",
+            "radial-gradient(50% 50% at 50% 50%, #640DFB 0%, rgba(100, 13, 251, 0) 100%)",
         }}
       />
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
         style={{
-          left: "-300px",
-          bottom: "100px",
-          width: "800px",
-          height: "800px",
-          borderRadius: "50%",
+          left: vw(-621),
+          top: vw(509),
+          width: vw(1181),
+          height: vw(1181),
+          opacity: 0.1,
           background:
-            "radial-gradient(closest-side, rgba(100, 13, 251, 0.06) 0%, rgba(100, 13, 251, 0) 70%)",
+            "radial-gradient(50% 50% at 50% 50%, #640DFB 0%, rgba(100, 13, 251, 0) 100%)",
         }}
       />
 

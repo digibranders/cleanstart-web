@@ -51,7 +51,7 @@ export function SbomIntelligence(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 py-section-md">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         {/* Heading */}
         <div className="text-center mb-10 md:mb-14">
           <h2
@@ -104,8 +104,7 @@ function IntelligenceCard({
         aspectRatio: "295/324",
         padding: "4px",
         borderRadius: "40px",
-        background:
-          "linear-gradient(180deg, rgba(44,193,235,0.30) 0%, rgba(44,193,235,0.08) 60%, rgba(44,193,235,0) 100%)",
+        background: "rgba(44,193,235,0.30)",
       }}
     >
       <div

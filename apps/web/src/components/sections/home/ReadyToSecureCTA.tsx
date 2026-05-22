@@ -30,13 +30,10 @@ export function ReadyToSecureCTA() {
         id="cta-title"
         className="relative z-10 font-display font-bold text-white"
         style={{
-          // Title widened from Figma's 401 → 470 so the copy lands in 3 lines
-          // (Ready to Secure / Your Container / Infrastructure?) instead of 4.
-          // Card top padding pulled in to 56 px to shift the heading slightly up.
           maxWidth: "470px",
-          fontSize: "clamp(1.75rem, 3.82vw, 3.4375rem)",
-          lineHeight: 1,
-          letterSpacing: "-0.05em",
+          fontSize: "var(--text-t-display-2)",
+          lineHeight: "var(--text-t-display-2-lh)",
+          letterSpacing: "var(--text-t-display-2-ls)",
         }}
       >
         Ready to Secure Your Container Infrastructure?
@@ -46,11 +43,10 @@ export function ReadyToSecureCTA() {
         <p
           className="font-normal text-white"
           style={{
-            // Figma 1440 node 763:3054: Sora Regular 20 px / lh 1.4 / -0.8 px / opacity 0.8 / w-493
             maxWidth: "493px",
-            fontSize: "20px",
-            lineHeight: 1.4,
-            letterSpacing: "-0.04em",
+            fontSize: "var(--text-t-body-lg)",
+            lineHeight: "var(--text-t-body-lg-lh)",
+            letterSpacing: "var(--text-t-body-lg-ls)",
             opacity: 0.8,
           }}
         >

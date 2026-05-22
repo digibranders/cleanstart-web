@@ -133,15 +133,20 @@ export function FrequentlyAskedQuestions() {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Title row — title flush-left, separator centered, description right-aligned.
             Same 1fr_auto_1fr grid pattern used by SecurityNotPatching and
             HowCleanStartHelp for visual parity. */}
         <div className="mb-8 flex flex-col items-start gap-5 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="faq-title"
-            className="justify-self-start font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
-            style={{ maxWidth: "493px", lineHeight: 1 }}
+            className="justify-self-start font-display font-bold text-[#111111]"
+            style={{
+              maxWidth: "493px",
+              fontSize: "var(--text-t-display-2)",
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
+            }}
           >
             Frequently Asked Questions
           </h2>
@@ -157,10 +162,9 @@ export function FrequentlyAskedQuestions() {
           <p
             className="font-normal text-[#111111] md:justify-self-end md:text-right"
             style={{
-              // Figma 1440 node 763:2984: Sora Regular 30 px / lh 1.4 / -1.2 px / opacity 0.8
-              fontSize: "clamp(1rem, 2.1vw, 1.875rem)",
-              lineHeight: 1.4,
-              letterSpacing: "-0.04em",
+              fontSize: "var(--text-t-subhead)",
+              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "var(--text-t-subhead-ls)",
               maxWidth: "585px",
               opacity: 0.8,
             }}
@@ -252,10 +256,9 @@ function FaqItemRow({
         <span
           className="flex-1 font-display font-bold text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
           style={{
-            // Figma 1440 node 763:3015: Manrope Bold 32 px / lh 1.0 / -1.6 px
-            fontSize: "clamp(1.125rem, 2.2vw, 2rem)",
-            lineHeight: 1,
-            letterSpacing: "-0.05em",
+            fontSize: "var(--text-t-heading-md)",
+            lineHeight: "var(--text-t-heading-md-lh)",
+            letterSpacing: "var(--text-t-heading-md-ls)",
           }}
         >
           {item.q}
@@ -282,7 +285,12 @@ function FaqItemRow({
         }}
       >
         <p
-          className="pt-3 text-[clamp(0.875rem,1.05vw,1rem)] font-normal leading-[1.55] tracking-[-0.01em] text-[#333333]"
+          className="pt-3 font-normal text-[#333333]"
+          style={{
+            fontSize: "var(--text-t-body-md)",
+            lineHeight: "var(--text-t-body-md-lh)",
+            letterSpacing: "var(--text-t-body-md-ls)",
+          }}
         >
           {item.a}
         </p>

@@ -46,7 +46,7 @@ export function SecurityNotPatching() {
       className="relative w-full overflow-hidden bg-[#F6F6F6] py-section-md"
       aria-labelledby="security-title"
     >
-      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Background decorations — positioned in the 1276-wide Figma section
              coordinate space. */}
         <div
@@ -100,8 +100,13 @@ export function SecurityNotPatching() {
         <div className="flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="security-title"
-            className="justify-self-start font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
-            style={{ maxWidth: "444px", lineHeight: 1 }}
+            className="justify-self-start font-display font-bold text-[#111111]"
+            style={{
+              maxWidth: "444px",
+              fontSize: "var(--text-t-display-2)",
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
+            }}
           >
             Security isn&rsquo;t just{" "}
             <span
@@ -126,10 +131,9 @@ export function SecurityNotPatching() {
           <p
             className="font-normal text-[#111111] md:justify-self-end md:text-right"
             style={{
-              // Figma 1440 (node 763:2350): Sora Regular 30 px / lh 1.4 / -1.2 px / w 541 / opacity 0.8
-              fontSize: "clamp(1rem, 2.1vw, 1.875rem)",
-              lineHeight: 1.4,
-              letterSpacing: "-0.04em",
+              fontSize: "var(--text-t-subhead)",
+              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "var(--text-t-subhead-ls)",
               maxWidth: "541px",
               opacity: 0.8,
             }}
@@ -139,8 +143,11 @@ export function SecurityNotPatching() {
           </p>
         </div>
 
-        {/* Cards grid + VS badge centerpiece */}
-        <div className="relative mt-16 grid grid-cols-1 gap-8 md:mt-[100px] md:grid-cols-2">
+        {/* Cards row + VS badge centerpiece.
+            Flex with a small gap keeps the two cards visually coupled with
+            the VS badge bridging them; `justify-center` keeps the pair centered
+            in the section's content area with symmetric breathing room. */}
+        <div className="relative mt-16 flex flex-col items-center gap-6 md:mt-[80px] md:flex-row md:justify-center md:gap-10">
           <SecurityCard kind="public" features={PUBLIC_IMAGES} />
           <SecurityCard kind="cleanstart" features={CLEANSTART_FEATURES} />
 
@@ -162,7 +169,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
 
   return (
     <div
-      className="relative mx-auto flex h-full w-full flex-col lg:max-w-[622px]"
+      className="relative flex h-full w-full flex-col lg:max-w-[500px]"
       style={{
         // Figma 1440: outer card 622×600, cyan border 10 px, radius 40
         borderRadius: 40,
@@ -188,7 +195,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
              the visible outcome with two distinct CSS gradients tuned to the
              eyeball colors of the rendered Figma textures. */}
         <div
-          className="relative flex h-[clamp(96px,9vw,130px)] w-full items-center justify-center gap-3 overflow-hidden"
+          className="relative flex h-[clamp(76px,7vw,100px)] w-full items-center justify-center gap-3 overflow-hidden"
           style={{
             background: isPublic
               ? // LEFT (Public Images) — desaturated texture overlay → reads black
@@ -273,10 +280,9 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                 <span
                   className="font-display font-bold text-white"
                   style={{
-                    // Figma 1440 node 763:4884: Manrope Bold 32 px / lh 1.0 / -1.6 px
-                    fontSize: "32px",
-                    lineHeight: 1,
-                    letterSpacing: "-1.6px",
+                    fontSize: "var(--text-t-heading-lg)",
+                    lineHeight: "var(--text-t-heading-lg-lh)",
+                    letterSpacing: "var(--text-t-heading-lg-ls)",
                   }}
                 >
                   Public Images
@@ -300,7 +306,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
             `flex-1` lets this area absorb the grid-row's stretched height so both
             cards' visible bottoms stay aligned regardless of which card's text
             wraps to two lines at any given viewport. */}
-        <div className="relative flex flex-1 flex-col overflow-hidden bg-white py-[clamp(28px,3vw,44px)]" style={{ minHeight: "clamp(340px, 31vw, 441px)" }}>
+        <div className="relative flex flex-1 flex-col overflow-hidden bg-white py-[clamp(24px,2.5vw,36px)]" style={{ minHeight: "clamp(260px, 22vw, 340px)" }}>
           {/* Decorative blobs (Figma Ellipse 46681 #DF9BFF + 46682 #2CC1EB) */}
           <div
             aria-hidden
@@ -358,11 +364,10 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                 <span
                   className="font-display text-[#333333]"
                   style={{
-                    // Figma 1440 node 763:4861: Manrope SemiBold 22 px / lh 1.4 / -1.1 px (-0.05em)
-                    fontSize: "clamp(1rem, 1.55vw, 1.375rem)",
+                    fontSize: "var(--text-t-heading-sm)",
                     fontWeight: 600,
-                    lineHeight: 1.4,
-                    letterSpacing: "-0.05em",
+                    lineHeight: "var(--text-t-heading-sm-lh)",
+                    letterSpacing: "var(--text-t-heading-sm-ls)",
                   }}
                 >
                   {label}
@@ -384,11 +389,14 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
  *  vertically centered between card rows via top:50% + translateY(-50%).
  *  z-30 keeps it above both cards. */
 function VsBadge() {
-  const SIZE = "clamp(120px, 14vw, 200px)";
+  // Smaller on mobile where the badge sits in the narrow gap between the
+  // vertically stacked cards; full size on tablet/desktop where it bridges
+  // the two side-by-side cards.
+  const SIZE = "clamp(72px, 11vw, 160px)";
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute hidden md:block"
+      className="pointer-events-none absolute"
       style={{
         left: "50%",
         top: "50%",

@@ -74,7 +74,7 @@ export function SbomHero(): React.ReactElement {
             maxWidth: "623px",
           }}
         >
-          continuously Verifiable SBOMs
+          Continuously Verifiable SBOMs
         </h1>
 
         <p

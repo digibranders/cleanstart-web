@@ -65,13 +65,17 @@ export function CleanStartAdvantage() {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 py-section-lg">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 py-section-lg">
         {/* Intro: title + description (Figma Frame 10 at 316,3438 — 517×265) */}
         <div className="max-w-[517px]">
           <h2
             id="advantage-title"
-            className="font-display text-display-md font-semibold tracking-[-0.05em] text-white"
-            style={{ lineHeight: 1 }}
+            className="font-display font-semibold text-white"
+            style={{
+              fontSize: "var(--text-t-display-2)",
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
+            }}
           >
             CleanStart{" "}
             <span
@@ -85,24 +89,37 @@ export function CleanStartAdvantage() {
             </span>
           </h2>
           <p
-            className="mt-6 text-[clamp(1rem,1.6vw,1.625rem)] font-normal leading-[1.5] tracking-[-0.05em] text-white"
+            className="mt-6 font-normal text-white"
+            style={{
+              fontSize: "var(--text-t-subhead)",
+              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "var(--text-t-subhead-ls)",
+            }}
           >
             Real results from teams that replaced vulnerable public images with
             CleanStart&rsquo;s hardened, source-built containers
           </p>
         </div>
 
-        {/* Stats row — 5 stats with 4 vertical gradient separators between them.
-            On mobile, stats wrap into a 2-col grid (separators hide). */}
-        <div className="mt-12 grid grid-cols-1 gap-y-8 sm:mt-16 sm:grid-cols-3 sm:gap-y-10 lg:mt-[120px] lg:flex lg:items-start lg:justify-between lg:gap-6">
+        {/* Stats — two layouts:
+            • Mobile/tablet (< lg) — Figma 403:15688 vertical stack:
+              5 stat blocks (32 px number / 16 px label / 12 px internal gap)
+              separated by 147 px-wide horizontal gradient lines, 24 px gap.
+            • Desktop (lg+) — 5 stats inline with 1×109 vertical separators. */}
+        <div className="mt-12 flex flex-col gap-6 sm:mt-14 lg:hidden">
           {STATS.map((stat, i) => (
             <React.Fragment key={stat.value}>
-              <StatBlock stat={stat} />
-              {i < STATS.length - 1 && (
-                <span className="hidden lg:contents">
-                  <Separator />
-                </span>
-              )}
+              <StatBlock stat={stat} variant="mobile" />
+              {i < STATS.length - 1 && <HorizontalDivider />}
+            </React.Fragment>
+          ))}
+        </div>
+
+        <div className="hidden lg:mt-[120px] lg:flex lg:items-start lg:justify-between lg:gap-6">
+          {STATS.map((stat, i) => (
+            <React.Fragment key={stat.value}>
+              <StatBlock stat={stat} variant="desktop" />
+              {i < STATS.length - 1 && <VerticalDivider />}
             </React.Fragment>
           ))}
         </div>
@@ -111,25 +128,71 @@ export function CleanStartAdvantage() {
   );
 }
 
-function StatBlock({ stat }: { stat: Stat }) {
+function StatBlock({
+  stat,
+  variant,
+}: {
+  stat: Stat;
+  variant: "mobile" | "desktop";
+}) {
+  if (variant === "mobile") {
+    // Figma 403:15688 — Manrope Bold 32 / lh 1.0 / -0.05em over Sora 16 / lh 1.1 / -0.05em
+    return (
+      <div className="flex w-[222px] flex-col gap-3">
+        <div
+          className="font-display font-bold text-white"
+          style={{
+            whiteSpace: "nowrap",
+            fontSize: "32px",
+            lineHeight: 1,
+            letterSpacing: "-0.05em",
+          }}
+        >
+          {stat.value}
+        </div>
+        <div
+          className="font-normal text-white"
+          style={{
+            fontSize: "16px",
+            lineHeight: 1.1,
+            letterSpacing: "-0.05em",
+          }}
+        >
+          {stat.label}
+        </div>
+      </div>
+    );
+  }
+  // Desktop variant uses the unified type-scale tokens.
   return (
     <div className="flex shrink-0 flex-col">
       <div
-        className="font-display text-4xl font-bold leading-none tracking-[-0.05em] text-white"
-        style={{ whiteSpace: "nowrap" }}
+        className="font-display font-bold text-white"
+        style={{
+          whiteSpace: "nowrap",
+          fontSize: "var(--text-t-heading-lg)",
+          lineHeight: "var(--text-t-heading-lg-lh)",
+          letterSpacing: "var(--text-t-heading-lg-ls)",
+        }}
       >
         {stat.value}
       </div>
-      <div className="mt-5 max-w-[180px] text-2xl font-normal leading-[1.1] tracking-[-0.05em] text-white">
+      <div
+        className="mt-5 max-w-[180px] font-normal text-white"
+        style={{
+          fontSize: "var(--text-t-heading-md)",
+          lineHeight: "var(--text-t-heading-md-lh)",
+          letterSpacing: "var(--text-t-heading-md-ls)",
+        }}
+      >
         {stat.label}
       </div>
     </div>
   );
 }
 
-function Separator() {
-  // 1×109 vertical gradient line (Figma Rectangle 19/23/24/25)
-  // 0% transparent → 49.3% solid white → 99.2% gray fading to transparent
+function VerticalDivider() {
+  // 1×109 vertical gradient line (Figma Rectangle 19/23/24/25) — desktop.
   return (
     <div
       aria-hidden
@@ -137,6 +200,24 @@ function Separator() {
       style={{
         background:
           "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 49.3%, rgba(153,153,153,0) 99.2%)",
+      }}
+    />
+  );
+}
+
+function HorizontalDivider() {
+  // 147×1 horizontal gradient line — Figma mobile divider (node 403:15692).
+  // Exact stops from the source SVG linearGradient:
+  //   0%     → white  opacity 0
+  //   49.32% → white  opacity 1
+  //   99.18% → #999   opacity 0
+  return (
+    <div
+      aria-hidden
+      className="h-px w-[147px] shrink-0"
+      style={{
+        background:
+          "linear-gradient(90deg, rgba(255,255,255,0) 0%, #FFFFFF 49.32%, rgba(153,153,153,0) 99.18%)",
       }}
     />
   );
