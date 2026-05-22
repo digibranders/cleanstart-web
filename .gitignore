@@ -51,6 +51,8 @@ coverage/
 # Playwright (apps/web responsive e2e gate)
 apps/web/playwright-report/
 apps/web/test-results/
+apps/cms/test-results/
+apps/cms/playwright-report/
 apps/web/tests/e2e/**/__screenshots__/
 apps/web/tests/e2e/**/*-snapshots/
 
