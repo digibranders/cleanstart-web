@@ -162,12 +162,13 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
 
   return (
     <div
-      className="relative mx-auto flex h-full w-full flex-col lg:max-w-[clamp(380px,32vw,480px)]"
+      className="relative mx-auto flex h-full w-full flex-col lg:max-w-[622px]"
       style={{
+        // Figma 1440: outer card 622×600, cyan border 10 px, radius 40
         borderRadius: 40,
-        background: "#2CC1EB", // outer cyan border (visible 10px around inner)
+        background: "#2CC1EB",
         padding: 10,
-        zIndex: 10, // above kubr tail layer (z=1) so tail goes behind the card
+        zIndex: 10,
       }}
     >
       <div
@@ -187,7 +188,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
              the visible outcome with two distinct CSS gradients tuned to the
              eyeball colors of the rendered Figma textures. */}
         <div
-          className="relative flex h-[clamp(80px,7vw,110px)] w-full items-center justify-center gap-3 overflow-hidden"
+          className="relative flex h-[clamp(96px,9vw,130px)] w-full items-center justify-center gap-3 overflow-hidden"
           style={{
             background: isPublic
               ? // LEFT (Public Images) — desaturated texture overlay → reads black
@@ -269,7 +270,15 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                   sizes="41px"
                   className="h-[47px] w-[41px]"
                 />
-                <span className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em] text-white">
+                <span
+                  className="font-display font-bold text-white"
+                  style={{
+                    // Figma 1440 node 763:4884: Manrope Bold 32 px / lh 1.0 / -1.6 px
+                    fontSize: "32px",
+                    lineHeight: 1,
+                    letterSpacing: "-1.6px",
+                  }}
+                >
                   Public Images
                 </span>
               </>
@@ -291,7 +300,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
             `flex-1` lets this area absorb the grid-row's stretched height so both
             cards' visible bottoms stay aligned regardless of which card's text
             wraps to two lines at any given viewport. */}
-        <div className="relative flex flex-1 flex-col overflow-hidden bg-white py-[clamp(20px,2.5vw,36px)]" style={{ minHeight: "clamp(300px, 24vw, 380px)" }}>
+        <div className="relative flex flex-1 flex-col overflow-hidden bg-white py-[clamp(28px,3vw,44px)]" style={{ minHeight: "clamp(340px, 31vw, 441px)" }}>
           {/* Decorative blobs (Figma Ellipse 46681 #DF9BFF + 46682 #2CC1EB) */}
           <div
             aria-hidden
@@ -324,7 +333,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
 
           {/* Bullet list — Figma bullets are 31px-tall rows with 71px top-to-top
               spacing → 40px gap between rows (same for both cards). */}
-          <ul className="relative z-10 mx-auto flex h-full max-w-[320px] flex-col justify-center gap-[clamp(20px,2.2vw,32px)]">
+          <ul className="relative z-10 mx-auto flex h-full max-w-[400px] flex-col justify-center gap-[clamp(20px,2.5vw,36px)]">
             {features.map((label) => (
               <li key={label} className="flex items-center gap-6">
                 {isPublic ? (
@@ -347,8 +356,14 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
                   />
                 )}
                 <span
-                  className="text-body-lg tracking-[-0.01em] text-[#333333]"
-                  style={{ fontWeight: isPublic ? 600 : 700 }}
+                  className="font-display text-[#333333]"
+                  style={{
+                    // Figma 1440 node 763:4861: Manrope SemiBold 22 px / lh 1.4 / -1.1 px (-0.05em)
+                    fontSize: "clamp(1rem, 1.55vw, 1.375rem)",
+                    fontWeight: 600,
+                    lineHeight: 1.4,
+                    letterSpacing: "-0.05em",
+                  }}
                 >
                   {label}
                 </span>
