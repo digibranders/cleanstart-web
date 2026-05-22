@@ -80,7 +80,22 @@ export const Guides: CollectionConfig = {
       relationTo: 'authors',
       hasMany: true,
       filterOptions: {
+        // Exclude authors who've toggled themselves out of the picker.
+        // Existing bylines stay intact (the saved relation still resolves).
         acceptingNewBylines: { not_equals: false },
+      },
+      admin: {
+        // List-view cell parity with Blogs / News / Categories. Payload's
+        // default relationship cell renders "<No Authors>" placeholder text
+        // and (on this specific list) was implicated in a hydration-time
+        // error after page load. Custom RelationshipCell resolves the
+        // related doc's `useAsTitle` and caches across rows.
+        components: {
+          Cell: {
+            path: '@/payload/admin/components/RelationshipCell.tsx#RelationshipCell',
+            clientProps: { collectionSlug: 'authors' },
+          },
+        },
       },
     },
     {
@@ -90,6 +105,12 @@ export const Guides: CollectionConfig = {
       admin: {
         description:
           'Author who reviewed this guide. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal.',
+        components: {
+          Cell: {
+            path: '@/payload/admin/components/RelationshipCell.tsx#RelationshipCell',
+            clientProps: { collectionSlug: 'authors' },
+          },
+        },
       },
     },
     {
