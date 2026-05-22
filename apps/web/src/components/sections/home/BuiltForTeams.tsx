@@ -137,14 +137,15 @@ export function BuiltForTeams() {
       }}
     >
       <div className="relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 py-section-md">
-        <header className="mx-auto max-w-[760px] text-center">
+        <header className="mx-auto max-w-[867px] text-center">
           <h2
             id="testimonials-title"
             className="font-display"
             style={{
+              // Figma 1440 node 763:2909: Manrope Bold 62 px / lh 1.0 / -3.1 px / w-696
               fontSize: "clamp(2rem,5.2vw,3.875rem)",
               fontWeight: 700,
-              lineHeight: "105%",
+              lineHeight: 1,
               letterSpacing: "-0.05em",
             }}
           >
@@ -153,15 +154,21 @@ export function BuiltForTeams() {
               className="bg-clip-text text-transparent"
               style={{
                 backgroundImage:
-                  "linear-gradient(90deg, #33BAEC 0%, #6F8DFF 50%, #B19CFF 100%)",
+                  "linear-gradient(101.56deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
               }}
             >
               Uncertainty
             </span>
           </h2>
           <p
-            className="mx-auto mt-6 text-body-lg font-normal leading-[1.5] tracking-[-0.02em] text-white/85"
-            style={{ maxWidth: "620px" }}
+            className="mx-auto mt-8 font-normal text-white"
+            style={{
+              // Figma 1440 node 763:2910: Sora Regular 30 px / lh 1.4 / -1.2 px / opacity 0.8
+              fontSize: "clamp(1rem, 2.1vw, 1.875rem)",
+              lineHeight: 1.4,
+              letterSpacing: "-0.04em",
+              opacity: 0.8,
+            }}
           >
             CleanStart replaces unpredictable builds with verified, secure
             images — helping engineering teams cut response times and prevent
