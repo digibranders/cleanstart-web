@@ -7,25 +7,25 @@ const CARDS = [
     id: "tl",
     title: "Inherited Vulnerabilities",
     description: "Unused packages increase exposure.",
-    haloColor: "#ff4c4c",
+    haloColor: "#239CFF",
   },
   {
     id: "tr",
     title: "Too Many Components",
     description: "Larger images expand attack paths.",
-    haloColor: "#ff8f8f",
+    haloColor: "#239CFF",
   },
   {
     id: "bl",
     title: "Oversized SBOM's",
     description: "More dependencies create more noise.",
-    haloColor: "#ff4c4c",
+    haloColor: "#239CFF",
   },
   {
     id: "br",
     title: "Constant Patching",
     description: "More packages require more fixes",
-    haloColor: "#ff4c4c",
+    haloColor: "#239CFF",
   },
 ] as const;
 

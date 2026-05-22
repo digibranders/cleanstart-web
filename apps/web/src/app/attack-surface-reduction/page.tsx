@@ -46,11 +46,8 @@ export default function AttackSurfaceReductionPage(): React.ReactElement {
         <FadeUp>
           <ASRModern />
         </FadeUp>
-        <FadeUp>
-          <ASRCTA />
-        </FadeUp>
       </main>
-      <Footer />
+      <Footer cta={<ASRCTA />} />
     </>
   );
 }

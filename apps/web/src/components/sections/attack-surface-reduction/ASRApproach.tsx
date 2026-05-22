@@ -35,10 +35,10 @@ export function ASRApproach(): React.ReactElement {
           className="text-[#111]"
           style={{
             fontFamily: "var(--font-figtree)",
-            fontSize: "clamp(28px, 3.23vw, 62px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 600,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
             maxWidth: "562px",
             marginBottom: "48px",
           }}
@@ -120,10 +120,10 @@ export function ASRApproach(): React.ReactElement {
                 className="text-[#111]"
                 style={{
                   fontFamily: "var(--font-figtree)",
-                  fontSize: "clamp(18px, 1.6vw, 22px)",
+                  fontSize: "var(--text-t-heading-md)",
                   fontWeight: 700,
-                  letterSpacing: "-0.05em",
-                  lineHeight: 1.1,
+                  letterSpacing: "var(--text-t-heading-md-ls)",
+                  lineHeight: "var(--text-t-heading-md-lh)",
                 }}
               >
                 {card.title}
@@ -132,10 +132,10 @@ export function ASRApproach(): React.ReactElement {
                 className="text-[#333]"
                 style={{
                   fontFamily: "var(--font-figtree)",
-                  fontSize: "clamp(15px, 1.2vw, 17px)",
+                  fontSize: "var(--text-t-body-lg)",
                   fontWeight: 400,
-                  letterSpacing: "-0.04em",
-                  lineHeight: 1.4,
+                  letterSpacing: "var(--text-t-body-lg-ls)",
+                  lineHeight: "var(--text-t-body-lg-lh)",
                 }}
               >
                 {card.desc}
@@ -197,10 +197,10 @@ function ApproachCell({ card, padLeft }: ApproachCellProps): React.ReactElement 
           className="text-[#111]"
           style={{
             fontFamily: "var(--font-figtree)",
-            fontSize: "clamp(20px, 2.1vw, 32px)",
+            fontSize: "var(--text-t-heading-lg)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.0,
+            letterSpacing: "var(--text-t-heading-lg-ls)",
+            lineHeight: "var(--text-t-heading-lg-lh)",
             maxWidth: "225px",
           }}
         >
@@ -210,10 +210,10 @@ function ApproachCell({ card, padLeft }: ApproachCellProps): React.ReactElement 
           className="text-[#333]"
           style={{
             fontFamily: "var(--font-figtree)",
-            fontSize: "clamp(16px, 1.5vw, 22px)",
+            fontSize: "var(--text-t-heading-md)",
             fontWeight: 400,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.4,
+            letterSpacing: "var(--text-t-heading-md-ls)",
+            lineHeight: "var(--text-t-heading-md-lh)",
             maxWidth: "290px",
           }}
         >
