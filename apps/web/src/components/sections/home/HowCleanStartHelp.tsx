@@ -83,11 +83,13 @@ export function HowCleanStartHelp() {
       />
 
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
-        {/* Title row + 1×90 vertical separator + description */}
-        <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:flex-row md:gap-[70px]">
+        {/* Title row — title flush-left, separator centered, description right-aligned.
+            Same 1fr auto 1fr grid pattern used by SecurityNotPatching for visual
+            parity. */}
+        <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="how-cleanstart-title"
-            className="font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
+            className="justify-self-start font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
             style={{ maxWidth: "444px", lineHeight: 1 }}
           >
             How CleanStart Will Help
@@ -95,16 +97,16 @@ export function HowCleanStartHelp() {
           {/* Vertical 1×90 fading-gray separator (Figma Rectangle 1000001788) */}
           <div
             aria-hidden
-            className="hidden h-[90px] w-px shrink-0 md:mt-3 md:block"
+            className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
             style={{
               background:
                 "linear-gradient(180deg, rgba(204,204,204,0) 0%, rgba(204,204,204,1) 47.2%, rgba(204,204,204,0) 100%)",
             }}
           />
           <p
-            className="font-normal text-[#111111] md:mt-3"
+            className="font-normal text-[#111111] md:justify-self-end md:text-right"
             style={{
-              // Figma 1440 (node 763:2462): Sora Regular 30px / lh 1.4 / -1.2 px / w-604 / opacity 0.8
+              // Figma 1440 (node 763:2462): Sora Regular 30 px / lh 1.4 / -1.2 px / w-604 / opacity 0.8
               fontSize: "clamp(1rem, 2.1vw, 1.875rem)",
               lineHeight: 1.4,
               letterSpacing: "-0.04em",
