@@ -693,20 +693,19 @@ body {
   }
 }
 
-/* Factory card body — glassy blue.
-   `container-type: inline-size` enables card-scoped container queries so
-   the desktop variant's interior (title, orb, padding) can scale with
-   the card's own width via cqi units. See RESPONSIVE-SYSTEM-AUDIT.md §8.3
-   Option A. */
+/* Factory card body — Figma 1440 exact (node 763:3610..3742):
+   bg-gradient #151021 → #131e8f (71.2%) → #551ece (vertical),
+   3 px solid lavender (#dab6f3) border, 24 px radius, multi-layer shadow. */
 .cs-factory-card {
   container-type: inline-size;
   container-name: factory-card;
-  background:
-    radial-gradient(140% 90% at 50% 0%, rgba(135, 200, 255, 0.55), rgba(46, 78, 200, 0.25) 60%, rgba(20, 30, 100, 0.6) 100%);
-  border: 1px solid rgba(180, 210, 255, 0.35);
+  background: linear-gradient(to bottom, #151021 0%, #131e8f 71.2%, #551ece 100%);
+  border: 3px solid #dab6f3;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    0 18px 40px -16px rgba(20, 18, 60, 0.6);
+    -8px 4px 20px 0 rgba(0, 0, 0, 0.23),
+    -33px 16px 37px 0 rgba(0, 0, 0, 0.20),
+    -74px 37px 49px 0 rgba(0, 0, 0, 0.12),
+    -131px 65px 59px 0 rgba(0, 0, 0, 0.03);
 }
 
 /* Comparison card outer (Public Images / CleanStart) */

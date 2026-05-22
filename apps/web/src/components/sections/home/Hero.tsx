@@ -11,9 +11,11 @@ export function Hero() {
           <h1
             className="font-display font-semibold text-white"
             style={{
+              // Figma node 763:3567 exact spec (1440 home design):
+              // Manrope SemiBold 72px / line-none / tracking -3.6px (= -0.05em)
               fontSize: "var(--text-hero-marketing)",
-              letterSpacing: "var(--text-hero-marketing-ls)",
-              lineHeight: "var(--text-hero-lh)",
+              letterSpacing: "-0.05em",
+              lineHeight: 1,
             }}
           >
             Secure by Design. Built from Source. Verified Container Images
