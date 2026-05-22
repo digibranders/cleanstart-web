@@ -1,34 +1,3 @@
-import Image from "next/image";
-
-/**
- * Kubr bird — escapes the CTA card's overflow:hidden so it peeks above the
- * card top edge per the Figma reference. Passed to `<Footer ctaOverlay=...>`,
- * which renders it on top of the clipped CTA surface.
- */
-export function ReadyToSecureCTAOverlay() {
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute z-10"
-      style={{
-        left: "clamp(20px, 5vw, 63px)",
-        top: "clamp(-154px, -10vw, -90px)",
-        width: "clamp(180px, 18vw, 304px)",
-        aspectRatio: "304 / 206",
-      }}
-    >
-      <Image
-        src="/images/cta-kubr.png"
-        alt=""
-        width={304}
-        height={206}
-        sizes="304px"
-        className="h-full w-full object-contain"
-      />
-    </div>
-  );
-}
-
 /**
  * Inner content for the Home page CTA, rendered inside the Footer's fixed
  * 1276×330 / radius-40 slot. The Footer owns the container, position, overlap,

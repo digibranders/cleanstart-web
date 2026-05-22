@@ -134,17 +134,28 @@ export function FrequentlyAskedQuestions() {
       />
 
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
-        {/* Title bar — Figma: title left (493w), description right (585w) */}
-        <div className="mb-8 flex flex-col items-start justify-between gap-5 md:mb-10 md:flex-row md:gap-12">
+        {/* Title row — title flush-left, separator centered, description right-aligned.
+            Same 1fr_auto_1fr grid pattern used by SecurityNotPatching and
+            HowCleanStartHelp for visual parity. */}
+        <div className="mb-8 flex flex-col items-start gap-5 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="faq-title"
-            className="font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
+            className="justify-self-start font-display text-display-md font-bold tracking-[-0.05em] text-[#111111]"
             style={{ maxWidth: "493px", lineHeight: 1 }}
           >
             Frequently Asked Questions
           </h2>
+          {/* Vertical 1×90 fading-gray separator */}
+          <div
+            aria-hidden
+            className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(204,204,204,0) 0%, rgba(204,204,204,1) 47.2%, rgba(204,204,204,0) 100%)",
+            }}
+          />
           <p
-            className="font-normal text-[#111111]"
+            className="font-normal text-[#111111] md:justify-self-end md:text-right"
             style={{
               // Figma 1440 node 763:2984: Sora Regular 30 px / lh 1.4 / -1.2 px / opacity 0.8
               fontSize: "clamp(1rem, 2.1vw, 1.875rem)",

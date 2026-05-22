@@ -12,7 +12,7 @@ const BuiltForTeams = dynamic(() =>
 );
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
-import { ReadyToSecureCTA, ReadyToSecureCTAOverlay } from "@/components/sections/home/ReadyToSecureCTA";
+import { ReadyToSecureCTA } from "@/components/sections/home/ReadyToSecureCTA";
 import { Footer } from "@/components/sections/Footer";
 import { SecurityNotPatching } from "@/components/sections/home/SecurityNotPatching";
 import { CleanStartAdvantage } from "@/components/sections/home/CleanStartAdvantage";
@@ -166,7 +166,7 @@ export default function Home() {
           </FadeUp>
         </div>
       </main>
-      <Footer cta={<ReadyToSecureCTA />} ctaOverlay={<ReadyToSecureCTAOverlay />} />
+      <Footer cta={<ReadyToSecureCTA />} />
     </>
   );
 }
