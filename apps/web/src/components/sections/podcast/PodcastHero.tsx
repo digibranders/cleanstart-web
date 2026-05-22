@@ -77,7 +77,7 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
         />
         {/* Text content — heading style + top-spacing aligned with Resource Center hero
             for cross-page consistency. */}
-        <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-[120px] lg:pt-[158px] pb-[260px] flex flex-col items-center text-center">
+        <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[120px] lg:pt-[158px] pb-[260px] flex flex-col items-center text-center">
           {eyebrow ? (
             <span className="text-[#cdd6ff] text-[14px] tracking-[0.18em] uppercase mb-3">
               {eyebrow}

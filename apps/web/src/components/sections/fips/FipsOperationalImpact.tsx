@@ -88,7 +88,7 @@ export function FipsOperationalImpact(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-14 md:pt-[100px] pb-14 md:pb-[100px] xl:pb-[250px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-14 md:pt-[100px] pb-14 md:pb-[100px] xl:pb-[250px]">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-10 md:gap-12 items-center">
           {/* Cube */}
           <div className="flex justify-center md:justify-start">

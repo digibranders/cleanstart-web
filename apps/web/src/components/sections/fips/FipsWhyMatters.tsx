@@ -37,7 +37,7 @@ export function FipsWhyMatters(): React.ReactElement {
       data-section="FipsWhyMatters"
       className="relative bg-white overflow-hidden"
     >
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-16 md:pt-[88px] pb-16 md:pb-[112px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 md:pt-[88px] pb-16 md:pb-[112px]">
         {/* Heading + intro */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-12 md:mb-[64px]">
           <h2

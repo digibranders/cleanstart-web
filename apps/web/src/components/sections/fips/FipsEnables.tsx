@@ -132,7 +132,7 @@ export function FipsEnables(): React.ReactElement {
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-16 md:pt-[120px] pb-16 md:pb-[100px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 md:pt-[120px] pb-16 md:pb-[100px]">
         {/* Heading group (Figma 1:382 — 752w × 240h, centered) */}
         <div className="text-center mx-auto mb-12 md:mb-[52px]" style={{ maxWidth: "752px" }}>
           <h2

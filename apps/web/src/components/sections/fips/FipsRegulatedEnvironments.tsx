@@ -52,7 +52,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 py-14 md:py-[110px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-14 md:py-[110px]">
         <h2
           className="text-white mb-10 md:mb-[64px]"
           style={{

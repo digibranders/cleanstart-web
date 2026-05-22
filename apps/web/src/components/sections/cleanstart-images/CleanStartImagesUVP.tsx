@@ -74,7 +74,7 @@ export function CleanStartImagesUVP(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto max-w-[var(--container-default)] px-6"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{ paddingTop: "var(--spacing-section-md)", paddingBottom: "var(--spacing-section-md)" }}
       >
         <h2

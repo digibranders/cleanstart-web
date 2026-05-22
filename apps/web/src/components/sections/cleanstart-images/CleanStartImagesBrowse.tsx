@@ -55,7 +55,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto max-w-[var(--container-default)] px-6 flex flex-col items-center"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col items-center"
         style={{ paddingTop: "80px" }}
       >
         {/* Tab bar — Figma 161:23557, 478×64, pill shape */}

@@ -188,7 +188,7 @@ export default async function CareersPage({
               }}
             />
 
-            <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+            <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
               {/* Default `align-items: stretch` so the <nav> column matches the
                   job list's height — that's what gives the inner sticky white
                   card a tall enough parent to anchor against while scrolling

@@ -73,7 +73,7 @@ export function BlogsHero({
         />
       </div>
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Title + search + categories — centered block */}
         <div
           className="flex flex-col items-center gap-10 mx-auto"

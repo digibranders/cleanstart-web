@@ -37,7 +37,7 @@ export function AboutOurStory() {
       />
 
       {/* Text content — left-aligned */}
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
           className="flex flex-col gap-6 py-[clamp(72px,11vw,150px)]"
           style={{ maxWidth: "514px" }}

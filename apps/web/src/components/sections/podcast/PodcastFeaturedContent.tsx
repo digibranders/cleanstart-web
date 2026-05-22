@@ -72,7 +72,7 @@ export function PodcastFeaturedContent({
     >
       <Cube side="left" />
       <Cube side="right" />
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-[80px] pb-[80px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[80px] pb-[80px]">
         <h2
           id="podcast-featured-title"
           className="text-center text-white font-bold"

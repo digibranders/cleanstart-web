@@ -72,7 +72,7 @@ export function WebinarsGrid({
         />
       </div>
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8">
           <aside
             className="shrink-0 lg:sticky lg:max-h-[calc(100vh-112px)] lg:overflow-y-auto"
