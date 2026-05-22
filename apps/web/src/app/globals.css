@@ -83,12 +83,16 @@
   --color-cs-text-dark: #111111;
 
   /* Container family — see RESPONSIVE-SYSTEM-AUDIT.md §6.3.
-     --container-default returned to 1276 (2026-05-22) to match the
-     Figma 1440 artboard's 82 px outer gutters (frames sit at x=82,
-     width=1276 inside the 1440 frame). At ≥1276 viewports auto-margins
-     take over, producing 82 px gutters at exactly the 1440 viewport.
+     --container-default returned to 1440 (2026-05-22, second pass) so
+     the side gutter stays constant at every viewport up to 1440. With
+     `px-6` (24 px) inside the Container, every section gets exactly
+     24 px of breathing room on each side at 1280, 1366, 1440 alike.
+     Above 1440 the cap kicks in and auto-margins grow the gutter
+     uniformly. The 1276-with-82-px-gutter Figma reading was correct
+     for the artboard but felt over-gutter'd in product — the team
+     chose visual consistency across desktop widths instead.
      --container-cs kept as alias for any legacy consumer. */
-  --container-default: 1276px;
+  --container-default: 1440px;
   --container-prose:    720px;
   --container-wide:    1600px;
   --container-cs: var(--container-default);
