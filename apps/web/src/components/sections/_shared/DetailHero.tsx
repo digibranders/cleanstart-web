@@ -6,10 +6,13 @@ export const DETAIL_HERO_GRADIENT =
 
 export const DETAIL_HERO_MIN_HEIGHT = "auto";
 
+// Consumes the --text-hero-utility token (32 → 48 px, clamp below lg / fixed at lg+).
+// Line-height kept at 1.15 (slightly looser than the marketing-hero 1.05) because
+// listing and article-detail titles can wrap to multiple lines.
 export const DETAIL_HERO_TITLE_STYLE: CSSProperties = {
-  fontSize: "clamp(2rem, 4vw, 3.5rem)",
+  fontSize: "var(--text-hero-utility)",
   lineHeight: 1.15,
-  letterSpacing: "-0.03em",
+  letterSpacing: "var(--text-hero-utility-ls)",
 };
 
 export interface DetailHeroCrumb {
@@ -70,7 +73,7 @@ export function DetailHero({
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         <Breadcrumb items={breadcrumb} />
 
         <div className="flex justify-center mt-10">

@@ -83,7 +83,7 @@ export function CleanSightSecurity(): React.ReactElement {
       />
 
       {/* ════ PART 1: Feature Cards + Shield ════ */}
-      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6 pt-section-md">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-6 pt-section-md">
         {/* Heading — 744px wide, centered */}
         <h2
           className="text-white text-center mx-auto"
@@ -863,7 +863,7 @@ export function CleanSightSecurity(): React.ReactElement {
 
         {/* Mobile fallback */}
         <div
-          className="lg:hidden relative mx-auto max-w-[1276px] px-4 sm:px-6"
+          className="lg:hidden relative mx-auto max-w-[var(--container-default)] px-4 sm:px-6"
           style={{ paddingTop: "240px", paddingBottom: "64px" }}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

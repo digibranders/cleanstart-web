@@ -73,7 +73,7 @@ export function BlogsHero({
         />
       </div>
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         {/* Title + search + categories — centered block */}
         <div
           className="flex flex-col items-center gap-10 mx-auto"
@@ -89,9 +89,9 @@ export function BlogsHero({
                 id="blogs-hero-title"
                 className="font-display font-semibold text-white text-center w-full"
                 style={{
-                  fontSize: "clamp(3rem,5.6vw,5rem)",
-                  lineHeight: "1.0",
-                  letterSpacing: "-0.05em",
+                  fontSize: "var(--text-hero-utility)",
+                  lineHeight: "var(--text-hero-lh)",
+                  letterSpacing: "var(--text-hero-utility-ls)",
                 }}
               >
                 Blogs
@@ -165,10 +165,10 @@ export function BlogsHero({
                 </p>
                 <div className="flex flex-col gap-4 w-full">
                   <h2
-                    className="font-display text-[clamp(1.5rem,3.06vw,2.75rem)] font-bold leading-none tracking-[-0.05em] text-white overflow-hidden"
+                    className="font-display text-[clamp(1.5rem,3.06vw,2.75rem)] font-bold leading-tight tracking-[-0.05em] text-white overflow-hidden"
                     style={{
                       display: "-webkit-box",
-                      WebkitLineClamp: 3,
+                      WebkitLineClamp: 4,
                       WebkitBoxOrient: "vertical",
                     }}
                   >

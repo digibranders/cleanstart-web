@@ -82,7 +82,7 @@ export function HowCleanStartHelp() {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-[1276px] px-6">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
         {/* Title row + 1×90 vertical separator + description */}
         <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:flex-row md:gap-[70px]">
           <h2

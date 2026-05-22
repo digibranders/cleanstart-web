@@ -65,7 +65,7 @@ export function CleanStartAdvantage() {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-[1276px] px-6 py-section-lg">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 py-section-lg">
         {/* Intro: title + description (Figma Frame 10 at 316,3438 — 517×265) */}
         <div className="max-w-[517px]">
           <h2

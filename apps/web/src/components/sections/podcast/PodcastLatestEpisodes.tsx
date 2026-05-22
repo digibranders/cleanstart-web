@@ -43,7 +43,7 @@ export function PodcastLatestEpisodes({
             "radial-gradient(ellipse 80% 60% at 50% 40%, #000 40%, transparent 80%)",
         }}
       />
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-[260px] pb-[160px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-[260px] pb-[160px]">
         <h2
           id="podcast-latest-title"
           className="text-left text-[#111111] font-bold"

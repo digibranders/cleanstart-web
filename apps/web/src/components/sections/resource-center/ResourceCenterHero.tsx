@@ -76,7 +76,7 @@ export function ResourceCenterHero({
       </div>
 
       {/* Content */}
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         {/* Title block + search */}
         <div
           className="flex flex-col items-center gap-6 lg:gap-8 mx-auto pt-[120px] lg:pt-[158px]"
@@ -91,8 +91,9 @@ export function ResourceCenterHero({
               id="rc-hero-title"
               className="font-display font-semibold leading-none"
               style={{
-                fontSize: "clamp(1.75rem, 7.5vw, 4.5rem)",
-                letterSpacing: "-0.05em",
+                fontSize: "var(--text-hero-utility)",
+                letterSpacing: "var(--text-hero-utility-ls)",
+                lineHeight: "var(--text-hero-lh)",
               }}
             >
               {"Resource "}

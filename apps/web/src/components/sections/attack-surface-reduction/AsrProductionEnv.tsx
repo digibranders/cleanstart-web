@@ -32,7 +32,7 @@ export function AsrProductionEnv(): React.ReactElement {
       style={{
         background:
           "linear-gradient(180deg, rgba(21,16,33,1) 0%, rgba(19,30,143,1) 67%, rgba(71,30,192,1) 100%)",
-        minHeight: "clamp(400px, 39.5vw, 758px)",
+        minHeight: "clamp(360px, 32vw, 620px)",
       }}
     >
       <h2 className="sr-only">Built for Modern Production Environments</h2>
@@ -74,7 +74,7 @@ export function AsrProductionEnv(): React.ReactElement {
       />
 
       {/* Content */}
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-section-md pb-section-cta">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-section-md pb-section-cta">
         {/* Heading */}
         <p
           className="text-white mb-14 md:mb-[88px]"

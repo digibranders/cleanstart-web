@@ -167,7 +167,7 @@ export function NewsroomHero(): React.ReactElement {
         />
       </div>
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         <div
           className="flex flex-col items-center gap-6 mx-auto text-center"
           style={{ paddingTop: "clamp(88px, 11vw, 146px)", paddingBottom: "clamp(40px, 5vw, 80px)", maxWidth: "623px" }}
@@ -176,9 +176,9 @@ export function NewsroomHero(): React.ReactElement {
             id="newsroom-hero-title"
             className="font-display font-semibold text-white"
             style={{
-              fontSize: "clamp(2.75rem, 5.6vw, 5rem)",
-              lineHeight: "1.0",
-              letterSpacing: "-0.05em",
+              fontSize: "var(--text-hero-utility)",
+              lineHeight: "var(--text-hero-lh)",
+              letterSpacing: "var(--text-hero-utility-ls)",
             }}
           >
             Newsroom

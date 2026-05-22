@@ -1,3 +1,5 @@
+> **ARCHIVED 2026-05-21.** This document is superseded by [`../RESPONSIVE-SYSTEM-AUDIT.md`](../RESPONSIVE-SYSTEM-AUDIT.md). Kept for historical reference only.
+
 # CleanStart Web — Responsive Design Forensic Audit
 
 **Date (v1 forensic audit):** 2026-05-18

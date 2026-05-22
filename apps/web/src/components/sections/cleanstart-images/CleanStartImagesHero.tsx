@@ -17,17 +17,17 @@ export function CleanStartImagesHero(): React.ReactElement {
     >
       {/* Content wrapper — Figma frame 1920×1084, title at y=175 */}
       <div
-        className="relative mx-auto max-w-[1276px] px-6 flex flex-col items-center text-center"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 flex flex-col items-center text-center"
         style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(48px, 6vw, 80px)" }}
       >
         <h1
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(40px, 4.17vw, 80px)",
+            fontSize: "var(--text-hero-product)",
             fontWeight: 600,
             letterSpacing: "-0.03em",
-            lineHeight: 1.0,
+            lineHeight: "var(--text-hero-lh)",
             maxWidth: "820px",
           }}
         >

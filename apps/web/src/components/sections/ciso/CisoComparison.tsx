@@ -362,7 +362,7 @@ export function CisoComparison(): React.ReactElement {
 
       {/* ════════════ MOBILE cards ════════════ */}
       <div
-        className="xl:hidden relative mx-auto max-w-[1276px] px-4 sm:px-6"
+        className="xl:hidden relative mx-auto max-w-[var(--container-default)] px-4 sm:px-6"
         style={{ paddingTop: "48px", paddingBottom: "60px" }}
       >
         {/* Traditional card */}

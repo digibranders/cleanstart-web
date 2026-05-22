@@ -29,7 +29,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
       {/* Background photo */}
       <div
         className="relative"
-        style={{ minHeight: "clamp(460px, 37vw, 711px)" }}
+        style={{ minHeight: "clamp(400px, 32vw, 580px)" }}
       >
         {/* Background image */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -54,7 +54,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
         />
 
         {/* Content */}
-        <div className="relative mx-auto max-w-[1276px] px-6 py-section-md flex flex-col justify-between h-full">
+        <div className="relative mx-auto max-w-[var(--container-default)] px-6 py-section-md flex flex-col justify-between h-full">
           {/* Heading */}
           <div>
             <p

@@ -218,7 +218,7 @@ export function ResourcesInsights() {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-[1276px] px-6">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
         {/* Title + description (stacked, left-aligned) */}
         <h2
           id="resources-title"

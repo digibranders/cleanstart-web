@@ -57,16 +57,16 @@ export function AboutHero() {
         />
       </div>
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         {/* Text at top: 178px from section top, matching Figma node 248:2066 */}
         <div className="pt-[clamp(96px,11vw,178px)] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col items-start gap-14 lg:max-w-[436px]">
             <h1
               className="font-display font-semibold text-white"
               style={{
-                fontSize: "clamp(3rem, 5.5vw, 5.5rem)",
-                lineHeight: "1.0",
-                letterSpacing: "-0.05em",
+                fontSize: "var(--text-hero-marketing)",
+                lineHeight: "var(--text-hero-lh)",
+                letterSpacing: "var(--text-hero-marketing-ls)",
               }}
             >
               Security Begins at The Source

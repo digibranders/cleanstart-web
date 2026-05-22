@@ -1,3 +1,5 @@
+> **ARCHIVED 2026-05-21.** This document is superseded by [`../RESPONSIVE-SYSTEM-AUDIT.md`](../RESPONSIVE-SYSTEM-AUDIT.md). Kept for historical reference only.
+
 # CleanStart Design Tokens (extracted from Figma)
 
 > **v3 Consistency Layer is canonical for component work.** Every component touched after 2026-05-20 must pick its sizes from the **role → token mapping tables** in the section below. The lint gate (Sprint 1 Day 4 of the v3 plan) enforces "no arbitrary values"; this section enforces *which* token. Figma values live in this file's later sections for re-extraction reference; the *role assignments* below are the source of truth.

@@ -62,7 +62,7 @@ export function SCAReduceNoise(): React.ReactElement {
 
       {/* Content: two columns */}
       <div
-        className="relative mx-auto max-w-[1276px] px-6 flex flex-col lg:flex-row items-start justify-between"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 flex flex-col lg:flex-row items-start justify-between"
         style={{ paddingTop: "120px", paddingBottom: "120px", gap: "40px" }}
       >
         {/* Left — heading + subtitle + 4 feature rows */}

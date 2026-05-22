@@ -7,7 +7,7 @@
  *   • blue 3D ball icon (96×96), title (text-card-title-lg), body (text-body-md)
  *
  * Responsive: 4-up on lg, 2-up on sm, stacked on mobile. Uses py-section-md
- * vertical padding token and standard mx-auto max-w-[1276px] rail.
+ * vertical padding token and standard mx-auto max-w-[var(--container-default)] rail.
  */
 
 const CARDS = [
@@ -51,7 +51,7 @@ export function SbomIntelligence(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6 py-section-md">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 py-section-md">
         {/* Heading */}
         <div className="text-center mb-10 md:mb-14">
           <h2

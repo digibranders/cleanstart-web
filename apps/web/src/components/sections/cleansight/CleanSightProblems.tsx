@@ -61,7 +61,7 @@ export function CleanSightProblems(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-4 sm:px-6 py-section-md">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-6 py-section-md">
         {/* Heading */}
         <div className="text-center">
           <h2

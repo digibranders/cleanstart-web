@@ -137,14 +137,14 @@ export function TeamsHero() {
       />
 
       {/* ── Content ── */}
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         <div className="flex flex-col items-center gap-6 pb-[80px] pt-[180px] text-center">
           <h1
             className="w-full font-display font-semibold text-white"
             style={{
-              fontSize: "clamp(2.5rem, 5.5vw, 5rem)",
-              lineHeight: "1.0",
-              letterSpacing: "-0.05em",
+              fontSize: "var(--text-hero-marketing)",
+              lineHeight: "var(--text-hero-lh)",
+              letterSpacing: "var(--text-hero-marketing-ls)",
             }}
           >
             {"United by "}

@@ -76,10 +76,10 @@ export function CisoHero(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(38px, 4.16vw, 80px)",
+              fontSize: "var(--text-hero-product)",
               fontWeight: 600,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.0,
+              letterSpacing: "var(--text-hero-product-ls)",
+              lineHeight: "var(--text-hero-lh)",
               marginBottom: "32px",
             }}
           >

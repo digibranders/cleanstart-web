@@ -115,7 +115,7 @@ export function LatestBlogs({
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         {/* Section heading */}
         <h2
           className="font-display font-bold"

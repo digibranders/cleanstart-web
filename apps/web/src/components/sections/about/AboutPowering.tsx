@@ -106,7 +106,7 @@ export function AboutPowering() {
 
       {/* ── Foreground content ─────────────────────────────────────── */}
 
-      <div className="relative mx-auto max-w-[1276px] px-6 pt-[100px] pb-[20px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 pt-[100px] pb-[20px]">
         {/* Title group — 248:2152 (centered, max-w 969px) */}
         <div className="mx-auto flex max-w-[969px] flex-col items-center gap-6 text-center text-white">
           <h2 className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em]">

@@ -133,7 +133,7 @@ export function FrequentlyAskedQuestions() {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-[1276px] px-6">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6">
         {/* Title bar — Figma: title left (493w), description right (585w) */}
         <div className="mb-8 flex flex-col items-start justify-between gap-5 md:mb-10 md:flex-row md:gap-12">
           <h2

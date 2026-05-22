@@ -1155,7 +1155,7 @@ export function SCATransform(): React.ReactElement {
       className="relative overflow-hidden bg-white"
       style={{ paddingTop: "120px", paddingBottom: "120px" }}
     >
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         {/* Section heading */}
         <h2
           className="text-center"

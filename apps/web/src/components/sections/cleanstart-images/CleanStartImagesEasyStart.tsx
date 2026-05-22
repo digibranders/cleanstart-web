@@ -54,7 +54,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
       data-section="CleanStartImagesEasyStart"
       className="relative overflow-hidden"
       style={{
-        minHeight: "clamp(480px, 44vw, 626px)",
+        minHeight: "clamp(420px, 36vw, 520px)",
         background:
           "linear-gradient(180deg, #0B0820 0%, #1A1248 35%, #2E1B8C 75%, #3A20B0 100%)",
       }}
@@ -72,7 +72,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto max-w-[1276px] px-6"
+        className="relative mx-auto max-w-[var(--container-default)] px-6"
         style={{ paddingTop: "var(--spacing-section-md)", paddingBottom: "var(--spacing-section-md)" }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_512px] gap-12 lg:gap-16 items-start">

@@ -105,7 +105,7 @@ export function WebinarsHero(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         <div
           className="flex flex-col items-center gap-6 mx-auto text-center"
           style={{ paddingTop: "140px", paddingBottom: "80px", maxWidth: "864px" }}
@@ -114,9 +114,9 @@ export function WebinarsHero(): React.ReactElement {
             id="webinars-hero-title"
             className="font-display font-semibold text-white"
             style={{
-              fontSize: "clamp(2.75rem, 5.6vw, 5rem)",
-              lineHeight: "1.0",
-              letterSpacing: "-0.04em",
+              fontSize: "var(--text-hero-utility)",
+              lineHeight: "var(--text-hero-lh)",
+              letterSpacing: "var(--text-hero-utility-ls)",
             }}
           >
             CleanStart{" "}

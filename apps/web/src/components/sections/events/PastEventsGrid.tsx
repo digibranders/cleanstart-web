@@ -97,7 +97,7 @@ export function PastEventsGrid({
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         <h2
           className="font-display font-bold"
           style={{

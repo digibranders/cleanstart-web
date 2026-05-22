@@ -16,7 +16,7 @@ import Image from "next/image";
  *   Enterprise Security Teams — "Improve software supply chain visibility."
  *
  * Responsive: 2-column on lg, image-then-stacked-cards on smaller screens.
- * Uses py-section-md vertical padding token and standard max-w-[1276px] rail.
+ * Uses py-section-md vertical padding token and standard max-w-[var(--container-default)] rail.
  */
 
 const CARDS = [
@@ -67,7 +67,7 @@ export function SbomAdvantage(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6 py-section-md" style={{ paddingBottom: "250px" }}>
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 py-section-md" style={{ paddingBottom: "250px" }}>
         {/* Heading */}
         <div className="text-center mb-10 md:mb-14">
           <h2

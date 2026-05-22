@@ -57,7 +57,7 @@ export function AboutOurVision() {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
           {/* Left: target / bullseye 3D image — wrapper sized to tight Figma CONTENT bounds (609×568) for max target size */}
           <div className="flex items-center lg:justify-start">

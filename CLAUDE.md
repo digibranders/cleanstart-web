@@ -36,7 +36,8 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 │   └── web/                         @cleanstart/web marketing site · Next.js 16 · Tailwind v4 · port 3001
 │       ├── src/{app,components,lib}/
 │       ├── figma.config.json         Figma Code Connect (include: src/components/**/*.figma.tsx)
-│       └── docs/design-tokens.md    Extracted Figma tokens (hero gradient, typography, palette, node IDs)
+│       └── docs/RESPONSIVE-SYSTEM-AUDIT.md  Authoritative responsive/typography/sizing system (2026-05-21)
+│       └── docs/_archive/           Legacy docs (RESPONSIVE-AUDIT.md, design-tokens.md, typography.md, web-responsiveness plan.md) — do NOT consult or copy from
 ├── packages/
 │   ├── types/                       re-exports apps/cms/payload-types
 │   ├── ui/                          @cleanstart/ui design-system primitives + tokens; consumed by apps/cms and apps/web
@@ -107,24 +108,49 @@ pnpm --filter @cleanstart/web build
 
 Everything in this section applies only to `apps/web`. It does not override the global code conventions above — it extends them.
 
-### v3 Consistency Layer (canonical for sizing)
+### Responsive system rules (canonical — supersedes v3 / Figma-tokens / RESPONSIVE-AUDIT)
 
-> Active responsive-remediation plan: `~/.claude/plans/lovely-honking-milner.md` (5 × 1-week sprints, started 2026-05-20).
-> Sizing/spacing/typography source of truth: **`apps/web/docs/design-tokens.md` § "v3 Consistency Layer — role → token mapping"**. Every component touched must pick its sizes from those tables; the lint gate (Sprint 1 Day 4) enforces "no arbitrary values" and the mapping table enforces *which* token.
-> Rules in short:
-> - **Use tokens, not arbitrary values.** No new `text-[Xrem]`, no bare `h-[Xpx]` on `*Card*` files, no bare `w-[Xpx]` without a `max-w` qualifier, no flat-px `fontSize:` in inline styles outside the documented allow-list.
+> **Source of truth: `apps/web/docs/RESPONSIVE-SYSTEM-AUDIT.md` (2026-05-21).**
+> All earlier docs (`apps/web/docs/_archive/RESPONSIVE-AUDIT.md`, `design-tokens.md`, `typography.md`, `web-responsiveness plan.md`) are archived. **Do NOT copy patterns from them**, do not reference them in new code or PRs, do not treat their "v3 Consistency Layer" tables as binding. Anything in those archived docs is historical.
+
+**Layout primitives (use these, do not hand-roll wrappers):**
+> - `<Container variant="default|wide|prose">` (`apps/web/src/components/layout/Container.tsx`) — wraps page content with the correct `--container-{default|wide|prose}` max-width (1440 / 1600 / 720). **Never hardcode `max-w-[1276px]`** — that magic number is gone from the codebase and must not return.
+> - `<Section padding="sm|md|lg|cta|none">` (`apps/web/src/components/layout/Section.tsx`) — wraps a section with one of the `--spacing-section-*` tokens. Default `padding="md"` (64 → 120 px fluid).
+
+**Hero H1 (consume the role token, do not inline clamp):**
+> - Marketing pages (home, about, teams) → `style={{ fontSize: "var(--text-hero-marketing)", letterSpacing: "var(--text-hero-marketing-ls)", lineHeight: "var(--text-hero-lh)" }}` → 40 → 72 px
+> - Product pages (cleansight, cleanstart-images, ASR, FIPS, CISO, SBOM, SCA, vulnerability-remediation) → `var(--text-hero-product)` → 36 → 56 px
+> - Listing + detail pages (blogs, news, events, podcast, webinars, resource-center, *[/slug]*) → `var(--text-hero-utility)` → 32 → 48 px. The shared `_shared/DetailHero.tsx` already consumes this; reuse it instead of building a new hero.
+> - Tokens are fluid below `lg` (1024 px) and lock to fixed px from `lg+`. Do NOT inline `clamp(...)` for a new hero — it diverges from the role system.
+
+**Card-grid interior scaling (use container queries, not viewport units):**
+> - For cards in a multi-column grid (Factory pattern, Resources article cards, etc.) where the card width depends on grid columns, add `container-type: inline-size` to the card root and size interiors with `clamp(min, Xcqi, max)`. See `apps/web/src/components/ui/FactoryCard.tsx` (desktop variant) for the reference implementation.
+> - The card's title-to-card-width ratio should land in the **8–13 %** band at every desktop viewport.
+> - Do NOT use viewport-scoped `clamp(min, Xvw, max)` for card interiors — it produces the over-sizing bug that the Factory card had before the container-query refactor.
+
+**CMS prose / blog rendering:**
+> - Body content from RenderLexical lives inside `.article-body` (see `apps/web/src/components/sections/blog/BlogDetailContent.tsx`).
+> - `.article-body .article-{paragraph|h1|h2|h3|h4|h5|h6|ul|ol|li|blockquote}` rules in `globals.css` consume the `--prose-*` token family. Body 17 → 18 px / lh 1.6 / column max 680 px / H3 ≥ 22 px (hierarchy must hold above body).
+> - **Do NOT use `text-[clamp(...)]` directly on prose elements** — wrap the content in `.article-body` and let the rules apply.
+
+**Form inputs (iOS Safari rule):**
+> - `<input>`, `<textarea>`, `<select>` must have `font-size: 16 px` minimum (or `1rem`). Below 16 px, iOS Safari zooms in on focus. `FormRenderer.tsx`'s `fieldInputStyle` already sets this; never override with `text-sm` (14 px).
+
+**Navbar logo:**
+> - Logo `<a>` link uses `shrink-0`, and the `<Image>` uses `shrink-0 object-contain` with explicit `width`/`height` props. The fix in `Header.tsx` / `Logo.tsx` prevents flex from squashing the aspect ratio at narrow viewports.
+
+**Carry-over rules from the prior system (still apply):**
+> - **No bare `w-[Xpx]` without a `max-w` qualifier.** Card widths use `w-full max-w-[Xpx]`.
 > - **Card heights → `min-h-[clamp()]` or `aspect-ratio`**, never `h-[Xpx]`.
-> - **Card widths → `w-full max-w-[Xpx]`**, never bare `w-[Xpx]`.
-> - **Every `<Image>` requires `sizes`** matching its actual rendered widths per breakpoint.
+> - **Every `<Image>` requires `sizes`** matching its rendered widths per breakpoint.
 > - **SVG with intrinsic ratio uses `preserveAspectRatio="xMidYMid meet"`** (never `"none"`).
-> - **No `<br />` in prose** (`<p>`, `<h1>`, `<h2>`, `<h3>`). Trust `max-width` and natural wrap.
-> - **Buttons use the discrete `--btn-fs-*` / `--btn-h-*` / `--btn-px-*` scale**, never `clamp()`. Primary CTAs are 44px tall minimum; smaller variants require `data-cta-utility` and are exempt from the axe-core `target-size` rule.
-> - **CMS prose (`.article-body`, Lexical render) uses the long-form subtable in `design-tokens.md`**, not the marketing card-body tokens — the two regimes are not interchangeable.
-> - **Section vertical padding uses one of the four `--spacing-section-*` tokens** (`py-section-sm` 48→80, `py-section-md` 64→120, `py-section-lg` 80→150, `py-section-cta` 160→250). Raw `paddingTop: 80px` / `py-16 md:py-20 xl:py-[120px]` shapes are forbidden in new code; heros are excluded (header-offset clamps). Default token for a new section is `py-section-md`.
-> - **Footer CTA-card geometry is owned by `Footer.tsx`**, not by per-page CTAs. Per-page CTAs paint *inside* the 1200 × {420 sm:360 lg:300} slot via the `cta` prop and never set their own width/height/border-radius. See "Footer CTA slot contract" in `design-tokens.md`.
-> - **Newsletter input boxes** (BlogsCTA / EventsCTA / WebinarsCTA pattern): wrapper is `flex-1 min-w-0` inside a `w-full` form. Never hardcode `width: 427px` — it overflows the 1200 slot at narrow desktops.
-> - **Font weights follow the role scale**: 400 body / 500 button/nav/meta / 600 sub-head + card title / 700 section head + hero head. No `fontWeight: 800` anywhere on marketing pages.
-> - **The closing artifact and measured v3.8 metrics** live in `apps/web/docs/RESPONSIVE-AUDIT.md` Part 14. The Lockdown checklist in §14.4 is the gate before `development` → `main` merge.
+> - **No `<br />` in prose** (`<p>`, `<h1>`, `<h2>`, `<h3>`). Trust `max-width` + `text-wrap: balance` (applied globally on `h1`/`h2`/`h3`/`h4` via `@layer base`).
+> - **Buttons use `--btn-fs-*` / `--btn-h-*` / `--btn-px-*`**, never `clamp()`. Primary CTAs ≥ 44 px tall.
+> - **Section vertical padding uses `--spacing-section-*` tokens** via the `<Section padding>` prop or `py-section-*` utility classes. Do not invent new `pt-Xpx sm:pt-Ypx lg:pt-Zpx` shapes.
+> - **Footer CTA-card geometry is owned by `Footer.tsx`**. Per-page CTAs paint inside the slot via the `cta` prop.
+> - **Font weights**: 400 body / 500 button/nav/meta / 600 sub-head + card title + hero / 700 article body H1-H3. No `font-weight: 800`.
+
+**The Figma artboard is 1920 px — that is the WRONG primary width.** The dev site targets 1440 as the primary viewport. When porting from Figma, scale interior dimensions (cards, illustrations, gaps, section padding) by ~0.75× where appropriate; keep absolute sizes (body text, buttons, form inputs, icons in text) at industry standards regardless of Figma. See RESPONSIVE-SYSTEM-AUDIT.md §17 decision 6 for the design-team handoff.
 
 ### Component structure
 
@@ -137,21 +163,24 @@ Everything in this section applies only to `apps/web`. It does not override the 
 
 Every section is built directly from Figma design context. These rules are non-negotiable:
 
-**Values must be exact — never approximated.**
+**Values must be exact — never approximated** (decorative gradients, shadows, radii):
 - Copy gradient strings verbatim including angle, all stops, and opacities.
-- Letter-spacing in `em` exactly as Figma reports (e.g. `-0.05em` ≠ `-0.04em`).
+- Letter-spacing in `em` exactly as Figma reports — except when consuming the role tokens (which already encode the correct tracking).
 - Border-radius in exact `px` — `40px` is not `rounded-2xl` (which is `16px`).
 - Shadow strings copied in full including all layers.
 - Use `style={{}}` inline for any value that cannot be expressed as an exact Tailwind class.
-- Use `clamp(minREM, Xvw, maxREM)` for all font sizes — never hardcode `px` for text.
 
-**Section wrapper pattern:**
+**Font sizes — use the token, not inline clamp:** Consume `--text-hero-{marketing|product|utility}`, `--text-display-{sm|md|lg}`, `--text-card-title-{sm|md|lg|xl}`, `--text-body-{xs|sm|md|lg|xl}`, or `--prose-*`. Inline `text-[clamp(...)]` for a new H1/H2 is forbidden — it bypasses the role system and produces the per-page H1-size drift the audit fixed.
+
+**Section wrapper pattern (new code MUST use this):**
 ```tsx
-<section className="relative overflow-hidden ..." style={{ minHeight: "Xpx" }}>
-  {/* decorative elements — absolute positioned */}
-  <div className="relative mx-auto max-w-[1276px] px-6">
+import { Section, Container } from "@/components/layout";
+
+<Section padding="md" className="relative overflow-hidden ...">
+  {/* decorative elements — absolute positioned, parent of <Section> */}
+  <Container>
     {/* content */}
-  </div>
+  </Container>
 </section>
 ```
 The outer `relative overflow-hidden` clips decorative elements. The inner `relative` wrapper ensures content sits above absolute decorative layers.

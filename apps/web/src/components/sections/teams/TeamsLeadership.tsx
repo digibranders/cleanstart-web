@@ -263,7 +263,7 @@ export function TeamsLeadership() {
       </div>
 
       {/* ── Content ── */}
-      <div className="relative mx-auto max-w-[1276px] px-6">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6">
         {/* Executive Leadership */}
         <h2
           className="mb-[60px] text-center font-display font-bold text-[#111]"

@@ -4,7 +4,7 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
       data-section="CleanStartImagesEnvironment"
       className="relative overflow-hidden"
       style={{
-        minHeight: "clamp(440px, 41vw, 594px)",
+        minHeight: "clamp(380px, 34vw, 500px)",
         background:
           "linear-gradient(180deg, #0B0820 0%, #131448 40%, #1F1D7F 75%, #2A2BA8 100%)",
       }}
