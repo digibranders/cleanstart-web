@@ -155,7 +155,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
 
   return (
     <div
-      className="relative mx-auto w-full lg:max-w-[clamp(380px,32vw,480px)]"
+      className="relative mx-auto flex h-full w-full flex-col lg:max-w-[clamp(380px,32vw,480px)]"
       style={{
         borderRadius: 40,
         background: "#2CC1EB", // outer cyan border (visible 10px around inner)
@@ -164,7 +164,7 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
       }}
     >
       <div
-        className="relative overflow-hidden"
+        className="relative flex flex-1 flex-col overflow-hidden"
         style={{ borderRadius: 32 }}
       >
         {/* Header section — dark gradient + decorative watermark + logo + cyan glow.
@@ -280,8 +280,11 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
           </div>
         </div>
 
-        {/* White content area — Figma inner body rect 108:7965/108:7903 is 441px tall. */}
-        <div className="relative min-h-[clamp(300px,24vw,380px)] overflow-hidden bg-white py-[clamp(20px,2.5vw,36px)]">
+        {/* White content area — Figma inner body rect 108:7965/108:7903 is 441px tall.
+            `flex-1` lets this area absorb the grid-row's stretched height so both
+            cards' visible bottoms stay aligned regardless of which card's text
+            wraps to two lines at any given viewport. */}
+        <div className="relative flex flex-1 flex-col overflow-hidden bg-white py-[clamp(20px,2.5vw,36px)]" style={{ minHeight: "clamp(300px, 24vw, 380px)" }}>
           {/* Decorative blobs (Figma Ellipse 46681 #DF9BFF + 46682 #2CC1EB) */}
           <div
             aria-hidden
