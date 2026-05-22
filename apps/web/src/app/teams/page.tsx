@@ -3,6 +3,7 @@ import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { TeamsHero } from "@/components/sections/teams/TeamsHero";
 import { TeamsLeadership } from "@/components/sections/teams/TeamsLeadership";
+import { TeamsHustleSquad } from "@/components/sections/teams/TeamsHustleSquad";
 import { TeamsInsiders } from "@/components/sections/teams/TeamsInsiders";
 import { TeamsHowWeWork } from "@/components/sections/teams/TeamsHowWeWork";
 import { TeamsCTA } from "@/components/sections/teams/TeamsCTA";
@@ -37,6 +38,11 @@ export default function TeamsPage() {
         {/* Executive Leadership + Advisory Board */}
         <FadeUp>
           <TeamsLeadership />
+        </FadeUp>
+
+        {/* The Hustle Squad — team photo carousel on dark gradient */}
+        <FadeUp>
+          <TeamsHustleSquad />
         </FadeUp>
 
         {/* CleanStart Insiders testimonials */}
