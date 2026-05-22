@@ -70,21 +70,25 @@ export function CisoCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Content row */}
+      {/* Content row.
+          Top padding pulled in (80 → 56) and title column widened (401 → 560)
+          so the long "Strengthen Your Software Supply Chain Foundations"
+          headline wraps into 3 lines instead of 5 and stays vertically
+          centered within the 330 px CTA card slot. */}
       <div
         className="relative flex flex-col lg:flex-row items-start"
-        style={{ padding: "80px 100px", gap: "68px" }}
+        style={{ padding: "56px 100px 60px", gap: "56px" }}
       >
         {/* Left: headline */}
         <p
           className="relative flex-shrink-0 text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 3vw, 42px)",
+            fontSize: "var(--text-t-display-2)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.1,
-            width: "min(401px, 100%)",
+            letterSpacing: "var(--text-t-display-2-ls)",
+            lineHeight: "var(--text-t-display-2-lh)",
+            width: "min(560px, 100%)",
             zIndex: 1,
           }}
         >
@@ -96,10 +100,10 @@ export function CisoCTA(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(14px, 1.09vw, 21px)",
+              fontSize: "var(--text-t-body-lg)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.4,
+              letterSpacing: "var(--text-t-body-lg-ls)",
+              lineHeight: "var(--text-t-body-lg-lh)",
               color: "rgba(255, 255, 255, 0.8)",
               maxWidth: "500px",
             }}

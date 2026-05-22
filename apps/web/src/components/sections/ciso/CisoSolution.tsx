@@ -106,10 +106,10 @@ export function CisoSolution(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(28px, 3.23vw, 62px)",
+              fontSize: "var(--text-t-display-2)",
               fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1,
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
               marginBottom: "24px",
             }}
           >
@@ -118,10 +118,10 @@ export function CisoSolution(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(16px, 1.56vw, 30px)",
+              fontSize: "var(--text-t-subhead)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.4,
+              letterSpacing: "var(--text-t-subhead-ls)",
+              lineHeight: "var(--text-t-subhead-lh)",
               color: "rgba(255,255,255,0.8)",
               maxWidth: "835px",
               margin: "0 auto",
@@ -299,10 +299,10 @@ export function CisoSolution(): React.ReactElement {
                   className="relative text-white"
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "clamp(16px, 1.67vw, 32px)",
+                    fontSize: "var(--text-t-heading-lg)",
                     fontWeight: 500,
-                    letterSpacing: "-0.05em",
-                    lineHeight: 1,
+                    letterSpacing: "var(--text-t-heading-lg-ls)",
+                    lineHeight: "var(--text-t-heading-lg-lh)",
                     marginBottom: "12px",
                     whiteSpace: "pre-line",
                   }}
@@ -313,10 +313,10 @@ export function CisoSolution(): React.ReactElement {
                   className="relative"
                   style={{
                     fontFamily: "var(--font-sans)",
-                    fontSize: "clamp(13px, 0.94vw, 18px)",
+                    fontSize: "var(--text-t-body-lg)",
                     fontWeight: 400,
-                    letterSpacing: "-0.07em",
-                    lineHeight: 1.1,
+                    letterSpacing: "var(--text-t-body-lg-ls)",
+                    lineHeight: "var(--text-t-body-lg-lh)",
                     color: "rgba(255,255,255,0.8)",
                   }}
                 >
