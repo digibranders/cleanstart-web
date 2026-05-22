@@ -65,13 +65,12 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
         </div>
       </div>
 
-      {/* DESKTOP (lg+) — container-query-driven layout. Card root declares
-          container-type via the .cs-factory-card rule in globals.css; the
-          interior title / orb / padding scale with the card's own width
-          via cqi units rather than the viewport. */}
+      {/* DESKTOP (lg+) — Figma 1440 spec (node 763:3610..3742):
+          Fixed 374 px height, 24 px corner radius, 3 px lavender (#DAB6F3)
+          border. Title and description sized to Figma values (32 / 16). */}
       <div
-        className="cs-factory-card relative hidden w-full overflow-hidden rounded-[24px] lg:flex lg:flex-col lg:items-center lg:gap-2 lg:pt-4 lg:pb-4"
-        style={{ minHeight: "clamp(220px, 60cqi, 374px)" }}
+        className="cs-factory-card relative hidden w-full overflow-hidden rounded-[24px] lg:flex lg:flex-col lg:items-center lg:gap-3 lg:pt-4 lg:pb-4"
+        style={{ height: "374px" }}
       >
         {/* Layer 1 — purple ellipse (upper-left accent) */}
         <div
@@ -134,31 +133,42 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           style={{ boxShadow: "inset 0 0 0 1.5px rgba(218,182,243,0.35)" }}
         />
 
-        {/* Orb icon — width scales 55% of card width, height auto. */}
-        <div className="pointer-events-none relative flex w-full items-center justify-center px-3">
+        {/* Orb icon — Figma 1440 spec: 220 × 164 px (placed top-aligned). */}
+        <div className="pointer-events-none relative flex w-full items-center justify-center">
           <Image
             src="/images/factory-orb.png"
             alt=""
             width={168}
             height={164}
             priority
-            sizes="(min-width: 1280px) 168px, 25vw"
-            className="w-auto object-contain drop-shadow-[0_10px_20px_rgba(20,15,60,0.55)]"
-            style={{ height: "clamp(80px, 55cqi, 164px)" }}
+            sizes="168px"
+            className="object-contain drop-shadow-[0_10px_20px_rgba(20,15,60,0.55)]"
+            style={{ height: "164px", width: "auto" }}
           />
         </div>
 
-        {/* Title + description — sized with cqi so they're always proportional to the card. */}
-        <div className="relative flex w-full flex-col items-center gap-2 px-3 text-center">
+        {/* Title + description — Figma 1440 exact:
+            Title Manrope Regular 32px / lh 1.0 / tracking -1.6px (-0.05em)
+            Desc  Sora    Regular 16px / lh 1.1 / tracking -0.64px (-0.04em) / opacity 0.8 */}
+        <div className="relative flex w-full flex-col items-center gap-3 px-3 text-center">
           <h3
-            className="font-display font-medium leading-tight tracking-[-0.04em] text-white"
-            style={{ fontSize: "clamp(1.125rem, 11cqi, 1.75rem)" }}
+            className="font-display font-normal text-white"
+            style={{
+              fontSize: "32px",
+              lineHeight: 1,
+              letterSpacing: "-1.6px",
+            }}
           >
             {renderTitle(title)}
           </h3>
           <p
-            className="font-normal leading-snug tracking-[-0.04em] text-white"
-            style={{ fontSize: "clamp(0.8125rem, 6cqi, 1.125rem)" }}
+            className="font-normal text-white"
+            style={{
+              fontSize: "16px",
+              lineHeight: 1.1,
+              letterSpacing: "-0.64px",
+              opacity: 0.8,
+            }}
           >
             {description}
           </p>
