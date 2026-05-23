@@ -1,136 +1,112 @@
-import Image from "next/image";
-import { Container, Section } from "@/components/layout";
+import Image from 'next/image';
 
-// Mirrors the Figma logo row (KPMG · Livlong · Hitachi · Aurascape · O9).
-const LOGOS: { file: string; name: string }[] = [
-  { file: "05-kpmg.png", name: "KPMG" },
-  { file: "09-livlong.png", name: "Livlong" },
-  { file: "06-hitachi.png", name: "Hitachi" },
-  { file: "08-aurascape.png", name: "Aurascape" },
-  { file: "07-o9.webp", name: "O9" },
+// Figma node 732:3467 — logos confirmed visible (non-blank exports)
+// Order matches Figma row: Livlong · Hitachi · Aurascape · Vi · Encora
+const LOGOS = [
+  { src: '/images/community/logo-loteria.png', alt: 'Livlong Insurance', w: 217, h: 55 },
+  { src: '/images/community/logo-hitachi.png', alt: 'Hitachi', w: 138, h: 55 },
+  { src: '/images/community/logo-purestorage.png', alt: 'Aurascape', w: 157, h: 55 },
+  { src: '/images/community/logo-vi.png', alt: 'Vi', w: 61, h: 55 },
+  { src: '/images/community/logo-encora.png', alt: 'Encora', w: 140, h: 40 },
 ];
 
-/**
- * "Union" cube — Figma decorative parallelogram. 324×377, gradient +
- * 10% opacity + 4px white border, rotated by matrix(-0.78, 0.62, 0.62,
- * 0.78). Two appear in the Trusted-by section: top-left and
- * bottom-right corners.
- */
-function UnionCube({
-  leftPct,
-  topPx,
-}: {
-  leftPct: number;
-  topPx: number;
-}) {
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute hidden lg:block"
-      style={{
-        left: `${leftPct}%`,
-        top: `${topPx}px`,
-        width: "323.83px",
-        height: "376.84px",
-        background:
-          "linear-gradient(334.43deg, rgba(44,193,235,0) -11.15%, #9A51FF 109.49%), #FFFFFF",
-        opacity: 0.1,
-        border: "4px solid #FFFFFF",
-        transform: "matrix(-0.78, 0.62, 0.62, 0.78, 0, 0)",
-        transformOrigin: "0 0",
-      }}
-    />
-  );
-}
-
-/**
- * Community / Trusted-by section (Figma 732:3467).
- *
- * White section background with two #DF9BFF blurred ellipses softening
- * the corners and two tilted "Union" cube shapes echoing the brand
- * geometry. Headline + logo strip sit on top.
- */
 export function CommunityTrustedBy() {
   return (
-    <Section
-      padding="lg"
-      ariaLabel="Trusted by industry leaders"
-      className="overflow-hidden bg-white"
-    >
-      {/* #DF9BFF blurred ellipse — top-left (Figma Ellipse 46685, -91,-66) */}
+    <section className="relative overflow-hidden bg-white">
+      {/* Decorative purple ellipse — top-left corner */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
         style={{
-          left: "calc(-91 / 1920 * 100%)",
-          top: "-66px",
-          width: "258px",
-          height: "258px",
-          borderRadius: "50%",
-          background: "#DF9BFF",
-          opacity: 0.5,
-          filter: "blur(121.5px)",
+          left: '-91px',
+          top: '-66px',
+          width: '258px',
+          height: '258px',
+          borderRadius: '50%',
+          background: 'radial-gradient(closest-side, rgba(196,70,239,0.25) 0%, transparent 70%)',
+          filter: 'blur(40px)',
         }}
       />
-      {/* #DF9BFF blurred ellipse — bottom-right (Figma Ellipse 46684, 1784,349) */}
+      {/* Decorative purple ellipse — bottom-right corner */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
         style={{
-          left: "calc(1784 / 1920 * 100%)",
-          top: "349px",
-          width: "258px",
-          height: "258px",
-          borderRadius: "50%",
-          background: "#DF9BFF",
-          opacity: 0.5,
-          filter: "blur(121.5px)",
+          right: '-60px',
+          bottom: '-30px',
+          width: '258px',
+          height: '258px',
+          borderRadius: '50%',
+          background: 'radial-gradient(closest-side, rgba(196,70,239,0.25) 0%, transparent 70%)',
+          filter: 'blur(40px)',
         }}
       />
 
-      {/* Union cube — top-left (-215, -181) */}
-      <UnionCube leftPct={(-215 / 1920) * 100} topPx={-181} />
-      {/* Union cube — bottom-right (1660, 234) */}
-      <UnionCube leftPct={(1660 / 1920) * 100} topPx={234} />
-
-      <Container className="relative">
+      <div className="relative py-[clamp(48px,7vw,100px)]">
+        {/* Heading */}
         <h2
-          className="text-center font-display font-bold text-[#0B0B27]"
+          className="font-display font-bold text-center mb-[clamp(32px,4vw,56px)]"
           style={{
-            fontSize: "var(--text-display-md)",
-            lineHeight: 1.1,
-            letterSpacing: "-0.02em",
+            fontSize: 'clamp(2rem, 4vw, 3.875rem)',
+            lineHeight: '1.05',
+            letterSpacing: '-0.05em',
           }}
         >
-          Trusted by industry{" "}
+          <span style={{ color: '#111111' }}>Trusted by industry</span>{' '}
           <span
+            className="bg-clip-text text-transparent"
             style={{
-              background:
-                "linear-gradient(90deg, #3960F9 0%, #239CFF 60%, #82AEFF 100%)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
+              backgroundImage:
+                'linear-gradient(-5.38deg, rgb(44, 193, 235) 0%, rgb(154, 81, 255) 63.963%)',
             }}
           >
             leaders
           </span>
         </h2>
 
-        <div className="mt-[clamp(40px,5vw,72px)] flex flex-wrap items-center justify-center gap-x-[clamp(32px,6vw,80px)] gap-y-8">
-          {LOGOS.map(({ file, name }) => (
-            <div key={file} className="flex h-10 items-center justify-center">
-              <Image
-                src={`/images/trusted/${file}`}
-                alt={name}
-                width={160}
-                height={40}
-                sizes="160px"
-                className="h-10 w-auto max-w-[180px] object-contain opacity-90"
-              />
-            </div>
-          ))}
+        {/* ── Infinite logo ticker ─────────────────────────────────────────────────
+            .cs-marquee provides: display:flex; width:max-content;
+            animation: cs-marquee-rtl linear infinite (defined in globals.css).
+            Doubled logo list means -50% translateX = exactly one logo-set width
+            → seamless loop with no jump.
+            mask-image fades logos into the background on both edges.
+        ──────────────────────────────────────────────────────────────────────── */}
+        <div
+          className="relative overflow-hidden"
+          style={{
+            maskImage:
+              'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+            WebkitMaskImage:
+              'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+          }}
+        >
+          <div
+            className="cs-marquee items-center"
+            style={{
+              gap: 'clamp(48px, 5.208vw, 100px)',
+              animationDuration: '28s',
+            }}
+          >
+            {[...LOGOS, ...LOGOS].map((logo, i) => (
+              <div
+                key={i}
+                className="flex-none flex items-center justify-center"
+              >
+                <Image
+                  src={logo.src}
+                  alt={logo.alt}
+                  width={logo.w}
+                  height={logo.h}
+                  sizes="(max-width: 768px) 100px, 180px"
+                  className="h-8 w-auto max-w-[180px] object-contain"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      </Container>
-    </Section>
+      </div>
+    </section>
   );
 }

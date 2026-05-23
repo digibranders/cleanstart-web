@@ -1,72 +1,72 @@
 /**
- * Community / CTA — Footer slot content (Figma 732:4357, 1276×295).
- *
- * Renders inside the Footer's locked 1276×330 / radius-40 slot. Owns
- * only the fill, decorative cube, and copy/CTA. The wrapper is
- * `absolute inset-0` to fill the slot.
+ * Community page CTA — rendered inside the Footer's locked 1200px × 300px
+ * radius-40 slot. Matches the Figma "Ready to secure the future?" card
+ * (node 732:4357): bg-gradient-to-b from-#131e8f to-#471ec0, left-aligned
+ * two-column layout, 3D element on the right.
  */
 export function CommunityCTA() {
   return (
     <div
-      className="absolute inset-0 grid grid-cols-1 items-center gap-y-6 p-8 md:gap-y-0 md:p-12 lg:grid-cols-[440px_1fr_280px] lg:gap-x-[clamp(32px,6vw,90px)] lg:p-[clamp(28px,4.2vw,56px)_clamp(48px,7vw,122px)]"
+      className="absolute inset-0 flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-center md:gap-0 md:p-12 lg:p-[clamp(40px,6vw,85px)_clamp(48px,8vw,122px)]"
       style={{
-        background: "linear-gradient(180deg, #131E8F 0%, #471EC0 100%)",
+        background: 'linear-gradient(180deg, #131E8F 0%, #471EC0 111.05%)',
       }}
     >
-      {/* Decorative radial */}
+      {/* Decorative blob */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
         style={{
-          left: "-10%",
-          top: "-30%",
-          width: "640px",
-          height: "640px",
-          background:
-            "radial-gradient(closest-side, rgba(127,82,255,0.45) 0%, rgba(127,82,255,0) 70%)",
+          left: '-8%',
+          top: '-40%',
+          width: '640px',
+          height: '640px',
+          borderRadius: '50%',
+          background: 'radial-gradient(closest-side, rgba(127,82,255,0.45) 0%, transparent 70%)',
         }}
       />
 
+      {/* Headline */}
       <p
-        className="relative z-10 font-display font-bold text-white"
+        className="relative z-10 font-display font-bold text-white md:w-[38%] md:shrink-0"
         style={{
-          maxWidth: "401px",
-          fontSize: "var(--text-t-display-2, var(--text-display-md))",
-          lineHeight: 1.05,
-          letterSpacing: "-0.04em",
+          fontSize: 'clamp(1.75rem, 3vw, 3.4375rem)',
+          lineHeight: '1.0',
+          letterSpacing: '-0.05em',
+          maxWidth: '401px',
         }}
       >
         Ready to secure the future?
       </p>
 
-      <div className="relative z-10 flex flex-col items-start gap-6">
+      {/* Body + CTA */}
+      <div className="relative z-10 flex flex-col items-start gap-6 md:pl-[clamp(32px,6vw,115px)]">
         <p
-          className="font-sans font-normal text-white"
+          className="font-sans font-normal text-white/80"
           style={{
-            maxWidth: "493px",
-            fontSize: "var(--text-body-lg)",
-            lineHeight: 1.4,
-            letterSpacing: "-0.025em",
-            opacity: 0.85,
+            fontSize: 'clamp(1rem, 1.4vw, 1.3125rem)',
+            lineHeight: '1.4',
+            letterSpacing: '-0.04em',
+            maxWidth: '493px',
           }}
         >
-          Join the community building the world&rsquo;s most trusted software ecosystem.
+          Join the community building the world&apos;s most trusted software ecosystem.
         </p>
         <a
-          href="https://github.com/cleanstart"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="cs-btn-glass"
+          href="#join"
+          className="cs-btn-glass flex items-center gap-2"
           style={{
-            ["--cs-btn-px" as string]: "18px",
-            ["--cs-btn-fs" as string]: "18px",
-            color: "#111111",
+            ['--cs-btn-px' as string]: '18px',
+            ['--cs-btn-fs' as string]: '18px',
+            color: '#111111',
+            letterSpacing: '-0.01em',
+            fontWeight: 500,
           }}
         >
-          <span>Join the Community</span>
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
+          Join the Community
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
             <path
-              d="M3 9h11m0 0l-4-4m4 4l-4 4"
+              d="M4 10h12m0 0-5-5m5 5-5 5"
               stroke="currentColor"
               strokeWidth="1.75"
               strokeLinecap="round"
@@ -76,22 +76,30 @@ export function CommunityCTA() {
         </a>
       </div>
 
-      {/* 3-D cube — right side */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      {/* 3D decorative element — right side, hidden below md */}
+      <div
         aria-hidden
-        src="/images/community/cta-cube.png"
-        alt=""
-        className="pointer-events-none relative z-10 hidden select-none lg:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
-          width: "260px",
-          height: "auto",
-          justifySelf: "end",
-          transform: "rotate(-12deg)",
+          right: 'clamp(20px, 4vw, 60px)',
+          top: '50%',
+          transform: 'translateY(-50%) rotate(-12.05deg)',
+          width: 'clamp(160px, 16vw, 254px)',
+          aspectRatio: '254 / 258',
+          opacity: 0.8,
         }}
-        loading="lazy"
-        decoding="async"
-      />
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/community/cta-3d-element.png"
+          alt=""
+          width={254}
+          height={258}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-contain"
+        />
+      </div>
     </div>
   );
 }

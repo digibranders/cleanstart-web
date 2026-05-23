@@ -1,162 +1,348 @@
-"use client";
+'use client';
 
-import { useRef } from "react";
-import Image from "next/image";
-import { Container, Section } from "@/components/layout";
+import { useState, useRef, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 
-type Quote = { name: string; role: string; avatar: string; body: string };
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
-const QUOTES: Quote[] = [
+interface Testimonial {
+  name: string;
+  role: string;
+  quote: string;
+  avatarSrc: string;
+  avatarW: number;
+  avatarH: number;
+}
+
+const TESTIMONIALS: Testimonial[] = [
   {
-    name: "Kevin R.",
-    role: "CISO, TechCorp",
-    avatar: "/images/community/avatar-kevin.png",
-    body: '"CleanStart has fundamentally changed our approach to developer security. We\'ve reduced vulnerabilities by 90% by following community-driven standards."',
+    name: 'Kevin R.',
+    role: 'CISO, TechCorp',
+    quote:
+      '"CleanStart has fundamentally changed our approach to developer security. We\'ve reduced vulnerabilities by 90% by following community-driven standards."',
+    avatarSrc: '/images/community/testimonial-avatar-1.png',
+    avatarW: 47,
+    avatarH: 47,
   },
   {
-    name: "Kevin R.",
-    role: "CISO, TechCorp",
-    avatar: "/images/community/avatar-kevin.png",
-    body: '"CleanStart has fundamentally changed our approach to developer security. We\'ve reduced vulnerabilities by 90% by following community-driven standards."',
+    name: 'Sarah M.',
+    role: 'VP Engineering, DataFlow',
+    quote:
+      '"The community\'s insight on SBOMs saved us weeks of compliance work. CleanStart made our whole pipeline audit-ready overnight."',
+    avatarSrc: '/images/community/testimonial-avatar-1.png',
+    avatarW: 47,
+    avatarH: 47,
   },
   {
-    name: "Kevin R.",
-    role: "CISO, TechCorp",
-    avatar: "/images/community/avatar-kevin.png",
-    body: '"CleanStart has fundamentally changed our approach to developer security. We\'ve reduced vulnerabilities by 90% by following community-driven standards."',
+    name: 'James T.',
+    role: 'Platform Lead, ScaleOps',
+    quote:
+      '"Adopting zero-CVE images through CleanStart gave our team real confidence. Security is no longer an afterthought — it\'s baked into every build."',
+    avatarSrc: '/images/community/testimonial-avatar-1.png',
+    avatarW: 47,
+    avatarH: 47,
   },
 ];
 
-function QuoteIcon({ size = 32, color = "#0B0B27" }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size * 0.75} viewBox="0 0 32 24" fill="none" aria-hidden>
-      <path
-        d="M0 24V13.4q0-5.32 2.84-9.5T11.3 0v6.34Q7.92 6.94 6.6 9.1q-1.32 2.16-1.32 4.62H10v10.28Zm17 0V13.4q0-5.32 2.84-9.5T28.3 0v6.34q-3.38.6-4.7 2.76-1.32 2.16-1.32 4.62H27v10.28Z"
-        fill={color}
-      />
-    </svg>
+const CARD_GAP = 32; // px — matches Figma gap between cards
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export function CommunityTestimonials(): React.ReactElement {
+  const [current, setCurrent] = useState(0);
+  const [slideWidth, setSlideWidth] = useState(696);
+  const firstCardRef = useRef<HTMLDivElement>(null);
+  const total = TESTIMONIALS.length;
+
+  // Measure first card width on mount and on resize
+  useEffect(() => {
+    const update = (): void => {
+      if (firstCardRef.current) {
+        setSlideWidth(firstCardRef.current.getBoundingClientRect().width);
+      }
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  const prev = useCallback((): void => setCurrent((i) => Math.max(0, i - 1)), []);
+  const next = useCallback(
+    (): void => setCurrent((i) => Math.min(total - 1, i + 1)),
+    [total],
   );
-}
 
-/**
- * Community / Testimonials carousel (Figma 732:3695).
- *
- * Light-tinted lavender backdrop with a large quote glyph at top-left,
- * paired carousel-arrow chips top-right, and a horizontally-scrollable
- * row of white quote cards. The third card peeks from behind to hint
- * scrollability (Figma `Rectangle 1000001880` at x=1187, y=-51).
- */
-export function CommunityTestimonials() {
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  const scrollBy = (dir: 1 | -1) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const card = track.querySelector("article");
-    const step = card ? card.getBoundingClientRect().width + 32 : 400;
-    track.scrollBy({ left: dir * step, behavior: "smooth" });
-  };
+  const translateX = -(current * (slideWidth + CARD_GAP));
 
   return (
-    <Section
-      padding="lg"
-      ariaLabel="Community testimonials"
-      className="overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(180deg, #F4EEFB 0%, #ECE7FE 60%, #E6E1FF 100%)",
-      }}
+    <section
+      className="relative overflow-hidden"
+      style={{ background: '#f6f6f6' }}
     >
-      {/* Decorative purple glow — bottom-left */}
+      {/* ── Decorative: Vector grid — top-left ──────────────────────────── */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/community/testimonial-vector.svg"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute hidden select-none xl:block"
+        style={{ left: '-270px', top: '-325px', width: '701px', height: '680px' }}
+        loading="lazy"
+        decoding="async"
+      />
+      {/* ── Decorative: Vector grid — top-right ─────────────────────────── */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/community/testimonial-vector.svg"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute hidden select-none xl:block"
+        style={{
+          left: 'calc(1441 / 1920 * 100%)',
+          top: '-380px',
+          width: '701px',
+          height: '680px',
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+
+      {/* ── Decorative: Union shapes ─────────────────────────────────────── */}
+      {/* Right union */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden lg:block"
+        className="pointer-events-none absolute hidden select-none xl:block"
         style={{
-          left: "-180px",
-          bottom: "-180px",
-          width: "560px",
-          height: "560px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(closest-side, rgba(122,89,255,0.25) 0%, rgba(122,89,255,0) 70%)",
-          filter: "blur(60px)",
+          right: 'calc(-192 / 1920 * 100%)',
+          top: '323px',
+          width: '488px',
+          height: '497px',
+          transform: 'scaleY(-1) rotate(141.39deg)',
+          opacity: 0.5,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/community/testimonial-union.svg"
+          alt=""
+          className="h-full w-full select-none object-contain"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      {/* Left union */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden select-none xl:block"
+        style={{
+          left: 'calc(-192 / 1920 * 100%)',
+          top: '323px',
+          width: '488px',
+          height: '497px',
+          transform: 'scaleY(-1) rotate(141.39deg)',
+          opacity: 0.5,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/community/testimonial-union.svg"
+          alt=""
+          className="h-full w-full select-none object-contain"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      {/* ── Decorative: Purple ellipses ───────────────────────────────────── */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden select-none lg:block"
+        style={{
+          left: 'calc(-37 / 1920 * 100%)',
+          top: '468px',
+          width: '258px',
+          height: '258px',
+          borderRadius: '50%',
+          background: 'radial-gradient(closest-side, rgba(196,70,239,0.18) 0%, transparent 70%)',
+          filter: 'blur(40px)',
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden select-none lg:block"
+        style={{
+          right: 'calc(-37 / 1920 * 100%)',
+          top: '442px',
+          width: '258px',
+          height: '258px',
+          borderRadius: '50%',
+          background: 'radial-gradient(closest-side, rgba(196,70,239,0.18) 0%, transparent 70%)',
+          filter: 'blur(40px)',
         }}
       />
 
-      <Container className="relative">
-        {/* Top row: quote icon + carousel arrows */}
-        <div className="flex items-center justify-between">
-          <QuoteIcon size={48} />
-          <div className="flex items-center gap-3">
+      {/* ── Content ───────────────────────────────────────────────────────── */}
+      {/*
+          pb-[250px] = Footer CTA contract:
+          170px CTA overlap + 80px breathing room above CTA top edge
+          (see Footer.tsx layout contract comment)
+      */}
+      <div className="relative z-10 mx-auto max-w-[var(--container-default)] px-6 pb-[250px] pt-[clamp(40px,6vw,100px)]">
+
+        {/* ── Header row: large quote mark + nav arrows ─────────────────── */}
+        <div className="mb-10 flex items-center justify-between">
+          {/* Large double-quote from Figma (72×72 asset) */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/community/testimonial-quote-lg.svg"
+            alt=""
+            aria-hidden
+            className="shrink-0 select-none"
+            style={{ width: '72px', height: '72px' }}
+            loading="eager"
+            decoding="async"
+          />
+
+          {/* Prev / Next buttons */}
+          <div className="flex items-center gap-6">
             <button
               type="button"
-              onClick={() => scrollBy(-1)}
               aria-label="Previous testimonial"
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0B0B27] text-white transition hover:bg-[#1B1F4F] cursor-pointer"
+              onClick={prev}
+              disabled={current === 0}
+              className="shrink-0 transition-opacity disabled:opacity-30"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
-                <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              {/* imgFrame rotated 180° to become left-arrow */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/community/testimonial-btn-prev.svg"
+                alt=""
+                aria-hidden
+                className="block select-none"
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  transform: 'rotate(180deg) scaleY(-1)',
+                }}
+                loading="eager"
+                decoding="async"
+              />
             </button>
             <button
               type="button"
-              onClick={() => scrollBy(1)}
               aria-label="Next testimonial"
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0B0B27] text-white transition hover:bg-[#1B1F4F] cursor-pointer"
+              onClick={next}
+              disabled={current === total - 1}
+              className="shrink-0 transition-opacity disabled:opacity-30"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
-                <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/community/testimonial-btn-next.svg"
+                alt=""
+                aria-hidden
+                className="block select-none"
+                style={{ width: '48px', height: '48px' }}
+                loading="eager"
+                decoding="async"
+              />
             </button>
           </div>
         </div>
 
-        {/* Carousel track */}
-        <div
-          ref={trackRef}
-          className="mt-10 flex snap-x snap-mandatory gap-8 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {QUOTES.map((q, i) => (
-            <article
-              key={i}
-              className="snap-start shrink-0 rounded-[16px] bg-white p-8 shadow-[0_24px_48px_-24px_rgba(11,11,39,0.18)]"
-              style={{ width: "min(696px, 85vw)" }}
-            >
-              <header className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span
-                    aria-hidden
-                    className="relative h-[47px] w-[47px] overflow-hidden rounded-full bg-[#E6E1FF]"
-                  >
-                    <Image src={q.avatar} alt="" width={47} height={47} className="h-full w-full object-cover" />
-                  </span>
-                  <div className="flex flex-col">
-                    <span
-                      className="font-display font-semibold text-[#0B0B27]"
-                      style={{ fontSize: "16px", lineHeight: 1.3 }}
-                    >
-                      {q.name}
-                    </span>
-                    <span
-                      className="font-sans uppercase text-[#5A5A6E]"
-                      style={{ fontSize: "11px", letterSpacing: "0.08em" }}
-                    >
-                      {q.role}
-                    </span>
-                  </div>
-                </div>
-                <QuoteIcon size={28} color="#B8B3D9" />
-              </header>
-              <p
-                className="mt-6 font-sans text-[#3A3A52]"
-                style={{ fontSize: "17px", lineHeight: 1.5, letterSpacing: "-0.01em" }}
+        {/* ── Slider ────────────────────────────────────────────────────── */}
+        {/*
+            overflow-hidden clips the peeking next card.
+            The track translates left by (current × (cardWidth + gap)).
+            Right-edge blur overlay provides the soft Figma fade-out effect.
+        */}
+        <div className="relative overflow-hidden">
+          {/* Slide track */}
+          <div
+            className="flex gap-8 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+            style={{ transform: `translateX(${translateX}px)` }}
+          >
+            {TESTIMONIALS.map((t, i) => (
+              <div
+                key={i}
+                ref={i === 0 ? firstCardRef : undefined}
+                className="flex-none w-full md:w-[696px]"
+                aria-hidden={i !== current}
               >
-                {q.body}
-              </p>
-            </article>
-          ))}
+                {/* Card — white rounded-[32px] matching Figma SVG viewBox r=32 */}
+                <div
+                  className="min-h-[327px] rounded-[32px] bg-white p-[clamp(24px,3.33vw,48px)]"
+                  style={{ boxShadow: '0 2px 32px rgba(17,17,17,0.06)' }}
+                >
+                  {/* Avatar row */}
+                  <div className="mb-6 flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      {/* Avatar circle */}
+                      <div className="shrink-0 overflow-hidden rounded-full" style={{ width: 47, height: 47 }}>
+                        <Image
+                          src={t.avatarSrc}
+                          alt={t.name}
+                          width={t.avatarW}
+                          height={t.avatarH}
+                          sizes="47px"
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <p
+                          className="font-sans font-semibold text-[#250800]"
+                          style={{ fontSize: '16px', lineHeight: '1.5' }}
+                        >
+                          {t.name}
+                        </p>
+                        <p
+                          className="font-sans font-normal text-[#250800]"
+                          style={{ fontSize: '14px', lineHeight: '1.5' }}
+                        >
+                          {t.role}
+                        </p>
+                      </div>
+                    </div>
+                    {/* Small quote mark — Figma imgImage583126Vectorized (35×47) */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/images/community/testimonial-quote-sm.svg"
+                      alt=""
+                      aria-hidden
+                      className="shrink-0 select-none"
+                      style={{ width: '35px', height: '47px', opacity: 0.25 }}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+
+                  {/* Quote text — Figma: Figtree SemiBold 26px / lh 1.5 */}
+                  <p
+                    className="font-display font-semibold text-[#250800]"
+                    style={{
+                      fontSize: 'clamp(1rem, 1.354vw, 1.625rem)',
+                      lineHeight: '1.5',
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    {t.quote}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Right-edge blur fade — matches Figma's bg-[#f6f6f6] blur-[17px] overlay */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 w-[130px]"
+            style={{
+              background:
+                'linear-gradient(to right, rgba(246,246,246,0) 0%, rgba(246,246,246,0.6) 40%, rgba(246,246,246,0.95) 80%, #f6f6f6 100%)',
+            }}
+          />
         </div>
-      </Container>
-    </Section>
+
+      </div>
+    </section>
   );
 }
