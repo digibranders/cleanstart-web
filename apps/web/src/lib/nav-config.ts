@@ -37,6 +37,8 @@ export type NavFlatItem = {
   kind: "flat";
   label: string;
   href: string;
+  /** true = page is built and the item renders as a <Link>; omit or false = <span> */
+  built?: boolean;
 };
 
 export type NavItem = NavMegaItem | NavCompactItem | NavFlatItem;
@@ -148,9 +150,8 @@ export const NAV_TREE: NavItem[] = [
       { label: "Teams", href: "/teams", built: true },
       { label: "Community", href: "/community", built: true },
       { label: "Careers", href: "/careers", built: true },
-      { label: "Contact Us", href: "/contact-us" },
+      { label: "Contact Us", href: "/contact-us", built: true },
     ],
   },
-  { kind: "flat", label: "Pricing", href: "/pricing" },
-  { kind: "flat", label: "Partners", href: "/partners" },
+  { kind: "flat", label: "Partners", href: "/partners", built: true },
 ];

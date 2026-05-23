@@ -32,7 +32,7 @@ export function ASRApproach(): React.ReactElement {
       {/* Heading */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 md:pt-[88px]">
         <h2
-          className="text-[#111]"
+          className="text-center text-[#111]"
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "clamp(32px, 4vw, 56px)",
@@ -40,6 +40,7 @@ export function ASRApproach(): React.ReactElement {
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
             maxWidth: "562px",
+            marginInline: "auto",
             marginBottom: "48px",
           }}
         >
@@ -145,12 +146,15 @@ interface ApproachCellProps {
 }
 
 function ApproachCell({ card, padLeft }: ApproachCellProps): React.ReactElement {
+  /* Inner padding insets each card from the section's container edges so the
+     4-up grid feels detached from the viewport max-width. Outer side pushes
+     content inward toward the centre divider. */
   return (
     <div
       className="relative flex items-center gap-8 py-10"
       style={{
-        paddingLeft: padLeft ? "48px" : "0",
-        paddingRight: padLeft ? "0" : "48px",
+        paddingLeft: padLeft ? "48px" : "160px",
+        paddingRight: padLeft ? "160px" : "48px",
       }}
     >
       {/* Soft radial glow behind icon */}
@@ -158,7 +162,7 @@ function ApproachCell({ card, padLeft }: ApproachCellProps): React.ReactElement 
         aria-hidden
         className="absolute pointer-events-none"
         style={{
-          left: padLeft ? "48px" : "0",
+          left: padLeft ? "48px" : "160px",
           top: "50%",
           transform: "translateY(-50%)",
           width: "165px",

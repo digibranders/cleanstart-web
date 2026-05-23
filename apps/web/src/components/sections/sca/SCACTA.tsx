@@ -4,15 +4,13 @@ import Link from "next/link";
 /**
  * SCA CTA — Figma node 604:3631 (1276×335 px card in Footer slot)
  *
- * Layout: everything centred — heading + description + button in a 571px
- * column, horizontally & vertically centred inside the card.
+ * Two-column layout: heading left, description + button right.
  * 3D teal cube peeks from the bottom-right corner (clips via parent overflow:hidden).
  *
  * Background: linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)
- * Heading:    55px Figtree Bold, white, letter-spacing -0.05em
- * Body:       21px regular, white 80%, centre-aligned, letter-spacing -0.04em
- * Button:     "Make SCA Actionable" — glass: border #dab6f3, bg white 65%
- * Cube:       absolute at left:84.81% top:58.07%, overflows right/bottom edges
+ * Heading:    clamp(26-44) / 600 / Manrope, white
+ * Body:       clamp(16-20) / 400 / Sora, white @ 80%
+ * Button:     "Make SCA Actionable" — glass
  */
 
 export function SCACTA(): React.ReactElement {
@@ -114,9 +112,9 @@ export function SCACTA(): React.ReactElement {
             style={{
               fontFamily: "var(--font-sans)",
               fontSize: "clamp(16px, 1.5vw, 20px)",
-            fontWeight: 400,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.4,
+              fontWeight: 400,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
               color: "rgba(255,255,255,0.8)",
               margin: 0,
             }}
@@ -132,6 +130,7 @@ export function SCACTA(): React.ReactElement {
               {
                 "--cs-btn-px": "18px",
                 "--cs-btn-fs": "16px",
+                fontWeight: 400,
               } as React.CSSProperties
             }
           >

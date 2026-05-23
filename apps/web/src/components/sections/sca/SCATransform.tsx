@@ -359,7 +359,8 @@ function TraditionalSCACard(): React.ReactElement {
             color: "#64748b",
             lineHeight: "20px",
             textAlign: "center",
-            whiteSpace: "nowrap",
+            maxWidth: "320px",
+            textWrap: "balance",
             margin: 0,
           }}
         >

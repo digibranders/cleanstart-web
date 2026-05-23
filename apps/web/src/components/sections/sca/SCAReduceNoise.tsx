@@ -176,19 +176,22 @@ export function SCAReduceNoise(): React.ReactElement {
               overflow: "hidden",
             }}
           >
-            {/* Purple glow blob inside cyan bg */}
+            {/* Ellipse 46704 — Figma 817:9438 exact spec.
+                315×267 ellipse, rotated 34.99°, top-left −113/−122, blur 105px,
+                linear-gradient(183.65deg, #7A29E3 −32.17%, #EF38E8 147.02%) */}
             <div
               aria-hidden
               style={{
                 position: "absolute",
                 top: "-113px",
                 left: "-122px",
-                width: "411px",
-                height: "399px",
+                width: "315px",
+                height: "267px",
                 borderRadius: "50%",
-                background: "rgba(154,81,255,0.25)",
-                filter: "blur(60px)",
-                transform: "rotate(35deg)",
+                background:
+                  "linear-gradient(183.65deg, #7A29E3 -32.17%, #EF38E8 147.02%)",
+                filter: "blur(105px)",
+                transform: "rotate(34.99deg)",
               }}
             />
           </div>

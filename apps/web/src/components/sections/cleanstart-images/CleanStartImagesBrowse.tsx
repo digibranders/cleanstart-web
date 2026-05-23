@@ -65,42 +65,43 @@ export function CleanStartImagesBrowse(): React.ReactElement {
         <div
           role="tablist"
           aria-label="Distribution channel"
-          className="inline-flex items-center gap-2 rounded-full p-1.5"
-          style={{ background: "#0B0820", maxWidth: "100%" }}
+          className="flex items-center gap-1"
+          style={{
+            background: "#fff",
+            border: "1px solid rgba(0,0,0,0.08)",
+            borderRadius: "100px",
+            padding: "4px",
+            width: "fit-content",
+            maxWidth: "100%",
+          }}
         >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === "portal"}
-            onClick={() => setTab("portal")}
-            className="relative flex h-10 cursor-pointer items-center justify-center rounded-full px-6 text-base font-semibold leading-[1] tracking-[-0.01em] text-white transition-all"
-            style={{
-              background:
-                tab === "portal"
-                  ? "linear-gradient(135deg,#5B3DF5 0%,#2E1CB6 100%)"
-                  : "transparent",
-            }}
-          >
-            CleanStart Portal
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === "repository"}
-            onClick={() => setTab("repository")}
-            className="relative flex h-10 cursor-pointer items-center justify-center rounded-full px-6 text-base font-semibold leading-[1] tracking-[-0.01em] text-white transition-all"
-            style={{
-              background:
-                tab === "repository"
-                  ? "linear-gradient(135deg,#5B3DF5 0%,#2E1CB6 100%)"
-                  : "transparent",
-            }}
-          >
-            CleanStart Repository
-          </button>
+          {(["portal", "repository"] as const).map((id) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={tab === id}
+              onClick={() => setTab(id)}
+              className="text-[clamp(0.9375rem,1.04vw,1.25rem)] font-semibold leading-[1.2] tracking-[-0.04em]"
+              style={{
+                padding: "8px 24px",
+                borderRadius: "100px",
+                cursor: "pointer",
+                border: "none",
+                transition: "background 0.15s, color 0.15s",
+                background:
+                  tab === id
+                    ? "linear-gradient(180deg, #151021 0%, #131E8F 100%)"
+                    : "transparent",
+                color: tab === id ? "#fff" : "#555",
+              }}
+            >
+              {id === "portal" ? "CleanStart Portal" : "CleanStart Repository"}
+            </button>
+          ))}
         </div>
 
-        {/* Tagline — Figma 161:23574 */}
+        {/* Tagline — H2-description spec: clamp(18-24) / 400 / Sora */}
         <p
           className="text-center mt-8 max-w-[843px]"
           style={{

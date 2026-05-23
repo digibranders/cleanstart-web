@@ -106,8 +106,8 @@ export function CleanSightBlindSpots(): React.ReactElement {
             lineHeight: 1.1,
           }}
         >
-          Visibility Without Context Creates Blind{" "}
-          <span className="cs-text-gradient-impact">Spots</span>
+          Visibility Without Context Creates{" "}
+          <span className="cs-text-gradient-impact">Blind Spots</span>
         </h2>
       </div>
 

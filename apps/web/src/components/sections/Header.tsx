@@ -27,8 +27,8 @@ export function Header() {
         <DesktopNav />
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
+          <Link
+            href="/book-a-demo"
             className="cs-btn-glass hidden lg:inline-flex"
             style={{
               ["--cs-btn-h" as string]: "36px",
@@ -37,7 +37,7 @@ export function Header() {
             }}
           >
             Book a Demo
-          </button>
+          </Link>
           <MobileNav />
         </div>
       </div>

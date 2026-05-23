@@ -91,20 +91,20 @@ const BOTTOM_CARD: React.CSSProperties = {
 
 const STAT_NUM: React.CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "var(--text-t-display-1)",
+  fontSize: "clamp(32px, 4vw, 56px)",
   fontWeight: 700,
-  letterSpacing: "var(--text-t-display-1-ls)",
-  lineHeight: "var(--text-t-display-1-lh)",
+  letterSpacing: "-0.04em",
+  lineHeight: 1.1,
   color: "#ffffff",
 };
 
 const STAT_LABEL: React.CSSProperties = {
   marginTop: "clamp(6px,0.83vw,12px)",
   fontFamily: "var(--font-sans)",
-  fontSize: "clamp(20px, 2vw, 28px)",
-  fontWeight: 500,
+  fontSize: "clamp(15px, 1.4vw, 20px)",
+  fontWeight: 400,
   letterSpacing: "-0.02em",
-  lineHeight: 1.3,
+  lineHeight: 1.4,
   color: "rgba(255,255,255,0.8)",
 };
 
@@ -172,14 +172,19 @@ export function SCASecurityOutcomes(): React.ReactElement {
       ref={sectionRef}
       className="relative overflow-hidden"
       style={{
-        minHeight: "900px",
         background:
           "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)",
       }}
     >
       <div
         className="relative mx-auto"
-        style={{ maxWidth: "1276px", padding: "100px 24px 80px" }}
+        style={{
+          maxWidth: "1276px",
+          paddingLeft: "24px",
+          paddingRight: "24px",
+          paddingTop: "clamp(48px, 6vw, 80px)",
+          paddingBottom: "clamp(48px, 6vw, 80px)",
+        }}
       >
         {/* ── Heading ── */}
         <h2
@@ -193,7 +198,7 @@ export function SCASecurityOutcomes(): React.ReactElement {
           }}
         >
           <span style={{ color: "#ffffff" }}>Security </span>
-          <span className="cs-text-gradient-impact">outcomes</span>
+          <span className="cs-text-gradient-impact">Outcomes</span>
         </h2>
 
         {/* ── Card grid + shield ── */}

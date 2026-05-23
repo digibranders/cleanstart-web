@@ -51,7 +51,7 @@ export function ASRBloated(): React.ReactElement {
           }}
         >
           <span className="block">Public images are</span>
-          <span className="block cs-text-gradient-impact">bloated</span>
+          <span className="block cs-text-gradient-impact">Bloated</span>
         </h2>
       </div>
 
@@ -113,48 +113,48 @@ export function ASRBloated(): React.ReactElement {
             <BloatedCard card={CARDS[3]} />
           </div>
 
-          {/* ── Connector lines ── */}
-          {/* TL connector */}
+          {/* ── Connector lines (Figma 783:1323/1324/1325 dotted elbow paths) ── */}
+          {/* TL connector — 92×94, dot at (86,88) anchors near image side */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             aria-hidden
             src="/images/attack-surface-reduction/public-images-line-tl.svg"
             alt=""
             className="absolute pointer-events-none select-none"
-            style={{ left: "285px", top: "88px", width: "125px", height: "auto", zIndex: 1 }}
+            style={{ left: "303px", top: "70px", width: "92px", height: "auto", zIndex: 1 }}
             loading="lazy"
             decoding="async"
           />
-          {/* TR connector */}
+          {/* TR connector — 92×94, mirror of TL with dot at (5,88) */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             aria-hidden
             src="/images/attack-surface-reduction/public-images-line-tr.svg"
             alt=""
             className="absolute pointer-events-none select-none"
-            style={{ right: "285px", top: "88px", width: "125px", height: "auto", transform: "scaleX(-1)", zIndex: 1 }}
+            style={{ right: "303px", top: "70px", width: "92px", height: "auto", zIndex: 1 }}
             loading="lazy"
             decoding="async"
           />
-          {/* BL connector */}
+          {/* BL connector — 153×83, dot at (147,5), elbow bottom-left → top-right */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             aria-hidden
             src="/images/attack-surface-reduction/public-images-line-bl.svg"
             alt=""
             className="absolute pointer-events-none select-none"
-            style={{ left: "295px", bottom: "82px", width: "78px", height: "auto", zIndex: 1 }}
+            style={{ left: "275px", bottom: "70px", width: "153px", height: "auto", zIndex: 1 }}
             loading="lazy"
             decoding="async"
           />
-          {/* BR connector */}
+          {/* BR connector — 153×83, mirror of BL via scaleX(-1) */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             aria-hidden
             src="/images/attack-surface-reduction/public-images-line-br.svg"
             alt=""
             className="absolute pointer-events-none select-none"
-            style={{ right: "295px", bottom: "82px", width: "78px", height: "auto", transform: "scaleX(-1)", zIndex: 1 }}
+            style={{ right: "275px", bottom: "70px", width: "153px", height: "auto", transform: "scaleX(-1)", zIndex: 1 }}
             loading="lazy"
             decoding="async"
           />
@@ -197,6 +197,9 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
         maxWidth: mobile ? "380px" : "303px",
         height: mobile ? undefined : "166px",
         minHeight: mobile ? "120px" : undefined,
+        /* container-query scope so title/desc font sizes scale with card width
+           (locked to card, not viewport). 1cqi = 1% of the card's inline size. */
+        containerType: "inline-size",
       }}
     >
       {/* Halo */}
@@ -275,7 +278,9 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             className="text-[#111]"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(20px, 2vw, 28px)",
+              /* 24px at 303px card width = 7.92cqi. Clamp floors at 18 (very
+                 narrow cards) and ceils at 24 (mobile card growing > 303). */
+              fontSize: "clamp(18px, 7.92cqi, 24px)",
               fontWeight: 600,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
@@ -287,7 +292,8 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             className="text-[#111]"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(15px, 1.4vw, 20px)",
+              /* 16px at 303px card width = 5.28cqi. */
+              fontSize: "clamp(13px, 5.28cqi, 16px)",
               fontWeight: 400,
               letterSpacing: "-0.02em",
               lineHeight: 1.4,

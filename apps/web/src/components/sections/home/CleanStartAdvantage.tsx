@@ -131,26 +131,29 @@ function StatBlock({
   variant: "mobile" | "desktop";
 }) {
   if (variant === "mobile") {
-    // Figma 403:15688 — Manrope Bold 32 / lh 1.0 / -0.05em over Sora 16 / lh 1.1 / -0.05em
+    // Home stat spec: number 32/700/Manrope · label 24/400/Sora
     return (
       <div className="flex w-[222px] flex-col gap-3">
         <div
-          className="font-display font-bold text-white"
+          className="font-display text-white"
           style={{
             whiteSpace: "nowrap",
-            fontSize: "32px",
-            lineHeight: 1,
-            letterSpacing: "-0.05em",
+            fontSize: "clamp(24px, 2.5vw, 36px)",
+            fontWeight: 700,
+            lineHeight: 1.1,
+            letterSpacing: "-0.04em",
           }}
         >
           {stat.value}
         </div>
         <div
-          className="font-normal text-white"
+          className="text-white"
           style={{
-            fontSize: "16px",
-            lineHeight: 1.1,
-            letterSpacing: "-0.05em",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(16px, 1.7vw, 24px)",
+            fontWeight: 400,
+            lineHeight: 1.3,
+            letterSpacing: "-0.02em",
           }}
         >
           {stat.label}
@@ -158,14 +161,14 @@ function StatBlock({
       </div>
     );
   }
-  // Desktop variant — Vuln stat spec
+  // Desktop variant — Home stat spec: number 32/700/Manrope · label 24/400/Sora
   return (
     <div className="flex shrink-0 flex-col">
       <div
         className="font-display text-white"
         style={{
           whiteSpace: "nowrap",
-          fontSize: "clamp(22px, 2.4vw, 32px)",
+          fontSize: "clamp(24px, 2.5vw, 36px)",
           fontWeight: 700,
           lineHeight: 1.1,
           letterSpacing: "-0.04em",
@@ -177,8 +180,8 @@ function StatBlock({
         className="mt-5 max-w-[180px] text-white"
         style={{
           fontFamily: "var(--font-sans)",
-          fontSize: "clamp(20px, 2vw, 28px)",
-          fontWeight: 500,
+          fontSize: "clamp(16px, 1.7vw, 24px)",
+          fontWeight: 400,
           lineHeight: 1.3,
           letterSpacing: "-0.02em",
         }}

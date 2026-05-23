@@ -39,10 +39,10 @@ page slugs, categories, types, and build status across the dev journey.
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
 | 1 | Homepage | `/` | Static | ✅ | Built |
-| 11 | Book a Demo | `/book-a-demo` | Static | ⬜ | Lead capture form page |
-| 20 | Partners | `/partners` | Static | ⬜ | |
+| 11 | Book a Demo | `/book-a-demo` | Static | ✅ | Lead capture form page (form is static UI; LeadHandler wiring pending) |
+| 20 | Partners | `/partners` | Static | ✅ | Hero, Why Partner, Global Network (region tabs), Testimonials, Partner Types |
 | 21 | Pricing | `/pricing` | Static | ⬜ | |
-| 31 | Deal Registration | `/deal-registration` | Static | ⬜ | |
+| 31 | Deal Registration | `/deal-registration` | Static | ✅ | Form is static UI; LeadHandler wiring pending |
 
 ---
 
@@ -53,7 +53,7 @@ page slugs, categories, types, and build status across the dev journey.
 | 22 | About Us | `/about-us` | Static | ✅ | Route at `src/app/about-us/` |
 | 23 | Careers | `/careers` | CMS Listing | ✅ | Backed by Payload `jobs` + `jobLocations` collections; published roles only. |
 | 24 | Community | `/community` | Static | ✅ | Built 2026-05-22 from Figma 732:3192 |
-| 25 | Contact Us | `/contact-us` | Static | ⬜ | |
+| 25 | Contact Us | `/contact-us` | Static | ✅ | Built 2026-05-23 from Figma 817:14719 |
 | 26 | Teams | `/teams` | Static | ✅ | All 5 sections built (farheen integration 2026-05-20) |
 
 ---
@@ -109,8 +109,9 @@ page slugs, categories, types, and build status across the dev journey.
 
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
-| 28 | Legal Hub | `/legal` | Legal | ⬜ | Index of all legal docs |
-| 29 | Privacy Policy | `/privacy-policy` | Legal | ⬜ | |
+| 28 | Legal Hub | `/legal` | Legal | ✅ | Default view: Additional Third-Party Terms; sidebar lists related legal docs |
+| 28a | Acceptable Use Policy | `/legal/acceptable-use-policy` | Legal | ✅ | Linked from `/legal` sidebar |
+| 29 | Privacy Policy | `/privacy-policy` | Legal | ✅ | |
 | 30 | Terms & Conditions | `/terms-and-condition` | Legal | ⬜ | Note: no trailing `s` on condition |
 
 ---

@@ -78,7 +78,7 @@ export function FipsCTA(): React.ReactElement {
 
         {/* Button — absolute at Figma button position. */}
         <Link
-          href="/contact-us"
+          href="/book-a-demo"
           className="cs-btn-glass absolute"
           style={
             {
@@ -137,7 +137,7 @@ export function FipsCTA(): React.ReactElement {
           knowing your containers are secured from the ground up.
         </p>
         <Link
-          href="/contact-us"
+          href="/book-a-demo"
           className="cs-btn-glass self-start"
           style={
             {

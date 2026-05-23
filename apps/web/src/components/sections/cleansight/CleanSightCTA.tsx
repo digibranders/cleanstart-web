@@ -1,14 +1,14 @@
 /*
- * Figma node 446:2377 — 1276×330 px card (positioned by Footer at top:-170px)
+ * Figma node 799:1339 — CleanSight CTA (white card variant)
  *
- * Card background: linear-gradient(to bottom, #131e8f → #471ec0 at 111.05%)
- * Heading: 55px Figtree Bold, white, letter-spacing -0.05em, w=401px
- * Description: 21px, white 80% opacity, letter-spacing -0.04em, w=607px
- * Gap between columns: 68px; padding: 80px 100px
- * Button: glassmorphic — border #dab6f3, bg rgba(255,255,255,0.65), text #111
- * Union decoration: 1101×1101 at left=547, top=-220 (absolute within card)
- * Ellipse right: 511×511 at left=1159, top=244, blur soft radial
- * Ellipse left: 320×320 at left=-139, top=-168, blur soft radial
+ *   Card bg: white (handled by the Footer's locked 1276×330 slot)
+ *   Union SVG grid: 1101×1101 at left:547 top:-220 (decorative purple radial-grid)
+ *   Ellipse top-left: 320×320 at left:-139 top:-168 (cyan glow)
+ *   Ellipse bottom-right: 511×511 at left:1159 top:244 (purple glow)
+ *   Screenshot mockup: 211×213, rotate(-15deg), at left:330 top:238
+ *   Heading: 55px Figtree Bold, #111 — capped at 44px to match other CTAs
+ *   Description: 21px Figtree Regular, #111 @ 80%
+ *   Button: solid blue (#3960F9), white text, "Book a Container Scan"
  */
 
 import Link from "next/link";
@@ -17,11 +17,27 @@ export function CleanSightCTA(): React.ReactElement {
   return (
     <div
       className="relative w-full h-full overflow-hidden"
-      style={{
-        background: "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)",
-      }}
+      style={{ background: "#ffffff" }}
     >
-      {/* ── Cyan glow — top-left ── */}
+      {/* ── Decorative grid (Union SVG, radial-faded purple) ── */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/cleansight/cta-union.svg"
+        alt=""
+        className="absolute pointer-events-none select-none hidden lg:block"
+        style={{
+          left: "547px",
+          top: "-220px",
+          width: "1101px",
+          height: "1101px",
+          opacity: 0.5,
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+
+      {/* ── Ellipse 46683 — top-left (Figma exact: #DF9BFF / 0.8 / blur 121.5) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -31,82 +47,97 @@ export function CleanSightCTA(): React.ReactElement {
           width: "320px",
           height: "320px",
           borderRadius: "50%",
-          background: "rgba(44, 193, 235, 0.12)",
-          filter: "blur(80px)",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
+          zIndex: 2,
         }}
       />
 
-      {/* ── Purple glow — bottom-right behind cube ── */}
+      {/* ── Ellipse 46682 — bottom-right (Figma exact: #DF9BFF / 0.8 / blur 121.5) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
         style={{
-          right: "0",
-          bottom: "-80px",
-          width: "320px",
-          height: "320px",
+          left: "1159px",
+          top: "244px",
+          width: "511px",
+          height: "511px",
           borderRadius: "50%",
-          background: "rgba(154, 81, 255, 0.2)",
-          filter: "blur(80px)",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
+          zIndex: 1,
         }}
       />
 
-      {/* ── Cube decoration — overflows bottom-right corner at 80% opacity (matches CISO/SBOM CTA) ── */}
+      {/* ── Decorative pink/violet cube — bottom-left corner of the card ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/ciso/cta-cube-noise.png"
+        src="/images/vulnerability-remediation/cta-cube.png"
         alt=""
         className="absolute pointer-events-none select-none hidden lg:block"
         style={{
-          right: "-60px",
-          bottom: "-100px",
-          width: "300px",
-          height: "300px",
+          left: "-40px",
+          bottom: "-40px",
+          width: "220px",
+          height: "220px",
           objectFit: "contain",
-          opacity: 0.75,
-          zIndex: 0,
+          opacity: 0.5,
+          zIndex: 3,
         }}
         loading="lazy"
         decoding="async"
       />
 
-      {/* ── Content row ── */}
+      {/* ── Content row — Vuln CTA pattern (absolute inset-0 + items-center) ── */}
       <div
-        className="relative flex flex-col lg:flex-row lg:items-center"
+        className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 items-center"
         style={{
-          padding: "clamp(40px, 6vw, 80px) clamp(32px, 5vw, 80px)",
-          gap: "clamp(32px, 5vw, 72px)",
+          paddingLeft: "clamp(28px, 4vw, 64px)",
+          paddingRight: "clamp(28px, 4vw, 64px)",
+          paddingTop: "clamp(20px, 3vw, 32px)",
+          paddingBottom: "clamp(20px, 3vw, 32px)",
+          columnGap: "clamp(32px, 5vw, 72px)",
         }}
       >
-        {/* Left: headline — auto-wraps 2 or 3 lines via balance */}
+        {/* Left: headline */}
         <p
-          className="relative text-white"
+          className="relative min-w-0 w-full font-display"
           style={{
-            fontFamily: "var(--font-display)",
             fontSize: "clamp(26px, 3.1vw, 44px)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
+            color: "#111111",
             maxWidth: "min(460px, 100%)",
             textWrap: "balance",
-            zIndex: 1,
+            margin: 0,
+            zIndex: 2,
           }}
         >
           See Everything. Fix Everything.
         </p>
 
         {/* Right: description + CTA button */}
-        <div className="relative flex flex-col" style={{ maxWidth: "min(460px, 100%)", gap: "clamp(20px, 2vw, 32px)", zIndex: 1 }}>
+        <div
+          className="flex flex-col min-w-0 w-full"
+          style={{
+            maxWidth: "420px",
+            gap: "clamp(16px, 1.5vw, 24px)",
+            zIndex: 2,
+          }}
+        >
           <p
             style={{
               fontFamily: "var(--font-sans)",
               fontSize: "clamp(16px, 1.5vw, 20px)",
-            fontWeight: 400,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.4,
-              color: "rgba(255, 255, 255, 0.8)",
-              maxWidth: "607px",
+              fontWeight: 400,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
+              color: "rgba(17, 17, 17, 0.8)",
+              margin: 0,
             }}
           >
             Continuous container visibility with integrated remediation across
@@ -115,17 +146,18 @@ export function CleanSightCTA(): React.ReactElement {
 
           <Link
             href="/contact-us"
-            className="cs-btn-glass self-start"
+            className="cs-btn-blue self-start"
             style={
               {
-                "--cs-btn-px": "18px",
+                "--cs-btn-h": "44px",
+                "--cs-btn-px": "16px",
                 "--cs-btn-fs": "16px",
               } as React.CSSProperties
             }
           >
             <span>Book a Container Scan</span>
             <svg
-              className="cs-cta-arrow"
+              className="cs-cta-arrow ml-2"
               width="18"
               height="18"
               viewBox="0 0 18 18"
