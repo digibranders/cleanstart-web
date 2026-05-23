@@ -96,11 +96,10 @@ function WhyCard({ img, imgStyle, title, desc }: CardDef): React.ReactElement {
         <h3
           style={{
             fontFamily: 'var(--font-display)',
-            /* 32px in Figma → 24px at 1440px; clamp from 20px mobile → 24px desktop */
-            fontSize: 'clamp(1.125rem, 1.67vw, 2rem)',
+            fontSize: 'clamp(22px, 2.4vw, 32px)',
             fontWeight: 700,
-            letterSpacing: '-0.05em',
-            lineHeight: 1.05,
+            letterSpacing: '-0.04em',
+            lineHeight: 1.1,
             color: '#111111',
           }}
         >
@@ -109,10 +108,9 @@ function WhyCard({ img, imgStyle, title, desc }: CardDef): React.ReactElement {
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            /* 22px in Figma → 16.5px at 1440px */
-            fontSize: 'clamp(0.875rem, 1.15vw, 1.375rem)',
+            fontSize: 'clamp(15px, 1.4vw, 20px)',
             fontWeight: 400,
-            letterSpacing: '-0.05em',
+            letterSpacing: '-0.02em',
             lineHeight: 1.4,
             color: '#333333',
           }}
@@ -233,10 +231,10 @@ export function DeveloperWhyItMatters(): React.ReactElement {
           className="text-center mx-auto"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(2rem, 3.23vw, 3.875rem)',
+            fontSize: 'clamp(32px, 4vw, 56px)',
             fontWeight: 700,
-            letterSpacing: '-0.05em',
-            lineHeight: 1,
+            letterSpacing: '-0.04em',
+            lineHeight: 1.1,
             color: '#111111',
             marginBottom: 'clamp(48px, 4.17vw, 80px)',
           }}

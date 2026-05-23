@@ -100,30 +100,30 @@ const STAT_NUM: React.CSSProperties = {
 
 const STAT_LABEL: React.CSSProperties = {
   marginTop: "clamp(6px,0.83vw,12px)",
-  fontFamily: "var(--font-body)",
-  fontSize: "var(--text-t-heading-md)",
-  fontWeight: 400,
-  letterSpacing: "var(--text-t-heading-md-ls)",
-  lineHeight: "var(--text-t-heading-md-lh)",
+  fontFamily: "var(--font-sans)",
+  fontSize: "clamp(20px, 2vw, 28px)",
+  fontWeight: 500,
+  letterSpacing: "-0.02em",
+  lineHeight: 1.3,
   color: "rgba(255,255,255,0.8)",
 };
 
 const FEAT_TITLE: React.CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "var(--text-t-heading-lg)",
+  fontSize: "clamp(22px, 2.4vw, 32px)",
   fontWeight: 700,
-  letterSpacing: "var(--text-t-heading-lg-ls)",
-  lineHeight: "var(--text-t-heading-lg-lh)",
+  letterSpacing: "-0.04em",
+  lineHeight: 1.1,
   color: "#111111",
 };
 
 const FEAT_DESC: React.CSSProperties = {
   marginTop: "clamp(6px,0.83vw,12px)",
-  fontFamily: "var(--font-body)",
-  fontSize: "var(--text-t-heading-md)",
+  fontFamily: "var(--font-sans)",
+  fontSize: "clamp(15px, 1.4vw, 20px)",
   fontWeight: 400,
-  letterSpacing: "var(--text-t-heading-md-ls)",
-  lineHeight: "var(--text-t-heading-md-lh)",
+  letterSpacing: "-0.02em",
+  lineHeight: 1.4,
   color: "#111111",
 };
 
@@ -186,24 +186,14 @@ export function SCASecurityOutcomes(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
           }}
         >
           <span style={{ color: "#ffffff" }}>Security </span>
-          <span
-            style={{
-              backgroundImage:
-                "linear-gradient(97.07deg,#9a51ff 1.76%,#2cc1eb 98.78%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            outcomes
-          </span>
+          <span className="cs-text-gradient-impact">outcomes</span>
         </h2>
 
         {/* ── Card grid + shield ── */}

@@ -70,30 +70,25 @@ export function CleanStartAdvantage() {
         <div className="max-w-[517px]">
           <h2
             id="advantage-title"
-            className="font-display font-semibold text-white"
+            className="font-display text-white"
             style={{
-              fontSize: "var(--text-t-display-2)",
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "clamp(32px, 4vw, 56px)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
             }}
           >
             CleanStart{" "}
-            <span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage:
-                  "linear-gradient(95deg, #9A50FF 0%, #2CC1EB 100%)",
-              }}
-            >
-              Advantage
-            </span>
+            <span className="cs-text-gradient-impact">Advantage</span>
           </h2>
           <p
-            className="mt-6 font-normal text-white"
+            className="mt-6 text-white"
             style={{
-              fontSize: "var(--text-t-subhead)",
-              lineHeight: "var(--text-t-subhead-lh)",
-              letterSpacing: "var(--text-t-subhead-ls)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
             }}
           >
             Real results from teams that replaced vulnerable public images with
@@ -163,26 +158,29 @@ function StatBlock({
       </div>
     );
   }
-  // Desktop variant uses the unified type-scale tokens.
+  // Desktop variant — Vuln stat spec
   return (
     <div className="flex shrink-0 flex-col">
       <div
-        className="font-display font-bold text-white"
+        className="font-display text-white"
         style={{
           whiteSpace: "nowrap",
-          fontSize: "var(--text-t-heading-lg)",
-          lineHeight: "var(--text-t-heading-lg-lh)",
-          letterSpacing: "var(--text-t-heading-lg-ls)",
+          fontSize: "clamp(22px, 2.4vw, 32px)",
+          fontWeight: 700,
+          lineHeight: 1.1,
+          letterSpacing: "-0.04em",
         }}
       >
         {stat.value}
       </div>
       <div
-        className="mt-5 max-w-[180px] font-normal text-white"
+        className="mt-5 max-w-[180px] text-white"
         style={{
-          fontSize: "var(--text-t-heading-md)",
-          lineHeight: "var(--text-t-heading-md-lh)",
-          letterSpacing: "var(--text-t-heading-md-ls)",
+          fontFamily: "var(--font-sans)",
+          fontSize: "clamp(20px, 2vw, 28px)",
+          fontWeight: 500,
+          lineHeight: 1.3,
+          letterSpacing: "-0.02em",
         }}
       >
         {stat.label}

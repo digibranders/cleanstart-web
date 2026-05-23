@@ -70,43 +70,45 @@ export function SbomCTA(): React.ReactElement {
 
       {/* ── Desktop layout (md+) — vertical stack until lg, then 2-col ── */}
       <div
-        className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 items-start"
+        className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 lg:items-center"
         style={{
-          paddingLeft: "clamp(32px, 5vw, 100px)",
-          paddingRight: "clamp(32px, 5vw, 100px)",
+          paddingLeft: "clamp(32px, 5vw, 80px)",
+          paddingRight: "clamp(32px, 5vw, 80px)",
           paddingTop: "clamp(40px, 5vw, 80px)",
-          columnGap: "clamp(24px, 4vw, 68px)",
+          paddingBottom: "clamp(40px, 5vw, 80px)",
+          columnGap: "clamp(32px, 5vw, 72px)",
         }}
       >
-        {/* Left column — heading, up to 401px wide, shrinks on narrow viewports */}
-        <div className="relative lg:flex-1 min-w-0 w-full" style={{ maxWidth: "401px" }}>
+        {/* Left column — heading, auto-wraps 2 or 3 lines via balance */}
+        <div className="relative min-w-0 w-full" style={{ maxWidth: "min(460px, 100%)" }}>
           <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
-              fontWeight: 700,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "clamp(26px, 3.1vw, 44px)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#fff",
               margin: 0,
+              textWrap: "balance",
             }}
           >
             Verify Every Component You Ship
           </p>
         </div>
 
-        {/* Right column — body + button, up to 607px wide, shrinks on narrow viewports */}
+        {/* Right column — body + button */}
         <div
-          className="flex flex-col lg:flex-1 min-w-0 w-full"
-          style={{ maxWidth: "607px", gap: "clamp(20px, 2vw, 32px)" }}
+          className="flex flex-col min-w-0 w-full"
+          style={{ maxWidth: "min(460px, 100%)", gap: "clamp(20px, 2vw, 32px)" }}
         >
           <p
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-body-lg)",
-              fontWeight: 400,
-              letterSpacing: "var(--text-t-body-lg-ls)",
-              lineHeight: "var(--text-t-body-lg-lh)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
               color: "rgba(255,255,255,0.80)",
               margin: 0,
             }}
@@ -121,7 +123,7 @@ export function SbomCTA(): React.ReactElement {
               {
                 "--cs-btn-h": "var(--btn-h-xl)",
                 "--cs-btn-px": "32px",
-                "--cs-btn-fs": "17px",
+                "--cs-btn-fs": "16px",
               } as React.CSSProperties
             }
           >
@@ -159,7 +161,7 @@ export function SbomCTA(): React.ReactElement {
           width: "300px",
           height: "300px",
           objectFit: "contain",
-          opacity: 0.8,
+          opacity: 0.75,
           zIndex: 0,
         }}
         loading="lazy"
@@ -171,10 +173,10 @@ export function SbomCTA(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "#fff",
             maxWidth: "280px",
           }}
@@ -200,7 +202,7 @@ export function SbomCTA(): React.ReactElement {
           style={
             {
               "--cs-btn-px": "22px",
-              "--cs-btn-fs": "14px",
+              "--cs-btn-fs": "16px",
             } as React.CSSProperties
           }
         >

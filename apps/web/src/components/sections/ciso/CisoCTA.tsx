@@ -63,7 +63,7 @@ export function CisoCTA(): React.ReactElement {
           width: "300px",
           height: "300px",
           objectFit: "contain",
-          opacity: 0.8,
+          opacity: 0.75,
           zIndex: 0,
         }}
         loading="lazy"
@@ -76,19 +76,20 @@ export function CisoCTA(): React.ReactElement {
           headline wraps into 3 lines instead of 5 and stays vertically
           centered within the 330 px CTA card slot. */}
       <div
-        className="relative flex flex-col lg:flex-row items-start"
-        style={{ padding: "56px 100px 60px", gap: "56px" }}
+        className="relative flex flex-col lg:flex-row lg:items-center"
+        style={{ padding: "clamp(40px, 6vw, 64px) clamp(32px, 5vw, 80px)", gap: "clamp(32px, 5vw, 72px)" }}
       >
-        {/* Left: headline */}
+        {/* Left: headline — auto-wraps 2 or 3 lines via balance */}
         <p
-          className="relative flex-shrink-0 text-white"
+          className="relative text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
-            width: "min(560px, 100%)",
+            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
+            maxWidth: "min(460px, 100%)",
+            textWrap: "balance",
             zIndex: 1,
           }}
         >
@@ -96,14 +97,14 @@ export function CisoCTA(): React.ReactElement {
         </p>
 
         {/* Right: description + CTA */}
-        <div className="relative flex flex-col flex-1" style={{ gap: "40px", zIndex: 1 }}>
+        <div className="relative flex flex-col" style={{ maxWidth: "min(460px, 100%)", gap: "clamp(20px, 2vw, 32px)", zIndex: 1 }}>
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "var(--text-t-body-lg)",
-              fontWeight: 400,
-              letterSpacing: "var(--text-t-body-lg-ls)",
-              lineHeight: "var(--text-t-body-lg-lh)",
+              fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
               color: "rgba(255, 255, 255, 0.8)",
               maxWidth: "500px",
             }}
@@ -118,7 +119,7 @@ export function CisoCTA(): React.ReactElement {
             style={
               {
                 "--cs-btn-px": "18px",
-                "--cs-btn-fs": "18px",
+                "--cs-btn-fs": "16px",
               } as React.CSSProperties
             }
           >

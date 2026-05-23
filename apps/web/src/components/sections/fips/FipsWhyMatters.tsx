@@ -44,34 +44,24 @@ export function FipsWhyMatters(): React.ReactElement {
             className="text-[#111]"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
-              fontWeight: 600,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "clamp(32px, 4vw, 56px)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               maxWidth: "444px",
             }}
           >
             Why FIPS 140-3{" "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(95deg, #239CFF 0%, #82AEFF 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Matters
-            </span>
+            <span className="cs-text-gradient-impact">Matters</span>
           </h2>
           <p
             className="text-[#333]"
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-subhead)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
               fontWeight: 400,
-              letterSpacing: "var(--text-t-subhead-ls)",
-              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
               maxWidth: "731px",
             }}
           >
@@ -122,10 +112,10 @@ function MatterTile({ card }: { card: MatterCard }): React.ReactElement {
           className="text-[#111] mb-2"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-heading-lg)",
+            fontSize: "clamp(22px, 2.4vw, 32px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-heading-lg-ls)",
-            lineHeight: "var(--text-t-heading-lg-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
           }}
         >
           {card.title}
@@ -133,11 +123,11 @@ function MatterTile({ card }: { card: MatterCard }): React.ReactElement {
         <p
           className="text-[#333]"
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-body-lg)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(15px, 1.4vw, 20px)",
             fontWeight: 400,
-            letterSpacing: "var(--text-t-body-lg-ls)",
-            lineHeight: "var(--text-t-body-lg-lh)",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
             opacity: 0.85,
           }}
         >

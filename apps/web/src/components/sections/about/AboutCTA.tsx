@@ -40,9 +40,10 @@ export function AboutCTA() {
         <p
           className="font-display font-bold"
           style={{
-            fontSize: "var(--text-t-display-2)",
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
           }}
         >
           Start Clean. Stay Secure.
@@ -50,10 +51,10 @@ export function AboutCTA() {
         <p
           className="font-sans text-white/80"
           style={{
+            fontSize: "clamp(16px, 1.5vw, 20px)",
             fontWeight: 400,
-            fontSize: "var(--text-t-body-lg)",
-            letterSpacing: "var(--text-t-body-lg-ls)",
-            lineHeight: "var(--text-t-body-lg-lh)",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
             maxWidth: "480px",
           }}
         >
@@ -67,7 +68,7 @@ export function AboutCTA() {
           className="cs-btn-glass"
           style={{
             ["--cs-btn-px" as string]: "18px",
-            ["--cs-btn-fs" as string]: "18px",
+            ["--cs-btn-fs" as string]: "16px",
             color: "#111111",
             letterSpacing: "-0.01em",
             fontWeight: 500,

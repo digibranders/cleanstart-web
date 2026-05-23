@@ -64,7 +64,7 @@ export function CleanSightCTA(): React.ReactElement {
           width: "300px",
           height: "300px",
           objectFit: "contain",
-          opacity: 0.8,
+          opacity: 0.75,
           zIndex: 0,
         }}
         loading="lazy"
@@ -73,22 +73,23 @@ export function CleanSightCTA(): React.ReactElement {
 
       {/* ── Content row ── */}
       <div
-        className="relative flex flex-col lg:flex-row items-start"
+        className="relative flex flex-col lg:flex-row lg:items-center"
         style={{
-          padding: "80px 100px",
-          gap: "68px",
+          padding: "clamp(40px, 6vw, 80px) clamp(32px, 5vw, 80px)",
+          gap: "clamp(32px, 5vw, 72px)",
         }}
       >
-        {/* Left: headline */}
+        {/* Left: headline — auto-wraps 2 or 3 lines via balance */}
         <p
-          className="relative flex-shrink-0 text-white"
+          className="relative text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
-            width: "min(401px, 100%)",
+            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
+            maxWidth: "min(460px, 100%)",
+            textWrap: "balance",
             zIndex: 1,
           }}
         >
@@ -96,14 +97,14 @@ export function CleanSightCTA(): React.ReactElement {
         </p>
 
         {/* Right: description + CTA button */}
-        <div className="relative flex flex-col flex-1" style={{ gap: "40px", zIndex: 1 }}>
+        <div className="relative flex flex-col" style={{ maxWidth: "min(460px, 100%)", gap: "clamp(20px, 2vw, 32px)", zIndex: 1 }}>
           <p
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-body-lg)",
-              fontWeight: 400,
-              letterSpacing: "var(--text-t-body-lg-ls)",
-              lineHeight: "var(--text-t-body-lg-lh)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
               color: "rgba(255, 255, 255, 0.8)",
               maxWidth: "607px",
             }}
@@ -118,7 +119,7 @@ export function CleanSightCTA(): React.ReactElement {
             style={
               {
                 "--cs-btn-px": "18px",
-                "--cs-btn-fs": "18px",
+                "--cs-btn-fs": "16px",
               } as React.CSSProperties
             }
           >

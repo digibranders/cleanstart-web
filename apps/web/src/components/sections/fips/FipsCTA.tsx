@@ -35,7 +35,7 @@ export function FipsCTA(): React.ReactElement {
             bottom: 0,
             width: "17.40%",
             height: "auto",
-          }}
+           opacity: 0.75,}}
           loading="lazy"
           decoding="async"
         />
@@ -47,10 +47,10 @@ export function FipsCTA(): React.ReactElement {
             left: "9.56%",
             top: "25.76%",
             width: "31.43%",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             margin: 0,
           }}
         >
@@ -64,10 +64,10 @@ export function FipsCTA(): React.ReactElement {
             left: "50.00%",
             top: "27.27%",
             width: "38.64%",
-            fontSize: "var(--text-t-body-lg)",
+            fontSize: "clamp(16px, 1.5vw, 20px)",
             fontWeight: 400,
-            letterSpacing: "var(--text-t-body-lg-ls)",
-            lineHeight: "var(--text-t-body-lg-lh)",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
             color: "rgba(255,255,255,0.88)",
             margin: 0,
           }}
@@ -114,10 +114,10 @@ export function FipsCTA(): React.ReactElement {
         <p
           className="font-display text-white"
           style={{
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "280px",
           }}
         >
@@ -142,7 +142,7 @@ export function FipsCTA(): React.ReactElement {
           style={
             {
               "--cs-btn-px": "22px",
-              "--cs-btn-fs": "14px",
+              "--cs-btn-fs": "16px",
             } as React.CSSProperties
           }
         >

@@ -45,20 +45,20 @@ const CARDS = [
 
 const CARD_TITLE: React.CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "var(--text-t-heading-lg)",
-  fontWeight: 700,
-  letterSpacing: "var(--text-t-heading-lg-ls)",
-  lineHeight: "var(--text-t-heading-lg-lh)",
+  fontSize: "clamp(20px, 2vw, 28px)",
+  fontWeight: 600,
+  letterSpacing: "-0.04em",
+  lineHeight: 1.1,
   color: "#111111",
 };
 
 const CARD_DESC: React.CSSProperties = {
   marginTop: "clamp(6px, 0.625vw, 12px)",
-  fontFamily: "var(--font-body)",
-  fontSize: "var(--text-t-body-lg)",
+  fontFamily: "var(--font-sans)",
+  fontSize: "clamp(15px, 1.4vw, 20px)",
   fontWeight: 400,
-  letterSpacing: "var(--text-t-body-lg-ls)",
-  lineHeight: "var(--text-t-body-lg-lh)",
+  letterSpacing: "-0.02em",
+  lineHeight: 1.4,
   color: "#333333",
 };
 
@@ -110,26 +110,15 @@ export function SCABuiltForDev(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "#111111",
           }}
         >
           Built for Modern Development{" "}
-          <span
-            style={{
-              display: "block",
-              backgroundImage:
-                "linear-gradient(103.5deg, #9a51ff 1.76%, #2cc1eb 98.78%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Workflows
-          </span>
+          <span className="block cs-text-gradient-impact">Workflows</span>
         </h2>
 
         {/* ── Content row: image panel + cards grid ── */}

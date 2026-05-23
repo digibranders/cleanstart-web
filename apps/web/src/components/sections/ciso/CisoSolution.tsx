@@ -106,10 +106,10 @@ export function CisoSolution(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               marginBottom: "24px",
             }}
           >
@@ -117,11 +117,11 @@ export function CisoSolution(): React.ReactElement {
           </h2>
           <p
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-subhead)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
               fontWeight: 400,
-              letterSpacing: "var(--text-t-subhead-ls)",
-              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
               color: "rgba(255,255,255,0.8)",
               maxWidth: "835px",
               margin: "0 auto",
@@ -239,7 +239,7 @@ export function CisoSolution(): React.ReactElement {
               xl: grid-cols-4 + gap-[32px] on 1276px = exactly 295px each column
               Mobile: 1 col → sm: 2 col */}
           <div
-            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8 xl:gap-[32px] px-6 xl:px-0"
+            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8 xl:gap-[32px]"
             style={{ marginTop: "120px" }}
           >
             {FEATURES.map((f) => (
@@ -299,10 +299,10 @@ export function CisoSolution(): React.ReactElement {
                   className="relative text-white"
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-heading-lg)",
-                    fontWeight: 500,
-                    letterSpacing: "var(--text-t-heading-lg-ls)",
-                    lineHeight: "var(--text-t-heading-lg-lh)",
+                    fontSize: "clamp(20px, 2vw, 28px)",
+                    fontWeight: 600,
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1.1,
                     marginBottom: "12px",
                     whiteSpace: "pre-line",
                   }}
@@ -313,10 +313,10 @@ export function CisoSolution(): React.ReactElement {
                   className="relative"
                   style={{
                     fontFamily: "var(--font-sans)",
-                    fontSize: "var(--text-t-body-lg)",
+                    fontSize: "clamp(15px, 1.4vw, 20px)",
                     fontWeight: 400,
-                    letterSpacing: "var(--text-t-body-lg-ls)",
-                    lineHeight: "var(--text-t-body-lg-lh)",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.4,
                     color: "rgba(255,255,255,0.8)",
                   }}
                 >

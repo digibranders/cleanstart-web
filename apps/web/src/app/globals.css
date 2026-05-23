@@ -1135,16 +1135,21 @@ body {
   gap: 12px;
 }
 .cs-tt-card__name {
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-weight: 500;
   letter-spacing: -0.02em;
 }
 .cs-tt-card__role {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: -0.02em;
   color: rgb(255 255 255 / 0.7);
 }
 .cs-tt-card__quote {
-  font-weight: 700;
+  font-family: var(--font-sans);
+  font-weight: 500;
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  line-height: 1.4;
 }
 .cs-tt-card__cta {
   display: inline-flex;
@@ -1199,11 +1204,11 @@ body {
   padding: clamp(20px, 2.2vw, 28px) clamp(24px, 2.8vw, 36px) clamp(20px, 2vw, 24px);
   gap: clamp(12px, 1.4vw, 18px);
 }
-.cs-tt-card--active .cs-tt-card__name  { font-size: clamp(1.0625rem, 1.1vw, 1.25rem); }
-.cs-tt-card--active .cs-tt-card__role  { font-size: clamp(0.8125rem, 0.85vw, 0.9375rem); }
+.cs-tt-card--active .cs-tt-card__name  { font-size: clamp(16px, 1.4vw, 20px); }
+.cs-tt-card--active .cs-tt-card__role  { font-size: clamp(16px, 1.4vw, 20px); }
 .cs-tt-card--active .cs-tt-card__quote {
-  font-size: clamp(1.0625rem, 1.3vw, 1.3125rem);
-  line-height: 1.35;
+  font-size: clamp(16px, 1.4vw, 20px);
+  line-height: 1.4;
   margin-top: -6px;
 }
 .cs-tt-card--active .cs-tt-card__cta   { font-size: clamp(0.875rem, 0.95vw, 1rem); }
@@ -1511,6 +1516,17 @@ body {
   background: linear-gradient(90deg, #5a3df0 0%, #a06bff 100%);
   -webkit-background-clip: text;
   background-clip: text;
+  color: transparent;
+}
+
+/* Unified H2 gradient — the "Impact" style. Use anywhere a word inside an
+   H2 (non-hero) needs the brand cyan→purple highlight. Single source of
+   truth so every section uses the same angle and stops. */
+.cs-text-gradient-impact {
+  background: linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: transparent;
 }
 

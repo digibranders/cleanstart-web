@@ -77,34 +77,21 @@ export function SbomRisks(): React.ReactElement {
         }}
       />
 
-      <div
-        className="relative mx-auto"
-        style={{ maxWidth: "1276px", paddingLeft: "24px", paddingRight: "24px" }}
-      >
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Section heading */}
         <div className="text-center mb-8 md:mb-16">
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#111",
             }}
           >
             {"Static SBOMs Create Blind "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(103deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Spots
-            </span>
+            <span className="cs-text-gradient-impact">Spots</span>
           </h2>
         </div>
 
@@ -176,10 +163,10 @@ export function SbomRisks(): React.ReactElement {
                   <h3
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "var(--text-t-heading-lg)",
+                      fontSize: "clamp(22px, 2.4vw, 32px)",
                       fontWeight: 700,
-                      letterSpacing: "var(--text-t-heading-lg-ls)",
-                      lineHeight: "var(--text-t-heading-lg-lh)",
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.1,
                       color: "#111",
                     }}
                   >
@@ -187,11 +174,11 @@ export function SbomRisks(): React.ReactElement {
                   </h3>
                   <p
                     style={{
-                      fontFamily: "var(--font-display)",
-                      fontSize: "var(--text-t-body-lg)",
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "clamp(15px, 1.4vw, 20px)",
                       fontWeight: 400,
-                      letterSpacing: "var(--text-t-body-lg-ls)",
-                      lineHeight: "var(--text-t-body-lg-lh)",
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.4,
                       color: "#333",
                     }}
                   >

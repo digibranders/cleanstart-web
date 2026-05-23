@@ -61,35 +61,25 @@ export function AboutWhoWeAre() {
         {/* Heading row */}
         <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-start lg:gap-[106px]">
           <h2
-            className="shrink-0 font-display font-bold"
+            className="shrink-0 font-display"
             style={{
-              fontSize: "clamp(2.5rem, 4vw, 3.875rem)",
-              lineHeight: "1.0",
-              letterSpacing: "-0.05em",
+              fontSize: "clamp(32px, 4vw, 56px)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
               color: "#111",
             }}
           >
-            Who We{" "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(-22.7deg, #2CC1EB 0%, #9A51FF 64%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Are
-            </span>
+            Who We <span className="cs-text-gradient-impact">Are</span>
           </h2>
 
           <p
-            className="font-sans"
             style={{
-              fontSize: "clamp(1.1rem, 1.8vw, 1.875rem)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
               fontWeight: 400,
-              lineHeight: "1.4",
-              letterSpacing: "-0.04em",
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
               color: "rgba(17,17,17,0.8)",
               maxWidth: "840px",
             }}
@@ -146,14 +136,26 @@ export function AboutWhoWeAre() {
 
                 <div className="flex flex-col gap-3">
                   <h3
-                    className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em]"
-                    style={{ color: "#333" }}
+                    className="font-display"
+                    style={{
+                      fontSize: "clamp(22px, 2.4vw, 32px)",
+                      fontWeight: 700,
+                      lineHeight: 1.1,
+                      letterSpacing: "-0.04em",
+                      color: "#333",
+                    }}
                   >
                     {pillar.title}
                   </h3>
                   <p
-                    className="text-body-lg font-normal leading-[1.5]"
-                    style={{ color: "#333" }}
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "clamp(15px, 1.4vw, 20px)",
+                      fontWeight: 400,
+                      lineHeight: 1.4,
+                      letterSpacing: "-0.02em",
+                      color: "#333",
+                    }}
                   >
                     {pillar.description}
                   </p>

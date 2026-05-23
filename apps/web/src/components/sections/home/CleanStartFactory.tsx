@@ -14,50 +14,6 @@ const CARDS: CardData[] = [
   { title: "Clean\nLibraries", blurb: "Complete. Signed.\nContinuously verified." },
 ];
 
-// Shared light-flare PNG (Figma `光斑 flare` instance node, natural 267 × 358).
-// The bright core sits ~33 % from the top of the image. The same WebP is reused
-// for all 9 beam occurrences — single network fetch + browser-deduped decode.
-function LightBeam({
-  left,
-  width,
-  opacity = 1,
-  top = 0,
-  scale = 1,
-}: {
-  left: number;
-  width: number;
-  opacity?: number;
-  top?: number;
-  scale?: number;
-}) {
-  const height = (width * 358) / 267;
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute"
-      style={{
-        left: `${left}px`,
-        top,
-        width,
-        height: height * scale,
-        transform: "translateX(-50%)",
-        opacity,
-      }}
-    >
-      <Image
-        src="/images/cleanstart-factory/flare.webp"
-        alt=""
-        aria-hidden
-        width={267}
-        height={358}
-        sizes={`${Math.ceil(width)}px`}
-        className="pointer-events-none select-none"
-        style={{ width: "100%", height: "100%", objectFit: "fill" }}
-      />
-    </div>
-  );
-}
-
 // Container-query-based card. The `factory-card` container's inline size (its
 // width) drives every interior dimension via `cqw` units — orb, title font,
 // blurb font, arrow circle, paddings — so the entire card scales as one unit.
@@ -166,6 +122,26 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
         </svg>
       </div>
 
+      {/* Light beam — anchored to the card's bottom edge via `top: 100%`,
+          extending downward. Sized in cqw so it scales with the card. The
+          card body's `aspect-ratio: 232.8/374` makes 100% of height equal
+          ≈ 160.65 cqw. Width and offset stay locked to card width. */}
+      <Image
+        src="/images/cleanstart-factory/flare.webp"
+        alt=""
+        aria-hidden
+        width={267}
+        height={358}
+        sizes="(min-width: 1280px) 75px, 6vw"
+        className="pointer-events-none absolute left-1/2 -translate-x-1/2 select-none"
+        style={{
+          width: "32cqw",
+          height: "auto",
+          top: "100%",
+          marginTop: "-8cqw",
+        }}
+      />
+
       <figcaption className="sr-only">
         {data.title.replace("\n", " ")}. {data.blurb.replace("\n", " ")}
       </figcaption>
@@ -174,14 +150,6 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
 }
 
 export function CleanStartFactory() {
-  const cardBeamCenters = [
-    232.8 / 2,
-    232.8 + 28 + 232.8 / 2,
-    2 * (232.8 + 28) + 232.8 / 2,
-    3 * (232.8 + 28) + 232.8 / 2,
-    4 * (232.8 + 28) + 232.8 / 2,
-  ];
-
   return (
     <Section padding="none" className="relative overflow-hidden">
       <div
@@ -208,11 +176,12 @@ export function CleanStartFactory() {
           />
 
           <h2
-            className="mt-[80px] text-center font-display font-semibold text-white"
+            className="mt-[80px] text-center font-display text-white"
             style={{
-              fontSize: "clamp(40px, 4.65vw, 62px)",
-              lineHeight: 1,
-              letterSpacing: "-0.05em",
+              fontSize: "clamp(32px, 4vw, 56px)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
             }}
           >
             The CleanStart Factory
@@ -227,20 +196,12 @@ export function CleanStartFactory() {
             ))}
           </div>
 
-          <div
-            aria-hidden
-            className="pointer-events-none relative mx-auto"
-            style={{ width: "100%", height: 180, marginTop: -24, zIndex: 1 }}
-          >
-            {cardBeamCenters.map((cx, i) => (
-              <LightBeam key={i} left={cx} width={70} opacity={0.95} />
-            ))}
-          </div>
-
           {/* Bottom factory block — will be rebuilt with DOM + the shared flare /
-              card-bg assets in the next iteration. */}
+              card-bg assets in the next iteration. The per-card flares above
+              already extend below each card via overflow, so no extra beam
+              row is needed here. */}
 
-          <div className="pb-[160px]" />
+          <div className="pb-[200px]" />
 
         </div>
       </Container>

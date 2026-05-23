@@ -245,35 +245,25 @@ export function AboutOurVision() {
           <div className="flex flex-col gap-10 lg:max-w-[622px]">
             <div className="flex flex-col gap-6">
               <h2
-                className="font-display font-bold"
+                className="font-display"
                 style={{
-                  fontSize: "clamp(2.5rem, 4vw, 3.875rem)",
-                  lineHeight: "1.0",
-                  letterSpacing: "-0.05em",
+                  fontSize: "clamp(32px, 4vw, 56px)",
+                  fontWeight: 700,
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.04em",
                   color: "#111",
                 }}
               >
-                Our{" "}
-                <span
-                  style={{
-                    background:
-                      "linear-gradient(-6.3deg, #2CC1EB 0%, #9A51FF 64%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  Vision
-                </span>
+                Our <span className="cs-text-gradient-impact">Vision</span>
               </h2>
 
               <p
-                className="font-sans"
                 style={{
-                  fontSize: "clamp(1.1rem, 1.8vw, 1.875rem)",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "clamp(18px, 1.7vw, 24px)",
                   fontWeight: 400,
-                  lineHeight: "1.4",
-                  letterSpacing: "-0.04em",
+                  lineHeight: 1.4,
+                  letterSpacing: "-0.02em",
                   color: "rgba(17,17,17,0.8)",
                 }}
               >

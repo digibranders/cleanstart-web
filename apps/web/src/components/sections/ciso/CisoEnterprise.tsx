@@ -63,7 +63,7 @@ const CARDS: CardDef[] = [
 ];
 
 // ─── Desktop card ─────────────────────────────────────────────────────────────
-function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactElement {
+function EnterpriseCard({ icon, title, desc }: CardDef): React.ReactElement {
   return (
     <div className="relative flex-shrink-0" style={{ width: "295px", height: "324px" }}>
       {/* Outer cyan glow — 30% opacity border effect */}
@@ -161,10 +161,10 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           <h3
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: `${titleSize}px`,
-              fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1,
+              fontSize: "clamp(20px, 2vw, 28px)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#111",
               margin: 0,
             }}
@@ -174,10 +174,9 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-              fontSize: "20px",
+              fontSize: "clamp(15px, 1.4vw, 20px)",
               fontWeight: 400,
-              letterSpacing: "-0.05em",
+              letterSpacing: "-0.02em",
               lineHeight: 1.4,
               color: "#555",
               margin: 0,
@@ -271,36 +270,23 @@ export function CisoEnterprise(): React.ReactElement {
         </div>
       </div>
 
-      <div
-        className="relative mx-auto"
-        style={{ maxWidth: "1276px", paddingLeft: "24px", paddingRight: "24px" }}
-      >
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
         {/* ── Heading ── */}
         <h2
           className="text-center mx-auto"
           style={{
             maxWidth: "654px",
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "#111",
             marginBottom: "74px",
           }}
         >
           Built for Enterprise{" "}
-          <span
-            style={{
-              background:
-                "linear-gradient(100.87deg, rgb(154, 81, 255) 1.758%, rgb(44, 193, 235) 98.781%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Environments
-          </span>
+          <span className="cs-text-gradient-impact">Environments</span>
         </h2>
 
         {/* ════ DESKTOP — 4 cards in a flex row, 295×32 gap = 1276px ════ */}
@@ -350,10 +336,10 @@ export function CisoEnterprise(): React.ReactElement {
               <h3
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "var(--text-t-heading-sm)",
-                  fontWeight: 700,
-                  letterSpacing: "var(--text-t-heading-sm-ls)",
-                  lineHeight: "var(--text-t-heading-sm-lh)",
+                  fontSize: "clamp(20px, 2vw, 28px)",
+                  fontWeight: 600,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.1,
                   color: "#111",
                 }}
               >
@@ -362,10 +348,10 @@ export function CisoEnterprise(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "var(--text-t-body-sm)",
+                  fontSize: "clamp(15px, 1.4vw, 20px)",
                   fontWeight: 400,
-                  letterSpacing: "var(--text-t-body-sm-ls)",
-                  lineHeight: "var(--text-t-body-sm-lh)",
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.4,
                   color: "#555",
                 }}
               >

@@ -43,34 +43,25 @@ export function AboutOurStory() {
           style={{ maxWidth: "514px" }}
         >
           <h2
-            className="font-display font-bold text-white"
+            className="font-display text-white"
             style={{
-              fontSize: "clamp(2.5rem, 4vw, 4rem)",
-              lineHeight: "1.0",
-              letterSpacing: "-0.05em",
+              fontSize: "clamp(32px, 4vw, 56px)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
             }}
           >
-            Our{" "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(106deg, #9A51FF 1.8%, #2CC1EB 98.8%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Story
-            </span>
+            Our <span className="cs-text-gradient-impact">Story</span>
           </h2>
 
           <p
-            className="font-sans text-white"
+            className="text-white"
             style={{
-              fontSize: "clamp(1rem, 1.4vw, 1.5rem)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
               fontWeight: 400,
-              lineHeight: "1.3",
-              letterSpacing: "-0.04em",
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
               opacity: 0.8,
             }}
           >

@@ -67,24 +67,14 @@ export function FipsMaturityModel(): React.ReactElement {
           className="text-center text-[#111] mb-12 md:mb-[64px]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 600,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
           }}
         >
           CleanStart FIPS 140-3 Maturity{" "}
-          <span
-            style={{
-              background:
-                "linear-gradient(95deg, #239CFF 0%, #82AEFF 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Model
-          </span>
+          <span className="cs-text-gradient-impact">Model</span>
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -117,10 +107,10 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
           className="text-[#111] mb-2"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-heading-md)",
-            fontWeight: 700,
-            letterSpacing: "var(--text-t-heading-md-ls)",
-            lineHeight: "var(--text-t-heading-md-lh)",
+            fontSize: "clamp(20px, 2vw, 28px)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
           }}
         >
           {stage.title}
@@ -128,11 +118,11 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
         <p
           className="text-[#333]"
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-body-lg)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(15px, 1.4vw, 20px)",
             fontWeight: 400,
-            letterSpacing: "var(--text-t-body-lg-ls)",
-            lineHeight: "var(--text-t-body-lg-lh)",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
             opacity: 0.85,
           }}
         >

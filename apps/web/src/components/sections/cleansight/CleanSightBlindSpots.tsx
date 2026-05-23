@@ -100,23 +100,14 @@ export function CleanSightBlindSpots(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
           }}
         >
           Visibility Without Context Creates Blind{" "}
-          <span
-            style={{
-              background: "linear-gradient(101.4deg, #9A51FF 45.6%, #2CC1EB 93.65%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Spots
-          </span>
+          <span className="cs-text-gradient-impact">Spots</span>
         </h2>
       </div>
 

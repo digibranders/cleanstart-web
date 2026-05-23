@@ -142,29 +142,23 @@ export function BuiltForTeams() {
             id="testimonials-title"
             className="font-display"
             style={{
-              fontSize: "var(--text-t-display-2)",
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              lineHeight: "var(--text-t-display-2-lh)",
-              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
             }}
           >
             Built for Teams That Can&rsquo;t Afford{" "}
-            <span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage:
-                  "linear-gradient(101.56deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
-              }}
-            >
-              Uncertainty
-            </span>
+            <span className="cs-text-gradient-impact">Uncertainty</span>
           </h2>
           <p
-            className="mx-auto mt-8 font-normal text-white"
+            className="mx-auto mt-8 text-white"
             style={{
-              fontSize: "var(--text-t-subhead)",
-              lineHeight: "var(--text-t-subhead-lh)",
-              letterSpacing: "var(--text-t-subhead-ls)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
               opacity: 0.8,
             }}
           >

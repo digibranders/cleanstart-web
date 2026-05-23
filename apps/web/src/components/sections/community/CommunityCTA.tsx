@@ -7,7 +7,7 @@
 export function CommunityCTA() {
   return (
     <div
-      className="absolute inset-0 flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-center md:gap-0 md:p-12 lg:p-[clamp(40px,6vw,85px)_clamp(48px,8vw,122px)]"
+      className="absolute inset-0 flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-center md:gap-0 md:p-12 lg:p-[clamp(40px,6vw,64px)_clamp(32px,5vw,80px)]"
       style={{
         background: 'linear-gradient(180deg, #131E8F 0%, #471EC0 111.05%)',
       }}
@@ -28,19 +28,21 @@ export function CommunityCTA() {
 
       {/* Headline */}
       <p
-        className="relative z-10 font-display font-bold text-white md:w-[38%] md:shrink-0"
+        className="relative z-10 font-display font-bold text-white md:shrink-0"
         style={{
-          fontSize: 'clamp(1.75rem, 3vw, 3.4375rem)',
-          lineHeight: '1.0',
-          letterSpacing: '-0.05em',
-          maxWidth: '401px',
+          fontSize: 'clamp(26px, 3.1vw, 44px)',
+          fontWeight: 600,
+          lineHeight: 1.1,
+          letterSpacing: '-0.04em',
+          maxWidth: 'min(460px, 100%)',
+          textWrap: 'balance',
         }}
       >
         Ready to secure the future?
       </p>
 
       {/* Body + CTA */}
-      <div className="relative z-10 flex flex-col items-start gap-6 md:pl-[clamp(32px,6vw,115px)]">
+      <div className="relative z-10 flex flex-col items-start gap-6 md:pl-[clamp(32px,5vw,72px)]" style={{ maxWidth: 'min(460px, 100%)' }}>
         <p
           className="font-sans font-normal text-white/80"
           style={{

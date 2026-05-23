@@ -87,36 +87,31 @@ export function DeveloperHero(): React.ReactElement {
 
       {/* ── Content column ── */}
       <div
-        className="relative mx-auto z-[2] flex flex-col items-center text-center"
-        style={{
-          maxWidth: '840px',
-          paddingLeft: '24px',
-          paddingRight: '24px',
-          paddingTop: '203px',
-        }}
+        className="relative mx-auto z-[2] flex w-full max-w-[840px] flex-col items-center px-6 sm:px-10 text-center"
+        style={{ paddingTop: '203px' }}
       >
         {/* H1 — exact Figma: 80px SemiBold, tracking -4px */}
         <h1
           className="text-white"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'var(--text-hero-product)',
-            fontWeight: 600,
-            letterSpacing: 'var(--text-hero-product-ls)',
-            lineHeight: 'var(--text-hero-lh)',
+            fontSize: 'clamp(40px, 4.45vw, 64px)',
+            fontWeight: 700,
+            letterSpacing: '-0.04em',
+            lineHeight: 1.05,
             marginBottom: '32px',
           }}
         >
           Trusted Container Foundations
         </h1>
 
-        {/* Subtitle — exact Figma text, 30px Sora Regular, 80% opacity */}
+        {/* Subtitle — Vuln spec body-lg */}
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(1rem, 1.56vw, 1.875rem)',
+            fontSize: 'clamp(18px, 1.7vw, 24px)',
             fontWeight: 400,
-            letterSpacing: '-0.04em',
+            letterSpacing: '-0.02em',
             lineHeight: 1.4,
             color: 'rgba(255,255,255,0.8)',
             maxWidth: '640px',

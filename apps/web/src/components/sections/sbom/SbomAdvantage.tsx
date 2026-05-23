@@ -73,25 +73,15 @@ export function SbomAdvantage(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#111",
             }}
           >
             {"Built for Modern Software "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(103.5deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Supply Chains
-            </span>
+            <span className="cs-text-gradient-impact">Supply Chains</span>
           </h2>
         </div>
 
@@ -134,14 +124,26 @@ export function SbomAdvantage(): React.ReactElement {
                 }}
               >
                 <p
-                  className="text-card-title-lg text-[#111]"
-                  style={{ fontFamily: "var(--font-display)" }}
+                  className="text-[#111]"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "clamp(20px, 2vw, 28px)",
+                    fontWeight: 600,
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1.1,
+                  }}
                 >
                   {card.title}
                 </p>
                 <p
-                  className="text-body-md text-[#333]"
-                  style={{ fontFamily: "var(--font-display)" }}
+                  className="text-[#333]"
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "clamp(15px, 1.4vw, 20px)",
+                    fontWeight: 400,
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.4,
+                  }}
                 >
                   {card.body}
                 </p>

@@ -140,12 +140,13 @@ export function FrequentlyAskedQuestions() {
         <div className="mb-8 flex flex-col items-start gap-5 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="faq-title"
-            className="justify-self-start font-display font-bold text-[#111111]"
+            className="justify-self-start font-display text-[#111111]"
             style={{
               maxWidth: "493px",
-              fontSize: "var(--text-t-display-2)",
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "clamp(32px, 4vw, 56px)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
             }}
           >
             Frequently Asked Questions
@@ -160,11 +161,13 @@ export function FrequentlyAskedQuestions() {
             }}
           />
           <p
-            className="font-normal text-[#111111] md:justify-self-end md:text-right"
+            className="text-[#111111] md:justify-self-end md:text-right"
             style={{
-              fontSize: "var(--text-t-subhead)",
-              lineHeight: "var(--text-t-subhead-lh)",
-              letterSpacing: "var(--text-t-subhead-ls)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
               maxWidth: "585px",
               opacity: 0.8,
             }}
@@ -254,11 +257,12 @@ function FaqItemRow({
         className="group flex w-full items-start justify-between gap-6 text-left cursor-pointer md:gap-12"
       >
         <span
-          className="flex-1 font-display font-bold text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
+          className="flex-1 font-display text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
           style={{
-            fontSize: "var(--text-t-heading-md)",
-            lineHeight: "var(--text-t-heading-md-lh)",
-            letterSpacing: "var(--text-t-heading-md-ls)",
+            fontSize: "clamp(20px, 2vw, 28px)",
+            fontWeight: 600,
+            lineHeight: 1.1,
+            letterSpacing: "-0.04em",
           }}
         >
           {item.q}
@@ -285,11 +289,13 @@ function FaqItemRow({
         }}
       >
         <p
-          className="pt-3 font-normal text-[#333333]"
+          className="pt-3 text-[#333333]"
           style={{
-            fontSize: "var(--text-t-body-md)",
-            lineHeight: "var(--text-t-body-md-lh)",
-            letterSpacing: "var(--text-t-body-md-ls)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(15px, 1.4vw, 20px)",
+            fontWeight: 400,
+            lineHeight: 1.4,
+            letterSpacing: "-0.02em",
           }}
         >
           {item.a}

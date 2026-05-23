@@ -96,20 +96,24 @@ function TeamCard({ name, role, photo, linkedIn }: TeamMember) {
       >
         <div className="flex flex-col gap-[9px] text-white">
           <p
-            className="font-display font-bold leading-none"
+            className="font-display"
             style={{
-              fontSize: "clamp(1.25rem, 2.2vw, 2rem)",
-              letterSpacing: "-0.05em",
+              fontSize: "clamp(20px, 2vw, 28px)",
+              fontWeight: 600,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
             }}
           >
             {name}
           </p>
           {role !== undefined && (
             <p
-              className="font-sans font-normal leading-[1.4]"
               style={{
-                fontSize: "clamp(0.875rem, 1.4vw, 1.25rem)",
-                letterSpacing: "-0.05em",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(15px, 1.4vw, 20px)",
+                fontWeight: 400,
+                lineHeight: 1.4,
+                letterSpacing: "-0.02em",
               }}
             >
               {role}
@@ -266,21 +270,16 @@ export function TeamsLeadership() {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Executive Leadership */}
         <h2
-          className="mb-[60px] text-center font-display font-bold text-[#111]"
+          className="mb-[60px] text-center font-display text-[#111]"
           style={{
-            fontSize: "clamp(2rem, 4vw, 3.875rem)",
-            lineHeight: "1.0",
-            letterSpacing: "-0.05em",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            lineHeight: 1.1,
+            letterSpacing: "-0.04em",
           }}
         >
           {"Executive "}
-          <span
-            className="bg-clip-text text-transparent"
-            style={{
-              backgroundImage:
-                "linear-gradient(-7.2deg, rgb(44,193,235) 0%, rgb(154,81,255) 64%)",
-            }}
-          >
+          <span className="cs-text-gradient-impact">
             Leadership
           </span>
         </h2>
@@ -293,21 +292,16 @@ export function TeamsLeadership() {
 
         {/* Advisory Board */}
         <h2
-          className="mb-[60px] text-center font-display font-bold text-[#111]"
+          className="mb-[60px] text-center font-display text-[#111]"
           style={{
-            fontSize: "clamp(2rem, 4vw, 3.875rem)",
-            lineHeight: "1.0",
-            letterSpacing: "-0.05em",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            lineHeight: 1.1,
+            letterSpacing: "-0.04em",
           }}
         >
           {"Advisory "}
-          <span
-            className="bg-clip-text text-transparent"
-            style={{
-              backgroundImage:
-                "linear-gradient(-9.86deg, rgb(44,193,235) 0%, rgb(154,81,255) 64%)",
-            }}
-          >
+          <span className="cs-text-gradient-impact">
             Board
           </span>
         </h2>

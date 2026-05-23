@@ -84,20 +84,21 @@ export function ASRCTA(): React.ReactElement {
 
       {/* Content row */}
       <div
-        className="relative flex flex-col lg:flex-row items-start"
-        style={{ padding: "56px 100px 60px", gap: "56px" }}
+        className="relative flex flex-col lg:flex-row lg:items-center"
+        style={{ padding: "clamp(40px, 6vw, 64px) clamp(32px, 5vw, 80px)", gap: "clamp(32px, 5vw, 72px)" }}
       >
-        {/* Left: headline */}
+        {/* Left: headline — auto-wraps 2 or 3 lines via balance */}
         <p
-          className="relative flex-shrink-0"
+          className="relative"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "#111111",
-            width: "min(420px, 100%)",
+            maxWidth: "min(460px, 100%)",
+            textWrap: "balance",
             zIndex: 1,
           }}
         >
@@ -106,16 +107,16 @@ export function ASRCTA(): React.ReactElement {
 
         {/* Right: description + CTA button */}
         <div
-          className="relative flex flex-col flex-1"
-          style={{ gap: "32px", zIndex: 1, maxWidth: "564px" }}
+          className="relative flex flex-col"
+          style={{ gap: "clamp(20px, 2vw, 32px)", zIndex: 1, maxWidth: "min(460px, 100%)" }}
         >
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "var(--text-t-subhead)",
-              fontWeight: 400,
-              letterSpacing: "var(--text-t-subhead-ls)",
-              lineHeight: "var(--text-t-subhead-lh)",
+              fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
               color: "#111111",
               opacity: 0.8,
               maxWidth: "493px",
@@ -135,7 +136,7 @@ export function ASRCTA(): React.ReactElement {
               boxShadow:
                 "0 1px 2px -1px rgba(9,6,63,0.4), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px #3960F9",
               fontFamily: "var(--font-sans)",
-              fontSize: "18px",
+              fontSize: "16px",
               fontWeight: 500,
               letterSpacing: "-0.01em",
             }}

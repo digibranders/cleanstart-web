@@ -41,11 +41,8 @@ export function CisoHero(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto z-[2]"
+        className="relative mx-auto z-[2] w-full max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
-          maxWidth: "1276px",
-          paddingLeft: "24px",
-          paddingRight: "24px",
           paddingTop: "203px",
           paddingBottom: "0",
           minHeight: "682px",
@@ -76,10 +73,10 @@ export function CisoHero(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-hero-product)",
-              fontWeight: 600,
-              letterSpacing: "var(--text-hero-product-ls)",
-              lineHeight: "var(--text-hero-lh)",
+              fontSize: "clamp(40px, 4.45vw, 64px)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
               marginBottom: "32px",
             }}
           >
@@ -89,10 +86,10 @@ export function CisoHero(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "var(--text-t-subhead)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
               fontWeight: 400,
-              letterSpacing: "var(--text-t-subhead-ls)",
-              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
               color: "rgba(255,255,255,0.8)",
               maxWidth: "620px",
               marginBottom: "32px",

@@ -131,25 +131,15 @@ export function CleanSightStats(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               whiteSpace: "nowrap",
             }}
           >
             From Visibility to{" "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(110.35deg, rgb(154, 81, 255) 65.662%, rgb(44, 193, 235) 93.65%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Results
-            </span>
+            <span className="cs-text-gradient-impact">Results</span>
           </h2>
         </div>
 
@@ -217,11 +207,11 @@ export function CleanSightStats(): React.ReactElement {
               {/* Label */}
               <p
                 style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: s.labelSize,
-                  fontWeight: 400,
-                  letterSpacing: s.labelTracking,
-                  lineHeight: 1.4,
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "clamp(20px, 2vw, 28px)",
+                  fontWeight: 500,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.3,
                   opacity: 0.9,
                 }}
               >

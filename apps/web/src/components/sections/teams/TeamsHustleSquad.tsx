@@ -154,23 +154,16 @@ export function TeamsHustleSquad() {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         {/* Title */}
         <h2
-          className="mb-[60px] text-center font-display font-bold text-white"
+          className="mb-[60px] text-center font-display text-white"
           style={{
-            fontSize: "clamp(2rem, 4vw, 3.875rem)",
-            lineHeight: "1.0",
-            letterSpacing: "-0.05em",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            lineHeight: 1.1,
+            letterSpacing: "-0.04em",
           }}
         >
           {"The Hustle "}
-          <span
-            className="bg-clip-text text-transparent"
-            style={{
-              backgroundImage:
-                "linear-gradient(104.939deg, rgb(154,81,255) 49.803%, rgb(44,193,235) 98.781%)",
-            }}
-          >
-            Squad
-          </span>
+          <span className="cs-text-gradient-impact">Squad</span>
         </h2>
 
         {/* Carousel */}

@@ -34,26 +34,17 @@ export function ASRApproach(): React.ReactElement {
         <h2
           className="text-[#111]"
           style={{
-            fontFamily: "var(--font-figtree)",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 600,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "562px",
             marginBottom: "48px",
           }}
         >
           The CleanStart{" "}
-          <span
-            style={{
-              background: "linear-gradient(95deg, #9A51FF 0%, #2CC1EB 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Approach
-          </span>
+          <span className="cs-text-gradient-impact">Approach</span>
         </h2>
       </div>
 
@@ -119,11 +110,11 @@ export function ASRApproach(): React.ReactElement {
               <p
                 className="text-[#111]"
                 style={{
-                  fontFamily: "var(--font-figtree)",
-                  fontSize: "var(--text-t-heading-md)",
-                  fontWeight: 700,
-                  letterSpacing: "var(--text-t-heading-md-ls)",
-                  lineHeight: "var(--text-t-heading-md-lh)",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(20px, 2vw, 28px)",
+                  fontWeight: 600,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.1,
                 }}
               >
                 {card.title}
@@ -131,11 +122,11 @@ export function ASRApproach(): React.ReactElement {
               <p
                 className="text-[#333]"
                 style={{
-                  fontFamily: "var(--font-figtree)",
-                  fontSize: "var(--text-t-body-lg)",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "clamp(15px, 1.4vw, 20px)",
                   fontWeight: 400,
-                  letterSpacing: "var(--text-t-body-lg-ls)",
-                  lineHeight: "var(--text-t-body-lg-lh)",
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.4,
                 }}
               >
                 {card.desc}
@@ -196,11 +187,11 @@ function ApproachCell({ card, padLeft }: ApproachCellProps): React.ReactElement 
         <p
           className="text-[#111]"
           style={{
-            fontFamily: "var(--font-figtree)",
-            fontSize: "var(--text-t-heading-lg)",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(22px, 2.4vw, 32px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-heading-lg-ls)",
-            lineHeight: "var(--text-t-heading-lg-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "225px",
           }}
         >
@@ -209,11 +200,11 @@ function ApproachCell({ card, padLeft }: ApproachCellProps): React.ReactElement 
         <p
           className="text-[#333]"
           style={{
-            fontFamily: "var(--font-figtree)",
-            fontSize: "var(--text-t-heading-md)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(15px, 1.4vw, 20px)",
             fontWeight: 400,
-            letterSpacing: "var(--text-t-heading-md-ls)",
-            lineHeight: "var(--text-t-heading-md-lh)",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
             maxWidth: "290px",
           }}
         >

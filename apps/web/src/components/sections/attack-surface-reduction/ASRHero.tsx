@@ -86,36 +86,25 @@ export function ASRHero(): React.ReactElement {
           <div className="flex-1" style={{ maxWidth: "545px" }}>
             <h1
               style={{
-                fontFamily: "var(--font-figtree)",
-                fontSize: "var(--text-hero-product)",
-                fontWeight: 600,
-                letterSpacing: "var(--text-hero-product-ls)",
-                lineHeight: 1,
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(40px, 4.45vw, 64px)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.05,
                 color: "white",
               }}
             >
-              Bigger Images,
-              <br />
-              <span
-                style={{
-                  background:
-                    "linear-gradient(95deg, #9A51FF 0%, #2CC1EB 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                Bigger Risk
-              </span>
+              <span className="block">Bigger Images,</span>
+              <span className="cs-text-gradient-impact">Bigger Risk</span>
             </h1>
 
             <p
               style={{
-                fontFamily: "var(--font-figtree)",
-                fontSize: "var(--text-t-subhead)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(18px, 1.7vw, 24px)",
                 fontWeight: 400,
-                letterSpacing: "var(--text-t-subhead-ls)",
-                lineHeight: "var(--text-t-subhead-lh)",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
                 color: "rgba(255, 255, 255, 0.8)",
                 marginTop: "24px",
               }}

@@ -76,7 +76,7 @@ export function AsrPublicImages(): React.ReactElement {
           Public images are{" "}
           <span
             style={{
-              background: "linear-gradient(99deg, #9A51FF 0%, #2CC1EB 100%)",
+              background: "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",

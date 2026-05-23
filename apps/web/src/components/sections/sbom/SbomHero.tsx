@@ -71,11 +71,8 @@ export function SbomHero(): React.ReactElement {
 
       {/* Content container — max-width 1276px centred, same as all other pages */}
       <div
-        className="relative mx-auto z-[2] flex flex-col items-center text-center"
+        className="relative mx-auto z-[2] flex w-full max-w-[var(--container-default)] flex-col items-center px-6 sm:px-10 text-center"
         style={{
-          maxWidth: "1276px",
-          paddingLeft: "24px",
-          paddingRight: "24px",
           paddingTop: "clamp(72px, 8vw, 128px)",
           paddingBottom: "clamp(40px, 5vw, 80px)",
         }}
@@ -84,10 +81,10 @@ export function SbomHero(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-hero-product)",
-            fontWeight: 600,
-            letterSpacing: "var(--text-hero-product-ls)",
-            lineHeight: "var(--text-hero-lh)",
+            fontSize: "clamp(40px, 4.45vw, 64px)",
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.05,
             marginBottom: "32px",
             maxWidth: "623px",
           }}
@@ -97,10 +94,10 @@ export function SbomHero(): React.ReactElement {
 
         <p
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "clamp(16px, 1.56vw, 30px)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(18px, 1.7vw, 24px)",
             fontWeight: 400,
-            letterSpacing: "-0.04em",
+            letterSpacing: "-0.02em",
             lineHeight: 1.4,
             color: "rgba(255,255,255,0.80)",
             maxWidth: "623px",

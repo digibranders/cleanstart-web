@@ -96,10 +96,10 @@ export function CisoRisks(): React.ReactElement {
           className="text-center text-[#111] mx-auto px-6"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "807px",
             marginBottom: "98px",
           }}
@@ -196,10 +196,10 @@ export function CisoRisks(): React.ReactElement {
                 <h3
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-heading-lg)",
+                    fontSize: "clamp(22px, 2.4vw, 32px)",
                     fontWeight: 700,
-                    letterSpacing: "var(--text-t-heading-lg-ls)",
-                    lineHeight: "var(--text-t-heading-lg-lh)",
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1.1,
                     color: "#111",
                     maxWidth: "225px",
                   }}
@@ -208,11 +208,11 @@ export function CisoRisks(): React.ReactElement {
                 </h3>
                 <p
                   style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-subhead)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "clamp(15px, 1.4vw, 20px)",
                     fontWeight: 400,
-                    letterSpacing: "var(--text-t-subhead-ls)",
-                    lineHeight: "var(--text-t-subhead-lh)",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.4,
                     color: "#333",
                     maxWidth: risk.descMaxWidth,
                   }}

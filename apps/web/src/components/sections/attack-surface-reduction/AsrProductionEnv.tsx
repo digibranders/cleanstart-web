@@ -91,7 +91,7 @@ export function AsrProductionEnv(): React.ReactElement {
           <span
             style={{
               background:
-                "linear-gradient(101.4deg, #9A51FF 45.6%, #2CC1EB 93.65%)",
+                "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",

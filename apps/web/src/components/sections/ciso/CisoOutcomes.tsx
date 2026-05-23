@@ -138,10 +138,10 @@ function StatCard({
         <p
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "var(--text-t-subhead)",
-            fontWeight: 400,
-            letterSpacing: "var(--text-t-subhead-ls)",
-            lineHeight: "var(--text-t-subhead-lh)",
+            fontSize: "clamp(20px, 2vw, 28px)",
+            fontWeight: 500,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.3,
             color: "#333",
           }}
         >
@@ -360,25 +360,15 @@ export function CisoOutcomes(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#fff",
             }}
           >
             Security{" "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(107.15deg, rgb(154, 81, 255) 1.758%, rgb(44, 193, 235) 98.781%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Outcomes
-            </span>
+            <span className="cs-text-gradient-impact">Outcomes</span>
           </h2>
         </div>
 
@@ -417,10 +407,10 @@ export function CisoOutcomes(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "var(--text-t-body-md)",
-                  fontWeight: 400,
-                  letterSpacing: "var(--text-t-body-md-ls)",
-                  lineHeight: "var(--text-t-body-md-lh)",
+                  fontSize: "clamp(20px, 2vw, 28px)",
+                  fontWeight: 500,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.3,
                   color: "#333",
                 }}
               >

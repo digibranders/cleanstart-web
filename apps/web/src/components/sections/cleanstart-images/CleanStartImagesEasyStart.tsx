@@ -74,32 +74,23 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               className="text-white"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-display-2)",
-                fontWeight: 600,
-                letterSpacing: "var(--text-t-display-2-ls)",
-                lineHeight: "var(--text-t-display-2-lh)",
+                fontSize: "clamp(32px, 4vw, 56px)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
               }}
             >
               Easy to{" "}
-              <span
-                style={{
-                  background:
-                    "linear-gradient(90deg,#7B5CFA 0%,#5B8DFF 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                start
-              </span>
+              <span className="cs-text-gradient-impact">start</span>
             </h2>
             <p
               className="mt-8 max-w-[596px]"
               style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-heading-sm)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(18px, 1.7vw, 24px)",
                 fontWeight: 400,
-                lineHeight: "var(--text-t-heading-sm-lh)",
-                letterSpacing: "var(--text-t-heading-sm-ls)",
+                lineHeight: 1.4,
+                letterSpacing: "-0.02em",
                 color: "rgba(255,255,255,0.85)",
               }}
             >
@@ -115,21 +106,25 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 >
                   <GlowBall />
                   <h3
-                    className="mt-3 text-card-title-sm text-white"
+                    className="mt-3 text-white"
                     style={{
                       fontFamily: "var(--font-display)",
+                      fontSize: "clamp(20px, 2vw, 28px)",
                       fontWeight: 600,
-                      letterSpacing: "-0.01em",
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.1,
                     }}
                   >
                     {f.title}
                   </h3>
                   <p
-                    className="mt-2 text-body-sm"
+                    className="mt-2"
                     style={{
-                      fontFamily: "var(--font-display)",
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "clamp(15px, 1.4vw, 20px)",
                       fontWeight: 400,
-                      lineHeight: 1.5,
+                      lineHeight: 1.4,
+                      letterSpacing: "-0.02em",
                       color: "rgba(255,255,255,0.75)",
                     }}
                   >

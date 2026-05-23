@@ -89,12 +89,13 @@ export function HowCleanStartHelp() {
         <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="how-cleanstart-title"
-            className="justify-self-start font-display font-bold text-[#111111]"
+            className="justify-self-start font-display text-[#111111]"
             style={{
               maxWidth: "444px",
-              fontSize: "var(--text-t-display-2)",
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "clamp(32px, 4vw, 56px)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
             }}
           >
             How CleanStart Will Help
@@ -109,11 +110,13 @@ export function HowCleanStartHelp() {
             }}
           />
           <p
-            className="font-normal text-[#111111] md:justify-self-end md:text-right"
+            className="text-[#111111] md:justify-self-end md:text-right"
             style={{
-              fontSize: "var(--text-t-subhead)",
-              lineHeight: "var(--text-t-subhead-lh)",
-              letterSpacing: "var(--text-t-subhead-ls)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
               maxWidth: "604px",
               opacity: 0.8,
             }}
@@ -225,11 +228,12 @@ function CisoCard({
       </div>
 
       <h3
-        className="mt-[28px] font-display font-bold text-white"
+        className="mt-[28px] font-display text-white"
         style={{
-          fontSize: "var(--text-t-heading-lg)",
-          lineHeight: "var(--text-t-heading-lg-lh)",
-          letterSpacing: "var(--text-t-heading-lg-ls)",
+          fontSize: "clamp(22px, 2.4vw, 32px)",
+          fontWeight: 700,
+          lineHeight: 1.1,
+          letterSpacing: "-0.04em",
           maxWidth: "504px",
         }}
       >
@@ -239,11 +243,13 @@ function CisoCard({
       </h3>
 
       <p
-        className="mt-[22px] font-normal text-white"
+        className="mt-[22px] text-white"
         style={{
-          fontSize: "var(--text-t-body-lg)",
-          lineHeight: "var(--text-t-body-lg-lh)",
-          letterSpacing: "var(--text-t-body-lg-ls)",
+          fontFamily: "var(--font-sans)",
+          fontSize: "clamp(15px, 1.4vw, 20px)",
+          fontWeight: 400,
+          lineHeight: 1.4,
+          letterSpacing: "-0.02em",
           maxWidth: "504px",
         }}
       >
@@ -376,22 +382,25 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
 
       <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
         <h3
-          className="font-display font-bold text-[#111111]"
+          className="font-display text-[#111111]"
           style={{
-            fontSize: "var(--text-t-heading-lg)",
-            lineHeight: "var(--text-t-heading-lg-lh)",
-            letterSpacing: "var(--text-t-heading-lg-ls)",
+            fontSize: "clamp(22px, 2.4vw, 32px)",
+            fontWeight: 700,
+            lineHeight: 1.1,
+            letterSpacing: "-0.04em",
             maxWidth: "234px",
           }}
         >
           {card.title}
         </h3>
         <p
-          className="font-normal text-[#333333]"
+          className="text-[#333333]"
           style={{
-            fontSize: "var(--text-t-body-lg)",
-            lineHeight: "var(--text-t-body-lg-lh)",
-            letterSpacing: "var(--text-t-body-lg-ls)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(15px, 1.4vw, 20px)",
+            fontWeight: 400,
+            lineHeight: 1.4,
+            letterSpacing: "-0.02em",
             maxWidth: "263px",
           }}
         >

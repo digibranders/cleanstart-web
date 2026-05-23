@@ -87,7 +87,7 @@ export function BlogDetailCTA(): React.ReactElement {
         src="/images/blog-detail/cta/cta-cube.png"
         alt=""
         className="absolute pointer-events-none select-none hidden xl:block object-contain"
-        style={{ left: "-63px", top: "220px", width: "206px", height: "207px" }}
+        style={{ left: "-63px", top: "220px", width: "206px", height: "207px" , opacity: 0.75,}}
         loading="lazy"
         decoding="async"
       />
@@ -99,7 +99,7 @@ export function BlogDetailCTA(): React.ReactElement {
         src="/images/blog-detail/cta/cta-cube.png"
         alt=""
         className="absolute pointer-events-none select-none hidden xl:block object-contain"
-        style={{ left: "1130px", top: "-63px", width: "259px", height: "260px" }}
+        style={{ left: "1130px", top: "-63px", width: "259px", height: "260px" , opacity: 0.75,}}
         loading="lazy"
         decoding="async"
       />
@@ -114,9 +114,10 @@ export function BlogDetailCTA(): React.ReactElement {
             className="font-display font-bold w-full lg:w-auto lg:max-w-[401px] text-left"
             style={{
               color: "#111111",
-              fontSize: "var(--text-t-display-2)",
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             }}
           >
             Stay Ahead of Container Security Threats
@@ -129,9 +130,10 @@ export function BlogDetailCTA(): React.ReactElement {
             <p
               className="font-normal"
               style={{
-                fontSize: "var(--text-t-body-lg)",
-                letterSpacing: "var(--text-t-body-lg-ls)",
-                lineHeight: "var(--text-t-body-lg-lh)",
+                fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
                 color: "#111111",
                 opacity: 0.8,
               }}
@@ -177,7 +179,7 @@ export function BlogDetailCTA(): React.ReactElement {
                     height: "44px",
                     padding: "0 18px",
                     // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored submit-button label, fixed 18px to match the inline gradient pill chrome. See RESPONSIVE-AUDIT.md §14.3.
-                    fontSize: "18px",
+                    fontSize: "16px",
                     letterSpacing: "-0.01em",
                     background:
                       "linear-gradient(180deg, #3960F9 0%, #2B97D1 100%)",

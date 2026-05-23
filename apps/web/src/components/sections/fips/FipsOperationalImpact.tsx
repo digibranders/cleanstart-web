@@ -113,25 +113,15 @@ export function FipsOperationalImpact(): React.ReactElement {
               className="text-[#111] mb-10 md:mb-[40px]"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-display-2)",
-                fontWeight: 600,
-                letterSpacing: "var(--text-t-display-2-ls)",
-                lineHeight: "var(--text-t-display-2-lh)",
+                fontSize: "clamp(32px, 4vw, 56px)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
                 maxWidth: "654px",
               }}
             >
               Operational Impact of Built-In{" "}
-              <span
-                style={{
-                  background:
-                    "linear-gradient(95deg, #239CFF 0%, #82AEFF 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                Compliance
-              </span>
+              <span className="cs-text-gradient-impact">Compliance</span>
             </h2>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-4">
@@ -167,11 +157,11 @@ export function FipsOperationalImpact(): React.ReactElement {
                   <p
                     className="text-[#333]"
                     style={{
-                      fontFamily: "var(--font-display)",
-                      fontSize: "var(--text-t-body-md)",
-                      fontWeight: 400,
-                      letterSpacing: "var(--text-t-body-md-ls)",
-                      lineHeight: "var(--text-t-body-md-lh)",
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "clamp(20px, 2vw, 28px)",
+                      fontWeight: 500,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.3,
                       opacity: 0.85,
                       maxWidth: "176px",
                     }}

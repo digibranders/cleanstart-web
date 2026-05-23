@@ -110,30 +110,25 @@ export function TeamsHowWeWork() {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[100px]">
         <div className="flex flex-col items-center gap-6 text-center">
           <h2
-            className="font-display font-bold text-white"
+            className="font-display text-white"
             style={{
-              fontSize: "clamp(2rem, 4vw, 3.875rem)",
-              lineHeight: "1.0",
-              letterSpacing: "-0.05em",
+              fontSize: "clamp(32px, 4vw, 56px)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
             }}
           >
             {"How We "}
-            <span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage:
-                  "linear-gradient(102.46deg, #9A51FF 66%, #2CC1EB 95%)",
-              }}
-            >
-              Work
-            </span>
+            <span className="cs-text-gradient-impact">Work</span>
           </h2>
           <p
-            className="max-w-[911px] font-sans text-white/80"
+            className="max-w-[911px] text-white/80"
             style={{
-              fontSize: "clamp(1.125rem, 2vw, 1.875rem)",
-              lineHeight: "1.4",
-              letterSpacing: "-0.04em",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
             }}
           >
             We work the way we build, with clarity, trust, and continuous

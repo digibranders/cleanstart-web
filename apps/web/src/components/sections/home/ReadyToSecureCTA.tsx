@@ -7,7 +7,7 @@
 export function ReadyToSecureCTA() {
   return (
     <div
-      className="absolute inset-0 grid grid-cols-1 items-start gap-y-8 p-8 md:gap-y-0 md:p-12 lg:items-start lg:grid-cols-[470px_1fr] lg:gap-x-[clamp(32px,7vw,90px)] lg:p-[clamp(28px,4.2vw,56px)_clamp(48px,10vw,145px)_clamp(40px,6vw,80px)_clamp(48px,8vw,122px)]"
+      className="absolute inset-0 grid grid-cols-1 items-start gap-y-8 p-8 md:gap-y-0 md:p-12 lg:items-center lg:grid-cols-[minmax(0,460px)_minmax(0,460px)] lg:gap-x-[clamp(32px,5vw,72px)] lg:justify-center lg:p-[clamp(40px,6vw,64px)_clamp(32px,5vw,80px)]"
       style={{
         background: "linear-gradient(180deg, #131E8F 0%, #471EC0 100%)",
       }}
@@ -28,12 +28,14 @@ export function ReadyToSecureCTA() {
 
       <p
         id="cta-title"
-        className="relative z-10 font-display font-bold text-white"
+        className="relative z-10 font-display text-white"
         style={{
-          maxWidth: "470px",
-          fontSize: "var(--text-t-display-2)",
-          lineHeight: "var(--text-t-display-2-lh)",
-          letterSpacing: "var(--text-t-display-2-ls)",
+          maxWidth: "min(460px, 100%)",
+          fontSize: "clamp(26px, 3.1vw, 44px)",
+          fontWeight: 600,
+          letterSpacing: "-0.04em",
+          lineHeight: 1.1,
+          textWrap: "balance",
         }}
       >
         Ready to Secure Your Container Infrastructure?
@@ -44,9 +46,10 @@ export function ReadyToSecureCTA() {
           className="font-normal text-white"
           style={{
             maxWidth: "493px",
-            fontSize: "var(--text-t-body-lg)",
-            lineHeight: "var(--text-t-body-lg-lh)",
-            letterSpacing: "var(--text-t-body-lg-ls)",
+            fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
             opacity: 0.8,
           }}
         >
@@ -58,7 +61,7 @@ export function ReadyToSecureCTA() {
           className="cs-btn-glass"
           style={{
             ["--cs-btn-px" as string]: "18px",
-            ["--cs-btn-fs" as string]: "18px",
+            ["--cs-btn-fs" as string]: "16px",
           }}
         >
           <span>Get a Demo</span>

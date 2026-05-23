@@ -53,25 +53,17 @@ export function ASRDelivers(): React.ReactElement {
         <h2
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "white",
-            maxWidth: "32.5rem", // Figma 519 / 16
-            marginBottom: "clamp(3rem, 8vw, 8.75rem)", // Figma ~170 px title→items
+            maxWidth: "32.5rem",
+            marginBottom: "clamp(3rem, 8vw, 8.75rem)",
           }}
         >
           What this delivers for{" "}
-          <span
-            className="bg-clip-text text-transparent"
-            style={{
-              backgroundImage:
-                "linear-gradient(96deg, #9A51FF 0%, #2CC1EB 100%)",
-            }}
-          >
-            your business
-          </span>
+          <span className="cs-text-gradient-impact">your business</span>
         </h2>
 
         {/* ---------- Benefits row (md+): 4 columns + 3 separators ---------- */}
@@ -108,23 +100,23 @@ function BenefitColumn({
       <h3
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: "var(--text-card-title-lg)",
+          fontSize: "clamp(22px, 2.4vw, 32px)",
           fontWeight: 700,
-          letterSpacing: "-0.05em",
-          lineHeight: 1,
+          letterSpacing: "-0.04em",
+          lineHeight: 1.1,
           color: "white",
         }}
       >
         {title}
       </h3>
-      {/* Figma 783:463: Figtree Regular 22/130%/-5% color #DDD */}
+      {/* Figma 783:463 — body */}
       <p
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "var(--text-body-lg)",
+          fontFamily: "var(--font-sans)",
+          fontSize: "clamp(15px, 1.4vw, 20px)",
           fontWeight: 400,
-          letterSpacing: "-0.05em",
-          lineHeight: 1.3,
+          letterSpacing: "-0.02em",
+          lineHeight: 1.4,
           color: "#DDDDDD",
         }}
       >

@@ -30,33 +30,24 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
           className="text-white text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 600,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "672px",
           }}
         >
           Built for your{" "}
-          <span
-            style={{
-              background:
-                "linear-gradient(90deg,#7B5CFA 0%,#5B8DFF 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            environment
-          </span>
+          <span className="cs-text-gradient-impact">environment</span>
         </h2>
         <p
           className="mt-5 text-center"
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-body-lg)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(18px, 1.7vw, 24px)",
             fontWeight: 400,
-            lineHeight: "var(--text-t-body-lg-lh)",
-            letterSpacing: "var(--text-t-body-lg-ls)",
+            lineHeight: 1.4,
+            letterSpacing: "-0.02em",
             color: "rgba(255,255,255,0.7)",
           }}
         >
