@@ -1,6 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  CalendarDaysIcon,
+  ContainerIcon,
+  type LucideIcon,
+  MessagesSquareIcon,
+  NewspaperIcon,
+} from "lucide-react";
+import {
   type Event as CmsEvent,
   getPastEvents,
   getUpcomingEvents,
@@ -232,11 +239,14 @@ async function fetchEvents(): Promise<EventItem[]> {
 // ─── Shared sub-components ────────────────────────────────────────────────────
 
 /**
- * Blue gradient ball icon — 34×34px, matches Figma "Ball" node exactly.
+ * Blue gradient ball icon — 34×34px, matches Figma "Ball" node.
+ * Hosts a Lucide icon (carried over from the previous CommunityResources
+ * design — one icon per card domain instead of a single shared SVG).
  */
-function BlueBall(): React.ReactElement {
+function BlueBall({ icon: Icon }: { icon: LucideIcon }): React.ReactElement {
   return (
     <div
+      aria-hidden
       className="relative isolate flex shrink-0 items-center justify-center overflow-hidden rounded-full"
       style={{
         width: 34,
@@ -245,15 +255,11 @@ function BlueBall(): React.ReactElement {
         boxShadow: "0px 2.186px 5.149px 0px rgba(28,60,142,0.33)",
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/community/card-ball-icon.svg"
-        alt=""
-        aria-hidden
-        className="relative z-[2] shrink-0 select-none"
+      <Icon
+        className="relative z-[2] shrink-0 text-white"
         style={{ width: "19.125px", height: "19.125px" }}
-        loading="lazy"
-        decoding="async"
+        strokeWidth={2}
+        aria-hidden
       />
       <div
         aria-hidden
@@ -267,10 +273,10 @@ function BlueBall(): React.ReactElement {
   );
 }
 
-function CardHeader({ title }: { title: string }): React.ReactElement {
+function CardHeader({ title, icon }: { title: string; icon: LucideIcon }): React.ReactElement {
   return (
     <div className="flex items-center gap-3">
-      <BlueBall />
+      <BlueBall icon={icon} />
       <h3
         className="font-display font-bold text-[#111]"
         style={{ fontSize: "24px", lineHeight: "32px" }}
@@ -308,7 +314,7 @@ function ExploreLink({ href, label = "Explore All Resources" }: { href: string; 
 function WhatsNewCard({ items }: { items: NewsItem[] }): React.ReactElement {
   return (
     <div className="flex h-full flex-col gap-8">
-      <CardHeader title="What's New" />
+      <CardHeader title="What's New" icon={NewspaperIcon} />
       <div className="flex flex-grow flex-col gap-6">
         {items.map((item, i) => (
           <Link
@@ -339,7 +345,7 @@ function WhatsNewCard({ items }: { items: NewsItem[] }): React.ReactElement {
 function DiscussionsCard(): React.ReactElement {
   return (
     <div className="flex h-full flex-col gap-8">
-      <CardHeader title="Community Discussions" />
+      <CardHeader title="Community Discussions" icon={MessagesSquareIcon} />
       <div className="flex flex-grow flex-col gap-4">
         {DISCUSSIONS.map((d, i) => (
           <div
@@ -390,7 +396,7 @@ function DiscussionsCard(): React.ReactElement {
 function CommunityImagesCard({ items }: { items: ImageItem[] }): React.ReactElement {
   return (
     <div className="flex h-full flex-col gap-8">
-      <CardHeader title="Community images" />
+      <CardHeader title="Community images" icon={ContainerIcon} />
       <div className="flex flex-grow flex-col gap-6">
         {items.map((item, i) => (
           <div key={`${item.name}-${i}`} className="flex items-center gap-2">
@@ -435,7 +441,7 @@ function CommunityImagesCard({ items }: { items: ImageItem[] }): React.ReactElem
 function UpcomingEventsCard({ items }: { items: EventItem[] }): React.ReactElement {
   return (
     <div className="flex h-full flex-col gap-8">
-      <CardHeader title="Upcoming Events" />
+      <CardHeader title="Upcoming Events" icon={CalendarDaysIcon} />
       <div className="flex flex-grow flex-col gap-7">
         {items.map((ev, i) => (
           <Link
