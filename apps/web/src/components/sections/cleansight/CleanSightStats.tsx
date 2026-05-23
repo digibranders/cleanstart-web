@@ -108,7 +108,7 @@ export function CleanSightStats(): React.ReactElement {
         aria-hidden
         src="/images/cleansight/stats-union.svg"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           right: "-20px",
           top: "-206px",
@@ -144,14 +144,14 @@ export function CleanSightStats(): React.ReactElement {
         </div>
 
         {/* ── Stats row — 4 columns with vertical dividers ── */}
-        <div className="relative grid grid-cols-2 xl:grid-cols-4">
+        <div className="relative grid grid-cols-2 lg:grid-cols-4">
 
           {/* Vertical dividers — 3 lines between the 4 columns */}
           {[1, 2, 3].map((i) => (
             <div
               key={i}
               aria-hidden
-              className="absolute hidden xl:block pointer-events-none"
+              className="absolute hidden lg:block pointer-events-none"
               style={{
                 left: `${(i / 4) * 100}%`,
                 top: 0,
@@ -165,7 +165,7 @@ export function CleanSightStats(): React.ReactElement {
           {/* Mobile divider — horizontal line between rows */}
           <div
             aria-hidden
-            className="xl:hidden absolute pointer-events-none"
+            className="lg:hidden absolute pointer-events-none"
             style={{
               left: 0, right: 0,
               top: "50%",
@@ -175,7 +175,7 @@ export function CleanSightStats(): React.ReactElement {
           />
           <div
             aria-hidden
-            className="xl:hidden absolute pointer-events-none"
+            className="lg:hidden absolute pointer-events-none"
             style={{
               top: 0, bottom: 0,
               left: "50%",
@@ -187,7 +187,7 @@ export function CleanSightStats(): React.ReactElement {
           {STATS.map((s) => (
             <div
               key={s.label}
-              className="text-center text-white flex flex-col items-center py-6 xl:py-0"
+              className="text-center text-white flex flex-col items-center py-6 lg:py-0"
               style={{ gap: "18px" }}
             >
               {/* Animated stat number */}

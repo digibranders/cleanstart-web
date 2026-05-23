@@ -138,7 +138,7 @@ export function CisoSolution(): React.ReactElement {
           {/* Track rail */}
           <div
             aria-hidden
-            className="hidden xl:block"
+            className="hidden lg:block"
             style={{
               height: "12px",
               background: "rgba(255,255,255,0.1)",
@@ -156,7 +156,7 @@ export function CisoSolution(): React.ReactElement {
                   Content: gradient SVG bg + two CSS masks */}
               <div
                 aria-hidden
-                className="hidden xl:flex absolute pointer-events-none"
+                className="hidden lg:flex absolute pointer-events-none"
                 style={{
                   left: `calc(${centerPct} - 133.5px)`,
                   top: "-75px",
@@ -190,7 +190,7 @@ export function CisoSolution(): React.ReactElement {
                   Content: gradient SVG bg + two CSS masks */}
               <div
                 aria-hidden
-                className="hidden xl:flex absolute pointer-events-none"
+                className="hidden lg:flex absolute pointer-events-none"
                 style={{
                   left: `calc(${centerPct} - 184.5px)`,
                   top: "-18px",
@@ -221,7 +221,7 @@ export function CisoSolution(): React.ReactElement {
               {/* Vertical indicator bar — 4×142px · top=3px below rail */}
               <div
                 aria-hidden
-                className="hidden xl:block absolute pointer-events-none"
+                className="hidden lg:block absolute pointer-events-none"
                 style={{
                   left: `calc(${centerPct} - 2px)`,
                   top: "3px",
@@ -236,10 +236,10 @@ export function CisoSolution(): React.ReactElement {
           ))}
 
           {/* ── Feature cards ──
-              xl: grid-cols-4 + gap-[32px] on 1276px = exactly 295px each column
+              lg: grid-cols-4 + gap-[32px] on 1276px = exactly 295px each column
               Mobile: 1 col → sm: 2 col */}
           <div
-            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8 xl:gap-[32px]"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-[32px]"
             style={{ marginTop: "120px" }}
           >
             {FEATURES.map((f) => (

@@ -73,7 +73,7 @@ export function SCABuiltForDev(): React.ReactElement {
       {/* Decorative purple glow — left edge */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           top: "50%",
           left: "-180px",
@@ -90,7 +90,7 @@ export function SCABuiltForDev(): React.ReactElement {
       {/* Decorative purple glow — right edge */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           top: "50%",
           right: "-180px",

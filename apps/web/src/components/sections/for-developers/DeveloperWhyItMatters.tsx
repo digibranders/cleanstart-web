@@ -131,7 +131,7 @@ export function DeveloperWhyItMatters(): React.ReactElement {
       {/* ── Left Union grid-pattern blob (Figma: left=-500, top=-539, w=1181) ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: 'calc(-500 / 1920 * 100vw)',
           top: 'calc(-539 / 1920 * 100vw)',
@@ -152,7 +152,7 @@ export function DeveloperWhyItMatters(): React.ReactElement {
       {/* ── Right Union grid-pattern blob (Figma: left=1216, top=-535, w=1101) ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: 'calc(1216 / 1920 * 100vw)',
           top: 'calc(-535 / 1920 * 100vw)',

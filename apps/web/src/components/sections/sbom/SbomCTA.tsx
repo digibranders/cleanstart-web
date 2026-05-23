@@ -24,7 +24,7 @@ export function SbomCTA(): React.ReactElement {
         aria-hidden
         src="/images/cleansight/cta-union.svg"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           left: "547px",
           top: "-220px",
@@ -39,7 +39,7 @@ export function SbomCTA(): React.ReactElement {
       {/* ── Ellipse — top-left ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: "-139px",
           top: "-168px",
@@ -55,7 +55,7 @@ export function SbomCTA(): React.ReactElement {
       {/* ── Ellipse — bottom-right ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: "1159px",
           top: "244px",
@@ -154,7 +154,7 @@ export function SbomCTA(): React.ReactElement {
         aria-hidden
         src="/images/ciso/cta-cube-noise.png"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           right: "-60px",
           bottom: "-100px",

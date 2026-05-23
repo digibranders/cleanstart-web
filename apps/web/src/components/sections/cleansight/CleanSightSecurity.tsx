@@ -1,6 +1,6 @@
 /**
  * Pattern-11 partial collapse (Sprint 3 Day 4):
- *   - Lowered `hidden xl:block` / `xl:hidden` -> `lg:block` / `lg:hidden`.
+ *   - Lowered `hidden lg:block` / `lg:hidden` -> `lg:block` / `lg:hidden`.
  *     The 1024-1279 dead zone (where neither the desktop chart nor the
  *     mobile fallback rendered cleanly) now picks up the desktop layout.
  *   - Replaced the 8 flat-px `fontSize: 20px / 16px` workflow labels with

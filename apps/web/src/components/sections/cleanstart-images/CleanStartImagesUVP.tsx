@@ -48,7 +48,7 @@ export function CleanStartImagesUVP(): React.ReactElement {
       {/* Pink/purple decorative flares — Figma ellipses 161:23666, 161:23667 */}
       <div
         aria-hidden
-        className="absolute pointer-events-none hidden xl:block"
+        className="absolute pointer-events-none hidden lg:block"
         style={{
           right: "-80px",
           top: "-64px",
@@ -61,7 +61,7 @@ export function CleanStartImagesUVP(): React.ReactElement {
       />
       <div
         aria-hidden
-        className="absolute pointer-events-none hidden xl:block"
+        className="absolute pointer-events-none hidden lg:block"
         style={{
           left: "-80px",
           top: "668px",

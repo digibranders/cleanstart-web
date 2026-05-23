@@ -32,7 +32,7 @@ export function CleanSightUnified(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/cleansight/unified-vector-bg.svg"
         alt=""
         style={{ left: "171px", top: "-115px", width: "568px", height: "551px" }}
@@ -44,7 +44,7 @@ export function CleanSightUnified(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/cleansight/unified-union-bg.svg"
         alt=""
         style={{
@@ -62,7 +62,7 @@ export function CleanSightUnified(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/cleansight/unified-ellipse-glow.svg"
         alt=""
         style={{ left: "1732px", top: "656px", width: "315px", height: "315px" }}
@@ -72,7 +72,7 @@ export function CleanSightUnified(): React.ReactElement {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         {/* Heading row */}
-        <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-8 xl:gap-[60px]">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-[60px]">
           <h2
             style={{
               fontFamily: "var(--font-display)",
@@ -90,7 +90,7 @@ export function CleanSightUnified(): React.ReactElement {
           </h2>
 
           <p
-            className="xl:pt-2"
+            className="lg:pt-2"
             style={{
               fontFamily: "var(--font-sans)",
               fontSize: "clamp(18px, 1.7vw, 24px)",
@@ -108,7 +108,7 @@ export function CleanSightUnified(): React.ReactElement {
         </div>
 
         {/* Feature cards */}
-        <div className="mt-10 xl:mt-[72px] grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 xl:gap-8">
+        <div className="mt-10 lg:mt-[72px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-8">
           {CARDS.map((card) => (
             <div
               key={card.title}

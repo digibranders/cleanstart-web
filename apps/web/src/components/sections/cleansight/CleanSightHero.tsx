@@ -22,7 +22,7 @@ export function CleanSightHero(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/cleansight/hero-wave-mesh.svg"
         alt=""
         style={{ left: "603px", top: 0, width: "730px", height: "708px", mixBlendMode: "screen", overflow: "hidden" }}

@@ -44,7 +44,7 @@ export function AboutWhoWeAre() {
         aria-hidden
         src="/images/about/who-we-are-union.svg"
         alt=""
-        className="pointer-events-none absolute select-none hidden xl:block"
+        className="pointer-events-none absolute select-none hidden lg:block"
         style={{
           right: "-80px",
           top: "50%",

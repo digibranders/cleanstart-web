@@ -524,7 +524,7 @@ export async function CommunitySections(): Promise<React.ReactElement> {
         src="/images/community/section-vector.svg"
         alt=""
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:block"
+        className="pointer-events-none absolute hidden select-none lg:block"
         style={{
           left: "calc(-471 / 1920 * 100%)",
           top: "calc(689 / 1200 * 100%)",
@@ -539,7 +539,7 @@ export async function CommunitySections(): Promise<React.ReactElement> {
         src="/images/community/section-vector.svg"
         alt=""
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:block"
+        className="pointer-events-none absolute hidden select-none lg:block"
         style={{
           left: "calc(1448 / 1920 * 100%)",
           top: "calc(-252 / 1200 * 100%)",

@@ -48,7 +48,7 @@ export function SCAReduceNoise(): React.ReactElement {
       {/* Cyan glow flare — top-right */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           top: "-16px",
           right: "130px",

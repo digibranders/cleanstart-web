@@ -122,23 +122,27 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
         </svg>
       </div>
 
-      {/* Light beam — anchored to the card's bottom edge via `top: 100%`,
-          extending downward. Sized in cqw so it scales with the card. The
-          card body's `aspect-ratio: 232.8/374` makes 100% of height equal
-          ≈ 160.65 cqw. Width and offset stay locked to card width. */}
+      {/* Light beam — anchored to the card's bottom edge, extending downward.
+          Thicker and brighter pass: width bumped to 65 cqw so the beam reads
+          as a substantial luminous shaft, pulled up by 18 cqw so the bright
+          core sits just below the card's bottom edge. Aspect 267:358 preserved
+          via height auto. `mix-blend-mode: screen` lifts the cyan onto the
+          dark backdrop without muddying it. */}
       <Image
         src="/images/cleanstart-factory/flare.webp"
         alt=""
         aria-hidden
         width={267}
         height={358}
-        sizes="(min-width: 1280px) 75px, 6vw"
+        sizes="(min-width: 1280px) 160px, 12vw"
         className="pointer-events-none absolute left-1/2 -translate-x-1/2 select-none"
         style={{
-          width: "32cqw",
+          width: "65cqw",
           height: "auto",
           top: "100%",
-          marginTop: "-8cqw",
+          marginTop: "-18cqw",
+          mixBlendMode: "screen",
+          filter: "saturate(1.15) brightness(1.1)",
         }}
       />
 
@@ -150,17 +154,10 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
 }
 
 export function CleanStartFactory() {
+  // Background is inherited from the parent `bg-cs-hero bg-cs-grid` wrapper
+  // in page.tsx so the Hero and Factory sections share one continuous backdrop.
   return (
     <Section padding="none" className="relative overflow-hidden">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(2, 3, 12, 0) 0%, rgba(2, 3, 12, 0.65) 10%, rgba(2, 3, 12, 0.95) 24%, #02030C 42%, #02030C 100%)",
-        }}
-      />
-
       <Container>
         <div className="relative mx-auto" style={{ maxWidth: 1276 }}>
           <div

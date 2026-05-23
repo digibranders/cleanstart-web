@@ -36,7 +36,7 @@ export function CleanSightProblems(): React.ReactElement {
       {/* Decorative union blobs */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           right: "-310px",
           top: "-267px",
@@ -49,7 +49,7 @@ export function CleanSightProblems(): React.ReactElement {
       />
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: "-310px",
           top: "254px",
@@ -94,11 +94,11 @@ export function CleanSightProblems(): React.ReactElement {
         </div>
 
         {/* 2×2 Card Grid */}
-        <div className="mt-12 xl:mt-[67px] grid grid-cols-1 sm:grid-cols-2 gap-px bg-[rgba(217,217,217,0.5)]">
+        <div className="mt-12 lg:mt-[67px] grid grid-cols-1 sm:grid-cols-2 gap-px bg-[rgba(217,217,217,0.5)]">
           {PROBLEMS.map((p, i) => (
             <div
               key={p.title}
-              className="bg-white flex items-center gap-6 xl:gap-8 p-8 xl:p-10"
+              className="bg-white flex items-center gap-6 lg:gap-8 p-8 lg:p-10"
               style={{
                 borderRight: i % 2 === 0 ? "1px solid rgba(217,217,217,0.5)" : undefined,
                 borderBottom: i < 2 ? "1px solid rgba(217,217,217,0.5)" : undefined,

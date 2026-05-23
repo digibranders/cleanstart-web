@@ -147,7 +147,7 @@ export function TeamsLeadership() {
       {/* ── Left vector blob (Figma Vector 583:3476) ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:block"
+        className="pointer-events-none absolute hidden select-none lg:block"
         style={{ left: "-270px", top: "-183px", width: "919px", height: "891px" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -165,7 +165,7 @@ export function TeamsLeadership() {
       {/* ── Right vector blob (mirror of left top-left) ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:block"
+        className="pointer-events-none absolute hidden select-none lg:block"
         style={{ right: "-270px", top: "-183px", width: "919px", height: "891px" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -183,7 +183,7 @@ export function TeamsLeadership() {
       {/* ── Center vector blob — sits horizontally centered behind the Advisory Board (Anandamoy) card ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:block"
+        className="pointer-events-none absolute hidden select-none lg:block"
         style={{
           left: "50%",
           bottom: "-120px",
@@ -207,7 +207,7 @@ export function TeamsLeadership() {
       {/* ── Bottom-left union shape (Figma Union 583:3480, rotate 141.39° scaleY-1) ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:flex items-center justify-center"
+        className="pointer-events-none absolute hidden select-none lg:flex items-center justify-center"
         style={{ left: "-164px", bottom: "-230px", width: "488px", height: "497px" }}
       >
         <div style={{ transform: "rotate(141.39deg) scaleY(-1)", flexShrink: 0 }}>
@@ -228,7 +228,7 @@ export function TeamsLeadership() {
       {/* Outer div = position anchor (258×258). Inner div uses inset:-94.19% to expand the glow. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:block"
+        className="pointer-events-none absolute hidden select-none lg:block"
         style={{ left: "-9px", bottom: "-104px", width: "258px", height: "258px" }}
       >
         <div className="absolute" style={{ inset: "-94.19%" }}>
@@ -246,7 +246,7 @@ export function TeamsLeadership() {
       {/* ── Bottom-right ellipse glow (Figma Ellipse 46684, 583:3483) ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:block"
+        className="pointer-events-none absolute hidden select-none lg:block"
         style={{
           left: "calc(1775px / 1920 * 100%)",
           bottom: "-121px",

@@ -31,7 +31,7 @@ export function SCAHero(): React.ReactElement {
       {/* ── Decorative blue light flare — Figma node 604:2441–2444 ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           right: "224px",
           top: "434px",

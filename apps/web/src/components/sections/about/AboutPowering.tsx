@@ -51,7 +51,7 @@ export function AboutPowering() {
           aria-hidden
           src="/images/about/powering-ellipse-blob.svg"
           alt=""
-          className="pointer-events-none absolute hidden select-none xl:block"
+          className="pointer-events-none absolute hidden select-none lg:block"
           style={{
             left: `calc(${leftPx}px / 1920 * 100%)`,
             top: "246px",
@@ -77,7 +77,7 @@ export function AboutPowering() {
           aria-hidden
           src="/images/about/powering-bg-vector.svg"
           alt=""
-          className="pointer-events-none absolute hidden select-none xl:block"
+          className="pointer-events-none absolute hidden select-none lg:block"
           style={{
             left: `calc(${x}px / 1920 * 100%)`,
             top: `${y}px`,
@@ -94,7 +94,7 @@ export function AboutPowering() {
         <div
           key={x}
           aria-hidden
-          className="pointer-events-none absolute top-[180px] hidden h-[1335px] w-px xl:block"
+          className="pointer-events-none absolute top-[180px] hidden h-[1335px] w-px lg:block"
           style={{
             left: `calc(${x}px / 1920 * 100%)`,
             opacity: 0.9,
@@ -137,7 +137,7 @@ export function AboutPowering() {
         </div>
 
         {/* Cards row — Figma top=412 → 80px gap below title block */}
-        <div className="mt-20 grid grid-cols-1 items-stretch gap-y-16 gap-x-[clamp(24px,6vw,91px)] md:grid-cols-2 xl:grid-cols-3 place-items-center">
+        <div className="mt-20 grid grid-cols-1 items-stretch gap-y-16 gap-x-[clamp(24px,6vw,91px)] md:grid-cols-2 lg:grid-cols-3 place-items-center">
           {CARDS.map((card) => (
             <FeatureCard key={card.title} {...card} />
           ))}

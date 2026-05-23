@@ -75,7 +75,7 @@ export function ASRHero(): React.ReactElement {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
-          className="flex flex-col xl:flex-row items-start xl:items-center"
+          className="flex flex-col lg:flex-row items-start lg:items-center"
           style={{
             paddingTop: "clamp(120px, 13vw, 229px)",
             paddingBottom: "clamp(56px, 7vw, 100px)",
@@ -147,7 +147,7 @@ export function ASRHero(): React.ReactElement {
 
           {/* Right: bloated-vs-clean comparison cards (combined Figma export) */}
           <div
-            className="hidden xl:block relative shrink-0"
+            className="hidden lg:block relative shrink-0"
             style={{ width: "min(622px, 48vw)" }}
           >
             <Image
@@ -162,7 +162,7 @@ export function ASRHero(): React.ReactElement {
           </div>
 
           {/* Mobile-only: smaller card image */}
-          <div className="block xl:hidden relative w-full">
+          <div className="block lg:hidden relative w-full">
             <Image
               src="/images/attack-surface-reduction/hero-mobile-cards.png"
               alt="BLOATED vs CLEAN image comparison"

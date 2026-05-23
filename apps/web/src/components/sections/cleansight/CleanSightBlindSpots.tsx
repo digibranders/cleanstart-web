@@ -15,7 +15,7 @@ export function CleanSightBlindSpots(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/cleansight/blindspot-union-right.svg"
         alt=""
         style={{
@@ -32,7 +32,7 @@ export function CleanSightBlindSpots(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/cleansight/blindspot-union-left.svg"
         alt=""
         style={{
@@ -48,7 +48,7 @@ export function CleanSightBlindSpots(): React.ReactElement {
       {/* Corner hex — bottom-left, rotated, opacity 20% */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: "-231px",
           top: "572px",
@@ -71,7 +71,7 @@ export function CleanSightBlindSpots(): React.ReactElement {
       {/* Corner hex — top-right, rotated, opacity 20% */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: "1624px",
           top: "-221px",

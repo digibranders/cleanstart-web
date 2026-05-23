@@ -85,7 +85,7 @@ export function CommunityTestimonials(): React.ReactElement {
         src="/images/community/testimonial-vector.svg"
         alt=""
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:block"
+        className="pointer-events-none absolute hidden select-none lg:block"
         style={{ left: '-270px', top: '-325px', width: '701px', height: '680px' }}
         loading="lazy"
         decoding="async"
@@ -96,7 +96,7 @@ export function CommunityTestimonials(): React.ReactElement {
         src="/images/community/testimonial-vector.svg"
         alt=""
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:block"
+        className="pointer-events-none absolute hidden select-none lg:block"
         style={{
           left: 'calc(1441 / 1920 * 100%)',
           top: '-380px',
@@ -111,7 +111,7 @@ export function CommunityTestimonials(): React.ReactElement {
       {/* Right union */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:block"
+        className="pointer-events-none absolute hidden select-none lg:block"
         style={{
           right: 'calc(-192 / 1920 * 100%)',
           top: '323px',
@@ -133,7 +133,7 @@ export function CommunityTestimonials(): React.ReactElement {
       {/* Left union */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden select-none xl:block"
+        className="pointer-events-none absolute hidden select-none lg:block"
         style={{
           left: 'calc(-192 / 1920 * 100%)',
           top: '323px',

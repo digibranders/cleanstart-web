@@ -276,7 +276,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
       {/* ── Left Vector grid blob (Figma: left=-423, top=-303, 979px) ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: 'calc(-423 / 1920 * 100vw)',
           top: 'calc(-303 / 1920 * 100vw)',
@@ -297,7 +297,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
       {/* ── Right Vector grid blob (Figma: left=1444, top=-372, 979px) ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: 'calc(1444 / 1920 * 100vw)',
           top: 'calc(-372 / 1920 * 100vw)',

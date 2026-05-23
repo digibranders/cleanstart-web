@@ -29,7 +29,7 @@ export function TeamsCTA() {
       {/* ── Ellipse — top-left ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: "-139px",
           top: "-168px",
@@ -45,7 +45,7 @@ export function TeamsCTA() {
       {/* ── Ellipse — bottom-right ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: "1159px",
           top: "244px",

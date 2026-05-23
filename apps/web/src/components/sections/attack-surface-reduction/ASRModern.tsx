@@ -63,7 +63,7 @@ export function ASRModern(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/vulnerability-remediation/s5-bg-decoration.png"
         alt=""
         width={372}
@@ -76,7 +76,7 @@ export function ASRModern(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/vulnerability-remediation/s5-bg-decoration.png"
         alt=""
         width={372}

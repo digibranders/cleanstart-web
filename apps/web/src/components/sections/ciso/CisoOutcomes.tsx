@@ -282,7 +282,7 @@ export function CisoOutcomes(): React.ReactElement {
         aria-hidden
         src="/images/ciso/outcomes-vector-corner.svg"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           left: "calc(50% + 471px)",
           top: "-339px",
@@ -299,7 +299,7 @@ export function CisoOutcomes(): React.ReactElement {
         aria-hidden
         src="/images/ciso/outcomes-vector-corner.svg"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           left: "calc(50% - 1521px)",
           top: "67px",
@@ -340,7 +340,7 @@ export function CisoOutcomes(): React.ReactElement {
           aria-hidden
           src="/images/ciso/outcomes-vector-center.svg"
           alt=""
-          className="absolute pointer-events-none select-none hidden xl:block"
+          className="absolute pointer-events-none select-none hidden lg:block"
           style={{
             left: "50%",
             top: "-56px",
@@ -376,7 +376,7 @@ export function CisoOutcomes(): React.ReactElement {
              4×295 + 3×32 = 1276px fills container exactly.
              Tall cards (1 & 3): h=326px, no top offset.
              Short cards (2 & 4): h=258px, marginTop=68px (bottom-aligns all cards). */}
-        <div className="hidden xl:flex items-start" style={{ gap: "32px" }}>
+        <div className="hidden lg:flex items-start" style={{ gap: "32px" }}>
           {STATS.map((stat) => (
             <StatCard key={stat.display} stat={stat} enabled={animated} />
           ))}
@@ -384,7 +384,7 @@ export function CisoOutcomes(): React.ReactElement {
 
         {/* ════════ MOBILE — 2-column grid ════════ */}
         <div
-          className="xl:hidden grid grid-cols-2 gap-4 px-4 sm:px-6"
+          className="lg:hidden grid grid-cols-2 gap-4 px-4 sm:px-6"
         >
           {STATS.map((stat) => (
             <div

@@ -144,7 +144,7 @@ export function SbomRisks(): React.ReactElement {
                 />
 
                 {/* 3D icon — responsive size */}
-                <div className="relative shrink-0 w-24 h-24 sm:w-36 sm:h-36 xl:w-[220px] xl:h-[220px]">
+                <div className="relative shrink-0 w-24 h-24 sm:w-36 sm:h-36 lg:w-[220px] lg:h-[220px]">
                   <Image
                     src={risk.icon}
                     alt={risk.iconAlt}

@@ -11,7 +11,7 @@ export function TeamsHowWeWork() {
       {/* Decorative line accents */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
           left: "calc(355px / 1920 * 100%)",
           top: "142px",
@@ -23,7 +23,7 @@ export function TeamsHowWeWork() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
           left: "calc(1564px / 1920 * 100%)",
           top: "142px",

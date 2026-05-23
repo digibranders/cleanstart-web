@@ -124,7 +124,7 @@ export function TeamsInsiders() {
       {/* Decorative corner blobs */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
           left: "-270px",
           top: "-183px",
@@ -137,7 +137,7 @@ export function TeamsInsiders() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
           right: "-270px",
           top: "-238px",

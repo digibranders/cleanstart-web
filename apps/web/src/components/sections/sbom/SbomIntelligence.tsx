@@ -70,7 +70,7 @@ export function SbomIntelligence(): React.ReactElement {
         </div>
 
         {/* 4-up card grid (site convention) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4" style={{ gap: "32px" }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ gap: "32px" }}>
           {CARDS.map((card) => (
             <IntelligenceCard key={card.id} title={card.title} body={card.body} />
           ))}

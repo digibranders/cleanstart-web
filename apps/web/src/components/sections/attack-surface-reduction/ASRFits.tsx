@@ -30,7 +30,7 @@ export function ASRFits(): React.ReactElement {
       <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Heading row: heading left, subtitle right */}
         <div
-          className="flex flex-col xl:flex-row xl:items-end xl:justify-between"
+          className="flex flex-col lg:flex-row lg:items-end lg:justify-between"
           style={{ marginBottom: "64px", gap: "32px" }}
         >
           <h2

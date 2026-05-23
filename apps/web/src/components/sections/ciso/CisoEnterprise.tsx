@@ -204,7 +204,7 @@ export function CisoEnterprise(): React.ReactElement {
         aria-hidden
         src="/images/ciso/enterprise-union.svg"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           right: "-185px",
           top: "-193px",
@@ -222,7 +222,7 @@ export function CisoEnterprise(): React.ReactElement {
         aria-hidden
         src="/images/ciso/enterprise-union.svg"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           left: "-218px",
           top: "-139px",
@@ -237,7 +237,7 @@ export function CisoEnterprise(): React.ReactElement {
       {/* ── Ellipse glow — top-right ── */}
       <div
         aria-hidden
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{ right: "-127px", top: "-74px", width: "315px", height: "315px" }}
       >
         <div className="absolute" style={{ inset: "-64.44%" }}>
@@ -255,7 +255,7 @@ export function CisoEnterprise(): React.ReactElement {
       {/* ── Ellipse glow — top-left ── */}
       <div
         aria-hidden
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{ left: "-103px", top: "-20px", width: "315px", height: "315px" }}
       >
         <div className="absolute" style={{ inset: "-64.44%" }}>
@@ -290,14 +290,14 @@ export function CisoEnterprise(): React.ReactElement {
         </h2>
 
         {/* ════ DESKTOP — 4 cards in a flex row, 295×32 gap = 1276px ════ */}
-        <div className="hidden xl:flex items-start" style={{ gap: "32px" }}>
+        <div className="hidden lg:flex items-start" style={{ gap: "32px" }}>
           {CARDS.map((card) => (
             <EnterpriseCard key={card.title} {...card} />
           ))}
         </div>
 
         {/* ════ MOBILE — 2-column grid ════ */}
-        <div className="xl:hidden grid grid-cols-2 gap-4">
+        <div className="lg:hidden grid grid-cols-2 gap-4">
           {CARDS.map((card) => (
             <div
               key={card.title}

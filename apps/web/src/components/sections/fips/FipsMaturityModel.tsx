@@ -33,7 +33,7 @@ export function FipsMaturityModel(): React.ReactElement {
       {/* Decorative side accents */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: "-40px",
           top: "55%",
@@ -48,7 +48,7 @@ export function FipsMaturityModel(): React.ReactElement {
       />
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           right: "-40px",
           top: "55%",

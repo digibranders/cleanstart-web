@@ -49,7 +49,7 @@ export function SCAProblems(): React.ReactElement {
 
         {/* Cards — 4 in a row on desktop, 2 on tablet, 1 on mobile */}
         <div
-          className="mt-[71px] grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
+          className="mt-[71px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
           style={{ gap: "32px" }}
         >
           {CARDS.map(({ title, desc, icon, iconAlt }) => (

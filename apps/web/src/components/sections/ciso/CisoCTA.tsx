@@ -38,7 +38,7 @@ export function CisoCTA(): React.ReactElement {
       {/* Purple glow — right (subtle, behind cube) */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           right: "0",
           bottom: "-80px",
@@ -56,7 +56,7 @@ export function CisoCTA(): React.ReactElement {
         aria-hidden
         src="/images/ciso/cta-cube-noise.png"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           right: "-60px",
           bottom: "-100px",
