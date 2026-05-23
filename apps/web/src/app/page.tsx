@@ -31,8 +31,6 @@ export default function Home() {
     <>
       <Header />
       <main>
-        {/* Hero + CleanStartFactory share ONE Figma frame (108:8631, 1920×2209) — render
-             them inside one wrapper that owns the continuous gradient + purple blob overlays. */}
         <div className="bg-cs-hero bg-cs-grid relative overflow-hidden">
           {/* Decorative purple radial blobs (Figma "Union" vectors, #640DFB radial fill) */}
           <div

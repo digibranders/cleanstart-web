@@ -1,121 +1,93 @@
-import Image from "next/image";
-import { Container } from "@/components/layout";
-
-/**
- * Community / Hero (Figma 732:3192, Frame 0-960).
- *
- * Layout: dark navy gradient + grid + decorative purple ellipses on the
- * top half; team photo bleed-to-edge fills the bottom half (-20→1940,
- * y=464, h=496). Title + body + Join-Community CTA sit in the top half.
- */
 export function CommunityHero() {
   return (
-    <section
-      className="relative overflow-hidden"
-      style={{
-        minHeight: "960px",
-        backgroundColor: "#0B0B27",
-        backgroundImage: [
-          "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
-          "linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-          "linear-gradient(180deg, #0B0B27 0%, #131E8F 60%, #471EC0 100%)",
-        ].join(", "),
-        backgroundSize: "80px 80px, 80px 80px, 100% 100%",
-        backgroundRepeat: "repeat, repeat, no-repeat",
-      }}
-    >
-      {/* Decorative purple ellipse — bottom-right */}
+    // Figma frame 732:3193 is 1920×960px.
+    // 56vw (not 50vw) gives the section enough height at 1280–1700px viewports so that the
+    // proportional photo offset (48.33%) always clears the H1 bottom — without affecting
+    // the 960px max (still hit at ≈1714px+, matching Figma exactly at 1920px).
+    <section className="relative overflow-hidden" style={{ minHeight: 'clamp(560px, 56vw, 960px)' }}>
+
+      {/* ── Hero photo ────────────────────────────────────────────────────────────
+          Figma: top=464px, height=496px in a 960px-tall frame.
+          Proportional: top = 464/960 = 48.33 %, fills to bottom.
+          Sharp top edge — no gradient blend, matching Figma exactly.
+      ─────────────────────────────────────────────────────────────────────────── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden lg:block"
-        style={{
-          right: "-180px",
-          top: "180px",
-          width: "560px",
-          height: "560px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(closest-side, rgba(122,89,255,0.45) 0%, rgba(122,89,255,0) 70%)",
-          filter: "blur(60px)",
-        }}
-      />
-      {/* Decorative purple ellipse — top-left */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute hidden lg:block"
-        style={{
-          left: "-220px",
-          top: "-160px",
-          width: "560px",
-          height: "560px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(closest-side, rgba(60,30,180,0.55) 0%, rgba(60,30,180,0) 70%)",
-          filter: "blur(80px)",
-        }}
-      />
+        className="pointer-events-none select-none absolute inset-x-0 hidden lg:block overflow-hidden"
+        style={{ top: 'calc(464 / 960 * 100%)', bottom: 0 }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/community/hero-photo.png"
+          alt=""
+          width={1960}
+          height={496}
+          loading="eager"
+          decoding="async"
+          className="w-full h-full object-cover object-top"
+        />
+      </div>
 
-      {/* Copy block (top half) */}
-      <Container className="relative z-10 pt-[clamp(120px,12vw,172px)]">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-8">
-          <h1
-            className="font-display font-semibold text-white"
-            style={{
-              fontSize: "var(--text-hero-marketing)",
-              letterSpacing: "var(--text-hero-marketing-ls)",
-              lineHeight: "var(--text-hero-lh)",
-            }}
-          >
-            Let&rsquo;s work together towards secure development
-          </h1>
-
-          <div className="flex flex-col items-start gap-8 lg:pt-2">
-            <p
-              className="font-sans font-normal text-white/80"
+      {/* ── Text content ──────────────────────────────────────────────────────────
+          Figma: left=322px, top=172px, two 622px columns with 32px gap.
+          At 1440px (75 % scale): top ≈ 129px, columns ≈ 466px each — handled by
+          the clamp on pt and the lg:w-[48%] split.
+      ─────────────────────────────────────────────────────────────────────────── */}
+      <div className="relative z-10 mx-auto max-w-[var(--container-default)] px-6">
+        <div className="pt-[clamp(96px,10vw,172px)] pb-[clamp(40px,5vw,80px)]">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-8">
+            {/* H1 — Figma: 72px Manrope SemiBold, tracking -3.6px */}
+            <h1
+              className="font-display font-semibold text-white lg:w-[48%]"
               style={{
-                fontSize: "var(--text-body-xl)",
-                lineHeight: 1.4,
-                letterSpacing: "-0.025em",
+                fontSize: 'var(--text-hero-marketing)',
+                lineHeight: 'var(--text-hero-lh)',
+                letterSpacing: 'var(--text-hero-marketing-ls)',
               }}
             >
-              Connect with developers and security leaders sharing real-world
-              strategies to reduce risk, secure images, and ship faster with
-              confidence.
-            </p>
-            <a
-              href="https://github.com/cleanstart"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cs-btn-glass"
-              style={{
-                ["--cs-btn-px" as string]: "18px",
-                ["--cs-btn-fs" as string]: "18px",
-                color: "#111111",
-              }}
-            >
-              <span>Join Community</span>
-            </a>
+              Let&apos;s work together towards secure development
+            </h1>
+
+            {/* Subtitle + CTA — Figma: 30px Sora Regular, lh 1.4, tracking -1.2px, opacity 80% */}
+            <div className="flex flex-col gap-8 lg:w-[48%] lg:pt-2">
+              <p
+                className="font-sans font-normal text-white/80"
+                style={{
+                  fontSize: 'clamp(18px, 1.5625vw, 30px)',
+                  lineHeight: '1.4',
+                  letterSpacing: '-0.04em',
+                }}
+              >
+                Connect with developers and security leaders sharing real-world strategies to reduce
+                risk, secure images, and ship faster with confidence.
+              </p>
+              <a
+                href="#join"
+                className="cs-btn-glass self-start"
+                style={{
+                  ['--cs-btn-px' as string]: '22px',
+                  ['--cs-btn-fs' as string]: '18px',
+                  color: '#111111',
+                  letterSpacing: '-0.05em',
+                  fontWeight: 500,
+                }}
+              >
+                Join Community
+              </a>
+            </div>
           </div>
         </div>
-      </Container>
+      </div>
 
-      {/* Team photo — bleeds edge-to-edge, sits in bottom half of hero. */}
+      {/* Bottom fade-out into the white Trusted-By section */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 select-none"
-        style={{ bottom: 0, height: "clamp(320px, 52vw, 496px)" }}
-      >
-        <div className="relative h-full w-full overflow-hidden">
-          <Image
-            src="/images/community/hero-team.png"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            style={{ objectFit: "cover", objectPosition: "center 30%" }}
-          />
-        </div>
-      </div>
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[200px]"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.18) 60%, rgba(255,255,255,0.40) 80%, rgba(255,255,255,0.70) 95%, #ffffff 100%)',
+        }}
+      />
     </section>
   );
 }

@@ -1,277 +1,249 @@
-import { FactoryCard } from "@/components/ui/FactoryCard";
-import { FactoryEnginePanel } from "@/components/sections/home/FactoryEnginePanel";
-import { RocketFlame } from "@/components/ui/RocketFlame";
+import Image from "next/image";
+import { Section, Container } from "@/components/layout";
 
-const CARDS = [
-  { title: "Clean Images", description: "Minimal. Immutable. Zero CVE." },
-  { title: "Clean Packages", description: "Curated. Verified. No hidden risk." },
-  { title: "Clean AI Models", description: "Scanned. Signed. Safe by design." },
-  { title: "Clean Sight", description: "AI-powered insights. Risk, policy & drift detection." },
-  { title: "Clean Libraries", description: "Complete. Signed. Continuously verified." },
+type CardData = {
+  title: string;
+  blurb: string;
+};
+
+const CARDS: CardData[] = [
+  { title: "Clean\nImages", blurb: "Minimal. Immutable.\nZero CVE." },
+  { title: "Clean\nPackages", blurb: "Curated. Verified. No\nhidden risk." },
+  { title: "Clean AI\nModels", blurb: "Scanned. Signed. Safe\nby design." },
+  { title: "Clean\nSight", blurb: "AI-powered insights. Risk,\npolicy & drift detection." },
+  { title: "Clean\nLibraries", blurb: "Complete. Signed.\nContinuously verified." },
 ];
 
-// Flame is 36px wide; subtract 18px to align flame CENTER with target X.
-// 5 top flames — one centered under each top card.
-// Card spacing at max-width 1276px: (1276 − 4×28) / 5 = 232.8px cards, gap 28px → 260.8px center-to-center.
-const TOP_FLAMES = [
-  "calc(50% - 539.6px)", // -521.6 - 18 (half flame width)
-  "calc(50% - 278.8px)", // -260.8 - 18
-  "calc(50% - 18px)",    //   0    - 18
-  "calc(50% + 242.8px)", // +260.8 - 18
-  "calc(50% + 503.6px)", // +521.6 - 18
-];
-
-// 4 bottom flames — evenly distributed under the engine panel, each centered.
-const BOTTOM_FLAMES = [
-  "calc(50% - 338px)", // -320 - 18
-  "calc(50% - 125px)", // -107 - 18
-  "calc(50% + 89px)",  // +107 - 18
-  "calc(50% + 302px)", // +320 - 18
-];
-
-export function CleanStartFactory() {
-  return (
-    <section className="relative overflow-hidden pb-16 pt-4 sm:pb-20 lg:pb-24">
-      {/* Title block — H2 + supporting line. Gives the "Factory" metaphor
-          immediate context: the 5 cards aren't a feature grid, they're a
-          pipeline. Subtitle is intentionally short (one line at desktop). */}
-      <div className="mx-auto max-w-[820px] px-6 text-center">
-        <h2
-          id="cleanstart-factory-title"
-          className="font-display font-bold text-white"
-          style={{
-            fontSize: "var(--text-t-display-2)",
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
-          }}
-        >
-          The CleanStart Factory
-        </h2>
-      </div>
-
-      {/* Mobile/tablet (< lg) — Figma 403:15302 spec:
-          Each card sits to the right of a horizontal cyan flare (216×161 with
-          plus-lighter blend) that peeks from behind the card's left edge. At
-          the bottom of the card stack, two more flares (225×167, rotated 90°)
-          point upward from the engine intake area. Hidden at lg+ where the
-          5-card row uses the rocket-flame engine instead. */}
-      <div className="relative mx-auto mt-10 w-full max-w-[var(--container-default)] px-6 sm:mt-12 sm:px-10 lg:hidden">
-        {/* Group 2085665153 — Bottom flares matching Figma mobile specs, placed before ul to render behind it */}
-        <div
-          className="pointer-events-none absolute"
-          style={{
-            width: "231.83px",
-            height: "225px",
-            left: "calc(50% - 231.83px / 2 + 16.84px)",
-            top: "calc(100% - 95px)",
-            zIndex: 0,
-          }}
-          aria-hidden
-        >
-          <div className="relative w-full h-full">
-            {/* Flare 1 (Figma 403:15299) */}
-            <div
-              className="absolute flex items-center justify-center"
-              style={{
-                left: "0px",
-                top: "0px",
-                width: "167.81px",
-                height: "225px",
-              }}
-            >
-              <span
-                className="flex-none"
-                style={{
-                  width: "225px",
-                  height: "167.81px",
-                  transform: "rotate(90deg)",
-                  mixBlendMode: "plus-lighter",
-                  background: "radial-gradient(50% 50% at 50% 50%, #FFF7ED 0%, #FFE062 8.33%, #98A809 36.98%, #212D00 100%)",
-                  filter: "blur(0.5px)",
-                  animation: "cs-pulse-glow-flare 3.6s ease-in-out 0s infinite",
-                }}
-              />
-            </div>
-            {/* Flare 2 (Figma 403:15300) */}
-            <div
-              className="absolute flex items-center justify-center"
-              style={{
-                left: "64.03px",
-                top: "0px",
-                width: "167.81px",
-                height: "225px",
-              }}
-            >
-              <span
-                className="flex-none"
-                style={{
-                  width: "225px",
-                  height: "167.81px",
-                  transform: "rotate(90deg)",
-                  mixBlendMode: "plus-lighter",
-                  background: "radial-gradient(50% 50% at 50% 50%, #FFF7ED 0%, #FFE062 8.33%, #98A809 36.98%, #212D00 100%)",
-                  filter: "blur(0.5px)",
-                  animation: "cs-pulse-glow-flare 3.6s ease-in-out 0.6s infinite",
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        <ul
-          aria-labelledby="cleanstart-factory-title"
-          className="relative z-10 ml-[25px] flex flex-col gap-3 sm:gap-4 list-none p-0"
-        >
-          {/* Vertical guide-line behind the left flares */}
-          <div
-            className="absolute w-[1px] bg-white/20 pointer-events-none"
-            style={{ left: "-25px", top: "44px", bottom: "44px" }}
-          />
-          {CARDS.map((card, i) => (
-            <li key={card.title} className="relative">
-              {/* Lens-flare — Figma 403:15292: a bright cyan-white core with
-                  a thin horizontal light beam streaking through it. Built as
-                  two stacked CSS layers since the real Figma flare uses a
-                  PNG mask we don't have:
-                    1. A thin horizontal streak (the beam)
-                    2. A small bright radial dot (the lens core)
-                  Both composited with plus-lighter so they brighten the dark
-                  section without obscuring it. */}
-              <FactoryFlare
-                left="-25px"
-                delay={`${i * 0.45}s`}
-                orient="horizontal"
-              />
-              <FactoryCard {...card} />
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Desktop (lg+): 5-card row that the engine flames anchor to. */}
-      <ul
-        aria-labelledby="cleanstart-factory-title"
-        className="mx-auto mt-10 hidden w-full max-w-[var(--container-default)] grid-cols-5 gap-5 px-6 sm:px-10 lg:mt-14 lg:grid xl:gap-7 list-none p-0"
-      >
-        {CARDS.map((card) => (
-          <li key={card.title}>
-            <FactoryCard {...card} />
-          </li>
-        ))}
-      </ul>
-
-      {/* Engine panel + flames */}
-      <div className="relative mx-auto mt-12 max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Top 5 flames — bulb sits at the bottom of each card. Container offset = -mt-12 (48px)
-             so flame top = card bottom. Flame height 130px = 48 (gap) + 82 (into panel).
-             z-0 so panel content sits above the lower portion of the flames.
-             Hidden below `lg`: the flame x-offsets (calc(50% ± 539.6px ...)) are
-             calibrated to the 5-up Figma layout that only renders at lg+; on
-             narrower viewports the cards stack and the flames would point
-             nowhere. */}
-        <div
-          className="pointer-events-none absolute inset-x-0 z-0 mx-auto hidden h-[140px] lg:block"
-          style={{ top: "-48px" }}
-          aria-hidden
-        >
-          {TOP_FLAMES.map((left, i) => (
-            <RocketFlame key={`top-${left}`} left={left} delay={i * 180} height={130} />
-          ))}
-        </div>
-
-        <FactoryEnginePanel />
-
-        {/* Bottom 4 flames — emerge from BOTTOM EDGE of engine panel, stream DOWN.
-             Top of this container = panel bottom edge. Same lg-only constraint
-             as the top flames (x-offsets only align with the 1276 engine panel). */}
-        <div
-          className="pointer-events-none absolute inset-x-0 top-full z-0 mx-auto hidden h-[180px] lg:block"
-          aria-hidden
-        >
-          {BOTTOM_FLAMES.map((left, i) => (
-            <RocketFlame
-              key={`bot-${left}`}
-              left={left}
-              delay={i * 220}
-              height={160}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/**
- * Lens-flare visual that mimics the Figma 403:15292 flare shape using two
- * stacked CSS gradients (Figma uses a PNG mask which we don't have):
- *   1. A thin tall vertical streak — the "beam"
- *   2. A small bright radial — the "lens core"
- * Composited with `plus-lighter` so the bright core punches over the dark
- * factory section background without dominating it.
- */
-function FactoryFlare({
+// Shared light-flare PNG (Figma `光斑 flare` instance node, natural 267 × 358).
+// The bright core sits ~33 % from the top of the image. The same WebP is reused
+// for all 9 beam occurrences — single network fetch + browser-deduped decode.
+function LightBeam({
   left,
-  top = "50%",
-  rotate = "0deg",
-  delay = "0s",
-  orient = "vertical",
+  width,
+  opacity = 1,
+  top = 0,
+  scale = 1,
 }: {
-  left: string;
-  top?: string;
-  rotate?: string;
-  delay?: string;
-  orient?: "vertical" | "horizontal";
+  left: number;
+  width: number;
+  opacity?: number;
+  top?: number;
+  scale?: number;
 }) {
-  const verticalTransform =
-    top === "50%" ? "translateY(-50%)" : "";
-  const wrapTransform = [
-    "translateX(-50%)",
-    verticalTransform,
-    `rotate(${rotate})`,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const height = (width * 358) / 267;
   return (
-    <span
+    <div
       aria-hidden
       className="pointer-events-none absolute"
       style={{
-        left,
+        left: `${left}px`,
         top,
-        width: "216px",
-        height: "161px",
-        transform: wrapTransform,
-        animation: `cs-pulse-glow-flare 3.6s ease-in-out ${delay} infinite`,
+        width,
+        height: height * scale,
+        transform: "translateX(-50%)",
+        opacity,
       }}
     >
-      {/* Beam — thin tall light streak */}
-      <span
-        className="absolute"
+      <Image
+        src="/images/cleanstart-factory/flare.webp"
+        alt=""
+        aria-hidden
+        width={267}
+        height={358}
+        sizes={`${Math.ceil(width)}px`}
+        className="pointer-events-none select-none"
+        style={{ width: "100%", height: "100%", objectFit: "fill" }}
+      />
+    </div>
+  );
+}
+
+// Container-query-based card. The `factory-card` container's inline size (its
+// width) drives every interior dimension via `cqw` units — orb, title font,
+// blurb font, arrow circle, paddings — so the entire card scales as one unit.
+// Figma reference geometry (all values relative to 232.8 × 374 card body):
+//   orb visible:  width 108 (46.39 %), top 39.8 (17.10 %), centered
+//   title:        font 32 (13.75 %), top ≈ 184 (79.04 %)
+//   blurb:        font 14 (6.01 %),  gap 12 below title
+//   arrow circle: 28 × 28 (12.03 %), top 322 (138.32 %), 1.75 px stroke (0.75 %)
+function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
+  return (
+    <figure
+      className="factory-card relative shrink-0"
+      style={{
+        // Fluid card width — desktop max 232.8, smaller on narrow viewports.
+        width: "clamp(180px, 16.2vw, 232.8px)",
+        aspectRatio: "232.8 / 374",
+        containerType: "inline-size",
+      }}
+    >
+      {/* Card background — the cropped image is the card body, 1:1 alignment. */}
+      <Image
+        src="/images/cleanstart-factory/factory-card-bg.webp"
+        alt=""
+        aria-hidden
+        width={232}
+        height={374}
+        sizes="(min-width: 1280px) 233px, 16vw"
+        priority={isFirst}
+        className="pointer-events-none absolute inset-0 h-full w-full select-none"
+      />
+
+      {/* Orb (chrome iridescent ring). Cropped 113 × 117, displayed at 46.39 %
+          of card width to match Figma's 108 px visible-orb width. */}
+      <Image
+        src="/images/cleanstart-factory/factory-icons.webp"
+        alt=""
+        aria-hidden
+        width={113}
+        height={117}
+        sizes="(min-width: 1280px) 108px, 8vw"
+        priority={isFirst}
+        className="pointer-events-none absolute left-1/2 -translate-x-1/2 select-none"
         style={{
-          left: "50%",
-          top: "50%",
-          width: orient === "vertical" ? "3px" : "216px",
-          height: orient === "vertical" ? "161px" : "3px",
-          transform: "translate(-50%, -50%)",
-          mixBlendMode: "plus-lighter",
-          background:
-            orient === "vertical"
-              ? "linear-gradient(180deg, rgba(2,17,47,0) 0%, rgba(11,138,227,0.6) 30%, rgb(211,255,248) 50%, rgba(11,138,227,0.6) 70%, rgba(2,17,47,0) 100%)"
-              : "linear-gradient(90deg, rgba(2,17,47,0) 0%, rgba(11,138,227,0.6) 30%, rgb(211,255,248) 50%, rgba(11,138,227,0.6) 70%, rgba(2,17,47,0) 100%)",
-          filter: "blur(0.5px)",
+          width: "46.39cqw",
+          height: "auto",
+          top: "17.1cqw",
         }}
       />
-      {/* Core — bright cyan lens dot/glow */}
-      <span
-        className="absolute inset-0"
+
+      {/* Title + blurb stack. All font/leading/letter-spacing in cqw so it
+          scales with the card. */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
         style={{
-          mixBlendMode: "plus-lighter",
+          top: "79.04cqw",
+          width: "86.34cqw",
+          gap: "5.15cqw",
+        }}
+      >
+        <h3
+          className="whitespace-pre-line text-center font-display font-normal text-white"
+          style={{
+            fontSize: "13.75cqw",
+            lineHeight: 1,
+            letterSpacing: "-0.05em",
+          }}
+        >
+          {data.title}
+        </h3>
+        <p
+          className="whitespace-pre-line text-center text-white/80"
+          style={{
+            fontFamily: "var(--font-sora), Sora, sans-serif",
+            fontSize: "6.01cqw",
+            lineHeight: 1.2,
+            letterSpacing: "-0.04em",
+          }}
+        >
+          {data.blurb}
+        </p>
+      </div>
+
+      {/* Arrow circle. */}
+      <div
+        aria-hidden
+        className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center rounded-full border-white/95"
+        style={{
+          top: "138.32cqw",
+          width: "12.03cqw",
+          height: "12.03cqw",
+          borderWidth: "0.75cqw",
+        }}
+      >
+        <svg
+          viewBox="0 0 28 28"
+          fill="none"
+          style={{ width: "35%", height: "35%" }}
+        >
+          <path
+            d="M13.5127 8.24061L18.6556 13.3834C18.8163 13.5442 18.9065 13.7621 18.9065 13.9893C18.9065 14.2166 18.8163 14.4345 18.6556 14.5952L13.5127 19.7381"
+            stroke="white"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
+
+      <figcaption className="sr-only">
+        {data.title.replace("\n", " ")}. {data.blurb.replace("\n", " ")}
+      </figcaption>
+    </figure>
+  );
+}
+
+export function CleanStartFactory() {
+  const cardBeamCenters = [
+    232.8 / 2,
+    232.8 + 28 + 232.8 / 2,
+    2 * (232.8 + 28) + 232.8 / 2,
+    3 * (232.8 + 28) + 232.8 / 2,
+    4 * (232.8 + 28) + 232.8 / 2,
+  ];
+
+  return (
+    <Section padding="none" className="relative overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
           background:
-            "radial-gradient(ellipse 50% 50% at 50% 50%, rgba(211,255,248,1) 0%, rgba(164,235,248,1) 2.6%, rgba(116,214,249,1) 5.2%, rgba(68,194,249,1) 7.8%, rgba(45,184,249,1) 9.1%, rgba(21,173,250,1) 10.4%, rgba(11,138,227,1) 29.7%, rgba(1,102,204,1) 49%, rgba(1,81,165,1) 61.7%, rgba(1,60,125,1) 74.5%, rgba(2,38,86,1) 87.2%, rgba(2,17,47,0) 100%)",
-          filter: "blur(0.5px)",
+            "linear-gradient(180deg, rgba(2, 3, 12, 0) 0%, rgba(2, 3, 12, 0.65) 10%, rgba(2, 3, 12, 0.95) 24%, #02030C 42%, #02030C 100%)",
         }}
       />
-    </span>
+
+      <Container>
+        <div className="relative mx-auto" style={{ maxWidth: 1276 }}>
+          <div
+            aria-hidden
+            className="mx-auto mt-[160px]"
+            style={{
+              width: "100%",
+              height: 2,
+              borderRadius: 70,
+              background:
+                "linear-gradient(90deg, rgba(59, 63, 173, 0) 0%, rgba(59, 63, 173, 1) 50%, rgba(59, 63, 173, 0) 100%)",
+            }}
+          />
+
+          <h2
+            className="mt-[80px] text-center font-display font-semibold text-white"
+            style={{
+              fontSize: "clamp(40px, 4.65vw, 62px)",
+              lineHeight: 1,
+              letterSpacing: "-0.05em",
+            }}
+          >
+            The CleanStart Factory
+          </h2>
+
+          <div
+            className="relative mx-auto mt-[64px] flex flex-wrap items-start justify-center"
+            style={{ gap: 28 }}
+          >
+            {CARDS.map((c, i) => (
+              <FactoryCard key={c.title} data={c} isFirst={i === 0} />
+            ))}
+          </div>
+
+          <div
+            aria-hidden
+            className="pointer-events-none relative mx-auto"
+            style={{ width: "100%", height: 180, marginTop: -24, zIndex: 1 }}
+          >
+            {cardBeamCenters.map((cx, i) => (
+              <LightBeam key={i} left={cx} width={70} opacity={0.95} />
+            ))}
+          </div>
+
+          {/* Bottom factory block — will be rebuilt with DOM + the shared flare /
+              card-bg assets in the next iteration. */}
+
+          <div className="pb-[160px]" />
+
+        </div>
+      </Container>
+    </Section>
   );
 }
