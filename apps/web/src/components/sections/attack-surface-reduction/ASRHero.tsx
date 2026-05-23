@@ -153,6 +153,27 @@ export function ASRHero(): React.ReactElement {
               columnGap: "4%",
             }}
           >
+            {/* Decorative glow — Figma asset, locked at intrinsic 246×328
+                regardless of viewport. Anchored so the glow's centre sits
+                exactly at the top-right corner of the cards-wrapper (half
+                above, half outside-right). */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              aria-hidden
+              src="/images/attack-surface-reduction/Final/hero-glow.png"
+              alt=""
+              className="absolute pointer-events-none select-none"
+              style={{
+                top: 0,
+                right: 0,
+                width: "246px",
+                height: "328px",
+                transform: "translate(50%, -50%)",
+                zIndex: 0,
+              }}
+              loading="eager"
+              decoding="async"
+            />
             {/* BLOATED card — larger, sits at row baseline. */}
             <Image
               src="/images/attack-surface-reduction/hero-card-bloated.png"
@@ -160,18 +181,20 @@ export function ASRHero(): React.ReactElement {
               width={662}
               height={885}
               sizes="(min-width: 1440px) 270px, 19vw"
-              className="block w-full h-auto"
+              className="block w-full h-auto relative"
+              style={{ alignSelf: "end", zIndex: 1 }}
               priority
             />
-            {/* CLEAN card — smaller (≈70% of BLOATED), bottom edge aligns
-                with BLOATED via grid align-items: end. */}
+            {/* CLEAN card — smaller (≈85% of BLOATED), bottom edge aligns
+                with BLOATED via explicit alignSelf: end. */}
             <Image
               src="/images/attack-surface-reduction/hero-card-clean.png"
               alt="CLEAN image: 87 MB · 12 packages · 0 HIGH CVEs"
               width={602}
               height={724}
               sizes="(min-width: 1440px) 180px, 13vw"
-              className="block w-full h-auto"
+              className="block w-full h-auto relative"
+              style={{ alignSelf: "end", zIndex: 1 }}
               priority
             />
           </div>

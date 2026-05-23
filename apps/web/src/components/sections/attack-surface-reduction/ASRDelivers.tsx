@@ -23,7 +23,7 @@ export function ASRDelivers(): React.ReactElement {
   return (
     <section
       data-section="ASRDelivers"
-      className="relative overflow-hidden"
+      className="relative overflow-hidden flex flex-col"
       style={{ minHeight: "clamp(560px, 50vw, 711px)" }}
     >
       {/* ---------- Background photo + overlay ---------- */}
@@ -48,7 +48,7 @@ export function ASRDelivers(): React.ReactElement {
       </div>
 
       {/* ---------- Content ---------- */}
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-lg flex flex-col h-full">
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 py-section-lg flex flex-col flex-1">
         {/* Heading (top-left) — Figma 783:457: Figtree Bold 62/100%/-5% */}
         <h2
           style={{
@@ -59,15 +59,16 @@ export function ASRDelivers(): React.ReactElement {
             lineHeight: 1.1,
             color: "white",
             maxWidth: "32.5rem",
-            marginBottom: "clamp(3rem, 8vw, 8.75rem)",
           }}
         >
           What this delivers for{" "}
           <span className="cs-text-gradient-impact">your business</span>
         </h2>
 
-        {/* ---------- Benefits row (md+): 4 columns + 3 separators ---------- */}
-        <div className="hidden md:flex items-stretch justify-between gap-6 lg:gap-8">
+        {/* ---------- Benefits row (md+): 4 columns + 3 separators ----------
+            mt-auto pins the row to the bottom of the section, regardless of
+            heading height or section min-height. */}
+        <div className="hidden md:flex items-stretch justify-between gap-6 lg:gap-8 mt-auto">
           {BENEFITS.map((b, i) => (
             <div key={b.title} className="flex items-stretch gap-6 lg:gap-8 flex-1">
               <BenefitColumn title={b.title} desc={b.desc} />
@@ -76,8 +77,8 @@ export function ASRDelivers(): React.ReactElement {
           ))}
         </div>
 
-        {/* ---------- Benefits grid (sm and below): 2×2 ---------- */}
-        <div className="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
+        {/* ---------- Benefits grid (sm and below): 2×2 — also bottom-pinned ---------- */}
+        <div className="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8 mt-auto pt-12">
           {BENEFITS.map((b) => (
             <BenefitColumn key={b.title} title={b.title} desc={b.desc} />
           ))}

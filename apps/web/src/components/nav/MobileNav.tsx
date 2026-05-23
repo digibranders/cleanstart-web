@@ -44,11 +44,14 @@ export function MobileNav() {
           <Accordion className="flex w-full flex-col gap-1" >
             {NAV_TREE.map((item) => {
               if (item.kind === "flat") {
-                return (
-                  <span
-                    key={item.label}
-                    className="block cursor-pointer rounded-[10px] px-3 py-3 text-base font-medium text-white/90 transition-colors hover:bg-white/[0.06] hover:text-white"
-                  >
+                const flatClass =
+                  "block cursor-pointer rounded-[10px] px-3 py-3 text-base font-medium text-white/90 transition-colors hover:bg-white/[0.06] hover:text-white";
+                return item.built ? (
+                  <Link key={item.label} href={item.href} className={flatClass}>
+                    {item.label}
+                  </Link>
+                ) : (
+                  <span key={item.label} className={flatClass}>
                     {item.label}
                   </span>
                 );
@@ -107,10 +110,10 @@ export function MobileNav() {
         </div>
 
         <div className="border-t border-white/8 p-4">
-          <button
-            type="button"
+          <Link
+            href="/book-a-demo"
             onClick={close}
-            className="cs-btn-glass w-full"
+            className="cs-btn-glass w-full justify-center"
             style={{
               ["--cs-btn-h" as string]: "40px",
               ["--cs-btn-px" as string]: "18px",
@@ -118,7 +121,7 @@ export function MobileNav() {
             }}
           >
             Book a Demo
-          </button>
+          </Link>
         </div>
       </SheetContent>
     </Sheet>

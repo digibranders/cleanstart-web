@@ -57,7 +57,7 @@ export function ReadyToSecureCTA() {
           knowing your containers are secured from the ground up.
         </p>
         <a
-          href="#get-a-demo"
+          href="/book-a-demo"
           className="cs-btn-glass"
           style={{
             ["--cs-btn-px" as string]: "18px",
