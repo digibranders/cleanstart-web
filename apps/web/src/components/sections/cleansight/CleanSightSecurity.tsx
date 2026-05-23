@@ -104,10 +104,19 @@ export function CleanSightSecurity(): React.ReactElement {
             All from Figma (1920px) offset by 322px:
             Left cards:  left=1px,   width=606, height=207, row-gap=44px (top=0 / top=251)
             Right cards: left=682px, width=595, height=207
-            Shield:      left=427px, width=444, height=470  */}
+            Shield:      left=427px, width=444, height=470
+            Wrapped in a width:1276 scaling box so the px layout shrinks
+            proportionally when the responsive container is narrower than
+            1276+gutter. Keeps the gutter intact from 1024px upward. */}
         <div
-          className="relative hidden lg:block"
-          style={{ marginTop: "84px", height: "510px" }}
+          className="relative hidden lg:block mx-auto"
+          style={{
+            marginTop: "84px",
+            width: "1276px",
+            height: "calc(510px * clamp(0.78, (100vw - 80px) / 1276, 1))",
+            transform: "scale(clamp(0.78, (100vw - 80px) / 1276, 1))",
+            transformOrigin: "top center",
+          }}
         >
           {/* Left card — top row */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -236,7 +245,7 @@ export function CleanSightSecurity(): React.ReactElement {
           />
 
           {/* Text — Runtime Visibility (top-left) */}
-          <div className="absolute" style={{ left: "45px", top: "32px", width: "260px" }}>
+          <div className="absolute" style={{ left: "45px", top: "32px", width: "320px" }}>
             <h3
               style={{
                 fontFamily: "var(--font-display)",
@@ -265,7 +274,7 @@ export function CleanSightSecurity(): React.ReactElement {
           </div>
 
           {/* Text — Compliance Monitoring (bottom-left) */}
-          <div className="absolute" style={{ left: "45px", top: "283px", width: "260px" }}>
+          <div className="absolute" style={{ left: "45px", top: "283px", width: "320px" }}>
             <h3
               style={{
                 fontFamily: "var(--font-display)",
@@ -294,7 +303,7 @@ export function CleanSightSecurity(): React.ReactElement {
           </div>
 
           {/* Text — Inherited Risk Detection (top-right) */}
-          <div className="absolute" style={{ left: "899px", top: "32px", width: "260px" }}>
+          <div className="absolute" style={{ left: "899px", top: "32px", width: "320px" }}>
             <h3
               style={{
                 fontFamily: "var(--font-display)",
@@ -323,7 +332,7 @@ export function CleanSightSecurity(): React.ReactElement {
           </div>
 
           {/* Text — One-Click Remediation (bottom-right) */}
-          <div className="absolute" style={{ left: "899px", top: "283px", width: "260px" }}>
+          <div className="absolute" style={{ left: "899px", top: "283px", width: "320px" }}>
             <h3
               style={{
                 fontFamily: "var(--font-display)",
@@ -545,10 +554,18 @@ export function CleanSightSecurity(): React.ReactElement {
           </p>
         </div>
 
-        {/* ── Desktop chart — 1276px content box absolutely centred ── */}
+        {/* ── Desktop chart — 1276px content box, scaled to fit gutter ── */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 hidden lg:block"
-          style={{ top: "0px", width: "1276px", height: "814px" }}
+          className="absolute hidden lg:block"
+          style={{
+            top: "0px",
+            left: "50%",
+            width: "1276px",
+            height: "814px",
+            transform:
+              "translateX(-50%) scale(clamp(0.78, (100vw - 80px) / 1276, 1))",
+            transformOrigin: "top center",
+          }}
         >
           {/* Wavy line: left=9, top=342, w=1255, h=511 */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -692,13 +709,13 @@ export function CleanSightSecurity(): React.ReactElement {
             </div>
           </div>
 
-          {/* Label — "Continuous Visibility": left=25, top=666, w=194 */}
+          {/* Label — "Continuous Visibility": widened to fit desc on 2 lines */}
           <div
             className="absolute text-white"
             style={{
               left: "25px",
               top: "666px",
-              width: "194px",
+              width: "240px",
               display: "flex",
               flexDirection: "column",
               gap: "8px",
@@ -707,7 +724,7 @@ export function CleanSightSecurity(): React.ReactElement {
             <p
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(20px, 2vw, 28px)",
+                fontSize: "clamp(18px, 1.8vw, 24px)",
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
@@ -718,7 +735,7 @@ export function CleanSightSecurity(): React.ReactElement {
             <p
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "clamp(15px, 1.4vw, 20px)",
+                fontSize: "clamp(13px, 1.1vw, 16px)",
                 fontWeight: 400,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.4,
@@ -729,13 +746,13 @@ export function CleanSightSecurity(): React.ReactElement {
             </p>
           </div>
 
-          {/* Label — "Risk Prioritization": left=382, top=339, w=170 */}
+          {/* Label — "Risk Prioritization": widened to fit desc on 2 lines */}
           <div
             className="absolute text-white"
             style={{
               left: "382px",
               top: "339px",
-              width: "170px",
+              width: "240px",
               display: "flex",
               flexDirection: "column",
               gap: "8px",
@@ -744,7 +761,7 @@ export function CleanSightSecurity(): React.ReactElement {
             <p
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(20px, 2vw, 28px)",
+                fontSize: "clamp(18px, 1.8vw, 24px)",
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
@@ -755,7 +772,7 @@ export function CleanSightSecurity(): React.ReactElement {
             <p
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "clamp(15px, 1.4vw, 20px)",
+                fontSize: "clamp(13px, 1.1vw, 16px)",
                 fontWeight: 400,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.4,
@@ -766,13 +783,13 @@ export function CleanSightSecurity(): React.ReactElement {
             </p>
           </div>
 
-          {/* Label — "Built-In Compliance": left=870, top=595, w=194 */}
+          {/* Label — "Built-In Compliance": widened to fit desc on 2 lines */}
           <div
             className="absolute text-white"
             style={{
               left: "870px",
               top: "595px",
-              width: "194px",
+              width: "240px",
               display: "flex",
               flexDirection: "column",
               gap: "8px",
@@ -781,7 +798,7 @@ export function CleanSightSecurity(): React.ReactElement {
             <p
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(20px, 2vw, 28px)",
+                fontSize: "clamp(18px, 1.8vw, 24px)",
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
@@ -792,7 +809,7 @@ export function CleanSightSecurity(): React.ReactElement {
             <p
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "clamp(15px, 1.4vw, 20px)",
+                fontSize: "clamp(13px, 1.1vw, 16px)",
                 fontWeight: 400,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.4,
@@ -803,13 +820,13 @@ export function CleanSightSecurity(): React.ReactElement {
             </p>
           </div>
 
-          {/* Label — "Faster Remediation": left=1058, top=306, w=184 */}
+          {/* Label — "Faster Remediation": shifted left + widened to fit desc on 2 lines within 1276 bounds */}
           <div
             className="absolute text-white"
             style={{
-              left: "1058px",
+              left: "1010px",
               top: "306px",
-              width: "184px",
+              width: "240px",
               display: "flex",
               flexDirection: "column",
               gap: "8px",
@@ -818,7 +835,7 @@ export function CleanSightSecurity(): React.ReactElement {
             <p
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(20px, 2vw, 28px)",
+                fontSize: "clamp(18px, 1.8vw, 24px)",
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
@@ -829,7 +846,7 @@ export function CleanSightSecurity(): React.ReactElement {
             <p
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "clamp(15px, 1.4vw, 20px)",
+                fontSize: "clamp(13px, 1.1vw, 16px)",
                 fontWeight: 400,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.4,

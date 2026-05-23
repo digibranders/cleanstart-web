@@ -44,7 +44,8 @@ export function SCAProblems(): React.ReactElement {
             color: "#111",
           }}
         >
-          Traditional SCA Creates Too Much Noise
+          <span className="block">Traditional SCA Creates</span>
+          <span className="block cs-text-gradient-impact">Too Much Noise</span>
         </h2>
 
         {/* Cards — 4 in a row on desktop, 2 on tablet, 1 on mobile */}

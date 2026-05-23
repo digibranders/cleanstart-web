@@ -74,8 +74,11 @@ export function CleanSightProblems(): React.ReactElement {
               color: "#111",
             }}
           >
-            When Container Visibility Falls Short,{" "}
-            <span className="cs-text-gradient-impact">Risk Grows</span>
+            <span className="block">When Container Visibility</span>
+            <span className="block">
+              Falls Short,{" "}
+              <span className="cs-text-gradient-impact">Risk Grows</span>
+            </span>
           </h2>
           <p
             className="mt-4"

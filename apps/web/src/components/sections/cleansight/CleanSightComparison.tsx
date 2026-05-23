@@ -55,16 +55,6 @@ export function CleanSightComparison(): React.ReactElement {
           </h2>
         </div>
 
-        {/* Vertical fading-gray separator (decorative, md+) */}
-        <div
-          aria-hidden
-          className="mx-auto mt-6 hidden h-[90px] w-px md:block"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(217,217,217,0) 0%, rgba(217,217,217,1) 47.2%, rgba(217,217,217,0) 100%)",
-          }}
-        />
-
         {/* Cards row + VS badge centerpiece. Mirrors SecurityNotPatching's
             responsive-flex layout exactly: cards stack on mobile, sit side-by-
             side on md+, VS badge centered absolutely above both. */}

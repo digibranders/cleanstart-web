@@ -56,7 +56,7 @@ export function SCAHero(): React.ReactElement {
         style={{
           width: "492px",
           height: "516px",
-          top: "169px",
+          top: "clamp(96px, 11vw, 160px)",
           right: "max(0px, calc(50vw - 703px))",
           objectFit: "contain",
         }}
@@ -66,7 +66,7 @@ export function SCAHero(): React.ReactElement {
       {/* ── Text content ── */}
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
-        style={{ paddingTop: "clamp(72px, 8vw, 128px)", paddingBottom: "clamp(56px, 7vw, 100px)" }}
+        style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(56px, 7vw, 100px)" }}
       >
         {/* Headline — Figma node 604:2428, 805×160px */}
         <h1
