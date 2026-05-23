@@ -48,7 +48,7 @@ export function CleanStartImagesUVP(): React.ReactElement {
       {/* Pink/purple decorative flares — Figma ellipses 161:23666, 161:23667 */}
       <div
         aria-hidden
-        className="absolute pointer-events-none hidden xl:block"
+        className="absolute pointer-events-none hidden lg:block"
         style={{
           right: "-80px",
           top: "-64px",
@@ -61,7 +61,7 @@ export function CleanStartImagesUVP(): React.ReactElement {
       />
       <div
         aria-hidden
-        className="absolute pointer-events-none hidden xl:block"
+        className="absolute pointer-events-none hidden lg:block"
         style={{
           left: "-80px",
           top: "668px",
@@ -81,25 +81,16 @@ export function CleanStartImagesUVP(): React.ReactElement {
           className="text-center mx-auto"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 600,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "#1A1A2E",
             maxWidth: "744px",
           }}
         >
           Unique Value{" "}
-          <span
-            style={{
-              background:
-                "linear-gradient(90deg,#7B5CFA 0%,#5B8DFF 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Proposition
-          </span>
+          <span className="cs-text-gradient-impact">Proposition</span>
         </h2>
 
         <div className="mt-16 grid grid-cols-1 lg:grid-cols-[513px_1fr] gap-12 lg:gap-24 items-center">
@@ -123,10 +114,10 @@ export function CleanStartImagesUVP(): React.ReactElement {
             <h3
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-heading-lg)",
+                fontSize: "clamp(22px, 2.4vw, 32px)",
                 fontWeight: 700,
-                letterSpacing: "var(--text-t-heading-lg-ls)",
-                lineHeight: "var(--text-t-heading-lg-lh)",
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
                 color: "#1A1A2E",
               }}
             >
@@ -138,11 +129,11 @@ export function CleanStartImagesUVP(): React.ReactElement {
                   key={b}
                   className="flex items-start gap-3"
                   style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-heading-sm)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "clamp(15px, 1.4vw, 20px)",
                     fontWeight: 400,
-                    lineHeight: "var(--text-t-heading-sm-lh)",
-                    letterSpacing: "var(--text-t-heading-sm-ls)",
+                    lineHeight: 1.4,
+                    letterSpacing: "-0.02em",
                     color: "#1A1A2E",
                   }}
                 >

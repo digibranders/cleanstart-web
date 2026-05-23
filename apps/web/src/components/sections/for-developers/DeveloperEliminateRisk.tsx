@@ -79,7 +79,7 @@ function FeatureBlock({ num, title, desc }: FeatureDef): React.ReactElement {
       <h3
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(1.125rem, 1.35vw, 1.625rem)',
+          fontSize: 'clamp(22px, 2.4vw, 32px)',
           fontWeight: 700,
           letterSpacing: '-0.04em',
           lineHeight: 1.1,
@@ -92,10 +92,10 @@ function FeatureBlock({ num, title, desc }: FeatureDef): React.ReactElement {
       <p
         style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--text-body-md)',
+          fontSize: 'clamp(15px, 1.4vw, 20px)',
           fontWeight: 400,
-          letterSpacing: '-0.01em',
-          lineHeight: 1.55,
+          letterSpacing: '-0.02em',
+          lineHeight: 1.4,
           color: 'rgba(255,255,255,0.7)',
         }}
       >
@@ -248,40 +248,23 @@ export function DeveloperEliminateRisk(): React.ReactElement {
         }}
       />
 
-      <div
-        className="relative mx-auto z-[2]"
-        style={{
-          maxWidth: 'var(--container-default)',
-          paddingLeft: '24px',
-          paddingRight: '24px',
-        }}
-      >
+      <div className="relative mx-auto z-[2] w-full max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Heading */}
         <h2
           className="text-center mx-auto"
           style={{
             maxWidth: '680px',
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(1.75rem, 3.23vw, 3.875rem)',
+            fontSize: 'clamp(32px, 4vw, 56px)',
             fontWeight: 700,
-            letterSpacing: '-0.05em',
-            lineHeight: 1,
+            letterSpacing: '-0.04em',
+            lineHeight: 1.1,
             color: '#ffffff',
             marginBottom: '16px',
           }}
         >
           Eliminate{' '}
-          <span
-            style={{
-              background:
-                'linear-gradient(102.22deg, rgb(154,81,255) 1.758%, rgb(44,193,235) 98.781%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            Risk Earlier
-          </span>
+          <span className="cs-text-gradient-impact">Risk Earlier</span>
         </h2>
 
         <p
@@ -289,10 +272,10 @@ export function DeveloperEliminateRisk(): React.ReactElement {
           style={{
             maxWidth: '540px',
             fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(0.9375rem, 1.04vw, 1.25rem)',
+            fontSize: 'clamp(18px, 1.7vw, 24px)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
-            lineHeight: 1.5,
+            lineHeight: 1.4,
             color: 'rgba(255,255,255,0.65)',
             marginBottom: '72px',
           }}

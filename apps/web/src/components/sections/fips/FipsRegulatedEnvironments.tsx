@@ -57,25 +57,15 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
           className="text-white mb-10 md:mb-[64px]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 600,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "770px",
           }}
         >
           Built for Regulated{" "}
-          <span
-            style={{
-              background:
-                "linear-gradient(95deg, #239CFF 0%, #82AEFF 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Environments
-          </span>
+          <span className="cs-text-gradient-impact">Environments</span>
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 md:gap-0">
@@ -96,10 +86,10 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
                 className="text-white mb-3"
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "var(--text-t-heading-lg)",
+                  fontSize: "clamp(22px, 2.4vw, 32px)",
                   fontWeight: 700,
-                  letterSpacing: "var(--text-t-heading-lg-ls)",
-                  lineHeight: "var(--text-t-heading-lg-lh)",
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.1,
                   maxWidth: "219px",
                 }}
               >
@@ -107,11 +97,11 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
               </p>
               <p
                 style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "var(--text-t-body-lg)",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "clamp(15px, 1.4vw, 20px)",
                   fontWeight: 400,
-                  letterSpacing: "var(--text-t-body-lg-ls)",
-                  lineHeight: "var(--text-t-body-lg-lh)",
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.4,
                   color: "rgba(255,255,255,0.78)",
                   maxWidth: "219px",
                 }}

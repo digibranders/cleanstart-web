@@ -138,10 +138,10 @@ function StatCard({
         <p
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "var(--text-t-subhead)",
-            fontWeight: 400,
-            letterSpacing: "var(--text-t-subhead-ls)",
-            lineHeight: "var(--text-t-subhead-lh)",
+            fontSize: "clamp(20px, 2vw, 28px)",
+            fontWeight: 500,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.3,
             color: "#333",
           }}
         >
@@ -282,7 +282,7 @@ export function CisoOutcomes(): React.ReactElement {
         aria-hidden
         src="/images/ciso/outcomes-vector-corner.svg"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           left: "calc(50% + 471px)",
           top: "-339px",
@@ -299,7 +299,7 @@ export function CisoOutcomes(): React.ReactElement {
         aria-hidden
         src="/images/ciso/outcomes-vector-corner.svg"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           left: "calc(50% - 1521px)",
           top: "67px",
@@ -340,7 +340,7 @@ export function CisoOutcomes(): React.ReactElement {
           aria-hidden
           src="/images/ciso/outcomes-vector-center.svg"
           alt=""
-          className="absolute pointer-events-none select-none hidden xl:block"
+          className="absolute pointer-events-none select-none hidden lg:block"
           style={{
             left: "50%",
             top: "-56px",
@@ -360,25 +360,15 @@ export function CisoOutcomes(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#fff",
             }}
           >
             Security{" "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(107.15deg, rgb(154, 81, 255) 1.758%, rgb(44, 193, 235) 98.781%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Outcomes
-            </span>
+            <span className="cs-text-gradient-impact">Outcomes</span>
           </h2>
         </div>
 
@@ -386,7 +376,7 @@ export function CisoOutcomes(): React.ReactElement {
              4×295 + 3×32 = 1276px fills container exactly.
              Tall cards (1 & 3): h=326px, no top offset.
              Short cards (2 & 4): h=258px, marginTop=68px (bottom-aligns all cards). */}
-        <div className="hidden xl:flex items-start" style={{ gap: "32px" }}>
+        <div className="hidden lg:flex items-start" style={{ gap: "32px" }}>
           {STATS.map((stat) => (
             <StatCard key={stat.display} stat={stat} enabled={animated} />
           ))}
@@ -394,7 +384,7 @@ export function CisoOutcomes(): React.ReactElement {
 
         {/* ════════ MOBILE — 2-column grid ════════ */}
         <div
-          className="xl:hidden grid grid-cols-2 gap-4 px-4 sm:px-6"
+          className="lg:hidden grid grid-cols-2 gap-4 px-4 sm:px-6"
         >
           {STATS.map((stat) => (
             <div
@@ -417,10 +407,10 @@ export function CisoOutcomes(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "var(--text-t-body-md)",
-                  fontWeight: 400,
-                  letterSpacing: "var(--text-t-body-md-ls)",
-                  lineHeight: "var(--text-t-body-md-lh)",
+                  fontSize: "clamp(20px, 2vw, 28px)",
+                  fontWeight: 500,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.3,
                   color: "#333",
                 }}
               >

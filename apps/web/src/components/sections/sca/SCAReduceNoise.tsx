@@ -48,7 +48,7 @@ export function SCAReduceNoise(): React.ReactElement {
       {/* Cyan glow flare — top-right */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           top: "-16px",
           right: "130px",
@@ -76,33 +76,23 @@ export function SCAReduceNoise(): React.ReactElement {
               className="text-white"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-display-2)",
+                fontSize: "clamp(32px, 4vw, 56px)",
                 fontWeight: 700,
-                letterSpacing: "var(--text-t-display-2-ls)",
-                lineHeight: "var(--text-t-display-2-lh)",
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
               }}
             >
               Reduce Noise{" "}
-              <span
-                style={{
-                  backgroundImage:
-                    "linear-gradient(99.93deg, #9a51ff 1.76%, #2cc1eb 98.78%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                at the Source
-              </span>
+              <span className="cs-text-gradient-impact">at the Source</span>
             </h2>
 
             <p
               style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "var(--text-t-subhead)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(18px, 1.7vw, 24px)",
                 fontWeight: 400,
-                letterSpacing: "var(--text-t-subhead-ls)",
-                lineHeight: "var(--text-t-subhead-lh)",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
                 color: "rgba(255,255,255,0.8)",
               }}
             >
@@ -142,10 +132,10 @@ export function SCAReduceNoise(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "var(--text-t-heading-sm)",
+                      fontSize: "clamp(20px, 2vw, 28px)",
                       fontWeight: 600,
-                      letterSpacing: "var(--text-t-heading-sm-ls)",
-                      lineHeight: "var(--text-t-heading-sm-lh)",
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.1,
                       color: "#fff",
                     }}
                   >
@@ -153,11 +143,11 @@ export function SCAReduceNoise(): React.ReactElement {
                   </p>
                   <p
                     style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "var(--text-t-body-md)",
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "clamp(15px, 1.4vw, 20px)",
                       fontWeight: 400,
-                      letterSpacing: "var(--text-t-body-md-ls)",
-                      lineHeight: "var(--text-t-body-md-lh)",
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.4,
                       color: "#cdcdcd",
                     }}
                   >

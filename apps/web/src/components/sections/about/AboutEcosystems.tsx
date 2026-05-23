@@ -67,27 +67,18 @@ export function AboutEcosystems() {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Heading */}
         <h2
-          className="text-center font-display font-bold text-black"
+          className="text-center font-display text-black"
           style={{
-            fontSize: "clamp(2rem, 4vw, 3.875rem)",
-            lineHeight: "1.0",
-            letterSpacing: "-0.05em",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            lineHeight: 1.1,
+            letterSpacing: "-0.04em",
           }}
         >
-          <span style={{ display: "block" }}>Built for The</span>
-          <span style={{ display: "block" }}>
+          <span className="block">Built for The</span>
+          <span className="block">
             Ecosystems{" "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(-12.5deg, #2CC1EB 0%, #9A51FF 64%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              You Trust
-            </span>
+            <span className="cs-text-gradient-impact">You Trust</span>
           </span>
         </h2>
 

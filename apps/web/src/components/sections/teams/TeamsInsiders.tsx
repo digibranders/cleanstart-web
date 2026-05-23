@@ -54,14 +54,26 @@ function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
         </div>
         <div>
           <p
-            className="font-sans font-semibold text-[#250800]"
-            style={{ fontSize: "clamp(0.875rem, 1vw, 1rem)", lineHeight: "1.5" }}
+            className="text-[#250800]"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(16px, 1.4vw, 20px)",
+              fontWeight: 500,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
+            }}
           >
             {name}
           </p>
           <p
-            className="font-sans font-normal text-[#250800]/70"
-            style={{ fontSize: "clamp(0.75rem, 0.9vw, 0.875rem)", lineHeight: "1.5" }}
+            className="text-[#250800]/70"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(16px, 1.4vw, 20px)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
+            }}
           >
             {role}
           </p>
@@ -70,10 +82,12 @@ function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
 
       {/* Quote text */}
       <p
-        className="font-display font-semibold text-[#250800]"
+        className="text-[#250800]"
         style={{
-          fontSize: "clamp(1rem, 1.5vw, 1.625rem)",
-          lineHeight: "1.5",
+          fontFamily: "var(--font-sans)",
+          fontSize: "clamp(16px, 1.4vw, 20px)",
+          fontWeight: 500,
+          lineHeight: 1.4,
           letterSpacing: "-0.02em",
         }}
       >
@@ -110,7 +124,7 @@ export function TeamsInsiders() {
       {/* Decorative corner blobs */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
           left: "-270px",
           top: "-183px",
@@ -123,7 +137,7 @@ export function TeamsInsiders() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
           right: "-270px",
           top: "-238px",
@@ -138,23 +152,16 @@ export function TeamsInsiders() {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Section title */}
         <h2
-          className="mb-[80px] text-center font-display font-bold text-[#111]"
+          className="mb-[80px] text-center font-display text-[#111]"
           style={{
-            fontSize: "clamp(2rem, 4vw, 3.875rem)",
-            lineHeight: "1.0",
-            letterSpacing: "-0.05em",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            lineHeight: 1.1,
+            letterSpacing: "-0.04em",
           }}
         >
           {"CleanStart "}
-          <span
-            className="bg-clip-text text-transparent"
-            style={{
-              backgroundImage:
-                "linear-gradient(-8.06deg, rgb(44,193,235) 0%, rgb(154,81,255) 64%)",
-            }}
-          >
-            Insiders
-          </span>
+          <span className="cs-text-gradient-impact">Insiders</span>
         </h2>
 
         {/* Controls row */}

@@ -25,7 +25,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
             <span className="text-white">Related </span>
             <span
               style={{
-                backgroundImage: "linear-gradient(101.688deg, #9A51FF 1.758%, #2CC1EB 98.781%)",
+                backgroundImage: "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",

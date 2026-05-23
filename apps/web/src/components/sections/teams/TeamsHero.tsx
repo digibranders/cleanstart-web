@@ -45,7 +45,7 @@ export function TeamsHero() {
       {/* ── Glow streak — narrow, top-right (Figma Ellipse 46640, rotate 43°) ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute select-none hidden xl:flex"
+        className="pointer-events-none absolute select-none hidden lg:flex"
         style={{
           left: "calc(1267px / 1920 * 100%)",
           top: "-92px",
@@ -73,7 +73,7 @@ export function TeamsHero() {
       {/* Line 104: left 1351px, top 72px, h 70px — one-sided fade */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
           left: "calc(1351px / 1920 * 100%)",
           top: "72px",
@@ -86,7 +86,7 @@ export function TeamsHero() {
       {/* Line 106: left 213px, top 142px, h 142px — both-end fade */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
           left: "calc(213px / 1920 * 100%)",
           top: "142px",
@@ -99,7 +99,7 @@ export function TeamsHero() {
       {/* Line 106: left 426px, top 285px, h 142px — both-end fade */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
           left: "calc(426px / 1920 * 100%)",
           top: "285px",
@@ -112,7 +112,7 @@ export function TeamsHero() {
       {/* Line 108: left 142px, top 355px, h 142px — both-end fade */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
           left: "calc(142px / 1920 * 100%)",
           top: "355px",
@@ -125,7 +125,7 @@ export function TeamsHero() {
       {/* Line 105: left 1564px, top 142px, h 70px — reversed one-sided fade */}
       <div
         aria-hidden
-        className="pointer-events-none absolute hidden xl:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
           left: "calc(1564px / 1920 * 100%)",
           top: "142px",

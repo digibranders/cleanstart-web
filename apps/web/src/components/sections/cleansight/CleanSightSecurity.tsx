@@ -1,6 +1,6 @@
 /**
  * Pattern-11 partial collapse (Sprint 3 Day 4):
- *   - Lowered `hidden xl:block` / `xl:hidden` -> `lg:block` / `lg:hidden`.
+ *   - Lowered `hidden lg:block` / `lg:hidden` -> `lg:block` / `lg:hidden`.
  *     The 1024-1279 dead zone (where neither the desktop chart nor the
  *     mobile fallback rendered cleanly) now picks up the desktop layout.
  *   - Replaced the 8 flat-px `fontSize: 20px / 16px` workflow labels with
@@ -89,25 +89,15 @@ export function CleanSightSecurity(): React.ReactElement {
           className="text-white text-center mx-auto"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 600,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "744px",
           }}
         >
           Built for Continuous Container{" "}
-          <span
-            style={{
-              background:
-                "linear-gradient(102.33deg, rgb(154, 81, 255) 45.138%, rgb(44, 193, 235) 98.781%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Security
-          </span>
+          <span className="cs-text-gradient-impact">Security</span>
         </h2>
 
         {/* ── Desktop: absolutely-positioned cards + shield ──
@@ -250,10 +240,10 @@ export function CleanSightSecurity(): React.ReactElement {
             <h3
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-heading-lg)",
+                fontSize: "clamp(22px, 2.4vw, 32px)",
                 fontWeight: 700,
-                letterSpacing: "var(--text-t-heading-lg-ls)",
-                lineHeight: "var(--text-t-heading-lg-lh)",
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
                 color: "#111",
               }}
             >
@@ -261,11 +251,11 @@ export function CleanSightSecurity(): React.ReactElement {
             </h3>
             <p
               style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-heading-md)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(15px, 1.4vw, 20px)",
                 fontWeight: 400,
-                letterSpacing: "var(--text-t-heading-md-ls)",
-                lineHeight: "var(--text-t-heading-md-lh)",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
                 color: "#111",
                 marginTop: "16px",
               }}
@@ -279,10 +269,10 @@ export function CleanSightSecurity(): React.ReactElement {
             <h3
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-heading-lg)",
+                fontSize: "clamp(22px, 2.4vw, 32px)",
                 fontWeight: 700,
-                letterSpacing: "var(--text-t-heading-lg-ls)",
-                lineHeight: "var(--text-t-heading-lg-lh)",
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
                 color: "#111",
               }}
             >
@@ -290,11 +280,11 @@ export function CleanSightSecurity(): React.ReactElement {
             </h3>
             <p
               style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-heading-md)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(15px, 1.4vw, 20px)",
                 fontWeight: 400,
-                letterSpacing: "var(--text-t-heading-md-ls)",
-                lineHeight: "var(--text-t-heading-md-lh)",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
                 color: "#111",
                 marginTop: "16px",
               }}
@@ -308,10 +298,10 @@ export function CleanSightSecurity(): React.ReactElement {
             <h3
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-heading-lg)",
+                fontSize: "clamp(22px, 2.4vw, 32px)",
                 fontWeight: 700,
-                letterSpacing: "var(--text-t-heading-lg-ls)",
-                lineHeight: "var(--text-t-heading-lg-lh)",
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
                 color: "#111",
               }}
             >
@@ -319,11 +309,11 @@ export function CleanSightSecurity(): React.ReactElement {
             </h3>
             <p
               style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-heading-md)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(15px, 1.4vw, 20px)",
                 fontWeight: 400,
-                letterSpacing: "var(--text-t-heading-md-ls)",
-                lineHeight: "var(--text-t-heading-md-lh)",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
                 color: "#111",
                 marginTop: "16px",
               }}
@@ -337,10 +327,10 @@ export function CleanSightSecurity(): React.ReactElement {
             <h3
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-heading-lg)",
+                fontSize: "clamp(22px, 2.4vw, 32px)",
                 fontWeight: 700,
-                letterSpacing: "var(--text-t-heading-lg-ls)",
-                lineHeight: "var(--text-t-heading-lg-lh)",
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
                 color: "#111",
               }}
             >
@@ -348,11 +338,11 @@ export function CleanSightSecurity(): React.ReactElement {
             </h3>
             <p
               style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-heading-md)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(15px, 1.4vw, 20px)",
                 fontWeight: 400,
-                letterSpacing: "var(--text-t-heading-md-ls)",
-                lineHeight: "var(--text-t-heading-md-lh)",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
                 color: "#111",
                 marginTop: "16px",
               }}
@@ -429,11 +419,11 @@ export function CleanSightSecurity(): React.ReactElement {
                 </h3>
                 <p
                   style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-body-lg)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "clamp(15px, 1.4vw, 20px)",
                     fontWeight: 400,
-                    letterSpacing: "var(--text-t-body-lg-ls)",
-                    lineHeight: "var(--text-t-body-lg-lh)",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.4,
                     color: "#111",
                   }}
                 >
@@ -532,32 +522,22 @@ export function CleanSightSecurity(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
             }}
           >
             From Visibility to{" "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(113.87deg, #9A51FF 45.605%, #2CC1EB 93.65%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Action
-            </span>
+            <span className="cs-text-gradient-impact">Action</span>
           </h2>
           <p
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-subhead)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
               fontWeight: 400,
-              letterSpacing: "var(--text-t-subhead-ls)",
-              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
             }}
           >
             Move beyond fragmented visibility with continuous remediation and
@@ -725,23 +705,23 @@ export function CleanSightSecurity(): React.ReactElement {
             }}
           >
             <p
-              className="text-body-lg"
               style={{
                 fontFamily: "var(--font-display)",
+                fontSize: "clamp(20px, 2vw, 28px)",
                 fontWeight: 600,
-                letterSpacing: "-0.037em",
-                lineHeight: 1.3,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
               }}
             >
               Continuous Visibility
             </p>
             <p
-              className="text-body-md"
               style={{
-                fontFamily: "var(--font-display)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(15px, 1.4vw, 20px)",
                 fontWeight: 400,
-                letterSpacing: "-0.037em",
-                lineHeight: 1.3,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
                 opacity: 0.8,
               }}
             >
@@ -762,23 +742,23 @@ export function CleanSightSecurity(): React.ReactElement {
             }}
           >
             <p
-              className="text-body-lg"
               style={{
                 fontFamily: "var(--font-display)",
+                fontSize: "clamp(20px, 2vw, 28px)",
                 fontWeight: 600,
-                letterSpacing: "-0.037em",
-                lineHeight: 1.3,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
               }}
             >
               Risk Prioritization
             </p>
             <p
-              className="text-body-md"
               style={{
-                fontFamily: "var(--font-display)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(15px, 1.4vw, 20px)",
                 fontWeight: 400,
-                letterSpacing: "-0.037em",
-                lineHeight: 1.3,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
                 opacity: 0.8,
               }}
             >
@@ -799,23 +779,23 @@ export function CleanSightSecurity(): React.ReactElement {
             }}
           >
             <p
-              className="text-body-lg"
               style={{
                 fontFamily: "var(--font-display)",
+                fontSize: "clamp(20px, 2vw, 28px)",
                 fontWeight: 600,
-                letterSpacing: "-0.037em",
-                lineHeight: 1.3,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
               }}
             >
               Built-In Compliance
             </p>
             <p
-              className="text-body-md"
               style={{
-                fontFamily: "var(--font-display)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(15px, 1.4vw, 20px)",
                 fontWeight: 400,
-                letterSpacing: "-0.037em",
-                lineHeight: 1.3,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
                 opacity: 0.8,
               }}
             >
@@ -836,23 +816,23 @@ export function CleanSightSecurity(): React.ReactElement {
             }}
           >
             <p
-              className="text-body-lg"
               style={{
                 fontFamily: "var(--font-display)",
+                fontSize: "clamp(20px, 2vw, 28px)",
                 fontWeight: 600,
-                letterSpacing: "-0.037em",
-                lineHeight: 1.3,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
               }}
             >
               Faster Remediation
             </p>
             <p
-              className="text-body-md"
               style={{
-                fontFamily: "var(--font-display)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "clamp(15px, 1.4vw, 20px)",
                 fontWeight: 400,
-                letterSpacing: "-0.037em",
-                lineHeight: 1.3,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
                 opacity: 0.8,
               }}
             >

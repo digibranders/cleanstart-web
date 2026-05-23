@@ -51,7 +51,7 @@ export function AboutPowering() {
           aria-hidden
           src="/images/about/powering-ellipse-blob.svg"
           alt=""
-          className="pointer-events-none absolute hidden select-none xl:block"
+          className="pointer-events-none absolute hidden select-none lg:block"
           style={{
             left: `calc(${leftPx}px / 1920 * 100%)`,
             top: "246px",
@@ -77,7 +77,7 @@ export function AboutPowering() {
           aria-hidden
           src="/images/about/powering-bg-vector.svg"
           alt=""
-          className="pointer-events-none absolute hidden select-none xl:block"
+          className="pointer-events-none absolute hidden select-none lg:block"
           style={{
             left: `calc(${x}px / 1920 * 100%)`,
             top: `${y}px`,
@@ -94,7 +94,7 @@ export function AboutPowering() {
         <div
           key={x}
           aria-hidden
-          className="pointer-events-none absolute top-[180px] hidden h-[1335px] w-px xl:block"
+          className="pointer-events-none absolute top-[180px] hidden h-[1335px] w-px lg:block"
           style={{
             left: `calc(${x}px / 1920 * 100%)`,
             opacity: 0.9,
@@ -110,18 +110,26 @@ export function AboutPowering() {
         {/* Title group — 248:2152 (centered, max-w 969px) */}
         <div className="mx-auto flex max-w-[969px] flex-col items-center gap-6 text-center text-white">
           <h2
-            className="font-display font-bold"
+            className="font-display"
             style={{
-              fontSize: "var(--text-t-display-2)",
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "clamp(32px, 4vw, 56px)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
             }}
           >
             Powering Trusted Software Delivery for Global Leaders.
           </h2>
           <p
-            className="text-[clamp(1.125rem,2.08vw,1.875rem)] font-normal leading-[1.4] tracking-[-0.04em]"
-            style={{ opacity: 0.8, maxWidth: "835px" }}
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
+              opacity: 0.8,
+              maxWidth: "835px",
+            }}
           >
             Tailored solutions for every role in your organization — from
             security leaders to engineering teams.
@@ -129,7 +137,7 @@ export function AboutPowering() {
         </div>
 
         {/* Cards row — Figma top=412 → 80px gap below title block */}
-        <div className="mt-20 grid grid-cols-1 items-stretch gap-y-16 gap-x-[clamp(24px,6vw,91px)] md:grid-cols-2 xl:grid-cols-3 place-items-center">
+        <div className="mt-20 grid grid-cols-1 items-stretch gap-y-16 gap-x-[clamp(24px,6vw,91px)] md:grid-cols-2 lg:grid-cols-3 place-items-center">
           {CARDS.map((card) => (
             <FeatureCard key={card.title} {...card} />
           ))}
@@ -192,10 +200,27 @@ function FeatureCard({ title, description }: Card) {
         </div>
 
         <div className="flex flex-col gap-3">
-          <h3 className="font-display text-card-title-lg font-bold leading-none tracking-[-0.05em] text-[#111]">
+          <h3
+            className="font-display text-[#111]"
+            style={{
+              fontSize: "clamp(22px, 2.4vw, 32px)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
+            }}
+          >
             {title}
           </h3>
-          <p className="text-body-lg font-normal leading-[1.5] text-[#555]">
+          <p
+            className="text-[#555]"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(15px, 1.4vw, 20px)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
+            }}
+          >
             {description}
           </p>
         </div>

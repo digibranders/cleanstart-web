@@ -195,10 +195,10 @@ function WorkflowStep({ num, icon, label, desc }: StepDef): React.ReactElement {
       <h3
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(1rem, 1.25vw, 1.375rem)',
-          fontWeight: 700,
+          fontSize: 'clamp(20px, 2vw, 28px)',
+          fontWeight: 600,
           letterSpacing: '-0.04em',
-          lineHeight: 1,
+          lineHeight: 1.1,
           color: '#111',
           marginBottom: '8px',
         }}
@@ -209,10 +209,10 @@ function WorkflowStep({ num, icon, label, desc }: StepDef): React.ReactElement {
       <p
         style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--text-body-sm)',
+          fontSize: 'clamp(15px, 1.4vw, 20px)',
           fontWeight: 400,
-          letterSpacing: '-0.01em',
-          lineHeight: 1.5,
+          letterSpacing: '-0.02em',
+          lineHeight: 1.4,
           color: '#666',
           maxWidth: '180px',
         }}
@@ -230,40 +230,23 @@ export function DeveloperWorkflows(): React.ReactElement {
       className="relative bg-white"
       style={{ paddingTop: '80px', paddingBottom: '100px' }}
     >
-      <div
-        className="relative mx-auto"
-        style={{
-          maxWidth: 'var(--container-default)',
-          paddingLeft: '24px',
-          paddingRight: '24px',
-        }}
-      >
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Heading */}
         <h2
           className="text-center mx-auto"
           style={{
             maxWidth: '720px',
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(1.75rem, 3.23vw, 3.875rem)',
+            fontSize: 'clamp(32px, 4vw, 56px)',
             fontWeight: 700,
-            letterSpacing: '-0.05em',
-            lineHeight: 1,
+            letterSpacing: '-0.04em',
+            lineHeight: 1.1,
             color: '#111',
             marginBottom: '16px',
           }}
         >
           Designed for{' '}
-          <span
-            style={{
-              background:
-                'linear-gradient(102.22deg, rgb(154,81,255) 1.758%, rgb(44,193,235) 98.781%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            Developer Workflows
-          </span>
+          <span className="cs-text-gradient-impact">Developer Workflows</span>
         </h2>
 
         <p
@@ -271,10 +254,10 @@ export function DeveloperWorkflows(): React.ReactElement {
           style={{
             maxWidth: '520px',
             fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(0.9375rem, 1.04vw, 1.25rem)',
+            fontSize: 'clamp(18px, 1.7vw, 24px)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
-            lineHeight: 1.5,
+            lineHeight: 1.4,
             color: '#666',
             marginBottom: '72px',
           }}

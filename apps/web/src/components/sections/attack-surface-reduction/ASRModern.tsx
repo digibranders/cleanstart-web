@@ -63,7 +63,7 @@ export function ASRModern(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/vulnerability-remediation/s5-bg-decoration.png"
         alt=""
         width={372}
@@ -76,7 +76,7 @@ export function ASRModern(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/vulnerability-remediation/s5-bg-decoration.png"
         alt=""
         width={372}
@@ -90,27 +90,18 @@ export function ASRModern(): React.ReactElement {
         {/* Heading */}
         <h2
           style={{
-            fontFamily: "var(--font-figtree)",
-            fontSize: "var(--text-t-display-2)",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "white",
             maxWidth: "700px",
             marginBottom: "64px",
           }}
         >
           Built for Modern Production{" "}
-          <span
-            style={{
-              background: "linear-gradient(95deg, #9A51FF 0%, #2CC1EB 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Environments
-          </span>
+          <span className="cs-text-gradient-impact">Environments</span>
         </h2>
 
         {/* 3 target cards */}
@@ -134,11 +125,11 @@ export function ASRModern(): React.ReactElement {
               </div>
               <h3
                 style={{
-                  fontFamily: "var(--font-figtree)",
-                  fontSize: "var(--text-t-heading-lg)",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(22px, 2.4vw, 32px)",
                   fontWeight: 700,
-                  letterSpacing: "var(--text-t-heading-lg-ls)",
-                  lineHeight: "var(--text-t-heading-lg-lh)",
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.1,
                   color: "white",
                 }}
               >
@@ -146,11 +137,11 @@ export function ASRModern(): React.ReactElement {
               </h3>
               <p
                 style={{
-                  fontFamily: "var(--font-figtree)",
-                  fontSize: "var(--text-t-heading-sm)",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "clamp(15px, 1.4vw, 20px)",
                   fontWeight: 400,
-                  letterSpacing: "var(--text-t-heading-sm-ls)",
-                  lineHeight: "var(--text-t-heading-sm-lh)",
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.4,
                   color: "rgba(255,255,255,0.75)",
                 }}
               >

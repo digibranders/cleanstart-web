@@ -65,7 +65,7 @@ export function ResourceCenterCTA(): React.ReactElement {
           width: "259px",
           height: "260px",
           transform: "rotate(-15deg)",
-          opacity: 0.9,
+          opacity: 0.75,
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -86,9 +86,10 @@ export function ResourceCenterCTA(): React.ReactElement {
             id="rc-cta-title"
             className="font-display font-bold text-center lg:text-left w-full lg:max-w-[486px]"
             style={{
-              fontSize: "var(--text-t-display-2)",
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
               color: "#111",
             }}
           >
@@ -101,9 +102,10 @@ export function ResourceCenterCTA(): React.ReactElement {
             <p
               className="font-normal text-center lg:text-left w-full lg:max-w-[493px]"
               style={{
-                fontSize: "var(--text-t-body-lg)",
-                letterSpacing: "var(--text-t-body-lg-ls)",
-                lineHeight: "var(--text-t-body-lg-lh)",
+                fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
                 color: "#111",
                 opacity: 0.8,
               }}

@@ -148,33 +148,25 @@ export function FipsEnables(): React.ReactElement {
             className="mx-auto text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(2rem, 4.2vw, 3.875rem)", // 32→62 px — Figma 62 px
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "-0.05em", // Figma -5%
-              lineHeight: 1, // Figma 100%
-              maxWidth: "41.5rem", // Figma 664 / 16
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              maxWidth: "41.5rem",
               marginBottom: "clamp(1rem, 2.2vw, 2rem)",
             }}
           >
             How CleanStart Enables{" "}
-            <span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage:
-                  "linear-gradient(99deg, #9A51FF 0%, #2CC1EB 100%)",
-              }}
-            >
-              FIPS 140-3 Compliance
-            </span>
+            <span className="cs-text-gradient-impact">FIPS 140-3 Compliance</span>
           </h2>
           <p
             className="mx-auto text-white"
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "clamp(1.0625rem, 2vw, 1.875rem)", // 17→30 px — Figma 30 px
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
               fontWeight: 400,
-              letterSpacing: "-0.04em", // Figma -4%
-              lineHeight: 1.4, // Figma 140%
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
               opacity: 0.8,
             }}
           >

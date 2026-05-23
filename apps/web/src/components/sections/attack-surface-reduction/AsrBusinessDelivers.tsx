@@ -72,7 +72,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
               <span
                 style={{
                   background:
-                    "linear-gradient(95.8deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
+                    "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",

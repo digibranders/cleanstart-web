@@ -98,16 +98,16 @@ export function Footer({
     >
       {hasCta && (
         <div
-          className="pointer-events-none absolute left-1/2 z-20 w-full max-w-[var(--container-default)] -translate-x-1/2 px-6 sm:px-10"
+          className="pointer-events-none absolute left-1/2 z-20 w-full max-w-[1152px] -translate-x-1/2 px-6 sm:px-10"
           style={{ top: "-170px" }}
         >
           {/* Sizing wrapper — NO overflow:hidden so `ctaOverlay` children can
-              break out of the card. The wrapper sits INSIDE the outer's
-              padding, so the card surface aligns with section content edges
-              (the H2 / body that lives inside `<Container>` on every section
-              above and below this CTA). */}
+              break out of the card. Card width capped at 1152 (intentionally
+              ~20% narrower than the global 1440 container) so it reads as a
+              focused conversion block, not a section-width banner. Heights
+              also reduced ~20% (420/360/300 → 336/288/240). */}
           <div
-            className="pointer-events-auto relative w-full h-[420px] sm:h-[360px] lg:h-[300px]"
+            className="pointer-events-auto relative w-full h-[336px] sm:h-[288px] lg:h-[240px]"
           >
             {/* Clipped card surface — fills the slot and clips inner content
                 to the rounded 1276×330 box. */}

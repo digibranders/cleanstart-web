@@ -42,27 +42,16 @@ export function ASRBloated(): React.ReactElement {
         <h2
           className="text-center text-[#111]"
           style={{
-            fontFamily: "var(--font-figtree)",
-            fontSize: "clamp(28px, 3.23vw, 62px)",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             marginBottom: "clamp(24px, 2.5vw, 48px)",
           }}
         >
           <span className="block">Public images are</span>
-          <span
-            className="block"
-            style={{
-              background:
-                "linear-gradient(97.6deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            bloated
-          </span>
+          <span className="block cs-text-gradient-impact">bloated</span>
         </h2>
       </div>
 
@@ -285,11 +274,11 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
           <p
             className="text-[#111]"
             style={{
-              fontFamily: "var(--font-figtree)",
-              fontSize: "clamp(16px, 1.4vw, 20px)",
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(20px, 2vw, 28px)",
               fontWeight: 600,
-              letterSpacing: "-0.37px",
-              lineHeight: 1.3,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
             }}
           >
             {card.title}
@@ -297,11 +286,11 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
           <p
             className="text-[#111]"
             style={{
-              fontFamily: "var(--font-figtree)",
-              fontSize: "clamp(14px, 1.1vw, 16px)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(15px, 1.4vw, 20px)",
               fontWeight: 400,
-              letterSpacing: "-0.37px",
-              lineHeight: 1.3,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
             }}
           >
             {card.description}

@@ -11,7 +11,7 @@
  * Glow: 165×165px at left=32px top=12px INSIDE the icon container (Figma-native coords)
  * Icon container: outer has no overflow-hidden; inner div clips the icon image
  * Dividers: vertical CSS gradient at 50%, horizontal CSS gradient at 50%
- * Union decorations: xl:block only
+ * Union decorations: lg:block only
  */
 
 export function CisoRisks(): React.ReactElement {
@@ -70,7 +70,7 @@ export function CisoRisks(): React.ReactElement {
         aria-hidden
         src="/images/ciso/risks-union-tr.svg"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{ right: "-200px", top: "-600px", width: "1101px", height: "1101px" }}
         loading="lazy"
         decoding="async"
@@ -82,7 +82,7 @@ export function CisoRisks(): React.ReactElement {
         aria-hidden
         src="/images/ciso/risks-union-bl.svg"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{ left: "-621px", bottom: "-400px", width: "1181px", height: "1181px" }}
         loading="lazy"
         decoding="async"
@@ -96,10 +96,10 @@ export function CisoRisks(): React.ReactElement {
           className="text-center text-[#111] mx-auto px-6"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "807px",
             marginBottom: "98px",
           }}
@@ -196,10 +196,10 @@ export function CisoRisks(): React.ReactElement {
                 <h3
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-heading-lg)",
+                    fontSize: "clamp(22px, 2.4vw, 32px)",
                     fontWeight: 700,
-                    letterSpacing: "var(--text-t-heading-lg-ls)",
-                    lineHeight: "var(--text-t-heading-lg-lh)",
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1.1,
                     color: "#111",
                     maxWidth: "225px",
                   }}
@@ -208,11 +208,11 @@ export function CisoRisks(): React.ReactElement {
                 </h3>
                 <p
                   style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-subhead)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "clamp(15px, 1.4vw, 20px)",
                     fontWeight: 400,
-                    letterSpacing: "var(--text-t-subhead-ls)",
-                    lineHeight: "var(--text-t-subhead-lh)",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.4,
                     color: "#333",
                     maxWidth: risk.descMaxWidth,
                   }}

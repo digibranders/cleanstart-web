@@ -35,7 +35,7 @@ export function BlogsCTA(): React.ReactElement {
           top: "180px",
           width: "176px",
           height: "178px",
-          opacity: 0.8,
+          opacity: 0.75,
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -57,7 +57,7 @@ export function BlogsCTA(): React.ReactElement {
           top: "-20px",
           width: "176px",
           height: "178px",
-          opacity: 0.8,
+          opacity: 0.75,
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -78,9 +78,10 @@ export function BlogsCTA(): React.ReactElement {
           <div
             className="font-display font-bold text-white w-full lg:w-auto lg:max-w-[401px] text-left"
             style={{
-              fontSize: "var(--text-t-display-2)",
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             }}
           >
             Stay Ahead of Container Security Threats
@@ -93,9 +94,10 @@ export function BlogsCTA(): React.ReactElement {
             <p
               className="font-normal text-white"
               style={{
-                fontSize: "var(--text-t-body-lg)",
-                letterSpacing: "var(--text-t-body-lg-ls)",
-                lineHeight: "var(--text-t-body-lg-lh)",
+                fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
                 opacity: 0.8,
               }}
             >
@@ -142,7 +144,7 @@ export function BlogsCTA(): React.ReactElement {
                   className="cs-btn-glass cs-btn-glass--no-lift shrink-0"
                   style={{
                     ["--cs-btn-px" as string]: "16px",
-                    ["--cs-btn-fs" as string]: "18px",
+                    ["--cs-btn-fs" as string]: "16px",
                     borderRadius: "0 12px 12px 0",
                     borderLeft: "none",
                   }}

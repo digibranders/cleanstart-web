@@ -242,24 +242,32 @@ export function ResourcesInsights() {
       />
 
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Title + description (stacked, left-aligned) */}
-        <h2
+        {/* Section label — intentionally a <p>, not an <h2>. This is a
+            least-priority "discover more" rail at the bottom of the page,
+            so no heading-tag in the document outline.
+            Matches the Vuln page treatment (VulnBlogsResources). */}
+        <p
           id="resources-title"
-          className="font-display font-bold text-[#111111]"
+          className="font-display text-[#111111]"
           style={{
-            fontSize: "var(--text-t-display-2)",
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.05,
+            margin: 0,
           }}
         >
           Resources &amp; Insights
-        </h2>
+        </p>
         <p
-          className="mt-5 max-w-[622px] font-normal text-[#333333]"
+          className="mt-4 max-w-[720px]"
           style={{
-            fontSize: "var(--text-t-subhead)",
-            lineHeight: "var(--text-t-subhead-lh)",
-            letterSpacing: "var(--text-t-subhead-ls)",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(18px, 1.7vw, 24px)",
+            fontWeight: 600,
+            color: "#555",
+            lineHeight: 1.4,
+            letterSpacing: "-0.02em",
           }}
         >
           Stay informed with the latest research, threat intelligence reports,
@@ -348,22 +356,29 @@ function ArticleCard({ article }: { article: Article }) {
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
-      <h3
-        className="font-display font-bold text-black transition-colors duration-200 group-hover:text-[#1B1F4F]"
+      {/* Card title — intentionally <p>, not <h3>: matches the parent
+          section's "no heading-tag" decision (least priority). */}
+      <p
+        className="text-[#1a1a1a] transition-colors duration-200 group-hover:text-[#1B1F4F]"
         style={{
-          fontSize: "var(--text-t-heading-md)",
-          lineHeight: "var(--text-t-heading-md-lh)",
-          letterSpacing: "var(--text-t-heading-md-ls)",
+          fontFamily: "var(--font-display)",
+          fontSize: "clamp(18px, 1.7vw, 24px)",
+          fontWeight: 600,
+          lineHeight: 1.25,
+          letterSpacing: "-0.02em",
+          margin: 0,
         }}
       >
         {article.title}
-      </h3>
+      </p>
       <p
-        className="font-normal text-[#333333]"
+        className="text-[#666]"
         style={{
-          fontSize: "var(--text-t-body-md)",
-          lineHeight: "var(--text-t-body-md-lh)",
-          letterSpacing: "var(--text-t-body-md-ls)",
+          fontFamily: "var(--font-sans)",
+          fontSize: "clamp(15px, 1.4vw, 20px)",
+          fontWeight: 400,
+          lineHeight: 1.5,
+          letterSpacing: "-0.02em",
         }}
       >
         {article.description}

@@ -108,7 +108,7 @@ export function CleanSightStats(): React.ReactElement {
         aria-hidden
         src="/images/cleansight/stats-union.svg"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           right: "-20px",
           top: "-206px",
@@ -131,37 +131,27 @@ export function CleanSightStats(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               whiteSpace: "nowrap",
             }}
           >
             From Visibility to{" "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(110.35deg, rgb(154, 81, 255) 65.662%, rgb(44, 193, 235) 93.65%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Results
-            </span>
+            <span className="cs-text-gradient-impact">Results</span>
           </h2>
         </div>
 
         {/* ── Stats row — 4 columns with vertical dividers ── */}
-        <div className="relative grid grid-cols-2 xl:grid-cols-4">
+        <div className="relative grid grid-cols-2 lg:grid-cols-4">
 
           {/* Vertical dividers — 3 lines between the 4 columns */}
           {[1, 2, 3].map((i) => (
             <div
               key={i}
               aria-hidden
-              className="absolute hidden xl:block pointer-events-none"
+              className="absolute hidden lg:block pointer-events-none"
               style={{
                 left: `${(i / 4) * 100}%`,
                 top: 0,
@@ -175,7 +165,7 @@ export function CleanSightStats(): React.ReactElement {
           {/* Mobile divider — horizontal line between rows */}
           <div
             aria-hidden
-            className="xl:hidden absolute pointer-events-none"
+            className="lg:hidden absolute pointer-events-none"
             style={{
               left: 0, right: 0,
               top: "50%",
@@ -185,7 +175,7 @@ export function CleanSightStats(): React.ReactElement {
           />
           <div
             aria-hidden
-            className="xl:hidden absolute pointer-events-none"
+            className="lg:hidden absolute pointer-events-none"
             style={{
               top: 0, bottom: 0,
               left: "50%",
@@ -197,7 +187,7 @@ export function CleanSightStats(): React.ReactElement {
           {STATS.map((s) => (
             <div
               key={s.label}
-              className="text-center text-white flex flex-col items-center py-6 xl:py-0"
+              className="text-center text-white flex flex-col items-center py-6 lg:py-0"
               style={{ gap: "18px" }}
             >
               {/* Animated stat number */}
@@ -217,11 +207,11 @@ export function CleanSightStats(): React.ReactElement {
               {/* Label */}
               <p
                 style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: s.labelSize,
-                  fontWeight: 400,
-                  letterSpacing: s.labelTracking,
-                  lineHeight: 1.4,
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "clamp(20px, 2vw, 28px)",
+                  fontWeight: 500,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.3,
                   opacity: 0.9,
                 }}
               >

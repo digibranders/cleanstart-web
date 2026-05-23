@@ -122,38 +122,27 @@ export function FipsHero(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              // Figma h1 is 80px at 1920w. clamp scales down to 40px on mobile.
-              fontSize: "var(--text-hero-product)",
-              fontWeight: 600,
-              letterSpacing: "var(--text-hero-product-ls)",
-              lineHeight: "var(--text-hero-lh)",
-              marginBottom: "32px", // gap between h1 (h=160) and subhead frame (y=192) = 32
+              fontSize: "clamp(40px, 4.45vw, 64px)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
+              marginBottom: "32px",
             }}
           >
             FIPS-Validated. Always{" "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(95deg, #82AEFF 0%, #2CC1EB 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Verified.
-            </span>
+            <span className="cs-text-gradient-impact">Verified.</span>
           </h1>
 
           <p
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-subhead)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
               fontWeight: 400,
-              letterSpacing: "var(--text-t-subhead-ls)",
-              lineHeight: "var(--text-t-subhead-lh)",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
               color: "rgba(255,255,255,0.85)",
               maxWidth: "545px",
-              marginBottom: "32px", // gap between body (h=84) and button (y=116) = 32
+              marginBottom: "32px",
             }}
           >
             Built on validated cryptographic foundations for secure, compliant

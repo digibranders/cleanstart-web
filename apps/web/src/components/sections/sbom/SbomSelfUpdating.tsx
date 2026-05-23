@@ -100,10 +100,10 @@ export function SbomSelfUpdating(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             width: vw(593),
           }}
         >
@@ -111,11 +111,11 @@ export function SbomSelfUpdating(): React.ReactElement {
         </h2>
         <p
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-subhead)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(18px, 1.7vw, 24px)",
             fontWeight: 400,
-            letterSpacing: "var(--text-t-subhead-ls)",
-            lineHeight: "var(--text-t-subhead-lh)",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
             color: "rgba(255,255,255,0.88)",
             width: "100%",
           }}
@@ -166,21 +166,21 @@ export function SbomSelfUpdating(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
           }}
         >
           Generate. Verify. Validate.
         </h2>
         <p
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-subhead)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(18px, 1.7vw, 24px)",
             fontWeight: 400,
-            letterSpacing: "var(--text-t-subhead-ls)",
-            lineHeight: "var(--text-t-subhead-lh)",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
             color: "rgba(255,255,255,0.85)",
             maxWidth: "600px",
           }}
@@ -354,7 +354,7 @@ function MobileCircle({ num }: { num: number }): React.ReactElement {
           // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored badge inside numbered circle, fixed 18px. See RESPONSIVE-AUDIT.md §14.3.
           fontSize: "18px",
           fontWeight: 700,
-          background: "linear-gradient(128.05deg, #9A51FF 35.82%, #2CC1EB 78.3%)",
+          background: "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           backgroundClip: "text",

@@ -1161,25 +1161,15 @@ export function SCATransform(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "#111",
           }}
         >
           Transform SCA{" "}
-          <span
-            style={{
-              backgroundImage:
-                "linear-gradient(97.07deg, #9a51ff 1.76%, #2cc1eb 98.78%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            outcomes
-          </span>
+          <span className="cs-text-gradient-impact">outcomes</span>
         </h2>
 
         {/* Three-column card layout */}

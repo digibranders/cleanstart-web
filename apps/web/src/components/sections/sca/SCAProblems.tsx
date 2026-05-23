@@ -37,10 +37,10 @@ export function SCAProblems(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "#111",
           }}
         >
@@ -49,7 +49,7 @@ export function SCAProblems(): React.ReactElement {
 
         {/* Cards — 4 in a row on desktop, 2 on tablet, 1 on mobile */}
         <div
-          className="mt-[71px] grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
+          className="mt-[71px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
           style={{ gap: "32px" }}
         >
           {CARDS.map(({ title, desc, icon, iconAlt }) => (
@@ -169,10 +169,10 @@ export function SCAProblems(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "var(--text-t-heading-lg)",
-                      fontWeight: 700,
-                      letterSpacing: "var(--text-t-heading-lg-ls)",
-                      lineHeight: "var(--text-t-heading-lg-lh)",
+                      fontSize: "clamp(20px, 2vw, 28px)",
+                      fontWeight: 600,
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.1,
                       color: "#111",
                     }}
                   >
@@ -180,11 +180,11 @@ export function SCAProblems(): React.ReactElement {
                   </p>
                   <p
                     style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "var(--text-t-body-lg)",
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "clamp(15px, 1.4vw, 20px)",
                       fontWeight: 400,
-                      letterSpacing: "var(--text-t-body-lg-ls)",
-                      lineHeight: "var(--text-t-body-lg-lh)",
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.4,
                       color: "#555",
                     }}
                   >

@@ -32,7 +32,7 @@ export function CleanSightUnified(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/cleansight/unified-vector-bg.svg"
         alt=""
         style={{ left: "171px", top: "-115px", width: "568px", height: "551px" }}
@@ -44,7 +44,7 @@ export function CleanSightUnified(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/cleansight/unified-union-bg.svg"
         alt=""
         style={{
@@ -62,7 +62,7 @@ export function CleanSightUnified(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         src="/images/cleansight/unified-ellipse-glow.svg"
         alt=""
         style={{ left: "1732px", top: "656px", width: "315px", height: "315px" }}
@@ -72,39 +72,30 @@ export function CleanSightUnified(): React.ReactElement {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         {/* Heading row */}
-        <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-8 xl:gap-[60px]">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-[60px]">
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#111",
               maxWidth: "654px",
               flexShrink: 0,
             }}
           >
             Unified Visibility and{" "}
-            <span
-              style={{
-                background: "linear-gradient(-11.94deg, #2CC1EB 0%, #9A51FF 63.96%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Remediation
-            </span>
+            <span className="cs-text-gradient-impact">Remediation</span>
           </h2>
 
           <p
-            className="xl:pt-2"
+            className="lg:pt-2"
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "clamp(14px, 1.5625vw, 30px)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
+              letterSpacing: "-0.02em",
               lineHeight: 1.4,
               color: "#111",
               opacity: 0.8,
@@ -117,7 +108,7 @@ export function CleanSightUnified(): React.ReactElement {
         </div>
 
         {/* Feature cards */}
-        <div className="mt-10 xl:mt-[72px] grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 xl:gap-8">
+        <div className="mt-10 lg:mt-[72px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-8">
           {CARDS.map((card) => (
             <div
               key={card.title}
@@ -210,10 +201,10 @@ export function CleanSightUnified(): React.ReactElement {
                 <h3
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-heading-lg)",
+                    fontSize: "clamp(22px, 2.4vw, 32px)",
                     fontWeight: 700,
-                    letterSpacing: "var(--text-t-heading-lg-ls)",
-                    lineHeight: "var(--text-t-heading-lg-lh)",
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1.1,
                     color: "#111",
                   }}
                 >
@@ -223,11 +214,11 @@ export function CleanSightUnified(): React.ReactElement {
                 {/* Body */}
                 <p
                   style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-heading-sm)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "clamp(15px, 1.4vw, 20px)",
                     fontWeight: 400,
-                    letterSpacing: "var(--text-t-heading-sm-ls)",
-                    lineHeight: "var(--text-t-heading-sm-lh)",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.4,
                     color: "#555",
                   }}
                 >

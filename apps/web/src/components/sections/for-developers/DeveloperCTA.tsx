@@ -37,7 +37,7 @@ export function DeveloperCTA(): React.ReactElement {
       {/* Purple glow — right */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           right: '0',
           bottom: '-80px',
@@ -55,14 +55,14 @@ export function DeveloperCTA(): React.ReactElement {
         aria-hidden
         src="/images/ciso/cta-cube-noise.png"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
           right: '-60px',
           bottom: '-100px',
           width: '300px',
           height: '300px',
           objectFit: 'contain',
-          opacity: 0.8,
+          opacity: 0.75,
           zIndex: 0,
         }}
         loading="lazy"
@@ -71,19 +71,20 @@ export function DeveloperCTA(): React.ReactElement {
 
       {/* Content row */}
       <div
-        className="relative flex flex-col lg:flex-row items-start"
-        style={{ padding: '80px 100px', gap: '68px' }}
+        className="relative flex flex-col lg:flex-row lg:items-center"
+        style={{ padding: 'clamp(40px, 6vw, 80px) clamp(32px, 5vw, 80px)', gap: 'clamp(32px, 5vw, 72px)' }}
       >
-        {/* Left: headline */}
+        {/* Left: headline — auto-wraps 2 or 3 lines via balance */}
         <p
-          className="relative flex-shrink-0 text-white"
+          className="relative text-white"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(1.75rem, 3vw, 2.625rem)',
-            fontWeight: 700,
-            letterSpacing: '-0.05em',
+            fontSize: 'clamp(26px, 3.1vw, 44px)',
+            fontWeight: 600,
+            letterSpacing: '-0.04em',
             lineHeight: 1.1,
-            width: 'min(401px, 100%)',
+            maxWidth: 'min(460px, 100%)',
+            textWrap: 'balance',
             zIndex: 1,
           }}
         >
@@ -91,7 +92,7 @@ export function DeveloperCTA(): React.ReactElement {
         </p>
 
         {/* Right: description + CTAs */}
-        <div className="relative flex flex-col flex-1" style={{ gap: '40px', zIndex: 1 }}>
+        <div className="relative flex flex-col" style={{ maxWidth: 'min(460px, 100%)', gap: 'clamp(20px, 2vw, 32px)', zIndex: 1 }}>
           <p
             style={{
               fontFamily: 'var(--font-sans)',

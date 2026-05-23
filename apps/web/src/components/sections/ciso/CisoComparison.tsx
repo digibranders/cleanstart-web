@@ -44,24 +44,17 @@ export function CisoComparison(): React.ReactElement {
         <div className="text-center">
           <h2
             id="ciso-comparison-title"
-            className="mx-auto font-display font-bold text-[#111111]"
+            className="mx-auto font-display text-[#111111]"
             style={{
               maxWidth: "min(737px, 100%)",
-              fontSize: "var(--text-t-display-2)",
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "clamp(32px, 4vw, 56px)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
             }}
           >
             From Visibility to Actionable{" "}
-            <span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage:
-                  "linear-gradient(102.22deg, rgb(154, 81, 255) 1.758%, rgb(44, 193, 235) 98.781%)",
-              }}
-            >
-              Risk Reduction
-            </span>
+            <span className="cs-text-gradient-impact">Risk Reduction</span>
           </h2>
         </div>
 
@@ -174,11 +167,12 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
 
           {/* Title */}
           <h3
-            className="relative z-10 text-center font-display font-bold text-white"
+            className="relative z-10 text-center font-display text-white"
             style={{
-              fontSize: "var(--text-t-heading-lg)",
-              lineHeight: "var(--text-t-heading-lg-lh)",
-              letterSpacing: "var(--text-t-heading-lg-ls)",
+              fontSize: "clamp(22px, 2.4vw, 32px)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
               padding: "0 16px",
             }}
           >
@@ -240,12 +234,13 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
                   className="h-6 w-6 shrink-0"
                 />
                 <span
-                  className="font-display text-[#333333]"
+                  className="text-[#333333]"
                   style={{
-                    fontSize: "var(--text-t-heading-sm)",
-                    fontWeight: isTraditional ? 600 : 700,
-                    lineHeight: "var(--text-t-heading-sm-lh)",
-                    letterSpacing: "var(--text-t-heading-sm-ls)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "clamp(15px, 1.4vw, 20px)",
+                    fontWeight: isTraditional ? 500 : 600,
+                    lineHeight: 1.4,
+                    letterSpacing: "-0.02em",
                   }}
                 >
                   {label}

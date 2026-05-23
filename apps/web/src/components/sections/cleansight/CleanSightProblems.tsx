@@ -36,7 +36,7 @@ export function CleanSightProblems(): React.ReactElement {
       {/* Decorative union blobs */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           right: "-310px",
           top: "-267px",
@@ -49,7 +49,7 @@ export function CleanSightProblems(): React.ReactElement {
       />
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: "-310px",
           top: "254px",
@@ -67,32 +67,23 @@ export function CleanSightProblems(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
+              fontSize: "clamp(32px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#111",
             }}
           >
             When Container Visibility Falls Short,{" "}
-            <span
-              style={{
-                background: "linear-gradient(103deg, #9A51FF 2%, #2CC1EB 99%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Risk Grows
-            </span>
+            <span className="cs-text-gradient-impact">Risk Grows</span>
           </h2>
           <p
             className="mt-4"
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "clamp(15px, 1.5625vw, 30px)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(18px, 1.7vw, 24px)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
+              letterSpacing: "-0.02em",
               lineHeight: 1.4,
               color: "#111",
               opacity: 0.8,
@@ -103,11 +94,11 @@ export function CleanSightProblems(): React.ReactElement {
         </div>
 
         {/* 2×2 Card Grid */}
-        <div className="mt-12 xl:mt-[67px] grid grid-cols-1 sm:grid-cols-2 gap-px bg-[rgba(217,217,217,0.5)]">
+        <div className="mt-12 lg:mt-[67px] grid grid-cols-1 sm:grid-cols-2 gap-px bg-[rgba(217,217,217,0.5)]">
           {PROBLEMS.map((p, i) => (
             <div
               key={p.title}
-              className="bg-white flex items-center gap-6 xl:gap-8 p-8 xl:p-10"
+              className="bg-white flex items-center gap-6 lg:gap-8 p-8 lg:p-10"
               style={{
                 borderRight: i % 2 === 0 ? "1px solid rgba(217,217,217,0.5)" : undefined,
                 borderBottom: i < 2 ? "1px solid rgba(217,217,217,0.5)" : undefined,
@@ -144,10 +135,10 @@ export function CleanSightProblems(): React.ReactElement {
                 <h3
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-heading-lg)",
+                    fontSize: "clamp(22px, 2.4vw, 32px)",
                     fontWeight: 700,
-                    letterSpacing: "var(--text-t-heading-lg-ls)",
-                    lineHeight: "var(--text-t-heading-lg-lh)",
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1.1,
                     color: "#111",
                   }}
                 >
@@ -155,11 +146,11 @@ export function CleanSightProblems(): React.ReactElement {
                 </h3>
                 <p
                   style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-heading-md)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "clamp(15px, 1.4vw, 20px)",
                     fontWeight: 400,
-                    letterSpacing: "var(--text-t-heading-md-ls)",
-                    lineHeight: "var(--text-t-heading-md-lh)",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.4,
                     color: "#333",
                   }}
                 >

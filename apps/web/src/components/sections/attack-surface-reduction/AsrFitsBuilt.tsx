@@ -43,7 +43,7 @@ export function AsrFitsBuilt(): React.ReactElement {
             Fits into what you&rsquo;ve already{" "}
             <span
               style={{
-                background: "linear-gradient(95deg, #9A51FF 0%, #2CC1EB 100%)",
+                background: "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",

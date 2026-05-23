@@ -276,7 +276,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
       {/* ── Left Vector grid blob (Figma: left=-423, top=-303, 979px) ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: 'calc(-423 / 1920 * 100vw)',
           top: 'calc(-303 / 1920 * 100vw)',
@@ -297,7 +297,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
       {/* ── Right Vector grid blob (Figma: left=1444, top=-372, 979px) ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: 'calc(1444 / 1920 * 100vw)',
           top: 'calc(-372 / 1920 * 100vw)',
@@ -331,10 +331,10 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           className="text-white text-center mx-auto"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(2rem, 3.23vw, 3.875rem)',
+            fontSize: 'clamp(32px, 4vw, 56px)',
             fontWeight: 700,
-            letterSpacing: '-0.05em',
-            lineHeight: 1,
+            letterSpacing: '-0.04em',
+            lineHeight: 1.1,
             maxWidth: '740px',
             marginBottom: '24px',
           }}
@@ -342,14 +342,14 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           Secure Foundations Without Workflow Changes
         </h2>
 
-        {/* Subtitle — 30px Sora Regular, white 80% opacity */}
+        {/* Subtitle — Vuln spec body-lg */}
         <p
           className="text-center mx-auto"
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(1rem, 1.56vw, 1.875rem)',
+            fontSize: 'clamp(18px, 1.7vw, 24px)',
             fontWeight: 400,
-            letterSpacing: '-0.04em',
+            letterSpacing: '-0.02em',
             lineHeight: 1.4,
             color: 'rgba(255,255,255,0.8)',
             maxWidth: '600px',
@@ -395,10 +395,10 @@ export function DeveloperSecureFoundations(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: 'var(--font-display)',
-                      fontSize: 'clamp(1.125rem, 1.67vw, 2rem)',
-                      fontWeight: 700,
-                      letterSpacing: '-0.05em',
-                      lineHeight: 1,
+                      fontSize: 'clamp(20px, 2vw, 28px)',
+                      fontWeight: 600,
+                      letterSpacing: '-0.04em',
+                      lineHeight: 1.1,
                       color: '#ffffff',
                       marginBottom: '12px',
                     }}
@@ -407,11 +407,11 @@ export function DeveloperSecureFoundations(): React.ReactElement {
                   </p>
                   <p
                     style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: 'clamp(0.8125rem, 1.15vw, 1.375rem)',
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: 'clamp(15px, 1.4vw, 20px)',
                       fontWeight: 400,
-                      letterSpacing: '-0.05em',
-                      lineHeight: 1.3,
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1.4,
                       color: '#dddddd',
                     }}
                   >
@@ -543,11 +543,10 @@ export function DeveloperSecureFoundations(): React.ReactElement {
               className="text-white"
               style={{
                 fontFamily: 'var(--font-display)',
-                /* Figma: 32px → 24px @1440px */
-                fontSize: 'clamp(1.125rem, 1.67vw, 2rem)',
+                fontSize: 'clamp(22px, 2.4vw, 32px)',
                 fontWeight: 700,
-                letterSpacing: '-0.05em',
-                lineHeight: 1,
+                letterSpacing: '-0.04em',
+                lineHeight: 1.1,
               }}
             >
               One change. Same workflow. Strong foundation
@@ -555,11 +554,10 @@ export function DeveloperSecureFoundations(): React.ReactElement {
             <p
               style={{
                 fontFamily: 'var(--font-sans)',
-                /* Figma: 18px → 13.5px @1440px */
-                fontSize: 'clamp(0.8125rem, 0.94vw, 1.125rem)',
+                fontSize: 'clamp(15px, 1.4vw, 20px)',
                 fontWeight: 400,
-                letterSpacing: '-0.07em',
-                lineHeight: 1.1,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.4,
                 color: 'rgba(255,255,255,0.8)',
               }}
             >

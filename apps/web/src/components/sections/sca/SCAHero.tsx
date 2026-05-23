@@ -31,7 +31,7 @@ export function SCAHero(): React.ReactElement {
       {/* ── Decorative blue light flare — Figma node 604:2441–2444 ── */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden xl:block"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           right: "224px",
           top: "434px",
@@ -72,37 +72,27 @@ export function SCAHero(): React.ReactElement {
         <h1
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-hero-product)",
-            fontWeight: 600,
-            letterSpacing: "var(--text-hero-product-ls)",
-            lineHeight: "var(--text-hero-lh)",
+            fontSize: "clamp(40px, 4.45vw, 64px)",
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.05,
             color: "#ffffff",
             maxWidth: "805px",
             margin: 0,
           }}
         >
           Smarter Software Composition{" "}
-          <span
-            style={{
-              backgroundImage:
-                "linear-gradient(100.39deg, #9a51ff 1.76%, #2cc1eb 98.78%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Analysis
-          </span>
+          <span className="cs-text-gradient-impact">Analysis</span>
         </h1>
 
         {/* Subtitle — Figma node 604:2429, 688px wide */}
         <p
           style={{
             marginTop: "clamp(16px, 1.67vw, 32px)",
-            fontFamily: "var(--font-body)",
-            fontSize: "clamp(16px, 1.25vw, 24px)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(18px, 1.7vw, 24px)",
             fontWeight: 400,
-            letterSpacing: "-0.04em",
+            letterSpacing: "-0.02em",
             lineHeight: 1.4,
             color: "rgba(255,255,255,0.8)",
             maxWidth: "688px",

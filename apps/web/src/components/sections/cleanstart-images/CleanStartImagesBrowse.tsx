@@ -29,7 +29,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
       {/* Decorative flares — Figma nodes 161:23572, 161:23573 (purple 4-point stars) */}
       <div
         aria-hidden
-        className="absolute pointer-events-none hidden xl:block"
+        className="absolute pointer-events-none hidden lg:block"
         style={{
           right: "-40px",
           top: "208px",
@@ -42,7 +42,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
       />
       <div
         aria-hidden
-        className="absolute pointer-events-none hidden xl:block"
+        className="absolute pointer-events-none hidden lg:block"
         style={{
           left: "-40px",
           top: "940px",
@@ -104,11 +104,11 @@ export function CleanStartImagesBrowse(): React.ReactElement {
         <p
           className="text-center mt-8 max-w-[843px]"
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-heading-sm)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(18px, 1.7vw, 24px)",
             fontWeight: 400,
-            lineHeight: "var(--text-t-heading-sm-lh)",
-            letterSpacing: "var(--text-t-heading-sm-ls)",
+            lineHeight: 1.4,
+            letterSpacing: "-0.02em",
             color: "#1A1A2E",
           }}
         >
