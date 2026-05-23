@@ -111,7 +111,7 @@ export const NAV_TREE: NavItem[] = [
     label: "Audience",
     width: 260,
     items: [
-      { label: "For Developers", href: "/for-developers" },
+      { label: "For Developers", href: "/for-developers", built: true },
       { label: "For CISO", href: "/for-ciso", built: true },
     ],
   },
