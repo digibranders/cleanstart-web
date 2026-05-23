@@ -31,33 +31,18 @@ export function ASRHero(): React.ReactElement {
         minHeight: "clamp(560px, 51vw, 824px)",
       }}
     >
-      {/* Background grid overlay — Figma uses 71.11 px squares with #130F26
-          lines. We use 80 px on the 1px-line variable so it tiles cleanly with
-          the rest of the site's hero grid utility (.bg-cs-grid is similar). */}
-      <div
+      {/* Figma-exact hero grid + blurred-ellipse glows (Figma node 783:119).
+          Single SVG asset: 1440×569, contains grid mask + top-right purple
+          ellipse + bottom-left larger ellipse + 3 accent lines. Fills the
+          section width responsively (preserveAspectRatio xMidYMid slice). */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(19, 15, 38, 0.55) 1px, transparent 1px), linear-gradient(90deg, rgba(19, 15, 38, 0.55) 1px, transparent 1px)",
-          backgroundSize: "80px 80px",
-        }}
-      />
-
-      {/* Purple radial blob — Figma Ellipse 46639 (top-right, soft, blurred) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute hidden md:block"
-        style={{
-          right: "-2vw",
-          top: "-80px",
-          width: "min(360px, 26vw)",
-          height: "min(360px, 26vw)",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(closest-side, rgba(122, 89, 255, 0.55) 0%, rgba(122, 89, 255, 0) 70%)",
-          filter: "blur(60px)",
-        }}
+        src="/images/attack-surface-reduction/hero-grid.svg"
+        alt=""
+        className="pointer-events-none select-none absolute inset-0 w-full h-full object-cover"
+        loading="eager"
+        decoding="async"
       />
 
       {/* Bottom purple-to-transparent fade so the hero glides into the next
@@ -77,7 +62,7 @@ export function ASRHero(): React.ReactElement {
         <div
           className="flex flex-col lg:flex-row items-start lg:items-center"
           style={{
-            paddingTop: "clamp(120px, 13vw, 229px)",
+            paddingTop: "clamp(96px, 11vw, 160px)",
             paddingBottom: "clamp(56px, 7vw, 100px)",
             gap: "40px",
           }}
@@ -145,31 +130,78 @@ export function ASRHero(): React.ReactElement {
             </Link>
           </div>
 
-          {/* Right: bloated-vs-clean comparison cards (combined Figma export) */}
+          {/* Right: two separate BLOATED + CLEAN cards side by side.
+              Figma exports each card as its own asset so colours, glows
+              and badge overlays render at full fidelity. */}
+          {/* Cards-wrapper.
+              Width clamps with explicit floor + ceiling so the wrapper has a
+              predictable, proportional size at every desktop viewport from
+              1024 → 1440+. Internal layout (60/40 split, column-gap, bottom
+              alignment) is all relative to the wrapper width — nothing
+              hard-coded — so the cards' position and proportions are
+              perfectly preserved at every breakpoint in the desktop band. */}
           <div
-            className="hidden lg:block relative shrink-0"
-            style={{ width: "min(622px, 48vw)" }}
+            className="hidden lg:grid relative shrink-0"
+            style={{
+              width: "clamp(340px, 32vw, 460px)",
+              /* Math: natural aspects H/W are 1.337 (BLOATED 662×885) and
+                 1.203 (CLEAN 602×724). For CLEAN_h = 0.85 × BLOATED_h:
+                 CLEAN_w = BLOATED_w × (1.337 × 0.85) / 1.203 ≈ 0.944 × BLOATED_w.
+                 With a 4% gap: BLOATED 49.4% + CLEAN 46.6% + gap 4% = 100%. */
+              gridTemplateColumns: "49.4% 46.6%",
+              alignItems: "end",
+              columnGap: "4%",
+            }}
           >
+            {/* BLOATED card — larger, sits at row baseline. */}
             <Image
-              src="/images/attack-surface-reduction/hero-cards.png"
-              alt="BLOATED vs CLEAN image comparison: 1.2 GB / 247 packages / 89 HIGH CVEs vs 87 MB / 12 packages / 0 HIGH CVEs"
-              width={622}
-              height={437}
-              sizes="(min-width: 1280px) 622px, 50vw"
-              className="w-full h-auto"
+              src="/images/attack-surface-reduction/hero-card-bloated.png"
+              alt="BLOATED image: 1.2 GB · 247 packages · 89 HIGH CVEs"
+              width={662}
+              height={885}
+              sizes="(min-width: 1440px) 270px, 19vw"
+              className="block w-full h-auto"
+              priority
+            />
+            {/* CLEAN card — smaller (≈70% of BLOATED), bottom edge aligns
+                with BLOATED via grid align-items: end. */}
+            <Image
+              src="/images/attack-surface-reduction/hero-card-clean.png"
+              alt="CLEAN image: 87 MB · 12 packages · 0 HIGH CVEs"
+              width={602}
+              height={724}
+              sizes="(min-width: 1440px) 180px, 13vw"
+              className="block w-full h-auto"
               priority
             />
           </div>
 
-          {/* Mobile-only: smaller card image */}
-          <div className="block lg:hidden relative w-full">
+          {/* Mobile-only: same 49.4/46.6 grid so CLEAN renders at 85% of
+              BLOATED's height (matches desktop layout exactly). */}
+          <div
+            className="grid lg:hidden relative w-full"
+            style={{
+              gridTemplateColumns: "49.4% 46.6%",
+              alignItems: "end",
+              columnGap: "4%",
+            }}
+          >
             <Image
-              src="/images/attack-surface-reduction/hero-mobile-cards.png"
-              alt="BLOATED vs CLEAN image comparison"
-              width={622}
-              height={437}
-              sizes="100vw"
-              className="w-full h-auto"
+              src="/images/attack-surface-reduction/hero-card-bloated.png"
+              alt="BLOATED image: 1.2 GB · 247 packages · 89 HIGH CVEs"
+              width={662}
+              height={885}
+              sizes="51vw"
+              className="block w-full h-auto"
+              priority
+            />
+            <Image
+              src="/images/attack-surface-reduction/hero-card-clean.png"
+              alt="CLEAN image: 87 MB · 12 packages · 0 HIGH CVEs"
+              width={602}
+              height={724}
+              sizes="45vw"
+              className="block w-full h-auto"
               priority
             />
           </div>
