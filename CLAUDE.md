@@ -32,7 +32,7 @@ The repo has **exactly three long-lived branches**. All three are kept in sync a
 |---|---|---|---|
 | `main` | — | Production truth. Deploys go from here. | Everything |
 | `development` | Primary dev branch on this device (`admin@digibranders.com`) | Day-to-day development for both `apps/cms` and `apps/web`. | Everything |
-| `farheen` | Farheen's primary device | Web-only contributions. | **`apps/web/` ONLY** — no edits to `apps/cms/`, `packages/`, `migrations/`, `infra/`, `docs/cleanstart-cms-architecture.html`, or shared config. Touching CMS code on `farheen` is a hard rule violation. |
+| `farheen` | Farheen's primary device | Web-only contributions, **scoped to the page being worked on**. | **`apps/web/` ONLY** — no edits to `apps/cms/`, `packages/`, `migrations/`, `infra/`, `docs/cleanstart-cms-architecture.html`, or shared config. Touching CMS code on `farheen` is a hard rule violation. |
 
 ### No other long-lived branches
 
@@ -50,11 +50,26 @@ After any work lands on `development` or `farheen`, all three branches get re-sy
 
 All three branches must end at the same commit SHA after the cycle. If they diverge for more than one development session, stop and reconcile before continuing.
 
+### Scoped-change rule on `farheen`
+
+Every commit on `farheen` must be **scoped to the page or feature being worked on**. Other pages, shared utilities, and global config stay untouched.
+
+- **Working on `/for-developers`?** Only touch `apps/web/src/app/for-developers/`, `apps/web/src/components/sections/for-developers/`, and `apps/web/public/images/for-developers/`. Do not edit `/community`, `/sbom`, `/teams`, etc., nor `globals.css`, `nav-config.ts`, layout primitives, or `tsconfig`/`eslint`/`prettier`/`biome` config.
+- **Adding a new page?** New route under `apps/web/src/app/<page>/`, new sections under `apps/web/src/components/sections/<page>/`, new assets under `apps/web/public/images/<page>/`. The only allowed cross-page edits are:
+  - One line in `apps/web/src/lib/nav-config.ts` to add the nav entry.
+  - One row in `docs/WEB-PAGES.md` for the page inventory.
+- **No bulk formatter sweeps.** Prettier/Biome reflows that touch dozens of unrelated files are forbidden. If formatter config changes, raise it for discussion before applying — never bundle a formatter pass with feature work.
+- **No "while I'm here" cleanups.** Renaming a shared variable, tweaking a layout primitive, or "fixing" an unrelated page in the same commit is out of scope.
+- **Shared files that ARE allowed to change** when justified by the in-scope work: `apps/web/src/lib/nav-config.ts` (nav entry only) and `docs/WEB-PAGES.md` (inventory row only). Anything else is out of scope.
+
+If a page genuinely needs a shared change (e.g. a new design token, a new layout primitive, a CSP allow-list entry), pause and coordinate — that work lands separately on `development` first, then `farheen` rebases.
+
 ### Forbidden git actions on this repo
 
 - Force-pushing `main` — never. Use forward merges and back-merges to align.
 - Creating new long-lived branches without updating this section first.
 - Touching `apps/cms/` or other CMS-side paths from the `farheen` branch.
+- Bulk formatter or cross-page commits on the `farheen` branch — see "Scoped-change rule" above.
 
 ---
 
