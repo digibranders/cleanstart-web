@@ -5,48 +5,45 @@ export function AsrFitsBuilt(): React.ReactElement {
     description: string;
   }> = [
     {
-      icon: "/images/attack-surface-reduction/fits-icon-1.png",
-      title: "Drop-in Images",
-      description: "Fewer exploitable components exist at image pull time",
+      icon: '/images/attack-surface-reduction/fits-icon-1.png',
+      title: 'Drop-in Images',
+      description: 'Fewer exploitable components exist at image pull time',
     },
     {
-      icon: "/images/attack-surface-reduction/fits-icon-2.png",
-      title: "Pipeline Compatible",
-      description: "Works with existing CI/CD and registries.",
+      icon: '/images/attack-surface-reduction/fits-icon-2.png',
+      title: 'Pipeline Compatible',
+      description: 'Works with existing CI/CD and registries.',
     },
     {
-      icon: "/images/attack-surface-reduction/fits-icon-3.png",
-      title: "Deploy Anywhere",
-      description: "Supports Kubernetes and container platforms.",
+      icon: '/images/attack-surface-reduction/fits-icon-3.png',
+      title: 'Deploy Anywhere',
+      description: 'Supports Kubernetes and container platforms.',
     },
   ];
 
   return (
-    <section
-      data-section="AsrFitsBuilt"
-      className="relative overflow-hidden"
-    >
+    <section data-section="AsrFitsBuilt" className="relative overflow-hidden">
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         {/* Heading row */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 md:mb-16">
           <h2
             className="text-[#111]"
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-display-2)",
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--text-t-display-2)',
               fontWeight: 600,
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
-              maxWidth: "562px",
+              letterSpacing: 'var(--text-t-display-2-ls)',
+              lineHeight: 'var(--text-t-display-2-lh)',
+              maxWidth: '562px',
             }}
           >
-            Fits into what you&rsquo;ve already{" "}
+            Fits into what you&rsquo;ve already{' '}
             <span
               style={{
-                background: "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
+                background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
               }}
             >
               built
@@ -55,16 +52,16 @@ export function AsrFitsBuilt(): React.ReactElement {
           <p
             className="text-[#111]/70"
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-subhead)",
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--text-t-subhead)',
               fontWeight: 400,
-              letterSpacing: "var(--text-t-subhead-ls)",
-              lineHeight: "var(--text-t-subhead-lh)",
-              maxWidth: "458px",
+              letterSpacing: 'var(--text-t-subhead-ls)',
+              lineHeight: 'var(--text-t-subhead-lh)',
+              maxWidth: '458px',
             }}
           >
-            Stay informed with the latest research, threat intelligence reports,
-            and expert analysis from our security team.
+            Stay informed with the latest research, threat intelligence reports, and expert analysis
+            from our security team.
           </p>
         </div>
 
@@ -85,16 +82,13 @@ interface FitsCardProps {
 
 function FitsCard({ card }: FitsCardProps): React.ReactElement {
   return (
-    <div
-      className="relative overflow-hidden rounded-[40px] min-h-[clamp(260px,26vw,352px)]"
-    >
+    <div className="relative overflow-hidden rounded-[40px] min-h-[clamp(260px,26vw,352px)]">
       {/* Outer cyan border glow */}
       <div
         aria-hidden
         className="absolute inset-0 rounded-[40px] pointer-events-none"
         style={{
-          background:
-            "linear-gradient(90deg, #2CC1EB 0%, #2CC1EB 100%)",
+          background: 'linear-gradient(90deg, #2CC1EB 0%, #2CC1EB 100%)',
           opacity: 0.3,
         }}
       />
@@ -102,21 +96,21 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
       {/* White card with subtle shadow */}
       <div
         className="absolute rounded-[40px] bg-white overflow-hidden flex flex-col"
-        style={{ inset: "8px" }}
+        style={{ inset: '8px' }}
       >
         {/* Purple glow blob */}
         <div
           aria-hidden
           className="absolute pointer-events-none"
           style={{
-            left: "8px",
-            top: "43px",
-            width: "360px",
-            maxWidth: "calc(100% + 80px)",
-            height: "153px",
-            background: "#df9bff",
-            borderRadius: "50%",
-            filter: "blur(66.5px)",
+            left: '8px',
+            top: '43px',
+            width: '360px',
+            maxWidth: 'calc(100% + 80px)',
+            height: '153px',
+            background: '#df9bff',
+            borderRadius: '50%',
+            filter: 'blur(66.5px)',
             opacity: 0.5,
           }}
         />
@@ -131,10 +125,10 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
             style={{
               left: `${pct}%`,
               top: 0,
-              width: "1px",
-              height: "60%",
+              width: '1px',
+              height: '60%',
               background:
-                "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%)",
+                'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%)',
             }}
           />
         ))}
@@ -149,9 +143,9 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
               left: 0,
               right: 0,
               top: `${pct}%`,
-              height: "1px",
+              height: '1px',
               background:
-                "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%)",
+                'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%)',
             }}
           />
         ))}
@@ -166,8 +160,8 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
             aria-hidden
             className="pointer-events-none select-none object-contain"
             style={{
-              width: "clamp(110px, 12vw, 160px)",
-              aspectRatio: "1 / 1",
+              width: 'clamp(110px, 12vw, 160px)',
+              aspectRatio: '1 / 1',
             }}
             loading="lazy"
             decoding="async"
@@ -179,9 +173,9 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
           aria-hidden
           className="pointer-events-none shrink-0"
           style={{
-            height: "1px",
+            height: '1px',
             background:
-              "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%)",
+              'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%)',
           }}
         />
 
@@ -190,10 +184,10 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
           <p
             className="text-card-title-lg text-[#111]"
             style={{
-              fontFamily: "var(--font-display)",
-              fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.0,
+              fontFamily: 'var(--font-display)',
+              fontWeight: 600,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.1,
             }}
           >
             {card.title}
@@ -201,11 +195,11 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
           <p
             className="text-body-lg text-[#555]"
             style={{
-              fontFamily: "var(--font-display)",
+              fontFamily: 'var(--font-sans)',
               fontWeight: 400,
-              letterSpacing: "-0.05em",
+              letterSpacing: '-0.02em',
               lineHeight: 1.4,
-              maxWidth: "295px",
+              maxWidth: '295px',
             }}
           >
             {card.description}

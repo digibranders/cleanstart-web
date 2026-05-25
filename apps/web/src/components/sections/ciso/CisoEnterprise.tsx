@@ -9,11 +9,11 @@ import type React from "react";
  *   Right Ellipse: right=-127px, top=-74px, 315×315px (SVG overflows via -64.44% inset)
  *   Left  Ellipse: left=-103px,  top=-20px, 315×315px
  *
- * Heading: 62px Manrope Bold, centered, #111, tracking -0.05em, maxW 654px
+ * Heading: 62px Manrope Bold, centered, #111, tracking -0.05em, lineHeight 1, maxW 654px
  *   "Environments" → gradient(100.87°, #9A51FF → #2CC1EB)
- *   marginBottom: 74px (cards start at 318px in 1920px frame; heading top=120px)
+ *   marginBottom: 74px
  *
- * 4 Cards — same 295+32 gap = 1276px fill, identical to CisoOutcomes layout
+ * 4 Cards — 4×295 + 3×32 = 1276px; container has NO horizontal padding
  *   Outer: 295×324px, borderRadius 40px, bg #2cc1eb opacity 0.3 (cyan glow border)
  *   Inner: 287×316px (inset 4px), borderRadius 36px, bg white, overflow hidden
  *   Decoratives inside inner:
@@ -21,11 +21,14 @@ import type React from "react";
  *     • H-lines: y=68 and y=184, 1px, white gradient, opacity 0.3
  *     • V-lines: x=48.47, 120.03, 162.38, 233.94; h=264px, 0.73px, opacity 0.8
  *   Ball: 96×96px circle, bg linear-gradient(180°,#239cff→#005be3)
- *     top-edge at 33px (= 50%–77.13px – translateY(–50%)), centered horizontally
+ *     top-edge at 33px (centered horizontally)
  *     Icon: 54×54px centered inside ball
- *   Text: top=152px, left=24px, width=251px, gap 12px
- *     Title: Manrope Bold 32px (card4: 29px), tracking -0.05em, #111, lh 1
- *     Desc:  Sora 20px, tracking -0.05em, #555, lh 1.4
+ *   Text block: top=136px (moved up 16px from Figma 152px for 180px clearance),
+ *               left=24px, width=251px, gap 12px
+ *     Title: Manrope Bold, titleSize px (32 or 29), tracking -0.05em, #111, lh 1
+ *     Desc:  Sora Regular 20px, tracking -0.05em, #555, lh 1.4
+ *
+ * Section: paddingTop 120px, paddingBottom 80px
  */
 
 interface CardDef {
@@ -63,16 +66,18 @@ const CARDS: CardDef[] = [
 ];
 
 // ─── Desktop card ─────────────────────────────────────────────────────────────
-function EnterpriseCard({ icon, title, desc }: CardDef): React.ReactElement {
+function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactElement {
   return (
+    /* Outer: 295×324px, cyan glow at 30% opacity behind inner white card */
     <div className="relative flex-shrink-0" style={{ width: "295px", height: "324px" }}>
-      {/* Outer cyan glow — 30% opacity border effect */}
+      {/* Outer cyan glow — creates the border halo effect */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{ borderRadius: "40px", background: "#2cc1eb", opacity: 0.3 }}
       />
-      {/* Inner white card: 287×316px */}
+
+      {/* Inner white card: 287×316px (4px inset on each side) */}
       <div
         className="absolute overflow-hidden bg-white"
         style={{ inset: "4px", borderRadius: "36px" }}
@@ -109,7 +114,7 @@ function EnterpriseCard({ icon, title, desc }: CardDef): React.ReactElement {
           />
         ))}
 
-        {/* Vertical lines at exact Figma x positions */}
+        {/* Vertical accent lines at Figma x positions */}
         {([48.47, 120.03, 162.38, 233.94] as const).map((x) => (
           <div
             key={x}
@@ -127,7 +132,7 @@ function EnterpriseCard({ icon, title, desc }: CardDef): React.ReactElement {
           />
         ))}
 
-        {/* Blue gradient ball — top edge at 33px, centered */}
+        {/* Blue gradient ball — top-edge at 33px, horizontally centered */}
         <div
           className="absolute flex items-center justify-center overflow-hidden"
           style={{
@@ -153,18 +158,19 @@ function EnterpriseCard({ icon, title, desc }: CardDef): React.ReactElement {
           />
         </div>
 
-        {/* Text block: top=152px, left=24px, width=251px, gap 12px */}
+        {/* Text block — nudged to top=136px (Figma 152px –16px) for 180px clearance.
+            Accommodates 2-line title + 12px gap + 3-line description comfortably. */}
         <div
           className="absolute flex flex-col"
-          style={{ top: "152px", left: "24px", width: "251px", gap: "12px" }}
+          style={{ top: "136px", left: "24px", width: "251px", gap: "12px" }}
         >
           <h3
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(20px, 2vw, 28px)",
-              fontWeight: 600,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
+              fontSize: `${titleSize}px`,
+              fontWeight: 700,
+              letterSpacing: "-0.05em",
+              lineHeight: 1,
               color: "#111",
               margin: 0,
             }}
@@ -174,9 +180,9 @@ function EnterpriseCard({ icon, title, desc }: CardDef): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(15px, 1.4vw, 20px)",
+              fontSize: "clamp(14px, 1.04vw, 20px)",
               fontWeight: 400,
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.05em",
               lineHeight: 1.4,
               color: "#555",
               margin: 0,
@@ -270,93 +276,152 @@ export function CisoEnterprise(): React.ReactElement {
         </div>
       </div>
 
-      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* ── Heading ── */}
+      {/* ── Heading — padded container so text has safe margins ── */}
+      <div className="relative mx-auto px-6 sm:px-10" style={{ maxWidth: "1276px" }}>
         <h2
           className="text-center mx-auto"
           style={{
             maxWidth: "654px",
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "clamp(28px, 3.23vw, 62px)",
             fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
+            letterSpacing: "-0.05em",
+            lineHeight: 1,
             color: "#111",
             marginBottom: "74px",
           }}
         >
           Built for Enterprise{" "}
-          <span className="cs-text-gradient-impact">Environments</span>
+          <span
+            style={{
+              background:
+                "linear-gradient(100.87deg, rgb(154, 81, 255) 1.758%, rgb(44, 193, 235) 98.781%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            Environments
+          </span>
         </h2>
+      </div>
 
-        {/* ════ DESKTOP — 4 cards in a flex row, 295×32 gap = 1276px ════ */}
-        <div className="hidden lg:flex items-start" style={{ gap: "32px" }}>
+      {/* ── Card container — NO horizontal padding so 4×295+3×32=1276px fills exactly ── */}
+      <div className="relative mx-auto" style={{ maxWidth: "1276px" }}>
+
+        {/* ════ DESKTOP — 4 cards in a flex row, centered ════ */}
+        <div
+          className="hidden xl:flex items-start justify-center"
+          style={{ gap: "32px" }}
+        >
           {CARDS.map((card) => (
             <EnterpriseCard key={card.title} {...card} />
           ))}
         </div>
 
-        {/* ════ MOBILE — 2-column grid ════ */}
-        <div className="lg:hidden grid grid-cols-2 gap-4">
+        {/* ════ MOBILE — 1-col stack ════
+             Figma 856:1367 — cards 328×238px (10px margin each side in 360px)
+             Ball: 70×70px centered, top=20px
+             Icon: 40×40px inside ball
+             Text block: top=108px, centered, title 20px Bold, desc 14px Regular */}
+        <div className="xl:hidden flex flex-col gap-4 px-4">
           {CARDS.map((card) => (
             <div
               key={card.title}
-              className="bg-white flex flex-col items-center text-center"
-              style={{
-                borderRadius: "20px",
-                border: "1px solid rgba(44,193,235,0.35)",
-                padding: "24px 16px 20px",
-                gap: "12px",
-              }}
+              className="relative flex-shrink-0"
+              style={{ height: "238px" }}
             >
-              {/* Scaled-down blue ball */}
+              {/* Outer cyan glow border */}
               <div
-                style={{
-                  flexShrink: 0,
-                  width: "64px",
-                  height: "64px",
-                  borderRadius: "50%",
-                  background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
-                  boxShadow: "0px 4px 10px 0px rgba(28,60,142,0.33)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                aria-hidden
+                className="absolute inset-0 pointer-events-none"
+                style={{ borderRadius: "40px", background: "#2cc1eb", opacity: 0.3 }}
+              />
+              {/* Inner white card: 6px inset */}
+              <div
+                className="absolute overflow-hidden bg-white"
+                style={{ inset: "6px", borderRadius: "34px" }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={card.icon}
-                  alt=""
+                {/* Purple blur at top */}
+                <div
                   aria-hidden
-                  style={{ width: "36px", height: "36px", objectFit: "contain" }}
-                  loading="lazy"
-                  decoding="async"
+                  className="absolute pointer-events-none"
+                  style={{
+                    top: "16px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "180px",
+                    height: "100px",
+                    background: "#df9bff",
+                    filter: "blur(50px)",
+                    opacity: 0.3,
+                  }}
                 />
+
+                {/* Blue gradient ball — 70×70px, centered, top=20px */}
+                <div
+                  className="absolute flex items-center justify-center overflow-hidden"
+                  style={{
+                    left: "50%",
+                    top: "20px",
+                    transform: "translateX(-50%)",
+                    width: "70px",
+                    height: "70px",
+                    borderRadius: "50%",
+                    background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
+                    boxShadow:
+                      "0px 4.5px 10.6px 0px rgba(28,60,142,0.33), inset 0px -0.17px 0.21px 0px rgba(0,44,179,0.5), inset 0px 0.085px 0.425px 0px rgba(255,255,255,0.81)",
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={card.icon}
+                    alt=""
+                    aria-hidden
+                    style={{ width: "40px", height: "40px", objectFit: "contain" }}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+
+                {/* Text block — centered, top=108px */}
+                <div
+                  className="absolute flex flex-col items-center text-center"
+                  style={{
+                    top: "108px",
+                    left: "16px",
+                    right: "16px",
+                    gap: "10px",
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: `${card.titleSize > 30 ? 20 : 18}px`,
+                      fontWeight: 700,
+                      letterSpacing: "-0.05em",
+                      lineHeight: 1.1,
+                      color: "#111",
+                      margin: 0,
+                    }}
+                  >
+                    {card.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "14px",
+                      fontWeight: 400,
+                      letterSpacing: "-0.03em",
+                      lineHeight: 1.4,
+                      color: "#555",
+                      margin: 0,
+                    }}
+                  >
+                    {card.desc}
+                  </p>
+                </div>
               </div>
-              <h3
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "clamp(20px, 2vw, 28px)",
-                  fontWeight: 600,
-                  letterSpacing: "-0.04em",
-                  lineHeight: 1.1,
-                  color: "#111",
-                }}
-              >
-                {card.title}
-              </h3>
-              <p
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "clamp(15px, 1.4vw, 20px)",
-                  fontWeight: 400,
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.4,
-                  color: "#555",
-                }}
-              >
-                {card.desc}
-              </p>
             </div>
           ))}
         </div>

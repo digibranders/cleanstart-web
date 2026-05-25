@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from 'next/image';
 
 /**
  * Figma frame 516:5324 — 1920 × 926 "Generate. Verify. Validate."
@@ -42,8 +42,7 @@ export function SbomSelfUpdating(): React.ReactElement {
       data-section="SbomSelfUpdating"
       className="relative overflow-hidden w-full"
       style={{
-        background:
-          "linear-gradient(180deg, #151021 0%, #131e8f 67.139%, #471ec0 107.43%)",
+        background: 'linear-gradient(180deg, #151021 0%, #131e8f 67.139%, #471ec0 107.43%)',
         minHeight: `clamp(560px, ${vw(926)}, ${vw(926)})`,
       }}
     >
@@ -56,9 +55,9 @@ export function SbomSelfUpdating(): React.ReactElement {
           top: vw(252),
           width: vw(1181),
           height: vw(1181),
-          borderRadius: "50%",
+          borderRadius: '50%',
           background:
-            "radial-gradient(closest-side, rgba(71,30,192,0.55) 0%, rgba(71,30,192,0) 70%)",
+            'radial-gradient(closest-side, rgba(71,30,192,0.55) 0%, rgba(71,30,192,0) 70%)',
           filter: `blur(${vw(60)})`,
         }}
       />
@@ -70,9 +69,9 @@ export function SbomSelfUpdating(): React.ReactElement {
           top: vw(-513),
           width: vw(1181),
           height: vw(1181),
-          borderRadius: "50%",
+          borderRadius: '50%',
           background:
-            "radial-gradient(closest-side, rgba(71,30,192,0.45) 0%, rgba(71,30,192,0) 70%)",
+            'radial-gradient(closest-side, rgba(71,30,192,0.45) 0%, rgba(71,30,192,0) 70%)',
           filter: `blur(${vw(60)})`,
         }}
       />
@@ -99,10 +98,10 @@ export function SbomSelfUpdating(): React.ReactElement {
         <h2
           className="text-white"
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 4vw, 56px)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-display-md)',
+            fontWeight: 600,
+            letterSpacing: '-0.04em',
             lineHeight: 1.1,
             width: vw(593),
           }}
@@ -111,17 +110,17 @@ export function SbomSelfUpdating(): React.ReactElement {
         </h2>
         <p
           style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "clamp(18px, 1.7vw, 24px)",
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-t-subhead)',
             fontWeight: 400,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.4,
-            color: "rgba(255,255,255,0.88)",
-            width: "100%",
+            letterSpacing: '-0.02em',
+            lineHeight: 1.45,
+            color: 'rgba(255,255,255,0.88)',
+            width: '100%',
           }}
         >
-          Automated SBOM generation with cryptographic signing and continuous
-          validation across build and runtime environments.
+          Automated SBOM generation with cryptographic signing and continuous validation across
+          build and runtime environments.
         </p>
       </div>
 
@@ -129,8 +128,8 @@ export function SbomSelfUpdating(): React.ReactElement {
       <div
         className="hidden lg:block absolute"
         style={{
-          left: "50%",
-          transform: "translateX(-50%)",
+          left: '50%',
+          transform: 'translateX(-50%)',
           top: vw(378),
           width: vw(872),
           height: vw(468),
@@ -143,70 +142,180 @@ export function SbomSelfUpdating(): React.ReactElement {
           height={468}
           sizes="(min-width: 1280px) 872px, 100vw"
           className="w-full h-full object-contain"
-          style={{ display: "block" }}
+          style={{ display: 'block' }}
           loading="lazy"
         />
       </div>
 
       {/* Numbered circles */}
-      <FigmaCircle size={82} x={768}  y={459} glowSize={63.778} glowOffset={9}    num={1} numGradient="linear-gradient(128.05deg, #9A51FF 35.82%, #2CC1EB 78.3%)" />
-      <FigmaCircle size={82} x={1076} y={457} glowSize={63.778} glowOffset={9}    num={2} numGradient="linear-gradient(136.97deg, #9A51FF 35.82%, #2CC1EB 78.3%)" />
-      <FigmaCircle size={76} x={698}  y={567} glowSize={59.111} glowOffset={8.34} num={3} numGradient="linear-gradient(121.14deg, #9A51FF 35.82%, #2CC1EB 78.3%)" small />
-      <FigmaCircle size={76} x={1148} y={569} glowSize={59.111} glowOffset={8.34} num={4} numGradient="linear-gradient(121.14deg, #9A51FF 35.82%, #2CC1EB 78.3%)" small />
+      <FigmaCircle
+        size={82}
+        x={768}
+        y={459}
+        glowSize={63.778}
+        glowOffset={9}
+        num={1}
+        numGradient="linear-gradient(128.05deg, #9A51FF 35.82%, #2CC1EB 78.3%)"
+      />
+      <FigmaCircle
+        size={82}
+        x={1076}
+        y={457}
+        glowSize={63.778}
+        glowOffset={9}
+        num={2}
+        numGradient="linear-gradient(136.97deg, #9A51FF 35.82%, #2CC1EB 78.3%)"
+      />
+      <FigmaCircle
+        size={76}
+        x={698}
+        y={567}
+        glowSize={59.111}
+        glowOffset={8.34}
+        num={3}
+        numGradient="linear-gradient(121.14deg, #9A51FF 35.82%, #2CC1EB 78.3%)"
+        small
+      />
+      <FigmaCircle
+        size={76}
+        x={1148}
+        y={569}
+        glowSize={59.111}
+        glowOffset={8.34}
+        num={4}
+        numGradient="linear-gradient(121.14deg, #9A51FF 35.82%, #2CC1EB 78.3%)"
+        small
+      />
 
       {/* Captions */}
-      <FeatureLabel x={503}  y={394} title="Generate" body="Continuously create software inventories across environments." bodyWidth={266} />
-      <FeatureLabel x={1153} y={394} title="Verify"   body="Cryptographically validate software provenance." bodyWidth={218} />
-      <FeatureLabel x={431}  y={716} title="Track"    body="Monitor dependencies and component changes over time." />
-      <FeatureLabel x={1234} y={728} title="Validate" body="Continuously assess inventory accuracy and integrity." />
+      <FeatureLabel
+        x={503}
+        y={394}
+        title="Generate"
+        body="Continuously create software inventories across environments."
+        bodyWidth={266}
+      />
+      <FeatureLabel
+        x={1153}
+        y={394}
+        title="Verify"
+        body="Cryptographically validate software provenance."
+        bodyWidth={218}
+      />
+      <FeatureLabel
+        x={431}
+        y={716}
+        title="Track"
+        body="Monitor dependencies and component changes over time."
+      />
+      <FeatureLabel
+        x={1234}
+        y={728}
+        title="Validate"
+        body="Continuously assess inventory accuracy and integrity."
+      />
 
-      {/* ═════════════ MOBILE (< lg) ═════════════ */}
-      <div className="lg:hidden mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md flex flex-col items-center text-center gap-8">
+      {/* ═════════════ MOBILE (< lg) ═════════════
+           Figma mobile node 817:1281 — dark gradient 360×812px section.
+           4 stacked action cards (130×328px each) with light card backgrounds. */}
+      <div
+        className="lg:hidden flex flex-col items-center"
+        style={{ paddingTop: '32px', paddingBottom: '32px' }}
+      >
+        {/* Heading — Figma top:32px, w:257px, 2 lines → ends ≈ 99px */}
         <h2
-          className="text-white"
+          className="text-white text-center"
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 4vw, 56px)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-display-md)',
+            fontWeight: 600,
+            letterSpacing: '-0.04em',
             lineHeight: 1.1,
+            width: '257px',
+            marginBottom: '0',
+            textTransform: 'capitalize',
           }}
         >
           Generate. Verify. Validate.
         </h2>
+
+        {/* Subhead — Figma top:116px → gap after heading ≈ 17px */}
         <p
+          className="text-center"
           style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "clamp(18px, 1.7vw, 24px)",
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-t-subhead)',
             fontWeight: 400,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.4,
-            color: "rgba(255,255,255,0.85)",
-            maxWidth: "600px",
+            letterSpacing: '-0.02em',
+            lineHeight: 1.45,
+            color: 'rgba(255,255,255,0.80)',
+            width: '319px',
+            marginTop: '17px',
+            marginBottom: '24px',
           }}
         >
-          Automated SBOM generation with cryptographic signing and continuous
-          validation across build and runtime environments.
+          Automated SBOM generation with cryptographic signing and continuous validation across
+          build and runtime environments.
         </p>
-        <Image
-          src="/images/sbom/platforms-3d.png"
-          alt="Generate, Verify, Track, Validate — four-step SBOM lifecycle"
-          width={872}
-          height={468}
-          sizes="(min-width: 768px) 672px, 100vw"
-          className="w-full max-w-2xl h-auto object-contain"
-          loading="lazy"
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl text-left">
+
+        {/* 4 stacked action cards */}
+        <div
+          className="flex flex-col items-center"
+          style={{ gap: '16px', width: '100%', paddingLeft: '16px', paddingRight: '16px' }}
+        >
           {MOBILE_FEATURES.map((f) => (
-            <div key={f.num} className="flex flex-col items-start gap-3">
-              <MobileCircle num={f.num} />
-              <p className="text-card-title-md text-white" style={{ fontFamily: "var(--font-display)" }}>
-                {f.title}
-              </p>
-              <p className="text-body-md" style={{ fontFamily: "var(--font-display)", color: "rgba(255,255,255,0.75)" }}>
-                {f.body}
-              </p>
+            <div
+              key={f.num}
+              className="relative overflow-hidden"
+              style={{
+                width: '100%',
+                maxWidth: '328px',
+                height: '130px',
+                borderRadius: '24px',
+              }}
+            >
+              {/* Card background SVG */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/sbom/mobile-action-card-bg.svg"
+                alt=""
+                aria-hidden
+                className="absolute inset-0 w-full h-full pointer-events-none"
+                loading="lazy"
+              />
+              {/* Content */}
+              <div
+                className="absolute inset-0 flex flex-col items-center justify-center text-center"
+                style={{ gap: '12px' }}
+              >
+                <p
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--text-card-title-md)',
+                    fontWeight: 600,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1.1,
+                    color: '#000',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {f.title}
+                </p>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-body-sm)',
+                    fontWeight: 400,
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.4,
+                    color: '#111',
+                    opacity: 0.8,
+                    width: '199px',
+                  }}
+                >
+                  {f.body}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -218,10 +327,14 @@ export function SbomSelfUpdating(): React.ReactElement {
 /* ── data ─────────────────────────────────────────────────────────── */
 
 const MOBILE_FEATURES = [
-  { num: 1, title: "Generate", body: "Continuously create software inventories across environments." },
-  { num: 2, title: "Verify",   body: "Cryptographically validate software provenance." },
-  { num: 3, title: "Track",    body: "Monitor dependencies and component changes over time." },
-  { num: 4, title: "Validate", body: "Continuously assess inventory accuracy and integrity." },
+  {
+    num: 1,
+    title: 'Generate',
+    body: 'Continuously create software inventories across environments.',
+  },
+  { num: 2, title: 'Verify', body: 'Cryptographically validate software provenance.' },
+  { num: 3, title: 'Track', body: 'Monitor dependencies and component changes over time.' },
+  { num: 4, title: 'Validate', body: 'Continuously assess inventory accuracy and integrity.' },
 ];
 
 /* ── sub-components ───────────────────────────────────────────────── */
@@ -237,9 +350,20 @@ type FigmaCircleProps = {
   small?: boolean;
 };
 
-function FigmaCircle({ size, x, y, glowSize, glowOffset, num, numGradient, small = false }: FigmaCircleProps): React.ReactElement {
-  const bgAsset = small ? "/images/sbom/ellipse-small.svg" : "/images/sbom/ellipse-large.svg";
-  const glowAsset = small ? "/images/sbom/ellipse-small-glow.svg" : "/images/sbom/ellipse-large-glow.svg";
+function FigmaCircle({
+  size,
+  x,
+  y,
+  glowSize,
+  glowOffset,
+  num,
+  numGradient,
+  small = false,
+}: FigmaCircleProps): React.ReactElement {
+  const bgAsset = small ? '/images/sbom/ellipse-small.svg' : '/images/sbom/ellipse-large.svg';
+  const glowAsset = small
+    ? '/images/sbom/ellipse-small-glow.svg'
+    : '/images/sbom/ellipse-large-glow.svg';
 
   return (
     <div
@@ -270,18 +394,19 @@ function FigmaCircle({ size, x, y, glowSize, glowOffset, num, numGradient, small
         loading="lazy"
         decoding="async"
       />
+      {/* TODO: needs new --stat-number-* token — 15→30px decorative numeral inside a circle, no matching role token */}
       <span
         className="relative"
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "clamp(15px, 1.56vw, 30px)",
+          fontFamily: 'var(--font-display)',
+          fontSize: 'clamp(15px, 1.56vw, 30px)',
           fontWeight: 700,
-          letterSpacing: "-0.02em",
+          letterSpacing: '-0.02em',
           lineHeight: 1,
           background: numGradient,
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
           zIndex: 1,
         }}
       >
@@ -307,61 +432,29 @@ function FeatureLabel({ x, y, title, body, bodyWidth }: FeatureLabelProps): Reac
     >
       <p
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "var(--text-t-heading-sm)",
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--text-t-heading-sm)',
           fontWeight: 600,
-          lineHeight: "var(--text-t-heading-sm-lh)",
-          letterSpacing: "var(--text-t-heading-sm-ls)",
-          width: "100%",
+          lineHeight: 'var(--text-t-heading-sm-lh)',
+          letterSpacing: 'var(--text-t-heading-sm-ls)',
+          width: '100%',
         }}
       >
         {title}
       </p>
       <p
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "var(--text-t-body-md)",
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--text-t-body-md)',
           fontWeight: 400,
-          lineHeight: "var(--text-t-body-md-lh)",
-          letterSpacing: "var(--text-t-body-md-ls)",
-          color: "rgba(255,255,255,0.80)",
-          width: bodyWidth ? vw(bodyWidth) : "100%",
+          lineHeight: 'var(--text-t-body-md-lh)',
+          letterSpacing: 'var(--text-t-body-md-ls)',
+          color: 'rgba(255,255,255,0.80)',
+          width: bodyWidth ? vw(bodyWidth) : '100%',
         }}
       >
         {body}
       </p>
-    </div>
-  );
-}
-
-function MobileCircle({ num }: { num: number }): React.ReactElement {
-  return (
-    <div
-      style={{
-        width: 48,
-        height: 48,
-        borderRadius: "50%",
-        background: "linear-gradient(135deg, rgba(154,81,255,0.25) 0%, rgba(44,193,235,0.25) 100%)",
-        border: "1px solid rgba(154,81,255,0.4)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <span
-        style={{
-          fontFamily: "var(--font-display)",
-          // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored badge inside numbered circle, fixed 18px. See RESPONSIVE-AUDIT.md §14.3.
-          fontSize: "18px",
-          fontWeight: 700,
-          background: "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-        }}
-      >
-        {num}
-      </span>
     </div>
   );
 }

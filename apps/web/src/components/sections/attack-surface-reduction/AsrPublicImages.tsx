@@ -17,46 +17,43 @@
  *  - Icon:  small red shield on the left
  */
 const CARDS: Array<{
-  pos: "tl" | "tr" | "bl" | "br";
+  pos: 'tl' | 'tr' | 'bl' | 'br';
   title: string;
   description: string;
 }> = [
   {
-    pos: "tl",
-    title: "Inherited Vulnerabilities",
-    description: "Unused packages increase exposure.",
+    pos: 'tl',
+    title: 'Inherited Vulnerabilities',
+    description: 'Unused packages increase exposure.',
   },
   {
-    pos: "tr",
-    title: "Too Many Components",
-    description: "Larger images expand attack paths.",
+    pos: 'tr',
+    title: 'Too Many Components',
+    description: 'Larger images expand attack paths.',
   },
   {
-    pos: "bl",
-    title: "Oversized SBOMs",
-    description: "More dependencies create more noise.",
+    pos: 'bl',
+    title: 'Oversized SBOMs',
+    description: 'More dependencies create more noise.',
   },
   {
-    pos: "br",
-    title: "Constant Patching",
-    description: "More packages require more fixes.",
+    pos: 'br',
+    title: 'Constant Patching',
+    description: 'More packages require more fixes.',
   },
 ];
 
 export function AsrPublicImages(): React.ReactElement {
   return (
-    <section
-      data-section="AsrPublicImages"
-      className="relative overflow-hidden"
-    >
+    <section data-section="AsrPublicImages" className="relative overflow-hidden">
       {/* White-glow band at top edge — Figma section transition */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0"
         style={{
-          height: "120px",
+          height: '120px',
           background:
-            "radial-gradient(ellipse 60% 100% at 50% 0%, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 70%)",
+            'radial-gradient(ellipse 60% 100% at 50% 0%, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 70%)',
         }}
       />
 
@@ -65,21 +62,21 @@ export function AsrPublicImages(): React.ReactElement {
         <h2
           className="text-center text-[#111111]"
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
-            fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
-            marginBottom: "48px",
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-t-display-2)',
+            fontWeight: 600,
+            letterSpacing: 'var(--text-t-display-2-ls)',
+            lineHeight: 'var(--text-t-display-2-lh)',
+            marginBottom: '48px',
           }}
         >
-          Public images are{" "}
+          Public images are{' '}
           <span
             style={{
-              background: "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
+              background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
             }}
           >
             bloated
@@ -89,21 +86,20 @@ export function AsrPublicImages(): React.ReactElement {
 
       {/* Desktop diagram: container center, 4 cards at corners, dashed lines */}
       <div className="hidden md:block relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-section-md">
-        <div className="relative" style={{ aspectRatio: "1276 / 540" }}>
+        <div className="relative" style={{ aspectRatio: '1276 / 540' }}>
           {/* Soft red radial glow under the container */}
           <div
             aria-hidden
             className="absolute pointer-events-none"
             style={{
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "560px",
-              height: "320px",
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(255,76,76,0.28) 0%, rgba(255,76,76,0) 70%)",
-              filter: "blur(40px)",
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '560px',
+              height: '320px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(255,76,76,0.28) 0%, rgba(255,76,76,0) 70%)',
+              filter: 'blur(40px)',
             }}
           />
 
@@ -113,7 +109,7 @@ export function AsrPublicImages(): React.ReactElement {
             className="absolute pointer-events-none"
             viewBox="0 0 1260 540"
             preserveAspectRatio="xMidYMid meet"
-            style={{ inset: 0, width: "100%", height: "100%" }}
+            style={{ inset: 0, width: '100%', height: '100%' }}
           >
             {/* TL card → container TL */}
             <path
@@ -157,12 +153,12 @@ export function AsrPublicImages(): React.ReactElement {
             alt=""
             className="absolute pointer-events-none select-none"
             style={{
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "560px",
-              height: "auto",
-              maxWidth: "none",
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '560px',
+              height: 'auto',
+              maxWidth: 'none',
               zIndex: 1,
             }}
             loading="lazy"
@@ -175,15 +171,11 @@ export function AsrPublicImages(): React.ReactElement {
             const positionStyle: React.CSSProperties = {
               tl: { left: 0, top: 0 },
               tr: { right: 0, top: 0 },
-              bl: { left: "1.8%", bottom: 0 },
-              br: { right: "2.6%", bottom: 0 },
+              bl: { left: '1.8%', bottom: 0 },
+              br: { right: '2.6%', bottom: 0 },
             }[card.pos];
             return (
-              <div
-                key={card.title}
-                className="absolute"
-                style={{ ...positionStyle, zIndex: 2 }}
-              >
+              <div key={card.title} className="absolute" style={{ ...positionStyle, zIndex: 2 }}>
                 <BloatedCard title={card.title} description={card.description} />
               </div>
             );
@@ -199,16 +191,12 @@ export function AsrPublicImages(): React.ReactElement {
           src="/images/attack-surface-reduction/bloated-container2.png"
           alt=""
           className="pointer-events-none select-none"
-          style={{ width: "min(320px, 90%)", height: "auto" }}
+          style={{ width: 'min(320px, 90%)', height: 'auto' }}
           loading="lazy"
           decoding="async"
         />
         {CARDS.map((card) => (
-          <BloatedCard
-            key={card.title}
-            title={card.title}
-            description={card.description}
-          />
+          <BloatedCard key={card.title} title={card.title} description={card.description} />
         ))}
       </div>
     </section>
@@ -220,20 +208,17 @@ interface BloatedCardProps {
   description: string;
 }
 
-function BloatedCard({
-  title,
-  description,
-}: BloatedCardProps): React.ReactElement {
+function BloatedCard({ title, description }: BloatedCardProps): React.ReactElement {
   return (
-    <div className="relative" style={{ width: "clamp(240px, 24vw, 303px)", maxWidth: "100%" }}>
+    <div className="relative" style={{ width: 'clamp(240px, 24vw, 303px)', maxWidth: '100%' }}>
       {/* Outer red→white border halo — Figma fill_UB7EN2 [#FF4C4C, #FFFFFF] */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{
-          borderRadius: "20px",
+          borderRadius: '20px',
           background:
-            "linear-gradient(135deg, rgba(255,76,76,0.45) 0%, rgba(255,255,255,0.0) 100%), #FFFFFF",
+            'linear-gradient(135deg, rgba(255,76,76,0.45) 0%, rgba(255,255,255,0.0) 100%), #FFFFFF',
           opacity: 0.85,
         }}
       />
@@ -241,24 +226,23 @@ function BloatedCard({
       <div
         className="relative bg-white flex items-center gap-3"
         style={{
-          margin: "8px",
-          padding: "16px 18px",
-          borderRadius: "16px",
-          minHeight: "150px",
+          margin: '8px',
+          padding: '16px 18px',
+          borderRadius: '16px',
+          minHeight: '150px',
           boxShadow:
-            "0px 4px 4px 0px rgba(22,34,51,0.04), 0px 4px 24px 0px rgba(22,34,51,0.04), 0px 24px 24px 0px rgba(22,34,51,0.04), 0px 32px 32px 0px rgba(22,34,51,0.04), 0px 64px 64px 0px rgba(22,34,51,0.12), 0px 120px 120px 0px rgba(22,34,51,0.08)",
+            '0px 4px 4px 0px rgba(22,34,51,0.04), 0px 4px 24px 0px rgba(22,34,51,0.04), 0px 24px 24px 0px rgba(22,34,51,0.04), 0px 32px 32px 0px rgba(22,34,51,0.04), 0px 64px 64px 0px rgba(22,34,51,0.12), 0px 120px 120px 0px rgba(22,34,51,0.08)',
         }}
       >
         {/* Red shield icon box */}
         <div
           className="relative shrink-0 self-start"
           style={{
-            width: "44px",
-            height: "44px",
-            borderRadius: "10px",
-            background: "linear-gradient(135deg, #FF4C4C 0%, #FF8A8A 100%)",
-            boxShadow:
-              "0 4px 8px -2px rgba(255,76,76,0.4), inset 0 1px 0 rgba(255,255,255,0.3)",
+            width: '44px',
+            height: '44px',
+            borderRadius: '10px',
+            background: 'linear-gradient(135deg, #FF4C4C 0%, #FF8A8A 100%)',
+            boxShadow: '0 4px 8px -2px rgba(255,76,76,0.4), inset 0 1px 0 rgba(255,255,255,0.3)',
           }}
         >
           <svg
@@ -268,10 +252,10 @@ function BloatedCard({
             fill="none"
             aria-hidden
             style={{
-              position: "absolute",
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
             }}
           >
             <path
@@ -281,12 +265,7 @@ function BloatedCard({
               strokeLinejoin="round"
               fill="none"
             />
-            <path
-              d="M12 8v4"
-              stroke="white"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
+            <path d="M12 8v4" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
             <circle cx="12" cy="15" r="1" fill="white" />
           </svg>
         </div>
@@ -296,11 +275,11 @@ function BloatedCard({
           <p
             className="text-[#111111]"
             style={{
-              fontFamily: "var(--font-display)",
+              fontFamily: 'var(--font-display)',
               // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-              fontSize: "18px",
+              fontSize: '18px',
               fontWeight: 600,
-              letterSpacing: "-0.04em",
+              letterSpacing: '-0.04em',
               lineHeight: 1.2,
             }}
           >
@@ -309,11 +288,11 @@ function BloatedCard({
           <p
             className="text-[#444444]"
             style={{
-              fontFamily: "var(--font-display)",
+              fontFamily: 'var(--font-display)',
               // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-              fontSize: "13px",
+              fontSize: '13px',
               fontWeight: 400,
-              letterSpacing: "-0.02em",
+              letterSpacing: '-0.02em',
               lineHeight: 1.35,
             }}
           >

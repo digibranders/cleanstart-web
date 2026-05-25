@@ -68,16 +68,18 @@ const LEGAL_LINKS = [
 //
 // IMPORTANT — Layout contract:
 //   - The CTA card wrapper uses `top: 0; translateY(-50%)` so the card's
-//     vertical center sits exactly on the footer's top edge. At lg the card is
-//     240px tall, so 120px sits above the footer (overlapping the previous
-//     section) and 120px sits inside the footer.
+//     vertical center sits exactly on the footer's top edge. The card-slot
+//     heights below (350 mobile / 300 sm / 260 lg) mean ~175/150/130px of the
+//     card sits above the footer (overlapping the previous section) and the
+//     other half sits inside the footer.
 //   - Every page that uses `<Footer cta=...>` MUST make sure its last section
 //     extends at least `card_height / 2` below its natural content so the CTA
 //     card overlaps real section bg (gradient, pattern, decorative SVGs), NOT
-//     empty body white. The largest card-half is 168px (mobile, h=336).
+//     empty body white. The largest card-half is 175px (mobile, h=350).
 //   - Convention: every last bg-providing element of a CTA page uses
-//     `padding-bottom: 250px`. The Footer's `padding-top` matches at 250px,
-//     producing symmetric spacing above and below the card at every breakpoint.
+//     `padding-bottom: 250px` (or `var(--spacing-section-cta)`). The Footer's
+//     `padding-top: var(--spacing-section-cta)` matches, producing symmetric
+//     spacing above and below the card at every breakpoint.
 //
 // Locked card container contract (per-page CTAs must fit these bounds):
 //   width: 1276px (max-width: calc(100% - 48px))
@@ -108,7 +110,7 @@ export function Footer({
               focused conversion block, not a section-width banner. Heights
               also reduced ~20% (420/360/300 → 336/288/240). */}
           <div
-            className="pointer-events-auto relative w-full h-[336px] sm:h-[288px] lg:h-[240px]"
+            className="pointer-events-auto relative w-full h-[350px] sm:h-[300px] lg:h-[260px]"
           >
             {/* Clipped card surface — fills the slot and clips inner content
                 to the rounded 1276×330 box. */}

@@ -4,16 +4,8 @@
     {
       "name": "web",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@cleanstart/web", "dev"],
-      "port": 3001,
-      "autoPort": false
-    },
-    {
-      "name": "cms",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@cleanstart/cms", "dev"],
-      "port": 3000,
-      "autoPort": false
+      "runtimeArgs": ["--filter", "web", "dev"],
+      "port": 3001
     }
   ]
 }

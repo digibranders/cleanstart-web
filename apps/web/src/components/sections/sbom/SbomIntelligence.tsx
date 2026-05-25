@@ -1,20 +1,45 @@
 /**
- * Figma frame 516:5364 (top half) — 1920 × 762 "SBOM Intelligence That Drives Action"
+ * Figma frame 516:5364 — 1920 × 762 "SBOM Intelligence That Drives Action"
  *
- * White backdrop with subtle cyan halos. Four equally-spaced cards in a row:
- *   • outer  295 × 324 — cyan rgba(44,193,235) gradient halo, rounded-40
- *   • inner  white card, rounded-36 with grid texture + soft purple top glow
- *   • blue 3D ball icon (96×96), title (text-card-title-lg), body (text-body-md)
- *
- * Responsive: 4-up on lg, 2-up on sm, stacked on mobile. Uses py-section-md
- * vertical padding token and standard mx-auto max-w-[var(--container-default)] rail.
+ * Desktop: White backdrop, 4-up card grid with blue 3D ball icons.
+ * Mobile (Figma 817:1281): Stacked cards with cyan-framed white cards,
+ * blue ball with unique icon per card. Cards at y=2434–3450px on mobile canvas.
  */
 
 const CARDS = [
-  { id: "coverage",   title: "Complete Coverage",      body: "Continuously updated software inventories." },
-  { id: "dependency", title: "Dependency Mapping",     body: "Track transitive and inherited dependencies." },
-  { id: "compliance", title: "Compliance Readiness",   body: "Support audit and regulatory requirements." },
-  { id: "visibility", title: "Supply Chain Visibility", body: "Improve visibility across software ecosystems." },
+  {
+    id: "coverage",
+    title: "Complete Coverage",
+    body: "Continuously updated software inventories.",
+    mobileIcon: "/images/sbom/mobile-adv-1.svg",
+    // Figma mobile text widths (node 817:1349–1351)
+    mobileTitleW: 135,
+    mobileBodyW: 155,
+  },
+  {
+    id: "dependency",
+    title: "Dependency Mapping",
+    body: "Track transitive and inherited dependencies.",
+    mobileIcon: "/images/sbom/mobile-adv-2.svg",
+    mobileTitleW: 135,
+    mobileBodyW: 187,
+  },
+  {
+    id: "compliance",
+    title: "Compliance Readiness",
+    body: "Support audit and regulatory requirements.",
+    mobileIcon: "/images/sbom/mobile-adv-3.svg",
+    mobileTitleW: 175,
+    mobileBodyW: 155,
+  },
+  {
+    id: "visibility",
+    title: "Supply Chain Visibility",
+    body: "Improve visibility across software ecosystems.",
+    mobileIcon: "/images/sbom/mobile-adv-4.svg",
+    mobileTitleW: 135,
+    mobileBodyW: 201,
+  },
 ] as const;
 
 export function SbomIntelligence(): React.ReactElement {
@@ -51,14 +76,14 @@ export function SbomIntelligence(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
-        {/* Heading */}
+      {/* ── Heading (shared) ── */}
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md">
         <div className="text-center mb-10 md:mb-14">
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(32px, 4vw, 56px)",
-              fontWeight: 700,
+              fontSize: "var(--text-display-md)",
+              fontWeight: 600,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
               color: "#111",
@@ -68,18 +93,38 @@ export function SbomIntelligence(): React.ReactElement {
             <span className="cs-text-gradient-impact">Action</span>
           </h2>
         </div>
+      </div>
 
-        {/* 4-up card grid (site convention) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ gap: "32px" }}>
+      {/* ── DESKTOP 4-up card grid (sm+) ── */}
+      <div className="relative hidden sm:block mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-section-md">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4" style={{ gap: "32px" }}>
           {CARDS.map((card) => (
             <IntelligenceCard key={card.id} title={card.title} body={card.body} />
           ))}
         </div>
       </div>
+
+      {/* ── MOBILE stacked cards (< sm) ── Figma pixel-perfect 360px design ── */}
+      <div
+        className="sm:hidden flex flex-col items-center pb-10"
+        style={{ gap: "16px", paddingLeft: "10px", paddingRight: "10px" }}
+      >
+        {CARDS.map((card) => (
+          <MobileIntelligenceCard
+            key={card.id}
+            title={card.title}
+            body={card.body}
+            mobileIcon={card.mobileIcon}
+            titleW={card.mobileTitleW}
+            bodyW={card.mobileBodyW}
+          />
+        ))}
+      </div>
     </section>
   );
 }
 
+/* ── Desktop card ─────────────────────────────────────────────────── */
 function IntelligenceCard({
   title,
   body,
@@ -107,7 +152,7 @@ function IntelligenceCard({
           paddingRight: "clamp(20px, 1.67vw, 32px)",
         }}
       >
-        {/* Upper purple-pink glow (Figma) */}
+        {/* Upper purple-pink glow */}
         <div
           aria-hidden
           className="pointer-events-none select-none absolute"
@@ -123,7 +168,6 @@ function IntelligenceCard({
             borderRadius: "50%",
           }}
         />
-
         {/* Faint vertical grid lines */}
         <div
           aria-hidden
@@ -134,7 +178,6 @@ function IntelligenceCard({
             opacity: 0.4,
           }}
         />
-
         {/* Blue 3D ball icon */}
         <div
           className="relative mx-auto flex items-center justify-center"
@@ -159,14 +202,12 @@ function IntelligenceCard({
             decoding="async"
           />
         </div>
-
-        {/* Title + body */}
         <div className="relative text-left flex flex-col gap-3">
           <p
             className="text-[#111]"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(20px, 2vw, 28px)",
+              fontSize: "var(--text-card-title-lg)",
               fontWeight: 600,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
@@ -178,10 +219,144 @@ function IntelligenceCard({
             className="text-[#555]"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(15px, 1.4vw, 20px)",
+              fontSize: "var(--text-body-lg)",
               fontWeight: 400,
               letterSpacing: "-0.02em",
               lineHeight: 1.4,
+            }}
+          >
+            {body}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Mobile card (Figma pixel-perfect) ─────────────────────────────── */
+function MobileIntelligenceCard({
+  title,
+  body,
+  mobileIcon,
+  titleW,
+  bodyW,
+}: {
+  title: string;
+  body: string;
+  mobileIcon: string;
+  titleW: number;
+  bodyW: number;
+}): React.ReactElement {
+  // Figma: icon-area container h=87px top=10px, ball 70px centered vertically.
+  // Ball center = 10 + 87/2 = 53.5px → ball top = 53.5 - 35 = 18.5px ≈ 18px.
+  const BALL_TOP = 18;
+  // Text starts at 108px from inner card top (Figma absolute coord delta).
+  const TEXT_TOP = 108;
+
+  return (
+    <div
+      className="relative"
+      style={{ width: "340px", height: "238px" }}
+    >
+      {/* Outer cyan frame SVG (340×238, opacity 0.3 per Figma) */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/sbom/mobile-intel-card-frame.svg"
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        loading="lazy"
+      />
+
+      {/* Inner white card — left:6px top:6px w:328px h:226px (Figma delta) */}
+      <div
+        className="absolute bg-white overflow-hidden"
+        style={{
+          left: "6px",
+          top: "6px",
+          width: "328px",
+          height: "226px",
+          borderRadius: "16px",
+        }}
+      >
+        {/* Purple glow behind ball — w:209 h:90 blur:66.5 top:13px centered */}
+        <div
+          aria-hidden
+          className="absolute pointer-events-none"
+          style={{
+            left: "50%",
+            transform: "translateX(-50%)",
+            top: "13px",
+            width: "209px",
+            height: "90px",
+            background: "#DF9BFF",
+            opacity: 0.5,
+            filter: "blur(66.5px)",
+            borderRadius: "50%",
+          }}
+        />
+
+        {/* Blue ball — 70px, centered, top:18px (centered in 87px container at top:10px) */}
+        <div
+          className="absolute flex items-center justify-center overflow-hidden"
+          style={{
+            left: "50%",
+            transform: "translateX(-50%)",
+            top: `${BALL_TOP}px`,
+            width: "70px",
+            height: "70px",
+            borderRadius: "50%",
+            background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
+            boxShadow:
+              "0px 4.5px 10.6px 0px rgba(28,60,142,0.33), inset 0px -0.17px 0.212px 0px rgba(0,44,179,0.5), inset 0px 0.085px 0.424px 0px rgba(255,255,255,0.81)",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={mobileIcon}
+            alt=""
+            aria-hidden
+            width={40}
+            height={40}
+            className="object-contain relative z-10"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        {/* Title + body — top:108px matches Figma (ball bottom 88px → 20px gap) */}
+        <div
+          className="absolute flex flex-col items-center text-center"
+          style={{
+            left: "50%",
+            transform: "translateX(-50%)",
+            top: `${TEXT_TOP}px`,
+            gap: "12px",
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--text-card-title-md)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              color: "#000",
+              width: `${titleW}px`,
+            }}
+          >
+            {title}
+          </p>
+          <p
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--text-body-sm)",
+              fontWeight: 400,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.5,
+              color: "#111",
+              opacity: 0.8,
+              width: `${bodyW}px`,
             }}
           >
             {body}
