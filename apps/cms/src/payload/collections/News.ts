@@ -10,6 +10,7 @@ import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { firstPublishBeforeValidateHook } from '../hooks/first-publish';
 import {
   searchSyncAfterChangeHook,
@@ -185,6 +186,7 @@ export const News: CollectionConfig = {
     // Honours editor backdates and explicit picker edits.
     beforeValidate: [firstPublishBeforeValidateHook({ field: 'publicationDate' })],
     beforeChange: [
+      normalizeLexicalHook(),
       bodyStatsHook({
         fields: { readingMinutes: 'readingMinutes', wordCount: 'wordCount' },
       }),

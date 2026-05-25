@@ -611,7 +611,7 @@
     }
   ],
   "hooks": {
-    "beforeChange": 3,
+    "beforeChange": 4,
     "afterChange": 6,
     "beforeValidate": 0,
     "afterDelete": 1

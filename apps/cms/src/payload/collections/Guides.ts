@@ -13,6 +13,7 @@ import { bodyStatsHook } from '../hooks/body-stats';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import {
   searchSyncAfterChangeHook,
@@ -285,6 +286,7 @@ export const Guides: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
+      normalizeLexicalHook(),
       firstPublishHook(),
       displayPublishedAtBackfillHook,
       bodyStatsHook({
