@@ -6,14 +6,12 @@
  * blue ball with unique icon per card. Cards at y=2434–3450px on mobile canvas.
  */
 
-import Image from "next/image";
-
 const CARDS = [
   {
     id: "coverage",
     title: "Complete Coverage",
     body: "Continuously updated software inventories.",
-    mobileIcon: "/images/sbom/mobile-adv-1.png",
+    mobileIcon: "/images/sbom/mobile-adv-1.svg",
     // Figma mobile text widths (node 817:1349–1351)
     mobileTitleW: 135,
     mobileBodyW: 155,
@@ -22,7 +20,7 @@ const CARDS = [
     id: "dependency",
     title: "Dependency Mapping",
     body: "Track transitive and inherited dependencies.",
-    mobileIcon: "/images/sbom/mobile-adv-2.png",
+    mobileIcon: "/images/sbom/mobile-adv-2.svg",
     mobileTitleW: 135,
     mobileBodyW: 187,
   },
@@ -30,7 +28,7 @@ const CARDS = [
     id: "compliance",
     title: "Compliance Readiness",
     body: "Support audit and regulatory requirements.",
-    mobileIcon: "/images/sbom/mobile-adv-3.png",
+    mobileIcon: "/images/sbom/mobile-adv-3.svg",
     mobileTitleW: 175,
     mobileBodyW: 155,
   },
@@ -38,7 +36,7 @@ const CARDS = [
     id: "visibility",
     title: "Supply Chain Visibility",
     body: "Improve visibility across software ecosystems.",
-    mobileIcon: "/images/sbom/mobile-adv-4.png",
+    mobileIcon: "/images/sbom/mobile-adv-4.svg",
     mobileTitleW: 135,
     mobileBodyW: 201,
   },
@@ -313,7 +311,8 @@ function MobileIntelligenceCard({
               "0px 4.5px 10.6px 0px rgba(28,60,142,0.33), inset 0px -0.17px 0.212px 0px rgba(0,44,179,0.5), inset 0px 0.085px 0.424px 0px rgba(255,255,255,0.81)",
           }}
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={mobileIcon}
             alt=""
             aria-hidden
@@ -321,6 +320,7 @@ function MobileIntelligenceCard({
             height={40}
             className="object-contain relative z-10"
             loading="lazy"
+            decoding="async"
           />
         </div>
 
