@@ -1,20 +1,20 @@
 export function AsrBusinessDelivers(): React.ReactElement {
   const metrics: Array<{ title: string; description: string }> = [
     {
-      title: "Reduce Security Risks",
-      description: "Reduced exposure during image pull",
+      title: 'Reduce Security Risks',
+      description: 'Reduced exposure during image pull',
     },
     {
-      title: "Smaller CVE Backlog",
-      description: "Less recurring remediation across builds and releases",
+      title: 'Smaller CVE Backlog',
+      description: 'Less recurring remediation across builds and releases',
     },
     {
-      title: "Focused SBOMs",
-      description: "Only meaningful components to track and defend",
+      title: 'Focused SBOMs',
+      description: 'Only meaningful components to track and defend',
     },
     {
-      title: "Lower Operational Load",
-      description: "Less scanning, patching, and rework for teams",
+      title: 'Lower Operational Load',
+      description: 'Less scanning, patching, and rework for teams',
     },
   ];
 
@@ -27,10 +27,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
       <h2 className="sr-only">What this delivers for your business</h2>
 
       {/* Background photo */}
-      <div
-        className="relative"
-        style={{ minHeight: "clamp(400px, 32vw, 580px)" }}
-      >
+      <div className="relative" style={{ minHeight: 'clamp(400px, 32vw, 580px)' }}>
         {/* Background image */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -38,7 +35,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
           src="/images/attack-surface-reduction/business-photo.jpg"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none select-none"
-          style={{ objectFit: "cover", objectPosition: "center top" }}
+          style={{ objectFit: 'cover', objectPosition: 'center top' }}
           loading="lazy"
           decoding="async"
         />
@@ -49,7 +46,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "linear-gradient(180deg, rgba(21,16,33,0.82) 0%, rgba(19,30,143,0.78) 71%, rgba(71,30,192,0.72) 100%)",
+              'linear-gradient(180deg, rgba(21,16,33,0.82) 0%, rgba(19,30,143,0.78) 71%, rgba(71,30,192,0.72) 100%)',
           }}
         />
 
@@ -60,22 +57,21 @@ export function AsrBusinessDelivers(): React.ReactElement {
             <p
               className="text-white"
               style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--text-t-display-2)",
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--text-t-display-2)',
                 fontWeight: 700,
-                letterSpacing: "var(--text-t-display-2-ls)",
-                lineHeight: "var(--text-t-display-2-lh)",
-                maxWidth: "519px",
+                letterSpacing: 'var(--text-t-display-2-ls)',
+                lineHeight: 'var(--text-t-display-2-lh)',
+                maxWidth: '519px',
               }}
             >
-              What this delivers for{" "}
+              What this delivers for{' '}
               <span
                 style={{
-                  background:
-                    "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
+                  background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
                 }}
               >
                 your business
@@ -86,7 +82,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
           {/* Metric columns */}
           <div
             className="mt-12 md:mt-16 grid grid-cols-2 md:grid-cols-4 gap-y-8"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}
+            style={{ borderTop: '1px solid rgba(255,255,255,0.15)' }}
           >
             {metrics.map((metric, idx) => (
               <div
@@ -95,8 +91,8 @@ export function AsrBusinessDelivers(): React.ReactElement {
                 style={
                   idx > 0
                     ? {
-                        paddingLeft: "clamp(12px, 2.6vw, 32px)",
-                        borderLeft: "1px solid rgba(255,255,255,0.18)",
+                        paddingLeft: 'clamp(12px, 2.6vw, 32px)',
+                        borderLeft: '1px solid rgba(255,255,255,0.18)',
                       }
                     : undefined
                 }
@@ -104,24 +100,24 @@ export function AsrBusinessDelivers(): React.ReactElement {
                 <p
                   className="text-white"
                   style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-heading-lg)",
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--text-t-heading-lg)',
                     fontWeight: 700,
-                    letterSpacing: "var(--text-t-heading-lg-ls)",
-                    lineHeight: "var(--text-t-heading-lg-lh)",
-                    marginBottom: "10px",
+                    letterSpacing: 'var(--text-t-heading-lg-ls)',
+                    lineHeight: 'var(--text-t-heading-lg-lh)',
+                    marginBottom: '10px',
                   }}
                 >
                   {metric.title}
                 </p>
                 <p
                   style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-heading-md)",
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--text-t-heading-md)',
                     fontWeight: 400,
-                    letterSpacing: "var(--text-t-heading-md-ls)",
-                    lineHeight: "var(--text-t-heading-md-lh)",
-                    color: "#dddddd",
+                    letterSpacing: 'var(--text-t-heading-md-ls)',
+                    lineHeight: 'var(--text-t-heading-md-lh)',
+                    color: '#dddddd',
                   }}
                 >
                   {metric.description}

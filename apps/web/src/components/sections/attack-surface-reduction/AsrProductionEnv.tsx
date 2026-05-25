@@ -5,22 +5,19 @@ export function AsrProductionEnv(): React.ReactElement {
     description: string;
   }> = [
     {
-      icon: "/images/attack-surface-reduction/prod-icon-k8s.png",
-      title: "Kubernetes Platforms",
-      description:
-        "Production clusters running containerized workloads.",
+      icon: '/images/attack-surface-reduction/prod-icon-k8s.png',
+      title: 'Kubernetes Platforms',
+      description: 'Production clusters running containerized workloads.',
     },
     {
-      icon: "/images/attack-surface-reduction/prod-icon-docs.png",
-      title: "Regulated Environments",
-      description:
-        "Workloads with compliance and audit requirements.",
+      icon: '/images/attack-surface-reduction/prod-icon-docs.png',
+      title: 'Regulated Environments',
+      description: 'Workloads with compliance and audit requirements.',
     },
     {
-      icon: "/images/attack-surface-reduction/prod-icon-security.png",
-      title: "Security-Focused Teams",
-      description:
-        "Teams prioritizing prevention over remediation.",
+      icon: '/images/attack-surface-reduction/prod-icon-security.png',
+      title: 'Security-Focused Teams',
+      description: 'Teams prioritizing prevention over remediation.',
     },
   ];
 
@@ -31,8 +28,8 @@ export function AsrProductionEnv(): React.ReactElement {
       aria-label="Built for Modern Production Environments"
       style={{
         background:
-          "linear-gradient(180deg, rgba(21,16,33,1) 0%, rgba(19,30,143,1) 67%, rgba(71,30,192,1) 100%)",
-        minHeight: "clamp(360px, 32vw, 620px)",
+          'linear-gradient(180deg, rgba(21,16,33,1) 0%, rgba(19,30,143,1) 67%, rgba(71,30,192,1) 100%)',
+        minHeight: 'clamp(360px, 32vw, 620px)',
       }}
     >
       <h2 className="sr-only">Built for Modern Production Environments</h2>
@@ -45,11 +42,11 @@ export function AsrProductionEnv(): React.ReactElement {
         alt=""
         className="absolute pointer-events-none select-none mix-blend-overlay hidden md:block"
         style={{
-          left: "-147px",
-          top: "397px",
-          width: "469px",
-          height: "488px",
-          transform: "rotate(-150deg) scaleY(-1)",
+          left: '-147px',
+          top: '397px',
+          width: '469px',
+          height: '488px',
+          transform: 'rotate(-150deg) scaleY(-1)',
         }}
         loading="lazy"
         decoding="async"
@@ -63,11 +60,11 @@ export function AsrProductionEnv(): React.ReactElement {
         alt=""
         className="absolute pointer-events-none select-none mix-blend-overlay hidden md:block"
         style={{
-          right: "-150px",
-          top: "-175px",
-          width: "488px",
-          height: "497px",
-          transform: "rotate(141.39deg) scaleY(-1)",
+          right: '-150px',
+          top: '-175px',
+          width: '488px',
+          height: '497px',
+          transform: 'rotate(141.39deg) scaleY(-1)',
         }}
         loading="lazy"
         decoding="async"
@@ -79,22 +76,21 @@ export function AsrProductionEnv(): React.ReactElement {
         <p
           className="text-white mb-14 md:mb-[88px]"
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-display-2)",
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-t-display-2)',
             fontWeight: 700,
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
-            maxWidth: "686px",
+            letterSpacing: 'var(--text-t-display-2-ls)',
+            lineHeight: 'var(--text-t-display-2-lh)',
+            maxWidth: '686px',
           }}
         >
-          Built for Modern Production{" "}
+          Built for Modern Production{' '}
           <span
             style={{
-              background:
-                "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
+              background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
             }}
           >
             Environments
@@ -110,9 +106,8 @@ export function AsrProductionEnv(): React.ReactElement {
               style={
                 idx > 0
                   ? {
-                      paddingLeft: "clamp(16px, 2.6vw, 48px)",
-                      borderLeft:
-                        "1px dashed rgba(255,255,255,0.22)",
+                      paddingLeft: 'clamp(16px, 2.6vw, 48px)',
+                      borderLeft: '1px dashed rgba(255,255,255,0.22)',
                     }
                   : undefined
               }
@@ -124,7 +119,7 @@ export function AsrProductionEnv(): React.ReactElement {
                 alt=""
                 aria-hidden
                 className="pointer-events-none select-none mb-6"
-                style={{ width: "72px", height: "72px" }}
+                style={{ width: '72px', height: '72px' }}
                 loading="lazy"
                 decoding="async"
               />
@@ -133,12 +128,12 @@ export function AsrProductionEnv(): React.ReactElement {
               <p
                 className="text-white mb-3"
                 style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "var(--text-t-heading-lg)",
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'var(--text-t-heading-lg)',
                   fontWeight: 700,
-                  letterSpacing: "var(--text-t-heading-lg-ls)",
-                  lineHeight: "var(--text-t-heading-lg-lh)",
-                  maxWidth: "340px",
+                  letterSpacing: 'var(--text-t-heading-lg-ls)',
+                  lineHeight: 'var(--text-t-heading-lg-lh)',
+                  maxWidth: '340px',
                 }}
               >
                 {item.title}
@@ -148,12 +143,12 @@ export function AsrProductionEnv(): React.ReactElement {
               <p
                 className="text-white"
                 style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "var(--text-t-heading-sm)",
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'var(--text-t-heading-sm)',
                   fontWeight: 400,
-                  letterSpacing: "var(--text-t-heading-sm-ls)",
-                  lineHeight: "var(--text-t-heading-sm-lh)",
-                  maxWidth: "294px",
+                  letterSpacing: 'var(--text-t-heading-sm-ls)',
+                  lineHeight: 'var(--text-t-heading-sm-lh)',
+                  maxWidth: '294px',
                   opacity: 0.85,
                 }}
               >

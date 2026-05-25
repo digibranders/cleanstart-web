@@ -1,5 +1,5 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
 /**
  * ASR Hero — Figma node 783:91
@@ -27,8 +27,8 @@ export function ASRHero(): React.ReactElement {
       style={{
         // Figma gradient (verbatim): 179.99deg navy → blue → purple → fade-out.
         background:
-          "linear-gradient(179.99deg, #151021 -25.7%, #10123E 31.16%, #131E8F 51.01%, #471EC0 68.71%, #471FC3 79.83%, rgba(70, 30, 191, 0.85) 85.02%, rgba(66, 30, 188, 0.4) 93.72%, rgba(66, 30, 188, 0) 98.92%)",
-        minHeight: "clamp(560px, 51vw, 824px)",
+          'linear-gradient(179.99deg, #151021 -25.7%, #10123E 31.16%, #131E8F 51.01%, #471EC0 68.71%, #471FC3 79.83%, rgba(70, 30, 191, 0.85) 85.02%, rgba(66, 30, 188, 0.4) 93.72%, rgba(66, 30, 188, 0) 98.92%)',
+        minHeight: 'clamp(560px, 51vw, 824px)',
       }}
     >
       {/* Background grid overlay — Figma uses 71.11 px squares with #130F26
@@ -39,8 +39,8 @@ export function ASRHero(): React.ReactElement {
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(19, 15, 38, 0.55) 1px, transparent 1px), linear-gradient(90deg, rgba(19, 15, 38, 0.55) 1px, transparent 1px)",
-          backgroundSize: "80px 80px",
+            'linear-gradient(rgba(19, 15, 38, 0.55) 1px, transparent 1px), linear-gradient(90deg, rgba(19, 15, 38, 0.55) 1px, transparent 1px)',
+          backgroundSize: '80px 80px',
         }}
       />
 
@@ -49,14 +49,14 @@ export function ASRHero(): React.ReactElement {
         aria-hidden
         className="pointer-events-none absolute hidden md:block"
         style={{
-          right: "-2vw",
-          top: "-80px",
-          width: "min(360px, 26vw)",
-          height: "min(360px, 26vw)",
-          borderRadius: "50%",
+          right: '-2vw',
+          top: '-80px',
+          width: 'min(360px, 26vw)',
+          height: 'min(360px, 26vw)',
+          borderRadius: '50%',
           background:
-            "radial-gradient(closest-side, rgba(122, 89, 255, 0.55) 0%, rgba(122, 89, 255, 0) 70%)",
-          filter: "blur(60px)",
+            'radial-gradient(closest-side, rgba(122, 89, 255, 0.55) 0%, rgba(122, 89, 255, 0) 70%)',
+          filter: 'blur(60px)',
         }}
       />
 
@@ -66,10 +66,9 @@ export function ASRHero(): React.ReactElement {
         aria-hidden
         className="pointer-events-none select-none absolute bottom-0 left-0 right-0"
         style={{
-          height: "180px",
-          background:
-            "linear-gradient(180deg, rgba(71,30,192,0) 0%, rgba(120,60,255,0.35) 100%)",
-          mixBlendMode: "screen",
+          height: '180px',
+          background: 'linear-gradient(180deg, rgba(71,30,192,0) 0%, rgba(120,60,255,0.35) 100%)',
+          mixBlendMode: 'screen',
         }}
       />
 
@@ -77,21 +76,24 @@ export function ASRHero(): React.ReactElement {
         <div
           className="flex flex-col lg:flex-row items-start lg:items-center"
           style={{
-            paddingTop: "clamp(120px, 13vw, 229px)",
-            paddingBottom: "clamp(56px, 7vw, 100px)",
-            gap: "40px",
+            paddingTop: 'clamp(120px, 13vw, 229px)',
+            paddingBottom: 'clamp(56px, 7vw, 100px)',
+            gap: '40px',
           }}
         >
           {/* Left: copy — heading + body + CTA */}
-          <div className="flex-1" style={{ maxWidth: "545px" }}>
+          <div
+            className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left"
+            style={{ maxWidth: '545px' }}
+          >
             <h1
               style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(40px, 4.45vw, 64px)",
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(36px, 4.45vw, 64px)',
                 fontWeight: 700,
-                letterSpacing: "-0.04em",
+                letterSpacing: '-0.04em',
                 lineHeight: 1.05,
-                color: "white",
+                color: 'white',
               }}
             >
               <span className="block">Bigger Images,</span>
@@ -100,17 +102,18 @@ export function ASRHero(): React.ReactElement {
 
             <p
               style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "clamp(18px, 1.7vw, 24px)",
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'clamp(16px, 1.7vw, 24px)',
                 fontWeight: 400,
-                letterSpacing: "-0.02em",
+                letterSpacing: '-0.02em',
                 lineHeight: 1.4,
-                color: "rgba(255, 255, 255, 0.8)",
-                marginTop: "24px",
+                color: 'rgba(255, 255, 255, 0.8)',
+                marginTop: '20px',
+                maxWidth: '480px',
               }}
             >
-              CleanStart Images reduce attack surface by eliminating
-              unnecessary components before they enter production.
+              CleanStart Images reduce attack surface by eliminating unnecessary components before
+              they enter production.
             </p>
 
             {/* CTA — shared .cs-btn-glass utility (matches every other hero) */}
@@ -119,9 +122,9 @@ export function ASRHero(): React.ReactElement {
               className="cs-btn-glass"
               style={
                 {
-                  marginTop: "40px",
-                  "--cs-btn-px": "18px",
-                  "--cs-btn-fs": "18px",
+                  marginTop: 'clamp(24px, 3vw, 40px)',
+                  '--cs-btn-px': '18px',
+                  '--cs-btn-fs': '18px',
                 } as React.CSSProperties
               }
             >
@@ -146,10 +149,7 @@ export function ASRHero(): React.ReactElement {
           </div>
 
           {/* Right: bloated-vs-clean comparison cards (combined Figma export) */}
-          <div
-            className="hidden lg:block relative shrink-0"
-            style={{ width: "min(622px, 48vw)" }}
-          >
+          <div className="hidden lg:block relative shrink-0" style={{ width: 'min(622px, 48vw)' }}>
             <Image
               src="/images/attack-surface-reduction/hero-cards.png"
               alt="BLOATED vs CLEAN image comparison: 1.2 GB / 247 packages / 89 HIGH CVEs vs 87 MB / 12 packages / 0 HIGH CVEs"
