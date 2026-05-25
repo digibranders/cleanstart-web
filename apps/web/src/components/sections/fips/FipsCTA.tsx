@@ -1,16 +1,29 @@
 import Link from "next/link";
 
 /**
- * Inner content for the FIPS Compliance CTA, rendered inside the Footer's
- * fixed 1276 × 330 / radius-40 slot. Figma frame 1:637.
+ * Inner content for the FIPS CTA card (Figma node 787:2343).
+ * Card natural size: 1276 × 335 px, border-radius 40px.
  *
- * Card background — sampled directly from the Figma render at three Y bands:
- *   y=0   → #131E8F (deep navy at top)
- *   y=167 → #2A1EA5 (mid)
- *   y=335 → #401EBA (purple at bottom)
- * The cube image (cta-cube.png) has the SAME vertical gradient baked into
- * its non-cube pixels so it blends seamlessly with no visible bounding box.
+ * Figma layout (inside 1276×335 slot, all measurements relative to card width):
+ *   Content container: left=122px (9.56%), width=1047px (82.05%)
+ *     vertically centred (top=85px = ~25% of 335px → use flex items-center)
+ *     gap=115px (11.00% of 1047px content container)
+ *   Heading col : 401px = 38.30% of content container
+ *     55px Figtree Bold  ls=−0.05em  lh=1  white
+ *   Right col   : 493px = 47.09% of content container
+ *     flex-col gap=24px
+ *     – body  : 21px Regular  ls=−0.04em  lh=1.4  opacity=0.8
+ *     – button: cs-btn-glass 18px px=18px
+ *   Cube image  : absolute bottom-right, w=255px = 19.98% of card width
+ *
+ * vw rates (value / 1440 × 100):
+ *   heading font  55 / 1440 = 3.82vw
+ *   body font     21 / 1440 = 1.46vw
+ *
+ * Using absolute inner container to pin left=9.56% and span 82.05% width
+ * avoids percentage-of-content-box drift that occurs with CSS padding.
  */
+
 const CARD_BG =
   "linear-gradient(180deg, #131E8F 0%, #2A1EA5 50%, #401EBA 100%)";
 
@@ -21,116 +34,138 @@ export function FipsCTA(): React.ReactElement {
       className="absolute inset-0 overflow-hidden"
       style={{ background: CARD_BG }}
     >
-      {/* -------------------- Desktop layout (md+) -------------------- */}
-      <div className="hidden md:block absolute inset-0">
-        {/* Cube — anchored to bottom-right. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          aria-hidden
-          src="/images/fips/cta-cube.png"
-          alt=""
-          className="pointer-events-none select-none absolute"
-          style={{
-            right: 0,
-            bottom: 0,
-            width: "17.40%",
-            height: "auto",
-           opacity: 0.75,}}
-          loading="lazy"
-          decoding="async"
-        />
+      {/* ── Cube — anchored bottom-right ── */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/fips/cta-cube.png"
+        alt=""
+        className="pointer-events-none select-none absolute hidden md:block"
+        style={{
+          right: 0,
+          bottom: 0,
+          /* Figma: 255px at 1276px card width → 19.98% */
+          width: "19.98%",
+          height: "auto",
+          opacity: 0.75,
+        }}
+        loading="lazy"
+        decoding="async"
+      />
 
-        {/* Heading — absolute at exact Figma coords (1276×330 slot). */}
+      {/* ── Desktop layout (md+) ── */}
+      {/*
+       * Absolutely-positioned inner container that maps directly to Figma coords:
+       *   left  = 122 / 1276 = 9.56% of card width
+       *   width = 1047 / 1276 = 82.05% of card width
+       *   top/bottom = 0 → vertically centred via flex items-center
+       */}
+      <div
+        className="hidden md:flex absolute items-center"
+        style={{
+          left: "9.56%",
+          width: "82.05%",
+          top: 0,
+          bottom: 0,
+          /* gap = 115px at 1047px container = 10.98%, clamped */
+          gap: "clamp(32px, 10.98%, 115px)",
+        }}
+      >
+        {/* Heading — 401 / 1047 = 38.30% of content container */}
         <p
-          className="font-display text-white absolute"
+          className="text-white flex-shrink-0"
           style={{
-            left: "9.56%",
-            top: "25.76%",
-            width: "31.43%",
-            fontSize: "clamp(26px, 3.1vw, 44px)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            margin: 0,
+            fontFamily: "var(--font-display)",
+            /*
+             * Figma: 55px at 1440px → 3.82vw.
+             * Capped at 44px so it wraps to max 3 lines inside the column at lg
+             * card height (240px). Figma card is 335px; our Footer uses 240px at lg.
+             */
+            fontSize: "clamp(22px, 3.05vw, 44px)",
+            fontWeight: 700,
+            letterSpacing: "-0.05em",
+            lineHeight: 1,
+            width: "38.30%",
           }}
         >
           Ready to Secure Your Container Infrastructure?
         </p>
 
-        {/* Body text — absolute. */}
-        <p
-          className="font-display absolute"
-          style={{
-            left: "50.00%",
-            top: "27.27%",
-            width: "38.64%",
-            fontSize: "clamp(16px, 1.5vw, 20px)",
-            fontWeight: 400,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.4,
-            color: "rgba(255,255,255,0.88)",
-            margin: 0,
-          }}
+        {/* Right column — 493 / 1047 = 47.09% of content container */}
+        <div
+          className="flex flex-col flex-shrink-0"
+          style={{ gap: "24px", width: "47.09%" }}
         >
-          Start with zero-CVE hardened images. Deploy faster with confidence
-          knowing your containers are secured from the ground up.
-        </p>
-
-        {/* Button — absolute at Figma button position. */}
-        <Link
-          href="/contact-us"
-          className="cs-btn-glass absolute"
-          style={
-            {
-              left: "50.00%",
-              top: "60.91%",
-              "--cs-btn-px": "30px",
-              "--cs-btn-fs": "16px",
-            } as React.CSSProperties
-          }
-        >
-          Get a Demo
-          <svg
-            className="cs-cta-arrow"
-            width="22"
-            height="22"
-            viewBox="0 0 22 22"
-            fill="none"
-            aria-hidden
+          {/* Body — 21px Regular, ls=−0.04em, lh=1.4, opacity=0.8 */}
+          <p
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(13px, 1.46vw, 21px)",
+              fontWeight: 400,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.4,
+              color: "rgba(255,255,255,0.80)",
+            }}
           >
-            <path
-              d="M4 11h14M12 5l6 6-6 6"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </Link>
+            Start with zero-CVE hardened images. Deploy faster with confidence
+            knowing your containers are secured from the ground up.
+          </p>
+
+          {/* Button — 18px font, px=18px (Figma node 787:2348) */}
+          <Link
+            href="/contact-us"
+            className="cs-btn-glass self-start"
+            style={
+              {
+                "--cs-btn-px": "18px",
+                "--cs-btn-fs": "18px",
+              } as React.CSSProperties
+            }
+          >
+            Get a Demo
+            <svg
+              className="cs-cta-arrow"
+              width="22"
+              height="22"
+              viewBox="0 0 22 22"
+              fill="none"
+              aria-hidden
+            >
+              <path
+                d="M4 11h14M12 5l6 6-6 6"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
+        </div>
       </div>
 
-      {/* -------------------- Mobile fallback (under md) -------------------- */}
+      {/* ── Mobile fallback (under md) ── */}
       <div className="md:hidden relative h-full p-6 flex flex-col gap-5 justify-center">
         <p
-          className="font-display text-white"
+          className="text-white"
           style={{
-            fontSize: "clamp(26px, 3.1vw, 44px)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(26px, 7vw, 40px)",
+            fontWeight: 700,
+            letterSpacing: "-0.05em",
+            lineHeight: 1,
             maxWidth: "280px",
           }}
         >
           Ready to Secure Your Container Infrastructure?
         </p>
         <p
-          className="font-display"
           style={{
-            fontSize: "var(--text-t-body-md)",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(14px, 4vw, 18px)",
             fontWeight: 400,
-            letterSpacing: "var(--text-t-body-md-ls)",
-            lineHeight: "var(--text-t-body-md-lh)",
-            color: "rgba(255,255,255,0.88)",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.4,
+            color: "rgba(255,255,255,0.80)",
           }}
         >
           Start with zero-CVE hardened images. Deploy faster with confidence
@@ -141,7 +176,7 @@ export function FipsCTA(): React.ReactElement {
           className="cs-btn-glass self-start"
           style={
             {
-              "--cs-btn-px": "22px",
+              "--cs-btn-px": "18px",
               "--cs-btn-fs": "16px",
             } as React.CSSProperties
           }

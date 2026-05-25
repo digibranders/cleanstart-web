@@ -2,8 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 
+/**
+ * Figma node 787:2316 — Operational Impact section.
+ * Frame: 1440 × 627 px.
+ *
+ * Layout (centred, total content width = 1275px):
+ *   Left column:  cube image  369 × 446 px
+ *   Gap:          67 px
+ *   Right column: 839 px
+ *     • H2   62px Figtree Bold  ls=-3.1px(−0.05em)  w=654px
+ *     • gap  80px
+ *     • Stats 4 × 176px columns, 45px gaps (absolute offsets 0/221/442/663)
+ *       – number  52px Figtree Bold  ls=-2.6px(−0.05em)
+ *       – label   20px Figtree Reg   ls=-1px(−0.05em)  lh=1.4  #333
+ *
+ * vw rates (value / 1440 × 100):
+ *   paddingTop   120 / 1440 = 8.33vw
+ *   h2 font       62 / 1440 = 4.31vw
+ *   stat num      52 / 1440 = 3.61vw
+ *   stat label    20 / 1440 = 1.39vw
+ *   h2 gap        80 / 1440 = 5.56vw
+ *   cube width   369 / 1440 = 25.63vw
+ */
+
 interface Stat {
-  /** Final integer value (without the %) */
   target: number;
   label: string;
 }
@@ -15,7 +37,7 @@ const STATS: Stat[] = [
   { target: 60, label: "Less manual compliance effort" },
 ];
 
-const DURATION = 2000; // ms — total animation time
+const DURATION = 2000;
 
 function easeOutCubic(t: number): number {
   return 1 - (1 - t) ** 3;
@@ -26,7 +48,6 @@ export function FipsOperationalImpact(): React.ReactElement {
   const [started, setStarted] = useState(false);
   const [counts, setCounts] = useState<number[]>(() => STATS.map(() => 0));
 
-  /* Start counters once when the section first enters the viewport. */
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -40,7 +61,6 @@ export function FipsOperationalImpact(): React.ReactElement {
     return () => observer.disconnect();
   }, [started]);
 
-  /* Animate from 0 → target on each frame using easeOutCubic. */
   useEffect(() => {
     if (!started) return;
     const startTime = performance.now();
@@ -61,7 +81,9 @@ export function FipsOperationalImpact(): React.ReactElement {
       data-section="FipsOperationalImpact"
       className="relative bg-white overflow-hidden"
     >
-      {/* Subtle grid texture */}
+      {/*
+       * Subtle grid texture (matches Figma background grid lines)
+       */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute inset-0"
@@ -72,7 +94,31 @@ export function FipsOperationalImpact(): React.ReactElement {
         }}
       />
 
-      {/* Top-right soft halo */}
+      {/*
+       * Left decorative vector — Figma: x=−41 y=63 w=577 h=560
+       * Positioned relative to the section left edge.
+       */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/fips/flare-left.png"
+        alt=""
+        className="pointer-events-none select-none absolute hidden md:block"
+        style={{
+          left: "-41px",
+          top: "63px",
+          width: "577px",
+          height: "560px",
+          opacity: 0.5,
+          mixBlendMode: "multiply",
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+
+      {/*
+       * Top-right soft halo — Figma: x=1663 y=−40 w=371 h=371
+       */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden md:block"
@@ -88,10 +134,26 @@ export function FipsOperationalImpact(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-14 md:pt-[100px] pb-14 md:pb-[100px] lg:pb-[250px]">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-10 md:gap-12 items-center">
-          {/* Cube */}
-          <div className="flex justify-center md:justify-start">
+      <div
+        className="relative mx-auto px-4 md:px-0"
+        style={{
+          maxWidth: "1276px",
+          /*
+           * Figma: content top y=120px at 1440px → 120/1440 = 8.33vw
+           */
+          paddingTop: "clamp(60px, 8.33vw, 120px)",
+          /*
+           * 250px = 170px CTA-card overlap + 80px breathing room (Footer contract).
+           */
+          paddingBottom: "250px",
+        }}
+      >
+        <div
+          className="flex flex-col md:flex-row items-center md:items-start"
+          style={{ gap: "clamp(32px, 4.65vw, 67px)" }}
+        >
+          {/* ── Left column: 3D cube image ── */}
+          <div className="flex-shrink-0 flex justify-center md:justify-start">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/fips/cube-impact.png"
@@ -99,7 +161,10 @@ export function FipsOperationalImpact(): React.ReactElement {
               aria-hidden
               className="pointer-events-none select-none"
               style={{
-                width: "clamp(220px, 22vw, 369px)",
+                /*
+                 * Figma: 369px wide at 1440px → 369/1440 = 25.63vw
+                 */
+                width: "clamp(200px, 25.63vw, 369px)",
                 height: "auto",
               }}
               loading="lazy"
@@ -107,24 +172,36 @@ export function FipsOperationalImpact(): React.ReactElement {
             />
           </div>
 
-          {/* Heading + stats */}
-          <div>
+          {/* ── Right column: heading + stats ── */}
+          <div className="flex-1 min-w-0">
             <h2
-              className="text-[#111] mb-10 md:mb-[40px]"
+              className="text-[#111]"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(32px, 4vw, 56px)",
+                /*
+                 * Figma: 62px at 1440px → 62/1440 = 4.31vw
+                 */
+                fontSize: "clamp(28px, 4.31vw, 62px)",
                 fontWeight: 700,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
+                /* Figma: −3.1px on 62px = −0.05em */
+                letterSpacing: "-0.05em",
+                lineHeight: 1.05,
                 maxWidth: "654px",
+                /*
+                 * Figma: 80px gap between heading and stats at 1440px → 5.56vw
+                 */
+                marginBottom: "clamp(32px, 5.56vw, 80px)",
               }}
             >
               Operational Impact of Built-In{" "}
               <span className="cs-text-gradient-impact">Compliance</span>
             </h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-4">
+            {/* Stats row — 4 columns, each 176px, 45px gap */}
+            <div
+              className="grid grid-cols-2 md:grid-cols-4"
+              style={{ gap: "clamp(16px, 3.13vw, 45px) clamp(16px, 3.13vw, 45px)" }}
+            >
               {STATS.map((stat, idx) => (
                 <div
                   key={stat.label}
@@ -132,37 +209,47 @@ export function FipsOperationalImpact(): React.ReactElement {
                   style={
                     idx > 0
                       ? {
-                          paddingLeft: "clamp(12px, 1.5vw, 24px)",
-                          borderLeft: "1px solid rgba(35, 90, 220, 0.18)",
+                          paddingLeft: "clamp(12px, 1.67vw, 24px)",
+                          borderLeft: "1.5px solid rgba(35, 90, 220, 0.18)",
                         }
                       : undefined
                   }
                 >
+                  {/* Number */}
                   <p
                     aria-live="polite"
                     aria-label={`${stat.target}% ${stat.label}`}
                     className="text-[#111]"
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "var(--text-t-display-2)",
+                      /*
+                       * Figma: 52px at 1440px → 52/1440 = 3.61vw
+                       */
+                      fontSize: "clamp(24px, 3.61vw, 52px)",
                       fontWeight: 700,
-                      letterSpacing: "var(--text-t-display-2-ls)",
-                      lineHeight: "var(--text-t-display-2-lh)",
-                      marginBottom: "10px",
+                      /* Figma: −2.6px on 52px = −0.05em */
+                      letterSpacing: "-0.05em",
+                      lineHeight: 1,
+                      marginBottom: "8px",
                       fontVariantNumeric: "tabular-nums",
                     }}
                   >
                     {counts[idx] ?? 0}%
                   </p>
+
+                  {/* Label */}
                   <p
-                    className="text-[#333]"
                     style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "clamp(20px, 2vw, 28px)",
-                      fontWeight: 500,
-                      letterSpacing: "-0.02em",
-                      lineHeight: 1.3,
-                      opacity: 0.85,
+                      fontFamily: "var(--font-display)",
+                      /*
+                       * Figma: 20px at 1440px → 20/1440 = 1.39vw
+                       */
+                      fontSize: "clamp(13px, 1.39vw, 20px)",
+                      fontWeight: 400,
+                      /* Figma: −1px on 20px = −0.05em */
+                      letterSpacing: "-0.05em",
+                      lineHeight: 1.4,
+                      color: "#333",
                       maxWidth: "176px",
                     }}
                   >
