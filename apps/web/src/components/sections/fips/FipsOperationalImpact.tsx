@@ -175,7 +175,7 @@ export function FipsOperationalImpact(): React.ReactElement {
           {/* ── Right column: heading + stats ── */}
           <div className="flex-1 min-w-0">
             <h2
-              className="text-[#111]"
+              className="text-[#111] text-center md:text-left"
               style={{
                 fontFamily: "var(--font-display)",
                 /*
@@ -223,9 +223,9 @@ export function FipsOperationalImpact(): React.ReactElement {
                     style={{
                       fontFamily: "var(--font-display)",
                       /*
-                       * Figma: 52px at 1440px → 52/1440 = 3.61vw
+                       * Mobile: 32px (Figma 366:7788), desktop: 52px at 1440px → 3.61vw
                        */
-                      fontSize: "clamp(24px, 3.61vw, 52px)",
+                      fontSize: "clamp(32px, 3.61vw, 52px)",
                       fontWeight: 700,
                       /* Figma: −2.6px on 52px = −0.05em */
                       letterSpacing: "-0.05em",
@@ -242,9 +242,9 @@ export function FipsOperationalImpact(): React.ReactElement {
                     style={{
                       fontFamily: "var(--font-display)",
                       /*
-                       * Figma: 20px at 1440px → 20/1440 = 1.39vw
+                       * Mobile: 16px (Figma 366:7788), desktop: 20px at 1440px → 1.39vw
                        */
-                      fontSize: "clamp(13px, 1.39vw, 20px)",
+                      fontSize: "clamp(16px, 1.39vw, 20px)",
                       fontWeight: 400,
                       /* Figma: −1px on 20px = −0.05em */
                       letterSpacing: "-0.05em",

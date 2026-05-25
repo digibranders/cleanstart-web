@@ -148,9 +148,10 @@ export function FipsEnables(): React.ReactElement {
             className="mx-auto text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(32px, 4vw, 56px)",
+              /* Mobile: 28px (Figma 366:7788), desktop: 56px */
+              fontSize: "clamp(28px, 4vw, 56px)",
               fontWeight: 700,
-              letterSpacing: "-0.04em",
+              letterSpacing: "-0.05em",
               lineHeight: 1.1,
               maxWidth: "41.5rem",
               marginBottom: "clamp(1rem, 2.2vw, 2rem)",
@@ -163,9 +164,10 @@ export function FipsEnables(): React.ReactElement {
             className="mx-auto text-white"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(18px, 1.7vw, 24px)",
+              /* Mobile: 16px (Figma 366:7788), desktop: 24px */
+              fontSize: "clamp(16px, 1.7vw, 24px)",
               fontWeight: 400,
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.04em",
               lineHeight: 1.4,
               opacity: 0.8,
             }}

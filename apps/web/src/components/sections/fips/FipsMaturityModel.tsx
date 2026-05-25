@@ -62,14 +62,15 @@ export function FipsMaturityModel(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 md:pt-[80px] pb-16 md:pb-[88px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-10 pt-14 md:pt-[80px] pb-14 md:pb-[88px]">
         <h2
           className="text-center text-[#111] mb-12 md:mb-[64px]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 4vw, 56px)",
+            /* Mobile: 28px (Figma 366:7788), desktop: 56px */
+            fontSize: "clamp(28px, 4vw, 56px)",
             fontWeight: 700,
-            letterSpacing: "-0.04em",
+            letterSpacing: "-0.05em",
             lineHeight: 1.1,
           }}
         >
@@ -97,7 +98,8 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
         border: "1px solid rgba(218, 182, 243, 0.55)",
         boxShadow:
           "0 20px 36px -22px rgba(132, 80, 255, 0.18), 0 1px 0 rgba(255,255,255,0.85) inset",
-        minHeight: "clamp(260px, 24vw, 320px)",
+        /* Mobile: 226px (Figma 366:7788 card h=226px) */
+        minHeight: "clamp(226px, 24vw, 320px)",
       }}
     >
       <FipsBall size={84} />
@@ -107,9 +109,10 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
           className="text-[#111] mb-2"
           style={{
             fontFamily: "var(--font-display)",
+            /* Mobile: 20px (Figma 366:7788), desktop: 28px */
             fontSize: "clamp(20px, 2vw, 28px)",
             fontWeight: 600,
-            letterSpacing: "-0.04em",
+            letterSpacing: "-0.05em",
             lineHeight: 1.1,
           }}
         >
@@ -119,11 +122,12 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
           className="text-[#333]"
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(15px, 1.4vw, 20px)",
+            /* Mobile: 14px (Figma 366:7788), desktop: 20px */
+            fontSize: "clamp(14px, 1.4vw, 20px)",
             fontWeight: 400,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.4,
-            opacity: 0.85,
+            letterSpacing: "-0.035em",
+            lineHeight: 1.5,
+            opacity: 0.8,
           }}
         >
           {stage.description}
