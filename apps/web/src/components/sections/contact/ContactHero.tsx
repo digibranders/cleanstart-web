@@ -1,140 +1,153 @@
 import { Container } from "@/components/layout";
 
+/**
+ * Hero — Figma node 857:14714.
+ *
+ * Background: vertical multi-stop gradient (dark navy → blue → violet → fading
+ * to transparent at the bottom so it bleeds into the next section).
+ * Decorations: two 3D-cube renders flanking the title, rotated and rendered
+ * with mix-blend-mode: color-dodge per Figma. No grid pattern — design uses
+ * a flat painted background.
+ *
+ * Spec dimensions are taken from a 1920-wide artboard; cube positions/sizes
+ * are scaled via calc(... / 1920 * 100%) so they hold relative to the viewport.
+ */
 export function ContactHero() {
   return (
     <section
-      className="bg-cs-hero relative overflow-hidden"
-      style={{ minHeight: "clamp(360px, 30vw, 460px)" }}
+      className="relative overflow-hidden"
+      style={{
+        // Exact stops from Figma 857:14714.
+        backgroundImage:
+          "linear-gradient(180deg, rgb(21, 16, 33) 25.702%, rgb(16, 18, 62) 31.159%, rgb(19, 30, 143) 51.006%, rgb(71, 30, 192) 68.711%, rgb(71, 31, 195) 79.832%, rgba(70, 30, 191, 0.85) 85.018%, rgba(66, 30, 188, 0.4) 93.72%, rgba(66, 30, 188, 0) 100.66%)",
+        // Extended past Figma's 498px so the gradient continues behind the
+        // top of the form card and only fades out around the email-row
+        // (the form is pulled up over the hero via -mt-10/-mt-16).
+        minHeight: "clamp(620px, 54vw, 820px)",
+      }}
     >
-      {/* SVG tile grid — Figma's rounded-square pattern (71×71 tiles).
-          Replaces the shared `bg-cs-grid` linear-gradient lines so this
-          section gets the actual Figma pattern, not 1-px CSS hairlines. */}
+      {/* Left 3D cube — flanking the title at roughly the same vertical level
+          as the right cube. Mix-blend-mode color-dodge. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
-          backgroundImage: "url('/images/contact/hero-grid.svg')",
-          backgroundRepeat: "repeat",
-          backgroundSize: "72px 72px",
-          // Mask: fade the grid out toward the bottom so it doesn't fight
-          // the white fade-into-next-section.
-          WebkitMaskImage:
-            "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
-          maskImage:
-            "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
-        }}
-      />
-
-      {/* Purple radial blobs flanking the title — Figma decorative ellipses */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          left: "calc(420px / 1920 * 100%)",
+          left: "30px",
           top: "100px",
-          width: "360px",
-          height: "360px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(closest-side, rgba(122,89,255,0.40) 0%, rgba(122,89,255,0) 100%)",
-          filter: "blur(70px)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          left: "calc(1180px / 1920 * 100%)",
-          top: "60px",
-          width: "360px",
-          height: "360px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(closest-side, rgba(70,30,191,0.45) 0%, rgba(70,30,191,0) 100%)",
-          filter: "blur(80px)",
-        }}
-      />
-
-      {/* Left floating 3D cube — reused brand asset, optional decorative */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden lg:block"
-        style={{
-          top: "60px",
-          left: "calc(50% - 760px)",
-          width: "260px",
-          height: "260px",
-          transform: "rotate(-12deg)",
+          width: "419px",
+          height: "419px",
+          mixBlendMode: "color-dodge",
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/about/cta-3d-cube.svg"
-          alt=""
-          loading="eager"
-          decoding="async"
-          className="h-full w-full object-contain opacity-90"
-        />
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            transform: "rotate(-46.54deg)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/contact/hero-cube.png"
+            alt=""
+            width={294}
+            height={298}
+            loading="eager"
+            decoding="async"
+            style={{
+              width: "294px",
+              height: "298px",
+              opacity: 0.4,
+              objectFit: "contain",
+            }}
+          />
+        </div>
       </div>
 
-      {/* Right floating 3D cube */}
+      {/* Right 3D cube — mirrors the left, flanking the title. */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden lg:block"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
-          top: "80px",
-          left: "calc(50% + 500px)",
-          width: "260px",
-          height: "260px",
-          transform: "rotate(10deg)",
+          right: "30px",
+          top: "100px",
+          width: "419px",
+          height: "419px",
+          mixBlendMode: "color-dodge",
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/about/cta-3d-cube.svg"
-          alt=""
-          loading="eager"
-          decoding="async"
-          className="h-full w-full object-contain opacity-90"
-        />
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            transform: "rotate(46.54deg)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/contact/hero-cube.png"
+            alt=""
+            width={294}
+            height={298}
+            loading="eager"
+            decoding="async"
+            style={{
+              width: "294px",
+              height: "298px",
+              opacity: 0.4,
+              objectFit: "contain",
+            }}
+          />
+        </div>
       </div>
 
       <Container className="relative">
-        <div className="flex flex-col items-center pt-[clamp(72px,8vw,128px)] pb-[clamp(40px,5vw,72px)] text-center">
+        {/* Title block — Figma 857:14946, w=730, top=186, gap=24 between
+            title and subtitle, centered. */}
+        <div className="mx-auto flex flex-col items-center gap-6 pt-[clamp(96px,14vw,186px)] pb-[clamp(16px,2vw,28px)] text-center">
           <h1
-            className="font-display font-semibold text-white"
+            className="text-white whitespace-nowrap"
             style={{
-              fontSize: "var(--text-hero-marketing)",
-              lineHeight: "var(--text-hero-lh)",
-              letterSpacing: "var(--text-hero-marketing-ls)",
+              fontFamily:
+                "var(--font-display, 'Figtree', 'Manrope', sans-serif)",
+              fontSize: "clamp(40px, 4.45vw, 64px)",
+              lineHeight: 1.05,
+              letterSpacing: "-0.04em",
+              fontWeight: 600,
             }}
           >
-            Contact <span className="text-[#3960F9]">US</span>
+            Contact{" "}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{
+                backgroundImage:
+                  "linear-gradient(110.276deg, rgb(154, 81, 255) 1.7578%, rgb(44, 193, 235) 98.781%)",
+              }}
+            >
+              US
+            </span>
           </h1>
           <p
-            className="mt-5 max-w-[720px] text-white/80"
+            className="text-white/80"
             style={{
               fontFamily: "var(--font-sans)",
               fontSize: "var(--text-body-lg)",
               fontWeight: 400,
-              lineHeight: 1.5,
-              letterSpacing: "-0.01em",
+              lineHeight: 1.3,
+              letterSpacing: "-0.04em",
+              maxWidth: "730px",
             }}
           >
             We would be happy to hear from you about any feedback or questions.
           </p>
         </div>
       </Container>
-
-      {/* Bottom fade into white */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.20) 100%)",
-        }}
-      />
     </section>
   );
 }
