@@ -122,7 +122,7 @@ export function CleanSightStats(): React.ReactElement {
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md" style={{ paddingBottom: "250px" }}>
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md" style={{ paddingBottom: "var(--spacing-section-cta)" }}>
 
         {/* ── Heading ── */}
         <div className="text-center" style={{ marginBottom: "62px" }}>

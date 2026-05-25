@@ -93,7 +93,7 @@ export function CleanSightCTA(): React.ReactElement {
 
       {/* ── Content row — Vuln CTA pattern (absolute inset-0 + items-center) ── */}
       <div
-        className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 items-center"
+        className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 items-start"
         style={{
           paddingLeft: "clamp(28px, 4vw, 64px)",
           paddingRight: "clamp(28px, 4vw, 64px)",
@@ -106,7 +106,7 @@ export function CleanSightCTA(): React.ReactElement {
         <p
           className="relative min-w-0 w-full font-display"
           style={{
-            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontSize: "var(--cta-card-title)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -132,7 +132,7 @@ export function CleanSightCTA(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(16px, 1.5vw, 20px)",
+              fontSize: "var(--cta-card-desc)",
               fontWeight: 400,
               letterSpacing: "-0.02em",
               lineHeight: 1.4,
