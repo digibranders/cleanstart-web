@@ -61,21 +61,25 @@ const LEGAL_LINKS = [
   { label: "Security", href: "#security" },
 ];
 
-// CTA-card overlap is owned here, not by callers. Card overhangs the Footer by
-// 170px (Figma 446:1765). Callers pass content only via the `cta` prop. Do not
-// re-add `topPadding` or negative section margins per-page.
+// CTA-card overlap is owned here, not by callers. Card is vertically CENTERED
+// on the Footer's top edge (half above, half below). Callers pass content only
+// via the `cta` prop. Do not re-add `topPadding` or negative section margins
+// per-page.
 //
 // IMPORTANT — Layout contract:
-//   - The Footer has NO reserved gap above it. The CTA card sits absolutely at
-//     `top: -170px` and visually OVERLAPS the previous section by 170px.
+//   - The CTA card wrapper uses `top: 0; translateY(-50%)` so the card's
+//     vertical center sits exactly on the footer's top edge. The card-slot
+//     heights below (350 mobile / 300 sm / 260 lg) mean ~175/150/130px of the
+//     card sits above the footer (overlapping the previous section) and the
+//     other half sits inside the footer.
 //   - Every page that uses `<Footer cta=...>` MUST make sure its last section
-//     extends at least 170px below its natural content so the CTA card overlaps
-//     real section bg (gradient, pattern, decorative SVGs — whatever the
-//     section actually paints), NOT empty body white.
+//     extends at least `card_height / 2` below its natural content so the CTA
+//     card overlaps real section bg (gradient, pattern, decorative SVGs), NOT
+//     empty body white. The largest card-half is 175px (mobile, h=350).
 //   - Convention: every last bg-providing element of a CTA page uses
-//     `padding-bottom: 250px` — that's 170px for the CTA overlap + 80px of
-//     breathing room between the page's last content and the CTA card top.
-//     Standardised across all pages so the gap is visually consistent.
+//     `padding-bottom: 250px` (or `var(--spacing-section-cta)`). The Footer's
+//     `padding-top: var(--spacing-section-cta)` matches, producing symmetric
+//     spacing above and below the card at every breakpoint.
 //
 // Locked card container contract (per-page CTAs must fit these bounds):
 //   width: 1276px (max-width: calc(100% - 48px))
@@ -98,8 +102,7 @@ export function Footer({
     >
       {hasCta && (
         <div
-          className="pointer-events-none absolute left-1/2 z-20 w-full max-w-[1152px] -translate-x-1/2 px-6 sm:px-10"
-          style={{ top: "-170px" }}
+          className="pointer-events-none absolute left-1/2 top-0 z-20 w-full max-w-[1152px] -translate-x-1/2 -translate-y-1/2 px-6 sm:px-10"
         >
           {/* Sizing wrapper — NO overflow:hidden so `ctaOverlay` children can
               break out of the card. Card width capped at 1152 (intentionally
@@ -156,7 +159,7 @@ export function Footer({
           }}
         />
       <div className="relative">
-       <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[330px] sm:pt-[280px] lg:pt-[240px]" : "pt-[80px]"}`}>
+       <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-section-cta" : "pt-[80px]"}`}>
         {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
         <div className="flex flex-wrap items-start justify-between gap-8">
           <p

@@ -69,21 +69,23 @@ export function CisoCTA(): React.ReactElement {
           Desktop: left=122px, right=107px, top≈85px, gap=115px between two columns.
           Mobile: stacked column with responsive padding. */}
       <div
-        className="relative flex flex-col lg:flex-row lg:items-center"
+        className="relative flex flex-col lg:flex-row lg:items-start"
         style={{
           padding: "clamp(40px, 4.43vw, 85px) clamp(32px, 6.35vw, 122px)",
           gap: "clamp(32px, 5.99vw, 115px)",
         }}
       >
-        {/* Left: headline — Manrope Bold 55px, lh 1, tracking -0.05em */}
+        {/* Left: headline — global CTA-card title token (`--cta-card-title`).
+            Per the strict-fonts rule the token + dev's weight/ls/lh win even
+            though the surrounding cube/padding geometry stays farheen-Figma. */}
         <p
           className="relative text-white flex-shrink-0"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 2.86vw, 55px)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1,
+            fontSize: "var(--cta-card-title)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "min(462px, 100%)",
           }}
         >
@@ -95,13 +97,13 @@ export function CisoCTA(): React.ReactElement {
           className="relative flex flex-col"
           style={{ maxWidth: "min(493px, 100%)", gap: "clamp(20px, 1.25vw, 24px)" }}
         >
-          {/* Description — Sora Regular 21px, opacity 0.8, tracking -0.04em, lh 1.4 */}
+          {/* Description — global CTA-card desc token (`--cta-card-desc`). */}
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(15px, 1.09vw, 21px)",
+              fontSize: "var(--cta-card-desc)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
+              letterSpacing: "-0.02em",
               lineHeight: 1.4,
               color: "rgba(255, 255, 255, 0.8)",
             }}

@@ -84,7 +84,7 @@ export function ASRCTA(): React.ReactElement {
 
       {/* Content row */}
       <div
-        className="relative flex flex-col lg:flex-row lg:items-center"
+        className="relative flex flex-col lg:flex-row lg:items-start"
         style={{ padding: "clamp(40px, 6vw, 64px) clamp(32px, 5vw, 80px)", gap: "clamp(32px, 5vw, 72px)" }}
       >
         {/* Left: headline — auto-wraps 2 or 3 lines via balance */}
@@ -92,7 +92,7 @@ export function ASRCTA(): React.ReactElement {
           className="relative"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontSize: "var(--cta-card-title)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -113,7 +113,7 @@ export function ASRCTA(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(16px, 1.5vw, 20px)",
+              fontSize: "var(--cta-card-desc)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
             lineHeight: 1.4,

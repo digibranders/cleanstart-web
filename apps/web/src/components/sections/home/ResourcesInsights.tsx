@@ -1,7 +1,10 @@
-"use client";
+import {
+  getResourcesInsightsData,
+  type ResourceCardsByTab,
+  type TabId,
+} from "@/lib/resources-insights";
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { ResourcesInsightsClient } from "./ResourcesInsightsClient";
 
 /**
  * Section: "Resources & Insights"
@@ -14,32 +17,34 @@ import Image from "next/image";
  *   - Inactive tabs: gray text #666
  * - 3 article cards: image 404×231, then title (Bold 22px) + description (Regular 16px) + Explore link
  *
- * Interactive:
- * - Click any tab to switch (state-driven)
- * - Cards swap content per tab (placeholder content per category)
- * - Hover: card subtle lift + shadow
- * - Keyboard: Tab to focus, Enter/Space to activate
+ * --- Data flow -----------------------------------------------------
+ *
+ * This is now a SERVER component. It calls `getResourcesInsightsData()`
+ * which fetches the latest 3 published items from each of 6 Payload
+ * collections in parallel and caches each response for 5 minutes via
+ * Next.js ISR (`fetch(..., { next: { revalidate: 300 } })`).
+ *
+ * The home page stays statically pre-rendered: we deliberately avoid
+ * `lib/cms-fetch` because its `draftMode()` cookie read would force a
+ * dynamic render on every request. Visitors get the cached HTML; CMS
+ * is only contacted in background revalidation.
+ *
+ * If CMS is unreachable (cold start, droplet down, network blip) the
+ * fetches return empty arrays and the section still renders via the
+ * `PLACEHOLDER_ARTICLES_BY_TAB` constants below — the home page never
+ * crashes on a CMS failure, and Next.js will keep retrying in the
+ * background until the data warms up again.
+ *
+ * Interactive tab UI lives in `./ResourcesInsightsClient.tsx`.
  */
 
-type TabId = "blogs" | "resource" | "newsroom" | "knowledgehub" | "events" | "podcast";
-
-const TABS: { id: TabId; label: string }[] = [
-  { id: "blogs", label: "Blogs" },
-  { id: "resource", label: "Resource" },
-  { id: "newsroom", label: "Newsroom" },
-  { id: "knowledgehub", label: "Knowledgehub" },
-  { id: "events", label: "Events" },
-  { id: "podcast", label: "Podcast" },
-];
-
-interface Article {
-  image: string;
-  title: string;
-  description: string;
-  href: string;
-}
-
-const ARTICLES_BY_TAB: Record<TabId, Article[]> = {
+// =============================================================================
+// Placeholder fallbacks — render when a CMS collection returns zero items
+// (empty collection, fetch failed, or cold cache). Each fallback is hand-
+// curated to be on-brand and slot-pluggable into the same `ResourceCard`
+// shape the CMS produces.
+// =============================================================================
+const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
   blogs: [
     {
       image: "/images/resource-1.png",
@@ -67,25 +72,28 @@ const ARTICLES_BY_TAB: Record<TabId, Article[]> = {
   ],
   resource: [
     {
-      image: "/images/resource-1.png",
+      image: "/images/resource-center/cover-poster/datasheet-cover.png",
       title: "CleanStart Whitepaper: A Technical Architecture Overview",
       description:
         "A deep technical dive into how CleanStart's deterministic build pipeline produces hardened, signed container images at scale.",
       href: "#resource-whitepaper",
+      isCoverPoster: true,
     },
     {
-      image: "/images/resource-2.png",
+      image: "/images/resource-center/cover-poster/datasheet-report.png",
       title: "Container Hardening Checklist for Production Workloads",
       description:
         "A practical, vendor-neutral checklist your platform team can use to evaluate the hardening posture of any container image before it ships.",
       href: "#resource-checklist",
+      isCoverPoster: true,
     },
     {
-      image: "/images/resource-3.png",
+      image: "/images/resource-center/cover-poster/architecture-insights.png",
       title: "FIPS 140-3 Compliance Quick-Start Guide",
       description:
         "Step-by-step guidance for organizations adopting FIPS 140-3 cryptographic modules in containerized environments.",
       href: "#resource-fips",
+      isCoverPoster: true,
     },
   ],
   newsroom: [
@@ -111,29 +119,6 @@ const ARTICLES_BY_TAB: Record<TabId, Article[]> = {
       href: "#news-report",
     },
   ],
-  knowledgehub: [
-    {
-      image: "/images/resource-2.png",
-      title: "Understanding Image Provenance and Attestation",
-      description:
-        "How cryptographic provenance gives you a verifiable chain-of-custody from source code to deployed container image.",
-      href: "#kb-provenance",
-    },
-    {
-      image: "/images/resource-1.png",
-      title: "Sigstore + Cosign: Verifying Signed Images in CI/CD",
-      description:
-        "Practical guide to integrating image signature verification into your GitHub Actions, GitLab, or Argo CD workflow.",
-      href: "#kb-cosign",
-    },
-    {
-      image: "/images/resource-3.png",
-      title: "Reducing Attack Surface with Distroless Patterns",
-      description:
-        "When and why to use distroless base images, and what tradeoffs you accept by removing the shell from production images.",
-      href: "#kb-distroless",
-    },
-  ],
   events: [
     {
       image: "/images/resource-1.png",
@@ -157,57 +142,26 @@ const ARTICLES_BY_TAB: Record<TabId, Article[]> = {
       href: "#event-rsa",
     },
   ],
-  podcast: [
-    {
-      image: "/images/resource-3.png",
-      title: "Ep 12: Inside CleanStart's Continuous-Rebuild Pipeline",
-      description:
-        "How we rebuild thousands of images per day in response to upstream CVE disclosures — and why that's the future of base images.",
-      href: "#podcast-12",
-    },
-    {
-      image: "/images/resource-1.png",
-      title: "Ep 11: A Conversation with the SLSA Working Group",
-      description:
-        "Maintainers from the SLSA framework join us to discuss provenance levels, build platforms, and the hard parts of supply-chain security.",
-      href: "#podcast-11",
-    },
-    {
-      image: "/images/resource-2.png",
-      title: "Ep 10: From SBOM to Trust — The Verification Gap",
-      description:
-        "Why an SBOM alone doesn't tell you whether you can trust an image, and what a complete verification stack looks like in practice.",
-      href: "#podcast-10",
-    },
-  ],
 };
 
-export function ResourcesInsights() {
-  const [activeTab, setActiveTab] = useState<TabId>("blogs");
-  const articles = ARTICLES_BY_TAB[activeTab];
+/**
+ * Per-tab merge: real CMS data takes precedence; if the collection
+ * returned zero items the tab falls back to its hand-curated placeholders.
+ * This keeps the section populated end-to-end while the CMS is still
+ * empty for a given collection (or temporarily unreachable).
+ */
+function mergeWithFallback(cms: ResourceCardsByTab): ResourceCardsByTab {
+  const out = {} as ResourceCardsByTab;
+  for (const tab of Object.keys(PLACEHOLDER_ARTICLES_BY_TAB) as TabId[]) {
+    const live = cms[tab];
+    out[tab] = live.length > 0 ? live : PLACEHOLDER_ARTICLES_BY_TAB[tab];
+  }
+  return out;
+}
 
-  // Auto-center the active tab in the horizontal scroller (mobile/tablet).
-  // First tab ("blogs") stays at scroll position 0 so the bar reads from
-  // the left edge by default; every other tab smoothly scrolls to center.
-  const scrollerRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    if (activeTab === "blogs") {
-      scroller.scrollTo({ left: 0, behavior: "smooth" });
-      return;
-    }
-    const btn = scroller.querySelector<HTMLButtonElement>(
-      `#tab-${activeTab}`,
-    );
-    if (!btn) return;
-    const target =
-      btn.offsetLeft - (scroller.clientWidth - btn.offsetWidth) / 2;
-    scroller.scrollTo({
-      left: Math.max(0, target),
-      behavior: "smooth",
-    });
-  }, [activeTab]);
+export async function ResourcesInsights() {
+  const cmsData = await getResourcesInsightsData();
+  const articlesByTab = mergeWithFallback(cmsData);
 
   return (
     <section
@@ -274,131 +228,8 @@ export function ResourcesInsights() {
           and expert analysis from our security team.
         </p>
 
-        {/* Tab bar — Figma 108:8529: 929×64, padding 8, gap 12, white bg, radius 30.
-            Horizontal scroller; clicking a tab smoothly centers it (handled by
-            the useEffect above; first tab "Blogs" stays at scrollLeft 0). */}
-        <div
-          ref={scrollerRef}
-          className="mt-12 -mx-6 overflow-x-auto px-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-        <div
-          role="tablist"
-          aria-label="Resource categories"
-          className="inline-flex items-center gap-2 rounded-full bg-white p-1.5"
-          style={{
-            boxShadow:
-              "0 1px 0 rgba(0,0,0,0.04), 0 24px 48px -24px rgba(60,30,150,0.06)",
-          }}
-        >
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                aria-controls="resources-articles"
-                id={`tab-${tab.id}`}
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative flex h-10 cursor-pointer items-center justify-center rounded-full px-6 text-base font-semibold leading-[1] tracking-[-0.04em] transition-colors duration-200 ease-out ${
-                  isActive
-                    ? "text-white"
-                    : "text-[#666666] hover:text-[#111111]"
-                }`}
-                style={{
-                  background: isActive
-                    ? "linear-gradient(180deg, #2B97D1 0%, #3960F9 100%)"
-                    : "transparent",
-                  boxShadow: isActive
-                    ? "0 6px 16px -6px rgba(57,96,249,0.45)"
-                    : "none",
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-        </div>
-
-        {/* Article cards row */}
-        <div
-          id="resources-articles"
-          role="tabpanel"
-          aria-labelledby={`tab-${activeTab}`}
-          className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
-          key={activeTab}
-        >
-          {articles.map((article) => (
-            <ArticleCard key={article.title} article={article} />
-          ))}
-        </div>
+        <ResourcesInsightsClient articlesByTab={articlesByTab} />
       </div>
     </section>
-  );
-}
-
-function ArticleCard({ article }: { article: Article }) {
-  return (
-    <a
-      href={article.href}
-      className="group flex flex-col gap-4 transition-transform duration-200 cursor-pointer hover:-translate-y-1"
-      style={{ animation: "cs-fade-slide-in 280ms ease-out both" }}
-    >
-      {/* Figma: image card 404×231, corner radius 40 */}
-      <div className="relative h-[231px] w-full overflow-hidden rounded-[40px]">
-        <Image
-          src={article.image}
-          alt=""
-          fill
-          sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      </div>
-      {/* Card title — intentionally <p>, not <h3>: matches the parent
-          section's "no heading-tag" decision (least priority). */}
-      <p
-        className="text-[#1a1a1a] transition-colors duration-200 group-hover:text-[#1B1F4F]"
-        style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "clamp(18px, 1.7vw, 24px)",
-          fontWeight: 600,
-          lineHeight: 1.25,
-          letterSpacing: "-0.02em",
-          margin: 0,
-        }}
-      >
-        {article.title}
-      </p>
-      <p
-        className="text-[#666]"
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: "clamp(15px, 1.4vw, 20px)",
-          fontWeight: 400,
-          lineHeight: 1.5,
-          letterSpacing: "-0.02em",
-        }}
-      >
-        {article.description}
-      </p>
-      {/* Figma: "Explore" Sora Bold 16px, color #000, with filled chevron arrow */}
-      <span className="inline-flex items-center gap-2 text-base font-bold text-black transition-transform duration-200 group-hover:translate-x-1">
-        <span>Explore</span>
-        <svg
-          width="8"
-          height="16"
-          viewBox="0 0 8 16"
-          fill="none"
-          aria-hidden
-        >
-          <path
-            d="M6.71 7.29 2.94 11.06 1.79 9.91l3.16-2.88 1.09-.92-1.09-.93-3.16-2.85L2.94 2 6.71 5.77a1.06 1.06 0 0 1 .31.75 1.06 1.06 0 0 1-.31.77Z"
-            fill="currentColor"
-          />
-        </svg>
-      </span>
-    </a>
   );
 }

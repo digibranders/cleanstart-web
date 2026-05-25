@@ -40,9 +40,9 @@ export function CommunityHero() {
             <h1
               className="font-display font-semibold text-white lg:w-[48%]"
               style={{
-                fontSize: 'var(--text-hero-marketing)',
-                lineHeight: 'var(--text-hero-lh)',
-                letterSpacing: 'var(--text-hero-marketing-ls)',
+                fontSize: 'clamp(40px, 4.45vw, 64px)',
+                lineHeight: 1.05,
+                letterSpacing: '-0.04em',
               }}
             >
               Let&apos;s work together towards secure development

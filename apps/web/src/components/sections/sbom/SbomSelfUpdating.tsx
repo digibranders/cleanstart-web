@@ -99,8 +99,8 @@ export function SbomSelfUpdating(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(32px, 4vw, 56px)',
-            fontWeight: 700,
+            fontSize: 'var(--text-display-md)',
+            fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
             width: vw(593),
@@ -111,10 +111,10 @@ export function SbomSelfUpdating(): React.ReactElement {
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(18px, 1.7vw, 24px)',
+            fontSize: 'var(--text-t-subhead)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
-            lineHeight: 1.4,
+            lineHeight: 1.45,
             color: 'rgba(255,255,255,0.88)',
             width: '100%',
           }}
@@ -227,10 +227,10 @@ export function SbomSelfUpdating(): React.ReactElement {
           className="text-white text-center"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '28px',
-            fontWeight: 700,
+            fontSize: 'var(--text-display-md)',
+            fontWeight: 600,
             letterSpacing: '-0.04em',
-            lineHeight: 1.2,
+            lineHeight: 1.1,
             width: '257px',
             marginBottom: '0',
             textTransform: 'capitalize',
@@ -244,10 +244,10 @@ export function SbomSelfUpdating(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '16px',
+            fontSize: 'var(--text-t-subhead)',
             fontWeight: 400,
-            letterSpacing: '-0.64px',
-            lineHeight: 1.5,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.45,
             color: 'rgba(255,255,255,0.80)',
             width: '319px',
             marginTop: '17px',
@@ -291,10 +291,10 @@ export function SbomSelfUpdating(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: '24px',
+                    fontSize: 'var(--text-card-title-md)',
                     fontWeight: 600,
-                    letterSpacing: '-1.2px',
-                    lineHeight: 1,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1.1,
                     color: '#000',
                     whiteSpace: 'nowrap',
                   }}
@@ -304,10 +304,10 @@ export function SbomSelfUpdating(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: 'var(--font-sans)',
-                    fontSize: '14px',
+                    fontSize: 'var(--text-body-sm)',
                     fontWeight: 400,
-                    letterSpacing: '-0.56px',
-                    lineHeight: 1.1,
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.4,
                     color: '#111',
                     opacity: 0.8,
                     width: '199px',
@@ -394,6 +394,7 @@ function FigmaCircle({
         loading="lazy"
         decoding="async"
       />
+      {/* TODO: needs new --stat-number-* token — 15→30px decorative numeral inside a circle, no matching role token */}
       <span
         className="relative"
         style={{

@@ -130,11 +130,12 @@ export function ResourceDetailLeadCapture({
               {/* Headline */}
               <h2
                 id="rd-cta-title"
-                className="font-display font-bold shrink-0 text-white text-center lg:text-left w-full lg:w-[486px]"
+                className="font-display shrink-0 text-white text-center lg:text-left w-full lg:w-[486px]"
                 style={{
-                  fontSize: "clamp(1.5rem, 2.86vw, 3.4375rem)",
-                  lineHeight: 1.1,
-                  letterSpacing: "-0.05em",
+                  fontSize: "var(--cta-card-title)",
+                  fontWeight: "var(--cta-card-title-weight)",
+                  lineHeight: "var(--cta-card-title-lh)",
+                  letterSpacing: "var(--cta-card-title-ls)",
                 }}
               >
                 {heading}
@@ -147,9 +148,13 @@ export function ResourceDetailLeadCapture({
               >
                 {/* Legal teaser */}
                 <p
-                  // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-                  className="text-sm lg:text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] text-white text-center lg:text-left w-full lg:w-[493px]"
-                  style={{ opacity: 0.8 }}
+                  className="font-normal text-white text-center lg:text-left w-full lg:w-[493px]"
+                  style={{
+                    fontSize: "var(--cta-card-desc)",
+                    lineHeight: "var(--cta-card-desc-lh)",
+                    letterSpacing: "var(--cta-card-desc-ls)",
+                    opacity: 0.8,
+                  }}
                 >
                   By checking this box, you agree that CleanStart may use your
                   information to contact you. You may opt out at any time.{" "}
@@ -172,12 +177,15 @@ export function ResourceDetailLeadCapture({
                     placeholder="Enter Your Email"
                     aria-label="Email address"
                     autoComplete="email"
-                    // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-                    className="text-base lg:text-[1.3125rem] font-normal leading-[1.4] tracking-[-0.04em] bg-white w-full sm:w-[352px] h-[41px]"
+                    className="font-normal bg-white w-full sm:w-[352px]"
                     style={{
+                      height: "var(--cta-card-btn-h)",
+                      fontSize: "var(--cta-card-btn-fs)",
+                      lineHeight: 1.4,
+                      letterSpacing: "-0.01em",
                       borderRadius: "8px",
                       border: "1px solid #111",
-                      paddingLeft: "20px",
+                      paddingLeft: "16px",
                       paddingRight: "16px",
                       color: "#111",
                       outline: "none",
@@ -187,9 +195,12 @@ export function ResourceDetailLeadCapture({
                   {/* Glass "Get in Touch" button */}
                   <button
                     type="submit"
-                    className="relative overflow-hidden inline-flex items-center justify-center gap-2 text-base lg:text-lg font-medium tracking-[-0.01em] shrink-0 h-[43px] w-full sm:w-auto"
+                    className="relative overflow-hidden inline-flex items-center justify-center gap-2 font-medium tracking-[-0.01em] shrink-0 w-full sm:w-auto"
                     style={{
-                      padding: "9px 18px",
+                      height: "var(--cta-card-btn-h)",
+                      paddingLeft: "var(--cta-card-btn-px)",
+                      paddingRight: "var(--cta-card-btn-px)",
+                      fontSize: "var(--cta-card-btn-fs)",
                       borderRadius: "8px",
                       border: "1px solid #dab6f3",
                       background: "rgba(255,255,255,0.65)",

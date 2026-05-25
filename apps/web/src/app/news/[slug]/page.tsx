@@ -116,14 +116,14 @@ export async function renderNewsDetail({
             style={{
               background:
                 "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)",
-              paddingBottom: "250px",
+              paddingBottom: "var(--spacing-section-cta)",
             }}
           >
             <NewsDetailRelated items={related} />
           </div>
         ) : (
-          /* NewsDetailBody has internal pb-[80px] → spacer covers remaining 170 */
-          <div aria-hidden className="bg-white" style={{ height: "170px" }} />
+          /* NewsDetailBody has internal pb-[80px] → spacer covers remaining 100 */
+          <div aria-hidden className="bg-white" style={{ height: "100px" }} />
         )}
 
       </main>

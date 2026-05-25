@@ -47,10 +47,9 @@ export function FipsWhyMatters(): React.ReactElement {
             className="text-[#111] text-center md:text-left"
             style={{
               fontFamily: "var(--font-display)",
-              /* Mobile (Figma 913:218): 28px, lh=1.2. Desktop: 56px. */
-              fontSize: "clamp(28px, 4vw, 56px)",
-              fontWeight: 700,
-              letterSpacing: "-0.05em",
+              fontSize: "var(--text-display-md)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
               lineHeight: 1.1,
               maxWidth: "444px",
             }}
@@ -62,11 +61,10 @@ export function FipsWhyMatters(): React.ReactElement {
             className="text-[#333] text-center md:text-left"
             style={{
               fontFamily: "var(--font-sans)",
-              /* Mobile (Figma 913:218): 16px, ls=−0.04em, lh=1.4. Desktop: 24px. */
-              fontSize: "clamp(16px, 1.7vw, 24px)",
+              fontSize: "var(--text-t-subhead)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.5,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.45,
               maxWidth: "731px",
             }}
           >
@@ -134,11 +132,9 @@ function MatterTile({ card }: { card: MatterCard }): React.ReactElement {
           className="text-[#111] mb-2"
           style={{
             fontFamily: "var(--font-display)",
-            /* Mobile (Figma 913:218): 20px SemiBold, ls=−1px=−0.05em, lh=none(≈1).
-             * Desktop: clamp up to 32px. */
-            fontSize: "clamp(20px, 2.4vw, 32px)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
+            fontSize: "var(--text-card-title-lg)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
             lineHeight: 1.1,
           }}
         >
@@ -148,12 +144,10 @@ function MatterTile({ card }: { card: MatterCard }): React.ReactElement {
           className="text-[#333]"
           style={{
             fontFamily: "var(--font-sans)",
-            /* Mobile (Figma 913:218): 14px, ls=−0.56px=−0.04em, lh=1.1, opacity=0.8.
-             * Desktop: clamp up to 20px. */
-            fontSize: "clamp(14px, 1.4vw, 20px)",
+            fontSize: "var(--text-body-lg)",
             fontWeight: 400,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
             opacity: 0.8,
           }}
         >

@@ -7,7 +7,7 @@
 export function CommunityCTA() {
   return (
     <div
-      className="absolute inset-0 flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-center md:gap-0 md:p-12 lg:p-[clamp(40px,6vw,64px)_clamp(32px,5vw,80px)]"
+      className="absolute inset-0 flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-start md:gap-0 md:p-12 lg:p-[clamp(32px,4vw,48px)_clamp(32px,5vw,80px)]"
       style={{
         background: 'linear-gradient(180deg, #131E8F 0%, #471EC0 111.05%)',
       }}
@@ -30,7 +30,7 @@ export function CommunityCTA() {
       <p
         className="relative z-10 font-display font-bold text-white md:shrink-0"
         style={{
-          fontSize: 'clamp(26px, 3.1vw, 44px)',
+          fontSize: 'var(--cta-card-title)',
           fontWeight: 600,
           lineHeight: 1.1,
           letterSpacing: '-0.04em',

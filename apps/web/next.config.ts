@@ -58,6 +58,18 @@ const nextConfig: NextConfig = {
         hostname: "cdn.cleanstart.com",
         pathname: "/**",
       },
+      {
+        // Public CleanStart community-images logos served from GCS
+        protocol: "https",
+        hostname: "storage.googleapis.com",
+        pathname: "/cdpimages/**",
+      },
+      {
+        // Brand-colored stack logos (devicons) served via jsDelivr CDN
+        protocol: "https",
+        hostname: "cdn.jsdelivr.net",
+        pathname: "/gh/devicons/devicon/**",
+      },
     ],
   },
 };

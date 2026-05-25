@@ -170,24 +170,25 @@ export async function renderBlogDetail({
           <BlogDetailFAQ faqs={post.faqs} />
         )}
 
-        {/* Trailing buffer ensures 80px visible gap between the last section's
-            content and the CTA card top (CTA card overhangs by 170px, so the
-            section preceding the footer needs +250px below its last content
-            block). Each branch budgets exactly that, accounting for the
-            internal pb already provided by the last rendered section. */}
+        {/* Trailing buffer ensures 60px visible gap between the last section's
+            content and the CTA card top. CTA card is centered on the footer
+            edge (120px half above), so the section preceding the footer needs
+            +180px below its last content block. Each branch budgets exactly
+            that, accounting for the internal pb already provided by the last
+            rendered section. */}
         {relatedPosts.length > 0 ? (
-          <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)", paddingBottom: "230px" }}>
+          <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)", paddingBottom: "160px" }}>
             <BlogDetailRelatedPosts posts={relatedPosts} />
           </div>
         ) : post.faqs && post.faqs.length > 0 ? (
-          /* FAQ section already has pb-20 (80px) → spacer covers remaining 170 */
-          <div aria-hidden className="bg-white" style={{ height: "170px" }} />
+          /* FAQ section already has pb-20 (80px) → spacer covers remaining 100 */
+          <div aria-hidden className="bg-white" style={{ height: "100px" }} />
         ) : previousTarget || nextTarget ? (
-          /* JourneyNav has py-10/12 (40/48px) bottom → spacer covers ~200px */
-          <div aria-hidden className="bg-white" style={{ height: "200px" }} />
+          /* JourneyNav has py-10/12 (40/48px) bottom → spacer covers remaining ~130 */
+          <div aria-hidden className="bg-white" style={{ height: "130px" }} />
         ) : (
-          /* Author section has internal pb-16 (64px) → spacer covers remaining 186 */
-          <div aria-hidden className="bg-white" style={{ height: "186px" }} />
+          /* Author section has internal pb-16 (64px) → spacer covers remaining 116 */
+          <div aria-hidden className="bg-white" style={{ height: "116px" }} />
         )}
 
       </main>

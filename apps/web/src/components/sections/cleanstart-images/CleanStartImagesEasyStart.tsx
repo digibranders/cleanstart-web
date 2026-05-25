@@ -261,9 +261,9 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "var(--text-display-md)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "700px",
           }}
         >
@@ -313,12 +313,12 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "12px",
+                    fontSize: "var(--text-body-xs)",
                     fontWeight: 700,
                     color: "#a855f7",
                     letterSpacing: "2.2042px",
                     textTransform: "uppercase",
-                    lineHeight: "15px",
+                    lineHeight: 1.25,
                   }}
                 >
                   CLEANSTART
@@ -326,12 +326,12 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "16.583px",
+                    fontSize: "var(--text-body-md)",
                     fontWeight: 700,
                     color: "#fff",
                     letterSpacing: "1.6531px",
                     textTransform: "uppercase",
-                    lineHeight: "25.715px",
+                    lineHeight: 1.55,
                   }}
                 >
                   HARDENED IMAGES
@@ -718,9 +718,9 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                   style={{
                     fontFamily: "var(--font-display)",
                     fontSize: "var(--text-card-title-lg)",
-                    fontWeight: 700,
-                    letterSpacing: "-0.05em",
-                    lineHeight: 1.0,
+                    fontWeight: 600,
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1.1,
                   }}
                 >
                   {f.title}

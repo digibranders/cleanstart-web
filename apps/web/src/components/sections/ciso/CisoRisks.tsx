@@ -109,10 +109,10 @@ export function CisoRisks(): React.ReactElement {
           className="text-center text-[#111] mx-auto px-6"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 4vw, 56px)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: "clamp(1.1, 1.1, 1.2)",
+            fontSize: "var(--text-display-md)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "807px",
             marginBottom: "clamp(32px, 7.7vw, 98px)",
           }}
@@ -197,10 +197,10 @@ export function CisoRisks(): React.ReactElement {
                   <h3
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "20px",
+                      fontSize: "var(--text-card-title-md)",
                       fontWeight: 600,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1,
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.1,
                       color: "#000",
                       margin: 0,
                     }}
@@ -210,10 +210,10 @@ export function CisoRisks(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-sans)",
-                      fontSize: "14px",
+                      fontSize: "var(--text-body-sm)",
                       fontWeight: 400,
-                      letterSpacing: "-0.04em",
-                      lineHeight: 1.1,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.4,
                       color: "#111",
                       opacity: 0.8,
                       maxWidth: risk.descMaxWidthMobile,
@@ -316,8 +316,8 @@ export function CisoRisks(): React.ReactElement {
                   <h3
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(22px, 2.4vw, 32px)",
-                      fontWeight: 700,
+                      fontSize: "var(--text-card-title-lg)",
+                      fontWeight: 600,
                       letterSpacing: "-0.04em",
                       lineHeight: 1.1,
                       color: "#111",
@@ -329,7 +329,7 @@ export function CisoRisks(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-sans)",
-                      fontSize: "clamp(15px, 1.4vw, 20px)",
+                      fontSize: "var(--text-body-lg)",
                       fontWeight: 400,
                       letterSpacing: "-0.02em",
                       lineHeight: 1.4,

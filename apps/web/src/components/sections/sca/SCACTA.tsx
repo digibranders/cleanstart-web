@@ -76,12 +76,12 @@ export function SCACTA(): React.ReactElement {
           Desktop layout (md+) — heading left, desc+button right
       ══════════════════════════════════════════ */}
       <div
-        className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 lg:items-center"
+        className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 lg:items-start"
         style={{
           paddingLeft: "clamp(32px, 5vw, 80px)",
           paddingRight: "clamp(32px, 5vw, 80px)",
-          paddingTop: "clamp(40px, 5vw, 80px)",
-          paddingBottom: "clamp(40px, 5vw, 80px)",
+          paddingTop: "clamp(24px, 3vw, 40px)",
+          paddingBottom: "clamp(24px, 3vw, 40px)",
           columnGap: "clamp(32px, 5vw, 72px)",
         }}
       >
@@ -90,7 +90,7 @@ export function SCACTA(): React.ReactElement {
           className="relative min-w-0 w-full text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontSize: "var(--cta-card-title)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -111,7 +111,7 @@ export function SCACTA(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(16px, 1.5vw, 20px)",
+              fontSize: "var(--cta-card-desc)",
               fontWeight: 400,
               letterSpacing: "-0.02em",
               lineHeight: 1.4,
@@ -162,7 +162,7 @@ export function SCACTA(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontSize: "var(--cta-card-title)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,

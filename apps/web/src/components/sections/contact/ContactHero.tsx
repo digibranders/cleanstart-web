@@ -1,0 +1,153 @@
+import { Container } from "@/components/layout";
+
+/**
+ * Hero — Figma node 857:14714.
+ *
+ * Background: vertical multi-stop gradient (dark navy → blue → violet → fading
+ * to transparent at the bottom so it bleeds into the next section).
+ * Decorations: two 3D-cube renders flanking the title, rotated and rendered
+ * with mix-blend-mode: color-dodge per Figma. No grid pattern — design uses
+ * a flat painted background.
+ *
+ * Spec dimensions are taken from a 1920-wide artboard; cube positions/sizes
+ * are scaled via calc(... / 1920 * 100%) so they hold relative to the viewport.
+ */
+export function ContactHero() {
+  return (
+    <section
+      className="relative overflow-hidden"
+      style={{
+        // Exact stops from Figma 857:14714.
+        backgroundImage:
+          "linear-gradient(180deg, rgb(21, 16, 33) 25.702%, rgb(16, 18, 62) 31.159%, rgb(19, 30, 143) 51.006%, rgb(71, 30, 192) 68.711%, rgb(71, 31, 195) 79.832%, rgba(70, 30, 191, 0.85) 85.018%, rgba(66, 30, 188, 0.4) 93.72%, rgba(66, 30, 188, 0) 100.66%)",
+        // Extended past Figma's 498px so the gradient continues behind the
+        // top of the form card and only fades out around the email-row
+        // (the form is pulled up over the hero via -mt-10/-mt-16).
+        minHeight: "clamp(620px, 54vw, 820px)",
+      }}
+    >
+      {/* Left 3D cube — flanking the title at roughly the same vertical level
+          as the right cube. Mix-blend-mode color-dodge. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden lg:block"
+        style={{
+          left: "30px",
+          top: "100px",
+          width: "419px",
+          height: "419px",
+          mixBlendMode: "color-dodge",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            transform: "rotate(-46.54deg)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/contact/hero-cube.png"
+            alt=""
+            width={294}
+            height={298}
+            loading="eager"
+            decoding="async"
+            style={{
+              width: "294px",
+              height: "298px",
+              opacity: 0.4,
+              objectFit: "contain",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Right 3D cube — mirrors the left, flanking the title. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden lg:block"
+        style={{
+          right: "30px",
+          top: "100px",
+          width: "419px",
+          height: "419px",
+          mixBlendMode: "color-dodge",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            transform: "rotate(46.54deg)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/contact/hero-cube.png"
+            alt=""
+            width={294}
+            height={298}
+            loading="eager"
+            decoding="async"
+            style={{
+              width: "294px",
+              height: "298px",
+              opacity: 0.4,
+              objectFit: "contain",
+            }}
+          />
+        </div>
+      </div>
+
+      <Container className="relative">
+        {/* Title block — Figma 857:14946, w=730, top=186, gap=24 between
+            title and subtitle, centered. */}
+        <div className="mx-auto flex flex-col items-center gap-6 pt-[clamp(96px,14vw,186px)] pb-[clamp(16px,2vw,28px)] text-center">
+          <h1
+            className="text-white whitespace-nowrap"
+            style={{
+              fontFamily:
+                "var(--font-display, 'Figtree', 'Manrope', sans-serif)",
+              fontSize: "clamp(40px, 4.45vw, 64px)",
+              lineHeight: 1.05,
+              letterSpacing: "-0.04em",
+              fontWeight: 600,
+            }}
+          >
+            Contact{" "}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{
+                backgroundImage:
+                  "linear-gradient(110.276deg, rgb(154, 81, 255) 1.7578%, rgb(44, 193, 235) 98.781%)",
+              }}
+            >
+              US
+            </span>
+          </h1>
+          <p
+            className="text-white/80"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--text-body-lg)",
+              fontWeight: 400,
+              lineHeight: 1.3,
+              letterSpacing: "-0.04em",
+              maxWidth: "730px",
+            }}
+          >
+            We would be happy to hear from you about any feedback or questions.
+          </p>
+        </div>
+      </Container>
+    </section>
+  );
+}

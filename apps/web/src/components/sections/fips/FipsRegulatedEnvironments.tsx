@@ -28,11 +28,6 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
       data-section="FipsRegulatedEnvironments"
       className="relative overflow-hidden"
       aria-label="Built for Regulated Environments"
-      /*
-       * Mobile (Figma 366:7788): 695px tall for stacked 4-item list.
-       * Desktop: clamp up to 550px for 4-column layout.
-       */
-      style={{ minHeight: "clamp(520px, 48vw, 550px)" }}
     >
       {/* Background photo */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -72,7 +67,16 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-10 py-14 md:py-[110px]">
+      {/*
+       * Min-height + flex column lives on the inner wrapper (not the <section>)
+       * so the sectors grid below can `mt-auto` push to the bottom of the
+       * frame. Mobile (Figma 366:7788) needs 520px floor for the stacked
+       * 4-item list; desktop clamps to 550px.
+       */}
+      <div
+        className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-10 py-14 md:py-[110px] flex flex-col"
+        style={{ minHeight: "clamp(520px, 48vw, 550px)" }}
+      >
         {/*
          * Heading
          * Mobile: 28px Figtree Bold (Figma 366:7788), desktop: 56px
@@ -97,7 +101,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
          *   Mobile  (< md): 1 column, items stacked vertically — matches Figma 366:7788
          *   Desktop (≥ md): 4 columns side-by-side with left-border dividers
          */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-y-8 md:gap-0">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-y-8 md:gap-0 mt-auto md:pt-16">
           {SECTORS.map((sector, idx) => (
             <div
               key={sector.title}

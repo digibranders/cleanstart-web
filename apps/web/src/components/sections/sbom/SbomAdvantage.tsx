@@ -63,7 +63,7 @@ export function SbomAdvantage(): React.ReactElement {
 
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
-        style={{ paddingTop: 'clamp(56px, 6vw, 100px)', paddingBottom: '250px' }}
+        style={{ paddingTop: 'clamp(56px, 6vw, 100px)', paddingBottom: 'var(--spacing-section-cta)' }}
       >
         {/* Heading */}
         <div className="text-center mb-10 md:mb-14">

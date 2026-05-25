@@ -11,9 +11,9 @@ export function Hero() {
           <h1
             className="font-display font-semibold text-white"
             style={{
-              fontSize: "var(--text-t-display-1)",
-              letterSpacing: "var(--text-t-display-1-ls)",
-              lineHeight: "var(--text-t-display-1-lh)",
+              fontSize: "clamp(40px, 4.45vw, 64px)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
             }}
           >
             Secure by Design. Built from Source. Verified Container Images

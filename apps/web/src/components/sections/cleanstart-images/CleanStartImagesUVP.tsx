@@ -98,9 +98,9 @@ export function CleanStartImagesUVP(): React.ReactElement {
             className="font-display inline"
             style={{
               fontSize: "var(--text-display-md)",
-              fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.05,
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#111",
             }}
           >
@@ -239,8 +239,8 @@ export function CleanStartImagesUVP(): React.ReactElement {
                     className="font-display"
                     style={{
                       fontSize: "var(--text-card-title-lg)",
-                      fontWeight: 700,
-                      letterSpacing: "-0.05em",
+                      fontWeight: 600,
+                      letterSpacing: "-0.04em",
                       lineHeight: 1.1,
                       color: "#111",
                     }}

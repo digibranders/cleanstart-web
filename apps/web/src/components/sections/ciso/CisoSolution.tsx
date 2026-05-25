@@ -122,10 +122,10 @@ export function CisoSolution(): React.ReactElement {
           className="text-center text-white mx-auto"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "28px",
+            fontSize: "var(--text-display-md)",
             fontWeight: 600,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.2,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "259px",
             marginBottom: "17px",
           }}
@@ -138,10 +138,10 @@ export function CisoSolution(): React.ReactElement {
           className="text-center mx-auto"
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "16px",
+            fontSize: "var(--text-t-subhead)",
             fontWeight: 400,
-            letterSpacing: "-0.07em",
-            lineHeight: 1.4,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.45,
             color: "rgba(255,255,255,0.8)",
             maxWidth: "282px",
             marginBottom: "46px",
@@ -265,10 +265,10 @@ export function CisoSolution(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "18px",
-                      fontWeight: 500,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1,
+                      fontSize: "var(--text-card-title-md)",
+                      fontWeight: 600,
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.1,
                       color: "#fff",
                       margin: 0,
                       whiteSpace: "nowrap",
@@ -279,9 +279,9 @@ export function CisoSolution(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-sans)",
-                      fontSize: "14px",
+                      fontSize: "var(--text-body-sm)",
                       fontWeight: 400,
-                      letterSpacing: "-0.07em",
+                      letterSpacing: "-0.02em",
                       lineHeight: 1.5,
                       color: "rgba(255,255,255,0.8)",
                       margin: 0,
@@ -339,8 +339,8 @@ export function CisoSolution(): React.ReactElement {
               className="text-white"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(32px, 4vw, 56px)",
-                fontWeight: 700,
+                fontSize: "var(--text-display-md)",
+                fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
                 marginBottom: "24px",
@@ -351,10 +351,10 @@ export function CisoSolution(): React.ReactElement {
             <p
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "clamp(18px, 1.7vw, 24px)",
+                fontSize: "var(--text-t-subhead)",
                 fontWeight: 400,
                 letterSpacing: "-0.02em",
-                lineHeight: 1.4,
+                lineHeight: 1.45,
                 color: "rgba(255,255,255,0.8)",
                 maxWidth: "835px",
                 margin: "0 auto",
@@ -524,7 +524,7 @@ export function CisoSolution(): React.ReactElement {
                     className="relative text-white"
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(20px, 2vw, 28px)",
+                      fontSize: "var(--text-card-title-lg)",
                       fontWeight: 600,
                       letterSpacing: "-0.04em",
                       lineHeight: 1.1,
@@ -538,7 +538,7 @@ export function CisoSolution(): React.ReactElement {
                     className="relative"
                     style={{
                       fontFamily: "var(--font-sans)",
-                      fontSize: "clamp(15px, 1.4vw, 20px)",
+                      fontSize: "var(--text-body-lg)",
                       fontWeight: 400,
                       letterSpacing: "-0.02em",
                       lineHeight: 1.4,

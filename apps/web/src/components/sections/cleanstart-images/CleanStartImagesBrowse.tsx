@@ -140,9 +140,9 @@ function TrustCardItem({ card }: { card: TrustCard }): React.ReactElement {
             style={{
               fontFamily: "var(--font-display)",
               fontSize: "var(--text-card-title-lg)",
-              fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.0,
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#111",
             }}
           >
@@ -258,9 +258,9 @@ export function CleanStartImagesBrowse(): React.ReactElement {
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "var(--text-display-md)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "#111",
           }}
         >
