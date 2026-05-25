@@ -28,21 +28,6 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
   // don't share the same id (which would collide and break the SVG clip).
   const cardKey = data.title.replace(/\s+/g, "-").toLowerCase();
 
-  // All Figma layer values are stated in the design's px units relative to a
-  // 232.8 px-wide card body. Container queries (`cqw` = 1 % of card width)
-  // make every layer scale proportionally when the card resizes.
-  //
-  //   24 px radius       → 10.31 cqw
-  //   72 px blur         → 30.93 cqw
-  //   21.21 px sub-r     → 9.11  cqw
-  //   551.93 × 652       → 237.08 × 280.07 (cyan halo, opacity 0.7, bottom-heavy)
-  //   343.69 × 406       → 147.63 × 174.40 (purple halo, opacity 0.34, mid)
-  //   130.37 × 158       → 56.00 × 67.87  (Mask — black ellipse, opacity 0.2, bottom-center)
-  //   302.50 × 312.2     → 129.94 × 134.10 (orb-glow group bounding box)
-  //   inner 156.7 × 185.11 → 67.31 × 79.51   (#066BF1 blue)
-  //   inner 178.53 × 210.89 → 76.69 × 90.59  (#04C7F2 cyan)
-  //   inner 197.24 × 233   → 84.72 × 100.09 (#5D04D7 purple / #04C7F2 wash)
-
   return (
     <figure
       className="factory-card relative shrink-0"
@@ -53,128 +38,22 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
         containerType: "inline-size",
       }}
     >
-      {/* Card body — gradient + all interior glow ellipses, clipped to the
-          24 px (10.31 cqw) rounded rectangle. Box-shadow matches Figma's
-          left-side dark drop-shadow stack. */}
-      <div
-        className="absolute inset-0 overflow-hidden"
-        style={{
-          borderRadius: "10.31cqw",
-          background:
-            "linear-gradient(180deg, #151021 0%, #131E8F 71.2%, #551ECE 100%)",
-          boxShadow:
-            "-8px 4px 20px rgba(0,0,0,0.23), -33px 16px 37px rgba(0,0,0,0.2), -74px 37px 49px rgba(0,0,0,0.12), -131px 65px 59px rgba(0,0,0,0.03)",
-        }}
-      >
-        {/* Big purple halo — #5D04D7, opacity 0.34, blur 72 px, mid-card */}
-        <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-          style={{
-            width: "147.63cqw",
-            height: "174.4cqw",
-            background: "#5D04D7",
-            opacity: 0.34,
-            filter: "blur(30.93cqw)",
-          }}
-        />
-        {/* Big cyan halo — #04C7F2, opacity 0.7, blur 72 px, bottom-heavy */}
-        <div
-          className="absolute left-1/2 rounded-full"
-          style={{
-            top: "78%",
-            transform: "translate(-50%, -50%)",
-            width: "237.08cqw",
-            height: "280.07cqw",
-            background: "#04C7F2",
-            opacity: 0.7,
-            filter: "blur(30.93cqw)",
-          }}
-        />
-        {/* Mask — black soft ellipse at bottom-center, opacity 0.2 */}
-        <div
-          className="absolute left-1/2 -translate-x-1/2"
-          style={{
-            top: "65%",
-            width: "56cqw",
-            height: "67.87cqw",
-            background: "#000000",
-            opacity: 0.2,
-            borderRadius: "9.11cqw",
-          }}
-        />
-        {/* Orb-glow group 2085665008 — three soft ellipses blurred 72 px,
-            painted behind the orb position (top center, ~25 % from top). */}
-        <div
-          className="absolute left-1/2 -translate-x-1/2"
-          style={{
-            top: "5%",
-            width: "129.94cqw",
-            height: "134.1cqw",
-            filter: "blur(30.93cqw)",
-          }}
-        >
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              width: "67.31cqw",
-              height: "79.51cqw",
-              background: "#066BF1",
-            }}
-          />
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              width: "76.69cqw",
-              height: "90.59cqw",
-              background: "#04C7F2",
-            }}
-          />
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              width: "84.72cqw",
-              height: "100.09cqw",
-              background: "#04C7F2",
-              opacity: 0.34,
-            }}
-          />
-        </div>
-        {/* Orb-glow group 2085665009 — second halo with purple sub-ellipse */}
-        <div
-          className="absolute left-1/2 -translate-x-1/2"
-          style={{
-            top: "5%",
-            width: "129.94cqw",
-            height: "134.1cqw",
-            filter: "blur(30.93cqw)",
-          }}
-        >
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              width: "67.31cqw",
-              height: "79.51cqw",
-              background: "#066BF1",
-            }}
-          />
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              width: "76.69cqw",
-              height: "90.59cqw",
-              background: "#04C7F2",
-            }}
-          />
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              width: "84.72cqw",
-              height: "100.09cqw",
-              background: "#5D04D7",
-            }}
-          />
-        </div>
-      </div>
+      {/* Card background — the cropped image is the card body, 1:1 alignment.
+          `borderRadius: 10.3cqw` (= 24 px at desktop card width, matching
+          Figma `Rectangle 1000001822` borderRadius:24) clips any partial-alpha
+          pixels at the bottom-left flare-halo leak so all four corners read as
+          a true, constant rounded-rect on the shared background. */}
+      <Image
+        src="/images/cleanstart-factory/factory-card-bg.webp"
+        alt=""
+        aria-hidden
+        width={232}
+        height={374}
+        sizes="(min-width: 1280px) 233px, 16vw"
+        priority={isFirst}
+        className="pointer-events-none absolute inset-0 h-full w-full select-none"
+        style={{ borderRadius: "10.3cqw" }}
+      />
 
 
       {/* Orb (chrome iridescent ring). Cropped 113 × 117, displayed at 46.39 %
