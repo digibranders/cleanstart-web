@@ -107,7 +107,7 @@ export function Footer({
               focused conversion block, not a section-width banner. Heights
               also reduced ~20% (420/360/300 → 336/288/240). */}
           <div
-            className="pointer-events-auto relative w-full h-[336px] sm:h-[288px] lg:h-[240px]"
+            className="pointer-events-auto relative w-full h-[350px] sm:h-[300px] lg:h-[260px]"
           >
             {/* Clipped card surface — fills the slot and clips inner content
                 to the rounded 1276×330 box. */}
@@ -156,7 +156,7 @@ export function Footer({
           }}
         />
       <div className="relative">
-       <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[320px] sm:pt-[260px] lg:pt-[225px]" : "pt-[80px]"}`}>
+       <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[330px] sm:pt-[280px] lg:pt-[240px]" : "pt-[80px]"}`}>
         {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
         <div className="flex flex-wrap items-start justify-between gap-8">
           <p
