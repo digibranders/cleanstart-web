@@ -2,22 +2,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 /**
- * ASR Hero — Figma node 783:91
+ * ASR Hero — pixel-perfect for both desktop (Figma 783:91) and mobile (Figma 920:609).
  *
- * Background:
- *  - Vertical gradient: #151021 → #10123E → #131E8F → #471EC0 → fade to transparent.
- *  - 80px CSS grid overlay (#130F26 lines on the dark base).
- *  - Purple #7A59FF radial blob top-right (heavy blur).
- *
- * Content:
- *  - Heading "Bigger Images, Bigger Risk" — "Bigger Risk" in cyan→purple gradient.
- *  - Body copy: "CleanStart Images reduce attack surface by eliminating
- *    unnecessary components before they enter production."
- *  - Glass CTA "Explore Cleanstart Images" — .cs-btn-glass utility.
- *  - Right side: bloated-vs-clean comparison card image (hero-cards.png).
- *
- * Per request: colours / images / CTA style / gradients match Figma exactly,
- * but pixel sizes use the responsive token system (no hard-coded 1440 px).
+ * Mobile specs (360px / node 920:609):
+ *  - Content starts at top: 136px
+ *  - Heading: Figtree Bold 32px / lh 1.2 / white
+ *  - "Bigger Risk": gradient 98.23deg #9A51FF→#2CC1EB, tracking -1.6px
+ *  - Description: Figtree Regular 16px / tracking -0.64px / opacity 0.8
+ *  - CTA: px-24 py-12, border #dab6f3, 16px Medium, tracking -0.8px
+ *  - Cards: hero-mobile-cards.png (BLOATED left @13px / CLEAN right @193px)
  */
 export function ASRHero(): React.ReactElement {
   return (
@@ -25,15 +18,12 @@ export function ASRHero(): React.ReactElement {
       data-section="ASRHero"
       className="relative overflow-hidden"
       style={{
-        // Figma gradient (verbatim): 179.99deg navy → blue → purple → fade-out.
         background:
           'linear-gradient(179.99deg, #151021 -25.7%, #10123E 31.16%, #131E8F 51.01%, #471EC0 68.71%, #471FC3 79.83%, rgba(70, 30, 191, 0.85) 85.02%, rgba(66, 30, 188, 0.4) 93.72%, rgba(66, 30, 188, 0) 98.92%)',
         minHeight: 'clamp(560px, 51vw, 824px)',
       }}
     >
-      {/* Background grid overlay — Figma uses 71.11 px squares with #130F26
-          lines. We use 80 px on the 1px-line variable so it tiles cleanly with
-          the rest of the site's hero grid utility (.bg-cs-grid is similar). */}
+      {/* 80px grid overlay */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -44,7 +34,7 @@ export function ASRHero(): React.ReactElement {
         }}
       />
 
-      {/* Purple radial blob — Figma Ellipse 46639 (top-right, soft, blurred) */}
+      {/* Purple radial blob — desktop only */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden md:block"
@@ -60,8 +50,7 @@ export function ASRHero(): React.ReactElement {
         }}
       />
 
-      {/* Bottom purple-to-transparent fade so the hero glides into the next
-          section instead of cutting hard at the section edge. */}
+      {/* Bottom purple fade into next section */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute bottom-0 left-0 right-0"
@@ -76,55 +65,99 @@ export function ASRHero(): React.ReactElement {
         <div
           className="flex flex-col lg:flex-row items-start lg:items-center"
           style={{
-            paddingTop: 'clamp(120px, 13vw, 229px)',
+            /* Mobile: 136px matches Figma node 920:609 top:136px offset */
+            paddingTop: 'clamp(136px, 13vw, 229px)',
             paddingBottom: 'clamp(56px, 7vw, 100px)',
             gap: '40px',
           }}
         >
-          {/* Left: copy — heading + body + CTA */}
+          {/* ── Left: heading + description + CTA ── */}
           <div
             className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left"
-            style={{ maxWidth: '545px' }}
+            style={{
+              maxWidth: '545px',
+              gap: '24px' /* Figma: gap-[24px] between text-block and button */,
+            }}
           >
-            <h1
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(36px, 4.45vw, 64px)',
-                fontWeight: 700,
-                letterSpacing: '-0.04em',
-                lineHeight: 1.05,
-                color: 'white',
-              }}
+            {/* Text block — heading + description share gap-[16px] (Figma) */}
+            <div
+              className="flex flex-col items-center lg:items-start text-center lg:text-left"
+              style={{ gap: '16px', width: '100%' }}
             >
-              <span className="block">Bigger Images,</span>
-              <span className="cs-text-gradient-impact">Bigger Risk</span>
-            </h1>
+              {/* H1 — Figma: Figtree Bold 32px / lh 1.2 on mobile */}
+              <h1
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'clamp(32px, 4.45vw, 64px)',
+                  fontWeight: 700,
+                  lineHeight: 1.2,
+                  color: 'white',
+                  margin: 0,
+                }}
+              >
+                <span className="block">Bigger Images,</span>
+                {/*
+                 * Figma 920:609 gradient: 98.23deg #9A51FF(17.6%) → #2CC1EB(92.7%)
+                 * tracking: -1.6px (Figma: tracking-[-1.6px] at 32px)
+                 */}
+                <span
+                  style={{
+                    background: 'linear-gradient(98.23deg, #9A51FF 17.617%, #2CC1EB 92.717%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    color: 'transparent',
+                    letterSpacing: '-1.6px',
+                  }}
+                >
+                  Bigger Risk
+                </span>
+              </h1>
 
-            <p
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'clamp(16px, 1.7vw, 24px)',
-                fontWeight: 400,
-                letterSpacing: '-0.02em',
-                lineHeight: 1.4,
-                color: 'rgba(255, 255, 255, 0.8)',
-                marginTop: '20px',
-                maxWidth: '480px',
-              }}
-            >
-              CleanStart Images reduce attack surface by eliminating unnecessary components before
-              they enter production.
-            </p>
+              {/* Description — Figma: Figtree Regular 16px, tracking -0.64px, opacity 0.8 */}
+              <p
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'clamp(16px, 1.7vw, 24px)',
+                  fontWeight: 400,
+                  letterSpacing: '-0.04em',
+                  lineHeight: 1.4,
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  maxWidth: '480px',
+                  margin: 0,
+                }}
+              >
+                CleanStart Images reduce attack surface by eliminating unnecessary components before
+                they enter production.
+              </p>
+            </div>
 
-            {/* CTA — shared .cs-btn-glass utility (matches every other hero) */}
+            {/*
+             * CTA — Figma 920:609 exact specs:
+             *   padding: 12px 24px (py-[12px] px-[24px])
+             *   border: 1px solid #dab6f3 (lavender)
+             *   border-radius: 8px
+             *   font: Inter/Sans Medium 16px, tracking -0.8px (-0.05em)
+             *   color: #111
+             *   background: glass (rgba white + radial blue tints)
+             */}
             <Link
               href="/cleanstart-images"
               className="cs-btn-glass"
               style={
                 {
-                  marginTop: 'clamp(24px, 3vw, 40px)',
-                  '--cs-btn-px': '18px',
-                  '--cs-btn-fs': '18px',
+                  /* Override the height-based layout with explicit padding */
+                  height: 'auto',
+                  padding: '12px 24px',
+                  /* Figma lavender border (replaces default white border) */
+                  border: '1px solid #dab6f3',
+                  /* Font overrides */
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '16px',
+                  fontWeight: 500,
+                  letterSpacing: '-0.05em',
+                  /* Figma text color */
+                  color: '#111111',
                 } as React.CSSProperties
               }
             >
@@ -148,7 +181,7 @@ export function ASRHero(): React.ReactElement {
             </Link>
           </div>
 
-          {/* Right: bloated-vs-clean comparison cards (combined Figma export) */}
+          {/* ── Desktop: side-by-side comparison cards ── */}
           <div className="hidden lg:block relative shrink-0" style={{ width: 'min(622px, 48vw)' }}>
             <Image
               src="/images/attack-surface-reduction/hero-cards.png"
@@ -161,13 +194,17 @@ export function ASRHero(): React.ReactElement {
             />
           </div>
 
-          {/* Mobile-only: smaller card image */}
+          {/*
+           * Mobile: combined cards export matches Figma 920:609 layout —
+           * BLOATED card (168×226) at left:13px, CLEAN card (153×188) at left:193px
+           * Both are baked into hero-mobile-cards.png as a single composite.
+           */}
           <div className="block lg:hidden relative w-full">
             <Image
               src="/images/attack-surface-reduction/hero-mobile-cards.png"
-              alt="BLOATED vs CLEAN image comparison"
-              width={622}
-              height={437}
+              alt="BLOATED vs CLEAN image comparison: 1.2 GB / 247 packages / 89 HIGH CVEs vs 87 MB / 12 packages / 0 HIGH CVEs"
+              width={334}
+              height={227}
               sizes="100vw"
               className="w-full h-auto"
               priority
