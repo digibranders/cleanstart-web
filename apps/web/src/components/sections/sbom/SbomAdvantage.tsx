@@ -294,11 +294,12 @@ export function SbomAdvantage(): React.ReactElement {
               bodyW={149}
             />
 
-            {/* Compliance Programs — curved card, 145px. Figma titleW:243 bodyW:169 */}
+            {/* Compliance Programs — Figma card-b+scaleY(-1) = wavy bottom facing ball.
+                card-c already has the curve at bottom → same result without transform. */}
             <MobileBuiltForCard
               title="Compliance Programs"
               body="Support modern regulatory requirements."
-              bgSvg="/images/sbom/mobile-builtfor-card-b.svg"
+              bgSvg="/images/sbom/mobile-builtfor-card-c.svg"
               height={145}
               titleW={243}
               bodyW={169}
@@ -332,11 +333,12 @@ export function SbomAdvantage(): React.ReactElement {
               />
             </div>
 
-            {/* Container Environments — flipped curve, 145px. Figma titleW:249 bodyW:205 */}
+            {/* Container Environments — Figma card-c+scaleY(-1) = wavy top facing ball.
+                card-b already has the curve at top → same result without transform. */}
             <MobileBuiltForCard
               title="Container Environments"
               body="Track software inventories across images."
-              bgSvg="/images/sbom/mobile-builtfor-card-c.svg"
+              bgSvg="/images/sbom/mobile-builtfor-card-b.svg"
               height={145}
               titleW={249}
               bodyW={205}
