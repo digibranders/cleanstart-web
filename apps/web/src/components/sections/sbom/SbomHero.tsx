@@ -81,12 +81,13 @@ export function SbomHero(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(40px, 4.45vw, 64px)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.05,
-            marginBottom: "32px",
+            fontSize: "var(--text-hero-product)",
+            fontWeight: 600,
+            letterSpacing: "var(--text-hero-product-ls, -0.04em)",
+            lineHeight: "var(--text-hero-lh, 1.05)",
+            marginBottom: "clamp(16px, 2.5vw, 32px)",
             maxWidth: "623px",
+            textTransform: "capitalize",
           }}
         >
           Continuously Verifiable SBOMs
@@ -95,13 +96,13 @@ export function SbomHero(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(18px, 1.7vw, 24px)",
+            fontSize: "var(--text-t-subhead)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
-            lineHeight: 1.4,
+            lineHeight: 1.45,
             color: "rgba(255,255,255,0.80)",
             maxWidth: "623px",
-            marginBottom: "32px",
+            marginBottom: "clamp(24px, 2.5vw, 32px)",
           }}
         >
           Know what you ship with continuously updated, cryptographically verifiable software inventories.

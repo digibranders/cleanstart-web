@@ -62,13 +62,13 @@ export function FipsMaturityModel(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 md:pt-[80px] pb-16 md:pb-[88px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-10 pt-14 md:pt-[80px] pb-14 md:pb-[88px]">
         <h2
           className="text-center text-[#111] mb-12 md:mb-[64px]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 4vw, 56px)",
-            fontWeight: 700,
+            fontSize: "var(--text-display-md)",
+            fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
           }}
@@ -97,7 +97,8 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
         border: "1px solid rgba(218, 182, 243, 0.55)",
         boxShadow:
           "0 20px 36px -22px rgba(132, 80, 255, 0.18), 0 1px 0 rgba(255,255,255,0.85) inset",
-        minHeight: "clamp(260px, 24vw, 320px)",
+        /* Mobile: 226px (Figma 366:7788 card h=226px) */
+        minHeight: "clamp(226px, 24vw, 320px)",
       }}
     >
       <FipsBall size={84} />
@@ -107,7 +108,7 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
           className="text-[#111] mb-2"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(20px, 2vw, 28px)",
+            fontSize: "var(--text-card-title-lg)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -119,11 +120,11 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
           className="text-[#333]"
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(15px, 1.4vw, 20px)",
+            fontSize: "var(--text-body-lg)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
-            lineHeight: 1.4,
-            opacity: 0.85,
+            lineHeight: 1.5,
+            opacity: 0.8,
           }}
         >
           {stage.description}

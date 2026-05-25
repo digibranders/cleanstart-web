@@ -69,17 +69,18 @@ function useCounter(target: number, duration = 1800, enabled = false): number {
 interface StatDef {
   // If target is a number, animate counter; if null use display string as-is
   target: number | null;
-  display: string;      // full display string (used when target is null)
-  suffix: string;       // appended after animated count
-  label: string;
-  tall: boolean;        // true=326px height; false=258px height
+  display: string;   // full display string (used when target is null)
+  suffix: string;    // appended after animated count
+  line1: string;     // first label line (desktop card forces exactly 2 lines)
+  line2: string;     // second label line
+  tall: boolean;     // true=326px height; false=258px height
 }
 
 const STATS: StatDef[] = [
-  { target: 89,   display: "89%",  suffix: "%",  label: "Fewer inherited vulnerabilities", tall: true  },
-  { target: 70,   display: "70%+", suffix: "%+", label: "Smaller software inventories",    tall: false },
-  { target: null, display: "2–3x", suffix: "",   label: "Faster remediation cycles",       tall: true  },
-  { target: 40,   display: "40%",  suffix: "%",  label: "Lower remediation workload",      tall: false },
+  { target: 89,   display: "89%",  suffix: "%",  line1: "Fewer inherited",    line2: "vulnerabilities",  tall: true  },
+  { target: 70,   display: "70%+", suffix: "%+", line1: "Smaller software",   line2: "inventories",      tall: false },
+  { target: null, display: "2–3x", suffix: "",   line1: "Faster remediation", line2: "cycles",           tall: true  },
+  { target: 40,   display: "40%",  suffix: "%",  line1: "Lower remediation",  line2: "workload",         tall: false },
 ];
 
 // ─── Single stat card ─────────────────────────────────────────────────────────
@@ -108,6 +109,7 @@ function StatCard({
     >
       {/* ── Animated number ──
           bottom edge pinned at 106px from card top via translateY(-100%) */}
+      {/* TODO: needs new --stat-number-* token — 40→62px display numeral has no matching role token */}
       <div
         className="absolute whitespace-nowrap"
         style={{
@@ -115,37 +117,41 @@ function StatCard({
           top: "106px",
           transform: "translateY(-100%)",
           fontFamily: "var(--font-display)",
-          fontSize: "var(--text-t-display-2)",
+          fontSize: "clamp(40px, 3.23vw, 62px)",
           fontWeight: 700,
-          letterSpacing: "var(--text-t-display-2-ls)",
-          lineHeight: "var(--text-t-display-2-lh)",
+          letterSpacing: "-0.04em",
+          lineHeight: 1.2,
           color: "#111",
         }}
       >
         {displayValue}
       </div>
 
-      {/* ── Description label ──
-          Tall cards: top=232px | Short cards: top=164px */}
+      {/* ── Description label — exactly 2 lines per Figma ──
+          Figma: tall top=232px, short top=164px.
+          Nudged –10px for browser line-height safety (104px vs 94px).
+          2 lines × 22px × lh1.4 = 61.6px — well within 104px available. */}
       <div
         className="absolute"
         style={{
           left: "32px",
-          top: stat.tall ? "232px" : "164px",
+          top: stat.tall ? "222px" : "154px",
           width: "231px",
         }}
       >
         <p
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(20px, 2vw, 28px)",
-            fontWeight: 500,
+            fontSize: "var(--text-body-lg)",
+            fontWeight: 400,
             letterSpacing: "-0.02em",
-            lineHeight: 1.3,
+            lineHeight: 1.4,
             color: "#333",
           }}
         >
-          {stat.label}
+          {stat.line1}
+          <br />
+          {stat.line2}
         </p>
       </div>
     </div>
@@ -360,8 +366,8 @@ export function CisoOutcomes(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(32px, 4vw, 56px)",
-              fontWeight: 700,
+              fontSize: "var(--text-display-md)",
+              fontWeight: 600,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
               color: "#fff",
@@ -376,46 +382,57 @@ export function CisoOutcomes(): React.ReactElement {
              4×295 + 3×32 = 1276px fills container exactly.
              Tall cards (1 & 3): h=326px, no top offset.
              Short cards (2 & 4): h=258px, marginTop=68px (bottom-aligns all cards). */}
-        <div className="hidden lg:flex items-start" style={{ gap: "32px" }}>
+        <div className="hidden xl:flex items-start" style={{ gap: "32px" }}>
           {STATS.map((stat) => (
             <StatCard key={stat.display} stat={stat} enabled={animated} />
           ))}
         </div>
 
-        {/* ════════ MOBILE — 2-column grid ════════ */}
-        <div
-          className="lg:hidden grid grid-cols-2 gap-4 px-4 sm:px-6"
-        >
+        {/* ════════ MOBILE — 1-col stack ════════
+             Figma 856:1346 — cards 328×144px, 16px gap
+             Number: left=32, top=32, 40px Bold lh=1.2
+             Label:  left=32, top=92, 16px Regular — single line (no <br />) */}
+        <div className="xl:hidden flex flex-col gap-4 px-4">
           {STATS.map((stat) => (
             <div
               key={stat.display}
-              className="bg-white flex flex-col"
-              style={{ borderRadius: "20px", padding: "28px 20px", gap: "12px" }}
+              className="relative bg-white"
+              style={{ borderRadius: "24px", height: "144px" }}
             >
-              <p
+              {/* Animated number */}
+              {/* TODO: needs new --stat-number-* token — 40px display numeral has no matching role token */}
+              <div
+                className="absolute"
                 style={{
+                  left: "32px",
+                  top: "32px",
                   fontFamily: "var(--font-display)",
-                  fontSize: "var(--text-t-display-2)",
+                  fontSize: "40px",
                   fontWeight: 700,
-                  letterSpacing: "var(--text-t-display-2-ls)",
-                  lineHeight: "var(--text-t-display-2-lh)",
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.2,
                   color: "#111",
                 }}
               >
                 {stat.display}
-              </p>
-              <p
+              </div>
+              {/* Label — single line */}
+              <div
+                className="absolute"
                 style={{
+                  left: "32px",
+                  right: "16px",
+                  top: "92px",
                   fontFamily: "var(--font-sans)",
-                  fontSize: "clamp(20px, 2vw, 28px)",
-                  fontWeight: 500,
+                  fontSize: "var(--text-body-md)",
+                  fontWeight: 400,
                   letterSpacing: "-0.02em",
-                  lineHeight: 1.3,
+                  lineHeight: 1.4,
                   color: "#333",
                 }}
               >
-                {stat.label}
-              </p>
+                {stat.line1} {stat.line2}
+              </div>
             </div>
           ))}
         </div>
