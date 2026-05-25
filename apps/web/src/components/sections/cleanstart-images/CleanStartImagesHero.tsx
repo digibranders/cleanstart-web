@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export function CleanStartImagesHero(): React.ReactElement {
   return (
@@ -6,90 +7,129 @@ export function CleanStartImagesHero(): React.ReactElement {
       data-section="CleanStartImagesHero"
       className="relative overflow-hidden"
       style={{
-        backgroundColor: "#0B0820",
-        backgroundImage: [
-          "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
-          "linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-          "linear-gradient(180deg, rgb(11,8,32) 0%, rgb(15,12,52) 22%, rgb(20,25,110) 42%, rgb(46,28,170) 62%, rgb(71,30,192) 78%, rgba(71,30,192,0.7) 88%, rgba(71,30,192,0) 100%)",
-        ].join(", "),
-        backgroundSize: "80px 80px, 80px 80px, 100% 100%",
-        backgroundRepeat: "repeat, repeat, no-repeat",
+        background:
+          "linear-gradient(179.99deg, rgb(21,16,33) 0%, rgb(21,16,33) 25.702%, rgb(16,18,62) 31.159%, rgb(19,30,143) 51.006%, rgb(71,30,192) 68.711%, rgb(71,31,195) 79.832%, rgba(70,30,191,0.85) 85.018%, rgba(66,30,188,0.4) 93.72%, rgba(66,30,188,0) 98.921%)",
+        minHeight: "clamp(580px, 52vw, 741px)",
       }}
     >
-      {/* Content wrapper — Figma frame 1920×1084, title at y=175 */}
+      {/* Decorative ellipse glow — behind 3D image (Figma: left-777, top-151 in full frame; minus ~72px nav → top ~79px in section) */}
       <div
-        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col items-center text-center"
-        style={{ paddingTop: "clamp(72px, 8vw, 128px)", paddingBottom: "clamp(16px, 2vw, 32px)" }}
+        aria-hidden
+        className="absolute pointer-events-none select-none hidden lg:block"
+        style={{ left: "777px", top: "79px", width: "497px", height: "502px" }}
       >
-        <h1
-          className="text-white"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "clamp(40px, 4.45vw, 64px)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.05,
-            maxWidth: "820px",
-          }}
-        >
-          Approach to CVE Free{" "}
-          <span
-            style={{
-              fontSize: "inherit",
-              background:
-                "linear-gradient(99deg, #9A51FF 0%, #2CC1EB 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Container Images
-          </span>
-        </h1>
-
-        {/* CTA — glass button between heading and hero diagram */}
-        <Link
-          href="#browse-images"
-          className="cs-btn-glass mt-10"
-          style={
-            {
-              "--cs-btn-px": "18px",
-              "--cs-btn-fs": "16px",
-            } as React.CSSProperties
-          }
-        >
-          <span>Browse Images</span>
-          <svg
-            className="cs-cta-arrow"
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            aria-hidden
-          >
-            <path
-              d="M3 9h11m0 0l-4-4m4 4l-4 4"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </Link>
-
-        {/* Diagram — Figma group 161:23277, 1244×466 at y=424 (relative to hero 1084) */}
-        <div className="relative mt-[64px] w-full flex justify-center">
+        <div style={{ position: "absolute", inset: "-68.53% -69.22%" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/cleanstart-images/hero-diagram.png"
-            alt="CleanStart approach diagram: container images flow through CleanStart's hardened, FIPS-compliant pipeline to private registries and customer repositories."
-            width={1322}
-            height={466}
-            className="w-full max-w-[1322px] h-auto select-none"
+            src="/images/cleanstart-images/hero-ellipse-glow.svg"
+            alt=""
+            aria-hidden
+            className="block max-w-none size-full select-none pointer-events-none"
             loading="eager"
             decoding="async"
-            draggable={false}
           />
+        </div>
+      </div>
+
+      {/* Decorative vector grid — overlays behind 3D image (Figma: left-690, top-63 in full frame; minus nav → top ~0) */}
+      <div
+        aria-hidden
+        className="absolute pointer-events-none select-none hidden lg:block"
+        style={{ left: "690px", top: "0px", width: "730px", height: "708px" }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/cleanstart-images/hero-vector-grid.svg"
+          alt=""
+          aria-hidden
+          className="block max-w-none size-full select-none pointer-events-none"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+
+      {/* Two-column layout — section is flex-col + justify-center so content sits vertically centred in the hero */}
+      <div
+        className="absolute inset-0 z-10 flex flex-col justify-center pointer-events-none"
+        aria-hidden
+      />
+      <div
+        className="relative z-10 w-full h-full flex items-center"
+        style={{ minHeight: "inherit" }}
+      >
+        <div
+          className="mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col lg:flex-row items-center"
+          style={{
+            paddingTop: "clamp(48px, 5vw, 80px)",
+            paddingBottom: "clamp(48px, 5vw, 80px)",
+            gap: "clamp(40px, 4vw, 60px)",
+          }}
+        >
+          {/* Left column — Figma: w-623px, gap-32px */}
+          <div
+            className="flex flex-col items-start"
+            style={{ flexShrink: 0, maxWidth: "623px", gap: "32px" }}
+          >
+            <h1
+              className="text-white w-full"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--text-hero-product)",
+                letterSpacing: "-0.05em",
+                lineHeight: 1.0,
+                fontWeight: 600,
+              }}
+            >
+              Trusted Container Foundations
+            </h1>
+
+            <div className="flex flex-col items-start w-full" style={{ gap: "32px" }}>
+              <p
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "var(--text-body-xl)",
+                  fontWeight: 400,
+                  lineHeight: 1.4,
+                  letterSpacing: "-0.04em",
+                  color: "rgba(255,255,255,0.8)",
+                }}
+              >
+                Minimal, hardened, verifiable container images built from trusted
+                sources and continuously rebuilt to reduce inherited risk.
+              </p>
+
+              <Link
+                href="#explore-images"
+                className="cs-btn-glass"
+                style={
+                  {
+                    "--cs-btn-fs": "var(--btn-fs-lg)",
+                    "--cs-btn-h": "var(--btn-h-xl)",
+                    "--cs-btn-px": "var(--btn-px-xl)",
+                  } as React.CSSProperties
+                }
+              >
+                Explore Images
+              </Link>
+            </div>
+          </div>
+
+          {/* Right column — 3D container illustration, vertically centred with left column */}
+          <div className="relative flex-1 flex items-center justify-center lg:justify-end">
+            <Image
+              src="/images/cleanstart-images/hero-3d-container.png"
+              alt="3D isometric container image illustrating CleanStart's hardened, FIPS-compliant image pipeline with security shield and code modules."
+              width={523}
+              height={455}
+              sizes="(max-width: 1024px) 80vw, 523px"
+              className="w-full max-w-[523px] select-none object-contain"
+              style={{ height: "auto" }}
+              loading="eager"
+              decoding="async"
+              draggable={false}
+              priority
+            />
+          </div>
         </div>
       </div>
     </section>

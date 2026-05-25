@@ -1,141 +1,281 @@
-"use client";
+type TrustCard = {
+  title: string;
+  body: string;
+  iconSrc: string;
+};
 
-import { useState } from "react";
+const TRUST_CARDS: TrustCard[] = [
+  {
+    title: "Trusted Source Components",
+    body: "Build from verified upstream sources.",
+    iconSrc: "/images/cleanstart-images/trust-ball-cube.svg",
+  },
+  {
+    title: "Minimal Runtime Images",
+    body: "Only required components included.",
+    iconSrc: "/images/cleanstart-images/trust-ball-cube.svg",
+  },
+  {
+    title: "Deterministic Builds",
+    body: "Reproducible and verifiable pipelines.",
+    iconSrc: "/images/cleanstart-images/trust-ball-refresh.svg",
+  },
+  {
+    title: "Continuous Rebuilds",
+    body: "Rapid response to newly disclosed vulnerabilities.",
+    iconSrc: "/images/cleanstart-images/trust-ball-cube.svg",
+  },
+];
 
-type Tab = "portal" | "repository";
+/* Vertical line x-positions from Figma (px within 287px card) */
+const VERTICAL_LINES = [48.47, 120.03, 162.38, 233.94];
+
+function TrustCardItem({ card }: { card: TrustCard }): React.ReactElement {
+  return (
+    /* Outer cyan glow wrapper — Figma: 295×354, rounded-40, rgba(44,193,235,0.3) */
+    <div
+      className="shrink-0"
+      style={{
+        background: "rgba(44,193,235,0.3)",
+        borderRadius: "40px",
+        padding: "4px",
+      }}
+    >
+      {/* Inner white card — Figma: 287×346, rounded-36, overflow-clip */}
+      <div
+        className="relative bg-white overflow-hidden"
+        style={{
+          width: "287px",
+          minHeight: "346px",
+          borderRadius: "36px",
+        }}
+      >
+        {/* Purple glow blob — Figma: #df9bff, blur 66.5px, opacity 30%, w-262px, h-153px, top-28px, centered */}
+        <div
+          aria-hidden
+          className="absolute pointer-events-none"
+          style={{
+            top: "28px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "262.871px",
+            height: "153px",
+            background: "#df9bff",
+            filter: "blur(66.5px)",
+            opacity: 0.3,
+            borderRadius: "50%",
+          }}
+        />
+
+        {/* Horizontal gradient lines — Figma: top 67.54px and 183.54px, opacity 30% */}
+        {[67.54, 183.54].map((y) => (
+          <div
+            key={y}
+            aria-hidden
+            className="absolute pointer-events-none"
+            style={{
+              top: `${y}px`,
+              left: "-68px",
+              right: "-68px",
+              height: "1px",
+              background:
+                "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50.77%, rgba(255,255,255,0) 100%)",
+              opacity: 0.3,
+            }}
+          />
+        ))}
+
+        {/* Vertical gradient lines — Figma: 4 lines, h-264px, w-0.73px, opacity 80% */}
+        {VERTICAL_LINES.map((x) => (
+          <div
+            key={x}
+            aria-hidden
+            className="absolute pointer-events-none"
+            style={{
+              left: `${x}px`,
+              top: 0,
+              width: "0.73px",
+              height: "264px",
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50.77%, rgba(255,255,255,0) 100%)",
+              opacity: 0.8,
+            }}
+          />
+        ))}
+
+        {/* Blue ball icon — Figma: 96×96px, top 24px, left 24px (left-aligned with text) */}
+        <div
+          className="absolute flex items-center justify-center"
+          style={{
+            top: "24px",
+            left: "24px",
+            width: "96px",
+            height: "96px",
+            borderRadius: "160px",
+            background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
+            boxShadow:
+              "0px 6.171px 14.537px rgba(28,60,142,0.33), inset 0px 0.116px 0.582px rgba(255,255,255,0.81), inset 0px -0.233px 0.291px rgba(0,44,179,0.5)",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={card.iconSrc}
+            alt=""
+            aria-hidden
+            width={54}
+            height={54}
+            className="select-none pointer-events-none"
+            style={{ width: "54px", height: "54px" }}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        {/* Text — Figma: left 24px, top 162px, width 251px, gap 12px */}
+        <div
+          className="absolute flex flex-col"
+          style={{ left: "24px", top: "162px", width: "251px", gap: "12px" }}
+        >
+          <h3
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--text-card-title-lg)",
+              fontWeight: 700,
+              letterSpacing: "-0.05em",
+              lineHeight: 1.0,
+              color: "#111",
+            }}
+          >
+            {card.title}
+          </h3>
+          <p
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--text-body-lg)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.03em",
+              color: "#555",
+            }}
+          >
+            {card.body}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function CleanStartImagesBrowse(): React.ReactElement {
-  const [tab, setTab] = useState<Tab>("portal");
-
   return (
     <section
-      data-section="CleanStartImagesBrowse"
+      data-section="CleanStartImagesTrustedSources"
       className="relative overflow-hidden bg-white"
-      style={{ minHeight: "clamp(720px, 60vw, 880px)" }}
+      style={{ minHeight: "clamp(600px, 52vw, 736px)" }}
     >
-      {/* Decorative grid (faint) */}
+      {/* Corner vector — top-left (Figma: left-[-414px], top-[-174px], 568×551) */}
       <div
         aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: [
-            "linear-gradient(rgba(120,80,200,0.06) 1px, transparent 1px)",
-            "linear-gradient(90deg, rgba(120,80,200,0.06) 1px, transparent 1px)",
-          ].join(", "),
-          backgroundSize: "80px 80px, 80px 80px",
-        }}
-      />
+        className="absolute pointer-events-none select-none hidden lg:block"
+        style={{ left: "-414px", top: "-174px", width: "568px", height: "551px" }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/cleanstart-images/browse-vector-corner.svg"
+          alt=""
+          aria-hidden
+          className="block size-full max-w-none select-none pointer-events-none"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
 
-      {/* Decorative flares — Figma nodes 161:23572, 161:23573 (purple 4-point stars) */}
+      {/* Corner vector — top-right (Figma: left-[1260px], top-[-156px], 568×551) */}
       <div
         aria-hidden
-        className="absolute pointer-events-none hidden lg:block"
-        style={{
-          right: "-40px",
-          top: "208px",
-          width: "328px",
-          height: "328px",
-          background:
-            "radial-gradient(circle at center, rgba(155,80,230,0.35) 0%, rgba(155,80,230,0) 60%)",
-          mixBlendMode: "screen",
-        }}
-      />
+        className="absolute pointer-events-none select-none hidden lg:block"
+        style={{ left: "1260px", top: "-156px", width: "568px", height: "551px" }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/cleanstart-images/browse-vector-corner.svg"
+          alt=""
+          aria-hidden
+          className="block size-full max-w-none select-none pointer-events-none"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      {/* Ellipse glow — left (Figma: left-[-305px], top-578, size-315, inset-[-64.44%]) */}
       <div
         aria-hidden
-        className="absolute pointer-events-none hidden lg:block"
-        style={{
-          left: "-40px",
-          top: "940px",
-          width: "328px",
-          height: "328px",
-          background:
-            "radial-gradient(circle at center, rgba(155,80,230,0.35) 0%, rgba(155,80,230,0) 60%)",
-          mixBlendMode: "screen",
-        }}
-      />
+        className="absolute pointer-events-none select-none hidden lg:block"
+        style={{ left: "-305px", top: "578px", width: "315px", height: "315px" }}
+      >
+        <div style={{ position: "absolute", inset: "-64.44%" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/cleanstart-images/browse-ellipse-glow.svg"
+            alt=""
+            aria-hidden
+            className="block size-full max-w-none select-none pointer-events-none"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </div>
+
+      {/* Ellipse glow — right (Figma: left-[1487px], top-578, size-315, inset-[-64.44%]) */}
+      <div
+        aria-hidden
+        className="absolute pointer-events-none select-none hidden lg:block"
+        style={{ left: "1487px", top: "578px", width: "315px", height: "315px" }}
+      >
+        <div style={{ position: "absolute", inset: "-64.44%" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/cleanstart-images/browse-ellipse-glow.svg"
+            alt=""
+            aria-hidden
+            className="block size-full max-w-none select-none pointer-events-none"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </div>
 
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col items-center"
-        style={{ paddingTop: "80px" }}
+        style={{
+          paddingTop: "var(--spacing-section-md)",
+          paddingBottom: "var(--spacing-section-md)",
+        }}
       >
-        {/* Tab bar — matches home Resources & Insights tab dimensions
-            (h-10 buttons + p-1.5 container, text-base SemiBold). Active tab
-            uses the page's purple gradient instead of the Resources blue
-            gradient to fit this section's palette. */}
+        {/* Heading — Figma: 62px, bold, centered, gradient "Sources" */}
+        <h2
+          className="text-center"
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "var(--text-display-md)",
+            fontWeight: 700,
+            letterSpacing: "-0.05em",
+            lineHeight: 1.05,
+            color: "#111",
+          }}
+        >
+          Built from Trusted{" "}
+          <span className="cs-text-gradient-impact">Sources</span>
+        </h2>
+
+        {/* 4-card row — Figma: 287px cards, 41px gaps, centered */}
         <div
-          role="tablist"
-          aria-label="Distribution channel"
-          className="flex items-center gap-1"
-          style={{
-            background: "#fff",
-            border: "1px solid rgba(0,0,0,0.08)",
-            borderRadius: "100px",
-            padding: "4px",
-            width: "fit-content",
-            maxWidth: "100%",
-          }}
+          className="mt-12 lg:mt-16 flex flex-col sm:flex-row flex-wrap lg:flex-nowrap justify-center"
+          style={{ gap: "41px" }}
         >
-          {(["portal", "repository"] as const).map((id) => (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              aria-selected={tab === id}
-              onClick={() => setTab(id)}
-              className="text-[clamp(0.9375rem,1.04vw,1.25rem)] font-semibold leading-[1.2] tracking-[-0.04em]"
-              style={{
-                padding: "8px 24px",
-                borderRadius: "100px",
-                cursor: "pointer",
-                border: "none",
-                transition: "background 0.15s, color 0.15s",
-                background:
-                  tab === id
-                    ? "linear-gradient(180deg, #151021 0%, #131E8F 100%)"
-                    : "transparent",
-                color: tab === id ? "#fff" : "#555",
-              }}
-            >
-              {id === "portal" ? "CleanStart Portal" : "CleanStart Repository"}
-            </button>
+          {TRUST_CARDS.map((card) => (
+            <TrustCardItem key={card.title} card={card} />
           ))}
-        </div>
-
-        {/* Tagline — H2-description spec: clamp(18-24) / 400 / Sora */}
-        <p
-          className="text-center mt-8 max-w-[843px]"
-          style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "clamp(18px, 1.7vw, 24px)",
-            fontWeight: 400,
-            lineHeight: 1.4,
-            letterSpacing: "-0.02em",
-            color: "#1A1A2E",
-          }}
-        >
-          It offers clean, vulnerability-free container and virtual machine
-          images. Customers may choose accessing directly from CleanStart or
-          replicate images to their own private repositories
-        </p>
-
-        {/* Dashboard mockup — Figma 161:23567, 1274×732 */}
-        <div className="relative mt-14 mb-16 sm:mb-20 lg:mb-24 w-full flex justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/cleanstart-images/browse-dashboard.png"
-            alt="CleanStart Portal browse images dashboard preview, showing 20 of 398 hardened container images filtered by OS, category, and architecture."
-            width={1274}
-            height={732}
-            className="w-full max-w-[1274px] h-auto select-none"
-            style={{
-              borderRadius: "16px",
-              boxShadow:
-                "0 30px 80px -20px rgba(91,61,245,0.35), 0 10px 30px -10px rgba(0,0,0,0.4)",
-            }}
-            loading="lazy"
-            decoding="async"
-            draggable={false}
-          />
         </div>
       </div>
     </section>

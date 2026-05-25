@@ -6,6 +6,8 @@ import { CleanStartImagesBrowse } from "@/components/sections/cleanstart-images/
 import { CleanStartImagesEasyStart } from "@/components/sections/cleanstart-images/CleanStartImagesEasyStart";
 import { CleanStartImagesUVP } from "@/components/sections/cleanstart-images/CleanStartImagesUVP";
 import { CleanStartImagesEnvironment } from "@/components/sections/cleanstart-images/CleanStartImagesEnvironment";
+import { CleanStartImagesMeasure } from "@/components/sections/cleanstart-images/CleanStartImagesMeasure";
+import { CleanStartImagesCta } from "@/components/sections/cleanstart-images/CleanStartImagesCta";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
@@ -41,8 +43,11 @@ export default function CleanStartImagesPage(): React.ReactElement {
         <FadeUp>
           <CleanStartImagesEnvironment />
         </FadeUp>
+        <FadeUp>
+          <CleanStartImagesMeasure />
+        </FadeUp>
       </main>
-      <Footer />
+      <Footer cta={<CleanStartImagesCta />} />
     </>
   );
 }
