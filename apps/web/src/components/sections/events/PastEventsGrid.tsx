@@ -20,7 +20,7 @@ export function PastEventsGrid({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ background: "#f6f6f6", paddingBottom: "250px" }}
+      style={{ background: "#f6f6f6", paddingBottom: "var(--spacing-section-cta)" }}
       data-section="PastEvents"
     >
       {/* Radial gradient blobs — mirrors LatestBlogs (blogs page) */}

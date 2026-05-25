@@ -48,6 +48,11 @@ interface TextInputProps {
   required?: boolean;
 }
 
+/**
+ * Single-line text input. Styling matches the BookDemoForm `FigmaTextInput`:
+ * #FBFBFB bg, 1.5px #DDDDDD border, rounded-8, 48px tall, Manrope Medium 16px,
+ * placeholder #A3A3A3, focus border #3960F9.
+ */
 export function TextInput({
   name,
   type = "text",
@@ -64,8 +69,18 @@ export function TextInput({
         placeholder={placeholder}
         required={required}
         aria-label={label ?? placeholder}
-        className="w-full rounded-[8px] border border-[#D9DFE8] bg-white px-4 py-3 text-[#0F123E] placeholder:text-[#94A3B8] outline-none focus:border-[#2F49E5] focus:ring-2 focus:ring-[#2F49E5]/20 transition-colors"
-        style={{ fontSize: "16px", lineHeight: 1.4 }}
+        className="w-full rounded-[8px] outline-none transition-colors placeholder:text-[#A3A3A3] focus:border-[#3960F9]"
+        style={{
+          background: "#FBFBFB",
+          border: "1.5px solid #DDDDDD",
+          padding: "15px 17px",
+          fontFamily: "var(--font-display), 'Manrope', sans-serif",
+          fontWeight: 500,
+          fontSize: "16px",
+          lineHeight: 1.125,
+          color: "#111111",
+          height: "48px",
+        }}
       />
     </label>
   );
@@ -78,6 +93,10 @@ interface TextAreaProps {
   label?: string;
 }
 
+/**
+ * Multi-line variant of TextInput. Same surface treatment but variable
+ * height — `minHeight: 108px`, vertical resize allowed.
+ */
 export function TextArea({
   name,
   placeholder,
@@ -92,53 +111,72 @@ export function TextArea({
         rows={rows}
         placeholder={placeholder}
         aria-label={label ?? placeholder}
-        className="w-full rounded-[8px] border border-[#D9DFE8] bg-white px-4 py-3 text-[#0F123E] placeholder:text-[#94A3B8] outline-none focus:border-[#2F49E5] focus:ring-2 focus:ring-[#2F49E5]/20 transition-colors resize-y"
-        style={{ fontSize: "16px", lineHeight: 1.5 }}
+        className="w-full resize-y rounded-[8px] outline-none transition-colors placeholder:text-[#A3A3A3] focus:border-[#3960F9]"
+        style={{
+          background: "#FBFBFB",
+          border: "1.5px solid #DDDDDD",
+          padding: "12px 17px",
+          fontFamily: "var(--font-display), 'Manrope', sans-serif",
+          fontWeight: 500,
+          fontSize: "16px",
+          lineHeight: 1.5,
+          color: "#111111",
+          minHeight: "108px",
+        }}
       />
     </label>
   );
 }
 
-export function SubmitButton({ children = "Submit application" }: { children?: ReactNode }) {
+/**
+ * Primary submit button. Matches Figma frame 867:964 — #3960F9 fill, 44px
+ * tall, rounded-8, Manrope Medium 18px white label, the exact effect_KNZQYT
+ * box-shadow (1px ring + soft inner top-highlight), a blurred white-60%
+ * glow ellipse offset right of the label, and the cursor + hover states.
+ */
+export function SubmitButton({
+  children = "Submit application",
+}: {
+  children?: ReactNode;
+}): React.ReactElement {
   return (
     <button
       type="submit"
-      className="w-full rounded-[8px] bg-[#2F49E5] hover:bg-[#2438C2] text-white font-semibold py-3 transition-colors"
-      style={{ fontSize: "var(--btn-fs-md, 16px)", minHeight: "44px" }}
-    >
-      {children}
-    </button>
-  );
-}
-
-export function RecaptchaPlaceholder(): React.ReactElement {
-  return (
-    <div
-      className="flex items-center justify-between rounded-[6px] bg-[#F9F9F9] border border-[#D9DFE8] px-4 py-3"
-      aria-label="reCAPTCHA placeholder"
+      className="relative w-full overflow-hidden rounded-[8px] text-white cursor-pointer transition-colors hover:bg-[#2438C2] disabled:cursor-not-allowed disabled:opacity-70"
+      style={{
+        background: "#3960F9",
+        height: "44px",
+        boxShadow:
+          "0 0 0 1px rgba(57, 96, 249, 1), 0 1px 2px -1px rgba(9, 6, 63, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.16)",
+      }}
     >
       <span
-        className="rounded-[4px] bg-[#2F8AF0] px-3 py-1 text-white"
-        style={{ fontSize: "12px", lineHeight: 1.4 }}
+        className="relative z-10 inline-flex items-center justify-center"
+        style={{
+          fontFamily: "var(--font-display), 'Manrope', sans-serif",
+          fontWeight: 500,
+          fontSize: "clamp(15px, 1.4vw, 18px)",
+          lineHeight: "24.06px",
+          letterSpacing: "-0.01em",
+        }}
       >
-        protect by recaptcha
+        {children}
       </span>
-      <svg
-        width="32"
-        height="32"
-        viewBox="0 0 32 32"
-        fill="none"
+      {/* Blurred glow ellipse — Figma 867:970 (rgba(255,255,255,0.6) blur 20px) */}
+      <span
         aria-hidden
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M16 4a12 12 0 1 1-8.485 3.515M4 8v6h6"
-          stroke="#94A3B8"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </div>
+        className="pointer-events-none absolute"
+        style={{
+          width: "30px",
+          height: "30px",
+          right: "calc(50% - 88px)",
+          top: "50%",
+          transform: "translateY(-50%)",
+          background: "rgba(255, 255, 255, 0.6)",
+          borderRadius: "9999px",
+          filter: "blur(20px)",
+        }}
+      />
+    </button>
   );
 }

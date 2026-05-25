@@ -44,8 +44,6 @@ const PILLARS: PillarDef[] = [
 
 const SECTION_BG =
   'linear-gradient(to bottom, #151021 0%, #131e8f 62.497%, #471ec0 100%)';
-const CARD_BG =
-  'linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)';
 const CODE_PANEL_SHADOW =
   '0px 120px 120px 0px rgba(223,155,255,0.08),' +
   '0px 64px 64px 0px rgba(22,34,51,0.12),' +
@@ -115,152 +113,117 @@ interface CompCardProps {
 }
 
 function CompCard({ title, fromImage, isCleanStart }: CompCardProps): React.ReactElement {
+  /*
+   * Mirrors the home page SecurityNotPatching card chrome:
+   *   - Outer cyan rect (#2CC1EB), radius 40, 10px padding → reads as a 10px cyan border.
+   *   - Inner content radius 32, overflow hidden.
+   *   - Header: dark gradient with watermark vector (cube → Traditional, chevron →
+   *     CleanStart) at soft-light blend, plus a cyan light-flare across the bottom edge.
+   *   - Body: terminal panel (#0c131c) carrying the Dockerfile content — replaces the
+   *     home card's white body so the "drop-in code comparison" reading is preserved.
+   */
   return (
     <div
-      className="relative overflow-hidden"
+      className="relative flex h-full w-full flex-col"
       style={{
         flex: '1 1 0',
-        /* Figma 602px → 451px @1440; let it fill available flex space */
         minWidth: 0,
-        borderRadius: '40px',
+        borderRadius: 40,
+        background: '#2CC1EB',
+        padding: 10,
+        boxShadow: CODE_PANEL_SHADOW,
+        zIndex: 10,
       }}
     >
-      {/* ── Card base gradient ── */}
-      <div className="absolute inset-0" style={{ background: CARD_BG }} />
-
-      {/* ── Background texture (mix-blend-saturation) — subtle noise/grid pattern ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/for-developers/secure/card-texture.png"
-        alt=""
-        className="absolute pointer-events-none select-none"
-        style={{
-          left: '-8%',
-          top: '-20%',
-          width: '116%',
-          height: 'auto',
-          mixBlendMode: 'saturation',
-          opacity: 0.6,
-          transform: 'rotate(-0.73deg)',
-        }}
-        loading="lazy"
-        decoding="async"
-      />
-
-      {/* ── Header gradient overlay ── */}
-      {isCleanStart ? (
-        /* Right card: vivid cyan/purple radial glow in header */
-        <div
-          aria-hidden
-          className="absolute pointer-events-none select-none"
-          style={{
-            /* Matches Figma gradient image position: left=-113px, top=-229px at Figma scale → ×0.75 */
-            left: 'calc(-113px * 0.75)',
-            top: 'calc(-229px * 0.75)',
-            width: 'calc(1028px * 0.75)',
-            height: 'calc(1028px * 0.75)',
-            borderRadius: '50%',
-            background:
-              'radial-gradient(ellipse at 55% 60%, rgba(44,193,235,0.55) 0%, rgba(71,30,192,0.4) 30%, rgba(19,30,143,0.2) 55%, transparent 75%)',
-          }}
-        />
-      ) : (
-        /* Left card: gradient overlay (card-gradient-left.png, 1024×1024, 4KB) */
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          aria-hidden
-          src="/images/for-developers/secure/card-gradient-left.png"
-          alt=""
-          className="absolute pointer-events-none select-none"
-          style={{
-            left: 'calc(-113px * 0.75)',
-            top: 'calc(-229px * 0.75)',
-            width: 'calc(1028px * 0.75)',
-            height: 'calc(1028px * 0.75)',
-            maxWidth: 'none',
-            objectFit: 'cover',
-          }}
-          loading="lazy"
-          decoding="async"
-        />
-      )}
-
-      {/* ── Teal flare at header/body junction (right card only) ── */}
-      {isCleanStart && (
-        <div
-          aria-hidden
-          className="absolute pointer-events-none select-none"
-          style={{
-            left: '-15%',
-            top: '55px',
-            width: '130%',
-            height: '100px',
-            background:
-              'radial-gradient(ellipse at 50% 50%, rgba(44,193,235,0.45) 0%, rgba(21,173,250,0.2) 40%, transparent 70%)',
-          }}
-        />
-      )}
-
-      {/* ── Hex vector overlay (right card only, top-right, soft-light blend) ── */}
-      {isCleanStart && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          aria-hidden
-          src="/images/for-developers/secure/card-hex.svg"
-          alt=""
-          className="absolute pointer-events-none select-none"
-          style={{
-            right: 'calc(-4px * 0.75)',
-            top: 'calc(-13px * 0.75)',
-            width: 'calc(244px * 0.75)',
-            height: 'calc(241px * 0.75)',
-            mixBlendMode: 'soft-light',
-          }}
-          loading="lazy"
-          decoding="async"
-        />
-      )}
-
-      {/* ── Card title (header zone, ~100px tall) ── */}
       <div
-        className="relative flex items-center justify-center z-10"
-        style={{ height: 'clamp(80px, 6.77vw, 130px)' }}
+        className="relative flex flex-1 flex-col overflow-hidden"
+        style={{ borderRadius: 32 }}
       >
-        <h3
-          className="text-white text-center"
+        {/* Header — dark gradient + watermark + cyan flare */}
+        <div
+          className="relative flex w-full items-center justify-center overflow-hidden"
           style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(1rem, 1.67vw, 2rem)',
-            fontWeight: 700,
-            letterSpacing: '-0.05em',
-            lineHeight: 1,
-            padding: '0 clamp(20px, 2.5vw, 40px)',
+            height: 'clamp(76px, 7vw, 100px)',
+            background: isCleanStart
+              ? 'linear-gradient(135deg, #1B0E33 0%, #2B1456 40%, #471EC0 100%)'
+              : 'linear-gradient(135deg, #151021 0%, #1A1733 60%, #221A3D 100%)',
           }}
         >
-          {title}
-        </h3>
-      </div>
+          {isCleanStart ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              aria-hidden
+              src="/images/security/header-chevron.svg"
+              alt=""
+              className="pointer-events-none absolute select-none mix-blend-soft-light"
+              style={{
+                right: '-120px',
+                top: '-2px',
+                width: '258px',
+                height: '236px',
+                opacity: 0.7,
+              }}
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              aria-hidden
+              src="/images/security/header-cube.svg"
+              alt=""
+              className="pointer-events-none absolute select-none mix-blend-soft-light"
+              style={{
+                right: '-37px',
+                top: '-13px',
+                width: '162px',
+                height: '186.4px',
+                opacity: 0.7,
+              }}
+              loading="lazy"
+              decoding="async"
+            />
+          )}
 
-      {/* ── Dark code panel ── */}
-      {/*
-       * Figma padding at 1920px: 45px top, 48px bottom, 70px left/right.
-       * Scaled to 1440px (×0.75): ~34px V, ~52px H.
-       * clamp vw values: 45/1920*100=2.34vw (V), 70/1920*100=3.65vw (H).
-       */}
-      <div
-        className="relative z-10"
-        style={{
-          background: '#0c131c',
-          borderRadius: '32px',
-          boxShadow: CODE_PANEL_SHADOW,
-          paddingTop: 'clamp(20px, 2.34vw, 34px)',
-          paddingBottom: 'clamp(20px, 2.5vw, 36px)',
-          paddingLeft: 'clamp(24px, 3.65vw, 52px)',
-          paddingRight: 'clamp(24px, 3.65vw, 52px)',
-        }}
-      >
-        <DockerfileBlock fromImage={fromImage} />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0"
+            style={{
+              height: '60px',
+              background:
+                'radial-gradient(60% 140% at 50% 100%, rgba(44,193,235,0.65) 0%, rgba(44,193,235,0.25) 35%, rgba(44,193,235,0) 70%)',
+              filter: 'blur(6px)',
+            }}
+          />
+
+          <h3
+            className="relative z-10 text-center text-white"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(1rem, 1.67vw, 2rem)',
+              fontWeight: 700,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.1,
+              padding: '0 clamp(20px, 2.5vw, 40px)',
+            }}
+          >
+            {title}
+          </h3>
+        </div>
+
+        {/* Body — terminal code panel */}
+        <div
+          className="relative flex flex-1 flex-col"
+          style={{
+            background: '#0c131c',
+            paddingTop: 'clamp(20px, 2.34vw, 34px)',
+            paddingBottom: 'clamp(20px, 2.5vw, 36px)',
+            paddingLeft: 'clamp(24px, 3.65vw, 52px)',
+            paddingRight: 'clamp(24px, 3.65vw, 52px)',
+          }}
+        >
+          <DockerfileBlock fromImage={fromImage} />
+        </div>
       </div>
     </div>
   );
@@ -505,40 +468,36 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           </div>
         </div>
 
-        {/* ── Bottom banner ── */}
-        {/* Figma: dark gradient rounded-[32px], 1276×146px, text centered */}
+        {/* ── Bottom banner — same dark→purple body + cyan flare, no cyan border ── */}
         <div
           className="relative overflow-hidden text-center"
           style={{
-            background: CARD_BG,
-            borderRadius: '32px',
+            borderRadius: 32,
+            background:
+              'linear-gradient(135deg, #1B0E33 0%, #2B1456 40%, #471EC0 100%)',
             paddingTop: 'clamp(24px, 2.6vw, 50px)',
             paddingBottom: 'clamp(24px, 2.6vw, 50px)',
             paddingLeft: '24px',
             paddingRight: '24px',
+            boxShadow: CODE_PANEL_SHADOW,
           }}
         >
-          {/* Banner bg texture */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          {/* Cyan light-flare across the bottom edge — same recipe as the card headers */}
+          <div
             aria-hidden
-            src="/images/for-developers/secure/card-texture.png"
-            alt=""
-            className="absolute pointer-events-none select-none"
+            className="pointer-events-none absolute inset-x-0 bottom-0"
             style={{
-              left: '-10%',
-              top: '-100%',
-              width: '120%',
-              height: 'auto',
-              mixBlendMode: 'saturation',
-              opacity: 0.5,
-              transform: 'rotate(-0.73deg)',
+              height: '70px',
+              background:
+                'radial-gradient(60% 140% at 50% 100%, rgba(44,193,235,0.55) 0%, rgba(44,193,235,0.22) 35%, rgba(44,193,235,0) 70%)',
+              filter: 'blur(6px)',
             }}
-            loading="lazy"
-            decoding="async"
           />
 
-          <div className="relative z-10 flex flex-col items-center" style={{ gap: '12px' }}>
+          <div
+            className="relative z-10 flex flex-col items-center"
+            style={{ gap: '12px' }}
+          >
             <p
               className="text-white"
               style={{

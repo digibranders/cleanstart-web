@@ -12,6 +12,7 @@ import {
   getPastEvents,
   getUpcomingEvents,
 } from "@/lib/events";
+import { fetchCommunityImages } from "@/lib/api/community-images";
 import { effectivePublishedAt } from "@/lib/published-date";
 import { getResources, type Resource, type ResourceType } from "@/lib/resources";
 import { resourceTypeLabel } from "@/lib/resources-utils";
@@ -192,32 +193,18 @@ async function fetchWhatsNew(): Promise<NewsItem[]> {
   }
 }
 
-type CommunityImagesApiResponse = {
-  items?: Array<{ name?: unknown; image_url?: unknown; updated_at?: unknown }>;
-};
-
-const IMAGES_API = "https://api-cleanstart-images.vercel.app/api/community-images";
-
-async function fetchCommunityImages(): Promise<ImageItem[]> {
-  try {
-    const res = await fetch(IMAGES_API, { next: { revalidate: 300 } });
-    if (!res.ok) return IMAGE_FALLBACK;
-    const data = (await res.json()) as CommunityImagesApiResponse;
-    const items = Array.isArray(data.items) ? data.items : [];
-    const parsed = items
-      .map((raw): ImageItem | null => {
-        const name = typeof raw.name === "string" ? raw.name : null;
-        const imgSrc = typeof raw.image_url === "string" ? raw.image_url : null;
-        const updatedAt = typeof raw.updated_at === "string" ? raw.updated_at : undefined;
-        if (!name || !imgSrc) return null;
-        return { imgSrc, name, updated: formatRelative(updatedAt) };
-      })
-      .filter((x): x is ImageItem => x !== null)
-      .slice(0, 4);
-    return parsed.length > 0 ? parsed : IMAGE_FALLBACK;
-  } catch {
-    return IMAGE_FALLBACK;
-  }
+async function loadCommunityImageCards(): Promise<ImageItem[]> {
+  const items = await fetchCommunityImages();
+  const parsed = items
+    .map(
+      (item): ImageItem => ({
+        imgSrc: item.imageUrl,
+        name: item.name,
+        updated: formatRelative(item.updatedAt),
+      }),
+    )
+    .slice(0, 4);
+  return parsed.length > 0 ? parsed : IMAGE_FALLBACK;
 }
 
 async function fetchEvents(): Promise<EventItem[]> {
@@ -508,7 +495,7 @@ function CardWrapper({ children }: { children: React.ReactNode }): React.ReactEl
 export async function CommunitySections(): Promise<React.ReactElement> {
   const [news, images, events] = await Promise.all([
     fetchWhatsNew(),
-    fetchCommunityImages(),
+    loadCommunityImageCards(),
     fetchEvents(),
   ]);
 

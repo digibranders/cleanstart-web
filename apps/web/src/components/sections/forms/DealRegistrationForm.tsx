@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
 import {
   FormCard,
   FormSectionTitle,
-  RecaptchaPlaceholder,
   SubmitButton,
   TextArea,
   TextInput,
@@ -63,7 +63,7 @@ export function DealRegistrationForm(): React.ReactElement {
           <TextArea name="dealDetails" placeholder="Deal Details" label="Deal Details" />
         </div>
 
-        <RecaptchaPlaceholder />
+        <TurnstileWidget />
         <SubmitButton>Submit application</SubmitButton>
       </form>
     </FormCard>

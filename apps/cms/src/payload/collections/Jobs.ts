@@ -12,6 +12,7 @@ import { contentTitleField } from '../fields/title';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
@@ -239,7 +240,7 @@ export const Jobs: CollectionConfig = {
     ...seoFieldsForSidebar('jobs'),
   ],
   hooks: {
-    beforeChange: [firstPublishHook(), displayPublishedAtBackfillHook],
+    beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook],
     afterChange: [
       slugChangeRedirectHook('jobs'),
       schemaOverrideAuditHook('jobs'),

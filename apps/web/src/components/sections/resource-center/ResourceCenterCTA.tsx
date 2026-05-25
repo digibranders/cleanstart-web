@@ -81,12 +81,12 @@ export function ResourceCenterCTA(): React.ReactElement {
       <div
         className="absolute inset-0 flex items-center px-6 py-8 lg:px-[100px] lg:py-[60px]"
       >
-        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-[68px] w-full">
+        <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-[68px] w-full">
           <p
             id="rc-cta-title"
             className="font-display font-bold text-center lg:text-left w-full lg:max-w-[486px]"
             style={{
-              fontSize: "clamp(26px, 3.1vw, 44px)",
+              fontSize: "var(--cta-card-title)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -102,7 +102,7 @@ export function ResourceCenterCTA(): React.ReactElement {
             <p
               className="font-normal text-center lg:text-left w-full lg:max-w-[493px]"
               style={{
-                fontSize: "clamp(16px, 1.5vw, 20px)",
+                fontSize: "var(--cta-card-desc)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
             lineHeight: 1.4,

@@ -404,6 +404,29 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 
 ---
 
+## Production rollout checklist (run once when going live)
+
+These are one-shot operations that **must** run against the prod Postgres on the droplet before / right after the first production deploy. They are not part of the normal CI deploy. Each item should be checked off in the deploy PR description.
+
+1. **Lexical list-normalisation backfill.** `apps/cms/scripts/normalize-lexical-lists.ts` merges adjacent same-shape `list` nodes inside every Lexical body field. The `normalizeLexicalHook` only fixes docs on save — existing prod content needs this one-shot pass.
+   - **Always run with `--bypass-hooks` in production.** Without it, `payload.update()` re-fires every `afterChange` hook on each updated row: Teams notifications spam the editor channel, IndexNow falsely pings Bing/Yandex, Meilisearch reindexes for nothing, `updatedAt` churn pollutes the sitemap `lastmod` and editor sort order, and a version row is created per doc.
+   - Recommended sequence on the droplet (from inside the `cms` container, with `/opt/cleanstart/.env` mounted):
+     ```bash
+     # 1. Dry-run to see the blast radius (no writes):
+     node --env-file=.env --no-warnings --experimental-strip-types \
+       scripts/normalize-lexical-lists.ts --dry-run
+
+     # 2. Real run, hooks bypassed (no Teams / IndexNow / search-sync side effects):
+     node --env-file=.env --no-warnings --experimental-strip-types \
+       scripts/normalize-lexical-lists.ts --bypass-hooks
+     ```
+   - Re-runnable. Already-clean docs are skipped via `needsListMerge`.
+   - After the run, spot-check one blog and one guide on the live site — bullet lists should render as a single `<ul>`, not one `<ul>` per bullet.
+
+(Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
+
+---
+
 ## When stuck
 
 - **Schema question?** Read arch doc §`#new-fields` for that collection.

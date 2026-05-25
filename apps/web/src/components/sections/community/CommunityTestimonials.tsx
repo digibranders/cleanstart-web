@@ -183,11 +183,11 @@ export function CommunityTestimonials(): React.ReactElement {
 
       {/* ── Content ───────────────────────────────────────────────────────── */}
       {/*
-          pb-[250px] = Footer CTA contract:
+          pb-section-cta = Footer CTA contract:
           170px CTA overlap + 80px breathing room above CTA top edge
           (see Footer.tsx layout contract comment)
       */}
-      <div className="relative z-10 mx-auto max-w-[var(--container-default)] px-6 pb-[250px] pt-[clamp(40px,6vw,100px)]">
+      <div className="relative z-10 mx-auto max-w-[var(--container-default)] px-6 pb-section-cta pt-[clamp(40px,6vw,100px)]">
 
         {/* ── Header row: large quote mark + nav arrows ─────────────────── */}
         <div className="mb-10 flex items-center justify-between">

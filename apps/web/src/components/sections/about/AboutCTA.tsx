@@ -40,7 +40,7 @@ export function AboutCTA() {
         <p
           className="font-display font-bold"
           style={{
-            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontSize: "var(--cta-card-title)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -51,7 +51,7 @@ export function AboutCTA() {
         <p
           className="font-sans text-white/80"
           style={{
-            fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontSize: "var(--cta-card-desc)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
             lineHeight: 1.4,

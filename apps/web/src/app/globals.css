@@ -44,7 +44,7 @@
   --spacing-section-sm: clamp(2.5rem, 5vw, 4rem);            /* 40→64px — tight/sequential grids */
   --spacing-section-md: clamp(3rem, 6vw, 5.5rem);            /* 48→88px — standard sections */
   --spacing-section-lg: clamp(4rem, 8vw, 7rem);              /* 64→112px — feature/hero-adjacent */
-  --spacing-section-cta: clamp(10rem, 18vw, 15.625rem);      /* 160→250px — CTA-overlap reservation above Footer */
+  --spacing-section-cta: clamp(7.5rem, 12vw, 11.25rem);      /* 120→180px — CTA-overlap reservation above Footer (120px card half + 60px visible gap) */
 
   /* Card padding scale (fluid) */
   --spacing-card-sm: clamp(1rem, 1.5vw, 1.5rem);             /* 16→24px — compact cards */
@@ -189,6 +189,24 @@
   --prose-h4-mt: 2rem;
   --prose-h4-mb: 0.5rem;
   --prose-column-max: 720px;
+
+  /* Footer-slot CTA card tokens — single source of truth for the "card sitting
+     in the Footer's 1276×330/240 slot" pattern used by every page-end CTA
+     (product pages + CMS listing/detail pages). The ideal reference is
+     /vulnerability-remediation; before these tokens existed every consumer
+     duplicated the same clamp strings inline. Anything painted inside the
+     footer slot must consume these — never hardcode a new clamp for the title,
+     description, or submit button. */
+  --cta-card-title:       clamp(26px, 3.1vw, 44px);
+  --cta-card-title-ls:    -0.04em;
+  --cta-card-title-lh:    1.1;
+  --cta-card-title-weight: 600;
+  --cta-card-desc:        clamp(16px, 1.5vw, 20px);
+  --cta-card-desc-ls:     -0.02em;
+  --cta-card-desc-lh:     1.4;
+  --cta-card-btn-h:       40px;
+  --cta-card-btn-px:      16px;
+  --cta-card-btn-fs:      16px;
 }
 
 :root {
@@ -776,8 +794,23 @@ body {
   }
 }
 
+/* Tab-content swap animation (used by the homepage Resources & Insights rail).
+   Slightly larger Y offset and a longer duration than `cs-fade-slide-in` so
+   the stagger reads as a smooth wave when 3 cards swap in together. */
+@keyframes cs-tab-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [style*="cs-fade-slide-in"]   { animation: none !important; }
+  [style*="cs-tab-card-in"]     { animation: none !important; }
   [style*="cs-pulse-glow"]      { animation: none !important; }
   [style*="cs-pulse-glow-flare"]{ animation: none !important; }
 }
@@ -1530,6 +1563,15 @@ body {
   color: transparent;
 }
 
+/* Brand-cyan stroke for icon-only SVG glyphs (Lucide, Heroicons, etc.).
+   `currentColor` flows through to the icon's stroke. A true linear gradient
+   on the stroke would require an inline <defs> in the same SVG — for the
+   small icons we use, solid cyan reads cleaner against the gradient-tinted
+   icon badge. */
+.cs-icon-gradient {
+  color: #2CC1EB;
+}
+
 /* Grid backdrop for security section (subtle) */
 .cs-section-light {
   background:
@@ -1706,7 +1748,11 @@ body {
 }
 .article-body .article-ul { list-style-type: disc; }
 .article-body .article-ol { list-style-type: decimal; }
-.article-body .article-li { margin-bottom: 0.4em; }
+.article-body .article-li { margin-bottom: 0.2em; line-height: 1.5; }
+.article-body .article-ul + .article-ul,
+.article-body .article-ol + .article-ol,
+.article-body .article-ul + .article-ol,
+.article-body .article-ol + .article-ul { margin-top: -1em; }
 
 .article-body .article-blockquote {
   border-left: 4px solid #4a3bf1;

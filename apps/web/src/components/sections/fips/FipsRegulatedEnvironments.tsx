@@ -28,7 +28,6 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
       data-section="FipsRegulatedEnvironments"
       className="relative overflow-hidden"
       aria-label="Built for Regulated Environments"
-      style={{ minHeight: "clamp(400px, 30vw, 550px)" }}
     >
       {/* Background photo (Figma 1:586 — bare 1922×669 image, no text overlay) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -52,7 +51,10 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-14 md:py-[110px]">
+      <div
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-14 md:py-[110px] flex flex-col"
+        style={{ minHeight: "clamp(400px, 30vw, 550px)" }}
+      >
         <h2
           className="text-white mb-10 md:mb-[64px]"
           style={{
@@ -68,7 +70,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
           <span className="cs-text-gradient-impact">Environments</span>
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 md:gap-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 md:gap-0 mt-auto md:pt-16">
           {SECTORS.map((sector, idx) => (
             <div
               key={sector.title}

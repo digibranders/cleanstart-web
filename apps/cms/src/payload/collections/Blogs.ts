@@ -11,6 +11,7 @@ import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
@@ -285,6 +286,7 @@ export const Blogs: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
+      normalizeLexicalHook(),
       firstPublishHook(),
       displayPublishedAtBackfillHook,
       bodyStatsHook({

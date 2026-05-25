@@ -49,6 +49,10 @@ export function buildCsp({
     "blob:",
     "https://cdn.cleanstart.com",
     "https://cms.cleanstart.com",
+    // Public CleanStart community-images logos served by GCS
+    "https://storage.googleapis.com",
+    // Brand-colored stack logos (devicons) served via jsDelivr CDN
+    "https://cdn.jsdelivr.net",
   ];
 
   const fontSrc = ["'self'", "https://fonts.gstatic.com", "data:"];

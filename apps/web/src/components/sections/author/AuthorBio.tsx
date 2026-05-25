@@ -14,7 +14,7 @@ export function AuthorBio({ author }: AuthorBioProps): React.ReactElement | null
 
   return (
     <section className="relative w-full bg-white">
-      <div className="relative mx-auto max-w-[720px] px-6 pt-section-md pb-section-md">
+      <div className="relative mx-auto max-w-[720px] px-6 pt-section-md pb-section-cta">
         <div className="article-body">
           {hasLong ? (
             <RenderLexical content={author.bioLong} />

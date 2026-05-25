@@ -86,9 +86,9 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
               id="careers-hero-title"
               className="font-display font-semibold"
               style={{
-                fontSize: "var(--text-hero-utility)",
-                letterSpacing: "var(--text-hero-utility-ls)",
-                lineHeight: "var(--text-hero-lh)",
+                fontSize: "clamp(40px, 4.45vw, 64px)",
+                letterSpacing: "-0.04em",
+                lineHeight: 1.05,
               }}
             >
               Careers
