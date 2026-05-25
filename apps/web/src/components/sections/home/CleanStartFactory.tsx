@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Section, Container } from "@/components/layout";
 
 type CardData = {
@@ -23,6 +24,25 @@ const CARDS: CardData[] = [
 //   blurb:        font 14 (6.01 %),  gap 12 below title
 //   arrow circle: 28 × 28 (12.03 %), top 322 (138.32 %), 1.75 px stroke (0.75 %)
 function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
+  // Stable, unique clipPath id for the chevron SVG so the 5 rendered cards
+  // don't share the same id (which would collide and break the SVG clip).
+  const cardKey = data.title.replace(/\s+/g, "-").toLowerCase();
+
+  // All Figma layer values are stated in the design's px units relative to a
+  // 232.8 px-wide card body. Container queries (`cqw` = 1 % of card width)
+  // make every layer scale proportionally when the card resizes.
+  //
+  //   24 px radius       → 10.31 cqw
+  //   72 px blur         → 30.93 cqw
+  //   21.21 px sub-r     → 9.11  cqw
+  //   551.93 × 652       → 237.08 × 280.07 (cyan halo, opacity 0.7, bottom-heavy)
+  //   343.69 × 406       → 147.63 × 174.40 (purple halo, opacity 0.34, mid)
+  //   130.37 × 158       → 56.00 × 67.87  (Mask — black ellipse, opacity 0.2, bottom-center)
+  //   302.50 × 312.2     → 129.94 × 134.10 (orb-glow group bounding box)
+  //   inner 156.7 × 185.11 → 67.31 × 79.51   (#066BF1 blue)
+  //   inner 178.53 × 210.89 → 76.69 × 90.59  (#04C7F2 cyan)
+  //   inner 197.24 × 233   → 84.72 × 100.09 (#5D04D7 purple / #04C7F2 wash)
+
   return (
     <figure
       className="factory-card relative shrink-0"
@@ -33,17 +53,129 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
         containerType: "inline-size",
       }}
     >
-      {/* Card background — the cropped image is the card body, 1:1 alignment. */}
-      <Image
-        src="/images/cleanstart-factory/factory-card-bg.webp"
-        alt=""
-        aria-hidden
-        width={232}
-        height={374}
-        sizes="(min-width: 1280px) 233px, 16vw"
-        priority={isFirst}
-        className="pointer-events-none absolute inset-0 h-full w-full select-none"
-      />
+      {/* Card body — gradient + all interior glow ellipses, clipped to the
+          24 px (10.31 cqw) rounded rectangle. Box-shadow matches Figma's
+          left-side dark drop-shadow stack. */}
+      <div
+        className="absolute inset-0 overflow-hidden"
+        style={{
+          borderRadius: "10.31cqw",
+          background:
+            "linear-gradient(180deg, #151021 0%, #131E8F 71.2%, #551ECE 100%)",
+          boxShadow:
+            "-8px 4px 20px rgba(0,0,0,0.23), -33px 16px 37px rgba(0,0,0,0.2), -74px 37px 49px rgba(0,0,0,0.12), -131px 65px 59px rgba(0,0,0,0.03)",
+        }}
+      >
+        {/* Big purple halo — #5D04D7, opacity 0.34, blur 72 px, mid-card */}
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{
+            width: "147.63cqw",
+            height: "174.4cqw",
+            background: "#5D04D7",
+            opacity: 0.34,
+            filter: "blur(30.93cqw)",
+          }}
+        />
+        {/* Big cyan halo — #04C7F2, opacity 0.7, blur 72 px, bottom-heavy */}
+        <div
+          className="absolute left-1/2 rounded-full"
+          style={{
+            top: "78%",
+            transform: "translate(-50%, -50%)",
+            width: "237.08cqw",
+            height: "280.07cqw",
+            background: "#04C7F2",
+            opacity: 0.7,
+            filter: "blur(30.93cqw)",
+          }}
+        />
+        {/* Mask — black soft ellipse at bottom-center, opacity 0.2 */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2"
+          style={{
+            top: "65%",
+            width: "56cqw",
+            height: "67.87cqw",
+            background: "#000000",
+            opacity: 0.2,
+            borderRadius: "9.11cqw",
+          }}
+        />
+        {/* Orb-glow group 2085665008 — three soft ellipses blurred 72 px,
+            painted behind the orb position (top center, ~25 % from top). */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2"
+          style={{
+            top: "5%",
+            width: "129.94cqw",
+            height: "134.1cqw",
+            filter: "blur(30.93cqw)",
+          }}
+        >
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              width: "67.31cqw",
+              height: "79.51cqw",
+              background: "#066BF1",
+            }}
+          />
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              width: "76.69cqw",
+              height: "90.59cqw",
+              background: "#04C7F2",
+            }}
+          />
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              width: "84.72cqw",
+              height: "100.09cqw",
+              background: "#04C7F2",
+              opacity: 0.34,
+            }}
+          />
+        </div>
+        {/* Orb-glow group 2085665009 — second halo with purple sub-ellipse */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2"
+          style={{
+            top: "5%",
+            width: "129.94cqw",
+            height: "134.1cqw",
+            filter: "blur(30.93cqw)",
+          }}
+        >
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              width: "67.31cqw",
+              height: "79.51cqw",
+              background: "#066BF1",
+            }}
+          />
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              width: "76.69cqw",
+              height: "90.59cqw",
+              background: "#04C7F2",
+            }}
+          />
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              width: "84.72cqw",
+              height: "100.09cqw",
+              background: "#5D04D7",
+            }}
+          />
+        </div>
+      </div>
+
 
       {/* Orb (chrome iridescent ring). Cropped 113 × 117, displayed at 46.39 %
           of card width to match Figma's 108 px visible-orb width. */}
@@ -96,31 +228,48 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
         </p>
       </div>
 
-      {/* Arrow circle. */}
-      <div
-        aria-hidden
-        className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center rounded-full border-white/95"
+      {/* Arrow circle — interactive Link wrapping the exact Figma SVG (node
+          810:1419). href is a placeholder for now; per-card destinations will
+          be wired later. Sized in cqw so the hit target scales with the card. */}
+      <Link
+        href="#"
+        aria-label={`Learn more about ${data.title.replace("\n", " ")}`}
+        className="absolute left-1/2 -translate-x-1/2 cursor-pointer rounded-full outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
         style={{
           top: "138.32cqw",
           width: "12.03cqw",
           height: "12.03cqw",
-          borderWidth: "0.75cqw",
         }}
       >
         <svg
+          aria-hidden
           viewBox="0 0 28 28"
           fill="none"
-          style={{ width: "35%", height: "35%" }}
+          xmlns="http://www.w3.org/2000/svg"
+          className="block h-full w-full"
         >
-          <path
-            d="M13.5127 8.24061L18.6556 13.3834C18.8163 13.5442 18.9065 13.7621 18.9065 13.9893C18.9065 14.2166 18.8163 14.4345 18.6556 14.5952L13.5127 19.7381"
+          <g clipPath={`url(#clip0_arrow_${cardKey})`}>
+            <path
+              d="M13.5127 8.24061L18.6556 13.3834C18.8163 13.5442 18.9065 13.7622 18.9065 13.9894C18.9065 14.2167 18.8163 14.4347 18.6556 14.5954L13.5127 19.7383C13.4337 19.8202 13.3391 19.8854 13.2345 19.9304C13.1299 19.9753 13.0175 19.9989 12.9037 19.9999C12.7898 20.0009 12.677 19.9792 12.5716 19.9361C12.4663 19.893 12.3706 19.8294 12.2901 19.7489C12.2096 19.6684 12.146 19.5727 12.1029 19.4674C12.0598 19.362 12.0381 19.2492 12.0391 19.1354C12.0401 19.0216 12.0637 18.9091 12.1087 18.8045C12.1536 18.6999 12.2189 18.6054 12.3007 18.5263L16.8376 13.9894L12.3007 9.45261C12.1446 9.29095 12.0582 9.07443 12.0602 8.84969C12.0621 8.62495 12.1523 8.40997 12.3112 8.25105C12.4701 8.09213 12.6851 8.00199 12.9098 8.00003C13.1346 7.99808 13.3511 8.08447 13.5127 8.24061Z"
+              fill="white"
+            />
+          </g>
+          <rect
+            x="0.875"
+            y="0.875"
+            width="26.25"
+            height="26.25"
+            rx="13.125"
             stroke="white"
             strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
           />
+          <defs>
+            <clipPath id={`clip0_arrow_${cardKey}`}>
+              <rect width="28" height="28" rx="14" fill="white" />
+            </clipPath>
+          </defs>
         </svg>
-      </div>
+      </Link>
 
       {/* Light beam — anchored to the card's bottom edge, extending downward.
           Thicker and brighter pass: width bumped to 65 cqw so the beam reads
@@ -154,8 +303,9 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
 }
 
 export function CleanStartFactory() {
-  // Background is inherited from the parent `bg-cs-hero bg-cs-grid` wrapper
-  // in page.tsx so the Hero and Factory sections share one continuous backdrop.
+  // Background is inherited from the parent `bg-cs-hero` wrapper in page.tsx
+  // so the Hero and Factory sections share one continuous backdrop. The grid
+  // overlay (`bg-cs-grid`) has been removed from the home wrapper per design.
   return (
     <Section padding="none" className="relative overflow-hidden">
       <Container>
