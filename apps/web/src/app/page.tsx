@@ -127,7 +127,7 @@ export default function Home() {
         {/* FAQ + Resources share one continuous #F6F6F6 canvas so their
             transparent backgrounds and decorative blobs/grids bleed across
             section boundaries without a hard edge. */}
-        <div className="relative overflow-hidden bg-[#F6F6F6] pb-[250px]">
+        <div className="relative overflow-hidden bg-[#F6F6F6] pb-section-cta">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 overflow-hidden"

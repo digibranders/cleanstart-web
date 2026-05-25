@@ -29,6 +29,10 @@ interface Testimonial {
   name: string;
   role: string;
   company: string;
+  /** Optional logo asset (same files served from TrustedByMarquee). When
+   *  provided, `CompanyMark` renders the wordmark image instead of the
+   *  text-only orb placeholder. */
+  logoSrc?: string;
   quote: string;
   caseStudyHref: string;
 }
@@ -37,13 +41,15 @@ const TESTIMONIAL_PHOTO = "/images/testimonial-photo.png";
 
 const TESTIMONIALS: Testimonial[] = [
   {
-    name: "Lucas Zhang",
-    role: "CISO, CFO",
-    company: "eventus",
+    name: "Mathan Babu K",
+    role: "CTSO & DPO, Vodafone Idea",
+    company: "Vodafone Idea",
+    logoSrc: "/images/trusted/10-vi.png",
     quote:
-      "Our proactive threat detection tools have transformed our response time to incidents. We now identify and neutralize threats before they escalate into costly breaches.",
-    caseStudyHref: "#case-study-lucas",
+      "Containers and microservices now sit at the heart of modern application delivery and the broader supply chain ecosystem. CleanStart's shift-left security approach couldn't have arrived at a more critical time.",
+    caseStudyHref: "#case-study-mathan",
   },
+  // Placeholder slot — replace with real testimonial #2 when copy lands.
   {
     name: "Priya Patel",
     role: "VP of Engineering",
@@ -52,6 +58,7 @@ const TESTIMONIALS: Testimonial[] = [
       "CleanStart's deterministic builds eliminated entire categories of supply-chain risk for our team. We deploy with confidence — no more unexplained drift between staging and production.",
     caseStudyHref: "#case-study-priya",
   },
+  // Placeholder slot — replace with real testimonial #3 when copy lands.
   {
     name: "Marcus Bennett",
     role: "Head of Platform",
@@ -294,7 +301,7 @@ function ActiveCard({ testimonial }: { testimonial: Testimonial }) {
             <div className="cs-tt-card__name">{testimonial.name}</div>
             <div className="cs-tt-card__role">{testimonial.role}</div>
           </div>
-          <CompanyMark company={testimonial.company} />
+          <CompanyMark company={testimonial.company} logoSrc={testimonial.logoSrc} />
         </div>
 
         {/* Decorative open quote mark — anchors the quote as the hero element */}
@@ -386,7 +393,7 @@ function SidePeek({
             <span className="cs-tt-peek__name">{testimonial.name}</span>
             <span className="cs-tt-peek__role">{testimonial.role}</span>
           </span>
-          <CompanyMark company={testimonial.company} small />
+          <CompanyMark company={testimonial.company} logoSrc={testimonial.logoSrc} small />
         </span>
         <span className="cs-tt-peek__quote">{testimonial.quote}</span>
         <span className="cs-tt-peek__cta">
@@ -450,16 +457,45 @@ function NavButton({
 }
 
 // =============================================================================
-// Company mark — placeholder wordmark (eventus/northwave/vertaglow PNGs not
-// in the project). Uses a tiny gradient orb + the name to keep visual rhythm.
+// Company mark — renders the real wordmark image when `logoSrc` is supplied
+// (uses the same grayscale-on-dark treatment as TrustedByMarquee so the logo
+// reads as a subtle attribution rather than a competing brand badge). Falls
+// back to the gradient-orb + text placeholder for testimonials that don't
+// have a logo file yet.
 // =============================================================================
 function CompanyMark({
   company,
+  logoSrc,
   small = false,
 }: {
   company: string;
+  // Accept explicit `undefined` so callers can forward the optional
+  // `testimonial.logoSrc` field directly under `exactOptionalPropertyTypes`.
+  logoSrc?: string | undefined;
   small?: boolean;
 }) {
+  if (logoSrc) {
+    const h = small ? 18 : 24;
+    const maxW = small ? 80 : 110;
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={logoSrc}
+        alt={company}
+        height={h}
+        style={{
+          height: h,
+          maxWidth: maxW,
+          width: "auto",
+          objectFit: "contain",
+          opacity: 0.9,
+          filter: "grayscale(1) brightness(2) contrast(1.1)",
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+    );
+  }
   return (
     <span
       className={`inline-flex items-center gap-1.5 font-sans text-white/85 ${small ? "text-body-xs" : "text-body-sm"}`}
