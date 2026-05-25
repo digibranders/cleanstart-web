@@ -42,7 +42,7 @@ export function WebinarsGrid({
       style={{
         background: "#F6F6F6",
         paddingTop: "var(--spacing-section-md)",
-        paddingBottom: "250px",
+        paddingBottom: "var(--spacing-section-cta)",
         overflowX: "clip",
       }}
       data-section="WebinarsGrid"

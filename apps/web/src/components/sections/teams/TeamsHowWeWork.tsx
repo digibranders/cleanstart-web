@@ -3,7 +3,7 @@ export function TeamsHowWeWork() {
     <section
       className="relative overflow-hidden bg-cs-grid"
       style={{
-        paddingBottom: "250px",
+        paddingBottom: "var(--spacing-section-cta)",
         background:
           "linear-gradient(180deg, #151021 0%, #131E8F 67.14%, #471EC0 107.43%)",
       }}

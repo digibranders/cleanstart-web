@@ -68,7 +68,7 @@ export function SCABuiltForDev(): React.ReactElement {
   return (
     <section
       className="relative overflow-hidden"
-      style={{ background: "#f7f7f7", paddingTop: "120px", paddingBottom: "250px" }}
+      style={{ background: "#f7f7f7", paddingTop: "120px", paddingBottom: "var(--spacing-section-cta)" }}
     >
       {/* Decorative purple glow — left edge */}
       <div

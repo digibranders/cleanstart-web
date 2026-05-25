@@ -47,7 +47,7 @@ export function FipsCTA(): React.ReactElement {
             left: "9.56%",
             top: "25.76%",
             width: "31.43%",
-            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontSize: "var(--cta-card-title)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -64,7 +64,7 @@ export function FipsCTA(): React.ReactElement {
             left: "50.00%",
             top: "27.27%",
             width: "38.64%",
-            fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontSize: "var(--cta-card-desc)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
             lineHeight: 1.4,
@@ -114,7 +114,7 @@ export function FipsCTA(): React.ReactElement {
         <p
           className="font-display text-white"
           style={{
-            fontSize: "clamp(26px, 3.1vw, 44px)",
+            fontSize: "var(--cta-card-title)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
