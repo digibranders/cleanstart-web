@@ -44,8 +44,8 @@ export function ASRBloated(): React.ReactElement {
           className="text-center text-[#111]"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(32px, 4vw, 56px)',
-            fontWeight: 700,
+            fontSize: 'var(--text-display-md)',
+            fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
             marginBottom: 'clamp(24px, 2.5vw, 48px)',
@@ -280,7 +280,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             className="text-[#111]"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(20px, 2vw, 28px)',
+              fontSize: 'var(--text-card-title-md)',
               fontWeight: 600,
               letterSpacing: '-0.04em',
               lineHeight: 1.1,
@@ -292,7 +292,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             className="text-[#111]"
             style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: 'clamp(15px, 1.4vw, 20px)',
+              fontSize: 'var(--text-body-md)',
               fontWeight: 400,
               letterSpacing: '-0.02em',
               lineHeight: 1.4,

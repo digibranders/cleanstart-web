@@ -171,16 +171,13 @@ export function FipsHero(): React.ReactElement {
           style={{ maxWidth: "623px" }}
         >
           <h1
-            className="text-white leading-[1.2] md:leading-[1.05]"
+            className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              /*
-               * Mobile (Figma 913:219): 32px, lh=1.2 (via Tailwind leading-[1.2])
-               * Desktop (Figma 787:1918): 80px at 1440px → 5.56vw, lh=1.05 (md:leading-[1.05])
-               */
-              fontSize: "clamp(32px, 5.56vw, 80px)",
-              fontWeight: 700,
-              letterSpacing: "-0.05em",
+              fontSize: "var(--text-hero-product)",
+              fontWeight: 600,
+              letterSpacing: "var(--text-hero-product-ls, -0.04em)",
+              lineHeight: "var(--text-hero-lh, 1.05)",
               marginBottom: "clamp(16px, 1.67vw, 24px)",
             }}
           >
@@ -191,14 +188,10 @@ export function FipsHero(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              /*
-               * Mobile (Figma 913:219): 16px, ls=−0.04em, lh=1.4
-               * Desktop (Figma 787:1918): 30px at 1440px → 2.08vw
-               */
-              fontSize: "clamp(16px, 2.08vw, 30px)",
+              fontSize: "var(--text-t-subhead)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.45,
               color: "rgba(255,255,255,0.8)",
               width: "100%",
               marginBottom: "clamp(24px, 2.22vw, 32px)",

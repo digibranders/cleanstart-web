@@ -143,9 +143,11 @@ export function FipsOperationalImpact(): React.ReactElement {
            */
           paddingTop: "clamp(60px, 8.33vw, 120px)",
           /*
-           * 250px = 170px CTA-card overlap + 80px breathing room (Footer contract).
+           * Footer contract: the last bg-providing element on a CTA page uses
+           * --spacing-section-cta (160 → 250px) so the centered CTA card has
+           * matching breathing room above and below the footer's top edge.
            */
-          paddingBottom: "250px",
+          paddingBottom: "var(--spacing-section-cta)",
         }}
       >
         <div

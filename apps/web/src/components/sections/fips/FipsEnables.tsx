@@ -5,20 +5,13 @@ import { Section, Container } from "@/components/layout";
  * "How CleanStart Enables FIPS 140-3 Compliance" — Figma node 787:2093.
  *
  * Composition:
- *   • Wheel visual = single PNG exported from Figma node 787:2100
- *     (donut, wedges with gradients/glows, inner light-blue ring,
- *     center dark core — all baked in). Lives at /images/fips/hub-wheel.png.
- *   • All text (numbers 01-07, capability labels, "Validated Foundation") is
- *     real, selectable HTML on top of the image. The text is positioned with
- *     percentages of the wheel box and sized with container queries (`cqi`),
- *     so each piece is locked to the wheel — it scales with the image at
- *     every viewport. The HTML text sits over the burned-in text in the PNG
- *     at the exact same coordinates, so the visible text becomes the
- *     sharp, selectable HTML version.
- *
- * Surrounding chrome (heading, subhead, padding, container, flares) uses
- * the project's design tokens (`--color-cs-*`, `--text-*`, `--spacing-*`)
- * and primitives (<Section>, <Container>).
+ *   • Wheel visual = single PNG (`/images/fips/hub-wheel.png`) — pure
+ *     decoration: donut, 8 wedges with gradients/glows, light-blue inner
+ *     ring, center dark core. No text is baked into the PNG.
+ *   • Capability labels + "Validated Foundation" are selectable HTML on
+ *     top, positioned with Figma-coordinate text-box rects and sized with
+ *     container queries (`cqi`) so each piece is locked to the wheel and
+ *     scales with the image at every viewport.
  */
 
 /* ---------- Figma hub geometry (used to compute % positions) ---------- */
@@ -35,29 +28,23 @@ const HUB_MAX_REM = "58.27rem"; // 932.26 / 16
 /**
  * Wheel slices. Each row maps to a wedge in clockwise order from 12 o'clock.
  * Positions and sizes are the Figma TEXT-BOX rects (top-left + size) for the
- * burned-in number and label inside that wedge — taken verbatim from
- * the hub group (787:2107) layout data so the overlay sits exactly on top
- * of the burned-in artwork.
+ * label inside that wedge — taken verbatim from the hub group (787:2107)
+ * layout data.
  */
 const SLICES: ReadonlyArray<{
-  num: string;
   label: string;
-  numX: number;
-  numY: number;
-  numW: number;
-  numH: number;
   labelX: number;
   labelY: number;
   labelW: number;
   labelH: number;
 }> = [
-  { num: "01", label: "Build Integrity",         numX: 499.18, numY: 102, numW: 27, numH: 36, labelX: 503.18, labelY: 175, labelW: 145, labelH: 72 },
-  { num: "02", label: "Runtime Security",        numX: 737.18, numY: 271, numW: 32, numH: 36, labelX: 651.18, labelY: 354, labelW: 151, labelH: 72 },
-  { num: "03", label: "Compliance Automation",   numX: 764.18, numY: 553, numW: 32, numH: 36, labelX: 597.18, labelY: 590, labelW: 159, labelH: 72 },
-  { num: "04", label: "Crypto Validation",       numX: 550.18, numY: 770, numW: 33, numH: 36, labelX: 399.18, labelY: 698, labelW: 127, labelH: 72 },
-  { num: "05", label: "Hardened Configurations", numX: 252.18, numY: 726, numW: 33, numH: 36, labelX: 146.18, labelY: 582, labelW: 191, labelH: 72 },
-  { num: "06", label: "Secure Deployment",       numX: 102.18, numY: 477, numW: 34, numH: 36, labelX: 110.18, labelY: 352, labelW: 159, labelH: 72 },
-  { num: "07", label: "Continuous Monitoring",   numX: 205.18, numY: 190, numW: 32, numH: 36, labelX: 255.18, labelY: 167, labelW: 165, labelH: 72 },
+  { label: "Build Integrity",         labelX: 503.18, labelY: 175, labelW: 145, labelH: 72 },
+  { label: "Runtime Security",        labelX: 676.18, labelY: 354, labelW: 151, labelH: 72 },
+  { label: "Compliance Automation",   labelX: 622.18, labelY: 590, labelW: 159, labelH: 72 },
+  { label: "Crypto Validation",       labelX: 399.18, labelY: 698, labelW: 127, labelH: 72 },
+  { label: "Hardened Configurations", labelX: 166.18, labelY: 582, labelW: 191, labelH: 72 },
+  { label: "Secure Deployment",       labelX: 110.18, labelY: 352, labelW: 159, labelH: 72 },
+  { label: "Continuous Monitoring",   labelX: 255.18, labelY: 167, labelW: 165, labelH: 72 },
 ];
 
 /** Center "Validated Foundation" text-box from Figma (Manrope SemiBold 32 px). */
@@ -218,46 +205,26 @@ function HubWheel(): React.ReactElement {
           % + cqi so every label moves and scales with the image. */}
       <div className="absolute inset-0">
         {SLICES.map((s) => {
-          const numRect = rectToPct(s.numX, s.numY, s.numW, s.numH);
           const lblRect = rectToPct(s.labelX, s.labelY, s.labelW, s.labelH);
           return (
-            <div key={s.num}>
-              {/* Number — Figma style_W3RXBI: Sora Bold 24px / 150% / -7% */}
-              <span
-                className="absolute flex items-start text-white"
-                style={{
-                  left: numRect.left,
-                  top: numRect.top,
-                  width: numRect.width,
-                  height: numRect.height,
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "clamp(0.75rem, 2.57cqi, 1.5rem)", // 12 → 24 px
-                  fontWeight: 700,
-                  letterSpacing: "-0.07em",
-                  lineHeight: 1.5,
-                }}
-              >
-                {s.num}
-              </span>
-
-              {/* Label — Figma style_UHZRHP: Figtree SemiBold 28px / 130% / -1.32% */}
-              <span
-                className="absolute flex items-center justify-center text-center text-white"
-                style={{
-                  left: lblRect.left,
-                  top: lblRect.top,
-                  width: lblRect.width,
-                  height: lblRect.height,
-                  fontFamily: "var(--font-display)",
-                  fontSize: "clamp(0.8125rem, 3cqi, 1.75rem)", // 13 → 28 px
-                  fontWeight: 600,
-                  letterSpacing: "-0.0132em",
-                  lineHeight: 1.3,
-                }}
-              >
-                {s.label}
-              </span>
-            </div>
+            /* Label — Figma style_UHZRHP: Figtree SemiBold 28px / 130% / -1.32% */
+            <span
+              key={s.label}
+              className="absolute flex items-center justify-center text-center text-white"
+              style={{
+                left: lblRect.left,
+                top: lblRect.top,
+                width: lblRect.width,
+                height: lblRect.height,
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(0.8125rem, 3cqi, 1.75rem)", // 13 → 28 px
+                fontWeight: 600,
+                letterSpacing: "-0.0132em",
+                lineHeight: 1.3,
+              }}
+            >
+              {s.label}
+            </span>
           );
         })}
 

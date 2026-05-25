@@ -8,6 +8,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import Link from "next/link";
 import { NAV_TREE } from "@/lib/nav-config";
 import { MegaMenu } from "@/components/nav/MegaMenu";
 import { CompactDropdown } from "@/components/nav/CompactDropdown";
@@ -18,11 +19,17 @@ export function DesktopNav() {
       <NavigationMenuList className="gap-7">
         {NAV_TREE.map((item) => {
           if (item.kind === "flat") {
+            const flatClass =
+              "cs-nav-link relative inline-flex cursor-pointer items-center text-base font-medium leading-none text-white/85 transition-colors hover:text-white";
             return (
               <NavigationMenuItem key={item.label}>
-                <span className="cs-nav-link relative inline-flex cursor-pointer items-center text-base font-medium leading-none text-white/85 transition-colors hover:text-white">
-                  {item.label}
-                </span>
+                {item.built ? (
+                  <Link href={item.href} className={flatClass}>
+                    {item.label}
+                  </Link>
+                ) : (
+                  <span className={flatClass}>{item.label}</span>
+                )}
               </NavigationMenuItem>
             );
           }

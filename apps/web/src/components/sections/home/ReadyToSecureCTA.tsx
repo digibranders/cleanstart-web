@@ -7,7 +7,7 @@
 export function ReadyToSecureCTA() {
   return (
     <div
-      className="absolute inset-0 grid grid-cols-1 items-start gap-y-8 p-8 md:gap-y-0 md:p-12 lg:items-center lg:grid-cols-[minmax(0,460px)_minmax(0,460px)] lg:gap-x-[clamp(32px,5vw,72px)] lg:justify-center lg:p-[clamp(40px,6vw,64px)_clamp(32px,5vw,80px)]"
+      className="absolute inset-0 grid grid-cols-1 items-center gap-y-8 p-8 md:gap-y-0 md:p-12 lg:items-start lg:grid-cols-[minmax(0,460px)_minmax(0,460px)] lg:gap-x-[clamp(32px,5vw,72px)] lg:justify-center lg:p-[clamp(32px,4vw,48px)_clamp(32px,5vw,80px)]"
       style={{
         background: "linear-gradient(180deg, #131E8F 0%, #471EC0 100%)",
       }}
@@ -31,7 +31,7 @@ export function ReadyToSecureCTA() {
         className="relative z-10 font-display text-white"
         style={{
           maxWidth: "min(460px, 100%)",
-          fontSize: "clamp(26px, 3.1vw, 44px)",
+          fontSize: "var(--cta-card-title)",
           fontWeight: 600,
           letterSpacing: "-0.04em",
           lineHeight: 1.1,
@@ -46,7 +46,7 @@ export function ReadyToSecureCTA() {
           className="font-normal text-white"
           style={{
             maxWidth: "493px",
-            fontSize: "clamp(16px, 1.5vw, 20px)",
+            fontSize: "var(--cta-card-desc)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
             lineHeight: 1.4,
@@ -57,7 +57,7 @@ export function ReadyToSecureCTA() {
           knowing your containers are secured from the ground up.
         </p>
         <a
-          href="#get-a-demo"
+          href="/book-a-demo"
           className="cs-btn-glass"
           style={{
             ["--cs-btn-px" as string]: "18px",

@@ -36,8 +36,8 @@ export function ASRApproach(): React.ReactElement {
           className="text-[#111]"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(32px, 4vw, 56px)',
-            fontWeight: 700,
+            fontSize: 'var(--text-display-md)',
+            fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
             maxWidth: '562px',
@@ -130,8 +130,8 @@ export function ASRApproach(): React.ReactElement {
                 className="text-[#111]"
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(20px, 5.5vw, 28px)',
-                  fontWeight: 700,
+                  fontSize: 'var(--text-card-title-lg)',
+                  fontWeight: 600,
                   letterSpacing: '-0.04em',
                   lineHeight: 1.1,
                   marginBottom: '12px',
@@ -143,7 +143,7 @@ export function ASRApproach(): React.ReactElement {
                 className="text-[#333]"
                 style={{
                   fontFamily: 'var(--font-sans)',
-                  fontSize: 'clamp(15px, 4vw, 18px)',
+                  fontSize: 'var(--text-body-md)',
                   fontWeight: 400,
                   letterSpacing: '-0.02em',
                   lineHeight: 1.5,
@@ -208,8 +208,8 @@ function ApproachCell({ card, padLeft }: ApproachCellProps): React.ReactElement 
           className="text-[#111]"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(22px, 2.4vw, 32px)',
-            fontWeight: 700,
+            fontSize: 'var(--text-card-title-lg)',
+            fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
             maxWidth: '225px',
@@ -221,7 +221,7 @@ function ApproachCell({ card, padLeft }: ApproachCellProps): React.ReactElement 
           className="text-[#333]"
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(15px, 1.4vw, 20px)',
+            fontSize: 'var(--text-body-md)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.4,

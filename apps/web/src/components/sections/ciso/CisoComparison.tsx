@@ -73,10 +73,10 @@ export function CisoComparison(): React.ReactElement {
           className="text-center mx-auto px-4"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "28px",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.2,
+            fontSize: "var(--text-display-md)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "264px",
             marginBottom: "24px",
           }}
@@ -147,8 +147,8 @@ export function CisoComparison(): React.ReactElement {
               className="mx-auto font-display text-[#111111]"
               style={{
                 maxWidth: "min(737px, 100%)",
-                fontSize: "clamp(32px, 4vw, 56px)",
-                fontWeight: 700,
+                fontSize: "var(--text-display-md)",
+                fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
               }}
@@ -253,10 +253,10 @@ function MobileCard({
         <h3
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "20px",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1,
+            fontSize: "var(--text-card-title-md)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "#fff",
             textAlign: "center",
           }}
@@ -349,9 +349,9 @@ function MobileCard({
               <span
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "16px",
+                  fontSize: "var(--text-body-md)",
                   fontWeight: isTraditional ? 500 : 600,
-                  letterSpacing: "-0.05em",
+                  letterSpacing: "-0.02em",
                   lineHeight: 1.4,
                   color: "#333",
                   whiteSpace: "nowrap",
@@ -437,8 +437,8 @@ function DesktopCard({
           <h3
             className="relative z-10 text-center font-display text-white"
             style={{
-              fontSize: "clamp(22px, 2.4vw, 32px)",
-              fontWeight: 700,
+              fontSize: "var(--text-card-title-lg)",
+              fontWeight: 600,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
               padding: "0 16px",
@@ -483,7 +483,7 @@ function DesktopCard({
                   className="text-[#333333]"
                   style={{
                     fontFamily: "var(--font-sans)",
-                    fontSize: "clamp(15px, 1.4vw, 20px)",
+                    fontSize: "var(--text-body-lg)",
                     fontWeight: isTraditional ? 500 : 600,
                     lineHeight: 1.4,
                     letterSpacing: "-0.02em",

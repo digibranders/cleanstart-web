@@ -379,7 +379,7 @@
     }
   ],
   "hooks": {
-    "beforeChange": 0,
+    "beforeChange": 1,
     "afterChange": 4,
     "beforeValidate": 0,
     "afterDelete": 1

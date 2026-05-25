@@ -1,335 +1,616 @@
+import Image from 'next/image';
 import type React from 'react';
 
 /*
- * Figma node 732-412 — "Designed for Developer Workflows" section
+ * Figma node 857-4900 — "Designed for Developer Workflows" (rebuilt 1:1).
  *
- * Background: white
- * Heading: ~62px Manrope Bold, #111, tracking -0.05em, centered
- *   "Developer Workflows" → purple→cyan gradient
- * 5-step pipeline visualization:
- *   - Horizontal row of numbered circles (64px, blue gradient) connected by dashed lines
- *   - Step label below each circle (Manrope Bold)
- *   - Short description below label (Sora)
- * Section padding: 80px top / 100px bottom
+ * Layout (1922×1090 in Figma, scaled to fit the container at 1276 max-width):
+ *   • #f6f6f6 base bg with decorative hex shapes at the top corners + a soft
+ *     glow blob behind each, and a faint center hex pattern behind the title.
+ *   • Heading: "Designed for Developer Workflows" — "Workflows" rendered with
+ *     the cs-text-gradient-impact (purple→cyan, 100.878°).
+ *   • Pipeline row of 7 small step cards (Code · Git · CI/CD · Build · Registry
+ *     · Deploy · Runtime) with the centre slot replaced by the highlighted
+ *     "CleanStart Hardened Image" card (dark blue gradient + ellipse glows,
+ *     reusing the layered approach from the StackCard marquee). Arrows
+ *     connect the cards left→right.
+ *   • "Minimal . Hardened . Verifiable" pill below the CleanStart card.
+ *   • 4 feature cards (Existing CI/CD Pipelines · Registry Compatible ·
+ *     Faster Builds · Cleaner SBOMs) in a row at the bottom. Each has a
+ *     gradient border ring (3-4 px), a soft purple bloom inside, faint
+ *     vertical guide lines, and a 96 px blue gradient "ball" icon at the
+ *     top-left.
+ *
+ * Asset folder: /images/for-developers/workflows/
  */
 
-interface StepDef {
-  num: string;
-  icon: React.ReactElement;
+const ASSET_BASE = '/images/for-developers/workflows';
+
+// ─── Pipeline step data ─────────────────────────────────────────────────────
+
+interface PipelineStep {
   label: string;
-  desc: string;
+  icon: string;
+  /** Some icons render slightly smaller per Figma — overrides the default 64 px. */
+  iconSize?: number;
 }
 
-function PullIcon(): React.ReactElement {
-  return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M14 4V18M14 18L9 13M14 18L19 13"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M4 22H24"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
+const PIPELINE_STEPS_LEFT: PipelineStep[] = [
+  { label: 'Code', icon: `${ASSET_BASE}/logo-code.png`, iconSize: 60 },
+  { label: 'Git', icon: `${ASSET_BASE}/logo-git.png`, iconSize: 56 },
+  { label: 'CI/CD', icon: `${ASSET_BASE}/logo-cicd.svg`, iconSize: 56 },
+  { label: 'Build', icon: `${ASSET_BASE}/logo-build.svg`, iconSize: 60 },
+];
+
+const PIPELINE_STEPS_RIGHT: PipelineStep[] = [
+  { label: 'Registry', icon: `${ASSET_BASE}/logo-registry.png`, iconSize: 60 },
+  { label: 'Deploy', icon: `${ASSET_BASE}/logo-deploy.svg`, iconSize: 56 },
+  { label: 'Runtime', icon: `${ASSET_BASE}/logo-runtime.svg`, iconSize: 56 },
+];
+
+// ─── Feature card data ──────────────────────────────────────────────────────
+
+interface FeatureCard {
+  title: string;
+  body: string;
 }
 
-function BuildIcon(): React.ReactElement {
-  return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="4" width="9" height="9" rx="1.5" stroke="white" strokeWidth="2" />
-      <rect x="15" y="4" width="9" height="9" rx="1.5" stroke="white" strokeWidth="2" />
-      <rect x="4" y="15" width="9" height="9" rx="1.5" stroke="white" strokeWidth="2" />
-      <path
-        d="M17 19H23M20 16V22"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function AttestIcon(): React.ReactElement {
-  return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M14 3L24 8V15C24 21 18.5 25 14 26.5C9.5 25 4 21 4 15V8L14 3Z"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M10 14L13 17L18 11"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function PushIcon(): React.ReactElement {
-  return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="6" width="20" height="16" rx="2" stroke="white" strokeWidth="2" />
-      <circle cx="14" cy="14" r="3" stroke="white" strokeWidth="2" />
-      <path
-        d="M4 10H8M20 10H24"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function DeployIcon(): React.ReactElement {
-  return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M14 4L26 10V18L14 24L2 18V10L14 4Z"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M14 4V24M2 10L14 16L26 10"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-const STEPS: StepDef[] = [
+const FEATURE_CARDS: FeatureCard[] = [
   {
-    num: '01',
-    icon: <PullIcon />,
-    label: 'Pull',
-    desc: 'Start from a pre-hardened base image from the CleanStart registry',
+    title: 'Existing CI/CD Pipelines',
+    body: 'Works with current development workflows.',
   },
   {
-    num: '02',
-    icon: <BuildIcon />,
-    label: 'Build',
-    desc: 'Add your application layer on top of a secure foundation',
+    title: 'Registry Compatible',
+    body: 'Integrates with existing registries and tooling.',
   },
   {
-    num: '03',
-    icon: <AttestIcon />,
-    label: 'Attest',
-    desc: 'SBOMs and cryptographic signatures are generated automatically',
+    title: 'Faster Builds',
+    body: 'Smaller images improve pull and deployment times.',
   },
   {
-    num: '04',
-    icon: <PushIcon />,
-    label: 'Push',
-    desc: 'Publish your verified, signed image to any OCI registry',
-  },
-  {
-    num: '05',
-    icon: <DeployIcon />,
-    label: 'Deploy',
-    desc: 'Ship to production with built-in provenance and confidence',
+    title: 'Cleaner SBOMs',
+    body: 'Reduce dependency complexity across environments.',
   },
 ];
 
-function WorkflowStep({ num, icon, label, desc }: StepDef): React.ReactElement {
+// ─── Sub-components ─────────────────────────────────────────────────────────
+
+/**
+ * Small pipeline step card — 112×126 in Figma. Light cyan-tinted background
+ * with rounded 16 px corners, white inner panel, single subtle vertical
+ * gradient line for depth, icon centered on top, label at the bottom.
+ */
+function PipelineStepCard({ label, icon, iconSize = 60 }: PipelineStep): React.ReactElement {
   return (
-    <div className="flex flex-col items-center text-center" style={{ flex: '1 1 0' }}>
-      {/* Numbered circle */}
+    <div
+      className="relative flex shrink-0 flex-col items-center justify-between"
+      style={{
+        width: '112px',
+        height: '126px',
+        borderRadius: '16px',
+        background:
+          'linear-gradient(90deg, rgba(44,193,235,0.23), rgba(44,193,235,0.23))',
+        padding: '2px',
+      }}
+    >
       <div
-        style={{
-          width: '72px',
-          height: '72px',
-          borderRadius: '50%',
-          background: 'linear-gradient(180deg, #239cff 0%, #005be3 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '20px',
-          flexShrink: 0,
-          boxShadow:
-            '0px 6px 14px rgba(28,60,142,0.33), inset 0px -0.23px 0.29px rgba(0,44,179,0.5), inset 0px 0.12px 0.58px rgba(255,255,255,0.81)',
-          position: 'relative',
-        }}
+        className="relative flex h-full w-full flex-col items-center justify-between overflow-hidden bg-white"
+        style={{ borderRadius: '14px', padding: '14px 10px 12px' }}
       >
-        {/* Step number badge */}
-        <span
-          className="absolute"
+        {/* Subtle vertical highlight line — Figma Rectangle 1000001839 */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute"
           style={{
-            top: '-8px',
-            right: '-8px',
-            width: '22px',
-            height: '22px',
-            borderRadius: '50%',
-            background: '#131e8f',
-            border: '2px solid white',
-            fontSize: '10px',
-            fontFamily: 'var(--font-display)',
-            fontWeight: 700,
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            lineHeight: 1,
+            top: 0,
+            bottom: 0,
+            right: 0,
+            width: '0.73px',
+            background:
+              'linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 50.77%, rgba(255,255,255,0) 100%)',
+            opacity: 0.8,
+          }}
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={icon}
+          alt=""
+          aria-hidden
+          width={iconSize}
+          height={iconSize}
+          style={{ width: `${iconSize}px`, height: `${iconSize}px`, objectFit: 'contain' }}
+          loading="lazy"
+          decoding="async"
+        />
+        <span
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '18px',
+            fontWeight: 400,
+            letterSpacing: '-0.04em',
+            lineHeight: 1.2,
+            color: '#555',
+            whiteSpace: 'nowrap',
           }}
         >
-          {num}
+          {label}
         </span>
-        {icon}
       </div>
+    </div>
+  );
+}
 
-      <h3
+/**
+ * Highlighted "CleanStart Hardened Image" card — 146×154 in Figma, dark blue
+ * gradient with layered ellipse glows (same construction as the marquee
+ * StackCard but adapted for portrait aspect). Houses the cube illustration
+ * + 2-line white label.
+ */
+function CleanStartCard(): React.ReactElement {
+  return (
+    <div
+      className="relative flex shrink-0 flex-col items-center justify-center overflow-hidden"
+      style={{
+        width: '146px',
+        height: '154px',
+        borderRadius: '13.5px',
+        border: '1.688px solid #dab6f3',
+        background: 'linear-gradient(180deg, #151021 0%, #131E8F 71.2%, #551ECE 100%)',
+        // Full 5-shadow stack from Figma — soft left-fall cascade for depth.
+        boxShadow: [
+          '-115.368px 57.403px 36.017px 0 rgba(0,0,0,0)',
+          '-73.723px 36.580px 33.203px 0 rgba(0,0,0,0.03)',
+          '-41.645px 20.822px 27.576px 0 rgba(0,0,0,0.12)',
+          '-18.571px 9.004px 20.822px 0 rgba(0,0,0,0.20)',
+          '-4.502px 2.251px 11.255px 0 rgba(0,0,0,0.23)',
+        ].join(', '),
+      }}
+    >
+      {/* Purple wash */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
         style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(20px, 2vw, 28px)',
-          fontWeight: 600,
-          letterSpacing: '-0.04em',
-          lineHeight: 1.1,
-          color: '#111',
-          marginBottom: '8px',
+          width: '158.5px',
+          height: '227.4px',
+          left: '-34px',
+          top: '-90px',
+          background: '#5D04D7',
+          opacity: 0.34,
+          filter: 'blur(40px)',
+          borderRadius: '50%',
         }}
-      >
-        {label}
-      </h3>
+      />
+      {/* Dominant cyan glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
+        style={{
+          width: '254.5px',
+          height: '365.1px',
+          left: '-9.4px',
+          top: '-120px',
+          background: '#04C7F2',
+          opacity: 0.6,
+          filter: 'blur(40px)',
+          borderRadius: '50%',
+        }}
+      />
+      {/* Right-edge color-dodge flare */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
+        style={{
+          width: '102px',
+          height: '180px',
+          right: '-30px',
+          top: '-10px',
+          mixBlendMode: 'color-dodge',
+          opacity: 0.6,
+          background:
+            'radial-gradient(50% 50% at 50% 50%, #D3FFF8 0%, #15ADFA 10%, #0166CC 50%, rgba(2,17,47,0) 100%)',
+        }}
+      />
 
+      {/* Grain/noise texture overlay — SVG feTurbulence inline. ~200 bytes,
+          no extra request. Overlay blend adds fine speckles to the gradient
+          surface without washing out the cyan/purple glows. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          mixBlendMode: 'overlay',
+          opacity: 0.18,
+          backgroundImage:
+            'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'160\' height=\'160\'><filter id=\'n\'><feTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'2\' stitchTiles=\'stitch\'/><feColorMatrix values=\'0 0 0 0 1   0 0 0 0 1   0 0 0 0 1   0 0 0 1 0\'/></filter><rect width=\'100%\' height=\'100%\' filter=\'url(%23n)\'/></svg>")',
+          backgroundSize: '160px 160px',
+        }}
+      />
+
+      {/* Cube illustration */}
+      <Image
+        src={`${ASSET_BASE}/cube-image.png`}
+        alt=""
+        aria-hidden
+        width={77}
+        height={84}
+        priority
+        className="relative z-10 select-none"
+        style={{ marginTop: '12px', objectFit: 'contain' }}
+      />
+
+      {/* Label */}
       <p
+        className="relative z-10 text-center"
         style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: 'clamp(15px, 1.4vw, 20px)',
+          fontSize: '13px',
           fontWeight: 400,
-          letterSpacing: '-0.02em',
-          lineHeight: 1.4,
-          color: '#666',
-          maxWidth: '180px',
+          letterSpacing: '-0.04em',
+          lineHeight: 1.2,
+          color: '#ffffff',
+          marginTop: '6px',
+          padding: '0 8px',
         }}
       >
-        {desc}
+        CleanStart
+        <br />
+        Hardened Image
       </p>
     </div>
   );
 }
 
+/**
+ * Arrow between pipeline steps — dashed right-arrow vector from Figma.
+ */
+function PipelineArrow(): React.ReactElement {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`${ASSET_BASE}/arrow-straight.svg`}
+      alt=""
+      aria-hidden
+      width={30}
+      height={16}
+      style={{ width: '30px', height: '16px', flexShrink: 0, opacity: 0.6 }}
+    />
+  );
+}
+
+/**
+ * 96 px blue gradient "ball" icon for feature cards. Uses the shared cube SVG
+ * inside a blue radial gradient sphere — approximates the Figma 3D ball
+ * without the (heavy) Light/HardLight/Pattern overlays.
+ */
+function FeatureBall(): React.ReactElement {
+  return (
+    <div
+      className="relative flex items-center justify-center overflow-hidden"
+      style={{
+        width: '96px',
+        height: '96px',
+        borderRadius: '50%',
+        background: 'linear-gradient(180deg, #239cff 0%, #005be3 100%)',
+        boxShadow:
+          '0 6.17px 14.54px rgba(28,60,142,0.33), inset 0 -0.23px 0.29px rgba(0,44,179,0.5), inset 0 0.12px 0.58px rgba(255,255,255,0.81)',
+      }}
+    >
+      {/* Soft top highlight — approximates the Figma 3D shine */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
+        style={{
+          inset: '0',
+          background:
+            'radial-gradient(60% 50% at 50% 20%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 100%)',
+        }}
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`${ASSET_BASE}/icon-cicd-card.svg`}
+        alt=""
+        aria-hidden
+        width={54}
+        height={54}
+        className="relative z-10"
+        style={{ width: '54px', height: '54px' }}
+      />
+    </div>
+  );
+}
+
+/**
+ * Feature card — 295×324 outer, 287×316 inner with 4 px gradient ring.
+ * Soft purple bloom inside, 4 faint vertical highlight lines + 2 horizontal,
+ * blue ball icon at top-left, title + body at the bottom.
+ */
+function FeatureCardView({ title, body }: FeatureCard): React.ReactElement {
+  return (
+    <div
+      className="relative flex shrink-0"
+      style={{
+        width: '295px',
+        height: '324px',
+        borderRadius: '40px',
+        background:
+          'linear-gradient(90deg, rgba(44,193,235,0.30), rgba(44,193,235,0.30))',
+        padding: '4px',
+      }}
+    >
+      <div
+        className="relative h-full w-full overflow-hidden bg-white"
+        style={{ borderRadius: '36px' }}
+      >
+        {/* Purple bloom */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute"
+          style={{
+            width: '262.87px',
+            height: '153px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            top: '28px',
+            background: '#df9bff',
+            opacity: 0.3,
+            filter: 'blur(66.5px)',
+          }}
+        />
+
+        {/* 4 faint vertical highlight lines — Figma Rectangle 100000183[8,9,1,2] */}
+        {[48.47, 120.03, 162.38, 233.94].map((left) => (
+          <div
+            key={left}
+            aria-hidden
+            className="pointer-events-none absolute"
+            style={{
+              top: 0,
+              left: `${left}px`,
+              width: '0.73px',
+              height: '264px',
+              background:
+                'linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 50.77%, rgba(255,255,255,0) 100%)',
+              opacity: 0.8,
+            }}
+          />
+        ))}
+
+        {/* 2 faint horizontal highlight lines — Figma Rectangle 100000184[3,4] */}
+        {[67.5, 183.5].map((top) => (
+          <div
+            key={top}
+            aria-hidden
+            className="pointer-events-none absolute"
+            style={{
+              left: '-68px',
+              right: '-68px',
+              top: `${top}px`,
+              height: '1px',
+              background:
+                'linear-gradient(90deg, rgba(255,255,255,0) 0%, #ffffff 50.77%, rgba(255,255,255,0) 100%)',
+              opacity: 0.3,
+            }}
+          />
+        ))}
+
+        {/* Ball icon */}
+        <div className="absolute" style={{ top: '32px', left: '24px' }}>
+          <FeatureBall />
+        </div>
+
+        {/* Title + body */}
+        <div
+          className="absolute flex flex-col"
+          style={{ top: '152px', left: '24px', width: '251px', gap: '12px' }}
+        >
+          <h3
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '28px',
+              fontWeight: 700,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.1,
+              color: '#111',
+              margin: 0,
+            }}
+          >
+            {title}
+          </h3>
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '18px',
+              fontWeight: 400,
+              letterSpacing: '-0.03em',
+              lineHeight: 1.4,
+              color: '#555',
+              margin: 0,
+            }}
+          >
+            {body}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main section ───────────────────────────────────────────────────────────
+
 export function DeveloperWorkflows(): React.ReactElement {
   return (
     <section
       data-section="DeveloperWorkflows"
-      className="relative bg-white"
-      style={{ paddingTop: '80px', paddingBottom: '100px' }}
+      className="relative overflow-hidden"
+      style={{
+        background: '#f6f6f6',
+        paddingTop: '120px',
+        paddingBottom: '120px',
+      }}
     >
-      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
+      {/* ── Decorative background ── */}
+      {/* Center hex pattern behind title */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`${ASSET_BASE}/arc-pattern.svg`}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-[10px] -translate-x-1/2 select-none"
+        style={{ width: '701px', height: '680px', opacity: 0.5 }}
+      />
+
+      {/* Left + right corner hex shapes */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`${ASSET_BASE}/corner-blob.svg`}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute select-none"
+        style={{
+          width: '488px',
+          height: '496px',
+          left: '-218px',
+          top: '-139px',
+          transform: 'scaleY(-1) rotate(141.39deg)',
+        }}
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`${ASSET_BASE}/corner-blob.svg`}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute select-none"
+        style={{
+          width: '488px',
+          height: '496px',
+          right: '-218px',
+          top: '-139px',
+          transform: 'scaleY(-1) rotate(141.39deg) scaleX(-1)',
+        }}
+      />
+
+      {/* Corner glow ellipses */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`${ASSET_BASE}/ellipse-glow.svg`}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute select-none"
+        style={{ width: '500px', height: '500px', left: '-103px', top: '-20px' }}
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`${ASSET_BASE}/ellipse-glow.svg`}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute select-none"
+        style={{ width: '500px', height: '500px', right: '-103px', top: '-74px' }}
+      />
+
+      {/* ── Content column ── */}
+      <div className="relative mx-auto w-full max-w-[1276px] px-6 sm:px-10">
         {/* Heading */}
         <h2
-          className="text-center mx-auto"
+          className="mx-auto text-center"
           style={{
             maxWidth: '720px',
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(32px, 4vw, 56px)',
+            fontSize: 'clamp(36px, 4.3vw, 62px)',
             fontWeight: 700,
-            letterSpacing: '-0.04em',
+            letterSpacing: '-0.05em',
             lineHeight: 1.1,
             color: '#111',
-            marginBottom: '16px',
+            marginBottom: '80px',
           }}
         >
-          Designed for{' '}
-          <span className="cs-text-gradient-impact">Developer Workflows</span>
+          Designed for Developer{' '}
+          <span className="cs-text-gradient-impact">Workflows</span>
         </h2>
 
-        <p
-          className="text-center mx-auto"
-          style={{
-            maxWidth: '520px',
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(18px, 1.7vw, 24px)',
-            fontWeight: 400,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.4,
-            color: '#666',
-            marginBottom: '72px',
-          }}
-        >
-          Integrate secure container foundations into your existing CI/CD pipeline in minutes.
-        </p>
-
-        {/* ════ DESKTOP pipeline ════ */}
-        <div className="hidden lg:block relative">
-          {/* Connecting dashed line — runs between circles */}
-          <div
-            aria-hidden
-            className="absolute"
-            style={{
-              top: '35px',
-              left: 'calc(10% + 36px)',
-              right: 'calc(10% + 36px)',
-              height: '2px',
-              background:
-                'repeating-linear-gradient(90deg, rgba(19,30,143,0.3) 0px, rgba(19,30,143,0.3) 8px, transparent 8px, transparent 16px)',
-            }}
-          />
-
-          <div className="flex items-start" style={{ gap: '0' }}>
-            {STEPS.map((step) => (
-              <WorkflowStep key={step.num} {...step} />
+        {/* ── Pipeline ── */}
+        <div className="relative mb-20 flex flex-col items-center">
+          {/* Desktop pipeline */}
+          <div className="hidden md:flex items-center justify-center" style={{ gap: '14px' }}>
+            {PIPELINE_STEPS_LEFT.map((step, i) => (
+              <PipelineRow key={step.label} step={step} showArrowAfter={i < PIPELINE_STEPS_LEFT.length - 1} />
+            ))}
+            <PipelineArrow />
+            <CleanStartCard />
+            <PipelineArrow />
+            {PIPELINE_STEPS_RIGHT.map((step, i) => (
+              <PipelineRow key={step.label} step={step} showArrowAfter={i < PIPELINE_STEPS_RIGHT.length - 1} />
             ))}
           </div>
-        </div>
 
-        {/* ════ MOBILE stacked ════ */}
-        <div className="lg:hidden flex flex-col items-center" style={{ gap: '40px' }}>
-          {STEPS.map((step, i) => (
-            <div key={step.num} className="flex flex-col items-center" style={{ gap: '0' }}>
-              <WorkflowStep {...step} />
-              {i < STEPS.length - 1 && (
-                <div
-                  aria-hidden
-                  style={{
-                    width: '2px',
-                    height: '24px',
-                    background: 'rgba(19,30,143,0.25)',
-                    marginTop: '16px',
-                  }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+          {/* Mobile pipeline — wrap into rows */}
+          <div className="md:hidden flex flex-wrap items-center justify-center gap-3">
+            {PIPELINE_STEPS_LEFT.map((step) => (
+              <PipelineStepCard key={step.label} {...step} />
+            ))}
+            <CleanStartCard />
+            {PIPELINE_STEPS_RIGHT.map((step) => (
+              <PipelineStepCard key={step.label} {...step} />
+            ))}
+          </div>
 
-        {/* Command hint */}
-        <div
-          className="mt-12 mx-auto flex items-center justify-center gap-3"
-          style={{ maxWidth: '600px' }}
-        >
+          {/* "Minimal . Hardened . Verifiable" pill */}
           <div
+            className="relative mt-6 flex items-center justify-center"
             style={{
-              padding: '12px 24px',
-              borderRadius: '12px',
-              background: '#f6f6f8',
-              border: '1px solid #e5e5ea',
-              fontFamily: 'monospace',
-              fontSize: 'clamp(0.8125rem, 0.94vw, 1rem)',
-              color: '#333',
-              letterSpacing: '0',
+              height: '36px',
+              padding: '0 25px',
+              borderRadius: '40px',
+              background: 'rgba(44,193,235,0.40)',
             }}
           >
-            <span style={{ color: '#9a51ff', fontWeight: 600 }}>docker pull</span>
-            {' registry.cleanstart.com/node:22-slim'}
+            <span
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '18px',
+                fontWeight: 600,
+                letterSpacing: '-0.04em',
+                lineHeight: 1.4,
+                color: '#333',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Minimal . Hardened . Verifiable
+            </span>
           </div>
+        </div>
+
+        {/* ── 4 feature cards ── */}
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-items-center"
+          style={{ gap: '32px' }}
+        >
+          {FEATURE_CARDS.map((card) => (
+            <FeatureCardView key={card.title} {...card} />
+          ))}
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Small helper to keep the desktop pipeline JSX flat — renders a step card
+ * optionally followed by an arrow. (The center CleanStart card breaks the
+ * left/right rows so the arrows around it are placed manually above.)
+ */
+function PipelineRow({
+  step,
+  showArrowAfter,
+}: {
+  step: PipelineStep;
+  showArrowAfter: boolean;
+}): React.ReactElement {
+  return (
+    <>
+      <PipelineStepCard {...step} />
+      {showArrowAfter ? <PipelineArrow /> : null}
+    </>
   );
 }

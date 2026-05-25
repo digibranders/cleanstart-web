@@ -1,12 +1,13 @@
 import Image from "next/image";
 
+import { RadarScanner } from "./RadarScanner";
+
 export function CleanSightBlindSpots(): React.ReactElement {
   return (
     <section
       data-section="CleanSightBlindSpots"
       className="relative overflow-hidden"
       style={{
-        minHeight: "908px",
         background:
           "linear-gradient(180deg, #151021 0%, #131e8f 67.139%, #471ec0 107.43%)",
       }}
@@ -91,43 +92,46 @@ export function CleanSightBlindSpots(): React.ReactElement {
         />
       </div>
 
-      {/* Heading — top:80px per Figma, centered over 686px width */}
+      {/* Content stack — heading + radar share a flex column so spacing scales fluidly across viewports.
+          Padding / gap / radar size are all bound to viewport HEIGHT as well so the whole section
+          stays inside a typical laptop viewport (~813px effective) without scroll-clipping the dial. */}
       <div
-        className="relative text-center mx-auto"
-        style={{ paddingTop: "var(--spacing-section-md)", maxWidth: "686px", paddingLeft: "16px", paddingRight: "16px" }}
+        className="relative flex flex-col items-center mx-auto"
+        style={{
+          paddingTop: "clamp(40px, 6vh, 88px)",
+          paddingBottom: "clamp(40px, 6vh, 88px)",
+          paddingLeft: "16px",
+          paddingRight: "16px",
+          gap: "clamp(28px, 4vh, 64px)",
+          maxWidth: "1200px",
+        }}
       >
         <h2
-          className="text-white"
+          className="text-white text-center"
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
+            maxWidth: "686px",
           }}
         >
           Visibility Without Context Creates{" "}
           <span className="cs-text-gradient-impact">Blind Spots</span>
         </h2>
-      </div>
 
-      {/* Radar visualization — centered, top:274px from section top per Figma */}
-      <div
-        className="absolute left-1/2"
-        style={{
-          top: "274px",
-          transform: "translateX(-50%)",
-          width: "clamp(280px, 45vw, 580px)",
-          height: "clamp(280px, 45vw, 565px)",
-        }}
-      >
-        <Image
-          src="/images/cleansight/blindspot-radar.png"
-          alt="Container visibility radar showing blind spots"
-          fill
-          className="object-contain relative z-10"
-          sizes="(max-width: 768px) 280px, 580px"
-        />
+        {/* Radar visualization — width is the lesser of 70vw, 60vh, and the 580px cap, with a 300px floor.
+            Sweep is locked to dial radius via closest-side mask, so it always reaches the inner blue ring. */}
+        <div
+          className="relative"
+          style={{
+            width: "clamp(300px, min(70vw, 60vh), 580px)",
+            aspectRatio: "580 / 565",
+          }}
+        >
+          <RadarScanner />
+        </div>
       </div>
     </section>
   );

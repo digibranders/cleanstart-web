@@ -1,22 +1,27 @@
-/**
- * Pattern-11 partial collapse (Sprint 3 Day 4):
- *   - Lowered `hidden lg:block` / `lg:hidden` -> `lg:block` / `lg:hidden`.
- *     The 1024-1279 dead zone (where neither the desktop chart nor the
- *     mobile fallback rendered cleanly) now picks up the desktop layout.
- *   - Replaced the 8 flat-px `fontSize: 20px / 16px` workflow labels with
- *     `text-body-lg` / `text-body-md` tokens (v3 Consistency Layer).
- *
- * Still owed (v3 plan Sprint 3 follow-up): the workflow-chart geometry
- * (wavy line + 4 nodes + 4 connector lines + 4 labels) is still drawn
- * with 1276-frame absolute coordinates inside a `width: 1276px` chart
- * container. At lg+ (>=1024) the container is wider than 1276 px only
- * at >=1440 viewports, so between 1024-1439 the chart visually overflows
- * the content rail until viewport >= 1440 where it fits. Full collapse
- * to a proportional-scaled (transform: scale(min(1, container/1276)))
- * or percent-coordinate layout is the next step. */
+// Title strings use \n to force a 2-line wrap matching the Figma reference.
+// FeatureCard sets whiteSpace: "pre-line" so the break renders.
+const FEATURE_CARDS = [
+  {
+    title: "Runtime\nVisibility",
+    body: "Track container activity across environments.",
+  },
+  {
+    title: "Inherited Risk\nDetection",
+    body: "Identify vulnerable dependencies and image exposure.",
+  },
+  {
+    title: "Compliance\nMonitoring",
+    body: "Continuously monitor security and compliance posture.",
+  },
+  {
+    title: "One-Click\nRemediation",
+    body: "Accelerate remediation workflows and response.",
+  },
+] as const;
+
 const WORKFLOW = [
   {
-    label: "Continuous Visibility",
+    label: "Continuous\nVisibility",
     body: "Maintain real-time awareness across environments.",
   },
   {
@@ -24,14 +29,80 @@ const WORKFLOW = [
     body: "Focus on exploitable inherited vulnerabilities.",
   },
   {
-    label: "Built-In Compliance",
+    label: "Built-In\nCompliance",
     body: "Support audit readiness and policy enforcement.",
   },
   {
     label: "Faster Remediation",
     body: "Reduce operational response time and effort.",
   },
-];
+] as const;
+
+function FeatureCard({
+  title,
+  body,
+  side,
+  variant = "shield",
+}: {
+  title: string;
+  body: string;
+  /** "left" / "right" puts extra padding on the inner edge (the shield side).
+      Omit for symmetric padding when the card stands alone. */
+  side?: "left" | "right";
+  /** "shield": desktop card under the floating shield (2-line title, left-aligned).
+      "stack":  mobile/standalone card (1-line title, centered, no shield interaction). */
+  variant?: "shield" | "stack";
+}) {
+  const pad = "clamp(24px, 2.6vw, 44px)";
+  const innerPad = "clamp(80px, 8vw, 140px)";
+  const paddingLeft = side === "left" ? pad : side === "right" ? innerPad : pad;
+  const paddingRight = side === "left" ? innerPad : side === "right" ? pad : pad;
+  const isStack = variant === "stack";
+  // On mobile/stack we render the title with no forced break so \n collapses to a space.
+  const displayTitle = isStack ? title.replace(/\n/g, " ") : title;
+  return (
+    <div
+      className="bg-white flex flex-col justify-center"
+      style={{
+        borderRadius: "24px",
+        paddingTop: pad,
+        paddingBottom: pad,
+        paddingLeft: isStack ? pad : paddingLeft,
+        paddingRight: isStack ? pad : paddingRight,
+        gap: "12px",
+        minHeight: isStack ? undefined : "clamp(180px, 15vw, 220px)",
+        textAlign: isStack ? "center" : "left",
+        alignItems: isStack ? "center" : "stretch",
+      }}
+    >
+      <h3
+        style={{
+          fontFamily: "var(--font-display)",
+          fontSize: isStack ? "clamp(18px, 5vw, 22px)" : "clamp(22px, 2.2vw, 32px)",
+          fontWeight: 700,
+          letterSpacing: "-0.03em",
+          lineHeight: 1.15,
+          color: "#0F1419",
+          whiteSpace: isStack ? "normal" : "pre-line",
+        }}
+      >
+        {displayTitle}
+      </h3>
+      <p
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: isStack ? "clamp(13px, 3.5vw, 15px)" : "clamp(14px, 1.2vw, 18px)",
+          fontWeight: 400,
+          letterSpacing: "-0.01em",
+          lineHeight: 1.5,
+          color: "#4B5563",
+        }}
+      >
+        {body}
+      </p>
+    </div>
+  );
+}
 
 export function CleanSightSecurity(): React.ReactElement {
   return (
@@ -41,10 +112,9 @@ export function CleanSightSecurity(): React.ReactElement {
       style={{
         background:
           "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)",
-        minHeight: "1708px",
       }}
     >
-      {/* Crystal decoration — top-right (xl only) */}
+      {/* Decorative crystals — desktop only */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -52,18 +122,16 @@ export function CleanSightSecurity(): React.ReactElement {
         src="/images/cleansight/security-crystal.png"
         alt=""
         style={{
-          left: "1564px",
+          right: "-80px",
           top: "-157px",
-          width: "630px",
-          height: "578px",
+          width: "min(630px, 35vw)",
+          height: "auto",
           opacity: 0.4,
           transform: "scaleY(-1) rotate(148.85deg)",
         }}
         loading="lazy"
         decoding="async"
       />
-
-      {/* Crystal decoration — top-left (xl only) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -73,8 +141,8 @@ export function CleanSightSecurity(): React.ReactElement {
         style={{
           left: "-163px",
           top: "-133px",
-          width: "605px",
-          height: "506px",
+          width: "min(605px, 32vw)",
+          height: "auto",
           opacity: 0.4,
           transform: "scaleY(-1) rotate(18.26deg)",
         }}
@@ -82,9 +150,16 @@ export function CleanSightSecurity(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ════ PART 1: Feature Cards + Shield ════ */}
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md">
-        {/* Heading — 744px wide, centered */}
+      {/* ════ PART 1: Heading + Cards + Shield ════ */}
+      <div
+        className="relative mx-auto"
+        style={{
+          maxWidth: "var(--container-default)",
+          paddingLeft: "clamp(16px, 4vw, 80px)",
+          paddingRight: "clamp(16px, 4vw, 80px)",
+          paddingTop: "var(--spacing-section-md)",
+        }}
+      >
         <h2
           className="text-white text-center mx-auto"
           style={{
@@ -100,355 +175,74 @@ export function CleanSightSecurity(): React.ReactElement {
           <span className="cs-text-gradient-impact">Security</span>
         </h2>
 
-        {/* ── Desktop: absolutely-positioned cards + shield ──
-            All from Figma (1920px) offset by 322px:
-            Left cards:  left=1px,   width=606, height=207, row-gap=44px (top=0 / top=251)
-            Right cards: left=682px, width=595, height=207
-            Shield:      left=427px, width=444, height=470
-            Wrapped in a width:1276 scaling box so the px layout shrinks
-            proportionally when the responsive container is narrower than
-            1276+gutter. Keeps the gutter intact from 1024px upward. */}
+        {/* Desktop layout: 2×2 card grid with the shield floating dead-centre on top.
+            Cards have extra padding on the inner edge so text never collides with the shield. */}
         <div
-          className="relative hidden lg:block mx-auto"
-          style={{
-            marginTop: "84px",
-            width: "1276px",
-            height: "calc(510px * clamp(0.78, (100vw - 80px) / 1276, 1))",
-            transform: "scale(clamp(0.78, (100vw - 80px) / 1276, 1))",
-            transformOrigin: "top center",
-          }}
+          className="hidden lg:block relative"
+          style={{ marginTop: "clamp(48px, 6vw, 84px)" }}
         >
-          {/* Left card — top row */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-card-left.svg"
-            alt=""
-            style={{ left: "1px", top: "0px", width: "606px", height: "207px" }}
-            loading="lazy"
-            decoding="async"
-          />
-          {/* Left card — bottom row */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-card-left.svg"
-            alt=""
-            style={{ left: "1px", top: "251px", width: "606px", height: "207px" }}
-            loading="lazy"
-            decoding="async"
-          />
-
-          {/* Right card — top row */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-card-right.svg"
-            alt=""
-            style={{ left: "682px", top: "0px", width: "595px", height: "207px" }}
-            loading="lazy"
-            decoding="async"
-          />
-          {/* Right card — bottom row */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-card-right.svg"
-            alt=""
-            style={{ left: "682px", top: "251px", width: "595px", height: "207px" }}
-            loading="lazy"
-            decoding="async"
-          />
-
-          {/* Shield connector — vertical line top */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-shield-vline.svg"
-            alt=""
-            style={{ left: "646px", top: "87px", width: "2px", height: "100px" }}
-            loading="lazy"
-            decoding="async"
-          />
-          {/* Shield connector — vertical line bottom */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-shield-vline.svg"
-            alt=""
-            style={{ left: "646px", top: "307px", width: "2px", height: "100px" }}
-            loading="lazy"
-            decoding="async"
-          />
-
-          {/* Shield connector — arc right */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-shield-arc-right.svg"
-            alt=""
-            style={{ left: "695px", top: "122px", width: "39px", height: "124px" }}
-            loading="lazy"
-            decoding="async"
-          />
-          {/* Shield connector — arc left */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-shield-arc-left.svg"
-            alt=""
-            style={{ left: "552px", top: "122px", width: "39px", height: "124px" }}
-            loading="lazy"
-            decoding="async"
-          />
-
-          {/* Shield — 444×470 container, overflow-hidden clips the large PNG */}
           <div
-            className="absolute z-10 overflow-hidden pointer-events-none"
-            style={{ left: "427px", top: "0px", width: "444px", height: "470px" }}
+            className="grid"
+            style={{
+              gridTemplateColumns: "1fr 1fr",
+              gridTemplateRows: "auto auto",
+              columnGap: "clamp(20px, 2vw, 40px)",
+              rowGap: "clamp(20px, 2vw, 40px)",
+            }}
+          >
+            <FeatureCard {...FEATURE_CARDS[0]} side="left" />
+            <FeatureCard {...FEATURE_CARDS[1]} side="right" />
+            <FeatureCard {...FEATURE_CARDS[2]} side="left" />
+            <FeatureCard {...FEATURE_CARDS[3]} side="right" />
+          </div>
+
+          {/* Shield — absolutely centered on top of the 2×2 grid.
+              New asset (security-shield-complete.png, 444×470) already has the
+              CleanStart logo baked in and is cropped tight to the shield with
+              no extra padding, so a simple <img> at native aspect is all we need. */}
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "clamp(240px, 26vw, 360px)",
+              aspectRatio: "444 / 470",
+              zIndex: 10,
+            }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/cleansight/security-shield-hero.png"
+              src="/images/cleansight/security-shield-complete.png"
               alt="CleanSight security shield"
               style={{
-                position: "absolute",
-                width: "196.86%",
-                height: "139.48%",
-                left: "-49.08%",
-                top: "-19.78%",
-                maxWidth: "none",
+                width: "100%",
+                height: "100%",
+                display: "block",
+                objectFit: "contain",
               }}
             />
           </div>
-
-          {/* Shield logo — viewBox 110.515×129.179, centred over shield
-               Shield centre: (427+222, 235) = (649, 235)
-               Logo: left=649-55=594, top=235-65=170 */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none z-20"
-            src="/images/cleansight/security-shield-logo.svg"
-            alt=""
-            style={{ left: "594px", top: "170px", width: "111px", height: "129px" }}
-            loading="lazy"
-            decoding="async"
-          />
-
-          {/* Text — Runtime Visibility (top-left) */}
-          <div className="absolute" style={{ left: "45px", top: "32px", width: "320px" }}>
-            <h3
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(22px, 2.4vw, 32px)",
-                fontWeight: 700,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-                color: "#111",
-              }}
-            >
-              Runtime Visibility
-            </h3>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "clamp(15px, 1.4vw, 20px)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                color: "#111",
-                marginTop: "16px",
-              }}
-            >
-              Track container activity across environments.
-            </p>
-          </div>
-
-          {/* Text — Compliance Monitoring (bottom-left) */}
-          <div className="absolute" style={{ left: "45px", top: "283px", width: "320px" }}>
-            <h3
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(22px, 2.4vw, 32px)",
-                fontWeight: 700,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-                color: "#111",
-              }}
-            >
-              Compliance Monitoring
-            </h3>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "clamp(15px, 1.4vw, 20px)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                color: "#111",
-                marginTop: "16px",
-              }}
-            >
-              Continuously monitor security and compliance posture.
-            </p>
-          </div>
-
-          {/* Text — Inherited Risk Detection (top-right) */}
-          <div className="absolute" style={{ left: "899px", top: "32px", width: "320px" }}>
-            <h3
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(22px, 2.4vw, 32px)",
-                fontWeight: 700,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-                color: "#111",
-              }}
-            >
-              Inherited Risk Detection
-            </h3>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "clamp(15px, 1.4vw, 20px)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                color: "#111",
-                marginTop: "16px",
-              }}
-            >
-              Identify vulnerable dependencies and image exposure.
-            </p>
-          </div>
-
-          {/* Text — One-Click Remediation (bottom-right) */}
-          <div className="absolute" style={{ left: "899px", top: "283px", width: "320px" }}>
-            <h3
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(22px, 2.4vw, 32px)",
-                fontWeight: 700,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-                color: "#111",
-              }}
-            >
-              One-Click Remediation
-            </h3>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "clamp(15px, 1.4vw, 20px)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                color: "#111",
-                marginTop: "16px",
-              }}
-            >
-              Accelerate remediation workflows and response.
-            </p>
-          </div>
         </div>
 
-        {/* ── Mobile: shield + 2×2 card grid ── */}
-        <div className="lg:hidden mt-10">
-          <div className="flex justify-center mb-8">
-            <div
-              className="relative overflow-hidden"
-              style={{ width: "220px", height: "234px" }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/cleansight/security-shield-hero.png"
-                alt="CleanSight security shield"
-                style={{
-                  position: "absolute",
-                  width: "196.86%",
-                  height: "139.48%",
-                  left: "-49.08%",
-                  top: "-19.78%",
-                  maxWidth: "none",
-                }}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {(
-              [
-                {
-                  title: "Runtime Visibility",
-                  body: "Track container activity across environments.",
-                },
-                {
-                  title: "Inherited Risk Detection",
-                  body: "Identify vulnerable dependencies and image exposure.",
-                },
-                {
-                  title: "Compliance Monitoring",
-                  body: "Continuously monitor security and compliance posture.",
-                },
-                {
-                  title: "One-Click Remediation",
-                  body: "Accelerate remediation workflows and response.",
-                },
-              ] as const
-            ).map((f) => (
-              <div
-                key={f.title}
-                className="bg-white flex flex-col"
-                style={{
-                  borderRadius: "32px",
-                  padding: "32px",
-                  border: "1px solid rgba(44,193,235,0.25)",
-                  gap: "16px",
-                }}
-              >
-                <h3
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-t-heading-lg)",
-                    fontWeight: 700,
-                    letterSpacing: "var(--text-t-heading-lg-ls)",
-                    lineHeight: "var(--text-t-heading-lg-lh)",
-                    color: "#111",
-                  }}
-                >
-                  {f.title}
-                </h3>
-                <p
-                  style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "clamp(15px, 1.4vw, 20px)",
-                    fontWeight: 400,
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.4,
-                    color: "#111",
-                  }}
-                >
-                  {f.body}
-                </p>
-              </div>
-            ))}
-          </div>
+        {/* Mobile / tablet: no shield — just a vertical stack of centered cards */}
+        <div className="lg:hidden mt-10 flex flex-col gap-4">
+          {FEATURE_CARDS.map((f) => (
+            <FeatureCard key={f.title} {...f} variant="stack" />
+          ))}
         </div>
       </div>
 
-      {/* Divider — 1px hairline, 1280px wide, centred (xl only) */}
+      {/* Hairline divider */}
       <div
         aria-hidden
         className="hidden lg:block mx-auto"
-        style={{ marginTop: "80px", maxWidth: "1280px", height: "1px", overflow: "hidden" }}
+        style={{
+          marginTop: "clamp(48px, 5vw, 80px)",
+          maxWidth: "1280px",
+          paddingLeft: "clamp(16px, 4vw, 80px)",
+          paddingRight: "clamp(16px, 4vw, 80px)",
+        }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -462,28 +256,20 @@ export function CleanSightSecurity(): React.ReactElement {
         />
       </div>
 
-      {/* ════ PART 2: From Visibility to Action ════
-          Figma: 1920×814px block.
-          Content-box offset = (1920-1276)/2 = 322px → Figma_left - 322 = content-box left.
-
-          Wavy line (373:1139):  left=331-322=9,  top=342, w=1255, h=511  (viewBox 1257×513)
-          Node 1 (22×22):        left=322-322=0,  top=644
-          Node 2 (26×26):        left=671-322=349,top=437
-          Node 3 (26×26):        left=1163-322=841,top=569
-          Node 4 (26×26):        left=1572-322=1250,top=329
-          Vline near N1 (292px): flex left=330-322=8,   top=663, h=292
-          Vline near N2 (381px): flex left=684-322=362, top=459, h=381
-          Vline near N3 (292px): flex left=1176-322=854,top=581, h=292
-          Label 1: left=347-322=25,   top=666, w=194
-          Label 2: left=704-322=382,  top=339, w=170
-          Label 3: left=1192-322=870, top=595, w=194
-          Label 4: left=1380-322=1058,top=306, w=184
-      */}
+      {/* ════ PART 2: From Visibility to Action — workflow chart ════
+          paddingBottom is intentionally 0 so the chart's curve reaches the
+          bottom edge of the section, matching the Figma reference. */}
       <div
-        className="relative overflow-hidden"
-        style={{ minHeight: "814px" }}
+        className="relative mx-auto"
+        style={{
+          maxWidth: "var(--container-default)",
+          paddingLeft: "clamp(16px, 4vw, 80px)",
+          paddingRight: "clamp(16px, 4vw, 80px)",
+          paddingTop: "clamp(48px, 5vw, 80px)",
+          paddingBottom: "0",
+        }}
       >
-        {/* Union — right: Figma left=1228, top=252, size=1181 */}
+        {/* Decorative unions (desktop only) */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
@@ -491,16 +277,15 @@ export function CleanSightSecurity(): React.ReactElement {
           src="/images/cleansight/security-union-right.svg"
           alt=""
           style={{
-            left: "calc(1228 / 1920 * 100%)",
-            top: "252px",
-            width: "1181px",
-            height: "1181px",
+            right: "-30vw",
+            top: "200px",
+            width: "min(1181px, 60vw)",
+            height: "auto",
+            opacity: 0.6,
           }}
           loading="lazy"
           decoding="async"
         />
-
-        {/* Union — left: Figma left=-631, top=55, size=1181 */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
@@ -508,25 +293,19 @@ export function CleanSightSecurity(): React.ReactElement {
           src="/images/cleansight/security-union-left.svg"
           alt=""
           style={{
-            left: "calc(-631 / 1920 * 100%)",
-            top: "55px",
-            width: "1181px",
-            height: "1181px",
+            left: "-30vw",
+            top: "0px",
+            width: "min(1181px, 60vw)",
+            height: "auto",
+            opacity: 0.6,
           }}
           loading="lazy"
           decoding="async"
         />
 
-        {/* Heading — Figma: left=599, top=80, w=753, gap=24 (centred in 1920px) */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 text-center text-white"
-          style={{
-            top: "80px",
-            width: "min(753px, 90vw)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "24px",
-          }}
+          className="relative text-center text-white mx-auto flex flex-col"
+          style={{ maxWidth: "753px", gap: "24px" }}
         >
           <h2
             style={{
@@ -554,360 +333,289 @@ export function CleanSightSecurity(): React.ReactElement {
           </p>
         </div>
 
-        {/* ── Desktop chart — 1276px content box, scaled to fit gutter ── */}
+        {/* Desktop chart — locked-group layout.
+            container-type: inline-size makes every cqi unit inside resolve
+            against THIS box's width. Combined with aspectRatio (height locked
+            to width) and %-based positions, the curve + nodes + dashed lines +
+            labels all scale together as one unit, with no relative drift at
+            any viewport. */}
         <div
-          className="absolute hidden lg:block"
+          className="hidden lg:block relative mx-auto"
           style={{
-            top: "0px",
-            left: "50%",
-            width: "1276px",
-            height: "814px",
-            transform:
-              "translateX(-50%) scale(clamp(0.78, (100vw - 80px) / 1276, 1))",
-            transformOrigin: "top center",
+            marginTop: "clamp(40px, 4vw, 64px)",
+            width: "100%",
+            maxWidth: "1276px",
+            // Taller aspect leaves room at the bottom for label text to fit
+            // without clipping while the curve still hugs the section bottom.
+            aspectRatio: "1276 / 540",
+            containerType: "inline-size",
           }}
         >
-          {/* Wavy line: left=9, top=342, w=1255, h=511 */}
+          {/* Wavy connector line — natural aspect 1257:513. Pinned to bottom so
+              the curve's lowest stretch reaches the chart's bottom edge. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             aria-hidden
             className="absolute pointer-events-none select-none"
             src="/images/cleansight/security-workflow-line.svg"
             alt=""
-            style={{ left: "9px", top: "342px", width: "1255px", height: "511px" }}
-            loading="lazy"
-            decoding="async"
-          />
-
-          {/* Node 1 — Continuous Visibility (22×22) */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-node-1.svg"
-            alt=""
-            style={{ left: "0px", top: "644px", width: "22px", height: "22px" }}
-            loading="lazy"
-            decoding="async"
-          />
-
-          {/* Node 2 — Risk Prioritization (26×26) */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-node-2.svg"
-            alt=""
-            style={{ left: "349px", top: "437px", width: "26px", height: "26px" }}
-            loading="lazy"
-            decoding="async"
-          />
-
-          {/* Node 3 — Built-In Compliance (26×26) */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-node-3.svg"
-            alt=""
-            style={{ left: "841px", top: "569px", width: "26px", height: "26px" }}
-            loading="lazy"
-            decoding="async"
-          />
-
-          {/* Node 4 — Faster Remediation (26×26) */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            aria-hidden
-            className="absolute pointer-events-none select-none"
-            src="/images/cleansight/security-node-4.svg"
-            alt=""
-            style={{ left: "1250px", top: "329px", width: "26px", height: "26px" }}
-            loading="lazy"
-            decoding="async"
-          />
-
-          {/*
-            Vertical connector lines.
-            The SVGs are horizontal (292×2 or 381×2, preserveAspectRatio="none").
-            Figma renders them via a flex+rotate90 pattern, mirrored exactly below.
-            Outer div: w=0, h=line_length, flex centering → inner rotated img fills height.
-          */}
-
-          {/* Vline near Node 1 (292px) — Figma left=330→content:8, top=663 */}
-          <div
-            aria-hidden
-            className="absolute flex items-center justify-center pointer-events-none select-none"
-            style={{ left: "8px", top: "663px", width: "0", height: "292px" }}
-          >
-            <div style={{ transform: "rotate(90deg)", flexShrink: 0 }}>
-              <div style={{ position: "relative", width: "292px", height: "0" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  alt=""
-                  src="/images/cleansight/security-vline-short.svg"
-                  style={{
-                    position: "absolute",
-                    inset: "-2px 0 0 0",
-                    width: "292px",
-                    height: "2px",
-                    display: "block",
-                    maxWidth: "none",
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Vline near Node 2 (381px tall) — Figma left=684→content:362, top=459 */}
-          <div
-            aria-hidden
-            className="absolute flex items-center justify-center pointer-events-none select-none"
-            style={{ left: "362px", top: "459px", width: "0", height: "381px" }}
-          >
-            <div style={{ transform: "rotate(90deg)", flexShrink: 0 }}>
-              <div style={{ position: "relative", width: "381px", height: "0" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  alt=""
-                  src="/images/cleansight/security-vline-tall.svg"
-                  style={{
-                    position: "absolute",
-                    inset: "-2px 0 0 0",
-                    width: "381px",
-                    height: "2px",
-                    display: "block",
-                    maxWidth: "none",
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Vline near Node 3 (292px) — Figma left=1176→content:854, top=581 */}
-          <div
-            aria-hidden
-            className="absolute flex items-center justify-center pointer-events-none select-none"
-            style={{ left: "854px", top: "581px", width: "0", height: "292px" }}
-          >
-            <div style={{ transform: "rotate(90deg)", flexShrink: 0 }}>
-              <div style={{ position: "relative", width: "292px", height: "0" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  alt=""
-                  src="/images/cleansight/security-vline-short.svg"
-                  style={{
-                    position: "absolute",
-                    inset: "-2px 0 0 0",
-                    width: "292px",
-                    height: "2px",
-                    display: "block",
-                    maxWidth: "none",
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Label — "Continuous Visibility": widened to fit desc on 2 lines */}
-          <div
-            className="absolute text-white"
             style={{
-              left: "25px",
-              top: "666px",
-              width: "240px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
+              left: "1%",
+              bottom: "0%",
+              width: "98%",
+              aspectRatio: "1257 / 513",
             }}
-          >
-            <p
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(18px, 1.8vw, 24px)",
-                fontWeight: 600,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-              }}
-            >
-              Continuous Visibility
-            </p>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "clamp(13px, 1.1vw, 16px)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                opacity: 0.8,
-              }}
-            >
-              Maintain real-time awareness across environments.
-            </p>
-          </div>
+            loading="lazy"
+            decoding="async"
+          />
 
-          {/* Label — "Risk Prioritization": widened to fit desc on 2 lines */}
-          <div
-            className="absolute text-white"
-            style={{
-              left: "382px",
-              top: "339px",
-              width: "240px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-            }}
-          >
-            <p
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(18px, 1.8vw, 24px)",
-                fontWeight: 600,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-              }}
-            >
-              Risk Prioritization
-            </p>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "clamp(13px, 1.1vw, 16px)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                opacity: 0.8,
-              }}
-            >
-              Focus on exploitable inherited vulnerabilities.
-            </p>
-          </div>
-
-          {/* Label — "Built-In Compliance": widened to fit desc on 2 lines */}
-          <div
-            className="absolute text-white"
-            style={{
-              left: "870px",
-              top: "595px",
-              width: "240px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-            }}
-          >
-            <p
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(18px, 1.8vw, 24px)",
-                fontWeight: 600,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-              }}
-            >
-              Built-In Compliance
-            </p>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "clamp(13px, 1.1vw, 16px)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                opacity: 0.8,
-              }}
-            >
-              Support audit readiness and policy enforcement.
-            </p>
-          </div>
-
-          {/* Label — "Faster Remediation": shifted left + widened to fit desc on 2 lines within 1276 bounds */}
-          <div
-            className="absolute text-white"
-            style={{
-              left: "1010px",
-              top: "306px",
-              width: "240px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-            }}
-          >
-            <p
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(18px, 1.8vw, 24px)",
-                fontWeight: 600,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-              }}
-            >
-              Faster Remediation
-            </p>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "clamp(13px, 1.1vw, 16px)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                opacity: 0.8,
-              }}
-            >
-              Reduce operational response time and effort.
-            </p>
-          </div>
+          {/* Node positions derived from the actual SVG path (viewBox 1257×513):
+             - Curve start (left edge):  svg(1, 316)    → chart (1%,  64%)
+             - First peak (bezier apex): svg(357, 113)  → chart (29%, 26%)
+             - Valley (lowest mid pt):   svg(733, 230)  → chart (58%, 48%)
+             - Right edge top:           svg(1256, 1)   → chart (99%, 6%)
+             where chart x = 1% + (svg_x/1257)*98% and chart y = (30 + svg_y*510/513)/540*100%. */}
+          {/* Per-pointer label positioning — each `labelY` is tuned independently
+              so every label sits at a hand-picked distance from its own dot. */}
+          {/* Step 1 — Continuous Visibility. Dot 64%, label 70% (gap 6%, below).
+              Tightened from 80% so the label hugs its dot rather than floating at the bottom. */}
+          <WorkflowStep
+            x="1%"
+            nodeSrc="security-node-1.svg"
+            nodeY="64%"
+            labelY="70%"
+            labelAlign="left"
+            label={WORKFLOW[0].label}
+            body={WORKFLOW[0].body}
+          />
+          {/* Step 2 — Risk Prioritization. Dot 26%, label 12% (gap 14%, above).
+              Brought down from 4% so it hugs the dot instead of floating at the top. */}
+          <WorkflowStep
+            x="29%"
+            nodeSrc="security-node-2.svg"
+            nodeY="26%"
+            labelY="12%"
+            labelAlign="left"
+            label={WORKFLOW[1].label}
+            body={WORKFLOW[1].body}
+          />
+          {/* Step 3 — Built-In Compliance. Dot 48%, label 56% (gap 8%, below). */}
+          <WorkflowStep
+            x="58%"
+            nodeSrc="security-node-3.svg"
+            nodeY="48%"
+            labelY="56%"
+            labelAlign="left"
+            label={WORKFLOW[2].label}
+            body={WORKFLOW[2].body}
+          />
+          {/* Step 4 — Faster Remediation. Dot 6%, label anchored above the dot.
+              labelAnchorY="bottom" means labelY refers to the BOTTOM edge of the
+              label, so label extends upward from labelY=2%. Combined with align="right"
+              the label sits above-and-left of the dot, just clear of the curve. */}
+          <WorkflowStep
+            x="99%"
+            nodeSrc="security-node-4.svg"
+            nodeY="6%"
+            labelY="2%"
+            labelAlign="right"
+            labelAnchorY="bottom"
+            label={WORKFLOW[3].label}
+            body={WORKFLOW[3].body}
+          />
         </div>
 
-        {/* Mobile fallback */}
+        {/* Mobile fallback — numbered list of workflow steps */}
         <div
-          className="lg:hidden relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
-          style={{ paddingTop: "240px", paddingBottom: "64px" }}
+          className="lg:hidden mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6"
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {WORKFLOW.map((w, i) => (
-              <div key={w.label} className="flex gap-4 items-start">
-                <div
-                  className="flex-shrink-0 flex items-center justify-center rounded-full text-white font-bold"
+          {WORKFLOW.map((w, i) => (
+            <div key={w.label} className="flex gap-4 items-start">
+              <div
+                className="flex-shrink-0 flex items-center justify-center rounded-full text-white font-bold"
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  background: "linear-gradient(to bottom, #239CFF, #005BE3)",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "14px",
+                }}
+              >
+                {i + 1}
+              </div>
+              <div>
+                <p
+                  className="text-white font-semibold"
                   style={{
-                    width: "36px",
-                    height: "36px",
-                    background: "linear-gradient(to bottom, #239CFF, #005BE3)",
                     fontFamily: "var(--font-display)",
-                    // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-                    fontSize: "14px",
+                    fontSize: "18px",
+                    letterSpacing: "-0.03em",
                   }}
                 >
-                  {i + 1}
-                </div>
-                <div>
-                  <p
-                    className="text-white font-semibold"
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-                      fontSize: "18px",
-                      letterSpacing: "-0.03em",
-                    }}
-                  >
-                    {w.label}
-                  </p>
-                  <p
-                    className="text-white mt-1"
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-                      fontSize: "15px",
-                      opacity: 0.8,
-                    }}
-                  >
-                    {w.body}
-                  </p>
-                </div>
+                  {w.label}
+                </p>
+                <p
+                  className="text-white mt-1"
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "15px",
+                    opacity: 0.8,
+                  }}
+                >
+                  {w.body}
+                </p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function WorkflowStep({
+  nodeSrc,
+  x,
+  nodeY,
+  labelY,
+  labelAlign,
+  labelAnchorY = "top",
+  label,
+  body,
+}: {
+  nodeSrc: string;
+  x: string;
+  nodeY: string;
+  /** Absolute Y position of the label (% of chart height). */
+  labelY: string;
+  /** Horizontal placement of the label relative to the vertical drop line at x. */
+  labelAlign: "left" | "right" | "center";
+  /** Which edge of the label labelY refers to:
+      "top" (default) → labelY is the top of the label, label extends downward.
+      "bottom" → labelY is the bottom of the label, label extends upward. */
+  labelAnchorY?: "top" | "bottom";
+  label: string;
+  body: string;
+}) {
+  // Node size scales with chart width via cqi.
+  const nodeSize = "clamp(14px, 1.8cqi, 22px)";
+  // Gap between the vertical line and the label edge.
+  const gap = "clamp(6px, 0.8cqi, 12px)";
+
+  let xTransform: string;
+  let textAlign: "left" | "right" | "center";
+  switch (labelAlign) {
+    case "left":
+      xTransform = `translateX(${gap})`;
+      textAlign = "left";
+      break;
+    case "right":
+      xTransform = `translateX(calc(-100% - ${gap}))`;
+      textAlign = "right";
+      break;
+    case "center":
+      xTransform = "translateX(-50%)";
+      textAlign = "center";
+      break;
+  }
+  const yTransform = labelAnchorY === "bottom" ? " translateY(-100%)" : "";
+  const labelTransform = `${xTransform}${yTransform}`;
+
+  return (
+    <>
+      {/* Vertical dashed drop line — runs from the dot center down to chart bottom */}
+      <div
+        aria-hidden
+        className="absolute pointer-events-none"
+        style={{
+          left: x,
+          top: nodeY,
+          bottom: "0%",
+          width: "0",
+          borderLeft: "1px dashed rgba(255,255,255,0.4)",
+          transform: "translateX(-0.5px)",
+        }}
+      />
+      {/* Node circle */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src={`/images/cleansight/${nodeSrc}`}
+        alt=""
+        className="absolute pointer-events-none select-none"
+        style={{
+          left: x,
+          top: nodeY,
+          width: nodeSize,
+          height: nodeSize,
+          transform: "translate(-50%, -50%)",
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+      {/* Label — anchored at (x, labelY); transform shifts it left / right / centered around the drop line */}
+      <WorkflowLabel
+        label={label}
+        body={body}
+        textAlign={textAlign}
+        style={{
+          left: x,
+          top: labelY,
+          transform: labelTransform,
+        }}
+      />
+    </>
+  );
+}
+
+function WorkflowLabel({
+  label,
+  body,
+  style,
+  textAlign = "left",
+}: {
+  label: string;
+  body: string;
+  style: React.CSSProperties;
+  textAlign?: "left" | "right" | "center";
+}) {
+  return (
+    <div
+      className="absolute text-white"
+      style={{
+        ...style,
+        // Width scales with the chart (cqi) so labels never collide between viewports.
+        width: "clamp(110px, 13cqi, 180px)",
+        textAlign,
+        display: "flex",
+        flexDirection: "column",
+        gap: "4px",
+      }}
+    >
+      <p
+        style={{
+          fontFamily: "var(--font-display)",
+          fontSize: "clamp(12px, 1.4cqi, 18px)",
+          fontWeight: 600,
+          letterSpacing: "-0.03em",
+          lineHeight: 1.15,
+          whiteSpace: "pre-line",
+        }}
+      >
+        {label}
+      </p>
+      <p
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "clamp(10px, 1cqi, 13px)",
+          fontWeight: 400,
+          letterSpacing: "-0.01em",
+          lineHeight: 1.45,
+          opacity: 0.75,
+        }}
+      >
+        {body}
+      </p>
+    </div>
   );
 }

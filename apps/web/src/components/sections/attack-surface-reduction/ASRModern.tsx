@@ -60,8 +60,8 @@ export function ASRModern(): React.ReactElement {
           className="text-center sm:text-left"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(32px, 4vw, 56px)',
-            fontWeight: 700,
+            fontSize: 'var(--text-display-md)',
+            fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
             color: 'white',
@@ -94,8 +94,8 @@ export function ASRModern(): React.ReactElement {
               <h3
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(22px, 2.4vw, 32px)',
-                  fontWeight: 700,
+                  fontSize: 'var(--text-card-title-lg)',
+                  fontWeight: 600,
                   letterSpacing: '-0.04em',
                   lineHeight: 1.1,
                   color: 'white',
@@ -106,7 +106,7 @@ export function ASRModern(): React.ReactElement {
               <p
                 style={{
                   fontFamily: 'var(--font-sans)',
-                  fontSize: 'clamp(15px, 1.4vw, 20px)',
+                  fontSize: 'var(--text-body-md)',
                   fontWeight: 400,
                   letterSpacing: '-0.02em',
                   lineHeight: 1.4,

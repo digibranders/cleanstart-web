@@ -11,6 +11,7 @@ import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
 import { firstPublishHook } from '../hooks/first-publish';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 
@@ -275,7 +276,7 @@ export const Events: CollectionConfig = {
     ...seoFieldsForSidebar('events'),
   ],
   hooks: {
-    beforeChange: [firstPublishHook(), eventStatusTimestampsHook],
+    beforeChange: [normalizeLexicalHook(), firstPublishHook(), eventStatusTimestampsHook],
     afterChange: [
       slugChangeRedirectHook('events'),
       schemaOverrideAuditHook('events'),

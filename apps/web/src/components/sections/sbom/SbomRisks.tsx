@@ -118,10 +118,10 @@ export function SbomRisks(): React.ReactElement {
           <h2
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(28px, 4vw, 56px)',
-              fontWeight: 700,
+              fontSize: 'var(--text-display-md)',
+              fontWeight: 600,
               letterSpacing: '-0.04em',
-              lineHeight: 1.2,
+              lineHeight: 1.1,
               color: '#111',
             }}
           >
@@ -195,8 +195,8 @@ export function SbomRisks(): React.ReactElement {
                   <h3
                     style={{
                       fontFamily: 'var(--font-display)',
-                      fontSize: 'clamp(22px, 2.4vw, 32px)',
-                      fontWeight: 700,
+                      fontSize: 'var(--text-card-title-lg)',
+                      fontWeight: 600,
                       letterSpacing: '-0.04em',
                       lineHeight: 1.1,
                       color: '#111',
@@ -207,7 +207,7 @@ export function SbomRisks(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: 'var(--font-sans)',
-                      fontSize: 'clamp(15px, 1.4vw, 20px)',
+                      fontSize: 'var(--text-body-lg)',
                       fontWeight: 400,
                       letterSpacing: '-0.02em',
                       lineHeight: 1.4,
@@ -345,10 +345,10 @@ function MobileRiskCard({ risk }: { risk: Risk }): React.ReactElement {
         <p
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '20px',
+            fontSize: 'var(--text-card-title-md)',
             fontWeight: 600,
-            letterSpacing: '-1px',
-            lineHeight: 1,
+            letterSpacing: '-0.04em',
+            lineHeight: 1.1,
             color: '#000',
             whiteSpace: 'nowrap',
           }}
@@ -358,10 +358,10 @@ function MobileRiskCard({ risk }: { risk: Risk }): React.ReactElement {
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '14px',
+            fontSize: 'var(--text-body-sm)',
             fontWeight: 400,
-            letterSpacing: '-0.56px',
-            lineHeight: 1.1,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.4,
             color: '#111',
             opacity: 0.8,
             width: `${risk.mobileBodyW}px`,

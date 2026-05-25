@@ -57,9 +57,9 @@ export function CleanStartImagesCta(): React.ReactElement {
           className="font-display text-white shrink-0"
           style={{
             fontSize: "var(--text-display-sm)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "354px",
           }}
         >

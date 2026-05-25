@@ -84,7 +84,7 @@ export default async function ResourceCenterPage({
               marginTop: "-32px",
               zIndex: 1,
               paddingTop: "52px",
-              paddingBottom: "250px",
+              paddingBottom: "var(--spacing-section-cta)",
             }}
             aria-label="Resources listing"
           >

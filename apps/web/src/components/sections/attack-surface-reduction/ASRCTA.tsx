@@ -72,7 +72,7 @@ export function ASRCTA(): React.ReactElement {
 
       {/* Content — desktop: row, mobile: centered column */}
       <div
-        className="relative flex flex-col items-center text-center lg:flex-row lg:items-center lg:text-left"
+        className="relative flex flex-col items-center text-center lg:flex-row lg:items-start lg:text-left"
         style={{
           padding: 'clamp(36px, 6vw, 64px) clamp(24px, 5vw, 80px)',
           gap: 'clamp(24px, 5vw, 72px)',
@@ -83,8 +83,8 @@ export function ASRCTA(): React.ReactElement {
           className="relative"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(28px, 3.1vw, 44px)',
-            fontWeight: 700,
+            fontSize: 'var(--cta-card-title)',
+            fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
             color: '#111111',
@@ -104,7 +104,7 @@ export function ASRCTA(): React.ReactElement {
           <p
             style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: 'clamp(16px, 1.5vw, 20px)',
+              fontSize: 'var(--cta-card-desc)',
               fontWeight: 400,
               letterSpacing: '-0.02em',
               lineHeight: 1.4,
@@ -116,7 +116,7 @@ export function ASRCTA(): React.ReactElement {
           </p>
 
           <Link
-            href="/contact-us"
+            href="/book-a-demo"
             className="inline-flex items-center gap-2 text-white transition-transform duration-200 hover:-translate-y-px"
             style={{
               padding: '12px 20px',

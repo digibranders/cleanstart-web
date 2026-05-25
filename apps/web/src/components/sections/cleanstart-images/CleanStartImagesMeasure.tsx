@@ -237,9 +237,9 @@ export function CleanStartImagesMeasure(): React.ReactElement {
           className="font-display text-[#111]"
           style={{
             fontSize: "var(--text-display-md)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "clamp(500px, 58vw, 835px)",
           }}
         >

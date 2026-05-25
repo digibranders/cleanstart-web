@@ -33,8 +33,8 @@ export function ASRFits(): React.ReactElement {
           <h2
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(32px, 4vw, 56px)',
-              fontWeight: 700,
+              fontSize: 'var(--text-display-md)',
+              fontWeight: 600,
               letterSpacing: '-0.04em',
               lineHeight: 1.1,
               color: '#111111',
@@ -46,10 +46,10 @@ export function ASRFits(): React.ReactElement {
           <p
             style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: 'clamp(18px, 1.7vw, 24px)',
+              fontSize: 'var(--text-t-subhead)',
               fontWeight: 400,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.4,
+              letterSpacing: 'var(--text-t-subhead-ls)',
+              lineHeight: 'var(--text-t-subhead-lh)',
               color: '#555555',
               maxWidth: '480px',
             }}
@@ -84,8 +84,8 @@ export function ASRFits(): React.ReactElement {
               <h3
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(20px, 2.4vw, 32px)',
-                  fontWeight: 700,
+                  fontSize: 'var(--text-card-title-lg)',
+                  fontWeight: 600,
                   letterSpacing: '-0.04em',
                   lineHeight: 1.1,
                   color: '#111111',
@@ -96,7 +96,7 @@ export function ASRFits(): React.ReactElement {
               <p
                 style={{
                   fontFamily: 'var(--font-sans)',
-                  fontSize: 'clamp(15px, 1.4vw, 20px)',
+                  fontSize: 'var(--text-body-md)',
                   fontWeight: 400,
                   letterSpacing: '-0.02em',
                   lineHeight: 1.4,

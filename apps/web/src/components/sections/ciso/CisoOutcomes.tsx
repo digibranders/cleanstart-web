@@ -109,6 +109,7 @@ function StatCard({
     >
       {/* ── Animated number ──
           bottom edge pinned at 106px from card top via translateY(-100%) */}
+      {/* TODO: needs new --stat-number-* token — 40→62px display numeral has no matching role token */}
       <div
         className="absolute whitespace-nowrap"
         style={{
@@ -141,9 +142,9 @@ function StatCard({
         <p
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(13px, 1.15vw, 22px)",
+            fontSize: "var(--text-body-lg)",
             fontWeight: 400,
-            letterSpacing: "-0.05em",
+            letterSpacing: "-0.02em",
             lineHeight: 1.4,
             color: "#333",
           }}
@@ -365,8 +366,8 @@ export function CisoOutcomes(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(32px, 4vw, 56px)",
-              fontWeight: 700,
+              fontSize: "var(--text-display-md)",
+              fontWeight: 600,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
               color: "#fff",
@@ -399,6 +400,7 @@ export function CisoOutcomes(): React.ReactElement {
               style={{ borderRadius: "24px", height: "144px" }}
             >
               {/* Animated number */}
+              {/* TODO: needs new --stat-number-* token — 40px display numeral has no matching role token */}
               <div
                 className="absolute"
                 style={{
@@ -422,9 +424,9 @@ export function CisoOutcomes(): React.ReactElement {
                   right: "16px",
                   top: "92px",
                   fontFamily: "var(--font-sans)",
-                  fontSize: "16px",
+                  fontSize: "var(--text-body-md)",
                   fontWeight: 400,
-                  letterSpacing: "-0.05em",
+                  letterSpacing: "-0.02em",
                   lineHeight: 1.4,
                   color: "#333",
                 }}

@@ -14,6 +14,7 @@ import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
 import { firstPublishHook } from '../hooks/first-publish';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
@@ -234,7 +235,7 @@ export const Webinars: CollectionConfig = {
     ...seoFieldsForSidebar('webinars'),
   ],
   hooks: {
-    beforeChange: [firstPublishHook(), displayPublishedAtBackfillHook, eventStatusTimestampsHook],
+    beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook, eventStatusTimestampsHook],
     afterChange: [
       slugChangeRedirectHook('webinars'),
       schemaOverrideAuditHook('webinars'),

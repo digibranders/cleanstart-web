@@ -560,7 +560,7 @@
     }
   ],
   "hooks": {
-    "beforeChange": 1,
+    "beforeChange": 2,
     "afterChange": 5,
     "beforeValidate": 1,
     "afterDelete": 1

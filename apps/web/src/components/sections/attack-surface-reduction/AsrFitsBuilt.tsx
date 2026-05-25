@@ -185,9 +185,9 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
             className="text-card-title-lg text-[#111]"
             style={{
               fontFamily: 'var(--font-display)',
-              fontWeight: 700,
-              letterSpacing: '-0.05em',
-              lineHeight: 1.0,
+              fontWeight: 600,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.1,
             }}
           >
             {card.title}
@@ -195,9 +195,9 @@ function FitsCard({ card }: FitsCardProps): React.ReactElement {
           <p
             className="text-body-lg text-[#555]"
             style={{
-              fontFamily: 'var(--font-display)',
+              fontFamily: 'var(--font-sans)',
               fontWeight: 400,
-              letterSpacing: '-0.05em',
+              letterSpacing: '-0.02em',
               lineHeight: 1.4,
               maxWidth: '295px',
             }}

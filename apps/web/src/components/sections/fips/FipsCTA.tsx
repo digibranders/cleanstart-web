@@ -76,15 +76,11 @@ export function FipsCTA(): React.ReactElement {
           className="text-white flex-shrink-0"
           style={{
             fontFamily: "var(--font-display)",
-            /*
-             * Figma: 55px at 1440px → 3.82vw.
-             * Capped at 44px so it wraps to max 3 lines inside the column at lg
-             * card height (240px). Figma card is 335px; our Footer uses 240px at lg.
-             */
-            fontSize: "clamp(22px, 3.05vw, 44px)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1,
+            // Global CTA-card title token (`--cta-card-title`) per strict-fonts rule.
+            fontSize: "var(--cta-card-title)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             width: "38.30%",
           }}
         >
@@ -100,9 +96,9 @@ export function FipsCTA(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(13px, 1.46vw, 21px)",
+              fontSize: "var(--cta-card-desc)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
+              letterSpacing: "-0.02em",
               lineHeight: 1.4,
               color: "rgba(255,255,255,0.80)",
             }}
@@ -113,7 +109,7 @@ export function FipsCTA(): React.ReactElement {
 
           {/* Button — 18px font, px=18px (Figma node 787:2348) */}
           <Link
-            href="/contact-us"
+            href="/book-a-demo"
             className="cs-btn-glass self-start"
             style={
               {
@@ -149,10 +145,10 @@ export function FipsCTA(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(26px, 7vw, 40px)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1,
+            fontSize: "var(--cta-card-title)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "280px",
           }}
         >
@@ -161,9 +157,9 @@ export function FipsCTA(): React.ReactElement {
         <p
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(14px, 4vw, 18px)",
+            fontSize: "var(--cta-card-desc)",
             fontWeight: 400,
-            letterSpacing: "-0.04em",
+            letterSpacing: "-0.02em",
             lineHeight: 1.4,
             color: "rgba(255,255,255,0.80)",
           }}
@@ -172,7 +168,7 @@ export function FipsCTA(): React.ReactElement {
           knowing your containers are secured from the ground up.
         </p>
         <Link
-          href="/contact-us"
+          href="/book-a-demo"
           className="cs-btn-glass self-start"
           style={
             {

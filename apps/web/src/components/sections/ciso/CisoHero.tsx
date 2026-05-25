@@ -180,10 +180,10 @@ export function CisoHero(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(32px, 4.17vw, 80px)",
+              fontSize: "var(--text-hero-product)",
               fontWeight: 600,
-              letterSpacing: "-0.05em",
-              lineHeight: 1,
+              letterSpacing: "var(--text-hero-product-ls, -0.04em)",
+              lineHeight: "var(--text-hero-lh, 1.05)",
               /* Mobile gap-[16px] per Figma; Desktop 32px */
               marginBottom: "clamp(16px, 1.67vw, 32px)",
             }}
@@ -195,10 +195,10 @@ export function CisoHero(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(16px, 1.56vw, 30px)",
+              fontSize: "var(--text-t-subhead)",
               fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.45,
               color: "rgba(255,255,255,0.8)",
               /* Mobile gap-[24px] per Figma; Desktop 32px */
               marginBottom: "clamp(24px, 1.67vw, 32px)",

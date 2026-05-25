@@ -75,8 +75,8 @@ export function CleanStartImagesHero(): React.ReactElement {
               style={{
                 fontFamily: "var(--font-display)",
                 fontSize: "var(--text-hero-product)",
-                letterSpacing: "-0.05em",
-                lineHeight: 1.0,
+                letterSpacing: "var(--text-hero-product-ls, -0.04em)",
+                lineHeight: "var(--text-hero-lh, 1.05)",
                 fontWeight: 600,
               }}
             >
@@ -89,8 +89,8 @@ export function CleanStartImagesHero(): React.ReactElement {
                   fontFamily: "var(--font-sans)",
                   fontSize: "var(--text-body-xl)",
                   fontWeight: 400,
-                  lineHeight: 1.4,
-                  letterSpacing: "-0.04em",
+                  lineHeight: 1.45,
+                  letterSpacing: "-0.02em",
                   color: "rgba(255,255,255,0.8)",
                 }}
               >

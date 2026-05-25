@@ -78,7 +78,7 @@ export function AsrProductionEnv(): React.ReactElement {
           style={{
             fontFamily: 'var(--font-display)',
             fontSize: 'var(--text-t-display-2)',
-            fontWeight: 700,
+            fontWeight: 600,
             letterSpacing: 'var(--text-t-display-2-ls)',
             lineHeight: 'var(--text-t-display-2-lh)',
             maxWidth: '686px',
@@ -130,7 +130,7 @@ export function AsrProductionEnv(): React.ReactElement {
                 style={{
                   fontFamily: 'var(--font-display)',
                   fontSize: 'var(--text-t-heading-lg)',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   letterSpacing: 'var(--text-t-heading-lg-ls)',
                   lineHeight: 'var(--text-t-heading-lg-lh)',
                   maxWidth: '340px',

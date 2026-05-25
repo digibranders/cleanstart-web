@@ -6,10 +6,8 @@ import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
 import { AuthorHero } from "@/components/sections/author/AuthorHero";
 import { AuthorBio } from "@/components/sections/author/AuthorBio";
-import { AuthorDetails } from "@/components/sections/author/AuthorDetails";
-import { AuthorPosts } from "@/components/sections/author/AuthorPosts";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
-import { getAuthorBySlug, getPostsByAuthor } from "@/lib/authors";
+import { getAuthorBySlug } from "@/lib/authors";
 import { mediaUrl } from "@/lib/blog";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 
@@ -61,20 +59,12 @@ export default async function AuthorPage({
   const author = await getAuthorBySlug(slug);
   if (!author) notFound();
 
-  const posts = await getPostsByAuthor(author.id, { limit: 6 });
-
   return (
     <>
       <Header />
       <main>
         <AuthorHero author={author} />
         <AuthorBio author={author} />
-        <AuthorDetails author={author} />
-        {posts.length > 0 ? (
-          <AuthorPosts posts={posts} authorName={author.name} />
-        ) : (
-          <div aria-hidden className="bg-white" style={{ height: "186px" }} />
-        )}
       </main>
       <Footer cta={<BlogDetailCTA />} />
     </>

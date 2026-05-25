@@ -175,9 +175,9 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
           className="font-display text-white text-center"
           style={{
             fontSize: "var(--text-display-md)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             maxWidth: "clamp(280px, 43vw, 623px)",
             textWrap: "wrap" as const,
           }}

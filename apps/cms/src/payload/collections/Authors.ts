@@ -9,6 +9,7 @@ import {
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
@@ -170,6 +171,7 @@ export const Authors: CollectionConfig = {
     ...seoFieldsForSidebar('authors'),
   ],
   hooks: {
+    beforeChange: [normalizeLexicalHook({ fields: ['bioLong'] })],
     afterChange: [
       slugChangeRedirectHook('authors'),
       searchSyncAfterChangeHook('authors'),

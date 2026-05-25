@@ -160,8 +160,16 @@ export function HowCleanStartHelp() {
             />
           </svg>
 
-          {/* 4-card grid */}
-          <div className="relative grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2" style={{ zIndex: 1 }}>
+          {/* 4-card grid. Gap clamped 16 → 32 px scales with viewport so the
+              2-col layout doesn't waste horizontal space at md (~768 px)
+              while still hitting Figma's 32 px at xl. */}
+          <div
+            className="relative grid grid-cols-1 md:grid-cols-2"
+            style={{
+              zIndex: 1,
+              gap: "clamp(16px, 2.2vw, 32px)",
+            }}
+          >
             <CisoCard
               activeTab={activeTab}
               setActiveTab={setActiveTab}
@@ -199,13 +207,17 @@ function CisoCard({
         padding: "clamp(20px, 3vw, 32px) clamp(24px, 4vw, 52px)",
       }}
     >
-      {/* Tab pill at top-left */}
+      {/* Tab pill at top-left. Height + padding are responsive so the two
+          labels ("For CISOs" / "For Developers") always sit on a single
+          row even on the narrowest md-grid card (~328 px). `max-w-full`
+          guarantees the pill bar can't outgrow the card width. */}
       <div
         role="tablist"
         aria-label="Audience"
         data-cta-utility
-        className="flex h-[42px] w-fit items-center gap-1 rounded-[999px] p-1"
+        className="flex w-fit max-w-full items-center gap-1 rounded-[999px] p-1"
         style={{
+          height: "clamp(34px, 3.6vw, 42px)",
           background:
             "radial-gradient(120% 120% at 0% 0%, rgba(218,182,243,0.25) 0%, rgba(52,34,102,0) 70%), rgba(187,175,255,0.08)",
           border: "1px solid rgba(255,255,255,0.18)",
@@ -303,8 +315,15 @@ function TabPill({
       aria-selected={active}
       data-cta-utility
       onClick={onClick}
-      className="relative h-[34px] cursor-pointer rounded-[999px] px-3 text-lg font-medium text-white transition-all duration-200"
+      // `whitespace-nowrap` keeps each label on one line; clamp scales
+      // height/font/padding from the smallest md card (~328 px) up to the
+      // Figma desktop spec so the two pills always sit on a single row
+      // inside the parent tab bar.
+      className="relative cursor-pointer whitespace-nowrap rounded-[999px] font-medium text-white transition-all duration-200"
       style={{
+        height: "clamp(26px, 3vw, 34px)",
+        padding: "0 clamp(8px, 1.2vw, 12px)",
+        fontSize: "clamp(13px, 1.4vw, 18px)",
         opacity: active ? 1 : 0.7,
         background: active
           ? "linear-gradient(180deg, #2B97D1 0%, #395FF9 100%)"
@@ -320,52 +339,91 @@ function TabPill({
 }
 
 /* ============================================================================
-   Feature Card — gear orb + title + description on a white card surface.
-   White fill, 24 px radius, soft elevation so the card lifts off the grid
-   background; reads as a proper card on every viewport.
+   Feature Card — gear orb + title + description.
+   TRANSPARENT bg: the L-shape SVG behind the grid supplies the unified white
+   surface across all 3 feature cards, so each card sits on the same continuous
+   shape rather than reading as 3 separate white rectangles.
    ========================================================================== */
 function FeatureCardItem({ card }: { card: FeatureCard }) {
   return (
     <article
-      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col items-center text-center gap-3 rounded-[24px] bg-white sm:flex-row sm:text-left sm:items-center sm:gap-6"
+      // Two responsive levers working together:
+      //
+      // 1. `containerType: inline-size` makes every interior `cqi/cqw`
+      //    below resolve against the CARD width (not the viewport). The
+      //    icon shrinks 1:1 with the card so a fixed 224 px gear never
+      //    devours the text column on narrower cards.
+      //
+      // 2. Layout switches from VERTICAL (icon top centered, text below
+      //    full-width) to HORIZONTAL (icon-left, text-right) at `lg`
+      //    instead of `sm`. The md range (768–1023 px) sits in the 2-col
+      //    grid where each card is only ~328–488 px wide — far too tight
+      //    for the icon-left composition. Below lg we get the full card
+      //    width for text, so descriptions wrap to 2–3 lines instead of
+      //    the previous 7–8.
+      //
+      // The L-shape SVG behind these cards uses `preserveAspectRatio="none"`
+      // and a 50 %-of-container cutout, so it auto-aligns with whatever
+      // height the grid stretches all 4 cards to.
+      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col items-center text-center gap-[clamp(16px,2vw,24px)] rounded-[24px] bg-white md:bg-transparent md:rounded-none lg:flex-row lg:text-left lg:items-center lg:gap-[clamp(16px,2vw,24px)]"
       style={{
-        paddingLeft: "clamp(16px, 5vw, 70px)",
-        paddingRight: "clamp(16px, 5vw, 70px)",
+        // Smaller padding cap (50 vs 70) reclaims breathing room for the
+        // icon + text on tight md cards while still feeling spacious at xl.
+        paddingLeft: "clamp(16px, 4cqi, 50px)",
+        paddingRight: "clamp(16px, 4cqi, 50px)",
         paddingTop: "clamp(16px, 3vw, 32px)",
         paddingBottom: "clamp(16px, 3vw, 32px)",
-        boxShadow:
-          "0 1px 0 rgba(0,0,0,0.04), 0 24px 48px -24px rgba(60,30,150,0.08)",
+        containerType: "inline-size",
       }}
     >
-      {/* Gear orb — Figma-exact: solid lavender ellipse #DF9BFF (165×165 at (-3, 1))
-          BLURRED to be a soft glow, with gear image (161×160 at (20, 11)) on top.
-          Outer container 224×180. */}
-      <div className="relative h-[180px] w-[224px] shrink-0">
-        {/* Lavender soft glow (Figma Ellipse 46679 — solid #DF9BFF) */}
+      {/* Gear orb — Figma reference: 224 × 180 wrapper, lavender glow
+          165 × 165 at (-3, 1), gear image 161 × 160 at (20, 11).
+            Wrapper width now scales with the CARD via `cqi`:
+              clamp(96px, 30cqi, 224px)
+              · md card (328 px) → 30cqi ≈ 98 px (clamps to 96 floor)
+              · lg card (456 px) → 30cqi ≈ 137 px
+              · xl card (632 px) → 30cqi ≈ 190 px
+              · 2xl+ card (≥747px) → 224 px (Figma max, capped)
+            All inner positions and sizes are expressed as percentages of
+            the wrapper so glow + gear scale 1:1 as the wrapper shrinks.
+            Wrapper also exposes its own `containerType` so the glow
+            blur radius scales with the icon itself (not the card). */}
+      <div
+        className="relative shrink-0"
+        style={{
+          width: "clamp(96px, 30cqi, 224px)",
+          aspectRatio: "224 / 180",
+          containerType: "inline-size",
+        }}
+      >
+        {/* Lavender soft glow. Percentages keep the (-3, 1) offset, 165 px
+            circle, and 16 px blur scaling with the wrapper. Blur uses cqi
+            (= % of icon wrapper width) so the softness scales linearly. */}
         <div
           aria-hidden
           className="absolute"
           style={{
-            left: "-3px",
-            top: "1px",
-            width: "165px",
-            height: "165px",
+            left: "-1.34%",       // -3 / 224
+            top: "0.56%",          //  1 / 180 (% of height for top)
+            width: "73.66%",       // 165 / 224
+            height: "91.67%",      // 165 / 180
             borderRadius: "50%",
             background:
               "radial-gradient(closest-side, rgba(223, 155, 255, 0.65) 0%, rgba(223, 155, 255, 0.30) 55%, rgba(223, 155, 255, 0) 80%)",
-            filter: "blur(16px)",
+            filter: "blur(7.14cqi)", // 16 / 224 ≈ 7.14 % of icon width
             zIndex: 1,
           }}
         />
-        {/* Gear image — wrap Image in absolute div so positioning doesn't interfere
-            with Next.js Image's own width/height attributes. */}
+        {/* Gear image. Absolute wrapper with %-positioning; Next.js Image
+            fills it via `h-full w-full object-contain` so the gear sharpens
+            and scales without us touching the underlying width/height. */}
         <div
           className="absolute"
           style={{
-            left: "20px",
-            top: "11px",
-            width: "161px",
-            height: "160px",
+            left: "8.93%",         //  20 / 224
+            top: "6.11%",          //  11 / 180
+            width: "71.88%",       // 161 / 224
+            height: "88.89%",      // 160 / 180
             zIndex: 20,
           }}
         >
@@ -374,21 +432,32 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
             alt=""
             width={161}
             height={160}
-            sizes="161px"
+            sizes="(min-width: 1280px) 161px, (min-width: 768px) 18vw, 30vw"
             className="h-full w-full object-contain"
           />
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-6" style={{ minWidth: 0 }}>
+      {/* `min-w-0` is critical — without it, `flex-1` (when horizontal at
+          lg+) can't actually shrink the text column below its content's
+          intrinsic width, and long words ("Streamlined", "Protection")
+          would overflow the card. Gap is responsive so md vertical mode
+          gets a tighter rhythm than the lg horizontal layout. */}
+      <div className="flex min-w-0 flex-1 flex-col gap-[clamp(12px,1.5vw,24px)]">
         <h3
           className="font-display text-[#111111]"
           style={{
+            // 22 px floor matches the Figma title baseline. The horizontal-
+            // layout text-column squeeze is gone (vertical at md gives full
+            // card width), so we can keep the larger floor without risk.
             fontSize: "clamp(22px, 2.4vw, 32px)",
             fontWeight: 700,
             lineHeight: 1.1,
             letterSpacing: "-0.04em",
-            maxWidth: "234px",
+            // Removed the rigid 234 px maxWidth — flex layout already caps
+            // the column at the available text area. `overflowWrap` is a
+            // safety net for compound words at the smallest breakpoint.
+            overflowWrap: "break-word",
           }}
         >
           {card.title}
@@ -401,7 +470,7 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
             fontWeight: 400,
             lineHeight: 1.4,
             letterSpacing: "-0.02em",
-            maxWidth: "263px",
+            overflowWrap: "break-word",
           }}
         >
           {card.description}

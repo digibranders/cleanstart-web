@@ -202,7 +202,7 @@ export function CisoEnterprise(): React.ReactElement {
     <section
       data-section="CisoEnterprise"
       className="relative overflow-hidden bg-white"
-      style={{ paddingTop: "120px", paddingBottom: "200px" }}
+      style={{ paddingTop: "120px", paddingBottom: "var(--spacing-section-cta)" }}
     >
       {/* ── Corner Union — top-right ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
