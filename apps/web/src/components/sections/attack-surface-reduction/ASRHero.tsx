@@ -1,5 +1,5 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
 /**
  * ASR Hero — Figma node 783:91
@@ -27,22 +27,37 @@ export function ASRHero(): React.ReactElement {
       style={{
         // Figma gradient (verbatim): 179.99deg navy → blue → purple → fade-out.
         background:
-          "linear-gradient(179.99deg, #151021 -25.7%, #10123E 31.16%, #131E8F 51.01%, #471EC0 68.71%, #471FC3 79.83%, rgba(70, 30, 191, 0.85) 85.02%, rgba(66, 30, 188, 0.4) 93.72%, rgba(66, 30, 188, 0) 98.92%)",
-        minHeight: "clamp(560px, 51vw, 824px)",
+          'linear-gradient(179.99deg, #151021 -25.7%, #10123E 31.16%, #131E8F 51.01%, #471EC0 68.71%, #471FC3 79.83%, rgba(70, 30, 191, 0.85) 85.02%, rgba(66, 30, 188, 0.4) 93.72%, rgba(66, 30, 188, 0) 98.92%)',
+        minHeight: 'clamp(560px, 51vw, 824px)',
       }}
     >
-      {/* Figma-exact hero grid + blurred-ellipse glows (Figma node 783:119).
-          Single SVG asset: 1440×569, contains grid mask + top-right purple
-          ellipse + bottom-left larger ellipse + 3 accent lines. Fills the
-          section width responsively (preserveAspectRatio xMidYMid slice). */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      {/* Background grid overlay — Figma uses 71.11 px squares with #130F26
+          lines. We use 80 px on the 1px-line variable so it tiles cleanly with
+          the rest of the site's hero grid utility (.bg-cs-grid is similar). */}
+      <div
         aria-hidden
-        src="/images/attack-surface-reduction/hero-grid.svg"
-        alt=""
-        className="pointer-events-none select-none absolute inset-0 w-full h-full object-cover"
-        loading="eager"
-        decoding="async"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(19, 15, 38, 0.55) 1px, transparent 1px), linear-gradient(90deg, rgba(19, 15, 38, 0.55) 1px, transparent 1px)',
+          backgroundSize: '80px 80px',
+        }}
+      />
+
+      {/* Purple radial blob — Figma Ellipse 46639 (top-right, soft, blurred) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden md:block"
+        style={{
+          right: '-2vw',
+          top: '-80px',
+          width: 'min(360px, 26vw)',
+          height: 'min(360px, 26vw)',
+          borderRadius: '50%',
+          background:
+            'radial-gradient(closest-side, rgba(122, 89, 255, 0.55) 0%, rgba(122, 89, 255, 0) 70%)',
+          filter: 'blur(60px)',
+        }}
       />
 
       {/* Bottom purple-to-transparent fade so the hero glides into the next
@@ -51,10 +66,9 @@ export function ASRHero(): React.ReactElement {
         aria-hidden
         className="pointer-events-none select-none absolute bottom-0 left-0 right-0"
         style={{
-          height: "180px",
-          background:
-            "linear-gradient(180deg, rgba(71,30,192,0) 0%, rgba(120,60,255,0.35) 100%)",
-          mixBlendMode: "screen",
+          height: '180px',
+          background: 'linear-gradient(180deg, rgba(71,30,192,0) 0%, rgba(120,60,255,0.35) 100%)',
+          mixBlendMode: 'screen',
         }}
       />
 
@@ -62,21 +76,24 @@ export function ASRHero(): React.ReactElement {
         <div
           className="flex flex-col lg:flex-row items-start lg:items-center"
           style={{
-            paddingTop: "clamp(96px, 11vw, 160px)",
-            paddingBottom: "clamp(56px, 7vw, 100px)",
-            gap: "40px",
+            paddingTop: 'clamp(120px, 13vw, 229px)',
+            paddingBottom: 'clamp(56px, 7vw, 100px)',
+            gap: '40px',
           }}
         >
           {/* Left: copy — heading + body + CTA */}
-          <div className="flex-1" style={{ maxWidth: "545px" }}>
+          <div
+            className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left"
+            style={{ maxWidth: '545px' }}
+          >
             <h1
               style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(40px, 4.45vw, 64px)",
-                fontWeight: 700,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.05,
-                color: "white",
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--text-hero-product)',
+                fontWeight: 600,
+                letterSpacing: 'var(--text-hero-product-ls, -0.04em)',
+                lineHeight: 'var(--text-hero-lh, 1.05)',
+                color: 'white',
               }}
             >
               <span className="block">Bigger Images,</span>
@@ -85,17 +102,18 @@ export function ASRHero(): React.ReactElement {
 
             <p
               style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "clamp(18px, 1.7vw, 24px)",
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-t-subhead)',
                 fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                color: "rgba(255, 255, 255, 0.8)",
-                marginTop: "24px",
+                letterSpacing: 'var(--text-t-subhead-ls)',
+                lineHeight: 'var(--text-t-subhead-lh)',
+                color: 'rgba(255, 255, 255, 0.8)',
+                marginTop: '20px',
+                maxWidth: '480px',
               }}
             >
-              CleanStart Images reduce attack surface by eliminating
-              unnecessary components before they enter production.
+              CleanStart Images reduce attack surface by eliminating unnecessary components before
+              they enter production.
             </p>
 
             {/* CTA — shared .cs-btn-glass utility (matches every other hero) */}
@@ -104,9 +122,9 @@ export function ASRHero(): React.ReactElement {
               className="cs-btn-glass"
               style={
                 {
-                  marginTop: "40px",
-                  "--cs-btn-px": "18px",
-                  "--cs-btn-fs": "18px",
+                  marginTop: 'clamp(24px, 3vw, 40px)',
+                  '--cs-btn-px': '18px',
+                  '--cs-btn-fs': '18px',
                 } as React.CSSProperties
               }
             >
@@ -130,101 +148,28 @@ export function ASRHero(): React.ReactElement {
             </Link>
           </div>
 
-          {/* Right: two separate BLOATED + CLEAN cards side by side.
-              Figma exports each card as its own asset so colours, glows
-              and badge overlays render at full fidelity. */}
-          {/* Cards-wrapper.
-              Width clamps with explicit floor + ceiling so the wrapper has a
-              predictable, proportional size at every desktop viewport from
-              1024 → 1440+. Internal layout (60/40 split, column-gap, bottom
-              alignment) is all relative to the wrapper width — nothing
-              hard-coded — so the cards' position and proportions are
-              perfectly preserved at every breakpoint in the desktop band. */}
-          <div
-            className="hidden lg:grid relative shrink-0"
-            style={{
-              width: "clamp(340px, 32vw, 460px)",
-              /* Math: natural aspects H/W are 1.337 (BLOATED 662×885) and
-                 1.203 (CLEAN 602×724). For CLEAN_h = 0.85 × BLOATED_h:
-                 CLEAN_w = BLOATED_w × (1.337 × 0.85) / 1.203 ≈ 0.944 × BLOATED_w.
-                 With a 4% gap: BLOATED 49.4% + CLEAN 46.6% + gap 4% = 100%. */
-              gridTemplateColumns: "49.4% 46.6%",
-              alignItems: "end",
-              columnGap: "4%",
-            }}
-          >
-            {/* Decorative glow — Figma asset, locked at intrinsic 246×328
-                regardless of viewport. Anchored so the glow's centre sits
-                exactly at the top-right corner of the cards-wrapper (half
-                above, half outside-right). */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              aria-hidden
-              src="/images/attack-surface-reduction/Final/hero-glow.png"
-              alt=""
-              className="absolute pointer-events-none select-none"
-              style={{
-                top: 0,
-                right: 0,
-                width: "246px",
-                height: "328px",
-                transform: "translate(50%, -50%)",
-                zIndex: 0,
-              }}
-              loading="eager"
-              decoding="async"
-            />
-            {/* BLOATED card — larger, sits at row baseline. */}
+          {/* Right: bloated-vs-clean comparison cards (combined Figma export) */}
+          <div className="hidden lg:block relative shrink-0" style={{ width: 'min(622px, 48vw)' }}>
             <Image
-              src="/images/attack-surface-reduction/hero-card-bloated.png"
-              alt="BLOATED image: 1.2 GB · 247 packages · 89 HIGH CVEs"
-              width={662}
-              height={885}
-              sizes="(min-width: 1440px) 270px, 19vw"
-              className="block w-full h-auto relative"
-              style={{ alignSelf: "end", zIndex: 1 }}
-              priority
-            />
-            {/* CLEAN card — smaller (≈85% of BLOATED), bottom edge aligns
-                with BLOATED via explicit alignSelf: end. */}
-            <Image
-              src="/images/attack-surface-reduction/hero-card-clean.png"
-              alt="CLEAN image: 87 MB · 12 packages · 0 HIGH CVEs"
-              width={602}
-              height={724}
-              sizes="(min-width: 1440px) 180px, 13vw"
-              className="block w-full h-auto relative"
-              style={{ alignSelf: "end", zIndex: 1 }}
+              src="/images/attack-surface-reduction/hero-cards.png"
+              alt="BLOATED vs CLEAN image comparison: 1.2 GB / 247 packages / 89 HIGH CVEs vs 87 MB / 12 packages / 0 HIGH CVEs"
+              width={622}
+              height={437}
+              sizes="(min-width: 1280px) 622px, 50vw"
+              className="w-full h-auto"
               priority
             />
           </div>
 
-          {/* Mobile-only: same 49.4/46.6 grid so CLEAN renders at 85% of
-              BLOATED's height (matches desktop layout exactly). */}
-          <div
-            className="grid lg:hidden relative w-full"
-            style={{
-              gridTemplateColumns: "49.4% 46.6%",
-              alignItems: "end",
-              columnGap: "4%",
-            }}
-          >
+          {/* Mobile-only: smaller card image */}
+          <div className="block lg:hidden relative w-full">
             <Image
-              src="/images/attack-surface-reduction/hero-card-bloated.png"
-              alt="BLOATED image: 1.2 GB · 247 packages · 89 HIGH CVEs"
-              width={662}
-              height={885}
-              sizes="51vw"
-              className="block w-full h-auto"
-              priority
-            />
-            <Image
-              src="/images/attack-surface-reduction/hero-card-clean.png"
-              alt="CLEAN image: 87 MB · 12 packages · 0 HIGH CVEs"
-              width={602}
-              height={724}
-              sizes="45vw"
-              className="block w-full h-auto"
+              src="/images/attack-surface-reduction/hero-mobile-cards.png"
+              alt="BLOATED vs CLEAN image comparison"
+              width={622}
+              height={437}
+              sizes="100vw"
+              className="w-full h-auto"
               priority
             />
           </div>
