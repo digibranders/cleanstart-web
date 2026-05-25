@@ -69,17 +69,18 @@ function useCounter(target: number, duration = 1800, enabled = false): number {
 interface StatDef {
   // If target is a number, animate counter; if null use display string as-is
   target: number | null;
-  display: string;      // full display string (used when target is null)
-  suffix: string;       // appended after animated count
-  label: string;
-  tall: boolean;        // true=326px height; false=258px height
+  display: string;   // full display string (used when target is null)
+  suffix: string;    // appended after animated count
+  line1: string;     // first label line (desktop card forces exactly 2 lines)
+  line2: string;     // second label line
+  tall: boolean;     // true=326px height; false=258px height
 }
 
 const STATS: StatDef[] = [
-  { target: 89,   display: "89%",  suffix: "%",  label: "Fewer inherited vulnerabilities", tall: true  },
-  { target: 70,   display: "70%+", suffix: "%+", label: "Smaller software inventories",    tall: false },
-  { target: null, display: "2–3x", suffix: "",   label: "Faster remediation cycles",       tall: true  },
-  { target: 40,   display: "40%",  suffix: "%",  label: "Lower remediation workload",      tall: false },
+  { target: 89,   display: "89%",  suffix: "%",  line1: "Fewer inherited",    line2: "vulnerabilities",  tall: true  },
+  { target: 70,   display: "70%+", suffix: "%+", line1: "Smaller software",   line2: "inventories",      tall: false },
+  { target: null, display: "2–3x", suffix: "",   line1: "Faster remediation", line2: "cycles",           tall: true  },
+  { target: 40,   display: "40%",  suffix: "%",  line1: "Lower remediation",  line2: "workload",         tall: false },
 ];
 
 // ─── Single stat card ─────────────────────────────────────────────────────────
@@ -115,37 +116,41 @@ function StatCard({
           top: "106px",
           transform: "translateY(-100%)",
           fontFamily: "var(--font-display)",
-          fontSize: "var(--text-t-display-2)",
+          fontSize: "clamp(40px, 3.23vw, 62px)",
           fontWeight: 700,
-          letterSpacing: "var(--text-t-display-2-ls)",
-          lineHeight: "var(--text-t-display-2-lh)",
+          letterSpacing: "-0.04em",
+          lineHeight: 1.2,
           color: "#111",
         }}
       >
         {displayValue}
       </div>
 
-      {/* ── Description label ──
-          Tall cards: top=232px | Short cards: top=164px */}
+      {/* ── Description label — exactly 2 lines per Figma ──
+          Figma: tall top=232px, short top=164px.
+          Nudged –10px for browser line-height safety (104px vs 94px).
+          2 lines × 22px × lh1.4 = 61.6px — well within 104px available. */}
       <div
         className="absolute"
         style={{
           left: "32px",
-          top: stat.tall ? "232px" : "164px",
+          top: stat.tall ? "222px" : "154px",
           width: "231px",
         }}
       >
         <p
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(20px, 2vw, 28px)",
-            fontWeight: 500,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.3,
+            fontSize: "clamp(13px, 1.15vw, 22px)",
+            fontWeight: 400,
+            letterSpacing: "-0.05em",
+            lineHeight: 1.4,
             color: "#333",
           }}
         >
-          {stat.label}
+          {stat.line1}
+          <br />
+          {stat.line2}
         </p>
       </div>
     </div>
@@ -395,10 +400,10 @@ export function CisoOutcomes(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "var(--text-t-display-2)",
+                  fontSize: "clamp(32px, 8vw, 52px)",
                   fontWeight: 700,
-                  letterSpacing: "var(--text-t-display-2-ls)",
-                  lineHeight: "var(--text-t-display-2-lh)",
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.1,
                   color: "#111",
                 }}
               >
@@ -407,14 +412,14 @@ export function CisoOutcomes(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "clamp(20px, 2vw, 28px)",
-                  fontWeight: 500,
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.3,
+                  fontSize: "clamp(12px, 3vw, 16px)",
+                  fontWeight: 400,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.4,
                   color: "#333",
                 }}
               >
-                {stat.label}
+                {stat.line1} {stat.line2}
               </p>
             </div>
           ))}
