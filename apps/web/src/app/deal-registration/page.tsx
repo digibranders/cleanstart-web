@@ -28,9 +28,9 @@ export default function DealRegistrationPage() {
           <h1
             className="font-display font-semibold text-white text-center mx-auto"
             style={{
-              fontSize: "var(--text-hero-utility)",
-              lineHeight: 1.15,
-              letterSpacing: "var(--text-hero-utility-ls)",
+              fontSize: "clamp(40px, 4.45vw, 64px)",
+              lineHeight: 1.05,
+              letterSpacing: "-0.04em",
               maxWidth: "860px",
             }}
           >
