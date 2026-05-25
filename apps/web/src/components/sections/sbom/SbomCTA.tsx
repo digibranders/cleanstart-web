@@ -168,62 +168,99 @@ export function SbomCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Mobile fallback ── */}
-      <div className="md:hidden relative h-full px-6 py-10 flex flex-col gap-5 justify-center">
-        <p
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "clamp(26px, 3.1vw, 44px)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            color: "#fff",
-            maxWidth: "280px",
-          }}
-        >
-          Verify Every Component You Ship
-        </p>
-        <p
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--text-t-body-md)",
-            fontWeight: 400,
-            letterSpacing: "var(--text-t-body-md-ls)",
-            lineHeight: "var(--text-t-body-md-lh)",
-            color: "rgba(255,255,255,0.80)",
-          }}
-        >
-          Continuously updated, cryptographically verifiable software
-          inventories built for modern software supply chains.
-        </p>
-        <Link
-          href="/contact-us"
-          className="cs-btn-glass self-start"
-          style={
-            {
-              "--cs-btn-px": "22px",
-              "--cs-btn-fs": "16px",
-            } as React.CSSProperties
-          }
-        >
-          Download the SBOM Datasheet
-          <svg
-            className="cs-cta-arrow"
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            aria-hidden
+      {/* ── Mobile fallback (Figma 817:1281 at y=4372) ──
+           Gradient card 328×308, rounded-24, Union decoration, centered text.
+           NB: This div sits inside the 330px footer CTA slot (absolute inset-0),
+           so on mobile we match the Figma CTA card dimensions. */}
+      <div className="md:hidden absolute inset-0 overflow-hidden" style={{ borderRadius: "inherit" }}>
+        {/* Ellipse top-left glow — Figma Ellipse46682 left=-159 top=-154 w=223 */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/sbom/mobile-cta-ellipse.svg"
+          alt=""
+          aria-hidden
+          className="absolute pointer-events-none select-none"
+          style={{ left: "-159px", top: "-154px", width: "223px", height: "223px" }}
+          loading="lazy"
+        />
+
+        {/* Union decoration — Figma left=56 top=52 w=378 */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/sbom/mobile-cta-union.svg"
+          alt=""
+          aria-hidden
+          className="absolute pointer-events-none select-none"
+          style={{ left: "56px", top: "52px", width: "378px", height: "378px", opacity: 0.15 }}
+          loading="lazy"
+        />
+
+        {/* Content — centered */}
+        <div className="relative h-full flex flex-col items-center text-center">
+          {/* Heading at top=32 */}
+          <p
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "28px",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.2,
+              color: "#fff",
+              width: "276px",
+              marginTop: "32px",
+            }}
           >
-            <path
-              d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </Link>
+            Verify Every Component You Ship
+          </p>
+
+          {/* Body at top=116 → 116-32(heading)-padding ≈ 52px margin-top from heading bottom */}
+          <p
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "16px",
+              fontWeight: 400,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.5,
+              color: "rgba(255,255,255,0.80)",
+              width: "265px",
+              marginTop: "20px",
+            }}
+          >
+            Continuously updated, cryptographically verifiable software
+            inventories built for modern software supply chains.
+          </p>
+
+          {/* Button */}
+          <Link
+            href="/contact-us"
+            className="cs-btn-glass"
+            style={
+              {
+                "--cs-btn-px": "24px",
+                "--cs-btn-fs": "16px",
+                marginTop: "24px",
+              } as React.CSSProperties
+            }
+          >
+            Download the SBOM Datasheet
+            <svg
+              className="cs-cta-arrow"
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+              aria-hidden
+            >
+              <path
+                d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
+        </div>
       </div>
     </div>
   );

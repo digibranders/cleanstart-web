@@ -160,53 +160,102 @@ export function SbomSelfUpdating(): React.ReactElement {
       <FeatureLabel x={431}  y={716} title="Track"    body="Monitor dependencies and component changes over time." />
       <FeatureLabel x={1234} y={728} title="Validate" body="Continuously assess inventory accuracy and integrity." />
 
-      {/* ═════════════ MOBILE (< lg) ═════════════ */}
-      <div className="lg:hidden mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md flex flex-col items-center text-center gap-8">
+      {/* ═════════════ MOBILE (< lg) ═════════════
+           Figma mobile node 817:1281 — dark gradient 360×812px section.
+           4 stacked action cards (130×328px each) with light card backgrounds. */}
+      <div
+        className="lg:hidden flex flex-col items-center"
+        style={{ paddingTop: "32px", paddingBottom: "32px" }}
+      >
+        {/* Heading */}
         <h2
-          className="text-white"
+          className="text-white text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "28px",
             fontWeight: 700,
             letterSpacing: "-0.04em",
-            lineHeight: 1.1,
+            lineHeight: 1.2,
+            width: "257px",
+            marginBottom: "0",
           }}
         >
           Generate. Verify. Validate.
         </h2>
+
+        {/* Subhead */}
         <p
+          className="text-center"
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(18px, 1.7vw, 24px)",
+            fontSize: "16px",
             fontWeight: 400,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.4,
-            color: "rgba(255,255,255,0.85)",
-            maxWidth: "600px",
+            letterSpacing: "-0.04em",
+            lineHeight: 1.5,
+            color: "rgba(255,255,255,0.80)",
+            width: "319px",
+            marginTop: "56px",
+            marginBottom: "40px",
           }}
         >
           Automated SBOM generation with cryptographic signing and continuous
           validation across build and runtime environments.
         </p>
-        <Image
-          src="/images/sbom/platforms-3d.png"
-          alt="Generate, Verify, Track, Validate — four-step SBOM lifecycle"
-          width={872}
-          height={468}
-          sizes="(min-width: 768px) 672px, 100vw"
-          className="w-full max-w-2xl h-auto object-contain"
-          loading="lazy"
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl text-left">
+
+        {/* 4 stacked action cards */}
+        <div className="flex flex-col items-center" style={{ gap: "16px", width: "100%", paddingLeft: "16px", paddingRight: "16px" }}>
           {MOBILE_FEATURES.map((f) => (
-            <div key={f.num} className="flex flex-col items-start gap-3">
-              <MobileCircle num={f.num} />
-              <p className="text-card-title-md text-white" style={{ fontFamily: "var(--font-display)" }}>
-                {f.title}
-              </p>
-              <p className="text-body-md" style={{ fontFamily: "var(--font-display)", color: "rgba(255,255,255,0.75)" }}>
-                {f.body}
-              </p>
+            <div
+              key={f.num}
+              className="relative overflow-hidden"
+              style={{
+                width: "100%",
+                maxWidth: "328px",
+                height: "130px",
+                borderRadius: "24px",
+              }}
+            >
+              {/* Card background SVG */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/sbom/mobile-action-card-bg.svg"
+                alt=""
+                aria-hidden
+                className="absolute inset-0 w-full h-full pointer-events-none"
+                loading="lazy"
+              />
+              {/* Content */}
+              <div
+                className="absolute inset-0 flex flex-col items-center justify-center text-center"
+                style={{ gap: "12px" }}
+              >
+                <p
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "24px",
+                    fontWeight: 600,
+                    letterSpacing: "-0.05em",
+                    lineHeight: 1,
+                    color: "#000",
+                  }}
+                >
+                  {f.title}
+                </p>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "14px",
+                    fontWeight: 400,
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1.1,
+                    color: "#111",
+                    opacity: 0.8,
+                    maxWidth: "199px",
+                  }}
+                >
+                  {f.body}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -334,34 +383,3 @@ function FeatureLabel({ x, y, title, body, bodyWidth }: FeatureLabelProps): Reac
   );
 }
 
-function MobileCircle({ num }: { num: number }): React.ReactElement {
-  return (
-    <div
-      style={{
-        width: 48,
-        height: 48,
-        borderRadius: "50%",
-        background: "linear-gradient(135deg, rgba(154,81,255,0.25) 0%, rgba(44,193,235,0.25) 100%)",
-        border: "1px solid rgba(154,81,255,0.4)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <span
-        style={{
-          fontFamily: "var(--font-display)",
-          // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored badge inside numbered circle, fixed 18px. See RESPONSIVE-AUDIT.md §14.3.
-          fontSize: "18px",
-          fontWeight: 700,
-          background: "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-        }}
-      >
-        {num}
-      </span>
-    </div>
-  );
-}

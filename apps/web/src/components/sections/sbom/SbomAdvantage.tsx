@@ -3,20 +3,9 @@ import Image from "next/image";
 /**
  * Figma frame 516:5494 — 1920 × 889 "Built for Modern Software Supply Chains"
  *
- * Light-gray (#f7f7f7) backdrop. Centred heading, then a two-column layout:
- *   • Left  — infinity-loop circuit photo, 512 × 384, blue 1.5px border, r=20
- *   • Right — 2 × 2 card grid (each 354 × 180). The inner corner of every card
- *             is rounded 62px so the cut faces a central infinity-icon ball
- *             that sits at the grid's geometric centre.
- *
- * Card copy:
- *   CI/CD Pipelines           — "Integrate into existing workflows."
- *   Container Environments    — "Track software inventories across images."
- *   Compliance Programs       — "Support modern regulatory requirements."
- *   Enterprise Security Teams — "Improve software supply chain visibility."
- *
- * Responsive: 2-column on lg, image-then-stacked-cards on smaller screens.
- * Uses py-section-md vertical padding token and standard max-w-[var(--container-default)] rail.
+ * Desktop: Light-gray (#f7f7f7) backdrop, infinity-loop circuit image + 2×2 card grid.
+ * Mobile (Figma 817:1281 at y=3466): "Built for Modern Software Supply Chains" heading,
+ * infinity circuit image, then 4 orbital/connection items with card backgrounds.
  */
 
 const CARDS = [
@@ -24,25 +13,29 @@ const CARDS = [
     id: "cicd",
     title: "CI/CD Pipelines",
     body: "Integrate into existing workflows.",
-    cornerRadius: "8px 8px 62px 8px", // br rounded → points down-right toward centre
+    cornerRadius: "8px 8px 62px 8px",
+    mobileBg: "a", // mobile-builtfor-card-a.svg (plain border card, 122px)
   },
   {
     id: "container",
     title: "Container Environments",
     body: "Track software inventories across images.",
-    cornerRadius: "8px 8px 8px 62px", // bl rounded → down-left toward centre
+    cornerRadius: "8px 8px 8px 62px",
+    mobileBg: "c", // mobile-builtfor-card-c.svg (flipped curve, 145px)
   },
   {
     id: "compliance",
     title: "Compliance Programs",
     body: "Support modern regulatory requirements.",
-    cornerRadius: "8px 62px 8px 8px", // tr rounded → up-right toward centre
+    cornerRadius: "8px 62px 8px 8px",
+    mobileBg: "b", // mobile-builtfor-card-b.svg (curve, 145px)
   },
   {
     id: "security",
     title: "Enterprise Security Teams",
     body: "Improve software supply chain visibility.",
-    cornerRadius: "62px 8px 8px 8px", // tl rounded → up-left toward centre
+    cornerRadius: "62px 8px 8px 8px",
+    mobileBg: "a", // mobile-builtfor-card-a.svg (plain border card, 122px)
   },
 ] as const;
 
@@ -51,6 +44,7 @@ export function SbomAdvantage(): React.ReactElement {
     <section
       data-section="SbomAdvantage"
       className="relative overflow-hidden bg-[#f7f7f7] w-full"
+      style={{ minHeight: "calc(250px + 42vw)" }}
     >
       {/* Decorative cyan halo bottom-right */}
       <div
@@ -67,16 +61,19 @@ export function SbomAdvantage(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md" style={{ paddingBottom: "250px" }}>
+      <div
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
+        style={{ paddingTop: "clamp(56px, 6vw, 100px)", paddingBottom: "250px" }}
+      >
         {/* Heading */}
         <div className="text-center mb-10 md:mb-14">
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "clamp(28px, 4vw, 56px)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
-              lineHeight: 1.1,
+              lineHeight: 1.2,
               color: "#111",
             }}
           >
@@ -85,8 +82,8 @@ export function SbomAdvantage(): React.ReactElement {
           </h2>
         </div>
 
-        {/* Image + 2×2 cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-[512fr_708fr] gap-6 lg:gap-8 items-stretch">
+        {/* ── DESKTOP image + 2×2 cards ── */}
+        <div className="hidden lg:grid grid-cols-[512fr_708fr] gap-8 items-stretch">
           {/* Left: infinity circuit image */}
           <div
             className="relative overflow-hidden w-full"
@@ -108,7 +105,7 @@ export function SbomAdvantage(): React.ReactElement {
           </div>
 
           {/* Right: 2×2 grid with central infinity ball icon */}
-          <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+          <div className="relative grid grid-cols-2 gap-6">
             {CARDS.map((card) => (
               <article
                 key={card.id}
@@ -150,7 +147,7 @@ export function SbomAdvantage(): React.ReactElement {
               </article>
             ))}
 
-            {/* Central infinity ball — hidden below sm to avoid overlap */}
+            {/* Central infinity ball */}
             <div
               aria-hidden
               className="hidden sm:flex absolute items-center justify-center"
@@ -178,7 +175,227 @@ export function SbomAdvantage(): React.ReactElement {
             </div>
           </div>
         </div>
+
+        {/* ── TABLET stacked (sm to lg) ── */}
+        <div className="hidden sm:grid lg:hidden grid-cols-[1fr_1fr] gap-6 items-start">
+          {/* Infinity circuit image */}
+          <div
+            className="relative overflow-hidden w-full col-span-2"
+            style={{
+              borderRadius: "20px",
+              border: "1.5px solid #076eff",
+              aspectRatio: "512/384",
+            }}
+          >
+            <Image
+              src="/images/sbom/infinity-circuit.png"
+              alt="CleanStart SBOM continuous delivery loop"
+              fill
+              sizes="100vw"
+              className="object-cover"
+              loading="lazy"
+            />
+          </div>
+          {CARDS.map((card) => (
+            <article
+              key={card.id}
+              className="bg-white"
+              style={{
+                borderRadius: "16px",
+                border: "1.5px solid rgba(0,0,0,0.06)",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+              }}
+            >
+              <p
+                className="text-[#111]"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "18px",
+                  fontWeight: 600,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.1,
+                }}
+              >
+                {card.title}
+              </p>
+              <p
+                className="text-[#333]"
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "15px",
+                  fontWeight: 400,
+                  lineHeight: 1.4,
+                }}
+              >
+                {card.body}
+              </p>
+            </article>
+          ))}
+        </div>
+
+        {/* ── MOBILE (< sm) — Figma pixel-perfect 360px design ── */}
+        <div className="sm:hidden flex flex-col items-center" style={{ gap: "0" }}>
+          {/* Infinity circuit image — 328×183 with cyan gradient + border */}
+          <div
+            className="relative overflow-hidden"
+            style={{
+              width: "328px",
+              height: "183px",
+              borderRadius: "24px",
+              border: "0.961px solid #076eff",
+              background:
+                "linear-gradient(90deg, rgba(44,193,235,0.4) 0%, rgba(44,193,235,0.4) 100%)",
+              marginBottom: "16px",
+              flexShrink: 0,
+            }}
+          >
+            {/* Ellipse decoration */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/sbom/mobile-builtfor-ellipse.svg"
+              alt=""
+              aria-hidden
+              className="absolute pointer-events-none"
+              style={{
+                left: "-78px",
+                top: "-72px",
+                width: "263px",
+                height: "256px",
+              }}
+              loading="lazy"
+            />
+            {/* Circuit image */}
+            <Image
+              src="/images/sbom/infinity-circuit.png"
+              alt="CleanStart SBOM built for modern supply chains"
+              fill
+              sizes="328px"
+              className="object-cover"
+              loading="lazy"
+            />
+          </div>
+
+          {/* 4 built-for item cards with relative positioning for central ball */}
+          <div className="relative flex flex-col items-center" style={{ width: "328px", gap: "16px" }}>
+
+            {/* CI/CD Pipelines — plain border card, 122px */}
+            <MobileBuiltForCard
+              title="CI/CD Pipelines"
+              body="Integrate into existing workflows."
+              bgSvg="/images/sbom/mobile-builtfor-card-a.svg"
+              height={122}
+            />
+
+            {/* Compliance Programs — curved card, 145px */}
+            <MobileBuiltForCard
+              title="Compliance Programs"
+              body="Support modern regulatory requirements."
+              bgSvg="/images/sbom/mobile-builtfor-card-b.svg"
+              height={145}
+            />
+
+            {/* Central ball between compliance and container */}
+            <div
+              aria-hidden
+              className="relative flex items-center justify-center overflow-hidden self-center shrink-0"
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "50%",
+                background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
+                boxShadow: "0px 3.6px 8.48px 0px rgba(28,60,142,0.33)",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/sbom/mobile-builtfor-ball-icon.svg"
+                alt=""
+                aria-hidden
+                style={{ width: "27px", height: "31px" }}
+                loading="lazy"
+              />
+            </div>
+
+            {/* Container Environments — flipped curve, 145px */}
+            <MobileBuiltForCard
+              title="Container Environments"
+              body="Track software inventories across images."
+              bgSvg="/images/sbom/mobile-builtfor-card-c.svg"
+              height={145}
+            />
+
+            {/* Enterprise Security Teams — plain border card, 122px */}
+            <MobileBuiltForCard
+              title="Enterprise Security Teams"
+              body="Improve software supply chain visibility."
+              bgSvg="/images/sbom/mobile-builtfor-card-a.svg"
+              height={122}
+            />
+          </div>
+        </div>
       </div>
     </section>
+  );
+}
+
+/* ── Mobile built-for item card ─────────────────────────────────────── */
+function MobileBuiltForCard({
+  title,
+  body,
+  bgSvg,
+  height,
+}: {
+  title: string;
+  body: string;
+  bgSvg: string;
+  height: number;
+}): React.ReactElement {
+  return (
+    <div
+      className="relative flex flex-col items-center justify-center text-center"
+      style={{ width: "328px", height: `${height}px` }}
+    >
+      {/* Background SVG */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={bgSvg}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        loading="lazy"
+      />
+      {/* Content */}
+      <div className="relative flex flex-col items-center gap-[12px] text-center">
+        <p
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "20px",
+            fontWeight: 600,
+            letterSpacing: "-0.05em",
+            lineHeight: 1,
+            color: "#000",
+          }}
+        >
+          {title}
+        </p>
+        <p
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "14px",
+            fontWeight: 400,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.5,
+            color: "#111",
+            opacity: 0.8,
+            maxWidth: "205px",
+          }}
+        >
+          {body}
+        </p>
+      </div>
+    </div>
   );
 }

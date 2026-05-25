@@ -3,16 +3,16 @@ import Image from "next/image";
 /**
  * Figma frame 161:21113 — 1920 × 1088 "When SBOMs Fall Short, Risk Grows"
  *
- * White background section with a 2×2 grid of risk cards.
- * Each card has a 3D icon, a bold title, and a description.
- * A subtle dividing line separates the left and right columns,
- * and a horizontal line separates the top and bottom rows.
+ * Desktop: White background section with a 2×2 grid of risk cards.
+ * Mobile (Figma 817:1281): Stacked cards with circular glow icons and dark
+ * card backgrounds from the 360px mobile design.
  */
 
 const RISKS = [
   {
     id: "incomplete",
     icon: "/images/sbom/risk-icon-incomplete.png",
+    mobileIcon: "/images/sbom/mobile-risk-1.png",
     iconAlt: "Incomplete Visibility icon",
     title: "Incomplete Visibility",
     body: "Missing packages and dependencies hide risk.",
@@ -20,6 +20,7 @@ const RISKS = [
   {
     id: "traceability",
     icon: "/images/sbom/risk-icon-traceability.png",
+    mobileIcon: "/images/sbom/mobile-risk-2.png",
     iconAlt: "Broken Traceability icon",
     title: "Broken Traceability",
     body: "Disconnected inventories weaken provenance tracking.",
@@ -27,6 +28,7 @@ const RISKS = [
   {
     id: "stale",
     icon: "/images/sbom/risk-icon-stale.png",
+    mobileIcon: "/images/sbom/mobile-risk-3.png",
     iconAlt: "Stale Data icon",
     title: "Stale Data",
     body: "Static SBOMs quickly become outdated.",
@@ -34,6 +36,7 @@ const RISKS = [
   {
     id: "compliance",
     icon: "/images/sbom/risk-icon-compliance.png",
+    mobileIcon: "/images/sbom/mobile-risk-4.png",
     iconAlt: "Compliance Exposure icon",
     title: "Compliance Exposure",
     body: "Incomplete inventories increase audit complexity.",
@@ -83,10 +86,10 @@ export function SbomRisks(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "clamp(28px, 4vw, 56px)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
-              lineHeight: 1.1,
+              lineHeight: 1.2,
               color: "#111",
             }}
           >
@@ -95,9 +98,9 @@ export function SbomRisks(): React.ReactElement {
           </h2>
         </div>
 
-        {/* 2×2 grid */}
+        {/* ── DESKTOP 2×2 grid (md+) ── */}
         <div
-          className="grid grid-cols-1 md:grid-cols-2"
+          className="hidden md:grid md:grid-cols-2"
           style={{ gap: "0" }}
         >
           {RISKS.map((risk, i) => {
@@ -128,10 +131,10 @@ export function SbomRisks(): React.ReactElement {
                   />
                 )}
 
-                {/* Purple glow — hidden on small screens */}
+                {/* Purple glow */}
                 <div
                   aria-hidden
-                  className="pointer-events-none select-none absolute hidden sm:block"
+                  className="pointer-events-none select-none absolute"
                   style={{
                     left: isRight ? "auto" : "32px",
                     top: "12px",
@@ -143,7 +146,7 @@ export function SbomRisks(): React.ReactElement {
                   }}
                 />
 
-                {/* 3D icon — responsive size */}
+                {/* 3D icon */}
                 <div className="relative shrink-0 w-24 h-24 sm:w-36 sm:h-36 lg:w-[220px] lg:h-[220px]">
                   <Image
                     src={risk.icon}
@@ -188,6 +191,98 @@ export function SbomRisks(): React.ReactElement {
               </div>
             );
           })}
+        </div>
+
+        {/* ── MOBILE stacked cards (< md) ── */}
+        <div className="md:hidden flex flex-col items-center" style={{ gap: "16px" }}>
+          {RISKS.map((risk) => (
+            <div
+              key={risk.id}
+              className="relative overflow-hidden w-full"
+              style={{
+                maxWidth: "328px",
+                height: "206px",
+                borderRadius: "24px",
+                background: "white",
+              }}
+            >
+              {/* Card border frame SVG */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/sbom/mobile-risk-card-bg.svg"
+                alt=""
+                aria-hidden
+                className="absolute inset-0 w-full h-full pointer-events-none"
+                loading="lazy"
+              />
+
+              {/* Content */}
+              <div className="absolute inset-0 flex flex-col items-center pt-[10px]">
+                {/* Icon area with glow */}
+                <div className="relative flex items-center justify-center" style={{ width: "108px", height: "87px" }}>
+                  {/* Purple glow circle */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/sbom/mobile-risk-icon-glow.svg"
+                    alt=""
+                    aria-hidden
+                    className="absolute pointer-events-none"
+                    style={{
+                      left: "50%",
+                      top: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "79.75px",
+                      height: "79.75px",
+                    }}
+                    loading="lazy"
+                  />
+                  {/* Risk icon */}
+                  <Image
+                    src={risk.mobileIcon}
+                    alt={risk.iconAlt}
+                    width={80}
+                    height={80}
+                    className="relative object-contain"
+                    style={{ width: "80px", height: "80px" }}
+                    loading="lazy"
+                  />
+                </div>
+
+                {/* Text */}
+                <div
+                  className="flex flex-col items-center text-center"
+                  style={{ gap: "12px", marginTop: "10px" }}
+                >
+                  <p
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: "20px",
+                      fontWeight: 600,
+                      letterSpacing: "-0.05em",
+                      lineHeight: 1,
+                      color: "#000",
+                    }}
+                  >
+                    {risk.title}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "14px",
+                      fontWeight: 400,
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.1,
+                      color: "#111",
+                      opacity: 0.8,
+                      maxWidth: "199px",
+                    }}
+                  >
+                    {risk.body}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
