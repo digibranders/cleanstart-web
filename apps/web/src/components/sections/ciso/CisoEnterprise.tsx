@@ -311,7 +311,7 @@ export function CisoEnterprise(): React.ReactElement {
 
         {/* ════ DESKTOP — 4 cards in a flex row, centered ════ */}
         <div
-          className="hidden lg:flex items-start justify-center"
+          className="hidden xl:flex items-start justify-center"
           style={{ gap: "32px" }}
         >
           {CARDS.map((card) => (
@@ -319,67 +319,109 @@ export function CisoEnterprise(): React.ReactElement {
           ))}
         </div>
 
-        {/* ════ MOBILE — 2-column grid ════ */}
-        <div className="lg:hidden grid grid-cols-2 gap-4 px-4 sm:px-6">
+        {/* ════ MOBILE — 1-col stack ════
+             Figma 856:1367 — cards 328×238px (10px margin each side in 360px)
+             Ball: 70×70px centered, top=20px
+             Icon: 40×40px inside ball
+             Text block: top=108px, centered, title 20px Bold, desc 14px Regular */}
+        <div className="xl:hidden flex flex-col gap-4 px-4">
           {CARDS.map((card) => (
             <div
               key={card.title}
-              className="bg-white flex flex-col items-center text-center"
-              style={{
-                borderRadius: "20px",
-                border: "1px solid rgba(44,193,235,0.35)",
-                padding: "24px 16px 20px",
-                gap: "12px",
-              }}
+              className="relative flex-shrink-0"
+              style={{ height: "238px" }}
             >
-              {/* Scaled-down blue ball */}
+              {/* Outer cyan glow border */}
               <div
-                style={{
-                  flexShrink: 0,
-                  width: "64px",
-                  height: "64px",
-                  borderRadius: "50%",
-                  background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
-                  boxShadow: "0px 4px 10px 0px rgba(28,60,142,0.33)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                aria-hidden
+                className="absolute inset-0 pointer-events-none"
+                style={{ borderRadius: "40px", background: "#2cc1eb", opacity: 0.3 }}
+              />
+              {/* Inner white card: 6px inset */}
+              <div
+                className="absolute overflow-hidden bg-white"
+                style={{ inset: "6px", borderRadius: "34px" }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={card.icon}
-                  alt=""
+                {/* Purple blur at top */}
+                <div
                   aria-hidden
-                  style={{ width: "36px", height: "36px", objectFit: "contain" }}
-                  loading="lazy"
-                  decoding="async"
+                  className="absolute pointer-events-none"
+                  style={{
+                    top: "16px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "180px",
+                    height: "100px",
+                    background: "#df9bff",
+                    filter: "blur(50px)",
+                    opacity: 0.3,
+                  }}
                 />
+
+                {/* Blue gradient ball — 70×70px, centered, top=20px */}
+                <div
+                  className="absolute flex items-center justify-center overflow-hidden"
+                  style={{
+                    left: "50%",
+                    top: "20px",
+                    transform: "translateX(-50%)",
+                    width: "70px",
+                    height: "70px",
+                    borderRadius: "50%",
+                    background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
+                    boxShadow:
+                      "0px 4.5px 10.6px 0px rgba(28,60,142,0.33), inset 0px -0.17px 0.21px 0px rgba(0,44,179,0.5), inset 0px 0.085px 0.425px 0px rgba(255,255,255,0.81)",
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={card.icon}
+                    alt=""
+                    aria-hidden
+                    style={{ width: "40px", height: "40px", objectFit: "contain" }}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+
+                {/* Text block — centered, top=108px */}
+                <div
+                  className="absolute flex flex-col items-center text-center"
+                  style={{
+                    top: "108px",
+                    left: "16px",
+                    right: "16px",
+                    gap: "10px",
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: `${card.titleSize > 30 ? 20 : 18}px`,
+                      fontWeight: 700,
+                      letterSpacing: "-0.05em",
+                      lineHeight: 1.1,
+                      color: "#111",
+                      margin: 0,
+                    }}
+                  >
+                    {card.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "14px",
+                      fontWeight: 400,
+                      letterSpacing: "-0.03em",
+                      lineHeight: 1.4,
+                      color: "#555",
+                      margin: 0,
+                    }}
+                  >
+                    {card.desc}
+                  </p>
+                </div>
               </div>
-              <h3
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "clamp(14px, 3.5vw, 20px)",
-                  fontWeight: 700,
-                  letterSpacing: "-0.05em",
-                  lineHeight: 1.1,
-                  color: "#111",
-                }}
-              >
-                {card.title}
-              </h3>
-              <p
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "clamp(11px, 2.8vw, 14px)",
-                  fontWeight: 400,
-                  letterSpacing: "-0.03em",
-                  lineHeight: 1.4,
-                  color: "#555",
-                }}
-              >
-                {card.desc}
-              </p>
             </div>
           ))}
         </div>

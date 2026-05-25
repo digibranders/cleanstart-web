@@ -381,46 +381,56 @@ export function CisoOutcomes(): React.ReactElement {
              4×295 + 3×32 = 1276px fills container exactly.
              Tall cards (1 & 3): h=326px, no top offset.
              Short cards (2 & 4): h=258px, marginTop=68px (bottom-aligns all cards). */}
-        <div className="hidden lg:flex items-start" style={{ gap: "32px" }}>
+        <div className="hidden xl:flex items-start" style={{ gap: "32px" }}>
           {STATS.map((stat) => (
             <StatCard key={stat.display} stat={stat} enabled={animated} />
           ))}
         </div>
 
-        {/* ════════ MOBILE — 2-column grid ════════ */}
-        <div
-          className="lg:hidden grid grid-cols-2 gap-4 px-4 sm:px-6"
-        >
+        {/* ════════ MOBILE — 1-col stack ════════
+             Figma 856:1346 — cards 328×144px, 16px gap
+             Number: left=32, top=32, 40px Bold lh=1.2
+             Label:  left=32, top=92, 16px Regular — single line (no <br />) */}
+        <div className="xl:hidden flex flex-col gap-4 px-4">
           {STATS.map((stat) => (
             <div
               key={stat.display}
-              className="bg-white flex flex-col"
-              style={{ borderRadius: "20px", padding: "28px 20px", gap: "12px" }}
+              className="relative bg-white"
+              style={{ borderRadius: "24px", height: "144px" }}
             >
-              <p
+              {/* Animated number */}
+              <div
+                className="absolute"
                 style={{
+                  left: "32px",
+                  top: "32px",
                   fontFamily: "var(--font-display)",
-                  fontSize: "clamp(32px, 8vw, 52px)",
+                  fontSize: "40px",
                   fontWeight: 700,
                   letterSpacing: "-0.04em",
-                  lineHeight: 1.1,
+                  lineHeight: 1.2,
                   color: "#111",
                 }}
               >
                 {stat.display}
-              </p>
-              <p
+              </div>
+              {/* Label — single line */}
+              <div
+                className="absolute"
                 style={{
+                  left: "32px",
+                  right: "16px",
+                  top: "92px",
                   fontFamily: "var(--font-sans)",
-                  fontSize: "clamp(12px, 3vw, 16px)",
+                  fontSize: "16px",
                   fontWeight: 400,
-                  letterSpacing: "-0.04em",
+                  letterSpacing: "-0.05em",
                   lineHeight: 1.4,
                   color: "#333",
                 }}
               >
                 {stat.line1} {stat.line2}
-              </p>
+              </div>
             </div>
           ))}
         </div>
