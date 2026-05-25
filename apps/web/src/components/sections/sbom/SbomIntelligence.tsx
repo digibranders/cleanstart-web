@@ -14,24 +14,33 @@ const CARDS = [
     title: "Complete Coverage",
     body: "Continuously updated software inventories.",
     mobileIcon: "/images/sbom/mobile-adv-1.png",
+    // Figma mobile text widths (node 817:1349–1351)
+    mobileTitleW: 135,
+    mobileBodyW: 155,
   },
   {
     id: "dependency",
     title: "Dependency Mapping",
     body: "Track transitive and inherited dependencies.",
     mobileIcon: "/images/sbom/mobile-adv-2.png",
+    mobileTitleW: 135,
+    mobileBodyW: 187,
   },
   {
     id: "compliance",
     title: "Compliance Readiness",
     body: "Support audit and regulatory requirements.",
     mobileIcon: "/images/sbom/mobile-adv-3.png",
+    mobileTitleW: 175,
+    mobileBodyW: 155,
   },
   {
     id: "visibility",
     title: "Supply Chain Visibility",
     body: "Improve visibility across software ecosystems.",
     mobileIcon: "/images/sbom/mobile-adv-4.png",
+    mobileTitleW: 135,
+    mobileBodyW: 201,
   },
 ] as const;
 
@@ -103,7 +112,14 @@ export function SbomIntelligence(): React.ReactElement {
         style={{ gap: "16px", paddingLeft: "10px", paddingRight: "10px" }}
       >
         {CARDS.map((card) => (
-          <MobileIntelligenceCard key={card.id} {...card} />
+          <MobileIntelligenceCard
+            key={card.id}
+            title={card.title}
+            body={card.body}
+            mobileIcon={card.mobileIcon}
+            titleW={card.mobileTitleW}
+            bodyW={card.mobileBodyW}
+          />
         ))}
       </div>
     </section>
@@ -224,17 +240,27 @@ function MobileIntelligenceCard({
   title,
   body,
   mobileIcon,
+  titleW,
+  bodyW,
 }: {
   title: string;
   body: string;
   mobileIcon: string;
+  titleW: number;
+  bodyW: number;
 }): React.ReactElement {
+  // Figma: icon-area container h=87px top=10px, ball 70px centered vertically.
+  // Ball center = 10 + 87/2 = 53.5px → ball top = 53.5 - 35 = 18.5px ≈ 18px.
+  const BALL_TOP = 18;
+  // Text starts at 108px from inner card top (Figma absolute coord delta).
+  const TEXT_TOP = 108;
+
   return (
     <div
       className="relative"
       style={{ width: "340px", height: "238px" }}
     >
-      {/* Outer cyan frame */}
+      {/* Outer cyan frame SVG (340×238, opacity 0.3 per Figma) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/sbom/mobile-intel-card-frame.svg"
@@ -243,7 +269,8 @@ function MobileIntelligenceCard({
         className="absolute inset-0 w-full h-full pointer-events-none"
         loading="lazy"
       />
-      {/* Inner white card */}
+
+      {/* Inner white card — left:6px top:6px w:328px h:226px (Figma delta) */}
       <div
         className="absolute bg-white overflow-hidden"
         style={{
@@ -254,7 +281,7 @@ function MobileIntelligenceCard({
           borderRadius: "16px",
         }}
       >
-        {/* Purple glow at top */}
+        {/* Purple glow behind ball — w:209 h:90 blur:66.5 top:13px centered */}
         <div
           aria-hidden
           className="absolute pointer-events-none"
@@ -271,13 +298,13 @@ function MobileIntelligenceCard({
           }}
         />
 
-        {/* Blue ball with unique icon */}
+        {/* Blue ball — 70px, centered, top:18px (centered in 87px container at top:10px) */}
         <div
           className="absolute flex items-center justify-center overflow-hidden"
           style={{
             left: "50%",
             transform: "translateX(-50%)",
-            top: "10px",
+            top: `${BALL_TOP}px`,
             width: "70px",
             height: "70px",
             borderRadius: "50%",
@@ -297,10 +324,15 @@ function MobileIntelligenceCard({
           />
         </div>
 
-        {/* Title + body */}
+        {/* Title + body — top:108px matches Figma (ball bottom 88px → 20px gap) */}
         <div
           className="absolute flex flex-col items-center text-center"
-          style={{ left: "50%", transform: "translateX(-50%)", top: "108px", gap: "12px" }}
+          style={{
+            left: "50%",
+            transform: "translateX(-50%)",
+            top: `${TEXT_TOP}px`,
+            gap: "12px",
+          }}
         >
           <p
             style={{
@@ -310,7 +342,7 @@ function MobileIntelligenceCard({
               letterSpacing: "-0.05em",
               lineHeight: 1,
               color: "#000",
-              width: "135px",
+              width: `${titleW}px`,
             }}
           >
             {title}
@@ -324,7 +356,7 @@ function MobileIntelligenceCard({
               lineHeight: 1.5,
               color: "#111",
               opacity: 0.8,
-              width: "187px",
+              width: `${bodyW}px`,
             }}
           >
             {body}
