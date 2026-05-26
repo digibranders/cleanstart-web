@@ -114,18 +114,21 @@ export function ResourcesInsightsClient({
         </div>
       </div>
 
-      {/* Article cards row — remounts on tab change; each card animates in
-          via the `cs-tab-card-in` keyframe with a small stagger. */}
+      {/* Article cards — mobile: horizontal snap scroller with a peek of
+          the next card (matches Figma mobile spec); sm+: 2-col grid;
+          lg+: 3-col grid. Each card animates in on tab change via the
+          `cs-tab-card-in` keyframe with a small stagger. */}
       <div
         id="resources-articles"
         role="tabpanel"
         aria-labelledby={`tab-${activeTab}`}
         key={activeTab}
-        className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
+        className="mt-10 -mx-6 flex snap-x snap-mandatory gap-5 overflow-x-auto pl-10 pr-6 pb-2 [scrollbar-padding-left:2.5rem] [scroll-padding-left:2.5rem] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-8 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3"
       >
         {articles.map((article, idx) => (
           <div
             key={`${activeTab}:${article.title}`}
+            className="shrink-0 basis-[82%] snap-start sm:shrink sm:basis-auto"
             style={{
               animation:
                 "cs-tab-card-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both",
@@ -175,10 +178,15 @@ function ArticleCard({ article }: { article: ResourceCard }) {
           lineHeight: 1.25,
           letterSpacing: "-0.02em",
           margin: 0,
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
         }}
       >
         {article.title}
       </p>
+      {/* Abstract clamped to 3 lines so card heights stay reasonable. */}
       <p
         className="text-[#666]"
         style={{
@@ -187,6 +195,10 @@ function ArticleCard({ article }: { article: ResourceCard }) {
           fontWeight: 400,
           lineHeight: 1.5,
           letterSpacing: "-0.02em",
+          display: "-webkit-box",
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
         }}
       >
         {article.description}

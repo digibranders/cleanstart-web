@@ -20,7 +20,9 @@ export function Hero() {
           </h1>
 
           <a
-            href="#browse-images"
+            href="https://images.cleanstart.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="cs-btn-glass"
             style={{
               ["--cs-btn-px" as string]: "18px",

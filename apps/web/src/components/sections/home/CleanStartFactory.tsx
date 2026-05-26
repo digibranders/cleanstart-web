@@ -11,7 +11,8 @@ const CARDS: CardData[] = [
   { title: "Clean\nImages", blurb: "Minimal. Immutable.\nZero CVE." },
   { title: "Clean\nPackages", blurb: "Curated. Verified. No\nhidden risk." },
   { title: "Clean AI\nModels", blurb: "Scanned. Signed. Safe\nby design." },
-  { title: "Clean\nSight", blurb: "AI-powered insights. Risk,\npolicy & drift detection." },
+  // "Clean Sight" removed (2026-05) — top row trimmed to 4 cards across
+  // every viewport. Grid + row max-width updated below to match.
   { title: "Clean\nLibraries", blurb: "Complete. Signed.\nContinuously verified." },
 ];
 
@@ -739,10 +740,15 @@ function CleanStartFactoryMobile() {
           className="pointer-events-none absolute"
           style={{
             left: `${LINE_X}px`,
-            // top: 50% of first card; bottom: 50% of last card — using
-            // calc with card height tied to the 88/295 aspect.
-            top: "calc((100% / 5 - 16px * 4 / 5) / 2)",
-            bottom: "calc((100% / 5 - 16px * 4 / 5) / 2)",
+            // top: 50% of first card; bottom: 50% of last card.
+            //   For N cards stacked with gap G in a column of height H,
+            //     card_H = (H − (N−1)·G) / N
+            //   The line should start at first-card center and end at
+            //   last-card center, so offset from container top/bottom =
+            //   card_H / 2 = (H/N − (N−1)·G/N) / 2.
+            //   Updated for N=4 (was 5): `(100% / 4 − 16px × 3 / 4) / 2`.
+            top: "calc((100% / 4 - 16px * 3 / 4) / 2)",
+            bottom: "calc((100% / 4 - 16px * 3 / 4) / 2)",
             width: 2,
             transform: "translateX(-50%)",
             background:
@@ -848,7 +854,14 @@ function CleanStartFactoryMobile() {
 // =============================================================================
 
 const BB_W = 1276;
-const BB_H = 285;
+// Reduced from 285 → 240.72 to tighten the outer-frame vertical breathing
+// around the inner panels (top + bottom margins shrink from 48/52.28 to
+// 28/28 — fully symmetric). Panels stay at their original 512 × 184.72
+// Figma size; only the dark frame around them gets thinner. Companion
+// edits below: `top: CQW(48) → CQW(28)` on the right panel and on the
+// left wrapper Frame (which hosts the left panel + arrow + accent, all
+// moving up together as one rigid block).
+const BB_H = 240.72;
 /** Convert a Figma px (relative to the 1276-wide bottom block) to cqw. */
 const CQW = (px: number) => `${(px / BB_W) * 100}cqw`;
 
@@ -902,10 +915,14 @@ function FactoryPanel({
     <div
       className="absolute flex flex-col items-center justify-center overflow-hidden"
       style={{
-        // Right panel at bottom-block (714, 48). Left panel at wrapper-local
-        // (0, 0) — the caller positions the wrapper at (46, 48).
-        left: side === "left" ? 0 : CQW(714),
-        top: side === "left" ? 0 : CQW(48),
+        // Right panel at bottom-block (736, 28). Left panel at wrapper-local
+        // (0, 0) — the caller positions the wrapper at (28, 28).
+        // All four outer margins now equal 28 figma px (= ~24 rendered at
+        // the 1112 block scale): top 28, bottom 28, left 28, right 28.
+        // BB_W − 28 (left) − 512 (left panel) − 196 (gap, occupied by the
+        // arrow) − 512 (right panel) − 28 (right) = 1276 ✓
+        left: side === "left" ? 0 : CQW(736),
+        top: side === "left" ? 0 : CQW(28),
         width: CQW(512),
         height: CQW(184.72),
         padding: CQW(24),
@@ -1025,9 +1042,23 @@ function FactoryBottomBlock() {
           1276 × 285.
           NOTE: SVG file uses `width="100%" height="100%"` (no fixed px
           intrinsic), so the browser defaults `naturalSize` to 300×150 = 2:1
-          aspect. Set EXPLICIT pixel height (430 cqw) to force the correct
-          viewBox aspect — without it `height: auto` ends up at 739 px and
-          pushes the card to ~1.7× its real height. */}
+          aspect. Set EXPLICIT pixel height to force the correct viewBox
+          aspect — without it `height: auto` would default to ~740 px.
+          --------------------------------------------------------------
+          Vertical-scale recalibration when BB_H ≠ 285:
+            The SVG's card-body region inside the viewBox is fixed at
+            1276 × 285 figma units. When we shrink BB_H below 285 to
+            tighten the outer-frame spacing, we MUST shrink the rendered
+            mask in lockstep — otherwise the SVG paints the card chrome
+            past the block's bottom edge (the visible "extra padding"
+            the user reported). The SVG already has
+            `preserveAspectRatio="none"`, so we scale only the y-axis:
+              scale_y = BB_H / 285                       (= 0.845 today)
+              rendered height = 430 × scale_y            (≈ 363.35)
+              rendered top    = -21 × scale_y            (≈ -17.74)
+            The horizontal width + left stay untouched (no x-scale).
+            Corners get a ~15 % vertical compression which is visually
+            imperceptible on a 24-px rounded rect. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/cleanstart-factory/factory-card-mask.svg"
@@ -1036,9 +1067,9 @@ function FactoryBottomBlock() {
         className="pointer-events-none absolute select-none"
         style={{
           left: CQW(-190),
-          top: CQW(-21),
+          top: CQW(-21 * (BB_H / 285)),
           width: CQW(1478),
-          height: CQW(430),
+          height: CQW(430 * (BB_H / 285)),
           maxWidth: "none",
         }}
       />
@@ -1062,7 +1093,11 @@ function FactoryBottomBlock() {
             left: CQW(3),
             top: CQW(2),
             width: CQW(1271),
-            height: `${(281 / BB_H) * 100}%`,
+            // Figma intent: leave a 2-px gap at top + bottom of block.
+            // Original literal was `281 / 285 ≈ 98.6 %` (calibrated for
+            // the old BB_H = 285). Now expressed as `(BB_H − 4) / BB_H`
+            // so it scales automatically whenever BB_H changes.
+            height: `${((BB_H - 4) / BB_H) * 100}%`,
             borderRadius: CQW(20),
             backgroundImage:
               "url(/images/cleanstart-factory/diagonal-lines.png)",
@@ -1115,39 +1150,61 @@ function FactoryBottomBlock() {
           </div>
         </FactoryPanel>
 
-        {/* Left wrapper Frame 2147238459 at (46, 48), 666 × 184.717.
+        {/* Left wrapper Frame 2147238459 at (28, 28), 666 × 184.717.
             Figma layer order (bottom → top):
               1. Arrow Vector 1194233950
               2. Left panel Frame 2147238336 (paints over arrow's left half)
-              3. Small accent Vector 1194233951 */}
+              3. Small accent Vector 1194233951
+            Left moved 46 → 28 to match the (now symmetric) 28-px outer
+            margin on every side. The arrow + accent live INSIDE this
+            wrapper with wrapper-local offsets, so they shift left by
+            the same 18 px as a single rigid unit; the accent-on-arrow-
+            tail alignment is preserved exactly. Right panel shifted
+            714 → 736 to widen the inter-panel gap from 156 → 196 figma
+            units; the arrow's width was increased proportionally below
+            so its rounded tail still merges 8 px into the left panel
+            and the tip still pokes 8 px short of the right panel (same
+            visual handshake as the original Figma). */}
         <div
           className="absolute"
           style={{
-            left: CQW(46),
-            top: CQW(48),
+            left: CQW(28),
+            top: CQW(28),
             width: CQW(666),
             height: CQW(184.717),
           }}
         >
           {/* Arrow — factory-arrow.svg with gradient fill + radial stroke +
               4-stop drop-shadow baked in.
-              · Vertical centering: panel is 184.717 tall, arrow body is 70.539
-                tall → centered top = (184.717 − 70.539)/2 ≈ 57.09 (was 54.16
-                per raw Figma spec; we override to mid-panel for visual balance).
-              · Horizontal overlap: spec puts arrow left edge at wrapper x=512
-                which is exactly the panel right edge. Pulling left by 8 px so
-                the rounded tail merges into the panel right edge instead of
-                reading as a separate floating element.
-              · SVG canvas (352.536 × 215.539) is positioned around the
-                154 × 70.539 path bbox via Figma's own inset technique. */}
+              · Width grown 154 → 196 to bridge the now-196-figma gap
+                between the two panels (panels moved closer to the block's
+                outer edges to give all four margins the same 28-px frame).
+                Height scaled proportionally (154/70.539 = 196/89.78 = 2.184)
+                so the SVG `inset` calibration below stays valid — the
+                inset percentages produce an inner div whose WH ratio
+                matches the SVG canvas's 352.536/215.539 = 1.636 only when
+                the wrapper preserves the arrow path's 2.184 aspect.
+              · Vertical centering recomputed: wrapper is 184.717 tall,
+                arrow visible body is now 89.78 tall → centered top =
+                (184.717 − 89.78) / 2 ≈ 47.47. Arrow's vertical center
+                (47.47 + 89.78/2 = 92.36) is unchanged from before, so the
+                small accent (factory-accent.svg) which sits at wrapper-
+                local (497, 55) still aligns perfectly with the arrow tail.
+              · Horizontal overlap: spec puts arrow left edge at wrapper
+                x=512 (= panel right edge). Pulling left by 8 → wrapper-
+                local 504, so the rounded tail merges 8 px into the left
+                panel. Arrow right edge = 504 + 196 = 700, leaving an 8-px
+                gap before the right panel (which starts at wrapper-local
+                736 − 28 = 708). Mirrors the original 8-overlap / ~8-gap
+                handshake. */}
           <div
             aria-hidden
             className="pointer-events-none absolute"
             style={{
               left: CQW(512 - 8),
-              top: CQW(57.09),
-              width: CQW(154),
-              height: CQW(70.539),
+              top: CQW(47.47),
+              width: CQW(196),
+              height: CQW(89.78),
             }}
           >
             <div
@@ -1295,25 +1352,29 @@ export function CleanStartFactory() {
             The CleanStart Factory
           </h2>
 
-          {/* Tablet + desktop: 5 cards LOCKED in a single horizontal row,
-              md → xl. CSS Grid with 5 equal columns (`minmax(0, 1fr)` so a
+          {/* Tablet + desktop: 4 cards LOCKED in a single horizontal row,
+              md → xl. CSS Grid with 4 equal columns (`minmax(0, 1fr)` so a
               column can shrink below its content's intrinsic min-width
               instead of forcing the row to overflow). Gap is fluid: scales
               from the Figma 28 px at ≥1280 down to 8 px on the narrowest
               tablet.
-                Wrapper `maxWidth: 1112` (was 1276) caps each card at
-                200 px instead of the Figma 232.8 so the factory fits a
-                1440×900 viewport. Cards still scale fluidly below that
-                — every interior dimension uses `cqw`, so orb, title,
-                blurb, arrow shrink together with the column width.
-              Never wraps; never overflows. Hidden below `md` (the
-              mobile factory below takes over). */}
+                Wrapper `maxWidth: 884` (= 4 cards × 200 px + 3 gaps × 28).
+                Cards stay at 200 px max (preserving the viewport-fit
+                pass — at 232.8 each card would climb back to 374 px tall
+                and break the 1440×900 budget). The 884-wide row sits
+                centered above the 1112-wide bottom block — a deliberate
+                "5 → 4 → 2" funnel asymmetry where the cards row is
+                narrower than the engine/factory block below.
+              Below `md` (the mobile factory below takes over). All
+              interior dimensions use `cqw`, so orb, title, blurb, arrow
+              shrink together with the column width. Never wraps;
+              never overflows. */}
           <div
             className="relative mx-auto mt-[32px] hidden md:grid"
             style={{
-              gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
+              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
               columnGap: "clamp(8px, 2.2vw, 28px)",
-              maxWidth: 1112,
+              maxWidth: 884,
             }}
           >
             {CARDS.map((c, i) => (
