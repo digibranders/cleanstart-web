@@ -425,46 +425,75 @@ export function CleanSightSecurity(): React.ReactElement {
           />
         </div>
 
-        {/* Mobile fallback — numbered list of workflow steps */}
+        {/* Mobile fallback — 4 dark cards stacked vertically with a small
+            white dot accent on the left edge (centered vertically). Replaces
+            the previous numbered-circle list to match the reference design. */}
         <div
-          className="lg:hidden mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6"
+          className="lg:hidden mt-10 flex flex-col gap-4"
         >
-          {WORKFLOW.map((w, i) => (
-            <div key={w.label} className="flex gap-4 items-start">
-              <div
-                className="flex-shrink-0 flex items-center justify-center rounded-full text-white font-bold"
+          {WORKFLOW.map((w) => (
+            <div
+              key={w.label}
+              className="relative flex flex-col"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: "16px",
+                padding: "20px 24px 20px 36px",
+                gap: "8px",
+              }}
+            >
+              {/* Tick line — short horizontal accent from just outside the
+                  card's left edge into the dot, giving each row a "labeled
+                  marker" feel per the reference. */}
+              <span
+                aria-hidden
+                className="absolute top-1/2 -translate-y-1/2"
                 style={{
-                  width: "36px",
-                  height: "36px",
-                  background: "linear-gradient(to bottom, #239CFF, #005BE3)",
+                  left: "-6px",
+                  width: "18px",
+                  height: "1.5px",
+                  background: "rgba(255,255,255,0.6)",
+                }}
+              />
+              {/* Left-edge accent dot — centered vertically, renders on top
+                  of the tick line so the line "connects" to the dot. */}
+              <span
+                aria-hidden
+                className="absolute left-3 top-1/2 -translate-y-1/2 block rounded-full"
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  background: "#ffffff",
+                  boxShadow: "0 0 12px rgba(255,255,255,0.5)",
+                }}
+              />
+              <p
+                className="text-white font-semibold"
+                style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "14px",
+                  fontSize: "18px",
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.2,
+                  /* Collapse forced \n line-breaks from the WORKFLOW data
+                     ("Continuous\nVisibility") into spaces for the mobile
+                     single-line stack treatment. */
+                  whiteSpace: "normal",
                 }}
               >
-                {i + 1}
-              </div>
-              <div>
-                <p
-                  className="text-white font-semibold"
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "18px",
-                    letterSpacing: "-0.03em",
-                  }}
-                >
-                  {w.label}
-                </p>
-                <p
-                  className="text-white mt-1"
-                  style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "15px",
-                    opacity: 0.8,
-                  }}
-                >
-                  {w.body}
-                </p>
-              </div>
+                {w.label.replace(/\n/g, " ")}
+              </p>
+              <p
+                className="text-white/70"
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "14px",
+                  lineHeight: 1.4,
+                }}
+              >
+                {w.body}
+              </p>
             </div>
           ))}
         </div>

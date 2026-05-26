@@ -28,7 +28,10 @@ const CARDS = [
 export function SCAProblems(): React.ReactElement {
   return (
     <section
-      className="relative overflow-hidden bg-white"
+      /* max-lg:!pt-/pb- overrides the inline 120px padding only on mobile —
+         the 120/120 was too generous below lg and creating 240px of stacked
+         dead space between neighboring sections. */
+      className="relative overflow-hidden bg-white max-lg:!pt-[60px] max-lg:!pb-[60px]"
       style={{ paddingTop: "120px", paddingBottom: "120px" }}
     >
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
@@ -56,8 +59,11 @@ export function SCAProblems(): React.ReactElement {
           {CARDS.map(({ title, desc, icon, iconAlt }) => (
             <div
               key={title}
-              className="relative"
-              style={{ width: "100%", aspectRatio: "295/354" }}
+              /* Mobile aspect tightened (280 → 245) — text content is
+                 absolute-positioned at top:162 and ends around y=242 for the
+                 common 2-line body, so 245 leaves ~30px breathing instead of
+                 the ~70px dead space that 280 created. sm+ unchanged. */
+              className="relative w-full aspect-[295/245] sm:aspect-[295/354]"
             >
               {/* Outer cyan border layer at 30% opacity */}
               <div
@@ -157,9 +163,11 @@ export function SCAProblems(): React.ReactElement {
                   />
                 </div>
 
-                {/* Text content — at y=162 from card top */}
+                {/* Text content — at y=162 from card top.
+                    Mobile: centered to match the per-card design; sm+: left-
+                    aligned as the original Figma intent. */}
                 <div
-                  className="absolute flex flex-col"
+                  className="absolute flex flex-col text-center sm:text-left"
                   style={{
                     top: "162px",
                     left: "24px",

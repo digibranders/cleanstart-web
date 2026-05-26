@@ -78,6 +78,7 @@ const TOP_CARD: React.CSSProperties = {
   flexDirection: "column" as const,
   justifyContent: "center",
   padding: "clamp(20px,2.5vw,32px) clamp(20px,2.8vw,36px)",
+  minHeight: "clamp(140px, 16.3vw, 209px)",
 };
 
 const BOTTOM_CARD: React.CSSProperties = {
@@ -87,6 +88,7 @@ const BOTTOM_CARD: React.CSSProperties = {
   flexDirection: "column" as const,
   justifyContent: "center",
   padding: "clamp(20px,2.5vw,32px) clamp(20px,2.8vw,36px)",
+  minHeight: "clamp(140px, 16.1vw, 209px)",
 };
 
 const STAT_NUM: React.CSSProperties = {
@@ -133,10 +135,11 @@ const FEAT_DESC: React.CSSProperties = {
  *   column gap    = 86px
  *   overlap/card  = (444 − 86) / 2 = 179px  →  14.05vw
  *
- * Right cards need paddingLeft ≥ overlap to keep text visible.
- * We use clamp(100px, 15vw, 195px) with an extra margin.
+ * Right cards need paddingLeft ≥ overlap to keep text visible at lg+ where
+ * the shield overlaps the 2×2 grid. Applied as `lg:!pl-[clamp(100px,15vw,195px)]`
+ * on each right card so it doesn't waste mobile space (where the cards stack
+ * one-per-row and the shield is hidden).
  */
-const RIGHT_CARD_PADDING_LEFT = "clamp(100px,15vw,195px)";
 
 /* ─── Component ─────────────────────────────────────────── */
 
@@ -204,10 +207,12 @@ export function SCASecurityOutcomes(): React.ReactElement {
         {/* ── Card grid + shield ── */}
         <div className="relative" style={{ marginTop: "60px" }}>
 
-          {/* Shield — centred, spans both rows */}
+          {/* Shield — centred, spans both rows. Hidden on mobile because the
+              cards stack 1-per-row there; the shield only makes sense over
+              the 2×2 desktop grid. */}
           <div
             aria-hidden
-            className="pointer-events-none select-none absolute"
+            className="pointer-events-none select-none absolute hidden lg:block"
             style={{
               left: "50%",
               transform: "translateX(-50%)",
@@ -249,31 +254,28 @@ export function SCASecurityOutcomes(): React.ReactElement {
             </div>
           </div>
 
-          {/* 2 × 2 grid */}
+          {/* Card grid — mobile: 1-col stacked alternating blue/white per
+              reference, lg+: original 2×2 with the shield overlap. Mobile
+              order is controlled via `order-*` utilities so each card lands
+              in the right slot of the stack without changing DOM order
+              (which the lg grid still consumes left-to-right, top-to-bottom). */}
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gridTemplateRows:
-                "clamp(140px,16.3vw,209px) clamp(140px,16.1vw,209px)",
-              columnGap: "clamp(40px,6.7vw,86px)",
-              rowGap: "clamp(8px,3.4vw,44px)",
-            }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 lg:gap-y-[clamp(8px,3.4vw,44px)] lg:gap-x-[clamp(40px,6.7vw,86px)]"
           >
-            {/* Top-left — 89% */}
-            <div style={TOP_CARD}>
+            {/* Top-left — 89% (mobile slot 1) */}
+            <div className="order-1 lg:order-none" style={TOP_CARD}>
               <p style={STAT_NUM}>
                 {count89}%
               </p>
               <p style={STAT_LABEL}>Fewer inherited vulnerabilities</p>
             </div>
 
-            {/* Top-right — 75% (extra left padding to clear shield) */}
+            {/* Top-right — 75% (mobile slot 3; lg+ gets extra left padding
+                to clear the shield via !pl which beats the inline padding
+                shorthand). */}
             <div
-              style={{
-                ...TOP_CARD,
-                paddingLeft: RIGHT_CARD_PADDING_LEFT,
-              }}
+              className="order-3 lg:order-none lg:!pl-[clamp(100px,15vw,195px)]"
+              style={TOP_CARD}
             >
               <p style={STAT_NUM}>
                 {count75}%
@@ -281,18 +283,17 @@ export function SCASecurityOutcomes(): React.ReactElement {
               <p style={STAT_LABEL}>Faster remediation cycles</p>
             </div>
 
-            {/* Bottom-left — Smaller SBOMs */}
-            <div style={BOTTOM_CARD}>
+            {/* Bottom-left — Smaller SBOMs (mobile slot 2) */}
+            <div className="order-2 lg:order-none" style={BOTTOM_CARD}>
               <p style={FEAT_TITLE}>Smaller SBOMs</p>
               <p style={FEAT_DESC}>Reduced dependency complexity</p>
             </div>
 
-            {/* Bottom-right — Faster Reviews (extra left padding to clear shield) */}
+            {/* Bottom-right — Faster Reviews (mobile slot 4; lg+ gets the
+                same shield-clearance left padding as the 75% card above). */}
             <div
-              style={{
-                ...BOTTOM_CARD,
-                paddingLeft: RIGHT_CARD_PADDING_LEFT,
-              }}
+              className="order-4 lg:order-none lg:!pl-[clamp(100px,15vw,195px)]"
+              style={BOTTOM_CARD}
             >
               <p style={FEAT_TITLE}>Faster Reviews</p>
               <p style={FEAT_DESC}>Improved triage and prioritization</p>

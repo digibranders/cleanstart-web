@@ -76,9 +76,12 @@ export function TeamsCTA() {
         decoding="async"
       />
 
-      {/* Text content */}
+      {/* Text content — desktop only. The mobile equivalent is the
+          md:hidden centered column further below. Was rendering on mobile
+          too (no hidden class), creating a duplicate "Join the Team" /
+          Careers button overlapping the mobile layout. */}
       <div
-        className="absolute flex flex-col gap-4"
+        className="hidden md:flex absolute flex-col gap-4"
         style={{
           left: "clamp(24px, 45%, 547px)",
           top: "50%",
@@ -160,6 +163,90 @@ export function TeamsCTA() {
             </svg>
           </a>
         </div>
+      </div>
+
+      {/* ── Mobile layout (< md) — centered column with the cube at top.
+          The desktop blocks above are all `hidden md:block` / absolute, so
+          this is the only path that renders content inside the Footer's
+          CTA slot at mobile widths. */}
+      <div
+        className="md:hidden absolute inset-0 flex flex-col items-center justify-center text-center"
+        style={{ padding: "24px" }}
+      >
+        {/* Cube image — centered at top of card */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          aria-hidden
+          src="/images/teams/cta-cube.png"
+          alt=""
+          className="pointer-events-none select-none"
+          style={{ width: "100px", height: "auto", marginBottom: "8px" }}
+          loading="lazy"
+          decoding="async"
+        />
+
+        {/* Title */}
+        <p
+          className="font-display font-bold text-[#111]"
+          style={{
+            fontSize: "var(--cta-card-title)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
+            margin: 0,
+          }}
+        >
+          Join the Team
+        </p>
+
+        {/* Subtitle — wraps naturally on mobile (no whiteSpace:nowrap) */}
+        <p
+          className="font-sans text-[#111]/80"
+          style={{
+            fontSize: "var(--cta-card-desc)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
+            margin: "8px 0 20px",
+            maxWidth: "280px",
+          }}
+        >
+          Visit our career page to explore open opportunities
+        </p>
+
+        {/* Careers button — centered (no self-start, no absolute positioning) */}
+        <a
+          href="/careers"
+          className="relative inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden font-medium text-white"
+          style={{
+            width: "136px",
+            height: "44px",
+            fontSize: "1rem",
+            letterSpacing: "-0.01em",
+            borderRadius: "8px",
+            background: "linear-gradient(180deg, #3960F9 0%, #2B97D1 100%)",
+            boxShadow:
+              "0 0 0 1px #3960F9, 0 1px 2px -1px rgba(9,6,63,0.4), inset 0 1px 0 0 rgba(255,255,255,0.16)",
+          }}
+        >
+          <span style={{ position: "relative", zIndex: 1 }}>Careers</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden
+            style={{ position: "relative", zIndex: 1 }}
+          >
+            <path
+              d="M3 8h10M9 4l4 4-4 4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </a>
       </div>
     </div>
   );

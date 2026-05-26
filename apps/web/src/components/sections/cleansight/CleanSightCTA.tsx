@@ -175,6 +175,108 @@ export function CleanSightCTA(): React.ReactElement {
           </Link>
         </div>
       </div>
+
+      {/* ── Mobile layout (< md) — centered column with cube decoration ──
+          The desktop content row above is `hidden md:flex`, so this is the
+          only path that renders content inside the Footer's CTA slot at
+          mobile widths. */}
+      <div
+        className="md:hidden absolute inset-0 overflow-hidden flex flex-col items-center justify-center text-center"
+        style={{
+          padding: "32px 28px",
+        }}
+      >
+        {/* Purple cube — bottom-right corner decoration */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          aria-hidden
+          src="/images/vulnerability-remediation/cta-cube.png"
+          alt=""
+          className="absolute pointer-events-none select-none"
+          style={{
+            right: "-24px",
+            bottom: "-24px",
+            width: "120px",
+            height: "120px",
+            objectFit: "contain",
+            opacity: 0.85,
+            zIndex: 1,
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+
+        {/* Heading */}
+        <p
+          className="font-display"
+          style={{
+            position: "relative",
+            zIndex: 2,
+            fontSize: "var(--cta-card-title)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.15,
+            color: "#111111",
+            margin: 0,
+            maxWidth: "300px",
+            textWrap: "balance",
+          }}
+        >
+          See Everything. Fix Everything.
+        </p>
+
+        {/* Subtitle */}
+        <p
+          style={{
+            position: "relative",
+            zIndex: 2,
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--cta-card-desc)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
+            color: "rgba(17, 17, 17, 0.8)",
+            margin: "12px 0 24px 0",
+            maxWidth: "290px",
+          }}
+        >
+          Continuous container visibility with integrated remediation across
+          modern environments.
+        </p>
+
+        {/* Button — centered (not self-start like the desktop variant) */}
+        <Link
+          href="/contact-us"
+          className="cs-btn-blue"
+          style={
+            {
+              position: "relative",
+              zIndex: 2,
+              "--cs-btn-h": "44px",
+              "--cs-btn-px": "20px",
+              "--cs-btn-fs": "15px",
+            } as React.CSSProperties
+          }
+        >
+          <span>Book a Container Scan</span>
+          <svg
+            className="cs-cta-arrow ml-2"
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+            fill="none"
+            aria-hidden
+          >
+            <path
+              d="M3 9h11m0 0l-4-4m4 4l-4 4"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </Link>
+      </div>
     </div>
   );
 }

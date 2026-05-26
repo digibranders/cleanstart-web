@@ -59,7 +59,7 @@ export function AboutWhoWeAre() {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Heading row */}
-        <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-start lg:gap-[106px]">
+        <div className="flex flex-col items-center text-center gap-12 lg:flex-row lg:items-start lg:text-left lg:gap-[106px]">
           <h2
             className="shrink-0 font-display"
             style={{
@@ -84,9 +84,7 @@ export function AboutWhoWeAre() {
               maxWidth: "840px",
             }}
           >
-            CleanStart builds trusted software delivery by integrating security,
-            compliance, and provenance into every build—giving enterprises
-            confidence from source to production.
+            CleanStart is building the foundation for trusted open source and AI infrastructure by embedding security, compliance, and provenance into every build, giving enterprises confidence from source to production. 
           </p>
         </div>
 
@@ -122,7 +120,7 @@ export function AboutWhoWeAre() {
 
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
             {PILLARS.map((pillar) => (
-              <div key={pillar.title} className="flex flex-col gap-6 px-0 sm:px-8 first:pl-0 last:pr-0">
+              <div key={pillar.title} className="flex flex-col items-center text-center sm:items-start sm:text-left gap-6 px-0 sm:px-8 first:pl-0 last:pr-0">
                 <div className="relative h-[100px] w-[100px] overflow-hidden rounded-lg shrink-0">
                   <Image
                     src={pillar.icon}

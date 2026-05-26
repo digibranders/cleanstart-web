@@ -77,9 +77,15 @@ const LEGAL_LINKS = [
 //     card overlaps real section bg (gradient, pattern, decorative SVGs), NOT
 //     empty body white. The largest card-half is 175px (mobile, h=350).
 //   - Convention: every last bg-providing element of a CTA page uses
-//     `padding-bottom: 250px` (or `var(--spacing-section-cta)`). The Footer's
-//     `padding-top: var(--spacing-section-cta)` matches, producing symmetric
-//     spacing above and below the card at every breakpoint.
+//     `padding-bottom: 250px` (or `var(--spacing-section-cta)`).
+//   - Footer pt is responsive per breakpoint to match the slot heights above
+//     plus a 60px visible gap between card bottom and the tagline paragraph:
+//       mobile  pt-[235px]  (175px card-half + 60px)
+//       sm      pt-[210px]  (150px card-half + 60px)
+//       lg      pt-[190px]  (130px card-half + 60px)
+//     `var(--spacing-section-cta)` is NOT used here because its mobile floor
+//     (120px) is smaller than the mobile card-half (175px), which caused the
+//     card bottom to overlap the tagline at narrow viewports.
 //
 // Locked card container contract (per-page CTAs must fit these bounds):
 //   width: 1276px (max-width: calc(100% - 48px))
@@ -159,7 +165,7 @@ export function Footer({
           }}
         />
       <div className="relative">
-       <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-section-cta" : "pt-[80px]"}`}>
+       <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[235px] sm:pt-[210px] lg:pt-[190px]" : "pt-[80px]"}`}>
         {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
         <div className="flex flex-wrap items-start justify-between gap-8">
           <p

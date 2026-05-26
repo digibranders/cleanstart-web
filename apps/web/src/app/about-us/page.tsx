@@ -30,8 +30,10 @@ export default function AboutPage() {
       />
       <Header />
       <main>
-        {/* Hero shares the same dark gradient wrapper as the homepage hero */}
-        <div className="bg-cs-hero bg-cs-grid relative overflow-hidden">
+        {/* Hero shares the same dark gradient wrapper as the homepage hero.
+            overflow switched to visible at sub-lg so the mobile cube inside
+            AboutHero can break out and overlap into AboutWhoWeAre. */}
+        <div className="bg-cs-hero bg-cs-grid relative overflow-visible lg:overflow-hidden">
           <div className="relative">
             <AboutHero />
           </div>

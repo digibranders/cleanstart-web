@@ -44,7 +44,7 @@
   --spacing-section-sm: clamp(2.5rem, 5vw, 4rem);            /* 40→64px — tight/sequential grids */
   --spacing-section-md: clamp(3rem, 6vw, 5.5rem);            /* 48→88px — standard sections */
   --spacing-section-lg: clamp(4rem, 8vw, 7rem);              /* 64→112px — feature/hero-adjacent */
-  --spacing-section-cta: clamp(7.5rem, 12vw, 11.25rem);      /* 120→180px — CTA-overlap reservation above Footer (120px card half + 60px visible gap) */
+  --spacing-section-cta: 14.6875rem;                          /* 235px (mobile default) — CTA-overlap reservation above Footer. Per-breakpoint overrides below match Footer slot heights so the card-half always clears the previous section's content with a 60px breathing gap. Stepped (not clamp) because the value needs to DECREASE as the viewport grows (slot height shrinks lg+), which a clamp cannot express. */
 
   /* Card padding scale (fluid) */
   --spacing-card-sm: clamp(1rem, 1.5vw, 1.5rem);             /* 16→24px — compact cards */
@@ -207,6 +207,17 @@
   --cta-card-btn-h:       40px;
   --cta-card-btn-px:      16px;
   --cta-card-btn-fs:      16px;
+}
+
+/* CTA-overlap reservation: shrink as viewport grows because the Footer's
+   CTA card slot height also shrinks (350 / 300 / 260 → card-half 175/150/130).
+   Keeps a constant ~60px breathing gap between the card top edge and the
+   previous section's last line of content at every breakpoint. */
+@media (min-width: 40rem) {
+  :root { --spacing-section-cta: 13.125rem; /* 210px = 150 card-half + 60px */ }
+}
+@media (min-width: 64rem) {
+  :root { --spacing-section-cta: 11.875rem; /* 190px = 130 card-half + 60px */ }
 }
 
 :root {
