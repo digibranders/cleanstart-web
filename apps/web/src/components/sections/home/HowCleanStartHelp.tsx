@@ -103,7 +103,7 @@ export function HowCleanStartHelp() {
 
   return (
     <section
-      className="relative w-full pb-16 pt-20 sm:pb-20 lg:pb-0 lg:pt-24"
+      className="relative w-full pb-12 pt-12 sm:pb-16 lg:pb-0 lg:pt-14"
       aria-labelledby="how-cleanstart-title"
       style={{ backgroundColor: "#F6F6F6" }}
     >
@@ -127,7 +127,7 @@ export function HowCleanStartHelp() {
         {/* Title row — title flush-left, separator centered, description right-aligned.
             Same 1fr auto 1fr grid pattern used by SecurityNotPatching for visual
             parity. */}
-        <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
+        <div className="mb-8 flex flex-col items-start gap-6 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="how-cleanstart-title"
             className="justify-self-start font-display text-[#111111]"
@@ -190,13 +190,13 @@ export function HowCleanStartHelp() {
           <svg
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-full w-full hidden md:block"
-            viewBox="0 0 1276 678"
+            viewBox="0 0 1276 582"
             // eslint-disable-next-line no-restricted-syntax -- see comment above
             preserveAspectRatio="none"
             style={{ zIndex: 0 }}
           >
             <path
-              d="M694 0L1236 0C1258.09 0 1276 22.09 1276 40L1276 638C1276 660.09 1258.09 678 1236 678L40 678C17.91 678 0 660.09 0 638L0 380C0 357.91 17.91 340 40 340L614 340C636.09 340 654 317.91 654 300L654 40C654 17.91 671.91 0 694 0Z"
+              d="M694 0L1236 0C1258.09 0 1276 22.09 1276 40L1276 542C1276 564.09 1258.09 582 1236 582L40 582C17.91 582 0 564.09 0 542L0 332C0 309.91 17.91 292 40 292L614 292C636.09 292 654 269.91 654 252L654 40C654 17.91 671.91 0 694 0Z"
               fill="white"
             />
           </svg>
@@ -244,7 +244,7 @@ function CisoCard({
 }) {
   return (
     <article
-      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col overflow-hidden"
+      className="relative flex min-h-[clamp(220px,18vw,260px)] w-full flex-col overflow-hidden"
       style={{
         borderRadius: "40px",
         background:
@@ -425,7 +425,7 @@ function FeatureCardItem({
       // The L-shape SVG behind these cards uses `preserveAspectRatio="none"`
       // and a 50 %-of-container cutout, so it auto-aligns with whatever
       // height the grid stretches all 4 cards to.
-      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col items-center text-center gap-[clamp(16px,2vw,24px)] rounded-[24px] bg-white md:bg-transparent md:rounded-none lg:flex-row lg:text-left lg:items-center lg:gap-[clamp(16px,2vw,24px)]"
+      className="relative flex min-h-[clamp(220px,18vw,260px)] w-full flex-col items-center text-center gap-[clamp(16px,2vw,24px)] rounded-[24px] bg-white md:bg-transparent md:rounded-none lg:flex-row lg:text-left lg:items-center lg:gap-[clamp(16px,2vw,24px)]"
       style={{
         // Smaller padding cap (50 vs 70) reclaims breathing room for the
         // icon + text on tight md cards while still feeling spacious at xl.

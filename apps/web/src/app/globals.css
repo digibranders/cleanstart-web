@@ -1622,8 +1622,8 @@ body {
 .cs-tt-morph[data-pos="-1"],
 .cs-tt-morph[data-pos="1"] {
   z-index: 10;
-  opacity: 0.42;
-  filter: blur(0.6px);
+  opacity: 0.32;
+  filter: blur(4px);
   background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 100%);
   box-shadow: 0 12px 32px -16px rgba(7, 4, 30, 0.5);
 }

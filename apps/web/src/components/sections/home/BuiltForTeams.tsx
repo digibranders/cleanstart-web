@@ -167,7 +167,7 @@ export function BuiltForTeams() {
           "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
     >
-      <div className="relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
+      <div className="relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 py-section-sm">
         <header className="flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="testimonials-title"
@@ -211,7 +211,7 @@ export function BuiltForTeams() {
 
         <section
           ref={carouselRef}
-          className="cs-tt-carousel relative mt-16 outline-none sm:mt-20"
+          className="cs-tt-carousel relative mt-10 outline-none sm:mt-12"
           aria-roledescription="carousel"
           aria-label="Customer testimonials"
           onKeyDown={onKeyDown}
