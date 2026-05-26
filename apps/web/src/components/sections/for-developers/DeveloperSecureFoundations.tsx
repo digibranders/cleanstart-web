@@ -51,8 +51,10 @@ const CODE_PANEL_SHADOW =
   '0px 24px 24px 0px rgba(22,34,51,0.04),' +
   '0px 4px 24px 0px rgba(22,34,51,0.04),' +
   '0px 4px 4px 0px rgba(22,34,51,0.04)';
-const PILLAR_DIVIDER =
+const PILLAR_DIVIDER_V =
   'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.3) 20%, rgba(255,255,255,0.3) 80%, transparent 100%)';
+const PILLAR_DIVIDER_H =
+  'linear-gradient(to right, transparent 0%, rgba(255,255,255,0.3) 20%, rgba(255,255,255,0.3) 80%, transparent 100%)';
 
 /** Syntax-highlighted Dockerfile content for each card */
 interface DockerfileProps {
@@ -128,9 +130,10 @@ function CompCard({ title, fromImage, isCleanStart }: CompCardProps): React.Reac
       style={{
         flex: '1 1 0',
         minWidth: 0,
-        borderRadius: 40,
-        background: '#2CC1EB',
-        padding: 10,
+        borderRadius: 'clamp(24px, 2.78vw, 40px)',
+        /* Figma fill_BL89KJ: cyan #2CC1EB with 0.4 layer opacity — softer than solid. */
+        background: 'rgba(44, 193, 235, 0.4)',
+        padding: 'clamp(6px, 0.7vw, 10px)',
         boxShadow: CODE_PANEL_SHADOW,
         zIndex: 10,
       }}
@@ -283,8 +286,8 @@ export function DeveloperSecureFoundations(): React.ReactElement {
         className="relative mx-auto"
         style={{
           maxWidth: 'var(--container-default)',
-          paddingLeft: '48px',
-          paddingRight: '48px',
+          paddingLeft: 'clamp(16px, 4vw, 48px)',
+          paddingRight: 'clamp(16px, 4vw, 48px)',
           paddingTop: 'clamp(48px, 4.17vw, 80px)',
           paddingBottom: 'clamp(60px, 5.2vw, 100px)',
         }}
@@ -324,28 +327,81 @@ export function DeveloperSecureFoundations(): React.ReactElement {
         </p>
 
         {/* ── 4 Feature pillars ── */}
-        {/* Figma: each pillar 263px, 3 dividers at ~300px intervals within 1276px */}
+        {/* Mobile (Figma 857:6108): single column, 204px wide, ~24px gap, centered
+            text, thin horizontal divider between pillars.
+            Desktop (Figma 798:2243): 4 columns with vertical dividers between. */}
         <div
-          className="relative"
-          style={{ marginBottom: 'clamp(40px, 3.65vw, 70px)' }}
+          className="relative mx-auto"
+          style={{
+            marginBottom: 'clamp(40px, 3.65vw, 70px)',
+            maxWidth: '240px',
+          }}
         >
-          <div
-            className="grid grid-cols-2 lg:grid-cols-4"
-            style={{ columnGap: 0, rowGap: 'clamp(24px, 2.5vw, 40px)' }}
-          >
+          {/* Mobile-only flex column with horizontal dividers */}
+          <div className="flex flex-col items-stretch lg:hidden">
             {PILLARS.map((pillar, i) => (
-              <div key={pillar.title} className="relative">
-                {/* Vertical divider before pillars 2–4 (on lg) */}
+              <div key={`m-${pillar.title}`} className="flex flex-col">
                 {i > 0 && (
                   <div
                     aria-hidden
-                    className="pointer-events-none absolute hidden lg:block"
+                    className="pointer-events-none mx-auto"
+                    style={{
+                      width: '147px',
+                      height: '1px',
+                      background: PILLAR_DIVIDER_H,
+                      marginTop: '24px',
+                      marginBottom: '24px',
+                    }}
+                  />
+                )}
+                <p
+                  className="text-center"
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '20px',
+                    fontWeight: 600,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1.1,
+                    color: '#ffffff',
+                    marginBottom: '12px',
+                  }}
+                >
+                  {pillar.title}
+                </p>
+                <p
+                  className="text-center"
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.4,
+                    color: '#dddddd',
+                  }}
+                >
+                  {pillar.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop-only 4-col grid with vertical dividers */}
+          <div
+            className="hidden lg:grid lg:grid-cols-4"
+            style={{ columnGap: 0, rowGap: 'clamp(24px, 2.5vw, 40px)', maxWidth: 'none' }}
+          >
+            {PILLARS.map((pillar, i) => (
+              <div key={pillar.title} className="relative">
+                {i > 0 && (
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute"
                     style={{
                       left: 0,
                       top: '8%',
                       bottom: '8%',
                       width: '1px',
-                      background: PILLAR_DIVIDER,
+                      background: PILLAR_DIVIDER_V,
                     }}
                   />
                 )}
@@ -416,9 +472,11 @@ export function DeveloperSecureFoundations(): React.ReactElement {
             }}
           />
 
-          {/* Cards flex row */}
+          {/* Cards flex row (desktop) / column (mobile). The badge-seal arrow is
+              rendered inline between the cards on mobile so it sits in flow, and
+              absolutely positioned at the centre on desktop (see block below). */}
           <div
-            className="relative flex flex-col lg:flex-row"
+            className="relative flex flex-col lg:flex-row items-stretch"
             style={{ gap: 'clamp(16px, 2.08vw, 40px)' }}
           >
             <CompCard
@@ -426,6 +484,46 @@ export function DeveloperSecureFoundations(): React.ReactElement {
               fromImage="python:3.11-slim"
               isCleanStart={false}
             />
+
+            {/* Mobile-only arrow between cards — points downward, right-aligned.
+                Figma mobile places the badge chevron between the two stacked cards
+                on the right edge. badge-seal.png is a sprite — we use the same crop
+                window as desktop, then rotate the whole window 90° clockwise so the
+                horizontal `>>` becomes a downward chevron. */}
+            <div
+              aria-hidden
+              className="pointer-events-none relative lg:hidden flex justify-end"
+              style={{ height: '60px', paddingRight: '20px' }}
+            >
+              <div
+                style={{
+                  position: 'relative',
+                  width: '64px',
+                  height: '64px',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  transform: 'rotate(90deg)',
+                  transformOrigin: 'center center',
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/for-developers/secure/badge-seal.png"
+                  alt=""
+                  style={{
+                    position: 'absolute',
+                    left: '-42.32%',
+                    top: '-102.44%',
+                    width: '313.68%',
+                    height: '307.32%',
+                    maxWidth: 'none',
+                  }}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            </div>
+
             <CompCard
               title="CleanStart image (Drop-in)"
               fromImage="cleanstart/python:3.11"
