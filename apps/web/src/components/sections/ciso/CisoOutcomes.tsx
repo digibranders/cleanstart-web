@@ -4,34 +4,45 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 
 /*
- * Figma node 583:2556 — 1920px wide
- *
+ * ── DESKTOP — Figma node 583:2556 — 1920px wide ──────────────────────────────
  * Background: linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)
- * paddingTop: 120px
+ * paddingTop: 120px / paddingBottom: 200px
  *
- * Heading: "Security Outcomes" — 62px Manrope Bold, centered
- *   "Outcomes" has gradient fill (107.15deg, #9A51FF → #2CC1EB)
+ * Heading: "Security Outcomes" — 62px Manrope SemiBold, centered
+ *   "Outcomes" gradient 107.15deg #9A51FF → #2CC1EB, marginBottom 80px
  *
- * 4 stat cards — all 295px wide, gap=32px → 4×295+3×32=1276px (no padding needed)
- *   Tall cards (1 & 3): h=326px, top=263px in section
- *   Short cards (2 & 4): h=258px, top=331px (68px lower, bottom aligns at 589px)
- *   Card border-radius: 24px, bg: white, overflow: clip
+ * 4 stat cards — 295px wide, gap=32px → 4×295+3×32=1276px
+ *   Tall (1 & 3): h=326px | Short (2 & 4): h=258px, marginTop=68px
+ *   Border-radius: 24px, bg: white
+ * Number: left=32, top=106px (translateY-100%), Manrope Bold 62px, #111
+ * Label:  left=32, Tall top=222px / Short top=154px, Sora 22px, #333
  *
- * Number: left=32px, bottom edge at 106px from card top (translateY(-100%) from top=106)
- *   Font: Manrope Bold, 62px, lh=1.2, color #111
- * Label: left-aligned at left=32px
- *   Tall cards: top=232px; Short cards: top=164px
- *   Font: Sora Regular, 22px, tracking -0.05em, lh=1.4, color #333
+ * Decorations: corner vectors (top-right & bottom-left), glow bars at top=633px,
+ *   teal flares at left=139/469/799/1129px, center vector 803×803 top=-56px
  *
- * Bottom decorations:
- *   Glow bars: 3 horizontal lines at top=633px in section (full-width, rotated PNGs)
- *   Teal flares: 652×145px, mix-blend-screen, bottom=77px in section, one per card column
- *     Left positions in section: 139px, 469px, 799px, 1129px
+ * ── MOBILE — Figma node 856:1330 — 360px wide ────────────────────────────────
+ * Section height: ~816px
  *
- * Corner vectors: 979×979 SVG decorators
- *   Top-right: section left=1431px, top=-339px
- *   Bottom-left: section left=-561px, top=67px
- * Center vector: 803×803, centered, top=-56px relative to content
+ * Heading: absolute, top=32px, left=50%-0.5px (centered), width=211px
+ *   Manrope SemiBold 28px, lh=1.2
+ *   "Security " white · "Outcomes " gradient 96.45deg #9A51FF→#2CC1EB
+ *
+ * Cards container: absolute, top=124px, left=50% (centered), width=328px
+ *   flex-col, gap=16px
+ *   Each card: 328×144px, borderRadius=20px, bg=#fff,
+ *     boxShadow="0px 4px 20px 0px rgba(0,0,0,0.08)"
+ *   Number: left=32, top=32, Manrope Bold 40px, lh=1.2, color=#000
+ *   Label:  left=32, top=92, width=280px, 16px Regular, tracking=-0.8px, #333
+ *
+ * Mobile card values:  89% · +70% · 2–3x · 40%
+ *
+ * Background (mobile):
+ *   Center vector: left=50%+0.5px (centered), top=-56px, 803×803px
+ *   Left vector:   left=-72px, top=-81px, 463×463px
+ *
+ * Mobile bottom decorations:
+ *   Glow bar (856:1336): left=-36.55px, top=782.04px, 1340.273×87.964px
+ *   Flare  (856:1340):   left=-31px, bottom=34.64px, 437.805×97.365px, mix-blend-screen
  */
 
 // ─── Counter animation hook ───────────────────────────────────────────────────
@@ -67,23 +78,37 @@ function useCounter(target: number, duration = 1800, enabled = false): number {
 
 // ─── Stat card data ───────────────────────────────────────────────────────────
 interface StatDef {
-  // If target is a number, animate counter; if null use display string as-is
   target: number | null;
-  display: string;   // full display string (used when target is null)
-  suffix: string;    // appended after animated count
-  line1: string;     // first label line (desktop card forces exactly 2 lines)
-  line2: string;     // second label line
-  tall: boolean;     // true=326px height; false=258px height
+  display: string;       // desktop display (used when target is null or for desktop)
+  mobileDisplay: string; // mobile display (pre-formatted, used for non-animated mobile)
+  mobilePrefix: string;  // prefix before animated count on mobile (e.g. "+" for "+70%")
+  suffix: string;        // appended after animated count on desktop
+  mobileSuffix: string;  // appended after animated count on mobile
+  line1: string;
+  line2: string;
+  tall: boolean;         // desktop only: true=326px, false=258px
 }
 
 const STATS: StatDef[] = [
-  { target: 89,   display: "89%",  suffix: "%",  line1: "Fewer inherited",    line2: "vulnerabilities",  tall: true  },
-  { target: 70,   display: "70%+", suffix: "%+", line1: "Smaller software",   line2: "inventories",      tall: false },
-  { target: null, display: "2–3x", suffix: "",   line1: "Faster remediation", line2: "cycles",           tall: true  },
-  { target: 40,   display: "40%",  suffix: "%",  line1: "Lower remediation",  line2: "workload",         tall: false },
+  {
+    target: 89,   display: "89%",  mobileDisplay: "89%",  mobilePrefix: "",  suffix: "%",  mobileSuffix: "%",
+    line1: "Fewer inherited",    line2: "vulnerabilities",  tall: true,
+  },
+  {
+    target: 70,   display: "70%+", mobileDisplay: "+70%", mobilePrefix: "+", suffix: "%+", mobileSuffix: "%",
+    line1: "Smaller software",   line2: "inventories",      tall: false,
+  },
+  {
+    target: null, display: "2–3x", mobileDisplay: "2–3x", mobilePrefix: "",  suffix: "",   mobileSuffix: "",
+    line1: "Faster remediation", line2: "cycles",           tall: true,
+  },
+  {
+    target: 40,   display: "40%",  mobileDisplay: "40%",  mobilePrefix: "",  suffix: "%",  mobileSuffix: "%",
+    line1: "Lower remediation",  line2: "workload",         tall: false,
+  },
 ];
 
-// ─── Single stat card ─────────────────────────────────────────────────────────
+// ─── Desktop stat card ────────────────────────────────────────────────────────
 function StatCard({
   stat,
   enabled,
@@ -91,7 +116,6 @@ function StatCard({
   stat: StatDef;
   enabled: boolean;
 }): React.ReactElement {
-  // Only animate numeric targets; ranges ("2–3x") stay static
   const count = useCounter(stat.target ?? 0, 1800, enabled && stat.target !== null);
   const displayValue =
     stat.target !== null ? `${count}${stat.suffix}` : stat.display;
@@ -107,9 +131,6 @@ function StatCard({
         marginTop: stat.tall ? "0px" : "68px",
       }}
     >
-      {/* ── Animated number ──
-          bottom edge pinned at 106px from card top via translateY(-100%) */}
-      {/* TODO: needs new --stat-number-* token — 40→62px display numeral has no matching role token */}
       <div
         className="absolute whitespace-nowrap"
         style={{
@@ -127,10 +148,6 @@ function StatCard({
         {displayValue}
       </div>
 
-      {/* ── Description label — exactly 2 lines per Figma ──
-          Figma: tall top=232px, short top=164px.
-          Nudged –10px for browser line-height safety (104px vs 94px).
-          2 lines × 22px × lh1.4 = 61.6px — well within 104px available. */}
       <div
         className="absolute"
         style={{
@@ -158,9 +175,73 @@ function StatCard({
   );
 }
 
-// ─── Bottom teal flare ────────────────────────────────────────────────────────
-// Each flare: 652×145px outer, mix-blend-screen; glow extends -100% below (total 290px)
-// Mask shapes the glow into an oval spotlight
+// ─── Mobile stat card ─────────────────────────────────────────────────────────
+// Figma 856:1347–1366: 328×144px, borderRadius 20px, shadow
+// Number: left=32, top=32, 40px Bold, color #000
+// Label:  left=32, top=92, width=280px, 16px, tracking=-0.8px, #333
+function MobileStatCard({
+  stat,
+  enabled,
+}: {
+  stat: StatDef;
+  enabled: boolean;
+}): React.ReactElement {
+  const count = useCounter(stat.target ?? 0, 1800, enabled && stat.target !== null);
+  const displayValue =
+    stat.target !== null
+      ? `${stat.mobilePrefix}${count}${stat.mobileSuffix}`
+      : stat.mobileDisplay;
+
+  return (
+    <div
+      className="relative flex-shrink-0"
+      style={{
+        width: "328px",
+        height: "144px",
+        borderRadius: "20px",
+        backgroundColor: "#fff",
+        boxShadow: "0px 4px 20px 0px rgba(0, 0, 0, 0.08)",
+      }}
+    >
+      {/* Number — left=32, top=32 */}
+      {/* TODO: needs new --stat-number-* token */}
+      <div
+        className="absolute whitespace-nowrap"
+        style={{
+          left: "32px",
+          top: "32px",
+          fontFamily: "var(--font-display)",
+          fontSize: "40px",
+          fontWeight: 700,
+          lineHeight: 1.2,
+          color: "#000",
+        }}
+      >
+        {displayValue}
+      </div>
+
+      {/* Label — left=32, top=92, width=280px */}
+      <div
+        className="absolute"
+        style={{
+          left: "32px",
+          top: "92px",
+          width: "280px",
+          fontFamily: "var(--font-sans)",
+          fontSize: "var(--text-body-md)",
+          fontWeight: 400,
+          lineHeight: 1.4,
+          letterSpacing: "-0.02em",
+          color: "#333",
+        }}
+      >
+        {stat.line1} {stat.line2}
+      </div>
+    </div>
+  );
+}
+
+// ─── Desktop: bottom teal flare ───────────────────────────────────────────────
 function BottomFlare({ left }: { left: string }): React.ReactElement {
   return (
     <div
@@ -174,11 +255,7 @@ function BottomFlare({ left }: { left: string }): React.ReactElement {
         mixBlendMode: "screen",
       }}
     >
-      {/* Glow extends 100% below container for soft fade */}
-      <div
-        className="absolute"
-        style={{ inset: "0 0 -100% 0" }}
-      >
+      <div className="absolute" style={{ inset: "0 0 -100% 0" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/ciso/outcomes-flare.svg"
@@ -207,7 +284,7 @@ function BottomFlare({ left }: { left: string }): React.ReactElement {
   );
 }
 
-// ─── Horizontal glow bar (rotated PNG technique from Figma) ───────────────────
+// ─── Desktop: horizontal glow bar ─────────────────────────────────────────────
 function GlowBar({
   src,
   height,
@@ -225,7 +302,6 @@ function GlowBar({
       className="absolute pointer-events-none select-none left-0 right-0 flex items-center justify-center"
       style={{ top: `${top}px`, height: `${height}px`, opacity }}
     >
-      {/* Rotate the PNG 90° so vertical gradient becomes horizontal */}
       <div
         style={{
           flexShrink: 0,
@@ -252,7 +328,6 @@ export function CisoOutcomes(): React.ReactElement {
   const sectionRef = useRef<HTMLElement>(null);
   const [animated, setAnimated] = useState(false);
 
-  // Trigger counters once section is 20% visible
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -278,77 +353,43 @@ export function CisoOutcomes(): React.ReactElement {
       style={{
         background:
           "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)",
-        paddingTop: "120px",
-        paddingBottom: "200px", // room for glow bars + flares below cards
       }}
     >
-      {/* ── Corner vector — top-right: frame left=1431 → section-absolute ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/ciso/outcomes-vector-corner.svg"
-        alt=""
-        className="absolute pointer-events-none select-none hidden lg:block"
-        style={{
-          left: "calc(50% + 471px)",
-          top: "-339px",
-          width: "979px",
-          height: "979px",
-        }}
-        loading="lazy"
-        decoding="async"
-      />
 
-      {/* ── Corner vector — bottom-left: frame left=-561 → section-absolute ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/ciso/outcomes-vector-corner.svg"
-        alt=""
-        className="absolute pointer-events-none select-none hidden lg:block"
-        style={{
-          left: "calc(50% - 1521px)",
-          top: "67px",
-          width: "979px",
-          height: "979px",
-        }}
-        loading="lazy"
-        decoding="async"
-      />
+      {/* ════════════════════════════════════════════════════════════════════
+          MOBILE (< xl) — pixel-perfect per Figma 856:1330
+          Section height: ~816px, all elements absolutely positioned
+      ════════════════════════════════════════════════════════════════════ */}
+      <div
+        className="xl:hidden relative overflow-hidden"
+        style={{ minHeight: "816px" }}
+      >
+        {/* Left vector — left=-72px, top=-81px, 463×463px */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          aria-hidden
+          src="/images/ciso/outcomes-vector-corner.svg"
+          alt=""
+          className="absolute pointer-events-none select-none"
+          style={{
+            left: "-72px",
+            top: "-81px",
+            width: "463px",
+            height: "463px",
+          }}
+          loading="lazy"
+          decoding="async"
+        />
 
-      {/* ── Bottom glow bars — horizontal gradient lines at top=633px ── */}
-      <GlowBar
-        src="/images/ciso/outcomes-glow-bar1.png"
-        height={131}
-        opacity={0.4}
-        top={633}
-      />
-      <GlowBar
-        src="/images/ciso/outcomes-glow-bar2.png"
-        height={51}
-        opacity={0.3}
-        top={633}
-      />
-
-      {/* ── Bottom teal flares — one per card column ── */}
-      {/* Section-relative left positions: 139, 469, 799, 1129px */}
-      <BottomFlare left="139px" />
-      <BottomFlare left="469px" />
-      <BottomFlare left="799px" />
-      <BottomFlare left="1129px" />
-
-      {/* ── 1276px content container ── */}
-      <div className="relative mx-auto" style={{ maxWidth: "1276px" }}>
-
-        {/* ── Center decorative vector — 803×803, centered, top=-56px ── */}
+        {/* Center vector — left=50%+0.5px (centered), top=-56px, 803×803px */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
           src="/images/ciso/outcomes-vector-center.svg"
           alt=""
-          className="absolute pointer-events-none select-none hidden lg:block"
+          className="absolute pointer-events-none select-none"
           style={{
-            left: "50%",
+            left: "calc(50% + 0.5px)",
             top: "-56px",
             transform: "translateX(-50%)",
             width: "803px",
@@ -358,86 +399,206 @@ export function CisoOutcomes(): React.ReactElement {
           decoding="async"
         />
 
-        {/* ── Heading ── */}
+        {/* Glow bar — 856:1336: left=-36.55px, top=782.04px, 1340.273×87.964px */}
         <div
-          className="relative text-center px-6"
-          style={{ marginBottom: "80px" }}
+          aria-hidden
+          className="absolute pointer-events-none select-none"
+          style={{
+            left: "-36.55px",
+            top: "782.04px",
+            width: "1340.273px",
+            height: "87.964px",
+          }}
         >
-          <h2
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/ciso/outcomes-glow-bar1.png"
+            alt=""
+            style={{ width: "100%", height: "100%", objectFit: "fill", opacity: 0.4 }}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        {/* Bottom flare — 856:1340: left=-31px, bottom=34.64px, 437.805×97.365px, mix-blend-screen */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          aria-hidden
+          src="/images/ciso/outcomes-flare.svg"
+          alt=""
+          className="absolute pointer-events-none select-none"
+          style={{
+            left: "-31px",
+            bottom: "34.64px",
+            width: "437.805px",
+            height: "97.365px",
+            mixBlendMode: "screen",
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+
+        {/* Heading — 856:1345: top=32px, left=50%-0.5px, width=211px, centered */}
+        {/* Manrope SemiBold 28px, lh=1.2 */}
+        {/* "Security " white · "Outcomes " gradient 96.45deg #9A51FF→#2CC1EB */}
+        <h2
+          className="absolute text-center"
+          style={{
+            top: "32px",
+            left: "calc(50% - 0.5px)",
+            transform: "translateX(-50%)",
+            width: "211px",
+            fontFamily: "var(--font-display)",
+            fontSize: "var(--text-display-sm)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.2,
+            color: "#fff",
+          }}
+        >
+          {"Security "}
+          <span
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--text-display-md)",
-              fontWeight: 600,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-              color: "#fff",
+              background:
+                "linear-gradient(96.45deg, #9A51FF 1.758%, #2CC1EB 98.781%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
             }}
           >
-            Security{" "}
-            <span className="cs-text-gradient-impact">Outcomes</span>
-          </h2>
-        </div>
+            {"Outcomes "}
+          </span>
+        </h2>
 
-        {/* ════════ DESKTOP — 4 staggered cards, no horizontal padding ════════
-             4×295 + 3×32 = 1276px fills container exactly.
-             Tall cards (1 & 3): h=326px, no top offset.
-             Short cards (2 & 4): h=258px, marginTop=68px (bottom-aligns all cards). */}
-        <div className="hidden xl:flex items-start" style={{ gap: "32px" }}>
+        {/* Cards container — 856:1346: top=124px, left=50%, width=328px, flex-col gap=16px */}
+        <div
+          className="absolute flex flex-col"
+          style={{
+            top: "124px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "328px",
+            gap: "16px",
+          }}
+        >
           {STATS.map((stat) => (
-            <StatCard key={stat.display} stat={stat} enabled={animated} />
+            <MobileStatCard key={stat.mobileDisplay + stat.line1} stat={stat} enabled={animated} />
           ))}
         </div>
-
-        {/* ════════ MOBILE — 1-col stack ════════
-             Figma 856:1346 — cards 328×144px, 16px gap
-             Number: left=32, top=32, 40px Bold lh=1.2
-             Label:  left=32, top=92, 16px Regular — single line (no <br />) */}
-        <div className="xl:hidden flex flex-col gap-4 px-4">
-          {STATS.map((stat) => (
-            <div
-              key={stat.display}
-              className="relative bg-white"
-              style={{ borderRadius: "24px", height: "144px" }}
-            >
-              {/* Animated number */}
-              {/* TODO: needs new --stat-number-* token — 40px display numeral has no matching role token */}
-              <div
-                className="absolute"
-                style={{
-                  left: "32px",
-                  top: "32px",
-                  fontFamily: "var(--font-display)",
-                  fontSize: "40px",
-                  fontWeight: 700,
-                  letterSpacing: "-0.04em",
-                  lineHeight: 1.2,
-                  color: "#111",
-                }}
-              >
-                {stat.display}
-              </div>
-              {/* Label — single line */}
-              <div
-                className="absolute"
-                style={{
-                  left: "32px",
-                  right: "16px",
-                  top: "92px",
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--text-body-md)",
-                  fontWeight: 400,
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.4,
-                  color: "#333",
-                }}
-              >
-                {stat.line1} {stat.line2}
-              </div>
-            </div>
-          ))}
-        </div>
-
       </div>
+
+      {/* ════════════════════════════════════════════════════════════════════
+          DESKTOP (≥ xl) — pixel-perfect per Figma 583:2556
+      ════════════════════════════════════════════════════════════════════ */}
+      <div
+        className="hidden xl:block relative"
+        style={{ paddingTop: "120px", paddingBottom: "200px" }}
+      >
+        {/* Corner vector — top-right: frame left=1431 → section-absolute */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          aria-hidden
+          src="/images/ciso/outcomes-vector-corner.svg"
+          alt=""
+          className="absolute pointer-events-none select-none"
+          style={{
+            left: "calc(50% + 471px)",
+            top: "-339px",
+            width: "979px",
+            height: "979px",
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+
+        {/* Corner vector — bottom-left: frame left=-561 → section-absolute */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          aria-hidden
+          src="/images/ciso/outcomes-vector-corner.svg"
+          alt=""
+          className="absolute pointer-events-none select-none"
+          style={{
+            left: "calc(50% - 1521px)",
+            top: "67px",
+            width: "979px",
+            height: "979px",
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+
+        {/* Glow bars — horizontal gradient lines at top=633px */}
+        <GlowBar
+          src="/images/ciso/outcomes-glow-bar1.png"
+          height={131}
+          opacity={0.4}
+          top={633}
+        />
+        <GlowBar
+          src="/images/ciso/outcomes-glow-bar2.png"
+          height={51}
+          opacity={0.3}
+          top={633}
+        />
+
+        {/* Bottom teal flares — one per card column */}
+        <BottomFlare left="139px" />
+        <BottomFlare left="469px" />
+        <BottomFlare left="799px" />
+        <BottomFlare left="1129px" />
+
+        {/* 1276px content container */}
+        <div className="relative mx-auto" style={{ maxWidth: "1276px" }}>
+
+          {/* Center decorative vector — 803×803, centered, top=-56px */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            aria-hidden
+            src="/images/ciso/outcomes-vector-center.svg"
+            alt=""
+            className="absolute pointer-events-none select-none"
+            style={{
+              left: "50%",
+              top: "-56px",
+              transform: "translateX(-50%)",
+              width: "803px",
+              height: "803px",
+            }}
+            loading="lazy"
+            decoding="async"
+          />
+
+          {/* Heading */}
+          <div
+            className="relative text-center px-6"
+            style={{ marginBottom: "80px" }}
+          >
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--text-display-md)",
+                fontWeight: 600,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+                color: "#fff",
+              }}
+            >
+              Security{" "}
+              <span className="cs-text-gradient-impact">Outcomes</span>
+            </h2>
+          </div>
+
+          {/* Desktop cards — 4 staggered, fills 1276px */}
+          <div className="flex items-start" style={{ gap: "32px" }}>
+            {STATS.map((stat) => (
+              <StatCard key={stat.display} stat={stat} enabled={animated} />
+            ))}
+          </div>
+
+        </div>
+      </div>
+
     </section>
   );
 }

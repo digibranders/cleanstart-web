@@ -2,7 +2,9 @@
 // Listing only surfaces records whose Payload `_status=published` AND
 // `hiringStatus=open` (paused/closed roles never reach the marketing site).
 
+import { cache } from "react";
 import { fetchCMS } from "./cms-fetch";
+import type { LexicalRoot } from "./blog";
 
 export type JobDepartment =
   | "engineering"
@@ -56,6 +58,8 @@ export type Job = {
     max?: number | null;
     currency?: "USD" | "EUR" | "GBP" | "INR" | null;
   };
+  body?: LexicalRoot | null;
+  updatedAt?: string | null;
 };
 
 type PayloadListResponse<T> = {
@@ -140,6 +144,21 @@ export async function getJobs({
     `/api/jobs?${params.toString()}`,
   );
 }
+
+export const getJobBySlug = cache(
+  async (slug: string): Promise<Job | null> => {
+    const params = new URLSearchParams({
+      "where[slug][equals]": slug,
+      "where[_status][equals]": "published",
+      depth: "2",
+      limit: "1",
+    });
+    const res = await fetchCMS<PayloadListResponse<Job>>(
+      `/api/jobs?${params.toString()}`,
+    );
+    return res.docs[0] ?? null;
+  },
+);
 
 export async function getJobLocations(): Promise<JobLocation[]> {
   const res = await fetchCMS<PayloadListResponse<JobLocation>>(

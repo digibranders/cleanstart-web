@@ -28,6 +28,11 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
       data-section="FipsRegulatedEnvironments"
       className="relative overflow-hidden"
       aria-label="Built for Regulated Environments"
+      /*
+       * Mobile (Figma 366:8028): section frame h=695px.
+       * Desktop: scales up proportionally via vw.
+       */
+      style={{ minHeight: "clamp(695px, 50vw, 800px)" }}
     >
       {/* Background photo */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -42,15 +47,30 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
       />
 
       {/*
-       * Mobile gradient overlay — top-to-bottom dark (Figma 366:7788 shows
-       * heavy dark overlay covering the whole mobile section).
+       * Mobile overlay — transparent at top, fades to black at ~79%.
+       * Figma 366:8028: linear-gradient(180deg, rgba(0,0,0,0) 24%, rgba(0,0,0,0.9) 79%)
+       * This lets the photo show through at top while darkening the sector list area.
        */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none md:hidden"
         style={{
           background:
-            "linear-gradient(180deg, rgba(10,8,32,0.92) 0%, rgba(10,8,32,0.88) 60%, rgba(10,8,32,0.80) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0) 24%, rgba(0,0,0,0.9) 79%)",
+        }}
+      />
+
+      {/*
+       * Mobile purple overlay — rises from bottom.
+       * Figma 366:8028 node 366:8030: rotated gradient giving a purple
+       * wash in the lower section behind the sector list.
+       */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none md:hidden"
+        style={{
+          background:
+            "linear-gradient(0deg, rgba(71,30,192,0.60) 0%, rgba(66,30,188,0.30) 20%, rgba(66,30,188,0) 42%)",
         }}
       />
 
@@ -67,22 +87,14 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
         }}
       />
 
-      {/*
-       * Min-height + flex column lives on the inner wrapper (not the <section>)
-       * so the sectors grid below can `mt-auto` push to the bottom of the
-       * frame. Mobile (Figma 366:7788) needs 520px floor for the stacked
-       * 4-item list; desktop clamps to 550px.
-       */}
-      <div
-        className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-10 py-14 md:py-[110px] flex flex-col"
-        style={{ minHeight: "clamp(520px, 48vw, 550px)" }}
-      >
+      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-10 pt-8 pb-14 md:py-[110px] flex flex-col" style={{ minHeight: "inherit" }}>
         {/*
          * Heading
-         * Mobile: 28px Figtree Bold (Figma 366:7788), desktop: 56px
+         * Mobile (Figma 366:8028): 28px Bold, centered, ls=-0.05em, lh=1.2, w=264px.
+         * Desktop: 56px, left-aligned, maxWidth=770px.
          */}
         <h2
-          className="text-white mb-8 md:mb-[64px]"
+          className="text-white text-center md:text-left mb-16 md:mb-[64px]"
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "clamp(28px, 4vw, 56px)",
@@ -97,24 +109,72 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
         </h2>
 
         {/*
-         * Grid:
-         *   Mobile  (< md): 1 column, items stacked vertically — matches Figma 366:7788
-         *   Desktop (≥ md): 4 columns side-by-side with left-border dividers
+         * Mobile layout — flex column with gradient dividers.
+         * Figma 366:8028: flex-col gap=24px, sectors at left=32px.
+         * Sectors: title 20px SemiBold, desc 14px Regular, separated by
+         * a 147px × 1px gradient line fading left-to-right.
          */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-y-8 md:gap-0 mt-auto md:pt-16">
+        <div className="flex flex-col gap-[24px] md:hidden px-4 mt-auto">
+          {SECTORS.map((sector, idx) => (
+            <div key={sector.title}>
+              <div className="flex flex-col gap-[6px]">
+                <p
+                  className="text-white"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "20px",
+                    fontWeight: 600,
+                    letterSpacing: "-0.05em",
+                    lineHeight: 1,
+                  }}
+                >
+                  {sector.title}
+                </p>
+                <p
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "14px",
+                    fontWeight: 400,
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1.5,
+                    color: "rgba(255,255,255,0.80)",
+                  }}
+                >
+                  {sector.description}
+                </p>
+              </div>
+
+              {/*
+               * Gradient divider — between sectors, not after the last.
+               * Figma 366:8028: Rectangle19 = 1px × 147px image rotated -90°
+               * giving a horizontal line that fades right. Reproduced in CSS.
+               */}
+              {idx < SECTORS.length - 1 && (
+                <div
+                  aria-hidden
+                  className="mt-[24px]"
+                  style={{
+                    height: "1px",
+                    width: "147px",
+                    background:
+                      "linear-gradient(90deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 100%)",
+                  }}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/*
+         * Desktop layout — 4-column grid with left-border dividers.
+         * Figma desktop node (node 366:7788 / 787:xxxx).
+         */}
+        <div className="hidden md:grid md:grid-cols-4 md:gap-0 mt-auto md:pt-16">
           {SECTORS.map((sector, idx) => (
             <div
               key={sector.title}
-              /*
-               * Border-left divider only on md+ (4-column layout).
-               * On mobile (1-column) no divider is shown.
-               */
               className={`relative md:px-7 md:first:pl-0 ${idx > 0 ? "md:border-l md:border-white/20" : ""}`}
             >
-              {/*
-               * Sector title
-               * Mobile: 20px SemiBold (Figma 366:7788), desktop: 32px
-               */}
               <p
                 className="text-white mb-3"
                 style={{
@@ -128,16 +188,12 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
               >
                 {sector.title}
               </p>
-              {/*
-               * Sector description
-               * Mobile: 14px Regular (Figma 366:7788), desktop: 20px
-               */}
               <p
                 style={{
                   fontFamily: "var(--font-display)",
                   fontSize: "clamp(14px, 1.4vw, 20px)",
                   fontWeight: 400,
-                  letterSpacing: "-0.035em",
+                  letterSpacing: "-0.04em",
                   lineHeight: 1.5,
                   color: "rgba(255,255,255,0.78)",
                   maxWidth: "219px",
