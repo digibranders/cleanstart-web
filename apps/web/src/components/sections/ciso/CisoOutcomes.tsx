@@ -204,6 +204,7 @@ function MobileStatCard({
       }}
     >
       {/* Number — left=32, top=32 */}
+      {/* TODO: needs new --stat-number-* token */}
       <div
         className="absolute whitespace-nowrap"
         style={{
@@ -227,10 +228,10 @@ function MobileStatCard({
           top: "92px",
           width: "280px",
           fontFamily: "var(--font-sans)",
-          fontSize: "16px",
+          fontSize: "var(--text-body-md)",
           fontWeight: 400,
           lineHeight: 1.4,
-          letterSpacing: "-0.8px",
+          letterSpacing: "-0.02em",
           color: "#333",
         }}
       >
@@ -448,8 +449,9 @@ export function CisoOutcomes(): React.ReactElement {
             transform: "translateX(-50%)",
             width: "211px",
             fontFamily: "var(--font-display)",
-            fontSize: "28px",
+            fontSize: "var(--text-display-sm)",
             fontWeight: 600,
+            letterSpacing: "-0.04em",
             lineHeight: 1.2,
             color: "#fff",
           }}

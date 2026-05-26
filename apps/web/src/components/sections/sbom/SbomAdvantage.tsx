@@ -407,10 +407,10 @@ function MobileBuiltForCard({
         <p
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '20px',
+            fontSize: 'var(--text-card-title-md)',
             fontWeight: 600,
-            letterSpacing: '-1px',
-            lineHeight: 1,
+            letterSpacing: '-0.04em',
+            lineHeight: 1.1,
             color: '#000',
             width: `${titleW}px`,
           }}
@@ -420,9 +420,9 @@ function MobileBuiltForCard({
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '14px',
+            fontSize: 'var(--text-body-sm)',
             fontWeight: 400,
-            letterSpacing: '-0.56px',
+            letterSpacing: '-0.02em',
             lineHeight: 1.5,
             color: '#111',
             opacity: 0.8,

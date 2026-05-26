@@ -83,22 +83,20 @@ export function ASRHero(): React.ReactElement {
               className="flex flex-col items-center lg:items-start text-center lg:text-left"
               style={{ gap: '16px', width: '100%' }}
             >
-              {/* H1 — Figma: Figtree Bold 32px / lh 1.2 on mobile */}
+              {/* H1 — product-hero token (36 → 56 px) */}
               <h1
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(32px, 4.45vw, 64px)',
+                  fontSize: 'var(--text-hero-product)',
                   fontWeight: 700,
-                  lineHeight: 1.2,
+                  letterSpacing: 'var(--text-hero-product-ls, -0.04em)',
+                  lineHeight: 'var(--text-hero-lh, 1.05)',
                   color: 'white',
                   margin: 0,
                 }}
               >
                 <span className="block">Bigger Images,</span>
-                {/*
-                 * Figma 920:609 gradient: 98.23deg #9A51FF(17.6%) → #2CC1EB(92.7%)
-                 * tracking: -1.6px (Figma: tracking-[-1.6px] at 32px)
-                 */}
+                {/* Figma 920:609 gradient: 98.23deg #9A51FF(17.6%) → #2CC1EB(92.7%) */}
                 <span
                   style={{
                     background: 'linear-gradient(98.23deg, #9A51FF 17.617%, #2CC1EB 92.717%)',
@@ -106,21 +104,21 @@ export function ASRHero(): React.ReactElement {
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
                     color: 'transparent',
-                    letterSpacing: '-1.6px',
+                    letterSpacing: 'var(--text-hero-product-ls, -0.04em)',
                   }}
                 >
                   Bigger Risk
                 </span>
               </h1>
 
-              {/* Description — Figma: Figtree Regular 16px, tracking -0.64px, opacity 0.8 */}
+              {/* Description — section-intro subhead token (17 → 22 px) */}
               <p
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(16px, 1.7vw, 24px)',
+                  fontSize: 'var(--text-t-subhead)',
                   fontWeight: 400,
-                  letterSpacing: '-0.04em',
-                  lineHeight: 1.4,
+                  letterSpacing: 'var(--text-t-subhead-ls, -0.02em)',
+                  lineHeight: 'var(--text-t-subhead-lh, 1.45)',
                   color: 'rgba(255, 255, 255, 0.8)',
                   maxWidth: '480px',
                   margin: 0,
@@ -145,17 +143,9 @@ export function ASRHero(): React.ReactElement {
               className="cs-btn-glass"
               style={
                 {
-                  /* Override the height-based layout with explicit padding */
-                  height: 'auto',
-                  padding: '12px 24px',
-                  /* Figma lavender border (replaces default white border) */
-                  border: '1px solid #dab6f3',
-                  /* Font overrides */
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '16px',
                   fontWeight: 500,
                   letterSpacing: '-0.05em',
-                  /* Figma text color */
                   color: '#111111',
                 } as React.CSSProperties
               }

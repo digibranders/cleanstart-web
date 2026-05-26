@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 /**
  * Inner content for the SBOM CTA card, rendered inside the Footer's
@@ -9,7 +9,7 @@ import Link from 'next/link';
  * Bird sits at left-[308px] top-[221.5px], partially clipped at bottom.
  */
 
-const CARD_BG = 'linear-gradient(180deg, #131E8F 0%, #471EC0 100%)';
+const CARD_BG = "linear-gradient(180deg, #131E8F 0%, #471EC0 100%)";
 
 export function SbomCTA(): React.ReactElement {
   return (
@@ -26,10 +26,10 @@ export function SbomCTA(): React.ReactElement {
         alt=""
         className="absolute pointer-events-none select-none hidden lg:block"
         style={{
-          left: '547px',
-          top: '-220px',
-          width: '1101px',
-          height: '1101px',
+          left: "547px",
+          top: "-220px",
+          width: "1101px",
+          height: "1101px",
           opacity: 0.08,
         }}
         loading="lazy"
@@ -41,14 +41,14 @@ export function SbomCTA(): React.ReactElement {
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
         style={{
-          left: '-139px',
-          top: '-168px',
-          width: '320px',
-          height: '320px',
-          borderRadius: '50%',
-          background: '#DF9BFF',
+          left: "-139px",
+          top: "-168px",
+          width: "320px",
+          height: "320px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
           opacity: 0.8,
-          filter: 'blur(121.5px)',
+          filter: "blur(121.5px)",
         }}
       />
 
@@ -57,14 +57,14 @@ export function SbomCTA(): React.ReactElement {
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
         style={{
-          left: '1159px',
-          top: '244px',
-          width: '511px',
-          height: '511px',
-          borderRadius: '50%',
-          background: '#DF9BFF',
+          left: "1159px",
+          top: "244px",
+          width: "511px",
+          height: "511px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
           opacity: 0.8,
-          filter: 'blur(121.5px)',
+          filter: "blur(121.5px)",
         }}
       />
 
@@ -72,25 +72,25 @@ export function SbomCTA(): React.ReactElement {
       <div
         className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 lg:items-start"
         style={{
-          paddingLeft: 'clamp(32px, 5vw, 80px)',
-          paddingRight: 'clamp(32px, 5vw, 80px)',
-          paddingTop: 'clamp(24px, 3vw, 40px)',
-          paddingBottom: 'clamp(24px, 3vw, 40px)',
-          columnGap: 'clamp(32px, 5vw, 72px)',
+          paddingLeft: "clamp(32px, 5vw, 80px)",
+          paddingRight: "clamp(32px, 5vw, 80px)",
+          paddingTop: "clamp(24px, 3vw, 40px)",
+          paddingBottom: "clamp(24px, 3vw, 40px)",
+          columnGap: "clamp(32px, 5vw, 72px)",
         }}
       >
         {/* Left column — heading, auto-wraps 2 or 3 lines via balance */}
-        <div className="relative min-w-0 w-full" style={{ maxWidth: 'min(460px, 100%)' }}>
+        <div className="relative min-w-0 w-full" style={{ maxWidth: "min(460px, 100%)" }}>
           <p
             style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'var(--cta-card-title)',
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--cta-card-title)",
               fontWeight: 600,
-              letterSpacing: '-0.04em',
+              letterSpacing: "-0.04em",
               lineHeight: 1.1,
-              color: '#fff',
+              color: "#fff",
               margin: 0,
-              textWrap: 'balance',
+              textWrap: "balance",
             }}
           >
             Verify Every Component You Ship
@@ -100,30 +100,30 @@ export function SbomCTA(): React.ReactElement {
         {/* Right column — body + button */}
         <div
           className="flex flex-col min-w-0 w-full"
-          style={{ maxWidth: 'min(460px, 100%)', gap: 'clamp(20px, 2vw, 32px)' }}
+          style={{ maxWidth: "min(460px, 100%)", gap: "clamp(20px, 2vw, 32px)" }}
         >
           <p
             style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--cta-card-desc)',
-              fontWeight: 400,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.4,
-              color: 'rgba(255,255,255,0.80)',
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--cta-card-desc)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.4,
+              color: "rgba(255,255,255,0.80)",
               margin: 0,
             }}
           >
-            Continuously updated, cryptographically verifiable software inventories built for modern
-            software supply chains.
+            Continuously updated, cryptographically verifiable software
+            inventories built for modern software supply chains.
           </p>
           <Link
             href="/contact-us"
             className="cs-btn-glass self-start"
             style={
               {
-                '--cs-btn-h': 'var(--btn-h-xl)',
-                '--cs-btn-px': '32px',
-                '--cs-btn-fs': '16px',
+                "--cs-btn-h": "var(--btn-h-xl)",
+                "--cs-btn-px": "32px",
+                "--cs-btn-fs": "16px",
               } as React.CSSProperties
             }
           >
@@ -134,8 +134,7 @@ export function SbomCTA(): React.ReactElement {
               height="22"
               viewBox="0 0 22 22"
               fill="none"
-              aria-hidden="true"
-              role="presentation"
+              aria-hidden
             >
               <path
                 d="M4 11h14M12 5l6 6-6 6"
@@ -157,11 +156,11 @@ export function SbomCTA(): React.ReactElement {
         alt=""
         className="absolute pointer-events-none select-none hidden lg:block"
         style={{
-          right: '-60px',
-          bottom: '-100px',
-          width: '300px',
-          height: '300px',
-          objectFit: 'contain',
+          right: "-60px",
+          bottom: "-100px",
+          width: "300px",
+          height: "300px",
+          objectFit: "contain",
           opacity: 0.75,
           zIndex: 0,
         }}
@@ -169,90 +168,62 @@ export function SbomCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Mobile layout (< md) — Figma node 817:1558, 360px canvas ──
-           Gradient: 212.81deg #131E8F → #471EC0.
-           Ellipse:  left:-159px top:-154px 223×223px.
-           Union:    left:56px  top:52px   378×378px (SVG has opacity baked in).
-           Content:  centered column, marginTop-based absolute offsets. */}
-      <div
-        className="md:hidden absolute inset-0 overflow-hidden"
-        style={{
-          borderRadius: 'inherit',
-          background: 'linear-gradient(212.81deg, #131E8F 36.343%, #471EC0 90.615%)',
-        }}
-      >
-        {/* Ellipse decoration — top-left bleed */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/sbom/mobile-cta-ellipse.svg"
-          alt=""
-          aria-hidden
-          className="absolute pointer-events-none select-none"
-          style={{ left: '-159px', top: '-154px', width: '223px', height: '223px' }}
-          loading="lazy"
-          decoding="async"
-        />
-        {/* Union radial pattern */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/sbom/mobile-cta-union.svg"
-          alt=""
-          aria-hidden
-          className="absolute pointer-events-none select-none"
-          style={{ left: '56px', top: '52px', width: '378px', height: '378px' }}
-          loading="lazy"
-          decoding="async"
-        />
-
-        {/* Content column — top-aligned with Figma marginTops */}
-        <div className="relative h-full flex flex-col items-center text-center">
-          {/* Heading — Figma: 28px / 700 / -0.04em / 1.2lh / w:276px / top:32px */}
-          <p
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '28px',
-              fontWeight: 700,
-              letterSpacing: '-0.04em',
-              lineHeight: 1.2,
-              color: '#fff',
-              width: '276px',
-              marginTop: '32px',
-              textTransform: 'capitalize',
-            }}
+      {/* ── Mobile fallback ── */}
+      <div className="md:hidden relative h-full px-6 py-10 flex flex-col gap-5 justify-center">
+        <p
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "var(--cta-card-title)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
+            color: "#fff",
+            maxWidth: "280px",
+          }}
+        >
+          Verify Every Component You Ship
+        </p>
+        <p
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "var(--text-t-body-md)",
+            fontWeight: 400,
+            letterSpacing: "var(--text-t-body-md-ls)",
+            lineHeight: "var(--text-t-body-md-lh)",
+            color: "rgba(255,255,255,0.80)",
+          }}
+        >
+          Continuously updated, cryptographically verifiable software
+          inventories built for modern software supply chains.
+        </p>
+        <Link
+          href="/contact-us"
+          className="cs-btn-glass self-start"
+          style={
+            {
+              "--cs-btn-px": "22px",
+              "--cs-btn-fs": "16px",
+            } as React.CSSProperties
+          }
+        >
+          Download the SBOM Datasheet
+          <svg
+            className="cs-cta-arrow"
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+            fill="none"
+            aria-hidden
           >
-            Verify Every Component You Ship
-          </p>
-          {/* Body — Figma: 16px / 400 / -0.64px / 1.5lh / w:265px / marginTop:17px */}
-          <p
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '16px',
-              fontWeight: 400,
-              letterSpacing: '-0.64px',
-              lineHeight: 1.5,
-              color: 'rgba(255,255,255,0.80)',
-              width: '265px',
-              marginTop: '17px',
-            }}
-          >
-            Continuously updated, cryptographically verifiable software inventories built for modern
-            software supply chains.
-          </p>
-          {/* Button — no arrow per Figma mobile spec */}
-          <Link
-            href="/contact-us"
-            className="cs-btn-glass"
-            style={
-              {
-                '--cs-btn-px': '24px',
-                '--cs-btn-fs': '16px',
-                marginTop: '24px',
-              } as React.CSSProperties
-            }
-          >
-            Download the SBOM Datasheet
-          </Link>
-        </div>
+            <path
+              d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </Link>
       </div>
     </div>
   );

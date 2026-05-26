@@ -688,29 +688,29 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                     />
                   </div>
 
-                  {/* Title — Figma: 20px, Manrope SemiBold, tracking-[-1px], lh:1 */}
+                  {/* Title — card-title-md token (18 → 24 px) */}
                   <h3
                     className="text-white font-display"
                     style={{
                       marginTop: "20px",
-                      fontSize: "20px",
+                      fontSize: "var(--text-card-title-md)",
                       fontWeight: 600,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1,
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.1,
                     }}
                   >
                     {f.title}
                   </h3>
 
-                  {/* Body — Figma: 14px, Sora Regular, tracking-[-0.56px], lh:1.5, 80% opacity */}
+                  {/* Body — body-sm token (14 → 16 px) */}
                   <p
                     className="font-sans"
                     style={{
                       marginTop: "12px",
-                      fontSize: "14px",
+                      fontSize: "var(--text-body-sm)",
                       fontWeight: 400,
                       color: "rgba(255,255,255,0.8)",
-                      letterSpacing: "-0.04em",
+                      letterSpacing: "-0.02em",
                       lineHeight: 1.5,
                       maxWidth: "220px",
                     }}

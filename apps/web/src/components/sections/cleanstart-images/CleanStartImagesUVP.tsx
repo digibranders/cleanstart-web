@@ -136,10 +136,10 @@ function MobileUVPCard({ card }: { card: CardData }): React.ReactElement {
         <h3
           className="font-display"
           style={{
-            fontSize: "20px",
+            fontSize: "var(--text-card-title-md)",
             fontWeight: 600,
-            letterSpacing: "-0.05em",
-            lineHeight: 1,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
             color: "#111",
           }}
         >
@@ -148,11 +148,11 @@ function MobileUVPCard({ card }: { card: CardData }): React.ReactElement {
         <p
           className="font-sans"
           style={{
-            fontSize: "14px",
+            fontSize: "var(--text-body-sm)",
             fontWeight: 400,
-            lineHeight: 1.1,
+            lineHeight: 1.4,
             color: "rgba(17,17,17,0.8)",
-            letterSpacing: "-0.04em",
+            letterSpacing: "-0.02em",
           }}
         >
           {card.body}
