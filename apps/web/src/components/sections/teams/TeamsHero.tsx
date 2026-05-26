@@ -1,9 +1,13 @@
 export function TeamsHero() {
   return (
     <section
+      /* min-height removed entirely — was leaving ~140px of dead gradient
+         space below the paragraph on desktop (content only needs ~350px,
+         old floor was 490px). Section now hugs content on both viewports;
+         pt-[clamp(72,8vw,128)] + pb-[80px] padding still gives the hero
+         plenty of vertical breathing room. */
       className="relative overflow-hidden"
       style={{
-        minHeight: "490px",
         backgroundColor: "#151021",
         backgroundImage: [
           "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",

@@ -5,13 +5,80 @@ interface ChipItem {
   id: string;
   line1: string;
   line2: string;
+  Icon: () => React.ReactElement;
+}
+
+/* Per-chip white-line icons rendered inside the blue ball. Each one is a
+ * single-purpose, no-fill SVG sized 28×28 viewBox so they look consistent at
+ * the chip's 40px target. */
+function IconBroom(): React.ReactElement {
+  return (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden>
+      {/* Browser window frame */}
+      <rect x="3.5" y="5" width="25" height="22" rx="2.5" stroke="#fff" strokeWidth="1.6"/>
+      {/* Window chrome bar */}
+      <path d="M3.5 10h25" stroke="#fff" strokeWidth="1.4"/>
+      {/* 3 traffic-light dots */}
+      <circle cx="6.5" cy="7.5" r="0.85" fill="#fff"/>
+      <circle cx="9" cy="7.5" r="0.85" fill="#fff"/>
+      <circle cx="11.5" cy="7.5" r="0.85" fill="#fff"/>
+      {/* Broom handle (diagonal) */}
+      <path d="M20 13.5l-6 6" stroke="#fff" strokeWidth="1.7" strokeLinecap="round"/>
+      {/* Broom head (slanted block) */}
+      <path d="M11.4 17.4l4.6 4.6 1.6-1.6-4.6-4.6-1.6 1.6z" stroke="#fff" strokeWidth="1.4" strokeLinejoin="round"/>
+      {/* Broom bristles (3 lines fanning out below the head) */}
+      <path d="M10 21l-1.5 2M11.5 22l-1 2.4M13 23l-0.3 2.5" stroke="#fff" strokeWidth="1.2" strokeLinecap="round"/>
+      {/* Sparkle */}
+      <path d="M22 16l0.6 1.4 1.4 0.6-1.4 0.6L22 20l-0.6-1.4-1.4-0.6 1.4-0.6L22 16z" fill="#fff"/>
+    </svg>
+  );
+}
+function IconWifi(): React.ReactElement {
+  return (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden>
+      {/* Outer arc (largest) */}
+      <path d="M3 9.5a13 13 0 0 1 18 0" stroke="#fff" strokeWidth="1.9" strokeLinecap="round"/>
+      {/* Middle arc */}
+      <path d="M6 12.5a9 9 0 0 1 12 0" stroke="#fff" strokeWidth="1.9" strokeLinecap="round"/>
+      {/* Inner arc */}
+      <path d="M9 15.5a5 5 0 0 1 6 0" stroke="#fff" strokeWidth="1.9" strokeLinecap="round"/>
+      {/* Center dot at bottom */}
+      <circle cx="12" cy="19" r="1.5" fill="#fff"/>
+    </svg>
+  );
+}
+function IconTarget(): React.ReactElement {
+  return (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden>
+      {/* Outer ring */}
+      <circle cx="12" cy="12" r="8.5" stroke="#fff" strokeWidth="1.7"/>
+      {/* Inner ring */}
+      <circle cx="12" cy="12" r="4.5" stroke="#fff" strokeWidth="1.7"/>
+      {/* Center dot */}
+      <circle cx="12" cy="12" r="1.8" fill="#fff"/>
+      {/* Crosshair lines — extending from outside the outer ring through to inside the inner ring on each cardinal axis */}
+      <path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="#fff" strokeWidth="1.7" strokeLinecap="round"/>
+    </svg>
+  );
+}
+function IconPhoneShield(): React.ReactElement {
+  return (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden>
+      {/* Phone outline — portrait, rounded */}
+      <rect x="5" y="2.5" width="14" height="19" rx="2.8" stroke="#fff" strokeWidth="1.7"/>
+      {/* Shield body — filled white so it reads as solid inside the phone */}
+      <path d="M12 7l3.5 1.4v2.6c0 2.3-1.5 4.4-3.5 5.1-2-0.7-3.5-2.8-3.5-5.1V8.4L12 7z" fill="#fff"/>
+      {/* Checkmark — drawn in blue so it contrasts against the white shield */}
+      <path d="M10.2 11.4l1.3 1.3 2.3-2.3" stroke="#1556d3" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    </svg>
+  );
 }
 
 const OUTCOME_CHIPS: ChipItem[] = [
-  { id: "c1", line1: "Cleaner software",  line2: "foundations"  },
-  { id: "c2", line1: "Better SCA signal", line2: "quality"      },
-  { id: "c3", line1: "Faster, focused",   line2: "remediation"  },
-  { id: "c4", line1: "Stronger security", line2: "outcomes"     },
+  { id: "c1", line1: "Cleaner software",  line2: "foundations",  Icon: IconBroom       },
+  { id: "c2", line1: "Better SCA signal", line2: "quality",      Icon: IconWifi        },
+  { id: "c3", line1: "Faster, focused",   line2: "remediation",  Icon: IconTarget      },
+  { id: "c4", line1: "Stronger security", line2: "outcomes",     Icon: IconPhoneShield },
 ];
 
 /* ─── Quick stats inside the CleanSight card ────────────────────────────── */
@@ -769,12 +836,13 @@ function CleanSightCard(): React.ReactElement {
         }}
       />
 
-      {/* Header title */}
+      {/* Header title — centered in the indigo header bar */}
       <p
         style={{
           position: "absolute",
           top: "54px",
-          left: "115px",
+          left: "50%",
+          transform: "translateX(-50%)",
           fontFamily: "var(--font-display)",
           // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
           fontSize: "20px",
@@ -788,12 +856,13 @@ function CleanSightCard(): React.ReactElement {
         CleanSight Insight
       </p>
 
-      {/* Header subtitle */}
+      {/* Header subtitle — centered in the indigo header bar */}
       <p
         style={{
           position: "absolute",
           top: "76px",
-          left: "115px",
+          left: "50%",
+          transform: "translateX(-50%)",
           fontFamily: "var(--font-body)",
           // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
           fontSize: "12px",
@@ -807,10 +876,10 @@ function CleanSightCard(): React.ReactElement {
         Contextualize and act
       </p>
 
-      {/* ── RECOMMENDED ALTERNATIVE label — top:162px ── */}
+      {/* ── RECOMMENDED ALTERNATIVE label — top:162px, centered ── */}
       <div
         style={{ position: "absolute", top: "162px", left: "38px", right: "38px" }}
-        className="flex items-center"
+        className="flex items-center justify-center"
       >
         <div className="flex items-center" style={{ gap: "8px" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -862,12 +931,13 @@ function CleanSightCard(): React.ReactElement {
               color: "#94a3b8",
               lineHeight: "16.5px",
               margin: 0,
+              textAlign: "center",
             }}
           >
             Current Image
           </p>
           <div
-            className="flex items-center"
+            className="flex items-center justify-center"
             style={{
               background: "#f8fafc",
               border: "1px solid #f1f5f9",
@@ -947,12 +1017,13 @@ function CleanSightCard(): React.ReactElement {
               color: "#6366f1",
               lineHeight: "16.5px",
               margin: 0,
+              textAlign: "center",
             }}
           >
             Recommended Image
           </p>
           <div
-            className="flex flex-col"
+            className="flex flex-col items-center"
             style={{
               background: "#eef2ff",
               border: "1px solid #e0e7ff",
@@ -961,7 +1032,7 @@ function CleanSightCard(): React.ReactElement {
               gap: "8px",
             }}
           >
-            <div className="flex items-center">
+            <div className="flex items-center justify-center">
               <div
                 style={{
                   background: "#6366f1",
@@ -1018,7 +1089,7 @@ function CleanSightCard(): React.ReactElement {
                 background: "#bbf7d0",
                 borderRadius: "9999px",
                 padding: "2px 8px",
-                alignSelf: "flex-start",
+                alignSelf: "center",
               }}
             >
               <p
@@ -1153,7 +1224,10 @@ function CleanSightCard(): React.ReactElement {
 export function SCATransform(): React.ReactElement {
   return (
     <section
-      className="relative overflow-hidden bg-white"
+      /* max-lg:!pt-/pb- overrides the inline 120px padding only on mobile —
+         the 120/120 was creating dead white space above the "Transform SCA
+         outcomes" heading on mobile when stacked below SCAReduceNoise. */
+      className="relative overflow-hidden bg-white max-lg:!pt-[60px] max-lg:!pb-[60px]"
       style={{ paddingTop: "120px", paddingBottom: "120px" }}
     >
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
@@ -1173,9 +1247,13 @@ export function SCATransform(): React.ReactElement {
           <span className="cs-text-gradient-impact">outcomes</span>
         </h2>
 
-        {/* Three-column card layout */}
+        {/* Three-column card layout — desktop (lg+) only.
+            Each card uses absolute positioning designed for ~500px wide; at
+            mobile widths the headers overflow and the bottom row text gets
+            cramped. Mobile renders only the CenterCard inside a CSS-transform
+            scaling wrapper below. */}
         <div
-          className="flex flex-col lg:flex-row"
+          className="hidden lg:flex lg:flex-row"
           style={{ marginTop: "64px", gap: "32px", alignItems: "stretch" }}
         >
           <TraditionalSCACard />
@@ -1183,9 +1261,92 @@ export function SCATransform(): React.ReactElement {
           <CleanSightCard />
         </div>
 
-        {/* Outcome chips row — flex-nowrap on lg+ so all 4 stay in one line */}
+        {/* Mobile-only — Traditional SCA card at native 500px width,
+            CSS-scaled to fit. Sits at the top of the mobile stack so the
+            order matches the desktop left-to-right reading sequence. */}
         <div
-          className="flex flex-wrap lg:flex-nowrap justify-center"
+          className="lg:hidden mx-auto"
+          style={{
+            width: "min(500px, calc(100vw - 48px))",
+            aspectRatio: "500 / 726",
+            position: "relative",
+            marginTop: "64px",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "500px",
+              height: "726px",
+              transform: "scale(min(1, calc((100vw - 48px) / 500px)))",
+              transformOrigin: "top left",
+            }}
+          >
+            <TraditionalSCACard />
+          </div>
+        </div>
+
+        {/* Mobile-only — CleanStart Foundation card at native design width
+            (500px), CSS-scaled to fit any narrow viewport. Outer wrapper
+            reserves scaled visual space via aspect-ratio so chips below
+            land at the right offset. */}
+        <div
+          className="lg:hidden mx-auto"
+          style={{
+            width: "min(500px, calc(100vw - 48px))",
+            aspectRatio: "500 / 726",
+            position: "relative",
+            marginTop: "32px",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "500px",
+              height: "726px",
+              transform: "scale(min(1, calc((100vw - 48px) / 500px)))",
+              transformOrigin: "top left",
+            }}
+          >
+            <CenterCard />
+          </div>
+        </div>
+
+        {/* Mobile-only — CleanSight Insight card, same scale pattern as
+            CenterCard above. Renders below CleanStart Foundation per the
+            reference design. */}
+        <div
+          className="lg:hidden mx-auto"
+          style={{
+            width: "min(500px, calc(100vw - 48px))",
+            aspectRatio: "500 / 726",
+            position: "relative",
+            marginTop: "32px",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "500px",
+              height: "726px",
+              transform: "scale(min(1, calc((100vw - 48px) / 500px)))",
+              transformOrigin: "top left",
+            }}
+          >
+            <CleanSightCard />
+          </div>
+        </div>
+
+        {/* Outcome chips row — mobile stacks vertically (one chip per row,
+            full-width), lg+ keeps the original 4-in-a-row horizontal layout. */}
+        <div
+          className="flex flex-col lg:flex-row lg:flex-nowrap justify-center"
           style={{ marginTop: "48px", gap: "16px" }}
         >
           {OUTCOME_CHIPS.map((chip) => (
@@ -1199,13 +1360,15 @@ export function SCATransform(): React.ReactElement {
                 borderRadius: "36px",
                 paddingLeft: "25px",
                 paddingRight: "24px",
-                gap: "16px",
+                /* Bumped from 16 → 24px to match reference's airier
+                   ball-to-text spacing in the mobile vertical stack. */
+                gap: "24px",
                 flex: "1 1 0",
                 minWidth: 0,
                 height: "122px",
               }}
             >
-              {/* Blue gradient ball with CleanStart logo */}
+              {/* Blue gradient ball with per-chip white-line icon */}
               <div
                 style={{
                   flexShrink: 0,
@@ -1219,16 +1382,7 @@ export function SCATransform(): React.ReactElement {
                   justifyContent: "center",
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/sca/center-ball-logo.svg"
-                  alt=""
-                  aria-hidden
-                  width={40}
-                  height={40}
-                  loading="lazy"
-                  decoding="async"
-                />
+                <chip.Icon />
               </div>
 
               {/* Two-line label */}

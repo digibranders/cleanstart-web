@@ -65,7 +65,7 @@ export function SCAHero(): React.ReactElement {
 
       {/* ── Text content ── */}
       <div
-        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 text-center lg:text-left"
         style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(56px, 7vw, 100px)" }}
       >
         {/* Headline — Figma node 604:2428, 805×160px */}
@@ -146,6 +146,22 @@ export function SCAHero(): React.ReactElement {
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </Link>
+
+        {/* Mobile-only inline 3D illustration — desktop variant is the
+            absolute-positioned one above, hidden below lg. */}
+        <div className="lg:hidden mt-10 flex justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/sca/hero-3d-illustration.png"
+            alt=""
+            aria-hidden
+            width={492}
+            height={516}
+            decoding="async"
+            className="select-none pointer-events-none h-auto"
+            style={{ width: "clamp(280px, 90vw, 380px)" }}
+          />
+        </div>
       </div>
     </section>
   );

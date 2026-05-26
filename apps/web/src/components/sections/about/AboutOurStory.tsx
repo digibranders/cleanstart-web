@@ -1,34 +1,53 @@
 export function AboutOurStory() {
   return (
     <section
-      className="relative overflow-hidden"
-      style={{ minHeight: "clamp(420px, 40vw, 600px)" }}
+      className="relative overflow-hidden min-h-[640px] lg:min-h-[clamp(420px,40vw,600px)]"
     >
-      {/* Full-width founders photo as background */}
+      {/* Founders photo — two sources, one per viewport, because the section
+          changes aspect ratio dramatically between mobile (tall, ~9:16) and
+          desktop (wide, ~16:5). Using one image for both meant either the
+          portrait got upscaled 5× on desktop (blurry building tops, founders
+          off-screen) or the landscape got cropped to nothing on mobile. */}
+
+      {/* Mobile: portrait photo (founders in the lower half, centered) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/about/founders-photo2.png"
+        src="/images/about/founders-new.png"
         alt="CleanStart founders"
-        className="absolute inset-0 full w-full object-cover"
-        style={{ objectPosition: "80% center" }}
+        className="absolute inset-0 h-full w-full object-cover object-center lg:hidden"
         loading="lazy"
         decoding="async"
       />
 
-      {/* Black left-to-right fade — Figma node 248:2108, exact 2-stop values */}
+      {/* Desktop: landscape photo (founders centered horizontally, full NYC
+          scene visible). Anchored at 80% center so the founders sit on the
+          right portion of the section behind the left-aligned text overlay. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/about/founders-photo2.png"
+        alt="CleanStart founders"
+        className="absolute inset-0 h-full w-full object-cover object-[80%_center] hidden lg:block"
+        loading="lazy"
+        decoding="async"
+      />
+
+      {/* Desktop overlay — Figma node 248:2108 left-to-right black fade.
+          Hidden on mobile because the text is centered, not left-aligned, so
+          a horizontal fade no longer matches the text position. */}
       <div
         aria-hidden
-        className="absolute inset-0"
+        className="absolute inset-0 hidden lg:block"
         style={{
           background:
             "linear-gradient(84.003deg, rgba(0,0,0,0.88) 1.453%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0) 58%)",
         }}
       />
 
-      {/* Purple gradient from bottom — Figma node 248:2107, rotate-180 → 0deg, layer opacity 60% */}
+      {/* Desktop purple bottom gradient — Figma node 248:2107. Hidden on
+          mobile so the founders photo stays clean below the text overlay. */}
       <div
         aria-hidden
-        className="absolute inset-0"
+        className="absolute inset-0 hidden lg:block"
         style={{
           opacity: 0.6,
           background:
@@ -36,10 +55,22 @@ export function AboutOurStory() {
         }}
       />
 
-      {/* Text content — left-aligned */}
+      {/* Mobile overlay — top-down dark fade. Opaque behind the centered text
+          at the top of the section, fading to transparent by ~55% so the
+          founders show through unobscured in the lower half. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 lg:hidden"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.62) 25%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0) 60%)",
+        }}
+      />
+
+      {/* Text content — centered on mobile, left-aligned on lg+ */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
-          className="flex flex-col gap-6 py-[clamp(72px,11vw,150px)]"
+          className="flex flex-col items-center text-center mx-auto lg:items-start lg:text-left lg:mx-0 gap-6 py-[clamp(72px,11vw,150px)]"
           style={{ maxWidth: "514px" }}
         >
           <h2
@@ -65,12 +96,7 @@ export function AboutOurStory() {
               opacity: 0.8,
             }}
           >
-            Our founders spent decades in cybersecurity and engineering and saw
-            a recurring flaw: security was always added after software was
-            built. CleanStart began with a simple belief, trust must start at
-            the foundation. That belief drives everything we do, helping
-            organizations move fast, stay compliant, and deliver software the
-            world can trust.
+            CleanStart was founded on a simple belief: trusted software starts at the foundation. By integrating security, compliance, and provenance into every build, we help organizations confidently deliver open source and AI infrastructure at scale.
           </p>
         </div>
       </div>

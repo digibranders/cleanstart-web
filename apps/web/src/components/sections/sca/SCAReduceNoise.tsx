@@ -60,9 +60,11 @@ export function SCAReduceNoise(): React.ReactElement {
         }}
       />
 
-      {/* Content: two columns */}
+      {/* Content: two columns — max-lg:!pt-/pb- shrinks the 120/120 inline
+          padding to 60/60 only on mobile to remove dead space between this
+          section and SCATransform below. */}
       <div
-        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col lg:flex-row items-start justify-between"
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col lg:flex-row items-start justify-between max-lg:!pt-[60px] max-lg:!pb-[60px]"
         style={{ paddingTop: "120px", paddingBottom: "120px", gap: "40px" }}
       >
         {/* Left — heading + subtitle + 4 feature rows */}
@@ -99,6 +101,35 @@ export function SCAReduceNoise(): React.ReactElement {
               Minimal, hardened images reduce inherited vulnerabilities before
               SCA scanning begins.
             </p>
+          </div>
+
+          {/* Mobile-only mockup — sits between subtitle and feature rows.
+              Mockup body is natively 512×541 with absolute positioning, so it
+              can't fluid-resize. We render it at native size and CSS-transform
+              scale to fit the viewport. Outer wrapper reserves layout space
+              that matches the scaled visual size via aspect-ratio. */}
+          <div
+            className="lg:hidden mx-auto"
+            style={{
+              width: "min(512px, calc(100vw - 48px))",
+              aspectRatio: "512 / 541",
+              position: "relative",
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "512px",
+                height: "541px",
+                transform: "scale(min(1, calc((100vw - 48px) / 512px)))",
+                transformOrigin: "top left",
+              }}
+            >
+              <Mockup />
+            </div>
           </div>
 
           {/* Feature rows — gap 24px between rows */}
@@ -159,170 +190,184 @@ export function SCAReduceNoise(): React.ReactElement {
           </div>
         </div>
 
-        {/* Right — cyan glassmorphic bg + dark mockup card stacked */}
+        {/* Right — cyan glassmorphic bg + dark mockup card stacked.
+            Desktop only — mobile renders a scaled clone inside the left column
+            above the feature rows. */}
         <div
           className="flex-shrink-0 hidden lg:block"
           style={{ position: "relative", width: "512px", height: "541px" }}
         >
-          {/* Cyan glassmorphic background (604:2925) */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              borderRadius: "20px",
-              border: "1.5px solid #076eff",
-              background:
-                "linear-gradient(90deg, rgba(44,193,235,0.4) 0%, rgba(44,193,235,0.4) 100%)",
-              overflow: "hidden",
-            }}
-          >
-            {/* Ellipse 46704 — Figma 817:9438 exact spec.
-                315×267 ellipse, rotated 34.99°, top-left −113/−122, blur 105px,
-                linear-gradient(183.65deg, #7A29E3 −32.17%, #EF38E8 147.02%) */}
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                top: "-113px",
-                left: "-122px",
-                width: "315px",
-                height: "267px",
-                borderRadius: "50%",
-                background:
-                  "linear-gradient(183.65deg, #7A29E3 -32.17%, #EF38E8 147.02%)",
-                filter: "blur(105px)",
-                transform: "rotate(34.99deg)",
-              }}
-            />
-          </div>
-
-          {/* Dark gradient mockup card (604:2961) — 25px right, 19px down */}
-          <div
-            style={{
-              position: "absolute",
-              top: "19px",
-              left: "25px",
-              width: "462px",
-              height: "493px",
-              borderRadius: "18.762px",
-              border: "1.564px solid #dab6f3",
-              background:
-                "linear-gradient(180deg, #151021 0%, #131e8f 71.2%, #551ece 100%)",
-              boxShadow:
-                "-160px 80px 50px rgba(0,0,0,0), -102px 51px 46px rgba(0,0,0,0.03), -58px 29px 38px rgba(0,0,0,0.12), -26px 13px 29px rgba(0,0,0,0.2), -6px 3px 16px rgba(0,0,0,0.23)",
-              overflow: "hidden",
-            }}
-          >
-            {/* Window chrome dots + title — at y=23 from card top */}
-            <div
-              className="absolute flex items-center"
-              style={{ top: "23px", left: "30px", gap: "10px" }}
-            >
-              {["#ff5f57", "#febc2e", "#28c840"].map((c) => (
-                <div
-                  key={c}
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    background: c,
-                    flexShrink: 0,
-                  }}
-                />
-              ))}
-              <span
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "var(--text-t-body-lg)",
-                  fontWeight: 600,
-                  letterSpacing: "var(--text-t-body-lg-ls)",
-                  lineHeight: "var(--text-t-body-lg-lh)",
-                  color: "#fff",
-                  marginLeft: "8px",
-                }}
-              >
-                Sca-analyzer --- Scan-minimal
-              </span>
-            </div>
-
-            {/* Divider — at y=74 from card top */}
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                top: "74px",
-                left: "30px",
-                right: "30px",
-                height: "1px",
-                background: "rgba(70,70,70,0.5)",
-              }}
-            />
-
-            {/* Metric rows — first at y=103 from card top, gap 16px, h=48px each */}
-            <div
-              className="absolute flex flex-col"
-              style={{ top: "103px", left: "30px", right: "30px", gap: "16px" }}
-            >
-              {METRICS.map(({ value, color }) => (
-                <div
-                  key={value}
-                  className="flex items-center justify-end rounded-[8px]"
-                  style={{
-                    height: "48px",
-                    padding: "0 16px",
-                    background: "rgba(0,0,0,0.1)",
-                    border: "0.5px solid #464646",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-                      fontSize: "16px",
-                      fontWeight: 600,
-                      letterSpacing: "-0.04em",
-                      color,
-                      opacity: 0.8,
-                    }}
-                  >
-                    {value}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Bar chart area — bottom 30px from card bottom */}
-            <div
-              style={{
-                position: "absolute",
-                bottom: "30px",
-                left: "30px",
-                right: "30px",
-                height: "150px",
-                borderRadius: "7px",
-                background: "rgba(0,0,0,0.1)",
-                display: "flex",
-                alignItems: "flex-end",
-                padding: "0 16px",
-                gap: "16px",
-              }}
-            >
-              {BARS.map(({ h, c }, i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: "49px",
-                    height: `${h}px`,
-                    background: c,
-                    borderRadius: "8px 8px 0 0",
-                    flexShrink: 0,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+          <Mockup />
         </div>
       </div>
     </section>
+  );
+}
+
+/** Sca-analyzer mockup body — natively 512×541. Used directly at native size
+ * on desktop (right column) and inside a CSS-transform scaling wrapper on
+ * mobile (between subtitle and feature rows). All internals use absolute
+ * positioning pinned to those native dimensions. */
+function Mockup(): React.ReactElement {
+  return (
+    <>
+      {/* Cyan glassmorphic background (604:2925) */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "20px",
+          border: "1.5px solid #076eff",
+          background:
+            "linear-gradient(90deg, rgba(44,193,235,0.4) 0%, rgba(44,193,235,0.4) 100%)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Ellipse 46704 — Figma 817:9438 exact spec.
+            315×267 ellipse, rotated 34.99°, top-left −113/−122, blur 105px,
+            linear-gradient(183.65deg, #7A29E3 −32.17%, #EF38E8 147.02%) */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: "-113px",
+            left: "-122px",
+            width: "315px",
+            height: "267px",
+            borderRadius: "50%",
+            background:
+              "linear-gradient(183.65deg, #7A29E3 -32.17%, #EF38E8 147.02%)",
+            filter: "blur(105px)",
+            transform: "rotate(34.99deg)",
+          }}
+        />
+      </div>
+
+      {/* Dark gradient mockup card (604:2961) — 25px right, 19px down */}
+      <div
+        style={{
+          position: "absolute",
+          top: "19px",
+          left: "25px",
+          width: "462px",
+          height: "493px",
+          borderRadius: "18.762px",
+          border: "1.564px solid #dab6f3",
+          background:
+            "linear-gradient(180deg, #151021 0%, #131e8f 71.2%, #551ece 100%)",
+          boxShadow:
+            "-160px 80px 50px rgba(0,0,0,0), -102px 51px 46px rgba(0,0,0,0.03), -58px 29px 38px rgba(0,0,0,0.12), -26px 13px 29px rgba(0,0,0,0.2), -6px 3px 16px rgba(0,0,0,0.23)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Window chrome dots + title — at y=23 from card top */}
+        <div
+          className="absolute flex items-center"
+          style={{ top: "23px", left: "30px", gap: "10px" }}
+        >
+          {["#ff5f57", "#febc2e", "#28c840"].map((c) => (
+            <div
+              key={c}
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                background: c,
+                flexShrink: 0,
+              }}
+            />
+          ))}
+          <span
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--text-t-body-lg)",
+              fontWeight: 600,
+              letterSpacing: "var(--text-t-body-lg-ls)",
+              lineHeight: "var(--text-t-body-lg-lh)",
+              color: "#fff",
+              marginLeft: "8px",
+            }}
+          >
+            Sca-analyzer --- Scan-minimal
+          </span>
+        </div>
+
+        {/* Divider — at y=74 from card top */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: "74px",
+            left: "30px",
+            right: "30px",
+            height: "1px",
+            background: "rgba(70,70,70,0.5)",
+          }}
+        />
+
+        {/* Metric rows — first at y=103 from card top, gap 16px, h=48px each */}
+        <div
+          className="absolute flex flex-col"
+          style={{ top: "103px", left: "30px", right: "30px", gap: "16px" }}
+        >
+          {METRICS.map(({ value, color }) => (
+            <div
+              key={value}
+              className="flex items-center justify-end rounded-[8px]"
+              style={{
+                height: "48px",
+                padding: "0 16px",
+                background: "rgba(0,0,0,0.1)",
+                border: "0.5px solid #464646",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-body)",
+                  // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
+                  fontSize: "16px",
+                  fontWeight: 600,
+                  letterSpacing: "-0.04em",
+                  color,
+                  opacity: 0.8,
+                }}
+              >
+                {value}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Bar chart area — bottom 30px from card bottom */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: "30px",
+            left: "30px",
+            right: "30px",
+            height: "150px",
+            borderRadius: "7px",
+            background: "rgba(0,0,0,0.1)",
+            display: "flex",
+            alignItems: "flex-end",
+            padding: "0 16px",
+            gap: "16px",
+          }}
+        >
+          {BARS.map(({ h, c }, i) => (
+            <div
+              key={i}
+              style={{
+                width: "49px",
+                height: `${h}px`,
+                background: c,
+                borderRadius: "8px 8px 0 0",
+                flexShrink: 0,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
