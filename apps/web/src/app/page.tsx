@@ -95,20 +95,12 @@ export default function Home() {
               <CleanStartFactory />
             </FadeUp>
           </div>
-          {/* Bottom fade — softens the dark Hero/Factory wrapper into the
-              #F6F6F6 page bg of the section below. Per Figma 108:8631 the
-              dark gradient fill itself fades to alpha 0 over its last ~15%
-              with intermediate alpha steps; we replicate that smoothness
-              with a 5-stop gradient (~420px tall) easing from transparent
-              through warm purple haze to solid #F6F6F6. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-[360px]"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(246, 246, 246, 0) 0%, rgba(246, 246, 246, 0.08) 20%, rgba(246, 246, 246, 0.25) 45%, rgba(246, 246, 246, 0.55) 65%, rgba(246, 246, 246, 0.85) 85%, #F6F6F6 100%)",
-            }}
-          />
+          {/* Bottom fade removed (2026-05) — the white-to-transparent
+              gradient was washing out the factory's rocket-exhaust flares
+              and the dark hero backdrop overall. The next section
+              (`SecurityNotPatching`) starts cleanly with its own #F6F6F6
+              background, giving a hard contrast edge that lets the dark
+              factory and the bright section below each own their space. */}
         </div>
 
         {/* Order matches Figma: Security → Advantage stats → How Will Help → Testimonials */}
