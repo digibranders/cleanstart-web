@@ -59,11 +59,26 @@ export function AboutOurVision() {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
-          {/* Left: target / bullseye 3D image — wrapper sized to tight Figma CONTENT bounds (609×568) for max target size */}
-          <div className="flex items-center lg:justify-start">
+          {/* Target / bullseye 3D image — wrapper sized to tight Figma CONTENT
+              bounds (609×568) for max target size.
+              order-2 places it BELOW the text on mobile (per user spec: text →
+              CTA → image at bottom) and in the RIGHT column on lg+ (since the
+              text wrapper has order-1). justify-center on mobile centers the
+              image inside the section container; lg+ aligns to column start. */}
+          <div className="order-2 flex items-center justify-center lg:justify-start">
             <div
               className="relative"
-              style={{ width: "clamp(420px, 55vw, 620px)", aspectRatio: "609 / 568" }}
+              style={{
+                /* Mobile floor lowered (420 → 280) so the image fits
+                   centered on a 375px phone. Desktop max tightened (620 →
+                   440) because at 620 the image was 578px tall while the
+                   text+CTA column was only ~270px, leaving ~150px of dead
+                   space above AND below the text with items-center. 440 ×
+                   568/609 = ~410 tall → balanced row, no visible gap below
+                   the Contact Us button. */
+                width: "clamp(280px, 50vw, 440px)",
+                aspectRatio: "609 / 568",
+              }}
             >
               {/* Background blobs from Figma (Ellipse 46683 + 46703) — large blurred purple + cyan circles that sit behind the graphic and make the white echo ellipses visible */}
               <div
@@ -241,9 +256,11 @@ export function AboutOurVision() {
             </div>
           </div>
 
-          {/* Right: text + CTA */}
-          <div className="flex flex-col gap-10 lg:max-w-[622px]">
-            <div className="flex flex-col gap-6">
+          {/* Text + CTA — order-1 puts this FIRST: top of stack on mobile
+              (heading → paragraph → Contact Us button) and LEFT column on
+              lg+. Image wrapper above carries order-2 to land below/right. */}
+          <div className="order-1 flex flex-col items-center text-center lg:items-start lg:text-left gap-10 lg:max-w-[622px]">
+            <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-6">
               <h2
                 className="font-display"
                 style={{
@@ -267,9 +284,7 @@ export function AboutOurVision() {
                   color: "rgba(17,17,17,0.8)",
                 }}
               >
-                We believe every organization should be able to build and
-                release software that is secure by design. CleanStart is
-                creating that future, one clean build at a time.
+                We believe trusted software should be built into the foundation. CleanStart is creating that future for open source and AI infrastructure, one clean build at a time. 
               </p>
             </div>
 
@@ -278,7 +293,7 @@ export function AboutOurVision() {
                 instead of stretching to the parent flex column's 622 px. */}
             <a
               href="#contact"
-              className="cs-btn-blue self-start"
+              className="cs-btn-blue self-center lg:self-start"
               style={{ minWidth: "131px" }}
             >
               Contact Us

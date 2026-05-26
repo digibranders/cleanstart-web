@@ -96,72 +96,87 @@ export function CleanSightProblems(): React.ReactElement {
           </p>
         </div>
 
-        {/* 2×2 Card Grid */}
-        <div className="mt-12 lg:mt-[67px] grid grid-cols-1 sm:grid-cols-2 gap-px bg-[rgba(217,217,217,0.5)]">
-          {PROBLEMS.map((p, i) => (
-            <div
-              key={p.title}
-              className="bg-white flex items-center gap-6 lg:gap-8 p-8 lg:p-10"
-              style={{
-                borderRight: i % 2 === 0 ? "1px solid rgba(217,217,217,0.5)" : undefined,
-                borderBottom: i < 2 ? "1px solid rgba(217,217,217,0.5)" : undefined,
-              }}
-            >
-              {/* Glow + image */}
-              <div className="relative flex-shrink-0" style={{ width: "220px", height: "165px" }}>
-                <div
-                  aria-hidden
-                  className="pointer-events-none select-none absolute"
-                  style={{
-                    left: "16px",
-                    top: "0px",
-                    width: "165px",
-                    height: "165px",
-                    borderRadius: "50%",
-                    background: "rgba(154, 81, 255, 0.18)",
-                    filter: "blur(30px)",
-                  }}
-                />
-                <Image
-                  src={p.img}
-                  alt={p.alt}
-                  width={220}
-                  height={165}
-                  sizes="220px"
-                  className="relative object-contain w-full h-full"
-                  loading="lazy"
-                />
-              </div>
+        {/* Card grid.
+            Mobile: 1-col stack with 16px gap, each card is a standalone
+            rounded-2xl card (icon centered on top, text centered below).
+            sm+: original 2×2 grid with 1px gray dividers and flex-row cards
+            (image left, text right). */}
+        <div className="mt-12 lg:mt-[67px] grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-px sm:bg-[rgba(217,217,217,0.5)]">
+          {PROBLEMS.map((p, i) => {
+            // Per-cell dividers — sm+ only, drawn via right/bottom borders
+            // that mesh with the grid's 1px gap + gray background.
+            const showRight = i % 2 === 0;   // cells 0 and 2 → right edge of left column
+            const showBottom = i < 2;        // cells 0 and 1 → bottom edge of top row
+            return (
+              <div
+                key={p.title}
+                className={[
+                  "bg-white",
+                  // Mobile: standalone column card, centered, with rounded border
+                  "flex flex-col items-center text-center gap-3 p-6 rounded-2xl border border-[rgba(217,217,217,0.5)]",
+                  // sm+: revert to original flex-row in-grid layout (no rounding/border, dividers via siblings)
+                  "sm:flex-row sm:items-center sm:text-left sm:gap-6 sm:p-8 sm:rounded-none sm:border-0",
+                  "lg:gap-8 lg:p-10",
+                  // sm+ per-cell dividers
+                  showRight && "sm:border-r sm:border-r-[rgba(217,217,217,0.5)]",
+                  showBottom && "sm:border-b sm:border-b-[rgba(217,217,217,0.5)]",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                {/* Icon wrapper — 100×100 on mobile, 220×165 on sm+ */}
+                <div className="relative flex-shrink-0 w-[100px] h-[100px] sm:w-[220px] sm:h-[165px]">
+                  {/* Glow — fills the wrapper on mobile, original 165×165 offset on sm+ */}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none select-none absolute inset-0 sm:inset-auto sm:left-[16px] sm:top-0 sm:w-[165px] sm:h-[165px]"
+                    style={{
+                      borderRadius: "50%",
+                      background: "rgba(154, 81, 255, 0.18)",
+                      filter: "blur(30px)",
+                    }}
+                  />
+                  <Image
+                    src={p.img}
+                    alt={p.alt}
+                    width={220}
+                    height={165}
+                    sizes="(min-width: 640px) 220px, 100px"
+                    className="relative object-contain w-full h-full"
+                    loading="lazy"
+                  />
+                </div>
 
-              {/* Text */}
-              <div className="flex flex-col gap-[10px]">
-                <h3
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "clamp(22px, 2.4vw, 32px)",
-                    fontWeight: 700,
-                    letterSpacing: "-0.04em",
-                    lineHeight: 1.1,
-                    color: "#111",
-                  }}
-                >
-                  {p.title}
-                </h3>
-                <p
-                  style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "clamp(15px, 1.4vw, 20px)",
-                    fontWeight: 400,
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.4,
-                    color: "#333",
-                  }}
-                >
-                  {p.body}
-                </p>
+                {/* Text */}
+                <div className="flex flex-col gap-[10px]">
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: "clamp(22px, 2.4vw, 32px)",
+                      fontWeight: 700,
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.1,
+                      color: "#111",
+                    }}
+                  >
+                    {p.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "clamp(15px, 1.4vw, 20px)",
+                      fontWeight: 400,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.4,
+                      color: "#333",
+                    }}
+                  >
+                    {p.body}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

@@ -1,7 +1,7 @@
 export function AboutHero() {
   return (
     <section
-      className="relative bg-cs-hero bg-cs-grid overflow-hidden"
+      className="relative bg-cs-hero bg-cs-grid overflow-visible lg:overflow-hidden"
       style={{ minHeight: "clamp(440px, 40vw, 569px)" }}
     >
       {/* Purple radial blobs — matching Figma ellipse overlays */}
@@ -60,7 +60,7 @@ export function AboutHero() {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Text at top: 178px from section top, matching Figma node 248:2066 */}
         <div className="pt-[clamp(72px,8vw,128px)] pb-[clamp(40px,5vw,80px)]">
-          <div className="flex flex-col items-start gap-14 lg:max-w-[436px]">
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-14 lg:max-w-[436px]">
             <h1
               className="font-display font-semibold text-white"
               style={{
@@ -85,6 +85,41 @@ export function AboutHero() {
             >
               Contact Us
             </a>
+
+            {/* Mobile-only Figma-accurate cube (node 817:1850).
+                Outer wrapper uses mix-blend-mode: color-dodge so the cube
+                glows into the dark hero gradient instead of sitting flat
+                like a sprite. Inner div clips the slightly-oversized image
+                (per Figma's negative offsets) so the cube reads as cropped
+                naturally. mb-[-130px] + z-10 keeps the existing breakout
+                behavior into the white WhoWeAre section below. */}
+            <div
+              aria-hidden
+              className="lg:hidden block relative z-10 mb-[-130px] lg:mb-0 pointer-events-none select-none"
+              style={{
+                width: "clamp(300px, 95vw, 380px)",
+                aspectRatio: "347 / 378",
+                mixBlendMode: "color-dodge",
+              }}
+            >
+              <div className="absolute inset-0 overflow-hidden">
+                {/* Figma positions: left:-14.75%, top:-8.5%, w:131.09%, h:120.19% */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/about/hero-3d-figma.png"
+                  alt=""
+                  loading="eager"
+                  decoding="async"
+                  className="absolute max-w-none"
+                  style={{
+                    left: "-14.75%",
+                    top: "-8.5%",
+                    width: "131.09%",
+                    height: "120.19%",
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

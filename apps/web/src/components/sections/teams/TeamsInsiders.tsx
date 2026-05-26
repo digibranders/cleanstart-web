@@ -152,7 +152,7 @@ export function TeamsInsiders() {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Section title */}
         <h2
-          className="mb-[80px] text-center font-display text-[#111]"
+          className="mb-2 lg:mb-[80px] text-center font-display text-[#111]"
           style={{
             fontSize: "clamp(32px, 4vw, 56px)",
             fontWeight: 700,
@@ -164,67 +164,18 @@ export function TeamsInsiders() {
           <span className="cs-text-gradient-impact">Insiders</span>
         </h2>
 
-        {/* Controls row */}
-        <div className="mb-8 flex items-center justify-between">
-          {/* Large decorative open-quote — CSS unicode, no image asset needed */}
+        {/* Open-quote row — standalone decorative quote mark above the
+            scrollable track, top-left aligned. Arrows have moved to a
+            dedicated centered row below the cards (see further down). */}
+        <div className="mb-4">
           <span
             aria-hidden
-            className="pointer-events-none select-none font-display font-bold leading-none text-[#111]/20"
+            className="pointer-events-none select-none font-display font-bold leading-none text-[#111]"
             // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
             style={{ fontSize: "72px", lineHeight: 1 }}
           >
             &ldquo;
           </span>
-
-          {/* Prev / Next arrows */}
-          <div className="flex gap-6">
-            <button
-              type="button"
-              onClick={() => scroll("prev")}
-              disabled={!canPrev}
-              aria-label="Previous testimonial"
-              className="flex size-[48px] items-center justify-center rounded-full border border-[#111]/20 bg-white transition-opacity disabled:opacity-30"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                aria-hidden
-              >
-                <path
-                  d="M12.5 15L7.5 10L12.5 5"
-                  stroke="#111"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onClick={() => scroll("next")}
-              disabled={!canNext}
-              aria-label="Next testimonial"
-              className="flex size-[48px] items-center justify-center rounded-full border border-[#111]/20 bg-white transition-opacity disabled:opacity-30"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                aria-hidden
-              >
-                <path
-                  d="M7.5 5L12.5 10L7.5 15"
-                  stroke="#111"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
         </div>
 
         {/* Scrollable track */}
@@ -241,6 +192,45 @@ export function TeamsInsiders() {
             <TestimonialCard key={i} {...t} />
           ))}
         </section>
+
+        {/* Prev / Next arrows — centered below the carousel, black bg + white
+            icons per the reference design. */}
+        <div className="mt-8 flex items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => scroll("prev")}
+            disabled={!canPrev}
+            aria-label="Previous testimonial"
+            className="flex size-[48px] items-center justify-center rounded-full bg-[#111] text-white transition-opacity hover:bg-[#222] disabled:opacity-30"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+              <path
+                d="M12.5 15L7.5 10L12.5 5"
+                stroke="#fff"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => scroll("next")}
+            disabled={!canNext}
+            aria-label="Next testimonial"
+            className="flex size-[48px] items-center justify-center rounded-full bg-[#111] text-white transition-opacity hover:bg-[#222] disabled:opacity-30"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+              <path
+                d="M7.5 5L12.5 10L7.5 15"
+                stroke="#fff"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
     </section>
   );

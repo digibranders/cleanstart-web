@@ -9,23 +9,70 @@
  *  - cards laid out in a 1276px container, white-card pitch = 437px, gap = 91px
  */
 
-type Card = { title: string; description: string };
+type Card = {
+  title: string;
+  description: string;
+  Icon: () => React.ReactElement;
+};
+
+/* Per-card white-line inline SVG icons. Same approach as SCATransform's chip
+ * icons + CleanSightUnified — keeps visual weight consistent across the row
+ * without shipping 3 separate SVG asset files. Each icon renders at the
+ * blue ball's full inner size (56% of 96px ≈ 54px). */
+function IconAccelerate(): React.ReactElement {
+  return (
+    <svg width="54" height="54" viewBox="0 0 32 32" fill="none" aria-hidden>
+      {/* Main upward arrow (chevron) */}
+      <path d="M16 6l8 9h-5v9h-6v-9H8l8-9z" fill="#fff"/>
+      {/* Smaller motion chevrons either side, behind the main arrow */}
+      <path d="M8 19l4 4M24 19l-4 4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" opacity="0.55"/>
+      <path d="M6 23l3 3M26 23l-3 3" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" opacity="0.35"/>
+    </svg>
+  );
+}
+function IconCheckShield(): React.ReactElement {
+  return (
+    <svg width="54" height="54" viewBox="0 0 32 32" fill="none" aria-hidden>
+      {/* Document with curled corner */}
+      <path d="M8 4h12l4 4v18a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round" fill="rgba(255,255,255,0.1)"/>
+      <path d="M20 4v4h4" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round"/>
+      {/* Big check inside */}
+      <path d="M11 17l3 3 6-7" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+function IconLock(): React.ReactElement {
+  return (
+    <svg width="54" height="54" viewBox="0 0 32 32" fill="none" aria-hidden>
+      {/* Shackle */}
+      <path d="M10 14V11a6 6 0 0 1 12 0v3" stroke="#fff" strokeWidth="1.9" strokeLinecap="round"/>
+      {/* Lock body */}
+      <rect x="7" y="14" width="18" height="14" rx="2.5" stroke="#fff" strokeWidth="1.9" fill="rgba(255,255,255,0.1)"/>
+      {/* Keyhole — small circle + slot */}
+      <circle cx="16" cy="20" r="1.6" fill="#fff"/>
+      <path d="M16 21.4v3" stroke="#fff" strokeWidth="1.8" strokeLinecap="round"/>
+    </svg>
+  );
+}
 
 const CARDS: Card[] = [
   {
     title: "Accelerates Development",
     description:
-      "Security no longer slows innovation. CleanStart automates compliance and hardens builds from the source, giving developers freedom to move fast without risk.",
+      "Security should accelerate innovation, not slow it down. CleanStart automates compliance and hardens builds at source, helping teams move faster confidently..",
+    Icon: IconAccelerate,
   },
   {
     title: "End-to-End Transparency",
     description:
-      "Every artifact tells its story. With CleanStart, every software component from source to production carries full provenance and cryptographic proof of trust.",
+      "Every build is fully verifiable. CleanStart delivers complete provenance and cryptographic trust from source to production across open source and AI infrastructure. ",
+    Icon: IconCheckShield,
   },
   {
     title: "Secure by Design",
     description:
-      "Security is strongest when it starts at the foundation. CleanStart embeds trust and compliance deeply into every build, making every release inherently secure by default.",
+      "Trust starts at the foundation. CleanStart embeds security, compliance, and provenance into every build, making every release secure by default.",
+    Icon: IconLock,
   },
 ];
 
@@ -131,8 +178,7 @@ export function AboutPowering() {
               maxWidth: "835px",
             }}
           >
-            Tailored solutions for every role in your organization — from
-            security leaders to engineering teams.
+            Tailored solutions for every role in your organization — from security leaders to engineering teams.
           </p>
         </div>
 
@@ -148,7 +194,7 @@ export function AboutPowering() {
   );
 }
 
-function FeatureCard({ title, description }: Card) {
+function FeatureCard({ title, description, Icon }: Card) {
   return (
     <div
       className="relative w-full"
@@ -172,8 +218,9 @@ function FeatureCard({ title, description }: Card) {
         style={{ backgroundColor: "#2CC1EB", opacity: 0.3 }}
       />
 
-      {/* White card — flex column, no absolute internals */}
-      <div className="relative flex h-full w-full flex-col gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[24px] bg-white p-card-md">
+      {/* White card — flex column, no absolute internals.
+          Mobile: ball + text centered. sm+: original left-aligned. */}
+      <div className="relative flex h-full w-full flex-col items-center text-center sm:items-start sm:text-left gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[24px] bg-white p-card-md">
         {/* Ball — 248:2163 (96×96, blue gradient, inset highlight) */}
         <div
           className="flex shrink-0 items-center justify-center overflow-hidden"
@@ -186,17 +233,7 @@ function FeatureCard({ title, description }: Card) {
               "0px 6.171px 14.537px rgba(28,60,142,0.33), inset 0px -0.233px 0.291px rgba(0,44,179,0.5), inset 0px 0.116px 0.582px rgba(255,255,255,0.81)",
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/about/powering-ball-icon.svg"
-            alt=""
-            width={54}
-            height={54}
-            className="object-contain"
-            style={{ width: "56%", height: "56%" }}
-            loading="lazy"
-            decoding="async"
-          />
+          <Icon />
         </div>
 
         <div className="flex flex-col gap-3">
