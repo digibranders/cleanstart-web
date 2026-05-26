@@ -63,17 +63,16 @@ export function ASRHero(): React.ReactElement {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
-          className="flex flex-col lg:flex-row items-start lg:items-center"
+          className="flex flex-col lg:flex-row items-start lg:items-center gap-[29px] lg:gap-[40px]"
           style={{
             /* Mobile: 136px matches Figma node 920:609 top:136px offset */
             paddingTop: 'clamp(136px, 13vw, 229px)',
             paddingBottom: 'clamp(56px, 7vw, 100px)',
-            gap: '40px',
           }}
         >
           {/* ── Left: heading + description + CTA ── */}
           <div
-            className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left"
+            className="w-full lg:flex-1 flex flex-col items-center lg:items-start text-center lg:text-left"
             style={{
               maxWidth: '545px',
               gap: '24px' /* Figma: gap-[24px] between text-block and button */,
