@@ -476,8 +476,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
               rendered inline between the cards on mobile so it sits in flow, and
               absolutely positioned at the centre on desktop (see block below). */}
           <div
-            className="relative flex flex-col lg:flex-row items-stretch"
-            style={{ gap: 'clamp(16px, 2.08vw, 40px)' }}
+            className="relative flex flex-col lg:flex-row items-stretch gap-0 lg:gap-[clamp(16px,2.08vw,40px)]"
           >
             <CompCard
               title="Traditional Security Operations"
@@ -493,16 +492,16 @@ export function DeveloperSecureFoundations(): React.ReactElement {
             <div
               aria-hidden
               className="pointer-events-none relative lg:hidden flex justify-end"
-              style={{ height: '60px', paddingRight: '20px' }}
+              style={{ height: '40px', paddingRight: '20px' }}
             >
               <div
                 style={{
                   position: 'relative',
-                  width: '64px',
-                  height: '64px',
+                  width: '48px',
+                  height: '48px',
                   overflow: 'hidden',
                   flexShrink: 0,
-                  transform: 'rotate(90deg)',
+                  transform: 'translateY(-4px) rotate(90deg)',
                   transformOrigin: 'center center',
                 }}
               >
