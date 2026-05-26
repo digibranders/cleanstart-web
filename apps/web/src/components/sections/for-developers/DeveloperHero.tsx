@@ -440,7 +440,9 @@ export function DeveloperHero(): React.ReactElement {
         </p>
 
         <Link
-          href="/cleanstart-images"
+          href="https://images.cleanstart.com"
+          target="_blank"
+          rel="noopener noreferrer"
           className="cs-btn-glass"
           style={
             {

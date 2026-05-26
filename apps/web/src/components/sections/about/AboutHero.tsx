@@ -73,7 +73,7 @@ export function AboutHero() {
             </h1>
 
             <a
-              href="#contact"
+              href="/contact-us"
               className="cs-btn-glass"
               style={{
                 ["--cs-btn-px" as string]: "18px",

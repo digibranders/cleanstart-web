@@ -97,7 +97,7 @@ export function CleanSightHero(): React.ReactElement {
             </p>
 
             <Link
-              href="/contact-us"
+              href="/book-a-demo"
               className="cs-btn-glass"
               style={
                 {
@@ -106,7 +106,7 @@ export function CleanSightHero(): React.ReactElement {
                 } as React.CSSProperties
               }
             >
-              <span>Contact Us</span>
+              <span>Get a Demo</span>
               <svg
                 className="cs-cta-arrow"
                 width="18"

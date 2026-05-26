@@ -64,7 +64,7 @@ export function AboutCTA() {
 
       <div className="relative flex flex-wrap items-center justify-center gap-4 sm:gap-12">
         <a
-          href="#contact"
+          href="/contact-us"
           className="cs-btn-glass"
           style={{
             ["--cs-btn-px" as string]: "18px",
@@ -77,14 +77,14 @@ export function AboutCTA() {
           Contact Sales
         </a>
         {/* <a
-          href="#how-it-works"
+          href="/cleansight"
           className="cs-btn-blue"
           style={{ minWidth: "163px" }}
         >
           How it works
         </a> */}
         <a
-          href="#careers"
+          href="/careers"
           className="cs-btn-blue"
           style={{ minWidth: "111px" }}
         >

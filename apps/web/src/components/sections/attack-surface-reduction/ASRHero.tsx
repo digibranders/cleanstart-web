@@ -139,7 +139,9 @@ export function ASRHero(): React.ReactElement {
              *   background: glass (rgba white + radial blue tints)
              */}
             <Link
-              href="/cleanstart-images"
+              href="https://images.cleanstart.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="cs-btn-glass"
               style={
                 {

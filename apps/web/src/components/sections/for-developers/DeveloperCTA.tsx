@@ -125,7 +125,7 @@ export function DeveloperCTA(): React.ReactElement {
           </p>
 
           <Link
-            href="/cleanstart-images"
+            href="/resource-center"
             className="cs-btn-blue self-start"
             style={
               {
@@ -158,7 +158,7 @@ export function DeveloperCTA(): React.ReactElement {
       </div>
 
       {/* ── Mobile layout ── */}
-      <div className="flex md:hidden absolute inset-0 flex-col items-start justify-center" style={{ padding: '32px 28px' }}>
+      <div className="flex md:hidden absolute inset-0 flex-col items-center justify-center text-center" style={{ padding: '32px 28px' }}>
         <p
           className="font-display font-bold"
           style={{
@@ -188,7 +188,7 @@ export function DeveloperCTA(): React.ReactElement {
           development workflows.
         </p>
         <Link
-          href="/cleanstart-images"
+          href="/resource-center"
           className="cs-btn-blue"
           style={
             {

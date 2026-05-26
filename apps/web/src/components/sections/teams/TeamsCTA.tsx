@@ -76,16 +76,8 @@ export function TeamsCTA() {
         decoding="async"
       />
 
-      {/* Text content */}
-      <div
-        className="absolute flex flex-col gap-4"
-        style={{
-          left: "clamp(24px, 45%, 547px)",
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: "min(607px, calc(100% - clamp(24px, 45%, 547px) - 24px))",
-        }}
-      >
+      {/* Text content — centered column on mobile, anchored to right-half on md+ */}
+      <div className="absolute inset-x-6 inset-y-0 flex flex-col items-center justify-center gap-4 text-center md:inset-auto md:left-[clamp(24px,45%,547px)] md:top-1/2 md:-translate-y-1/2 md:items-start md:text-left md:w-[min(607px,calc(100%-clamp(24px,45%,547px)-24px))]">
         <p
           className="font-display font-bold text-[#111]"
           style={{
@@ -98,15 +90,14 @@ export function TeamsCTA() {
           Join the Team
         </p>
 
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-10 items-center md:items-start">
           <p
-            className="font-sans text-[#111]/80"
+            className="font-sans text-[#111]/80 whitespace-normal md:whitespace-nowrap"
             style={{
               fontSize: "var(--cta-card-desc)",
-            fontWeight: 400,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.4,
-              whiteSpace: "nowrap",
+              fontWeight: 400,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
             }}
           >
             Visit our career page to explore open opportunities

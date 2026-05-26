@@ -207,7 +207,9 @@ export function FipsHero(): React.ReactElement {
            * Desktop: px=18 py=9 (Figma 787:1948)
            */}
           <Link
-            href="/cleanstart-images"
+            href="https://images.cleanstart.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="cs-btn-glass"
             style={
               {
