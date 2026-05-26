@@ -331,14 +331,13 @@ export function DeveloperSecureFoundations(): React.ReactElement {
             text, thin horizontal divider between pillars.
             Desktop (Figma 798:2243): 4 columns with vertical dividers between. */}
         <div
-          className="relative mx-auto"
+          className="relative"
           style={{
             marginBottom: 'clamp(40px, 3.65vw, 70px)',
-            maxWidth: '240px',
           }}
         >
           {/* Mobile-only flex column with horizontal dividers */}
-          <div className="flex flex-col items-stretch lg:hidden">
+          <div className="flex flex-col items-stretch lg:hidden mx-auto" style={{ maxWidth: '240px' }}>
             {PILLARS.map((pillar, i) => (
               <div key={`m-${pillar.title}`} className="flex flex-col">
                 {i > 0 && (
@@ -388,7 +387,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           {/* Desktop-only 4-col grid with vertical dividers */}
           <div
             className="hidden lg:grid lg:grid-cols-4"
-            style={{ columnGap: 0, rowGap: 'clamp(24px, 2.5vw, 40px)', maxWidth: 'none' }}
+            style={{ columnGap: 0, rowGap: 'clamp(24px, 2.5vw, 40px)' }}
           >
             {PILLARS.map((pillar, i) => (
               <div key={pillar.title} className="relative">
@@ -476,7 +475,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
               rendered inline between the cards on mobile so it sits in flow, and
               absolutely positioned at the centre on desktop (see block below). */}
           <div
-            className="relative flex flex-col lg:flex-row items-stretch gap-0 lg:gap-[clamp(16px,2.08vw,40px)]"
+            className="relative flex flex-col lg:flex-row items-stretch gap-6 lg:gap-[clamp(16px,2.08vw,40px)]"
           >
             <CompCard
               title="Traditional Security Operations"
@@ -484,24 +483,29 @@ export function DeveloperSecureFoundations(): React.ReactElement {
               isCleanStart={false}
             />
 
-            {/* Mobile-only arrow between cards — points downward, right-aligned.
-                Figma mobile places the badge chevron between the two stacked cards
-                on the right edge. badge-seal.png is a sprite — we use the same crop
-                window as desktop, then rotate the whole window 90° clockwise so the
-                horizontal `>>` becomes a downward chevron. */}
+            {/* Mobile-only arrow — absolutely positioned to overlap the joint
+                between the two stacked cards on the right edge. Sized to match
+                desktop (~64px), with overflow:hidden + cropped sprite + 90°
+                rotation so the horizontal `>>` reads as a downward chevron. */}
             <div
               aria-hidden
-              className="pointer-events-none relative lg:hidden flex justify-end"
-              style={{ height: '40px', paddingRight: '20px' }}
+              className="pointer-events-none absolute lg:hidden"
+              style={{
+                right: '20px',
+                top: '50%',
+                width: '64px',
+                height: '64px',
+                transform: 'translateY(-50%)',
+                zIndex: 20,
+              }}
             >
               <div
                 style={{
                   position: 'relative',
-                  width: '48px',
-                  height: '48px',
+                  width: '100%',
+                  height: '100%',
                   overflow: 'hidden',
-                  flexShrink: 0,
-                  transform: 'translateY(-4px) rotate(90deg)',
+                  transform: 'rotate(90deg)',
                   transformOrigin: 'center center',
                 }}
               >
