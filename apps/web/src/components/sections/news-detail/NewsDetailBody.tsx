@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { mediaUrl } from "@/lib/blog";
 import { RenderLexical } from "@/lib/renderLexical";
 import type { NewsDetail } from "@/lib/news";
@@ -9,6 +10,7 @@ interface NewsDetailBodyProps {
 
 export function NewsDetailBody({ item }: NewsDetailBodyProps): React.ReactElement {
   const logoUrl = mediaUrl(item.publisherLogo?.url);
+  const heroUrl = mediaUrl(item.heroImage?.url);
 
   const datelinePieces: string[] = [];
   if (item.location) datelinePieces.push(item.location);
@@ -20,7 +22,30 @@ export function NewsDetailBody({ item }: NewsDetailBodyProps): React.ReactElemen
       className="relative w-full bg-white"
       data-section="NewsDetailBody"
     >
-      <div className="relative mx-auto max-w-[820px] px-6 pt-[64px] pb-[80px]">
+      <div className="relative mx-auto max-w-[820px] px-6 pt-[40px] sm:pt-[64px] pb-[80px]">
+        {/* Hero image — Figma 817:5939 (Newsroom Detail Mobile, image 583153).
+            Sits between the dark hero meta row and the article body, with the
+            full-width responsive aspect retained from the source. */}
+        {heroUrl && item.heroImage?.width && item.heroImage?.height && (
+          <div
+            className="relative w-full overflow-hidden mb-8"
+            style={{
+              aspectRatio: `${item.heroImage.width} / ${item.heroImage.height}`,
+              borderRadius: "20px",
+              background: "rgba(0,0,0,0.05)",
+            }}
+          >
+            <Image
+              src={heroUrl}
+              alt={item.heroImage.alt ?? item.title}
+              fill
+              sizes="(max-width: 820px) 100vw, 820px"
+              className="object-cover"
+              priority
+            />
+          </div>
+        )}
+
         {/* Publisher logo card */}
         {logoUrl && (
           <div

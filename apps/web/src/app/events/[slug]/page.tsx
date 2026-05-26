@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
 import { EventDetailHero } from "@/components/sections/events/EventDetailHero";
+import { EventDetailMobileCard } from "@/components/sections/events/EventDetailMobileCard";
 import {
   formatEventDate,
   getEventBySlug,
@@ -145,16 +146,40 @@ export async function renderEventDetail({
       <JsonLd id={`event-schema-${event.slug}`} data={eventJsonLd(event)} />
       <Header />
       <main style={{ background: "#f6f6f6" }}>
-        <EventDetailHero
+        {/* MOBILE — compact card-style layout per Figma 926:1443. */}
+        <EventDetailMobileCard
           title={event.title}
+          slug={event.slug}
           venue={event.venue}
           longDate={longDate}
-          eventStatus={event.eventStatus}
+          shortDate={formatEventDate(
+            event.startsAt,
+            event.timezone,
+            event.customDateLabel,
+            "short",
+          )}
+          abstract={event.abstract ?? null}
+          heroImageUrl={heroImg ?? null}
+          heroImageAlt={event.heroImage?.alt ?? null}
+          heroImageWidth={event.heroImage?.width ?? null}
+          heroImageHeight={event.heroImage?.height ?? null}
           isPast={isPast}
+          eventStatus={event.eventStatus}
         />
 
+        {/* DESKTOP — existing hero + image + body layout. */}
+        <div className="hidden lg:block">
+          <EventDetailHero
+            title={event.title}
+            venue={event.venue}
+            longDate={longDate}
+            eventStatus={event.eventStatus}
+            isPast={isPast}
+          />
+        </div>
+
         {(heroImg || showRegisterCta || showPostEventCta) && (
-          <section className="relative mx-auto max-w-[820px] px-6" style={{ paddingTop: "64px" }}>
+          <section className="relative mx-auto max-w-[820px] px-6 hidden lg:block" style={{ paddingTop: "64px" }}>
             {heroImg && event.heroImage?.width && event.heroImage?.height && (
               <div
                 className="relative overflow-hidden mx-auto"
