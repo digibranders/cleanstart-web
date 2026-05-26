@@ -1,3 +1,5 @@
+import type React from "react";
+
 type TrustCard = {
   title: string;
   body: string;
@@ -30,7 +32,116 @@ const TRUST_CARDS: TrustCard[] = [
 /* Vertical line x-positions from Figma (px within 287px card) */
 const VERTICAL_LINES = [48.47, 120.03, 162.38, 233.94];
 
-function TrustCardItem({ card }: { card: TrustCard }): React.ReactElement {
+/**
+ * Mobile card — vertical layout matching Figma 856:549
+ * 328×226 px, rounded-16, icon centered at top, text centered below
+ */
+function MobileTrustCard({ card }: { card: TrustCard }): React.ReactElement {
+  return (
+    <div
+      className="w-full mx-auto"
+      style={{
+        maxWidth: "328px",
+        height: "226px",
+        position: "relative",
+        borderRadius: "16px",
+        background: "white",
+        overflow: "hidden",
+        /* Subtle cyan glow border — simulates Figma rect1000001781 asset */
+        boxShadow:
+          "0 0 0 1.5px rgba(44,193,235,0.22), 0 6px 24px rgba(44,193,235,0.14), 0 2px 8px rgba(0,0,0,0.06)",
+      }}
+    >
+      {/* Purple glow blob — 209×90 px, blur 66.5 px, opacity 50 % — sits behind ball */}
+      <div
+        aria-hidden
+        className="absolute pointer-events-none select-none"
+        style={{
+          top: "-16px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "209px",
+          height: "90px",
+          background: "#df9bff",
+          filter: "blur(66.5px)",
+          opacity: 0.5,
+          borderRadius: "50%",
+        }}
+      />
+
+      {/* Blue ball — 70×70 px, centered horizontally, top 10 px */}
+      <div
+        className="absolute flex items-center justify-center"
+        style={{
+          top: "10px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "70px",
+          height: "70px",
+          borderRadius: "50%",
+          background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
+          boxShadow:
+            "0px 4.5px 10.5px rgba(28,60,142,0.33), inset 0px 0.116px 0.582px rgba(255,255,255,0.81), inset 0px -0.233px 0.291px rgba(0,44,179,0.5)",
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={card.iconSrc}
+          alt=""
+          aria-hidden
+          width={40}
+          height={40}
+          className="select-none pointer-events-none"
+          style={{ width: "40px", height: "40px" }}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      {/* Text block — centered, top 108 px, gap 12 px */}
+      <div
+        className="absolute flex flex-col items-center text-center"
+        style={{
+          top: "108px",
+          left: "16px",
+          right: "16px",
+          gap: "12px",
+        }}
+      >
+        <h3
+          className="font-display"
+          style={{
+            fontSize: "20px",
+            fontWeight: 600,
+            letterSpacing: "-0.05em",
+            lineHeight: 1,
+            color: "#000",
+          }}
+        >
+          {card.title}
+        </h3>
+        <p
+          className="font-sans"
+          style={{
+            fontSize: "14px",
+            fontWeight: 400,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.5,
+            color: "rgba(17,17,17,0.8)",
+          }}
+        >
+          {card.body}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Desktop card — Figma: 295×354 outer, 287×346 inner
+ * Cyan glow border wrapper, white card, grid lines, left-aligned ball + text
+ */
+function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
   return (
     /* Outer cyan glow wrapper — Figma: 295×354, rounded-40, rgba(44,193,235,0.3) */
     <div
@@ -137,8 +248,8 @@ function TrustCardItem({ card }: { card: TrustCard }): React.ReactElement {
           style={{ left: "24px", top: "162px", width: "251px", gap: "12px" }}
         >
           <h3
+            className="font-display"
             style={{
-              fontFamily: "var(--font-display)",
               fontSize: "var(--text-card-title-lg)",
               fontWeight: 600,
               letterSpacing: "-0.04em",
@@ -149,8 +260,8 @@ function TrustCardItem({ card }: { card: TrustCard }): React.ReactElement {
             {card.title}
           </h3>
           <p
+            className="font-sans"
             style={{
-              fontFamily: "var(--font-sans)",
               fontSize: "var(--text-body-lg)",
               fontWeight: 400,
               lineHeight: 1.4,
@@ -171,7 +282,6 @@ export function CleanStartImagesBrowse(): React.ReactElement {
     <section
       data-section="CleanStartImagesTrustedSources"
       className="relative overflow-hidden bg-white"
-      style={{ minHeight: "clamp(600px, 52vw, 736px)" }}
     >
       {/* Corner vector — top-left (Figma: left-[-414px], top-[-174px], 568×551) */}
       <div
@@ -252,7 +362,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
           paddingBottom: "var(--spacing-section-md)",
         }}
       >
-        {/* Heading — Figma: 62px, bold, centered, gradient "Sources" */}
+        {/* Heading — desktop: --text-display-md (~62px); mobile: ~28px via token clamp */}
         <h2
           className="text-center"
           style={{
@@ -260,7 +370,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
             fontSize: "var(--text-display-md)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
-            lineHeight: 1.1,
+            lineHeight: 1.2,
             color: "#111",
           }}
         >
@@ -268,13 +378,20 @@ export function CleanStartImagesBrowse(): React.ReactElement {
           <span className="cs-text-gradient-impact">Sources</span>
         </h2>
 
-        {/* 4-card row — Figma: 287px cards, 41px gaps, centered */}
+        {/* ── Mobile card list — vertical stacked, hidden at lg+ ────────────── */}
+        <div className="lg:hidden mt-10 w-full flex flex-col items-center gap-7">
+          {TRUST_CARDS.map((card) => (
+            <MobileTrustCard key={card.title} card={card} />
+          ))}
+        </div>
+
+        {/* ── Desktop card row — 4-up horizontal, hidden below lg ──────────── */}
         <div
-          className="mt-12 lg:mt-16 flex flex-col sm:flex-row flex-wrap lg:flex-nowrap justify-center"
+          className="hidden lg:flex flex-row flex-nowrap justify-center mt-16"
           style={{ gap: "41px" }}
         >
           {TRUST_CARDS.map((card) => (
-            <TrustCardItem key={card.title} card={card} />
+            <DesktopTrustCard key={card.title} card={card} />
           ))}
         </div>
       </div>

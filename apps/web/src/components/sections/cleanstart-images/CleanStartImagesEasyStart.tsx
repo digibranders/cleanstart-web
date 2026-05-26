@@ -1,3 +1,5 @@
+import type React from "react";
+
 type StackItem = {
   label: string;
   iconSrc: string;
@@ -497,7 +499,9 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
             </div>
 
             {/* ── RIGHT PANEL ── */}
-            <StackPanel label="YOUR DEPLOYMENTS" items={YOUR_DEPLOYMENTS} />
+            <div className="mt-8 lg:mt-0">
+              <StackPanel label="YOUR DEPLOYMENTS" items={YOUR_DEPLOYMENTS} />
+            </div>
           </div>
           {/* END diagram grid */}
 
@@ -575,7 +579,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 border: "0.918px solid rgba(139,92,246,0.3)",
                 borderRadius: "11.021px",
                 padding: "22.918px",
-                height: "97px",
+                minHeight: "97px",
                 display: "flex",
                 alignItems: "center",
                 gap: "22px",
@@ -610,7 +614,8 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 />
               </div>
 
-              <div>
+              {/* Text — constrained to 185px (Figma) to allow body to wrap on mobile */}
+              <div style={{ maxWidth: "185px" }}>
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
@@ -630,7 +635,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                     fontWeight: 400,
                     color: "#9ca3af",
                     lineHeight: "18.368px",
-                    whiteSpace: "nowrap",
                   }}
                 >
                   Automatically rebuilt with the latest fixes.
@@ -647,99 +651,186 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
           className="mt-14 lg:mt-20 relative mx-auto"
           style={{ maxWidth: "1058px" }}
         >
-          {/* Vertical dividers between columns (desktop) */}
-          <div
-            aria-hidden
-            className="absolute hidden lg:block pointer-events-none inset-y-0"
-            style={{
-              left: "33.333%",
-              width: "0.918px",
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0) 100%)",
-            }}
-          />
-          <div
-            aria-hidden
-            className="absolute hidden lg:block pointer-events-none inset-y-0"
-            style={{
-              left: "66.666%",
-              width: "0.918px",
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0) 100%)",
-            }}
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-3">
+          {/* ── Mobile: centered vertical stack with separator lines ─────────── */}
+          {/* Figma 856:364 — 70px ball, 20px title, 14px body, 187px separator */}
+          <div className="sm:hidden flex flex-col items-center">
             {FEATURES.map((f, i) => (
-              <div
-                key={f.title}
-                style={{
-                  paddingTop: 0,
-                  paddingLeft: i > 0 ? "clamp(20px, 3.5vw, 48px)" : 0,
-                  paddingRight:
-                    i < FEATURES.length - 1
-                      ? "clamp(20px, 3.5vw, 48px)"
-                      : 0,
-                }}
-              >
-                {/* Blue ball — Figma: size-[73.038px], rounded-[120px], blue gradient */}
-                <div
-                  style={{
-                    width: "73.038px",
-                    height: "73.038px",
-                    borderRadius: "120px",
-                    background:
-                      "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
-                    boxShadow:
-                      "0px 4.629px 10.903px rgba(28,60,142,0.33), inset 0px -0.175px 0.218px rgba(0,44,179,0.5), inset 0px 0.087px 0.436px rgba(255,255,255,0.81)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: "20px",
-                    overflow: "hidden",
-                  }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={f.iconSrc}
-                    alt=""
-                    aria-hidden
-                    width={40}
-                    height={40}
-                    style={{ width: "40.5px", height: "40.5px" }}
-                    className="select-none pointer-events-none"
-                    loading="lazy"
-                    decoding="async"
-                  />
+              <div key={f.title} className="flex flex-col items-center w-full">
+                <div className="flex flex-col items-center text-center py-8">
+                  {/* Blue ball — Figma mobile: 70×70px */}
+                  <div
+                    style={{
+                      width: "70px",
+                      height: "70px",
+                      borderRadius: "120px",
+                      background:
+                        "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
+                      boxShadow:
+                        "0px 4.5px 10.5px rgba(28,60,142,0.33), inset 0px -0.175px 0.218px rgba(0,44,179,0.5), inset 0px 0.087px 0.436px rgba(255,255,255,0.81)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={f.iconSrc}
+                      alt=""
+                      aria-hidden
+                      width={40}
+                      height={40}
+                      style={{ width: "40px", height: "40px" }}
+                      className="select-none pointer-events-none"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+
+                  {/* Title — Figma: 20px, Manrope SemiBold, tracking-[-1px], lh:1 */}
+                  <h3
+                    className="text-white font-display"
+                    style={{
+                      marginTop: "20px",
+                      fontSize: "20px",
+                      fontWeight: 600,
+                      letterSpacing: "-0.05em",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {f.title}
+                  </h3>
+
+                  {/* Body — Figma: 14px, Sora Regular, tracking-[-0.56px], lh:1.5, 80% opacity */}
+                  <p
+                    className="font-sans"
+                    style={{
+                      marginTop: "12px",
+                      fontSize: "14px",
+                      fontWeight: 400,
+                      color: "rgba(255,255,255,0.8)",
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.5,
+                      maxWidth: "220px",
+                    }}
+                  >
+                    {f.body}
+                  </p>
                 </div>
 
-                <h3
-                  className="text-white"
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-card-title-lg)",
-                    fontWeight: 600,
-                    letterSpacing: "-0.04em",
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {f.title}
-                </h3>
-
-                <p
-                  style={{
-                    marginTop: "12px",
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "var(--text-body-lg)",
-                    fontWeight: 400,
-                    color: "rgba(255,255,255,0.7)",
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {f.body}
-                </p>
+                {/* Separator line between items — Figma: w-187px, gradient fade */}
+                {i < FEATURES.length - 1 && (
+                  <div
+                    aria-hidden
+                    style={{
+                      width: "187px",
+                      height: "1.5px",
+                      flexShrink: 0,
+                      background:
+                        "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)",
+                    }}
+                  />
+                )}
               </div>
             ))}
+          </div>
+
+          {/* ── Desktop: 3-column grid with vertical dividers ─────────────── */}
+          <div className="hidden sm:block">
+            {/* Vertical dividers between columns */}
+            <div className="relative">
+              <div
+                aria-hidden
+                className="absolute hidden lg:block pointer-events-none inset-y-0"
+                style={{
+                  left: "33.333%",
+                  width: "0.918px",
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0) 100%)",
+                }}
+              />
+              <div
+                aria-hidden
+                className="absolute hidden lg:block pointer-events-none inset-y-0"
+                style={{
+                  left: "66.666%",
+                  width: "0.918px",
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0) 100%)",
+                }}
+              />
+
+              <div className="grid sm:grid-cols-3">
+                {FEATURES.map((f, i) => (
+                  <div
+                    key={f.title}
+                    className={[
+                      i > 0 ? "sm:pl-6 lg:pl-12" : "",
+                      i < FEATURES.length - 1 ? "sm:pr-6 lg:pr-12" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    {/* Blue ball — Figma desktop: 73×73px */}
+                    <div
+                      style={{
+                        width: "73.038px",
+                        height: "73.038px",
+                        borderRadius: "120px",
+                        background:
+                          "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
+                        boxShadow:
+                          "0px 4.629px 10.903px rgba(28,60,142,0.33), inset 0px -0.175px 0.218px rgba(0,44,179,0.5), inset 0px 0.087px 0.436px rgba(255,255,255,0.81)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginBottom: "20px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={f.iconSrc}
+                        alt=""
+                        aria-hidden
+                        width={40}
+                        height={40}
+                        style={{ width: "40.5px", height: "40.5px" }}
+                        className="select-none pointer-events-none"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+
+                    <h3
+                      className="text-white font-display"
+                      style={{
+                        fontSize: "var(--text-card-title-lg)",
+                        fontWeight: 600,
+                        letterSpacing: "-0.04em",
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      {f.title}
+                    </h3>
+
+                    <p
+                      className="font-sans"
+                      style={{
+                        marginTop: "12px",
+                        fontSize: "var(--text-body-lg)",
+                        fontWeight: 400,
+                        color: "rgba(255,255,255,0.7)",
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {f.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
         {/* END feature row */}
