@@ -28,7 +28,7 @@ export function ReadyToSecureCTA() {
 
       <p
         id="cta-title"
-        className="relative z-10 font-display text-white"
+        className="relative z-10 font-display text-white text-center lg:text-left mx-auto lg:mx-0"
         style={{
           maxWidth: "min(460px, 100%)",
           fontSize: "var(--cta-card-title)",
@@ -41,9 +41,9 @@ export function ReadyToSecureCTA() {
         Ready to Secure Your Container Infrastructure?
       </p>
 
-      <div className="relative z-10 flex flex-col items-start gap-[18px]">
+      <div className="relative z-10 flex flex-col items-center lg:items-start gap-[18px]">
         <p
-          className="font-normal text-white"
+          className="font-normal text-white text-center lg:text-left"
           style={{
             maxWidth: "493px",
             fontSize: "var(--cta-card-desc)",

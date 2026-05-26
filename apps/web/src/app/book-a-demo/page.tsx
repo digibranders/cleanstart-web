@@ -30,22 +30,20 @@ export default function BookDemoPage() {
       <main className="bg-white">
         <DemoHero />
 
-        {/* Shared light surface — WhatsSets + form share one bg + decorative layer */}
+        <section
+          className="relative -mt-[140px]"
+          style={{
+            paddingLeft: "clamp(24px, 4vw, 80px)",
+            paddingRight: "clamp(24px, 4vw, 80px)",
+            paddingBottom: "clamp(48px, 6vw, 80px)",
+          }}
+        >
+          <BookDemoForm />
+        </section>
+
         <BookDemoBody>
           <FadeUp>
             <WhatsSetsUsApart />
-          </FadeUp>
-
-          <FadeUp>
-            <div
-              style={{
-                paddingLeft: "clamp(24px, 4vw, 80px)",
-                paddingRight: "clamp(24px, 4vw, 80px)",
-                paddingBottom: "clamp(64px, 8vw, 120px)",
-              }}
-            >
-              <BookDemoForm />
-            </div>
           </FadeUp>
         </BookDemoBody>
 

@@ -23,34 +23,37 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
           "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
       }}
     >
-      {/* Card image */}
+      {/* Card image — the OUTER wrapper is NOT overflow-hidden so the category
+          badge (positioned `bottom: -12px`) can spill below the image without
+          being clipped. The INNER div clips the image to the rounded corners. */}
       <div
-        className="relative shrink-0 overflow-hidden m-3"
-        style={{
-          aspectRatio: "380 / 200",
-          borderRadius: "20px",
-          background: "#e8e8f0",
-        }}
+        className="relative shrink-0 m-3"
+        style={{ aspectRatio: "380 / 200" }}
       >
-        {post.heroImage?.url ? (
-          <Image
-            src={mediaUrl(post.heroImage.url)!}
-            alt={post.heroImage.alt ?? post.title}
-            fill
-            className="object-cover"
-            sizes="(min-width: 1280px) 380px, (min-width: 768px) 45vw, 90vw"
-          />
-        ) : (
-          <div
-            className="w-full h-full"
-            style={{
-              background:
-                "linear-gradient(135deg, #1a1a4e 0%, #2d1b9e 50%, #471ec0 100%)",
-            }}
-          />
-        )}
+        <div
+          className="absolute inset-0 overflow-hidden"
+          style={{ borderRadius: "20px", background: "#e8e8f0" }}
+        >
+          {post.heroImage?.url ? (
+            <Image
+              src={mediaUrl(post.heroImage.url)!}
+              alt={post.heroImage.alt ?? post.title}
+              fill
+              className="object-cover"
+              sizes="(min-width: 1280px) 380px, (min-width: 768px) 45vw, 90vw"
+            />
+          ) : (
+            <div
+              className="w-full h-full"
+              style={{
+                background:
+                  "linear-gradient(135deg, #1a1a4e 0%, #2d1b9e 50%, #471ec0 100%)",
+              }}
+            />
+          )}
+        </div>
 
-        {/* Category badge — overlaps image bottom */}
+        {/* Category badge — overlaps image bottom (outside the clipping inner div) */}
         {primaryCategory && (
           <div className="absolute" style={{ left: "20px", bottom: "-12px", zIndex: 1 }}>
             <CategoryBadge label={primaryCategory.name} />

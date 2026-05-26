@@ -26,10 +26,11 @@ export function BlogsCTA(): React.ReactElement {
       className="absolute inset-0"
       style={{ background: "linear-gradient(180deg, #471ec0 0%, #131e8f 100%)" }}
     >
-      {/* Left cube */}
+      {/* Left cube — visible from mobile per Figma 817:3938 (small 117px peek)
+          and scales up at sm+ to the existing desktop placement. */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        className="pointer-events-none select-none absolute block"
         style={{
           left: "-20px",
           top: "180px",
@@ -51,7 +52,7 @@ export function BlogsCTA(): React.ReactElement {
       {/* Right cube */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        className="pointer-events-none select-none absolute hidden sm:block"
         style={{
           left: "1070px",
           top: "-20px",
@@ -72,11 +73,11 @@ export function BlogsCTA(): React.ReactElement {
 
       <div className="absolute inset-0 flex items-center justify-center px-6">
         <div
-          className="flex flex-col lg:flex-row items-start gap-y-4 lg:gap-y-0 lg:gap-x-[clamp(40px,9vw,115px)] w-full"
+          className="flex flex-col lg:flex-row items-center lg:items-start gap-y-4 lg:gap-y-0 lg:gap-x-[clamp(40px,9vw,115px)] w-full"
           style={{ maxWidth: "1047px" }}
         >
           <div
-            className="font-display font-bold text-white w-full lg:w-auto lg:max-w-[401px] text-left"
+            className="font-display font-bold text-white w-full lg:w-auto lg:max-w-[401px] text-center lg:text-left"
             style={{
               fontSize: "var(--cta-card-title)",
             fontWeight: 600,
@@ -88,11 +89,11 @@ export function BlogsCTA(): React.ReactElement {
           </div>
 
           <div
-            className="flex flex-col items-start w-full max-w-[493px]"
+            className="flex flex-col items-center lg:items-start w-full max-w-[493px]"
             style={{ gap: "24px" }}
           >
             <p
-              className="font-normal text-white"
+              className="font-normal text-white text-center lg:text-left"
               style={{
                 fontSize: "var(--cta-card-desc)",
             fontWeight: 400,

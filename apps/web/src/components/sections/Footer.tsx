@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 /**
  * Footer — Figma Frame 2147238429 (108:8061), 1920×850
@@ -7,7 +8,7 @@ import React from "react";
  *  1. Top row: tagline (left) + 5 social icons (right)
  *  2. Four nav columns: Contact, Solutions, Connect, Members of
  *  3. Awarded-with section: 4 badges
- *  4. Bottom row: Logo + © + Privacy/Legal/Security links
+ *  4. Bottom row: Logo + © + legal links (Privacy Policy, Acceptable Use Policy)
  *
  * Background: linear gradient #151021 → #131E8F → #471EC0 with decorative
  * purple ellipses + faint glowing line accents (Figma "Line 104..108").
@@ -56,9 +57,8 @@ const AWARDS: { name: string; src: string; w: number; h: number }[] = [
 ];
 
 const LEGAL_LINKS = [
-  { label: "Privacy Program", href: "#privacy" },
-  { label: "Legal", href: "#legal" },
-  { label: "Security", href: "#security" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Acceptable Use Policy", href: "/legal/acceptable-use-policy" },
 ];
 
 // CTA-card overlap is owned here, not by callers. Card is vertically CENTERED
@@ -102,7 +102,7 @@ export function Footer({
     >
       {hasCta && (
         <div
-          className="pointer-events-none absolute left-1/2 top-0 z-20 w-full max-w-[1152px] -translate-x-1/2 -translate-y-1/2 px-6 sm:px-10"
+          className="pointer-events-none absolute left-1/2 top-0 z-20 w-full max-w-[1152px] -translate-x-1/2 translate-y-[calc(-100%-30px)] sm:-translate-y-1/2 px-6 sm:px-10"
         >
           {/* Sizing wrapper — NO overflow:hidden so `ctaOverlay` children can
               break out of the card. Card width capped at 1152 (intentionally
@@ -159,7 +159,7 @@ export function Footer({
           }}
         />
       <div className="relative">
-       <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-section-cta" : "pt-[80px]"}`}>
+       <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[var(--footer-cta-pt)]" : "pt-[80px]"}`}>
         {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
         <div className="flex flex-wrap items-start justify-between gap-8">
           <p
@@ -202,9 +202,11 @@ export function Footer({
           </ul>
         </div>
 
-        {/* 4 navigation columns — Figma: horizontal, hug-content, 272px gap (1276 wide) */}
+        {/* 4 navigation columns — Figma: horizontal, hug-content, 272px gap
+            (1276 wide) on desktop; collapsible accordion stack on mobile
+            (Figma 817:3471 mobile layout). */}
         <nav
-          className="mt-[62px] grid grid-cols-2 gap-y-12 sm:flex sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-y-12"
+          className="mt-[40px] flex flex-col sm:mt-[62px] sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-y-12"
           aria-label="Footer navigation"
         >
           <FooterColumn title="Contact" links={COL_CONTACT} />
@@ -254,13 +256,13 @@ export function Footer({
             {LEGAL_LINKS.map((link, i) => (
               <React.Fragment key={link.href}>
                 <li className="flex leading-none">
-                  <a
+                  <Link
                     href={link.href}
                     className="text-xs italic leading-[1.75] text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
                     style={{ letterSpacing: "0.24px" }}
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
                 {i < LEGAL_LINKS.length - 1 && (
                   <li
@@ -280,36 +282,94 @@ export function Footer({
 }
 
 function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
+  // MOBILE (<sm): collapsible accordion per Figma 817:3475 — section header
+  // with arrow-down icon, expands on tap. Uses native <details>/<summary>.
+  // DESKTOP (sm+): always-expanded column with heading + flat link list.
   return (
-    <div>
-      <h3 className="font-display text-base font-semibold leading-[1.3] tracking-[-0.04em] text-white">
-        {title}
-      </h3>
-      <ul className="mt-6 flex flex-col gap-3">
-        {links.map((link) => (
-          <li key={link.href} className="flex leading-none">
-            <a
-              href={link.href}
-              className="group inline-flex items-center gap-2 text-sm font-normal leading-[1.4] tracking-[-0.04em] text-white/85 transition-colors duration-200 hover:text-white cursor-pointer"
-            >
-              <span>{link.label}</span>
-              <svg
-                width="10"
-                height="14"
-                viewBox="0 0 10 14"
-                fill="none"
-                aria-hidden
-                className="opacity-90 transition-transform duration-200 group-hover:translate-x-1"
+    <div className="sm:contents">
+      {/* Mobile accordion */}
+      <details className="sm:hidden border-b border-white/10 group">
+        <summary
+          className="flex items-center justify-between cursor-pointer list-none py-3"
+        >
+          <h3 className="font-display text-base font-semibold leading-[1.3] tracking-[-0.04em] text-white">
+            {title}
+          </h3>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden
+            className="text-white/70 transition-transform duration-200 group-open:rotate-180"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </summary>
+        <ul className="flex flex-col gap-3 pb-4">
+          {links.map((link) => (
+            <li key={link.href} className="flex leading-none">
+              <a
+                href={link.href}
+                className="group/link inline-flex items-center gap-2 text-sm font-normal leading-[1.4] tracking-[-0.04em] text-white/85 transition-colors duration-200 hover:text-white cursor-pointer"
               >
-                <path
-                  d="M7.62875 7.38101L2.40375 12.3179L1.25 11.1674L4.40375 8.29228L5.49625 7.36956L4.40375 6.44683L1.25 3.59465L2.40375 2.41992L7.62875 7.38101Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </a>
-          </li>
-        ))}
-      </ul>
+                <span>{link.label}</span>
+                <svg
+                  width="10"
+                  height="14"
+                  viewBox="0 0 10 14"
+                  fill="none"
+                  aria-hidden
+                  className="opacity-90 transition-transform duration-200 group-hover/link:translate-x-1"
+                >
+                  <path
+                    d="M7.62875 7.38101L2.40375 12.3179L1.25 11.1674L4.40375 8.29228L5.49625 7.36956L4.40375 6.44683L1.25 3.59465L2.40375 2.41992L7.62875 7.38101Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </details>
+
+      {/* Desktop column (always expanded) */}
+      <div className="hidden sm:block">
+        <h3 className="font-display text-base font-semibold leading-[1.3] tracking-[-0.04em] text-white">
+          {title}
+        </h3>
+        <ul className="mt-6 flex flex-col gap-3">
+          {links.map((link) => (
+            <li key={link.href} className="flex leading-none">
+              <a
+                href={link.href}
+                className="group inline-flex items-center gap-2 text-sm font-normal leading-[1.4] tracking-[-0.04em] text-white/85 transition-colors duration-200 hover:text-white cursor-pointer"
+              >
+                <span>{link.label}</span>
+                <svg
+                  width="10"
+                  height="14"
+                  viewBox="0 0 10 14"
+                  fill="none"
+                  aria-hidden
+                  className="opacity-90 transition-transform duration-200 group-hover:translate-x-1"
+                >
+                  <path
+                    d="M7.62875 7.38101L2.40375 12.3179L1.25 11.1674L4.40375 8.29228L5.49625 7.36956L4.40375 6.44683L1.25 3.59465L2.40375 2.41992L7.62875 7.38101Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

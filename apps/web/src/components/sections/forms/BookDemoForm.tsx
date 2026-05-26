@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 
 /**
@@ -11,18 +11,34 @@ import { TurnstileWidget } from "@/components/TurnstileWidget";
  * spec exactly; font sizes follow the vulnerability-remediation page
  * convention (inline clamp).
  */
+function newSubmissionId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `sub_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
+
 export function BookDemoForm(): React.ReactElement {
   const [submitted, setSubmitted] = useState(false);
+  const inFlightRef = useRef(false);
+  const submissionIdRef = useRef<string | null>(null);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Lead intake adapter is not yet exposed at the web edge; this form
-    // provides client-side UX only and will be wired through LeadHandler.
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+    submissionIdRef.current = newSubmissionId();
+    // submissionIdRef.current would travel to LeadHandler as Idempotency-Key.
+    e.currentTarget.reset();
     setSubmitted(true);
+    window.setTimeout(() => {
+      setSubmitted(false);
+      inFlightRef.current = false;
+    }, 5000);
   };
 
   return (
-    <div className="mx-auto w-full" style={{ maxWidth: "840px" }}>
+    <div className="mx-auto w-full" style={{ maxWidth: "760px" }}>
       {/* Outer gradient card — Figma fill_39F7LQ, 24px radius, 24px inset */}
       <div
         className="rounded-[24px]"
@@ -40,51 +56,29 @@ export function BookDemoForm(): React.ReactElement {
             border: "1px solid rgba(255, 255, 255, 0.07)",
           }}
         >
-          {submitted ? (
-            <p
-              className="text-center py-8"
-              style={{
-                fontFamily: "var(--font-sans), 'Sora', sans-serif",
-                fontSize: "16px",
-                lineHeight: 1.5,
-                color: "#111111",
-              }}
-            >
-              Thanks — your demo request has been received. Our team will reach out shortly.
-            </p>
-          ) : (
-            <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-              <h3
-                className="text-center"
-                style={{
-                  fontFamily: "var(--font-display), 'Manrope', sans-serif",
-                  fontWeight: 700,
-                  fontSize: "clamp(24px, 2.8vw, 40px)",
-                  lineHeight: 1,
-                  letterSpacing: "-0.05em",
-                  color: "#111111",
-                  marginBottom: "12px",
-                }}
-              >
-                Get a Demo
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FigmaTextInput name="firstName" placeholder="First Name" />
-                <FigmaTextInput name="lastName" placeholder="Last Name" />
+          <SuccessBanner
+            show={submitted}
+            message="Thanks — your demo request has been received. Our team will reach out within 24 hours."
+          />
+          <form onSubmit={onSubmit} className="flex flex-col gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
+                <FigmaTextInput name="firstName" label="First Name" required />
+                <FigmaTextInput name="lastName" label="Last Name" />
               </div>
 
-              <FigmaTextInput name="email" type="email" placeholder="Email*" required />
-              <FigmaTextInput name="company" placeholder="Company Name *" required />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
+                <FigmaTextInput name="email" type="email" label="Email" required />
+                <FigmaTextInput name="company" label="Company Name" required />
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FigmaTextInput name="country" placeholder="Country/Region" />
-                <FigmaTextInput name="phone" type="tel" placeholder="Phone Number*" required />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
+                <FigmaTextInput name="country" label="Country/Region" />
+                <FigmaTextInput name="phone" type="tel" label="Phone Number" required />
               </div>
 
               <FigmaTextInput
                 name="referralSource"
-                placeholder="How did you hear about CleanStart?"
+                label="How did you hear about CleanStart?"
               />
 
               <ConsentText>
@@ -107,7 +101,7 @@ export function BookDemoForm(): React.ReactElement {
               </ConsentText>
               <FigmaCheckbox
                 name="consent_storage"
-                label="I agree to allow CleanStart to store and process my personal data.*"
+                label="I agree to allow CleanStart to store and process my personal data."
                 required
               />
 
@@ -122,48 +116,117 @@ export function BookDemoForm(): React.ReactElement {
               </ConsentText>
 
               <TurnstileWidget />
-              <SubmitButton />
+              <SubmitButton submitted={submitted} />
             </form>
-          )}
         </div>
       </div>
     </div>
   );
 }
 
+interface SuccessBannerProps {
+  show: boolean;
+  message: string;
+}
+
+function SuccessBanner({ show, message }: SuccessBannerProps): React.ReactElement {
+  return (
+    <output
+      aria-live="polite"
+      className="block overflow-hidden transition-all duration-300 ease-out"
+      style={{
+        maxHeight: show ? "120px" : "0px",
+        opacity: show ? 1 : 0,
+        marginBottom: show ? "20px" : "0px",
+      }}
+    >
+      <div
+        className="flex items-start gap-3 rounded-[10px] px-4 py-3"
+        style={{
+          background: "#ECFDF3",
+          border: "1px solid #ABEFC6",
+        }}
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 20 20"
+          aria-hidden
+          className="shrink-0"
+          style={{ marginTop: "2px" }}
+        >
+          <circle cx="10" cy="10" r="9" fill="#12B76A" />
+          <path
+            d="M6 10.5l2.5 2.5L14 7.5"
+            fill="none"
+            stroke="#FFFFFF"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <span
+          style={{
+            fontFamily: "var(--font-sans), 'Sora', sans-serif",
+            fontSize: "14px",
+            fontWeight: 500,
+            lineHeight: 1.45,
+            color: "#054F31",
+          }}
+        >
+          {message}
+        </span>
+      </div>
+    </output>
+  );
+}
+
 interface InputProps {
   name: string;
   type?: "text" | "email" | "tel";
-  placeholder: string;
+  label: string;
+  placeholder?: string;
   required?: boolean;
 }
 
 function FigmaTextInput({
   name,
   type = "text",
+  label,
   placeholder,
   required,
 }: InputProps): React.ReactElement {
   return (
-    <label className="block">
-      <span className="sr-only">{placeholder}</span>
+    <label htmlFor={name} className="block">
+      <span
+        className="mb-2 block text-[#111111]"
+        style={{
+          fontFamily: "var(--font-display, 'Manrope'), sans-serif",
+          fontSize: "14px",
+          fontWeight: 400,
+          lineHeight: 1.2,
+        }}
+      >
+        {label}
+        {required && <span className="ml-0.5 text-[#D14343]">*</span>}
+      </span>
       <input
+        id={name}
         name={name}
         type={type}
-        placeholder={placeholder}
         required={required}
-        aria-label={placeholder}
-        className="w-full rounded-[8px] outline-none transition-colors focus:border-[#3960F9]"
+        placeholder={placeholder ?? label}
+        className="block w-full rounded-[8px] outline-none transition-colors placeholder:text-[#9CA3AF] focus:border-[#3960F9]"
         style={{
           background: "#FBFBFB",
           border: "1.5px solid #DDDDDD",
-          padding: "15px 17px",
+          padding: "10px 14px",
           fontFamily: "var(--font-display), 'Manrope', sans-serif",
           fontWeight: 500,
           fontSize: "16px",
           lineHeight: 1.125,
           color: "#111111",
-          height: "48px",
+          height: "40px",
         }}
       />
     </label>
@@ -176,11 +239,11 @@ function ConsentText({ children }: { children: React.ReactNode }): React.ReactEl
       style={{
         fontFamily: "var(--font-sans), 'Sora', sans-serif",
         fontWeight: 400,
-        fontSize: "16px",
+        fontSize: "13px",
         lineHeight: 1.5,
-        letterSpacing: "-0.04em",
+        letterSpacing: "-0.02em",
         color: "#111111",
-        opacity: 0.8,
+        opacity: 0.75,
         textAlign: "justify",
       }}
     >
@@ -197,34 +260,45 @@ interface CheckboxProps {
 
 function FigmaCheckbox({ name, label, required }: CheckboxProps): React.ReactElement {
   return (
-    <label className="flex items-center" style={{ gap: "9px" }}>
-      <input
-        type="checkbox"
-        name={name}
-        required={required}
-        aria-required={required || undefined}
-        className="appearance-none cursor-pointer checked:bg-[#3960F9] checked:border-[#3960F9] relative"
-        style={{
-          width: "32px",
-          height: "32px",
-          background: "#FBFBFB",
-          border: "1.5px solid #DDDDDD",
-          borderRadius: "8px",
-          flexShrink: 0,
-        }}
-      />
+    <label className="flex items-center cursor-pointer" style={{ gap: "8px" }}>
+      <span className="relative inline-flex shrink-0" style={{ width: "18px", height: "18px" }}>
+        <input
+          type="checkbox"
+          name={name}
+          required={required}
+          aria-required={required || undefined}
+          className="peer w-full h-full appearance-none cursor-pointer rounded-[4px] bg-[#FBFBFB] border-[1.5px] border-[#DDDDDD] checked:bg-[#3960F9] checked:border-[#3960F9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3960F9]"
+        />
+        <svg
+          aria-hidden
+          viewBox="0 0 16 16"
+          className="pointer-events-none absolute inset-0 m-auto hidden peer-checked:block"
+          width="12"
+          height="12"
+        >
+          <path
+            d="M3 8.5l3 3 7-7"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
       <span
         style={{
           fontFamily: "var(--font-sans), 'Sora', sans-serif",
           fontWeight: 400,
-          fontSize: "16px",
-          lineHeight: 1.5,
-          letterSpacing: "-0.04em",
+          fontSize: "13px",
+          lineHeight: 1.4,
+          letterSpacing: "-0.02em",
           color: "#111111",
-          opacity: 0.8,
+          opacity: 0.85,
         }}
       >
         {label}
+        {required && <span className="ml-0.5 text-[#D14343]">*</span>}
       </span>
     </label>
   );
@@ -236,20 +310,22 @@ function FigmaCheckbox({ name, label, required }: CheckboxProps): React.ReactEle
  * Manrope Medium 18px white label. A blurred 30px white-60% ellipse
  * (867:970) glows just right of the label.
  */
-function SubmitButton(): React.ReactElement {
+function SubmitButton({ submitted }: { submitted: boolean }): React.ReactElement {
   return (
     <button
       type="submit"
-      className="relative w-full overflow-hidden rounded-[8px] text-white cursor-pointer transition-colors hover:bg-[#2438C2] disabled:cursor-not-allowed"
+      disabled={submitted}
+      className="relative w-full overflow-hidden rounded-[8px] text-white cursor-pointer transition-colors hover:bg-[#2438C2] disabled:cursor-not-allowed disabled:opacity-90"
       style={{
-        background: "#3960F9",
+        background: submitted ? "#12B76A" : "#3960F9",
         height: "44px",
-        boxShadow:
-          "0 0 0 1px rgba(57, 96, 249, 1), 0 1px 2px -1px rgba(9, 6, 63, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.16)",
+        boxShadow: submitted
+          ? "0 0 0 1px rgba(18, 183, 106, 1), 0 1px 2px -1px rgba(9, 6, 63, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.16)"
+          : "0 0 0 1px rgba(57, 96, 249, 1), 0 1px 2px -1px rgba(9, 6, 63, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.16)",
       }}
     >
       <span
-        className="relative z-10 inline-flex items-center justify-center"
+        className="relative z-10 inline-flex items-center justify-center gap-2"
         style={{
           fontFamily: "var(--font-display), 'Manrope', sans-serif",
           fontWeight: 500,
@@ -258,7 +334,19 @@ function SubmitButton(): React.ReactElement {
           letterSpacing: "-0.01em",
         }}
       >
-        Submit application
+        {submitted ? "Submitted" : "Submit application"}
+        {submitted && (
+          <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden>
+            <path
+              d="M5 10.5l3 3 7-7"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        )}
       </span>
       {/* Blurred glow ellipse — Figma 867:970 (rgba(255,255,255,0.6) blur 20px) */}
       <span

@@ -12,7 +12,7 @@ import { Footer } from "@/components/sections/Footer";
 import { NewsDetailHero } from "@/components/sections/news-detail/NewsDetailHero";
 import { NewsDetailBody } from "@/components/sections/news-detail/NewsDetailBody";
 import { NewsDetailRelated } from "@/components/sections/news-detail/NewsDetailRelated";
-import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
+import { NewsDetailCTA } from "@/components/sections/news-detail/NewsDetailCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, newsArticleSchema } from "@/lib/seo/jsonld";
 
@@ -122,12 +122,13 @@ export async function renderNewsDetail({
             <NewsDetailRelated items={related} />
           </div>
         ) : (
-          /* NewsDetailBody has internal pb-[80px] → spacer covers remaining 100 */
-          <div aria-hidden className="bg-white" style={{ height: "100px" }} />
+          /* NewsDetailBody has internal pb-[80px] → spacer covers remainder
+             via responsive token (440/210/190 at mobile/sm/lg). */
+          <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 80px)" }} />
         )}
 
       </main>
-      <Footer cta={<BlogDetailCTA />} />
+      <Footer cta={<NewsDetailCTA />} />
     </>
   );
 }

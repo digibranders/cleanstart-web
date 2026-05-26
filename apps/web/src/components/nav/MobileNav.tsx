@@ -73,7 +73,7 @@ export function MobileNav() {
                   <AccordionTrigger className="px-3 py-3 text-base font-medium text-white/90 hover:text-white hover:no-underline">
                     {item.label}
                   </AccordionTrigger>
-                  <AccordionContent className="pl-3">
+                  <AccordionContent className="pl-3 [&_a]:!no-underline">
                     <ul className="flex flex-col gap-0.5 pb-1">
                       {leaves.map((leaf, i) =>
                         "__header" in leaf ? (
@@ -89,7 +89,7 @@ export function MobileNav() {
                               <Link
                                 href={leaf.href}
                                 onClick={close}
-                                className="block rounded-[8px] px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/[0.06] hover:text-white"
+                                className="block rounded-[8px] px-3 py-2 text-sm text-white/80 no-underline transition-colors hover:bg-white/[0.06] hover:text-white"
                               >
                                 {leaf.label}
                               </Link>

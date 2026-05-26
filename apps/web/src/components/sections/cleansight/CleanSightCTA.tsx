@@ -145,7 +145,7 @@ export function CleanSightCTA(): React.ReactElement {
           </p>
 
           <Link
-            href="/contact-us"
+            href="/book-a-demo"
             className="cs-btn-blue self-start"
             style={
               {

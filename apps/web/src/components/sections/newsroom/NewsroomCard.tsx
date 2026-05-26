@@ -19,7 +19,7 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
     <article
       className="relative flex w-full max-w-[404px] flex-col bg-white overflow-hidden"
       style={{
-        minHeight: "clamp(440px, 38vw, 521px)",
+        minHeight: "clamp(360px, 38vw, 521px)",
         borderRadius: "32px",
         boxShadow:
           "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
@@ -68,19 +68,20 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
       </div>
 
       {/* Category badge — overlaps image bottom */}
-      <div className="relative px-8" style={{ marginTop: "-12px", zIndex: 1 }}>
+      <div className="relative px-5 md:px-8" style={{ marginTop: "-12px", zIndex: 1 }}>
         <CategoryBadge label={pillLabel} />
       </div>
 
-      {/* Card content — fills remaining height, Read more pinned to bottom */}
+      {/* Card content — fills remaining height, Read more pinned to bottom.
+          Mobile uses tighter padding to reclaim height. */}
       <div
-        className="relative flex flex-1 flex-col justify-between pt-4 pb-8 px-8"
+        className="relative flex flex-1 flex-col justify-between pt-3 pb-5 px-5 md:pt-4 md:pb-8 md:px-8"
       >
-        <div className="flex flex-col" style={{ gap: "12px" }}>
-          {/* Meta row: date + read time */}
-          <div className="flex items-center" style={{ gap: "16px" }}>
+        <div className="flex flex-col gap-2.5 md:gap-3">
+          {/* Meta row: date + read time. Smaller on mobile, no wrapping. */}
+          <div className="flex items-center gap-3 md:gap-4">
             {date && (
-              <div className="flex items-center" style={{ gap: "4px" }}>
+              <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/blogs/icon-calendar-grey.svg"
@@ -88,12 +89,12 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
                   aria-hidden
                   width={18}
                   height={18}
-                  className="pointer-events-none select-none"
+                  className="pointer-events-none select-none shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]"
                   loading="lazy"
                   decoding="async"
                 />
                 <span
-                  className="text-sm font-medium leading-normal"
+                  className="text-[12px] md:text-sm font-medium leading-normal whitespace-nowrap"
                   style={{ color: "#666" }}
                 >
                   {date}
@@ -101,7 +102,7 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
               </div>
             )}
             {readTime && (
-              <div className="flex items-center" style={{ gap: "4px" }}>
+              <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/blogs/icon-clock-grey.svg"
@@ -109,12 +110,12 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
                   aria-hidden
                   width={18}
                   height={18}
-                  className="pointer-events-none select-none"
+                  className="pointer-events-none select-none shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]"
                   loading="lazy"
                   decoding="async"
                 />
                 <span
-                  className="text-sm font-medium leading-normal"
+                  className="text-[12px] md:text-sm font-medium leading-normal whitespace-nowrap"
                   style={{ color: "#666" }}
                 >
                   {readTime}

@@ -7,7 +7,7 @@
 export function CommunityCTA() {
   return (
     <div
-      className="absolute inset-0 flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-start md:gap-0 md:p-12 lg:p-[clamp(32px,4vw,48px)_clamp(32px,5vw,80px)]"
+      className="absolute inset-0 flex flex-col items-center text-center gap-8 overflow-hidden p-8 md:flex-row md:items-start md:text-left md:gap-0 md:p-12 lg:p-[clamp(32px,4vw,48px)_clamp(32px,5vw,80px)]"
       style={{
         background: 'linear-gradient(180deg, #131E8F 0%, #471EC0 111.05%)',
       }}
@@ -42,7 +42,7 @@ export function CommunityCTA() {
       </p>
 
       {/* Body + CTA */}
-      <div className="relative z-10 flex flex-col items-start gap-6 md:pl-[clamp(32px,5vw,72px)]" style={{ maxWidth: 'min(460px, 100%)' }}>
+      <div className="relative z-10 flex flex-col items-center md:items-start gap-6 md:pl-[clamp(32px,5vw,72px)]" style={{ maxWidth: 'min(460px, 100%)' }}>
         <p
           className="font-sans font-normal text-white/80"
           style={{
@@ -55,7 +55,9 @@ export function CommunityCTA() {
           Join the community building the world&apos;s most trusted software ecosystem.
         </p>
         <a
-          href="#join"
+          href="https://github.com/cleanstart"
+          target="_blank"
+          rel="noopener noreferrer"
           className="cs-btn-glass flex items-center gap-2"
           style={{
             ['--cs-btn-px' as string]: '18px',

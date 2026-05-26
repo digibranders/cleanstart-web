@@ -117,7 +117,7 @@ export function SbomCTA(): React.ReactElement {
             software supply chains.
           </p>
           <Link
-            href="/contact-us"
+            href="/resource-center"
             className="cs-btn-glass self-start"
             style={
               {
@@ -242,7 +242,7 @@ export function SbomCTA(): React.ReactElement {
           </p>
           {/* Button — no arrow per Figma mobile spec */}
           <Link
-            href="/contact-us"
+            href="/resource-center"
             className="cs-btn-glass"
             style={
               {

@@ -62,7 +62,9 @@ export function CommunityHero() {
                 risk, secure images, and ship faster with confidence.
               </p>
               <a
-                href="#join"
+                href="https://github.com/cleanstart"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="cs-btn-glass self-start"
                 style={{
                   ['--cs-btn-px' as string]: '22px',

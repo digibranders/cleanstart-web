@@ -57,24 +57,8 @@ export function CisoCTA(): React.ReactElement {
       ════════════════════════════════════════════════════════════════════ */}
       <div className="sm:hidden absolute inset-0">
 
-        {/* Cube — bottom-right, partially clipped by card overflow:hidden */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          aria-hidden
-          src="/images/ciso/cta-cube-noise.png"
-          alt=""
-          className="absolute pointer-events-none select-none"
-          style={{
-            right: "-20px",
-            bottom: "-24px",
-            width: "88px",
-            height: "88px",
-            objectFit: "contain",
-            opacity: 0.8,
-          }}
-          loading="lazy"
-          decoding="async"
-        />
+        {/* Mobile cube intentionally omitted per design — no decorative images
+            on mobile CTA cards (only gradient/colors/gridlines). */}
 
         {/* Heading — top=32px, w=260px, centered */}
         <p
@@ -122,7 +106,7 @@ export function CisoCTA(): React.ReactElement {
           style={{ top: "262px", left: "50%", transform: "translateX(-50%)" }}
         >
           <Link
-            href="/contact-us"
+            href="/resource-center"
             className="cs-btn-glass"
             style={
               {
@@ -215,7 +199,7 @@ export function CisoCTA(): React.ReactElement {
 
             {/* Button */}
             <Link
-              href="/contact-us"
+              href="/resource-center"
               className="cs-btn-glass self-start"
               style={
                 {

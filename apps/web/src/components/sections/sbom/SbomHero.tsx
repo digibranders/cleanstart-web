@@ -109,7 +109,7 @@ export function SbomHero(): React.ReactElement {
         </p>
 
         <Link
-          href="/contact-us"
+          href="/book-a-demo"
           className="cs-btn-glass"
           style={
             {

@@ -1,0 +1,40 @@
+Page,Slot,CTA text,Target,Notes
+/,Hero,Browse Images,https://images.cleanstart.com,Opens public image catalog in a new tab
+/,Footer CTA,Get a Demo,/book-a-demo,Primary conversion — lead capture form
+/cleansight,Hero,Get a Demo,/book-a-demo,Primary conversion — lead capture form
+/cleansight,Footer CTA,Book a Container Scan,/book-a-demo,Primary conversion — lead capture form
+/cleanstart-images,Hero,Explore Images,https://images.cleanstart.com,Opens public image catalog in a new tab
+/cleanstart-images,Footer CTA,Explore Hardened Images,https://images.cleanstart.com,Opens public image catalog in a new tab
+/for-developers,Hero,Explore CleanStart Images,https://images.cleanstart.com,Opens public image catalog in a new tab
+/for-developers,Footer CTA,Read the Guide,/resource-center,Opens the resource center listing
+/for-ciso,Hero,Explore Free Secure Image,https://images.cleanstart.com,Opens public image catalog in a new tab
+/for-ciso,Footer CTA,Read the Executive Brief,/resource-center,Opens the resource center listing
+/teams,Footer CTA,Careers,/careers,Opens the careers listing page
+/fips,Hero,Explore FIPS Images,https://images.cleanstart.com,Opens public image catalog in a new tab
+/fips,Footer CTA,Get a Demo,/book-a-demo,Primary conversion — lead capture form
+/software-bill-materials,Hero,Watch How SBOM Works,/book-a-demo,Primary conversion — lead capture form
+/software-bill-materials,Footer CTA,Download the SBOM Datasheet,/resource-center,Opens the resource center listing
+/software-composition-analysis,Hero,Watch How SCA Works,/book-a-demo,Primary conversion — lead capture form
+/software-composition-analysis,Footer CTA,Make SCA Actionable,/book-a-demo,Primary conversion — lead capture form
+/attack-surface-reduction,Hero,Explore Cleanstart Images,https://images.cleanstart.com,Opens public image catalog in a new tab
+/attack-surface-reduction,Footer CTA,Attack Surface Reduction,/book-a-demo,Primary conversion — lead capture form
+/vulnerability-remediation,Hero,Explore Images,https://images.cleanstart.com,Opens public image catalog in a new tab
+/vulnerability-remediation,Footer CTA,Assess Your Container Exposure,/book-a-demo,Primary conversion — lead capture form
+# Company / conversion pages,,,,
+/about-us,Hero,Contact Us,/contact-us,Opens the general contact form
+/about-us,Footer CTA (card 1),Contact Sales,/contact-us,Opens the general contact form
+/about-us,Footer CTA (card 3),Careers,/careers,Opens the careers listing page
+/partners,Hero,Get a Demo,/book-a-demo,Primary conversion — lead capture form
+/partners,Hero,Deal Registration,/deal-registration,Opens partner deal-registration form
+/community,Hero,Join Community,https://github.com/cleanstart,Opens the CleanStart GitHub org in a new tab
+/community,Footer CTA,Join the Community,https://github.com/cleanstart,Opens the CleanStart GitHub org in a new tab
+# Content / listing pages,,,,
+/blogs,Footer CTA,Subscribe (email form),POST /api/leads/submit (newsletter list),Inline newsletter signup form
+/blog/[slug],Footer CTA,Subscribe (email form),POST /api/leads/submit (newsletter list),Inline newsletter signup form
+/news/[slug],Footer CTA,Contact,/contact-us,Press / info intent — opens the general contact form
+/events,Footer CTA,Subscribe (email form),POST /api/leads/submit (events list),Inline events newsletter signup form
+/webinars,Footer CTA,Subscribe (email form),POST /api/leads/submit (webinar list),Inline webinars newsletter signup form
+/podcast,CTA card 1,Resource Center,/resource-center,Opens the resource center listing
+/podcast,CTA card 2,Read Blogs,/blogs,Opens the blog listing
+/podcast,CTA card 3,Sign Up,/book-a-demo,Primary conversion — lead capture form
+/resource-center,Footer CTA,Book a Container Scan,/book-a-demo,Primary conversion — lead capture form

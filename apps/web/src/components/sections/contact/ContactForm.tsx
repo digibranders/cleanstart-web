@@ -2,7 +2,7 @@
 
 import { Container } from "@/components/layout";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface FieldState {
   firstName: string;
@@ -22,10 +22,19 @@ const initialState: FieldState = {
   brief: "",
 };
 
+function newSubmissionId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `sub_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
+
 export function ContactForm() {
   const [values, setValues] = useState<FieldState>(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const inFlightRef = useRef(false);
+  const submissionIdRef = useRef<string | null>(null);
 
   const onChange =
     (key: keyof FieldState) =>
@@ -34,16 +43,24 @@ export function ContactForm() {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+    submissionIdRef.current = newSubmissionId();
+    // submissionIdRef.current would travel to LeadHandler as Idempotency-Key.
     setSubmitting(true);
     window.setTimeout(() => {
       setSubmitting(false);
       setSubmitted(true);
       setValues(initialState);
+      window.setTimeout(() => {
+        setSubmitted(false);
+        inFlightRef.current = false;
+      }, 5000);
     }, 600);
   };
 
   return (
-    <section className="relative -mt-40 pb-16 sm:-mt-56 sm:pb-20 lg:-mt-72">
+    <section className="relative -mt-[140px] pb-16 sm:pb-20">
       <Container>
         <div className="mx-auto w-full max-w-[860px]">
           {/* Outer cyan border — solid 2px cyan ring + slight outer glow */}
@@ -123,6 +140,10 @@ export function ContactForm() {
                 onSubmit={onSubmit}
                 className="px-3 pt-6 pb-3 sm:px-[24px] sm:pt-[30px] sm:pb-[18px]"
               >
+                <SuccessBanner
+                  show={submitted}
+                  message="Thanks — we've received your message and will reply within 24 hours."
+                />
                 <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
                   <Field
                     id="firstName"
@@ -139,7 +160,6 @@ export function ContactForm() {
                   <Field
                     id="lastName"
                     label="Last Name"
-                    required
                     autoComplete="family-name"
                     minLength={2}
                     maxLength={50}
@@ -206,12 +226,13 @@ export function ContactForm() {
                     and a subtle radial glow at the bottom-center (Figma Ellipse3938). */}
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="relative mt-4 flex h-12 w-full cursor-pointer items-center justify-center overflow-hidden rounded-[8px] text-white transition-colors duration-150 hover:bg-[#2438C2] disabled:cursor-not-allowed disabled:opacity-70"
+                  disabled={submitting || submitted}
+                  className="relative mt-4 flex h-12 w-full cursor-pointer items-center justify-center overflow-hidden rounded-[8px] text-white transition-colors duration-150 hover:bg-[#2438C2] disabled:cursor-not-allowed disabled:opacity-90"
                   style={{
-                    backgroundColor: "#3960F9",
-                    boxShadow:
-                      "0 1px 2px -1px rgba(9,6,63,0.4), 0 0 0 1px #3960F9, inset 0 1px 0 rgba(255,255,255,0.16)",
+                    backgroundColor: submitted ? "#12B76A" : "#3960F9",
+                    boxShadow: submitted
+                      ? "0 1px 2px -1px rgba(9,6,63,0.4), 0 0 0 1px #12B76A, inset 0 1px 0 rgba(255,255,255,0.16)"
+                      : "0 1px 2px -1px rgba(9,6,63,0.4), 0 0 0 1px #3960F9, inset 0 1px 0 rgba(255,255,255,0.16)",
                   }}
                 >
                   {/* Bottom-center radial glow */}
@@ -241,9 +262,9 @@ export function ContactForm() {
                         letterSpacing: "-0.18px",
                       }}
                     >
-                      {submitting ? "Sending…" : "Submit"}
+                      {submitting ? "Sending…" : submitted ? "Sent" : "Submit"}
                     </span>
-                    {!submitting && (
+                    {!submitting && !submitted && (
                       <svg
                         width="25"
                         height="22"
@@ -267,21 +288,21 @@ export function ContactForm() {
                         />
                       </svg>
                     )}
+                    {submitted && (
+                      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden>
+                        <path
+                          d="M5 10.5l3 3 7-7"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
                   </span>
                 </button>
 
-                {submitted && (
-                  <output
-                    className="mt-4 block text-center text-[#1A7F3C]"
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "var(--text-body-md)",
-                    }}
-                  >
-                    Thanks — we&apos;ve received your message and will reply
-                    within 24 hours.
-                  </output>
-                )}
               </form>
             </div>
           </div>
@@ -341,16 +362,16 @@ function Field({
     color: "#111111",
   };
   const inputStyle: React.CSSProperties = multiline
-    ? { ...baseStyle, minHeight: "108px", padding: "12px 17px" }
-    : { ...baseStyle, height: "48px", padding: "15px 17px" };
+    ? { ...baseStyle, minHeight: "88px", padding: "10px 14px" }
+    : { ...baseStyle, height: "40px", padding: "10px 14px" };
 
   return (
     <label htmlFor={id} className="block">
       <span
-        className="mb-3 block text-[#111111]"
+        className="mb-2 block text-[#111111]"
         style={{
           fontFamily: "var(--font-display, 'Manrope'), sans-serif",
-          fontSize: "16px",
+          fontSize: "14px",
           fontWeight: 400,
           lineHeight: 1.2,
         }}
@@ -397,5 +418,45 @@ function Field({
         />
       )}
     </label>
+  );
+}
+
+interface SuccessBannerProps {
+  show: boolean;
+  message: string;
+}
+
+function SuccessBanner({ show, message }: SuccessBannerProps) {
+  return (
+    <output
+      aria-live="polite"
+      className="block overflow-hidden transition-all duration-300 ease-out"
+      style={{
+        maxHeight: show ? "120px" : "0px",
+        opacity: show ? 1 : 0,
+        marginBottom: show ? "20px" : "0px",
+      }}
+    >
+      <div
+        className="flex items-start gap-3 rounded-[10px] px-4 py-3"
+        style={{ background: "#ECFDF3", border: "1px solid #ABEFC6" }}
+      >
+        <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden className="shrink-0" style={{ marginTop: "2px" }}>
+          <circle cx="10" cy="10" r="9" fill="#12B76A" />
+          <path d="M6 10.5l2.5 2.5L14 7.5" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <span
+          style={{
+            fontFamily: "var(--font-sans), 'Sora', sans-serif",
+            fontSize: "14px",
+            fontWeight: 500,
+            lineHeight: 1.45,
+            color: "#054F31",
+          }}
+        >
+          {message}
+        </span>
+      </div>
+    </output>
   );
 }

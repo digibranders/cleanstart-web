@@ -45,7 +45,7 @@ const DEFAULT_CTA_CARDS: PodcastCtaCard[] = [
     title: "Get Updates",
     body: "Join our mailing list for curated insights and upcoming sessions.",
     ctaLabel: "Sign Up",
-    ctaHref: "#",
+    ctaHref: "/book-a-demo",
   },
 ];
 

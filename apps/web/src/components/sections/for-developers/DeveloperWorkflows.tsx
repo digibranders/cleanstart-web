@@ -53,24 +53,30 @@ const PIPELINE_STEPS_RIGHT: PipelineStep[] = [
 interface FeatureCard {
   title: string;
   body: string;
+  /** Per-card glyph SVG rendered inside the blue ball — exported from Figma node 857:6287. */
+  icon: string;
 }
 
 const FEATURE_CARDS: FeatureCard[] = [
   {
     title: 'Existing CI/CD Pipelines',
     body: 'Works with current development workflows.',
+    icon: `${ASSET_BASE}/icon-cicd-pipelines.svg`,
   },
   {
     title: 'Registry Compatible',
     body: 'Integrates with existing registries and tooling.',
+    icon: `${ASSET_BASE}/icon-registry.svg`,
   },
   {
     title: 'Faster Builds',
     body: 'Smaller images improve pull and deployment times.',
+    icon: `${ASSET_BASE}/icon-faster-builds.svg`,
   },
   {
     title: 'Cleaner SBOMs',
     body: 'Reduce dependency complexity across environments.',
+    icon: `${ASSET_BASE}/icon-sboms.svg`,
   },
 ];
 
@@ -280,11 +286,191 @@ function PipelineArrow(): React.ReactElement {
 }
 
 /**
+ * Mobile-only vertical arrow — same dashed asset, rotated 90deg to point down.
+ */
+function MobilePipelineArrow(): React.ReactElement {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`${ASSET_BASE}/arrow-straight.svg`}
+      alt=""
+      aria-hidden
+      width={30}
+      height={16}
+      style={{
+        width: '30px',
+        height: '16px',
+        flexShrink: 0,
+        opacity: 0.6,
+        transform: 'rotate(90deg)',
+      }}
+    />
+  );
+}
+
+/**
+ * Mobile horizontal pipeline step card — icon on left, label on right.
+ * Matches the Figma mobile layout: 244×80 with rounded 16px, soft cyan tint.
+ */
+function MobilePipelineCard({ label, icon, iconSize = 56 }: PipelineStep): React.ReactElement {
+  return (
+    <div
+      className="relative flex items-center"
+      style={{
+        width: '244px',
+        height: '80px',
+        borderRadius: '16px',
+        background:
+          'linear-gradient(90deg, rgba(44,193,235,0.23), rgba(44,193,235,0.23))',
+        padding: '2px',
+      }}
+    >
+      <div
+        className="relative flex h-full w-full items-center overflow-hidden bg-white"
+        style={{ borderRadius: '14px', padding: '12px 20px' }}
+      >
+        {/* Subtle vertical highlight line */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute"
+          style={{
+            top: 0,
+            bottom: 0,
+            left: '50%',
+            width: '0.73px',
+            background:
+              'linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 50.77%, rgba(255,255,255,0) 100%)',
+            opacity: 0.6,
+          }}
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={icon}
+          alt=""
+          aria-hidden
+          width={iconSize}
+          height={iconSize}
+          style={{
+            width: `${iconSize}px`,
+            height: `${iconSize}px`,
+            objectFit: 'contain',
+            flexShrink: 0,
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+        <span
+          className="ml-auto"
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '18px',
+            fontWeight: 400,
+            letterSpacing: '-0.04em',
+            lineHeight: 1.2,
+            color: '#555',
+            whiteSpace: 'nowrap',
+            paddingRight: '12px',
+          }}
+        >
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Mobile horizontal CleanStart card — icon on left, "CleanStart Hardened Image"
+ * label on right, dark gradient background. Same 244×80 footprint as the step
+ * cards so the column stays aligned.
+ */
+function MobileCleanStartCard(): React.ReactElement {
+  return (
+    <div
+      className="relative flex shrink-0 items-center overflow-hidden"
+      style={{
+        width: '244px',
+        height: '80px',
+        borderRadius: '13.5px',
+        border: '1.688px solid #dab6f3',
+        background: 'linear-gradient(180deg, #151021 0%, #131E8F 71.2%, #551ECE 100%)',
+        boxShadow: [
+          '-73.723px 36.580px 33.203px 0 rgba(0,0,0,0.03)',
+          '-41.645px 20.822px 27.576px 0 rgba(0,0,0,0.12)',
+          '-18.571px 9.004px 20.822px 0 rgba(0,0,0,0.20)',
+          '-4.502px 2.251px 11.255px 0 rgba(0,0,0,0.23)',
+        ].join(', '),
+        padding: '12px 18px',
+      }}
+    >
+      {/* Purple wash */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
+        style={{
+          width: '158.5px',
+          height: '160px',
+          left: '-34px',
+          top: '-50px',
+          background: '#5D04D7',
+          opacity: 0.34,
+          filter: 'blur(40px)',
+          borderRadius: '50%',
+        }}
+      />
+      {/* Cyan glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
+        style={{
+          width: '254.5px',
+          height: '200px',
+          left: '-9.4px',
+          top: '-80px',
+          background: '#04C7F2',
+          opacity: 0.55,
+          filter: 'blur(40px)',
+          borderRadius: '50%',
+        }}
+      />
+
+      <Image
+        src={`${ASSET_BASE}/cube-image.png`}
+        alt=""
+        aria-hidden
+        width={48}
+        height={52}
+        priority
+        className="relative z-10 select-none shrink-0"
+        style={{ objectFit: 'contain' }}
+      />
+
+      <p
+        className="relative z-10 ml-auto text-right"
+        style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: '14px',
+          fontWeight: 500,
+          letterSpacing: '-0.04em',
+          lineHeight: 1.15,
+          color: '#ffffff',
+          paddingRight: '4px',
+        }}
+      >
+        CleanStart
+        <br />
+        Hardened Image
+      </p>
+    </div>
+  );
+}
+
+/**
  * 96 px blue gradient "ball" icon for feature cards. Uses the shared cube SVG
  * inside a blue radial gradient sphere — approximates the Figma 3D ball
  * without the (heavy) Light/HardLight/Pattern overlays.
  */
-function FeatureBall(): React.ReactElement {
+function FeatureBall({ icon }: { icon: string }): React.ReactElement {
   return (
     <div
       className="relative flex items-center justify-center overflow-hidden"
@@ -309,7 +495,7 @@ function FeatureBall(): React.ReactElement {
       />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={`${ASSET_BASE}/icon-cicd-card.svg`}
+        src={icon}
         alt=""
         aria-hidden
         width={54}
@@ -326,22 +512,22 @@ function FeatureBall(): React.ReactElement {
  * Soft purple bloom inside, 4 faint vertical highlight lines + 2 horizontal,
  * blue ball icon at top-left, title + body at the bottom.
  */
-function FeatureCardView({ title, body }: FeatureCard): React.ReactElement {
+function FeatureCardView({ title, body, icon }: FeatureCard): React.ReactElement {
+  /* Figma mobile (857:6287): 320×253, outer radius 20, inner radius 16, padding 6.
+     Figma desktop (857-4900 / earlier): 295×324, outer radius 40, inner radius 36, padding 4.
+     The radii/padding shrink on mobile because the card is shorter; we keep the
+     desktop styling above lg. */
   return (
     <div
-      className="relative flex shrink-0"
+      className="relative flex shrink-0 w-full max-w-[320px] lg:max-w-[295px] rounded-[20px] lg:rounded-[40px] p-[6px] lg:p-[4px]"
       style={{
-        width: '295px',
         height: '324px',
-        borderRadius: '40px',
         background:
           'linear-gradient(90deg, rgba(44,193,235,0.30), rgba(44,193,235,0.30))',
-        padding: '4px',
       }}
     >
       <div
-        className="relative h-full w-full overflow-hidden bg-white"
-        style={{ borderRadius: '36px' }}
+        className="relative h-full w-full overflow-hidden bg-white rounded-[14px] lg:rounded-[36px]"
       >
         {/* Purple bloom */}
         <div
@@ -397,7 +583,7 @@ function FeatureCardView({ title, body }: FeatureCard): React.ReactElement {
 
         {/* Ball icon */}
         <div className="absolute" style={{ top: '32px', left: '24px' }}>
-          <FeatureBall />
+          <FeatureBall icon={icon} />
         </div>
 
         {/* Title + body */}
@@ -446,8 +632,8 @@ export function DeveloperWorkflows(): React.ReactElement {
       className="relative overflow-hidden"
       style={{
         background: '#f6f6f6',
-        paddingTop: '120px',
-        paddingBottom: '120px',
+        paddingTop: 'clamp(56px, 6.25vw, 120px)',
+        paddingBottom: 'clamp(56px, 6.25vw, 120px)',
       }}
     >
       {/* ── Decorative background ── */}
@@ -517,12 +703,12 @@ export function DeveloperWorkflows(): React.ReactElement {
           style={{
             maxWidth: '720px',
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(36px, 4.3vw, 62px)',
+            fontSize: 'clamp(28px, 4.3vw, 62px)',
             fontWeight: 700,
             letterSpacing: '-0.05em',
-            lineHeight: 1.1,
+            lineHeight: 1.15,
             color: '#111',
-            marginBottom: '80px',
+            marginBottom: 'clamp(40px, 4.17vw, 80px)',
           }}
         >
           Designed for Developer{' '}
@@ -544,14 +730,33 @@ export function DeveloperWorkflows(): React.ReactElement {
             ))}
           </div>
 
-          {/* Mobile pipeline — wrap into rows */}
-          <div className="md:hidden flex flex-wrap items-center justify-center gap-3">
-            {PIPELINE_STEPS_LEFT.map((step) => (
-              <PipelineStepCard key={step.label} {...step} />
+          {/* Mobile pipeline — vertical single column, horizontal cards with
+              vertical dashed arrows between them. Order mirrors the Figma
+              mobile screenshot: Git → CI/CD → Build → CleanStart → Registry
+              → Deploy → Runtime → Code. */}
+          <div className="md:hidden flex flex-col items-center gap-2">
+            {[
+              { label: 'Git', icon: `${ASSET_BASE}/logo-git.png`, iconSize: 48 },
+              { label: 'CI/CD', icon: `${ASSET_BASE}/logo-cicd.svg`, iconSize: 48 },
+              { label: 'Build', icon: `${ASSET_BASE}/logo-build.svg`, iconSize: 52 },
+            ].map((step) => (
+              <div key={`m-${step.label}`} className="flex flex-col items-center gap-2">
+                <MobilePipelineCard {...step} />
+                <MobilePipelineArrow />
+              </div>
             ))}
-            <CleanStartCard />
-            {PIPELINE_STEPS_RIGHT.map((step) => (
-              <PipelineStepCard key={step.label} {...step} />
+            <MobileCleanStartCard />
+            <MobilePipelineArrow />
+            {[
+              { label: 'Registry', icon: `${ASSET_BASE}/logo-registry.png`, iconSize: 52 },
+              { label: 'Deploy', icon: `${ASSET_BASE}/logo-deploy.svg`, iconSize: 48 },
+              { label: 'Runtime', icon: `${ASSET_BASE}/logo-runtime.svg`, iconSize: 48 },
+              { label: 'Code', icon: `${ASSET_BASE}/logo-code.png`, iconSize: 52 },
+            ].map((step, i, arr) => (
+              <div key={`m-${step.label}`} className="flex flex-col items-center gap-2">
+                <MobilePipelineCard {...step} />
+                {i < arr.length - 1 ? <MobilePipelineArrow /> : null}
+              </div>
             ))}
           </div>
 
@@ -583,8 +788,7 @@ export function DeveloperWorkflows(): React.ReactElement {
 
         {/* ── 4 feature cards ── */}
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-items-center"
-          style={{ gap: '32px' }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-items-center gap-4 lg:gap-8"
         >
           {FEATURE_CARDS.map((card) => (
             <FeatureCardView key={card.title} {...card} />

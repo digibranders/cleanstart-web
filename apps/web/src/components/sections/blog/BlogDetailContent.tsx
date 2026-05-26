@@ -53,7 +53,9 @@ export function BlogDetailContent({
         ~680px body column = ~72 chars at 18px — optimal reading line length.
       */}
       <div className="relative mx-auto max-w-[1120px] px-6">
-        <div className="relative flex gap-12 pt-16 pb-28">
+        {/* Mobile uses a tighter top padding so the abstract sits closer to the
+            hero's meta/share row; lg+ keeps the original 64px breathing room. */}
+        <div className="relative flex gap-12 pt-6 sm:pt-10 lg:pt-16 pb-28">
 
           {/* ── LEFT: Table of Contents (sticky below header) ── */}
           <aside className="hidden lg:block shrink-0" style={{ width: "260px" }}>
@@ -68,6 +70,12 @@ export function BlogDetailContent({
           {/* ── CENTER: Article body ── */}
           {/* mx-auto centers the column when the xl TOC sidebar is hidden; xl:mx-0 resets it once the sidebar is visible */}
           <article className="min-w-0 flex-1 mx-auto lg:mx-0" style={{ maxWidth: "680px" }}>
+            {/* Mobile-only collapsible TOC — Figma blog detail mobile shows a
+                "Blended" dropdown listing the article's sections (817:4497). */}
+            <div className="lg:hidden mb-8">
+              <MobileTableOfContents toc={tableOfContents} />
+            </div>
+
             {abstract && (
               <p
                 className="mb-8 text-[clamp(1rem,1.2vw,1.125rem)] leading-[1.7] tracking-[-0.01em]"
@@ -218,5 +226,128 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
         })}
       </ul>
     </nav>
+  );
+}
+
+/* ─── Mobile Table of Contents (collapsible) ────────────────────────────── */
+
+function MobileTableOfContents({
+  toc,
+}: {
+  toc?: TocEntry[] | null | undefined;
+}): React.ReactElement | null {
+  const [open, setOpen] = useState(false);
+
+  const entries: { text: string; slug: string; level: number }[] = useMemo(
+    () =>
+      (toc ?? [])
+        .filter(
+          (e): e is RenderedTocEntry =>
+            !!e?.text && typeof e.level === "number" && e.level >= 2 && e.level <= 4,
+        )
+        .map((e) => ({
+          text: e.text,
+          slug: slugifyText(e.text),
+          level: e.level,
+        })),
+    [toc],
+  );
+
+  if (!entries.length) return null;
+
+  const handleClick = (slug: string): void => {
+    const byId = document.getElementById(slug);
+    const fallback = byId
+      ? null
+      : Array.from(
+          document.querySelectorAll<HTMLElement>(
+            ".article-body .article-h2, .article-body .article-h3, .article-body .article-h4",
+          ),
+        ).find((h) => slugifyText(h.textContent ?? "") === slug) ?? null;
+    const target = byId ?? fallback;
+    if (!target) return;
+    const top = target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+    window.scrollTo({ top, behavior: "smooth" });
+    setOpen(false);
+  };
+
+  return (
+    <details
+      open={open}
+      onToggle={(event) => setOpen((event.target as HTMLDetailsElement).open)}
+      className="w-full"
+      style={{
+        border: "1px solid rgba(17,17,17,0.10)",
+        borderRadius: "12px",
+        background: "white",
+        overflow: "hidden",
+      }}
+    >
+      <summary
+        className="flex items-center justify-between font-sans cursor-pointer list-none"
+        style={{
+          padding: "12px 16px",
+          fontSize: "15px",
+          fontWeight: 600,
+          color: "#111",
+          letterSpacing: "-0.01em",
+        }}
+      >
+        <span>Contents</span>
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden
+          style={{
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s",
+          }}
+        >
+          <path
+            d="M6 9l6 6 6-6"
+            stroke="#111"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </summary>
+      <ul
+        style={{
+          listStyle: "none",
+          padding: "0 16px 12px",
+          margin: 0,
+          borderTop: "1px solid rgba(17,17,17,0.08)",
+        }}
+      >
+        {entries.map((entry) => (
+          <li
+            key={entry.slug}
+            style={{
+              paddingLeft: `${(entry.level - 2) * 12}px`,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => handleClick(entry.slug)}
+              className="font-sans w-full text-left"
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "8px 0",
+                fontSize: entry.level === 2 ? "14px" : "13px",
+                lineHeight: 1.5,
+                color: "rgba(17,17,17,0.75)",
+              }}
+            >
+              {entry.text}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </details>
   );
 }

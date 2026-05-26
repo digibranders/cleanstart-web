@@ -100,6 +100,17 @@ export function Waveform(): React.ReactElement {
             will-change: transform, opacity;
           }
         }
+        /* Mobile: thin the bar field so it reads as a clean equalizer, not a packed brick.
+           Hide 3 of every 4 bars (≈24 bars across the row) and cap the silhouette height. */
+        @media (max-width: 639px) {
+          .podcast-waveform { height: 64px !important; }
+          .podcast-waveform__bar:not(:nth-child(4n+1)) { display: none; }
+        }
+        /* Small tablet: hide every other bar (≈48 bars), modest height. */
+        @media (min-width: 640px) and (max-width: 1023px) {
+          .podcast-waveform { height: 88px !important; }
+          .podcast-waveform__bar:nth-child(even) { display: none; }
+        }
       `}</style>
     </div>
   );

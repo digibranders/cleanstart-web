@@ -85,7 +85,9 @@ export function CleanStartImagesCta(): React.ReactElement {
 
           {/* Glass button — Figma: border #dab6f3, bg rgba(255,255,255,0.65), r=8px */}
           <a
-            href="/cleanstart-images"
+            href="https://images.cleanstart.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-[8px] border transition-opacity duration-200 hover:opacity-90"
             style={{
               borderColor: "#dab6f3",

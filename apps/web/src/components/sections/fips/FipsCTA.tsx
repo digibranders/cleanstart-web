@@ -140,7 +140,7 @@ export function FipsCTA(): React.ReactElement {
       </div>
 
       {/* ── Mobile fallback (under md) ── */}
-      <div className="md:hidden relative h-full p-6 flex flex-col gap-5 justify-center">
+      <div className="md:hidden relative h-full p-6 flex flex-col gap-5 justify-center items-center text-center">
         <p
           className="text-white"
           style={{

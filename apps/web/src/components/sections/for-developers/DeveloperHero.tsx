@@ -393,17 +393,6 @@ export function DeveloperHero(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Bottom fade — blends hero into white WhyItMatters section */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute inset-x-0 bottom-0 z-[1]"
-        style={{
-          height: '160px',
-          background:
-            'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 55%, rgba(255,255,255,0.92) 88%, #ffffff 100%)',
-        }}
-      />
-
       {/* ── Content column ── */}
       <div
         className="relative mx-auto z-[2] flex w-full max-w-[840px] flex-col items-center px-6 sm:px-10 text-center"
@@ -440,7 +429,9 @@ export function DeveloperHero(): React.ReactElement {
         </p>
 
         <Link
-          href="/cleanstart-images"
+          href="https://images.cleanstart.com"
+          target="_blank"
+          rel="noopener noreferrer"
           className="cs-btn-glass"
           style={
             {

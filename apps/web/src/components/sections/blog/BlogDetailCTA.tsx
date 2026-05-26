@@ -107,11 +107,11 @@ export function BlogDetailCTA(): React.ReactElement {
       {/* ── Content ── */}
       <div className="absolute inset-0 flex items-center justify-center px-6">
         <div
-          className="flex flex-col lg:flex-row items-start gap-y-4 lg:gap-y-0 lg:gap-x-[clamp(40px,9vw,115px)] w-full"
+          className="flex flex-col lg:flex-row items-center lg:items-start gap-y-4 lg:gap-y-0 lg:gap-x-[clamp(40px,9vw,115px)] w-full"
           style={{ maxWidth: "1047px" }}
         >
           <div
-            className="font-display font-bold w-full lg:w-auto lg:max-w-[401px] text-left"
+            className="font-display font-bold w-full lg:w-auto lg:max-w-[401px] text-center lg:text-left"
             style={{
               color: "#111111",
               fontSize: "var(--cta-card-title)",
@@ -124,11 +124,11 @@ export function BlogDetailCTA(): React.ReactElement {
           </div>
 
           <div
-            className="flex flex-col items-start w-full max-w-[493px]"
+            className="flex flex-col items-center lg:items-start w-full max-w-[493px]"
             style={{ gap: "24px" }}
           >
             <p
-              className="font-normal"
+              className="font-normal text-center lg:text-left"
               style={{
                 fontSize: "var(--cta-card-desc)",
             fontWeight: 400,

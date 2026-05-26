@@ -99,7 +99,9 @@ export function CleanStartImagesHero(): React.ReactElement {
               </p>
 
               <Link
-                href="#explore-images"
+                href="https://images.cleanstart.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="cs-btn-glass"
                 style={
                   {

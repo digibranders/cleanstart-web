@@ -113,11 +113,12 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
             header CTA (cs-btn-blue / cs-btn-glass) uses. When the role is
             closed, the CTA becomes a non-interactive "Applications closed"
             label with no glow, hover, or press effect. */}
-        <div className="shrink-0">
+        {/* Apply CTA — full-width on mobile per Figma 817:7317 spec, auto-width at lg+. */}
+        <div className="shrink-0 w-full lg:w-auto">
           {isClosed ? (
             <span
               aria-disabled
-              className="inline-flex items-center justify-center font-sans select-none"
+              className="inline-flex items-center justify-center font-sans select-none w-full lg:w-auto"
               style={closedButtonStyle}
             >
               Applications closed
@@ -127,7 +128,7 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
               href={href}
               target={href.startsWith("http") ? "_blank" : undefined}
               rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-              className={APPLY_BUTTON_CLASS}
+              className={`${APPLY_BUTTON_CLASS} w-full lg:w-auto`}
               style={applyButtonStyle}
               aria-label={`Apply for ${job.title}`}
             >
@@ -140,7 +141,7 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
           ) : (
             <Link
               href={href}
-              className={APPLY_BUTTON_CLASS}
+              className={`${APPLY_BUTTON_CLASS} w-full lg:w-auto`}
               style={applyButtonStyle}
               aria-label={`Apply for ${job.title}`}
             >
