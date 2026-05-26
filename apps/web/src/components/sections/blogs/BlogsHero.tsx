@@ -120,16 +120,17 @@ export function BlogsHero({
             >
               <SearchBar
                 initialQuery={searchQuery}
-                placeholder="Search blogs..."
+                placeholder="Search articles of your interest..."
                 ariaLabel="Search blogs"
               />
             </Suspense>
           </div>
 
-          {/* Category filter pills */}
+          {/* Category filter pills.
+              MOBILE (<lg): single horizontally-scrollable row per Figma 817:3566.
+              LG+: wrap-to-multiple-rows centered within the hero. */}
           <nav
-            className="flex flex-wrap items-center justify-center"
-            style={{ gap: "10px" }}
+            className="-mx-6 sm:mx-0 lg:flex-wrap lg:justify-center flex items-center gap-[10px] overflow-x-auto lg:overflow-visible px-6 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden w-screen sm:w-auto"
             aria-label="Blog categories"
           >
             <CategoryPill
@@ -154,14 +155,14 @@ export function BlogsHero({
             className="grid grid-cols-1 lg:grid-cols-[minmax(280px,513px)_1fr] mt-[clamp(56px,7vw,102px)]"
             style={{ gap: "32px" }}
           >
-            {/* Left: text */}
-            <div className="flex flex-col gap-6 items-start">
+            {/* Left: text — on mobile, ordered AFTER the image per Figma 817:3470 layout. */}
+            <div className="flex flex-col gap-6 items-start order-2 lg:order-1">
               <div className="flex flex-col gap-6 w-full">
                 <p
                   className="text-body-lg font-medium leading-[1.5] tracking-[-0.04em]"
                   style={{ color: "#d8d8d8" }}
                 >
-                  FEATURED BLOGS
+                  FEATURED ARTICLES
                 </p>
                 <div className="flex flex-col gap-4 w-full">
                   <h2
@@ -203,9 +204,10 @@ export function BlogsHero({
               </Link>
             </div>
 
-            {/* Right: featured image — outer purple border + inset image */}
+            {/* Right: featured image — outer purple border + inset image. On
+                mobile, ordered BEFORE the text per Figma 817:3470. */}
             <div
-              className="relative w-full"
+              className="relative w-full order-1 lg:order-2"
               style={{
                 aspectRatio: "711 / 349",
                 borderRadius: "20px",

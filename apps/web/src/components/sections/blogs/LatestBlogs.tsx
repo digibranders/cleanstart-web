@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Blog } from "@/lib/blog";
 import { Pagination } from "@/components/ui/Pagination";
 import { BlogCard } from "./BlogCard";
@@ -150,14 +151,124 @@ export function LatestBlogs({
               ))}
             </div>
 
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              buildHref={(p) => buildPageHref(p, activeCategory, searchQuery)}
-            />
+            {/* DESKTOP — full numbered pagination. */}
+            <div className="hidden lg:block">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                buildHref={(p) => buildPageHref(p, activeCategory, searchQuery)}
+              />
+            </div>
+
+            {/* MOBILE — compact "< num >" pagination per Figma 817:3915 spec. */}
+            {totalPages > 1 && (
+              <CompactMobilePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                buildHref={(p) =>
+                  buildPageHref(p, activeCategory, searchQuery)
+                }
+              />
+            )}
           </>
         )}
       </div>
     </section>
+  );
+}
+
+interface CompactMobilePaginationProps {
+  currentPage: number;
+  totalPages: number;
+  buildHref: (page: number) => string;
+}
+
+function CompactMobilePagination({
+  currentPage,
+  totalPages,
+  buildHref,
+}: CompactMobilePaginationProps): React.ReactElement {
+  const prevDisabled = currentPage <= 1;
+  const nextDisabled = currentPage >= totalPages;
+  return (
+    <nav
+      aria-label="Pagination"
+      className="lg:hidden flex items-center justify-center"
+      style={{ gap: "16px", marginTop: "40px" }}
+    >
+      {prevDisabled ? (
+        <span
+          aria-disabled
+          aria-label="Previous page"
+          className="inline-flex items-center justify-center select-none"
+          style={{ width: "24px", height: "24px", opacity: 0.32 }}
+        >
+          <ChevronArrow direction="left" />
+        </span>
+      ) : (
+        <Link
+          href={buildHref(currentPage - 1)}
+          aria-label="Previous page"
+          rel="prev"
+          className="inline-flex items-center justify-center"
+          style={{ width: "24px", height: "24px" }}
+        >
+          <ChevronArrow direction="left" />
+        </Link>
+      )}
+      <span
+        aria-current="page"
+        className="font-sans"
+        style={{
+          fontSize: "16px",
+          fontWeight: 600,
+          color: "#4a3bf1",
+          minWidth: "24px",
+          textAlign: "center",
+        }}
+      >
+        {currentPage}
+      </span>
+      {nextDisabled ? (
+        <span
+          aria-disabled
+          aria-label="Next page"
+          className="inline-flex items-center justify-center select-none"
+          style={{ width: "24px", height: "24px", opacity: 0.32 }}
+        >
+          <ChevronArrow direction="right" />
+        </span>
+      ) : (
+        <Link
+          href={buildHref(currentPage + 1)}
+          aria-label="Next page"
+          rel="next"
+          className="inline-flex items-center justify-center"
+          style={{ width: "24px", height: "24px" }}
+        >
+          <ChevronArrow direction="right" />
+        </Link>
+      )}
+    </nav>
+  );
+}
+
+function ChevronArrow({
+  direction,
+}: {
+  direction: "left" | "right";
+}): React.ReactElement {
+  const path =
+    direction === "right" ? "M9 6l6 6-6 6" : "M15 18l-6-6 6-6";
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d={path}
+        stroke="#4a3bf1"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
