@@ -55,11 +55,10 @@ export function DemoHero(): React.ReactElement {
         className="relative mx-auto flex items-end justify-center text-center"
         style={{
           maxWidth: "var(--container-default)",
-          minHeight: "clamp(280px, 26vw, 369px)",
           paddingLeft: "24px",
           paddingRight: "24px",
           paddingTop: "clamp(96px, 12vw, 176px)",
-          paddingBottom: "clamp(40px, 4vw, 72px)",
+          paddingBottom: "200px",
         }}
       >
         <h1
