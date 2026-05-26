@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { PreviewBanner } from "@/components/PreviewBanner";
+import { AgentationDev } from "@/components/dev/AgentationDev";
 import { WebVitals } from "@/components/observability/WebVitals";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
 import { JsonLd, organizationSchema } from "@/lib/seo/jsonld";
@@ -125,6 +126,7 @@ export default function RootLayout({
         {children}
         <Analytics />
         <SpeedInsights />
+        <AgentationDev />
       </body>
     </html>
   );

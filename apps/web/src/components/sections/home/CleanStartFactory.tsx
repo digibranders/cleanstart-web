@@ -1247,13 +1247,33 @@ export function CleanStartFactory() {
   // Background is inherited from the parent `bg-cs-hero` wrapper in page.tsx
   // so the Hero and Factory sections share one continuous backdrop. The grid
   // overlay (`bg-cs-grid`) has been removed from the home wrapper per design.
+  //
+  // ── Viewport-fit pass (1440×900 laptop budget) ──────────────────────
+  // The factory used to total ~1029 px (divider gap + H2 + cards 374 +
+  // bottom block 285 + spacing), which overflowed a 1440×900 laptop's
+  // ~820 px page area by ~210 px — visitors had to scroll to see the
+  // bottom block. Compressed to ~787 px by:
+  //   · Capping the desktop cards row at 1112 (was 1276) → each card
+  //     200 px wide instead of 232.8 → height 321 instead of 374
+  //     (cqw interior — orb, title, blurb, arrow — auto-scales down).
+  //   · Capping the bottom block at 1112 (was 1276) → height 248
+  //     instead of 285. All `CQW(...)` interior positions are computed
+  //     against the unchanged `BB_W = 1276` reference, so block
+  //     interior layout is unaffected — only the rendered scale shrinks.
+  //   · Reducing inter-section spacing: divider 64→40, H2-top 56→32,
+  //     cards-top 64→32, block-top 56→32, bottom-pad 80→40.
+  //   · H2 font cap 56→48 px (saves ~8 px of stack height; remains
+  //     dominant on the page).
+  // Net: ~242 px reclaimed. The whole factory now sits inside a single
+  // 1440×900 viewport, and is only ~87 px tall-of-fold on 1366×768
+  // (vs. ~330 today).
   return (
     <Section padding="none" className="relative overflow-hidden">
       <Container>
         <div className="relative mx-auto" style={{ maxWidth: 1276 }}>
           <div
             aria-hidden
-            className="mx-auto mt-[64px]"
+            className="mx-auto mt-[40px]"
             style={{
               width: "100%",
               height: 2,
@@ -1264,9 +1284,9 @@ export function CleanStartFactory() {
           />
 
           <h2
-            className="mt-[56px] text-center font-display text-white"
+            className="mt-[32px] text-center font-display text-white"
             style={{
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "clamp(28px, 3.4vw, 48px)",
               fontWeight: 700,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
@@ -1280,19 +1300,20 @@ export function CleanStartFactory() {
               column can shrink below its content's intrinsic min-width
               instead of forcing the row to overflow). Gap is fluid: scales
               from the Figma 28 px at ≥1280 down to 8 px on the narrowest
-              tablet. Wrapper `maxWidth: 1276` matches the Figma frame so
-              cards reach exactly 232.8 px @ xl (the spec width). Below
-              that they shrink as one — `cqw` interior sizing means orb,
-              title, blurb, arrow all scale with the column width. Never
-              wraps; never overflows.
-
-              Hidden below `md` (the mobile factory below takes over). */}
+              tablet.
+                Wrapper `maxWidth: 1112` (was 1276) caps each card at
+                200 px instead of the Figma 232.8 so the factory fits a
+                1440×900 viewport. Cards still scale fluidly below that
+                — every interior dimension uses `cqw`, so orb, title,
+                blurb, arrow shrink together with the column width.
+              Never wraps; never overflows. Hidden below `md` (the
+              mobile factory below takes over). */}
           <div
-            className="relative mx-auto mt-[64px] hidden md:grid"
+            className="relative mx-auto mt-[32px] hidden md:grid"
             style={{
               gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
               columnGap: "clamp(8px, 2.2vw, 28px)",
-              maxWidth: 1276,
+              maxWidth: 1112,
             }}
           >
             {CARDS.map((c, i) => (
@@ -1310,12 +1331,26 @@ export function CleanStartFactory() {
           {/* Bottom factory block (Figma node 810:1503). Pure DOM/CSS,
               the only assets are diagonal-lines.png + factory-arrow.svg +
               the shared flare.webp. Sized in cqw via its own container query
-              so every interior layer scales as one with the block width. */}
-          <div className="mt-[56px] hidden md:block">
+              so every interior layer scales as one with the block width.
+              Width capped at 1112 (matches the cards row cap above) — the
+              `BB_W = 1276` reference inside `FactoryBottomBlock` stays
+              the same, so every `CQW(x)` interior position is unchanged;
+              only the rendered scale shrinks. */}
+          <div
+            className="mx-auto mt-[32px] hidden md:block"
+            style={{ width: "100%", maxWidth: 1112 }}
+          >
             <FactoryBottomBlock />
           </div>
 
-          <div className="pb-[80px]" />
+          {/* Bottom pad reserves room for the rocket-exhaust flares that
+              extend below the block. At the 1112-px block scale the flare
+              image is ≈ 279 × 374 px and anchored with `marginTop: -180cqw`,
+              so the bright cores extend ~67 px below the block and the
+              tapered halo trails to ~217 px below. 96 px shows the full
+              bright cores + most of the halo without re-inflating the
+              section past the 1440×900 budget. */}
+          <div className="pb-[96px]" />
 
         </div>
       </Container>
