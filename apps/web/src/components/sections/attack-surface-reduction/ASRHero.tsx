@@ -13,8 +13,8 @@ import Link from 'next/link';
  *  - Description: Figtree Regular 30px / tracking -0.04em / opacity 0.8
  *  - CTA: px-18px py-9px · font Inter Medium 18px / tracking -0.01em · border #dab6f3 · glass
  *  - Content → CTA gap: 40px · Heading → Desc gap: 24px
- *  - BLOATED card: hero-cards.png (484×493 natural) · CLEAN card: JSX 295×362px
- *    BLOATED at wrapper left:0 top:0, CLEAN at wrapper left:325px top:77px
+ *  - BLOATED card: hero-cards.png rendered 360px wide (larger, on left).
+ *  - CLEAN card: JSX 260×320px (smaller, on right). Both bottom-aligned per Figma 783:90.
  *
  * Mobile specs (360px / node 920:609):
  *  - Content starts at top: 136px
@@ -39,29 +39,31 @@ export function ASRHero(): React.ReactElement {
       }}
     >
       {/*
-       * Desktop mesh — 1920×569px SVG positioned at left:-240px so it overflows
-       * 240px on each side of the 1440px viewport. overflow-hidden on the section clips it.
+       * Grid mesh — same hero-mesh.svg across all viewports.
+       * Desktop (md+): 1920×569px positioned at left:-240px so it overflows
+       * 240px on each side of the 1440px viewport.
+       * Mobile: stretched to 100% width via preserveAspectRatio="none" baked
+       * into the SVG, so the grid stays continuous instead of being a different
+       * CSS pattern. overflow-hidden on the section clips it.
        */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        className="pointer-events-none select-none absolute hidden lg:block max-w-none"
+        className="pointer-events-none select-none absolute left-0 top-0 w-full h-[400px] md:hidden"
+        src="/images/attack-surface-reduction/hero-mesh.svg"
+        alt=""
+        loading="eager"
+        decoding="async"
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden md:block max-w-none"
         src="/images/attack-surface-reduction/hero-mesh.svg"
         alt=""
         style={{ left: '-240px', top: 0, width: '1920px', height: '569px' }}
         loading="eager"
         decoding="async"
-      />
-
-      {/* Mobile grid overlay — subtle dark crosshatch, hidden at lg+ */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 lg:hidden"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(19, 15, 38, 0.55) 1px, transparent 1px), linear-gradient(90deg, rgba(19, 15, 38, 0.55) 1px, transparent 1px)',
-          backgroundSize: '80px 80px',
-        }}
       />
 
       {/* Bottom purple fade into next section */}
@@ -81,25 +83,25 @@ export function ASRHero(): React.ReactElement {
        */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 lg:px-[82px]">
         <div
-          className="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-10"
+          className="flex flex-col md:flex-row items-start md:items-end gap-6 md:gap-6 lg:gap-10"
           style={{
-            paddingTop: 'clamp(136px, 15.9vw, 229px)',
+            paddingTop: 'clamp(112px, 15.9vw, 229px)',
             paddingBottom: 'clamp(56px, 8.3vw, 120px)',
           }}
         >
           {/* ── Left: heading + description + CTA ── */}
           <div
-            className="w-full lg:flex-1 flex flex-col items-center lg:items-start text-center lg:text-left gap-6 lg:gap-10"
+            className="w-full md:flex-1 flex flex-col items-center md:items-start text-center md:text-left gap-6 md:gap-6 lg:gap-10"
             style={{ maxWidth: '545px' }}
           >
             {/* Text block — heading + description */}
-            <div className="flex flex-col items-center lg:items-start text-center lg:text-left gap-4 lg:gap-6 w-full">
+            <div className="flex flex-col items-center md:items-start text-center md:text-left gap-4 md:gap-5 lg:gap-6 w-full">
               {/*
                * H1: 32px Bold mobile → 80px SemiBold desktop
                * Tracking: -0.05em works at both sizes.
                */}
               <h1
-                className="text-[32px] font-bold lg:font-semibold lg:[font-size:var(--text-hero-product)]"
+                className="text-[36px] font-bold lg:font-semibold lg:text-[64px]"
                 style={{
                   fontFamily: 'var(--font-display)',
                   letterSpacing: 'var(--text-hero-product-ls, -0.04em)',
@@ -186,38 +188,64 @@ export function ASRHero(): React.ReactElement {
             </Link>
           </div>
 
-          {/* ── Desktop: BLOATED + CLEAN cards side-by-side ── */}
+          {/* ── Tablet + Desktop: BLOATED + CLEAN cards side-by-side ── */}
           {/*
-           * The wrapper is a relative container sized to hold both absolutely-positioned cards.
-           * BLOATED card (hero-cards.png 484×493 natural) at left=0 top=0, rendered 330px wide.
-           * CLEAN card (JSX, 295×362px) at left=325px top=77px — Figma delta between card origins.
-           * Wrapper: 620px wide (325+295), 450px tall (77+362+buffer).
+           * Stage system: cards are authored at a fixed 650×440 "design canvas"
+           * and CSS-scaled uniformly via --asr-card-scale (0.55 at md → 1.0 at 1440+).
+           * The OUTER div reserves the post-scale footprint so flex layout is honest;
+           * the INNER div renders the design-size canvas and transforms it down.
+           * This preserves every absolute-positioned interior coordinate.
+           *
+           * BLOATED bottom-anchored at canvas bottom:0; the PNG carries ~38px of
+           * baked-in drop-shadow padding below the visible card frame, so CLEAN is
+           * anchored at bottom:38px to align the visible card frames at the same baseline.
            */}
           <div
-            className="hidden lg:flex relative shrink-0"
-            style={{ width: '620px', height: '450px' }}
+            className="hidden md:block relative shrink-0 [--asr-card-scale:0.5] lg:[--asr-card-scale:0.72] xl:[--asr-card-scale:1]"
+            style={{
+              width: 'calc(650px * var(--asr-card-scale))',
+              // Height excludes the ≈26px drop-shadow padding baked into hero-cards.png,
+              // so the wrapper's bottom edge = the cards' VISIBLE bottom. items-end on the
+              // parent flex row then aligns that to the CTA's bottom.
+              height: 'calc(414px * var(--asr-card-scale))',
+            }}
           >
-            {/* BLOATED card */}
-            <div style={{ position: 'absolute', left: 0, top: 0 }}>
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '650px',
+                height: '440px',
+                transform: 'scale(var(--asr-card-scale))',
+                transformOrigin: 'top left',
+              }}
+            >
+            {/* BLOATED card — larger, bottom-aligned, on the left */}
+            <div style={{ position: 'absolute', left: 0, bottom: 0 }}>
               <Image
                 src="/images/attack-surface-reduction/hero-cards.png"
                 alt="BLOATED image: 1.2 GB, 247 packages, 89 HIGH CVEs"
                 width={484}
                 height={493}
-                sizes="330px"
-                style={{ width: '330px', height: 'auto' }}
+                sizes="430px"
+                style={{ width: '430px', height: 'auto' }}
                 priority
               />
             </div>
 
-            {/* CLEAN card */}
+            {/* CLEAN card — smaller, visually bottom-aligned with BLOATED.
+                Measured from the PNG: hero-cards.png is 484×493; the visible card
+                frame ends at y=464 (29px of drop-shadow padding underneath). At the
+                rendered 430px width (scale 430/484 = 0.888) that's ≈26px of shadow.
+                CLEAN bottom:26px matches BLOATED's visible bottom exactly. */}
             <div
               style={{
                 position: 'absolute',
-                left: '325px',
-                top: '77px',
-                width: '295px',
-                height: '362px',
+                left: '390px',
+                bottom: '26px',
+                width: '260px',
+                height: '320px',
                 background: 'linear-gradient(180deg, #151021 0%, #131e8f 71.202%, #551ece 100%)',
                 border: '2.345px solid #dab6f3',
                 borderRadius: '18.762px',
@@ -244,8 +272,8 @@ export function ASRHero(): React.ReactElement {
                 <div
                   style={{
                     position: 'absolute',
-                    left: '12px',
-                    top: '16px',
+                    left: '11px',
+                    top: '14px',
                     border: '0.785px solid #dab6f3',
                     borderRadius: '23.491px',
                     padding: '4px 8px',
@@ -257,7 +285,7 @@ export function ASRHero(): React.ReactElement {
                     style={{
                       fontFamily: 'var(--font-display)',
                       fontWeight: 700,
-                      fontSize: '12.528px',
+                      fontSize: '11px',
                       color: 'white',
                       lineHeight: 1,
                     }}
@@ -270,8 +298,8 @@ export function ASRHero(): React.ReactElement {
                 <div
                   style={{
                     position: 'absolute',
-                    left: '220px',
-                    top: '16px',
+                    right: '11px',
+                    top: '14px',
                     border: '0.785px solid #dab6f3',
                     borderRadius: '23.491px',
                     padding: '4px 8px',
@@ -311,10 +339,10 @@ export function ASRHero(): React.ReactElement {
                   alt=""
                   style={{
                     position: 'absolute',
-                    left: '94px',
-                    top: '120px',
-                    width: '105px',
-                    height: '121px',
+                    left: '84px',
+                    top: '102px',
+                    width: '92px',
+                    height: '107px',
                   }}
                   loading="lazy"
                   decoding="async"
@@ -324,8 +352,8 @@ export function ASRHero(): React.ReactElement {
                 <div
                   style={{
                     position: 'absolute',
-                    left: '12px',
-                    top: '311px',
+                    left: '11px',
+                    bottom: '14px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '4px',
@@ -361,8 +389,8 @@ export function ASRHero(): React.ReactElement {
                 <div
                   style={{
                     position: 'absolute',
-                    left: '195px',
-                    top: '311px',
+                    right: '11px',
+                    bottom: '14px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '4px',
@@ -395,14 +423,15 @@ export function ASRHero(): React.ReactElement {
                 </div>
               </div>
             </div>
+            </div>
           </div>
 
-          {/* ── Mobile: combined cards export ── */}
+          {/* ── Mobile (< md): combined cards export ── */}
           {/*
            * hero-mobile-cards.png matches Figma 920:609 layout —
            * BLOATED card (168×226) at left:13px, CLEAN card (153×188) at left:193px.
            */}
-          <div className="block lg:hidden relative w-full">
+          <div className="block md:hidden relative w-full">
             <Image
               src="/images/attack-surface-reduction/hero-mobile-cards.png"
               alt="BLOATED vs CLEAN image comparison: 1.2 GB / 247 packages / 89 HIGH CVEs vs 87 MB / 12 packages / 0 HIGH CVEs"
