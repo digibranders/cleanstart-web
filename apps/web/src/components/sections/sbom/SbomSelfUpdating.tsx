@@ -99,7 +99,7 @@ export function SbomSelfUpdating(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'var(--text-display-md)',
+            fontSize: 'var(--fs-h2)',
             fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
@@ -111,7 +111,7 @@ export function SbomSelfUpdating(): React.ReactElement {
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-t-subhead)',
+            fontSize: 'var(--fs-lead)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.45,
@@ -227,7 +227,7 @@ export function SbomSelfUpdating(): React.ReactElement {
           className="text-white text-center"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'var(--text-display-md)',
+            fontSize: 'var(--fs-h2)',
             fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
@@ -244,7 +244,7 @@ export function SbomSelfUpdating(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-t-subhead)',
+            fontSize: 'var(--fs-lead)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.45,
@@ -291,7 +291,7 @@ export function SbomSelfUpdating(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: 'var(--text-card-title-md)',
+                    fontSize: 'var(--fs-h4)',
                     fontWeight: 600,
                     letterSpacing: '-0.04em',
                     lineHeight: 1.1,
@@ -304,7 +304,7 @@ export function SbomSelfUpdating(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: 'var(--font-sans)',
-                    fontSize: 'var(--text-body-sm)',
+                    fontSize: 'var(--fs-body-sm)',
                     fontWeight: 400,
                     letterSpacing: '-0.02em',
                     lineHeight: 1.4,
@@ -399,7 +399,7 @@ function FigmaCircle({
         className="relative"
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(15px, 1.56vw, 30px)',
+          fontSize: 'var(--fs-lead)',
           fontWeight: 700,
           letterSpacing: '-0.02em',
           lineHeight: 1,
@@ -433,7 +433,7 @@ function FeatureLabel({ x, y, title, body, bodyWidth }: FeatureLabelProps): Reac
       <p
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'var(--text-t-heading-sm)',
+          fontSize: 'var(--fs-h4)',
           fontWeight: 600,
           lineHeight: 'var(--text-t-heading-sm-lh)',
           letterSpacing: 'var(--text-t-heading-sm-ls)',
@@ -445,7 +445,7 @@ function FeatureLabel({ x, y, title, body, bodyWidth }: FeatureLabelProps): Reac
       <p
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'var(--text-t-body-md)',
+          fontSize: 'var(--fs-body)',
           fontWeight: 400,
           lineHeight: 'var(--text-t-body-md-lh)',
           letterSpacing: 'var(--text-t-body-md-ls)',
