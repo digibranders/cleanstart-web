@@ -178,7 +178,7 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(14px, 1.04vw, 20px)",
+              fontSize: "var(--fs-body)",
               fontWeight: 400,
               letterSpacing: "-0.05em",
               lineHeight: 1.4,
@@ -281,7 +281,7 @@ export function CisoEnterprise(): React.ReactElement {
           style={{
             maxWidth: "654px",
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 3.23vw, 62px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             letterSpacing: "-0.05em",
             lineHeight: 1,
@@ -408,7 +408,7 @@ export function CisoEnterprise(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-sans)",
-                      fontSize: "14px",
+                      fontSize: "var(--fs-body-sm)",
                       fontWeight: 400,
                       letterSpacing: "-0.03em",
                       lineHeight: 1.4,
