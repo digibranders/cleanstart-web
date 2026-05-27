@@ -26,10 +26,10 @@ export function BlogsHero({
       style={{ minHeight: "clamp(820px, 75vw, 1059px)", background: HERO_GRADIENT }}
       aria-labelledby="blogs-hero-title"
     >
-      {/* Decorative glow — left side, mix-blend-hard-light */}
+      {/* Decorative glow — left side, mix-blend-hard-light (hidden on mobile) */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        className="pointer-events-none select-none absolute hidden sm:block"
         style={{
           left: "-119px",
           top: "279px",
@@ -49,10 +49,10 @@ export function BlogsHero({
         />
       </div>
 
-      {/* Decorative glow — right side, mirrored from left */}
+      {/* Decorative glow — right side, mirrored from left (hidden on mobile) */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        className="pointer-events-none select-none absolute hidden sm:block"
         style={{
           right: "-119px",
           top: "279px",
@@ -73,7 +73,7 @@ export function BlogsHero({
         />
       </div>
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[clamp(96px,12vw,160px)]">
         {/* Title + search + categories — centered block */}
         <div
           className="flex flex-col items-center gap-10 mx-auto"
@@ -152,7 +152,7 @@ export function BlogsHero({
         {/* Featured Blog — 2-column: text left, image right */}
         {featuredPost ? (
           <div
-            className="grid grid-cols-1 lg:grid-cols-[minmax(280px,513px)_1fr] mt-[clamp(56px,7vw,102px)]"
+            className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(420px,580px)] mt-[clamp(56px,7vw,102px)]"
             style={{ gap: "32px" }}
           >
             {/* Left: text — on mobile, ordered AFTER the image per Figma 817:3470 layout. */}
@@ -168,7 +168,8 @@ export function BlogsHero({
                   <h2
                     className="font-display font-bold leading-tight tracking-[-0.05em] text-white overflow-hidden"
                     style={{
-                      fontSize: "var(--fs-h2)",
+                      /* Featured article title is a CARD title, not a section H2 — use --fs-h3 (22→28). */
+                      fontSize: "var(--fs-h3)",
                       display: "-webkit-box",
                       WebkitLineClamp: 4,
                       WebkitBoxOrient: "vertical",
