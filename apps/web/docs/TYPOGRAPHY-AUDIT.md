@@ -234,13 +234,17 @@ The stub format is:
 
 | Phase | Total PRs | Opened | Merged | % complete |
 |---|---|---|---|---|
-| Phase 0 — Foundation | 1 | 1 (this) | 0 | 0% |
-| Phase 1 — Marketing | 18 | 0 | 0 | 0% |
-| Phase 2 — CMS | 16 | 0 | 0 | 0% |
-| Phase 3 — Chrome | 6 | 0 | 0 | 0% |
-| Phase 4 — Enforcement | 1 | 0 | 0 | 0% |
-| Phase 5 — Docs finalisation | 1 | 0 | 0 | 0% |
-| **TOTAL** | **43** | **1** | **0** | **2%** |
+| Phase 0 — Foundation | 1 | 1 | 1 | **100%** ✅ |
+| Phase 1 — Marketing | 18 | 18 | 18 | **100%** ✅ |
+| Phase 2 — CMS | 16 | 16 | 16 | **100%** ✅ |
+| Phase 3 — Chrome | 1 (batched) | 1 | 1 | **100%** ✅ |
+| Phase 4 — Enforcement | — | — | — | deferred (alias shim retained) |
+| Phase 5 — Docs finalisation | 1 | 1 | 1 | **100%** ✅ |
+| **TOTAL** | **37 (PRs + batches)** | **37** | **37** | **~95%** |
+
+**Status as of 2026-05-27:** Functionally complete. Every page, section, card, button, input, hero, and listing/detail surface on `apps/web` consumes the v4 `--fs-*` token system. The legacy `--text-*` alias shim in `globals.css` is retained — it transparently routes 50+ companion-token refs (`--text-hero-lh`, `--text-t-heading-sm-ls`, etc.) and ~120 Tailwind utility-class consumers (`text-body-md`, `text-display-md`, etc.) to the new `--fs-*` family. Visual output is the v4 scale everywhere.
+
+**Phase 4 deferred:** Migrating the remaining ~170 alias consumers + adding biome enforcement rules + deleting the alias shim is tracked as a future cleanup sprint. The system is already producing the correct visual result; Phase 4 only removes the alias indirection.
 
 ---
 
