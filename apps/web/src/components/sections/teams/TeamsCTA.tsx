@@ -109,7 +109,7 @@ export function TeamsCTA() {
             style={{
               width: "136px",
               height: "44px",
-              fontSize: "1.125rem",
+              fontSize: "var(--fs-lead)",
               letterSpacing: "-0.01em",
               borderRadius: "8px",
               background:

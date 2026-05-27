@@ -141,7 +141,7 @@ export function TeamsHero() {
           <h1
             className="w-full font-display font-semibold text-white"
             style={{
-              fontSize: "clamp(36px, 4.45vw, 64px)",
+              fontSize: "var(--fs-display)",
               lineHeight: 1.05,
               letterSpacing: "-0.04em",
             }}
@@ -160,7 +160,7 @@ export function TeamsHero() {
           <p
             className="max-w-[911px] font-sans text-white/80"
             style={{
-              fontSize: "clamp(1.125rem, 2vw, 1.875rem)",
+              fontSize: "var(--fs-lead)",
               lineHeight: "1.4",
               letterSpacing: "-0.04em",
             }}
