@@ -2,32 +2,18 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
+import {
+  HOME_TESTIMONIALS,
+  type Testimonial,
+} from "@/components/sections/home/BuiltForTeams";
 
-interface Testimonial {
-  quote: string;
-  name: string;
-  role: string;
-  avatar: string;
-}
+/**
+ * Light-card "CleanStart Insiders" testimonial layout (the design used on
+ * the /teams page), but populated with the home-page testimonial data
+ * (`HOME_TESTIMONIALS`). Used on /community and /partners.
+ */
 
-const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      "Working at CleanStart means solving problems that matter. We build systems where security and speed reinforce each other, not compete.",
-    name: "Sanket Modi",
-    role: "Sr. Manager, Developer Relations",
-    avatar: "/images/teams/sanket-modi.png",
-  },
-  {
-    quote:
-      "The culture here is built on trust and ownership. Every engineer ships with confidence because we invest in the tooling that lets you be sure.",
-    name: "Sanket Modi",
-    role: "Sr. Manager, Developer Relations",
-    avatar: "/images/teams/sanket-modi.png",
-  },
-];
-
-function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
+function TestimonialCard({ name, role, photoSrc, quote }: Testimonial) {
   return (
     <div
       className="relative shrink-0 w-[calc(50%-12px)] overflow-hidden rounded-[24px] p-12"
@@ -40,15 +26,23 @@ function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
       <span
         aria-hidden
         className="pointer-events-none select-none absolute right-12 top-8 font-display font-bold leading-none text-[#250800]/20"
-        // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
+        // eslint-disable-next-line no-restricted-syntax -- Figma-anchored fontSize inside constrained component.
         style={{ fontSize: "40px", lineHeight: 1 }}
       >
         &rdquo;
       </span>
 
       <div className="mb-6 flex items-center gap-4">
-        <div className="relative shrink-0 size-[47px] overflow-hidden rounded-full">
-          <Image src={avatar} alt={name} fill className="object-cover" sizes="47px" />
+        <div className="relative shrink-0 size-[47px] overflow-hidden rounded-full bg-[#eee]">
+          {photoSrc ? (
+            <Image
+              src={photoSrc}
+              alt={name}
+              fill
+              className="object-cover"
+              sizes="47px"
+            />
+          ) : null}
         </div>
         <div>
           <p
@@ -94,7 +88,14 @@ function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
   );
 }
 
-export function PartnersTestimonials() {
+export interface HomeTestimonialsInsidersProps {
+  /** Add bottom padding so the prev/next arrows clear an overlapping Footer CTA card. */
+  reserveFooterCtaSpace?: boolean;
+}
+
+export function HomeTestimonialsInsiders({
+  reserveFooterCtaSpace = false,
+}: HomeTestimonialsInsidersProps = {}) {
   const trackRef = useRef<HTMLElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
@@ -102,20 +103,31 @@ export function PartnersTestimonials() {
   function scroll(dir: "prev" | "next") {
     const track = trackRef.current;
     if (!track) return;
-    const step = track.clientWidth / 2 + 16;
-    track.scrollBy({ left: dir === "next" ? step : -step, behavior: "smooth" });
+    const first = track.firstElementChild as HTMLElement | null;
+    // Step by one full card (card width + flex gap) so the next card lands
+    // flush at the track's left edge instead of showing partially.
+    const gap = 24;
+    const step = first ? first.offsetWidth + gap : track.clientWidth;
+    const max = track.scrollWidth - track.clientWidth;
+    const target = Math.max(
+      0,
+      Math.min(max, track.scrollLeft + (dir === "next" ? step : -step)),
+    );
+    track.scrollTo({ left: target });
   }
 
   function onScroll() {
     const track = trackRef.current;
     if (!track) return;
     setCanPrev(track.scrollLeft > 8);
-    setCanNext(track.scrollLeft < track.scrollWidth - track.clientWidth - 8);
+    setCanNext(
+      track.scrollLeft < track.scrollWidth - track.clientWidth - 8,
+    );
   }
 
   return (
     <section
-      className="relative overflow-hidden py-section-md"
+      className={`relative overflow-hidden pt-section-md ${reserveFooterCtaSpace ? "pb-[var(--spacing-section-cta)]" : "pb-section-md"}`}
       style={{ background: "#f6f6f6" }}
     >
       <div
@@ -155,15 +167,15 @@ export function PartnersTestimonials() {
             letterSpacing: "-0.04em",
           }}
         >
-          {/* {"CleanStart "}
-          <span className="cs-text-gradient-impact">Insiders</span> */}
+          {"CleanStart "}
+          <span className="cs-text-gradient-impact">Insiders</span>
         </h2>
 
         <div className="mb-4">
           <span
             aria-hidden
             className="pointer-events-none select-none font-display font-bold leading-none text-[#111]"
-            // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
+            // eslint-disable-next-line no-restricted-syntax -- Figma-anchored fontSize inside constrained component.
             style={{ fontSize: "72px", lineHeight: 1 }}
           >
             &ldquo;
@@ -174,13 +186,13 @@ export function PartnersTestimonials() {
           ref={trackRef}
           onScroll={onScroll}
           aria-label="Testimonials carousel"
-          // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region requires keyboard access per WCAG 2.1.1 (axe rule scrollable-region-focusable).
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region requires keyboard access per WCAG 2.1.1.
           tabIndex={0}
           className="flex gap-6 overflow-x-auto pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9A51FF]/40 focus-visible:ring-offset-2 rounded-[24px]"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {TESTIMONIALS.map((t, i) => (
-            <TestimonialCard key={i} {...t} />
+          {HOME_TESTIMONIALS.map((t) => (
+            <TestimonialCard key={t.name} {...t} />
           ))}
         </section>
 
@@ -193,6 +205,7 @@ export function PartnersTestimonials() {
             className="flex size-[48px] items-center justify-center rounded-full bg-[#111] text-white transition-opacity hover:bg-[#222] disabled:opacity-30"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+              <title>Previous</title>
               <path
                 d="M12.5 15L7.5 10L12.5 5"
                 stroke="#fff"
@@ -210,6 +223,7 @@ export function PartnersTestimonials() {
             className="flex size-[48px] items-center justify-center rounded-full bg-[#111] text-white transition-opacity hover:bg-[#222] disabled:opacity-30"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+              <title>Next</title>
               <path
                 d="M7.5 5L12.5 10L7.5 15"
                 stroke="#fff"

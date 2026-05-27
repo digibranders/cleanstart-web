@@ -25,7 +25,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *   • Reduced motion: no auto-advance, no float, transitions cap at 80 ms
  */
 
-interface Testimonial {
+export interface Testimonial {
   name: string;
   role: string;
   company: string;
@@ -41,7 +41,7 @@ interface Testimonial {
 
 const TESTIMONIAL_PHOTO = "/images/testimonial-photo.png";
 
-const TESTIMONIALS: Testimonial[] = [
+export const HOME_TESTIMONIALS: Testimonial[] = [
   {
     name: "Mathan Babu K",
     role: "CTSO & DPO, Vodafone Idea",
@@ -92,7 +92,31 @@ function offsetFor(i: number, active: number, total: number) {
 
 const TRANSITION_MS = 640;
 
-export function BuiltForTeams() {
+export interface BuiltForTeamsProps {
+  /** Override the testimonial list. Defaults to the home-page testimonials. */
+  testimonials?: Testimonial[];
+  /** Optional override for the section heading (JSX). */
+  heading?: React.ReactNode;
+  /** Optional override for the supporting description copy. */
+  description?: React.ReactNode;
+  /** Hide the heading + description header row entirely. */
+  hideHeader?: boolean;
+  /**
+   * Extend the section's bottom padding so the carousel's prev/next arrows
+   * stay clear of an overlapping Footer CTA card on the next sibling. Set on
+   * pages whose `<Footer>` receives a `cta` prop (e.g. /community).
+   */
+  reserveFooterCtaSpace?: boolean;
+}
+
+export function BuiltForTeams({
+  testimonials,
+  heading,
+  description,
+  hideHeader = false,
+  reserveFooterCtaSpace = false,
+}: BuiltForTeamsProps = {}) {
+  const TESTIMONIALS = testimonials ?? HOME_TESTIMONIALS;
   const [active, setActive] = useState(0);
   const [direction, setDirection] = useState<Direction>("next");
   const [paused, setPaused] = useState(false);
@@ -317,7 +341,10 @@ export function BuiltForTeams() {
           "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
     >
-      <div className="relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 py-section-sm">
+      <div
+        className={`relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 ${reserveFooterCtaSpace ? "pt-section-sm pb-[var(--spacing-section-cta)]" : "py-section-sm"}`}
+      >
+        {!hideHeader && (
         <header className="flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="testimonials-title"
@@ -330,8 +357,12 @@ export function BuiltForTeams() {
               letterSpacing: "-0.04em",
             }}
           >
-            Built for Teams That Can&rsquo;t Afford{" "}
-            <span className="cs-text-gradient-impact">Uncertainty</span>
+            {heading ?? (
+              <>
+                Built for Teams That Can&rsquo;t Afford{" "}
+                <span className="cs-text-gradient-impact">Uncertainty</span>
+              </>
+            )}
           </h2>
           <div
             aria-hidden
@@ -353,11 +384,11 @@ export function BuiltForTeams() {
               opacity: 0.8,
             }}
           >
-            CleanStart replaces unpredictable builds with verified, secure
-            images — helping engineering teams cut response times and prevent
-            breaches.
+            {description ??
+              "CleanStart replaces unpredictable builds with verified, secure images — helping engineering teams cut response times and prevent breaches."}
           </p>
         </header>
+        )}
 
         <section
           ref={carouselRef}
