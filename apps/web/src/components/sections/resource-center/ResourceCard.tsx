@@ -119,16 +119,19 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
           {resource.title}
         </h3>
 
-        {/* CTA link */}
+        {/* CTA link — small variant. Card content area is ~256 px wide so
+            long CTAs ("View Architecture Insights") were overflowing at the
+            old --fs-body / 20×14 arrow combo. Drop to --fs-body-sm (14 px)
+            and a 16×11 arrow so the link fits on one line. */}
         <Link
           href={`/resource/${resource.slug}`}
-          className="flex items-center gap-2"
+          className="flex items-center gap-1.5"
           aria-label={`${ctaLabel} — ${resource.title}`}
         >
           <span
             className="font-sans font-medium whitespace-nowrap"
             style={{
-              fontSize: "var(--fs-body)",
+              fontSize: "var(--fs-body-sm)",
               lineHeight: "1.5",
               color: "#4a3bf1",
             }}
@@ -140,8 +143,8 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
             src="/images/resource-center/card-arrow.svg"
             alt=""
             aria-hidden
-            width={20}
-            height={14}
+            width={16}
+            height={11}
             className="pointer-events-none select-none"
             loading="lazy"
             decoding="async"
