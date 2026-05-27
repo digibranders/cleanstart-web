@@ -197,16 +197,16 @@ export function CisoSolution(): React.ReactElement {
                 }}
               />
 
-              {/* ── Card — left=93px, right=41px; minHeight 114px, grows
-                  with content so wrapped titles + descriptions stay visible.
-                  Inner text now flows via padding (was absolutely positioned
-                  with overflow:hidden — clipped multi-line content). ── */}
+              {/* ── Card — margin-positioned (93px left, 41px right) so the
+                  row grows with the card's natural height. Was previously
+                  position:absolute with fixed 114px height — which clipped
+                  wrapped titles + descriptions and caused the card to
+                  overflow into the next row when grown. ── */}
               <div
                 style={{
-                  position: "absolute",
-                  left: "93px",
-                  right: "41px",
-                  top: "0",
+                  position: "relative",
+                  marginLeft: "93px",
+                  marginRight: "41px",
                   minHeight: "114px",
                   borderRadius: "17.928px",
                   border: "2.241px solid #dab6f3",
