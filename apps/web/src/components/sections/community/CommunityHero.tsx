@@ -34,13 +34,13 @@ export function CommunityHero() {
           the clamp on pt and the lg:w-[48%] split.
       ─────────────────────────────────────────────────────────────────────────── */}
       <div className="relative z-10 mx-auto max-w-[var(--container-default)] px-6">
-        <div className="pt-[clamp(96px,10vw,172px)] pb-[clamp(40px,5vw,80px)]">
+        <div className="pt-[clamp(112px,10vw,172px)] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-8">
             {/* H1 — Figma: 72px Manrope SemiBold, tracking -3.6px */}
             <h1
               className="font-display font-semibold text-white lg:w-[48%]"
               style={{
-                fontSize: 'clamp(40px, 4.45vw, 64px)',
+                fontSize: 'clamp(36px, 4.45vw, 64px)',
                 lineHeight: 1.05,
                 letterSpacing: '-0.04em',
               }}

@@ -6,7 +6,7 @@ import Image from "next/image";
  *
  * ── MOBILE (< sm) ────────────────────────────────────────────────────────────
  * Background: white section
- * Heading: 28px Figtree Bold, centered, maxW 264px, lh 1.2
+ * Heading: 28px Manrope Bold, centered, maxW 264px, lh 1.2
  *   "Visibility Alone Doesn't " → #111
  *   "Reduce Risk" → gradient 98.05deg #9A51FF 71.726% → #2CC1EB 98.781%
  * Two cards stacked, gap 16px, each 328px wide centered
@@ -17,7 +17,7 @@ import Image from "next/image";
  *     Teal flare at bottom: mix-blend-plus-lighter, comp-flare.svg
  *   Body (white): comp-gradient-left/right.png overlay, list items gap 16px
  *     Icons: comp-icon-gear.svg (12.672px) / comp-icon-check.svg
- *     Text: 16px Figtree Medium/SemiBold, #333, tracking -0.8px (-0.05em), lh 1.4
+ *     Text: 16px Manrope Medium/SemiBold, #333, tracking -0.8px (-0.05em), lh 1.4
  * VS badge: comp-vs-badge.png 87×87px, absolute centered between cards
  * Card outer shadow: multi-layer CSS shadow + subtle purple glow
  *

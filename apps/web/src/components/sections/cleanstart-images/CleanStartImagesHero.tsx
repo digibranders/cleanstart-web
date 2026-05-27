@@ -58,9 +58,8 @@ export function CleanStartImagesHero(): React.ReactElement {
         style={{ minHeight: "inherit" }}
       >
         <div
-          className="mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col lg:flex-row items-center"
+          className="mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col lg:flex-row items-center pt-[112px] lg:pt-[clamp(48px,5vw,80px)]"
           style={{
-            paddingTop: "clamp(48px, 5vw, 80px)",
             paddingBottom: "clamp(48px, 5vw, 80px)",
             gap: "clamp(40px, 4vw, 60px)",
           }}
@@ -74,9 +73,9 @@ export function CleanStartImagesHero(): React.ReactElement {
               className="text-white w-full"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-hero-product)",
-                letterSpacing: "var(--text-hero-product-ls, -0.04em)",
-                lineHeight: "var(--text-hero-lh, 1.05)",
+                fontSize: "var(--fs-display)",
+                letterSpacing: "var(--fs-display-ls)",
+                lineHeight: "var(--fs-display-lh)",
                 fontWeight: 600,
               }}
             >
@@ -87,7 +86,7 @@ export function CleanStartImagesHero(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "var(--text-body-xl)",
+                  fontSize: "var(--fs-lead)",
                   fontWeight: 400,
                   lineHeight: 1.45,
                   letterSpacing: "-0.02em",

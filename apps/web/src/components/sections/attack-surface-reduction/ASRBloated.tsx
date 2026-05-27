@@ -40,13 +40,13 @@ export function ASRBloated(): React.ReactElement {
       {/* ── Heading ── */}
       {/*
        * Figma 920:610 heading specs:
-       *   "Public images are" → Figtree SemiBold 28px / lh 1.2 / #111 / centered
+       *   "Public images are" → Manrope SemiBold 28px / lh 1.2 / #111 / centered
        *   "bloated"           → gradient 97.33deg #9A51FF 26.48% → #2CC1EB 98.78%
        *                         tracking -1.4px
        */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 md:pt-[88px]">
         <h2
-          className="text-center text-[#111] text-[28px] lg:[font-size:var(--text-display-md)]"
+          className="text-center text-[#111] text-[28px] lg:[font-size:var(--fs-h2)]"
           style={{
             fontFamily: 'var(--font-display)',
             fontWeight: 600,
@@ -229,8 +229,8 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
      *                   fill #fb6d6d + mix-blend-overlay gradient + mix-blend-color #ff7777
      *                   Icon image: 40×40px centred (15px from each edge)
      *
-     * Title           : Figtree SemiBold 20px / lh 1.0 / tracking -0.05em / #111
-     * Description     : Figtree Regular 14px / lh 1.5 / tracking -0.04em / #111 / opacity 0.8
+     * Title           : Manrope SemiBold 20px / lh 1.0 / tracking -0.05em / #111
+     * Description     : Manrope Regular 14px / lh 1.5 / tracking -0.04em / #111 / opacity 0.8
      */
     return (
       <div
@@ -306,14 +306,14 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
           {/* Text block */}
           <div className="flex flex-col min-w-0" style={{ gap: '8px' }}>
             {/*
-             * Title: Figtree SemiBold 20px / lh 1.0 / tracking -1px (-0.05em) / #111
-             * Figma: font-['Figtree:SemiBold'] font-semibold text-[20px] tracking-[-1px] leading-none
+             * Title: Manrope SemiBold 20px / lh 1.0 / tracking -1px (-0.05em) / #111
+             * Figma: font-['Manrope:SemiBold'] font-semibold text-[20px] tracking-[-1px] leading-none
              */}
             <p
               className="text-[#111]"
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'var(--text-card-title-md)',
+                fontSize: 'var(--fs-h4)',
                 fontWeight: 600,
                 letterSpacing: '-0.04em',
                 lineHeight: 1.1,
@@ -322,14 +322,14 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
               {card.title}
             </p>
             {/*
-             * Description: Figtree Regular 14px / lh 1.5 / tracking -0.56px (-0.04em)
+             * Description: Manrope Regular 14px / lh 1.5 / tracking -0.56px (-0.04em)
              *              opacity 0.8 / #111
-             * Figma: font-['Figtree:Regular'] text-[14px] leading-[1.5] tracking-[-0.56px] opacity-80
+             * Figma: font-['Manrope:Regular'] text-[14px] leading-[1.5] tracking-[-0.56px] opacity-80
              */}
             <p
               style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-body-sm)',
+                fontSize: 'var(--fs-body-sm)',
                 fontWeight: 400,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.4,
@@ -426,7 +426,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             className="text-[#111]"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'var(--text-card-title-md)',
+              fontSize: 'var(--fs-h4)',
               fontWeight: 600,
               letterSpacing: '-0.04em',
               lineHeight: 1.1,
@@ -438,7 +438,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             className="text-[#111]"
             style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-body-md)',
+              fontSize: 'var(--fs-body)',
               fontWeight: 400,
               letterSpacing: '-0.02em',
               lineHeight: 1.4,

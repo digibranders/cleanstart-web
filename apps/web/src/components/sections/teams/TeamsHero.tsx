@@ -9,13 +9,8 @@ export function TeamsHero() {
       className="relative overflow-hidden"
       style={{
         backgroundColor: "#151021",
-        backgroundImage: [
-          "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
-          "linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+        backgroundImage:
           "linear-gradient(179.998deg, rgb(21,16,33) 25.702%, rgb(16,18,62) 43.563%, rgb(19,30,143) 67.739%, rgb(71,30,192) 89.306%, rgb(71,31,195) 102.85%, rgba(70,30,191,0.85) 109.17%, rgba(66,30,188,0.4) 119.77%, rgba(66,30,188,0) 126.11%)",
-        ].join(", "),
-        backgroundSize: "80px 80px, 80px 80px, 100% 100%",
-        backgroundRepeat: "repeat, repeat, no-repeat",
       }}
     >
       {/* ── Glow blob — large, left-center (Figma Ellipse 46641, rotate 43°) ── */}
@@ -142,11 +137,11 @@ export function TeamsHero() {
 
       {/* ── Content ── */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <div className="flex flex-col items-center gap-6 pb-[80px] pt-[clamp(72px,8vw,128px)] text-center">
+        <div className="flex flex-col items-center gap-6 pb-[80px] pt-[clamp(112px,8vw,128px)] text-center">
           <h1
             className="w-full font-display font-semibold text-white"
             style={{
-              fontSize: "clamp(40px, 4.45vw, 64px)",
+              fontSize: "clamp(36px, 4.45vw, 64px)",
               lineHeight: 1.05,
               letterSpacing: "-0.04em",
             }}

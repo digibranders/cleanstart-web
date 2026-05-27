@@ -19,7 +19,7 @@ const BENEFITS = [
  * Mobile (Figma 366:6670 — 360×611px):
  *   Photo: exact Figma offsets (left -33.16%, w 173.52%, h 124.69%), no brightness filter.
  *   Overlay starts at 115px from top (Figma 366:6672) — provides all darkening.
- *   Heading: Figtree Bold 28px / lh 1.2 / centred / w-200px / top: 32px.
+ *   Heading: Manrope Bold 28px / lh 1.2 / centred / w-200px / top: 32px.
  *   "your business" → gradient 94.09deg #9A51FF 26.48% → #2CC1EB 98.78%,
  *                      tracking -1.4px.
  *   Benefits: left: 32px, top: 164px, flex-col gap-24px,
@@ -30,29 +30,22 @@ export function ASRDelivers(): React.ReactElement {
   return (
     <section
       data-section="ASRDelivers"
-      className="relative overflow-hidden"
-      style={{ minHeight: 'clamp(611px, 50vw, 711px)' }}
+      className="relative overflow-hidden md:min-h-0"
+      style={{ minHeight: 'clamp(680px, 50vw, 711px)' }}
     >
       {/* ── Mobile background photo ── */}
       {/*
-       * Figma 366:6671: explicit absolute positioning, NO brightness filter.
-       *   left: -33.16%  width: 173.52%  top: 0.02%  height: 124.69%
+       * Figma 366:6671: full-bleed 360×611 image (pre-cropped asset).
        * The gradient overlay (below) provides all the darkening.
        */}
       <div aria-hidden className="absolute inset-0 overflow-hidden md:hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/attack-surface-reduction/s4-person.jpg"
+          src="/images/attack-surface-reduction/s4-person-mobile.png"
           alt=""
-          className="absolute max-w-none pointer-events-none select-none"
-          style={{
-            left: '-33.16%',
-            top: '0.02%',
-            width: '173.52%',
-            height: '124.69%',
-            objectFit: 'cover',
-          }}
+          className="absolute inset-0 w-full h-full pointer-events-none select-none"
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
           loading="lazy"
           decoding="async"
         />
@@ -81,26 +74,20 @@ export function ASRDelivers(): React.ReactElement {
         }}
       />
 
-      {/* ── Mobile overlay: starts exactly 115px from section top ── */}
+      {/* ── Mobile overlay: full-section purple gradient ── */}
       {/*
-       * Figma 366:6672: 496px-tall overlay starting at top: 115px.
-       * Inner div is rotate-180 with gradient:
-       *   linear-gradient(180.63deg, rgba(71,30,192,0.6) 59.9%, <out-of-order stops>...)
-       * Out-of-order stops clamp to 59.9% → hard snap at 40.1% of overlay after flip:
-       *   0%    : transparent
-       *   40.1% : rgba(66,30,188,0.3) → snap rgba(71,30,192,0.6)
-       *   100%  : solid rgba(71,30,192,0.6)
+       * Figma stops (Selection colors / Linear, top→bottom):
+       *   0%   #471EC0 @ 100%
+       *   17%  #461EBF @ 87%
+       *   57%  #421EBC @ 50%
+       *   100% #421EBC @ 0%
        */}
       <div
         aria-hidden
-        className="absolute md:hidden pointer-events-none"
+        className="absolute inset-0 md:hidden pointer-events-none"
         style={{
-          left: 0,
-          right: 0,
-          top: '115px',
-          bottom: 0,
           background:
-            'linear-gradient(180deg, rgba(66,30,188,0) 0%, rgba(66,30,188,0.3) 40.1%, rgba(70,30,191,0.522) 40.11%, rgba(71,30,192,0.6) 40.12%, rgba(71,30,192,0.6) 100%)',
+            'linear-gradient(180deg, rgba(71,30,192,1) 0%, rgba(70,30,191,0.87) 17%, rgba(66,30,188,0.5) 57%, rgba(66,30,188,0) 100%)',
         }}
       />
 
@@ -110,7 +97,7 @@ export function ASRDelivers(): React.ReactElement {
         <h2
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'var(--text-display-md)',
+            fontSize: 'var(--fs-h2)',
             fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
@@ -151,7 +138,7 @@ export function ASRDelivers(): React.ReactElement {
           <p
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'var(--text-display-sm)',
+              fontSize: 'var(--fs-h3)',
               fontWeight: 600,
               letterSpacing: '-0.04em',
               lineHeight: 1.2,
@@ -164,7 +151,7 @@ export function ASRDelivers(): React.ReactElement {
           <p
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'var(--text-display-sm)',
+              fontSize: 'var(--fs-h3)',
               fontWeight: 600,
               letterSpacing: '-0.04em',
               lineHeight: 1.2,
@@ -226,7 +213,7 @@ function BenefitColumn({
       <h3
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'var(--text-card-title-lg)',
+          fontSize: 'var(--fs-h3)',
           fontWeight: 600,
           letterSpacing: '-0.04em',
           lineHeight: 1.1,
@@ -238,7 +225,7 @@ function BenefitColumn({
       <p
         style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--text-body-md)',
+          fontSize: 'var(--fs-body)',
           fontWeight: 400,
           letterSpacing: '-0.02em',
           lineHeight: 1.4,
@@ -275,8 +262,8 @@ function DesktopSeparator(): React.ReactElement {
 /*
  * Figma 366:6676/80/84/88 specs:
  *   Container : 194px wide · flex-col · gap 6px
- *   Title     : Figtree SemiBold 20px / lh 1.0 / tracking -1px / white / max-w 173px
- *   Desc      : Figtree Regular 14px / lh 1.5 / tracking -0.56px / white / opacity 0.8 / max-w 185px
+ *   Title     : Manrope SemiBold 20px / lh 1.0 / tracking -1px / white / max-w 173px
+ *   Desc      : Manrope Regular 14px / lh 1.5 / tracking -0.56px / white / opacity 0.8 / max-w 185px
  */
 function MobileBenefit({
   title,
@@ -290,7 +277,7 @@ function MobileBenefit({
       <p
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'var(--text-card-title-md)',
+          fontSize: 'var(--fs-h4)',
           fontWeight: 600,
           letterSpacing: '-0.04em',
           lineHeight: 1.1,
@@ -304,7 +291,7 @@ function MobileBenefit({
       <p
         style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--text-body-sm)',
+          fontSize: 'var(--fs-body-sm)',
           fontWeight: 400,
           letterSpacing: '-0.02em',
           lineHeight: 1.4,

@@ -90,8 +90,12 @@ function BenefitCardView({ card }: { card: BenefitCard }): React.ReactElement {
       }}
     >
       <span
-        className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-white text-[#5B3FE4]"
-        style={{ border: "1px solid #ECE2FF" }}
+        className="inline-flex items-center justify-center w-[64px] h-[64px] rounded-full text-white"
+        style={{
+          background:
+            "radial-gradient(circle at 30% 30%, #6CB6FF 0%, #2E7BFF 45%, #1240D4 100%)",
+          boxShadow: "0 8px 18px -8px rgba(30,80,220,0.45)",
+        }}
         aria-hidden
       >
         {card.icon}
@@ -114,33 +118,60 @@ function BenefitCardView({ card }: { card: BenefitCard }): React.ReactElement {
 
 function ShieldIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" role="img" aria-hidden="true" focusable="false">
-      <title>Shield</title>
-      <path d="M12 3 4 6v6.5c0 4.5 3.4 8.4 8 9 4.6-.6 8-4.5 8-9V6l-8-3Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/>
+    <svg width="38" height="38" viewBox="0 0 48 48" fill="none" role="img" aria-hidden="true" focusable="false">
+      <title>Handshake with shield</title>
+      <path d="M24 6.5l-5.5 2v4.2c0 3.6 2.4 6.7 5.5 7.5 3.1-.8 5.5-3.9 5.5-7.5V8.5L24 6.5Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+      <path d="m20.5 12.5 2.4 2.4 4.6-4.6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M9 28l5-2.5 4 2 4 4 4-4 4-2 5 2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M9 28v6l4 2 5-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M39 28v6l-4 2-5-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M18 31.5 22 35l2-1.5 2 1.5 4-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
 }
 function CheckBadgeIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" role="img" aria-hidden="true" focusable="false">
-      <title>Check badge</title>
-      <path d="m9 12 2.2 2.2L15 10.5M12 3 4 6v6.5c0 4.5 3.4 8.4 8 9 4.6-.6 8-4.5 8-9V6l-8-3Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round"/>
+    <svg width="38" height="38" viewBox="0 0 48 48" fill="none" role="img" aria-hidden="true" focusable="false">
+      <title>Trophy with sparkles</title>
+      <path d="M19 11h12v6c0 3.3-2.7 6-6 6s-6-2.7-6-6v-6Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+      <path d="M19 14h-3c-1.1 0-2 .9-2 2 0 2.8 2.2 5 5 5M31 14h3c1.1 0 2 .9 2 2 0 2.8-2.2 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M22 22.5v3.5h6v-3.5" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+      <path d="M18 26h14l-2 4H20l-2-4Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+      <path d="M22 30h6l-1 6h-4l-1-6Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+      <path d="M11 18l.7 1.5L13 20l-1.3.5L11 22l-.7-1.5L9 20l1.3-.5L11 18Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+      <path d="M37 16l.7 1.5L39 18l-1.3.5L37 20l-.7-1.5L35 18l1.3-.5L37 16Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+      <path d="M37 28l.7 1.5L39 30l-1.3.5L37 32l-.7-1.5L35 30l1.3-.5L37 28Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
     </svg>
   );
 }
 function TrendingUpIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" role="img" aria-hidden="true" focusable="false">
-      <title>Trending up</title>
-      <path d="M3 17 9 11l4 4 8-8M14 5h7v7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg width="38" height="38" viewBox="0 0 48 48" fill="none" role="img" aria-hidden="true" focusable="false">
+      <title>Person with arrows and stars</title>
+      <circle cx="24" cy="17" r="3" stroke="currentColor" strokeWidth="2"/>
+      <path d="M24 20v5M18 26l6-1 6 1M16 30l8-5 8 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M16 13v6M14 15l2-2 2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M24 8v8M21.5 10.5 24 8l2.5 2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M32 13v6M30 15l2-2 2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="m13 34 1 2 2 .3-1.5 1.4.4 2-1.9-1-1.9 1 .4-2L10 36.3l2-.3 1-2Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+      <path d="m24 33 1.2 2.4 2.6.4-1.9 1.8.4 2.6-2.3-1.2-2.3 1.2.4-2.6-1.9-1.8 2.6-.4L24 33Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+      <path d="m35 34 1 2 2 .3-1.5 1.4.4 2-1.9-1-1.9 1 .4-2L32 36.3l2-.3 1-2Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
     </svg>
   );
 }
 function SparkleIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" role="img" aria-hidden="true" focusable="false">
-      <title>Sparkle</title>
-      <path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+    <svg width="38" height="38" viewBox="0 0 48 48" fill="none" role="img" aria-hidden="true" focusable="false">
+      <title>Growth arrows with coins</title>
+      <path d="M15 24v-8M13 18l2-2 2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M24 22v-12M21 13l3-3 3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M33 24v-7M31 19l2-2 2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <circle cx="15" cy="34" r="5" stroke="currentColor" strokeWidth="2"/>
+      <path d="M15 31.5v5M14 33h2M14 35h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <circle cx="24" cy="35" r="5.5" stroke="currentColor" strokeWidth="2"/>
+      <path d="M24 32v6M22.8 33.5h2.4M22.8 36.5h2.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+      <circle cx="33" cy="34" r="5" stroke="currentColor" strokeWidth="2"/>
+      <path d="M33 31.5v5M32 33h2M32 35h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
   );
 }

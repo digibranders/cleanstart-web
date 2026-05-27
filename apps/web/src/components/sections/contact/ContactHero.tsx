@@ -105,13 +105,12 @@ export function ContactHero() {
       <Container className="relative">
         {/* Title block — Figma 857:14946, w=730, top=186, gap=24 between
             title and subtitle, centered. */}
-        <div className="mx-auto flex flex-col items-center gap-5 pt-[clamp(72px,9vw,128px)] pb-[200px] text-center">
+        <div className="mx-auto flex flex-col items-center gap-5 pt-[clamp(112px,9vw,128px)] pb-[200px] text-center">
           <h1
             className="text-white whitespace-nowrap"
             style={{
-              fontFamily:
-                "var(--font-display, 'Figtree', 'Manrope', sans-serif)",
-              fontSize: "clamp(40px, 4.45vw, 64px)",
+              fontFamily: "var(--font-display), sans-serif",
+              fontSize: "clamp(36px, 4.45vw, 64px)",
               lineHeight: 1.05,
               letterSpacing: "-0.04em",
               fontWeight: 600,

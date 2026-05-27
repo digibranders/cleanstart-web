@@ -165,7 +165,7 @@ export function CisoHero(): React.ReactElement {
         className="relative mx-auto z-[2] w-full max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
           /* Mobile: 136px (Figma 856:1043); Desktop: 158px (Figma 817:10441) */
-          paddingTop: "clamp(136px, 8.23vw, 158px)",
+          paddingTop: "clamp(112px, 8.23vw, 158px)",
           paddingBottom: "80px",
           minHeight: "751px",
         }}
@@ -180,7 +180,7 @@ export function CisoHero(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-hero-product)",
+              fontSize: "clamp(36px, 4.45vw, 64px)",
               fontWeight: 600,
               letterSpacing: "var(--text-hero-product-ls, -0.04em)",
               lineHeight: "var(--text-hero-lh, 1.05)",

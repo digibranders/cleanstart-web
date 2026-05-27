@@ -14,8 +14,7 @@ export function CleanStartImagesMeasure(): React.ReactElement {
       className="relative overflow-hidden bg-white"
       style={{
         paddingTop: "clamp(56px, 7vw, 100px)",
-        // 170 px CTA-card overlap + 80 px breathing room = 250 px (standard footer CTA convention)
-        paddingBottom: "250px",
+        paddingBottom: "var(--spacing-section-cta)",
         minHeight: "clamp(400px, 40vw, 586px)",
       }}
     >
@@ -236,7 +235,7 @@ export function CleanStartImagesMeasure(): React.ReactElement {
         <h2
           className="font-display text-[#111]"
           style={{
-            fontSize: "var(--text-display-md)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -248,7 +247,7 @@ export function CleanStartImagesMeasure(): React.ReactElement {
         <p
           className="font-sans mt-6 mx-auto"
           style={{
-            fontSize: "var(--text-body-xl)",
+            fontSize: "var(--fs-lead)",
             fontWeight: 400,
             lineHeight: 1.4,
             letterSpacing: "-0.02em",

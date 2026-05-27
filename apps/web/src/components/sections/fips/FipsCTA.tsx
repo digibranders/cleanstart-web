@@ -9,7 +9,7 @@ import Link from "next/link";
  *     vertically centred (top=85px = ~25% of 335px → use flex items-center)
  *     gap=115px (11.00% of 1047px content container)
  *   Heading col : 401px = 38.30% of content container
- *     55px Figtree Bold  ls=−0.05em  lh=1  white
+ *     55px Manrope Bold  ls=−0.05em  lh=1  white
  *   Right col   : 493px = 47.09% of content container
  *     flex-col gap=24px
  *     – body  : 21px Regular  ls=−0.04em  lh=1.4  opacity=0.8

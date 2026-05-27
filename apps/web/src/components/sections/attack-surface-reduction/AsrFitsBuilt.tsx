@@ -30,7 +30,7 @@ export function AsrFitsBuilt(): React.ReactElement {
             className="text-[#111]"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'var(--text-t-display-2)',
+              fontSize: 'var(--fs-h1)',
               fontWeight: 600,
               letterSpacing: 'var(--text-t-display-2-ls)',
               lineHeight: 'var(--text-t-display-2-lh)',
@@ -53,7 +53,7 @@ export function AsrFitsBuilt(): React.ReactElement {
             className="text-[#111]/70"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'var(--text-t-subhead)',
+              fontSize: 'var(--fs-lead)',
               fontWeight: 400,
               letterSpacing: 'var(--text-t-subhead-ls)',
               lineHeight: 'var(--text-t-subhead-lh)',

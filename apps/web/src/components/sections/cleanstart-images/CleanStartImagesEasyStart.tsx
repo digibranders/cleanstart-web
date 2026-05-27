@@ -112,7 +112,7 @@ function StackPanel({
       <p
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: "var(--text-body-xs)",
+          fontSize: "var(--fs-caption)",
           fontWeight: 700,
           color: "#9ca3af",
           letterSpacing: "1.2858px",
@@ -179,7 +179,7 @@ function StackPanel({
             <span
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-body-sm)",
+                fontSize: "var(--fs-body-sm)",
                 fontWeight: 500,
                 color: "#fff",
                 lineHeight: "22.042px",
@@ -262,7 +262,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
           className="text-white text-center mx-auto"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-display-md)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -315,7 +315,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-body-xs)",
+                    fontSize: "var(--fs-caption)",
                     fontWeight: 700,
                     color: "#a855f7",
                     letterSpacing: "2.2042px",
@@ -328,7 +328,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-body-md)",
+                    fontSize: "var(--fs-body)",
                     fontWeight: 700,
                     color: "#fff",
                     letterSpacing: "1.6531px",
@@ -461,7 +461,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                       <span
                         style={{
                           fontFamily: "var(--font-display)",
-                          fontSize: "var(--text-body-sm)",
+                          fontSize: "var(--fs-body-sm)",
                           fontWeight: 500,
                           color: "#fff",
                           lineHeight: "22.042px",
@@ -619,7 +619,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-body-md)",
+                    fontSize: "var(--fs-body)",
                     fontWeight: 700,
                     color: "#f3f4f6",
                     lineHeight: "25.715px",
@@ -631,7 +631,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "var(--text-body-sm)",
+                    fontSize: "var(--fs-body-sm)",
                     fontWeight: 400,
                     color: "#9ca3af",
                     lineHeight: "18.368px",
@@ -693,7 +693,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                     className="text-white font-display"
                     style={{
                       marginTop: "20px",
-                      fontSize: "var(--text-card-title-md)",
+                      fontSize: "var(--fs-h4)",
                       fontWeight: 600,
                       letterSpacing: "-0.04em",
                       lineHeight: 1.1,
@@ -707,7 +707,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                     className="font-sans"
                     style={{
                       marginTop: "12px",
-                      fontSize: "var(--text-body-sm)",
+                      fontSize: "var(--fs-body-sm)",
                       fontWeight: 400,
                       color: "rgba(255,255,255,0.8)",
                       letterSpacing: "-0.02em",
@@ -806,7 +806,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                     <h3
                       className="text-white font-display"
                       style={{
-                        fontSize: "var(--text-card-title-lg)",
+                        fontSize: "var(--fs-h3)",
                         fontWeight: 600,
                         letterSpacing: "-0.04em",
                         lineHeight: 1.1,
@@ -819,7 +819,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                       className="font-sans"
                       style={{
                         marginTop: "12px",
-                        fontSize: "var(--text-body-lg)",
+                        fontSize: "var(--fs-body)",
                         fontWeight: 400,
                         color: "rgba(255,255,255,0.7)",
                         lineHeight: 1.4,

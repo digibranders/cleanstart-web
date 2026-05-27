@@ -174,7 +174,7 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
         <h2
           className="font-display text-white text-center"
           style={{
-            fontSize: "var(--text-display-md)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,

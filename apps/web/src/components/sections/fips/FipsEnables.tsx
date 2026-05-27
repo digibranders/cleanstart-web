@@ -207,7 +207,7 @@ function HubWheel(): React.ReactElement {
         {SLICES.map((s) => {
           const lblRect = rectToPct(s.labelX, s.labelY, s.labelW, s.labelH);
           return (
-            /* Label — Figma style_UHZRHP: Figtree SemiBold 28px / 130% / -1.32% */
+            /* Label — Figma style_UHZRHP: Manrope SemiBold 28px / 130% / -1.32% */
             <span
               key={s.label}
               className="absolute flex items-center justify-center text-center text-white"

@@ -6,8 +6,8 @@
  *   Ellipse top-left: 320×320 at left:-139 top:-168 (cyan glow)
  *   Ellipse bottom-right: 511×511 at left:1159 top:244 (purple glow)
  *   Screenshot mockup: 211×213, rotate(-15deg), at left:330 top:238
- *   Heading: 55px Figtree Bold, #111 — capped at 44px to match other CTAs
- *   Description: 21px Figtree Regular, #111 @ 80%
+ *   Heading: 55px Manrope Bold, #111 — capped at 44px to match other CTAs
+ *   Description: 21px Manrope Regular, #111 @ 80%
  *   Button: solid blue (#3960F9), white text, "Book a Container Scan"
  */
 

@@ -110,7 +110,7 @@ export function CleanSightBlindSpots(): React.ReactElement {
           className="text-white text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,

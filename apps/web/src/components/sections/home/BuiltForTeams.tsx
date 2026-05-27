@@ -33,8 +33,10 @@ interface Testimonial {
    *  provided, `CompanyMark` renders the wordmark image instead of the
    *  text-only orb placeholder. */
   logoSrc?: string;
+  /** Optional headshot. Falls back to the shared placeholder when omitted. */
+  photoSrc?: string;
   quote: string;
-  caseStudyHref: string;
+  caseStudyHref?: string;
 }
 
 const TESTIMONIAL_PHOTO = "/images/testimonial-photo.png";
@@ -45,27 +47,29 @@ const TESTIMONIALS: Testimonial[] = [
     role: "CTSO & DPO, Vodafone Idea",
     company: "Vodafone Idea",
     logoSrc: "/images/trusted/10-vi.png",
+    photoSrc: "/images/testimonials/mathan-babu-k.jpg",
     quote:
       "Containers and microservices now sit at the heart of modern application delivery and the broader supply chain ecosystem. CleanStart's shift-left security approach couldn't have arrived at a more critical time.",
-    caseStudyHref: "#case-study-mathan",
   },
-  // Placeholder slot — replace with real testimonial #2 when copy lands.
   {
-    name: "Priya Patel",
-    role: "VP of Engineering",
-    company: "northwave",
+    name: "Shanker Ramrakhiani",
+    role: "CISO & Head of BCP, India Infoline Finance Limited",
+    company: "India Infoline Finance Limited",
+    logoSrc: "/images/trusted/03-iifl-finance.png",
+    photoSrc: "/images/testimonials/shanker-ramrakhiani.jpg",
     quote:
-      "CleanStart's deterministic builds eliminated entire categories of supply-chain risk for our team. We deploy with confidence — no more unexplained drift between staging and production.",
-    caseStudyHref: "#case-study-priya",
+      "CleanStart helped us standardize our container foundations without slowing development. Tasks that previously required significant manual effort are now eliminated, deployments are faster, and our security team has greater confidence in the images we use.",
+    caseStudyHref: "https://cdn.cleanstart.com/case-studies/iifl-case-study.pdf",
   },
-  // Placeholder slot — replace with real testimonial #3 when copy lands.
   {
-    name: "Marcus Bennett",
-    role: "Head of Platform",
-    company: "vertaglow",
+    name: "Mr. Moinul Khan",
+    role: "CEO, Aurascape",
+    company: "Aurascape",
+    logoSrc: "/images/trusted/08-aurascape.png",
+    photoSrc: "/images/testimonials/moinul-khan.jpg",
     quote:
-      "Hardened, source-built containers are now the default for every service we ship. CleanStart shaved weeks off our compliance audits and gave engineering its time back.",
-    caseStudyHref: "#case-study-marcus",
+      "Standardizing on verified container foundations gave us confidence in the base of every service we deploy and allowed us to shift security much earlier in the build process.",
+    caseStudyHref: "https://cdn.cleanstart.com/case-studies/aurascape-case-study.pdf",
   },
 ];
 
@@ -95,6 +99,17 @@ export function BuiltForTeams() {
   const [transitioning, setTransitioning] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
+
+  // Drag-to-rotate state. Any card (active OR peek) can be grabbed on
+  // desktop; the carousel scrubs the same circular motion it uses for
+  // auto-advance. `dir` is locked at pointerdown for peeks (left peek =>
+  // prev, right peek => next) and on first movement >4 px for the active
+  // card (rightward => prev, leftward => next). `dx` is signed in the
+  // dir's direction (always positive for a peek-toward-centre drag, and
+  // matching the swipe direction for active).
+  const [dragInfo, setDragInfo] = useState<
+    { dir: "prev" | "next"; dx: number } | null
+  >(null);
 
   const total = TESTIMONIALS.length;
   const goPrev = useCallback(() => {
@@ -144,17 +159,152 @@ export function BuiltForTeams() {
     }
   };
 
+  // Instagram-Reels-style hold-to-pause: pressing and holding pauses
+  // auto-advance for as long as the finger is down; releasing resumes.
+  // A horizontal drag > 40 px still navigates prev/next on release.
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0]?.clientX ?? null;
+    setPaused(true);
   };
   const onTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current == null) return;
+    const startX = touchStartX.current;
+    touchStartX.current = null;
+    setPaused(false);
+    if (startX == null) return;
     const touch = e.changedTouches[0];
     if (!touch) return;
-    const dx = touch.clientX - touchStartX.current;
+    const dx = touch.clientX - startX;
     if (Math.abs(dx) > 40) (dx > 0 ? goPrev : goNext)();
-    touchStartX.current = null;
   };
+  const onTouchCancel = () => {
+    touchStartX.current = null;
+    setPaused(false);
+  };
+
+  // Drag-to-rotate.
+  //
+  // Design notes:
+  // • We use *window*-level pointermove / pointerup listeners (not native
+  //   listeners on the card) so a fast drag that overshoots the card's
+  //   bounds never loses a frame.
+  // • The pointer is captured on pointerdown so subsequent clicks still
+  //   route to the article — we use that capture path to suppress the
+  //   trailing click event that would otherwise re-fire goPrev/goNext.
+  // • A 4 px dead-zone keeps incidental jitter from launching a drag, and
+  //   active-card direction stays unlocked until the user actually moves —
+  //   so dragging right then back through zero re-locks to "next".
+  //
+  // Commit at ~50% of the peek distance. The CSS peek distance is
+  // clamp(280px, 28vw, 380px); 140 sits at the lower bound's halfway.
+  const DRAG_COMMIT_PX = 140;
+  // dragRef holds the *live* drag state (mutated on every move) so the
+  // window listeners don't see stale React closures. dragInfo (state) is
+  // what the DOM reads via data-* + CSS variables.
+  const dragRef = useRef<{
+    startX: number;
+    originPos: -1 | 0 | 1;
+    pointerId: number;
+    dir: "prev" | "next" | null;
+    hasMoved: boolean;
+  } | null>(null);
+  // Set to true on a drag that moved past the dead-zone; the next click
+  // event is then swallowed so peek onClick doesn't double-fire goPrev/Next.
+  const suppressNextClickRef = useRef(false);
+
+  const onCardDragStart = useCallback(
+    (
+      originPos: -1 | 0 | 1,
+      startClientX: number,
+      target: HTMLElement,
+      pointerId: number,
+    ) => {
+      // Always capture so the trailing click still routes here (we can
+      // then swallow it via suppressNextClickRef).
+      try {
+        target.setPointerCapture(pointerId);
+      } catch {
+        // throws if the pointer is no longer active — safe to ignore.
+      }
+      dragRef.current = {
+        startX: startClientX,
+        originPos,
+        pointerId,
+        // Peeks lock direction at down; active waits for first 4 px move.
+        dir: originPos === -1 ? "prev" : originPos === 1 ? "next" : null,
+        hasMoved: false,
+      };
+      setPaused(true);
+      if (dragRef.current.dir) setDragInfo({ dir: dragRef.current.dir, dx: 0 });
+
+      const onMove = (e: PointerEvent) => {
+        const ref = dragRef.current;
+        if (!ref || e.pointerId !== ref.pointerId) return;
+        const raw = e.clientX - ref.startX;
+        // Active card: lock direction only once the user clears the dead
+        // zone; below the dead zone keep dir null so the next sustained
+        // direction wins.
+        if (ref.originPos === 0) {
+          if (Math.abs(raw) < 4) {
+            // In the dead zone — no visual update, also reset dir so the
+            // user can effectively pick a new direction by passing through.
+            if (ref.dir) {
+              ref.dir = null;
+              setDragInfo(null);
+            }
+            return;
+          }
+          const newDir: "prev" | "next" = raw > 0 ? "prev" : "next";
+          if (ref.dir !== newDir) ref.dir = newDir;
+        }
+        ref.hasMoved = Math.abs(raw) >= 4;
+        const dir = ref.dir;
+        if (!dir) return;
+        const dx = dir === "prev" ? Math.max(0, raw) : Math.min(0, raw);
+        setDragInfo({ dir, dx });
+      };
+
+      const cleanup = () => {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onUp);
+      };
+
+      const onUp = (e: PointerEvent) => {
+        const ref = dragRef.current;
+        if (!ref || e.pointerId !== ref.pointerId) return;
+        cleanup();
+        const raw = e.clientX - ref.startX;
+        const dir = ref.dir;
+        const hasMoved = ref.hasMoved;
+        dragRef.current = null;
+        setDragInfo(null);
+        setPaused(false);
+        if (hasMoved) suppressNextClickRef.current = true;
+        if (dir && hasMoved && Math.abs(raw) >= DRAG_COMMIT_PX) {
+          if (dir === "prev") goPrev();
+          else goNext();
+        }
+      };
+
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onUp);
+    },
+    [goPrev, goNext],
+  );
+
+  // Wraps a card's onClick so a click that fires immediately after a
+  // committed drag is swallowed (prevents goPrev/Next from running twice).
+  const wrapClick = useCallback((cb: (() => void) | undefined) => {
+    if (!cb) return undefined;
+    return () => {
+      if (suppressNextClickRef.current) {
+        suppressNextClickRef.current = false;
+        return;
+      }
+      cb();
+    };
+  }, []);
 
 
   return (
@@ -221,6 +371,7 @@ export function BuiltForTeams() {
           onBlur={() => setPaused(false)}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
+          onTouchCancel={onTouchCancel}
         >
           <div className="sr-only" aria-live="polite" aria-atomic="true">
             Showing testimonial {active + 1} of {total} from{" "}
@@ -235,7 +386,18 @@ export function BuiltForTeams() {
               that wraps around the stage (only possible with N=3) is marked
               data-wrap during the transition and fades through 0 to mask
               its teleport. */}
-          <div className="cs-tt-stage" data-direction={direction}>
+          <div
+            className="cs-tt-stage"
+            data-direction={direction}
+            data-dragging={dragInfo ? dragInfo.dir : undefined}
+            style={
+              dragInfo
+                ? ({
+                    ["--cs-tt-drag-dx" as never]: `${dragInfo.dx}px`,
+                  } as React.CSSProperties)
+                : undefined
+            }
+          >
             {TESTIMONIALS.map((t, i) => {
               const pos = offsetFor(i, active, total);
               if (Math.abs(pos) > 1) return null;
@@ -249,7 +411,10 @@ export function BuiltForTeams() {
                   testimonial={t}
                   pos={pos}
                   wrap={isWrap}
-                  onClick={pos === -1 ? goPrev : pos === 1 ? goNext : undefined}
+                  onClick={wrapClick(
+                    pos === -1 ? goPrev : pos === 1 ? goNext : undefined,
+                  )}
+                  onCardDragStart={onCardDragStart}
                 />
               );
             })}
@@ -326,11 +491,18 @@ function MorphCard({
   pos,
   wrap,
   onClick,
+  onCardDragStart,
 }: {
   testimonial: Testimonial;
   pos: number;
   wrap: boolean;
   onClick: (() => void) | undefined;
+  onCardDragStart: (
+    originPos: -1 | 0 | 1,
+    startClientX: number,
+    target: HTMLElement,
+    pointerId: number,
+  ) => void;
 }) {
   const isActive = pos === 0;
   return (
@@ -345,6 +517,18 @@ function MorphCard({
       aria-current={isActive ? "true" : undefined}
       tabIndex={isActive ? undefined : -1}
       onClick={onClick}
+      onPointerDown={(e) => {
+        if (e.button !== 0) return;
+        // Don't hijack interactive descendants (CTA link, future buttons).
+        if ((e.target as HTMLElement).closest("a, button")) return;
+        e.preventDefault();
+        onCardDragStart(
+          pos as -1 | 0 | 1,
+          e.clientX,
+          e.currentTarget as HTMLElement,
+          e.pointerId,
+        );
+      }}
       onKeyDown={
         isActive || !onClick
           ? undefined
@@ -359,7 +543,7 @@ function MorphCard({
       <div className="cs-tt-card__photo">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={TESTIMONIAL_PHOTO}
+          src={testimonial.photoSrc ?? TESTIMONIAL_PHOTO}
           alt={isActive ? `${testimonial.name}, ${testimonial.role}` : ""}
           width={160}
           height={160}
@@ -385,30 +569,39 @@ function MorphCard({
           &ldquo;{testimonial.quote}&rdquo;
         </p>
 
-        <a
-          href={testimonial.caseStudyHref}
-          className="cs-tt-card__cta"
-          tabIndex={isActive ? undefined : -1}
-          onClick={
-            isActive
-              ? undefined
-              : (e) => {
-                  e.preventDefault();
-                  onClick?.();
-                }
-          }
-        >
-          <span>Read Case study</span>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-            <path
-              d="M4 10h12m0 0l-4-4m4 4l-4 4"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </a>
+        {testimonial.caseStudyHref ? (
+          <a
+            href={testimonial.caseStudyHref}
+            className="cs-tt-card__cta"
+            target="_blank"
+            rel="noopener noreferrer"
+            tabIndex={isActive ? undefined : -1}
+            onClick={
+              isActive
+                ? undefined
+                : (e) => {
+                    e.preventDefault();
+                    onClick?.();
+                  }
+            }
+          >
+            <span>Read Case study</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+              <path
+                d="M4 10h12m0 0l-4-4m4 4l-4 4"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </a>
+        ) : (
+          // Empty spacer preserves the body's three-child layout
+          // (head / quote / cta) so the quote stays vertically positioned
+          // identically across cards regardless of CTA presence.
+          <span aria-hidden className="cs-tt-card__cta-spacer" />
+        )}
       </div>
     </article>
   );

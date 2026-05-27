@@ -77,7 +77,7 @@ export function AsrProductionEnv(): React.ReactElement {
           className="text-white mb-14 md:mb-[88px]"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'var(--text-t-display-2)',
+            fontSize: 'var(--fs-h1)',
             fontWeight: 600,
             letterSpacing: 'var(--text-t-display-2-ls)',
             lineHeight: 'var(--text-t-display-2-lh)',
@@ -129,7 +129,7 @@ export function AsrProductionEnv(): React.ReactElement {
                 className="text-white mb-3"
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 'var(--text-t-heading-lg)',
+                  fontSize: 'var(--fs-h2)',
                   fontWeight: 600,
                   letterSpacing: 'var(--text-t-heading-lg-ls)',
                   lineHeight: 'var(--text-t-heading-lg-lh)',
@@ -144,7 +144,7 @@ export function AsrProductionEnv(): React.ReactElement {
                 className="text-white"
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 'var(--text-t-heading-sm)',
+                  fontSize: 'var(--fs-h4)',
                   fontWeight: 400,
                   letterSpacing: 'var(--text-t-heading-sm-ls)',
                   lineHeight: 'var(--text-t-heading-sm-lh)',
