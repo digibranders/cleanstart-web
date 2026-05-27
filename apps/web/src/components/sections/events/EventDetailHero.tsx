@@ -30,7 +30,7 @@ export function EventDetailHero({
         <>
           <div className="flex items-center gap-[8px] shrink-0 text-white">
             <LocationIcon />
-            <span className="whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-medium leading-none tracking-[-0.05em]">
+            <span className="whitespace-nowrap font-medium leading-none tracking-[-0.05em]" style={{ fontSize: "var(--fs-body)" }}>
               {venue}
             </span>
           </div>
@@ -40,7 +40,7 @@ export function EventDetailHero({
           {longDate && (
             <div className="flex items-center gap-[8px] shrink-0 text-white">
               <CalendarIcon />
-              <span className="whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-medium leading-none tracking-[-0.05em]">
+              <span className="whitespace-nowrap font-medium leading-none tracking-[-0.05em]" style={{ fontSize: "var(--fs-body)" }}>
                 {longDate}
               </span>
             </div>
@@ -52,7 +52,7 @@ export function EventDetailHero({
               <span
                 className="uppercase tracking-wider text-white"
                 style={{
-                  fontSize: "0.75rem",
+                  fontSize: "var(--fs-badge)",
                   padding: "4px 10px",
                   borderRadius: "999px",
                   background: "rgba(255,255,255,0.15)",

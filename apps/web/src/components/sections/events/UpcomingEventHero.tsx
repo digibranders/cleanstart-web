@@ -79,7 +79,7 @@ export function UpcomingEventHero({
           id="events-hero-title"
           className="font-display font-semibold text-white text-center"
           style={{
-            fontSize: "var(--text-hero-utility)",
+            fontSize: "var(--fs-h1)",
             lineHeight: "var(--text-hero-lh)",
             letterSpacing: "var(--text-hero-utility-ls)",
             marginBottom: "60px",
@@ -252,7 +252,7 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
             <h2
               className="font-display font-semibold text-white overflow-hidden"
               style={{
-                fontSize: "clamp(2rem,2.78vw,2.5rem)",
+                fontSize: "var(--fs-h2)",
                 lineHeight: "1.1",
                 letterSpacing: "-0.05em",
                 display: "-webkit-box",
@@ -338,7 +338,7 @@ function EmptyHeroCard(): React.ReactElement {
         <p
           className="font-display font-semibold text-white"
           style={{
-            fontSize: "clamp(1.5rem,2.5vw,2.25rem)",
+            fontSize: "var(--fs-h3)",
             letterSpacing: "-0.04em",
             lineHeight: "1.2",
           }}
@@ -348,7 +348,7 @@ function EmptyHeroCard(): React.ReactElement {
         <p
           className="text-white/70"
           style={{
-            fontSize: "clamp(0.95rem,1.2vw,1.0625rem)",
+            fontSize: "var(--fs-body)",
             lineHeight: 1.5,
           }}
         >
