@@ -953,14 +953,22 @@ body {
   border-radius: 20px;
 }
 
-/* Pointed arrow at the top of the mega-menu, auto-aligned to active trigger */
+/* Pointed arrow at the top of the mega-menu, auto-aligned to active trigger.
+   Uses the SAME rgba + backdrop-blur as .cs-mega-surface so the surfaces read
+   as identical. The element box is intentionally larger than the visible
+   triangle (40x20 box → 18x10 triangle) so backdrop-filter has enough pixels
+   to sample — a 10px-tall element gives the blur almost nothing to work with
+   and ends up looking grey. clip-path then shows only the triangle. */
 .cs-mega-arrow {
-  width: 18px;
-  height: 10px;
-  background: rgba(21, 16, 33, 0.92);
+  width: 40px;
+  height: 20px;
+  background-color: rgba(21, 16, 33, 0.92);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  /* Visible 18x10 triangle occupies the TOP half of the 40x20 box.
+     The bottom half is clipped away, but its presence gives backdrop-filter
+     more area to sample, producing the same blur color as .cs-mega-surface. */
+  clip-path: polygon(50% 0%, calc(50% - 9px) 50%, calc(50% + 9px) 50%);
 }
 
 /* Hover state for individual menu items — subtle gradient left bar + soft fill */
@@ -2363,6 +2371,26 @@ body {
   line-height: 1.4;
   margin-top: var(--prose-h4-mt);
   margin-bottom: var(--prose-h4-mb);
+}
+
+/* <strong>/<b> inherits the host heading's weight so it doesn't jump to 900
+   (Manrope resolves `font-weight: bolder` to 900). Headings stay at 600. */
+.article-body .article-h1 strong, .article-body .article-h1 b,
+.article-body .article-h2 strong, .article-body .article-h2 b,
+.article-body .article-h3 strong, .article-body .article-h3 b,
+.article-body .article-h4 strong, .article-body .article-h4 b,
+.article-body .article-h5 strong, .article-body .article-h5 b,
+.article-body .article-h6 strong, .article-body .article-h6 b {
+  font-weight: inherit;
+}
+/* Body-level <strong>/<b> emphasis caps at 700 — never the browser default 900. */
+.article-body .article-paragraph strong,
+.article-body .article-paragraph b,
+.article-body .article-li strong,
+.article-body .article-li b,
+.article-body .article-blockquote strong,
+.article-body .article-blockquote b {
+  font-weight: 700;
 }
 
 .article-body .article-ul,
