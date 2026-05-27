@@ -262,7 +262,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
           className="text-white text-center mx-auto"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
+            fontSize: "var(--fs-h1)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
