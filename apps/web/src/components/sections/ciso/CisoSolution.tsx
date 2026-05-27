@@ -117,16 +117,17 @@ export function CisoSolution(): React.ReactElement {
           decoding="async"
         />
 
-        {/* ── Heading — 28px SemiBold, centered, maxW 259px ── */}
+        {/* ── Heading — 28px SemiBold, centered. Container px-6 gutter
+              controls width; H2 itself is unconstrained so it doesn't wrap
+              to 3 lines when there's room for 2. ── */}
         <h2
-          className="text-center text-white mx-auto"
+          className="text-center text-white mx-auto px-6"
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "var(--fs-h2)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
-            maxWidth: "259px",
             marginBottom: "17px",
           }}
         >
@@ -346,7 +347,7 @@ export function CisoSolution(): React.ReactElement {
               className="text-white"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-h1)",
+                fontSize: "var(--fs-h2)",
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,

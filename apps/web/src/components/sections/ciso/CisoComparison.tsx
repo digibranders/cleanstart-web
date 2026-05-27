@@ -72,7 +72,6 @@ export function CisoComparison(): React.ReactElement {
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
-                maxWidth: "264px",
               }}
             >
               <span style={{ color: "#111" }}>{"Visibility Alone Doesn't "}</span>
@@ -92,7 +91,7 @@ export function CisoComparison(): React.ReactElement {
               className="mx-auto hidden font-display text-[#111111] sm:block"
               style={{
                 maxWidth: "min(737px, 100%)",
-                fontSize: "var(--fs-h1)",
+                fontSize: "var(--fs-h2)",
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
@@ -102,16 +101,6 @@ export function CisoComparison(): React.ReactElement {
               <span className="cs-text-gradient-impact">Risk Reduction</span>
             </h2>
           </div>
-
-          {/* Vertical fading-gray separator (decorative, desktop only) */}
-          <div
-            aria-hidden
-            className="mx-auto mt-6 hidden h-[90px] w-px md:block"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(217,217,217,0) 0%, rgba(217,217,217,1) 47.2%, rgba(217,217,217,0) 100%)",
-            }}
-          />
 
           {/* Cards row — stacks on mobile, side-by-side from md+ (matches
               SecurityNotPatching on the homepage). VS badge sits centered on

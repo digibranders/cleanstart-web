@@ -731,11 +731,12 @@ export function DeveloperWorkflows(): React.ReactElement {
           </div>
 
           {/* Mobile pipeline — vertical single column, horizontal cards with
-              vertical dashed arrows between them. Order mirrors the Figma
-              mobile screenshot: Git → CI/CD → Build → CleanStart → Registry
-              → Deploy → Runtime → Code. */}
+              vertical dashed arrows between them. Order mirrors desktop:
+              Code → Git → CI/CD → Build → CleanStart → Registry → Deploy →
+              Runtime. */}
           <div className="md:hidden flex flex-col items-center gap-2">
             {[
+              { label: 'Code', icon: `${ASSET_BASE}/logo-code.png`, iconSize: 52 },
               { label: 'Git', icon: `${ASSET_BASE}/logo-git.png`, iconSize: 48 },
               { label: 'CI/CD', icon: `${ASSET_BASE}/logo-cicd.svg`, iconSize: 48 },
               { label: 'Build', icon: `${ASSET_BASE}/logo-build.svg`, iconSize: 52 },
@@ -751,7 +752,6 @@ export function DeveloperWorkflows(): React.ReactElement {
               { label: 'Registry', icon: `${ASSET_BASE}/logo-registry.png`, iconSize: 52 },
               { label: 'Deploy', icon: `${ASSET_BASE}/logo-deploy.svg`, iconSize: 48 },
               { label: 'Runtime', icon: `${ASSET_BASE}/logo-runtime.svg`, iconSize: 48 },
-              { label: 'Code', icon: `${ASSET_BASE}/logo-code.png`, iconSize: 52 },
             ].map((step, i, arr) => (
               <div key={`m-${step.label}`} className="flex flex-col items-center gap-2">
                 <MobilePipelineCard {...step} />

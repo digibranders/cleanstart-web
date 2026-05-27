@@ -32,7 +32,7 @@ export function BlogsHero({
         className="pointer-events-none select-none absolute hidden sm:block"
         style={{
           left: "-119px",
-          top: "279px",
+          top: "120px",
           width: "332px",
           height: "313px",
           mixBlendMode: "hard-light",
@@ -49,31 +49,7 @@ export function BlogsHero({
         />
       </div>
 
-      {/* Decorative glow — right side, mirrored from left (hidden on mobile) */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden sm:block"
-        style={{
-          right: "-119px",
-          top: "279px",
-          width: "332px",
-          height: "313px",
-          mixBlendMode: "hard-light",
-          opacity: 0.3,
-          transform: "scaleX(-1)",
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/blogs/hero-glow-left.png"
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[clamp(96px,12vw,160px)]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[clamp(24px,3vw,40px)]">
         {/* Title + search + categories — centered block */}
         <div
           className="flex flex-col items-center gap-10 mx-auto"

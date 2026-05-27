@@ -19,7 +19,7 @@ export function UpcomingEventHero({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ minHeight: "clamp(560px, 52vw, 746px)", background: HERO_GRADIENT }}
+      style={{ background: HERO_GRADIENT }}
       aria-labelledby="events-hero-title"
     >
       {/* Decorative isometric cube — left side */}
@@ -52,7 +52,7 @@ export function UpcomingEventHero({
         className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           right: "-142px",
-          top: "503px",
+          bottom: "-120px",
           width: "346px",
           height: "346px",
           mixBlendMode: "color-dodge",
@@ -308,9 +308,9 @@ function EmptyHeroCard(): React.ReactElement {
     <div
       className="relative w-full mx-auto overflow-visible"
       style={{
-        maxWidth: "1276px",
-        minHeight: "clamp(300px, 30vw, 368px)",
-        borderRadius: "20px",
+        maxWidth: "820px",
+        minHeight: "clamp(180px, 18vw, 220px)",
+        borderRadius: "16px",
         background: "rgba(165, 103, 255, 0.4)",
         backdropFilter: "blur(4px)",
         WebkitBackdropFilter: "blur(4px)",
@@ -323,7 +323,7 @@ function EmptyHeroCard(): React.ReactElement {
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
-          borderRadius: "20px",
+          borderRadius: "16px",
           backgroundImage:
             "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='2' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
           backgroundSize: "120px 120px",
