@@ -69,7 +69,7 @@ export function AboutEcosystems() {
         <h2
           className="text-center font-display text-black"
           style={{
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             lineHeight: 1.1,
             letterSpacing: "-0.04em",
