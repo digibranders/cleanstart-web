@@ -174,7 +174,7 @@ export function CisoSolution(): React.ReactElement {
               key={f.titleMobile}
               style={{
                 position: "relative",
-                height: "114px",
+                minHeight: "114px",
                 marginBottom: i < FEATURES.length - 1 ? "16px" : 0,
               }}
             >
@@ -197,20 +197,28 @@ export function CisoSolution(): React.ReactElement {
                 }}
               />
 
-              {/* ── Card — 114px tall, left=93px, right=41px ── */}
+              {/* ── Card — left=93px, right=41px; minHeight 114px, grows
+                  with content so wrapped titles + descriptions stay visible.
+                  Inner text now flows via padding (was absolutely positioned
+                  with overflow:hidden — clipped multi-line content). ── */}
               <div
                 style={{
                   position: "absolute",
                   left: "93px",
                   right: "41px",
                   top: "0",
-                  height: "114px",
+                  minHeight: "114px",
                   borderRadius: "17.928px",
                   border: "2.241px solid #dab6f3",
                   background:
                     "linear-gradient(180deg, #151021 0%, #131e8f 71.202%, #551ece 100%)",
                   boxShadow: MOBILE_CARD_SHADOW,
                   overflow: "hidden",
+                  padding: "20px 8px 20px 24px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  gap: "6px",
                 }}
               >
                 {/* Card inner ellipse glow A */}
@@ -250,13 +258,12 @@ export function CisoSolution(): React.ReactElement {
                   decoding="async"
                 />
 
-                {/* Card text — left=24px top=24px gap=6px */}
+                {/* Card text — content flows naturally inside the card's
+                    flex column (padding 20px sides → 24px effective on left
+                    via the existing 24px offset, 8px on right). */}
                 <div
                   style={{
-                    position: "absolute",
-                    left: "24px",
-                    top: "24px",
-                    right: "8px",
+                    position: "relative",
                     display: "flex",
                     flexDirection: "column",
                     gap: "6px",
