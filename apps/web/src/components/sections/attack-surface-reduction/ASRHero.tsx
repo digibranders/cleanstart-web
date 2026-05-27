@@ -352,6 +352,56 @@ export function ASRHero(): React.ReactElement {
                   </span>
                 </div>
 
+                {/* Logo backdrop — green blur ellipse (Figma "Ellipse 46693") */}
+                <div
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    width: '55.67px',
+                    height: '59.65px',
+                    left: '45.3px',
+                    top: '58.91px',
+                    background: '#4AFF2E',
+                    filter: 'blur(31.7874px)',
+                    transform: 'rotate(18.37deg)',
+                    pointerEvents: 'none',
+                  }}
+                />
+
+                {/* Logo backdrop — soft radial wash (Figma "Union") */}
+                <div
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    width: '136.25px',
+                    height: '136.25px',
+                    left: 'calc(50% - 136.25px / 2 - 19.23px)',
+                    top: 'calc(50% - 136.25px / 2 - 18.55px)',
+                    background:
+                      'radial-gradient(50% 50% at 50% 50%, rgba(28, 163, 111, 0.5) 0%, rgba(5, 132, 83, 0) 100%)',
+                    transform: 'rotate(18.37deg)',
+                    pointerEvents: 'none',
+                  }}
+                />
+
+                {/* Logo backdrop — etched gridline pattern (Figma 366:6517) */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  aria-hidden
+                  alt=""
+                  src="/images/attack-surface-reduction/hero-clean-gridline.svg"
+                  style={{
+                    position: 'absolute',
+                    width: '154px',
+                    height: '167px',
+                    left: 'calc(50% - 154px / 2 - 19.23px)',
+                    top: 'calc(50% - 167px / 2 - 18.55px)',
+                    pointerEvents: 'none',
+                  }}
+                  loading="lazy"
+                  decoding="async"
+                />
+
                 {/* CleanStart geometric "N" logo — centred in card body */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
