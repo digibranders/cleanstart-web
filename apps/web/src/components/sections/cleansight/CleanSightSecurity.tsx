@@ -429,21 +429,36 @@ export function CleanSightSecurity(): React.ReactElement {
             white dot accent on the left edge (centered vertically). Replaces
             the previous numbered-circle list to match the reference design. */}
         <div
-          className="lg:hidden mt-10 flex flex-col gap-4"
+          className="lg:hidden mt-10 flex flex-col gap-4 pb-[clamp(48px,10vw,96px)]"
         >
           {WORKFLOW.map((w) => (
             <div
               key={w.label}
-              className="relative flex flex-col"
+              className="relative flex flex-col overflow-hidden"
               style={{
-                background:
-                  "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-                border: "1px solid rgba(255,255,255,0.12)",
+                backgroundImage:
+                  "linear-gradient(180deg, rgba(0,198,255,0.2) 0%, rgba(53,30,175,0.04) 100%), linear-gradient(180deg, rgba(36,237,255,0.4) 0%, rgba(22,142,153,0) 100%)",
+                backgroundOrigin: "border-box",
+                backgroundClip: "padding-box, border-box",
+                border: "1px solid transparent",
                 borderRadius: "16px",
                 padding: "20px 24px 20px 36px",
                 gap: "8px",
               }}
             >
+              {/* Figma noise texture — fractalNoise (baseFreq 2, 3 octaves,
+                  seed 3775) → luminanceToAlpha → 51% threshold → #24EDFF flood.
+                  Matches the SVG filter from Figma spec exactly. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 297 113'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='2' numOctaves='3' stitchTiles='stitch' seed='3775' result='t'/><feColorMatrix in='t' type='luminanceToAlpha' result='a'/><feComponentTransfer in='a' result='b'><feFuncA type='discrete' tableValues='1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'/></feComponentTransfer><feFlood flood-color='%2324EDFF' result='c'/><feComposite in='c' in2='b' operator='in'/></filter><rect width='297' height='113' filter='url(%23n)'/></svg>\")",
+                  backgroundSize: "297px 113px",
+                  backgroundRepeat: "repeat",
+                }}
+              />
               {/* Tick line — short horizontal accent from just outside the
                   card's left edge into the dot, giving each row a "labeled
                   marker" feel per the reference. */}
