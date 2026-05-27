@@ -93,8 +93,9 @@ export function ResourcesInsightsClient({
                 aria-controls="resources-articles"
                 id={`tab-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
-                className="text-[clamp(0.9375rem,1.04vw,1.25rem)] font-semibold leading-[1.2] tracking-[-0.04em]"
+                className="font-semibold leading-[1.2] tracking-[-0.04em]"
                 style={{
+                  fontSize: "var(--fs-body)",
                   padding: "8px 24px",
                   borderRadius: "100px",
                   cursor: "pointer",
@@ -173,7 +174,7 @@ function ArticleCard({ article }: { article: ResourceCard }) {
         className="text-[#1a1a1a] transition-colors duration-200 group-hover:text-[#1B1F4F]"
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(18px, 1.7vw, 24px)",
+          fontSize: "var(--fs-lead)",
           fontWeight: 600,
           lineHeight: 1.25,
           letterSpacing: "-0.02em",
@@ -191,7 +192,7 @@ function ArticleCard({ article }: { article: ResourceCard }) {
         className="text-[#666]"
         style={{
           fontFamily: "var(--font-sans)",
-          fontSize: "clamp(15px, 1.4vw, 20px)",
+          fontSize: "var(--fs-body)",
           fontWeight: 400,
           lineHeight: 1.5,
           letterSpacing: "-0.02em",

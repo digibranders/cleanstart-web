@@ -1343,7 +1343,7 @@ export function CleanStartFactory() {
           <h2
             className="mt-[32px] text-center font-display text-white"
             style={{
-              fontSize: "clamp(28px, 3.4vw, 48px)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",

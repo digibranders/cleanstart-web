@@ -11,7 +11,7 @@ export function Hero() {
           <h1
             className="font-display font-semibold text-white"
             style={{
-              fontSize: "clamp(40px, 4.45vw, 64px)",
+              fontSize: "var(--fs-display)",
               letterSpacing: "-0.04em",
               lineHeight: 1.05,
             }}
