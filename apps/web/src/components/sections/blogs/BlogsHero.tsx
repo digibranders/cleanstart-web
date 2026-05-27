@@ -168,8 +168,10 @@ export function BlogsHero({
                   <h2
                     className="font-display font-bold leading-tight tracking-[-0.05em] text-white overflow-hidden"
                     style={{
-                      /* Featured article title is a CARD title, not a section H2 — use --fs-h3 (22→28). */
-                      fontSize: "var(--fs-h3)",
+                      /* Featured-tier card title — explicit 32 px per design.
+                         Sits between standard card title (--fs-h3 = 28) and
+                         section H2 (--fs-h2 = 56) by design. */
+                      fontSize: "32px",
                       display: "-webkit-box",
                       WebkitLineClamp: 4,
                       WebkitBoxOrient: "vertical",
@@ -180,9 +182,9 @@ export function BlogsHero({
                   {featuredPost.abstract && (
                     <p
                       className="font-normal leading-[1.4] tracking-[-0.05em]"
-                      /* Featured article abstract is a CARD description, not a section description —
-                         use --fs-body (16→17) to match the card-title (--fs-h3) pairing. */
-                      style={{ fontSize: "var(--fs-body)", color: "#d1e5ff" }}
+                      /* Featured-tier card description — explicit 20 px per design.
+                         Pairs with the 32 px featured-card title above. */
+                      style={{ fontSize: "20px", color: "#d1e5ff" }}
                     >
                       {featuredPost.abstract}
                     </p>
