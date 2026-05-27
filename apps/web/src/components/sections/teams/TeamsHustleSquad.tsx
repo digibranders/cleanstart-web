@@ -156,7 +156,7 @@ export function TeamsHustleSquad() {
         <h2
           className="mb-[60px] text-center font-display text-white"
           style={{
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             lineHeight: 1.1,
             letterSpacing: "-0.04em",

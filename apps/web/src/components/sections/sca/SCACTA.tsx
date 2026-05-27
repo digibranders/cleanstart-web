@@ -175,7 +175,7 @@ export function SCACTA(): React.ReactElement {
           style={{
             fontFamily: "var(--font-display)",
             // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-            fontSize: "14px",
+            fontSize: "var(--fs-body-sm)",
             fontWeight: 400,
             letterSpacing: "-0.03em",
             lineHeight: 1.4,
@@ -201,7 +201,7 @@ export function SCACTA(): React.ReactElement {
             style={{
               fontFamily: "var(--font-display)",
               // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-              fontSize: "14px",
+              fontSize: "var(--fs-body-sm)",
               fontWeight: 500,
               letterSpacing: "-0.01em",
               color: "#111",

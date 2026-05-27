@@ -133,7 +133,7 @@ export function HowCleanStartHelp() {
             className="justify-self-start font-display text-[#111111]"
             style={{
               maxWidth: "444px",
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
@@ -154,7 +154,7 @@ export function HowCleanStartHelp() {
             className="text-[#111111] md:justify-self-end md:text-right"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontSize: "var(--fs-lead)",
               fontWeight: 400,
               lineHeight: 1.4,
               letterSpacing: "-0.02em",
@@ -288,7 +288,7 @@ function CisoCard({
         key={`${activeTab}-title`}
         className="mt-[28px] font-display text-white"
         style={{
-          fontSize: "clamp(22px, 2.4vw, 32px)",
+          fontSize: "var(--fs-h3)",
           fontWeight: 700,
           lineHeight: 1.1,
           letterSpacing: "-0.04em",
@@ -304,7 +304,7 @@ function CisoCard({
         className="mt-[22px] text-white"
         style={{
           fontFamily: "var(--font-sans)",
-          fontSize: "clamp(15px, 1.4vw, 20px)",
+          fontSize: "var(--fs-body)",
           fontWeight: 400,
           lineHeight: 1.4,
           letterSpacing: "-0.02em",
@@ -375,7 +375,7 @@ function TabPill({
       style={{
         height: "clamp(26px, 3vw, 34px)",
         padding: "0 clamp(8px, 1.2vw, 12px)",
-        fontSize: "clamp(13px, 1.4vw, 18px)",
+        fontSize: "var(--fs-body-sm)",
         opacity: active ? 1 : 0.7,
         background: active
           ? "linear-gradient(180deg, #2B97D1 0%, #395FF9 100%)"
@@ -512,7 +512,7 @@ function FeatureCardItem({
             // 22 px floor matches the Figma title baseline. The horizontal-
             // layout text-column squeeze is gone (vertical at md gives full
             // card width), so we can keep the larger floor without risk.
-            fontSize: "clamp(22px, 2.4vw, 32px)",
+            fontSize: "var(--fs-h3)",
             fontWeight: 700,
             lineHeight: 1.1,
             letterSpacing: "-0.04em",
@@ -528,7 +528,7 @@ function FeatureCardItem({
           className="text-[#333333]"
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(15px, 1.4vw, 20px)",
+            fontSize: "var(--fs-body)",
             fontWeight: 400,
             lineHeight: 1.4,
             letterSpacing: "-0.02em",

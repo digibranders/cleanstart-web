@@ -63,7 +63,7 @@ export function AboutWhoWeAre() {
           <h2
             className="shrink-0 font-display"
             style={{
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
@@ -76,7 +76,7 @@ export function AboutWhoWeAre() {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontSize: "var(--fs-lead)",
               fontWeight: 400,
               lineHeight: 1.4,
               letterSpacing: "-0.02em",
@@ -136,7 +136,7 @@ export function AboutWhoWeAre() {
                   <h3
                     className="font-display"
                     style={{
-                      fontSize: "clamp(22px, 2.4vw, 32px)",
+                      fontSize: "var(--fs-h3)",
                       fontWeight: 700,
                       lineHeight: 1.1,
                       letterSpacing: "-0.04em",
@@ -148,7 +148,7 @@ export function AboutWhoWeAre() {
                   <p
                     style={{
                       fontFamily: "var(--font-sans)",
-                      fontSize: "clamp(15px, 1.4vw, 20px)",
+                      fontSize: "var(--fs-body)",
                       fontWeight: 400,
                       lineHeight: 1.4,
                       letterSpacing: "-0.02em",

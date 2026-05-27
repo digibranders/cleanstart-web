@@ -40,7 +40,7 @@ export function CommunityHero() {
             <h1
               className="font-display font-semibold text-white lg:w-[48%]"
               style={{
-                fontSize: 'clamp(36px, 4.45vw, 64px)',
+                fontSize: 'var(--fs-display)',
                 lineHeight: 1.05,
                 letterSpacing: '-0.04em',
               }}
@@ -53,7 +53,7 @@ export function CommunityHero() {
               <p
                 className="font-sans font-normal text-white/80"
                 style={{
-                  fontSize: 'clamp(18px, 1.5625vw, 30px)',
+                  fontSize: 'var(--fs-lead)',
                   lineHeight: '1.4',
                   letterSpacing: '-0.04em',
                 }}

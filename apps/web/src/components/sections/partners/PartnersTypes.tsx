@@ -34,7 +34,7 @@ export function PartnersTypes(): React.ReactElement {
             <h2
               className="font-display font-semibold text-[#0F123E]"
               style={{
-                fontSize: "var(--text-display-md)",
+                fontSize: "var(--fs-h2)",
                 lineHeight: 1.15,
                 letterSpacing: "-0.02em",
               }}
@@ -56,7 +56,7 @@ export function PartnersTypes(): React.ReactElement {
           <div className="lg:col-span-7 lg:pt-3">
             <p
               className="text-[#475569]"
-              style={{ fontSize: "var(--text-body-lg)", lineHeight: 1.5 }}
+              style={{ fontSize: "var(--fs-body)", lineHeight: 1.5 }}
             >
               Whether you integrate the technology, deliver it to customers, or embed it into
               managed services, each partnership creates shared value and growth.
@@ -105,13 +105,13 @@ function TypeCard({ type }: { type: PartnerType }): React.ReactElement {
       </div>
       <h3
         className="font-display font-semibold text-[#0F123E]"
-        style={{ fontSize: "var(--text-card-title-lg)", lineHeight: 1.25 }}
+        style={{ fontSize: "var(--fs-h3)", lineHeight: 1.25 }}
       >
         {type.title}
       </h3>
       <p
         className="text-[#475569]"
-        style={{ fontSize: "var(--text-body-sm)", lineHeight: 1.55 }}
+        style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.55 }}
       >
         {type.body}
       </p>

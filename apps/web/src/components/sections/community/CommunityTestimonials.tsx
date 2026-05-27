@@ -290,13 +290,13 @@ export function CommunityTestimonials(): React.ReactElement {
                       <div>
                         <p
                           className="font-sans font-semibold text-[#250800]"
-                          style={{ fontSize: '16px', lineHeight: '1.5' }}
+                          style={{ fontSize: 'var(--fs-body)', lineHeight: '1.5' }}
                         >
                           {t.name}
                         </p>
                         <p
                           className="font-sans font-normal text-[#250800]"
-                          style={{ fontSize: '14px', lineHeight: '1.5' }}
+                          style={{ fontSize: 'var(--fs-body-sm)', lineHeight: '1.5' }}
                         >
                           {t.role}
                         </p>
@@ -319,7 +319,7 @@ export function CommunityTestimonials(): React.ReactElement {
                   <p
                     className="font-display font-semibold text-[#250800]"
                     style={{
-                      fontSize: 'clamp(1rem, 1.354vw, 1.625rem)',
+                      fontSize: 'var(--fs-lead)',
                       lineHeight: '1.5',
                       letterSpacing: '-0.02em',
                     }}

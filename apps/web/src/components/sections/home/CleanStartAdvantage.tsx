@@ -72,7 +72,7 @@ export function CleanStartAdvantage() {
             id="advantage-title"
             className="font-display text-white"
             style={{
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
@@ -85,7 +85,7 @@ export function CleanStartAdvantage() {
             className="mt-6 text-white"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontSize: "var(--fs-lead)",
               fontWeight: 400,
               lineHeight: 1.4,
               letterSpacing: "-0.02em",
@@ -138,7 +138,7 @@ function StatBlock({
           className="font-display text-white"
           style={{
             whiteSpace: "nowrap",
-            fontSize: "clamp(24px, 2.5vw, 36px)",
+            fontSize: "var(--fs-h3)",
             fontWeight: 700,
             lineHeight: 1.1,
             letterSpacing: "-0.04em",
@@ -150,7 +150,7 @@ function StatBlock({
           className="text-white"
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(16px, 1.7vw, 24px)",
+            fontSize: "var(--fs-lead)",
             fontWeight: 400,
             lineHeight: 1.3,
             letterSpacing: "-0.02em",
@@ -168,7 +168,7 @@ function StatBlock({
         className="font-display text-white"
         style={{
           whiteSpace: "nowrap",
-          fontSize: "clamp(24px, 2.5vw, 36px)",
+          fontSize: "var(--fs-h3)",
           fontWeight: 700,
           lineHeight: 1.1,
           letterSpacing: "-0.04em",
@@ -180,7 +180,7 @@ function StatBlock({
         className="mt-5 max-w-[180px] text-white"
         style={{
           fontFamily: "var(--font-sans)",
-          fontSize: "clamp(16px, 1.7vw, 24px)",
+          fontSize: "var(--fs-lead)",
           fontWeight: 400,
           lineHeight: 1.3,
           letterSpacing: "-0.02em",

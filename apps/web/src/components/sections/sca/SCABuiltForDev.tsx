@@ -45,7 +45,7 @@ const CARDS = [
 
 const CARD_TITLE: React.CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "clamp(20px, 2vw, 28px)",
+  fontSize: "var(--fs-h3)",
   fontWeight: 600,
   letterSpacing: "-0.04em",
   lineHeight: 1.1,
@@ -55,7 +55,7 @@ const CARD_TITLE: React.CSSProperties = {
 const CARD_DESC: React.CSSProperties = {
   marginTop: "clamp(6px, 0.625vw, 12px)",
   fontFamily: "var(--font-sans)",
-  fontSize: "clamp(15px, 1.4vw, 20px)",
+  fontSize: "var(--fs-body)",
   fontWeight: 400,
   letterSpacing: "-0.02em",
   lineHeight: 1.4,
@@ -110,7 +110,7 @@ export function SCABuiltForDev(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,

@@ -324,7 +324,7 @@ export function BuiltForTeams() {
             className="justify-self-start font-display text-white"
             style={{
               maxWidth: "560px",
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
@@ -345,7 +345,7 @@ export function BuiltForTeams() {
             className="text-white md:justify-self-end md:text-right"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontSize: "var(--fs-lead)",
               fontWeight: 400,
               lineHeight: 1.4,
               letterSpacing: "-0.02em",
@@ -518,6 +518,13 @@ function MorphCard({
       tabIndex={isActive ? undefined : -1}
       onClick={onClick}
       onPointerDown={(e) => {
+        // Desktop-only: peeks only exist at ≥ 1024 px, and the touch-swipe
+        // handler on the carousel section already covers mobile / tablet.
+        // Bail for non-mouse pointers and below the desktop breakpoint so
+        // we don't fight the touch handlers (or, on touchscreen laptops,
+        // hijack a finger that the user meant to scroll the page with).
+        if (e.pointerType !== "mouse") return;
+        if (window.innerWidth < 1024) return;
         if (e.button !== 0) return;
         // Don't hijack interactive descendants (CTA link, future buttons).
         if ((e.target as HTMLElement).closest("a, button")) return;
@@ -569,21 +576,12 @@ function MorphCard({
           &ldquo;{testimonial.quote}&rdquo;
         </p>
 
-        {testimonial.caseStudyHref ? (
+        {testimonial.caseStudyHref && isActive ? (
           <a
             href={testimonial.caseStudyHref}
             className="cs-tt-card__cta"
             target="_blank"
             rel="noopener noreferrer"
-            tabIndex={isActive ? undefined : -1}
-            onClick={
-              isActive
-                ? undefined
-                : (e) => {
-                    e.preventDefault();
-                    onClick?.();
-                  }
-            }
           >
             <span>Read Case study</span>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
@@ -600,6 +598,10 @@ function MorphCard({
           // Empty spacer preserves the body's three-child layout
           // (head / quote / cta) so the quote stays vertically positioned
           // identically across cards regardless of CTA presence.
+          // Peek cards (!isActive) intentionally omit the <a> to avoid
+          // nesting an interactive link inside the role="button" article
+          // (axe-core nested-interactive violation; the whole card is
+          // clickable to activate it).
           <span aria-hidden className="cs-tt-card__cta-spacer" />
         )}
       </div>

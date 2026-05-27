@@ -162,7 +162,7 @@ export function DeveloperCTA(): React.ReactElement {
         <p
           className="font-display font-bold"
           style={{
-            fontSize: '26px',
+            fontSize: 'var(--fs-h3)',
             fontWeight: 700,
             letterSpacing: '-0.05em',
             lineHeight: 1.05,
@@ -176,7 +176,7 @@ export function DeveloperCTA(): React.ReactElement {
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '15px',
+            fontSize: 'var(--fs-body-sm)',
             fontWeight: 400,
             letterSpacing: '-0.03em',
             lineHeight: 1.4,

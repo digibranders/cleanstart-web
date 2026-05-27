@@ -264,7 +264,7 @@ export function AboutOurVision() {
               <h2
                 className="font-display"
                 style={{
-                  fontSize: "clamp(32px, 4vw, 56px)",
+                  fontSize: "var(--fs-h2)",
                   fontWeight: 700,
                   lineHeight: 1.1,
                   letterSpacing: "-0.04em",
@@ -277,7 +277,7 @@ export function AboutOurVision() {
               <p
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "clamp(18px, 1.7vw, 24px)",
+                  fontSize: "var(--fs-lead)",
                   fontWeight: 400,
                   lineHeight: 1.4,
                   letterSpacing: "-0.02em",

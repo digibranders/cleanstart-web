@@ -64,7 +64,7 @@ export function AboutHero() {
             <h1
               className="font-display font-semibold text-white"
               style={{
-                fontSize: "clamp(36px, 4.45vw, 64px)",
+                fontSize: "var(--fs-display)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.04em",
               }}

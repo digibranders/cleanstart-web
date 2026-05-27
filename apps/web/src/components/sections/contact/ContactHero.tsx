@@ -110,7 +110,7 @@ export function ContactHero() {
             className="text-white whitespace-nowrap"
             style={{
               fontFamily: "var(--font-display), sans-serif",
-              fontSize: "clamp(36px, 4.45vw, 64px)",
+              fontSize: "var(--fs-display)",
               lineHeight: 1.05,
               letterSpacing: "-0.04em",
               fontWeight: 600,
@@ -131,7 +131,7 @@ export function ContactHero() {
             className="text-white/80"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "var(--text-body-lg)",
+              fontSize: "var(--fs-body)",
               fontWeight: 400,
               lineHeight: 1.3,
               letterSpacing: "-0.04em",

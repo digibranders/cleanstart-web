@@ -153,13 +153,13 @@ export function AboutPowering() {
 
       {/* ── Foreground content ─────────────────────────────────────── */}
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[100px] pb-[20px]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[100px] pb-16 lg:pb-[20px]">
         {/* Title group — 248:2152 (centered, max-w 969px) */}
         <div className="mx-auto flex max-w-[969px] flex-col items-center gap-6 text-center text-white">
           <h2
             className="font-display"
             style={{
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
@@ -170,7 +170,7 @@ export function AboutPowering() {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontSize: "var(--fs-lead)",
               fontWeight: 400,
               lineHeight: 1.4,
               letterSpacing: "-0.02em",
@@ -182,8 +182,10 @@ export function AboutPowering() {
           </p>
         </div>
 
-        {/* Cards row — Figma top=412 → 80px gap below title block */}
-        <div className="mt-20 grid grid-cols-1 items-stretch gap-y-16 gap-x-[clamp(24px,6vw,91px)] md:grid-cols-2 lg:grid-cols-3 place-items-center">
+        {/* Cards row — Figma top=412 → 80px gap below title block.
+            Tablet + mobile stack vertically (single column) with rectangle cards.
+            3-up grid only kicks in at lg+. */}
+        <div className="mt-20 grid grid-cols-1 items-stretch gap-y-10 lg:gap-y-16 gap-x-[clamp(24px,6vw,91px)] lg:grid-cols-3 place-items-center">
           {CARDS.map((card) => (
             <FeatureCard key={card.title} {...card} />
           ))}
@@ -197,30 +199,32 @@ export function AboutPowering() {
 function FeatureCard({ title, description, Icon }: Card) {
   return (
     <div
-      className="relative w-full"
-      style={{ maxWidth: "346px", minHeight: "clamp(360px, 30vw, 420px)" }}
+      className="relative w-full max-w-[560px] lg:max-w-[346px] lg:min-h-[clamp(360px,30vw,420px)]"
     >
-      {/* Outer shadow — 248:2159 (404×478, 29px halo, top-rounded glow PNG) */}
+      {/* Outer shadow — 248:2159 (404×478, 29px halo, top-rounded glow PNG).
+          Desktop only — tablet/mobile show a single dark inner border instead. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/about/powering-card-glow.svg"
         alt=""
-        className="pointer-events-none absolute -inset-x-[29px] -top-[29px] h-[calc(100%+58px)] w-[calc(100%+58px)] max-w-none select-none"
+        className="pointer-events-none absolute -inset-x-[29px] -top-[29px] hidden h-[calc(100%+58px)] w-[calc(100%+58px)] max-w-none select-none lg:block"
         loading="lazy"
         decoding="async"
       />
 
-      {/* Cyan glow ring — 248:2161 (362×440, #2CC1EB @ 0.3, rounded-24) */}
+      {/* Cyan glow ring — 248:2161 (362×440, #2CC1EB @ 0.3, rounded-24).
+          Desktop only. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-2 rounded-[24px]"
+        className="pointer-events-none absolute -inset-2 hidden rounded-[24px] lg:block"
         style={{ backgroundColor: "#2CC1EB", opacity: 0.3 }}
       />
 
       {/* White card — flex column, no absolute internals.
-          Mobile: ball + text centered. sm+: original left-aligned. */}
-      <div className="relative flex h-full w-full flex-col items-center text-center sm:items-start sm:text-left gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[24px] bg-white p-card-md">
+          Mobile/tablet: single dark inner border (no double glow).
+          sm+: original left-aligned. */}
+      <div className="relative flex h-full w-full flex-col items-center text-center sm:items-start sm:text-left gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[24px] border-2 border-[#0a1a4d] bg-white p-card-md lg:border-0">
         {/* Ball — 248:2163 (96×96, blue gradient, inset highlight) */}
         <div
           className="flex shrink-0 items-center justify-center overflow-hidden"
@@ -240,7 +244,7 @@ function FeatureCard({ title, description, Icon }: Card) {
           <h3
             className="font-display text-[#111]"
             style={{
-              fontSize: "clamp(22px, 2.4vw, 32px)",
+              fontSize: "var(--fs-h3)",
               fontWeight: 700,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
@@ -252,7 +256,7 @@ function FeatureCard({ title, description, Icon }: Card) {
             className="text-[#555]"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(15px, 1.4vw, 20px)",
+              fontSize: "var(--fs-body)",
               fontWeight: 400,
               lineHeight: 1.4,
               letterSpacing: "-0.02em",

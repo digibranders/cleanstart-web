@@ -143,7 +143,7 @@ export function FrequentlyAskedQuestions() {
             className="justify-self-start font-display text-[#111111]"
             style={{
               maxWidth: "493px",
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
@@ -164,7 +164,7 @@ export function FrequentlyAskedQuestions() {
             className="text-[#111111] md:justify-self-end md:text-right"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontSize: "var(--fs-lead)",
               fontWeight: 400,
               lineHeight: 1.4,
               letterSpacing: "-0.02em",
@@ -262,7 +262,7 @@ function FaqItemRow({
         <span
           className="flex-1 font-display text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
           style={{
-            fontSize: "clamp(20px, 2vw, 28px)",
+            fontSize: "var(--fs-h3)",
             fontWeight: 600,
             lineHeight: 1.1,
             letterSpacing: "-0.04em",
@@ -296,7 +296,7 @@ function FaqItemRow({
             className="pt-3 text-[#333333]"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(15px, 1.4vw, 20px)",
+              fontSize: "var(--fs-body)",
               fontWeight: 400,
               lineHeight: 1.4,
               letterSpacing: "-0.02em",

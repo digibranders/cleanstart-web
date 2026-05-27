@@ -232,7 +232,7 @@ function FilterGroup({
       <p
         className="font-sans uppercase"
         style={{
-          fontSize: "12px",
+          fontSize: "var(--fs-badge)",
           letterSpacing: "0.08em",
           color: "rgba(17,17,17,0.6)",
           fontWeight: 500,
@@ -269,7 +269,7 @@ function FilterGroup({
               ) : null}
               <span
                 className="font-sans"
-                style={{ fontSize: "14px", lineHeight: 1.2 }}
+                style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.2 }}
               >
                 {item.label}
               </span>
@@ -319,7 +319,7 @@ function MobileTabStrip({
                 aria-current={item.active ? "page" : undefined}
                 className="block whitespace-nowrap font-sans"
                 style={{
-                  fontSize: "14px",
+                  fontSize: "var(--fs-body-sm)",
                   fontWeight: 500,
                   padding: "8px 14px",
                   borderRadius: "999px",

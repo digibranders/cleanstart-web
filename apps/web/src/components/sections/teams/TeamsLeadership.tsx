@@ -98,7 +98,7 @@ function TeamCard({ name, role, photo, linkedIn }: TeamMember) {
           <p
             className="font-display"
             style={{
-              fontSize: "clamp(20px, 2vw, 28px)",
+              fontSize: "var(--fs-h3)",
               fontWeight: 600,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
@@ -110,7 +110,7 @@ function TeamCard({ name, role, photo, linkedIn }: TeamMember) {
             <p
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "clamp(15px, 1.4vw, 20px)",
+                fontSize: "var(--fs-body)",
                 fontWeight: 400,
                 lineHeight: 1.4,
                 letterSpacing: "-0.02em",
@@ -272,7 +272,7 @@ export function TeamsLeadership() {
         <h2
           className="mb-[60px] text-center font-display text-[#111]"
           style={{
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             lineHeight: 1.1,
             letterSpacing: "-0.04em",
@@ -294,7 +294,7 @@ export function TeamsLeadership() {
         <h2
           className="mb-[60px] text-center font-display text-[#111]"
           style={{
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             lineHeight: 1.1,
             letterSpacing: "-0.04em",

@@ -66,7 +66,7 @@ export function DemoHero(): React.ReactElement {
           style={{
             fontFamily: "var(--font-display), sans-serif",
             fontWeight: 600,
-            fontSize: "clamp(36px, 4.45vw, 64px)",
+            fontSize: "var(--fs-display)",
             lineHeight: 1.05,
             letterSpacing: "-0.04em",
           }}

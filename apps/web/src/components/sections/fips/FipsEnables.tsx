@@ -136,7 +136,7 @@ export function FipsEnables(): React.ReactElement {
             style={{
               fontFamily: "var(--font-display)",
               /* Mobile: 28px (Figma 366:7788), desktop: 56px */
-              fontSize: "clamp(28px, 4vw, 56px)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               letterSpacing: "-0.05em",
               lineHeight: 1.1,
@@ -152,7 +152,7 @@ export function FipsEnables(): React.ReactElement {
             style={{
               fontFamily: "var(--font-sans)",
               /* Mobile: 16px (Figma 366:7788), desktop: 24px */
-              fontSize: "clamp(16px, 1.7vw, 24px)",
+              fontSize: "var(--fs-lead)",
               fontWeight: 400,
               letterSpacing: "-0.04em",
               lineHeight: 1.4,

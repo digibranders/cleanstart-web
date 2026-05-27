@@ -30,7 +30,7 @@ export function WhatsSetsUsApart(): React.ReactElement {
           style={{
             fontFamily: "var(--font-display), 'Manrope', sans-serif",
             fontWeight: 700,
-            fontSize: "clamp(32px, 4.3vw, 62px)",
+            fontSize: "var(--fs-h2)",
             lineHeight: 1,
             letterSpacing: "-0.05em",
             color: "#111111",
@@ -61,7 +61,7 @@ export function WhatsSetsUsApart(): React.ReactElement {
                 style={{
                   fontFamily: "var(--font-sans), 'Sora', sans-serif",
                   fontWeight: 400,
-                  fontSize: "clamp(15px, 1.4vw, 20px)",
+                  fontSize: "var(--fs-body)",
                   lineHeight: 1.4,
                   letterSpacing: "-0.04em",
                   color: "#111111",

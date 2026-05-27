@@ -41,7 +41,7 @@ function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
         aria-hidden
         className="pointer-events-none select-none absolute right-12 top-8 font-display font-bold leading-none text-[#250800]/20"
         // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-        style={{ fontSize: "40px", lineHeight: 1 }}
+        style={{ fontSize: "var(--fs-h2)", lineHeight: 1 }}
       >
         &rdquo;
       </span>
@@ -55,7 +55,7 @@ function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
             className="text-[#250800]"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(16px, 1.4vw, 20px)",
+              fontSize: "var(--fs-body)",
               fontWeight: 500,
               lineHeight: 1.4,
               letterSpacing: "-0.02em",
@@ -67,7 +67,7 @@ function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
             className="text-[#250800]/70"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(16px, 1.4vw, 20px)",
+              fontSize: "var(--fs-body)",
               fontWeight: 400,
               lineHeight: 1.4,
               letterSpacing: "-0.02em",
@@ -82,7 +82,7 @@ function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
         className="text-[#250800]"
         style={{
           fontFamily: "var(--font-sans)",
-          fontSize: "clamp(16px, 1.4vw, 20px)",
+          fontSize: "var(--fs-body)",
           fontWeight: 500,
           lineHeight: 1.4,
           letterSpacing: "-0.02em",
@@ -149,7 +149,7 @@ export function PartnersTestimonials() {
         <h2
           className="mb-2 lg:mb-[80px] text-center font-display text-[#111]"
           style={{
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             lineHeight: 1.1,
             letterSpacing: "-0.04em",
@@ -164,7 +164,7 @@ export function PartnersTestimonials() {
             aria-hidden
             className="pointer-events-none select-none font-display font-bold leading-none text-[#111]"
             // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-            style={{ fontSize: "72px", lineHeight: 1 }}
+            style={{ fontSize: "var(--fs-display)", lineHeight: 1 }}
           >
             &ldquo;
           </span>

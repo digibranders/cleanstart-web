@@ -73,7 +73,7 @@ export function CisoComparison(): React.ReactElement {
           className="text-center mx-auto px-4"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-display-md)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -147,7 +147,7 @@ export function CisoComparison(): React.ReactElement {
               className="mx-auto font-display text-[#111111]"
               style={{
                 maxWidth: "min(737px, 100%)",
-                fontSize: "var(--text-display-md)",
+                fontSize: "var(--fs-h2)",
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
@@ -253,7 +253,7 @@ function MobileCard({
         <h3
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-card-title-md)",
+            fontSize: "var(--fs-h4)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -349,7 +349,7 @@ function MobileCard({
               <span
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "var(--text-body-md)",
+                  fontSize: "var(--fs-body)",
                   fontWeight: isTraditional ? 500 : 600,
                   letterSpacing: "-0.02em",
                   lineHeight: 1.4,
@@ -437,7 +437,7 @@ function DesktopCard({
           <h3
             className="relative z-10 text-center font-display text-white"
             style={{
-              fontSize: "var(--text-card-title-lg)",
+              fontSize: "var(--fs-h3)",
               fontWeight: 600,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
@@ -483,7 +483,7 @@ function DesktopCard({
                   className="text-[#333333]"
                   style={{
                     fontFamily: "var(--font-sans)",
-                    fontSize: "var(--text-body-lg)",
+                    fontSize: "var(--fs-body)",
                     fontWeight: isTraditional ? 500 : 600,
                     lineHeight: 1.4,
                     letterSpacing: "-0.02em",

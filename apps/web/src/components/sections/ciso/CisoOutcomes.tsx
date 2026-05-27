@@ -138,7 +138,7 @@ function StatCard({
           top: "106px",
           transform: "translateY(-100%)",
           fontFamily: "var(--font-display)",
-          fontSize: "clamp(40px, 3.23vw, 62px)",
+          fontSize: "var(--fs-h2)",
           fontWeight: 700,
           letterSpacing: "-0.04em",
           lineHeight: 1.2,
@@ -159,7 +159,7 @@ function StatCard({
         <p
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "var(--text-body-lg)",
+            fontSize: "var(--fs-body)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
             lineHeight: 1.4,
@@ -211,7 +211,7 @@ function MobileStatCard({
           left: "32px",
           top: "32px",
           fontFamily: "var(--font-display)",
-          fontSize: "40px",
+          fontSize: "var(--fs-h2)",
           fontWeight: 700,
           lineHeight: 1.2,
           color: "#000",
@@ -228,7 +228,7 @@ function MobileStatCard({
           top: "92px",
           width: "280px",
           fontFamily: "var(--font-sans)",
-          fontSize: "var(--text-body-md)",
+          fontSize: "var(--fs-body)",
           fontWeight: 400,
           lineHeight: 1.4,
           letterSpacing: "-0.02em",
@@ -449,7 +449,7 @@ export function CisoOutcomes(): React.ReactElement {
             transform: "translateX(-50%)",
             width: "211px",
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-display-sm)",
+            fontSize: "var(--fs-h3)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.2,
@@ -577,7 +577,7 @@ export function CisoOutcomes(): React.ReactElement {
             <h2
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--text-display-md)",
+                fontSize: "var(--fs-h2)",
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,

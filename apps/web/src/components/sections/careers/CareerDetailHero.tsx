@@ -94,7 +94,7 @@ export function CareerDetailHero({
               <span
                 className="font-sans"
                 style={{
-                  fontSize: "13px",
+                  fontSize: "var(--fs-caption)",
                   fontWeight: 500,
                   color: "rgba(255,255,255,0.7)",
                   letterSpacing: "-0.005em",
@@ -105,7 +105,7 @@ export function CareerDetailHero({
               <span
                 className="font-sans"
                 style={{
-                  fontSize: "13px",
+                  fontSize: "var(--fs-caption)",
                   fontWeight: 500,
                   color: "#fff",
                   letterSpacing: "-0.005em",

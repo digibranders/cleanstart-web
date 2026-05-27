@@ -73,7 +73,7 @@ export function SbomAdvantage(): React.ReactElement {
           <h2
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(28px, 4vw, 56px)',
+              fontSize: 'var(--fs-h2)',
               fontWeight: 700,
               letterSpacing: '-0.04em',
               lineHeight: 1.2,
@@ -127,7 +127,7 @@ export function SbomAdvantage(): React.ReactElement {
                   className="text-[#111]"
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: 'clamp(20px, 2vw, 28px)',
+                    fontSize: 'var(--fs-h3)',
                     fontWeight: 600,
                     letterSpacing: '-0.04em',
                     lineHeight: 1.1,
@@ -139,7 +139,7 @@ export function SbomAdvantage(): React.ReactElement {
                   className="text-[#333]"
                   style={{
                     fontFamily: 'var(--font-sans)',
-                    fontSize: 'clamp(15px, 1.4vw, 20px)',
+                    fontSize: 'var(--fs-body)',
                     fontWeight: 400,
                     letterSpacing: '-0.02em',
                     lineHeight: 1.4,
@@ -216,7 +216,7 @@ export function SbomAdvantage(): React.ReactElement {
                 className="text-[#111]"
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: '18px',
+                  fontSize: 'var(--fs-h5)',
                   fontWeight: 600,
                   letterSpacing: '-0.04em',
                   lineHeight: 1.1,
@@ -228,7 +228,7 @@ export function SbomAdvantage(): React.ReactElement {
                 className="text-[#333]"
                 style={{
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '15px',
+                  fontSize: 'var(--fs-body-sm)',
                   fontWeight: 400,
                   lineHeight: 1.4,
                 }}
@@ -407,7 +407,7 @@ function MobileBuiltForCard({
         <p
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'var(--text-card-title-md)',
+            fontSize: 'var(--fs-h4)',
             fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
@@ -420,7 +420,7 @@ function MobileBuiltForCard({
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-body-sm)',
+            fontSize: 'var(--fs-body-sm)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.5,

@@ -1743,13 +1743,14 @@ body {
     box-shadow 640ms ease-out;
 }
 
-/* Centre — dominant card */
+/* Centre — dominant card. Cursor affordance for grab is added later in
+   a min-width: 1024px media query (drag-to-rotate is desktop-only). */
 .cs-tt-morph[data-pos="0"] {
   z-index: 30;
   transform: translate(-50%, -50%) scale(1);
   opacity: 1;
   filter: none;
-  cursor: grab;
+  cursor: default;
   background: linear-gradient(135deg, #1F1740 0%, #242682 60%, #3F279E 100%);
   box-shadow:
     0 24px 60px -20px rgba(7, 4, 30, 0.55),
@@ -1792,97 +1793,115 @@ body {
   outline-offset: 6px;
 }
 
-/* ---- Drag-to-rotate: cursor affordance + live carousel rotation -------
+/* ---- Drag-to-rotate (DESKTOP ONLY, ≥ 1024 px) ----------------------------
    The peek cards advertise themselves as grabbable. While the user drags,
    we treat the gesture as a scrub through the same circular motion the
    carousel uses for auto-advance — every visible card moves in concert,
-   not just the peek. JS sets `data-dragging="prev"` or `data-dragging="next"`
-   on the stage and pushes the raw cursor offset as `--cs-tt-drag-dx`. CSS
-   converts that into a 0..1 progress and linearly interpolates each card's
-   transform/opacity/blur between its current slot and its next slot.
+   not just the peek. JS sets `data-dragging="prev" | "next"` on the stage
+   and pushes the raw cursor offset as `--cs-tt-drag-dx`. CSS converts that
+   into a 0..1 progress and linearly interpolates each card's transform /
+   opacity / blur between its current slot and its next slot.
 
    Releasing short of the commit threshold (~50% of the peek distance)
    clears the data attributes — the cards' regular transition kicks back
-   in and they glide home. Releasing past the threshold calls goPrev/goNext,
-   which updates data-pos; the same transition then carries each card from
-   its mid-drag visual to its new slot, producing a continuous rotation. */
-.cs-tt-stage { --cs-tt-peek-dist: clamp(280px, 28vw, 380px); }
-.cs-tt-morph[data-pos="-1"],
-.cs-tt-morph[data-pos="1"],
-.cs-tt-morph[data-pos="0"] {
-  cursor: grab;
-  touch-action: none;
-}
-.cs-tt-stage[data-dragging] .cs-tt-morph { transition: none; cursor: grabbing; }
+   in and they glide home. Releasing past the threshold calls goPrev /
+   goNext, which updates data-pos; the same transition then carries each
+   card from its mid-drag visual to its new slot, producing a continuous
+   rotation.
 
-/* Prev rotation (dragging left peek rightward): left peek → centre,
-   active → right peek slot. Right peek stays put until commit, where the
-   existing data-wrap teleport masks its jump back to the left slot. */
-.cs-tt-stage[data-dragging="prev"] {
-  --cs-tt-progress: clamp(
-    0,
-    calc(var(--cs-tt-drag-dx, 0px) / var(--cs-tt-peek-dist)),
-    1
-  );
-}
-.cs-tt-stage[data-dragging="prev"] .cs-tt-morph[data-pos="-1"] {
-  transform:
-    translate(
-      calc(
-        (-50% - var(--cs-tt-peek-dist))
-        + var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)
-      ),
-      -50%
-    )
-    scale(calc(0.68 + var(--cs-tt-progress, 0) * 0.32));
-  opacity: calc(0.32 + var(--cs-tt-progress, 0) * 0.68);
-  filter: blur(calc((1 - var(--cs-tt-progress, 0)) * 4px));
-  z-index: 35;
-}
-.cs-tt-stage[data-dragging="prev"] .cs-tt-morph[data-pos="0"] {
-  transform:
-    translate(
-      calc(-50% + var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)),
-      -50%
-    )
-    scale(calc(1 - var(--cs-tt-progress, 0) * 0.32));
-  opacity: calc(1 - var(--cs-tt-progress, 0) * 0.68);
-  filter: blur(calc(var(--cs-tt-progress, 0) * 4px));
-}
+   The whole block is gated behind a min-width: 1024 px media query: the
+   JS handler also bails out below that breakpoint, so this is defence in
+   depth — even if a future refactor accidentally lets data-dragging be
+   set on mobile, the rules won't apply and the touch-swipe + dots / nav
+   buttons keep owning navigation at narrow viewports. */
+@media (min-width: 1024px) {
+  .cs-tt-stage { --cs-tt-peek-dist: clamp(280px, 28vw, 380px); }
 
-/* Next rotation (dragging right peek leftward): right peek → centre,
-   active → left peek slot. Mirror of the prev block. The drag-dx is
-   negative here, so we negate it before dividing. */
-.cs-tt-stage[data-dragging="next"] {
-  --cs-tt-progress: clamp(
-    0,
-    calc((0px - var(--cs-tt-drag-dx, 0px)) / var(--cs-tt-peek-dist)),
-    1
-  );
-}
-.cs-tt-stage[data-dragging="next"] .cs-tt-morph[data-pos="1"] {
-  transform:
-    translate(
-      calc(
-        (-50% + var(--cs-tt-peek-dist))
-        - var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)
-      ),
-      -50%
-    )
-    scale(calc(0.68 + var(--cs-tt-progress, 0) * 0.32));
-  opacity: calc(0.32 + var(--cs-tt-progress, 0) * 0.68);
-  filter: blur(calc((1 - var(--cs-tt-progress, 0)) * 4px));
-  z-index: 35;
-}
-.cs-tt-stage[data-dragging="next"] .cs-tt-morph[data-pos="0"] {
-  transform:
-    translate(
-      calc(-50% - var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)),
-      -50%
-    )
-    scale(calc(1 - var(--cs-tt-progress, 0) * 0.32));
-  opacity: calc(1 - var(--cs-tt-progress, 0) * 0.68);
-  filter: blur(calc(var(--cs-tt-progress, 0) * 4px));
+  /* Affordance: grabbable cards on desktop. touch-action: none keeps a
+     touchscreen-laptop user's finger from triggering native scroll while
+     they drag (their tap-swipe still works on narrower viewports because
+     the media query doesn't apply there). */
+  .cs-tt-morph[data-pos="-1"],
+  .cs-tt-morph[data-pos="1"],
+  .cs-tt-morph[data-pos="0"] {
+    cursor: grab;
+    touch-action: none;
+  }
+  .cs-tt-stage[data-dragging] .cs-tt-morph {
+    transition: none;
+    cursor: grabbing;
+  }
+
+  /* Prev rotation (dragging left peek rightward OR active rightward):
+     left peek → centre, active → right peek slot. Right peek stays put
+     until commit, where the existing data-wrap teleport masks its jump
+     back to the left slot. */
+  .cs-tt-stage[data-dragging="prev"] {
+    --cs-tt-progress: clamp(
+      0,
+      calc(var(--cs-tt-drag-dx, 0px) / var(--cs-tt-peek-dist)),
+      1
+    );
+  }
+  .cs-tt-stage[data-dragging="prev"] .cs-tt-morph[data-pos="-1"] {
+    transform:
+      translate(
+        calc(
+          (-50% - var(--cs-tt-peek-dist))
+          + var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)
+        ),
+        -50%
+      )
+      scale(calc(0.68 + var(--cs-tt-progress, 0) * 0.32));
+    opacity: calc(0.32 + var(--cs-tt-progress, 0) * 0.68);
+    filter: blur(calc((1 - var(--cs-tt-progress, 0)) * 4px));
+    z-index: 35;
+  }
+  .cs-tt-stage[data-dragging="prev"] .cs-tt-morph[data-pos="0"] {
+    transform:
+      translate(
+        calc(-50% + var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)),
+        -50%
+      )
+      scale(calc(1 - var(--cs-tt-progress, 0) * 0.32));
+    opacity: calc(1 - var(--cs-tt-progress, 0) * 0.68);
+    filter: blur(calc(var(--cs-tt-progress, 0) * 4px));
+  }
+
+  /* Next rotation (dragging right peek leftward OR active leftward).
+     Mirror of the prev block. The drag-dx is negative here, so we negate
+     before dividing. */
+  .cs-tt-stage[data-dragging="next"] {
+    --cs-tt-progress: clamp(
+      0,
+      calc((0px - var(--cs-tt-drag-dx, 0px)) / var(--cs-tt-peek-dist)),
+      1
+    );
+  }
+  .cs-tt-stage[data-dragging="next"] .cs-tt-morph[data-pos="1"] {
+    transform:
+      translate(
+        calc(
+          (-50% + var(--cs-tt-peek-dist))
+          - var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)
+        ),
+        -50%
+      )
+      scale(calc(0.68 + var(--cs-tt-progress, 0) * 0.32));
+    opacity: calc(0.32 + var(--cs-tt-progress, 0) * 0.68);
+    filter: blur(calc((1 - var(--cs-tt-progress, 0)) * 4px));
+    z-index: 35;
+  }
+  .cs-tt-stage[data-dragging="next"] .cs-tt-morph[data-pos="0"] {
+    transform:
+      translate(
+        calc(-50% - var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)),
+        -50%
+      )
+      scale(calc(1 - var(--cs-tt-progress, 0) * 0.32));
+    opacity: calc(1 - var(--cs-tt-progress, 0) * 0.68);
+    filter: blur(calc(var(--cs-tt-progress, 0) * 4px));
+  }
 }
 
 /* Wrapping card — fade through 0 so the cross-stage teleport is hidden.

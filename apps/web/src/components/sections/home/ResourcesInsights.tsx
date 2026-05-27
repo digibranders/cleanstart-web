@@ -204,7 +204,7 @@ export async function ResourcesInsights() {
           id="resources-title"
           className="font-display text-[#111111]"
           style={{
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             letterSpacing: "-0.04em",
             lineHeight: 1.05,
@@ -217,7 +217,7 @@ export async function ResourcesInsights() {
           className="mt-4 max-w-[720px]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(18px, 1.7vw, 24px)",
+            fontSize: "var(--fs-lead)",
             fontWeight: 600,
             color: "#555",
             lineHeight: 1.4,
