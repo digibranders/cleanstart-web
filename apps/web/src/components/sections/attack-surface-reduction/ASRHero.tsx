@@ -103,11 +103,12 @@ export function ASRHero(): React.ReactElement {
                * Tracking: -0.05em works at both sizes.
                */}
               <h1
-                className="text-[36px] font-bold lg:font-semibold lg:text-[64px]"
+                className="font-bold lg:font-semibold"
                 style={{
                   fontFamily: 'var(--font-display)',
-                  letterSpacing: 'var(--text-hero-product-ls, -0.04em)',
-                  lineHeight: 'var(--text-hero-lh, 1.05)',
+                  fontSize: 'var(--fs-display)',
+                  letterSpacing: 'var(--fs-display-ls)',
+                  lineHeight: 'var(--fs-display-lh)',
                   color: 'white',
                   margin: 0,
                 }}

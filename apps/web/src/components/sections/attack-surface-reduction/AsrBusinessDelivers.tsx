@@ -58,7 +58,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
               className="text-white"
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'var(--text-t-display-2)',
+                fontSize: 'var(--fs-h1)',
                 fontWeight: 600,
                 letterSpacing: 'var(--text-t-display-2-ls)',
                 lineHeight: 'var(--text-t-display-2-lh)',
@@ -101,7 +101,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
                   className="text-white"
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: 'var(--text-t-heading-lg)',
+                    fontSize: 'var(--fs-h2)',
                     fontWeight: 600,
                     letterSpacing: 'var(--text-t-heading-lg-ls)',
                     lineHeight: 'var(--text-t-heading-lg-lh)',
@@ -113,7 +113,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: 'var(--text-t-heading-md)',
+                    fontSize: 'var(--fs-h3)',
                     fontWeight: 400,
                     letterSpacing: 'var(--text-t-heading-md-ls)',
                     lineHeight: 'var(--text-t-heading-md-lh)',

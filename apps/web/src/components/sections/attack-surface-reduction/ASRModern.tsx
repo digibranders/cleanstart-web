@@ -141,7 +141,7 @@ export function ASRModern(): React.ReactElement {
           className="text-center sm:text-left"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'var(--text-display-md)',
+            fontSize: 'var(--fs-h2)',
             fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
@@ -174,7 +174,7 @@ export function ASRModern(): React.ReactElement {
               <h3
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 'var(--text-card-title-lg)',
+                  fontSize: 'var(--fs-h3)',
                   fontWeight: 600,
                   letterSpacing: '-0.04em',
                   lineHeight: 1.1,
@@ -186,7 +186,7 @@ export function ASRModern(): React.ReactElement {
               <p
                 style={{
                   fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--text-body-md)',
+                  fontSize: 'var(--fs-body)',
                   fontWeight: 400,
                   letterSpacing: '-0.02em',
                   lineHeight: 1.4,
@@ -224,7 +224,7 @@ export function ASRModern(): React.ReactElement {
           <p
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'var(--text-display-sm)',
+              fontSize: 'var(--fs-h3)',
               fontWeight: 600,
               letterSpacing: '-0.04em',
               lineHeight: 1.2,
@@ -355,7 +355,7 @@ function ModernItem({
         <p
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'var(--text-card-title-md)',
+            fontSize: 'var(--fs-h4)',
             fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
@@ -368,7 +368,7 @@ function ModernItem({
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-body-md)',
+            fontSize: 'var(--fs-body)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.4,

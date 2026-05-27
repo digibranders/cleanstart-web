@@ -166,7 +166,7 @@ export function ASRCTA(): React.ReactElement {
             height: "44px",
             paddingLeft: "24px",
             paddingRight: "24px",
-            fontSize: "16px",
+            fontSize: "var(--fs-button)",
             letterSpacing: "-0.05em",
             whiteSpace: "nowrap",
             boxShadow:

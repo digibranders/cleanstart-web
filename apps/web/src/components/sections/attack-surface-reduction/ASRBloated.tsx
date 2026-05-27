@@ -46,7 +46,7 @@ export function ASRBloated(): React.ReactElement {
        */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 md:pt-[88px]">
         <h2
-          className="text-center text-[#111] text-[28px] lg:[font-size:var(--text-display-md)]"
+          className="text-center text-[#111] text-[28px] lg:[font-size:var(--fs-h2)]"
           style={{
             fontFamily: 'var(--font-display)',
             fontWeight: 600,
@@ -313,7 +313,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
               className="text-[#111]"
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'var(--text-card-title-md)',
+                fontSize: 'var(--fs-h4)',
                 fontWeight: 600,
                 letterSpacing: '-0.04em',
                 lineHeight: 1.1,
@@ -329,7 +329,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             <p
               style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-body-sm)',
+                fontSize: 'var(--fs-body-sm)',
                 fontWeight: 400,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.4,
@@ -426,7 +426,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             className="text-[#111]"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'var(--text-card-title-md)',
+              fontSize: 'var(--fs-h4)',
               fontWeight: 600,
               letterSpacing: '-0.04em',
               lineHeight: 1.1,
@@ -438,7 +438,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             className="text-[#111]"
             style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-body-md)',
+              fontSize: 'var(--fs-body)',
               fontWeight: 400,
               letterSpacing: '-0.02em',
               lineHeight: 1.4,
