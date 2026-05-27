@@ -86,7 +86,7 @@ export function SbomIntelligence(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-h2)",
+              fontSize: "var(--fs-h1)",
               fontWeight: 600,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
