@@ -145,7 +145,7 @@ export function CleanSightCTA(): React.ReactElement {
           </p>
 
           <Link
-            href="/contact-us"
+            href="/book-a-demo"
             className="cs-btn-blue self-start"
             style={
               {
@@ -246,7 +246,7 @@ export function CleanSightCTA(): React.ReactElement {
 
         {/* Button — centered (not self-start like the desktop variant) */}
         <Link
-          href="/contact-us"
+          href="/book-a-demo"
           className="cs-btn-blue"
           style={
             {

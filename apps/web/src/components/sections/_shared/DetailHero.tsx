@@ -99,24 +99,41 @@ export function DetailHero({
           />
         )}
 
-        {meta && (
-          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-3 pt-[12px] pb-[20px] sm:justify-between">
-            {meta}
-          </div>
-        )}
-
         {!meta && <div className="pb-[20px]" aria-hidden />}
       </div>
+
+      {/*
+       * Meta bar — rebounded to match the body section's content track instead
+       * of the hero's wide outer container. On lg+, the bar spans from the
+       * TOC sidebar's left edge (container's left gutter + 0) through the
+       * body column's right edge (260px TOC + 48px gap + 680px body = 988px).
+       * On smaller viewports the bar collapses to the article column width
+       * (max 680px, centered) — matching what the user sees below the hero.
+       */}
+      {meta && (
+        <div className="relative mx-auto max-w-[1120px] px-6">
+          <div className="mx-auto lg:mx-0 w-full max-w-[680px] lg:max-w-[988px] flex flex-wrap items-center gap-x-4 gap-y-3 justify-center lg:justify-between pt-[14px] pb-[22px]">
+            {meta}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
 
 function Breadcrumb({ items }: { items: DetailHeroCrumb[] }): React.ReactElement {
+  // On mobile (<sm) we collapse to `Home > [Last]`: intermediate crumbs are
+  // hidden to avoid the orphan-chevron wrap and to free vertical space. The
+  // full chain is in the DOM for screen readers and shows from sm+.
+  const lastIdx = items.length - 1;
   return (
-    <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-y-1 gap-0 pt-[clamp(40px,6vw,58px)]">
+    <nav
+      aria-label="Breadcrumb"
+      className="flex flex-nowrap items-center gap-0 overflow-x-auto pt-[calc(72px+env(safe-area-inset-top)+clamp(16px,3vw,40px))] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible sm:gap-y-1"
+    >
       <Link
         href="/"
-        className="flex items-center justify-center w-11 h-11 rounded-full"
+        className="flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full shrink-0"
         aria-label="Home"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -136,9 +153,14 @@ function Breadcrumb({ items }: { items: DetailHeroCrumb[] }): React.ReactElement
         </svg>
       </Link>
       {items.map((item, idx) => {
-        const isLast = idx === items.length - 1;
+        const isLast = idx === lastIdx;
+        // Hide every non-last crumb on mobile via `hidden sm:flex`. Last stays
+        // visible. Screen readers still see the full chain.
         return (
-          <span key={`${item.label}-${idx}`} className="flex items-center">
+          <span
+            key={`${item.label}-${idx}`}
+            className={isLast ? "flex items-center min-w-0" : "hidden sm:flex items-center"}
+          >
             <BreadcrumbChevron />
             {item.href && !isLast ? (
               <Link
@@ -150,7 +172,7 @@ function Breadcrumb({ items }: { items: DetailHeroCrumb[] }): React.ReactElement
               </Link>
             ) : (
               <span
-                className="flex items-center h-11 px-2 max-w-[280px] truncate text-xs leading-[1.4]"
+                className="flex items-center h-9 sm:h-11 px-2 min-w-0 max-w-[220px] sm:max-w-[280px] truncate text-xs leading-[1.4]"
                 style={{ color: "#BFCCDA" }}
                 aria-current={isLast ? "page" : undefined}
               >
@@ -179,17 +201,18 @@ function BreadcrumbChevron(): React.ReactElement {
 }
 
 export function DetailHeroMetaSeparator(): React.ReactElement {
+  // Compact 1×20 vertical divider matching the careers detail hero. Sits
+  // between meta items at lg+ where the bar flows horizontally; hidden on
+  // smaller viewports where items wrap onto their own lines.
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src="/images/blogs/hero-meta-separator.svg"
-      alt=""
+    <span
       aria-hidden
-      width={1}
-      height={46}
-      className="mx-4 shrink-0 hidden lg:block"
-      loading="lazy"
-      decoding="async"
+      className="hidden lg:inline-block shrink-0"
+      style={{
+        width: "1px",
+        height: "20px",
+        background: "rgba(255,255,255,0.18)",
+      }}
     />
   );
 }

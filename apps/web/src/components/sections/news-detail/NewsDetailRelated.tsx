@@ -56,8 +56,20 @@ export function NewsDetailRelated({
           </Link>
         </div>
 
+        {/*
+          MOBILE (<sm): horizontal scroll-snap row matching the related-blogs
+          pattern (cards peek at the right edge to hint scrollability).
+          SM+: 2-column grid. LG+: 3-column grid.
+        */}
+        <div className="flex sm:hidden overflow-x-auto snap-x snap-mandatory gap-4 mt-[40px] pb-[40px] -mx-6 pl-10 pr-6 [scroll-padding-left:2.5rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {items.map((item) => (
+            <div key={item.id} className="snap-start shrink-0 w-[80%] min-w-[260px] max-w-[320px]">
+              <NewsroomCard item={item} />
+            </div>
+          ))}
+        </div>
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-[60px] pb-[40px]"
+          className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 mt-[60px] pb-[40px]"
           style={{ gap: "24px" }}
         >
           {items.map((item) => (

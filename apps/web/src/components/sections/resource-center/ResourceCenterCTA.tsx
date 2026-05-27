@@ -56,6 +56,7 @@ export function ResourceCenterCTA(): React.ReactElement {
         />
       </div>
 
+      {/* Decorative cube — desktop placement (xl+) at fixed coords. */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden xl:block"
@@ -78,10 +79,36 @@ export function ResourceCenterCTA(): React.ReactElement {
         />
       </div>
 
+      {/* Decorative cube — mobile/tablet placement per Figma 444:680 (image 583137).
+          Smaller cube anchored to the bottom-right of the CTA card, fading into
+          the white background. Hidden at xl+ where the desktop placement above
+          takes over. */}
+      <div
+        aria-hidden
+        className="absolute pointer-events-none select-none xl:hidden"
+        style={{
+          right: "-40px",
+          bottom: "-30px",
+          width: "180px",
+          height: "180px",
+          transform: "rotate(-10deg)",
+          opacity: 0.6,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/resource-center/cta-cube.png"
+          alt=""
+          className="w-full h-full object-contain"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
       <div
         className="absolute inset-0 flex items-center px-6 py-8 lg:px-[100px] lg:py-[60px]"
       >
-        <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-[68px] w-full">
+        <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6 lg:gap-[68px] w-full">
           <p
             id="rc-cta-title"
             className="font-display font-bold text-center lg:text-left w-full lg:max-w-[486px]"
@@ -133,7 +160,7 @@ export function ResourceCenterCTA(): React.ReactElement {
                   filter: "blur(10.0245px)",
                 }}
               />
-              Get in Touch
+              Book a Container Scan
               <svg width="22" height="20" viewBox="0 0 22 20" fill="none" aria-hidden>
                 <path
                   d="M4 10h14M12 4l6 6-6 6"

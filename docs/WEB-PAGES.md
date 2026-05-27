@@ -112,7 +112,7 @@ page slugs, categories, types, and build status across the dev journey.
 | 28 | Legal Hub | `/legal` | Legal | ✅ | Default view: Additional Third-Party Terms; sidebar lists related legal docs |
 | 28a | Acceptable Use Policy | `/legal/acceptable-use-policy` | Legal | ✅ | Linked from `/legal` sidebar |
 | 29 | Privacy Policy | `/privacy-policy` | Legal | ✅ | |
-| 30 | Terms & Conditions | `/terms-and-condition` | Legal | ⬜ | Note: no trailing `s` on condition |
+| 30 | Terms & Conditions | `/terms-and-condition` | Legal | ❌ | Dropped — not building. Acceptable Use Policy covers the equivalent legal surface |
 
 ---
 
@@ -152,4 +152,4 @@ Blogs ✅ → Knowledge Hub → Newsroom ✅ → Resource Center ✅ → Webinar
 Blog Single Post ✅ → Author Page
 
 **Wave 5 — Legal + Utility**
-Legal Hub → Privacy Policy → Terms & Conditions → 404 Page
+Legal Hub → Privacy Policy → 404 Page  (Terms & Conditions dropped)

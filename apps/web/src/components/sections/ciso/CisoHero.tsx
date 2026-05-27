@@ -210,7 +210,9 @@ export function CisoHero(): React.ReactElement {
 
           {/* Mobile: 16px Manrope Medium, self-center (centered); Desktop: 20px, self-start (left) */}
           <Link
-            href="/cleanstart-images"
+            href="https://images.cleanstart.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="cs-btn-glass self-center md:self-start"
             style={
               {

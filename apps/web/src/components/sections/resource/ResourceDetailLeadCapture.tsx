@@ -90,10 +90,10 @@ export function ResourceDetailLeadCapture({
             />
           </div>
 
-          {/* Lead cube — bottom-left, rotated + flipped */}
+          {/* Lead cube — bottom-left, rotated + flipped (desktop only) */}
           <div
             aria-hidden
-            className="absolute pointer-events-none select-none"
+            className="absolute pointer-events-none select-none hidden sm:block"
             style={{
               left: "0.06px",
               top: "221.5px",
@@ -144,7 +144,7 @@ export function ResourceDetailLeadCapture({
               {/* Form */}
               <form
                 onSubmit={handleSubmit}
-                className="flex flex-col items-stretch lg:items-start shrink-0 w-full lg:w-[549px] gap-4 lg:gap-10"
+                className="flex flex-col items-stretch lg:items-start shrink-0 w-full lg:w-[549px] gap-6 lg:gap-10"
               >
                 {/* Legal teaser */}
                 <p
@@ -177,10 +177,9 @@ export function ResourceDetailLeadCapture({
                     placeholder="Enter Your Email"
                     aria-label="Email address"
                     autoComplete="email"
-                    className="font-normal bg-white w-full sm:w-[352px]"
+                    className="font-normal bg-white w-full sm:w-[352px] h-9 lg:h-11"
                     style={{
-                      height: "var(--cta-card-btn-h)",
-                      fontSize: "var(--cta-card-btn-fs)",
+                      fontSize: "16px",
                       lineHeight: 1.4,
                       letterSpacing: "-0.01em",
                       borderRadius: "8px",
@@ -255,10 +254,8 @@ export function ResourceDetailLeadCapture({
                     type="checkbox"
                     checked={agreed}
                     onChange={(e) => setAgreed(e.target.checked)}
-                    className="shrink-0"
+                    className="shrink-0 w-[14px] h-[14px] lg:w-[20px] lg:h-[20px]"
                     style={{
-                      width: "20px",
-                      height: "20px",
                       borderRadius: "3px",
                       accentColor: "#3960f9",
                       cursor: "pointer",

@@ -124,7 +124,7 @@ export function SCACTA(): React.ReactElement {
             insights.
           </p>
           <Link
-            href="/contact-us"
+            href="/book-a-demo"
             className="cs-btn-glass self-start"
             style={
               {
@@ -187,7 +187,7 @@ export function SCACTA(): React.ReactElement {
           container foundations and contextualized insights.
         </p>
         <Link
-          href="/contact-us"
+          href="/book-a-demo"
           className="inline-flex items-center gap-2 rounded-[8px] overflow-hidden"
           style={{
             padding: "9px 18px",

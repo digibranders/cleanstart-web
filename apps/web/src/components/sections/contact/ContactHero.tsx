@@ -17,13 +17,8 @@ export function ContactHero() {
     <section
       className="relative overflow-hidden"
       style={{
-        // Exact stops from Figma 857:14714.
         backgroundImage:
           "linear-gradient(180deg, rgb(21, 16, 33) 25.702%, rgb(16, 18, 62) 31.159%, rgb(19, 30, 143) 51.006%, rgb(71, 30, 192) 68.711%, rgb(71, 31, 195) 79.832%, rgba(70, 30, 191, 0.85) 85.018%, rgba(66, 30, 188, 0.4) 93.72%, rgba(66, 30, 188, 0) 100.66%)",
-        // Extended past Figma's 498px so the gradient continues behind the
-        // top of the form card and only fades out around the email-row
-        // (the form is pulled up over the hero via -mt-10/-mt-16).
-        minHeight: "clamp(620px, 54vw, 820px)",
       }}
     >
       {/* Left 3D cube — flanking the title at roughly the same vertical level
@@ -32,8 +27,8 @@ export function ContactHero() {
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
         style={{
-          left: "30px",
-          top: "100px",
+          left: "-40px",
+          top: "150px",
           width: "419px",
           height: "419px",
           mixBlendMode: "color-dodge",
@@ -72,8 +67,8 @@ export function ContactHero() {
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
         style={{
-          right: "30px",
-          top: "100px",
+          right: "-40px",
+          top: "40px",
           width: "419px",
           height: "419px",
           mixBlendMode: "color-dodge",
@@ -110,7 +105,7 @@ export function ContactHero() {
       <Container className="relative">
         {/* Title block — Figma 857:14946, w=730, top=186, gap=24 between
             title and subtitle, centered. */}
-        <div className="mx-auto flex flex-col items-center gap-6 pt-[clamp(96px,14vw,186px)] pb-[clamp(16px,2vw,28px)] text-center">
+        <div className="mx-auto flex flex-col items-center gap-5 pt-[clamp(72px,9vw,128px)] pb-[200px] text-center">
           <h1
             className="text-white whitespace-nowrap"
             style={{

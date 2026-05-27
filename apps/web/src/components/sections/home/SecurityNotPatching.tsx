@@ -43,7 +43,7 @@ const CLEANSTART_FEATURES = [
 export function SecurityNotPatching() {
   return (
     <section
-      className="relative w-full overflow-hidden bg-[#F6F6F6] py-section-md"
+      className="relative w-full overflow-hidden bg-[#F6F6F6] py-section-sm"
       aria-labelledby="security-title"
     >
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
@@ -142,7 +142,7 @@ export function SecurityNotPatching() {
             Flex with a small gap keeps the two cards visually coupled with
             the VS badge bridging them; `justify-center` keeps the pair centered
             in the section's content area with symmetric breathing room. */}
-        <div className="relative mt-16 flex flex-col items-center gap-6 md:mt-[80px] md:flex-row md:justify-center md:gap-10">
+        <div className="relative mt-10 flex flex-col items-center gap-6 md:mt-12 md:flex-row md:justify-center md:gap-10">
           <SecurityCard kind="public" features={PUBLIC_IMAGES} />
           <SecurityCard kind="cleanstart" features={CLEANSTART_FEATURES} />
 

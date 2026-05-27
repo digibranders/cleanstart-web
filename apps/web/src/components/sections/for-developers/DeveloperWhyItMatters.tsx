@@ -1,58 +1,77 @@
 import type React from 'react';
 
 /*
- * Figma node 798:2209 — "Why Does It Matter" section (1920 px artboard)
+ * Figma node 798:2209 (desktop) + 857:6066 (mobile).
  *
- * Background: white
- * Decorative: two Union grid-pattern SVG blobs at top-left and top-right corners,
- *             clipped by section overflow-hidden. Two ellipse glows at top corners.
- * H2:  62px Manrope Bold, #111, tracking -3.1px (≈ -0.05em), lh 1, top 120px
- * 2×2 grid of problem cards with 1px gradient dividers (vertical + horizontal)
- * Each card: [purple glow + 3D illustration (296×220px)] [title 32px + desc 22px]
- * All interior dimensions scaled ×0.75 for the 1440px primary viewport.
+ * Desktop: 2×2 grid of problem cards with 1px gradient dividers — illustration on the
+ *   left, text on the right, no per-card background.
+ * Mobile (below lg / 1024px): single-column stack. Each card is a self-contained white
+ *   tile with 24px radius and soft shadow, icon centered at top with a purple glow
+ *   halo, title + description centered below.
+ *
+ * Mobile order in Figma: Bloated → Remediation → Inherited Vulnerabilities → Slower.
+ * Desktop order in Figma: Bloated → Inherited Vulnerabilities → Remediation → Slower.
+ * Each card carries its own desktop / mobile slot to honour both orderings without
+ * re-shuffling the data array.
  */
 
 interface CardDef {
-  img: string;
-  /** Figma absolute-percentage positioning for the img inside its overflow container */
-  imgStyle: React.CSSProperties;
+  /** Desktop side-by-side illustration (large 3D render). */
+  desktopImg: string;
+  /** Figma absolute-percentage positioning for the desktop img inside its overflow container */
+  desktopImgStyle: React.CSSProperties;
+  /** Mobile centered icon (smaller, standalone). */
+  mobileIcon: string;
+  /** Mobile icon sizing inside the 108×87 frame — Figma positions per card. */
+  mobileIconStyle: React.CSSProperties;
   title: string;
   desc: string;
 }
 
 const CARDS: [CardDef, CardDef, CardDef, CardDef] = [
   {
-    img: '/images/for-developers/why/card-bloated.png',
-    imgStyle: { left: '8.15%', top: '-2.03%', width: '86.53%', height: '104.52%' },
+    desktopImg: '/images/for-developers/why/card-bloated.png',
+    desktopImgStyle: { left: '8.15%', top: '-2.03%', width: '86.53%', height: '104.52%' },
+    mobileIcon: '/images/for-developers/why/icon-bloated.png',
+    mobileIconStyle: { left: '12px', top: '2px', width: '84px', height: '84px' },
     title: 'Bloated Base Images',
     desc: 'Public images include unnecessary packages and dependencies.',
   },
   {
-    img: '/images/for-developers/why/card-vulnerabilities.png',
-    imgStyle: { left: '9.12%', top: '-0.71%', width: '83.45%', height: '100.71%' },
+    desktopImg: '/images/for-developers/why/card-vulnerabilities.png',
+    desktopImgStyle: { left: '9.12%', top: '-0.71%', width: '83.45%', height: '100.71%' },
+    mobileIcon: '/images/for-developers/why/icon-vulnerabilities.png',
+    mobileIconStyle: { left: '-3px', top: '8px', width: '115px', height: '71px' },
     title: 'Inherited Vulnerabilities',
     desc: 'Most CVEs originate from upstream components.',
   },
   {
-    img: '/images/for-developers/why/card-remediation.png',
-    imgStyle: { left: '8.45%', top: '-8.18%', width: '87.16%', height: '117.27%' },
+    desktopImg: '/images/for-developers/why/card-remediation.png',
+    desktopImgStyle: { left: '8.45%', top: '-8.18%', width: '87.16%', height: '117.27%' },
+    mobileIcon: '/images/for-developers/why/icon-remediation.png',
+    mobileIconStyle: { left: '8px', top: '-3px', width: '93px', height: '93px' },
     title: 'Remediation Overload',
     desc: 'Teams spend time triaging inherited issues.',
   },
   {
-    img: '/images/for-developers/why/card-development.png',
-    imgStyle: { left: '15.93%', top: '1.36%', width: '72.54%', height: '96.83%' },
+    desktopImg: '/images/for-developers/why/card-development.png',
+    desktopImgStyle: { left: '15.93%', top: '1.36%', width: '72.54%', height: '96.83%' },
+    mobileIcon: '/images/for-developers/why/icon-development.png',
+    mobileIconStyle: { left: '17px', top: '2px', width: '74px', height: '83px' },
     title: 'Slower Development Cycles',
     desc: 'Security bottlenecks delay releases and deployments.',
   },
 ];
+
+/** Mobile card ordering — Figma reflows Remediation above Vulnerabilities. */
+const MOBILE_ORDER = [0, 2, 1, 3] as const;
 
 const DIVIDER_H =
   'linear-gradient(to right, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%)';
 const DIVIDER_V =
   'linear-gradient(to bottom, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%)';
 
-function WhyCard({ img, imgStyle, title, desc }: CardDef): React.ReactElement {
+function DesktopWhyCard({ desktopImg, desktopImgStyle, title, desc }: CardDef): React.ReactElement {
   return (
     <div className="flex items-center" style={{ gap: 'clamp(16px, 1.67vw, 24px)' }}>
       {/* ── Illustration area ── */}
@@ -81,10 +100,10 @@ function WhyCard({ img, imgStyle, title, desc }: CardDef): React.ReactElement {
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={img}
+            src={desktopImg}
             alt=""
             className="absolute max-w-none"
-            style={imgStyle}
+            style={desktopImgStyle}
             loading="lazy"
             decoding="async"
           />
@@ -122,11 +141,87 @@ function WhyCard({ img, imgStyle, title, desc }: CardDef): React.ReactElement {
   );
 }
 
+function MobileWhyCard({ mobileIcon, mobileIconStyle, title, desc }: CardDef): React.ReactElement {
+  return (
+    <div
+      className="relative bg-white flex flex-col items-center"
+      style={{
+        borderRadius: '24px',
+        padding: '20px 24px 28px',
+        boxShadow:
+          '0 1px 2px rgba(17, 17, 17, 0.04), 0 12px 32px -8px rgba(17, 17, 17, 0.06)',
+      }}
+    >
+      {/* ── Icon area (108×87 Figma frame) ── */}
+      <div
+        className="relative shrink-0"
+        aria-hidden
+        style={{ width: '108px', height: '87px' }}
+      >
+        {/* Purple glow — 79.75×79.75, blur 20.78, opacity 0.35 (Ellipse 46679) */}
+        <div
+          aria-hidden
+          className="pointer-events-none select-none absolute"
+          style={{
+            left: '-1.45px',
+            top: '0.24px',
+            width: '79.75px',
+            height: '79.75px',
+            background: '#DF9BFF',
+            opacity: 0.35,
+            filter: 'blur(20.78px)',
+            borderRadius: '50%',
+          }}
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={mobileIcon}
+          alt=""
+          className="absolute max-w-none"
+          style={{ ...mobileIconStyle, objectFit: 'contain' }}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      {/* ── Text ── */}
+      <div className="flex flex-col items-center text-center" style={{ marginTop: '12px', gap: '12px' }}>
+        <h3
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '20px',
+            fontWeight: 600,
+            letterSpacing: '-0.05em',
+            lineHeight: 1,
+            color: '#000000',
+          }}
+        >
+          {title}
+        </h3>
+        <p
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '14px',
+            fontWeight: 400,
+            letterSpacing: '-0.04em',
+            lineHeight: 1.4,
+            color: 'rgba(17, 17, 17, 0.8)',
+            maxWidth: '260px',
+          }}
+        >
+          {desc}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function DeveloperWhyItMatters(): React.ReactElement {
   return (
     <section
       data-section="DeveloperWhyItMatters"
-      className="relative overflow-hidden bg-white"
+      className="relative overflow-hidden"
+      style={{ backgroundColor: '#F6F6F6' }}
     >
       {/* ── Left Union grid-pattern blob (Figma: left=-500, top=-539, w=1181) ── */}
       <div
@@ -174,7 +269,7 @@ export function DeveloperWhyItMatters(): React.ReactElement {
       {/* Rendered size at 1920: 258 × (1 + 2×0.9419) ≈ 744px; center at (61, 53) */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           /* left = center_x - half_rendered = 61 - 372 = -311 */
           left: 'calc(-311 / 1920 * 100vw)',
@@ -197,7 +292,7 @@ export function DeveloperWhyItMatters(): React.ReactElement {
       {/* center at (1849, 53); rendered 744px */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
           left: 'calc(1477 / 1920 * 100vw)',
           top: 'calc(-319 / 1920 * 100vw)',
@@ -220,34 +315,41 @@ export function DeveloperWhyItMatters(): React.ReactElement {
         className="relative mx-auto"
         style={{
           maxWidth: 'var(--container-default)',
-          paddingLeft: '48px',
-          paddingRight: '48px',
-          paddingTop: 'clamp(72px, 6.25vw, 120px)',
-          paddingBottom: 'clamp(60px, 5.2vw, 100px)',
+          paddingLeft: 'clamp(16px, 4vw, 48px)',
+          paddingRight: 'clamp(16px, 4vw, 48px)',
+          paddingTop: 'clamp(56px, 6.25vw, 120px)',
+          paddingBottom: 'clamp(48px, 5.2vw, 100px)',
         }}
       >
-        {/* H2 — Figma: 62px Manrope Bold, tracking -3.1px */}
+        {/* H2 — Figma desktop: 62px Manrope Bold tracking -3.1px · Figma mobile: 28px tracking 0 */}
         <h2
           className="text-center mx-auto"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(32px, 4vw, 56px)',
+            fontSize: 'clamp(28px, 4vw, 56px)',
             fontWeight: 700,
             letterSpacing: '-0.04em',
-            lineHeight: 1.1,
+            lineHeight: 1.15,
             color: '#111111',
-            marginBottom: 'clamp(48px, 4.17vw, 80px)',
+            marginBottom: 'clamp(32px, 4.17vw, 80px)',
           }}
         >
           Why Does It Matter
         </h2>
 
-        {/* ── 2×2 problem-card grid ── */}
-        <div className="relative">
+        {/* ── Mobile: single-column card stack ── */}
+        <div className="flex flex-col gap-4 lg:hidden">
+          {MOBILE_ORDER.map((idx) => (
+            <MobileWhyCard key={`m-${idx}`} {...CARDS[idx as 0 | 1 | 2 | 3]} />
+          ))}
+        </div>
+
+        {/* ── Desktop: 2×2 problem-card grid with gradient dividers ── */}
+        <div className="relative hidden lg:block">
           {/* Vertical centre divider — Figma: 1px line at x=962 (page centre) */}
           <div
             aria-hidden
-            className="pointer-events-none absolute hidden lg:block"
+            className="pointer-events-none absolute"
             style={{
               left: '50%',
               top: '4%',
@@ -258,21 +360,21 @@ export function DeveloperWhyItMatters(): React.ReactElement {
           />
 
           <div
-            className="grid grid-cols-1 lg:grid-cols-2"
+            className="grid grid-cols-2"
             style={{ rowGap: 0, columnGap: 0 }}
           >
             {/* ── Row 1 ── */}
             <div style={{ paddingRight: '32px', paddingBottom: '48px' }}>
-              <WhyCard {...CARDS[0]} />
+              <DesktopWhyCard {...CARDS[0]} />
             </div>
             <div style={{ paddingLeft: '32px', paddingBottom: '48px' }}>
-              <WhyCard {...CARDS[1]} />
+              <DesktopWhyCard {...CARDS[1]} />
             </div>
 
             {/* Horizontal divider spanning both columns — Figma: 1234px × 1px at y=530 */}
             <div
               aria-hidden
-              className="pointer-events-none hidden lg:block"
+              className="pointer-events-none"
               style={{
                 gridColumn: '1 / -1',
                 height: '1px',
@@ -282,10 +384,10 @@ export function DeveloperWhyItMatters(): React.ReactElement {
 
             {/* ── Row 2 ── */}
             <div style={{ paddingRight: '32px', paddingTop: '48px' }}>
-              <WhyCard {...CARDS[2]} />
+              <DesktopWhyCard {...CARDS[2]} />
             </div>
             <div style={{ paddingLeft: '32px', paddingTop: '48px' }}>
-              <WhyCard {...CARDS[3]} />
+              <DesktopWhyCard {...CARDS[3]} />
             </div>
           </div>
         </div>

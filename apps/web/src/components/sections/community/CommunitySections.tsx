@@ -479,9 +479,9 @@ function UpcomingEventsCard({ items }: { items: EventItem[] }): React.ReactEleme
 
 function CardWrapper({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
-    <div className="rounded-[32px] p-4" style={{ background: "rgba(44, 193, 235, 0.3)" }}>
+    <div className="h-full rounded-[32px] p-2" style={{ background: "rgba(44, 193, 235, 0.3)" }}>
       <div
-        className="flex min-h-[448px] flex-col rounded-[16px] p-[clamp(20px,2.083vw,40px)]"
+        className="flex h-full min-h-[395px] flex-col rounded-[24px] p-[clamp(20px,2.083vw,32px)]"
         style={{ background: "#f6f6f6" }}
       >
         {children}
@@ -583,19 +583,27 @@ export async function CommunitySections(): Promise<React.ReactElement> {
       </div>
 
       <div className="relative z-10 mx-auto max-w-[var(--container-default)] px-6 py-[clamp(48px,8vw,120px)]">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <CardWrapper>
-            <WhatsNewCard items={news} />
-          </CardWrapper>
-          <CardWrapper>
-            <DiscussionsCard />
-          </CardWrapper>
-          <CardWrapper>
-            <CommunityImagesCard items={images} />
-          </CardWrapper>
-          <CardWrapper>
-            <UpcomingEventsCard items={events} />
-          </CardWrapper>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <CardWrapper>
+              <WhatsNewCard items={news} />
+            </CardWrapper>
+          </div>
+          <div className="lg:col-span-5">
+            <CardWrapper>
+              <DiscussionsCard />
+            </CardWrapper>
+          </div>
+          <div className="lg:col-span-5">
+            <CardWrapper>
+              <CommunityImagesCard items={images} />
+            </CardWrapper>
+          </div>
+          <div className="lg:col-span-7">
+            <CardWrapper>
+              <UpcomingEventsCard items={events} />
+            </CardWrapper>
+          </div>
         </div>
       </div>
     </section>

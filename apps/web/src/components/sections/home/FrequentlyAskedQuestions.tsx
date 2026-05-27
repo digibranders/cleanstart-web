@@ -179,14 +179,21 @@ export function FrequentlyAskedQuestions() {
 
         {/* Cards size to their natural content. Opening a FAQ grows the card
             (and the section) by the answer height — standard FAQ behavior with
-            no permanent empty space below the cards in the closed state. */}
-        <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
+            no permanent empty space below the cards in the closed state.
+            On mobile the outer grid hosts the white card chrome and the two
+            columns share a single continuous list; on md+ each column is its
+            own card. */}
+        <div
+          className="grid grid-cols-1 items-start gap-5 rounded-[24px] bg-white p-6 max-md:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)] sm:rounded-[40px] sm:p-8 md:grid-cols-2 md:gap-6 md:rounded-none md:bg-transparent md:p-0 md:shadow-none"
+        >
           <FaqColumn
             items={LEFT_FAQS}
             openId={openId}
             setOpenId={setOpenId}
             idPrefix="left"
           />
+          {/* Divider between the two FAQ groups on mobile only. */}
+          <div aria-hidden className="h-px w-full bg-[#D9D9D9] md:hidden" />
           <FaqColumn
             items={RIGHT_FAQS}
             openId={openId}
@@ -212,11 +219,7 @@ function FaqColumn({
 }) {
   return (
     <div
-      className="flex flex-col gap-5 self-start rounded-[24px] bg-white p-6 sm:rounded-[40px] sm:p-8"
-      style={{
-        boxShadow:
-          "0 1px 0 rgba(0,0,0,0.04), 0 24px 48px -24px rgba(60,30,150,0.08)",
-      }}
+      className="flex flex-col gap-5 self-start max-md:rounded-none max-md:bg-transparent max-md:p-0 max-md:shadow-none md:rounded-[40px] md:bg-white md:p-8 md:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)]"
     >
       {items.map((item, i) => (
         <React.Fragment key={item.id}>

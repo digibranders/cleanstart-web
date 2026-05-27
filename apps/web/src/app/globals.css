@@ -44,7 +44,12 @@
   --spacing-section-sm: clamp(2.5rem, 5vw, 4rem);            /* 40→64px — tight/sequential grids */
   --spacing-section-md: clamp(3rem, 6vw, 5.5rem);            /* 48→88px — standard sections */
   --spacing-section-lg: clamp(4rem, 8vw, 7rem);              /* 64→112px — feature/hero-adjacent */
+<<<<<<< HEAD
   --spacing-section-cta: 14.6875rem;                          /* 235px (mobile default) — CTA-overlap reservation above Footer. Per-breakpoint overrides below match Footer slot heights so the card-half always clears the previous section's content with a 60px breathing gap. Stepped (not clamp) because the value needs to DECREASE as the viewport grows (slot height shrinks lg+), which a clamp cannot express. */
+=======
+  --spacing-section-cta: 27.5rem;                            /* 440px (mobile). On mobile the card is fully ABOVE the footer (detached, 30px gap) — section pb = card_h(350) + 30 + 60 breathing = 440. sm/lg overrides below center the card on the footer edge. */
+  --footer-cta-pt: 5rem;                                     /* 80px (mobile) — footer regular pt since card sits above, not overlapping. sm/lg overrides below give card-half + 60 breathing. */
+>>>>>>> origin/development
 
   /* Card padding scale (fluid) */
   --spacing-card-sm: clamp(1rem, 1.5vw, 1.5rem);             /* 16→24px — compact cards */
@@ -204,9 +209,9 @@
   --cta-card-desc:        clamp(16px, 1.5vw, 20px);
   --cta-card-desc-ls:     -0.02em;
   --cta-card-desc-lh:     1.4;
-  --cta-card-btn-h:       40px;
+  --cta-card-btn-h:       36px;  /* base = mobile; sm/lg overrides below */
   --cta-card-btn-px:      16px;
-  --cta-card-btn-fs:      16px;
+  --cta-card-btn-fs:      13px;  /* base = mobile; sm/lg overrides below */
 }
 
 /* CTA-overlap reservation: shrink as viewport grows because the Footer's
@@ -280,6 +285,16 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* CTA spacing — at sm+ the card switches from "detached above footer" to
+   "centered on footer edge" overlap mode. Token values track card_half + 60px
+   breathing (sm card 288/2 = 144 + 60 = 204; lg card 240/2 = 120 + 60 = 180). */
+@media (min-width: 40rem) {
+  :root {
+    --spacing-section-cta: 13.125rem;  /* 210px (sm) — overlap mode (card 300/2 + 60) */
+    --footer-cta-pt: 13.125rem;        /* 210px (sm) — overlap mode */
+  }
+}
+
 /* Hero role tokens lock to fixed px at lg+ (≥ 1024px viewport).
    Below lg, the clamp() values in @theme provide the fluid mobile→tablet bridge.
    See RESPONSIVE-SYSTEM-AUDIT.md §17 decision 2 ("Hybrid: clamp <lg, stepped ≥lg"). */
@@ -299,6 +314,12 @@
     --text-t-body-lg:    1.125rem;  /* 18 */
     --text-t-body-md:    1rem;      /* 16 */
     --text-t-body-sm:    0.875rem;  /* 14 */
+
+    --spacing-section-cta: 11.875rem;  /* 190px (lg) — overlap mode (card 260/2 + 60) */
+    --footer-cta-pt: 11.875rem;        /* 190px (lg) — overlap mode */
+
+    --cta-card-btn-h:  44px;  /* desktop CTA button + input target height */
+    --cta-card-btn-fs: 16px;
   }
 }
 
@@ -440,9 +461,11 @@ body {
   filter: brightness(1.10);
 }
 .cs-btn-blue:active {
-  transform: translateY(0) scale(0.97);
+  /* No geometry change — see .cs-btn-glass:active comment. Filter-only press
+     feedback so button width/height stay locked next to attached pills. */
+  transform: translateY(0);
+  filter: brightness(0.92);
   transition-duration: 80ms;
-  filter: brightness(1);
 }
 .cs-btn-blue:focus { outline: none; }
 .cs-btn-blue:focus-visible {
@@ -529,10 +552,22 @@ body {
     rgba(255, 255, 255, 0.92);
 }
 .cs-btn-glass:hover::after { opacity: 1; animation: cs-cta-shine 900ms ease-out 1; }
-.cs-btn-glass:active { transform: translateY(0) scale(0.97); transition-duration: 80ms; }
-/* Modifier for buttons joined to an input — suppresses the lift transform */
+/* Press feedback — no geometry change. A previous `scale(0.97)` shrank the
+   button ~1px in both axes, which broke alignment with attached input pills
+   (BlogsCTA, etc.) and caused subtle layout judder elsewhere. Filter-only
+   feedback keeps width/height locked across hover→press→release. */
+.cs-btn-glass:active {
+  transform: translateY(0);
+  filter: brightness(0.92);
+  transition-duration: 80ms;
+}
+/* Modifier for buttons joined to an input — also suppresses the hover lift. */
 .cs-btn-glass--no-lift:hover { transform: none; }
-.cs-btn-glass--no-lift:active { transform: scale(0.97); }
+.cs-btn-glass--no-lift:active {
+  transform: none;
+  filter: brightness(0.92);
+  transition-duration: 80ms;
+}
 
 /* Category pill — Glass (blur) + Noise texture from Figma */
 .cs-category-pill {
@@ -565,6 +600,84 @@ body {
   transition: transform 220ms cubic-bezier(.2, .9, .3, 1);
 }
 .cs-btn-glass:hover .cs-cta-arrow { transform: translateX(4px); }
+
+/* Unified CTA button HEIGHT + FONT-SIZE.
+     - Mobile  (< 64rem):  GLOBAL — every cs-btn-glass / cs-btn-blue site-wide
+       gets h 36 / fs 13 (Header "Book a Demo" utility size). Single mobile
+       touch-target across the whole site for visual + tactile consistency.
+     - Desktop (>= 64rem): SCOPED to the Footer CTA card only — h 44 / fs 16
+       (primary CTA size, WCAG 2.5.8 floor). Off-card buttons (hero, header)
+       keep their own desktop sizing.
+   WIDTH always varies with the button's label and per-card horizontal padding.
+   `!important` is intentional: historic call-sites set --cs-btn-h / --cs-btn-fs
+   (or even raw `height`/`font-size`) inline, and inline style beats stylesheets
+   without it. Horizontal padding is NOT overridden so each card tunes
+   label-to-edge spacing independently. */
+@media (min-width: 64rem) {
+  footer .pointer-events-auto .cs-btn-glass,
+  footer .pointer-events-auto .cs-btn-blue {
+    --cs-btn-h: 44px !important;
+    --cs-btn-fs: 16px !important;
+    height: 44px !important;
+    font-size: 16px !important;
+  }
+}
+@media (max-width: 63.99rem) {
+  .cs-btn-glass,
+  .cs-btn-blue {
+    --cs-btn-h: 36px !important;
+    --cs-btn-fs: 13px !important;
+    height: 36px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Inputs inside Footer CTA card track the button height so input + button rows
+   read as a single uniform pill. The wrapper `<div>` that gives the email
+   input its 44px hardcoded height (BlogsCTA / BlogDetailCTA / EventsCTA /
+   WebinarsCTA) is targeted via `:has()`; the raw `<input>` is targeted in
+   parallel for ResourceDetailLeadCapture which has no wrapper.
+   IMPORTANT: input font-size stays at 16px on every breakpoint — going below
+   16 triggers an iOS Safari zoom-in-on-focus (see CLAUDE.md). Only the height
+   changes per breakpoint. */
+@media (max-width: 63.99rem) {
+  /* Each selector in its own rule so :has() parsing on one can't drop the
+     others (older browsers / Tailwind preprocessor edge cases). min-height +
+     height belt-and-suspenders so UA input intrinsic sizing can't squish. */
+  footer .pointer-events-auto form input[type="email"] {
+    height: 36px !important;
+    min-height: 36px !important;
+  }
+  /* Only target the pill-wrapper pattern (input-only direct child, e.g.
+     BlogsCTA / EventsCTA). Resource detail wraps input+button siblings in the
+     same div — forcing height: 36 on THAT div clips the button to overlap. */
+  footer .pointer-events-auto form div:has(> input[type="email"]):not(:has(> button)) {
+    height: 36px !important;
+  }
+  footer .pointer-events-auto form button[type="submit"] {
+    height: 36px !important;
+    min-height: 36px !important;
+    font-size: 13px !important;
+    padding: 0 16px !important;
+  }
+  /* Input keeps 16px to avoid iOS Safari zoom-on-focus (CLAUDE.md). */
+  footer .pointer-events-auto form input[type="email"] {
+    font-size: 16px !important;
+  }
+}
+@media (min-width: 64rem) {
+  footer .pointer-events-auto form input[type="email"],
+  footer .pointer-events-auto form div:has(> input[type="email"]):not(:has(> button)),
+  footer .pointer-events-auto form button[type="submit"] {
+    height: 44px !important;
+  }
+  footer .pointer-events-auto form button[type="submit"] {
+    font-size: 16px !important;
+  }
+  footer .pointer-events-auto form input[type="email"] {
+    font-size: 16px !important;
+  }
+}
 
 /* ---- LINK CTA — Read Case study / Explore (resource cards) / Explore for Developers
    Figma: pure text + arrow inside Frame 19, no background. */
@@ -1468,6 +1581,198 @@ body {
     line-height: 1.45;
   }
   .cs-tt-stage { height: auto; min-height: 480px; }
+}
+
+/* =============================================================================
+   Shared-element morph carousel (BuiltForTeams).
+   One unified card component renders in 3 slots (data-pos: -1, 0, 1). All
+   cards share a single base size; only `transform` (translate + scale),
+   `opacity`, and `filter` are animated — never `width`/`height`, which
+   would force layout reflow and produce ugly intermediate sizes during
+   the transition. The "wrapping" card (only with N=3, when one card has
+   to teleport to the opposite peek) is masked with an opacity fade via
+   data-wrap so its cross-stage jump is invisible.
+   ========================================================================== */
+.cs-tt-morph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: stretch;
+  text-align: left;
+  width: min(798px, 100%);
+  height: clamp(280px, 24vw, 329px);
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform, opacity;
+  transition:
+    transform 640ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 640ms ease-out,
+    opacity 480ms ease-out,
+    filter 480ms ease-out,
+    box-shadow 640ms ease-out;
+}
+
+/* Centre — dominant card */
+.cs-tt-morph[data-pos="0"] {
+  z-index: 30;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  filter: none;
+  cursor: default;
+  background: linear-gradient(135deg, #1F1740 0%, #242682 60%, #3F279E 100%);
+  box-shadow:
+    0 24px 60px -20px rgba(7, 4, 30, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* Side peeks — dimmed, blurred, scaled toward the side. Scale shrinks the
+   card to ~542×224 visual size (matches the original peek geometry) while
+   keeping the same intrinsic dimensions, so transitions only animate the
+   transform/opacity. */
+.cs-tt-morph[data-pos="-1"],
+.cs-tt-morph[data-pos="1"] {
+  z-index: 10;
+  opacity: 0.32;
+  filter: blur(4px);
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 100%);
+  box-shadow: 0 12px 32px -16px rgba(7, 4, 30, 0.5);
+}
+.cs-tt-morph[data-pos="-1"] {
+  transform:
+    translate(calc(-50% - clamp(280px, 28vw, 380px)), -50%)
+    scale(0.68);
+}
+.cs-tt-morph[data-pos="1"] {
+  transform:
+    translate(calc(-50% + clamp(280px, 28vw, 380px)), -50%)
+    scale(0.68);
+}
+.cs-tt-morph[data-pos="-1"]:hover,
+.cs-tt-morph[data-pos="1"]:hover,
+.cs-tt-morph[data-pos="-1"]:focus-visible,
+.cs-tt-morph[data-pos="1"]:focus-visible {
+  opacity: 0.7;
+  filter: blur(0);
+}
+.cs-tt-morph[data-pos="-1"]:focus-visible,
+.cs-tt-morph[data-pos="1"]:focus-visible {
+  outline: 2px solid rgb(132 188 255 / 0.7);
+  outline-offset: 6px;
+}
+
+/* Wrapping card — fade through 0 so the cross-stage teleport is hidden.
+   transform/size transitions are disabled here so the new position is
+   adopted instantly while opacity carries the visual story. */
+.cs-tt-morph[data-wrap="true"] {
+  transition: opacity 600ms ease-in-out, filter 600ms ease-in-out;
+  animation: cs-tt-morph-wrap 640ms ease-in-out both;
+}
+@keyframes cs-tt-morph-wrap {
+  0%   { opacity: 0.42; }
+  35%  { opacity: 0; }
+  65%  { opacity: 0; }
+  100% { opacity: 0.42; }
+}
+
+/* Inner element sizing — same intrinsic sizes for all cards; the card-level
+   scale() handles peek shrinking. Active card gets its full design sizes. */
+.cs-tt-morph .cs-tt-card__photo {
+  width: clamp(200px, 20vw, 264px);
+  height: 100%;
+  border-radius: 24px 0 0 24px;
+}
+.cs-tt-morph .cs-tt-card__body {
+  padding: clamp(20px, 2.2vw, 28px) clamp(24px, 2.8vw, 36px) clamp(20px, 2vw, 24px);
+  gap: clamp(12px, 1.4vw, 18px);
+}
+.cs-tt-morph .cs-tt-card__name  { font-size: clamp(16px, 1.4vw, 20px); }
+.cs-tt-morph .cs-tt-card__role  { font-size: clamp(14px, 1.2vw, 16px); }
+.cs-tt-morph .cs-tt-card__quote {
+  font-size: clamp(0.9375rem, 0.95vw, 1.0625rem);
+}
+.cs-tt-morph .cs-tt-card__cta   { font-size: clamp(0.875rem, 0.95vw, 1rem); }
+
+/* Peek interactions */
+.cs-tt-morph:not([data-pos="0"]) .cs-tt-card__cta {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* Stacked layout on narrow viewports: only the active card is interactable;
+   off-screen cards stay in the DOM (opacity:0, position:absolute) so the
+   incoming card can transition in. Slide direction is implied by data-pos —
+   the +1 card sits 28px to the right and slides in when it becomes active;
+   the -1 card does the same from the left. */
+@media (max-width: 1023px) {
+  /* Stage clips off-screen cards so the swipe motion stays visually
+     contained within the card area; without this, the sliding peeks
+     would briefly show beyond the section padding. */
+  .cs-tt-stage {
+    position: relative;
+    height: clamp(540px, 130vw, 680px);
+    overflow: hidden;
+    border-radius: 24px;
+  }
+  .cs-tt-morph {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    flex-direction: column;
+    transform: none;
+    opacity: 1;
+    filter: none;
+    /* Pure horizontal slide — Material "standard" easing keeps the
+       motion smooth at both ends. Transform is the only animated
+       property so the GPU drives the whole transition. */
+    transition: transform 620ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+  .cs-tt-morph[data-pos="0"] {
+    z-index: 30;
+    transform: translate3d(0, 0, 0);
+    pointer-events: auto;
+  }
+  .cs-tt-morph[data-pos="1"] {
+    z-index: 20;
+    transform: translate3d(105%, 0, 0);
+    pointer-events: none;
+  }
+  .cs-tt-morph[data-pos="-1"] {
+    z-index: 20;
+    transform: translate3d(-105%, 0, 0);
+    pointer-events: none;
+  }
+  /* Wrapping card teleports between off-screen sides — both positions
+     are outside the clipped stage so the jump is invisible. Disabling
+     the transform transition prevents a brief flash through the centre. */
+  .cs-tt-morph[data-wrap="true"] {
+    transition: none;
+  }
+  .cs-tt-morph[data-pos="0"] .cs-tt-card__photo {
+    width: 100%;
+    height: 220px;
+    border-radius: 24px 24px 0 0;
+  }
+  .cs-tt-morph[data-pos="0"] .cs-tt-card__body {
+    padding: 20px 20px 24px;
+    gap: 14px;
+  }
+  .cs-tt-morph[data-pos="0"] .cs-tt-card__quote {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-tt-morph { transition-duration: 80ms !important; }
+  .cs-tt-morph[data-wrap="true"] { animation: none !important; }
 }
 
 /* ---- Nav button (Figma 108:8444 / 108:8448) ---------------------------- */

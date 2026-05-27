@@ -55,10 +55,35 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
 
   return (
     <section
-      className="relative isolate"
-      style={{ marginBottom: `-${VIDEO_OVERLAP_PX}px`, zIndex: 1 }}
+      className="podcast-hero relative isolate"
+      style={{
+        marginBottom: "calc(var(--podcast-section-overlap) * -1)",
+        zIndex: 1,
+      }}
       aria-labelledby="podcast-hero-title"
     >
+      {/* Desktop: the card vertical-center sits on the gradient's bottom edge (=
+          waveform centerline). On mobile we want the waveform centerline to sit on the
+          card's BOTTOM edge instead, so we shift the card up by its FULL height (not
+          half) and stop pulling LatestEpisodes upward — it flows naturally below. */}
+      <style>{`
+        .podcast-hero {
+          --podcast-card-overlap: ${VIDEO_OVERLAP_PX}px;
+          --podcast-section-overlap: ${VIDEO_OVERLAP_PX}px;
+        }
+        @media (max-width: 639px) {
+          .podcast-hero {
+            --podcast-card-overlap: calc((100vw - 96px) * 9 / 16);
+            --podcast-section-overlap: 0px;
+          }
+        }
+        @media (min-width: 640px) and (max-width: 1023px) {
+          .podcast-hero {
+            --podcast-card-overlap: 240px;
+            --podcast-section-overlap: 60px;
+          }
+        }
+      `}</style>
       {/* Hero gradient region (Figma gradient) with a white blending overlay near the
           bottom edge. The same overlay continues at the top of LatestEpisodes (fading the
           other way), so where the two sections meet they are both pure white — the embed
@@ -130,7 +155,7 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
         className="relative z-20 mx-auto px-6"
         style={{
           maxWidth: `${VIDEO_MAX_WIDTH_PX + 48}px`,
-          marginTop: `-${VIDEO_OVERLAP_PX}px`,
+          marginTop: "calc(var(--podcast-card-overlap) * -1)",
         }}
       >
         <div className="mx-auto w-full" style={{ maxWidth: `${VIDEO_MAX_WIDTH_PX}px` }}>
@@ -149,7 +174,8 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
                 aspectRatio: "16 / 9",
                 borderRadius: "16px",
                 border: "1px dashed rgba(255,255,255,0.25)",
-                background: "rgba(0,0,0,0.25)",
+                background:
+                  "linear-gradient(180deg, rgba(20,16,40,0.92) 0%, rgba(40,28,90,0.92) 100%)",
               }}
             >
               <span className="text-sm">

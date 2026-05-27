@@ -107,7 +107,7 @@ export function SCAHero(): React.ReactElement {
             CTA on the site) — play-icon prefix kept because this is a
             "Watch How..." CTA, arrow slides on hover via .cs-cta-arrow. */}
         <Link
-          href="/contact-us"
+          href="/book-a-demo"
           className="cs-btn-glass self-start"
           style={{
             marginTop: "clamp(28px, 2.5vw, 48px)",

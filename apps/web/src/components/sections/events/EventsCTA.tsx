@@ -62,7 +62,7 @@ export function EventsCTA(): React.ReactElement {
       {/* Left cube */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        className="pointer-events-none select-none absolute hidden sm:block"
         style={{
           left: "-45px",
           top: "230px",
@@ -84,7 +84,7 @@ export function EventsCTA(): React.ReactElement {
       {/* Right cube */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        className="pointer-events-none select-none absolute hidden sm:block"
         style={{
           left: "1145px",
           top: "-40px",
@@ -121,11 +121,11 @@ export function EventsCTA(): React.ReactElement {
           </div>
 
           <div
-            className="flex flex-col items-start w-full lg:max-w-[493px]"
+            className="flex flex-col items-center lg:items-start w-full lg:max-w-[493px]"
             style={{ gap: "24px" }}
           >
             <p
-              className="font-normal text-white"
+              className="font-normal text-white text-center lg:text-left"
               style={{
                 fontSize: "var(--cta-card-desc)",
             fontWeight: 400,

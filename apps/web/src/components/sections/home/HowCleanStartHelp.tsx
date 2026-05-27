@@ -38,31 +38,72 @@ interface FeatureCard {
   description: string;
 }
 
-const FEATURE_CARDS: FeatureCard[] = [
-  {
-    title: "Zero-Day Protection",
-    description: "Without deterministic builds, artifacts can change across environments.",
+interface TabContent {
+  heroTitle: string;
+  heroDescription: string;
+  ctaLabel: string;
+  ctaHref: string;
+  cards: [FeatureCard, FeatureCard, FeatureCard];
+}
+
+const TAB_CONTENT: Record<TabId, TabContent> = {
+  ciso: {
+    heroTitle: "Security leadership that scales",
+    heroDescription:
+      "Centralize visibility, cut audit cycles, and prove compliance — without slowing engineering down.",
+    ctaLabel: "Explore for CISOs",
+    ctaHref: "/for-ciso",
+    cards: [
+      {
+        title: "Reduce Security Costs by 70%",
+        description:
+          "Automated security, real-time scanning, and built-in compliance enable lean, cost-efficient DevSecOps teams.",
+      },
+      {
+        title: "Always-On Threat Protection",
+        description:
+          "Continuous vulnerability monitoring and rapid CVE response keep production hardened around the clock.",
+      },
+      {
+        title: "Centralized Visibility & Governance",
+        description:
+          "A unified dashboard for complete oversight and control over security posture and compliance.",
+      },
+    ],
   },
-  {
-    title: "Uncontrolled Builds",
-    description: "Without deterministic builds, artifacts can change across environments.",
+  developers: {
+    heroTitle: "Build pipelines you can trust",
+    heroDescription:
+      "Signed, deterministic images that drop into your CI/CD with zero friction and full provenance.",
+    ctaLabel: "Explore for Developers",
+    ctaHref: "/for-developers",
+    cards: [
+      {
+        title: "Signed & Verified Images",
+        description:
+          "Cryptographically signed images with automated security updates and full SBOM provenance.",
+      },
+      {
+        title: "Seamless CI/CD Integration",
+        description:
+          "Drop-in support for CI/CD pipelines, private registries, and SSO across your existing workflow.",
+      },
+      {
+        title: "Streamlined Development",
+        description:
+          "Ship faster with automated compliance, custom-built images, and minimal-CVE base layers.",
+      },
+    ],
   },
-  {
-    title: "Streamlined Development",
-    description: "Without deterministic builds, artifacts can change across environments.",
-  },
-];
+};
 
 export function HowCleanStartHelp() {
-  const [activeTab, setActiveTab] = useState<TabId>("ciso");
-
-  // Content shown in CISO card based on active tab
-  const ctaLabel =
-    activeTab === "ciso" ? "Explore for Developers" : "Explore for CISOs";
+  const [activeTab, setActiveTab] = useState<TabId>("developers");
+  const content = TAB_CONTENT[activeTab];
 
   return (
     <section
-      className="relative w-full pb-16 pt-20 sm:pb-20 lg:pb-0 lg:pt-24"
+      className="relative w-full pb-12 pt-12 sm:pb-16 lg:pb-0 lg:pt-14"
       aria-labelledby="how-cleanstart-title"
       style={{ backgroundColor: "#F6F6F6" }}
     >
@@ -86,7 +127,7 @@ export function HowCleanStartHelp() {
         {/* Title row — title flush-left, separator centered, description right-aligned.
             Same 1fr auto 1fr grid pattern used by SecurityNotPatching for visual
             parity. */}
-        <div className="mb-12 flex flex-col items-start gap-6 md:mb-[60px] md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
+        <div className="mb-8 flex flex-col items-start gap-6 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <h2
             id="how-cleanstart-title"
             className="justify-self-start font-display text-[#111111]"
@@ -149,13 +190,13 @@ export function HowCleanStartHelp() {
           <svg
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-full w-full hidden md:block"
-            viewBox="0 0 1276 678"
+            viewBox="0 0 1276 582"
             // eslint-disable-next-line no-restricted-syntax -- see comment above
             preserveAspectRatio="none"
             style={{ zIndex: 0 }}
           >
             <path
-              d="M694 0L1236 0C1258.09 0 1276 22.09 1276 40L1276 638C1276 660.09 1258.09 678 1236 678L40 678C17.91 678 0 660.09 0 638L0 380C0 357.91 17.91 340 40 340L614 340C636.09 340 654 317.91 654 300L654 40C654 17.91 671.91 0 694 0Z"
+              d="M694 0L1236 0C1258.09 0 1276 22.09 1276 40L1276 542C1276 564.09 1258.09 582 1236 582L40 582C17.91 582 0 564.09 0 542L0 332C0 309.91 17.91 292 40 292L614 292C636.09 292 654 269.91 654 252L654 40C654 17.91 671.91 0 694 0Z"
               fill="white"
             />
           </svg>
@@ -173,10 +214,14 @@ export function HowCleanStartHelp() {
             <CisoCard
               activeTab={activeTab}
               setActiveTab={setActiveTab}
-              ctaLabel={ctaLabel}
+              content={content}
             />
-            {FEATURE_CARDS.map((card) => (
-              <FeatureCardItem key={card.title} card={card} />
+            {content.cards.map((card, idx) => (
+              <FeatureCardItem
+                key={`${activeTab}:${card.title}`}
+                card={card}
+                index={idx}
+              />
             ))}
           </div>
         </div>
@@ -191,15 +236,15 @@ export function HowCleanStartHelp() {
 function CisoCard({
   activeTab,
   setActiveTab,
-  ctaLabel,
+  content,
 }: {
   activeTab: TabId;
   setActiveTab: (t: TabId) => void;
-  ctaLabel: string;
+  content: TabContent;
 }) {
   return (
     <article
-      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col overflow-hidden"
+      className="relative flex min-h-[clamp(220px,18vw,260px)] w-full flex-col overflow-hidden"
       style={{
         borderRadius: "40px",
         background:
@@ -226,20 +271,21 @@ function CisoCard({
         }}
       >
         <TabPill
-          id="ciso"
-          label="For CISOs"
-          active={activeTab === "ciso"}
-          onClick={() => setActiveTab("ciso")}
-        />
-        <TabPill
           id="developers"
           label="For Developers"
           active={activeTab === "developers"}
           onClick={() => setActiveTab("developers")}
         />
+        <TabPill
+          id="ciso"
+          label="For CISOs"
+          active={activeTab === "ciso"}
+          onClick={() => setActiveTab("ciso")}
+        />
       </div>
 
       <h3
+        key={`${activeTab}-title`}
         className="mt-[28px] font-display text-white"
         style={{
           fontSize: "clamp(22px, 2.4vw, 32px)",
@@ -247,14 +293,14 @@ function CisoCard({
           lineHeight: 1.1,
           letterSpacing: "-0.04em",
           maxWidth: "504px",
+          animation: "cs-tab-card-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both",
         }}
       >
-        {activeTab === "ciso"
-          ? "Security leadership that scales"
-          : "Build pipelines you can trust"}
+        {content.heroTitle}
       </h3>
 
       <p
+        key={`${activeTab}-desc`}
         className="mt-[22px] text-white"
         style={{
           fontFamily: "var(--font-sans)",
@@ -263,17 +309,23 @@ function CisoCard({
           lineHeight: 1.4,
           letterSpacing: "-0.02em",
           maxWidth: "504px",
+          animation: "cs-tab-card-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both",
+          animationDelay: "70ms",
         }}
       >
-        Without deterministic builds, artifacts can change across environments.
+        {content.heroDescription}
       </p>
 
-      {/* "Explore for Developers" CTA at bottom-right */}
       <a
-        href={activeTab === "ciso" ? "#explore-developers" : "#explore-cisos"}
+        key={`${activeTab}-cta`}
+        href={content.ctaHref}
         className="cs-link-cta mt-auto self-end"
+        style={{
+          animation: "cs-tab-card-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both",
+          animationDelay: "140ms",
+        }}
       >
-        <span>{ctaLabel}</span>
+        <span>{content.ctaLabel}</span>
         <svg
           className="cs-cta-arrow"
           width="20"
@@ -319,7 +371,7 @@ function TabPill({
       // height/font/padding from the smallest md card (~328 px) up to the
       // Figma desktop spec so the two pills always sit on a single row
       // inside the parent tab bar.
-      className="relative cursor-pointer whitespace-nowrap rounded-[999px] font-medium text-white transition-all duration-200"
+      className="relative cursor-pointer whitespace-nowrap rounded-[999px] font-medium text-white"
       style={{
         height: "clamp(26px, 3vw, 34px)",
         padding: "0 clamp(8px, 1.2vw, 12px)",
@@ -331,6 +383,8 @@ function TabPill({
         boxShadow: active
           ? "0 4px 12px -4px rgba(57,96,249,0.55), inset 0 1px 0 rgba(255,255,255,0.25)"
           : "none",
+        transition:
+          "background 360ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 360ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 280ms ease-out",
       }}
     >
       {label}
@@ -344,7 +398,13 @@ function TabPill({
    surface across all 3 feature cards, so each card sits on the same continuous
    shape rather than reading as 3 separate white rectangles.
    ========================================================================== */
-function FeatureCardItem({ card }: { card: FeatureCard }) {
+function FeatureCardItem({
+  card,
+  index,
+}: {
+  card: FeatureCard;
+  index: number;
+}) {
   return (
     <article
       // Two responsive levers working together:
@@ -365,7 +425,7 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
       // The L-shape SVG behind these cards uses `preserveAspectRatio="none"`
       // and a 50 %-of-container cutout, so it auto-aligns with whatever
       // height the grid stretches all 4 cards to.
-      className="relative flex min-h-[clamp(260px,24vw,308px)] w-full flex-col items-center text-center gap-[clamp(16px,2vw,24px)] rounded-[24px] bg-white md:bg-transparent md:rounded-none lg:flex-row lg:text-left lg:items-center lg:gap-[clamp(16px,2vw,24px)]"
+      className="relative flex min-h-[clamp(220px,18vw,260px)] w-full flex-col items-center text-center gap-[clamp(16px,2vw,24px)] rounded-[24px] bg-white md:bg-transparent md:rounded-none lg:flex-row lg:text-left lg:items-center lg:gap-[clamp(16px,2vw,24px)]"
       style={{
         // Smaller padding cap (50 vs 70) reclaims breathing room for the
         // icon + text on tight md cards while still feeling spacious at xl.
@@ -374,6 +434,8 @@ function FeatureCardItem({ card }: { card: FeatureCard }) {
         paddingTop: "clamp(16px, 3vw, 32px)",
         paddingBottom: "clamp(16px, 3vw, 32px)",
         containerType: "inline-size",
+        animation: "cs-tab-card-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both",
+        animationDelay: `${index * 70}ms`,
       }}
     >
       {/* Gear orb — Figma reference: 224 × 180 wrapper, lavender glow

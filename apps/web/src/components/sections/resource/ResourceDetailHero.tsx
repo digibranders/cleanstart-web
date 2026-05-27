@@ -94,10 +94,13 @@ export function ResourceDetailHero({
         className="relative mx-auto"
         style={{ maxWidth: "1276px", paddingLeft: "24px", paddingRight: "24px" }}
       >
-        {/* Breadcrumb */}
+        {/* Breadcrumb — on mobile (<sm) the intermediate "Resources" and
+            "<Type>" crumbs collapse to free vertical space and avoid the
+            orphan-chevron wrap when the title is long. Full chain stays in the
+            DOM for screen readers (hidden via `hidden sm:flex`). */}
         <nav
           aria-label="Breadcrumb"
-          className="flex items-center flex-wrap pt-[120px] lg:pt-[138px]"
+          className="flex flex-nowrap items-center overflow-x-auto pt-[120px] lg:pt-[138px] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible"
         >
           <Link
             href="/"
@@ -117,54 +120,61 @@ export function ResourceDetailHero({
               decoding="async"
             />
           </Link>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/resource-center/breadcrumb-arrow.svg"
-            alt=""
-            aria-hidden
-            width={20}
-            height={20}
-            className="pointer-events-none select-none shrink-0"
-            loading="lazy"
-            decoding="async"
-          />
-          <Link
-            href="/resource-center"
-            className="flex items-center justify-center text-xs font-normal leading-[1.4] shrink-0"
-            style={{
-              padding: "0 8px",
-              height: "32px",
-              color: "#98acc3",
-              textDecoration: "none",
-              borderRadius: "1000px",
-            }}
-          >
-            Resources
-          </Link>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/resource-center/breadcrumb-arrow.svg"
-            alt=""
-            aria-hidden
-            width={20}
-            height={20}
-            className="pointer-events-none select-none shrink-0"
-            loading="lazy"
-            decoding="async"
-          />
-          <Link
-            href={`/resource-center?type=${encodeURIComponent(resource.type ?? "")}`}
-            className="flex items-center justify-center text-xs font-normal leading-[1.4] shrink-0"
-            style={{
-              padding: "0 8px",
-              height: "32px",
-              color: "#98acc3",
-              textDecoration: "none",
-              borderRadius: "1000px",
-            }}
-          >
-            {typeLabel}
-          </Link>
+          {/* Intermediate crumb 1: Resources (hidden on mobile) */}
+          <span className="hidden sm:flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/resource-center/breadcrumb-arrow.svg"
+              alt=""
+              aria-hidden
+              width={20}
+              height={20}
+              className="pointer-events-none select-none shrink-0"
+              loading="lazy"
+              decoding="async"
+            />
+            <Link
+              href="/resource-center"
+              className="flex items-center justify-center text-xs font-normal leading-[1.4] shrink-0"
+              style={{
+                padding: "0 8px",
+                height: "32px",
+                color: "#98acc3",
+                textDecoration: "none",
+                borderRadius: "1000px",
+              }}
+            >
+              Resources
+            </Link>
+          </span>
+          {/* Intermediate crumb 2: <Type> (hidden on mobile) */}
+          <span className="hidden sm:flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/resource-center/breadcrumb-arrow.svg"
+              alt=""
+              aria-hidden
+              width={20}
+              height={20}
+              className="pointer-events-none select-none shrink-0"
+              loading="lazy"
+              decoding="async"
+            />
+            <Link
+              href={`/resource-center?type=${encodeURIComponent(resource.type ?? "")}`}
+              className="flex items-center justify-center text-xs font-normal leading-[1.4] shrink-0"
+              style={{
+                padding: "0 8px",
+                height: "32px",
+                color: "#98acc3",
+                textDecoration: "none",
+                borderRadius: "1000px",
+              }}
+            >
+              {typeLabel}
+            </Link>
+          </span>
+          {/* Current page (always visible) */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/resource-center/breadcrumb-arrow.svg"
@@ -177,13 +187,12 @@ export function ResourceDetailHero({
             decoding="async"
           />
           <span
-            className="text-xs font-normal truncate"
+            className="text-xs font-normal truncate min-w-0 max-w-[220px] sm:max-w-[320px]"
             style={{
               padding: "0 8px",
               height: "32px",
               lineHeight: "32px",
               color: "#bfccda",
-              maxWidth: "320px",
             }}
             aria-current="page"
           >

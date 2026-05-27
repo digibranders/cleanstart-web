@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import type { Webinar, WebinarRegion, WebinarType } from "@/lib/webinars";
 import { Pagination } from "@/components/ui/Pagination";
 import { WebinarCard } from "./WebinarCard";
@@ -103,11 +104,46 @@ export function WebinarsGrid({
                   ))}
                 </div>
 
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  buildHref={(p) => buildPageHref(p, activeType, activeRegion)}
-                />
+                {/* MOBILE — single "View More →" button per Figma 817:6997. */}
+                {totalPages > 1 && currentPage < totalPages && (
+                  <div className="flex lg:hidden justify-center" style={{ marginTop: "40px" }}>
+                    <Link
+                      href={buildPageHref(currentPage + 1, activeType, activeRegion)}
+                      rel="next"
+                      className="font-sans inline-flex items-center gap-2"
+                      style={{
+                        height: "44px",
+                        padding: "0 20px",
+                        borderRadius: "10px",
+                        background: "white",
+                        color: "#4a3bf1",
+                        fontSize: "15px",
+                        fontWeight: 500,
+                        border: "1px solid rgba(74,59,241,0.25)",
+                      }}
+                    >
+                      View More
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+                        <path
+                          d="M3.5 8h9M8.5 4l4 4-4 4"
+                          stroke="#4a3bf1"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Link>
+                  </div>
+                )}
+
+                {/* DESKTOP — full numbered pagination. */}
+                <div className="hidden lg:block">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    buildHref={(p) => buildPageHref(p, activeType, activeRegion)}
+                  />
+                </div>
               </>
             )}
           </div>
