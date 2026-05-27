@@ -38,7 +38,7 @@ export function PartnersWhy(): React.ReactElement {
             <h2
               className="font-display font-semibold text-[#0F123E]"
               style={{
-                fontSize: "var(--text-display-md)",
+                fontSize: "var(--fs-h2)",
                 lineHeight: 1.15,
                 letterSpacing: "-0.02em",
               }}
@@ -60,7 +60,7 @@ export function PartnersWhy(): React.ReactElement {
           <div className="lg:col-span-7 lg:pt-3">
             <p
               className="text-[#475569]"
-              style={{ fontSize: "var(--text-body-lg)", lineHeight: 1.5 }}
+              style={{ fontSize: "var(--fs-body)", lineHeight: 1.5 }}
             >
               As a partner, you help customers ship clean, compliant, and verifiable software with
               trust built in, not bolted on.
@@ -102,13 +102,13 @@ function BenefitCardView({ card }: { card: BenefitCard }): React.ReactElement {
       </span>
       <h3
         className="font-display font-semibold text-[#0F123E]"
-        style={{ fontSize: "var(--text-card-title-md)", lineHeight: 1.25 }}
+        style={{ fontSize: "var(--fs-h4)", lineHeight: 1.25 }}
       >
         {card.title}
       </h3>
       <p
         className="text-[#475569]"
-        style={{ fontSize: "var(--text-body-sm)", lineHeight: 1.55 }}
+        style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.55 }}
       >
         {card.body}
       </p>

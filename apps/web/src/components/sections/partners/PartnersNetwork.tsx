@@ -62,7 +62,7 @@ export function PartnersNetwork(): React.ReactElement {
           <h2
             className="font-display font-semibold text-white"
             style={{
-              fontSize: "var(--text-display-md)",
+              fontSize: "var(--fs-h2)",
               lineHeight: 1.15,
               letterSpacing: "-0.02em",
             }}
@@ -82,7 +82,7 @@ export function PartnersNetwork(): React.ReactElement {
           </h2>
           <p
             className="mt-5 text-white/75"
-            style={{ fontSize: "var(--text-body-md)", lineHeight: 1.55 }}
+            style={{ fontSize: "var(--fs-body)", lineHeight: 1.55 }}
           >
             From technology providers and cloud platforms to integrators and value sellers,
             CleanStart partners are shaping how trusted software is built, verified, and delivered
@@ -114,7 +114,7 @@ export function PartnersNetwork(): React.ReactElement {
                     ? "bg-white text-[#0F123E] font-semibold"
                     : "text-white/80 hover:text-white"
                 }`}
-                style={{ fontSize: "var(--text-body-sm)" }}
+                style={{ fontSize: "var(--fs-body-sm)" }}
               >
                 {region}
               </button>
@@ -125,7 +125,7 @@ export function PartnersNetwork(): React.ReactElement {
         {/* Partner cards grid */}
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {partners.length === 0 ? (
-            <div className="col-span-full text-center text-white/70 py-12" style={{ fontSize: "var(--text-body-md)" }}>
+            <div className="col-span-full text-center text-white/70 py-12" style={{ fontSize: "var(--fs-body)" }}>
               We&apos;re actively expanding in this region — check back soon.
             </div>
           ) : (
@@ -138,7 +138,7 @@ export function PartnersNetwork(): React.ReactElement {
             <button
               type="button"
               className="rounded-full px-6 py-3 text-[#0F123E] bg-white font-semibold hover:bg-white/90 transition-colors"
-              style={{ fontSize: "var(--text-body-sm)", minHeight: "44px" }}
+              style={{ fontSize: "var(--fs-body-sm)", minHeight: "44px" }}
             >
               View More
             </button>
@@ -168,11 +168,11 @@ function PartnerCard({ partner }: { partner: Partner }): React.ReactElement {
       <div className="flex flex-col gap-1">
         <h3
           className="font-display font-semibold text-[#0F123E]"
-          style={{ fontSize: "var(--text-card-title-sm)", lineHeight: 1.3 }}
+          style={{ fontSize: "var(--fs-h5)", lineHeight: 1.3 }}
         >
           {partner.name}
         </h3>
-        <p className="text-[#475569]" style={{ fontSize: "var(--text-body-xs)" }}>
+        <p className="text-[#475569]" style={{ fontSize: "var(--fs-caption)" }}>
           {partner.country}
         </p>
       </div>

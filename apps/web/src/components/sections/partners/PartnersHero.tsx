@@ -38,7 +38,7 @@ export function PartnersHero(): React.ReactElement {
           <h1
             className="font-display font-semibold text-white mx-auto"
             style={{
-              fontSize: "clamp(36px, 4.45vw, 64px)",
+              fontSize: "var(--fs-display)",
               lineHeight: 1.05,
               letterSpacing: "-0.04em",
               maxWidth: "860px",
@@ -61,7 +61,7 @@ export function PartnersHero(): React.ReactElement {
           <p
             className="text-white/80 mx-auto"
             style={{
-              fontSize: "var(--text-body-lg)",
+              fontSize: "var(--fs-body)",
               lineHeight: 1.5,
               maxWidth: "560px",
             }}
@@ -73,7 +73,7 @@ export function PartnersHero(): React.ReactElement {
             <Link
               href="/book-a-demo"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-white text-[#0F123E] px-5 py-3 font-semibold transition-colors hover:bg-white/90"
-              style={{ fontSize: "16px", minHeight: "44px" }}
+              style={{ fontSize: "var(--fs-button)", minHeight: "44px" }}
             >
               Become a Partner
               <ArrowIcon />
@@ -81,7 +81,7 @@ export function PartnersHero(): React.ReactElement {
             <Link
               href="/deal-registration"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2F49E5] text-white px-5 py-3 font-semibold transition-colors hover:bg-[#2438C2]"
-              style={{ fontSize: "16px", minHeight: "44px" }}
+              style={{ fontSize: "var(--fs-button)", minHeight: "44px" }}
             >
               Deal Registration
               <ArrowIcon className="text-white" />
