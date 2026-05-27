@@ -180,7 +180,9 @@ export function BlogsHero({
                   {featuredPost.abstract && (
                     <p
                       className="font-normal leading-[1.4] tracking-[-0.05em]"
-                      style={{ fontSize: "var(--fs-lead)", color: "#d1e5ff" }}
+                      /* Featured article abstract is a CARD description, not a section description —
+                         use --fs-body (16→17) to match the card-title (--fs-h3) pairing. */
+                      style={{ fontSize: "var(--fs-body)", color: "#d1e5ff" }}
                     >
                       {featuredPost.abstract}
                     </p>
