@@ -91,7 +91,7 @@ const TOP_CARD_SHELL: React.CSSProperties = {
   overflow: "hidden",
   background:
     "linear-gradient(180deg, #151021 0%, #131e8f 71.202%, #551ece 100%)",
-  borderRadius: "14px",
+  borderRadius: "24px",
   boxShadow:
     "-4.5px 2.25px 11.26px rgba(0,0,0,0.23),-18.57px 9px 20.82px rgba(0,0,0,0.2),-41.65px 20.82px 27.58px rgba(0,0,0,0.12)",
   minHeight: "clamp(140px, 16.3vw, 209px)",
@@ -159,7 +159,7 @@ function TopCard({
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
-          borderRadius: "14px",
+          borderRadius: "24px",
           padding: "1.688px",
           background:
             "radial-gradient(circle at 90% 13%, rgba(218,182,243,1) 0%, rgba(218,182,243,0) 100%)",
