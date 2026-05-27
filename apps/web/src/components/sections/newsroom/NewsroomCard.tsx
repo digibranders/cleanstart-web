@@ -57,7 +57,7 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
           <span
             className="font-display font-bold text-center text-white"
             style={{
-              fontSize: "1.5rem",
+              fontSize: "var(--fs-h3)",
               letterSpacing: "-0.03em",
               padding: "0 24px",
             }}
@@ -94,8 +94,8 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
                   decoding="async"
                 />
                 <span
-                  className="text-[12px] md:text-sm font-medium leading-normal whitespace-nowrap"
-                  style={{ color: "#666" }}
+                  className="font-medium leading-normal whitespace-nowrap"
+                  style={{ fontSize: "var(--fs-caption)", color: "#666" }}
                 >
                   {date}
                 </span>
@@ -115,8 +115,8 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
                   decoding="async"
                 />
                 <span
-                  className="text-[12px] md:text-sm font-medium leading-normal whitespace-nowrap"
-                  style={{ color: "#666" }}
+                  className="font-medium leading-normal whitespace-nowrap"
+                  style={{ fontSize: "var(--fs-caption)", color: "#666" }}
                 >
                   {readTime}
                 </span>

@@ -176,7 +176,7 @@ export function NewsroomHero(): React.ReactElement {
             id="newsroom-hero-title"
             className="font-display font-semibold text-white"
             style={{
-              fontSize: "var(--text-hero-utility)",
+              fontSize: "var(--fs-h1)",
               lineHeight: "var(--text-hero-lh)",
               letterSpacing: "var(--text-hero-utility-ls)",
             }}
@@ -186,7 +186,7 @@ export function NewsroomHero(): React.ReactElement {
           <p
             className="font-sans font-normal text-white"
             style={{
-              fontSize: "clamp(1.125rem, 2.08vw, 1.875rem)",
+              fontSize: "var(--fs-lead)",
               lineHeight: "1.4",
               letterSpacing: "-0.04em",
             }}

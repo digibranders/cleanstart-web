@@ -148,7 +148,7 @@ export function NewsroomGrid({
         {items.length === 0 ? (
           <p
             className="font-sans text-center py-20"
-            style={{ color: "rgba(17,17,17,0.54)", fontSize: "1.125rem" }}
+            style={{ color: "rgba(17,17,17,0.54)", fontSize: "var(--fs-lead)" }}
           >
             No news yet — check back soon.
           </p>
@@ -179,7 +179,7 @@ export function NewsroomGrid({
                     borderRadius: "10px",
                     background: "white",
                     color: "#4a3bf1",
-                    fontSize: "15px",
+                    fontSize: "var(--fs-body-sm)",
                     fontWeight: 500,
                     border: "1px solid rgba(74,59,241,0.25)",
                   }}
