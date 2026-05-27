@@ -8,9 +8,9 @@ import Link from 'next/link';
  *  - Section height: 823px · bg gradient identical to mobile
  *  - Mesh background: hero-mesh.svg 1920×569px at left:-240px (overflows both edges)
  *  - Content position: left 82px · top 229px
- *  - Heading: Figtree SemiBold 80px / lh 1.2 / tracking -0.05em
+ *  - Heading: Manrope SemiBold 80px / lh 1.2 / tracking -0.05em
  *  - "Bigger Risk": gradient 96.33deg #9A51FF 1.76% → #2CC1EB 98.78%
- *  - Description: Figtree Regular 30px / tracking -0.04em / opacity 0.8
+ *  - Description: Manrope Regular 30px / tracking -0.04em / opacity 0.8
  *  - CTA: px-18px py-9px · font Inter Medium 18px / tracking -0.01em · border #dab6f3 · glass
  *  - Content → CTA gap: 40px · Heading → Desc gap: 24px
  *  - BLOATED card: hero-cards.png rendered 360px wide (larger, on left).
@@ -18,9 +18,9 @@ import Link from 'next/link';
  *
  * Mobile specs (360px / node 920:609):
  *  - Content starts at top: 136px
- *  - Heading: Figtree Bold 32px / lh 1.2 / white
+ *  - Heading: Manrope Bold 32px / lh 1.2 / white
  *  - "Bigger Risk": gradient 98.23deg #9A51FF→#2CC1EB, tracking -1.6px
- *  - Description: Figtree Regular 16px / tracking -0.64px / opacity 0.8
+ *  - Description: Manrope Regular 16px / tracking -0.64px / opacity 0.8
  *  - CTA: px-24px py-12px · border #dab6f3 · 16px Medium · tracking -0.8px
  *  - Cards: hero-mobile-cards.png composite
  *
@@ -83,10 +83,12 @@ export function ASRHero(): React.ReactElement {
        */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 lg:px-[82px]">
         <div
-          className="flex flex-col md:flex-row items-start md:items-end gap-6 md:gap-6 lg:gap-10"
+          className="flex flex-col md:flex-row items-center md:items-end gap-8 md:gap-6 lg:gap-10"
           style={{
             paddingTop: 'clamp(112px, 15.9vw, 229px)',
-            paddingBottom: 'clamp(56px, 8.3vw, 120px)',
+            // Fixed bottom space below the cards/CTA at every viewport
+            // (was a clamp 56→120px which made the gap shift with width).
+            paddingBottom: '96px',
           }}
         >
           {/* ── Left: heading + description + CTA ── */}
@@ -200,13 +202,32 @@ export function ASRHero(): React.ReactElement {
            * baked-in drop-shadow padding below the visible card frame, so CLEAN is
            * anchored at bottom:38px to align the visible card frames at the same baseline.
            */}
+          {/*
+           * Stage scale system, two regimes:
+           *   • Mobile (<md): scale is computed so the VISIBLE card span
+           *     (BLOATED visible-left → CLEAN visible-right = 586 canvas units)
+           *     fills the container's content width (100vw - 48px, where 48px
+           *     is the section's px-6 gutter * 2). A negative left margin
+           *     (-64px * scale) shifts the wrapper so BLOATED's visible-left
+           *     sits flush with the left gutter and CLEAN's visible-right
+           *     sits flush with the right gutter. Heights derive from the
+           *     same scale → fully fluid.
+           *   • md+ : viewport clamp 0.5 → 1.0 across 768 → 1440vw.
+           * Both use CSS Values 4 px-over-px division for unitless ratios.
+           */}
           <div
-            className="hidden md:block relative shrink-0 [--asr-card-scale:0.5] lg:[--asr-card-scale:0.72] xl:[--asr-card-scale:1]"
+            className={[
+              'block relative shrink-0',
+              'w-full md:w-auto',
+              '-ml-[calc(64px*var(--asr-card-scale))] md:ml-0',
+              '[--asr-card-scale:calc((100vw-48px)/586px)]',
+              'md:[--asr-card-scale:clamp(0.5,calc(0.5+(100vw-768px)/672px*0.5),1)]',
+            ].join(' ')}
             style={{
               width: 'calc(650px * var(--asr-card-scale))',
-              // Height excludes the ≈26px drop-shadow padding baked into hero-cards.png,
-              // so the wrapper's bottom edge = the cards' VISIBLE bottom. items-end on the
-              // parent flex row then aligns that to the CTA's bottom.
+              // Height excludes the ≈26px drop-shadow padding baked into hero-cards.png
+              // so the wrapper's bottom edge = the cards' VISIBLE bottom. items-end on
+              // the parent flex row then pins that to the CTA's bottom on md+.
               height: 'calc(414px * var(--asr-card-scale))',
             }}
           >
@@ -426,22 +447,6 @@ export function ASRHero(): React.ReactElement {
             </div>
           </div>
 
-          {/* ── Mobile (< md): combined cards export ── */}
-          {/*
-           * hero-mobile-cards.png matches Figma 920:609 layout —
-           * BLOATED card (168×226) at left:13px, CLEAN card (153×188) at left:193px.
-           */}
-          <div className="block md:hidden relative w-full">
-            <Image
-              src="/images/attack-surface-reduction/hero-mobile-cards.png"
-              alt="BLOATED vs CLEAN image comparison: 1.2 GB / 247 packages / 89 HIGH CVEs vs 87 MB / 12 packages / 0 HIGH CVEs"
-              width={334}
-              height={227}
-              sizes="100vw"
-              className="w-full h-auto"
-              priority
-            />
-          </div>
         </div>
       </div>
     </section>
