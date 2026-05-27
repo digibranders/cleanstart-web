@@ -268,10 +268,9 @@ export function CisoSolution(): React.ReactElement {
                       fontSize: "var(--fs-h4)",
                       fontWeight: 600,
                       letterSpacing: "-0.04em",
-                      lineHeight: 1.1,
+                      lineHeight: 1.15,
                       color: "#fff",
                       margin: 0,
-                      whiteSpace: "nowrap",
                     }}
                   >
                     {f.titleMobile}
