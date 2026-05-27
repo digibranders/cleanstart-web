@@ -518,6 +518,13 @@ function MorphCard({
       tabIndex={isActive ? undefined : -1}
       onClick={onClick}
       onPointerDown={(e) => {
+        // Desktop-only: peeks only exist at ≥ 1024 px, and the touch-swipe
+        // handler on the carousel section already covers mobile / tablet.
+        // Bail for non-mouse pointers and below the desktop breakpoint so
+        // we don't fight the touch handlers (or, on touchscreen laptops,
+        // hijack a finger that the user meant to scroll the page with).
+        if (e.pointerType !== "mouse") return;
+        if (window.innerWidth < 1024) return;
         if (e.button !== 0) return;
         // Don't hijack interactive descendants (CTA link, future buttons).
         if ((e.target as HTMLElement).closest("a, button")) return;
