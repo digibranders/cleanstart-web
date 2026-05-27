@@ -266,7 +266,7 @@ function CardHeader({ title, icon }: { title: string; icon: LucideIcon }): React
       <BlueBall icon={icon} />
       <h3
         className="font-display font-bold text-[#111]"
-        style={{ fontSize: "24px", lineHeight: "32px" }}
+        style={{ fontSize: "var(--fs-h4)", lineHeight: "32px" }}
       >
         {title}
       </h3>
@@ -279,7 +279,7 @@ function ExploreLink({ href, label = "Explore All Resources" }: { href: string; 
     <Link
       href={href}
       className="flex items-center gap-3 font-display font-semibold text-[#4a3bf1]"
-      style={{ fontSize: "16px", lineHeight: "24px" }}
+      style={{ fontSize: "var(--fs-body)", lineHeight: "24px" }}
     >
       {label}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -317,7 +317,7 @@ function WhatsNewCard({ items }: { items: NewsItem[] }): React.ReactElement {
             </span>
             <span
               className="font-display font-semibold text-[#111]"
-              style={{ fontSize: "18px", lineHeight: "28px" }}
+              style={{ fontSize: "var(--fs-h5)", lineHeight: "28px" }}
             >
               {item.title}
             </span>
@@ -354,7 +354,7 @@ function DiscussionsCard(): React.ReactElement {
               <div>
                 <p
                   className="font-display font-semibold text-[#111]"
-                  style={{ fontSize: "14px", lineHeight: "20px" }}
+                  style={{ fontSize: "var(--fs-body-sm)", lineHeight: "20px" }}
                 >
                   {d.name}
                 </p>
@@ -368,7 +368,7 @@ function DiscussionsCard(): React.ReactElement {
             </div>
             <p
               className="font-sans font-normal text-[#111]"
-              style={{ fontSize: "14px", lineHeight: "22.75px" }}
+              style={{ fontSize: "var(--fs-body-sm)", lineHeight: "22.75px" }}
             >
               {d.message}
             </p>
@@ -406,7 +406,7 @@ function CommunityImagesCard({ items }: { items: ImageItem[] }): React.ReactElem
             <div>
               <p
                 className="font-display font-semibold text-[#111]"
-                style={{ fontSize: "14px", lineHeight: "20px" }}
+                style={{ fontSize: "var(--fs-body-sm)", lineHeight: "20px" }}
               >
                 {item.name}
               </p>
@@ -448,7 +448,7 @@ function UpcomingEventsCard({ items }: { items: EventItem[] }): React.ReactEleme
               </span>
               <span
                 className="font-display font-semibold text-[#424242]"
-                style={{ fontSize: "18px", lineHeight: "28px" }}
+                style={{ fontSize: "var(--fs-h5)", lineHeight: "28px" }}
               >
                 {ev.day}
               </span>
@@ -456,7 +456,7 @@ function UpcomingEventsCard({ items }: { items: EventItem[] }): React.ReactEleme
             <div>
               <p
                 className="font-display font-semibold text-[#111]"
-                style={{ fontSize: "16px", lineHeight: "24px" }}
+                style={{ fontSize: "var(--fs-body)", lineHeight: "24px" }}
               >
                 {ev.title}
               </p>

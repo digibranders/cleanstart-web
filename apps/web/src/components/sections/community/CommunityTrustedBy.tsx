@@ -47,7 +47,7 @@ export function CommunityTrustedBy() {
         <h2
           className="font-display font-bold text-center mb-[clamp(32px,4vw,56px)]"
           style={{
-            fontSize: 'clamp(2rem, 4vw, 3.875rem)',
+            fontSize: 'var(--fs-h2)',
             lineHeight: '1.05',
             letterSpacing: '-0.05em',
           }}
