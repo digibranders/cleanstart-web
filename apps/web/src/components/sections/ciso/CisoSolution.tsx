@@ -336,16 +336,17 @@ export function CisoSolution(): React.ReactElement {
           decoding="async"
         />
 
-        {/* ── 1276px content container ── */}
-        <div className="relative mx-auto" style={{ maxWidth: "1276px" }}>
+        {/* ── 1276px content container with shared side gutter so cards
+              don't overflow the viewport below 1276px. ── */}
+        <div className="relative mx-auto px-6 sm:px-10" style={{ maxWidth: "1276px" }}>
 
           {/* Heading group */}
-          <div className="text-center px-6" style={{ marginBottom: "125px" }}>
+          <div className="text-center" style={{ marginBottom: "125px" }}>
             <h2
               className="text-white"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-h2)",
+                fontSize: "var(--fs-h1)",
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,

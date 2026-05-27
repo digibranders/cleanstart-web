@@ -43,6 +43,7 @@ export function CisoRisks(): React.ReactElement {
       dataSection="CisoRisks"
       heading="Most Container Risk Is Inherited"
       cards={CARDS}
+      showCornerGlows={false}
     />
   );
 }
