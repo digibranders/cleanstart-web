@@ -169,7 +169,7 @@ export function FipsCTA(): React.ReactElement {
         </p>
         <Link
           href="/book-a-demo"
-          className="cs-btn-glass self-start"
+          className="cs-btn-glass self-center"
           style={
             {
               "--cs-btn-px": "18px",

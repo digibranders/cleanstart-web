@@ -1,3 +1,5 @@
+import React from "react";
+
 interface Sector {
   title: string;
   description: string;
@@ -26,185 +28,169 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
   return (
     <section
       data-section="FipsRegulatedEnvironments"
-      className="relative overflow-hidden"
+      className="relative isolate overflow-hidden"
       aria-label="Built for Regulated Environments"
-      /*
-       * Mobile (Figma 366:8028): section frame h=695px.
-       * Desktop: scales up proportionally via vw.
-       */
-      style={{ minHeight: "clamp(695px, 50vw, 800px)" }}
     >
-      {/* Background photo */}
+      {/* Background photo — mobile portrait below md, full-bleed photo above */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/fips/regulated-photo-mobile.png"
+        alt=""
+        className="absolute inset-0 w-full h-full -z-20 pointer-events-none select-none md:hidden"
+        style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(6px)", transform: "scale(1.03)" }}
+        loading="lazy"
+        decoding="async"
+      />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/fips/regulated-photo.png"
         alt=""
-        className="absolute inset-0 w-full h-full pointer-events-none select-none"
-        style={{ objectFit: "cover", objectPosition: "center center" }}
+        className="absolute inset-0 w-full h-full -z-20 pointer-events-none select-none hidden md:block"
+        style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(6px)", transform: "scale(1.03)" }}
         loading="lazy"
         decoding="async"
       />
 
-      {/*
-       * Mobile overlay — transparent at top, fades to black at ~79%.
-       * Figma 366:8028: linear-gradient(180deg, rgba(0,0,0,0) 24%, rgba(0,0,0,0.9) 79%)
-       * This lets the photo show through at top while darkening the sector list area.
-       */}
+      {/* Purple gradient overlay — matches home CleanStartAdvantage. */}
       <div
         aria-hidden
-        className="absolute inset-0 pointer-events-none md:hidden"
+        className="absolute inset-0 -z-10"
         style={{
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0) 24%, rgba(0,0,0,0.9) 79%)",
+            "linear-gradient(90deg, rgba(20,12,55,0.92) 0%, rgba(50,25,135,0.78) 35%, rgba(70,30,180,0.45) 65%, rgba(70,30,180,0.10) 100%)",
         }}
       />
 
-      {/*
-       * Mobile purple overlay — rises from bottom.
-       * Figma 366:8028 node 366:8030: rotated gradient giving a purple
-       * wash in the lower section behind the sector list.
-       */}
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none md:hidden"
-        style={{
-          background:
-            "linear-gradient(0deg, rgba(71,30,192,0.60) 0%, rgba(66,30,188,0.30) 20%, rgba(66,30,188,0) 42%)",
-        }}
-      />
+      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 py-section-lg">
+        <div className="max-w-[770px]">
+          <h2
+            className="font-display text-white"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+            }}
+          >
+            Built for Regulated{" "}
+            <span className="cs-text-gradient-impact">Environments</span>
+          </h2>
+        </div>
 
-      {/*
-       * Desktop gradient overlay — left-to-right for legibility with
-       * right-positioned photo subject.
-       */}
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none hidden md:block"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(15,12,40,0.92) 0%, rgba(15,12,40,0.86) 45%, rgba(15,12,40,0.55) 75%, rgba(15,12,40,0.30) 100%)",
-        }}
-      />
-
-      <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-10 pt-8 pb-14 md:py-[110px] flex flex-col" style={{ minHeight: "inherit" }}>
-        {/*
-         * Heading
-         * Mobile (Figma 366:8028): 28px Bold, centered, ls=-0.05em, lh=1.2, w=264px.
-         * Desktop: 56px, left-aligned, maxWidth=770px.
-         */}
-        <h2
-          className="text-white text-center md:text-left mb-16 md:mb-[64px]"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.1,
-            maxWidth: "770px",
-          }}
-        >
-          Built for Regulated{" "}
-          <span className="cs-text-gradient-impact">Environments</span>
-        </h2>
-
-        {/*
-         * Mobile layout — flex column with gradient dividers.
-         * Figma 366:8028: flex-col gap=24px, sectors at left=32px.
-         * Sectors: title 20px SemiBold, desc 14px Regular, separated by
-         * a 147px × 1px gradient line fading left-to-right.
-         */}
-        <div className="flex flex-col gap-[24px] md:hidden px-4 mt-auto">
-          {SECTORS.map((sector, idx) => (
-            <div key={sector.title}>
-              <div className="flex flex-col gap-[6px]">
-                <p
-                  className="text-white"
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--fs-h4)",
-                    fontWeight: 600,
-                    letterSpacing: "-0.05em",
-                    lineHeight: 1,
-                  }}
-                >
-                  {sector.title}
-                </p>
-                <p
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--fs-body-sm)",
-                    fontWeight: 400,
-                    letterSpacing: "-0.04em",
-                    lineHeight: 1.5,
-                    color: "rgba(255,255,255,0.80)",
-                  }}
-                >
-                  {sector.description}
-                </p>
-              </div>
-
-              {/*
-               * Gradient divider — between sectors, not after the last.
-               * Figma 366:8028: Rectangle19 = 1px × 147px image rotated -90°
-               * giving a horizontal line that fades right. Reproduced in CSS.
-               */}
-              {idx < SECTORS.length - 1 && (
-                <div
-                  aria-hidden
-                  className="mt-[24px]"
-                  style={{
-                    height: "1px",
-                    width: "147px",
-                    background:
-                      "linear-gradient(90deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 100%)",
-                  }}
-                />
-              )}
-            </div>
+        {/* Mobile/tablet stack — matches home CleanStartAdvantage mobile. */}
+        <div className="mt-12 flex flex-col gap-6 sm:mt-14 lg:hidden">
+          {SECTORS.map((sector, i) => (
+            <React.Fragment key={sector.title}>
+              <SectorBlock sector={sector} variant="mobile" />
+              {i < SECTORS.length - 1 && <HorizontalDivider />}
+            </React.Fragment>
           ))}
         </div>
 
-        {/*
-         * Desktop layout — 4-column grid with left-border dividers.
-         * Figma desktop node (node 366:7788 / 787:xxxx).
-         */}
-        <div className="hidden md:grid md:grid-cols-4 md:gap-0 mt-auto md:pt-16">
-          {SECTORS.map((sector, idx) => (
-            <div
-              key={sector.title}
-              className={`relative md:px-7 md:first:pl-0 ${idx > 0 ? "md:border-l md:border-white/20" : ""}`}
-            >
-              <p
-                className="text-white mb-3"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "var(--fs-h3)",
-                  fontWeight: 700,
-                  letterSpacing: "-0.05em",
-                  lineHeight: 1.1,
-                  maxWidth: "219px",
-                }}
-              >
-                {sector.title}
-              </p>
-              <p
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "var(--fs-body)",
-                  fontWeight: 400,
-                  letterSpacing: "-0.04em",
-                  lineHeight: 1.5,
-                  color: "rgba(255,255,255,0.78)",
-                  maxWidth: "219px",
-                }}
-              >
-                {sector.description}
-              </p>
-            </div>
+        {/* Desktop row — matches home CleanStartAdvantage desktop. */}
+        <div className="hidden lg:mt-[120px] lg:flex lg:items-start lg:justify-between lg:gap-6">
+          {SECTORS.map((sector, i) => (
+            <React.Fragment key={sector.title}>
+              <SectorBlock sector={sector} variant="desktop" />
+              {i < SECTORS.length - 1 && <VerticalDivider />}
+            </React.Fragment>
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function SectorBlock({
+  sector,
+  variant,
+}: {
+  sector: Sector;
+  variant: "mobile" | "desktop";
+}) {
+  if (variant === "mobile") {
+    return (
+      <div className="flex w-[222px] flex-col gap-3">
+        <div
+          className="font-display text-white"
+          style={{
+            fontSize: "var(--fs-h3)",
+            fontWeight: 700,
+            lineHeight: 1.1,
+            letterSpacing: "-0.04em",
+          }}
+        >
+          {sector.title}
+        </div>
+        <div
+          className="text-white"
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--fs-lead)",
+            fontWeight: 400,
+            lineHeight: 1.3,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {sector.description}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="flex shrink-0 flex-col">
+      <div
+        className="font-display text-white"
+        style={{
+          fontSize: "var(--fs-h3)",
+          fontWeight: 700,
+          lineHeight: 1.1,
+          letterSpacing: "-0.04em",
+          maxWidth: "219px",
+        }}
+      >
+        {sector.title}
+      </div>
+      <div
+        className="mt-5 max-w-[219px] text-white"
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "var(--fs-lead)",
+          fontWeight: 400,
+          lineHeight: 1.3,
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {sector.description}
+      </div>
+    </div>
+  );
+}
+
+function VerticalDivider() {
+  return (
+    <div
+      aria-hidden
+      className="h-[109px] w-px shrink-0 self-stretch"
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 49.3%, rgba(153,153,153,0) 99.2%)",
+      }}
+    />
+  );
+}
+
+function HorizontalDivider() {
+  return (
+    <div
+      aria-hidden
+      className="h-px w-[147px] shrink-0"
+      style={{
+        background:
+          "linear-gradient(90deg, rgba(255,255,255,0) 0%, #FFFFFF 49.32%, rgba(153,153,153,0) 99.18%)",
+      }}
+    />
   );
 }
