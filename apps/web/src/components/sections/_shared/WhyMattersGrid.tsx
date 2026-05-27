@@ -125,7 +125,7 @@ function DesktopCard({ imgSrc, imgAlt, imgStyle, title, desc }: WhyCard): React.
         <h3
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(22px, 2.4vw, 32px)',
+            fontSize: 'var(--fs-h3)',
             fontWeight: 700,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
@@ -138,7 +138,7 @@ function DesktopCard({ imgSrc, imgAlt, imgStyle, title, desc }: WhyCard): React.
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(15px, 1.4vw, 20px)',
+            fontSize: 'var(--fs-body)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.4,
@@ -208,7 +208,7 @@ function MobileCard({ imgSrc, imgAlt, mobileImgStyle, title, desc }: WhyCard): R
         <h3
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '20px',
+            fontSize: 'var(--fs-h4)',
             fontWeight: 600,
             letterSpacing: '-0.05em',
             lineHeight: 1,
@@ -221,7 +221,7 @@ function MobileCard({ imgSrc, imgAlt, mobileImgStyle, title, desc }: WhyCard): R
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '14px',
+            fontSize: 'var(--fs-body-sm)',
             fontWeight: 400,
             letterSpacing: '-0.04em',
             lineHeight: 1.4,
@@ -385,7 +385,7 @@ export function WhyMattersGrid({
           className="text-center mx-auto"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(28px, 4vw, 56px)',
+            fontSize: 'var(--fs-h2)',
             fontWeight: 700,
             letterSpacing: '-0.04em',
             lineHeight: 1.15,
@@ -401,7 +401,7 @@ export function WhyMattersGrid({
             className="text-center mx-auto"
             style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: 'clamp(14px, 1.25vw, 18px)',
+              fontSize: 'var(--fs-body-sm)',
               fontWeight: 400,
               letterSpacing: '-0.02em',
               lineHeight: 1.4,

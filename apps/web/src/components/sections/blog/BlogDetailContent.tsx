@@ -78,8 +78,9 @@ export function BlogDetailContent({
 
             {abstract && (
               <p
-                className="mb-8 text-[clamp(1rem,1.2vw,1.125rem)] leading-[1.7] tracking-[-0.01em]"
+                className="mb-8 leading-[1.7] tracking-[-0.01em]"
                 style={{
+                  fontSize: "var(--fs-body)",
                   color: "rgba(17,17,17,0.65)",
                   borderLeft: "3px solid #4a3bf1",
                   paddingLeft: "16px",
@@ -287,7 +288,7 @@ function MobileTableOfContents({
         className="flex items-center justify-between font-sans cursor-pointer list-none"
         style={{
           padding: "12px 16px",
-          fontSize: "15px",
+          fontSize: "var(--fs-body-sm)",
           fontWeight: 600,
           color: "#111",
           letterSpacing: "-0.01em",

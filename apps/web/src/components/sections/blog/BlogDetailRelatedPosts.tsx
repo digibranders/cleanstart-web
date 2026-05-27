@@ -41,7 +41,8 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
             aria-label="See all blog posts"
           >
             <span
-              className="font-display text-[clamp(1.25rem,2.2vw,2rem)] font-bold leading-none tracking-[-0.05em] text-white group-hover:text-[#2CC1EB] transition-colors duration-200"
+              className="font-display font-bold leading-none tracking-[-0.05em] text-white group-hover:text-[#2CC1EB] transition-colors duration-200"
+              style={{ fontSize: "var(--fs-h3)" }}
             >
               See All
             </span>
@@ -137,7 +138,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
                 <div className="flex items-center gap-1">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/images/blogs/icon-calendar-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
-                  <span className="text-[12px] md:text-sm font-medium leading-normal whitespace-nowrap" style={{ color: "#666" }}>
+                  <span className="font-medium leading-normal whitespace-nowrap" style={{ fontSize: "var(--fs-caption)", color: "#666" }}>
                     {formatBlogDate(displayDate)}
                   </span>
                 </div>
@@ -147,7 +148,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
               <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/blogs/icon-clock-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
-                <span className="text-[12px] md:text-sm font-medium leading-normal whitespace-nowrap" style={{ color: "#666" }}>
+                <span className="font-medium leading-normal whitespace-nowrap" style={{ fontSize: "var(--fs-caption)", color: "#666" }}>
                   {post.readingMinutes} min read
                 </span>
               </div>

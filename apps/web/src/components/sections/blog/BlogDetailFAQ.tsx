@@ -22,8 +22,8 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
 
           <div className="min-w-0 flex-1 mx-auto xl:mx-0" style={{ maxWidth: "680px" }}>
             <h2
-              className="font-display text-[clamp(1.375rem,2vw,2rem)] font-bold leading-[1.1] tracking-[-0.04em]"
-              style={{ color: "#111111", marginBottom: "24px" }}
+              className="font-display font-bold leading-[1.1] tracking-[-0.04em]"
+              style={{ fontSize: "var(--fs-h3)", color: "#111111", marginBottom: "24px" }}
             >
               Frequently Asked Questions
             </h2>
@@ -57,8 +57,8 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                       style={{ padding: "20px 24px" }}
                     >
                       <span
-                        className="flex-1 font-display text-[clamp(0.9375rem,1.1vw,1.0625rem)] font-semibold leading-[1.4] tracking-[-0.02em] transition-colors duration-200 group-hover:text-[#3960f9]"
-                        style={{ color: "#111111" }}
+                        className="flex-1 font-display font-semibold leading-[1.4] tracking-[-0.02em] transition-colors duration-200 group-hover:text-[#3960f9]"
+                        style={{ fontSize: "var(--fs-body)", color: "#111111" }}
                       >
                         {item.question}
                       </span>
@@ -96,8 +96,9 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                           para.trim() ? (
                             <p
                               key={j}
-                              className="text-[clamp(0.875rem,1vw,0.9375rem)] font-normal leading-[1.65] tracking-[-0.01em]"
+                              className="font-normal leading-[1.65] tracking-[-0.01em]"
                               style={{
+                                fontSize: "var(--fs-body-sm)",
                                 color: "rgba(17,17,17,0.65)",
                                 marginBottom: j < item.answer.split("\n").filter(Boolean).length - 1 ? "12px" : "0",
                               }}

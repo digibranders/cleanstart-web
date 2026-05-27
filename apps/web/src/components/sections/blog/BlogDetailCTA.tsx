@@ -179,7 +179,7 @@ export function BlogDetailCTA(): React.ReactElement {
                     height: "44px",
                     padding: "0 18px",
                     // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored submit-button label, fixed 18px to match the inline gradient pill chrome. See RESPONSIVE-AUDIT.md §14.3.
-                    fontSize: "16px",
+                    fontSize: "var(--fs-button)",
                     letterSpacing: "-0.01em",
                     background:
                       "linear-gradient(180deg, #3960F9 0%, #2B97D1 100%)",
