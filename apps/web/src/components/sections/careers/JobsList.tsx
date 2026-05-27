@@ -50,7 +50,7 @@ export function JobsList({
         <p
           className="text-center font-sans"
           style={{
-            fontSize: "18px",
+            fontSize: "var(--fs-h5)",
             lineHeight: 1.4,
             letterSpacing: "-0.02em",
             color: "rgba(17,17,17,0.54)",

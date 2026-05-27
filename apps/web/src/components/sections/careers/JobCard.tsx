@@ -45,7 +45,7 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
           <h2
             className="font-display"
             style={{
-              fontSize: "clamp(1.125rem, 1.4vw, 1.25rem)",
+              fontSize: "var(--fs-h5)",
               fontWeight: 600,
               lineHeight: 1.3,
               letterSpacing: "-0.02em",
@@ -78,7 +78,7 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
           <span
             className="font-sans"
             style={{
-              fontSize: "14px",
+              fontSize: "var(--fs-body-sm)",
               color: "rgba(17,17,17,0.7)",
               fontWeight: 400,
               lineHeight: 1.35,
@@ -99,7 +99,7 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
           <span
             className="font-sans"
             style={{
-              fontSize: "14px",
+              fontSize: "var(--fs-body-sm)",
               color: "rgba(17,17,17,0.7)",
               fontWeight: 400,
               lineHeight: 1.35,
@@ -164,7 +164,7 @@ const applyButtonStyle: React.CSSProperties = {
   borderRadius: "10px",
   background: "#4a3bf1",
   color: "white",
-  fontSize: "14px",
+  fontSize: "var(--fs-body-sm)",
   fontWeight: 500,
   letterSpacing: "-0.01em",
   whiteSpace: "nowrap",
@@ -184,7 +184,7 @@ const closedButtonStyle: React.CSSProperties = {
   background: "rgba(17,17,17,0.06)",
   color: "rgba(17,17,17,0.55)",
   border: "1px solid rgba(17,17,17,0.10)",
-  fontSize: "14px",
+  fontSize: "var(--fs-body-sm)",
   fontWeight: 500,
   letterSpacing: "-0.01em",
   whiteSpace: "nowrap",
@@ -211,7 +211,7 @@ function Pill({
     <span
       className="font-sans"
       style={{
-        fontSize: "12px",
+        fontSize: "var(--fs-badge)",
         fontWeight: 500,
         lineHeight: 1,
         padding: "5px 10px",

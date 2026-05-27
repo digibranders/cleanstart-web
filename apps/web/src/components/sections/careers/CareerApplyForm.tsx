@@ -102,7 +102,7 @@ export function CareerApplyForm({
         <h3
           className="font-display"
           style={{
-            fontSize: "20px",
+            fontSize: "var(--fs-h4)",
             fontWeight: 600,
             color: "#111",
             marginBottom: "8px",
@@ -113,7 +113,7 @@ export function CareerApplyForm({
         </h3>
         <p
           className="font-sans"
-          style={{ fontSize: "15px", color: "rgba(17,17,17,0.65)", lineHeight: 1.5 }}
+          style={{ fontSize: "var(--fs-body-sm)", color: "rgba(17,17,17,0.65)", lineHeight: 1.5 }}
         >
           Attach your resume to the draft in your mail client, then hit send.
           Our team will reply within 5 business days.
@@ -184,7 +184,7 @@ export function CareerApplyForm({
           htmlFor="resume"
           className="font-sans block"
           style={{
-            fontSize: "13px",
+            fontSize: "var(--fs-caption)",
             fontWeight: 500,
             color: "rgba(17,17,17,0.7)",
             marginBottom: "6px",
@@ -207,7 +207,7 @@ export function CareerApplyForm({
           <UploadIcon />
           <span
             style={{
-              fontSize: "14px",
+              fontSize: "var(--fs-body-sm)",
               fontWeight: 500,
               color: "#4a3bf1",
               marginTop: "8px",
@@ -217,7 +217,7 @@ export function CareerApplyForm({
           </span>
           <span
             style={{
-              fontSize: "12px",
+              fontSize: "var(--fs-badge)",
               color: "rgba(17,17,17,0.55)",
               marginTop: "4px",
             }}
@@ -250,7 +250,7 @@ export function CareerApplyForm({
         <p
           role="alert"
           className="font-sans mt-3"
-          style={{ fontSize: "13px", color: "#B42318", lineHeight: 1.4 }}
+          style={{ fontSize: "var(--fs-caption)", color: "#B42318", lineHeight: 1.4 }}
         >
           {error}
         </p>
@@ -264,7 +264,7 @@ export function CareerApplyForm({
           borderRadius: "10px",
           background: "#4a3bf1",
           color: "white",
-          fontSize: "15px",
+          fontSize: "var(--fs-body-sm)",
           fontWeight: 500,
           letterSpacing: "-0.01em",
           transition: "transform 200ms ease, filter 200ms ease, box-shadow 200ms ease",
@@ -306,7 +306,7 @@ function Field({
         htmlFor={name}
         className="font-sans block"
         style={{
-          fontSize: "13px",
+          fontSize: "var(--fs-caption)",
           fontWeight: 500,
           color: "rgba(17,17,17,0.7)",
           marginBottom: "6px",
@@ -332,7 +332,7 @@ function Field({
           borderRadius: "10px",
           border: "1px solid rgba(17,17,17,0.12)",
           background: "white",
-          fontSize: "16px",
+          fontSize: "var(--fs-body)",
           color: "#111",
           outline: "none",
         }}

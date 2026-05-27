@@ -86,7 +86,7 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
               id="careers-hero-title"
               className="font-display font-semibold"
               style={{
-                fontSize: "clamp(36px, 4.45vw, 64px)",
+                fontSize: "var(--fs-display)",
                 letterSpacing: "-0.04em",
                 lineHeight: 1.05,
               }}
@@ -96,7 +96,7 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
             <p
               className="font-sans font-normal"
               style={{
-                fontSize: "clamp(1rem, 1.25vw, 1.5rem)",
+                fontSize: "var(--fs-lead)",
                 lineHeight: 1.3,
                 letterSpacing: "-0.04em",
                 opacity: 0.8,
