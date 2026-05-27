@@ -52,6 +52,17 @@ export interface WhyMattersGridProps {
   cards: readonly [WhyCard, WhyCard, WhyCard, WhyCard];
   /** Mobile re-order indices (defaults to source order). */
   mobileOrder?: readonly [number, number, number, number];
+  /** Toggle the two top-corner purple ellipse glows. Defaults to true.
+   *  Set false on pages where the colour wash doesn't belong (e.g. CleanSight). */
+  showCornerGlows?: boolean;
+  /** Toggle the top-left hex-grid blob. Defaults to true. */
+  showLeftGrid?: boolean;
+  /** Toggle the top-right hex-grid blob. Defaults to true. */
+  showRightGrid?: boolean;
+  /** Render a single soft purple radial gradient at top-right
+   *  (Figma "Union": 1101×1101 at left=1347 top=-565, #640DFB / op 0.1).
+   *  Used on SbomRisks as a replacement for the corner glows. */
+  showUnionTint?: boolean;
 }
 
 // ── Divider gradients (fade in from the edges, 20%→80% solid) ────────────────
@@ -232,96 +243,132 @@ export function WhyMattersGrid({
   subheading,
   cards,
   mobileOrder = [0, 1, 2, 3],
+  showCornerGlows = true,
+  showLeftGrid = true,
+  showRightGrid = true,
+  showUnionTint = false,
 }: WhyMattersGridProps): React.ReactElement {
   return (
     <section
       data-section={dataSection}
       className="relative overflow-hidden"
-      style={{ backgroundColor: '#F6F6F6' }}
+      style={{
+        // Soft gradient blend at the top + bottom edges so the section
+        // doesn't form a hard horizontal seam against whatever sits above
+        // (typically a darker hero gradient) or below it.
+        background:
+          'linear-gradient(180deg, rgba(246,246,246,0) 0%, #F6F6F6 96px, #F6F6F6 calc(100% - 96px), rgba(246,246,246,0) 100%)',
+      }}
     >
       {/* ── Left hex-grid blob (Figma: left=-500, top=-539, w=1181) ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden lg:block"
-        style={{
-          left: 'calc(-500 / 1920 * 100vw)',
-          top: 'calc(-539 / 1920 * 100vw)',
-          width: 'calc(1181 / 1920 * 100vw)',
-          height: 'calc(1181 / 1920 * 100vw)',
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/for-developers/why/deco-union-left.svg"
-          alt=""
-          style={{ display: 'block', width: '100%', height: '100%' }}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
+      {showLeftGrid ? (
+        <div
+          aria-hidden
+          className="pointer-events-none select-none absolute hidden lg:block"
+          style={{
+            left: 'calc(-500 / 1920 * 100vw)',
+            top: 'calc(-539 / 1920 * 100vw)',
+            width: 'calc(1181 / 1920 * 100vw)',
+            height: 'calc(1181 / 1920 * 100vw)',
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/for-developers/why/deco-union-left.svg"
+            alt=""
+            style={{ display: 'block', width: '100%', height: '100%' }}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      ) : null}
 
       {/* ── Right hex-grid blob (Figma: left=1216, top=-535, w=1101) ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden lg:block"
-        style={{
-          left: 'calc(1216 / 1920 * 100vw)',
-          top: 'calc(-535 / 1920 * 100vw)',
-          width: 'calc(1101 / 1920 * 100vw)',
-          height: 'calc(1101 / 1920 * 100vw)',
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/for-developers/why/deco-union-right.svg"
-          alt=""
-          style={{ display: 'block', width: '100%', height: '100%' }}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
+      {showRightGrid ? (
+        <div
+          aria-hidden
+          className="pointer-events-none select-none absolute hidden lg:block"
+          style={{
+            left: 'calc(1216 / 1920 * 100vw)',
+            top: 'calc(-535 / 1920 * 100vw)',
+            width: 'calc(1101 / 1920 * 100vw)',
+            height: 'calc(1101 / 1920 * 100vw)',
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/for-developers/why/deco-union-right.svg"
+            alt=""
+            style={{ display: 'block', width: '100%', height: '100%' }}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      ) : null}
 
-      {/* ── Top-left ellipse glow ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden lg:block"
-        style={{
-          left: 'calc(-311 / 1920 * 100vw)',
-          top: 'calc(-319 / 1920 * 100vw)',
-          width: 'calc(744 / 1920 * 100vw)',
-          height: 'calc(744 / 1920 * 100vw)',
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/for-developers/why/deco-glow-top-left.svg"
-          alt=""
-          style={{ display: 'block', width: '100%', height: '100%' }}
-          loading="lazy"
-          decoding="async"
+      {/* ── Soft purple Union radial gradient — top-right (Figma spec).
+            1101×1101 at left=1347 top=-565, opacity 0.1.
+            Used on SbomRisks as a single colour-wash decoration. ── */}
+      {showUnionTint ? (
+        <div
+          aria-hidden
+          className="pointer-events-none select-none absolute hidden lg:block"
+          style={{
+            left: 'calc(1347 / 1920 * 100vw)',
+            top: 'calc(-565 / 1920 * 100vw)',
+            width: 'calc(1101 / 1920 * 100vw)',
+            height: 'calc(1101 / 1920 * 100vw)',
+            background:
+              'radial-gradient(50% 50% at 50% 50%, #640DFB 0%, rgba(100, 13, 251, 0) 100%)',
+            opacity: 0.1,
+          }}
         />
-      </div>
+      ) : null}
 
-      {/* ── Top-right ellipse glow ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden lg:block"
-        style={{
-          left: 'calc(1477 / 1920 * 100vw)',
-          top: 'calc(-319 / 1920 * 100vw)',
-          width: 'calc(744 / 1920 * 100vw)',
-          height: 'calc(744 / 1920 * 100vw)',
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/for-developers/why/deco-glow-top-right.svg"
-          alt=""
-          style={{ display: 'block', width: '100%', height: '100%' }}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
+      {/* ── Top-left + top-right ellipse glows (opt-out via showCornerGlows) ── */}
+      {showCornerGlows ? (
+        <>
+          <div
+            aria-hidden
+            className="pointer-events-none select-none absolute hidden lg:block"
+            style={{
+              left: 'calc(-311 / 1920 * 100vw)',
+              top: 'calc(-319 / 1920 * 100vw)',
+              width: 'calc(744 / 1920 * 100vw)',
+              height: 'calc(744 / 1920 * 100vw)',
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/for-developers/why/deco-glow-top-left.svg"
+              alt=""
+              style={{ display: 'block', width: '100%', height: '100%' }}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+
+          <div
+            aria-hidden
+            className="pointer-events-none select-none absolute hidden lg:block"
+            style={{
+              left: 'calc(1477 / 1920 * 100vw)',
+              top: 'calc(-319 / 1920 * 100vw)',
+              width: 'calc(744 / 1920 * 100vw)',
+              height: 'calc(744 / 1920 * 100vw)',
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/for-developers/why/deco-glow-top-right.svg"
+              alt=""
+              style={{ display: 'block', width: '100%', height: '100%' }}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </>
+      ) : null}
 
       {/* ── Content ── */}
       <div
