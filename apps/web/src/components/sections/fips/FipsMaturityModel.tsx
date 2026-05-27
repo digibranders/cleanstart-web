@@ -95,7 +95,7 @@ export function FipsMaturityModel(): React.ReactElement {
 function StageCard({ stage }: { stage: Stage }): React.ReactElement {
   return (
     <div
-      className="relative overflow-hidden rounded-[24px] px-6 py-7 flex flex-col gap-5"
+      className="relative overflow-hidden rounded-[24px] px-6 py-7 flex flex-col justify-center gap-5"
       style={{
         background:
           "linear-gradient(180deg, #F5EEFD 0%, #FFFFFF 100%)",
