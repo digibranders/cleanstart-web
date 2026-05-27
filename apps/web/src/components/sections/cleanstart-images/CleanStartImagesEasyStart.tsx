@@ -80,17 +80,17 @@ const FEATURES: FeatureItem[] = [
   {
     title: "Registry Compatible",
     body: "Works with existing registries and pipelines.",
-    iconSrc: "/images/cleanstart-images/workflows-feat-1.svg",
+    iconSrc: "/images/cleanstart-images/workflows-feat-registry-compatible.svg",
   },
   {
     title: "Minimal Workflow Changes",
     body: "Drop-in replacement — just change your base image tag.",
-    iconSrc: "/images/cleanstart-images/workflows-feat-2.svg",
+    iconSrc: "/images/cleanstart-images/workflows-feat-minimal-workflow.svg",
   },
   {
     title: "Continuous Updates",
     body: "Always access current hardened images.",
-    iconSrc: "/images/cleanstart-images/workflows-feat-3.svg",
+    iconSrc: "/images/cleanstart-images/workflows-feat-continuous-updates.svg",
   },
 ];
 

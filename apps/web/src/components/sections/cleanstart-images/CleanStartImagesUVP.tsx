@@ -15,7 +15,7 @@ const CARDS: CardData[] = [
   {
     title: "Up to 80% Smaller Images",
     body: "Reduce unnecessary runtime components",
-    imgSrc: "/images/cleanstart-images/perf-smaller-images.png",
+    imgSrc: "/images/cleanstart-images/uvp-icon-smaller-images.png",
     imgAlt: "3D icon representing image size reduction",
     imgStyle: { height: "104.52%", left: "8.15%", top: "-2.03%", width: "86.53%" },
     gap: 32,
@@ -23,7 +23,7 @@ const CARDS: CardData[] = [
   {
     title: "Lower Memory Consumption",
     body: "Improve runtime efficiency.",
-    imgSrc: "/images/cleanstart-images/perf-memory.png",
+    imgSrc: "/images/cleanstart-images/uvp-icon-memory.png",
     imgAlt: "3D cloud icon representing memory efficiency",
     imgStyle: { height: "100.71%", left: "9.12%", top: "-0.71%", width: "83.45%" },
     gap: 16,
@@ -31,7 +31,7 @@ const CARDS: CardData[] = [
   {
     title: "Faster Pull Times",
     body: "Accelerate deployments and scaling.",
-    imgSrc: "/images/cleanstart-images/perf-pull-times.png",
+    imgSrc: "/images/cleanstart-images/uvp-icon-pull-times.png",
     imgAlt: "3D box icon representing faster container pull times",
     imgStyle: { height: "117.27%", left: "8.45%", top: "-8.18%", width: "87.16%" },
     gap: 32,
@@ -39,7 +39,7 @@ const CARDS: CardData[] = [
   {
     title: "Reduced Attack Surface",
     body: "Fewer inherited vulnerabilities and dependencies.",
-    imgSrc: "/images/cleanstart-images/perf-attack-surface.png",
+    imgSrc: "/images/cleanstart-images/uvp-icon-attack-surface.png",
     imgAlt: "3D shield icon representing a reduced attack surface",
     imgStyle: { height: "96.83%", left: "15.93%", top: "1.36%", width: "72.54%" },
     gap: 16,

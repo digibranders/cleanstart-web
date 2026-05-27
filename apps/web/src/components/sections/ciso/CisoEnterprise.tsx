@@ -46,7 +46,7 @@ const CARDS: CardDef[] = [
     titleSize: 32,
   },
   {
-    icon: "/images/ciso/enterprise-icon-security.svg",
+    icon: "/images/ciso/enterprise-icon-devsecops.svg",
     title: "DevSecOps Teams",
     desc: "Reduce remediation overhead across teams.",
     titleSize: 32,
@@ -58,7 +58,7 @@ const CARDS: CardDef[] = [
     titleSize: 32,
   },
   {
-    icon: "/images/ciso/enterprise-icon-compliance.svg",
+    icon: "/images/ciso/enterprise-icon-security-ops.svg",
     title: "Enterprise Security Operations",
     desc: "Improve visibility into inherited software risk.",
     titleSize: 29,
@@ -132,13 +132,12 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           />
         ))}
 
-        {/* Blue gradient ball — top-edge at 33px, horizontally centered */}
+        {/* Blue gradient ball — top=33px, left=24px (left-aligned, matching text block) */}
         <div
           className="absolute flex items-center justify-center overflow-hidden"
           style={{
-            left: "50%",
+            left: "24px",
             top: "33px",
-            transform: "translateX(-50%)",
             width: "96px",
             height: "96px",
             borderRadius: "50%",
@@ -158,11 +157,10 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           />
         </div>
 
-        {/* Text block — nudged to top=136px (Figma 152px –16px) for 180px clearance.
-            Accommodates 2-line title + 12px gap + 3-line description comfortably. */}
+        {/* Text block — top=152px (Figma spec: 24px gap below ball bottom at 129px) */}
         <div
           className="absolute flex flex-col"
-          style={{ top: "136px", left: "24px", width: "251px", gap: "12px" }}
+          style={{ top: "152px", left: "24px", width: "251px", gap: "12px" }}
         >
           <h3
             style={{

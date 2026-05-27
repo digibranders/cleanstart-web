@@ -10,22 +10,22 @@ const TRUST_CARDS: TrustCard[] = [
   {
     title: "Trusted Source Components",
     body: "Build from verified upstream sources.",
-    iconSrc: "/images/cleanstart-images/trust-ball-cube.svg",
+    iconSrc: "/images/cleanstart-images/trust-icon-trusted-source.svg",
   },
   {
     title: "Minimal Runtime Images",
     body: "Only required components included.",
-    iconSrc: "/images/cleanstart-images/trust-ball-cube.svg",
+    iconSrc: "/images/cleanstart-images/trust-icon-minimal-runtime.svg",
   },
   {
     title: "Deterministic Builds",
     body: "Reproducible and verifiable pipelines.",
-    iconSrc: "/images/cleanstart-images/trust-ball-refresh.svg",
+    iconSrc: "/images/cleanstart-images/trust-icon-deterministic.svg",
   },
   {
     title: "Continuous Rebuilds",
     body: "Rapid response to newly disclosed vulnerabilities.",
-    iconSrc: "/images/cleanstart-images/trust-ball-cube.svg",
+    iconSrc: "/images/cleanstart-images/trust-icon-continuous-rebuild.svg",
   },
 ];
 
