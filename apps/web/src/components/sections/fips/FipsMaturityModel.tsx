@@ -3,24 +3,29 @@ import { FipsBall } from "./FipsBall";
 interface Stage {
   title: string;
   description: string;
+  icon: string;
 }
 
 const STAGES: Stage[] = [
   {
     title: "Harden Foundations",
     description: "Validated cryptographic starting point.",
+    icon: "/images/fips/maturity-icon-harden.svg",
   },
   {
     title: "Standardize Cryptography",
     description: "Consistent security across environments.",
+    icon: "/images/fips/maturity-icon-standardize.svg",
   },
   {
     title: "Validate Compliance",
     description: "Continuous evidence and verification.",
+    icon: "/images/fips/maturity-icon-validate.svg",
   },
   {
     title: "Continuously Monitor",
     description: "Track cryptographic compliance over time.",
+    icon: "/images/fips/maturity-icon-monitor.svg",
   },
 ];
 
@@ -101,7 +106,7 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
         minHeight: "clamp(226px, 24vw, 320px)",
       }}
     >
-      <FipsBall size={84} />
+      <FipsBall size={84} iconSrc={stage.icon} />
 
       <div>
         <p

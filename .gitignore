@@ -18,6 +18,7 @@ next-env.d.ts
 # Claude Code per-user settings and runtime files
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
+.claude/launch.json
 
 # Generated types — Payload regenerates this; do not edit by hand
 # (still committed; ignore only local stale copies during regeneration)

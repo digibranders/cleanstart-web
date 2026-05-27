@@ -1,16 +1,7 @@
+import type React from 'react';
 import Image from 'next/image';
 
-/**
- * "What this delivers for your business" — Figma node 783:452.
- *
- * Layout:
- *   - Full-bleed person photo (right-weighted) with purple→navy left overlay
- *   - Title top-left ("your business" gradient)
- *   - 4 benefit columns at the bottom, each ~263 px wide, with a 1×123 px
- *     vertical gradient separator between them (Figma Rectangle 1000001844).
- *
- * Below md the benefits stack into a 2×2 grid (no vertical separators).
- */
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
 const BENEFITS = [
   { title: 'Reduced Security Exposure', desc: 'Fewer inherited vulnerabilities.' },
@@ -19,15 +10,56 @@ const BENEFITS = [
   { title: 'Lower Operational Overhead', desc: 'Less patching and maintenance.' },
 ] as const;
 
+// ─── Section ──────────────────────────────────────────────────────────────────
+/*
+ * Desktop (Figma 783:452):
+ *   Full-bleed photo (right-weighted) + left-to-right purple overlay.
+ *   4-column benefits row with vertical gradient separators.
+ *
+ * Mobile (Figma 366:6670 — 360×611px):
+ *   Photo: exact Figma offsets (left -33.16%, w 173.52%, h 124.69%), no brightness filter.
+ *   Overlay starts at 115px from top (Figma 366:6672) — provides all darkening.
+ *   Heading: Figtree Bold 28px / lh 1.2 / centred / w-200px / top: 32px.
+ *   "your business" → gradient 94.09deg #9A51FF 26.48% → #2CC1EB 98.78%,
+ *                      tracking -1.4px.
+ *   Benefits: left: 32px, top: 164px, flex-col gap-24px,
+ *             items separated by 147×1px gradient dividers.
+ */
+
 export function ASRDelivers(): React.ReactElement {
   return (
     <section
       data-section="ASRDelivers"
       className="relative overflow-hidden"
-      style={{ minHeight: 'clamp(560px, 50vw, 711px)' }}
+      style={{ minHeight: 'clamp(611px, 50vw, 711px)' }}
     >
-      {/* ---------- Background photo + overlay ---------- */}
-      <div aria-hidden className="absolute inset-0">
+      {/* ── Mobile background photo ── */}
+      {/*
+       * Figma 366:6671: explicit absolute positioning, NO brightness filter.
+       *   left: -33.16%  width: 173.52%  top: 0.02%  height: 124.69%
+       * The gradient overlay (below) provides all the darkening.
+       */}
+      <div aria-hidden className="absolute inset-0 overflow-hidden md:hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          aria-hidden
+          src="/images/attack-surface-reduction/s4-person.jpg"
+          alt=""
+          className="absolute max-w-none pointer-events-none select-none"
+          style={{
+            left: '-33.16%',
+            top: '0.02%',
+            width: '173.52%',
+            height: '124.69%',
+            objectFit: 'cover',
+          }}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      {/* ── Desktop background photo ── */}
+      <div aria-hidden className="absolute inset-0 hidden md:block">
         <Image
           src="/images/attack-surface-reduction/s4-person.jpg"
           alt=""
@@ -37,19 +69,44 @@ export function ASRDelivers(): React.ReactElement {
           style={{ filter: 'brightness(0.55)' }}
           loading="lazy"
         />
-        {/* Left-to-right purple overlay (Figma 783:458 — purple → transparent) */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(90deg, rgba(19,30,143,0.92) 0%, rgba(71,30,192,0.70) 45%, rgba(71,30,192,0.30) 75%, rgba(0,0,0,0.10) 100%)',
-          }}
-        />
       </div>
 
-      {/* ---------- Content ---------- */}
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-lg flex flex-col h-full">
-        {/* Heading (top-left) — Figma 783:457: Figtree Bold 62/100%/-5% */}
+      {/* ── Desktop overlay: left → right purple ── */}
+      <div
+        aria-hidden
+        className="absolute inset-0 hidden md:block pointer-events-none"
+        style={{
+          background:
+            'linear-gradient(90deg, rgba(19,30,143,0.92) 0%, rgba(71,30,192,0.70) 45%, rgba(71,30,192,0.30) 75%, rgba(0,0,0,0.10) 100%)',
+        }}
+      />
+
+      {/* ── Mobile overlay: starts exactly 115px from section top ── */}
+      {/*
+       * Figma 366:6672: 496px-tall overlay starting at top: 115px.
+       * Inner div is rotate-180 with gradient:
+       *   linear-gradient(180.63deg, rgba(71,30,192,0.6) 59.9%, <out-of-order stops>...)
+       * Out-of-order stops clamp to 59.9% → hard snap at 40.1% of overlay after flip:
+       *   0%    : transparent
+       *   40.1% : rgba(66,30,188,0.3) → snap rgba(71,30,192,0.6)
+       *   100%  : solid rgba(71,30,192,0.6)
+       */}
+      <div
+        aria-hidden
+        className="absolute md:hidden pointer-events-none"
+        style={{
+          left: 0,
+          right: 0,
+          top: '115px',
+          bottom: 0,
+          background:
+            'linear-gradient(180deg, rgba(66,30,188,0) 0%, rgba(66,30,188,0.3) 40.1%, rgba(70,30,191,0.522) 40.11%, rgba(71,30,192,0.6) 40.12%, rgba(71,30,192,0.6) 100%)',
+        }}
+      />
+
+      {/* ── Desktop content ── */}
+      <div className="relative hidden md:flex flex-col mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-lg h-full">
+        {/* Heading */}
         <h2
           style={{
             fontFamily: 'var(--font-display)',
@@ -62,45 +119,110 @@ export function ASRDelivers(): React.ReactElement {
             marginBottom: 'clamp(3rem, 8vw, 8.75rem)',
           }}
         >
-          What this delivers for <span className="cs-text-gradient-impact">your business</span>
+          What this delivers for{' '}
+          <span className="cs-text-gradient-impact">your business</span>
         </h2>
 
-        {/* ---------- Benefits row (md+): 4 columns + 3 separators ---------- */}
-        <div className="hidden md:flex items-stretch justify-between gap-6 lg:gap-8">
+        {/* 4 columns + 3 vertical separators */}
+        <div className="flex items-stretch justify-between gap-6 lg:gap-8">
           {BENEFITS.map((b, i) => (
             <div key={b.title} className="flex items-stretch gap-6 lg:gap-8 flex-1">
               <BenefitColumn title={b.title} desc={b.desc} />
-              {i < BENEFITS.length - 1 && <Separator />}
+              {i < BENEFITS.length - 1 && <DesktopSeparator />}
             </div>
           ))}
         </div>
+      </div>
 
-        {/* ---------- Benefits list (mobile): single column, full width ---------- */}
-        <div className="md:hidden flex flex-col gap-6">
-          {BENEFITS.map((b) => (
-            <BenefitColumn key={b.title} title={b.title} desc={b.desc} mobile />
-          ))}
+      {/* ── Mobile content ── */}
+      <div className="absolute inset-0 md:hidden">
+
+        {/* Heading — 200px wide, centred, 32px from top */}
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '32px',
+            transform: 'translateX(-50%)',
+            width: '200px',
+            textAlign: 'center',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--text-display-sm)',
+              fontWeight: 600,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.2,
+              color: 'white',
+              margin: 0,
+            }}
+          >
+            What this
+          </p>
+          <p
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--text-display-sm)',
+              fontWeight: 600,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.2,
+              color: 'white',
+              margin: 0,
+            }}
+          >
+            {'delivers for '}
+            <span
+              style={{
+                background: 'linear-gradient(94.09deg, #9A51FF 26.48%, #2CC1EB 98.78%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                color: 'transparent',
+                letterSpacing: '-1.4px',
+              }}
+            >
+              your business
+            </span>
+          </p>
+        </div>
+
+        {/* Benefits list — left: 32px, top: 164px, gap-24px */}
+        <div
+          style={{
+            position: 'absolute',
+            left: '32px',
+            top: '164px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
+          }}
+        >
+          {BENEFITS.flatMap((b, i) => [
+            <MobileBenefit key={b.title} title={b.title} desc={b.desc} />,
+            ...(i < BENEFITS.length - 1 ? [<MobileDivider key={`d-${i}`} />] : []),
+          ])}
         </div>
       </div>
     </section>
   );
 }
 
+// ─── Desktop: BenefitColumn ───────────────────────────────────────────────────
+
 function BenefitColumn({
   title,
   desc,
-  mobile = false,
 }: {
   title: string;
   desc: string;
-  mobile?: boolean;
 }): React.ReactElement {
   return (
     <div
       className="flex flex-col flex-1 min-w-0"
-      style={{ gap: '0.75rem', maxWidth: mobile ? 'none' : '16.4375rem' /* Figma 263 / 16 */ }}
+      style={{ gap: '0.75rem', maxWidth: '16.4375rem' /* Figma 263px / 16 */ }}
     >
-      {/* Figma 783:462: Figtree Bold 32/100%/-5% */}
       <h3
         style={{
           fontFamily: 'var(--font-display)',
@@ -113,7 +235,6 @@ function BenefitColumn({
       >
         {title}
       </h3>
-      {/* Figma 783:463 — body */}
       <p
         style={{
           fontFamily: 'var(--font-sans)',
@@ -130,7 +251,9 @@ function BenefitColumn({
   );
 }
 
-function Separator(): React.ReactElement {
+// ─── Desktop: DesktopSeparator ────────────────────────────────────────────────
+
+function DesktopSeparator(): React.ReactElement {
   // eslint-disable-next-line @next/next/no-img-element
   return (
     <img
@@ -141,6 +264,78 @@ function Separator(): React.ReactElement {
       style={{
         width: '1px',
         height: 'clamp(5rem, 9vw, 7.6875rem)', // Figma 123 px max
+      }}
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
+
+// ─── Mobile: MobileBenefit ────────────────────────────────────────────────────
+/*
+ * Figma 366:6676/80/84/88 specs:
+ *   Container : 194px wide · flex-col · gap 6px
+ *   Title     : Figtree SemiBold 20px / lh 1.0 / tracking -1px / white / max-w 173px
+ *   Desc      : Figtree Regular 14px / lh 1.5 / tracking -0.56px / white / opacity 0.8 / max-w 185px
+ */
+function MobileBenefit({
+  title,
+  desc,
+}: {
+  title: string;
+  desc: string;
+}): React.ReactElement {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '194px' }}>
+      <p
+        style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--text-card-title-md)',
+          fontWeight: 600,
+          letterSpacing: '-0.04em',
+          lineHeight: 1.1,
+          color: 'white',
+          maxWidth: '173px',
+          margin: 0,
+        }}
+      >
+        {title}
+      </p>
+      <p
+        style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'var(--text-body-sm)',
+          fontWeight: 400,
+          letterSpacing: '-0.02em',
+          lineHeight: 1.4,
+          color: 'white',
+          opacity: 0.8,
+          maxWidth: '185px',
+          margin: 0,
+        }}
+      >
+        {desc}
+      </p>
+    </div>
+  );
+}
+
+// ─── Mobile: MobileDivider ────────────────────────────────────────────────────
+/*
+ * Figma Rectangle 19 — 1×147px SVG gradient line rotated -90° to produce
+ * a 147×1px horizontal divider: transparent → white → transparent.
+ * Reproduced in CSS to avoid the rotated-SVG container trick.
+ */
+function MobileDivider(): React.ReactElement {
+  return (
+    <div
+      aria-hidden
+      style={{
+        width: '147px',
+        height: '1px',
+        flexShrink: 0,
+        background:
+          'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 49.32%, rgba(153,153,153,0) 99.18%)',
       }}
     />
   );
