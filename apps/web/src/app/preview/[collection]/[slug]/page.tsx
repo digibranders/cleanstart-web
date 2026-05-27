@@ -100,7 +100,7 @@ function ErrorPage({ message }: { message: string }): React.ReactElement {
           boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
         }}
       >
-        <h1 style={{ fontSize: "1.25rem", margin: "0 0 0.5rem" }}>Preview unavailable</h1>
+        <h1 style={{ fontSize: "var(--fs-h5)", margin: "0 0 0.5rem" }}>Preview unavailable</h1>
         <p style={{ margin: "0 0 1rem", opacity: 0.8 }}>{message}</p>
         <a
           href="/"
@@ -111,7 +111,7 @@ function ErrorPage({ message }: { message: string }): React.ReactElement {
             background: "#111",
             color: "#fff",
             textDecoration: "none",
-            fontSize: "0.9rem",
+            fontSize: "var(--fs-body-sm)",
           }}
         >
           Go to homepage
