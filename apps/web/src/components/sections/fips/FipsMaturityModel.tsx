@@ -72,7 +72,7 @@ export function FipsMaturityModel(): React.ReactElement {
           className="text-center text-[#111] mb-12 md:mb-[64px]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-display-md)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -113,7 +113,7 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
           className="text-[#111] mb-2"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-card-title-lg)",
+            fontSize: "var(--fs-h3)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -125,7 +125,7 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
           className="text-[#333]"
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "var(--text-body-lg)",
+            fontSize: "var(--fs-body)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
             lineHeight: 1.5,

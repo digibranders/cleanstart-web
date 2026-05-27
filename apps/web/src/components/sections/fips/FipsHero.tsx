@@ -174,7 +174,7 @@ export function FipsHero(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(36px, 4.45vw, 64px)",
+              fontSize: "var(--fs-display)",
               fontWeight: 600,
               letterSpacing: "var(--text-hero-product-ls, -0.04em)",
               lineHeight: "var(--text-hero-lh, 1.05)",
@@ -188,7 +188,7 @@ export function FipsHero(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "var(--text-t-subhead)",
+              fontSize: "var(--fs-lead)",
               fontWeight: 400,
               letterSpacing: "-0.02em",
               lineHeight: 1.45,

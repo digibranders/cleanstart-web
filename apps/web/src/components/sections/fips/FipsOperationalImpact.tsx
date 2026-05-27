@@ -183,7 +183,7 @@ export function FipsOperationalImpact(): React.ReactElement {
                 /*
                  * Figma: 62px at 1440px → 62/1440 = 4.31vw
                  */
-                fontSize: "clamp(28px, 4.31vw, 62px)",
+                fontSize: "var(--fs-h2)",
                 fontWeight: 700,
                 /* Figma: −3.1px on 62px = −0.05em */
                 letterSpacing: "-0.05em",
@@ -227,7 +227,7 @@ export function FipsOperationalImpact(): React.ReactElement {
                       /*
                        * Mobile: 32px (Figma 366:7788), desktop: 52px at 1440px → 3.61vw
                        */
-                      fontSize: "clamp(32px, 3.61vw, 52px)",
+                      fontSize: "var(--fs-h2)",
                       fontWeight: 700,
                       /* Figma: −2.6px on 52px = −0.05em */
                       letterSpacing: "-0.05em",
@@ -246,7 +246,7 @@ export function FipsOperationalImpact(): React.ReactElement {
                       /*
                        * Mobile: 16px (Figma 366:7788), desktop: 20px at 1440px → 1.39vw
                        */
-                      fontSize: "clamp(16px, 1.39vw, 20px)",
+                      fontSize: "var(--fs-body)",
                       fontWeight: 400,
                       /* Figma: −1px on 20px = −0.05em */
                       letterSpacing: "-0.05em",

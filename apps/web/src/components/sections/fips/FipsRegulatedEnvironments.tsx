@@ -97,7 +97,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
           className="text-white text-center md:text-left mb-16 md:mb-[64px]"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(28px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             letterSpacing: "-0.05em",
             lineHeight: 1.1,
@@ -122,7 +122,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
                   className="text-white"
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "20px",
+                    fontSize: "var(--fs-h4)",
                     fontWeight: 600,
                     letterSpacing: "-0.05em",
                     lineHeight: 1,
@@ -133,7 +133,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "14px",
+                    fontSize: "var(--fs-body-sm)",
                     fontWeight: 400,
                     letterSpacing: "-0.04em",
                     lineHeight: 1.5,
@@ -179,7 +179,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
                 className="text-white mb-3"
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "clamp(20px, 2.4vw, 32px)",
+                  fontSize: "var(--fs-h3)",
                   fontWeight: 700,
                   letterSpacing: "-0.05em",
                   lineHeight: 1.1,
@@ -191,7 +191,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "clamp(14px, 1.4vw, 20px)",
+                  fontSize: "var(--fs-body)",
                   fontWeight: 400,
                   letterSpacing: "-0.04em",
                   lineHeight: 1.5,
