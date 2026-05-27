@@ -1,26 +1,29 @@
+/* Each `icon` is a pre-baked PNG that contains the blue gradient ball + the
+ * white-line glyph + the soft drop-shadow halo as a single composite, so the
+ * card no longer wraps it in a CSS ball. */
 const CARDS = [
   {
     title: "Alert Overload",
     desc: "Most findings originate from inherited dependencies.",
-    icon: "/images/sca/icon-card-alert.svg",
+    icon: "/images/sca/problem-ball-alert.png",
     iconAlt: "Alert icon",
   },
   {
     title: "Bloated Dependency Trees",
     desc: "Large images create excessive transitive vulnerabilities.",
-    icon: "/images/sca/icon-card-snowflake.svg",
+    icon: "/images/sca/problem-ball-bloated.png",
     iconAlt: "Dependency tree icon",
   },
   {
     title: "Remediation Fatigue",
     desc: "Teams spend time prioritizing low-value findings.",
-    icon: "/images/sca/icon-card-register.svg",
+    icon: "/images/sca/problem-ball-fatigue.png",
     iconAlt: "Registration icon",
   },
   {
     title: "Delayed Releases",
     desc: "Security backlogs slow software delivery.",
-    icon: "/images/sca/icon-card-acute.svg",
+    icon: "/images/sca/problem-ball-delayed.png",
     iconAlt: "Clock icon",
   },
 ];
@@ -137,27 +140,28 @@ export function SCAProblems(): React.ReactElement {
                   />
                 ))}
 
-                {/* Blue gradient ball — centered, 24px from top */}
+                {/*
+                 * Pre-baked icon ball (blue gradient + glyph + shadow halo
+                 * baked into the PNG; cropped flush to the visible ball
+                 * so width/height == the visible ball footprint).
+                 */}
                 <div
-                  className="absolute flex items-center justify-center rounded-full"
+                  className="absolute"
                   style={{
                     top: "24px",
                     left: "50%",
                     transform: "translateX(-50%)",
                     width: "96px",
                     height: "96px",
-                    background:
-                      "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
-                    boxShadow: "0px 6.171px 14.537px 0px rgba(28,60,142,0.33)",
-                    borderRadius: "160px",
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={icon}
                     alt={iconAlt}
-                    width={48}
-                    height={48}
+                    width={96}
+                    height={96}
+                    className="block w-full h-full object-contain select-none pointer-events-none"
                     loading="lazy"
                     decoding="async"
                   />
