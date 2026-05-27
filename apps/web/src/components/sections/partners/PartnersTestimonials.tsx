@@ -1,155 +1,226 @@
 "use client";
 
-import { useState } from "react";
-import { Container, Section } from "@/components/layout";
+import { useRef, useState } from "react";
+import Image from "next/image";
 
-interface Quote {
+interface Testimonial {
+  quote: string;
   name: string;
   role: string;
-  body: string;
+  avatar: string;
 }
 
-const QUOTES: Quote[] = [
+const TESTIMONIALS: Testimonial[] = [
   {
-    name: "Kevin R.",
-    role: "CISO, TechCorp",
-    body: "CleanStart has fundamentally changed our approach to developer security. We've reduced vulnerabilities by 90% by following community-driven standards.",
+    quote:
+      "Working at CleanStart means solving problems that matter. We build systems where security and speed reinforce each other, not compete.",
+    name: "Sanket Modi",
+    role: "Sr. Manager, Developer Relations",
+    avatar: "/images/teams/sanket-modi.png",
   },
   {
-    name: "Kevin R.",
-    role: "CISO, TechCorp",
-    body: "CleanStart has fundamentally changed our approach to developer security. We've reduced vulnerabilities by 90% by following community-driven standards.",
+    quote:
+      "The culture here is built on trust and ownership. Every engineer ships with confidence because we invest in the tooling that lets you be sure.",
+    name: "Sanket Modi",
+    role: "Sr. Manager, Developer Relations",
+    avatar: "/images/teams/sanket-modi.png",
   },
 ];
 
-export function PartnersTestimonials(): React.ReactElement {
-  const [index, setIndex] = useState(0);
-  const prev = () => setIndex((i) => (i - 1 + QUOTES.length) % QUOTES.length);
-  const next = () => setIndex((i) => (i + 1) % QUOTES.length);
-
-  return (
-    <Section padding="lg" className="bg-white">
-      <Container>
-        <div className="flex items-start justify-between gap-6">
-          <QuoteMark />
-          <div className="flex items-center gap-3">
-            <NavButton ariaLabel="Previous testimonial" onClick={prev}>
-              <ChevronLeft />
-            </NavButton>
-            <NavButton ariaLabel="Next testimonial" onClick={next}>
-              <ChevronRight />
-            </NavButton>
-          </div>
-        </div>
-
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {[0, 1].map((offset) => {
-            const q = QUOTES[(index + offset) % QUOTES.length];
-            if (!q) return null;
-            return <QuoteCard key={offset} quote={q} />;
-          })}
-        </div>
-      </Container>
-    </Section>
-  );
-}
-
-function QuoteCard({ quote }: { quote: Quote }): React.ReactElement {
+function TestimonialCard({ quote, name, role, avatar }: Testimonial) {
   return (
     <div
-      className="flex flex-col gap-5 rounded-[14px] bg-white p-6"
+      className="relative shrink-0 w-[calc(50%-12px)] overflow-hidden rounded-[24px] p-12"
       style={{
-        border: "1px solid #E2E8F0",
-        boxShadow: "0 12px 32px -24px rgba(60,30,150,0.18)",
+        background: "rgba(255,255,255,0.9)",
+        boxShadow: "0 2px 24px rgba(154,81,255,0.08)",
+        minWidth: "min(696px, 100%)",
       }}
     >
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF1FF] text-[#2F49E5] font-semibold"
-            aria-hidden
-          >
-            {quote.name.charAt(0)}
-          </span>
-          <div className="flex flex-col">
-            <span
-              className="font-display font-semibold text-[#0F123E]"
-              style={{ fontSize: "var(--text-body-md)" }}
-            >
-              {quote.name}
-            </span>
-            <span className="text-[#64748B]" style={{ fontSize: "var(--text-body-xs)" }}>
-              {quote.role}
-            </span>
-          </div>
-        </div>
-        <QuoteMark size={28} muted />
-      </div>
-      <p
-        className="text-[#0F123E]"
-        style={{ fontSize: "var(--text-body-md)", lineHeight: 1.55, fontWeight: 500 }}
+      <span
+        aria-hidden
+        className="pointer-events-none select-none absolute right-12 top-8 font-display font-bold leading-none text-[#250800]/20"
+        // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
+        style={{ fontSize: "40px", lineHeight: 1 }}
       >
-        &ldquo;{quote.body}&rdquo;
+        &rdquo;
+      </span>
+
+      <div className="mb-6 flex items-center gap-4">
+        <div className="relative shrink-0 size-[47px] overflow-hidden rounded-full">
+          <Image src={avatar} alt={name} fill className="object-cover" sizes="47px" />
+        </div>
+        <div>
+          <p
+            className="text-[#250800]"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(16px, 1.4vw, 20px)",
+              fontWeight: 500,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {name}
+          </p>
+          <p
+            className="text-[#250800]/70"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(16px, 1.4vw, 20px)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {role}
+          </p>
+        </div>
+      </div>
+
+      <p
+        className="text-[#250800]"
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "clamp(16px, 1.4vw, 20px)",
+          fontWeight: 500,
+          lineHeight: 1.4,
+          letterSpacing: "-0.02em",
+        }}
+      >
+        &ldquo;{quote}&rdquo;
       </p>
     </div>
   );
 }
 
-function QuoteMark({ size = 40, muted = false }: { size?: number; muted?: boolean }) {
+export function PartnersTestimonials() {
+  const trackRef = useRef<HTMLElement>(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(true);
+
+  function scroll(dir: "prev" | "next") {
+    const track = trackRef.current;
+    if (!track) return;
+    const step = track.clientWidth / 2 + 16;
+    track.scrollBy({ left: dir === "next" ? step : -step, behavior: "smooth" });
+  }
+
+  function onScroll() {
+    const track = trackRef.current;
+    if (!track) return;
+    setCanPrev(track.scrollLeft > 8);
+    setCanNext(track.scrollLeft < track.scrollWidth - track.clientWidth - 8);
+  }
+
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 32 32"
-      fill="none"
-      role="img"
-      aria-hidden="true"
-      focusable="false"
+    <section
+      className="relative overflow-hidden py-section-md"
+      style={{ background: "#f6f6f6" }}
     >
-      <title>Quote</title>
-      <path
-        d="M9 22h-4v-7c0-3.5 2.5-7 7-7v3c-2 0-3.5 1.5-3.5 4H9v7Zm14 0h-4v-7c0-3.5 2.5-7 7-7v3c-2 0-3.5 1.5-3.5 4H23v7Z"
-        fill={muted ? "#CBD5E1" : "#0F123E"}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden lg:block"
+        style={{
+          left: "-270px",
+          top: "-183px",
+          width: "701px",
+          height: "680px",
+          background:
+            "radial-gradient(closest-side, rgba(154,81,255,0.08) 0%, transparent 70%)",
+          filter: "blur(60px)",
+        }}
       />
-    </svg>
-  );
-}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden lg:block"
+        style={{
+          right: "-270px",
+          top: "-238px",
+          width: "701px",
+          height: "680px",
+          background:
+            "radial-gradient(closest-side, rgba(44,193,235,0.08) 0%, transparent 70%)",
+          filter: "blur(60px)",
+        }}
+      />
 
-function NavButton({
-  children,
-  onClick,
-  ariaLabel,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  ariaLabel: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={ariaLabel}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#0F123E] hover:bg-[#F4F6FB] transition-colors"
-      style={{ border: "1px solid #E2E8F0" }}
-    >
-      {children}
-    </button>
-  );
-}
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
+        <h2
+          className="mb-2 lg:mb-[80px] text-center font-display text-[#111]"
+          style={{
+            fontSize: "clamp(32px, 4vw, 56px)",
+            fontWeight: 700,
+            lineHeight: 1.1,
+            letterSpacing: "-0.04em",
+          }}
+        >
+          {/* {"CleanStart "}
+          <span className="cs-text-gradient-impact">Insiders</span> */}
+        </h2>
 
-function ChevronLeft() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" role="img" aria-hidden="true" focusable="false">
-      <title>Previous</title>
-      <path d="m10 3-5 5 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  );
-}
-function ChevronRight() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" role="img" aria-hidden="true" focusable="false">
-      <title>Next</title>
-      <path d="m6 3 5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
+        <div className="mb-4">
+          <span
+            aria-hidden
+            className="pointer-events-none select-none font-display font-bold leading-none text-[#111]"
+            // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
+            style={{ fontSize: "72px", lineHeight: 1 }}
+          >
+            &ldquo;
+          </span>
+        </div>
+
+        <section
+          ref={trackRef}
+          onScroll={onScroll}
+          aria-label="Testimonials carousel"
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region requires keyboard access per WCAG 2.1.1 (axe rule scrollable-region-focusable).
+          tabIndex={0}
+          className="flex gap-6 overflow-x-auto pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9A51FF]/40 focus-visible:ring-offset-2 rounded-[24px]"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {TESTIMONIALS.map((t, i) => (
+            <TestimonialCard key={i} {...t} />
+          ))}
+        </section>
+
+        <div className="mt-8 flex items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => scroll("prev")}
+            disabled={!canPrev}
+            aria-label="Previous testimonial"
+            className="flex size-[48px] items-center justify-center rounded-full bg-[#111] text-white transition-opacity hover:bg-[#222] disabled:opacity-30"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+              <path
+                d="M12.5 15L7.5 10L12.5 5"
+                stroke="#fff"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => scroll("next")}
+            disabled={!canNext}
+            aria-label="Next testimonial"
+            className="flex size-[48px] items-center justify-center rounded-full bg-[#111] text-white transition-opacity hover:bg-[#222] disabled:opacity-30"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+              <path
+                d="M7.5 5L12.5 10L7.5 15"
+                stroke="#fff"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
   );
 }

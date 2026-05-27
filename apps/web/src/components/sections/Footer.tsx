@@ -20,20 +20,20 @@ interface FooterLink {
 }
 
 const COL_CONTACT: FooterLink[] = [
-  { label: "About Us", href: "#about" },
+  { label: "About Us", href: "/about-us" },
   { label: "How It Works", href: "#how-it-works" },
-  { label: "Events", href: "#events" },
+  { label: "Events", href: "/events" },
 ];
 const COL_SOLUTIONS: FooterLink[] = [
-  { label: "Enhance SCA", href: "#sca" },
-  { label: "FIPS Compliance", href: "#fips" },
-  { label: "Vulnerability", href: "#vulnerability" },
+  { label: "Enhance SCA", href: "/software-composition-analysis" },
+  { label: "FIPS Compliance", href: "/fips" },
+  { label: "Vulnerability", href: "/vulnerability-remediation" },
 ];
 const COL_CONNECT: FooterLink[] = [
-  { label: "Contact Us", href: "#contact" },
-  { label: "Careers", href: "#careers" },
-  { label: "Newsroom", href: "#newsroom" },
-  { label: "Legal", href: "#legal" },
+  { label: "Contact Us", href: "/contact-us" },
+  { label: "Careers", href: "/careers" },
+  { label: "Newsroom", href: "/news" },
+  { label: "Legal", href: "/legal" },
 ];
 const COL_MEMBERS: FooterLink[] = [
   { label: "OpenSSF", href: "https://openssf.org" },

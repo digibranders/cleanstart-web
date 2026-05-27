@@ -1,12 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { Container, Section } from "@/components/layout";
 
 interface Partner {
   name: string;
   country: string;
-  initial: string;
+  logo: string;
 }
 
 const REGIONS = ["Asia Pacific", "Europe & Middle East", "North America"] as const;
@@ -14,14 +15,14 @@ type Region = (typeof REGIONS)[number];
 
 const PARTNERS: Record<Region, Partner[]> = {
   "Asia Pacific": [
-    { name: "Hitachi Systems", country: "India", initial: "H" },
-    { name: "Citius Cloud", country: "India", initial: "C" },
-    { name: "CyberNx", country: "India", initial: "C" },
-    { name: "eCaps", country: "India", initial: "e" },
-    { name: "SEESEC", country: "India", initial: "S" },
-    { name: "Imperium", country: "Singapore", initial: "I" },
-    { name: "R-Tech", country: "Indonesia", initial: "R" },
-    { name: "eSec Forte", country: "India", initial: "e" },
+    { name: "Hitachi Systems", country: "India", logo: "/images/partners/hitachi 1.png" },
+    { name: "Citius Cloud", country: "India", logo: "/images/partners/citius.png" },
+    { name: "CyberNx", country: "India", logo: "/images/partners/cyber.png" },
+    { name: "eCaps", country: "India", logo: "/images/partners/ecaps.png" },
+    { name: "SEESEC", country: "India", logo: "/images/partners/seesec.png" },
+    { name: "Imperium", country: "Singapore", logo: "/images/partners/imperium.png" },
+    { name: "R-Tech", country: "Indonesia", logo: "/images/partners/rtech.png" },
+    { name: "eSec Forte", country: "India", logo: "/images/partners/sec-forte.webp" },
   ],
   "Europe & Middle East": [],
   "North America": [],
@@ -154,13 +155,15 @@ function PartnerCard({ partner }: { partner: Partner }): React.ReactElement {
       className="flex flex-col gap-3 rounded-[12px] bg-white p-5"
       style={{ border: "1px solid rgba(255,255,255,0.12)" }}
     >
-      <div className="flex items-center gap-3">
-        <span
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-[#EEF1FF] text-[#2F49E5] font-bold"
-          aria-hidden
-        >
-          {partner.initial}
-        </span>
+      <div className="flex h-9 items-center">
+        <Image
+          src={partner.logo}
+          alt={`${partner.name} logo`}
+          width={160}
+          height={36}
+          sizes="160px"
+          className="h-full w-auto object-contain object-left"
+        />
       </div>
       <div className="flex flex-col gap-1">
         <h3
