@@ -594,7 +594,7 @@ function FeatureCardView({ title, body, icon }: FeatureCard): React.ReactElement
           <h3
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'var(--fs-h2)',
+              fontSize: 'var(--fs-h3)',
               fontWeight: 700,
               letterSpacing: '-0.04em',
               lineHeight: 1.1,
