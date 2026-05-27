@@ -89,7 +89,7 @@ export function BlogsHero({
                 id="blogs-hero-title"
                 className="font-display font-semibold text-white text-center w-full"
                 style={{
-                  fontSize: "var(--text-hero-utility)",
+                  fontSize: "var(--fs-h1)",
                   lineHeight: "var(--text-hero-lh)",
                   letterSpacing: "var(--text-hero-utility-ls)",
                 }}
@@ -99,7 +99,7 @@ export function BlogsHero({
               <p
                 className="font-sans font-normal text-white text-center"
                 style={{
-                  fontSize: "clamp(1.125rem,2.08vw,1.875rem)",
+                  fontSize: "var(--fs-lead)",
                   lineHeight: "1.4",
                   letterSpacing: "-0.04em",
                   opacity: 0.8,
@@ -166,8 +166,9 @@ export function BlogsHero({
                 </p>
                 <div className="flex flex-col gap-4 w-full">
                   <h2
-                    className="font-display text-[clamp(1.5rem,3.06vw,2.75rem)] font-bold leading-tight tracking-[-0.05em] text-white overflow-hidden"
+                    className="font-display font-bold leading-tight tracking-[-0.05em] text-white overflow-hidden"
                     style={{
+                      fontSize: "var(--fs-h2)",
                       display: "-webkit-box",
                       WebkitLineClamp: 4,
                       WebkitBoxOrient: "vertical",
@@ -177,8 +178,8 @@ export function BlogsHero({
                   </h2>
                   {featuredPost.abstract && (
                     <p
-                      className="text-[clamp(1rem,1.53vw,1.375rem)] font-normal leading-[1.4] tracking-[-0.05em]"
-                      style={{ color: "#d1e5ff" }}
+                      className="font-normal leading-[1.4] tracking-[-0.05em]"
+                      style={{ fontSize: "var(--fs-lead)", color: "#d1e5ff" }}
                     >
                       {featuredPost.abstract}
                     </p>
@@ -273,7 +274,7 @@ function CategoryPill({
           ? "rgba(196,70,239,0.6)"
           : "rgba(196,70,239,0.2)",
         // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-        fontSize: "14px",
+        fontSize: "var(--fs-body-sm)",
         lineHeight: "1.0",
         letterSpacing: "-0.02em",
         whiteSpace: "nowrap",
