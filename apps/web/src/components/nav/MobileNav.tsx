@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 import { MenuIcon } from "lucide-react";
+import { Logo } from "@/components/icons/Logo";
 import {
   Sheet,
   SheetContent,
@@ -40,7 +41,18 @@ export function MobileNav() {
           Browse CleanStart products, solutions, resources, and company links.
         </SheetDescription>
 
-        <div className="flex-1 overflow-y-auto px-2 pt-16 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+        <div className="flex items-center border-b border-white/8 px-4 py-4">
+          <Link
+            href="/"
+            onClick={close}
+            aria-label="CleanStart home"
+            className="flex items-center text-white outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-[#33BAEC]"
+          >
+            <Logo className="h-7 w-auto" />
+          </Link>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-2 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           <Accordion className="flex w-full flex-col gap-1" >
             {NAV_TREE.map((item) => {
               if (item.kind === "flat") {

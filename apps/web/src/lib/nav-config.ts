@@ -4,7 +4,7 @@
 // Slug authority: docs/WEB-PAGES.md. All items carry their real final slug regardless of
 // build status. Unbuilt items are rendered as <span> (non-clickable) — not <Link> — so
 // the href is data-only until the page exists. When a page is marked ✅ in WEB-PAGES.md,
-// switch its renderer from <span> to <Link> in MegaMenu / CompactDropdown / MobileNav.
+// switch its renderer from <span> to <Link> in MegaMenu / MobileNav.
 
 export type NavLeaf = {
   label: string;
@@ -47,7 +47,6 @@ export const NAV_TREE: NavItem[] = [
   {
     kind: "mega",
     label: "Products",
-    width: 520,
     groups: [
       {
         items: [
@@ -76,7 +75,6 @@ export const NAV_TREE: NavItem[] = [
   {
     kind: "mega",
     label: "Solutions",
-    width: 560,
     groups: [
       {
         items: [
@@ -111,7 +109,6 @@ export const NAV_TREE: NavItem[] = [
   {
     kind: "compact",
     label: "Audience",
-    width: 260,
     items: [
       { label: "For Developers", href: "/for-developers", built: true },
       { label: "For CISO", href: "/for-ciso", built: true },
@@ -120,7 +117,6 @@ export const NAV_TREE: NavItem[] = [
   {
     kind: "mega",
     label: "Resources",
-    width: 520,
     groups: [
       {
         title: "Insights",
@@ -144,7 +140,6 @@ export const NAV_TREE: NavItem[] = [
   {
     kind: "compact",
     label: "Company",
-    width: 260,
     items: [
       { label: "About Us", href: "/about-us", built: true },
       { label: "Teams", href: "/teams", built: true },

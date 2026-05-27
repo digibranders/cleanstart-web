@@ -927,21 +927,30 @@ body {
    Spec: plan file (cleanstart-nav-logo-png-use-this-logo-*).md
    ============================================================ */
 
-/* Scrolled header — subtle dark glass band so content underneath fades out */
+/* Scrolled header — dark glass band with backdrop blur.
+   Chromium re-tiles the backdrop-filter across compositor tiles on every
+   scroll frame, and the tile seams flash through as random vertical /
+   horizontal bands across the navbar. Mitigation stack:
+     1. Smaller blur radius (8px instead of 14px) keeps the kernel well
+        below the typical 64-tile boundary, so seams don't show.
+     2. `contain: paint` forces the browser to allocate its own paint
+        surface for the navbar — seams from sibling tiles can't leak in.
+     3. `translate3d(0,0,0)` + `backface-visibility: hidden` pin the
+        navbar to a single GPU layer so the blur isn't re-tiled mid-scroll.
+     4. `isolation: isolate` + `will-change: transform` prevent the blur
+        sampling from leaking through stacking contexts. */
 .cs-nav-shadow {
-  background-color: rgba(21, 16, 33, 0.72);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  /* Pin the backdrop-filter onto a single stable compositor layer.
-     Without these, browsers re-tile the blur on every scroll frame and the
-     tile seams show through as faint vertical bands that appear to jitter
-     "randomly" as the page scrolls. translateZ promotes the layer; the
-     `will-change` + `isolation` keep the blur sampling self-contained so
-     subpixel-aligned seams don't leak through. */
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  background-color: rgba(21, 16, 33, 0.78);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  backdrop-filter: blur(8px) saturate(140%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   will-change: transform;
   isolation: isolate;
+  contain: paint;
 }
 
 /* Mega-menu / compact dropdown surface — dark glass card */

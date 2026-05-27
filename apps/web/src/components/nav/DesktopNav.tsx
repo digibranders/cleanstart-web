@@ -11,7 +11,6 @@ import {
 import Link from "next/link";
 import { NAV_TREE } from "@/lib/nav-config";
 import { MegaMenu } from "@/components/nav/MegaMenu";
-import { CompactDropdown } from "@/components/nav/CompactDropdown";
 
 export function DesktopNav() {
   return (
@@ -39,11 +38,15 @@ export function DesktopNav() {
                 {item.label}
               </NavigationMenuTrigger>
               <NavigationMenuContent>
-                {item.kind === "mega" ? (
-                  <MegaMenu groups={item.groups} {...(item.width !== undefined ? { width: item.width } : {})} />
-                ) : (
-                  <CompactDropdown items={item.items} {...(item.width !== undefined ? { width: item.width } : {})} />
-                )}
+                <MegaMenu
+                  groups={
+                    item.kind === "mega"
+                      ? item.groups
+                      : [{ items: item.items }]
+                  }
+                  activeLabel={item.label}
+                  {...(item.width !== undefined ? { width: item.width } : {})}
+                />
               </NavigationMenuContent>
             </NavigationMenuItem>
           );
