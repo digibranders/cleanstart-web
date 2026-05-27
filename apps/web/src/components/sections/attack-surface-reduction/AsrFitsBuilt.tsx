@@ -30,7 +30,7 @@ export function AsrFitsBuilt(): React.ReactElement {
             className="text-[#111]"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'var(--fs-h1)',
+              fontSize: 'var(--fs-h2)',
               fontWeight: 600,
               letterSpacing: 'var(--text-t-display-2-ls)',
               lineHeight: 'var(--text-t-display-2-lh)',

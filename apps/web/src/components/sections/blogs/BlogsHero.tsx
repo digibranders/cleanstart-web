@@ -26,13 +26,13 @@ export function BlogsHero({
       style={{ minHeight: "clamp(820px, 75vw, 1059px)", background: HERO_GRADIENT }}
       aria-labelledby="blogs-hero-title"
     >
-      {/* Decorative glow — left side, mix-blend-hard-light */}
+      {/* Decorative glow — left side, mix-blend-hard-light (hidden on mobile) */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute"
+        className="pointer-events-none select-none absolute hidden sm:block"
         style={{
           left: "-119px",
-          top: "279px",
+          top: "120px",
           width: "332px",
           height: "313px",
           mixBlendMode: "hard-light",
@@ -49,31 +49,7 @@ export function BlogsHero({
         />
       </div>
 
-      {/* Decorative glow — right side, mirrored from left */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute"
-        style={{
-          right: "-119px",
-          top: "279px",
-          width: "332px",
-          height: "313px",
-          mixBlendMode: "hard-light",
-          opacity: 0.3,
-          transform: "scaleX(-1)",
-        }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/blogs/hero-glow-left.png"
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[clamp(24px,3vw,40px)]">
         {/* Title + search + categories — centered block */}
         <div
           className="flex flex-col items-center gap-10 mx-auto"
@@ -89,7 +65,7 @@ export function BlogsHero({
                 id="blogs-hero-title"
                 className="font-display font-semibold text-white text-center w-full"
                 style={{
-                  fontSize: "var(--text-hero-utility)",
+                  fontSize: "var(--fs-h1)",
                   lineHeight: "var(--text-hero-lh)",
                   letterSpacing: "var(--text-hero-utility-ls)",
                 }}
@@ -99,7 +75,7 @@ export function BlogsHero({
               <p
                 className="font-sans font-normal text-white text-center"
                 style={{
-                  fontSize: "clamp(1.125rem,2.08vw,1.875rem)",
+                  fontSize: "var(--fs-lead)",
                   lineHeight: "1.4",
                   letterSpacing: "-0.04em",
                   opacity: 0.8,
@@ -152,7 +128,7 @@ export function BlogsHero({
         {/* Featured Blog — 2-column: text left, image right */}
         {featuredPost ? (
           <div
-            className="grid grid-cols-1 lg:grid-cols-[minmax(280px,513px)_1fr] mt-[clamp(56px,7vw,102px)]"
+            className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(420px,580px)] mt-[clamp(56px,7vw,102px)]"
             style={{ gap: "32px" }}
           >
             {/* Left: text — on mobile, ordered AFTER the image per Figma 817:3470 layout. */}
@@ -166,8 +142,12 @@ export function BlogsHero({
                 </p>
                 <div className="flex flex-col gap-4 w-full">
                   <h2
-                    className="font-display text-[clamp(1.5rem,3.06vw,2.75rem)] font-bold leading-tight tracking-[-0.05em] text-white overflow-hidden"
+                    className="font-display font-bold leading-tight tracking-[-0.05em] text-white overflow-hidden"
                     style={{
+                      /* Featured-tier card title — explicit 32 px per design.
+                         Sits between standard card title (--fs-h3 = 28) and
+                         section H2 (--fs-h2 = 56) by design. */
+                      fontSize: "32px",
                       display: "-webkit-box",
                       WebkitLineClamp: 4,
                       WebkitBoxOrient: "vertical",
@@ -177,8 +157,10 @@ export function BlogsHero({
                   </h2>
                   {featuredPost.abstract && (
                     <p
-                      className="text-[clamp(1rem,1.53vw,1.375rem)] font-normal leading-[1.4] tracking-[-0.05em]"
-                      style={{ color: "#d1e5ff" }}
+                      className="font-normal leading-[1.4] tracking-[-0.05em]"
+                      /* Featured-tier card description — explicit 20 px per design.
+                         Pairs with the 32 px featured-card title above. */
+                      style={{ fontSize: "20px", color: "#d1e5ff" }}
                     >
                       {featuredPost.abstract}
                     </p>
@@ -273,7 +255,7 @@ function CategoryPill({
           ? "rgba(196,70,239,0.6)"
           : "rgba(196,70,239,0.2)",
         // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-        fontSize: "14px",
+        fontSize: "var(--fs-body-sm)",
         lineHeight: "1.0",
         letterSpacing: "-0.02em",
         whiteSpace: "nowrap",

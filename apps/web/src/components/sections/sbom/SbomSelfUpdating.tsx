@@ -36,6 +36,20 @@ import Image from 'next/image';
 // Fluid scaler — projects a 1920-canvas px value to vw on viewports < 1920px.
 const vw = (n: number): string => `${(n / 1920) * 100}vw`;
 
+// Vertical shift applied to the absolute-positioned image + labels group at
+// narrow desktop viewports. The heading copy doesn't scale with vw, so on
+// viewports < ~1420px the heading would otherwise crash into the labels.
+// Shift activates once `vw(378)` (the image's natural top) drops below 280px.
+const VERT_SHIFT = `max(0px, calc(280px - ${vw(378)}))`;
+
+// Extra breathing room added below the bottom labels. Kept small so the
+// padding under the labels visually matches the padding above the heading
+// (top is `vw(80)` ≈ 60 px at a 1456 viewport).
+const SECTION_BREATHING_ROOM = '24px';
+
+// top: vw(y) + VERT_SHIFT — keeps the whole image/labels group together.
+const topShift = (y: number): string => `calc(${vw(y)} + ${VERT_SHIFT})`;
+
 export function SbomSelfUpdating(): React.ReactElement {
   return (
     <section
@@ -43,7 +57,7 @@ export function SbomSelfUpdating(): React.ReactElement {
       className="relative overflow-hidden w-full"
       style={{
         background: 'linear-gradient(180deg, #151021 0%, #131e8f 67.139%, #471ec0 107.43%)',
-        minHeight: `clamp(560px, ${vw(926)}, ${vw(926)})`,
+        minHeight: `max(620px, calc(${vw(926)} + ${VERT_SHIFT} + ${SECTION_BREATHING_ROOM}))`,
       }}
     >
       {/* Decorative purple blobs */}
@@ -90,10 +104,19 @@ export function SbomSelfUpdating(): React.ReactElement {
 
       {/* ═════════════ DESKTOP (lg+) ═════════════ */}
 
-      {/* Heading block */}
+      {/* Heading block — centered. Container width is wide enough that the
+          subtitle lands on 3 lines at every desktop viewport instead of
+          collapsing to 4 lines on narrow screens. H2 width follows the
+          container so it stays on 1 line when there's room. */}
       <div
         className="hidden lg:flex absolute flex-col items-center text-center"
-        style={{ left: vw(599), top: vw(80), width: vw(753), gap: vw(24) }}
+        style={{
+          left: '50%',
+          transform: 'translateX(-50%)',
+          top: vw(80),
+          width: 'min(680px, 80vw)',
+          gap: vw(24),
+        }}
       >
         <h2
           className="text-white"
@@ -103,7 +126,6 @@ export function SbomSelfUpdating(): React.ReactElement {
             fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
-            width: vw(593),
           }}
         >
           Generate. Verify. Validate.
@@ -130,7 +152,7 @@ export function SbomSelfUpdating(): React.ReactElement {
         style={{
           left: '50%',
           transform: 'translateX(-50%)',
-          top: vw(378),
+          top: topShift(378),
           width: vw(872),
           height: vw(468),
         }}
@@ -187,16 +209,17 @@ export function SbomSelfUpdating(): React.ReactElement {
         small
       />
 
-      {/* Captions */}
+      {/* Captions — top row nudged outward (Generate further left, Verify
+          further right) so the body copy clears the platform illustration. */}
       <FeatureLabel
-        x={503}
+        x={423}
         y={394}
         title="Generate"
         body="Continuously create software inventories across environments."
         bodyWidth={266}
       />
       <FeatureLabel
-        x={1153}
+        x={1233}
         y={394}
         title="Verify"
         body="Cryptographically validate software provenance."
@@ -368,7 +391,7 @@ function FigmaCircle({
   return (
     <div
       className="hidden lg:flex absolute items-center justify-center"
-      style={{ left: vw(x), top: vw(y), width: vw(size), height: vw(size), zIndex: 10 }}
+      style={{ left: vw(x), top: topShift(y), width: vw(size), height: vw(size), zIndex: 10 }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -428,7 +451,7 @@ function FeatureLabel({ x, y, title, body, bodyWidth }: FeatureLabelProps): Reac
   return (
     <div
       className="hidden lg:flex absolute flex-col items-center text-center text-white"
-      style={{ left: vw(x), top: vw(y), width: vw(256), gap: vw(8) }}
+      style={{ left: vw(x), top: topShift(y), width: vw(256), gap: vw(8) }}
     >
       <p
         style={{

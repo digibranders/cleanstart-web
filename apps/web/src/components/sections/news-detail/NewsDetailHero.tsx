@@ -117,7 +117,8 @@ export function NewsDetailHero({
               <CalendarIcon />
               <time
                 dateTime={publicationDate}
-                className="font-medium leading-none whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] tracking-[-0.05em]"
+                className="font-medium leading-none whitespace-nowrap tracking-[-0.05em]"
+                style={{ fontSize: "var(--fs-body)" }}
               >
                 {formatNewsDate(publicationDate)}
               </time>

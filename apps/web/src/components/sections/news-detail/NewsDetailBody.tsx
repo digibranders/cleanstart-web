@@ -73,8 +73,8 @@ export function NewsDetailBody({ item }: NewsDetailBodyProps): React.ReactElemen
         {/* Dateline */}
         {dateline && (
           <p
-            className="font-sans text-[15px] font-medium leading-[1.6] mb-6"
-            style={{ color: "rgba(17,17,17,0.6)", letterSpacing: "0.02em" }}
+            className="font-sans font-medium leading-[1.6] mb-6"
+            style={{ fontSize: "var(--fs-body-sm)", color: "rgba(17,17,17,0.6)", letterSpacing: "0.02em" }}
           >
             {dateline} —{" "}
             <span style={{ color: "rgba(17,17,17,0.85)", fontWeight: 400 }}>

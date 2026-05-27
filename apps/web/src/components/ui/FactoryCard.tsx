@@ -64,7 +64,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           <h3
             className="font-display font-medium"
             style={{
-              fontSize: "20px",
+              fontSize: "var(--fs-h4)",
               lineHeight: 1,
               letterSpacing: "-1px",
             }}
@@ -74,7 +74,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           <p
             className="font-normal"
             style={{
-              fontSize: "14px",
+              fontSize: "var(--fs-body-sm)",
               lineHeight: 1.1,
               letterSpacing: "-0.98px",
               opacity: 0.8,
@@ -136,7 +136,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           <h3
             className="font-display font-normal text-white"
             style={{
-              fontSize: "var(--text-t-heading-lg)",
+              fontSize: "var(--fs-h2)",
               lineHeight: "var(--text-t-heading-lg-lh)",
               letterSpacing: "var(--text-t-heading-lg-ls)",
             }}
@@ -146,7 +146,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           <p
             className="font-normal text-white"
             style={{
-              fontSize: "var(--text-t-body-md)",
+              fontSize: "var(--fs-body)",
               lineHeight: "var(--text-t-body-md-lh)",
               letterSpacing: "var(--text-t-body-md-ls)",
               opacity: 0.8,

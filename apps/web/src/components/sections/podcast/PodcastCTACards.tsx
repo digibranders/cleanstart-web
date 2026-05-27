@@ -6,7 +6,11 @@ type Props = {
   cards: PodcastCtaCard[];
 };
 
-const CARD_ICON_SRC = "/images/podcast/cta-card-icon-54efec.png";
+const CARD_ICONS = [
+  "/images/podcast/explore.png",
+  "/images/podcast/new.png",
+  "/images/podcast/update.png",
+] as const;
 
 // Exact Figma tokens (node 373:3328 / card 373:3331)
 // Outer ring: 1.5px solid `#076eff`-like cyan tint with 0.3 alpha — rendered as a padded
@@ -52,7 +56,13 @@ function ArrowRight(): React.ReactElement {
   );
 }
 
-function ResourceCard({ card }: { card: PodcastCtaCard }): React.ReactElement {
+function ResourceCard({
+  card,
+  iconSrc,
+}: {
+  card: PodcastCtaCard;
+  iconSrc: string;
+}): React.ReactElement {
   return (
     <div className="relative flex w-full h-full">
       {/* Glow blob behind the card */}
@@ -159,7 +169,7 @@ function ResourceCard({ card }: { card: PodcastCtaCard }): React.ReactElement {
             }}
           >
             <Image
-              src={CARD_ICON_SRC}
+              src={iconSrc}
               alt=""
               width={200}
               height={200}
@@ -184,7 +194,7 @@ function ResourceCard({ card }: { card: PodcastCtaCard }): React.ReactElement {
               style={{
                 fontFamily: "var(--font-display), sans-serif",
                 fontWeight: 700,
-                fontSize: "clamp(1.25rem, 1.65vw, 1.75rem)",
+                fontSize: "var(--fs-h3)",
                 lineHeight: 1.1,
                 letterSpacing: "-0.04em",
               }}
@@ -196,7 +206,7 @@ function ResourceCard({ card }: { card: PodcastCtaCard }): React.ReactElement {
               style={{
                 fontFamily: "var(--font-display), sans-serif",
                 fontWeight: 400,
-                fontSize: "clamp(0.875rem, 1.05vw, 1.125rem)",
+                fontSize: "var(--fs-body)",
                 lineHeight: 1.4,
                 letterSpacing: "-0.03em",
               }}
@@ -220,7 +230,7 @@ function ResourceCard({ card }: { card: PodcastCtaCard }): React.ReactElement {
                 boxShadow: BUTTON_SHADOW,
                 fontFamily: "Inter, sans-serif",
                 fontWeight: 500,
-                fontSize: "clamp(0.875rem, 1.05vw, 1.125rem)",
+                fontSize: "var(--fs-body)",
                 letterSpacing: "-0.01em",
                 width: "fit-content",
               }}
@@ -329,8 +339,12 @@ export function PodcastCTACards({ cards }: Props): React.ReactElement | null {
           className="grid grid-cols-1 md:grid-cols-3 items-stretch"
           style={{ gap: "clamp(20px, 2.3vw, 33px)" }}
         >
-          {visible.map((card) => (
-            <ResourceCard key={card.title} card={card} />
+          {visible.map((card, i) => (
+            <ResourceCard
+              key={card.title}
+              card={card}
+              iconSrc={CARD_ICONS[i] ?? CARD_ICONS[0]}
+            />
           ))}
         </div>
       </div>

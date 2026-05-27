@@ -124,18 +124,20 @@ export function ResourceDetailLeadCapture({
 
           {/* Content row */}
           <div
-            className="absolute inset-0 flex items-center px-6 py-8 lg:px-[100px] lg:py-[60px]"
+            className="absolute inset-0 flex items-center px-6 py-8"
+            style={{ paddingLeft: "clamp(32px, 5.2vw, 100px)", paddingRight: "clamp(32px, 5.2vw, 100px)" }}
           >
-            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6 lg:gap-[68px] w-full">
+            <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 lg:gap-[clamp(32px,3.5vw,68px)] w-full min-w-0">
               {/* Headline */}
               <h2
                 id="rd-cta-title"
-                className="font-display shrink-0 text-white text-center lg:text-left w-full lg:w-[486px]"
+                className="font-display text-white text-center lg:text-left w-full lg:w-auto lg:flex-shrink-0"
                 style={{
                   fontSize: "var(--cta-card-title)",
                   fontWeight: "var(--cta-card-title-weight)",
                   lineHeight: "var(--cta-card-title-lh)",
                   letterSpacing: "var(--cta-card-title-ls)",
+                  maxWidth: "min(400px, 100%)",
                 }}
               >
                 {heading}
@@ -144,16 +146,17 @@ export function ResourceDetailLeadCapture({
               {/* Form */}
               <form
                 onSubmit={handleSubmit}
-                className="flex flex-col items-stretch lg:items-start shrink-0 w-full lg:w-[549px] gap-6 lg:gap-10"
+                className="flex flex-col items-stretch lg:items-start w-full lg:flex-1 lg:min-w-0 gap-4 lg:gap-5"
               >
                 {/* Legal teaser */}
                 <p
-                  className="font-normal text-white text-center lg:text-left w-full lg:w-[493px]"
+                  className="font-normal text-white text-center lg:text-left w-full"
                   style={{
                     fontSize: "var(--cta-card-desc)",
                     lineHeight: "var(--cta-card-desc-lh)",
                     letterSpacing: "var(--cta-card-desc-ls)",
                     opacity: 0.8,
+                    maxWidth: "493px",
                   }}
                 >
                   By checking this box, you agree that CleanStart may use your
@@ -177,9 +180,9 @@ export function ResourceDetailLeadCapture({
                     placeholder="Enter Your Email"
                     aria-label="Email address"
                     autoComplete="email"
-                    className="font-normal bg-white w-full sm:w-[352px] h-9 lg:h-11"
+                    className="font-normal bg-white w-full sm:w-[300px] h-9 lg:h-10"
                     style={{
-                      fontSize: "16px",
+                      fontSize: "var(--fs-button)",
                       lineHeight: 1.4,
                       letterSpacing: "-0.01em",
                       borderRadius: "8px",
@@ -242,11 +245,10 @@ export function ResourceDetailLeadCapture({
                   </button>
                 </div>
 
-                {/* Consent checkbox — input visual is 20x20 inside a 44px-tall
-                    label so the whole row meets WCAG 2.5.8 (target-size). */}
+                {/* Consent checkbox — 44px min-height for WCAG 2.5.8 target-size */}
                 <label
                   htmlFor="rd-consent"
-                  className="flex items-center gap-2 w-full text-xs lg:text-sm font-normal leading-none tracking-[-0.04em] text-white lg:whitespace-nowrap cursor-pointer"
+                  className="flex items-center gap-2 w-full text-xs font-normal leading-none tracking-[-0.04em] text-white cursor-pointer"
                   style={{ minHeight: "44px", opacity: 0.8 }}
                 >
                   <input

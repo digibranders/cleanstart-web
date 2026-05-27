@@ -4,7 +4,7 @@ const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123E 38%, #131E8F 67%, #471EC0 80%, #471FC3 100%)";
 
 const TITLE_STYLE: CSSProperties = {
-  fontSize: "clamp(40px, 4.45vw, 64px)",
+  fontSize: "var(--fs-display)",
   lineHeight: 1.05,
   letterSpacing: "-0.04em",
 };

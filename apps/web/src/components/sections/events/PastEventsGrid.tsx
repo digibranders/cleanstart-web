@@ -102,7 +102,7 @@ export function PastEventsGrid({
         <h2
           className="font-display font-bold"
           style={{
-            fontSize: "clamp(2.25rem,4.3vw,3.25rem)",
+            fontSize: "var(--fs-h1)",
             lineHeight: "1.1",
             letterSpacing: "-0.04em",
             color: "#111",
@@ -116,7 +116,7 @@ export function PastEventsGrid({
         {events.length === 0 ? (
           <p
             className="font-sans text-center py-20"
-            style={{ color: "rgba(17,17,17,0.54)", fontSize: "1.125rem" }}
+            style={{ color: "rgba(17,17,17,0.54)", fontSize: "var(--fs-lead)" }}
           >
             No past events to show yet.
           </p>
@@ -144,7 +144,7 @@ export function PastEventsGrid({
                     borderRadius: "10px",
                     background: "white",
                     color: "#4a3bf1",
-                    fontSize: "15px",
+                    fontSize: "var(--fs-body-sm)",
                     fontWeight: 500,
                     border: "1px solid rgba(74,59,241,0.25)",
                   }}

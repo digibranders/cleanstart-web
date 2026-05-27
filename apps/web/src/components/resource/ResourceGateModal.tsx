@@ -140,7 +140,7 @@ export function ResourceGateModal({
                 id="rgm-title"
                 className="font-display font-semibold text-[#111] truncate"
                 style={{
-                  fontSize: "1.375rem",
+                  fontSize: "var(--fs-h3)",
                   lineHeight: 1.2,
                   letterSpacing: "-0.02em",
                 }}

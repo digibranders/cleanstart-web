@@ -10,7 +10,7 @@ export const DETAIL_HERO_MIN_HEIGHT = "auto";
 // Line-height kept at 1.15 (slightly looser than the marketing-hero 1.05) because
 // listing and article-detail titles can wrap to multiple lines.
 export const DETAIL_HERO_TITLE_STYLE: CSSProperties = {
-  fontSize: "var(--text-hero-utility)",
+  fontSize: "var(--fs-h1)",
   lineHeight: 1.15,
   letterSpacing: "var(--text-hero-utility-ls)",
 };

@@ -37,7 +37,7 @@ export function Hero() {
           </a>
         </div>
 
-        <div className="mt-12">
+        <div className="mt-12" style={{ visibility: "hidden" }} aria-hidden>
           <HeroOrb />
         </div>
 

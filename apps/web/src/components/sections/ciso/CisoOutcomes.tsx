@@ -122,13 +122,12 @@ function StatCard({
 
   return (
     <div
-      className="relative flex-shrink-0 overflow-hidden"
+      className={`relative w-full overflow-hidden h-[326px] xl:w-[295px] xl:flex-shrink-0 ${
+        stat.tall ? "xl:h-[326px] xl:mt-0" : "xl:h-[258px] xl:mt-[68px]"
+      }`}
       style={{
-        width: "295px",
-        height: stat.tall ? "326px" : "258px",
         borderRadius: "24px",
         backgroundColor: "#fff",
-        marginTop: stat.tall ? "0px" : "68px",
       }}
     >
       <div
@@ -138,7 +137,7 @@ function StatCard({
           top: "106px",
           transform: "translateY(-100%)",
           fontFamily: "var(--font-display)",
-          fontSize: "var(--fs-h2)",
+          fontSize: "var(--fs-display)",
           fontWeight: 700,
           letterSpacing: "-0.04em",
           lineHeight: 1.2,
@@ -211,7 +210,7 @@ function MobileStatCard({
           left: "32px",
           top: "32px",
           fontFamily: "var(--font-display)",
-          fontSize: "var(--fs-h2)",
+          fontSize: "var(--fs-display)",
           fontWeight: 700,
           lineHeight: 1.2,
           color: "#000",
@@ -357,11 +356,11 @@ export function CisoOutcomes(): React.ReactElement {
     >
 
       {/* ════════════════════════════════════════════════════════════════════
-          MOBILE (< xl) — pixel-perfect per Figma 856:1330
+          MOBILE (< md) — pixel-perfect per Figma 856:1330
           Section height: ~816px, all elements absolutely positioned
       ════════════════════════════════════════════════════════════════════ */}
       <div
-        className="xl:hidden relative overflow-hidden"
+        className="md:hidden relative overflow-hidden"
         style={{ minHeight: "816px" }}
       >
         {/* Left vector — left=-72px, top=-81px, 463×463px */}
@@ -399,45 +398,6 @@ export function CisoOutcomes(): React.ReactElement {
           decoding="async"
         />
 
-        {/* Glow bar — 856:1336: left=-36.55px, top=782.04px, 1340.273×87.964px */}
-        <div
-          aria-hidden
-          className="absolute pointer-events-none select-none"
-          style={{
-            left: "-36.55px",
-            top: "782.04px",
-            width: "1340.273px",
-            height: "87.964px",
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/ciso/outcomes-glow-bar1.png"
-            alt=""
-            style={{ width: "100%", height: "100%", objectFit: "fill", opacity: 0.4 }}
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-
-        {/* Bottom flare — 856:1340: left=-31px, bottom=34.64px, 437.805×97.365px, mix-blend-screen */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          aria-hidden
-          src="/images/ciso/outcomes-flare.svg"
-          alt=""
-          className="absolute pointer-events-none select-none"
-          style={{
-            left: "-31px",
-            bottom: "34.64px",
-            width: "437.805px",
-            height: "97.365px",
-            mixBlendMode: "screen",
-          }}
-          loading="lazy"
-          decoding="async"
-        />
-
         {/* Heading — 856:1345: top=32px, left=50%-0.5px, width=211px, centered */}
         {/* Manrope SemiBold 28px, lh=1.2 */}
         {/* "Security " white · "Outcomes " gradient 96.45deg #9A51FF→#2CC1EB */}
@@ -449,7 +409,7 @@ export function CisoOutcomes(): React.ReactElement {
             transform: "translateX(-50%)",
             width: "211px",
             fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h3)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.2,
@@ -488,10 +448,12 @@ export function CisoOutcomes(): React.ReactElement {
       </div>
 
       {/* ════════════════════════════════════════════════════════════════════
-          DESKTOP (≥ xl) — pixel-perfect per Figma 583:2556
+          TABLET + DESKTOP (≥ md)
+            md–lg : 2×2 grid of uniform cards
+            xl+   : full 1×4 staggered row per Figma 583:2556
       ════════════════════════════════════════════════════════════════════ */}
       <div
-        className="hidden xl:block relative"
+        className="hidden md:block relative px-6 sm:px-10"
         style={{ paddingTop: "120px", paddingBottom: "200px" }}
       >
         {/* Corner vector — top-right: frame left=1431 → section-absolute */}
@@ -528,25 +490,29 @@ export function CisoOutcomes(): React.ReactElement {
           decoding="async"
         />
 
-        {/* Glow bars — horizontal gradient lines at top=633px */}
-        <GlowBar
-          src="/images/ciso/outcomes-glow-bar1.png"
-          height={131}
-          opacity={0.4}
-          top={633}
-        />
-        <GlowBar
-          src="/images/ciso/outcomes-glow-bar2.png"
-          height={51}
-          opacity={0.3}
-          top={633}
-        />
+        {/* Decorative track + per-column flares only fit the 4-wide row,
+            so they're xl-only. Hidden at md–lg (2×2 grid). */}
+        <div className="hidden xl:block">
+          {/* Glow bars — horizontal gradient lines at top=633px */}
+          <GlowBar
+            src="/images/ciso/outcomes-glow-bar1.png"
+            height={131}
+            opacity={0.4}
+            top={633}
+          />
+          <GlowBar
+            src="/images/ciso/outcomes-glow-bar2.png"
+            height={51}
+            opacity={0.3}
+            top={633}
+          />
 
-        {/* Bottom teal flares — one per card column */}
-        <BottomFlare left="139px" />
-        <BottomFlare left="469px" />
-        <BottomFlare left="799px" />
-        <BottomFlare left="1129px" />
+          {/* Bottom teal flares — one per card column */}
+          <BottomFlare left="139px" />
+          <BottomFlare left="469px" />
+          <BottomFlare left="799px" />
+          <BottomFlare left="1129px" />
+        </div>
 
         {/* 1276px content container */}
         <div className="relative mx-auto" style={{ maxWidth: "1276px" }}>
@@ -589,8 +555,10 @@ export function CisoOutcomes(): React.ReactElement {
             </h2>
           </div>
 
-          {/* Desktop cards — 4 staggered, fills 1276px */}
-          <div className="flex items-start" style={{ gap: "32px" }}>
+          {/* Cards
+                md–lg → 2×2 grid (uniform cards via items-stretch)
+                xl+   → flex row with staggered tall/short per Figma */}
+          <div className="grid grid-cols-2 items-stretch gap-6 lg:gap-8 xl:flex xl:items-start xl:gap-[32px]">
             {STATS.map((stat) => (
               <StatCard key={stat.display} stat={stat} enabled={animated} />
             ))}

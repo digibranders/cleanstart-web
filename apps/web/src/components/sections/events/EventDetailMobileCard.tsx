@@ -127,7 +127,7 @@ export function EventDetailMobileCard({
                 style={{
                   background: "rgba(196,70,239,0.18)",
                   color: "#E5C7FB",
-                  fontSize: "12px",
+                  fontSize: "var(--fs-badge)",
                   fontWeight: 600,
                   padding: "5px 10px",
                   borderRadius: "999px",
@@ -166,7 +166,7 @@ export function EventDetailMobileCard({
             id={`ev-detail-mobile-${slug}`}
             className="font-display text-white mt-5"
             style={{
-              fontSize: "26px",
+              fontSize: "var(--fs-h3)",
               lineHeight: 1.15,
               letterSpacing: "-0.02em",
               fontWeight: 600,
@@ -182,7 +182,7 @@ export function EventDetailMobileCard({
               <span
                 className="font-sans"
                 style={{
-                  fontSize: "14px",
+                  fontSize: "var(--fs-body-sm)",
                   fontWeight: 500,
                   letterSpacing: "-0.005em",
                 }}
@@ -199,7 +199,7 @@ export function EventDetailMobileCard({
               <span
                 className="font-sans"
                 style={{
-                  fontSize: "14px",
+                  fontSize: "var(--fs-body-sm)",
                   fontWeight: 500,
                   letterSpacing: "-0.005em",
                 }}
@@ -244,7 +244,7 @@ export function EventDetailMobileCard({
               borderRadius: "10px",
               background: "#4a3bf1",
               color: "white",
-              fontSize: "14px",
+              fontSize: "var(--fs-body-sm)",
               fontWeight: 500,
               border: "1px solid rgba(255,255,255,0.10)",
               cursor: "pointer",
@@ -260,7 +260,7 @@ export function EventDetailMobileCard({
           <p
             className="font-sans text-white mt-6"
             style={{
-              fontSize: "15px",
+              fontSize: "var(--fs-body-sm)",
               lineHeight: 1.55,
               letterSpacing: "-0.005em",
               opacity: 0.85,

@@ -48,6 +48,7 @@ export function CleanSightProblems(): React.ReactElement {
       }
       subheading="And remediation falls even further behind"
       cards={CARDS}
+      showCornerGlows={false}
     />
   );
 }

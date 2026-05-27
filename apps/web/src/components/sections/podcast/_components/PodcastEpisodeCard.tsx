@@ -43,7 +43,7 @@ export function PodcastEpisodeCard({
         </div>
         <h3
           id={`episode-${episode.slug}`}
-          className="mt-4 text-white font-semibold text-[20px] leading-snug"
+          className="mt-4 text-white font-semibold leading-snug" style={{ fontSize: "var(--fs-h4)" }}
         >
           {episode.title}
         </h3>

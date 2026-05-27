@@ -83,22 +83,34 @@ export function CommunityTrustedBy() {
           <div
             className="cs-marquee items-center"
             style={{
-              gap: 'clamp(48px, 5.208vw, 100px)',
-              animationDuration: '28s',
+              animationDuration: '42s',
             }}
           >
-            {[...LOGOS, ...LOGOS].map((logo, i) => (
+            {/*
+              Seamless infinite loop:
+              1. Each item gets `margin-right` (not flex `gap`) so the trailing
+                 edge gap exists. That keeps spacing identical at the seam.
+              2. We render the LOGOS list FOUR times. The keyframe (`cs-marquee-rtl`)
+                 animates from 0 → -50%, which moves exactly two copies' width.
+                 The two remaining copies on the right keep the viewport filled
+                 the entire animation cycle — no empty trailing gap, no jump on
+                 reset. (Doubled-only fails when viewport > one-copy-width: at
+                 -50% the rest of the viewport runs past the doubled list end
+                 and shows empty background. Quadrupling guarantees the visible
+                 window is always sitting over content even at the wrap point.)
+            */}
+            {[...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS].map((logo, i) => (
               <div
                 key={i}
-                className="flex-none flex items-center justify-center"
+                className="flex h-10 w-[160px] shrink-0 items-center justify-center mr-12"
               >
                 <Image
                   src={logo.src}
                   alt={logo.alt}
                   width={logo.w}
                   height={logo.h}
-                  sizes="(max-width: 768px) 100px, 180px"
-                  className="h-8 w-auto max-w-[180px] object-contain"
+                  sizes="160px"
+                  className="h-8 max-w-[140px] w-auto object-contain"
                   loading="lazy"
                   decoding="async"
                 />

@@ -104,7 +104,7 @@ const fieldInputStyle: React.CSSProperties = {
   width: "100%",
   // 1rem (16px) — iOS Safari zooms in on focus for inputs sized below
   // 16px. Stay at ≥ 16px to avoid the zoom shift.
-  fontSize: "1rem",
+  fontSize: "var(--fs-input)",
 };
 
 export function FormRenderer({

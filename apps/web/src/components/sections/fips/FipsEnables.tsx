@@ -22,8 +22,20 @@ const HUB_H = 896.08;
 const HUB_PNG_W = 1773;
 const HUB_PNG_H = 1793;
 
-/** Wheel display cap — Figma node 787:2100 is 932.26 px, expressed in rem. */
+/**
+ * Wheel display cap.
+ *   • Figma spec: 932.26 px (58.27 rem) at desktop.
+ *   • Viewport-height cap: the wheel is the visual focus of the section, so
+ *     it must fully fit in the user's viewport without scrolling once the
+ *     section is in view. Reserve ~14 rem (224 px) for the sticky nav and
+ *     the heading block above the wheel, then derive the max width from
+ *     the height-after-reserve via the PNG's aspect ratio (1773/1793 ≈ 0.989).
+ *   • The two caps are combined with `min()` so width is bound by whichever
+ *     dimension is tighter on the current viewport.
+ */
 const HUB_MAX_REM = "58.27rem"; // 932.26 / 16
+const HUB_HEIGHT_RESERVE_REM = "14rem"; // nav + heading + breathing room
+const HUB_MAX_WIDTH_CSS = `min(${HUB_MAX_REM}, calc((100svh - ${HUB_HEIGHT_RESERVE_REM}) * ${HUB_PNG_W} / ${HUB_PNG_H}))`;
 
 /**
  * Wheel slices. Each row maps to a wedge in clockwise order from 12 o'clock.
@@ -38,17 +50,27 @@ const SLICES: ReadonlyArray<{
   labelW: number;
   labelH: number;
 }> = [
-  { label: "Build Integrity",         labelX: 503.18, labelY: 175, labelW: 145, labelH: 72 },
+  // Visual nudges applied to the top-arc + bottom-arc labels so the text
+  // tracks the wedge's angular center (Figma's text-box rects sat a few px
+  // left of the visual sweet spot):
+  //   Build Integrity   → labelX +8
+  //   Crypto Validation → labelX +6
+  { label: "Build Integrity",         labelX: 511.18, labelY: 175, labelW: 145, labelH: 72 },
   { label: "Runtime Security",        labelX: 676.18, labelY: 354, labelW: 151, labelH: 72 },
   { label: "Compliance Automation",   labelX: 622.18, labelY: 590, labelW: 159, labelH: 72 },
-  { label: "Crypto Validation",       labelX: 399.18, labelY: 698, labelW: 127, labelH: 72 },
+  { label: "Crypto Validation",       labelX: 405.18, labelY: 698, labelW: 127, labelH: 72 },
   { label: "Hardened Configurations", labelX: 166.18, labelY: 582, labelW: 191, labelH: 72 },
   { label: "Secure Deployment",       labelX: 110.18, labelY: 352, labelW: 159, labelH: 72 },
   { label: "Continuous Monitoring",   labelX: 255.18, labelY: 167, labelW: 165, labelH: 72 },
 ];
 
-/** Center "Validated Foundation" text-box from Figma (Manrope SemiBold 32 px). */
-const CENTER_LABEL = { x: 378.18, y: 422, w: 164, h: 70 };
+/**
+ * Center "Validated Foundation" text-box.
+ * Centered on the wheel's geometric midpoint (HUB_W/2, HUB_H/2 = 466.13, 448.04):
+ *   x = 466.13 - 164/2 = 384.13
+ *   y = 448.04 -  70/2 = 413.04
+ */
+const CENTER_LABEL = { x: 384.13, y: 413.04, w: 164, h: 70 };
 
 /** Convert a top-left px rect in the Figma hub box to CSS top/left/width/height %. */
 function rectToPct(x: number, y: number, w: number, h: number) {
@@ -135,7 +157,7 @@ export function FipsEnables(): React.ReactElement {
             className="mx-auto text-white"
             style={{
               fontFamily: "var(--font-display)",
-              /* Mobile: 28px (Figma 366:7788), desktop: 56px */
+              /* Section heading bumped from --fs-h2 to --fs-h1 per typography QA round 2 */
               fontSize: "var(--fs-h2)",
               fontWeight: 700,
               letterSpacing: "-0.05em",
@@ -184,7 +206,7 @@ function HubWheel(): React.ReactElement {
       className="relative mx-auto"
       style={{
         width: "100%",
-        maxWidth: `min(100%, ${HUB_MAX_REM})`,
+        maxWidth: `min(100%, ${HUB_MAX_WIDTH_CSS})`,
         aspectRatio: `${HUB_PNG_W} / ${HUB_PNG_H}`,
         containerType: "inline-size",
       }}
@@ -228,14 +250,24 @@ function HubWheel(): React.ReactElement {
           );
         })}
 
-        {/* Center label — Figma style_TX6HWE: Manrope SemiBold 32px / 110% / -4% */}
+        {/*
+         * Center label — Figma style_TX6HWE: Manrope SemiBold 32px / 110% / -4%.
+         * Anchored to the dark inner-circle's visual center on the PNG, not
+         * to the Figma hub-box geometric center. The PNG was exported with
+         * uneven bleed (1773 × 1793), and a pixel scan of hub-wheel.png puts
+         * the inner circle's center at (51.49%, 50.86%) of the PNG — which,
+         * because the container's aspect-ratio matches the PNG, maps 1:1 to
+         * container %. (Earlier 47.46% y was wrong — the strict "purple"
+         * filter missed the dark-blue upper half of the inner circle.)
+         */}
         <span
           className="absolute flex items-center justify-center text-center text-white"
           style={{
-            left: centerPos.left,
-            top: centerPos.top,
+            left: "51.49%",
+            top: "50.86%",
             width: centerPos.width,
             height: centerPos.height,
+            transform: "translate(-50%, -50%)",
             fontFamily: "var(--font-display)",
             fontSize: "clamp(0.9375rem, 3.43cqi, 2rem)", // 15 → 32 px
             fontWeight: 600,

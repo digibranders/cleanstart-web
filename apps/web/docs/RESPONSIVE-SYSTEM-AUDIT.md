@@ -1,6 +1,12 @@
 # Responsive system audit — `apps/web`
 
-**Date:** 2026-05-21
+> **⚠️ Typography portions of this document are superseded by [`TYPOGRAPHY-SYSTEM.md`](./TYPOGRAPHY-SYSTEM.md) (2026-05-27, v4 scale).**
+>
+> Sections **§5 Type scale audit**, **§9 Prose/CMS audit**, and **§14 Recommended target system** describe the prior `--text-hero-*` / `--text-display-*` / `--text-card-title-*` / `--text-body-*` / `--text-t-*` token families. Those families are still defined in `globals.css` as **legacy aliases pointing to the new `--fs-*` token system** (introduced in Phase 0, 2026-05-27). For new code, consume `--fs-*` tokens per `TYPOGRAPHY-SYSTEM.md` — do not author new call-sites against the legacy `--text-*` tokens.
+>
+> This document remains the source of truth for **spacing, containers, layout primitives, breakpoints, and the responsive system as a whole** — only typography has been migrated to its own dedicated spec.
+
+**Date:** 2026-05-21 (typography portions superseded 2026-05-27)
 **Scope:** `apps/web` only. CMS admin (`apps/cms`) is out of scope.
 **Status:** Audit and recommendation. No code changes are landed against this doc.
 

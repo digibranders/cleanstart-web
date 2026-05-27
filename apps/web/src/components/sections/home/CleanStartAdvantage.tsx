@@ -46,13 +46,23 @@ export function CleanStartAdvantage() {
       className="relative isolate overflow-hidden"
       aria-labelledby="advantage-title"
     >
-      {/* Background image */}
+      {/* Background image — mobile portrait below md, full-bleed photo above */}
+      <Image
+        src="/images/home/advantage-bg-mobile.png"
+        alt=""
+        fill
+        sizes="100vw"
+        className="-z-20 object-cover object-center md:hidden"
+        style={{ filter: "blur(6px)", transform: "scale(1.03)" }}
+        priority={false}
+      />
       <Image
         src="/images/advantage-bg.jpg"
         alt=""
         fill
         sizes="100vw"
-        className="-z-20 object-cover object-center"
+        className="-z-20 object-cover object-center hidden md:block"
+        style={{ filter: "blur(6px)", transform: "scale(1.03)" }}
         priority={false}
       />
       {/* Dark gradient overlay so title/text remain readable on the photo */}

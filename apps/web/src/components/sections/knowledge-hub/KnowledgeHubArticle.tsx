@@ -15,21 +15,21 @@ const SIDEBAR_GROUPS: Array<{
 ];
 
 const PROSE_TEXT_STYLE = {
-  fontSize: "clamp(1.0625rem, 1.2vw, 1.1875rem)",
+  fontSize: "var(--fs-body)",
   lineHeight: "1.65",
   letterSpacing: "-0.01em",
   color: "#1f2030",
 };
 
 const SECTION_HEADING_STYLE = {
-  fontSize: "clamp(1.5rem, 2vw, 2rem)",
+  fontSize: "var(--fs-h3)",
   lineHeight: 1.2,
   letterSpacing: "-0.03em",
   color: "#0F1023",
 };
 
 const SUB_HEADING_STYLE = {
-  fontSize: "clamp(1.125rem, 1.4vw, 1.375rem)",
+  fontSize: "var(--fs-h5)",
   lineHeight: 1.3,
   letterSpacing: "-0.02em",
   color: "#0F1023",
@@ -47,7 +47,7 @@ export function KnowledgeHubArticle(): React.ReactElement {
                   <h2
                     className="font-display font-semibold"
                     style={{
-                      fontSize: "clamp(15px, 1.15vw, 18px)",
+                      fontSize: "var(--fs-body)",
                       letterSpacing: "-0.02em",
                       color: "#471EC0",
                     }}
@@ -61,7 +61,7 @@ export function KnowledgeHubArticle(): React.ReactElement {
                           href={item.href}
                           className="block transition-colors"
                           style={{
-                            fontSize: "clamp(13px, 1vw, 15px)",
+                            fontSize: "var(--fs-body-sm)",
                             lineHeight: 1.4,
                             color: item.active ? "#0F1023" : "#5A5F75",
                             fontWeight: item.active ? 600 : 400,
@@ -83,7 +83,7 @@ export function KnowledgeHubArticle(): React.ReactElement {
             <h1
               className="font-display font-semibold mt-4"
               style={{
-                fontSize: "clamp(2rem, 4vw, 3rem)",
+                fontSize: "var(--fs-h2)",
                 lineHeight: 1.15,
                 letterSpacing: "-0.03em",
                 color: "#0F1023",
@@ -96,7 +96,7 @@ export function KnowledgeHubArticle(): React.ReactElement {
             <p
               className="mt-6 font-medium"
               style={{
-                fontSize: "clamp(1.0625rem, 1.2vw, 1.1875rem)",
+                fontSize: "var(--fs-body)",
                 lineHeight: 1.5,
                 letterSpacing: "-0.01em",
                 color: "#3A3F55",
@@ -450,7 +450,7 @@ function CategoryBadge({ children }: { children: React.ReactNode }): React.React
     <span
       className="inline-flex items-center font-medium"
       style={{
-        fontSize: "clamp(13px, 1vw, 15px)",
+        fontSize: "var(--fs-body-sm)",
         lineHeight: 1.4,
         letterSpacing: "-0.01em",
         color: "#471EC0",
@@ -468,7 +468,7 @@ function Th({ children }: { children: React.ReactNode }): React.ReactElement {
       scope="col"
       className="border border-[#E5E7EF] px-6 py-3 font-display font-semibold"
       style={{
-        fontSize: "clamp(14px, 1.1vw, 17px)",
+        fontSize: "var(--fs-body-sm)",
         lineHeight: 1.4,
         letterSpacing: "-0.01em",
         color: "#0F1023",
@@ -494,7 +494,7 @@ function Td({
     <td
       className="border border-[#E5E7EF] px-6 py-4 align-top"
       style={{
-        fontSize: "clamp(14px, 1.05vw, 16px)",
+        fontSize: "var(--fs-body-sm)",
         lineHeight: 1.5,
         letterSpacing: "-0.01em",
         color: "#1f2030",
@@ -525,7 +525,7 @@ function Step({
           borderRadius: "999px",
           background: "#F4F2FB",
           color: "#471EC0",
-          fontSize: "clamp(13px, 1vw, 15px)",
+          fontSize: "var(--fs-body-sm)",
           lineHeight: 1,
         }}
         aria-hidden
@@ -559,7 +559,7 @@ function CodeBlock({
         color: "#7CE3A0",
         fontFamily:
           "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-        fontSize: "clamp(0.875rem, 1.05vw, 1rem)",
+        fontSize: "var(--fs-body-sm)",
         lineHeight: 1.6,
         whiteSpace: multiline ? "pre" : "pre-wrap",
       }}

@@ -67,19 +67,155 @@ function ShieldEmblem(): React.ReactElement {
 
 /* ─── Shared styles ──────────────────────────────────────── */
 
-const TOP_CARD: React.CSSProperties = {
+/*
+ * Dark "stat" card.
+ *
+ * Figma 857:9953 stacks five visual layers; we render them as positioned
+ * children of the card so the geometry scales with the card box:
+ *
+ *   1. Base linear gradient (top→bottom dark-navy→indigo→violet)
+ *   2. Radial gradient border highlighting the top-right (#dab6f3 → 0)
+ *   3. Cyan halo (#04C7F2) — wide, heavily blurred, ~70% opacity, anchored
+ *      to the card's upper band; gives the card its characteristic cyan
+ *      gleam along the top edge.
+ *   4. Violet halo (#5D04D7) — heavily blurred, ~34% opacity, anchored to
+ *      the lower-left; produces the purple under-glow.
+ *   5. Soft black ellipse (opacity 0.2) tucked just outside the upper-right
+ *      corner, adding a subtle vignette that lets the highlight read.
+ *
+ * Positions are expressed as % of the card box so the layers stay anchored
+ * at every viewport (cards are flex/minHeight-driven, not fixed at 328×105).
+ */
+const TOP_CARD_SHELL: React.CSSProperties = {
+  position: "relative",
+  overflow: "hidden",
   background:
     "linear-gradient(180deg, #151021 0%, #131e8f 71.202%, #551ece 100%)",
-  border: "1.688px solid #dab6f3",
-  borderRadius: "14px",
+  borderRadius: "24px",
   boxShadow:
     "-4.5px 2.25px 11.26px rgba(0,0,0,0.23),-18.57px 9px 20.82px rgba(0,0,0,0.2),-41.65px 20.82px 27.58px rgba(0,0,0,0.12)",
-  display: "flex",
-  flexDirection: "column" as const,
-  justifyContent: "center",
-  padding: "clamp(20px,2.5vw,32px) clamp(20px,2.8vw,36px)",
   minHeight: "clamp(140px, 16.3vw, 209px)",
+  isolation: "isolate", // contain blurs inside the rounded corners
 };
+
+function TopCard({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}): React.ReactElement {
+  return (
+    <div className={className} style={TOP_CARD_SHELL}>
+      {/* Layer 3 — cyan halo (top-anchored, wide) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
+        style={{
+          left: "-6.4%",
+          top: "-78.5%",
+          width: "174.3%",
+          height: "237%",
+          borderRadius: "50%",
+          background: "#04C7F2",
+          opacity: 0.7,
+          filter: "blur(81.04px)",
+        }}
+      />
+
+      {/* Layer 4 — violet halo (lower-left) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
+        style={{
+          left: "-45.5%",
+          top: "13.1%",
+          width: "108.6%",
+          height: "147.6%",
+          borderRadius: "50%",
+          background: "#5D04D7",
+          opacity: 0.34,
+          filter: "blur(81.04px)",
+        }}
+      />
+
+      {/* Layer 5 — black vignette just outside top-right corner */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
+        style={{
+          left: "64.7%",
+          top: "-132.4%",
+          width: "42.2%",
+          height: "56%",
+          borderRadius: "50%",
+          background: "#000",
+          opacity: 0.2,
+        }}
+      />
+
+      {/* Layer 2 — radial-gradient border highlight (top-right) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          borderRadius: "24px",
+          padding: "1.688px",
+          background:
+            "radial-gradient(circle at 90% 13%, rgba(218,182,243,1) 0%, rgba(218,182,243,0) 100%)",
+          WebkitMask:
+            "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+          WebkitMaskComposite: "xor",
+          maskComposite: "exclude",
+        }}
+      />
+
+      {/*
+       * Figma effects on the card surface:
+       *   • Layer blur — a soft Gaussian blur copy of the gradient base
+       *     softens the seams between the cyan/violet halos and the
+       *     underlying gradient so they read as one diffused surface
+       *     instead of three discrete blobs.
+       *   • Noise — fractal-noise grain (SVG feTurbulence) overlaid with
+       *     mix-blend-mode: overlay, low opacity. Adds the film-grain
+       *     texture from the Effects panel without dragging in a bitmap.
+       */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, #151021 0%, #131e8f 71.202%, #551ece 100%)",
+          filter: "blur(6px)",
+          opacity: 0.45,
+          mixBlendMode: "soft-light",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+          backgroundSize: "220px 220px",
+          opacity: 0.18,
+          mixBlendMode: "overlay",
+        }}
+      />
+
+      {/* Content slot */}
+      <div
+        className="relative flex flex-col justify-center h-full"
+        style={{
+          padding: "clamp(20px,2.5vw,32px) clamp(20px,2.8vw,36px)",
+          zIndex: 1,
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 const BOTTOM_CARD: React.CSSProperties = {
   background: "#ffffff",
@@ -93,7 +229,7 @@ const BOTTOM_CARD: React.CSSProperties = {
 
 const STAT_NUM: React.CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "var(--fs-h2)",
+  fontSize: "var(--fs-display)",
   fontWeight: 700,
   letterSpacing: "-0.04em",
   lineHeight: 1.1,
@@ -263,25 +399,18 @@ export function SCASecurityOutcomes(): React.ReactElement {
             className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 lg:gap-y-[clamp(8px,3.4vw,44px)] lg:gap-x-[clamp(40px,6.7vw,86px)]"
           >
             {/* Top-left — 89% (mobile slot 1) */}
-            <div className="order-1 lg:order-none" style={TOP_CARD}>
-              <p style={STAT_NUM}>
-                {count89}%
-              </p>
+            <TopCard className="order-1 lg:order-none">
+              <p style={STAT_NUM}>{count89}%</p>
               <p style={STAT_LABEL}>Fewer inherited vulnerabilities</p>
-            </div>
+            </TopCard>
 
             {/* Top-right — 75% (mobile slot 3; lg+ gets extra left padding
                 to clear the shield via !pl which beats the inline padding
                 shorthand). */}
-            <div
-              className="order-3 lg:order-none lg:!pl-[clamp(100px,15vw,195px)]"
-              style={TOP_CARD}
-            >
-              <p style={STAT_NUM}>
-                {count75}%
-              </p>
+            <TopCard className="order-3 lg:order-none lg:[&>div:last-child]:!pl-[clamp(100px,15vw,195px)]">
+              <p style={STAT_NUM}>{count75}%</p>
               <p style={STAT_LABEL}>Faster remediation cycles</p>
-            </div>
+            </TopCard>
 
             {/* Bottom-left — Smaller SBOMs (mobile slot 2) */}
             <div className="order-2 lg:order-none" style={BOTTOM_CARD}>

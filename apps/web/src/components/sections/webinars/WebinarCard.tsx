@@ -110,7 +110,7 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
               borderRadius: "12px",
               background: "#1F50FF",
               color: "#FFFFFF",
-              fontSize: "clamp(14px, 1.05vw, 16px)",
+              fontSize: "var(--fs-body-sm)",
             }}
           >
             Register
@@ -125,7 +125,7 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
               borderRadius: "12px",
               background: "#94A3B8",
               color: "#FFFFFF",
-              fontSize: "clamp(14px, 1.05vw, 16px)",
+              fontSize: "var(--fs-body-sm)",
               opacity: 0.6,
               cursor: "not-allowed",
             }}

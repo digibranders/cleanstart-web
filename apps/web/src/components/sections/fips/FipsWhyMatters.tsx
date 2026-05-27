@@ -114,9 +114,9 @@ function MatterTile({ card }: { card: MatterCard }): React.ReactElement {
     >
       {/*
        * Ball icon — same Figma icon on mobile and desktop.
-       * Mobile: 70px centered. Desktop: 92px right-aligned.
+       * Mobile: 70px centered. Desktop: 92px left-aligned.
        */}
-      <div className="flex justify-center md:justify-end mb-6">
+      <div className="flex justify-center md:justify-start mb-6">
         <div className="block md:hidden">
           <FipsBall size={70} iconSrc={card.icon} />
         </div>

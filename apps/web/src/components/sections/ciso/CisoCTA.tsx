@@ -128,11 +128,16 @@ export function CisoCTA(): React.ReactElement {
       </div>
 
       {/* ════════════════════════════════════════════════════════════════════
-          DESKTOP (≥ sm) — flex-row layout matching node 817:11498
+          DESKTOP (≥ sm) — absolute inset-0, flex-row, vertically centred
       ════════════════════════════════════════════════════════════════════ */}
-      <div className="hidden sm:block relative w-full h-full">
-
-        {/* Cube decoration — 255×259px, overflows right + bottom edges */}
+      <div
+        className="hidden sm:flex absolute inset-0 flex-row items-center overflow-hidden"
+        style={{
+          padding: "0 clamp(32px, 6.35vw, 122px)",
+          gap: "clamp(32px, 5.99vw, 115px)",
+        }}
+      >
+        {/* Cube decoration — 255×259px, anchored bottom-right, bleeds below */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
@@ -140,8 +145,8 @@ export function CisoCTA(): React.ReactElement {
           alt=""
           className="absolute pointer-events-none select-none"
           style={{
-            right: "-30px",
-            bottom: "-40px",
+            right: "-20px",
+            bottom: "-30px",
             width: "255px",
             height: "259px",
             objectFit: "contain",
@@ -152,81 +157,68 @@ export function CisoCTA(): React.ReactElement {
           decoding="async"
         />
 
-        {/* Content row — left=122px, right=107px, top≈85px, gap=115px */}
-        <div
-          className="relative flex flex-row items-start h-full"
+        {/* Left: headline */}
+        <p
+          className="relative text-white flex-shrink-0"
           style={{
-            padding: "clamp(40px, 4.43vw, 85px) clamp(32px, 6.35vw, 122px)",
-            gap: "clamp(32px, 5.99vw, 115px)",
+            fontFamily: "var(--font-display)",
+            fontSize: "var(--cta-card-title)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
+            maxWidth: "min(462px, 100%)",
           }}
         >
-          {/* Left: headline — Manrope Bold 55px, lh 1, tracking -0.05em */}
+          Strengthen Your Software Supply Chain Foundations
+        </p>
+
+        {/* Right: description + CTA button */}
+        <div
+          className="relative flex flex-col"
+          style={{ maxWidth: "min(493px, 100%)", gap: "clamp(16px, 1.25vw, 24px)" }}
+        >
           <p
-            className="relative text-white flex-shrink-0"
             style={{
-              fontFamily: "var(--font-display)",
-              // Strict-fonts: global CTA-card title token.
-              fontSize: "var(--cta-card-title)",
-              fontWeight: 600,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-              maxWidth: "min(462px, 100%)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--cta-card-desc)",
+              fontWeight: 400,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
+              color: "rgba(255, 255, 255, 0.8)",
             }}
           >
-            Strengthen Your Software Supply Chain Foundations
+            Reduce inherited software risk with minimal, hardened, verifiable
+            container images built for enterprise environments.
           </p>
 
-          {/* Right: description + CTA button */}
-          <div
-            className="relative flex flex-col"
-            style={{ maxWidth: "min(493px, 100%)", gap: "clamp(20px, 1.25vw, 24px)" }}
+          <Link
+            href="/resource-center"
+            className="cs-btn-glass self-start"
+            style={
+              {
+                "--cs-btn-px": "18px",
+                "--cs-btn-fs": "18px",
+              } as React.CSSProperties
+            }
           >
-            {/* Description */}
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                // Strict-fonts: global CTA-card desc token.
-                fontSize: "var(--cta-card-desc)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                color: "rgba(255, 255, 255, 0.8)",
-              }}
+            <span>Read the Executive Brief</span>
+            <svg
+              className="cs-cta-arrow"
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+              aria-hidden
             >
-              Reduce inherited software risk with minimal, hardened, verifiable
-              container images built for enterprise environments.
-            </p>
-
-            {/* Button */}
-            <Link
-              href="/resource-center"
-              className="cs-btn-glass self-start"
-              style={
-                {
-                  "--cs-btn-px": "18px",
-                  "--cs-btn-fs": "18px",
-                } as React.CSSProperties
-              }
-            >
-              <span>Read the Executive Brief</span>
-              <svg
-                className="cs-cta-arrow"
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                aria-hidden
-              >
-                <path
-                  d="M3 9h11m0 0l-4-4m4 4l-4 4"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Link>
-          </div>
+              <path
+                d="M3 9h11m0 0l-4-4m4 4l-4 4"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
         </div>
       </div>
     </div>

@@ -121,7 +121,7 @@ export function LatestBlogs({
         <h2
           className="font-display font-bold"
           style={{
-            fontSize: "var(--text-t-display-2)",
+            fontSize: "var(--fs-h1)",
             letterSpacing: "var(--text-t-display-2-ls)",
             lineHeight: "var(--text-t-display-2-lh)",
             color: "#111",
@@ -135,7 +135,7 @@ export function LatestBlogs({
         {posts.length === 0 ? (
           <p
             className="font-sans text-center py-20"
-            style={{ color: "rgba(17,17,17,0.54)", fontSize: "1.125rem" }}
+            style={{ color: "rgba(17,17,17,0.54)", fontSize: "var(--fs-lead)" }}
           >
             No posts found.
           </p>
@@ -220,7 +220,7 @@ function CompactMobilePagination({
         aria-current="page"
         className="font-sans"
         style={{
-          fontSize: "16px",
+          fontSize: "var(--fs-body)",
           fontWeight: 600,
           color: "#4a3bf1",
           minWidth: "24px",

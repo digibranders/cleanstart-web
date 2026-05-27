@@ -3,7 +3,7 @@ import type { CSSProperties, SVGProps } from "react";
 const baseStyle: CSSProperties = {
   width: "1em",
   height: "1em",
-  fontSize: "clamp(0.875rem,1.4vw,1.25rem)",
+  fontSize: "var(--fs-body)",
 };
 
 function BaseIcon({

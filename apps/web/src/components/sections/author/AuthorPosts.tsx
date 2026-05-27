@@ -31,7 +31,7 @@ export function AuthorPosts({
           <h2
             className="font-display font-semibold text-white"
             style={{
-              fontSize: "clamp(1.75rem, 3vw, 2.5rem)",
+              fontSize: "var(--fs-h2)",
               letterSpacing: "-0.02em",
               lineHeight: 1.15,
             }}

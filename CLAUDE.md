@@ -58,16 +58,21 @@ Every commit on `farheen` must be **scoped to the page or feature being worked o
 - **Adding a new page?** New route under `apps/web/src/app/<page>/`, new sections under `apps/web/src/components/sections/<page>/`, new assets under `apps/web/public/images/<page>/`. The only allowed cross-page edits are:
   - One line in `apps/web/src/lib/nav-config.ts` to add the nav entry.
   - One row in `docs/WEB-PAGES.md` for the page inventory.
-- **Typography comes from the global config — NOT from Figma.** For any new or existing page, **ignore Figma's font sizes, font family, font weights, letter-spacing, and line-heights**. Consume the project's role tokens only:
-  - Hero H1 → `--text-hero-marketing` / `--text-hero-product` / `--text-hero-utility` (pick by page type — see "Responsive system rules" below).
-  - Display / section H2 → `--text-display-{sm|md|lg}`.
-  - Card titles → `--text-card-title-{sm|md|lg|xl}`.
-  - Body copy → `--text-body-{xs|sm|md|lg|xl}`.
-  - Prose (CMS-rendered content) → `.article-body` + `--prose-*`.
-  - Buttons → `--btn-fs-*` / `--btn-h-*` / `--btn-px-*`.
-  - Font family → `font-display` / `font-sans` utility classes only (never `font-family: "InterFigmaName"` etc.).
+- **Typography comes from the global config — NOT from Figma.** For any new or existing page, **ignore Figma's font sizes, font family, font weights, letter-spacing, and line-heights**. The canonical typography spec is **[`apps/web/docs/TYPOGRAPHY-SYSTEM.md`](apps/web/docs/TYPOGRAPHY-SYSTEM.md)** (v2/v4, 2026-05-27). Consume the role tokens defined there:
+  - Hero H1 (marketing/product) → `var(--fs-display)` (36 → 64 px).
+  - Listing / detail / legal H1 → `var(--fs-h1)` (32 → 56 px).
+  - Section H2 → `var(--fs-h2)` (28 → 48 px).
+  - Subsection / card title → `var(--fs-h3)` (22 → 28 px).
+  - Card sub-title → `var(--fs-h4)`; small panel header → `var(--fs-h5)`.
+  - Hero sub-heading / intro → `var(--fs-lead)` (18 → 20 px).
+  - Body copy → `var(--fs-body)` (16 → 17 px); secondary → `var(--fs-body-sm)`; caption/meta → `var(--fs-caption)`.
+  - Buttons → `var(--fs-button)` (16 px) or `var(--fs-button-lg)` (16 → 18 px, hero CTA).
+  - Inputs / textarea / select → `var(--fs-input)` (16 px fixed — iOS zoom rule).
+  - Eyebrow chip → `var(--fs-eyebrow)` (UPPERCASE, 0.08em tracking).
+  - Prose (CMS-rendered article content) → `.article-body` + `--prose-*`.
+  - Font family → `var(--font-display)` (Manrope) / `var(--font-sans)` (Sora) / `var(--font-mono)`. Never literal `"Figtree"` / `"InterFigmaName"` etc.
   - Font weight → 400 body / 500 nav-meta-button / 600 sub-head + card title + hero / 700 article H1–H3. No `font-weight: 800`. No other weights.
-  Inline `text-[clamp(...)]`, `fontSize: "Xpx"`, or any other ad-hoc type sizing on a new page is forbidden. If a role token doesn't exist for what Figma shows, **stop and ask** — adding a new token is a shared change that goes through `development`, not `farheen`.
+  Inline `text-[clamp(...)]`, `text-[Xpx]`, `fontSize: "Xpx"`, or any other ad-hoc type sizing is forbidden. **Legacy `--text-hero-*` / `--text-display-*` / `--text-card-title-*` / `--text-body-*` / `--text-t-*` tokens are aliased to the new `--fs-*` family** in `globals.css` for backward compatibility but should not be used in new code. If a role token doesn't exist for what Figma shows, **stop and ask** — adding a new token is a shared change that goes through `development`, not `farheen`.
 - **No bulk formatter sweeps.** Prettier/Biome reflows that touch dozens of unrelated files are forbidden. If formatter config changes, raise it for discussion before applying — never bundle a formatter pass with feature work.
 - **No "while I'm here" cleanups.** Renaming a shared variable, tweaking a layout primitive, or "fixing" an unrelated page in the same commit is out of scope.
 - **Shared files that ARE allowed to change** when justified by the in-scope work: `apps/web/src/lib/nav-config.ts` (nav entry only) and `docs/WEB-PAGES.md` (inventory row only). Anything else is out of scope.

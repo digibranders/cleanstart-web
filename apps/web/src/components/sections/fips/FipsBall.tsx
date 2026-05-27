@@ -9,15 +9,30 @@ export function FipsBall({ size = 155, iconSrc }: FipsBallProps): React.ReactEle
       className="relative shrink-0"
       style={{ width: `${size}px`, height: `${size}px` }}
     >
-      {/* Outer halo */}
+      {/*
+       * Drop shadow — projects a soft blue bloom beneath the sphere
+       * (Figma: 0 10px 23px rgba(28,60,142,0.33)). Scaled by ball size so
+       * smaller mobile balls don't read overweighted.
+       */}
       <div
         aria-hidden
         className="absolute inset-0 rounded-full"
         style={{
           background:
-            "radial-gradient(closest-side, rgba(35, 156, 255, 0.35) 0%, rgba(35, 156, 255, 0) 75%)",
-          filter: "blur(12px)",
-          transform: "scale(1.15)",
+            "radial-gradient(closest-side, rgba(28, 60, 142, 0.33) 0%, rgba(28, 60, 142, 0) 72%)",
+          filter: `blur(${Math.max(8, size * 0.12)}px)`,
+          transform: `translateY(${size * 0.08}px) scale(1.08)`,
+        }}
+      />
+      {/* Outer cyan halo — keeps the ball lit even on darker card backgrounds */}
+      <div
+        aria-hidden
+        className="absolute inset-0 rounded-full"
+        style={{
+          background:
+            "radial-gradient(closest-side, rgba(35, 156, 255, 0.28) 0%, rgba(35, 156, 255, 0) 75%)",
+          filter: `blur(${Math.max(6, size * 0.08)}px)`,
+          transform: "scale(1.18)",
         }}
       />
       {/* Sphere base */}
@@ -27,8 +42,14 @@ export function FipsBall({ size = 155, iconSrc }: FipsBallProps): React.ReactEle
         style={{
           background:
             "radial-gradient(circle at 35% 30%, #5DB6FF 0%, #239CFF 38%, #005BE3 78%, #003F9F 100%)",
+          /*
+           * Inner shadows: bottom rim darkening + top rim highlight
+           * (Figma: inset 0 -0.38px rgba(0,44,179,0.5),
+           *         inset 0 0.19px rgba(255,255,255,0.81)).
+           * Scaled up to read at our ball sizes.
+           */
           boxShadow:
-            "inset 0 -8px 18px rgba(0, 0, 0, 0.28), inset 0 6px 14px rgba(255, 255, 255, 0.35)",
+            "inset 0 -10px 22px rgba(0, 41, 162, 0.55), inset 0 6px 14px rgba(255, 255, 255, 0.4)",
         }}
       >
         {/* Top-left glossy highlight */}

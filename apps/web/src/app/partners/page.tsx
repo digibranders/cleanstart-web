@@ -3,8 +3,8 @@ import { Footer } from "@/components/sections/Footer";
 import { PartnersHero } from "@/components/sections/partners/PartnersHero";
 import { PartnersWhy } from "@/components/sections/partners/PartnersWhy";
 import { PartnersNetwork } from "@/components/sections/partners/PartnersNetwork";
-import { PartnersTestimonials } from "@/components/sections/partners/PartnersTestimonials";
 import { PartnersTypes } from "@/components/sections/partners/PartnersTypes";
+import { HomeTestimonialsInsiders } from "@/components/sections/_shared/HomeTestimonialsInsiders";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
@@ -36,7 +36,7 @@ export default function PartnersPage() {
           <PartnersNetwork />
         </FadeUp>
         <FadeUp>
-          <PartnersTestimonials />
+          <HomeTestimonialsInsiders />
         </FadeUp>
         <FadeUp>
           <PartnersTypes />

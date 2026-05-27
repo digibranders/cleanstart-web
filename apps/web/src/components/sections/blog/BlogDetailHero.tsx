@@ -117,7 +117,7 @@ export function BlogDetailHero({
             <div className="flex items-center justify-center gap-3 mt-1">
               <span
                 className="font-sans text-white whitespace-nowrap"
-                style={{ fontSize: "14px", fontWeight: 500, opacity: 0.85 }}
+                style={{ fontSize: "var(--fs-body-sm)", fontWeight: 500, opacity: 0.85 }}
               >
                 Share
               </span>
@@ -153,7 +153,7 @@ export function BlogDetailHero({
           {readingMinutes != null && (
             <div className="hidden lg:flex items-center gap-[8px] shrink-0 text-white">
               <ClockIcon />
-              <span className="whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-normal leading-none tracking-[-0.05em]">
+              <span className="whitespace-nowrap font-normal leading-none tracking-[-0.05em]" style={{ fontSize: "var(--fs-body)" }}>
                 {readingMinutes} min read
               </span>
             </div>
@@ -178,7 +178,7 @@ export function BlogDetailHero({
                   aria-hidden
                 />
               )}
-              <span className="text-white whitespace-nowrap text-[clamp(0.875rem,1.4vw,1.25rem)] font-normal leading-[1.3]">
+              <span className="text-white whitespace-nowrap font-normal leading-[1.3]" style={{ fontSize: "var(--fs-body)" }}>
                 By {primaryAuthor.name}
               </span>
             </div>
@@ -191,14 +191,14 @@ export function BlogDetailHero({
               <CalendarIcon />
               <span className="whitespace-nowrap leading-none tracking-[-0.05em]">
                 <span
-                  className="text-[clamp(0.75rem,1.1vw,1rem)] font-normal"
-                  style={{ color: "rgba(255,255,255,0.65)" }}
+                  className="font-normal"
+                  style={{ fontSize: "var(--fs-caption)", color: "rgba(255,255,255,0.65)" }}
                 >
                   {showUpdated && updatedAt ? "Updated" : "Published"}
                 </span>{" "}
                 <time
                   dateTime={showUpdated && updatedAt ? updatedAt : publishedAt}
-                  className="text-white text-[clamp(0.875rem,1.4vw,1.25rem)] font-normal"
+                  className="text-white font-normal" style={{ fontSize: "var(--fs-body)" }}
                 >
                   {formatBlogDate(showUpdated && updatedAt ? updatedAt : publishedAt)}
                 </time>

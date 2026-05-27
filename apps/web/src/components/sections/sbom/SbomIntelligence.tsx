@@ -152,7 +152,7 @@ function IntelligenceCard({
         className="relative overflow-hidden bg-white h-full"
         style={{
           borderRadius: "36px",
-          paddingTop: "clamp(60px, 5vw, 88px)",
+          paddingTop: "clamp(80px, 7vw, 110px)",
           paddingBottom: "clamp(20px, 1.67vw, 32px)",
           paddingLeft: "clamp(20px, 1.67vw, 32px)",
           paddingRight: "clamp(20px, 1.67vw, 32px)",

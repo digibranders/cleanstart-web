@@ -44,6 +44,8 @@ export function SbomRisks(): React.ReactElement {
         </>
       }
       cards={CARDS}
+      showCornerGlows={false}
+      showLeftGrid={false}
     />
   );
 }

@@ -75,7 +75,7 @@ function PhotoWrapper({
 function AuthorName({ author }: { author: BlogAuthor }): React.ReactElement {
   const nameClasses = "font-display font-bold tracking-[-0.02em]";
   const nameStyle: React.CSSProperties = {
-    fontSize: "clamp(1.375rem, 2vw, 1.75rem)",
+    fontSize: "var(--fs-h3)",
     color: "#111111",
     lineHeight: 1.2,
     margin: 0,

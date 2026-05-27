@@ -122,7 +122,7 @@ export default function PrivacyPolicyPage() {
             </p>
 
             <div className="my-8 overflow-x-auto">
-              <table className="w-full border-collapse text-left" style={{ fontSize: "var(--text-body-sm)" }}>
+              <table className="w-full border-collapse text-left" style={{ fontSize: "var(--fs-body-sm)" }}>
                 <thead>
                   <tr className="bg-[#F4F6FB]">
                     <th className="border border-[#E2E8F0] p-3 align-top w-[18%]">Type of User</th>
@@ -273,7 +273,7 @@ export default function PrivacyPolicyPage() {
               following rights:
             </p>
             <div className="my-6 overflow-x-auto">
-              <table className="w-full border-collapse text-left" style={{ fontSize: "var(--text-body-sm)" }}>
+              <table className="w-full border-collapse text-left" style={{ fontSize: "var(--fs-body-sm)" }}>
                 <thead>
                   <tr className="bg-[#F4F6FB]">
                     <th className="border border-[#E2E8F0] p-3 w-[8%]">Sl. No.</th>

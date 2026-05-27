@@ -95,13 +95,14 @@ export function FipsMaturityModel(): React.ReactElement {
 function StageCard({ stage }: { stage: Stage }): React.ReactElement {
   return (
     <div
-      className="relative overflow-hidden rounded-[24px] px-6 py-7 flex flex-col gap-5"
+      className="relative overflow-hidden rounded-[22px] md:rounded-[40px] px-6 py-7 flex flex-col justify-center gap-5"
       style={{
         background:
           "linear-gradient(180deg, #F5EEFD 0%, #FFFFFF 100%)",
-        border: "1px solid rgba(218, 182, 243, 0.55)",
+        /* Figma: cyan #2CC1EB stroke at 30% opacity on both mobile and desktop. */
+        border: "1px solid rgba(44, 193, 235, 0.3)",
         boxShadow:
-          "0 20px 36px -22px rgba(132, 80, 255, 0.18), 0 1px 0 rgba(255,255,255,0.85) inset",
+          "0 20px 36px -22px rgba(44, 193, 235, 0.18), 0 1px 0 rgba(255,255,255,0.85) inset",
         /* Mobile: 226px (Figma 366:7788 card h=226px) */
         minHeight: "clamp(226px, 24vw, 320px)",
       }}

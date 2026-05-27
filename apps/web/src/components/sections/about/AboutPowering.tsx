@@ -214,17 +214,16 @@ function FeatureCard({ title, description, Icon }: Card) {
       />
 
       {/* Cyan glow ring — 248:2161 (362×440, #2CC1EB @ 0.3, rounded-24).
-          Desktop only. */}
+          Shown at every breakpoint — acts as the single inner border on tablet/mobile. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-2 hidden rounded-[24px] lg:block"
+        className="pointer-events-none absolute -inset-2 rounded-[24px]"
         style={{ backgroundColor: "#2CC1EB", opacity: 0.3 }}
       />
 
       {/* White card — flex column, no absolute internals.
-          Mobile/tablet: single dark inner border (no double glow).
-          sm+: original left-aligned. */}
-      <div className="relative flex h-full w-full flex-col items-center text-center sm:items-start sm:text-left gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[24px] border-2 border-[#0a1a4d] bg-white p-card-md lg:border-0">
+          Mobile: ball + text centered. sm+: original left-aligned. */}
+      <div className="relative flex h-full w-full flex-col items-center text-center sm:items-start sm:text-left gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[24px] bg-white p-card-md">
         {/* Ball — 248:2163 (96×96, blue gradient, inset highlight) */}
         <div
           className="flex shrink-0 items-center justify-center overflow-hidden"

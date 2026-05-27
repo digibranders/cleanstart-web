@@ -117,16 +117,17 @@ export function CisoSolution(): React.ReactElement {
           decoding="async"
         />
 
-        {/* ── Heading — 28px SemiBold, centered, maxW 259px ── */}
+        {/* ── Heading — 28px SemiBold, centered. Container px-6 gutter
+              controls width; H2 itself is unconstrained so it doesn't wrap
+              to 3 lines when there's room for 2. ── */}
         <h2
-          className="text-center text-white mx-auto"
+          className="text-center text-white mx-auto px-6"
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "var(--fs-h2)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
-            maxWidth: "259px",
             marginBottom: "17px",
           }}
         >
@@ -174,7 +175,7 @@ export function CisoSolution(): React.ReactElement {
               key={f.titleMobile}
               style={{
                 position: "relative",
-                height: "114px",
+                minHeight: "114px",
                 marginBottom: i < FEATURES.length - 1 ? "16px" : 0,
               }}
             >
@@ -197,20 +198,28 @@ export function CisoSolution(): React.ReactElement {
                 }}
               />
 
-              {/* ── Card — 114px tall, left=93px, right=41px ── */}
+              {/* ── Card — margin-positioned (93px left, 41px right) so the
+                  row grows with the card's natural height. Was previously
+                  position:absolute with fixed 114px height — which clipped
+                  wrapped titles + descriptions and caused the card to
+                  overflow into the next row when grown. ── */}
               <div
                 style={{
-                  position: "absolute",
-                  left: "93px",
-                  right: "41px",
-                  top: "0",
-                  height: "114px",
+                  position: "relative",
+                  marginLeft: "93px",
+                  marginRight: "41px",
+                  minHeight: "114px",
                   borderRadius: "17.928px",
                   border: "2.241px solid #dab6f3",
                   background:
                     "linear-gradient(180deg, #151021 0%, #131e8f 71.202%, #551ece 100%)",
                   boxShadow: MOBILE_CARD_SHADOW,
                   overflow: "hidden",
+                  padding: "20px 8px 20px 24px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  gap: "6px",
                 }}
               >
                 {/* Card inner ellipse glow A */}
@@ -250,13 +259,12 @@ export function CisoSolution(): React.ReactElement {
                   decoding="async"
                 />
 
-                {/* Card text — left=24px top=24px gap=6px */}
+                {/* Card text — content flows naturally inside the card's
+                    flex column (padding 20px sides → 24px effective on left
+                    via the existing 24px offset, 8px on right). */}
                 <div
                   style={{
-                    position: "absolute",
-                    left: "24px",
-                    top: "24px",
-                    right: "8px",
+                    position: "relative",
                     display: "flex",
                     flexDirection: "column",
                     gap: "6px",
@@ -268,10 +276,9 @@ export function CisoSolution(): React.ReactElement {
                       fontSize: "var(--fs-h4)",
                       fontWeight: 600,
                       letterSpacing: "-0.04em",
-                      lineHeight: 1.1,
+                      lineHeight: 1.15,
                       color: "#fff",
                       margin: 0,
-                      whiteSpace: "nowrap",
                     }}
                   >
                     {f.titleMobile}
@@ -330,11 +337,12 @@ export function CisoSolution(): React.ReactElement {
           decoding="async"
         />
 
-        {/* ── 1276px content container ── */}
-        <div className="relative mx-auto" style={{ maxWidth: "1276px" }}>
+        {/* ── 1276px content container with shared side gutter so cards
+              don't overflow the viewport below 1276px. ── */}
+        <div className="relative mx-auto px-6 sm:px-10" style={{ maxWidth: "1276px" }}>
 
           {/* Heading group */}
-          <div className="text-center px-6" style={{ marginBottom: "125px" }}>
+          <div className="text-center" style={{ marginBottom: "125px" }}>
             <h2
               className="text-white"
               style={{
