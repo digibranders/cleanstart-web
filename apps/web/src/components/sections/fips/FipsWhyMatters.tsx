@@ -53,7 +53,7 @@ export function FipsWhyMatters(): React.ReactElement {
             className="text-[#111] text-center md:text-left"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-h2)",
+              fontSize: "var(--fs-h1)",
               fontWeight: 600,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,

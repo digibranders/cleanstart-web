@@ -120,11 +120,10 @@ export function FipsOperationalImpact(): React.ReactElement {
           className="md:hidden text-[#111] text-center mx-auto"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
+            fontSize: "var(--fs-h1)",
             fontWeight: 700,
             letterSpacing: "-0.05em",
             lineHeight: 1.05,
-            maxWidth: "320px",
             marginBottom: "clamp(24px, 6vw, 40px)",
           }}
         >
@@ -166,7 +165,7 @@ export function FipsOperationalImpact(): React.ReactElement {
               className="hidden md:block text-[#111] md:text-left"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-h2)",
+                fontSize: "var(--fs-h1)",
                 fontWeight: 700,
                 letterSpacing: "-0.05em",
                 lineHeight: 1.05,
@@ -197,7 +196,7 @@ export function FipsOperationalImpact(): React.ReactElement {
                       className="text-[#111]"
                       style={{
                         fontFamily: "var(--font-display)",
-                        fontSize: "var(--fs-h2)",
+                        fontSize: "var(--fs-display)",
                         fontWeight: 700,
                         letterSpacing: "-0.05em",
                         lineHeight: 1,

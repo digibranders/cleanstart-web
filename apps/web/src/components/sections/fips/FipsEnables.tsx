@@ -157,8 +157,8 @@ export function FipsEnables(): React.ReactElement {
             className="mx-auto text-white"
             style={{
               fontFamily: "var(--font-display)",
-              /* Mobile: 28px (Figma 366:7788), desktop: 56px */
-              fontSize: "var(--fs-h2)",
+              /* Section heading bumped from --fs-h2 to --fs-h1 per typography QA round 2 */
+              fontSize: "var(--fs-h1)",
               fontWeight: 700,
               letterSpacing: "-0.05em",
               lineHeight: 1.1,
