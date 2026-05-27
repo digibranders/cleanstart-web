@@ -58,7 +58,7 @@ export function ContactOffices() {
           <h2
             className="font-display font-bold text-[#111111] whitespace-nowrap"
             style={{
-              fontSize: "var(--text-display-md)",
+              fontSize: "var(--fs-h2)",
               lineHeight: 1,
               letterSpacing: "-0.05em",
             }}
@@ -161,7 +161,7 @@ export function ContactOffices() {
               <h3
                 className="font-display font-bold text-white whitespace-nowrap"
                 style={{
-                  fontSize: "var(--text-card-title-lg)",
+                  fontSize: "var(--fs-h3)",
                   lineHeight: 1,
                   letterSpacing: "-0.05em",
                 }}
@@ -250,7 +250,7 @@ function OfficeCard({ office }: { office: Office }) {
         <h3
           className="font-display font-semibold text-white"
           style={{
-            fontSize: "var(--text-card-title-md)",
+            fontSize: "var(--fs-h4)",
             lineHeight: 1.2,
             letterSpacing: "-0.02em",
           }}
@@ -261,7 +261,7 @@ function OfficeCard({ office }: { office: Office }) {
           className="text-white/75"
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "var(--text-body-md)",
+            fontSize: "var(--fs-body)",
             fontWeight: 400,
             lineHeight: 1.5,
             letterSpacing: "-0.01em",

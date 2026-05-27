@@ -112,7 +112,7 @@ export function ContactForm() {
                   <h2
                     className="font-display font-semibold text-white"
                     style={{
-                      fontSize: "clamp(24px, 2.4vw, 32px)",
+                      fontSize: "var(--fs-h3)",
                       lineHeight: 1.1,
                       letterSpacing: "-0.5px",
                     }}
@@ -123,7 +123,7 @@ export function ContactForm() {
                     className="mt-3 text-white"
                     style={{
                       fontFamily: "var(--font-sans)",
-                      fontSize: "16px",
+                      fontSize: "var(--fs-input)",
                       fontWeight: 400,
                       lineHeight: 1.5,
                       letterSpacing: "-0.5px",
@@ -256,7 +256,7 @@ export function ContactForm() {
                     <span
                       style={{
                         fontFamily: "var(--font-sans)",
-                        fontSize: "18px",
+                        fontSize: "var(--fs-h5)",
                         fontWeight: 500,
                         lineHeight: 1.33,
                         letterSpacing: "-0.18px",
@@ -357,7 +357,7 @@ function Field({
     border: "1.5px solid #DDDDDD",
     fontFamily: "var(--font-display), 'Manrope', sans-serif",
     fontWeight: 500,
-    fontSize: "16px",
+    fontSize: "var(--fs-input)",
     lineHeight: multiline ? 1.5 : 1.125,
     color: "#111111",
   };
@@ -371,7 +371,7 @@ function Field({
         className="mb-2 block text-[#111111]"
         style={{
           fontFamily: "var(--font-display, 'Manrope'), sans-serif",
-          fontSize: "14px",
+          fontSize: "var(--fs-input-label)",
           fontWeight: 400,
           lineHeight: 1.2,
         }}
@@ -448,7 +448,7 @@ function SuccessBanner({ show, message }: SuccessBannerProps) {
         <span
           style={{
             fontFamily: "var(--font-sans), 'Sora', sans-serif",
-            fontSize: "14px",
+            fontSize: "var(--fs-input-label)",
             fontWeight: 500,
             lineHeight: 1.45,
             color: "#054F31",
