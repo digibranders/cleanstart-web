@@ -52,14 +52,14 @@ export function CleanStartImagesCta(): React.ReactElement {
         }}
       >
         {/* Left: section heading */}
-        {/* Figma: width=401px → scaled 354px; Figtree Bold → font-display (Manrope) */}
+        {/* Figma: width=401px → scaled 354px; Manrope Bold → font-display (Manrope) */}
         <h2
           className="font-display text-white shrink-0"
           style={{
-            fontSize: "var(--text-display-sm)",
+            fontSize: "var(--cta-card-title)",
             fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
+            letterSpacing: "var(--cta-card-title-ls)",
+            lineHeight: "var(--cta-card-title-lh)",
             maxWidth: "354px",
           }}
         >
@@ -71,10 +71,10 @@ export function CleanStartImagesCta(): React.ReactElement {
           <p
             className="font-sans"
             style={{
-              fontSize: "var(--text-body-lg)",
+              fontSize: "var(--cta-card-desc)",
               fontWeight: 400,
-              lineHeight: 1.4,
-              letterSpacing: "-0.04em",
+              lineHeight: "var(--cta-card-desc-lh)",
+              letterSpacing: "var(--cta-card-desc-ls)",
               color: "rgba(255, 255, 255, 0.8)",
               maxWidth: "440px",
             }}
@@ -83,45 +83,29 @@ export function CleanStartImagesCta(): React.ReactElement {
             infrastructure and reduced inherited risk.
           </p>
 
-          {/* Glass button — Figma: border #dab6f3, bg rgba(255,255,255,0.65), r=8px */}
           <a
             href="https://images.cleanstart.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-[8px] border transition-opacity duration-200 hover:opacity-90"
-            style={{
-              borderColor: "#dab6f3",
-              backgroundColor: "rgba(255, 255, 255, 0.65)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-              padding: "9px 18px",
-            }}
+            className="cs-btn-glass"
           >
-            <span
-              className="font-display font-medium whitespace-nowrap"
-              style={{
-                fontSize: "var(--btn-fs-lg)",
-                color: "#111111",
-                letterSpacing: "-0.01em",
-                lineHeight: 1.4,
-              }}
-            >
-              Explore Hardened Images
-            </span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/cleanstart-images/cta-arrow.svg"
-              alt=""
+            <span>Explore Hardened Images</span>
+            <svg
+              className="cs-cta-arrow"
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
               aria-hidden
-              width={25}
-              height={22}
-              style={{
-                display: "block",
-                width: "25px",
-                height: "22px",
-                flexShrink: 0,
-              }}
-            />
+            >
+              <path
+                d="M3 9h11m0 0l-4-4m4 4l-4 4"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </a>
         </div>
       </div>

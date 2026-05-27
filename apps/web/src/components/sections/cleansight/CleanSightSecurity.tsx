@@ -78,7 +78,7 @@ function FeatureCard({
       <h3
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: isStack ? "clamp(18px, 5vw, 22px)" : "clamp(22px, 2.2vw, 32px)",
+          fontSize: "var(--fs-h3)",
           fontWeight: 700,
           letterSpacing: "-0.03em",
           lineHeight: 1.15,
@@ -91,7 +91,7 @@ function FeatureCard({
       <p
         style={{
           fontFamily: "var(--font-sans)",
-          fontSize: isStack ? "clamp(13px, 3.5vw, 15px)" : "clamp(14px, 1.2vw, 18px)",
+          fontSize: "var(--fs-body)",
           fontWeight: 400,
           letterSpacing: "-0.01em",
           lineHeight: 1.5,
@@ -164,7 +164,7 @@ export function CleanSightSecurity(): React.ReactElement {
           className="text-white text-center mx-auto"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -310,7 +310,7 @@ export function CleanSightSecurity(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
@@ -322,7 +322,7 @@ export function CleanSightSecurity(): React.ReactElement {
           <p
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "clamp(18px, 1.7vw, 24px)",
+              fontSize: "var(--fs-lead)",
               fontWeight: 400,
               letterSpacing: "-0.02em",
               lineHeight: 1.4,
@@ -473,7 +473,7 @@ export function CleanSightSecurity(): React.ReactElement {
                 className="text-white font-semibold"
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "18px",
+                  fontSize: "var(--fs-h5)",
                   letterSpacing: "-0.03em",
                   lineHeight: 1.2,
                   /* Collapse forced \n line-breaks from the WORKFLOW data
@@ -488,7 +488,7 @@ export function CleanSightSecurity(): React.ReactElement {
                 className="text-white/70"
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "14px",
+                  fontSize: "var(--fs-body-sm)",
                   lineHeight: 1.4,
                 }}
               >

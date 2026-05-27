@@ -44,7 +44,7 @@ export function CleanSightComparison(): React.ReactElement {
             className="mx-auto font-display text-[#111111]"
             style={{
               maxWidth: "min(737px, 100%)",
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
@@ -157,7 +157,7 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
           <h3
             className="relative z-10 text-center font-display text-white"
             style={{
-              fontSize: "clamp(22px, 2.4vw, 32px)",
+              fontSize: "var(--fs-h3)",
               fontWeight: 700,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
@@ -226,7 +226,7 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
                   className="text-[#333333]"
                   style={{
                     fontFamily: "var(--font-sans)",
-                    fontSize: "clamp(15px, 1.4vw, 20px)",
+                    fontSize: "var(--fs-body)",
                     fontWeight: isTraditional ? 500 : 600,
                     lineHeight: 1.4,
                     letterSpacing: "-0.02em",

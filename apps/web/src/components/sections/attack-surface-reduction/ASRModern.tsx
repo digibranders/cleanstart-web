@@ -30,20 +30,20 @@ const TARGETS = [
  * Mobile (Figma 920:613 — 360×992px):
  *   BG  : linear-gradient(180deg, #151021 0%, #131e8f 69.941%, #471ec0 111.91%)
  *   Deco: two Union SVGs with mix-blend-overlay (top-right & bottom-left)
- *   H2  : Figtree Bold 28px / lh 1.2 / centred / w-254px / top: 32px
+ *   H2  : Manrope Bold 28px / lh 1.2 / centred / w-254px / top: 32px
  *         "Environments" → gradient 95.18deg #9A51FF 42.34% → #2CC1EB 98.78%
  *   Items: centred flex-col, gap-24px, items separated by 245×1px dividers
  *   Ball: 60×60px · round · bg linear-gradient(180deg,#239cff,#005be3)
  *         box-shadow outer + inset highlights · icon 33×33px
- *   Title: Figtree Bold 24px / tracking -1.2px / white
- *   Desc : Figtree Regular 16px / tracking -0.8px / white
+ *   Title: Manrope Bold 24px / tracking -1.2px / white
+ *   Desc : Manrope Regular 16px / tracking -0.8px / white
  */
 
 export function ASRModern(): React.ReactElement {
   return (
     <section
       data-section="ASRModern"
-      className="relative overflow-hidden"
+      className="relative overflow-hidden pb-section-cta md:pb-0"
       style={{
         background: 'linear-gradient(180deg, #151021 0%, #131E8F 69.941%, #471EC0 111.91%)',
       }}
@@ -208,7 +208,7 @@ export function ASRModern(): React.ReactElement {
        */}
       <div
         className="md:hidden relative"
-        style={{ minHeight: '992px' }}
+        style={{ minHeight: '660px' }}
       >
         {/* Heading */}
         <div
@@ -280,8 +280,8 @@ export function ASRModern(): React.ReactElement {
  *         inset: 0 -0.145px 0.182px rgba(0,44,179,0.5), 0 0.073px 0.364px rgba(255,255,255,0.81)
  *         radial highlight (simplified from Figma's mask+blend effects)
  *         Icon: 33×33px centred
- *   Title: Figtree Bold 24px / tracking -1.2px / white / centre / lh 1.5
- *   Desc : Figtree Regular 16px / tracking -0.8px / white / centre / lh 1.5
+ *   Title: Manrope Bold 24px / tracking -1.2px / white / centre / lh 1.5
+ *   Desc : Manrope Regular 16px / tracking -0.8px / white / centre / lh 1.5
  */
 function ModernItem({
   title,

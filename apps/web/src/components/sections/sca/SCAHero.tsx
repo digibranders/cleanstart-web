@@ -19,13 +19,8 @@ export function SCAHero(): React.ReactElement {
       className="relative overflow-hidden"
       style={{
         minHeight: "824px",
-        backgroundImage: [
-          "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
-          "linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+        backgroundImage:
           "linear-gradient(180deg, rgb(21,16,33) 25.7%, rgb(16,18,62) 31.2%, rgb(19,30,143) 51%, rgb(71,30,192) 68.7%, rgb(71,31,195) 79.8%, rgba(70,30,191,0.85) 85%, rgba(66,30,188,0.4) 93.7%, rgba(66,30,188,0) 98.9%)",
-        ].join(", "),
-        backgroundSize: "71px 71px, 71px 71px, 100% 100%",
-        backgroundRepeat: "repeat, repeat, no-repeat",
       }}
     >
       {/* ── Decorative blue light flare — Figma node 604:2441–2444 ── */}
@@ -66,13 +61,13 @@ export function SCAHero(): React.ReactElement {
       {/* ── Text content ── */}
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 text-center lg:text-left"
-        style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(56px, 7vw, 100px)" }}
+        style={{ paddingTop: "clamp(112px, 11vw, 160px)", paddingBottom: "clamp(56px, 7vw, 100px)" }}
       >
         {/* Headline — Figma node 604:2428, 805×160px */}
         <h1
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(40px, 4.45vw, 64px)",
+            fontSize: "clamp(36px, 4.45vw, 64px)",
             fontWeight: 700,
             letterSpacing: "-0.04em",
             lineHeight: 1.05,

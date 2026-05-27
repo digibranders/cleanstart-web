@@ -3,7 +3,7 @@ import Image from "next/image";
 /**
  * Dark gradient hero band for the Book a Demo page. Matches Figma node
  * 867:646 — a 1920×369 frame at x:-240, y:0 with the exact Figma
- * gradient and "Get a Demo" title (Figtree SemiBold 72px) at x:782, y:176
+ * gradient and "Get a Demo" title (Manrope SemiBold 72px) at x:782, y:176
  * within the 1440 viewport. The "Demo" word carries the Figma ts1
  * gradient. Two iridescent cube images (Figma image 583137/583138)
  * flank the title.
@@ -57,16 +57,16 @@ export function DemoHero(): React.ReactElement {
           maxWidth: "var(--container-default)",
           paddingLeft: "24px",
           paddingRight: "24px",
-          paddingTop: "clamp(96px, 12vw, 176px)",
+          paddingTop: "clamp(112px, 12vw, 176px)",
           paddingBottom: "200px",
         }}
       >
         <h1
           className="text-white"
           style={{
-            fontFamily: "var(--font-display), 'Figtree', sans-serif",
+            fontFamily: "var(--font-display), sans-serif",
             fontWeight: 600,
-            fontSize: "clamp(40px, 4.45vw, 64px)",
+            fontSize: "clamp(36px, 4.45vw, 64px)",
             lineHeight: 1.05,
             letterSpacing: "-0.04em",
           }}

@@ -182,7 +182,7 @@ function ResourceCard({ card }: { card: PodcastCtaCard }): React.ReactElement {
             <h3
               className="text-[#111111]"
               style={{
-                fontFamily: "Figtree, sans-serif",
+                fontFamily: "var(--font-display), sans-serif",
                 fontWeight: 700,
                 fontSize: "clamp(1.25rem, 1.65vw, 1.75rem)",
                 lineHeight: 1.1,
@@ -194,7 +194,7 @@ function ResourceCard({ card }: { card: PodcastCtaCard }): React.ReactElement {
             <p
               className="text-[#555555]"
               style={{
-                fontFamily: "Figtree, sans-serif",
+                fontFamily: "var(--font-display), sans-serif",
                 fontWeight: 400,
                 fontSize: "clamp(0.875rem, 1.05vw, 1.125rem)",
                 lineHeight: 1.4,

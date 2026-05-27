@@ -396,13 +396,13 @@ export function DeveloperHero(): React.ReactElement {
       {/* ── Content column ── */}
       <div
         className="relative mx-auto z-[2] flex w-full max-w-[840px] flex-col items-center px-6 sm:px-10 text-center"
-        style={{ paddingTop: '203px' }}
+        style={{ paddingTop: 'clamp(112px, 14vw, 203px)' }}
       >
         <h1
           className="text-white"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(40px, 4.45vw, 64px)',
+            fontSize: 'clamp(36px, 4.45vw, 64px)',
             fontWeight: 700,
             letterSpacing: '-0.04em',
             lineHeight: 1.05,

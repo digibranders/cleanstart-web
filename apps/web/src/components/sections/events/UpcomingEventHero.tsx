@@ -70,22 +70,7 @@ export function UpcomingEventHero({
         />
       </div>
 
-      {/* Subtle grid pattern overlay — 71×71 cells */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-          backgroundSize: "71px 71px",
-          maskImage:
-            "radial-gradient(ellipse 80% 60% at 50% 60%, rgba(0,0,0,0.85), rgba(0,0,0,0))",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 80% 60% at 50% 60%, rgba(0,0,0,0.85), rgba(0,0,0,0))",
-        }}
-      />
-
-      <div
+<div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(48px, 6vw, 80px)" }}
       >

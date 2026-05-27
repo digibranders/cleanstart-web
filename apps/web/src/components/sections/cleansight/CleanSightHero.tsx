@@ -56,7 +56,7 @@ export function CleanSightHero(): React.ReactElement {
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
-          paddingTop: "clamp(96px, 11vw, 160px)",
+          paddingTop: "clamp(112px, 11vw, 160px)",
           paddingBottom: "clamp(72px, 8vw, 120px)",
           zIndex: 2,
         }}
@@ -68,14 +68,14 @@ export function CleanSightHero(): React.ReactElement {
               className="text-white"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(40px, 4.45vw, 64px)",
+                fontSize: "var(--fs-display)",
                 fontWeight: 700,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.05,
               }}
             >
-              <span className="block whitespace-nowrap">Continuous Visibility.</span>
-              <span className="block whitespace-nowrap">
+              <span className="block">Continuous Visibility.</span>
+              <span className="block">
                 Continuous{" "}
                 <span className="cs-text-gradient-impact">Remediation.</span>
               </span>
@@ -85,7 +85,7 @@ export function CleanSightHero(): React.ReactElement {
               className="text-white max-w-[560px]"
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "clamp(18px, 1.7vw, 24px)",
+                fontSize: "var(--fs-lead)",
                 fontWeight: 400,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.4,

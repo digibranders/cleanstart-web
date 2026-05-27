@@ -89,7 +89,7 @@ export function FipsHero(): React.ReactElement {
            * Mobile (Figma 913:219): content block top=136px. Nav is ~56px
            * with 8px safe area → paddingTop 136px on mobile.
            */
-          paddingTop: "clamp(136px, 12.92vw, 200px)",
+          paddingTop: "clamp(112px, 12.92vw, 200px)",
           paddingBottom: "0",
           /* Desktop min-height mirrors Figma frame */
           minHeight: "clamp(658px, 46.32vw, 667px)",
@@ -174,7 +174,7 @@ export function FipsHero(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-hero-product)",
+              fontSize: "clamp(36px, 4.45vw, 64px)",
               fontWeight: 600,
               letterSpacing: "var(--text-hero-product-ls, -0.04em)",
               lineHeight: "var(--text-hero-lh, 1.05)",

@@ -111,7 +111,7 @@ function MobileTrustCard({ card }: { card: TrustCard }): React.ReactElement {
         <h3
           className="font-display"
           style={{
-            fontSize: "var(--text-card-title-md)",
+            fontSize: "var(--fs-h4)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.2,
@@ -123,7 +123,7 @@ function MobileTrustCard({ card }: { card: TrustCard }): React.ReactElement {
         <p
           className="font-sans"
           style={{
-            fontSize: "var(--text-body-sm)",
+            fontSize: "var(--fs-body-sm)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
             lineHeight: 1.5,
@@ -250,7 +250,7 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
           <h3
             className="font-display"
             style={{
-              fontSize: "var(--text-card-title-lg)",
+              fontSize: "var(--fs-h3)",
               fontWeight: 600,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
@@ -262,7 +262,7 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
           <p
             className="font-sans"
             style={{
-              fontSize: "var(--text-body-lg)",
+              fontSize: "var(--fs-body)",
               fontWeight: 400,
               lineHeight: 1.4,
               letterSpacing: "-0.03em",
@@ -367,7 +367,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-display-md)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.2,

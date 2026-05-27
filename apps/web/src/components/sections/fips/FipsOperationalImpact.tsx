@@ -10,11 +10,11 @@ import { useEffect, useRef, useState } from "react";
  *   Left column:  cube image  369 × 446 px
  *   Gap:          67 px
  *   Right column: 839 px
- *     • H2   62px Figtree Bold  ls=-3.1px(−0.05em)  w=654px
+ *     • H2   62px Manrope Bold  ls=-3.1px(−0.05em)  w=654px
  *     • gap  80px
  *     • Stats 4 × 176px columns, 45px gaps (absolute offsets 0/221/442/663)
- *       – number  52px Figtree Bold  ls=-2.6px(−0.05em)
- *       – label   20px Figtree Reg   ls=-1px(−0.05em)  lh=1.4  #333
+ *       – number  52px Manrope Bold  ls=-2.6px(−0.05em)
+ *       – label   20px Manrope Reg   ls=-1px(−0.05em)  lh=1.4  #333
  *
  * vw rates (value / 1440 × 100):
  *   paddingTop   120 / 1440 = 8.33vw

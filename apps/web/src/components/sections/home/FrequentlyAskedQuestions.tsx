@@ -284,25 +284,27 @@ function FaqItemRow({
         aria-hidden={!isOpen}
         data-faq-answer={isOpen ? "open" : "closed"}
         style={{
-          maxHeight: isOpen ? "600px" : "0px",
+          display: "grid",
+          gridTemplateRows: isOpen ? "1fr" : "0fr",
           opacity: isOpen ? 1 : 0,
-          overflow: "hidden",
           transition:
-            "max-height 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease-out",
+            "grid-template-rows 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease-out",
         }}
       >
-        <p
-          className="pt-3 text-[#333333]"
-          style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "clamp(15px, 1.4vw, 20px)",
-            fontWeight: 400,
-            lineHeight: 1.4,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          {item.a}
-        </p>
+        <div style={{ overflow: "hidden", minHeight: 0 }}>
+          <p
+            className="pt-3 text-[#333333]"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "clamp(15px, 1.4vw, 20px)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {item.a}
+          </p>
+        </div>
       </section>
     </div>
   );

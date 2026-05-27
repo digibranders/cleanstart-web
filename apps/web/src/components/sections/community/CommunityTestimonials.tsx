@@ -315,7 +315,7 @@ export function CommunityTestimonials(): React.ReactElement {
                     />
                   </div>
 
-                  {/* Quote text — Figma: Figtree SemiBold 26px / lh 1.5 */}
+                  {/* Quote text — Figma: Manrope SemiBold 26px / lh 1.5 */}
                   <p
                     className="font-display font-semibold text-[#250800]"
                     style={{

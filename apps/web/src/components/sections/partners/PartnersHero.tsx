@@ -33,12 +33,12 @@ export function PartnersHero(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[clamp(80px,10vw,140px)] pb-[clamp(60px,8vw,110px)]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[clamp(112px,10vw,140px)] pb-[clamp(60px,8vw,110px)]">
         <div className="flex flex-col items-center text-center gap-7">
           <h1
             className="font-display font-semibold text-white mx-auto"
             style={{
-              fontSize: "clamp(40px, 4.45vw, 64px)",
+              fontSize: "clamp(36px, 4.45vw, 64px)",
               lineHeight: 1.05,
               letterSpacing: "-0.04em",
               maxWidth: "860px",

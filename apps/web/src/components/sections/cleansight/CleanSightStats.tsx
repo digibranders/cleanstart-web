@@ -131,7 +131,7 @@ export function CleanSightStats(): React.ReactElement {
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(32px, 4vw, 56px)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
@@ -198,17 +198,17 @@ export function CleanSightStats(): React.ReactElement {
                 active={inView}
                 style={{
                   fontFamily: "'Rethink Sans', var(--font-display), sans-serif",
-                  fontSize: "var(--text-t-display-2)",
+                  fontSize: "var(--fs-h2)",
                   fontWeight: 700,
-                  lineHeight: "var(--text-t-display-2-lh)",
-                  letterSpacing: "var(--text-t-display-2-ls)",
+                  lineHeight: "var(--fs-h2-lh)",
+                  letterSpacing: "var(--fs-h2-ls)",
                 }}
               />
               {/* Label */}
               <p
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "clamp(20px, 2vw, 28px)",
+                  fontSize: "var(--fs-h3)",
                   fontWeight: 500,
                   letterSpacing: "-0.02em",
                   lineHeight: 1.3,

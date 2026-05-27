@@ -1,160 +1,195 @@
 /**
- * Attack Surface Reduction CTA card — Figma node 783:1295 (desktop) / 366:6432 (mobile).
- *
- * White card with two lavender (#DF9BFF) corner blur-ellipses for ambient
- * glow, a subtle decorative grid in the background, and a bright blue
- * primary CTA. Rendered inside the Footer's 1276×330 slot via
- * `<Footer cta={<ASRCTA />} />`.
- *
- * Mobile: single-column layout with bird mascot below button.
+ * Attack Surface Reduction CTA card — rendered inside the Footer's locked
+ * CTA slot. Figma node 366:6867 (mobile) + desktop specs:
+ *   bg: white · two #DF9BFF corner glow blobs · Union radial gradient
+ *   title/body: dark #111 · button: solid blue #3960F9
  */
 
-import Image from 'next/image';
-import Link from 'next/link';
+import Link from "next/link";
 
 export function ASRCTA(): React.ReactElement {
   return (
     <div
-      className="relative w-full h-full overflow-hidden bg-white"
-      style={{ borderRadius: 'inherit' }}
+      className="absolute inset-0 overflow-hidden flex flex-col items-center justify-center text-center gap-5 px-8 md:px-12 lg:grid lg:grid-cols-[minmax(0,460px)_minmax(0,460px)] lg:items-center lg:gap-x-[clamp(32px,5vw,72px)] lg:justify-center lg:text-left lg:p-[clamp(32px,4vw,48px)_clamp(32px,5vw,80px)]"
+      style={{ background: "#FFFFFF" }}
     >
-      {/* Union — decorative grid-of-squares pattern (desktop only — too wide for mobile) */}
+      {/* ── Mobile: top-left pink glow blob (Figma 366:6869) ─────────────────── */}
+      {/* left=-159px top=-154px size=223.44px blur=53.1276px */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute lg:hidden"
+        style={{
+          left: "-159px",
+          top: "-154px",
+          width: "223.44px",
+          height: "223.44px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(53.1276px)",
+        }}
+      />
+
+      {/* ── Mobile: bottom-right pink glow blob ──────────────────────────────── */}
+      {/* Figma: left=253px top=289px in 328×368 card → right=-148px bottom=-144px */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute lg:hidden"
+        style={{
+          right: "-148px",
+          bottom: "-144px",
+          width: "223.44px",
+          height: "223.44px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(53.1276px)",
+        }}
+      />
+
+      {/* ── Desktop: top-left pink glow blob (Ellipse 46683) ─────────────────── */}
+      {/* left=-139px top=-168px size=320px blur=121.5px */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden lg:block"
+        style={{
+          left: "-139px",
+          top: "-168px",
+          width: "320px",
+          height: "320px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
+        }}
+      />
+
+      {/* ── Desktop: right pink glow blob (Ellipse 46682) ────────────────────── */}
+      {/* left=1159px top=244px size=511px blur=121.5px — bleeds off right edge */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden lg:block"
+        style={{
+          left: "1159px",
+          top: "244px",
+          width: "511px",
+          height: "511px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
+        }}
+      />
+
+      {/* ── Desktop: Union grid SVG ───────────────────────────────────────────── */}
+      {/* Figma: left=547px top=-220px size=1101×1101px · opacity already baked in SVG path */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/attack-surface-reduction/union-pattern.svg"
+        src="/images/attack-surface-reduction/cta-union-grid.svg"
         alt=""
-        className="pointer-events-none absolute select-none hidden sm:block"
+        width={1101}
+        height={1101}
+        className="pointer-events-none select-none absolute hidden lg:block"
         style={{
-          left: 'clamp(200px, 38vw, 547px)',
-          top: '-220px',
-          width: '1101px',
-          height: '1101px',
-          maxWidth: 'none',
-          zIndex: 0,
+          left: "547px",
+          top: "-220px",
+          width: "1101px",
+          height: "1101px",
         }}
-        loading="lazy"
+        loading="eager"
         decoding="async"
-        draggable={false}
       />
 
-      {/* Top-left lavender ellipse */}
-      <div
+      {/* ── Mobile: Union hex decorative pattern (PNG) ───────────────────────── */}
+      {/* Figma 366:6870 · left=56px top=98px size=378px — mobile only */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         aria-hidden
-        className="pointer-events-none absolute"
+        src="/images/attack-surface-reduction/cta-union.png"
+        alt=""
+        width={378}
+        height={378}
+        className="pointer-events-none select-none absolute lg:hidden"
         style={{
-          left: '-139px',
-          top: '-168px',
-          width: 'clamp(160px, 22vw, 320px)',
-          height: 'clamp(160px, 22vw, 320px)',
-          borderRadius: '50%',
-          background: '#DF9BFF',
-          opacity: 0.8,
-          filter: 'blur(80px)',
+          left: "56px",
+          top: "98px",
+          width: "378px",
+          height: "378px",
+          objectFit: "contain",
+          opacity: 0.12,
         }}
+        loading="eager"
+        decoding="async"
       />
 
-      {/* Bottom-right lavender ellipse */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute"
+      {/* ── Headline ─────────────────────────────────────────────────────────── */}
+      <p
+        className="relative z-10 font-display"
         style={{
-          right: '-80px',
-          bottom: '-120px',
-          width: 'clamp(200px, 28vw, 511px)',
-          height: 'clamp(200px, 28vw, 511px)',
-          borderRadius: '50%',
-          background: '#DF9BFF',
-          opacity: 0.8,
-          filter: 'blur(80px)',
-        }}
-      />
-
-      {/* Content — desktop: row, mobile: centered column */}
-      <div
-        className="relative flex flex-col items-center text-center lg:flex-row lg:items-start lg:text-left"
-        style={{
-          padding: 'clamp(36px, 6vw, 64px) clamp(24px, 5vw, 80px)',
-          gap: 'clamp(24px, 5vw, 72px)',
+          color: "#111111",
+          maxWidth: "min(460px, 100%)",
+          fontSize: "var(--cta-card-title)",
+          fontWeight: 600,
+          letterSpacing: "var(--cta-card-title-ls)",
+          lineHeight: "var(--cta-card-title-lh)",
+          textWrap: "balance",
         }}
       >
-        {/* Headline */}
+        Reduce Attack Surface At The Source
+      </p>
+
+      {/* ── Body + blue CTA button ────────────────────────────────────────────── */}
+      <div className="relative z-10 flex flex-col items-center lg:items-start gap-[18px]">
         <p
-          className="relative"
+          className="font-normal text-center lg:text-left"
           style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--cta-card-title)',
-            fontWeight: 600,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.1,
-            color: '#111111',
-            maxWidth: 'min(420px, 100%)',
-            textWrap: 'balance',
-            zIndex: 1,
+            color: "#111111",
+            opacity: 0.8,
+            maxWidth: "440px",
+            fontSize: "var(--cta-card-desc)",
+            fontWeight: 400,
+            letterSpacing: "var(--cta-card-desc-ls)",
+            lineHeight: "var(--cta-card-desc-lh)",
           }}
         >
-          Reduce Attack Surface At The Source
+          Build with only what production needs.
         </p>
 
-        {/* Description + CTA + bird (mobile) */}
-        <div
-          className="relative flex flex-col items-center lg:items-start"
-          style={{ gap: 'clamp(16px, 2vw, 28px)', zIndex: 1, maxWidth: 'min(460px, 100%)' }}
+        {/* Solid blue button — Figma: #3960F9 h=44px radius=8px */}
+        <Link
+          href="/book-a-demo"
+          className="inline-flex items-center gap-2 font-sans font-medium text-white shrink-0"
+          style={{
+            background: "#3960F9",
+            borderRadius: "8px",
+            height: "44px",
+            paddingLeft: "24px",
+            paddingRight: "24px",
+            fontSize: "16px",
+            letterSpacing: "-0.05em",
+            whiteSpace: "nowrap",
+            boxShadow:
+              "0px 1px 2px -1px rgba(9,6,63,0.4), 0px 0px 0px 1px #3960F9, inset 0px 1px 0px 0px rgba(255,255,255,0.16)",
+          }}
         >
-          <p
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--cta-card-desc)',
-              fontWeight: 400,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.4,
-              color: '#111111',
-              opacity: 0.8,
-            }}
+          <span>Attack Surface Reduction</span>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+            fill="none"
+            aria-hidden
           >
-            Build with only what production needs.
-          </p>
-
-          <Link
-            href="/book-a-demo"
-            className="inline-flex items-center gap-2 text-white transition-transform duration-200 hover:-translate-y-px"
-            style={{
-              padding: '12px 20px',
-              borderRadius: '8px',
-              background: 'linear-gradient(180deg, #3960F9 0%, #2B97D1 100%)',
-              boxShadow:
-                '0 1px 2px -1px rgba(9,6,63,0.4), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px #3960F9',
-              fontFamily: 'var(--font-sans)',
-              fontSize: '16px',
-              fontWeight: 500,
-              letterSpacing: '-0.01em',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <span>Attack Surface Reduction</span>
-            <svg width="20" height="20" viewBox="0 0 18 18" fill="none" aria-hidden>
-              <path
-                d="M3 9h11m0 0l-4-4m4 4l-4 4"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </Link>
-
-          {/* Bird mascot — visible on mobile only */}
-          <div className="block lg:hidden mt-2">
-            <Image
-              src="/images/attack-surface-reduction/cta-bird-new.png"
-              alt=""
-              aria-hidden
-              width={120}
-              height={120}
-              className="object-contain pointer-events-none select-none"
+            <path
+              d="M3 9h11m0 0l-4-4m4 4l-4 4"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-          </div>
-        </div>
+          </svg>
+        </Link>
       </div>
     </div>
   );

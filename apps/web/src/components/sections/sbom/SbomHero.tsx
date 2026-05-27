@@ -73,7 +73,7 @@ export function SbomHero(): React.ReactElement {
       <div
         className="relative mx-auto z-[2] flex w-full max-w-[var(--container-default)] flex-col items-center px-6 sm:px-10 text-center"
         style={{
-          paddingTop: "clamp(72px, 8vw, 128px)",
+          paddingTop: "clamp(112px, 8vw, 128px)",
           paddingBottom: "clamp(40px, 5vw, 80px)",
         }}
       >
@@ -81,7 +81,7 @@ export function SbomHero(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--text-hero-product)",
+            fontSize: "clamp(36px, 4.45vw, 64px)",
             fontWeight: 600,
             letterSpacing: "var(--text-hero-product-ls, -0.04em)",
             lineHeight: "var(--text-hero-lh, 1.05)",

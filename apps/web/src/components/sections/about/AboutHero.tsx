@@ -59,12 +59,12 @@ export function AboutHero() {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Text at top: 178px from section top, matching Figma node 248:2066 */}
-        <div className="pt-[clamp(72px,8vw,128px)] pb-[clamp(40px,5vw,80px)]">
+        <div className="pt-[clamp(112px,8vw,128px)] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-14 lg:max-w-[436px]">
             <h1
               className="font-display font-semibold text-white"
               style={{
-                fontSize: "clamp(40px, 4.45vw, 64px)",
+                fontSize: "clamp(36px, 4.45vw, 64px)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.04em",
               }}

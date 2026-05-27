@@ -46,9 +46,9 @@ export function CommunityCTA() {
         <p
           className="font-sans font-normal text-white/80"
           style={{
-            fontSize: 'clamp(1rem, 1.4vw, 1.3125rem)',
-            lineHeight: '1.4',
-            letterSpacing: '-0.04em',
+            fontSize: 'var(--cta-card-desc)',
+            lineHeight: 'var(--cta-card-desc-lh)',
+            letterSpacing: 'var(--cta-card-desc-ls)',
             maxWidth: '493px',
           }}
         >

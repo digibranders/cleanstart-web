@@ -13,7 +13,7 @@
  * Card spec (Figma 366:6388 et al.):
  *  - Outer: 303×166, radius 20, gradient fill (red→white border halo)
  *  - Inner: 287×150 (8px inset), white, radius 16, big stacked shadow
- *  - Text:  Figtree SemiBold 20px title + Figtree Regular 14-15px description
+ *  - Text:  Manrope SemiBold 20px title + Manrope Regular 14-15px description
  *  - Icon:  small red shield on the left
  */
 const CARDS: Array<{

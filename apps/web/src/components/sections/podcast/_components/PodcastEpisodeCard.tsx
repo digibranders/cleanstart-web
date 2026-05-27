@@ -54,7 +54,7 @@ export function PodcastEpisodeCard({
   // Listing card — exact Figma spec (node 373:3163):
   // 404x306 white container, 8px radius, soft layered shadow,
   // 380x200 thumbnail, episode chip with #4a3bf1 text + 3px blue underline-shadow,
-  // 24px Figtree Medium title.
+  // 24px Manrope Medium title.
   return (
     <article
       className="relative flex flex-col w-full bg-white"
