@@ -37,7 +37,21 @@ export function CleanSightCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Ellipse 46683 — top-left (Figma exact: #DF9BFF / 0.8 / blur 121.5) ── */}
+      {/* ── Ellipse — top-left · mobile: 223px/53px · desktop: 320px/121.5px ── */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute lg:hidden"
+        style={{
+          left: "-158px",
+          top: "-134px",
+          width: "223.44px",
+          height: "223.44px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(53px)",
+        }}
+      />
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -54,7 +68,21 @@ export function CleanSightCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Ellipse 46682 — bottom-right (Figma exact: #DF9BFF / 0.8 / blur 121.5) ── */}
+      {/* ── Ellipse — bottom-right · mobile: 223px/53px · desktop: 511px/121.5px ── */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute lg:hidden"
+        style={{
+          right: "-145px",
+          bottom: "-141px",
+          width: "223.44px",
+          height: "223.44px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(53px)",
+        }}
+      />
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
