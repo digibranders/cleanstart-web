@@ -115,7 +115,7 @@ function DesktopWhyCard({ desktopImg, desktopImgStyle, title, desc }: CardDef): 
         <h3
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(22px, 2.4vw, 32px)',
+            fontSize: 'var(--fs-h3)',
             fontWeight: 700,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
@@ -127,7 +127,7 @@ function DesktopWhyCard({ desktopImg, desktopImgStyle, title, desc }: CardDef): 
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(15px, 1.4vw, 20px)',
+            fontSize: 'var(--fs-body)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.4,
@@ -189,7 +189,7 @@ function MobileWhyCard({ mobileIcon, mobileIconStyle, title, desc }: CardDef): R
         <h3
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '20px',
+            fontSize: 'var(--fs-h4)',
             fontWeight: 600,
             letterSpacing: '-0.05em',
             lineHeight: 1,
@@ -201,7 +201,7 @@ function MobileWhyCard({ mobileIcon, mobileIconStyle, title, desc }: CardDef): R
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '14px',
+            fontSize: 'var(--fs-body-sm)',
             fontWeight: 400,
             letterSpacing: '-0.04em',
             lineHeight: 1.4,
@@ -326,7 +326,7 @@ export function DeveloperWhyItMatters(): React.ReactElement {
           className="text-center mx-auto"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(28px, 4vw, 56px)',
+            fontSize: 'var(--fs-h2)',
             fontWeight: 700,
             letterSpacing: '-0.04em',
             lineHeight: 1.15,

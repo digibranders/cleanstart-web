@@ -402,7 +402,7 @@ export function DeveloperHero(): React.ReactElement {
           className="text-white"
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(36px, 4.45vw, 64px)',
+            fontSize: 'var(--fs-display)',
             fontWeight: 700,
             letterSpacing: '-0.04em',
             lineHeight: 1.05,
@@ -415,7 +415,7 @@ export function DeveloperHero(): React.ReactElement {
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(18px, 1.7vw, 24px)',
+            fontSize: 'var(--fs-lead)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.4,
@@ -457,7 +457,7 @@ export function DeveloperHero(): React.ReactElement {
         <p
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '19px',
+            fontSize: 'var(--fs-h5)',
             fontWeight: 400,
             letterSpacing: '-0.57px',
             lineHeight: 1.1,

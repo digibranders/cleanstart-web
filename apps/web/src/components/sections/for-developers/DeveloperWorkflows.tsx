@@ -132,7 +132,7 @@ function PipelineStepCard({ label, icon, iconSize = 60 }: PipelineStep): React.R
         <span
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '18px',
+            fontSize: 'var(--fs-h5)',
             fontWeight: 400,
             letterSpacing: '-0.04em',
             lineHeight: 1.2,
@@ -251,7 +251,7 @@ function CleanStartCard(): React.ReactElement {
         className="relative z-10 text-center"
         style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: '13px',
+          fontSize: 'var(--fs-caption)',
           fontWeight: 400,
           letterSpacing: '-0.04em',
           lineHeight: 1.2,
@@ -363,7 +363,7 @@ function MobilePipelineCard({ label, icon, iconSize = 56 }: PipelineStep): React
           className="ml-auto"
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '18px',
+            fontSize: 'var(--fs-h5)',
             fontWeight: 400,
             letterSpacing: '-0.04em',
             lineHeight: 1.2,
@@ -449,7 +449,7 @@ function MobileCleanStartCard(): React.ReactElement {
         className="relative z-10 ml-auto text-right"
         style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: '14px',
+          fontSize: 'var(--fs-body-sm)',
           fontWeight: 500,
           letterSpacing: '-0.04em',
           lineHeight: 1.15,
@@ -594,7 +594,7 @@ function FeatureCardView({ title, body, icon }: FeatureCard): React.ReactElement
           <h3
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: '28px',
+              fontSize: 'var(--fs-h2)',
               fontWeight: 700,
               letterSpacing: '-0.04em',
               lineHeight: 1.1,
@@ -607,7 +607,7 @@ function FeatureCardView({ title, body, icon }: FeatureCard): React.ReactElement
           <p
             style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: '18px',
+              fontSize: 'var(--fs-h5)',
               fontWeight: 400,
               letterSpacing: '-0.03em',
               lineHeight: 1.4,
@@ -703,7 +703,7 @@ export function DeveloperWorkflows(): React.ReactElement {
           style={{
             maxWidth: '720px',
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(28px, 4.3vw, 62px)',
+            fontSize: 'var(--fs-h2)',
             fontWeight: 700,
             letterSpacing: '-0.05em',
             lineHeight: 1.15,
@@ -773,7 +773,7 @@ export function DeveloperWorkflows(): React.ReactElement {
             <span
               style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: '18px',
+                fontSize: 'var(--fs-h5)',
                 fontWeight: 600,
                 letterSpacing: '-0.04em',
                 lineHeight: 1.4,

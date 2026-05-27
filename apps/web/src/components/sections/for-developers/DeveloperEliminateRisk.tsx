@@ -191,7 +191,7 @@ function GlowAnchorCard({
             className="cs-text-gradient-impact"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(46px, 4.4vw, 60px)',
+              fontSize: 'var(--fs-h2)',
               fontWeight: 700,
               letterSpacing: '-0.04em',
               lineHeight: 1,
@@ -205,7 +205,7 @@ function GlowAnchorCard({
             className="text-white"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(24px, 2.2vw, 30px)',
+              fontSize: 'var(--fs-h3)',
               fontWeight: 700,
               letterSpacing: '-0.04em',
               lineHeight: 1.1,
@@ -220,7 +220,7 @@ function GlowAnchorCard({
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(14px, 1.1vw, 16px)',
+            fontSize: 'var(--fs-body)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.45,
@@ -272,7 +272,7 @@ export function DeveloperEliminateRisk(): React.ReactElement {
           style={{
             maxWidth: '720px',
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(36px, 4.3vw, 62px)',
+            fontSize: 'var(--fs-h2)',
             fontWeight: 700,
             letterSpacing: '-0.05em',
             lineHeight: 1.1,
@@ -288,7 +288,7 @@ export function DeveloperEliminateRisk(): React.ReactElement {
           style={{
             maxWidth: '600px',
             fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(16px, 1.5vw, 20px)',
+            fontSize: 'var(--fs-lead)',
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.45,
