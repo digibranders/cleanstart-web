@@ -25,7 +25,7 @@ export function DealRegistrationForm(): React.ReactElement {
       <FormCard>
         <p
           className="text-center text-[#0F123E]"
-          style={{ fontSize: "var(--text-body-md)", lineHeight: 1.5 }}
+          style={{ fontSize: "var(--fs-body)", lineHeight: 1.5 }}
         >
           Thanks — your deal registration has been received. We&apos;ll be in touch within one
           business day.

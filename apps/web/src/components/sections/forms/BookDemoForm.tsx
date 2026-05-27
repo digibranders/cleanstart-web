@@ -168,7 +168,7 @@ function SuccessBanner({ show, message }: SuccessBannerProps): React.ReactElemen
         <span
           style={{
             fontFamily: "var(--font-sans), 'Sora', sans-serif",
-            fontSize: "14px",
+            fontSize: "var(--fs-body-sm)",
             fontWeight: 500,
             lineHeight: 1.45,
             color: "#054F31",
@@ -202,7 +202,7 @@ function FigmaTextInput({
         className="mb-2 block text-[#111111]"
         style={{
           fontFamily: "var(--font-display, 'Manrope'), sans-serif",
-          fontSize: "14px",
+          fontSize: "var(--fs-body-sm)",
           fontWeight: 400,
           lineHeight: 1.2,
         }}
@@ -223,7 +223,7 @@ function FigmaTextInput({
           padding: "10px 14px",
           fontFamily: "var(--font-display), 'Manrope', sans-serif",
           fontWeight: 500,
-          fontSize: "16px",
+          fontSize: "var(--fs-input)",
           lineHeight: 1.125,
           color: "#111111",
           height: "40px",
@@ -239,7 +239,7 @@ function ConsentText({ children }: { children: React.ReactNode }): React.ReactEl
       style={{
         fontFamily: "var(--font-sans), 'Sora', sans-serif",
         fontWeight: 400,
-        fontSize: "13px",
+        fontSize: "var(--fs-caption)",
         lineHeight: 1.5,
         letterSpacing: "-0.02em",
         color: "#111111",
@@ -290,7 +290,7 @@ function FigmaCheckbox({ name, label, required }: CheckboxProps): React.ReactEle
         style={{
           fontFamily: "var(--font-sans), 'Sora', sans-serif",
           fontWeight: 400,
-          fontSize: "13px",
+          fontSize: "var(--fs-caption)",
           lineHeight: 1.4,
           letterSpacing: "-0.02em",
           color: "#111111",
@@ -329,7 +329,7 @@ function SubmitButton({ submitted }: { submitted: boolean }): React.ReactElement
         style={{
           fontFamily: "var(--font-display), 'Manrope', sans-serif",
           fontWeight: 500,
-          fontSize: "clamp(15px, 1.4vw, 18px)",
+          fontSize: "var(--fs-lead)",
           lineHeight: "24.06px",
           letterSpacing: "-0.01em",
         }}

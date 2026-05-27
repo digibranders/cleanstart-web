@@ -33,7 +33,7 @@ export function FormSectionTitle({ children }: FormSectionTitleProps): React.Rea
   return (
     <h2
       className="font-display font-semibold text-[#0F123E]"
-      style={{ fontSize: "var(--text-body-lg)", lineHeight: 1.3 }}
+      style={{ fontSize: "var(--fs-body)", lineHeight: 1.3 }}
     >
       {children}
     </h2>
@@ -76,7 +76,7 @@ export function TextInput({
           padding: "15px 17px",
           fontFamily: "var(--font-display), 'Manrope', sans-serif",
           fontWeight: 500,
-          fontSize: "16px",
+          fontSize: "var(--fs-input)",
           lineHeight: 1.125,
           color: "#111111",
           height: "48px",
@@ -118,7 +118,7 @@ export function TextArea({
           padding: "12px 17px",
           fontFamily: "var(--font-display), 'Manrope', sans-serif",
           fontWeight: 500,
-          fontSize: "16px",
+          fontSize: "var(--fs-input)",
           lineHeight: 1.5,
           color: "#111111",
           minHeight: "108px",
@@ -155,7 +155,7 @@ export function SubmitButton({
         style={{
           fontFamily: "var(--font-display), 'Manrope', sans-serif",
           fontWeight: 500,
-          fontSize: "clamp(15px, 1.4vw, 18px)",
+          fontSize: "var(--fs-lead)",
           lineHeight: "24.06px",
           letterSpacing: "-0.01em",
         }}

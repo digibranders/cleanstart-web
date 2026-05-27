@@ -32,7 +32,7 @@ const BUTTON_BASE: React.CSSProperties = {
   borderRadius: "8px",
   border: "1px solid #E5E7EB",
   // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-  fontSize: "14px",
+  fontSize: "var(--fs-body-sm)",
   lineHeight: 1,
   background: "#FFFFFF",
   color: "#111111",
@@ -143,7 +143,7 @@ export function Pagination({
                 height: "36px",
                 color: "rgba(17,17,17,0.54)",
                 // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-                fontSize: "14px",
+                fontSize: "var(--fs-body-sm)",
               }}
             >
               …
