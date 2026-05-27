@@ -576,21 +576,12 @@ function MorphCard({
           &ldquo;{testimonial.quote}&rdquo;
         </p>
 
-        {testimonial.caseStudyHref ? (
+        {testimonial.caseStudyHref && isActive ? (
           <a
             href={testimonial.caseStudyHref}
             className="cs-tt-card__cta"
             target="_blank"
             rel="noopener noreferrer"
-            tabIndex={isActive ? undefined : -1}
-            onClick={
-              isActive
-                ? undefined
-                : (e) => {
-                    e.preventDefault();
-                    onClick?.();
-                  }
-            }
           >
             <span>Read Case study</span>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
@@ -607,6 +598,10 @@ function MorphCard({
           // Empty spacer preserves the body's three-child layout
           // (head / quote / cta) so the quote stays vertically positioned
           // identically across cards regardless of CTA presence.
+          // Peek cards (!isActive) intentionally omit the <a> to avoid
+          // nesting an interactive link inside the role="button" article
+          // (axe-core nested-interactive violation; the whole card is
+          // clickable to activate it).
           <span aria-hidden className="cs-tt-card__cta-spacer" />
         )}
       </div>
