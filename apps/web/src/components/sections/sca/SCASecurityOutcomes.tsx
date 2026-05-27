@@ -93,7 +93,7 @@ const BOTTOM_CARD: React.CSSProperties = {
 
 const STAT_NUM: React.CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "clamp(32px, 4vw, 56px)",
+  fontSize: "var(--fs-h2)",
   fontWeight: 700,
   letterSpacing: "-0.04em",
   lineHeight: 1.1,
@@ -103,7 +103,7 @@ const STAT_NUM: React.CSSProperties = {
 const STAT_LABEL: React.CSSProperties = {
   marginTop: "clamp(6px,0.83vw,12px)",
   fontFamily: "var(--font-sans)",
-  fontSize: "clamp(15px, 1.4vw, 20px)",
+  fontSize: "var(--fs-body)",
   fontWeight: 400,
   letterSpacing: "-0.02em",
   lineHeight: 1.4,
@@ -112,7 +112,7 @@ const STAT_LABEL: React.CSSProperties = {
 
 const FEAT_TITLE: React.CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "clamp(22px, 2.4vw, 32px)",
+  fontSize: "var(--fs-h3)",
   fontWeight: 700,
   letterSpacing: "-0.04em",
   lineHeight: 1.1,
@@ -122,7 +122,7 @@ const FEAT_TITLE: React.CSSProperties = {
 const FEAT_DESC: React.CSSProperties = {
   marginTop: "clamp(6px,0.83vw,12px)",
   fontFamily: "var(--font-sans)",
-  fontSize: "clamp(15px, 1.4vw, 20px)",
+  fontSize: "var(--fs-body)",
   fontWeight: 400,
   letterSpacing: "-0.02em",
   lineHeight: 1.4,
@@ -194,7 +194,7 @@ export function SCASecurityOutcomes(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,

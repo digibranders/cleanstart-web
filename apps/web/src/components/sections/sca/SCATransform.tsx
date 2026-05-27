@@ -241,7 +241,7 @@ function TraditionalSCACard(): React.ReactElement {
           left: "137px",
           fontFamily: "var(--font-display)",
           // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-          fontSize: "20px",
+          fontSize: "var(--fs-h4)",
           fontWeight: 700,
           lineHeight: "20px",
           color: "#ef4444",
@@ -376,7 +376,7 @@ function TraditionalSCACard(): React.ReactElement {
           transform: "translateX(-50%) translateY(-50%)",
           color: "#cbd5e1",
           // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-          fontSize: "16px",
+          fontSize: "var(--fs-body)",
           fontFamily: "var(--font-body)",
           fontWeight: 400,
           lineHeight: "16px",
@@ -406,7 +406,7 @@ function TraditionalSCACard(): React.ReactElement {
           style={{
             fontFamily: "var(--font-display)",
             // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-            fontSize: "18px",
+            fontSize: "var(--fs-h5)",
             fontWeight: 700,
             color: "#0f172a",
             lineHeight: "28px",
@@ -421,7 +421,7 @@ function TraditionalSCACard(): React.ReactElement {
           style={{
             fontFamily: "var(--font-body)",
             // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-            fontSize: "14px",
+            fontSize: "var(--fs-body-sm)",
             fontWeight: 400,
             color: "#64748b",
             lineHeight: "20px",
@@ -478,7 +478,7 @@ function CenterCard(): React.ReactElement {
           paddingLeft: "12px",
           fontFamily: "var(--font-display)",
           // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-          fontSize: "20px",
+          fontSize: "var(--fs-h4)",
           fontWeight: 700,
           lineHeight: "20px",
           color: "#ffffff",
@@ -737,7 +737,7 @@ function CenterCard(): React.ReactElement {
           style={{
             fontFamily: "var(--font-display)",
             // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-            fontSize: "18px",
+            fontSize: "var(--fs-h5)",
             fontWeight: 700,
             color: "#ffffff",
             lineHeight: "28px",
@@ -752,7 +752,7 @@ function CenterCard(): React.ReactElement {
           style={{
             fontFamily: "var(--font-body)",
             // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-            fontSize: "14px",
+            fontSize: "var(--fs-body-sm)",
             fontWeight: 400,
             color: "#adadad",
             lineHeight: "20px",
@@ -845,7 +845,7 @@ function CleanSightCard(): React.ReactElement {
           transform: "translateX(-50%)",
           fontFamily: "var(--font-display)",
           // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-          fontSize: "20px",
+          fontSize: "var(--fs-h4)",
           fontWeight: 700,
           lineHeight: "20px",
           color: "#fff",
@@ -968,7 +968,7 @@ function CleanSightCard(): React.ReactElement {
               style={{
                 fontFamily: "var(--font-display)",
                 // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-                fontSize: "16px",
+                fontSize: "var(--fs-body)",
                 fontWeight: 700,
                 color: "#1e293b",
                 paddingLeft: "16px",
@@ -1056,7 +1056,7 @@ function CleanSightCard(): React.ReactElement {
                   style={{
                     fontFamily: "var(--font-display)",
                     // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-                    fontSize: "16px",
+                    fontSize: "var(--fs-body)",
                     fontWeight: 700,
                     color: "#0f172a",
                     lineHeight: "24px",
@@ -1189,7 +1189,7 @@ function CleanSightCard(): React.ReactElement {
           style={{
             fontFamily: "var(--font-display)",
             // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-            fontSize: "18px",
+            fontSize: "var(--fs-h5)",
             fontWeight: 700,
             color: "#0f172a",
             textAlign: "center",
@@ -1204,7 +1204,7 @@ function CleanSightCard(): React.ReactElement {
           style={{
             fontFamily: "var(--font-body)",
             // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-            fontSize: "14px",
+            fontSize: "var(--fs-body-sm)",
             fontWeight: 400,
             color: "#64748b",
             textAlign: "center",
@@ -1236,7 +1236,7 @@ export function SCATransform(): React.ReactElement {
           className="text-center"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(32px, 4vw, 56px)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -1391,7 +1391,7 @@ export function SCATransform(): React.ReactElement {
                   style={{
                     fontFamily: "var(--font-display)",
                     // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-                    fontSize: "20px",
+                    fontSize: "var(--fs-h4)",
                     fontWeight: 700,
                     letterSpacing: "-0.019em",
                     lineHeight: "26px",
@@ -1405,7 +1405,7 @@ export function SCATransform(): React.ReactElement {
                   style={{
                     fontFamily: "var(--font-display)",
                     // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-                    fontSize: "20px",
+                    fontSize: "var(--fs-h4)",
                     fontWeight: 700,
                     letterSpacing: "-0.019em",
                     lineHeight: "26px",

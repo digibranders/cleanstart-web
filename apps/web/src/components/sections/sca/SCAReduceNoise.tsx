@@ -78,7 +78,7 @@ export function SCAReduceNoise(): React.ReactElement {
               className="text-white"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(32px, 4vw, 56px)",
+                fontSize: "var(--fs-h2)",
                 fontWeight: 700,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
@@ -91,7 +91,7 @@ export function SCAReduceNoise(): React.ReactElement {
             <p
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "clamp(18px, 1.7vw, 24px)",
+                fontSize: "var(--fs-lead)",
                 fontWeight: 400,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.4,
@@ -163,7 +163,7 @@ export function SCAReduceNoise(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "clamp(20px, 2vw, 28px)",
+                      fontSize: "var(--fs-h3)",
                       fontWeight: 600,
                       letterSpacing: "-0.04em",
                       lineHeight: 1.1,
@@ -175,7 +175,7 @@ export function SCAReduceNoise(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: "var(--font-sans)",
-                      fontSize: "clamp(15px, 1.4vw, 20px)",
+                      fontSize: "var(--fs-body)",
                       fontWeight: 400,
                       letterSpacing: "-0.02em",
                       lineHeight: 1.4,
@@ -280,7 +280,7 @@ function Mockup(): React.ReactElement {
           <span
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--text-t-body-lg)",
+              fontSize: "var(--fs-body)",
               fontWeight: 600,
               letterSpacing: "var(--text-t-body-lg-ls)",
               lineHeight: "var(--text-t-body-lg-lh)",
@@ -325,7 +325,7 @@ function Mockup(): React.ReactElement {
                 style={{
                   fontFamily: "var(--font-body)",
                   // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
-                  fontSize: "16px",
+                  fontSize: "var(--fs-body)",
                   fontWeight: 600,
                   letterSpacing: "-0.04em",
                   color,

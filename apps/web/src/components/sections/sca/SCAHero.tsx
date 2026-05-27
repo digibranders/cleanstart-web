@@ -67,7 +67,7 @@ export function SCAHero(): React.ReactElement {
         <h1
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(36px, 4.45vw, 64px)",
+            fontSize: "var(--fs-display)",
             fontWeight: 700,
             letterSpacing: "-0.04em",
             lineHeight: 1.05,
@@ -85,7 +85,7 @@ export function SCAHero(): React.ReactElement {
           style={{
             marginTop: "clamp(16px, 1.67vw, 32px)",
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(18px, 1.7vw, 24px)",
+            fontSize: "var(--fs-lead)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
             lineHeight: 1.4,
