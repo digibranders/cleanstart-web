@@ -178,11 +178,7 @@ export function AboutPowering() {
               maxWidth: "835px",
             }}
           >
-<<<<<<< HEAD
-            Help Tailored solutions for every role in your organization  from security leaders to engineering teams.
-=======
             Tailored solutions for every role in your organization — from security leaders to engineering teams.
->>>>>>> origin/development
           </p>
         </div>
 

@@ -5,10 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { PreviewBanner } from "@/components/PreviewBanner";
-// Local dev: missing `agentation` npm package causes a Next.js module-not-found
-// overlay that collapses the rendered page. Commented out until the package is
-// added (or removed permanently). Do not commit uncommented unless that's fixed.
-// import { AgentationDev } from "@/components/dev/AgentationDev";
+import { AgentationDev } from "@/components/dev/AgentationDev";
 import { WebVitals } from "@/components/observability/WebVitals";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
 import { JsonLd, organizationSchema } from "@/lib/seo/jsonld";
@@ -129,7 +126,7 @@ export default function RootLayout({
         {children}
         <Analytics />
         <SpeedInsights />
-        {/* <AgentationDev /> */}
+        <AgentationDev />
       </body>
     </html>
   );
