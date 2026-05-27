@@ -32,12 +32,10 @@ const RISKS: readonly Risk[] = [
   {
     id: 'incomplete',
     icon: '/images/sbom/risk-icon-incomplete.png',
-    mobileIcon: '/images/sbom/mobile-risk-icon-1.png',
+    mobileIcon: '/images/sbom/risk-icon-incomplete.png',
     iconAlt: 'Incomplete Visibility icon',
     title: 'Incomplete Visibility',
     body: 'Missing packages and dependencies hide risk.',
-    // Figma: outer 129.164×96px at left:-14.45px top:-5px; inner 86.53%×104.52% at left:8.15% top:-2.03%
-    // Effective position in icon-area: left≈-4px top≈-7px, size≈112×100px
     mobileIconW: 112,
     mobileIconH: 100,
     mobileBodyW: 199,
@@ -45,7 +43,7 @@ const RISKS: readonly Risk[] = [
   {
     id: 'traceability',
     icon: '/images/sbom/risk-icon-traceability.png',
-    mobileIcon: '/images/sbom/mobile-risk-icon-2.png',
+    mobileIcon: '/images/sbom/risk-icon-traceability.png',
     iconAlt: 'Broken Traceability icon',
     title: 'Broken Traceability',
     body: 'Disconnected inventories weaken provenance tracking.',
@@ -56,7 +54,7 @@ const RISKS: readonly Risk[] = [
   {
     id: 'stale',
     icon: '/images/sbom/risk-icon-stale.png',
-    mobileIcon: '/images/sbom/mobile-risk-icon-3.png',
+    mobileIcon: '/images/sbom/risk-icon-stale.png',
     iconAlt: 'Stale Data icon',
     title: 'Stale Data',
     body: 'Static SBOMs quickly become outdated.',
@@ -67,7 +65,7 @@ const RISKS: readonly Risk[] = [
   {
     id: 'compliance',
     icon: '/images/sbom/risk-icon-compliance.png',
-    mobileIcon: '/images/sbom/mobile-risk-icon-4.png',
+    mobileIcon: '/images/sbom/risk-icon-compliance.png',
     iconAlt: 'Compliance Exposure icon',
     title: 'Compliance Exposure',
     body: 'Incomplete inventories increase audit complexity.',

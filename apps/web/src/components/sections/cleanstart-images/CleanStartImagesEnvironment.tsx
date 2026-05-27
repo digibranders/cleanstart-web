@@ -8,16 +8,16 @@ type LogoItem = {
 };
 
 /**
- * Logos from Figma node 792:2886 — colored PNG screenshots matching exact
- * Figma proportions: CouchDB → PostgreSQL → Redis → Ubuntu → PHP.
+ * Logos from Figma node 792:2886 — SVG versions used to avoid baked-in
+ * background pixels showing edges against the dark gradient.
  * Two copies in the marquee track for a seamless infinite loop.
  */
 const LOGOS: LogoItem[] = [
-  { src: "/images/cleanstart-images/stacks-couchdb-color.png",    alt: "Apache CouchDB", w: 176, h: 88 },
-  { src: "/images/cleanstart-images/stacks-postgresql-color.png",  alt: "PostgreSQL",     w: 295, h: 56 },
-  { src: "/images/cleanstart-images/stacks-redis-color.png",       alt: "Redis",          w: 149, h: 47 },
-  { src: "/images/cleanstart-images/stacks-ubuntu-color.png",      alt: "Ubuntu",         w: 169, h: 65 },
-  { src: "/images/cleanstart-images/stacks-php-color.png",         alt: "PHP",            w: 96,  h: 47 },
+  { src: "/images/cleanstart-images/stacks-couchdb-color.svg",    alt: "Apache CouchDB", w: 176, h: 88 },
+  { src: "/images/cleanstart-images/stacks-postgresql.svg",        alt: "PostgreSQL",     w: 295, h: 56 },
+  { src: "/images/cleanstart-images/stacks-redis-color.svg",       alt: "Redis",          w: 149, h: 47 },
+  { src: "/images/cleanstart-images/stacks-ubuntu-color.svg",      alt: "Ubuntu",         w: 169, h: 65 },
+  { src: "/images/cleanstart-images/stacks-php-color.svg",         alt: "PHP",            w: 96,  h: 47 },
 ];
 
 export function CleanStartImagesEnvironment(): React.ReactElement {

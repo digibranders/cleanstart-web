@@ -1,6 +1,6 @@
 /*
  * Figma node 583:2328 — 1922×1088 px (desktop)
- * Figma node 896:495  — 360×964px  (mobile, node 856:1087)
+ * Figma node 856:1087  — 360×964px  (mobile)
  *
  * ── DESKTOP (≥ sm) ───────────────────────────────────────────────────────────
  * Section: paddingTop 120px, paddingBottom 160px
@@ -13,62 +13,99 @@
  * Dividers: vertical gradient at 50%, horizontal gradient at 50%
  * Union decorations: lg:block only
  *
- * ── MOBILE (< sm) ────────────────────────────────────────────────────────────
+ * ── MOBILE (< sm) — Figma 856:1087 ─────────────────────────────────────────
  * Heading: 28px Manrope Bold, #111, tracking -0.05em, centered, lh 1.2
  * 4 cards — single column, 16px gap, px-4 side padding
- *   Card: 328×206px, white rounded-[16px], subtle border
- *   Icon container: 108×87px, centered, top=20px from card top
- *   Glow: 79.75×79.75px at left=-1.45px top=0.24px within icon container
- *   Text block: top=112px from card top, centered, gap=12px
- *     Title: Manrope SemiBold 20px, tracking=-0.05em (-1px), #000, lh=1
- *     Desc:  Sora Regular 14px, tracking=-0.04em (-0.56px), #111, 80% opacity, lh=1.1
- *     Desc max-widths: 199px · 181px · 199px · 199px
+ *   Card: 328×206px, white rounded-[16px], subtle shadow
+ *   Outer icon container: 108.267×87px, centered at top=20px within card
+ *   Glow: 79.75×79.75px at left=-1.45px top=0.24px within outer icon container
+ *
+ * Per-card mobile icon specs (Figma 856:1090 / 1098 / 1106 / 1114):
+ *   Card 1 (Bloated):    inner 129.164×96px at (-14.45, -5), same % offsets as desktop
+ *   Card 2 (Inherited):  97×88px, centered-x, top=0, object-cover
+ *   Card 3 (Attack):     100×100px, centered-x+y, object-cover
+ *   Card 4 (Backlogs):   97×97px, centered-x+y, object-cover
+ *
+ * Text block: top=112px from card top, centered, gap=12px
+ *   Title: Manrope SemiBold 20px, tracking=-0.05em (-1px), #000, lh=1
+ *   Desc:  Sora Regular 14px, tracking=-0.04em (-0.56px), #111, 80% opacity, lh=1.1
+ *   Desc max-widths: 199px · 181px · 199px · 199px
  */
 
-export function CisoRisks(): React.ReactElement {
-  const risks = [
-    {
-      icon: "/images/ciso/risks-icon-bloated.png",
-      title: "Bloated Public Images",
-      description: "Unnecessary packages increase exposure.",
-      iconOffset: { top: "-2.03%", left: "8.15%", width: "86.53%", height: "104.52%" },
-      gap: "32px",
-      textMaxWidth: "294px",
-      descMaxWidth: "294px",
-      descMaxWidthMobile: "199px",
-    },
-    {
-      icon: "/images/ciso/risks-icon-inherited.png",
-      title: "Inherited Vulnerabilities",
-      description: "Most container risk originates upstream",
-      iconOffset: { top: "-0.71%", left: "9.12%", width: "83.45%", height: "100.71%" },
-      gap: "16px",
-      textMaxWidth: "360px",
-      descMaxWidth: "280px",
-      descMaxWidthMobile: "181px",
-    },
-    {
-      icon: "/images/ciso/risks-icon-attack.png",
-      title: "Expanding Attack Surface",
-      description: "Large dependency trees increase operational complexity.",
-      iconOffset: { top: "-8.18%", left: "8.45%", width: "87.16%", height: "117.27%" },
-      gap: "32px",
-      textMaxWidth: "294px",
-      descMaxWidth: "260px",
-      descMaxWidthMobile: "199px",
-    },
-    {
-      icon: "/images/ciso/risks-icon-backlogs.png",
-      title: "Remediation Backlogs",
-      description: "Security teams spend time triaging inherited risk.",
-      iconOffset: { top: "1.36%", left: "15.93%", width: "72.54%", height: "96.83%" },
-      gap: "16px",
-      textMaxWidth: "360px",
-      descMaxWidth: "280px",
-      descMaxWidthMobile: "199px",
-    },
-  ];
+// ─── Mobile icon spec (discriminated union) ───────────────────────────────────
+type MobileIconSpec =
+  /** Card 1: Figma uses same % offsets as desktop but within an oversized inner div */
+  | { kind: "offset"; innerW: number; innerH: number; innerLeft: number; innerTop: number }
+  /** Cards 2–4: object-cover, centered-x, top=0 */
+  | { kind: "cover-top"; w: number; h: number }
+  /** Cards 2–4: object-cover, centered-x AND centered-y */
+  | { kind: "cover-center"; w: number; h: number };
 
+interface RiskItem {
+  icon: string;
+  title: string;
+  description: string;
+  /** % offsets for desktop 296×220px container (also used by card-1 mobile inner div) */
+  iconOffset: { top: string; left: string; width: string; height: string };
+  gap: string;
+  textMaxWidth: string;
+  descMaxWidth: string;
+  descMaxWidthMobile: string;
+  mobileIcon: MobileIconSpec;
+}
+
+const RISKS: RiskItem[] = [
+  {
+    icon: "/images/ciso/risks-icon-bloated.png",
+    title: "Bloated Public Images",
+    description: "Unnecessary packages increase exposure.",
+    iconOffset: { top: "-2.03%", left: "8.15%", width: "86.53%", height: "104.52%" },
+    gap: "32px",
+    textMaxWidth: "294px",
+    descMaxWidth: "294px",
+    descMaxWidthMobile: "199px",
+    // Figma 909:2510 — 129.164×96px inner div at (-14.45, -5)
+    mobileIcon: { kind: "offset", innerW: 129.164, innerH: 96, innerLeft: -14.45, innerTop: -5 },
+  },
+  {
+    icon: "/images/ciso/risks-icon-inherited.png",
+    title: "Inherited Vulnerabilities",
+    description: "Most container risk originates upstream",
+    iconOffset: { top: "-0.71%", left: "9.12%", width: "83.45%", height: "100.71%" },
+    gap: "16px",
+    textMaxWidth: "360px",
+    descMaxWidth: "280px",
+    descMaxWidthMobile: "181px",
+    // Figma 909:2513 — 97×88px, centered-x, top=0
+    mobileIcon: { kind: "cover-top", w: 97, h: 88 },
+  },
+  {
+    icon: "/images/ciso/risks-icon-attack.png",
+    title: "Expanding Attack Surface",
+    description: "Large dependency trees increase operational complexity.",
+    iconOffset: { top: "-8.18%", left: "8.45%", width: "87.16%", height: "117.27%" },
+    gap: "32px",
+    textMaxWidth: "294px",
+    descMaxWidth: "260px",
+    descMaxWidthMobile: "199px",
+    // Figma 909:2516 — 100×100px, centered x+y
+    mobileIcon: { kind: "cover-center", w: 100, h: 100 },
+  },
+  {
+    icon: "/images/ciso/risks-icon-backlogs.png",
+    title: "Remediation Backlogs",
+    description: "Security teams spend time triaging inherited risk.",
+    iconOffset: { top: "1.36%", left: "15.93%", width: "72.54%", height: "96.83%" },
+    gap: "16px",
+    textMaxWidth: "360px",
+    descMaxWidth: "280px",
+    descMaxWidthMobile: "199px",
+    // Figma 909:2519 — 97×97px, centered x+y
+    mobileIcon: { kind: "cover-center", w: 97, h: 97 },
+  },
+];
+
+export function CisoRisks(): React.ReactElement {
   return (
     <section
       data-section="CisoRisks"
@@ -102,9 +139,7 @@ export function CisoRisks(): React.ReactElement {
       {/* ── Content container ── */}
       <div className="relative mx-auto" style={{ maxWidth: "1276px" }}>
 
-        {/* Heading — shared across breakpoints, font size responsive
-            Mobile: 28px Bold lh=1.2 (Figma 856:1086)
-            Desktop: 56px Bold lh=1.1 (Figma 583:2328) */}
+        {/* Heading */}
         <h2
           className="text-center text-[#111] mx-auto px-6"
           style={{
@@ -122,14 +157,14 @@ export function CisoRisks(): React.ReactElement {
 
         {/* ════════════════════════════════════════════════════════════════════
             MOBILE — single column card stack (< sm = 640px)
-            Figma 896:495 — 4 vertical cards, 16px gap, 16px side padding
-            Each card: 328×206px, white bg, rounded-[16px]
-            Icon: 108×87px centered at top=20px
-            Glow: 79.75×79.75px at left=-1.45px top=0.24px (mobile size)
-            Text: top=112px, gap=12px, centered
+            Figma 856:1087 — 4 vertical cards, 16px gap, 16px side padding
+            Card: 328×206px, white, rounded-[16px], shadow
+            Outer icon container: 108.267×87px, centered, top=20px
+            Glow: 79.75×79.75px at left=-1.45px top=0.24px
+            Text: top=112px, centered, gap=12px
         ════════════════════════════════════════════════════════════════════ */}
         <div className="sm:hidden flex flex-col gap-4 px-4">
-          {risks.map((risk) => (
+          {RISKS.map((risk) => (
             <div
               key={risk.title}
               className="relative bg-white"
@@ -140,22 +175,22 @@ export function CisoRisks(): React.ReactElement {
                 boxShadow: "0px 4px 24px 0px rgba(0,0,0,0.10)",
               }}
             >
-              {/* Icon container — 108×87px, centered horizontally, 20px from card top */}
+              {/* Outer icon container — 108.267×87px, centered, top=20px */}
               <div
-                className="absolute"
+                className="absolute overflow-hidden"
                 style={{
                   top: "20px",
                   left: "50%",
                   transform: "translateX(-50%)",
-                  width: "108px",
+                  width: "108.267px",
                   height: "87px",
                 }}
               >
-                {/* Ellipse glow — mobile: 130px centered on icon container */}
+                {/* Ellipse glow — 79.75×79.75px at left=-1.45px top=0.24px (Figma 856:1092) */}
                 <div
                   aria-hidden
                   className="absolute pointer-events-none"
-                  style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "130px", height: "130px" }}
+                  style={{ left: "-1.45px", top: "0.24px", width: "79.75px", height: "79.75px" }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -168,31 +203,93 @@ export function CisoRisks(): React.ReactElement {
                   />
                 </div>
 
-                {/* Icon image — clipped to container, same % offsets as desktop */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={risk.icon}
-                    alt=""
+                {/* Icon image — per-card Figma mobile spec ── */}
+                {risk.mobileIcon.kind === "offset" ? (
+                  /*
+                   * Card 1 (Bloated) — Figma 909:2510
+                   * Inner div: 129.164×96px at (-14.45px, -5px) within outer container
+                   * img inside uses same % offsets as desktop (applied to inner div dims)
+                   */
+                  <div
+                    className="absolute overflow-hidden pointer-events-none"
+                    style={{
+                      left: `${risk.mobileIcon.innerLeft}px`,
+                      top: `${risk.mobileIcon.innerTop}px`,
+                      width: `${risk.mobileIcon.innerW}px`,
+                      height: `${risk.mobileIcon.innerH}px`,
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={risk.icon}
+                      alt=""
+                      className="absolute pointer-events-none"
+                      style={{
+                        top: risk.iconOffset.top,
+                        left: risk.iconOffset.left,
+                        width: risk.iconOffset.width,
+                        height: risk.iconOffset.height,
+                        maxWidth: "none",
+                      }}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                ) : risk.mobileIcon.kind === "cover-top" ? (
+                  /*
+                   * Cards 2 (Inherited) — Figma 909:2513
+                   * 97×88px, horizontally centered, top=0, object-cover
+                   */
+                  <div
                     className="absolute pointer-events-none"
                     style={{
-                      top: risk.iconOffset.top,
-                      left: risk.iconOffset.left,
-                      width: risk.iconOffset.width,
-                      height: risk.iconOffset.height,
-                      maxWidth: "none",
+                      left: "50%",
+                      top: 0,
+                      transform: "translateX(-50%)",
+                      width: `${risk.mobileIcon.w}px`,
+                      height: `${risk.mobileIcon.h}px`,
                     }}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={risk.icon}
+                      alt=""
+                      className="absolute inset-0 pointer-events-none"
+                      style={{ objectFit: "cover", width: "100%", height: "100%", maxWidth: "none" }}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                ) : (
+                  /*
+                   * Cards 3 (Attack) & 4 (Backlogs) — Figma 909:2516 / 909:2519
+                   * 100×100 / 97×97px, centered x+y, object-cover
+                   */
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      left: "50%",
+                      top: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: `${risk.mobileIcon.w}px`,
+                      height: `${risk.mobileIcon.h}px`,
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={risk.icon}
+                      alt=""
+                      className="absolute inset-0 pointer-events-none"
+                      style={{ objectFit: "cover", width: "100%", height: "100%", maxWidth: "none" }}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                )}
               </div>
 
-              {/* Text block — centered, top=112px from card top, gap=12px */}
-              <div
-                className="absolute"
-                style={{ top: "112px", left: 0, right: 0 }}
-              >
+              {/* Text block — top=112px from card top, centered, gap=12px */}
+              <div className="absolute" style={{ top: "112px", left: 0, right: 0 }}>
                 <div className="flex flex-col items-center text-center" style={{ gap: "12px" }}>
                   <h3
                     style={{
@@ -263,7 +360,7 @@ export function CisoRisks(): React.ReactElement {
               }}
             />
 
-            {risks.map((risk) => (
+            {RISKS.map((risk) => (
               <div
                 key={risk.title}
                 className="relative flex flex-row items-center px-8"

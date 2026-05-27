@@ -11,6 +11,7 @@ const CARDS = [
     id: "coverage",
     title: "Complete Coverage",
     body: "Continuously updated software inventories.",
+    icon: "/images/sbom/mobile-adv-1.svg",
     mobileIcon: "/images/sbom/mobile-adv-1.svg",
     // Figma mobile text widths (node 817:1349–1351)
     mobileTitleW: 135,
@@ -20,6 +21,7 @@ const CARDS = [
     id: "dependency",
     title: "Dependency Mapping",
     body: "Track transitive and inherited dependencies.",
+    icon: "/images/sbom/mobile-adv-2.svg",
     mobileIcon: "/images/sbom/mobile-adv-2.svg",
     mobileTitleW: 135,
     mobileBodyW: 187,
@@ -28,6 +30,7 @@ const CARDS = [
     id: "compliance",
     title: "Compliance Readiness",
     body: "Support audit and regulatory requirements.",
+    icon: "/images/sbom/mobile-adv-3.svg",
     mobileIcon: "/images/sbom/mobile-adv-3.svg",
     mobileTitleW: 175,
     mobileBodyW: 155,
@@ -36,6 +39,7 @@ const CARDS = [
     id: "visibility",
     title: "Supply Chain Visibility",
     body: "Improve visibility across software ecosystems.",
+    icon: "/images/sbom/mobile-adv-4.svg",
     mobileIcon: "/images/sbom/mobile-adv-4.svg",
     mobileTitleW: 135,
     mobileBodyW: 201,
@@ -99,7 +103,7 @@ export function SbomIntelligence(): React.ReactElement {
       <div className="relative hidden sm:block mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-section-md">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4" style={{ gap: "32px" }}>
           {CARDS.map((card) => (
-            <IntelligenceCard key={card.id} title={card.title} body={card.body} />
+            <IntelligenceCard key={card.id} title={card.title} body={card.body} icon={card.icon} />
           ))}
         </div>
       </div>
@@ -128,9 +132,11 @@ export function SbomIntelligence(): React.ReactElement {
 function IntelligenceCard({
   title,
   body,
+  icon,
 }: {
   title: string;
   body: string;
+  icon: string;
 }): React.ReactElement {
   return (
     <div
@@ -194,7 +200,7 @@ function IntelligenceCard({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/sbom/icon-cubes.svg"
+            src={icon}
             alt=""
             aria-hidden
             style={{ width: "54px", height: "54px", display: "block" }}

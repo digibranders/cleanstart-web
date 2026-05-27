@@ -3,20 +3,24 @@ import { FipsBall } from "./FipsBall";
 interface MatterCard {
   title: string;
   description: string;
+  icon: string;
 }
 
 const TOP_ROW: MatterCard[] = [
   {
     title: "Validated Cryptography",
     description: "Trusted cryptographic modules for regulated environments.",
+    icon: "/images/fips/why-icon-validated-crypto.svg",
   },
   {
     title: "Centralized Crypto Management",
     description: "Consistent cryptographic standards across environments.",
+    icon: "/images/fips/why-icon-centralized-mgmt.svg",
   },
   {
     title: "Verified Secure Boot",
     description: "Protect workload integrity during startup.",
+    icon: "/images/fips/why-icon-secure-boot.svg",
   },
 ];
 
@@ -24,10 +28,12 @@ const BOTTOM_ROW: MatterCard[] = [
   {
     title: "Automated Compliance Documentation",
     description: "Continuous evidence generation for audits.",
+    icon: "/images/fips/why-icon-compliance-docs.svg",
   },
   {
     title: "Continuous Compliance Monitoring",
     description: "Track cryptographic compliance across deployments.",
+    icon: "/images/fips/why-icon-compliance-monitoring.svg",
   },
 ];
 
@@ -107,18 +113,15 @@ function MatterTile({ card }: { card: MatterCard }): React.ReactElement {
       }}
     >
       {/*
-       * Ball icon:
-       * Mobile (Figma 913:218): 70px, centered horizontally at top of card.
-       * Desktop: 92px, right-aligned.
+       * Ball icon — same Figma icon on mobile and desktop.
+       * Mobile: 70px centered. Desktop: 92px right-aligned.
        */}
       <div className="flex justify-center md:justify-end mb-6">
-        {/* Mobile ball — 70px, centered */}
-        <div className="md:hidden">
-          <FipsBall size={70} />
+        <div className="block md:hidden">
+          <FipsBall size={70} iconSrc={card.icon} />
         </div>
-        {/* Desktop ball — 92px, right-aligned */}
         <div className="hidden md:block">
-          <FipsBall size={92} />
+          <FipsBall size={92} iconSrc={card.icon} />
         </div>
       </div>
 
