@@ -543,7 +543,7 @@ export function CisoOutcomes(): React.ReactElement {
             <h2
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-h1)",
+                fontSize: "var(--fs-h2)",
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,

@@ -44,7 +44,7 @@ export function CleanSightComparison(): React.ReactElement {
             className="mx-auto font-display text-[#111111]"
             style={{
               maxWidth: "min(737px, 100%)",
-              fontSize: "var(--fs-h1)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,

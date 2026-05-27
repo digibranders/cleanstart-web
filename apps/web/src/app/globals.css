@@ -222,17 +222,20 @@
 
   /* Display & headings (formulas tuned to hit target at 1440px viewport).
      v4 (2026-05-27): bumped --fs-h1 32→56 and --fs-h2 28→48 after visual
-     review showed v3 desktop sizes (48 / 40) were too small. */
+     review showed v3 desktop sizes (48 / 40) were too small.
+     v5 (2026-05-27): bumped --fs-h2 to 28→56 (matches --fs-h1) and --fs-lead
+     to 18→24 per design review — section H2s and section descriptions
+     across marketing pages must share one canonical size. */
   --fs-display:  clamp(2.25rem, 1.5rem + 2.78vw, 4rem);      /* 36 → 64  hero H1 */
   --fs-h1:       clamp(2rem, 1.5rem + 2.22vw, 3.5rem);       /* 32 → 56  listing/detail/legal H1 */
-  --fs-h2:       clamp(1.75rem, 1.375rem + 1.78vw, 3rem);    /* 28 → 48  section H2 */
+  --fs-h2:       clamp(1.75rem, 1.375rem + 2.78vw, 3.5rem);  /* 28 → 56  section H2 */
   --fs-h3:       clamp(1.375rem, 1.25rem + 0.56vw, 1.75rem); /* 22 → 28  subsection / card title */
   --fs-h4:       1.25rem;                                     /* 20  (1.375rem ≥ md via override) */
   --fs-h5:       1.125rem;                                    /* 18 */
   --fs-h6:       1rem;                                        /* 16 */
 
   /* Body */
-  --fs-lead:     clamp(1.125rem, 1rem + 0.4vw, 1.25rem);     /* 18 → 20  hero sub-heading, intro */
+  --fs-lead:     clamp(1.125rem, 0.96rem + 0.83vw, 1.5rem);  /* 18 → 24  section description / hero sub-heading */
   --fs-body:     clamp(1rem, 0.95rem + 0.15vw, 1.0625rem);   /* 16 → 17  non-prose body */
   --fs-body-sm:  0.875rem;                                    /* 14 */
   --fs-caption:  0.8125rem;                                   /* 13 */
@@ -948,6 +951,16 @@ body {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
+}
+
+/* Pointed arrow at the top of the mega-menu, auto-aligned to active trigger */
+.cs-mega-arrow {
+  width: 18px;
+  height: 10px;
+  background: rgba(21, 16, 33, 0.92);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 }
 
 /* Hover state for individual menu items — subtle gradient left bar + soft fill */

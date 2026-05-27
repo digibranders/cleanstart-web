@@ -164,7 +164,7 @@ export function CleanSightSecurity(): React.ReactElement {
           className="text-white text-center mx-auto"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h1)",
+            fontSize: "var(--fs-h2)",
             fontWeight: 700,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
@@ -310,7 +310,7 @@ export function CleanSightSecurity(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-h1)",
+              fontSize: "var(--fs-h2)",
               fontWeight: 700,
               letterSpacing: "-0.04em",
               lineHeight: 1.1,

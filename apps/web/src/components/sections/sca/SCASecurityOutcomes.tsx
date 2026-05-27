@@ -229,7 +229,7 @@ const BOTTOM_CARD: React.CSSProperties = {
 
 const STAT_NUM: React.CSSProperties = {
   fontFamily: "var(--font-display)",
-  fontSize: "var(--fs-h2)",
+  fontSize: "var(--fs-display)",
   fontWeight: 700,
   letterSpacing: "-0.04em",
   lineHeight: 1.1,
