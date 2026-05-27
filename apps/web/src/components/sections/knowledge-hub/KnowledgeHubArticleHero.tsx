@@ -57,7 +57,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
             id="knowledge-hub-hero-title"
             className="font-display font-semibold text-white text-center"
             style={{
-              fontSize: "clamp(3rem, 5.6vw, 5rem)",
+              fontSize: "var(--fs-display)",
               lineHeight: 1.0,
               letterSpacing: "-0.05em",
             }}

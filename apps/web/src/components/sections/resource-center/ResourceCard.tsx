@@ -107,7 +107,7 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
         <h3
           className="font-display font-medium overflow-hidden"
           style={{
-            fontSize: "clamp(0.875rem, 1.25vw, 1.5rem)",
+            fontSize: "var(--fs-h4)",
             lineHeight: "1.3",
             color: "#111",
             letterSpacing: "-0.05em",
@@ -128,7 +128,7 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
           <span
             className="font-sans font-medium whitespace-nowrap"
             style={{
-              fontSize: "clamp(0.875rem, 1.04vw, 1.25rem)",
+              fontSize: "var(--fs-body)",
               lineHeight: "1.5",
               color: "#4a3bf1",
             }}

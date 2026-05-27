@@ -141,7 +141,7 @@ function Block({
       <h2
         className="font-display font-semibold"
         style={{
-          fontSize: "clamp(1.125rem, 1.5vw, 1.25rem)",
+          fontSize: "var(--fs-h5)",
           color: "#111111",
         }}
       >

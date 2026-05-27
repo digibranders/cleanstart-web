@@ -184,7 +184,7 @@ function ResourceCard({ card }: { card: PodcastCtaCard }): React.ReactElement {
               style={{
                 fontFamily: "var(--font-display), sans-serif",
                 fontWeight: 700,
-                fontSize: "clamp(1.25rem, 1.65vw, 1.75rem)",
+                fontSize: "var(--fs-h3)",
                 lineHeight: 1.1,
                 letterSpacing: "-0.04em",
               }}
@@ -196,7 +196,7 @@ function ResourceCard({ card }: { card: PodcastCtaCard }): React.ReactElement {
               style={{
                 fontFamily: "var(--font-display), sans-serif",
                 fontWeight: 400,
-                fontSize: "clamp(0.875rem, 1.05vw, 1.125rem)",
+                fontSize: "var(--fs-body)",
                 lineHeight: 1.4,
                 letterSpacing: "-0.03em",
               }}
@@ -220,7 +220,7 @@ function ResourceCard({ card }: { card: PodcastCtaCard }): React.ReactElement {
                 boxShadow: BUTTON_SHADOW,
                 fontFamily: "Inter, sans-serif",
                 fontWeight: 500,
-                fontSize: "clamp(0.875rem, 1.05vw, 1.125rem)",
+                fontSize: "var(--fs-body)",
                 letterSpacing: "-0.01em",
                 width: "fit-content",
               }}

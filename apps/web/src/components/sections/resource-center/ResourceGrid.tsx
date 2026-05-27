@@ -76,7 +76,7 @@ export function ResourceGrid({
               borderRadius: "10px",
               background: "white",
               color: "#4a3bf1",
-              fontSize: "15px",
+              fontSize: "var(--fs-body-sm)",
               fontWeight: 500,
               border: "1px solid rgba(74,59,241,0.25)",
               boxShadow:

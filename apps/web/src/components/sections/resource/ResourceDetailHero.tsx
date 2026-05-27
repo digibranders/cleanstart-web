@@ -229,7 +229,7 @@ export function ResourceDetailHero({
             style={{
               width: "840px",
               maxWidth: "100%",
-              fontSize: "clamp(1rem, 1.6vw, 1.5rem)",
+              fontSize: "var(--fs-lead)",
               letterSpacing: "-0.05em",
             }}
           >

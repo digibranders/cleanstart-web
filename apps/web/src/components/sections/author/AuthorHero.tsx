@@ -135,7 +135,7 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
               <h1
                 className="font-display font-semibold text-white"
                 style={{
-                  fontSize: "var(--text-hero-product)",
+                  fontSize: "var(--fs-display)",
                   lineHeight: 1.15,
                   letterSpacing: "var(--text-hero-product-ls)",
                 }}
@@ -166,7 +166,7 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
               <p
                 className="font-medium"
                 style={{
-                  fontSize: "var(--text-body-lg)",
+                  fontSize: "var(--fs-body)",
                   color: "rgba(255,255,255,0.85)",
                 }}
               >

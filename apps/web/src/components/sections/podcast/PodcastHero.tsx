@@ -112,7 +112,7 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
             id="podcast-hero-title"
             className="font-display font-semibold text-white"
             style={{
-              fontSize: "var(--text-hero-utility)",
+              fontSize: "var(--fs-h1)",
               lineHeight: "var(--text-hero-lh)",
               letterSpacing: "var(--text-hero-utility-ls)",
             }}
@@ -133,7 +133,7 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
           <p
             className="mt-6 font-sans font-normal text-white"
             style={{
-              fontSize: "clamp(1rem, 1.25vw, 1.5rem)",
+              fontSize: "var(--fs-lead)",
               lineHeight: 1.3,
               letterSpacing: "-0.04em",
               opacity: 0.8,

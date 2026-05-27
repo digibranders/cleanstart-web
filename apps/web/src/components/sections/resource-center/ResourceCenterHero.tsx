@@ -91,7 +91,7 @@ export function ResourceCenterHero({
               id="rc-hero-title"
               className="font-display font-semibold leading-none"
               style={{
-                fontSize: "var(--text-hero-utility)",
+                fontSize: "var(--fs-h1)",
                 letterSpacing: "var(--text-hero-utility-ls)",
                 lineHeight: "var(--text-hero-lh)",
               }}
@@ -111,7 +111,7 @@ export function ResourceCenterHero({
             <p
               className="font-sans font-normal"
               style={{
-                fontSize: "clamp(1rem, 1.25vw, 1.5rem)",
+                fontSize: "var(--fs-lead)",
                 lineHeight: 1.3,
                 letterSpacing: "-0.04em",
                 opacity: 0.8,

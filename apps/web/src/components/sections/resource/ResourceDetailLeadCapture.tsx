@@ -179,7 +179,7 @@ export function ResourceDetailLeadCapture({
                     autoComplete="email"
                     className="font-normal bg-white w-full sm:w-[352px] h-9 lg:h-11"
                     style={{
-                      fontSize: "16px",
+                      fontSize: "var(--fs-button)",
                       lineHeight: 1.4,
                       letterSpacing: "-0.01em",
                       borderRadius: "8px",

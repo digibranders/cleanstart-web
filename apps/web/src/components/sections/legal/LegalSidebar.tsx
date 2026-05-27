@@ -36,7 +36,7 @@ export function LegalSidebar({ activeHref }: LegalSidebarProps): React.ReactElem
                     ? "bg-[#EEF1FF] text-[#1E2A78] font-semibold"
                     : "text-[#475569] hover:text-[#1E2A78] hover:bg-[#F4F6FB]",
                 )}
-                style={{ fontSize: "var(--text-body-sm)" }}
+                style={{ fontSize: "var(--fs-body-sm)" }}
               >
                 {item.label}
               </Link>
