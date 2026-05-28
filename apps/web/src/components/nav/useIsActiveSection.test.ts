@@ -43,4 +43,16 @@ describe('useIsActiveSection', () => {
     const { result } = renderHook(() => useIsActiveSection(['/']));
     expect(result.current).toBe(false);
   });
+
+  it('returns false when hrefs is empty', () => {
+    vi.mocked(usePathname).mockReturnValue('/anything');
+    const { result } = renderHook(() => useIsActiveSection([]));
+    expect(result.current).toBe(false);
+  });
+
+  it('returns false when pathname is null', () => {
+    vi.mocked(usePathname).mockReturnValue(null as unknown as string);
+    const { result } = renderHook(() => useIsActiveSection(['/cleanstart-images']));
+    expect(result.current).toBe(false);
+  });
 });

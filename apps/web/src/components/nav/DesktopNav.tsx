@@ -6,7 +6,6 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import Link from "next/link";
 import { NAV_TREE, type NavItem } from "@/lib/nav-config";
@@ -16,7 +15,9 @@ import { useIsActiveSection } from "@/components/nav/useIsActiveSection";
 function collectHrefs(item: NavItem): string[] {
   if (item.kind === "flat") return [item.href];
   if (item.kind === "compact") return item.items.map((i) => i.href);
-  return item.groups.flatMap((g) => g.items.map((i) => i.href));
+  if (item.kind === "mega") return item.groups.flatMap((g) => g.items.map((i) => i.href));
+  item satisfies never;
+  return [];
 }
 
 function TopLevelItem({ item }: { item: NavItem }) {
@@ -24,7 +25,7 @@ function TopLevelItem({ item }: { item: NavItem }) {
 
   if (item.kind === "flat") {
     const flatClass =
-      "cs-nav-link relative inline-flex cursor-pointer items-center text-base font-medium leading-none text-white/85 transition-colors hover:text-white data-[active=true]:text-white";
+      "cs-nav-link relative inline-flex cursor-pointer items-center text-base font-medium leading-none text-white/85 transition-colors hover:text-white data-[active=true]:text-white after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[2px] after:rounded-full after:bg-[#2cc1eb] after:opacity-0 after:transition-opacity data-[active=true]:after:opacity-100";
     return (
       <NavigationMenuItem>
         {item.built !== false ? (
@@ -42,10 +43,7 @@ function TopLevelItem({ item }: { item: NavItem }) {
 
   return (
     <NavigationMenuItem>
-      <NavigationMenuTrigger
-        className={navigationMenuTriggerStyle()}
-        data-active={active}
-      >
+      <NavigationMenuTrigger data-active={active}>
         {item.label}
       </NavigationMenuTrigger>
       <NavigationMenuContent>
