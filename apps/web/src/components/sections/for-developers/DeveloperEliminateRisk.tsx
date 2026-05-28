@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import type React from 'react';
 import { MetricCounter } from './MetricCounter';
+import { Reveal, RevealStagger, RevealItem } from '@/components/ui/Reveal';
 
 const ICON_BASE = '/images/for-developers/eliminate-risk';
 
@@ -267,48 +268,54 @@ export function DeveloperEliminateRisk(): React.ReactElement {
     >
       <div className="relative mx-auto w-full max-w-[1276px] px-6 sm:px-10">
         {/* Heading */}
-        <h2
-          className="mx-auto text-center text-white"
-          style={{
-            maxWidth: '720px',
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-h2)',
-            fontWeight: 700,
-            letterSpacing: '-0.05em',
-            lineHeight: 1.1,
-            marginBottom: '20px',
-          }}
-        >
-          Eliminate Risk <span className="cs-text-gradient-impact">Earlier</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="mx-auto text-center text-white"
+            style={{
+              maxWidth: '720px',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-h2)',
+              fontWeight: 700,
+              letterSpacing: '-0.05em',
+              lineHeight: 1.1,
+              marginBottom: '20px',
+            }}
+          >
+            Eliminate Risk <span className="cs-text-gradient-impact">Earlier</span>
+          </h2>
+        </Reveal>
 
         {/* Subtitle */}
-        <p
-          className="mx-auto text-center"
-          style={{
-            maxWidth: '600px',
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--fs-lead)',
-            fontWeight: 400,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.45,
-            color: 'rgba(255,255,255,0.72)',
-            marginBottom: '64px',
-          }}
-        >
-          Hardened foundations shift the security conversation from incident response to
-          prevention — measurable from the first pull.
-        </p>
+        <Reveal header delay={0.15} y={20}>
+          <p
+            className="mx-auto text-center"
+            style={{
+              maxWidth: '600px',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--fs-lead)',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.45,
+              color: 'rgba(255,255,255,0.72)',
+              marginBottom: '64px',
+            }}
+          >
+            Hardened foundations shift the security conversation from incident response to
+            prevention — measurable from the first pull.
+          </p>
+        </Reveal>
 
         {/* 4-up grid */}
-        <div
+        <RevealStagger
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
           style={{ gap: '24px' }}
         >
           {METRICS.map((m) => (
-            <GlowAnchorCard key={m.label} {...m} />
+            <RevealItem key={m.label}>
+              <GlowAnchorCard {...m} />
+            </RevealItem>
           ))}
-        </div>
+        </RevealStagger>
       </div>
     </section>
   );

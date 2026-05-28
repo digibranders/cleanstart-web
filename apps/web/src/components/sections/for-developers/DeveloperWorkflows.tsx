@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type React from 'react';
+import { Reveal, RevealStagger, RevealItem } from '@/components/ui/Reveal';
 
 /*
  * Figma node 857-4900 — "Designed for Developer Workflows" (rebuilt 1:1).
@@ -519,7 +520,7 @@ function FeatureCardView({ title, body, icon }: FeatureCard): React.ReactElement
      desktop styling above lg. */
   return (
     <div
-      className="relative flex shrink-0 w-full max-w-[320px] lg:max-w-[295px] rounded-[20px] lg:rounded-[40px] p-[6px] lg:p-[4px]"
+      className="relative flex shrink-0 w-[320px] lg:w-[295px] rounded-[20px] lg:rounded-[40px] p-[6px] lg:p-[4px]"
       style={{
         height: '324px',
         background:
@@ -698,22 +699,24 @@ export function DeveloperWorkflows(): React.ReactElement {
       {/* ── Content column ── */}
       <div className="relative mx-auto w-full max-w-[1276px] px-6 sm:px-10">
         {/* Heading */}
-        <h2
-          className="mx-auto text-center"
-          style={{
-            maxWidth: '720px',
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-h2)',
-            fontWeight: 700,
-            letterSpacing: '-0.05em',
-            lineHeight: 1.15,
-            color: '#111',
-            marginBottom: 'clamp(40px, 4.17vw, 80px)',
-          }}
-        >
-          Designed for Developer{' '}
-          <span className="cs-text-gradient-impact">Workflows</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="mx-auto text-center"
+            style={{
+              maxWidth: '720px',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-h2)',
+              fontWeight: 700,
+              letterSpacing: '-0.05em',
+              lineHeight: 1.15,
+              color: '#111',
+              marginBottom: 'clamp(40px, 4.17vw, 80px)',
+            }}
+          >
+            Designed for Developer{' '}
+            <span className="cs-text-gradient-impact">Workflows</span>
+          </h2>
+        </Reveal>
 
         {/* ── Pipeline ── */}
         <div className="relative mb-20 flex flex-col items-center">
@@ -787,13 +790,15 @@ export function DeveloperWorkflows(): React.ReactElement {
         </div>
 
         {/* ── 4 feature cards ── */}
-        <div
+        <RevealStagger
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-items-center gap-4 lg:gap-8"
         >
           {FEATURE_CARDS.map((card) => (
-            <FeatureCardView key={card.title} {...card} />
+            <RevealItem key={card.title}>
+              <FeatureCardView {...card} />
+            </RevealItem>
           ))}
-        </div>
+        </RevealStagger>
       </div>
     </section>
   );
