@@ -90,7 +90,13 @@ function GroupsArea({
                         {inner}
                       </Link>
                     ) : (
-                      <span className={`${cls} cursor-pointer`}>{inner}</span>
+                      <span
+                        className={`${cls} cursor-default opacity-60`}
+                        aria-disabled="true"
+                        tabIndex={-1}
+                      >
+                        {inner}
+                      </span>
                     )}
                   </li>
                 );

@@ -58,14 +58,11 @@ export function MobileNav() {
               if (item.kind === "flat") {
                 const flatClass =
                   "block cursor-pointer rounded-[10px] px-3 py-3 text-base font-medium text-white/90 transition-colors hover:bg-white/[0.06] hover:text-white";
-                return item.built !== false ? (
+                if (item.built === false) return null;
+                return (
                   <Link key={item.label} href={item.href} className={flatClass}>
                     {item.label}
                   </Link>
-                ) : (
-                  <span key={item.label} className={flatClass}>
-                    {item.label}
-                  </span>
                 );
               }
               const leaves =
@@ -97,7 +94,7 @@ export function MobileNav() {
                           </li>
                         ) : (
                           <li key={leaf.label}>
-                            {leaf.built !== false ? (
+                            {leaf.built === false ? null : (
                               <Link
                                 href={leaf.href}
                                 onClick={close}
@@ -105,10 +102,6 @@ export function MobileNav() {
                               >
                                 {leaf.label}
                               </Link>
-                            ) : (
-                              <span className="block cursor-pointer rounded-[8px] px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/[0.06] hover:text-white">
-                                {leaf.label}
-                              </span>
                             )}
                           </li>
                         )
