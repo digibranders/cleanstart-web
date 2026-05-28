@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 export function TeamsHowWeWork() {
   return (
     <section
@@ -109,31 +111,35 @@ export function TeamsHowWeWork() {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[100px]">
         <div className="flex flex-col items-center gap-6 text-center">
-          <h2
-            className="font-display text-white"
-            style={{
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              lineHeight: 1.1,
-              letterSpacing: "-0.04em",
-            }}
-          >
-            {"How We "}
-            <span className="cs-text-gradient-impact">Work</span>
-          </h2>
-          <p
-            className="max-w-[911px] text-white/80"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              lineHeight: 1.4,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            We work the way we build, with clarity, trust, and continuous
-            improvement at every step.
-          </p>
+          <Reveal header>
+            <h2
+              className="font-display text-white"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                lineHeight: 1.1,
+                letterSpacing: "-0.04em",
+              }}
+            >
+              {"How We "}
+              <span className="cs-text-gradient-impact">Work</span>
+            </h2>
+          </Reveal>
+          <Reveal header delay={0.15} y={20}>
+            <p
+              className="max-w-[911px] text-white/80"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                lineHeight: 1.4,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              We work the way we build, with clarity, trust, and continuous
+              improvement at every step.
+            </p>
+          </Reveal>
         </div>
       </div>
     </section>
