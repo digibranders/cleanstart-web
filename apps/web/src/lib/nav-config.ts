@@ -31,8 +31,9 @@ export type NavMegaItem = {
   groups: NavGroup[];
   width?: number;
   /**
-   * Optional right-aligned exit-link in PanelHeader.
-   * ONLY set when the destination is genuinely different from what the panel already shows.
+   * Optional right-aligned exit-link in PanelHeader. **Set both or neither** — half-populated
+   * pairs are a bug. Only set when the destination is genuinely different from what the panel
+   * already shows.
    * Products → images.cleanstart.com (live catalog of 100+ images).
    * Company → mailto:careers@cleanstart.com.
    * Solutions / Audience / Resources have NO exit link.
@@ -44,7 +45,6 @@ export type NavMegaItem = {
 export type NavCompactItem = {
   kind: "compact";
   label: string;
-  tagline?: string;
   items: NavLeaf[];
   width?: number;
 };
@@ -53,6 +53,7 @@ export type NavFlatItem = {
   kind: "flat";
   label: string;
   href: string;
+  /** Default true. Set false to mark unbuilt. */
   built?: boolean;
 };
 
@@ -165,7 +166,7 @@ export const NAV_TREE: NavItem[] = [
     kind: "mega",
     label: "Resources",
     tagline: "Read, watch, learn — and meet us in person.",
-    accent: "cyan",
+    accent: "cyan", // intentional: Products + Resources both use cyan per design spec §4
     groups: [
       {
         title: "Insights",
