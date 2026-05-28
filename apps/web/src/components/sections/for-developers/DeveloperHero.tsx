@@ -409,7 +409,8 @@ export function DeveloperHero(): React.ReactElement {
             marginBottom: '32px',
           }}
         >
-          Trusted Container Foundations
+          Trusted Container{" "}
+          <span className="cs-text-gradient-impact">Foundations</span>
         </h1>
 
         <p

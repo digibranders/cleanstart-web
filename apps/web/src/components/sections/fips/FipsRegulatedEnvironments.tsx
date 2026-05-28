@@ -38,7 +38,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
         src="/images/fips/regulated-photo-mobile.png"
         alt=""
         className="absolute inset-0 w-full h-full -z-20 pointer-events-none select-none md:hidden"
-        style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(6px)", transform: "scale(1.03)" }}
+        style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(1.5px)", transform: "scale(1.01)" }}
         loading="lazy"
         decoding="async"
       />
@@ -48,7 +48,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
         src="/images/fips/regulated-photo.png"
         alt=""
         className="absolute inset-0 w-full h-full -z-20 pointer-events-none select-none hidden md:block"
-        style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(6px)", transform: "scale(1.03)" }}
+        style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(1.5px)", transform: "scale(1.01)" }}
         loading="lazy"
         decoding="async"
       />
@@ -157,7 +157,7 @@ function SectorBlock({
         className="mt-5 max-w-[219px] text-white"
         style={{
           fontFamily: "var(--font-sans)",
-          fontSize: "var(--fs-lead)",
+          fontSize: "20px",
           fontWeight: 400,
           lineHeight: 1.3,
           letterSpacing: "-0.02em",

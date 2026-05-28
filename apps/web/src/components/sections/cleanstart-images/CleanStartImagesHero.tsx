@@ -79,7 +79,8 @@ export function CleanStartImagesHero(): React.ReactElement {
                 fontWeight: 600,
               }}
             >
-              Trusted Container Foundations
+              Trusted Container{" "}
+              <span className="cs-text-gradient-impact">Foundations</span>
             </h1>
 
             <div className="flex flex-col items-start w-full" style={{ gap: "32px" }}>

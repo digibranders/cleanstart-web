@@ -78,8 +78,11 @@ export function FipsMaturityModel(): React.ReactElement {
             lineHeight: 1.1,
           }}
         >
-          CleanStart FIPS 140-3 Maturity{" "}
-          <span className="cs-text-gradient-impact">Model</span>
+          <span className="block">CleanStart FIPS 140-3</span>
+          <span className="block">
+            {"Maturity "}
+            <span className="cs-text-gradient-impact">Model</span>
+          </span>
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

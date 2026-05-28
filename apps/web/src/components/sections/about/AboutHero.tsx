@@ -69,7 +69,8 @@ export function AboutHero() {
                 letterSpacing: "-0.04em",
               }}
             >
-              Security Begins at The Source
+              Security Begins at{" "}
+              <span className="cs-text-gradient-impact">The Source</span>
             </h1>
 
             <a

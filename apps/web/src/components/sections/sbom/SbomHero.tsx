@@ -90,7 +90,8 @@ export function SbomHero(): React.ReactElement {
             textTransform: "capitalize",
           }}
         >
-          Continuously Verifiable SBOMs
+          Continuously Verifiable{" "}
+          <span className="cs-text-gradient-impact">SBOMs</span>
         </h1>
 
         <p

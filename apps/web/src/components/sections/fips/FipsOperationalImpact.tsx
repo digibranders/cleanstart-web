@@ -100,7 +100,7 @@ export function FipsOperationalImpact(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto px-4 md:px-0"
+        className="relative mx-auto px-6"
         style={{
           maxWidth: "1276px",
           /*
