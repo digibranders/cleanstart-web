@@ -1,3 +1,5 @@
+import { HeroReveal } from "@/components/ui/Reveal";
+
 const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123e 38%, #131e8f 67%, #471ec0 86%, #471fc3 100%)";
 
@@ -110,38 +112,42 @@ export function WebinarsHero(): React.ReactElement {
           className="flex flex-col items-center gap-6 mx-auto text-center"
           style={{ paddingTop: "140px", paddingBottom: "80px", maxWidth: "864px" }}
         >
-          <h1
-            id="webinars-hero-title"
-            className="font-display font-semibold text-white"
-            style={{
-              fontSize: "var(--fs-h1)",
-              lineHeight: "var(--text-hero-lh)",
-              letterSpacing: "var(--text-hero-utility-ls)",
-            }}
-          >
-            CleanStart{" "}
-            <span
-              className="bg-clip-text text-transparent"
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              id="webinars-hero-title"
+              className="font-display font-semibold text-white"
               style={{
-                backgroundImage:
-                  "linear-gradient(101.688deg, #9A51FF 1.758%, #2CC1EB 98.781%)",
+                fontSize: "var(--fs-h1)",
+                lineHeight: "var(--text-hero-lh)",
+                letterSpacing: "var(--text-hero-utility-ls)",
               }}
             >
-              Webinar
-            </span>
-          </h1>
-          <p
-            className="font-sans font-normal text-white"
-            style={{
-              fontSize: "var(--fs-lead)",
-              lineHeight: "1.4",
-              letterSpacing: "-0.03em",
-              opacity: 0.85,
-              maxWidth: "640px",
-            }}
-          >
-            Simplify your software supply chain, on your schedule.
-          </p>
+              CleanStart{" "}
+              <span
+                className="bg-clip-text text-transparent"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(101.688deg, #9A51FF 1.758%, #2CC1EB 98.781%)",
+                }}
+              >
+                Webinar
+              </span>
+            </h1>
+          </HeroReveal>
+          <HeroReveal y={30} delay={0.2} duration={0.8}>
+            <p
+              className="font-sans font-normal text-white"
+              style={{
+                fontSize: "var(--fs-lead)",
+                lineHeight: "1.4",
+                letterSpacing: "-0.03em",
+                opacity: 0.85,
+                maxWidth: "640px",
+              }}
+            >
+              Simplify your software supply chain, on your schedule.
+            </p>
+          </HeroReveal>
         </div>
       </div>
     </section>

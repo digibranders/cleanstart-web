@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { type Event, formatEventDate } from "@/lib/events";
 import { mediaUrl } from "@/lib/blog";
+import { HeroReveal, Reveal } from "@/components/ui/Reveal";
 
 const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123E 45%, #131E8F 66%, #471EC0 75%, #471FC3 100%)";
@@ -75,33 +76,37 @@ export function UpcomingEventHero({
         style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(48px, 6vw, 80px)" }}
       >
         {/* Page title */}
-        <h1
-          id="events-hero-title"
-          className="font-display font-semibold text-white text-center"
-          style={{
-            fontSize: "var(--fs-h1)",
-            lineHeight: "var(--text-hero-lh)",
-            letterSpacing: "var(--text-hero-utility-ls)",
-            marginBottom: "60px",
-          }}
-        >
-          <span>Upcoming </span>
-          <span
+        <HeroReveal y={50} duration={1.0}>
+          <h1
+            id="events-hero-title"
+            className="font-display font-semibold text-white text-center"
             style={{
-              background:
-                "linear-gradient(105.817deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              color: "transparent",
+              fontSize: "var(--fs-h1)",
+              lineHeight: "var(--text-hero-lh)",
+              letterSpacing: "var(--text-hero-utility-ls)",
+              marginBottom: "60px",
             }}
           >
-            Events
-          </span>
-        </h1>
+            <span>Upcoming </span>
+            <span
+              style={{
+                background:
+                  "linear-gradient(105.817deg, #9A51FF 1.76%, #2CC1EB 98.78%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
+            >
+              Events
+            </span>
+          </h1>
+        </HeroReveal>
 
         {/* Featured hero card */}
-        {event ? <FeaturedEventCard event={event} /> : <EmptyHeroCard />}
+        <Reveal y={30} delay={0.2}>
+          {event ? <FeaturedEventCard event={event} /> : <EmptyHeroCard />}
+        </Reveal>
       </div>
     </section>
   );

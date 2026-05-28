@@ -5,6 +5,7 @@ import type React from "react";
 import { pickImageUrl } from "@/lib/blog";
 import type { AuthorDetail } from "@/lib/authors";
 import { DETAIL_HERO_GRADIENT } from "@/components/sections/_shared/DetailHero";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 interface AuthorHeroProps {
   author: AuthorDetail;
@@ -131,7 +132,7 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
           </div>
 
           <div className="flex flex-col items-center gap-3">
-            <div className="flex items-center justify-center gap-3 flex-wrap">
+            <HeroReveal y={50} duration={1.0} className="flex items-center justify-center gap-3 flex-wrap">
               <h1
                 className="font-display font-semibold text-white"
                 style={{
@@ -160,18 +161,20 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
                   <LinkedInIcon />
                 </a>
               )}
-            </div>
+            </HeroReveal>
 
             {author.role && (
-              <p
-                className="font-medium"
-                style={{
-                  fontSize: "var(--fs-body)",
-                  color: "rgba(255,255,255,0.85)",
-                }}
-              >
-                {author.role}
-              </p>
+              <HeroReveal y={30} delay={0.2} duration={0.8}>
+                <p
+                  className="font-medium"
+                  style={{
+                    fontSize: "var(--fs-body)",
+                    color: "rgba(255,255,255,0.85)",
+                  }}
+                >
+                  {author.role}
+                </p>
+              </HeroReveal>
             )}
           </div>
         </div>

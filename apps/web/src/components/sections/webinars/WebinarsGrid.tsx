@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { Webinar, WebinarRegion, WebinarType } from "@/lib/webinars";
 import { Pagination } from "@/components/ui/Pagination";
+import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { WebinarCard } from "./WebinarCard";
 // WebinarFilters is a "use client" interactive sidebar; code-split so it
 // does not ship in the initial /webinars client bundle.
@@ -95,14 +96,16 @@ export function WebinarsGrid({
               </p>
             ) : (
               <>
-                <div
+                <RevealStagger
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center lg:justify-items-stretch"
                   style={{ gap: "32px" }}
                 >
                   {items.map((item) => (
-                    <WebinarCard key={item.id} item={item} />
+                    <RevealItem key={item.id}>
+                      <WebinarCard item={item} />
+                    </RevealItem>
                   ))}
-                </div>
+                </RevealStagger>
 
                 {/* MOBILE — single "View More →" button per Figma 817:6997. */}
                 {totalPages > 1 && currentPage < totalPages && (

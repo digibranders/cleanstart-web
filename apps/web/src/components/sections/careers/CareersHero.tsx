@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { SearchBar } from "@/components/sections/_shared/SearchBar";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 25.7%, #10123e 37.8%, #131e8f 66.9%, #471ec0 79.7%, #471fc3 92.2%, rgba(70,30,191,0.85) 97.9%, rgba(66,30,188,0.4) 107.7%, rgba(66,30,188,0) 113.5%)";
@@ -82,29 +83,33 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
             className="flex flex-col items-center gap-6 text-center text-white"
             style={{ maxWidth: "674px" }}
           >
-            <h1
-              id="careers-hero-title"
-              className="font-display font-semibold"
-              style={{
-                fontSize: "var(--fs-display)",
-                letterSpacing: "-0.04em",
-                lineHeight: 1.05,
-              }}
-            >
-              Careers
-            </h1>
-            <p
-              className="font-sans font-normal"
-              style={{
-                fontSize: "var(--fs-lead)",
-                lineHeight: 1.3,
-                letterSpacing: "-0.04em",
-                opacity: 0.8,
-              }}
-            >
-              Help us empower the world&rsquo;s largest enterprises to secure their
-              applications. Are you ready to join?
-            </p>
+            <HeroReveal y={50} duration={1.0}>
+              <h1
+                id="careers-hero-title"
+                className="font-display font-semibold"
+                style={{
+                  fontSize: "var(--fs-display)",
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.05,
+                }}
+              >
+                Careers
+              </h1>
+            </HeroReveal>
+            <HeroReveal y={30} delay={0.15} duration={0.8}>
+              <p
+                className="font-sans font-normal"
+                style={{
+                  fontSize: "var(--fs-lead)",
+                  lineHeight: 1.3,
+                  letterSpacing: "-0.04em",
+                  opacity: 0.8,
+                }}
+              >
+                Help us empower the world&rsquo;s largest enterprises to secure their
+                applications. Are you ready to join?
+              </p>
+            </HeroReveal>
           </div>
 
           <Suspense

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Resource } from "@/lib/resources";
 import { Pagination } from "@/components/ui/Pagination";
+import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { ResourceCard } from "./ResourceCard";
 
 interface ResourceGridProps {
@@ -55,13 +56,16 @@ export function ResourceGrid({
   return (
     <div className="flex-1 flex flex-col">
       {/* Grid — single column on mobile, 2-col on tablet, 3-col on desktop */}
-      <div
+      <RevealStagger
+        gap={0.08}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center lg:justify-items-start"
       >
         {resources.map((resource) => (
-          <ResourceCard key={resource.id} resource={resource} />
+          <RevealItem key={resource.id}>
+            <ResourceCard resource={resource} />
+          </RevealItem>
         ))}
-      </div>
+      </RevealStagger>
 
       {/* MOBILE — single "View More →" button per Figma mobile spec (444:401). */}
       {totalPages > 1 && currentPage < totalPages && (
