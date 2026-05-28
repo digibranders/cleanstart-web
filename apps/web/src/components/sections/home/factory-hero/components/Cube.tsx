@@ -16,18 +16,25 @@ interface CubeProps {
   railY: number;
   /** X span of travel: cube interpolates from -span/2 to +span/2 across the loop. */
   xSpan: number;
+  /** Travel axis: 'horizontal' (desktop/mid) or 'vertical' (mobile, top→bottom). */
+  orientation: 'horizontal' | 'vertical';
 }
 
-export function Cube({ loopOffset, logo, railY, xSpan }: CubeProps) {
+export function Cube({ loopOffset, logo, railY, xSpan, orientation }: CubeProps) {
   const phaseRef = useLoopPhase(loopOffset);
   const groupRef = useRef<Mesh>(null);
 
   useFrame(() => {
     const p = phaseRef.current;
     if (!groupRef.current) return;
-    // Map p.x (which is -1..+1) to actual scene X via xSpan.
-    groupRef.current.position.x = p.x * (xSpan / 2);
-    groupRef.current.position.y = railY;
+    if (orientation === 'horizontal') {
+      groupRef.current.position.x = p.x * (xSpan / 2);
+      groupRef.current.position.y = railY;
+    } else {
+      groupRef.current.position.x = 0;
+      // map +X (right) to -Y (down) so cube travels top→bottom
+      groupRef.current.position.y = -p.x * (xSpan / 2);
+    }
     groupRef.current.rotation.y += 0.01047; // 1 rev / 10s at 60fps (2π / 600)
   });
 
