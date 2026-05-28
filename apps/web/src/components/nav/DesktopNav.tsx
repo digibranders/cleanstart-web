@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -8,9 +9,22 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import Link from "next/link";
-import { NAV_TREE, type NavItem } from "@/lib/nav-config";
+import { NAV_TREE, type NavItem, type NavMegaItem } from "@/lib/nav-config";
 import { MegaMenu } from "@/components/nav/MegaMenu";
 import { useIsActiveSection } from "@/components/nav/useIsActiveSection";
+import { PanelProducts } from "@/components/nav/panels/PanelProducts";
+import { PanelSolutions } from "@/components/nav/panels/PanelSolutions";
+import { PanelAudience } from "@/components/nav/panels/PanelAudience";
+import { PanelResources } from "@/components/nav/panels/PanelResources";
+import { PanelCompany } from "@/components/nav/panels/PanelCompany";
+
+const PANELS: Record<string, (props: { item: NavMegaItem }) => React.ReactElement> = {
+  Products: PanelProducts,
+  Solutions: PanelSolutions,
+  Audience: PanelAudience,
+  Resources: PanelResources,
+  Company: PanelCompany,
+};
 
 function collectHrefs(item: NavItem): string[] {
   if (item.kind === "flat") return [item.href];
@@ -47,13 +61,17 @@ function TopLevelItem({ item }: { item: NavItem }) {
         {item.label}
       </NavigationMenuTrigger>
       <NavigationMenuContent>
-        <MegaMenu
-          groups={
-            item.kind === "mega" ? item.groups : [{ items: item.items }]
-          }
-          activeLabel={item.label}
-          {...(item.width !== undefined ? { width: item.width } : {})}
-        />
+        {item.kind === "mega" && PANELS[item.label] ? (
+          (() => { const Panel = PANELS[item.label]!; return <Panel item={item} />; })()
+        ) : (
+          <MegaMenu
+            groups={
+              item.kind === "mega" ? item.groups : [{ items: item.items }]
+            }
+            activeLabel={item.label}
+            {...(item.width !== undefined ? { width: item.width } : {})}
+          />
+        )}
       </NavigationMenuContent>
     </NavigationMenuItem>
   );
