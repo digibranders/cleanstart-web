@@ -26,14 +26,13 @@ export function BlogsCTA(): React.ReactElement {
       className="absolute inset-0"
       style={{ background: "linear-gradient(180deg, #471ec0 0%, #131e8f 100%)" }}
     >
-      {/* Left cube — visible from mobile per Figma 817:3938 (small 117px peek)
-          and scales up at sm+ to the existing desktop placement. */}
+      {/* Left cube — anchored top-left to mirror the right cube. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute block"
         style={{
           left: "-20px",
-          top: "180px",
+          top: "-20px",
           width: "176px",
           height: "178px",
           opacity: 0.75,

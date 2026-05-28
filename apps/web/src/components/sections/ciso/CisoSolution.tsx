@@ -80,14 +80,6 @@ const maskBase: React.CSSProperties = {
   maskPosition: "0px 0px, 0px 0px",
 };
 
-// Mobile card shadow (from Figma node 856:1138 layer values, simplified)
-const MOBILE_CARD_SHADOW = [
-  "-5.976px 2.988px 14.94px 0px rgba(0,0,0,0.23)",
-  "-24.651px 11.952px 27.639px 0px rgba(0,0,0,0.20)",
-  "-55.278px 27.639px 36.603px 0px rgba(0,0,0,0.12)",
-  "-97.858px 48.555px 44.073px 0px rgba(0,0,0,0.03)",
-].join(", ");
-
 export function CisoSolution(): React.ReactElement {
   return (
     <section
@@ -100,208 +92,39 @@ export function CisoSolution(): React.ReactElement {
     >
 
       {/* ══════════════════════════════════════════════════════════════════════
-          MOBILE — vertical timeline layout (< sm = 640px)
-          Figma node 856:1120 — 360×964px
+          MOBILE — single PNG render of the Figma comp (heading + subtitle +
+          timeline + 4 cards baked into /images/ciso/rrsv.png, 360×781).
+          Accessibility: heading + body copy rendered as visually-hidden
+          siblings so screen readers and SEO still see them.
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="sm:hidden" style={{ paddingTop: "32px", paddingBottom: "64px" }}>
-
-        {/* ── Corner vector — left top (partial) ── */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          aria-hidden
-          src="/images/ciso/solution-vector.svg"
-          alt=""
-          className="absolute pointer-events-none select-none"
-          style={{ left: "-87px", top: "-349px", width: "534px", height: "534px" }}
-          loading="lazy"
-          decoding="async"
-        />
-
-        {/* ── Heading — 28px SemiBold, centered. Container px-6 gutter
-              controls width; H2 itself is unconstrained so it doesn't wrap
-              to 3 lines when there's room for 2. ── */}
-        <h2
-          className="text-center text-white mx-auto px-6"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            marginBottom: "17px",
-          }}
-        >
-          Reduce Risk Before Deployment
-        </h2>
-
-        {/* ── Subtitle — 16px Regular, centered, maxW 282px ── */}
-        <p
-          className="text-center mx-auto"
-          style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "var(--fs-lead)",
-            fontWeight: 400,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.45,
-            color: "rgba(255,255,255,0.8)",
-            maxWidth: "282px",
-            marginBottom: "46px",
-          }}
-        >
+      <div
+        className="sm:hidden relative"
+        style={{ paddingTop: "32px", paddingBottom: "64px" }}
+      >
+        <h2 className="sr-only">Reduce Risk Before Deployment</h2>
+        <p className="sr-only">
           Minimal, hardened container images reduce inherited vulnerabilities
           before they reach production environments.
         </p>
-
-        {/* ── Timeline + Cards container ── */}
-        <div className="relative mx-auto" style={{ maxWidth: "360px" }}>
-
-          {/* Vertical connector line — 4px × 456px · left=60px · top=24px ── */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              left: "60px",
-              top: "24px",
-              width: "4px",
-              height: "456px",
-              background: "rgba(255,255,255,0.1)",
-              borderRadius: "32.734px",
-            }}
-          />
-
-          {/* ── 4 card rows ── */}
-          {FEATURES.map((f, i) => (
-            <div
-              key={f.titleMobile}
-              style={{
-                position: "relative",
-                minHeight: "114px",
-                marginBottom: i < FEATURES.length - 1 ? "16px" : 0,
-              }}
-            >
-              {/* ── Teal glow node — mix-blend-plus-lighter, 98×87px at left=40px ──
-                  Reuses desktop flare assets with scaled dimensions */}
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  left: "40px",
-                  top: "0",
-                  width: "98px",
-                  height: "87px",
-                  mixBlendMode: "plus-lighter",
-                  backgroundImage: "url('/images/ciso/solution-flare-gradient.svg')",
-                  backgroundSize: "100% 100%",
-                  maskImage:
-                    "url('/images/ciso/solution-flare-mask.svg'), url('/images/ciso/solution-flare-overlay.png')",
-                  ...maskBase,
-                }}
-              />
-
-              {/* ── Card — margin-positioned (93px left, 41px right) so the
-                  row grows with the card's natural height. Was previously
-                  position:absolute with fixed 114px height — which clipped
-                  wrapped titles + descriptions and caused the card to
-                  overflow into the next row when grown. ── */}
-              <div
-                style={{
-                  position: "relative",
-                  marginLeft: "93px",
-                  marginRight: "41px",
-                  minHeight: "114px",
-                  borderRadius: "17.928px",
-                  border: "2.241px solid #dab6f3",
-                  background:
-                    "linear-gradient(180deg, #151021 0%, #131e8f 71.202%, #551ece 100%)",
-                  boxShadow: MOBILE_CARD_SHADOW,
-                  overflow: "hidden",
-                  padding: "20px 8px 20px 24px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  gap: "6px",
-                }}
-              >
-                {/* Card inner ellipse glow A */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  aria-hidden
-                  src="/images/ciso/solution-ellipse-a.svg"
-                  alt=""
-                  className="absolute pointer-events-none select-none"
-                  style={{
-                    left: "-25%",
-                    top: "-20%",
-                    width: "130%",
-                    height: "150%",
-                    objectFit: "fill",
-                  }}
-                  loading="lazy"
-                  decoding="async"
-                />
-
-                {/* Card inner ellipse glow B */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  aria-hidden
-                  src="/images/ciso/solution-ellipse-b.svg"
-                  alt=""
-                  className="absolute pointer-events-none select-none"
-                  style={{
-                    left: "-30%",
-                    top: "-25%",
-                    width: "150%",
-                    height: "175%",
-                    objectFit: "fill",
-                    opacity: 0.5,
-                  }}
-                  loading="lazy"
-                  decoding="async"
-                />
-
-                {/* Card text — content flows naturally inside the card's
-                    flex column (padding 20px sides → 24px effective on left
-                    via the existing 24px offset, 8px on right). */}
-                <div
-                  style={{
-                    position: "relative",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "6px",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      fontSize: "var(--fs-h4)",
-                      fontWeight: 600,
-                      letterSpacing: "-0.04em",
-                      lineHeight: 1.15,
-                      color: "#fff",
-                      margin: 0,
-                    }}
-                  >
-                    {f.titleMobile}
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "var(--fs-body-sm)",
-                      fontWeight: 400,
-                      letterSpacing: "-0.02em",
-                      lineHeight: 1.5,
-                      color: "rgba(255,255,255,0.8)",
-                      margin: 0,
-                      maxWidth: f.descWidth,
-                    }}
-                  >
-                    {f.desc}
-                  </p>
-                </div>
-              </div>
-            </div>
+        <ul className="sr-only">
+          {FEATURES.map((f) => (
+            <li key={f.titleMobile}>
+              {f.titleMobile}: {f.desc}
+            </li>
           ))}
-        </div>
+        </ul>
+
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/ciso/rrsv.png"
+          alt=""
+          aria-hidden
+          width={360}
+          height={781}
+          loading="lazy"
+          decoding="async"
+          className="block mx-auto w-full max-w-[420px] h-auto pointer-events-none select-none"
+        />
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
