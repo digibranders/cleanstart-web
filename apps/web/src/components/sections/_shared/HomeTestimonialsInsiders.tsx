@@ -6,6 +6,7 @@ import {
   HOME_TESTIMONIALS,
   type Testimonial,
 } from "@/components/sections/home/BuiltForTeams";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Light-card "CleanStart Insiders" testimonial layout (the design used on
@@ -13,7 +14,13 @@ import {
  * (`HOME_TESTIMONIALS`). Used on /community and /partners.
  */
 
-function TestimonialCard({ name, role, photoSrc, quote }: Testimonial) {
+function TestimonialCard({
+  name,
+  role,
+  photoSrc,
+  quote,
+  hideAvatar = false,
+}: Testimonial & { hideAvatar?: boolean }) {
   return (
     <div
       className="relative shrink-0 snap-center lg:snap-start w-full md:w-[70%] lg:w-[calc(50%-12px)] overflow-hidden rounded-[24px] p-12"
@@ -32,17 +39,19 @@ function TestimonialCard({ name, role, photoSrc, quote }: Testimonial) {
       </span>
 
       <div className="mb-6 flex items-center gap-4">
-        <div className="relative shrink-0 size-[47px] overflow-hidden rounded-full bg-[#eee]">
-          {photoSrc ? (
-            <Image
-              src={photoSrc}
-              alt={name}
-              fill
-              className="object-cover"
-              sizes="47px"
-            />
-          ) : null}
-        </div>
+        {hideAvatar ? null : (
+          <div className="relative shrink-0 size-[47px] overflow-hidden rounded-full bg-[#eee]">
+            {photoSrc ? (
+              <Image
+                src={photoSrc}
+                alt={name}
+                fill
+                className="object-cover"
+                sizes="47px"
+              />
+            ) : null}
+          </div>
+        )}
         <div>
           <p
             className="text-[#250800]"
@@ -90,11 +99,18 @@ function TestimonialCard({ name, role, photoSrc, quote }: Testimonial) {
 export interface HomeTestimonialsInsidersProps {
   /** Add bottom padding so the prev/next arrows clear an overlapping Footer CTA card. */
   reserveFooterCtaSpace?: boolean;
+  /** Override the default home testimonials list. */
+  testimonials?: Testimonial[];
+  /** Hide the circular avatar on each card (used when no headshots are available). */
+  hideAvatar?: boolean;
 }
 
 export function HomeTestimonialsInsiders({
   reserveFooterCtaSpace = false,
+  testimonials,
+  hideAvatar = false,
 }: HomeTestimonialsInsidersProps = {}) {
+  const items = testimonials ?? HOME_TESTIMONIALS;
   const trackRef = useRef<HTMLElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
@@ -157,18 +173,20 @@ export function HomeTestimonialsInsiders({
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <h2
-          className="mb-2 lg:mb-[80px] text-center font-display text-[#111]"
-          style={{
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            lineHeight: 1.1,
-            letterSpacing: "-0.04em",
-          }}
-        >
-          {"CleanStart "}
-          <span className="cs-text-gradient-impact">Insiders</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="mb-2 lg:mb-[80px] text-center font-display text-[#111]"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            {"CleanStart "}
+            <span className="cs-text-gradient-impact">Insiders</span>
+          </h2>
+        </Reveal>
 
         {/* Quote mark (left) + prev/next arrows (right) — flanking the
             carousel above the cards. */}
@@ -244,8 +262,8 @@ export function HomeTestimonialsInsiders({
             className="flex gap-6 overflow-x-auto snap-x snap-mandatory px-0 md:px-[15%] lg:px-0 pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9A51FF]/40 focus-visible:ring-offset-2"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {HOME_TESTIMONIALS.map((t) => (
-              <TestimonialCard key={t.name} {...t} />
+            {items.map((t) => (
+              <TestimonialCard key={t.name} {...t} hideAvatar={hideAvatar} />
             ))}
           </section>
 

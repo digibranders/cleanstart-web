@@ -1,4 +1,5 @@
 import type React from 'react';
+import { Reveal } from '@/components/ui/Reveal';
 
 /*
  * WhyMattersGrid — shared layout for "problem cards" sections that follow the
@@ -418,38 +419,42 @@ export function WhyMattersGrid({
           paddingBottom: 'clamp(48px, 5.2vw, 100px)',
         }}
       >
-        <h2
-          className="text-center mx-auto"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-h2)',
-            fontWeight: 700,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.15,
-            color: '#111111',
-            margin: 0,
-          }}
-        >
-          {heading}
-        </h2>
-
-        {subheading ? (
-          <p
+        <Reveal header>
+          <h2
             className="text-center mx-auto"
             style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--fs-body-sm)',
-              fontWeight: 400,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.4,
-              color: 'rgba(17, 17, 17, 0.8)',
-              maxWidth: '680px',
-              marginTop: 'clamp(12px, 1.5vw, 20px)',
-              marginBottom: 0,
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-h2)',
+              fontWeight: 700,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.15,
+              color: '#111111',
+              margin: 0,
             }}
           >
-            {subheading}
-          </p>
+            {heading}
+          </h2>
+        </Reveal>
+
+        {subheading ? (
+          <Reveal header delay={0.15} y={20}>
+            <p
+              className="text-center mx-auto"
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--fs-body-sm)',
+                fontWeight: 400,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.4,
+                color: 'rgba(17, 17, 17, 0.8)',
+                maxWidth: '680px',
+                marginTop: 'clamp(12px, 1.5vw, 20px)',
+                marginBottom: 0,
+              }}
+            >
+              {subheading}
+            </p>
+          </Reveal>
         ) : null}
 
         <div style={{ marginTop: 'clamp(32px, 4.17vw, 80px)' }}>
