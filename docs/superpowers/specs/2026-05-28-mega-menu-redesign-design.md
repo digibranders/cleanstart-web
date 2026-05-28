@@ -1,5 +1,7 @@
 # Mega Menu Redesign — Design Spec
 
+> **Status:** CLOSED at commit `27e30324b98449a10ebd8406fcf82306a6812193` — all 5 phases shipped to `development`.
+
 **Date:** 2026-05-28
 **Owner:** admin@digibranders.com
 **Branch:** `development`
