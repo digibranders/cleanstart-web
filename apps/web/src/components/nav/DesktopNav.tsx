@@ -56,9 +56,7 @@ function TopLevelItem({ item, latestImages }: { item: NavItem; latestImages: Com
 
   let body: React.ReactElement | null = null;
   if (item.kind === "mega" && item.label === "Products") {
-    // latestImages is passed through but not yet consumed — wired in Task 3.3.
-    void latestImages;
-    body = <PanelProducts item={item} />;
+    body = <PanelProducts item={item} latestImages={latestImages} />;
   } else if (item.kind === "mega" && PANELS[item.label]) {
     const Panel = PANELS[item.label]!;
     body = <Panel item={item} />;
