@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Section: "Built for Teams That Can't Afford Uncertainty"
@@ -346,24 +347,25 @@ export function BuiltForTeams({
       >
         {!hideHeader && (
         <header className="flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
-          <h2
-            id="testimonials-title"
-            className="justify-self-start font-display text-white"
-            style={{
-              maxWidth: "560px",
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              lineHeight: 1.1,
-              letterSpacing: "-0.04em",
-            }}
-          >
-            {heading ?? (
-              <>
-                Built for Teams That Can&rsquo;t Afford{" "}
-                <span className="cs-text-gradient-impact">Uncertainty</span>
-              </>
-            )}
-          </h2>
+          <Reveal header className="justify-self-start" style={{ maxWidth: "560px" }}>
+            <h2
+              id="testimonials-title"
+              className="font-display text-white"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                lineHeight: 1.1,
+                letterSpacing: "-0.04em",
+              }}
+            >
+              {heading ?? (
+                <>
+                  Built for Teams That Can&rsquo;t Afford{" "}
+                  <span className="cs-text-gradient-impact">Uncertainty</span>
+                </>
+              )}
+            </h2>
+          </Reveal>
           <div
             aria-hidden
             className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
@@ -372,21 +374,28 @@ export function BuiltForTeams({
                 "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 47.2%, rgba(255,255,255,0) 100%)",
             }}
           />
-          <p
-            className="text-white md:justify-self-end md:text-right"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              lineHeight: 1.4,
-              letterSpacing: "-0.02em",
-              maxWidth: "604px",
-              opacity: 0.8,
-            }}
+          <Reveal
+            header
+            delay={0.15}
+            y={20}
+            className="md:justify-self-end"
+            style={{ maxWidth: "604px" }}
           >
-            {description ??
-              "CleanStart replaces unpredictable builds with verified, secure images — helping engineering teams cut response times and prevent breaches."}
-          </p>
+            <p
+              className="text-white md:text-right"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                lineHeight: 1.4,
+                letterSpacing: "-0.02em",
+                opacity: 0.8,
+              }}
+            >
+              {description ??
+                "CleanStart replaces unpredictable builds with verified, secure images — helping engineering teams cut response times and prevent breaches."}
+            </p>
+          </Reveal>
         </header>
         )}
 

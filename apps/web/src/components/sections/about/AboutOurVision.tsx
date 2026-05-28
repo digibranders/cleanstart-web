@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 export function AboutOurVision() {
   return (
@@ -261,31 +262,35 @@ export function AboutOurVision() {
               lg+. Image wrapper above carries order-2 to land below/right. */}
           <div className="order-1 flex flex-col items-center text-center lg:items-start lg:text-left gap-10 lg:max-w-[622px]">
             <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-6">
-              <h2
-                className="font-display"
-                style={{
-                  fontSize: "var(--fs-h2)",
-                  fontWeight: 700,
-                  lineHeight: 1.1,
-                  letterSpacing: "-0.04em",
-                  color: "#111",
-                }}
-              >
-                Our <span className="cs-text-gradient-impact">Vision</span>
-              </h2>
+              <Reveal header>
+                <h2
+                  className="font-display"
+                  style={{
+                    fontSize: "var(--fs-h2)",
+                    fontWeight: 700,
+                    lineHeight: 1.1,
+                    letterSpacing: "-0.04em",
+                    color: "#111",
+                  }}
+                >
+                  Our <span className="cs-text-gradient-impact">Vision</span>
+                </h2>
+              </Reveal>
 
-              <p
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--fs-lead)",
-                  fontWeight: 400,
-                  lineHeight: 1.4,
-                  letterSpacing: "-0.02em",
-                  color: "rgba(17,17,17,0.8)",
-                }}
-              >
-                We believe trusted software should be built into the foundation. CleanStart is creating that future for open source and AI infrastructure, one clean build at a time. 
-              </p>
+              <Reveal header delay={0.15} y={20}>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-lead)",
+                    fontWeight: 400,
+                    lineHeight: 1.4,
+                    letterSpacing: "-0.02em",
+                    color: "rgba(17,17,17,0.8)",
+                  }}
+                >
+                  We believe trusted software should be built into the foundation. CleanStart is creating that future for open source and AI infrastructure, one clean build at a time.
+                </p>
+              </Reveal>
             </div>
 
             {/* Blue "Contact Us" button — `self-start` keeps the button at

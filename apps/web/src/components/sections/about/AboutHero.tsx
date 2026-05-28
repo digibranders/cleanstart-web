@@ -1,3 +1,5 @@
+import { HeroReveal } from "@/components/ui/Reveal";
+
 export function AboutHero() {
   return (
     <section
@@ -61,31 +63,35 @@ export function AboutHero() {
         {/* Text at top: 178px from section top, matching Figma node 248:2066 */}
         <div className="pt-[clamp(112px,8vw,128px)] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-14 lg:max-w-[436px]">
-            <h1
-              className="font-display font-semibold text-white"
-              style={{
-                fontSize: "var(--fs-display)",
-                lineHeight: 1.05,
-                letterSpacing: "-0.04em",
-              }}
-            >
-              Security Begins at{" "}
-              <span className="cs-text-gradient-impact">The Source</span>
-            </h1>
+            <HeroReveal y={50} duration={1.0}>
+              <h1
+                className="font-display font-semibold text-white"
+                style={{
+                  fontSize: "var(--fs-display)",
+                  lineHeight: 1.05,
+                  letterSpacing: "-0.04em",
+                }}
+              >
+                Security Begins at{" "}
+                <span className="cs-text-gradient-impact">The Source</span>
+              </h1>
+            </HeroReveal>
 
-            <a
-              href="/contact-us"
-              className="cs-btn-glass"
-              style={{
-                ["--cs-btn-px" as string]: "18px",
-                ["--cs-btn-fs" as string]: "20px",
-                color: "#111111",
-                letterSpacing: "-0.05em",
-                fontWeight: 500,
-              }}
-            >
-              Contact Us
-            </a>
+            <HeroReveal y={30} delay={0.2} duration={0.8}>
+              <a
+                href="/contact-us"
+                className="cs-btn-glass"
+                style={{
+                  ["--cs-btn-px" as string]: "18px",
+                  ["--cs-btn-fs" as string]: "20px",
+                  color: "#111111",
+                  letterSpacing: "-0.05em",
+                  fontWeight: 500,
+                }}
+              >
+                Contact Us
+              </a>
+            </HeroReveal>
 
             {/* Mobile-only Figma-accurate cube (node 817:1850).
                 Outer wrapper uses mix-blend-mode: color-dodge so the cube

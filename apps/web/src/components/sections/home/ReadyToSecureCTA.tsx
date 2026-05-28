@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 /**
  * Inner content for the Home page CTA, rendered inside the Footer's fixed
  * 1276×330 / radius-40 slot. The Footer owns the container, position, overlap,
@@ -26,22 +28,24 @@ export function ReadyToSecureCTA() {
         }}
       />
 
-      <p
-        id="cta-title"
-        className="relative z-10 font-display text-white text-center lg:text-left mx-auto lg:mx-0"
-        style={{
-          maxWidth: "min(460px, 100%)",
-          fontSize: "var(--cta-card-title)",
-          fontWeight: 600,
-          letterSpacing: "-0.04em",
-          lineHeight: 1.1,
-          textWrap: "balance",
-        }}
-      >
-        Ready to Secure Your Container Infrastructure?
-      </p>
+      <Reveal header className="relative z-10 mx-auto lg:mx-0">
+        <p
+          id="cta-title"
+          className="font-display text-white text-center lg:text-left"
+          style={{
+            maxWidth: "min(460px, 100%)",
+            fontSize: "var(--cta-card-title)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
+            textWrap: "balance",
+          }}
+        >
+          Ready to Secure Your Container Infrastructure?
+        </p>
+      </Reveal>
 
-      <div className="relative z-10 flex flex-col items-center lg:items-start gap-[18px]">
+      <Reveal header delay={0.15} y={20} className="relative z-10 flex flex-col items-center lg:items-start gap-[18px]">
         <p
           className="font-normal text-white text-center lg:text-left"
           style={{
@@ -82,7 +86,7 @@ export function ReadyToSecureCTA() {
             />
           </svg>
         </a>
-      </div>
+      </Reveal>
     </div>
   );
 }

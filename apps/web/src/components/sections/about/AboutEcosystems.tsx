@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Ecosystem partners on the About Us page. Full-colour brand SVGs from
@@ -8,12 +9,12 @@ import Image from "next/image";
 // Intrinsic dimensions match each SVG's tight content-bbox viewBox so all
 // logos render at the same effective height with no transparent padding.
 const PARTNERS = [
-  { name: "Debian",         src: "/images/about/ecosystems-color/debian.svg",     width: 154, height: 60 },
+  { name: "Debian",         src: "/images/about/ecosystems-color/debian.svg",     width: 48,  height: 60 },
   { name: "Apache CouchDB", src: "/images/about/ecosystems-color/couchdb.svg",    width: 247, height: 60 },
-  { name: "PostgreSQL",     src: "/images/about/ecosystems-color/postgresql.svg", width: 133, height: 60 },
-  { name: "Redis",          src: "/images/about/ecosystems-color/redis.svg",      width: 181, height: 60 },
-  { name: "Ubuntu",         src: "/images/about/ecosystems-color/ubuntu.svg",     width: 250, height: 60 },
-  { name: "PHP",            src: "/images/about/ecosystems-color/php.svg",        width: 114, height: 60 },
+  { name: "PostgreSQL",     src: "/images/about/ecosystems-color/postgresql.svg", width: 61,  height: 60 },
+  { name: "Redis",          src: "/images/about/ecosystems-color/redis.svg",      width: 70,  height: 60 },
+  { name: "Ubuntu",         src: "/images/about/ecosystems-color/ubuntu.svg",     width: 60,  height: 60 },
+  { name: "PHP",            src: "/images/about/ecosystems-color/php.svg",        width: 112, height: 60 },
   { name: "Python",         src: "/images/about/ecosystems-color/python.svg",     width: 197, height: 60 },
   { name: "Notion",         src: "/images/about/ecosystems-color/notion.svg",     width: 58,  height: 60 },
 ];
@@ -51,21 +52,23 @@ export function AboutEcosystems() {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Heading */}
-        <h2
-          className="text-center font-display text-black"
-          style={{
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            lineHeight: 1.1,
-            letterSpacing: "-0.04em",
-          }}
-        >
-          <span className="block">Built for The</span>
-          <span className="block">
-            Ecosystems{" "}
-            <span className="cs-text-gradient-impact">You Trust</span>
-          </span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-center font-display text-black"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            <span className="block">Built for The</span>
+            <span className="block">
+              Ecosystems{" "}
+              <span className="cs-text-gradient-impact">You Trust</span>
+            </span>
+          </h2>
+        </Reveal>
 
       </div>
 
