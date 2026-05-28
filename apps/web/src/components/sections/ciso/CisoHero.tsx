@@ -188,7 +188,8 @@ export function CisoHero(): React.ReactElement {
               marginBottom: "clamp(16px, 1.67vw, 32px)",
             }}
           >
-            Trusted Software Foundations for CISOs
+            Trusted Software Foundations for{" "}
+            <span className="cs-text-gradient-impact">CISOs</span>
           </h1>
 
           {/* Mobile: 16px; Desktop: 30px Sora Regular, opacity 0.8, tracking -0.04em, lh 1.4 */}

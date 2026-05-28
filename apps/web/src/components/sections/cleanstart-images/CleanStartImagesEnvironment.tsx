@@ -8,16 +8,25 @@ type LogoItem = {
 };
 
 /**
- * Logos from Figma node 792:2886 — SVG versions used to avoid baked-in
- * background pixels showing edges against the dark gradient.
- * Two copies in the marquee track for a seamless infinite loop.
+ * Registry / cloud-platform brand logos. Icons keep their official brand
+ * colour (red Red-Hat fedora, orange AWS cubes, blue Docker whale, etc.);
+ * wordmark text has been recoloured white in the source SVGs so it reads
+ * against this section's dark navy → purple gradient. Two copies in the
+ * marquee track produce a seamless infinite loop.
  */
+// Intrinsic dimensions match each SVG's tight content-bbox viewBox so the
+// rendered marquee row has consistent logo heights with no transparent padding.
 const LOGOS: LogoItem[] = [
-  { src: "/images/cleanstart-images/stacks-couchdb-color.svg",    alt: "Apache CouchDB", w: 176, h: 88 },
-  { src: "/images/cleanstart-images/stacks-postgresql.svg",        alt: "PostgreSQL",     w: 295, h: 56 },
-  { src: "/images/cleanstart-images/stacks-redis-color.svg",       alt: "Redis",          w: 149, h: 47 },
-  { src: "/images/cleanstart-images/stacks-ubuntu-color.svg",      alt: "Ubuntu",         w: 169, h: 65 },
-  { src: "/images/cleanstart-images/stacks-php-color.svg",         alt: "PHP",            w: 96,  h: 47 },
+  { src: "/images/cleanstart-images/stacks-color/nexus.svg",        alt: "Sonatype Nexus",      w: 68,  h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/quay.svg",         alt: "Quay",                w: 204, h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/redhat.svg",       alt: "Red Hat",             w: 164, h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/harbor.svg",       alt: "Harbor",              w: 207, h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/azure.svg",        alt: "Microsoft Azure",     w: 205, h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/aws.svg",          alt: "Amazon Web Services", w: 151, h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/github.svg",       alt: "GitHub",              w: 196, h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/jfrog.svg",        alt: "JFrog",               w: 62,  h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/docker.svg",       alt: "Docker",              w: 209, h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/google-cloud.svg", alt: "Google Cloud",        w: 124, h: 60 },
 ];
 
 export function CleanStartImagesEnvironment(): React.ReactElement {
@@ -187,37 +196,27 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
         </h2>
 
         {/* ── Infinite logo marquee ──────────────────────────────────────────── */}
+        {/* Edge fade uses a CSS mask so the logos themselves fade to transparent
+            against whatever lies behind. The fade band is kept narrow (≈40px)
+            so it never exceeds the inter-logo gap — otherwise the mask reveals
+            pure section background between logos and reads as a darker column,
+            especially on mobile where the viewport is narrower than the gap. */}
         <div
           className="relative w-full overflow-hidden"
-          style={{ marginTop: "clamp(40px, 5vw, 80px)" }}
+          style={{
+            marginTop: "clamp(40px, 5vw, 80px)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%)",
+            maskImage:
+              "linear-gradient(to right, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%)",
+          }}
         >
-          {/* Left gradient fade — Figma: from #191e93 → transparent, w≈229px */}
-          <div
-            aria-hidden
-            className="absolute left-0 top-0 bottom-0 z-10 pointer-events-none"
-            style={{
-              width: "clamp(80px, 12vw, 180px)",
-              background:
-                "linear-gradient(to right, #191e93 0%, rgba(25,30,147,0) 100%)",
-            }}
-          />
-          {/* Right gradient fade — Figma: from #191e93 18.4% → transparent */}
-          <div
-            aria-hidden
-            className="absolute right-0 top-0 bottom-0 z-10 pointer-events-none"
-            style={{
-              width: "clamp(80px, 12vw, 180px)",
-              background:
-                "linear-gradient(to left, #191e93 18.391%, rgba(25,30,147,0) 100%)",
-            }}
-          />
-
           {/* Marquee track — two full copies for seamless loop */}
           <div
             className="cs-marquee"
             style={{
               animationDuration: "35s",
-              gap: "clamp(48px, 8vw, 120px)",
+              gap: "clamp(28px, 4vw, 64px)",
               alignItems: "center",
             }}
             aria-hidden

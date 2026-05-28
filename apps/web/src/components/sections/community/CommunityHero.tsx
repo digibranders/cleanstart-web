@@ -64,7 +64,8 @@ export function CommunityHero() {
                 letterSpacing: '-0.04em',
               }}
             >
-              Let&apos;s work together towards secure development
+              Let&apos;s work together towards{" "}
+              <span className="cs-text-gradient-impact">secure development</span>
             </h1>
 
             {/* Subtitle + CTA — Figma: 30px Sora Regular, lh 1.4, tracking -1.2px, opacity 80% */}

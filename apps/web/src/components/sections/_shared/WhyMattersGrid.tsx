@@ -63,6 +63,12 @@ export interface WhyMattersGridProps {
    *  (Figma "Union": 1101×1101 at left=1347 top=-565, #640DFB / op 0.1).
    *  Used on SbomRisks as a replacement for the corner glows. */
   showUnionTint?: boolean;
+  /** Drop the #F6F6F6 wash entirely so the section is transparent and inherits
+   *  whatever the section above paints (no visible colour seam). */
+  flushBg?: boolean;
+  /** Render the hex-grid blob at the bottom-left corner at reduced opacity.
+   *  Used on ASRApproach where the rest of the decoration is suppressed. */
+  showBottomLeftGrid?: boolean;
 }
 
 // ── Divider gradients (fade in from the edges, 20%→80% solid) ────────────────
@@ -83,12 +89,12 @@ const DEFAULT_IMG_STYLE: React.CSSProperties = {
 function DesktopCard({ imgSrc, imgAlt, imgStyle, title, desc }: WhyCard): React.ReactElement {
   return (
     <div className="flex items-center" style={{ gap: 'clamp(16px, 1.67vw, 24px)' }}>
-      {/* ── Illustration area (222×165 max, scales down to 160×120) ── */}
+      {/* ── Illustration area (compact: 170×125 max, scales down to 120×90) ── */}
       <div
         className="relative shrink-0"
         style={{
-          width: 'clamp(160px, 15.4vw, 222px)',
-          height: 'clamp(120px, 11.46vw, 165px)',
+          width: 'clamp(120px, 11.8vw, 170px)',
+          height: 'clamp(90px, 8.7vw, 125px)',
         }}
       >
         {/* Purple glow halo behind the icon */}
@@ -247,17 +253,24 @@ export function WhyMattersGrid({
   showLeftGrid = true,
   showRightGrid = true,
   showUnionTint = false,
+  flushBg = false,
+  showBottomLeftGrid = false,
 }: WhyMattersGridProps): React.ReactElement {
   return (
     <section
       data-section={dataSection}
       className="relative overflow-hidden"
       style={{
-        // Soft gradient blend at the top + bottom edges so the section
-        // doesn't form a hard horizontal seam against whatever sits above
-        // (typically a darker hero gradient) or below it.
-        background:
-          'linear-gradient(180deg, rgba(246,246,246,0) 0%, #F6F6F6 96px, #F6F6F6 calc(100% - 96px), rgba(246,246,246,0) 100%)',
+        background: flushBg
+          ? // Transparent — the caller is expected to wrap this section
+            // (and the section above it) in a single bg-[#F6F6F6] container,
+            // so both render against ONE continuous backdrop with no
+            // FadeUp-induced sub-pixel seam between them.
+            'transparent'
+          : // Soft gradient blend at the top + bottom edges so the section
+            // doesn't form a hard horizontal seam against whatever sits above
+            // (typically a darker hero gradient) or below it.
+            'linear-gradient(180deg, rgba(246,246,246,0) 0%, #F6F6F6 96px, #F6F6F6 calc(100% - 96px), rgba(246,246,246,0) 100%)',
       }}
     >
       {/* ── Left hex-grid blob (Figma: left=-500, top=-539, w=1181) ── */}
@@ -298,6 +311,30 @@ export function WhyMattersGrid({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/for-developers/why/deco-union-right.svg"
+            alt=""
+            style={{ display: 'block', width: '100%', height: '100%' }}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      ) : null}
+
+      {/* ── Bottom-left hex-grid blob (low opacity) ── */}
+      {showBottomLeftGrid ? (
+        <div
+          aria-hidden
+          className="pointer-events-none select-none absolute hidden lg:block"
+          style={{
+            left: 'calc(-500 / 1920 * 100vw)',
+            bottom: 'calc(-539 / 1920 * 100vw)',
+            width: 'calc(1181 / 1920 * 100vw)',
+            height: 'calc(1181 / 1920 * 100vw)',
+            opacity: 0.35,
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/for-developers/why/deco-union-left.svg"
             alt=""
             style={{ display: 'block', width: '100%', height: '100%' }}
             loading="lazy"
@@ -440,10 +477,19 @@ export function WhyMattersGrid({
             />
 
             <div className="grid grid-cols-2" style={{ rowGap: 0, columnGap: 0 }}>
-              <div style={{ paddingRight: '32px', paddingBottom: '48px' }}>
+              {/* Left column gets extra paddingLeft so its icon+text sits
+                  closer to the vertical centre divider (mirrors how the
+                  right column already hugs the divider naturally). */}
+              <div
+                style={{
+                  paddingLeft: 'clamp(24px, 5vw, 96px)',
+                  paddingRight: '24px',
+                  paddingBottom: '28px',
+                }}
+              >
                 <DesktopCard {...cards[0]} />
               </div>
-              <div style={{ paddingLeft: '32px', paddingBottom: '48px' }}>
+              <div style={{ paddingLeft: '24px', paddingBottom: '28px' }}>
                 <DesktopCard {...cards[1]} />
               </div>
 
@@ -458,10 +504,16 @@ export function WhyMattersGrid({
                 }}
               />
 
-              <div style={{ paddingRight: '32px', paddingTop: '48px' }}>
+              <div
+                style={{
+                  paddingLeft: 'clamp(24px, 5vw, 96px)',
+                  paddingRight: '24px',
+                  paddingTop: '28px',
+                }}
+              >
                 <DesktopCard {...cards[2]} />
               </div>
-              <div style={{ paddingLeft: '32px', paddingTop: '48px' }}>
+              <div style={{ paddingLeft: '24px', paddingTop: '28px' }}>
                 <DesktopCard {...cards[3]} />
               </div>
             </div>

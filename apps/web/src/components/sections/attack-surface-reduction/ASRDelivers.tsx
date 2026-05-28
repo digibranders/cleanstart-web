@@ -27,7 +27,7 @@ export function ASRDelivers(): React.ReactElement {
         fill
         sizes="100vw"
         className="-z-20 object-cover object-center md:hidden"
-        style={{ filter: 'blur(6px)', transform: 'scale(1.03)' }}
+        style={{ filter: 'blur(1.5px)', transform: 'scale(1.01)' }}
         priority={false}
       />
       <Image
@@ -36,7 +36,7 @@ export function ASRDelivers(): React.ReactElement {
         fill
         sizes="100vw"
         className="-z-20 object-cover object-center hidden md:block"
-        style={{ filter: 'blur(6px)', transform: 'scale(1.03)' }}
+        style={{ filter: 'blur(1.5px)', transform: 'scale(1.01)' }}
         priority={false}
       />
 
@@ -145,7 +145,7 @@ function BenefitBlock({
         className="mt-5 max-w-[219px] text-white"
         style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--fs-lead)',
+          fontSize: '20px',
           fontWeight: 400,
           lineHeight: 1.3,
           letterSpacing: '-0.02em',

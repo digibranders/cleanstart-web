@@ -32,7 +32,7 @@ export function CleanStartImagesCta(): React.ReactElement {
         }}
       >
         <Image
-          src="/images/cleanstart-images/cta-cube.png"
+          src="/images/cleanstart-images/cta-cube-textured.png"
           alt=""
           width={255}
           height={258}
@@ -42,6 +42,25 @@ export function CleanStartImagesCta(): React.ReactElement {
           decoding="async"
         />
       </div>
+
+      {/* Green cube — mobile only, extreme bottom-right corner, just the tip visible */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/cleanstart-images/cta-cube-green.png"
+        alt=""
+        className="pointer-events-none select-none absolute lg:hidden"
+        style={{
+          right: "-60px",
+          bottom: "-60px",
+          width: "160px",
+          height: "160px",
+          objectFit: "contain",
+          opacity: 0.9,
+        }}
+        loading="eager"
+        decoding="async"
+      />
 
       {/* Content — stacked (mobile/sm) → side-by-side (lg+) */}
       <div

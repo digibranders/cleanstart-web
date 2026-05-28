@@ -80,8 +80,8 @@ export function SbomAdvantage(): React.ReactElement {
               color: '#111',
             }}
           >
-            {'Built for Modern Software '}
-            <span className="cs-text-gradient-impact">Supply Chains</span>
+            <span className="block">Built for Modern Software</span>
+            <span className="cs-text-gradient-impact block">Supply Chains</span>
           </h2>
         </div>
 

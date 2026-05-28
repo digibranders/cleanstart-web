@@ -83,9 +83,10 @@ export function ASRHero(): React.ReactElement {
        */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 lg:px-[82px]">
         <div
-          className="flex flex-col md:flex-row items-center md:items-end gap-8 md:gap-6 lg:gap-10"
+          className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-6 lg:gap-10"
           style={{
-            paddingTop: 'clamp(112px, 15.9vw, 229px)',
+            // Match FipsHero top padding so the H1 baseline lines up across product heroes.
+            paddingTop: 'clamp(112px, 12.92vw, 200px)',
             // Fixed bottom space below the cards/CTA at every viewport
             // (was a clamp 56→120px which made the gap shift with width).
             paddingBottom: '96px',

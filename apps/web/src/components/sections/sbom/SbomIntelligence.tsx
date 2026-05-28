@@ -93,8 +93,11 @@ export function SbomIntelligence(): React.ReactElement {
               color: "#111",
             }}
           >
-            {"SBOM Intelligence That Drives "}
-            <span className="cs-text-gradient-impact">Action</span>
+            <span className="block">SBOM Intelligence That</span>
+            <span className="block">
+              {"Drives "}
+              <span className="cs-text-gradient-impact">Action</span>
+            </span>
           </h2>
         </div>
       </div>

@@ -53,7 +53,7 @@ export function CleanStartAdvantage() {
         fill
         sizes="100vw"
         className="-z-20 object-cover object-center md:hidden"
-        style={{ filter: "blur(6px)", transform: "scale(1.03)" }}
+        style={{ filter: "blur(1.5px)", transform: "scale(1.01)" }}
         priority={false}
       />
       <Image
@@ -62,7 +62,7 @@ export function CleanStartAdvantage() {
         fill
         sizes="100vw"
         className="-z-20 object-cover object-center hidden md:block"
-        style={{ filter: "blur(6px)", transform: "scale(1.03)" }}
+        style={{ filter: "blur(1.5px)", transform: "scale(1.01)" }}
         priority={false}
       />
       {/* Dark gradient overlay so title/text remain readable on the photo */}
@@ -171,14 +171,14 @@ function StatBlock({
       </div>
     );
   }
-  // Desktop variant — Home stat spec: number 32/700/Manrope · label 24/400/Sora
+  // Desktop variant — Home stat spec: number 32/700/Manrope · label 20/400/Sora
   return (
     <div className="flex shrink-0 flex-col">
       <div
         className="font-display text-white"
         style={{
           whiteSpace: "nowrap",
-          fontSize: "var(--fs-h3)",
+          fontSize: "32px",
           fontWeight: 700,
           lineHeight: 1.1,
           letterSpacing: "-0.04em",
@@ -190,7 +190,7 @@ function StatBlock({
         className="mt-5 max-w-[180px] text-white"
         style={{
           fontFamily: "var(--font-sans)",
-          fontSize: "var(--fs-lead)",
+          fontSize: "20px",
           fontWeight: 400,
           lineHeight: 1.3,
           letterSpacing: "-0.02em",

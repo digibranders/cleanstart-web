@@ -81,7 +81,7 @@ export function FipsHero(): React.ReactElement {
        * small screens (<1276px) where the container fills the viewport.
        */}
       <div
-        className="relative mx-auto z-[2] px-4 md:px-0"
+        className="relative mx-auto z-[2] px-6"
         style={{
           maxWidth: "1276px",
           /*

@@ -5,15 +5,32 @@ import { Section, Container } from "@/components/layout";
 type CardData = {
   title: string;
   blurb: string;
+  icon: string;
 };
 
 const CARDS: CardData[] = [
-  { title: "Clean\nImages", blurb: "Minimal. Immutable.\nZero CVE." },
-  { title: "Clean\nPackages", blurb: "Curated. Verified. No\nhidden risk." },
-  { title: "Clean AI\nModels", blurb: "Scanned. Signed. Safe\nby design." },
+  {
+    title: "Clean\nImages",
+    blurb: "Minimal. Immutable.\nZero CVE.",
+    icon: "/images/cleanstart-factory/factory-images.png",
+  },
+  {
+    title: "Clean\nPackages",
+    blurb: "Curated. Verified. No\nhidden risk.",
+    icon: "/images/cleanstart-factory/factory-packages.png",
+  },
+  {
+    title: "Clean AI\nModels",
+    blurb: "Scanned. Signed. Safe\nby design.",
+    icon: "/images/cleanstart-factory/factory-models.png",
+  },
   // "Clean Sight" removed (2026-05) — top row trimmed to 4 cards across
   // every viewport. Grid + row max-width updated below to match.
-  { title: "Clean\nLibraries", blurb: "Complete. Signed.\nContinuously verified." },
+  {
+    title: "Clean\nLibraries",
+    blurb: "Complete. Signed.\nContinuously verified.",
+    icon: "/images/cleanstart-factory/factory-libraries.png",
+  },
 ];
 
 // Container-query-based card. The `factory-card` container's inline size (its
@@ -91,11 +108,11 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
       {/* Orb (chrome iridescent ring). Cropped 113 × 117, displayed at 46.39 %
           of card width to match Figma's 108 px visible-orb width. */}
       <Image
-        src="/images/cleanstart-factory/factory-icons.webp"
+        src={data.icon}
         alt=""
         aria-hidden
-        width={113}
-        height={117}
+        width={192}
+        height={200}
         sizes="(min-width: 1280px) 108px, 8vw"
         priority={isFirst}
         className="pointer-events-none absolute left-1/2 -translate-x-1/2 select-none"
@@ -236,11 +253,11 @@ function FactoryMobileCard({ data, isFirst }: { data: CardData; isFirst: boolean
           vertically inside the 88 px card). The visible chrome ring fills
           most of that bbox. */}
       <Image
-        src="/images/cleanstart-factory/factory-icons.webp"
+        src={data.icon}
         alt=""
         aria-hidden
-        width={113}
-        height={117}
+        width={192}
+        height={200}
         sizes="(max-width: 480px) 60px, 80px"
         priority={isFirst}
         className="pointer-events-none absolute select-none"

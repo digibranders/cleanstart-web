@@ -35,7 +35,7 @@ const CARDS = [
 
 export function ASRBloated(): React.ReactElement {
   return (
-    <section data-section="ASRBloated" className="relative bg-white overflow-hidden">
+    <section data-section="ASRBloated" className="relative overflow-hidden">
 
       {/* ── Heading ── */}
       {/*

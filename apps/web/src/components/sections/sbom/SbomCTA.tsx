@@ -122,7 +122,7 @@ export function SbomCTA(): React.ReactElement {
             style={
               {
                 '--cs-btn-h': 'var(--btn-h-xl)',
-                '--cs-btn-px': '32px',
+                '--cs-btn-px': '20px',
                 '--cs-btn-fs': '16px',
               } as React.CSSProperties
             }
@@ -149,7 +149,7 @@ export function SbomCTA(): React.ReactElement {
         </div>
       </div>
 
-      {/* Cube decoration — overflows bottom-right corner at 80% opacity (matches CISO CTA) */}
+      {/* Cube decoration — overflows bottom-left corner, bleeds below slot */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -157,10 +157,10 @@ export function SbomCTA(): React.ReactElement {
         alt=""
         className="absolute pointer-events-none select-none hidden lg:block"
         style={{
-          right: '-60px',
-          bottom: '-100px',
-          width: '300px',
-          height: '300px',
+          left: '-50px',
+          bottom: '-120px',
+          width: '240px',
+          height: '240px',
           objectFit: 'contain',
           opacity: 0.75,
           zIndex: 0,
