@@ -1,6 +1,6 @@
+import { act, renderHook } from '@testing-library/react';
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
 import { useViewportMode } from './useViewportMode';
 
 function setViewport(w: number): void {

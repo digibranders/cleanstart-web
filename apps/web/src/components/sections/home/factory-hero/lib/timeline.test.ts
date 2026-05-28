@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getCubePhase, type CubePhase } from './timeline';
+import { type CubePhase, getCubePhase } from './timeline';
 
 describe('getCubePhase', () => {
   it('returns "spawning" before chamber 01 entry', () => {

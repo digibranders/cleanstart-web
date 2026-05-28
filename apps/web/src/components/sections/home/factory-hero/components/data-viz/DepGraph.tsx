@@ -1,6 +1,6 @@
 'use client';
 
-import { Text, Line } from '@react-three/drei';
+import { Line, Text } from '@react-three/drei';
 import { COLORS } from '../../lib/materials';
 
 interface Node {
@@ -11,10 +11,10 @@ interface Node {
 }
 
 const NODES: Node[] = [
-  { pos: [-0.35,  0.30, 0], label: 'openssl', vulnerable: true },
-  { pos: [ 0.35,  0.30, 0], label: 'libc',    vulnerable: false },
-  { pos: [-0.35, -0.30, 0], label: 'zlib',    vulnerable: false },
-  { pos: [ 0.35, -0.30, 0], label: 'curl',    vulnerable: true },
+  { pos: [-0.35, 0.3, 0], label: 'openssl', vulnerable: true },
+  { pos: [0.35, 0.3, 0], label: 'libc', vulnerable: false },
+  { pos: [-0.35, -0.3, 0], label: 'zlib', vulnerable: false },
+  { pos: [0.35, -0.3, 0], label: 'curl', vulnerable: true },
 ];
 
 interface Props {
@@ -41,7 +41,9 @@ export function DepGraph({ position, progress }: Props) {
       ))}
       {NODES.map((n) => {
         const color = n.vulnerable
-          ? (flipPhase > 0.5 ? COLORS.neonPrimary : COLORS.cveWarn)
+          ? flipPhase > 0.5
+            ? COLORS.neonPrimary
+            : COLORS.cveWarn
           : COLORS.neonPrimary;
         return (
           <group key={n.label} position={n.pos}>

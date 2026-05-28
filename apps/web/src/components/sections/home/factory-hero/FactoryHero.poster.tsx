@@ -20,14 +20,7 @@ export function FactoryHeroPoster({ fadeOut }: Props) {
         pointerEvents: 'none',
       }}
     >
-      <Image
-        src={poster}
-        alt=""
-        priority
-        fill
-        sizes="100vw"
-        style={{ objectFit: 'cover' }}
-      />
+      <Image src={poster} alt="" priority fill sizes="100vw" style={{ objectFit: 'cover' }} />
     </div>
   );
 }

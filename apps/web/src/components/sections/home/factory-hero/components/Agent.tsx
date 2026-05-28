@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
 import type { Mesh } from 'three';
 import { buildAgentGeometry } from '../lib/geometry';
 import { makeAgentMaterial } from '../lib/materials';

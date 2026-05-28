@@ -1,6 +1,6 @@
-// @vitest-environment happy-dom
-import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
+// @vitest-environment happy-dom
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useReducedMotion } from './useReducedMotion';
 
 function mockMatchMedia(matches: boolean) {

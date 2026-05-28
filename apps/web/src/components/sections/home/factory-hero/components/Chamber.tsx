@@ -1,12 +1,12 @@
 'use client';
 
-import { type ReactNode } from 'react';
 import { Text } from '@react-three/drei';
+import type { ReactNode } from 'react';
 import {
+  BLOOM_LAYER,
+  COLORS,
   makeChamberEdgeMaterial,
   makeChamberWallMaterial,
-  COLORS,
-  BLOOM_LAYER,
 } from '../lib/materials';
 
 interface ChamberProps {
@@ -32,13 +32,15 @@ export function Chamber({ position, size, label, children }: ChamberProps) {
         material={makeChamberEdgeMaterial()}
         onUpdate={(self) => self.layers.set(BLOOM_LAYER)}
       >
-        <edgesGeometry args={[
-          // re-using a temporary BoxGeometry for the edge extraction
-          (() => {
-            const { BoxGeometry } = require('three') as typeof import('three');
-            return new BoxGeometry(w, h, d);
-          })(),
-        ]}/>
+        <edgesGeometry
+          args={[
+            // re-using a temporary BoxGeometry for the edge extraction
+            (() => {
+              const { BoxGeometry } = require('three') as typeof import('three');
+              return new BoxGeometry(w, h, d);
+            })(),
+          ]}
+        />
       </lineSegments>
       {/* label above the chamber */}
       <Text

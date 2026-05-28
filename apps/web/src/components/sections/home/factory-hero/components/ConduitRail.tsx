@@ -2,7 +2,7 @@
 
 import { Line } from '@react-three/drei';
 import type { Object3D } from 'three';
-import { COLORS, BLOOM_LAYER } from '../lib/materials';
+import { BLOOM_LAYER, COLORS } from '../lib/materials';
 
 interface Props {
   length: number; // scene units

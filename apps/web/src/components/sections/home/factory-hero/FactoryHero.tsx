@@ -5,10 +5,9 @@ import { useEffect, useState } from 'react';
 import { FactoryHeroPoster } from './FactoryHero.poster';
 import { useReducedMotion } from './hooks/useReducedMotion';
 
-const FactoryScene = dynamic(
-  () => import('./FactoryScene').then((m) => m.FactoryScene),
-  { ssr: false }
-);
+const FactoryScene = dynamic(() => import('./FactoryScene').then((m) => m.FactoryScene), {
+  ssr: false,
+});
 
 const ARIA_LABEL =
   'CleanStart Factory pipeline: vulnerable upstream container images (such as nginx, postgres, redis) enter on the left, pass through four hardening stages — Intake, AI Logic Engine, CleanCompile, Attest and Handoff — and exit signed, verified, and CVE-free on the right.';

@@ -1,12 +1,12 @@
 'use client';
 
-import { useRef } from 'react';
 import { Billboard, useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
 import type { Mesh, ShaderMaterial } from 'three';
 import { type LogoSlug, getLogoAssetUrl } from '../lib/logoPool';
-import type { CubeMaterial } from '../lib/timeline';
 import { BLOOM_LAYER } from '../lib/materials';
+import type { CubeMaterial } from '../lib/timeline';
 
 interface Props {
   logo: LogoSlug;
@@ -51,7 +51,7 @@ export function CubeLogoPlane({ logo, materialState, dwell }: Props) {
           uniforms={{
             uMap: { value: texture },
             uColor: { value: materialState === 'clean' ? 1 : 0 },
-            uTint: { value: [0.353, 0.290, 0.471] }, // #5a4a78 normalized
+            uTint: { value: [0.353, 0.29, 0.471] }, // #5a4a78 normalized
           }}
           vertexShader={`
             varying vec2 vUv;

@@ -1,7 +1,7 @@
 'use client';
 
 import { Text } from '@react-three/drei';
-import { type CveSummary } from '../../lib/logoPool';
+import type { CveSummary } from '../../lib/logoPool';
 import { COLORS } from '../../lib/materials';
 
 interface Props {

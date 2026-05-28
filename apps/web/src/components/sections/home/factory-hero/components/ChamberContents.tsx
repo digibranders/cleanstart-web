@@ -1,14 +1,14 @@
 'use client';
 
-import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import type { CubePhase } from '../lib/timeline';
+import { useRef } from 'react';
 import { useLoopPhase } from '../hooks/useLoopPhase';
-import { ManifestCard } from './data-viz/ManifestCard';
-import { DepGraph } from './data-viz/DepGraph';
-import { BuildLattice } from './data-viz/BuildLattice';
-import { SbomTicker } from './data-viz/SbomTicker';
 import { getCveSummaryFor, getLogoForCube } from '../lib/logoPool';
+import type { CubePhase } from '../lib/timeline';
+import { BuildLattice } from './data-viz/BuildLattice';
+import { DepGraph } from './data-viz/DepGraph';
+import { ManifestCard } from './data-viz/ManifestCard';
+import { SbomTicker } from './data-viz/SbomTicker';
 
 interface Props {
   /** 0..3 — which chamber this content belongs to. */
@@ -27,10 +27,16 @@ export function ChamberContents({ chamberIndex }: Props) {
   useFrame(() => {
     const inChamber = (p: CubePhase): number => {
       switch (chamberIndex) {
-        case 0: return p.stage === 'ch1' ? p.dwell : 0;
-        case 1: return p.stage === 'ch2' ? p.dwell : 0;
-        case 2: return (p.stage === 'ch3-cleancompile' || p.stage === 'ch3-enter' || p.stage === 'ch3-exit') ? p.dwell : 0;
-        case 3: return p.stage === 'ch4' ? p.dwell : 0;
+        case 0:
+          return p.stage === 'ch1' ? p.dwell : 0;
+        case 1:
+          return p.stage === 'ch2' ? p.dwell : 0;
+        case 2:
+          return p.stage === 'ch3-cleancompile' || p.stage === 'ch3-enter' || p.stage === 'ch3-exit'
+            ? p.dwell
+            : 0;
+        case 3:
+          return p.stage === 'ch4' ? p.dwell : 0;
       }
     };
     const a = inChamber(phaseA.current);
@@ -42,7 +48,13 @@ export function ChamberContents({ chamberIndex }: Props) {
 
   switch (chamberIndex) {
     case 0:
-      return <ManifestCard position={[0, 0.6, 0.4]} summary={localRef.current.summary} visibility={localRef.current.progress} />;
+      return (
+        <ManifestCard
+          position={[0, 0.6, 0.4]}
+          summary={localRef.current.summary}
+          visibility={localRef.current.progress}
+        />
+      );
     case 1:
       return <DepGraph position={[0, 0, 0.2]} progress={localRef.current.progress} />;
     case 2:

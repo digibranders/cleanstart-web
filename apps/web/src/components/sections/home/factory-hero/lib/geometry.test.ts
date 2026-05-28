@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
 import { BoxGeometry } from 'three';
-import { buildCubeGeometry, buildAgentGeometry } from './geometry';
+import { describe, expect, it } from 'vitest';
+import { buildAgentGeometry, buildCubeGeometry } from './geometry';
 
 describe('geometry', () => {
   it('buildCubeGeometry returns a chamfered box with the spec dimensions', () => {

@@ -8,14 +8,14 @@ export const BLOOM_LAYER = 1;
 
 /** Brand palette tokens duplicated here as Three.js Colors. Mirrors spec § 3.2. */
 export const COLORS = {
-  neonPrimary:    new Color('#2cc1eb'),
-  neonSecondary:  new Color('#dab6f3'),
-  cveWarn:        new Color('#ff4d6d'),
-  cubeDirtyFrom:  new Color('#2a1a4d'),
-  cubeDirtyTo:    new Color('#0d0a1f'),
-  cubeCleanFrom:  new Color('#dab6f3'),
-  cubeCleanTo:    new Color('#2cc1eb'),
-  chamberWall:    new Color('#0d0a1f'),
+  neonPrimary: new Color('#2cc1eb'),
+  neonSecondary: new Color('#dab6f3'),
+  cveWarn: new Color('#ff4d6d'),
+  cubeDirtyFrom: new Color('#2a1a4d'),
+  cubeDirtyTo: new Color('#0d0a1f'),
+  cubeCleanFrom: new Color('#dab6f3'),
+  cubeCleanTo: new Color('#2cc1eb'),
+  chamberWall: new Color('#0d0a1f'),
 } as const;
 
 export function makeChamberWallMaterial(): MeshPhysicalMaterial {

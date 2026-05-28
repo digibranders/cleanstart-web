@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getLogoForCube, getCveSummaryFor, LOGO_POOL } from './logoPool';
+import { LOGO_POOL, getCveSummaryFor, getLogoForCube } from './logoPool';
 
 describe('logoPool', () => {
   it('exposes exactly the 10 curated logos', () => {

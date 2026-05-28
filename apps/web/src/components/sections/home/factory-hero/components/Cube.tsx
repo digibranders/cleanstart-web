@@ -1,15 +1,11 @@
 'use client';
 
-import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
 import type { Mesh } from 'three';
 import { useLoopPhase } from '../hooks/useLoopPhase';
-import { type LogoSlug } from '../lib/logoPool';
-import {
-  makeCubeDirtyMaterial,
-  makeCubeCleanMaterial,
-  BLOOM_LAYER,
-} from '../lib/materials';
+import type { LogoSlug } from '../lib/logoPool';
+import { BLOOM_LAYER, makeCubeCleanMaterial, makeCubeDirtyMaterial } from '../lib/materials';
 import { CubeLogoPlane } from './CubeLogoPlane';
 
 interface CubeProps {
@@ -32,7 +28,7 @@ export function Cube({ loopOffset, logo, railY, xSpan }: CubeProps) {
     // Map p.x (which is -1..+1) to actual scene X via xSpan.
     groupRef.current.position.x = p.x * (xSpan / 2);
     groupRef.current.position.y = railY;
-    groupRef.current.rotation.y += 0.0035; // ~1 rev / 10s at 60fps
+    groupRef.current.rotation.y += 0.01047; // 1 rev / 10s at 60fps (2π / 600)
   });
 
   // Render BOTH materials and toggle visibility — avoids material-swap cost per frame.
@@ -49,7 +45,11 @@ export function Cube({ loopOffset, logo, railY, xSpan }: CubeProps) {
       >
         <boxGeometry args={[0.6, 0.6, 0.6]} />
       </mesh>
-      <CubeLogoPlane logo={logo} materialState={phaseRef.current.material} dwell={phaseRef.current.dwell} />
+      <CubeLogoPlane
+        logo={logo}
+        materialState={phaseRef.current.material}
+        dwell={phaseRef.current.dwell}
+      />
     </group>
   );
 }
