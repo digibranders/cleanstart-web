@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { Agent } from './components/Agent';
@@ -44,11 +45,26 @@ export function FactoryScene() {
   const cubeXSpan = mode === 'mobile' ? 5.0 : X_SPAN;
   const orientation = mode === 'mobile' ? 'vertical' : 'horizontal';
 
+  // R3F's ResizeObserver runs on Canvas mount; if the parent measured 0x0 at
+  // that instant (likely under our dynamic import + suspense delay), the
+  // canvas stays at its 300x150 default. Fire resize events shortly after
+  // mount so the observer re-measures against the now-finalized parent.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const ids = [16, 100, 300, 600].map((delay) =>
+      window.setTimeout(() => window.dispatchEvent(new Event('resize')), delay),
+    );
+    return () => {
+      for (const id of ids) window.clearTimeout(id);
+    };
+  }, []);
+
   return (
     <Canvas
       camera={{ position: cameraPos, fov: cameraFov }}
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true }}
+      style={{ width: '100%', height: '100%' }}
     >
       <ambientLight intensity={0.15} color="#dab6f3" />
       <pointLight position={[0, 2, 2]} intensity={0.4} color="#2cc1eb" />
