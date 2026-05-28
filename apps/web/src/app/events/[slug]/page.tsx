@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { EventDetailHero } from "@/components/sections/events/EventDetailHero";
 import { EventDetailMobileCard } from "@/components/sections/events/EventDetailMobileCard";

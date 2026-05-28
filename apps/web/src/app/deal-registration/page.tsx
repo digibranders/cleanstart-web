@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { DealRegistrationForm } from "@/components/sections/forms/DealRegistrationForm";
 import { AboutEcosystems } from "@/components/sections/about/AboutEcosystems";

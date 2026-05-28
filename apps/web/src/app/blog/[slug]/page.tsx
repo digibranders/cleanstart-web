@@ -9,7 +9,7 @@ import {
 } from "@/lib/blog";
 import type { Blog } from "@/lib/blog";
 import { highlightLexical } from "@/lib/highlightLexical";
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
 import { BlogDetailContent } from "@/components/sections/blog/BlogDetailContent";
 import { BlogDetailAuthor } from "@/components/sections/blog/BlogDetailAuthor";

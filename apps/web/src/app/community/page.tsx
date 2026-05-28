@@ -1,4 +1,4 @@
-import { Header } from '@/components/sections/Header';
+import { Header } from '@/components/nav/Header';
 import { CommunityHero } from '@/components/sections/community/CommunityHero';
 import { CommunityTrustedBy } from '@/components/sections/community/CommunityTrustedBy';
 import { CommunitySections } from '@/components/sections/community/CommunitySections';

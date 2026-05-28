@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { Hero } from "@/components/sections/home/Hero";
 import { CleanStartFactory } from "@/components/sections/home/CleanStartFactory";
 import { HowCleanStartHelp } from "@/components/sections/home/HowCleanStartHelp";

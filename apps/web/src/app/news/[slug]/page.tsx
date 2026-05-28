@@ -7,7 +7,7 @@ import {
   getRelatedNews,
 } from "@/lib/news";
 import { highlightLexical } from "@/lib/highlightLexical";
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { NewsDetailHero } from "@/components/sections/news-detail/NewsDetailHero";
 import { NewsDetailBody } from "@/components/sections/news-detail/NewsDetailBody";

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { KnowledgeHubArticleHero } from "@/components/sections/knowledge-hub/KnowledgeHubArticleHero";

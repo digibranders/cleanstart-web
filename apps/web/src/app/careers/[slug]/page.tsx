@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { CareerDetailHero } from "@/components/sections/careers/CareerDetailHero";
 import { CareerDetailContent } from "@/components/sections/careers/CareerDetailContent";

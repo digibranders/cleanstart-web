@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { ErrorHero } from "@/components/sections/error/ErrorHero";
 
