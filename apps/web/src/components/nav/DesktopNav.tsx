@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/navigation-menu";
 import Link from "next/link";
 import { NAV_TREE, type NavItem, type NavMegaItem } from "@/lib/nav-config";
-import { MegaMenu } from "@/components/nav/MegaMenu";
 import { useIsActiveSection } from "@/components/nav/useIsActiveSection";
 import { PanelProducts } from "@/components/nav/panels/PanelProducts";
 import { PanelSolutions } from "@/components/nav/panels/PanelSolutions";
@@ -61,17 +60,9 @@ function TopLevelItem({ item }: { item: NavItem }) {
         {item.label}
       </NavigationMenuTrigger>
       <NavigationMenuContent>
-        {item.kind === "mega" && PANELS[item.label] ? (
-          (() => { const Panel = PANELS[item.label]!; return <Panel item={item} />; })()
-        ) : (
-          <MegaMenu
-            groups={
-              item.kind === "mega" ? item.groups : [{ items: item.items }]
-            }
-            activeLabel={item.label}
-            {...(item.width !== undefined ? { width: item.width } : {})}
-          />
-        )}
+        {item.kind === "mega" && PANELS[item.label]
+          ? (() => { const Panel = PANELS[item.label]!; return <Panel item={item} />; })()
+          : null}
       </NavigationMenuContent>
     </NavigationMenuItem>
   );
