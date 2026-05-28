@@ -1,11 +1,6 @@
 import { ArrowRightShort } from "@/components/icons/ArrowRightShort";
-import { FactoryHero } from "@/components/sections/home/factory-hero/FactoryHero";
 import { TrustedByMarquee } from "@/components/sections/home/TrustedByMarquee";
-
-// NOTE: <HeroReveal> wrappers (from the in-progress @/components/ui/Reveal)
-// were temporarily removed — they depend on a SmoothScrollProvider that
-// isn't wired up yet, which leaves H1+CTA stuck at opacity 0. Re-add the
-// wrappers once SmoothScrollProvider is mounted in layout.tsx.
+import { HeroReveal } from "@/components/ui/Reveal";
 
 export function Hero() {
   return (
@@ -13,40 +8,40 @@ export function Hero() {
 
       <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div className="mx-auto flex max-w-[1201px] flex-col items-center gap-6 text-center sm:gap-8">
-          <h1
-            className="font-display font-semibold text-white"
-            style={{
-              fontSize: "var(--fs-display)",
-              letterSpacing: "-0.04em",
-              lineHeight: 1.05,
-            }}
-          >
-            Secure by Design. Built from Source. Verified Container Images
-          </h1>
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              className="font-display font-semibold text-white"
+              style={{
+                fontSize: "var(--fs-display)",
+                letterSpacing: "-0.04em",
+                lineHeight: 1.05,
+              }}
+            >
+              Secure by Design. Built from Source. Verified Container Images
+            </h1>
+          </HeroReveal>
 
-          <a
-            href="https://images.cleanstart.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cs-btn-glass"
-            style={{
-              ["--cs-btn-px" as string]: "18px",
-              ["--cs-btn-fs" as string]: "20px",
-              color: "#111111",
-              letterSpacing: "-0.05em",
-              fontWeight: 500,
-            }}
-          >
-            <span>Browse Images</span>
-            <ArrowRightShort className="cs-cta-arrow text-[#111111]" />
-          </a>
+          <HeroReveal y={30} delay={0.2} duration={0.8}>
+            <a
+              href="https://images.cleanstart.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cs-btn-glass"
+              style={{
+                ["--cs-btn-px" as string]: "18px",
+                ["--cs-btn-fs" as string]: "20px",
+                color: "#111111",
+                letterSpacing: "-0.05em",
+                fontWeight: 500,
+              }}
+            >
+              <span>Browse Images</span>
+              <ArrowRightShort className="cs-cta-arrow text-[#111111]" />
+            </a>
+          </HeroReveal>
         </div>
 
-        <div className="mt-12 relative w-full" style={{ height: 'clamp(360px, 50vw, 620px)' }}>
-          <FactoryHero />
-        </div>
-
-        <div className="pb-16">
+        <div className="pb-16 pt-12">
           <TrustedByMarquee />
         </div>
       </div>
