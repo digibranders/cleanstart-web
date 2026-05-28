@@ -35,7 +35,10 @@
  * Corner vector: 534×534px at left=-87px top=-349px
  */
 
+"use client";
+
 import React from "react";
+import { Reveal } from "@/components/ui/Reveal";
 
 const COL_CENTERS = [
   "11.56%", // 147.5 / 1276
@@ -80,14 +83,6 @@ const maskBase: React.CSSProperties = {
   maskPosition: "0px 0px, 0px 0px",
 };
 
-// Mobile card shadow (from Figma node 856:1138 layer values, simplified)
-const MOBILE_CARD_SHADOW = [
-  "-5.976px 2.988px 14.94px 0px rgba(0,0,0,0.23)",
-  "-24.651px 11.952px 27.639px 0px rgba(0,0,0,0.20)",
-  "-55.278px 27.639px 36.603px 0px rgba(0,0,0,0.12)",
-  "-97.858px 48.555px 44.073px 0px rgba(0,0,0,0.03)",
-].join(", ");
-
 export function CisoSolution(): React.ReactElement {
   return (
     <section
@@ -100,189 +95,161 @@ export function CisoSolution(): React.ReactElement {
     >
 
       {/* ══════════════════════════════════════════════════════════════════════
-          MOBILE — vertical timeline layout (< sm = 640px)
-          Figma node 856:1120 — 360×964px
+          MOBILE — vertical timeline rebuilt in JSX to match the Figma comp
+          (heading + subtitle + cyan glow rail + 4 glassmorphic feature
+          cards). Replaces the previous flattened PNG so the layout is
+          fully selectable, responsive, and accessible to screen readers.
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="sm:hidden" style={{ paddingTop: "32px", paddingBottom: "64px" }}>
-
-        {/* ── Corner vector — left top (partial) ── */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          aria-hidden
-          src="/images/ciso/solution-vector.svg"
-          alt=""
-          className="absolute pointer-events-none select-none"
-          style={{ left: "-87px", top: "-349px", width: "534px", height: "534px" }}
-          loading="lazy"
-          decoding="async"
-        />
-
-        {/* ── Heading — 28px SemiBold, centered. Container px-6 gutter
-              controls width; H2 itself is unconstrained so it doesn't wrap
-              to 3 lines when there's room for 2. ── */}
+      <div
+        className="sm:hidden relative"
+        style={{ paddingTop: "32px", paddingBottom: "64px" }}
+      >
+        {/* Heading */}
         <h2
           className="text-center text-white mx-auto px-6"
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "var(--fs-h2)",
-            fontWeight: 600,
+            fontWeight: 700,
             letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            marginBottom: "17px",
+            lineHeight: 1.15,
+            marginBottom: "16px",
+            maxWidth: "320px",
           }}
         >
           Reduce Risk Before Deployment
         </h2>
 
-        {/* ── Subtitle — 16px Regular, centered, maxW 282px ── */}
+        {/* Subtitle */}
         <p
-          className="text-center mx-auto"
+          className="text-center mx-auto px-6"
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "var(--fs-lead)",
+            fontSize: "var(--fs-body)",
             fontWeight: 400,
             letterSpacing: "-0.02em",
-            lineHeight: 1.45,
+            lineHeight: 1.5,
             color: "rgba(255,255,255,0.8)",
-            maxWidth: "282px",
-            marginBottom: "46px",
+            maxWidth: "320px",
+            marginBottom: "40px",
           }}
         >
           Minimal, hardened container images reduce inherited vulnerabilities
           before they reach production environments.
         </p>
 
-        {/* ── Timeline + Cards container ── */}
-        <div className="relative mx-auto" style={{ maxWidth: "360px" }}>
-
-          {/* Vertical connector line — 4px × 456px · left=60px · top=24px ── */}
+        {/* Timeline + Cards container */}
+        <div
+          className="relative mx-auto"
+          style={{ maxWidth: "420px", paddingLeft: "16px", paddingRight: "16px" }}
+        >
+          {/* Vertical cyan glow rail — centered at x = 60px from the
+              parent's padding box, which lines up with the dot centre inside
+              each <li> (li starts at parent content edge = 16, dot.left = 36,
+              dot.width/2 = 8 → centre = 60). */}
           <div
             aria-hidden
             style={{
               position: "absolute",
-              left: "60px",
-              top: "24px",
-              width: "4px",
-              height: "456px",
-              background: "rgba(255,255,255,0.1)",
-              borderRadius: "32.734px",
+              left: "59px",
+              top: "32px",
+              bottom: "32px",
+              width: "2px",
+              background:
+                "linear-gradient(180deg, rgba(122,189,255,0) 0%, rgba(122,189,255,0.7) 12%, rgba(122,189,255,0.7) 88%, rgba(122,189,255,0) 100%)",
+              borderRadius: "32px",
+              boxShadow: "0 0 12px rgba(122,189,255,0.45)",
             }}
           />
 
-          {/* ── 4 card rows ── */}
-          {FEATURES.map((f, i) => (
-            <div
-              key={f.titleMobile}
-              style={{
-                position: "relative",
-                minHeight: "114px",
-                marginBottom: i < FEATURES.length - 1 ? "16px" : 0,
-              }}
-            >
-              {/* ── Teal glow node — mix-blend-plus-lighter, 98×87px at left=40px ──
-                  Reuses desktop flare assets with scaled dimensions */}
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  left: "40px",
-                  top: "0",
-                  width: "98px",
-                  height: "87px",
-                  mixBlendMode: "plus-lighter",
-                  backgroundImage: "url('/images/ciso/solution-flare-gradient.svg')",
-                  backgroundSize: "100% 100%",
-                  maskImage:
-                    "url('/images/ciso/solution-flare-mask.svg'), url('/images/ciso/solution-flare-overlay.png')",
-                  ...maskBase,
-                }}
-              />
-
-              {/* ── Card — margin-positioned (93px left, 41px right) so the
-                  row grows with the card's natural height. Was previously
-                  position:absolute with fixed 114px height — which clipped
-                  wrapped titles + descriptions and caused the card to
-                  overflow into the next row when grown. ── */}
-              <div
-                style={{
-                  position: "relative",
-                  marginLeft: "93px",
-                  marginRight: "41px",
-                  minHeight: "114px",
-                  borderRadius: "17.928px",
-                  border: "2.241px solid #dab6f3",
-                  background:
-                    "linear-gradient(180deg, #151021 0%, #131e8f 71.202%, #551ece 100%)",
-                  boxShadow: MOBILE_CARD_SHADOW,
-                  overflow: "hidden",
-                  padding: "20px 8px 20px 24px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  gap: "6px",
-                }}
+          <ul className="flex flex-col" style={{ gap: "20px", listStyle: "none", padding: 0, margin: 0 }}>
+            {FEATURES.map((f) => (
+              <li
+                key={f.titleMobile}
+                style={{ position: "relative", paddingLeft: "72px" }}
               >
-                {/* Card inner ellipse glow A */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                {/* Outer halo */}
+                <span
                   aria-hidden
-                  src="/images/ciso/solution-ellipse-a.svg"
-                  alt=""
-                  className="absolute pointer-events-none select-none"
                   style={{
-                    left: "-25%",
-                    top: "-20%",
-                    width: "130%",
-                    height: "150%",
-                    objectFit: "fill",
+                    position: "absolute",
+                    left: "16px",
+                    top: "50%",
+                    width: "56px",
+                    height: "56px",
+                    transform: "translateY(-50%)",
+                    borderRadius: "50%",
+                    background:
+                      "radial-gradient(circle, rgba(122,189,255,0.5) 0%, rgba(122,189,255,0) 65%)",
+                    pointerEvents: "none",
+                    mixBlendMode: "plus-lighter",
                   }}
-                  loading="lazy"
-                  decoding="async"
+                />
+                {/* Horizontal cross-glow ray */}
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: "8px",
+                    top: "50%",
+                    width: "72px",
+                    height: "2px",
+                    transform: "translateY(-50%)",
+                    background:
+                      "linear-gradient(90deg, rgba(122,189,255,0) 0%, rgba(180,225,255,0.9) 50%, rgba(122,189,255,0) 100%)",
+                    pointerEvents: "none",
+                    mixBlendMode: "plus-lighter",
+                    filter: "blur(0.4px)",
+                  }}
+                />
+                {/* Inner bright node */}
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: "36px",
+                    top: "50%",
+                    width: "16px",
+                    height: "16px",
+                    transform: "translateY(-50%)",
+                    borderRadius: "50%",
+                    background:
+                      "radial-gradient(circle, #ffffff 0%, #7ad6ff 40%, rgba(36,140,255,0) 75%)",
+                    boxShadow:
+                      "0 0 12px rgba(122,189,255,0.95), 0 0 24px rgba(80,160,255,0.6)",
+                    mixBlendMode: "plus-lighter",
+                  }}
                 />
 
-                {/* Card inner ellipse glow B */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  aria-hidden
-                  src="/images/ciso/solution-ellipse-b.svg"
-                  alt=""
-                  className="absolute pointer-events-none select-none"
-                  style={{
-                    left: "-30%",
-                    top: "-25%",
-                    width: "150%",
-                    height: "175%",
-                    objectFit: "fill",
-                    opacity: 0.5,
-                  }}
-                  loading="lazy"
-                  decoding="async"
-                />
-
-                {/* Card text — content flows naturally inside the card's
-                    flex column (padding 20px sides → 24px effective on left
-                    via the existing 24px offset, 8px on right). */}
+                {/* Card */}
                 <div
                   style={{
                     position: "relative",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "6px",
+                    borderRadius: "16px",
+                    border: "1px solid rgba(122,189,255,0.35)",
+                    background:
+                      "linear-gradient(180deg, rgba(46,82,200,0.45) 0%, rgba(58,42,160,0.45) 60%, rgba(85,30,206,0.45) 100%)",
+                    backdropFilter: "blur(14px)",
+                    WebkitBackdropFilter: "blur(14px)",
+                    padding: "18px 20px",
+                    boxShadow:
+                      "0 12px 28px rgba(8,12,40,0.35), inset 0 1px 0 rgba(255,255,255,0.05)",
                   }}
                 >
-                  <p
+                  <h3
                     style={{
                       fontFamily: "var(--font-display)",
                       fontSize: "var(--fs-h4)",
-                      fontWeight: 600,
+                      fontWeight: 700,
                       letterSpacing: "-0.04em",
                       lineHeight: 1.15,
                       color: "#fff",
                       margin: 0,
+                      marginBottom: "6px",
                     }}
                   >
                     {f.titleMobile}
-                  </p>
+                  </h3>
                   <p
                     style={{
                       fontFamily: "var(--font-sans)",
@@ -290,17 +257,16 @@ export function CisoSolution(): React.ReactElement {
                       fontWeight: 400,
                       letterSpacing: "-0.02em",
                       lineHeight: 1.5,
-                      color: "rgba(255,255,255,0.8)",
+                      color: "rgba(255,255,255,0.85)",
                       margin: 0,
-                      maxWidth: f.descWidth,
                     }}
                   >
                     {f.desc}
                   </p>
                 </div>
-              </div>
-            </div>
-          ))}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
@@ -343,34 +309,38 @@ export function CisoSolution(): React.ReactElement {
 
           {/* Heading group */}
           <div className="text-center" style={{ marginBottom: "125px" }}>
-            <h2
-              className="text-white"
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-h2)",
-                fontWeight: 600,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-                marginBottom: "24px",
-              }}
-            >
-              Reduce Risk Before Deployment
-            </h2>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-lead)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.45,
-                color: "rgba(255,255,255,0.8)",
-                maxWidth: "835px",
-                margin: "0 auto",
-              }}
-            >
-              Minimal, hardened container images reduce inherited vulnerabilities
-              before they reach production environments.
-            </p>
+            <Reveal header>
+              <h2
+                className="text-white"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "var(--fs-h2)",
+                  fontWeight: 600,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.1,
+                  marginBottom: "24px",
+                }}
+              >
+                Reduce Risk Before Deployment
+              </h2>
+            </Reveal>
+            <Reveal header delay={0.15} y={20}>
+              <p
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "var(--fs-lead)",
+                  fontWeight: 400,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.45,
+                  color: "rgba(255,255,255,0.8)",
+                  maxWidth: "835px",
+                  margin: "0 auto",
+                }}
+              >
+                Minimal, hardened container images reduce inherited vulnerabilities
+                before they reach production environments.
+              </p>
+            </Reveal>
           </div>
 
           {/* ── Track section ── */}

@@ -39,8 +39,11 @@ export function SbomRisks(): React.ReactElement {
       dataSection="SbomRisks"
       heading={
         <>
-          {'Static SBOMs Create Blind '}
-          <span className="cs-text-gradient-impact">Spots</span>
+          <span className="block">Static SBOMs Create</span>
+          <span className="block">
+            {'Blind '}
+            <span className="cs-text-gradient-impact">Spots</span>
+          </span>
         </>
       }
       cards={CARDS}

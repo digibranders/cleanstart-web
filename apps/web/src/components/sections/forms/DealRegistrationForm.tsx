@@ -64,7 +64,7 @@ export function DealRegistrationForm(): React.ReactElement {
         </div>
 
         <TurnstileWidget />
-        <SubmitButton>Submit application</SubmitButton>
+        <SubmitButton>Submit Application</SubmitButton>
       </form>
     </FormCard>
   );

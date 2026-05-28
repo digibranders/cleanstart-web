@@ -80,30 +80,24 @@ export function CommunityCTA() {
         </a>
       </div>
 
-      {/* 3D decorative element — right side, hidden below md */}
-      <div
+      {/* Textured cube — far right bottom corner, bleeds below card */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         aria-hidden
+        src="/images/community/cta-cube-textured.png"
+        alt=""
         className="pointer-events-none select-none absolute hidden lg:block"
         style={{
-          right: 'clamp(20px, 4vw, 60px)',
-          top: '50%',
-          transform: 'translateY(-50%) rotate(-12.05deg)',
-          width: 'clamp(160px, 16vw, 254px)',
-          aspectRatio: '254 / 258',
-          opacity: 0.8,
+          right: '-50px',
+          bottom: '-120px',
+          width: '220px',
+          height: '220px',
+          objectFit: 'contain',
+          opacity: 0.9,
         }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/community/cta-3d-element.png"
-          alt=""
-          width={254}
-          height={258}
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-contain"
-        />
-      </div>
+        loading="lazy"
+        decoding="async"
+      />
     </div>
   );
 }

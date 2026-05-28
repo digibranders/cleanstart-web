@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Section: "Security isn't just patching"
@@ -98,20 +99,21 @@ export function SecurityNotPatching() {
 
         {/* Title row — heading flush-left, separator dead-center, description flush-right */}
         <div className="flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
-          <h2
-            id="security-title"
-            className="justify-self-start font-display text-[#111111]"
-            style={{
-              maxWidth: "444px",
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-            }}
-          >
-            Security isn&rsquo;t just{" "}
-            <span className="cs-text-gradient-impact">patching</span>
-          </h2>
+          <Reveal header className="justify-self-start" style={{ maxWidth: "444px" }}>
+            <h2
+              id="security-title"
+              className="font-display text-[#111111]"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+              }}
+            >
+              Security isn&rsquo;t just{" "}
+              <span className="cs-text-gradient-impact">patching</span>
+            </h2>
+          </Reveal>
           {/* 1×90 vertical fading-gray separator (Figma Rectangle 1000001787 #D9D9D9) */}
           <div
             aria-hidden
@@ -121,21 +123,28 @@ export function SecurityNotPatching() {
                 "linear-gradient(180deg, rgba(217,217,217,0) 0%, rgba(217,217,217,1) 47.2%, rgba(217,217,217,0) 100%)",
             }}
           />
-          <p
-            className="text-[#111111] md:justify-self-end md:text-right"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              lineHeight: 1.4,
-              letterSpacing: "-0.02em",
-              maxWidth: "541px",
-              opacity: 0.8,
-            }}
+          <Reveal
+            header
+            delay={0.15}
+            y={20}
+            className="md:justify-self-end"
+            style={{ maxWidth: "541px" }}
           >
-            Recognized for innovation in secure software supply chain and
-            hardened container images.
-          </p>
+            <p
+              className="text-[#111111] md:text-right"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                lineHeight: 1.4,
+                letterSpacing: "-0.02em",
+                opacity: 0.8,
+              }}
+            >
+              Recognized for innovation in secure software supply chain and
+              hardened container images.
+            </p>
+          </Reveal>
         </div>
 
         {/* Cards row + VS badge centerpiece.

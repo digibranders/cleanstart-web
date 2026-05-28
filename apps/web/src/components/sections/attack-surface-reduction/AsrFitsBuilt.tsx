@@ -1,3 +1,5 @@
+import { Reveal } from '@/components/ui/Reveal';
+
 export function AsrFitsBuilt(): React.ReactElement {
   const cards: Array<{
     icon: string;
@@ -26,43 +28,45 @@ export function AsrFitsBuilt(): React.ReactElement {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         {/* Heading row */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 md:mb-16">
-          <h2
-            className="text-[#111]"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'var(--fs-h2)',
-              fontWeight: 600,
-              letterSpacing: 'var(--text-t-display-2-ls)',
-              lineHeight: 'var(--text-t-display-2-lh)',
-              maxWidth: '562px',
-            }}
-          >
-            Fits into what you&rsquo;ve already{' '}
-            <span
+          <Reveal header style={{ maxWidth: '562px' }}>
+            <h2
+              className="text-[#111]"
               style={{
-                background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--fs-h2)',
+                fontWeight: 600,
+                letterSpacing: 'var(--text-t-display-2-ls)',
+                lineHeight: 'var(--text-t-display-2-lh)',
               }}
             >
-              built
-            </span>
-          </h2>
-          <p
-            className="text-[#111]/70"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'var(--fs-lead)',
-              fontWeight: 400,
-              letterSpacing: 'var(--text-t-subhead-ls)',
-              lineHeight: 'var(--text-t-subhead-lh)',
-              maxWidth: '458px',
-            }}
-          >
-            Stay informed with the latest research, threat intelligence reports, and expert analysis
-            from our security team.
-          </p>
+              Fits into what you&rsquo;ve already{' '}
+              <span
+                style={{
+                  background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                built
+              </span>
+            </h2>
+          </Reveal>
+          <Reveal header delay={0.15} y={20} style={{ maxWidth: '458px' }}>
+            <p
+              className="text-[#111]/70"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--fs-lead)',
+                fontWeight: 400,
+                letterSpacing: 'var(--text-t-subhead-ls)',
+                lineHeight: 'var(--text-t-subhead-lh)',
+              }}
+            >
+              Stay informed with the latest research, threat intelligence reports, and expert analysis
+              from our security team.
+            </p>
+          </Reveal>
         </div>
 
         {/* Cards row */}

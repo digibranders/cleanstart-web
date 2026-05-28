@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 export function PartnersHero(): React.ReactElement {
   return (
@@ -35,39 +36,43 @@ export function PartnersHero(): React.ReactElement {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[clamp(112px,10vw,140px)] pb-[clamp(60px,8vw,110px)]">
         <div className="flex flex-col items-center text-center gap-7">
-          <h1
-            className="font-display font-semibold text-white mx-auto"
-            style={{
-              fontSize: "var(--fs-display)",
-              lineHeight: 1.05,
-              letterSpacing: "-0.04em",
-              maxWidth: "860px",
-            }}
-          >
-            Join the Clean Software{" "}
-            <span
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              className="font-display font-semibold text-white mx-auto"
               style={{
-                background:
-                  "linear-gradient(90deg, #B68CFF 0%, #7A59FF 50%, #4E2DEB 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
+                fontSize: "var(--fs-display)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.04em",
+                maxWidth: "860px",
               }}
             >
-              Movement.
-            </span>
-          </h1>
+              Join the Clean Software{" "}
+              <span
+                style={{
+                  background:
+                    "linear-gradient(90deg, #B68CFF 0%, #7A59FF 50%, #4E2DEB 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Movement.
+              </span>
+            </h1>
+          </HeroReveal>
 
-          <p
-            className="text-white/80 mx-auto"
-            style={{
-              fontSize: "var(--fs-body)",
-              lineHeight: 1.5,
-              maxWidth: "560px",
-            }}
-          >
-            Together, we set a new standard for trusted software
-          </p>
+          <HeroReveal y={30} delay={0.15} duration={0.8}>
+            <p
+              className="text-white/80 mx-auto"
+              style={{
+                fontSize: "var(--fs-body)",
+                lineHeight: 1.5,
+                maxWidth: "560px",
+              }}
+            >
+              Together, we set a new standard for trusted software
+            </p>
+          </HeroReveal>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <Link

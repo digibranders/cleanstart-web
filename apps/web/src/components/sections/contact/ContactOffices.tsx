@@ -1,5 +1,6 @@
 import React from "react";
 import { Section, Container } from "@/components/layout";
+import { Reveal } from "@/components/ui/Reveal";
 
 interface Office {
   flag: string;
@@ -53,7 +54,7 @@ export function ContactOffices() {
     <Section padding="md">
       <Container>
         {/* Title row with flanking solid hairlines + diamond endcaps (Figma). */}
-        <div className="mb-10 flex items-center gap-4 sm:mb-12 sm:gap-6">
+        <Reveal header className="mb-10 flex items-center gap-4 sm:mb-12 sm:gap-6">
           <Hairline />
           <h2
             className="font-display font-bold text-[#111111] whitespace-nowrap"
@@ -75,7 +76,7 @@ export function ContactOffices() {
             </span>
           </h2>
           <Hairline />
-        </div>
+        </Reveal>
 
         {/* Dark purple container that wraps offices + awards */}
         <div

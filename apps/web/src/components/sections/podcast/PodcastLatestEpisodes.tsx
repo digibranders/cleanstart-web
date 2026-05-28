@@ -1,4 +1,5 @@
 import type { PodcastEpisode } from "@/lib/podcast";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { PodcastEpisodeCard } from "./_components/PodcastEpisodeCard";
 
 type Props = {
@@ -44,25 +45,29 @@ export function PodcastLatestEpisodes({
         }}
       />
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[80px] sm:pt-[180px] lg:pt-[260px] pb-[80px] sm:pb-[120px] lg:pb-[160px]">
-        <h2
-          id="podcast-latest-title"
-          className="text-left text-[#111111] font-bold"
-          style={{
-            fontSize: "var(--fs-h1)",
-            lineHeight: 1.1,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          {title}
-        </h2>
+        <Reveal header>
+          <h2
+            id="podcast-latest-title"
+            className="text-left text-[#111111] font-bold"
+            style={{
+              fontSize: "var(--fs-h1)",
+              lineHeight: 1.1,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {title}
+          </h2>
+        </Reveal>
         {episodes.length === 0 ? (
           <p className="mt-10 text-[#475569]">New episodes coming soon.</p>
         ) : (
-          <div className="mt-[44px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[32px] gap-y-[32px]">
+          <RevealStagger className="mt-[44px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[32px] gap-y-[32px]">
             {episodes.map((ep) => (
-              <PodcastEpisodeCard key={ep.id} episode={ep} size="card" />
+              <RevealItem key={ep.id}>
+                <PodcastEpisodeCard episode={ep} size="card" />
+              </RevealItem>
             ))}
-          </div>
+          </RevealStagger>
         )}
       </div>
     </section>

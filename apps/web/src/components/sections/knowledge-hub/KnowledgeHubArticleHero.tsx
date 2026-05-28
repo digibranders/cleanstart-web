@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { SearchBar } from "@/components/sections/_shared/SearchBar";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123e 38%, #131e8f 67%, #471ec0 80%, #471fc3 100%)";
@@ -53,19 +54,21 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
           className="flex flex-col items-center mx-auto"
           style={{ paddingTop: "120px", paddingBottom: "80px", maxWidth: "864px" }}
         >
-          <h1
-            id="knowledge-hub-hero-title"
-            className="font-display font-semibold text-white text-center"
-            style={{
-              fontSize: "var(--fs-display)",
-              lineHeight: 1.0,
-              letterSpacing: "-0.05em",
-            }}
-          >
-            Knowledge <span style={{ color: "#C446EF" }}>Hub</span>
-          </h1>
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              id="knowledge-hub-hero-title"
+              className="font-display font-semibold text-white text-center"
+              style={{
+                fontSize: "var(--fs-display)",
+                lineHeight: 1.0,
+                letterSpacing: "-0.05em",
+              }}
+            >
+              Knowledge <span style={{ color: "#C446EF" }}>Hub</span>
+            </h1>
+          </HeroReveal>
 
-          <div className="mt-10 w-full flex justify-center">
+          <HeroReveal y={30} delay={0.2} duration={0.8} className="mt-10 w-full flex justify-center">
             <Suspense
               fallback={
                 <div
@@ -80,7 +83,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
                 ariaLabel="Search knowledge hub"
               />
             </Suspense>
-          </div>
+          </HeroReveal>
         </div>
       </div>
     </section>

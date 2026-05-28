@@ -4,6 +4,7 @@ import { resourceTypeLabel, mediaUrl } from "@/lib/resources";
 import type { Form } from "@/lib/forms";
 import { DETAIL_HERO_TITLE_STYLE } from "@/components/sections/_shared/DetailHero";
 import { ResourceDownloadButton } from "@/components/resource/ResourceDownloadButton";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 interface ResourceDetailHeroProps {
   resource: ResourceDetail;
@@ -205,13 +206,15 @@ export function ResourceDetailHero({
           className="flex flex-col items-center"
           style={{ marginTop: "16px" }}
         >
-          <h1
-            id="rd-hero-title"
-            className="font-display font-semibold text-center text-white"
-            style={{ ...DETAIL_HERO_TITLE_STYLE, maxWidth: "829px" }}
-          >
-            {resource.title}
-          </h1>
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              id="rd-hero-title"
+              className="font-display font-semibold text-center text-white"
+              style={{ ...DETAIL_HERO_TITLE_STYLE, maxWidth: "829px" }}
+            >
+              {resource.title}
+            </h1>
+          </HeroReveal>
         </div>
 
         {/* Download button */}

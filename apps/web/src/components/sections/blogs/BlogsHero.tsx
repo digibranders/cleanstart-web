@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { type Blog, type BlogCategory, formatBlogDate, mediaUrl } from "@/lib/blog";
 import { SearchBar } from "@/components/sections/_shared/SearchBar";
+import { HeroReveal, Reveal } from "@/components/ui/Reveal";
 
 const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123e 45%, #131e8f 61%, #471ec0 75%, #471fc3 84%, rgba(70,30,191,0.85) 88%, rgba(66,30,188,0.40) 95%, rgba(66,30,188,0) 99%)";
@@ -23,7 +24,7 @@ export function BlogsHero({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ minHeight: "clamp(820px, 75vw, 1059px)", background: HERO_GRADIENT }}
+      style={{ background: HERO_GRADIENT }}
       aria-labelledby="blogs-hero-title"
     >
       {/* Decorative glow — left side, mix-blend-hard-light (hidden on mobile) */}
@@ -49,7 +50,7 @@ export function BlogsHero({
         />
       </div>
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[clamp(24px,3vw,40px)]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[clamp(56px,7vw,96px)]">
         {/* Title + search + categories — centered block */}
         <div
           className="flex flex-col items-center gap-10 mx-auto"
@@ -61,28 +62,32 @@ export function BlogsHero({
             style={{ maxWidth: "702px" }}
           >
             <div className="flex flex-col items-center gap-8 w-full">
-              <h1
-                id="blogs-hero-title"
-                className="font-display font-semibold text-white text-center w-full"
-                style={{
-                  fontSize: "var(--fs-h1)",
-                  lineHeight: "var(--text-hero-lh)",
-                  letterSpacing: "var(--text-hero-utility-ls)",
-                }}
-              >
-                Blogs
-              </h1>
-              <p
-                className="font-sans font-normal text-white text-center"
-                style={{
-                  fontSize: "var(--fs-lead)",
-                  lineHeight: "1.4",
-                  letterSpacing: "-0.04em",
-                  opacity: 0.8,
-                }}
-              >
-                A Curated Collection of Writings, Research, and Solutions
-              </p>
+              <HeroReveal y={50} duration={1.0}>
+                <h1
+                  id="blogs-hero-title"
+                  className="font-display font-semibold text-white text-center w-full"
+                  style={{
+                    fontSize: "var(--fs-h1)",
+                    lineHeight: "var(--text-hero-lh)",
+                    letterSpacing: "var(--text-hero-utility-ls)",
+                  }}
+                >
+                  Blogs
+                </h1>
+              </HeroReveal>
+              <HeroReveal y={30} delay={0.2} duration={0.8}>
+                <p
+                  className="font-sans font-normal text-white text-center"
+                  style={{
+                    fontSize: "var(--fs-lead)",
+                    lineHeight: "1.4",
+                    letterSpacing: "-0.04em",
+                    opacity: 0.8,
+                  }}
+                >
+                  A Curated Collection of Writings, Research, and Solutions
+                </p>
+              </HeroReveal>
             </div>
 
             {/* Search bar */}
@@ -127,7 +132,7 @@ export function BlogsHero({
 
         {/* Featured Blog — 2-column: text left, image right */}
         {featuredPost ? (
-          <div
+          <Reveal
             className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(420px,580px)] mt-[clamp(56px,7vw,102px)]"
             style={{ gap: "32px" }}
           >
@@ -227,7 +232,7 @@ export function BlogsHero({
                 )}
               </div>
             </div>
-          </div>
+          </Reveal>
         ) : null}
       </div>
     </section>

@@ -1,22 +1,23 @@
 import Image from 'next/image';
+import { Reveal } from '@/components/ui/Reveal';
 
 const INTEGRATIONS: { title: string; desc: string; icon: string; iconAlt: string }[] = [
   {
     title: 'Drop-in Images',
     desc: 'Works with existing workflows.',
-    icon: '/images/attack-surface-reduction/fits-icon-1.png',
+    icon: '/images/attack-surface-reduction/image 583136.png',
     iconAlt: 'Monitor icon',
   },
   {
     title: 'Pipeline Compatible',
     desc: 'Integrates into CI/CD environments.',
-    icon: '/images/attack-surface-reduction/fits-icon-2.png',
+    icon: '/images/attack-surface-reduction/image 583137.png',
     iconAlt: 'Pipeline icon',
   },
   {
     title: 'Deploy Anywhere',
     desc: 'Cloud, on-prem, or regulated environments.',
-    icon: '/images/attack-surface-reduction/fits-icon-3.png',
+    icon: '/images/attack-surface-reduction/Point.png',
     iconAlt: 'Deploy icon',
   },
 ];
@@ -30,33 +31,35 @@ export function ASRFits(): React.ReactElement {
           className="flex flex-col lg:flex-row lg:items-end lg:justify-between"
           style={{ marginBottom: '64px', gap: '32px' }}
         >
-          <h2
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'var(--fs-h2)',
-              fontWeight: 600,
-              letterSpacing: '-0.04em',
-              lineHeight: 1.1,
-              color: '#111111',
-              maxWidth: '560px',
-            }}
-          >
-            Fits into what you've <span className="cs-text-gradient-impact">already built</span>
-          </h2>
-          <p
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--fs-lead)',
-              fontWeight: 400,
-              letterSpacing: 'var(--text-t-subhead-ls)',
-              lineHeight: 'var(--text-t-subhead-lh)',
-              color: '#555555',
-              maxWidth: '480px',
-            }}
-          >
-            Stay informed with the latest research, threat intelligence reports, and expert analysis
-            from our security team.
-          </p>
+          <Reveal header style={{ maxWidth: '560px' }}>
+            <h2
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--fs-h2)',
+                fontWeight: 600,
+                letterSpacing: '-0.04em',
+                lineHeight: 1.1,
+                color: '#111111',
+              }}
+            >
+              Fits into what you've <span className="cs-text-gradient-impact">already built</span>
+            </h2>
+          </Reveal>
+          <Reveal header delay={0.15} y={20} style={{ maxWidth: '480px' }}>
+            <p
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--fs-lead)',
+                fontWeight: 400,
+                letterSpacing: 'var(--text-t-subhead-ls)',
+                lineHeight: 'var(--text-t-subhead-lh)',
+                color: '#555555',
+              }}
+            >
+              Stay informed with the latest research, threat intelligence reports, and expert analysis
+              from our security team.
+            </p>
+          </Reveal>
         </div>
 
         {/* 3 integration cards */}

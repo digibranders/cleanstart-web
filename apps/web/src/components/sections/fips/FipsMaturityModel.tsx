@@ -1,4 +1,5 @@
 import { FipsBall } from "./FipsBall";
+import { Reveal } from "@/components/ui/Reveal";
 
 interface Stage {
   title: string;
@@ -68,19 +69,24 @@ export function FipsMaturityModel(): React.ReactElement {
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-4 sm:px-10 pt-14 md:pt-[80px] pb-14 md:pb-[88px]">
-        <h2
-          className="text-center text-[#111] mb-12 md:mb-[64px]"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-          }}
-        >
-          CleanStart FIPS 140-3 Maturity{" "}
-          <span className="cs-text-gradient-impact">Model</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-center text-[#111] mb-12 md:mb-[64px]"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+            }}
+          >
+            <span className="block">CleanStart FIPS 140-3</span>
+            <span className="block">
+              {"Maturity "}
+              <span className="cs-text-gradient-impact">Model</span>
+            </span>
+          </h2>
+        </Reveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {STAGES.map((stage) => (

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 interface TeamMember {
   name: string;
@@ -269,42 +270,48 @@ export function TeamsLeadership() {
       {/* ── Content ── */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Executive Leadership */}
-        <h2
-          className="mb-[60px] text-center font-display text-[#111]"
-          style={{
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            lineHeight: 1.1,
-            letterSpacing: "-0.04em",
-          }}
-        >
-          {"Executive "}
-          <span className="cs-text-gradient-impact">
-            Leadership
-          </span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="mb-[60px] text-center font-display text-[#111]"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            {"Executive "}
+            <span className="cs-text-gradient-impact">
+              Leadership
+            </span>
+          </h2>
+        </Reveal>
 
-        <div className="mb-[120px] grid grid-cols-1 gap-8 md:grid-cols-3">
+        <RevealStagger className="mb-[120px] grid grid-cols-1 gap-8 md:grid-cols-3">
           {EXECUTIVES.map((member) => (
-            <TeamCard key={member.name} {...member} />
+            <RevealItem key={member.name}>
+              <TeamCard {...member} />
+            </RevealItem>
           ))}
-        </div>
+        </RevealStagger>
 
         {/* Advisory Board */}
-        <h2
-          className="mb-[60px] text-center font-display text-[#111]"
-          style={{
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            lineHeight: 1.1,
-            letterSpacing: "-0.04em",
-          }}
-        >
-          {"Advisory "}
-          <span className="cs-text-gradient-impact">
-            Board
-          </span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="mb-[60px] text-center font-display text-[#111]"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            {"Advisory "}
+            <span className="cs-text-gradient-impact">
+              Board
+            </span>
+          </h2>
+        </Reveal>
 
         <div className="flex justify-center">
           <div className="w-full max-w-[404px]">

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Reveal } from "@/components/ui/Reveal";
 
 // Figma node 732:3467 — logos confirmed visible (non-blank exports)
 // Order matches Figma row: Livlong · Hitachi · Aurascape · Vi · Encora
@@ -44,25 +45,27 @@ export function CommunityTrustedBy() {
 
       <div className="relative py-[clamp(48px,7vw,100px)]">
         {/* Heading */}
-        <h2
-          className="font-display font-bold text-center mb-[clamp(32px,4vw,56px)]"
-          style={{
-            fontSize: 'var(--fs-h2)',
-            lineHeight: '1.05',
-            letterSpacing: '-0.05em',
-          }}
-        >
-          <span style={{ color: '#111111' }}>Trusted by industry</span>{' '}
-          <span
-            className="bg-clip-text text-transparent"
+        <Reveal header>
+          <h2
+            className="font-display font-bold text-center mb-[clamp(32px,4vw,56px)]"
             style={{
-              backgroundImage:
-                'linear-gradient(-5.38deg, rgb(44, 193, 235) 0%, rgb(154, 81, 255) 63.963%)',
+              fontSize: 'var(--fs-h2)',
+              lineHeight: '1.05',
+              letterSpacing: '-0.05em',
             }}
           >
-            leaders
-          </span>
-        </h2>
+            <span style={{ color: '#111111' }}>Trusted by industry</span>{' '}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{
+                backgroundImage:
+                  'linear-gradient(-5.38deg, rgb(44, 193, 235) 0%, rgb(154, 81, 255) 63.963%)',
+              }}
+            >
+              leaders
+            </span>
+          </h2>
+        </Reveal>
 
         {/* ── Infinite logo ticker ─────────────────────────────────────────────────
             .cs-marquee provides: display:flex; width:max-content;

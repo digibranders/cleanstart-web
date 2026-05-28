@@ -1,41 +1,39 @@
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
+/**
+ * Ecosystem partners on the About Us page. Full-colour brand SVGs from
+ * vectorlogo.zone (and Notion from svgl.app) — render directly on this
+ * section's white background with no recolouring required.
+ */
+// Intrinsic dimensions match each SVG's tight content-bbox viewBox so all
+// logos render at the same effective height with no transparent padding.
 const PARTNERS = [
-  {
-    name: "Apache CouchDB",
-    src: "/images/about/logo-couchdb.svg",
-    width: 176,
-    height: 88,
-  },
-  {
-    name: "PostgreSQL",
-    src: "/images/about/logo-postgresql.png",
-    width: 295,
-    height: 56,
-  },
-  {
-    name: "Redis",
-    src: "/images/about/logo-redis.svg",
-    width: 149,
-    height: 47,
-  },
-  {
-    name: "Ubuntu",
-    src: "/images/about/logo-ubuntu.svg",
-    width: 169,
-    height: 65,
-  },
-  {
-    name: "ph",
-    src: "/images/about/logo-ph.svg",
-    width: 96,
-    height: 47,
-  },
+  { name: "Debian",         src: "/images/about/ecosystems-color/debian.svg",     width: 48,  height: 60 },
+  { name: "Apache CouchDB", src: "/images/about/ecosystems-color/couchdb.svg",    width: 247, height: 60 },
+  { name: "PostgreSQL",     src: "/images/about/ecosystems-color/postgresql.svg", width: 61,  height: 60 },
+  { name: "Redis",          src: "/images/about/ecosystems-color/redis.svg",      width: 70,  height: 60 },
+  { name: "Ubuntu",         src: "/images/about/ecosystems-color/ubuntu.svg",     width: 60,  height: 60 },
+  { name: "PHP",            src: "/images/about/ecosystems-color/php.svg",        width: 112, height: 60 },
+  { name: "Python",         src: "/images/about/ecosystems-color/python.svg",     width: 197, height: 60 },
+  { name: "Notion",         src: "/images/about/ecosystems-color/notion.svg",     width: 58,  height: 60 },
 ];
 
-export function AboutEcosystems() {
+interface AboutEcosystemsProps {
+  /**
+   * Bottom padding variant.
+   *  - "cta"     → reserves space for an overlapping Footer CTA card (default,
+   *                matches the /about page where `<Footer cta={...} />` is used).
+   *  - "compact" → standard section padding for pages whose Footer has no CTA
+   *                overlap (e.g. /deal-registration).
+   */
+  bottomPadding?: "cta" | "compact";
+}
+
+export function AboutEcosystems({ bottomPadding = "cta" }: AboutEcosystemsProps = {}) {
+  const bottomClass = bottomPadding === "compact" ? "pb-section-md" : "pb-section-cta";
   return (
-    <section className="relative overflow-hidden bg-white pt-section-md pb-section-cta">
+    <section className={`relative overflow-hidden bg-white pt-section-md ${bottomClass}`}>
       {/* Decorative blobs */}
       <div
         aria-hidden
@@ -66,21 +64,23 @@ export function AboutEcosystems() {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Heading */}
-        <h2
-          className="text-center font-display text-black"
-          style={{
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            lineHeight: 1.1,
-            letterSpacing: "-0.04em",
-          }}
-        >
-          <span className="block">Built for The</span>
-          <span className="block">
-            Ecosystems{" "}
-            <span className="cs-text-gradient-impact">You Trust</span>
-          </span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-center font-display text-black"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            <span className="block">Built for The</span>
+            <span className="block">
+              Ecosystems{" "}
+              <span className="cs-text-gradient-impact">You Trust</span>
+            </span>
+          </h2>
+        </Reveal>
 
       </div>
 
@@ -88,7 +88,7 @@ export function AboutEcosystems() {
       <div
         className="relative mt-[60px] w-full overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]"
       >
-        <div className="cs-marquee items-center gap-x-[clamp(48px,8vw,120px)] py-2">
+        <div className="cs-marquee items-center gap-x-[clamp(28px,4vw,64px)] py-2">
           {[...PARTNERS, ...PARTNERS].map((p, i) => (
             <div
               key={`${p.name}-${i}`}
@@ -101,8 +101,8 @@ export function AboutEcosystems() {
                 width={p.width}
                 height={p.height}
                 sizes="200px"
-                className="h-auto object-contain opacity-80"
-                style={{ maxHeight: "88px", maxWidth: p.width }}
+                className="h-auto object-contain"
+                style={{ maxHeight: "56px", maxWidth: p.width }}
                 loading="lazy"
               />
             </div>

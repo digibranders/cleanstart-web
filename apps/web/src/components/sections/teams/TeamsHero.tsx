@@ -1,3 +1,5 @@
+import { HeroReveal } from "@/components/ui/Reveal";
+
 export function TeamsHero() {
   return (
     <section
@@ -138,37 +140,41 @@ export function TeamsHero() {
       {/* ── Content ── */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div className="flex flex-col items-center gap-6 pb-[80px] pt-[clamp(112px,8vw,128px)] text-center">
-          <h1
-            className="w-full font-display font-semibold text-white"
-            style={{
-              fontSize: "var(--fs-display)",
-              lineHeight: 1.05,
-              letterSpacing: "-0.04em",
-            }}
-          >
-            {"United by "}
-            <span
-              className="bg-clip-text text-transparent"
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              className="w-full font-display font-semibold text-white"
               style={{
-                backgroundImage:
-                  "linear-gradient(120.16deg, rgb(154,81,255) 1.7578%, rgb(44,193,235) 98.781%)",
+                fontSize: "var(--fs-display)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.04em",
               }}
             >
-              Purpose
-            </span>
-          </h1>
-          <p
-            className="max-w-[911px] font-sans text-white/80"
-            style={{
-              fontSize: "var(--fs-lead)",
-              lineHeight: "1.4",
-              letterSpacing: "-0.04em",
-            }}
-          >
-            Our teams bring deep expertise in security, compliance, and
-            engineering, connected by a shared commitment to building trusted
-            software from the start
-          </p>
+              {"United by "}
+              <span
+                className="bg-clip-text text-transparent"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(120.16deg, rgb(154,81,255) 1.7578%, rgb(44,193,235) 98.781%)",
+                }}
+              >
+                Purpose
+              </span>
+            </h1>
+          </HeroReveal>
+          <HeroReveal y={30} delay={0.2} duration={0.8}>
+            <p
+              className="max-w-[911px] font-sans text-white/80"
+              style={{
+                fontSize: "var(--fs-lead)",
+                lineHeight: "1.4",
+                letterSpacing: "-0.04em",
+              }}
+            >
+              Our teams bring deep expertise in security, compliance, and
+              engineering, connected by a shared commitment to building trusted
+              software from the start
+            </p>
+          </HeroReveal>
         </div>
       </div>
 

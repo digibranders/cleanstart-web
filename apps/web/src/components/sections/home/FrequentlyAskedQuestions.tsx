@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Section: "Frequently Asked Questions"
@@ -138,19 +139,20 @@ export function FrequentlyAskedQuestions() {
             Same 1fr_auto_1fr grid pattern used by SecurityNotPatching and
             HowCleanStartHelp for visual parity. */}
         <div className="mb-8 flex flex-col items-start gap-5 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
-          <h2
-            id="faq-title"
-            className="justify-self-start font-display text-[#111111]"
-            style={{
-              maxWidth: "493px",
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-            }}
-          >
-            Frequently Asked Questions
-          </h2>
+          <Reveal header className="justify-self-start" style={{ maxWidth: "493px" }}>
+            <h2
+              id="faq-title"
+              className="font-display text-[#111111]"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+              }}
+            >
+              Frequently Asked Questions
+            </h2>
+          </Reveal>
           {/* Vertical 1×90 fading-gray separator */}
           <div
             aria-hidden
@@ -160,21 +162,28 @@ export function FrequentlyAskedQuestions() {
                 "linear-gradient(180deg, rgba(204,204,204,0) 0%, rgba(204,204,204,1) 47.2%, rgba(204,204,204,0) 100%)",
             }}
           />
-          <p
-            className="text-[#111111] md:justify-self-end md:text-right"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              lineHeight: 1.4,
-              letterSpacing: "-0.02em",
-              maxWidth: "585px",
-              opacity: 0.8,
-            }}
+          <Reveal
+            header
+            delay={0.15}
+            y={20}
+            className="md:justify-self-end"
+            style={{ maxWidth: "585px" }}
           >
-            Common questions about CleanStart&apos;s hardened container images,
-            security, and integrations.
-          </p>
+            <p
+              className="text-[#111111] md:text-right"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                lineHeight: 1.4,
+                letterSpacing: "-0.02em",
+                opacity: 0.8,
+              }}
+            >
+              Common questions about CleanStart&apos;s hardened container images,
+              security, and integrations.
+            </p>
+          </Reveal>
         </div>
 
         {/* Cards size to their natural content. Opening a FAQ grows the card

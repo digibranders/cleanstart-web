@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { Container } from "@/components/layout/Container";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 const HERO_GRADIENT =
   "linear-gradient(180deg, #0B0820 0%, #131248 38%, #2E1D8E 70%, #5A2EE0 95%, #6E3CFF 100%)";
@@ -140,9 +141,11 @@ export function ErrorHero({ title, referenceId }: ErrorHeroProps) {
 
       <Container variant="default" className="relative">
         <div className="flex flex-col items-center pt-[clamp(80px,10vw,140px)] pb-[clamp(48px,6vw,96px)] text-center">
-          <h1 className="font-display text-balance" style={TITLE_STYLE}>
-            {title}
-          </h1>
+          <HeroReveal y={50} duration={1.0}>
+            <h1 className="font-display text-balance" style={TITLE_STYLE}>
+              {title}
+            </h1>
+          </HeroReveal>
 
           {/* 3D illustration — Figma node 857:19445 (797×655 at 1920).
               Scales fluidly with the viewport: 260 px on small phones up to

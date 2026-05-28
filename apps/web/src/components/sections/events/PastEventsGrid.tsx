@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Event } from "@/lib/events";
 import { Pagination } from "@/components/ui/Pagination";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { EventCard } from "./EventCard";
 
 interface PastEventsGridProps {
@@ -99,19 +100,21 @@ export function PastEventsGrid({
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <h2
-          className="font-display font-bold"
-          style={{
-            fontSize: "var(--fs-h1)",
-            lineHeight: "1.1",
-            letterSpacing: "-0.04em",
-            color: "#111",
-            paddingTop: "60px",
-            paddingBottom: "32px",
-          }}
-        >
-          Past Events
-        </h2>
+        <Reveal header>
+          <h2
+            className="font-display font-bold"
+            style={{
+              fontSize: "var(--fs-h1)",
+              lineHeight: "1.1",
+              letterSpacing: "-0.04em",
+              color: "#111",
+              paddingTop: "60px",
+              paddingBottom: "32px",
+            }}
+          >
+            Past Events
+          </h2>
+        </Reveal>
 
         {events.length === 0 ? (
           <p
@@ -122,14 +125,16 @@ export function PastEventsGrid({
           </p>
         ) : (
           <>
-            <div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center"
+            <RevealStagger
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center lg:justify-items-stretch"
               style={{ gap: "32px" }}
             >
               {events.map((event) => (
-                <EventCard key={event.id} event={event} />
+                <RevealItem key={event.id} className="w-full flex justify-center">
+                  <EventCard event={event} />
+                </RevealItem>
               ))}
-            </div>
+            </RevealStagger>
 
             {/* MOBILE — single "View More →" button per Figma 817:6541. */}
             {totalPages > 1 && currentPage < totalPages && (

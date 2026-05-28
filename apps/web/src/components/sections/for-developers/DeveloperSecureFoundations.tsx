@@ -1,4 +1,5 @@
 import type React from 'react';
+import { Reveal } from '@/components/ui/Reveal';
 
 /*
  * Figma node 798:2243 — "Secure Foundations Without Workflow Changes" section (1920 px artboard)
@@ -293,38 +294,42 @@ export function DeveloperSecureFoundations(): React.ReactElement {
         }}
       >
         {/* H2 — Figma: 62px Manrope Bold, tracking -3.1px */}
-        <h2
-          className="text-white text-center mx-auto"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-h2)',
-            fontWeight: 700,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.1,
-            maxWidth: '740px',
-            marginBottom: '24px',
-          }}
-        >
-          Secure Foundations Without Workflow Changes
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-white text-center mx-auto"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-h2)',
+              fontWeight: 700,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.1,
+              maxWidth: '740px',
+              marginBottom: '24px',
+            }}
+          >
+            Secure Foundations Without Workflow Changes
+          </h2>
+        </Reveal>
 
         {/* Subtitle — Vuln spec body-lg */}
-        <p
-          className="text-center mx-auto"
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--fs-lead)',
-            fontWeight: 400,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.4,
-            color: 'rgba(255,255,255,0.8)',
-            maxWidth: '600px',
-            marginBottom: 'clamp(40px, 3.65vw, 70px)',
-          }}
-        >
-          Replace public base images with hardened alternatives without disrupting existing
-          workflows
-        </p>
+        <Reveal header delay={0.15} y={20}>
+          <p
+            className="text-center mx-auto"
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--fs-lead)',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.4,
+              color: 'rgba(255,255,255,0.8)',
+              maxWidth: '600px',
+              marginBottom: 'clamp(40px, 3.65vw, 70px)',
+            }}
+          >
+            Replace public base images with hardened alternatives without disrupting existing
+            workflows
+          </p>
+        </Reveal>
 
         {/* ── 4 Feature pillars ── */}
         {/* Mobile (Figma 857:6108): single column, 204px wide, ~24px gap, centered

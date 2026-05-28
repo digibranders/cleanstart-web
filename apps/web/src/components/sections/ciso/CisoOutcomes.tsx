@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 /*
  * ── DESKTOP — Figma node 583:2556 — 1920px wide ──────────────────────────────
@@ -536,7 +537,8 @@ export function CisoOutcomes(): React.ReactElement {
           />
 
           {/* Heading */}
-          <div
+          <Reveal
+            header
             className="relative text-center px-6"
             style={{ marginBottom: "80px" }}
           >
@@ -553,16 +555,18 @@ export function CisoOutcomes(): React.ReactElement {
               Security{" "}
               <span className="cs-text-gradient-impact">Outcomes</span>
             </h2>
-          </div>
+          </Reveal>
 
           {/* Cards
                 md–lg → 2×2 grid (uniform cards via items-stretch)
                 xl+   → flex row with staggered tall/short per Figma */}
-          <div className="grid grid-cols-2 items-stretch gap-6 lg:gap-8 xl:flex xl:items-start xl:gap-[32px]">
+          <RevealStagger className="grid grid-cols-2 items-stretch gap-6 lg:gap-8 xl:flex xl:items-start xl:gap-[32px]">
             {STATS.map((stat) => (
-              <StatCard key={stat.display} stat={stat} enabled={animated} />
+              <RevealItem key={stat.display}>
+                <StatCard stat={stat} enabled={animated} />
+              </RevealItem>
             ))}
-          </div>
+          </RevealStagger>
 
         </div>
       </div>

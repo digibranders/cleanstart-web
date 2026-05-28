@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 // Title strings use \n to force a 2-line wrap matching the Figma reference.
 // FeatureCard sets whiteSpace: "pre-line" so the break renders.
 const FEATURE_CARDS = [
@@ -160,20 +162,22 @@ export function CleanSightSecurity(): React.ReactElement {
           paddingTop: "var(--spacing-section-md)",
         }}
       >
-        <h2
-          className="text-white text-center mx-auto"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            maxWidth: "744px",
-          }}
-        >
-          Built for Continuous Container{" "}
-          <span className="cs-text-gradient-impact">Security</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-white text-center mx-auto"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              maxWidth: "744px",
+            }}
+          >
+            Built for Continuous Container{" "}
+            <span className="cs-text-gradient-impact">Security</span>
+          </h2>
+        </Reveal>
 
         {/* Desktop layout: 2×2 card grid with the shield floating dead-centre on top.
             Cards have extra padding on the inner edge so text never collides with the shield. */}
@@ -307,30 +311,34 @@ export function CleanSightSecurity(): React.ReactElement {
           className="relative text-center text-white mx-auto flex flex-col"
           style={{ maxWidth: "753px", gap: "24px" }}
         >
-          <h2
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-            }}
-          >
-            From Visibility to{" "}
-            <span className="cs-text-gradient-impact">Action</span>
-          </h2>
-          <p
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.4,
-            }}
-          >
-            Move beyond fragmented visibility with continuous remediation and
-            operational security workflows.
-          </p>
+          <Reveal header>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+              }}
+            >
+              From Visibility to{" "}
+              <span className="cs-text-gradient-impact">Action</span>
+            </h2>
+          </Reveal>
+          <Reveal header delay={0.15} y={20}>
+            <p
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
+              }}
+            >
+              Move beyond fragmented visibility with continuous remediation and
+              operational security workflows.
+            </p>
+          </Reveal>
         </div>
 
         {/* Desktop chart — locked-group layout.
@@ -425,92 +433,116 @@ export function CleanSightSecurity(): React.ReactElement {
           />
         </div>
 
-        {/* Mobile fallback — 4 dark cards stacked vertically with a small
-            white dot accent on the left edge (centered vertically). Replaces
-            the previous numbered-circle list to match the reference design. */}
+        {/* Mobile fallback — vertical glow rail + glassmorphic card stack.
+            Mirrors the timeline pattern used on /for-ciso CisoSolution so the
+            two visualisations feel consistent across the marketing site. */}
         <div
-          className="lg:hidden mt-10 flex flex-col gap-4 pb-[clamp(48px,10vw,96px)]"
+          className="lg:hidden relative mx-auto mt-10 pb-[clamp(48px,10vw,96px)]"
+          style={{ maxWidth: "420px" }}
         >
-          {WORKFLOW.map((w) => (
-            <div
-              key={w.label}
-              className="relative flex flex-col overflow-hidden"
-              style={{
-                backgroundImage:
-                  "linear-gradient(180deg, rgba(0,198,255,0.2) 0%, rgba(53,30,175,0.04) 100%), linear-gradient(180deg, rgba(36,237,255,0.4) 0%, rgba(22,142,153,0) 100%)",
-                backgroundOrigin: "border-box",
-                backgroundClip: "padding-box, border-box",
-                border: "1px solid transparent",
-                borderRadius: "16px",
-                padding: "20px 24px 20px 36px",
-                gap: "8px",
-              }}
-            >
-              {/* Figma noise texture — fractalNoise (baseFreq 2, 3 octaves,
-                  seed 3775) → luminanceToAlpha → 51% threshold → #24EDFF flood.
-                  Matches the SVG filter from Figma spec exactly. */}
+          {/* Vertical connector rail — soft cyan glow that fades top/bottom. */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: "20px",
+              top: "20px",
+              bottom: "20px",
+              width: "2px",
+              background:
+                "linear-gradient(180deg, rgba(122,189,255,0.0) 0%, rgba(122,189,255,0.55) 12%, rgba(122,189,255,0.55) 88%, rgba(122,189,255,0.0) 100%)",
+              borderRadius: "32px",
+              boxShadow: "0 0 12px rgba(122,189,255,0.35)",
+            }}
+          />
+
+          <div className="flex flex-col gap-4">
+            {WORKFLOW.map((w) => (
               <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  backgroundImage:
-                    "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 297 113'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='2' numOctaves='3' stitchTiles='stitch' seed='3775' result='t'/><feColorMatrix in='t' type='luminanceToAlpha' result='a'/><feComponentTransfer in='a' result='b'><feFuncA type='discrete' tableValues='1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'/></feComponentTransfer><feFlood flood-color='%2324EDFF' result='c'/><feComposite in='c' in2='b' operator='in'/></filter><rect width='297' height='113' filter='url(%23n)'/></svg>\")",
-                  backgroundSize: "297px 113px",
-                  backgroundRepeat: "repeat",
-                }}
-              />
-              {/* Tick line — short horizontal accent from just outside the
-                  card's left edge into the dot, giving each row a "labeled
-                  marker" feel per the reference. */}
-              <span
-                aria-hidden
-                className="absolute top-1/2 -translate-y-1/2"
-                style={{
-                  left: "-6px",
-                  width: "18px",
-                  height: "1.5px",
-                  background: "rgba(255,255,255,0.6)",
-                }}
-              />
-              {/* Left-edge accent dot — centered vertically, renders on top
-                  of the tick line so the line "connects" to the dot. */}
-              <span
-                aria-hidden
-                className="absolute left-3 top-1/2 -translate-y-1/2 block rounded-full"
-                style={{
-                  width: "8px",
-                  height: "8px",
-                  background: "#ffffff",
-                  boxShadow: "0 0 12px rgba(255,255,255,0.5)",
-                }}
-              />
-              <p
-                className="text-white font-semibold"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "var(--fs-h5)",
-                  letterSpacing: "-0.03em",
-                  lineHeight: 1.2,
-                  /* Collapse forced \n line-breaks from the WORKFLOW data
-                     ("Continuous\nVisibility") into spaces for the mobile
-                     single-line stack treatment. */
-                  whiteSpace: "normal",
-                }}
+                key={w.label}
+                style={{ position: "relative", paddingLeft: "48px" }}
               >
-                {w.label.replace(/\n/g, " ")}
-              </p>
-              <p
-                className="text-white/70"
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--fs-body-sm)",
-                  lineHeight: 1.4,
-                }}
-              >
-                {w.body}
-              </p>
-            </div>
-          ))}
+                {/* Bright cyan glow node anchored on the rail at the
+                    vertical centre of the card. */}
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: "11px",
+                    top: "50%",
+                    width: "20px",
+                    height: "20px",
+                    transform: "translateY(-50%)",
+                    borderRadius: "50%",
+                    background:
+                      "radial-gradient(circle, #ffffff 0%, #7ad6ff 35%, rgba(36,140,255,0) 75%)",
+                    boxShadow:
+                      "0 0 16px rgba(122,189,255,0.9), 0 0 32px rgba(80,160,255,0.65)",
+                    mixBlendMode: "plus-lighter",
+                  }}
+                />
+                {/* Outer halo for the glow node. */}
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: "1px",
+                    top: "50%",
+                    width: "40px",
+                    height: "40px",
+                    transform: "translateY(-50%)",
+                    borderRadius: "50%",
+                    background:
+                      "radial-gradient(circle, rgba(122,189,255,0.45) 0%, rgba(122,189,255,0) 65%)",
+                    pointerEvents: "none",
+                    mixBlendMode: "plus-lighter",
+                  }}
+                />
+
+                {/* Glassmorphic card */}
+                <div
+                  className="relative flex flex-col overflow-hidden"
+                  style={{
+                    borderRadius: "16px",
+                    border: "1px solid rgba(122,189,255,0.35)",
+                    background:
+                      "linear-gradient(180deg, rgba(46,72,180,0.32) 0%, rgba(58,42,160,0.32) 60%, rgba(85,30,206,0.32) 100%)",
+                    backdropFilter: "blur(14px)",
+                    WebkitBackdropFilter: "blur(14px)",
+                    padding: "20px 22px",
+                    gap: "8px",
+                  }}
+                >
+                  <p
+                    className="text-white font-semibold"
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: "var(--fs-h5)",
+                      letterSpacing: "-0.03em",
+                      lineHeight: 1.2,
+                      /* Collapse forced \n line-breaks from the WORKFLOW data
+                         into spaces so each title renders on one line. */
+                      whiteSpace: "normal",
+                      margin: 0,
+                    }}
+                  >
+                    {w.label.replace(/\n/g, " ")}
+                  </p>
+                  <p
+                    className="text-white/75"
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "var(--fs-body-sm)",
+                      lineHeight: 1.45,
+                      margin: 0,
+                    }}
+                  >
+                    {w.body}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

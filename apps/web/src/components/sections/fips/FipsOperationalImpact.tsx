@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Figma node 787:2316 — Operational Impact section.
@@ -100,7 +101,7 @@ export function FipsOperationalImpact(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto px-4 md:px-0"
+        className="relative mx-auto px-6"
         style={{
           maxWidth: "1276px",
           /*
@@ -116,20 +117,22 @@ export function FipsOperationalImpact(): React.ReactElement {
         }}
       >
         {/* Mobile-only heading — sits above the cube. */}
-        <h2
-          className="md:hidden text-[#111] text-center mx-auto"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1.05,
-            marginBottom: "clamp(24px, 6vw, 40px)",
-          }}
-        >
-          Operational Impact of Built-In{" "}
-          <span className="cs-text-gradient-impact">Compliance</span>
-        </h2>
+        <Reveal header className="md:hidden">
+          <h2
+            className="text-[#111] text-center mx-auto"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              letterSpacing: "-0.05em",
+              lineHeight: 1.05,
+              marginBottom: "clamp(24px, 6vw, 40px)",
+            }}
+          >
+            Operational Impact of Built-In{" "}
+            <span className="cs-text-gradient-impact">Compliance</span>
+          </h2>
+        </Reveal>
 
         <div
           className="flex flex-col md:flex-row items-center md:items-start"
@@ -161,21 +164,23 @@ export function FipsOperationalImpact(): React.ReactElement {
 
           {/* ── Right column on desktop: heading + stats; mobile: stats only, centered ── */}
           <div className="flex-1 min-w-0 w-full">
-            <h2
-              className="hidden md:block text-[#111] md:text-left"
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-h2)",
-                fontWeight: 700,
-                letterSpacing: "-0.05em",
-                lineHeight: 1.05,
-                maxWidth: "654px",
-                marginBottom: "clamp(32px, 5.56vw, 80px)",
-              }}
-            >
-              Operational Impact of Built-In{" "}
-              <span className="cs-text-gradient-impact">Compliance</span>
-            </h2>
+            <Reveal header className="hidden md:block">
+              <h2
+                className="text-[#111] md:text-left"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "var(--fs-h2)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.05em",
+                  lineHeight: 1.05,
+                  maxWidth: "654px",
+                  marginBottom: "clamp(32px, 5.56vw, 80px)",
+                }}
+              >
+                Operational Impact of Built-In{" "}
+                <span className="cs-text-gradient-impact">Compliance</span>
+              </h2>
+            </Reveal>
 
             {/*
              * Stats — 1-col centered stack on mobile, 4-col flex row on

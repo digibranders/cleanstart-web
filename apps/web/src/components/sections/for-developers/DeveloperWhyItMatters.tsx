@@ -1,4 +1,5 @@
 import type React from 'react';
+import { Reveal } from '@/components/ui/Reveal';
 
 /*
  * Figma node 798:2209 (desktop) + 857:6066 (mobile).
@@ -322,20 +323,22 @@ export function DeveloperWhyItMatters(): React.ReactElement {
         }}
       >
         {/* H2 — Figma desktop: 62px Manrope Bold tracking -3.1px · Figma mobile: 28px tracking 0 */}
-        <h2
-          className="text-center mx-auto"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-h2)',
-            fontWeight: 700,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.15,
-            color: '#111111',
-            marginBottom: 'clamp(32px, 4.17vw, 80px)',
-          }}
-        >
-          Why Does It Matter
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-center mx-auto"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-h2)',
+              fontWeight: 700,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.15,
+              color: '#111111',
+              marginBottom: 'clamp(32px, 4.17vw, 80px)',
+            }}
+          >
+            Why Does It Matter
+          </h2>
+        </Reveal>
 
         {/* ── Mobile: single-column card stack ── */}
         <div className="flex flex-col gap-4 lg:hidden">

@@ -1,4 +1,5 @@
 import React from "react";
+import { Reveal } from "@/components/ui/Reveal";
 
 interface Sector {
   title: string;
@@ -38,7 +39,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
         src="/images/fips/regulated-photo-mobile.png"
         alt=""
         className="absolute inset-0 w-full h-full -z-20 pointer-events-none select-none md:hidden"
-        style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(6px)", transform: "scale(1.03)" }}
+        style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(1.5px)", transform: "scale(1.01)" }}
         loading="lazy"
         decoding="async"
       />
@@ -48,7 +49,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
         src="/images/fips/regulated-photo.png"
         alt=""
         className="absolute inset-0 w-full h-full -z-20 pointer-events-none select-none hidden md:block"
-        style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(6px)", transform: "scale(1.03)" }}
+        style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(1.5px)", transform: "scale(1.01)" }}
         loading="lazy"
         decoding="async"
       />
@@ -65,18 +66,20 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
 
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 py-section-lg">
         <div className="max-w-[770px]">
-          <h2
-            className="font-display text-white"
-            style={{
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-            }}
-          >
-            Built for Regulated{" "}
-            <span className="cs-text-gradient-impact">Environments</span>
-          </h2>
+          <Reveal header>
+            <h2
+              className="font-display text-white"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+              }}
+            >
+              Built for Regulated{" "}
+              <span className="cs-text-gradient-impact">Environments</span>
+            </h2>
+          </Reveal>
         </div>
 
         {/* Mobile/tablet stack — matches home CleanStartAdvantage mobile. */}
@@ -157,7 +160,7 @@ function SectorBlock({
         className="mt-5 max-w-[219px] text-white"
         style={{
           fontFamily: "var(--font-sans)",
-          fontSize: "var(--fs-lead)",
+          fontSize: "20px",
           fontWeight: 400,
           lineHeight: 1.3,
           letterSpacing: "-0.02em",

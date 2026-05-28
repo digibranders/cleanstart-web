@@ -15,6 +15,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useInView, useReducedMotion } from "motion/react";
+import { Reveal } from "@/components/ui/Reveal";
 
 interface StatDef {
   prefix: string;
@@ -126,21 +127,23 @@ export function CleanSightStats(): React.ReactElement {
 
         {/* ── Heading ── */}
         <div className="text-center" style={{ marginBottom: "62px" }}>
-          <h2
-            id="cleansight-stats-heading"
-            className="text-white"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-              whiteSpace: "nowrap",
-            }}
-          >
-            From Visibility to{" "}
-            <span className="cs-text-gradient-impact">Results</span>
-          </h2>
+          <Reveal header>
+            <h2
+              id="cleansight-stats-heading"
+              className="text-white"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+                whiteSpace: "nowrap",
+              }}
+            >
+              From Visibility to{" "}
+              <span className="cs-text-gradient-impact">Results</span>
+            </h2>
+          </Reveal>
         </div>
 
         {/* ── Stats row — 4 columns with vertical dividers ── */}

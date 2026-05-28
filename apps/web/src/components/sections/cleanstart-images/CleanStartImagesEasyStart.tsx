@@ -1,4 +1,5 @@
 import type React from "react";
+import { Reveal } from "@/components/ui/Reveal";
 
 type StackItem = {
   label: string;
@@ -100,6 +101,45 @@ const CHECKLIST = [
   "Continuous rebuilds",
 ];
 
+function ConnectorBeam({
+  alignPct,
+}: {
+  // Horizontal center of the rod, as a percent of content width (matches Figma serpentine offsets).
+  alignPct: number;
+}): React.ReactElement {
+  return (
+    <div
+      aria-hidden
+      className="md:hidden relative"
+      style={{
+        width: "100%",
+        height: "142px",
+        pointerEvents: "none",
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/cleanstart-images/workflows-mobile-rod.png"
+        alt=""
+        aria-hidden
+        width={131}
+        height={142}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: `${alignPct}%`,
+          transform: "translateX(-50%)",
+          width: "131px",
+          height: "142px",
+        }}
+        className="block select-none pointer-events-none"
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  );
+}
+
 function StackPanel({
   label,
   items,
@@ -108,7 +148,10 @@ function StackPanel({
   items: StackItem[];
 }): React.ReactElement {
   return (
-    <div className="flex flex-col" style={{ flex: "1 1 0", minWidth: 0 }}>
+    <div
+      className="flex flex-col relative"
+      style={{ flex: "1 1 0", minWidth: 0, zIndex: 10 }}
+    >
       <p
         style={{
           fontFamily: "var(--font-display)",
@@ -120,6 +163,7 @@ function StackPanel({
           lineHeight: 1,
           marginBottom: "22.042px",
           whiteSpace: "nowrap",
+          textAlign: "center",
         }}
       >
         {label}
@@ -207,7 +251,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
       {/* Corner Union — top-left (Figma: left-[-208px], top-[-191px], mix-blend-overlay) */}
       <div
         aria-hidden
-        className="absolute pointer-events-none select-none hidden lg:block"
+        className="absolute pointer-events-none select-none hidden md:block"
         style={{
           left: "-208px",
           top: "-191px",
@@ -230,7 +274,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
       {/* Corner Union — top-right (Figma: left-[1226px], top-[-118px], mix-blend-overlay) */}
       <div
         aria-hidden
-        className="absolute pointer-events-none select-none hidden lg:block"
+        className="absolute pointer-events-none select-none hidden md:block"
         style={{
           right: "-214px",
           top: "-118px",
@@ -258,24 +302,26 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
         }}
       >
         {/* Heading */}
-        <h2
-          className="text-white text-center mx-auto"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            maxWidth: "700px",
-          }}
-        >
-          Delivered Through Your Existing{" "}
-          <span className="cs-text-gradient-impact">Workflows</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-white text-center mx-auto"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              maxWidth: "700px",
+            }}
+          >
+            Delivered Through Your Existing{" "}
+            <span className="cs-text-gradient-impact">Workflows</span>
+          </h2>
+        </Reveal>
 
         {/* ── DIAGRAM AREA ── */}
         <div
-          className="mt-12 lg:mt-16 mx-auto"
+          className="mt-12 md:mt-16 mx-auto"
           style={{ maxWidth: "1058px" }}
         >
           {/*
@@ -283,35 +329,52 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
            * The center column contains ONLY the card (header + glowing card).
            * The callout sits in its own row below the grid, wider than the card.
            */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_66px_255px_66px_1fr] items-start">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_66px_255px_66px_1fr] items-start">
 
             {/* ── LEFT PANEL ── */}
             <StackPanel label="YOUR EXISTING STACK" items={YOUR_STACK} />
 
-            {/* ── LEFT CONNECTOR LINE (desktop, y≈204px matches Figma) ── */}
+            {/* Mobile beam: stack → hardened images (Figma: x=13 in 360 → 19.7%) — z-index:0 so card border paints over it */}
+            <div
+              className="md:hidden relative"
+              style={{ marginTop: "-30px", marginBottom: "-90px", zIndex: 0 }}
+            >
+              <ConnectorBeam alignPct={19.7} />
+            </div>
+
+            {/* ── LEFT CONNECTOR BEAM (desktop only — rod PNG rotated 90° to run horizontally between stack and hardened card) ── */}
             <div
               aria-hidden
-              className="hidden lg:flex items-start justify-center"
-              style={{ paddingTop: "204px" }}
+              className="hidden md:flex items-center justify-center"
+              style={{ paddingTop: "180px" }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/cleanstart-images/workflows-line-left.svg"
+                src="/images/cleanstart-images/workflows-mobile-rod.png"
                 alt=""
                 aria-hidden
-                width={67}
-                height={4}
-                style={{ width: "66.337px", height: "3.32px" }}
-                className="select-none pointer-events-none w-full"
+                width={131}
+                height={142}
+                style={{
+                  width: "100px",
+                  height: "108px",
+                  transform: "rotate(90deg)",
+                  transformOrigin: "center center",
+                }}
+                className="select-none pointer-events-none"
                 loading="lazy"
                 decoding="async"
               />
             </div>
 
             {/* ── CENTER CARD COLUMN (header + glowing card only) ── */}
-            <div className="flex flex-col items-center mt-8 lg:mt-0">
+            {/* Mobile: slightly narrower than content so the rod beams have side room and the card border paints over them (z-index:10). */}
+            <div
+              className="flex flex-col items-center mt-2 md:mt-0 relative w-full max-w-[288px] md:max-w-none mx-auto"
+              style={{ zIndex: 10 }}
+            >
               {/* Center header labels */}
-              <div className="text-center" style={{ paddingBottom: "22.042px" }}>
+              <div className="text-center" style={{ paddingBottom: "8px" }}>
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
@@ -478,28 +541,42 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
             </div>
             {/* END center column */}
 
-            {/* ── RIGHT CONNECTOR LINE (desktop only) ── */}
+            {/* Mobile beam: hardened images → deployments (Figma: x=219 in 360 → 81.5%) — z-index:0 so card paints over it. Mirrors rod 1: small top overlap (into hardened bottom), large bottom overlap (through YOUR DEPLOYMENTS label into items card). */}
+            <div
+              className="md:hidden relative"
+              style={{ marginTop: "-30px", marginBottom: "-90px", zIndex: 0 }}
+            >
+              <ConnectorBeam alignPct={81.5} />
+            </div>
+
+            {/* ── RIGHT CONNECTOR BEAM (desktop only — rod PNG rotated 90° between hardened card and deployments) ── */}
             <div
               aria-hidden
-              className="hidden lg:flex items-start justify-center"
-              style={{ paddingTop: "204px" }}
+              className="hidden md:flex items-center justify-center"
+              style={{ paddingTop: "180px" }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/cleanstart-images/workflows-line-right.svg"
+                src="/images/cleanstart-images/workflows-mobile-rod.png"
                 alt=""
                 aria-hidden
-                width={67}
-                height={4}
-                style={{ width: "66.337px", height: "3.32px" }}
-                className="select-none pointer-events-none w-full"
+                width={131}
+                height={142}
+                style={{
+                  width: "100px",
+                  height: "108px",
+                  transform: "rotate(90deg)",
+                  transformOrigin: "center center",
+                }}
+                className="select-none pointer-events-none"
                 loading="lazy"
                 decoding="async"
               />
             </div>
 
             {/* ── RIGHT PANEL ── */}
-            <div className="mt-8 lg:mt-0">
+            {/* Mobile: top margin keeps the gap between HARDENED card and deployments items card matching the rest. */}
+            <div className="mt-[22px] md:mt-0">
               <StackPanel label="YOUR DEPLOYMENTS" items={YOUR_DEPLOYMENTS} />
             </div>
           </div>
@@ -513,20 +590,20 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
            * The paths extend 47px into the callout box creating the visual connection.
            */}
           <div className="flex flex-col relative">
-            {/* Vector path — left (Figma: left-[168.32px], top-[378px] = grid bottom) — desktop only */}
+            {/* Vector path — left (176×122). Positioned so the curve's right edge meets the callout's left edge (callout 320px centered in 1058px container → callout_left = 369px → curve_left = 369 - 176 = 193px). Desktop only. */}
             <div
               aria-hidden
-              className="absolute pointer-events-none select-none hidden lg:block"
+              className="absolute pointer-events-none select-none hidden md:block"
               style={{
-                left: "168.32px",
+                left: "193px",
                 top: "0",
-                width: "191.949px",
-                height: "121.471px",
+                width: "176px",
+                height: "122px",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/cleanstart-images/workflows-vector-left.svg"
+                src="/images/cleanstart-images/workflows-callout-curve-left.svg"
                 alt=""
                 aria-hidden
                 className="block size-full max-w-none select-none pointer-events-none"
@@ -535,21 +612,20 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               />
             </div>
 
-            {/* Vector path — right (Figma: left-[708.07px], scaleX(-1)) — desktop only */}
+            {/* Vector path — right (171×121). Positioned so the curve's left edge meets the callout's right edge (callout 320px centered → callout_right = 369 + 320 = 689px). Desktop only. */}
             <div
               aria-hidden
-              className="absolute pointer-events-none select-none hidden lg:block"
+              className="absolute pointer-events-none select-none hidden md:block"
               style={{
-                left: "708.07px",
+                left: "689px",
                 top: "0",
-                width: "191.949px",
-                height: "121.471px",
-                transform: "scaleX(-1)",
+                width: "171px",
+                height: "121px",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/cleanstart-images/workflows-vector-left.svg"
+                src="/images/cleanstart-images/workflows-callout-curve-right.svg"
                 alt=""
                 aria-hidden
                 className="block size-full max-w-none select-none pointer-events-none"
@@ -558,22 +634,43 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               />
             </div>
 
-            {/* Vertical connector line from card bottom → callout (74px = Figma gap) */}
+            {/* Mobile beam: deployments → callout (Figma: x=114 in 360 → 50% centered). Margins tuned to match the ~80px gap on either side of the HARDENED card. z-index:0 so the callout border paints over the beam's bottom tail. */}
+            <div
+              className="md:hidden relative"
+              style={{ marginTop: "-31px", marginBottom: "-31px", zIndex: 0 }}
+            >
+              <ConnectorBeam alignPct={50} />
+            </div>
+
+            {/* Vertical connector beam from card bottom → callout — desktop only (rod PNG, natural orientation). Negative margins + zIndex:0 let it overlap both the HARDENED card above and the callout below so it visibly connects them. */}
             <div
               aria-hidden
+              className="hidden md:block relative"
               style={{
                 alignSelf: "center",
-                width: "0.918px",
-                height: "74px",
-                background:
-                  "linear-gradient(180deg, rgba(178,62,255,0.8) 0%, rgba(139,92,246,0.25) 100%)",
+                lineHeight: 0,
+                marginTop: "-32px",
+                marginBottom: "-12px",
+                zIndex: 0,
               }}
-            />
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/cleanstart-images/workflows-mobile-rod.png"
+                alt=""
+                aria-hidden
+                width={131}
+                height={142}
+                style={{ width: "90px", height: "120px" }}
+                className="block select-none pointer-events-none"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
 
-            {/* Always up-to-date callout — Figma: left-[343px] in 1058px container, w-[470px], h-[97px] */}
-            {/* Desktop: absolute offset left=343px; Mobile: auto-centered */}
+            {/* Always up-to-date callout — width sized to content (icon + gap + 185px text + 22.9px padding × 2 ≈ 304px). Centered horizontally on both desktop and mobile. Position:relative + zIndex:10 so the callout paints over the rod beam tail. */}
             <div
-              className="w-full max-w-[470px] mx-auto lg:ml-[343px] lg:mr-0 lg:max-w-[470.222px]"
+              className="w-full max-w-[320px] mx-auto relative"
               style={{
                 background: "rgba(15,10,31,0.6)",
                 border: "0.918px solid rgba(139,92,246,0.3)",
@@ -583,6 +680,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 display: "flex",
                 alignItems: "center",
                 gap: "22px",
+                zIndex: 10,
               }}
             >
               {/* Clock circle — Figma: size-[51.431px], border 0.918px #8b5cf6, drop-shadow */}
@@ -648,7 +746,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
 
         {/* ── FEATURE ROW ── */}
         <div
-          className="mt-14 lg:mt-20 relative mx-auto"
+          className="mt-14 md:mt-20 relative mx-auto"
           style={{ maxWidth: "1058px" }}
         >
           {/* ── Mobile: centered vertical stack with separator lines ─────────── */}
@@ -742,7 +840,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
             <div className="relative">
               <div
                 aria-hidden
-                className="absolute hidden lg:block pointer-events-none inset-y-0"
+                className="absolute hidden md:block pointer-events-none inset-y-0"
                 style={{
                   left: "33.333%",
                   width: "0.918px",
@@ -752,7 +850,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               />
               <div
                 aria-hidden
-                className="absolute hidden lg:block pointer-events-none inset-y-0"
+                className="absolute hidden md:block pointer-events-none inset-y-0"
                 style={{
                   left: "66.666%",
                   width: "0.918px",
@@ -766,8 +864,8 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                   <div
                     key={f.title}
                     className={[
-                      i > 0 ? "sm:pl-6 lg:pl-12" : "",
-                      i < FEATURES.length - 1 ? "sm:pr-6 lg:pr-12" : "",
+                      i > 0 ? "sm:pl-6 md:pl-12" : "",
+                      i < FEATURES.length - 1 ? "sm:pr-6 md:pr-12" : "",
                     ]
                       .filter(Boolean)
                       .join(" ")}

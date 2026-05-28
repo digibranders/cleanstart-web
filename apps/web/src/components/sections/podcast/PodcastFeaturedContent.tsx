@@ -1,4 +1,5 @@
 import type { PodcastEpisode } from "@/lib/podcast";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { PodcastEpisodeCard } from "./_components/PodcastEpisodeCard";
 
 // Exact Figma background (node 373:3284): #151021 → #131e8f @ 62.5% → #471ec0
@@ -73,32 +74,36 @@ export function PodcastFeaturedContent({
       <Cube side="left" />
       <Cube side="right" />
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[80px] pb-[80px]">
-        <h2
-          id="podcast-featured-title"
-          className="text-center text-white font-bold"
-          style={{
-            fontSize: "var(--fs-h1)",
-            lineHeight: 1,
-            letterSpacing: "-0.05em",
-          }}
-        >
-          {before}
-          <span
-            className="bg-clip-text text-transparent"
-            style={{ backgroundImage: HIGHLIGHT_GRADIENT }}
+        <Reveal header>
+          <h2
+            id="podcast-featured-title"
+            className="text-center text-white font-bold"
+            style={{
+              fontSize: "var(--fs-h1)",
+              lineHeight: 1,
+              letterSpacing: "-0.05em",
+            }}
           >
-            {mark}
-          </span>
-          {after}
-        </h2>
-        <div
+            {before}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{ backgroundImage: HIGHLIGHT_GRADIENT }}
+            >
+              {mark}
+            </span>
+            {after}
+          </h2>
+        </Reveal>
+        <RevealStagger
           className="mt-[60px] grid grid-cols-1 lg:grid-cols-2 gap-[32px]"
           style={{ maxWidth: "1280px", marginInline: "auto" }}
         >
           {episodes.map((ep) => (
-            <PodcastEpisodeCard key={ep.id} episode={ep} size="featured" />
+            <RevealItem key={ep.id}>
+              <PodcastEpisodeCard episode={ep} size="featured" />
+            </RevealItem>
           ))}
-        </div>
+        </RevealStagger>
       </div>
     </section>
   );

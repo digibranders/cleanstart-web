@@ -1,6 +1,7 @@
 import type React from "react";
 
 import type { AuthorDetail } from "@/lib/authors";
+import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 interface AuthorDetailsProps {
   author: AuthorDetail;
@@ -19,9 +20,10 @@ export function AuthorDetails({
   return (
     <section className="relative w-full bg-white">
       <div className="relative mx-auto max-w-[1120px] px-6 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+        <RevealStagger className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
           {hasExperience && (
-            <Block title="Experience">
+            <RevealItem>
+              <Block title="Experience">
               <ul className="flex flex-col gap-4">
                 {author.experience!.map((e, i) => (
                   <li key={e.id ?? `${e.company}-${i}`} className="flex flex-col gap-1">
@@ -45,10 +47,12 @@ export function AuthorDetails({
                 ))}
               </ul>
             </Block>
+            </RevealItem>
           )}
 
           {hasEducation && (
-            <Block title="Education">
+            <RevealItem>
+              <Block title="Education">
               <ul className="flex flex-col gap-4">
                 {author.education!.map((e, i) => (
                   <li
@@ -75,10 +79,12 @@ export function AuthorDetails({
                 ))}
               </ul>
             </Block>
+            </RevealItem>
           )}
 
           {hasSkills && (
-            <Block title="Skills">
+            <RevealItem>
+              <Block title="Skills">
               <div className="flex flex-wrap gap-2">
                 {author.skills!.map((s, i) => (
                   <span
@@ -95,10 +101,12 @@ export function AuthorDetails({
                 ))}
               </div>
             </Block>
+            </RevealItem>
           )}
 
           {hasAwards && (
-            <Block title="Awards & recognition">
+            <RevealItem>
+              <Block title="Awards & recognition">
               <ul className="flex flex-col gap-4">
                 {author.awards!.map((a, i) => (
                   <li key={a.id ?? `${a.title}-${i}`} className="flex flex-col gap-1">
@@ -122,8 +130,9 @@ export function AuthorDetails({
                 ))}
               </ul>
             </Block>
+            </RevealItem>
           )}
-        </div>
+        </RevealStagger>
       </div>
     </section>
   );

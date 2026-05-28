@@ -5,6 +5,7 @@ import type React from "react";
 import type { Blog } from "@/lib/blog";
 import { formatBlogDate, pickImageUrl } from "@/lib/blog";
 import { effectivePublishedAt } from "@/lib/published-date";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 interface AuthorPostsProps {
   posts: Blog[];
@@ -27,7 +28,7 @@ export function AuthorPosts({
       }}
     >
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md">
-        <div className="flex items-end justify-between gap-6 pb-10">
+        <Reveal header className="flex items-end justify-between gap-6 pb-10">
           <h2
             className="font-display font-semibold text-white"
             style={{
@@ -45,15 +46,19 @@ export function AuthorPosts({
           >
             All blogs →
           </Link>
-        </div>
+        </Reveal>
 
-        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post) => (
-            <li key={post.id}>
-              <PostCard post={post} />
-            </li>
-          ))}
-        </ul>
+        <RevealStagger>
+          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {posts.map((post) => (
+              <li key={post.id}>
+                <RevealItem>
+                  <PostCard post={post} />
+                </RevealItem>
+              </li>
+            ))}
+          </ul>
+        </RevealStagger>
       </div>
     </section>
   );

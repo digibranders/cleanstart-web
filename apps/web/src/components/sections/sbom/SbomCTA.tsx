@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Reveal } from '@/components/ui/Reveal';
 
 /**
  * Inner content for the SBOM CTA card, rendered inside the Footer's
@@ -80,7 +81,7 @@ export function SbomCTA(): React.ReactElement {
         }}
       >
         {/* Left column — heading, auto-wraps 2 or 3 lines via balance */}
-        <div className="relative min-w-0 w-full" style={{ maxWidth: 'min(460px, 100%)' }}>
+        <Reveal header className="relative min-w-0 w-full" style={{ maxWidth: 'min(460px, 100%)' }}>
           <p
             style={{
               fontFamily: 'var(--font-display)',
@@ -95,10 +96,13 @@ export function SbomCTA(): React.ReactElement {
           >
             Verify Every Component You Ship
           </p>
-        </div>
+        </Reveal>
 
         {/* Right column — body + button */}
-        <div
+        <Reveal
+          header
+          delay={0.15}
+          y={20}
           className="flex flex-col min-w-0 w-full"
           style={{ maxWidth: 'min(460px, 100%)', gap: 'clamp(20px, 2vw, 32px)' }}
         >
@@ -122,7 +126,7 @@ export function SbomCTA(): React.ReactElement {
             style={
               {
                 '--cs-btn-h': 'var(--btn-h-xl)',
-                '--cs-btn-px': '32px',
+                '--cs-btn-px': '20px',
                 '--cs-btn-fs': '16px',
               } as React.CSSProperties
             }
@@ -146,10 +150,10 @@ export function SbomCTA(): React.ReactElement {
               />
             </svg>
           </Link>
-        </div>
+        </Reveal>
       </div>
 
-      {/* Cube decoration — overflows bottom-right corner at 80% opacity (matches CISO CTA) */}
+      {/* Cube decoration — overflows bottom-left corner, bleeds below slot */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -157,10 +161,10 @@ export function SbomCTA(): React.ReactElement {
         alt=""
         className="absolute pointer-events-none select-none hidden lg:block"
         style={{
-          right: '-60px',
-          bottom: '-100px',
-          width: '300px',
-          height: '300px',
+          left: '-50px',
+          bottom: '-120px',
+          width: '240px',
+          height: '240px',
           objectFit: 'contain',
           opacity: 0.75,
           zIndex: 0,

@@ -4,7 +4,6 @@ import { DemoHero } from "@/components/sections/book-a-demo/DemoHero";
 import { BookDemoBody } from "@/components/sections/book-a-demo/BookDemoBody";
 import { WhatsSetsUsApart } from "@/components/sections/book-a-demo/WhatsSetsUsApart";
 import { BookDemoForm } from "@/components/sections/forms/BookDemoForm";
-import { TrustedMarquee } from "@/components/sections/book-a-demo/TrustedMarquee";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
@@ -30,26 +29,22 @@ export default function BookDemoPage() {
       <main className="bg-white">
         <DemoHero />
 
-        <section
-          className="relative -mt-[140px]"
-          style={{
-            paddingLeft: "clamp(24px, 4vw, 80px)",
-            paddingRight: "clamp(24px, 4vw, 80px)",
-            paddingBottom: "clamp(48px, 6vw, 80px)",
-          }}
-        >
-          <BookDemoForm />
-        </section>
-
         <BookDemoBody>
           <FadeUp>
             <WhatsSetsUsApart />
           </FadeUp>
-        </BookDemoBody>
 
-        <FadeUp>
-          <TrustedMarquee />
-        </FadeUp>
+          <section
+            className="relative"
+            style={{
+              paddingLeft: "clamp(24px, 4vw, 80px)",
+              paddingRight: "clamp(24px, 4vw, 80px)",
+              paddingBottom: "clamp(48px, 6vw, 80px)",
+            }}
+          >
+            <BookDemoForm />
+          </section>
+        </BookDemoBody>
       </main>
       <Footer />
     </>

@@ -1,5 +1,6 @@
 import type React from "react";
 import Link from "next/link";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 /*
  * Figma node 817:10441 — 1920×823px hero (desktop)
@@ -176,54 +177,61 @@ export function CisoHero(): React.ReactElement {
           style={{ maxWidth: "749px" }}
         >
           {/* Mobile: 32px; Desktop: 80px Manrope SemiBold, tracking -0.05em, lh 1 */}
-          <h1
-            className="text-white"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-display)",
-              fontWeight: 600,
-              letterSpacing: "var(--text-hero-product-ls, -0.04em)",
-              lineHeight: "var(--text-hero-lh, 1.05)",
-              /* Mobile gap-[16px] per Figma; Desktop 32px */
-              marginBottom: "clamp(16px, 1.67vw, 32px)",
-            }}
-          >
-            Trusted Software Foundations for CISOs
-          </h1>
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              className="text-white"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--fs-display)",
+                fontWeight: 600,
+                letterSpacing: "var(--text-hero-product-ls, -0.04em)",
+                lineHeight: "var(--text-hero-lh, 1.05)",
+                /* Mobile gap-[16px] per Figma; Desktop 32px */
+                marginBottom: "clamp(16px, 1.67vw, 32px)",
+              }}
+            >
+              Trusted Software Foundations for{" "}
+              <span className="cs-text-gradient-impact">CISOs</span>
+            </h1>
+          </HeroReveal>
 
           {/* Mobile: 16px; Desktop: 30px Sora Regular, opacity 0.8, tracking -0.04em, lh 1.4 */}
-          <p
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.45,
-              color: "rgba(255,255,255,0.8)",
-              /* Mobile gap-[24px] per Figma; Desktop 32px */
-              marginBottom: "clamp(24px, 1.67vw, 32px)",
-            }}
-          >
-            Reduce inherited software risk with minimal, hardened, verifiable
-            container foundations built for modern enterprise environments.
-          </p>
+          <HeroReveal y={30} delay={0.15} duration={0.8}>
+            <p
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.45,
+                color: "rgba(255,255,255,0.8)",
+                /* Mobile gap-[24px] per Figma; Desktop 32px */
+                marginBottom: "clamp(24px, 1.67vw, 32px)",
+              }}
+            >
+              Reduce inherited software risk with minimal, hardened, verifiable
+              container foundations built for modern enterprise environments.
+            </p>
+          </HeroReveal>
 
           {/* Mobile: 16px Manrope Medium, self-center (centered); Desktop: 20px, self-start (left) */}
-          <Link
-            href="https://images.cleanstart.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cs-btn-glass self-center md:self-start"
-            style={
-              {
-                "--cs-btn-fs": "clamp(16px, 1.04vw, 20px)",
-                "--cs-btn-h": "38px",
-                "--cs-btn-px": "18px",
-              } as React.CSSProperties
-            }
-          >
-            Explore Free Secure Image
-          </Link>
+          <HeroReveal y={30} delay={0.3} duration={0.8} className="self-center md:self-start">
+            <Link
+              href="https://images.cleanstart.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cs-btn-glass"
+              style={
+                {
+                  "--cs-btn-fs": "clamp(16px, 1.04vw, 20px)",
+                  "--cs-btn-h": "38px",
+                  "--cs-btn-px": "18px",
+                } as React.CSSProperties
+              }
+            >
+              Explore Free Secure Image
+            </Link>
+          </HeroReveal>
         </div>
       </div>
     </section>

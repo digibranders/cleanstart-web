@@ -66,8 +66,8 @@ const useIsomorphicLayoutEffect =
 export function FadeUp({
   children,
   delay = 0,
-  y = 24,
-  duration = 0.6,
+  y = 30,
+  duration = 0.7,
   amount = 0.05,
   replay = false,
   ...rest
@@ -118,8 +118,8 @@ export function FadeUp({
         ref={ref}
         initial={{ opacity: 0, y }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: !replay, amount, margin: "0px 0px -10% 0px" }}
-        transition={{ duration, delay, ease: [0.22, 1, 0.36, 1] }}
+        viewport={{ once: !replay, amount, margin: "0px 0px -60px 0px" }}
+        transition={{ duration, delay, ease: [0.16, 1, 0.3, 1] }}
         {...rest}
       >
         {children}

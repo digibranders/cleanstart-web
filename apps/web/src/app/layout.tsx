@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { PreviewBanner } from "@/components/PreviewBanner";
+import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 import { AgentationDev } from "@/components/dev/AgentationDev";
 import { WebVitals } from "@/components/observability/WebVitals";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
@@ -123,7 +124,7 @@ export default function RootLayout({
         <JsonLd id="org-jsonld" data={organizationSchema()} />
         <WebVitals />
         <PreviewBanner />
-        {children}
+        <SmoothScrollProvider>{children}</SmoothScrollProvider>
         <Analytics />
         <SpeedInsights />
         <AgentationDev />

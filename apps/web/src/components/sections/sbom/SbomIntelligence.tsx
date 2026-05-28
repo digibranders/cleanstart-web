@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 /**
  * Figma frame 516:5364 — 1920 × 762 "SBOM Intelligence That Drives Action"
  *
@@ -83,19 +85,24 @@ export function SbomIntelligence(): React.ReactElement {
       {/* ── Heading (shared) ── */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md">
         <div className="text-center mb-10 md:mb-14">
-          <h2
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-h2)",
-              fontWeight: 600,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-              color: "#111",
-            }}
-          >
-            {"SBOM Intelligence That Drives "}
-            <span className="cs-text-gradient-impact">Action</span>
-          </h2>
+          <Reveal header>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--fs-h2)",
+                fontWeight: 600,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+                color: "#111",
+              }}
+            >
+              <span className="block">SBOM Intelligence That</span>
+              <span className="block">
+                {"Drives "}
+                <span className="cs-text-gradient-impact">Action</span>
+              </span>
+            </h2>
+          </Reveal>
         </div>
       </div>
 

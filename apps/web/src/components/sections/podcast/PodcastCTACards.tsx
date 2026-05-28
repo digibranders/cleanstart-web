@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { PodcastCtaCard } from "@/lib/podcast";
+import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 type Props = {
   cards: PodcastCtaCard[];
@@ -335,18 +336,19 @@ export function PodcastCTACards({ cards }: Props): React.ReactElement | null {
       </svg>
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-[clamp(60px,7vw,100px)]">
-        <div
+        <RevealStagger
           className="grid grid-cols-1 md:grid-cols-3 items-stretch"
           style={{ gap: "clamp(20px, 2.3vw, 33px)" }}
         >
           {visible.map((card, i) => (
-            <ResourceCard
-              key={card.title}
-              card={card}
-              iconSrc={CARD_ICONS[i] ?? CARD_ICONS[0]}
-            />
+            <RevealItem key={card.title}>
+              <ResourceCard
+                card={card}
+                iconSrc={CARD_ICONS[i] ?? CARD_ICONS[0]}
+              />
+            </RevealItem>
           ))}
-        </div>
+        </RevealStagger>
       </div>
     </section>
   );

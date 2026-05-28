@@ -44,6 +44,11 @@ export function ASRApproach(): React.ReactElement {
         </>
       }
       cards={CARDS}
+      showCornerGlows={false}
+      showLeftGrid={false}
+      showRightGrid={false}
+      showBottomLeftGrid
+      flushBg
     />
   );
 }

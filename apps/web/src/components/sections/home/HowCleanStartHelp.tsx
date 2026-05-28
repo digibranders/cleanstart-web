@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Section: "How CleanStart Will Help"
@@ -36,6 +37,7 @@ type TabId = "ciso" | "developers";
 interface FeatureCard {
   title: string;
   description: string;
+  icon: string;
 }
 
 interface TabContent {
@@ -58,16 +60,19 @@ const TAB_CONTENT: Record<TabId, TabContent> = {
         title: "Reduce Security Costs by 70%",
         description:
           "Automated security, real-time scanning, and built-in compliance enable lean, cost-efficient DevSecOps teams.",
+        icon: "/images/home/help-icon1.png",
       },
       {
-        title: "Always-On Threat Protection",
+        title: "Enhanced Security",
         description:
-          "Continuous vulnerability monitoring and rapid CVE response keep production hardened around the clock.",
+          "Always-on security with smart threat and vulnerability protection.",
+        icon: "/images/home/help-icon2.png",
       },
       {
         title: "Centralized Visibility & Governance",
         description:
-          "A unified dashboard for complete oversight and control over security posture and compliance.",
+          "Unified dashboard for complete visibility and control over security and compliance.",
+        icon: "/images/home/help-icon3.png",
       },
     ],
   },
@@ -79,19 +84,22 @@ const TAB_CONTENT: Record<TabId, TabContent> = {
     ctaHref: "/for-developers",
     cards: [
       {
-        title: "Signed & Verified Images",
+        title: "Enhanced Security",
         description:
-          "Cryptographically signed images with automated security updates and full SBOM provenance.",
+          "Signed, verified images with automated security updates.",
+        icon: "/images/home/help-icon2.png",
       },
       {
-        title: "Seamless CI/CD Integration",
+        title: "Seamless Integration",
         description:
-          "Drop-in support for CI/CD pipelines, private registries, and SSO across your existing workflow.",
+          "CI/CD pipelines, private repos, and SSO support for complete workflow integration.",
+        icon: "/images/home/help-icon1.png",
       },
       {
         title: "Streamlined Development",
         description:
-          "Ship faster with automated compliance, custom-built images, and minimal-CVE base layers.",
+          "Speed up deployment with automated compliance and custom-built images.",
+        icon: "/images/home/help-icon3.png",
       },
     ],
   },
@@ -128,19 +136,20 @@ export function HowCleanStartHelp() {
             Same 1fr auto 1fr grid pattern used by SecurityNotPatching for visual
             parity. */}
         <div className="mb-8 flex flex-col items-start gap-6 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
-          <h2
-            id="how-cleanstart-title"
-            className="justify-self-start font-display text-[#111111]"
-            style={{
-              maxWidth: "444px",
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-            }}
-          >
-            How CleanStart Will Help
-          </h2>
+          <Reveal header className="justify-self-start" style={{ maxWidth: "444px" }}>
+            <h2
+              id="how-cleanstart-title"
+              className="font-display text-[#111111]"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+              }}
+            >
+              How CleanStart Will Help
+            </h2>
+          </Reveal>
           {/* Vertical 1×90 fading-gray separator (Figma Rectangle 1000001788) */}
           <div
             aria-hidden
@@ -150,21 +159,28 @@ export function HowCleanStartHelp() {
                 "linear-gradient(180deg, rgba(204,204,204,0) 0%, rgba(204,204,204,1) 47.2%, rgba(204,204,204,0) 100%)",
             }}
           />
-          <p
-            className="text-[#111111] md:justify-self-end md:text-right"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              lineHeight: 1.4,
-              letterSpacing: "-0.02em",
-              maxWidth: "604px",
-              opacity: 0.8,
-            }}
+          <Reveal
+            header
+            delay={0.15}
+            y={20}
+            className="md:justify-self-end"
+            style={{ maxWidth: "604px" }}
           >
-            Help Tailored solutions for every role in your organization — from
-            security leaders to engineering teams.
-          </p>
+            <p
+              className="text-[#111111] md:text-right"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                lineHeight: 1.4,
+                letterSpacing: "-0.02em",
+                opacity: 0.8,
+              }}
+            >
+              Help Tailored solutions for every role in your organization — from
+              security leaders to engineering teams.
+            </p>
+          </Reveal>
         </div>
 
         {/* Cards container — stays inside the container's px-6 padding so the
@@ -453,7 +469,7 @@ function FeatureCardItem({
       <div
         className="relative shrink-0"
         style={{
-          width: "clamp(96px, 30cqi, 224px)",
+          width: "clamp(128px, 40cqi, 288px)",
           aspectRatio: "224 / 180",
           containerType: "inline-size",
         }}
@@ -490,7 +506,7 @@ function FeatureCardItem({
           }}
         >
           <Image
-            src="/images/gear-orb.png"
+            src={card.icon}
             alt=""
             width={161}
             height={160}
