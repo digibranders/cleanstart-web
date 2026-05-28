@@ -8,7 +8,7 @@ const VALUE_PROPS: readonly string[] = [
 ];
 
 /**
- * Light-section row with the "Whats sets us Apart?" headline on the left
+ * Light-section row with the "What sets us Apart?" headline on the left
  * and four shielded value props on the right. Mirrors Figma frame 867:935
  * (layout_99XIKT — row, gap 60, starts at x:197.5, y:473). The section
  * itself is transparent so the parent `BookDemoBody` wrapper's shared
@@ -23,8 +23,8 @@ export function WhatsSetsUsApart(): React.ReactElement {
         maxWidth: "1276px",
         paddingLeft: "clamp(24px, 4vw, 80px)",
         paddingRight: "clamp(24px, 4vw, 80px)",
-        paddingTop: "clamp(64px, 7vw, 104px)",
-        paddingBottom: "clamp(40px, 5vw, 80px)",
+        paddingTop: "clamp(24px, 4vw, 64px)",
+        paddingBottom: "clamp(32px, 4vw, 64px)",
       }}
     >
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.1fr)] items-start gap-10 lg:gap-[60px]">
@@ -39,10 +39,9 @@ export function WhatsSetsUsApart(): React.ReactElement {
               color: "#111111",
             }}
           >
-            Whats sets
-            <br />
+            <span className="block">What sets</span>
             <span
-              className="inline-block bg-clip-text text-transparent"
+              className="block bg-clip-text text-transparent"
               style={{
                 backgroundImage:
                   "linear-gradient(-44deg, rgba(44, 193, 235, 1) 0%, rgba(154, 81, 255, 1) 65%)",
