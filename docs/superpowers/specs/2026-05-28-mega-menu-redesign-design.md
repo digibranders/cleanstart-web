@@ -52,7 +52,7 @@ The goal of this redesign is to fix all eleven and lift the navbar from "functio
 
 | # | Decision | Value |
 |---|----------|-------|
-| D1 | Aesthetic direction | **Hybrid** — Chainguard/Linear restraint + Stripe/Wiz featured tile + Wiz/Datadog POV bar |
+| D1 | Aesthetic direction | **Restrained-professional** — Linear / Vercel / Stripe restraint. No decorative glows, no radial gradient backgrounds, no neon shadows, no animated gradient sweeps. Color used as **signal** (eyebrow, link, accent border) — never as decoration. No "pills" on featured tiles — typography hierarchy alone carries the message. |
 | D2 | Code-snippet rotation pattern | **Random-on-open** from the latest-N set |
 | D3 | "Try it now" URL pattern | `https://images.cleanstart.com/images/<name>/details` |
 | D4 | Latest-images pool size | `LATEST_IMAGES_POOL_SIZE = 8` (latest 8 by `publishedAt` / `updatedAt` fallback) |
@@ -68,23 +68,27 @@ The goal of this redesign is to fix all eleven and lift the navbar from "functio
 
 ---
 
-## 4. Aesthetic direction (hybrid)
+## 4. Aesthetic direction (restrained-professional)
 
-Three influences, blended:
+One reference family: **Linear / Vercel / Stripe / Datadog.** Confident through restraint, not decoration.
 
-- **Chainguard / Linear** — restraint. Icon-led rows, not heavy gradient tiles. Monochrome glyphs at rest, gradient only on hover or active. Typography-forward.
-- **Stripe / Wiz** — the featured tile. Soft gradient background, big headline, optional code snippet teaser, single radial-glow blob in a corner. The tile is the panel's "earned attention" zone.
-- **Wiz / Datadog** — POV. The contextual CTA bar at the bottom carries a confident headline ("Stop patching. Replace the base." / "Not sure where to start?"), not a generic phrase.
+**Hard rules:**
+- **No radial gradient backgrounds.** Panels use a single solid surface (`#161126`).
+- **No corner glow blobs.** Featured tiles are solid (`#1c1530`) with a 1 px accent-color border.
+- **No `box-shadow` glows on hover.** Row hover = subtle fill + neutral border change.
+- **No pulsing dots, no animated gradient sweeps, no typewriter cycles** on the featured tile.
+- **No decorative pills.** "Featured" / "FIPS 140-3" / "We're hiring" / "Webinar" pills are cut — the headline carries the message. The only type labels that remain are tracked uppercase **typography** in the accent color (no chip, no border, no fill) on Latest Updates feed entries — that is information, not decoration.
+- **Reuse existing primitives.** All panel CTAs render via `cs-btn-glass` (existing brand button), never a new white pill or chip.
 
-Visual identity stays inside CleanStart's existing palette — deep purple `#471FC3`, cyan `#2cc1eb`, midnight `#151021`. Per-panel **glow accent color** varies so each panel feels distinct without breaking the system:
+**Color used as signal (kept):**
 
-| Panel | Glow accent | Hex |
-|-------|-------------|-----|
-| Products | Cyan | `#2cc1eb` |
-| Solutions | Green | `#6cffc2` |
-| Audience | Purple | `#471FC3` |
-| Resources | Cyan | `#2cc1eb` |
-| Company | Magenta | `#ff8ab8` |
+| Panel | Accent | Hex | Where it appears |
+|-------|--------|-----|------------------|
+| Products | Cyan | `#2cc1eb` | Eyebrow text, Latest Updates BLOG label, "Try {name} →" link, accent border on Products featured tile |
+| Solutions | Green | `#6cffc2` | Eyebrow text, "See FIPS stack →" link, accent border on Solutions featured tile |
+| Audience | Purple | `#a48cff` | Eyebrow text only |
+| Resources | Cyan | `#2cc1eb` | Eyebrow text, Spotlight eyebrow, Latest Updates NEWS / RESOURCE / WEBINAR label colors |
+| Company | Magenta | `#ff8ab8` | Eyebrow text, "See careers →" link, accent border on Company featured tile |
 
 ---
 
@@ -127,7 +131,7 @@ apps/web/src/components/nav/
 ├── pieces/                         (new) — small shared building blocks
 │   ├── PanelHeader.tsx             (eyebrow + tagline + right-aligned exit link)
 │   ├── PanelRow.tsx                (44px icon + label + desc + arrow)
-│   ├── FeaturedTile.tsx            (gradient bg, radial glow, slot pattern)
+│   ├── FeaturedTile.tsx            (solid bg, accent border, slot pattern — NO glow)
 │   ├── ContextualCTA.tsx           (bottom bar)
 │   └── PersonaCard.tsx             (Audience)
 └── data/                           (new) — server-side fetchers used by panels
@@ -177,12 +181,12 @@ Every panel renders inside `PanelShell`, which provides:
 
 | Property | Value |
 |----------|-------|
-| Border radius | 20 px (matches existing `cs-mega-surface`) |
-| Padding | 20 px all sides |
-| Background | `radial-gradient(120% 70% at 0% 0%, <glow>, transparent 55%), linear-gradient(180deg, #1a1330, #120c25)` |
-| Border | 1 px solid `rgba(255,255,255,0.08)` |
-| Shadow | `0 24px 60px -20px rgba(0,0,0,0.6)` plus inset hairline |
-| Header divider | 1 px bottom border on `PanelHeader`, `rgba(255,255,255,0.06)` |
+| Border radius | 16 px |
+| Padding | 18 px all sides |
+| Background | Solid `#161126` — same for every panel. **No radial gradients, no per-panel background tinting.** |
+| Border | 1 px solid `rgba(255,255,255,0.06)` |
+| Shadow | `0 18px 50px -20px rgba(0,0,0,0.5)` (drop shadow only — no inner glow) |
+| Header divider | 1 px bottom border on `PanelHeader`, `rgba(255,255,255,0.05)` |
 | Open animation | Opacity 0→1 + scale 0.96→1 over 180 ms, `cubic-bezier(0.22, 1, 0.36, 1)` |
 
 **Per-panel widths** (CSS width, not max-width):
@@ -201,17 +205,17 @@ Used by Products, Solutions, Company.
 
 | Property | Value |
 |----------|-------|
-| Grid | `44px 1fr auto`, 12 px gap |
-| Padding | 12 px |
-| Row height | ~68 px |
-| Icon tile rest | 44 × 44 / 12 px radius / `rgba(255,255,255,0.04)` bg / 1 px hairline border |
-| Icon tile hover | Gradient `linear-gradient(135deg, rgba(71,31,195,0.55), rgba(44,193,235,0.55))` + ambient cyan shadow |
-| Icon glyph | 20 × 20 SVG, 1.6 px stroke, white at rest |
+| Grid | `40px 1fr auto`, 12 px gap |
+| Padding | 10 × 12 px |
+| Row height | ~60 px |
+| Icon tile rest | 40 × 40 / 10 px radius / `rgba(255,255,255,0.04)` bg / 1 px hairline border / icon color `rgba(255,255,255,0.75)` |
+| Icon tile hover | `rgba(255,255,255,0.06)` bg / same border / icon color `#fff`. **No gradient, no glow shadow.** |
+| Icon glyph | 18 × 18 SVG, 1.6 px stroke, `currentColor` |
 | Label | 14 px / 600 weight / line-height 1.2 |
 | Description | 12 px / 400 / line-height 1.4 / `rgba(255,255,255,0.55)` |
-| Trailing arrow | `→` at 16 px, `rgba(255,255,255,0.25)` rest, `#2cc1eb` hover, slides 2 px right on hover |
-| Active-route | Same visual as hover (arrow does not slide) |
-| Hover background | `rgba(255,255,255,0.05)` + 1 px `rgba(44,193,235,0.18)` border |
+| Trailing arrow | `→` at 14 px, `rgba(255,255,255,0.25)` rest, `rgba(255,255,255,0.6)` on hover. **No translate, no color shift to accent.** |
+| Active-route | Same visual as hover |
+| Hover background | `rgba(255,255,255,0.04)` + 1 px `rgba(255,255,255,0.06)` border. **No `box-shadow` glow.** |
 
 ### 7.3 `nav-config.ts` schema delta
 
@@ -232,10 +236,15 @@ export type NavMegaItem = {
   kind: "mega";
   label: string;
   tagline: string;           // NEW — required
-  glow: "cyan" | "green" | "purple" | "magenta";  // NEW — required
+  accent: "cyan" | "green" | "purple" | "magenta";  // NEW — required (eyebrow + featured-tile border + accent link color)
   groups: NavGroup[];
   width?: number;
-  /** Override exit-link href shown in PanelHeader's right corner. */
+  /**
+   * Optional right-aligned exit-link in PanelHeader.
+   * ONLY set when the destination is genuinely different from what's already in the panel.
+   * Currently set on Products (→ images.cleanstart.com) and Company (→ mailto:careers@).
+   * Solutions, Audience, Resources have NO exit link.
+   */
   exitHref?: string;
   exitLabel?: string;
 };
@@ -294,6 +303,10 @@ Flip this single constant if production URL shape changes.
 
 **Cache reuse:** `fetchCommunityImages()` is already wrapped in `react.cache()` + tagged Next Data Cache (10 min revalidate, tag `community-images`). The community page already invokes it. The header's call deduplicates within a render and shares the 10-min cache globally — zero new origin requests in steady state.
 
+**Featured tile rendering:** **No "Featured" pill, no pulse dot.** Tile is solid `#1c1530` with 1 px cyan accent border. Headline → sub → code snippet (`$ docker pull cleanstart/<name>:latest`) → "Try {name} →" link in cyan. Whole tile is the link.
+
+**Exit link on PanelHeader:** `exitHref = "https://images.cleanstart.com"`, `exitLabel = "Browse all images"`. This is the only product panel exit link that earns its place — it points to the live image catalog (100+ entries), a genuinely different surface from the 3 marketing pages in the panel rows.
+
 ### 7.5 PanelSolutions
 
 Static. Four `PanelRow`s:
@@ -305,7 +318,7 @@ Static. Four `PanelRow`s:
 | `refresh` | Vulnerability Remediation | Patch upstream once, ship hardened downstream everywhere. |
 | `minimize` | Attack Surface Reduction | Distroless-style minimal images shrink your blast radius. |
 
-Featured tile content: pill "FIPS 140-3" (green) · headline "FIPS, drop-in." · sub "Validated cryptography, no code change. Replace base images, inherit compliance." · code snippet `cleanstart/python-fips` · CTA "See FIPS stack →" → `/fips`.
+Featured tile content: **no pill** · headline "FIPS, drop-in." · sub "Validated cryptography, no code change. Replace base images, inherit compliance." · code snippet `cleanstart/python-fips` · CTA "See FIPS stack →" → `/fips`. Tile has 1 px green accent border (`rgba(108,255,194,0.15)`); link text in green. **No exit link in PanelHeader** — the panel is the overview surface.
 
 Bottom CTA bar: "Need help mapping your compliance scope? Our solution engineers will walk it with you." / "Talk to SE" → `/book-a-demo?intent=se`.
 
@@ -313,10 +326,12 @@ Bottom CTA bar: "Need help mapping your compliance scope? Our solution engineers
 
 Replaces the compact menu. Two `PersonaCard`s in a 1fr/1fr grid.
 
-| Card | Glow | Icon | Label | Description | Href |
-|------|------|------|-------|-------------|------|
-| Left | cyan→purple | tools | For Developers | Hardened base images, signed SBOMs, and zero workflow friction. | `/for-developers` |
-| Right | green→cyan | hash | For CISO | Provable supply-chain integrity, audit-ready, and FIPS where you need it. | `/for-ciso` |
+| Card | Accent | Icon | Label | Description | Href |
+|------|--------|------|-------|-------------|------|
+| Left | cyan | tools | For Developers | Hardened base images, signed SBOMs, and zero workflow friction. | `/for-developers` |
+| Right | green | hash | For CISO | Provable supply-chain integrity, audit-ready, and FIPS where you need it. | `/for-ciso` |
+
+Each persona card: solid `#1c1530` background, 1 px accent-color border, accent-color icon tile, accent-color "Explore →" link. **No gradient backgrounds, no glows, no pills.**
 
 No featured tile, no bottom CTA bar.
 
@@ -336,19 +351,19 @@ Each row: tiny leading icon (14 × 14, 70 % opacity) + label (13 px / 500 weight
 
 #### Column 2 · Latest Updates (≈ 280 px, dynamic mixed feed)
 
-Header: `LATEST UPDATES` eyebrow + tiny "live" pill (cyan) to signal dynamism.
+Header: `LATEST UPDATES` eyebrow only. **No "live" pill** — the timestamps ("2d ago") already communicate freshness.
 
 3 cards, sorted by `publishedAt` desc across `blogs` + `news` + `resources` + `webinars`. Webinar card only appears if there is an upcoming session (`startsAt >= now`). If fewer than 3 items exist after filtering, render the available ones.
 
 Card shape:
 ```
 ┌─────────────────────────────────┐
-│ [TYPE pill] · meta              │
+│ TYPE · meta                     │
 │ Title (2 lines max, ellipsis)   │
 └─────────────────────────────────┘
 ```
 
-Type pills color-coded:
+Type label = **tracked uppercase typography in the accent color**. NOT a chip, NOT a pill. No border, no background, no rounded geometry. 9 px / 700 weight / 0.14em tracking. Plain text. The colored type label and the muted meta are separated by a thin neutral `·`.
 
 | Type | Color |
 |------|-------|
@@ -373,26 +388,26 @@ Single hero card with a 4-step priority chain. The first match renders; the rest
 
 **Priority 1 · Next in-person event (≤ 30 days):**
 - Source: `getUpcomingEvents({ limit: 1, kind: 'inPerson' })` filtered to `startsAt <= now + 30d`.
-- Pill: "Next event" (cyan with pulse dot).
-- Eyebrow: event location (e.g. "KubeCon EU · Paris").
+- **Tracked uppercase eyebrow (cyan, not a pill):** `NEXT EVENT · {location}` (e.g. `NEXT EVENT · KUBECON EU · PARIS`).
 - Headline: event hook copy (or fallback to event title).
 - Sub: date range + meeting offer.
 - CTA: "Save your seat →" → event slug.
 
 **Priority 2 · Next webinar (≤ 30 days):**
 - Source: `getUpcomingWebinars({ limit: 1 })` filtered to `startsAt <= now + 30d`.
-- Pill: "Webinar" (magenta).
+- **Tracked uppercase eyebrow (magenta, not a pill):** `NEXT WEBINAR`.
 - Headline: webinar title.
 - Sub: date · time · duration.
 - CTA: "Register →" → webinar slug.
 
 **Priority 3 · `resourcesSpotlight` CMS global (set and not expired):**
 - Source: Payload global `resourcesSpotlight` — `image`, `headline`, `sub`, `ctaLabel`, `ctaHref`, `expiresAt?`.
-- Render: optional image at top, headline, sub, custom CTA.
+- **Tracked uppercase eyebrow (cyan, not a pill):** `SPOTLIGHT`.
+- Optional image at top, headline, sub, custom CTA.
 - Filter: skip if `expiresAt` is set and in the past.
 
 **Priority 4 · Evergreen "Subscribe to the Bulletin":**
-- Hardcoded card. Pill: "Newsletter" (cyan).
+- Hardcoded card. **Tracked uppercase eyebrow (cyan):** `NEWSLETTER`.
 - Headline: "Get the CleanStart Bulletin."
 - Sub: "One email per month — new images, talks, advisories."
 - CTA: "Subscribe →" → existing newsletter endpoint.
@@ -416,7 +431,11 @@ export async function resolveResourcesSpotlight(): Promise<SpotlightCard> {
 
 #### Bottom CTA bar
 
-Same width as panel, 12 px above bottom. Copy: "Subscribe to the CleanStart Bulletin — one email per month, new images, talks, advisories." / "Subscribe" → existing newsletter endpoint. Hidden if Spotlight is currently showing Priority 4 (evergreen) — would be redundant.
+Same width as panel, 12 px above bottom. Copy: "Subscribe to the CleanStart Bulletin — one email per month, new images, talks, advisories." / "Subscribe" rendered as `cs-btn-glass` (existing brand button, 34 / 14 / 12 dims). Hidden if Spotlight is currently showing Priority 4 (Bulletin evergreen) — would be redundant.
+
+#### PanelHeader exit link
+
+**Not set.** The panel IS the overview surface — Browse column already exposes every route. A "Browse all →" link would point to nowhere distinct.
 
 ### 7.8 PanelCompany (3-state spotlight chain)
 
@@ -428,30 +447,29 @@ The first match renders; the rest are skipped.
 
 **State 1 · `careers.openRoles > 0` (default):**
 - Source: live count from Payload `careers` collection where `status === 'open'`.
-- Pill: "We're hiring" (magenta).
+- **No pill.** Headline carries the message.
 - Headline: "Build the base layer with us."
 - Sub: "Engineers, SEs, designers. Remote-friendly. Equity-led."
-- Avatar row: 4 overlapping circles (hand-coded in v1 — a follow-up can wire to team-photo avatars from a Payload collection).
-- Count caption: "{count} open roles".
-- CTA: "See careers →" → `/careers`.
-- Background: magenta gradient.
+- Avatar row: 4 overlapping circles (hand-coded in v1).
+- Count caption: "{count} open roles" — plain `rgba(255,255,255,0.70)` text, beside avatars.
+- CTA: "See careers →" → `/careers`, magenta link color.
+- Tile background: solid `#1c1530` + 1 px magenta accent border (`rgba(255,138,184,0.15)`). **No gradient, no glow.**
 
 **State 2 · No roles but `companySpotlight` CMS global is set (and not expired):**
 - Source: Payload global `companySpotlight` — same shape as `resourcesSpotlight`.
-- Pill: derived from CMS or default "Milestone" (cyan).
-- Optional eyebrow (e.g. "Mar 2026").
+- **Tracked uppercase eyebrow (cyan):** `SPOTLIGHT`. Optional secondary line from CMS (e.g. `MAR 2026`).
 - Headline, sub, CTA — all from CMS.
-- Background: cyan/green gradient (different from State 1 so editors visually see the variant).
+- Tile background: solid `#1c1530` + 1 px cyan accent border.
 - Filter: skip if `expiresAt` in the past.
 
 **State 3 · Evergreen "Join the talent network":**
 - Hardcoded.
-- Pill: "Talent network" (green).
+- **Tracked uppercase eyebrow (green):** `TALENT NETWORK`. No pill.
 - Headline: "Not hiring right now?"
 - Sub: "Tell us what you do — we'll reach out when a role opens that fits."
-- Trust pills row: `~30 sec` + `no resume` (green, hairline borders).
-- CTA: "Join the network →" → `/careers/talent-network` (D13 — falls back to `mailto:careers@cleanstart.com?subject=Talent%20network` in v1 if the route doesn't exist yet).
-- Background: green gradient (different from States 1 + 2).
+- Two trust-info chips (`~30 sec` and `no resume`) below the sub — these stay because they communicate *concrete, hard-to-infer information* about the form, not category. Render as small green text on a translucent green background, hairline border.
+- CTA: "Join the network →" → `/careers/talent-network` (D13 — falls back to `mailto:careers@cleanstart.com?subject=Talent%20network` in v1).
+- Tile background: solid `#1c1530` + 1 px green accent border.
 
 Priority logic encoded in `data/spotlights.ts`:
 
@@ -511,12 +529,16 @@ Flat link — unchanged. Just inherits the `cs-nav-link` active-route polish fro
 
 | Behavior | Default | `prefers-reduced-motion: reduce` |
 |----------|---------|----------------------------------|
-| Panel open (fade + scale) | 180 ms | Instant (no scale, no fade) |
-| Row hover (border + lift) | 150 ms color/transform | Color only, no transform |
-| Arrow translate on row hover | 200 ms `transform: translateX(2px)` | No translate |
-| Featured-tile glow pulse | None in v1 | n/a |
-| Panel cross-fade between triggers | Phase 5 only | Phase 5 fallback = instant |
-| Code-snippet typewriter (Phase 5) | 600 ms typing | Static — no animation, no re-render churn |
+| Panel open (fade + scale) | 180 ms opacity + scale 0.96 → 1 | Instant (no scale, no fade) |
+| Row hover (bg + border) | 120 ms color only | Same — no transform |
+| Trigger active underline | 150 ms opacity | Instant |
+| Panel cross-fade between triggers (Phase 5) | 180 ms opacity only — no layout shift | Instant |
+
+**Cut entirely** (per restrained-professional direction):
+- Featured-tile glow pulse / animated gradient sweep
+- Code-snippet typewriter cycle
+- Row arrow translate-on-hover
+- Icon-tile gradient transition
 
 All motion uses `transform` + `opacity` only — no layout-triggering properties. GPU-only.
 
@@ -574,12 +596,14 @@ Each phase is independently mergeable. After each: lint ✓ · typecheck ✓ · 
 - Swipe-down handle on the sheet top.
 - Audit touch targets on a real device (≥ 44 px).
 
-### Phase 5 — Motion + delight (1–2 days)
-- Cross-fade between triggers (single-popup pattern via base-ui's existing content slot — verify it doesn't already do this).
-- Animated gradient sweep on the featured tile (~6 s GPU loop, fades on hover-out).
-- Code-snippet typewriter cycle on `PanelProducts` (replaces random-on-open; pool stays the same).
-- Micro-icon hover scale (200 ms, 1 → 1.05).
-- `prefers-reduced-motion` audit — every animation has a clean fallback.
+### Phase 5 — Motion polish + reduced-motion audit (1 day)
+
+Scope intentionally tight after the restrained-professional direction (D1) cut all decorative animation.
+
+- Panel cross-fade between triggers (180 ms opacity only — no layout shift). Verify base-ui doesn't already do this cleanly; only add custom logic if needed.
+- `prefers-reduced-motion: reduce` audit — every transition in the navbar has a clean fallback per §10.
+
+**Explicitly cut** (per D1): animated gradient sweep, code-snippet typewriter cycle, micro-icon hover scale, glow pulses.
 
 ---
 
@@ -626,7 +650,7 @@ Lighthouse perf at /, /cleanstart-images, /blogs must not regress more than 2 po
 
 | Path | Action | Phase |
 |------|--------|-------|
-| `apps/web/src/lib/nav-config.ts` | Schema delta + flip `built` default + add icons/taglines/glow | 1 |
+| `apps/web/src/lib/nav-config.ts` | Schema delta + flip `built` default + add icons/taglines/accent; selective `exitHref`/`exitLabel` (Products + Company only) | 1 |
 | `apps/web/src/components/nav/Header.tsx` | Move from `sections/`; convert to RSC; add always-on backdrop-blur | 1 |
 | `apps/web/src/components/sections/Header.tsx` | Delete (file moves) | 1 |
 | `apps/web/src/components/nav/useIsActiveSection.ts` | New | 1 |
@@ -664,7 +688,7 @@ Lighthouse perf at /, /cleanstart-images, /blogs must not regress more than 2 po
 - Anything in `packages/ui/` (no new shared primitives for this work).
 - `cleanstart-logo.svg` and any logo treatment.
 - `globals.css` and the typography system (`apps/web/docs/TYPOGRAPHY-SYSTEM.md`) — the redesign consumes existing tokens; it does not add new ones.
-- The `cs-btn-glass` button — featured tile and contextual CTA buttons reuse existing button styles where they fit; no new variants.
+- The `cs-btn-glass` button — **all** panel `ContextualCTA` buttons render via `cs-btn-glass` with `--cs-btn-h: 34px / --cs-btn-px: 14px / --cs-btn-fs: 12px` (matches the old MegaMenu CTA card dimensions). No new white-pill button variant introduced.
 - IA changes (renaming or merging top-level triggers). Locked in §3 D5.
 
 ---

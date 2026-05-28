@@ -77,11 +77,17 @@ export type NavMegaItem = {
   label: string;
   /** Required. Shown under the eyebrow in PanelHeader. */
   tagline: string;
-  /** Required. Drives the radial-glow accent color in the panel background. */
-  glow: "cyan" | "green" | "purple" | "magenta";
+  /** Required. Drives the accent color on eyebrow, link, and featured-tile border. NOT used for background tinting. */
+  accent: "cyan" | "green" | "purple" | "magenta";
   groups: NavGroup[];
   width?: number;
-  /** Override the right-aligned exit-link in PanelHeader. */
+  /**
+   * Optional right-aligned exit-link in PanelHeader.
+   * ONLY set when the destination is genuinely different from what the panel already shows.
+   * Products → images.cleanstart.com (live catalog of 100+ images).
+   * Company → mailto:careers@cleanstart.com.
+   * Solutions / Audience / Resources have NO exit link.
+   */
   exitHref?: string;
   exitLabel?: string;
 };
@@ -119,25 +125,21 @@ Locate `NAV_TREE` (currently starting at line 46). Update the mega items so each
 Products entry — add after `label: "Products",`:
 ```ts
     tagline: "Hardened container supply chain — end to end.",
-    glow: "cyan",
-    exitHref: "/cleanstart-images",
-    exitLabel: "Compare all",
+    accent: "cyan",
+    exitHref: "https://images.cleanstart.com",
+    exitLabel: "Browse all images",
 ```
 
-Solutions entry — add after `label: "Solutions",`:
+Solutions entry — add after `label: "Solutions",`. **No exit link** — the panel is the entire surface:
 ```ts
     tagline: "Compliance, remediation, and a smaller attack surface.",
-    glow: "green",
-    exitHref: "/solutions",
-    exitLabel: "All solutions",
+    accent: "green",
 ```
 
-Resources entry — add after `label: "Resources",`:
+Resources entry — add after `label: "Resources",`. **No exit link** — Browse column already exposes every route:
 ```ts
     tagline: "Read, watch, learn — and meet us in person.",
-    glow: "cyan",
-    exitHref: "/resource-center",
-    exitLabel: "Browse all",
+    accent: "cyan",
 ```
 
 Promote Audience from `compact` to `mega` with two persona-card items (see Task 2.12 for `PanelAudience`). For now in `nav-config.ts`:
@@ -146,7 +148,7 @@ Promote Audience from `compact` to `mega` with two persona-card items (see Task 
     kind: "mega",
     label: "Audience",
     tagline: "Built for the people who ship and the people who sign off.",
-    glow: "purple",
+    accent: "purple",
     groups: [
       {
         items: [
@@ -177,7 +179,7 @@ Promote Company from `compact` to `mega`:
     kind: "mega",
     label: "Company",
     tagline: "The team rebuilding the base layer of open source.",
-    glow: "magenta",
+    accent: "magenta",
     exitHref: "mailto:careers@cleanstart.com",
     exitLabel: "careers@",
     groups: [
@@ -1171,28 +1173,30 @@ Unknown ids fall back to a low-opacity rect so layout never collapses."
 ```tsx
 import Link from "next/link";
 
+export type Accent = "cyan" | "green" | "purple" | "magenta";
+
 type Props = {
   eyebrow: string;
   tagline: string;
-  glow: "cyan" | "green" | "purple" | "magenta";
+  accent: Accent;
   exitHref?: string;
   exitLabel?: string;
 };
 
-const EYEBROW_COLOR: Record<Props["glow"], string> = {
+export const ACCENT_COLOR: Record<Accent, string> = {
   cyan: "#2cc1eb",
   green: "#6cffc2",
   purple: "#a48cff",
   magenta: "#ff8ab8",
 };
 
-export function PanelHeader({ eyebrow, tagline, glow, exitHref, exitLabel }: Props) {
+export function PanelHeader({ eyebrow, tagline, accent, exitHref, exitLabel }: Props) {
   return (
-    <div className="flex items-center justify-between border-b border-white/[0.06] pb-3.5">
+    <div className="flex items-start justify-between border-b border-white/[0.05] pb-3.5">
       <div>
         <div
           className="text-[10px] font-bold uppercase tracking-[0.16em]"
-          style={{ color: EYEBROW_COLOR[glow] }}
+          style={{ color: ACCENT_COLOR[accent] }}
         >
           {eyebrow}
         </div>
@@ -1201,8 +1205,7 @@ export function PanelHeader({ eyebrow, tagline, glow, exitHref, exitLabel }: Pro
       {exitHref && exitLabel && (
         <Link
           href={exitHref}
-          className="text-[11px] text-white/50 transition-colors hover:text-white/80"
-          aria-label={`Browse all ${eyebrow.toLowerCase()}`}
+          className="text-[11px] text-white/45 transition-colors hover:text-white/80"
         >
           {exitLabel} →
         </Link>
@@ -1240,14 +1243,17 @@ type Props = {
   built?: boolean;
 };
 
+// Restrained-professional per D1: subtle fill + neutral border on hover.
+// No box-shadow glow. No accent-color border. No icon-tile gradient.
+// No arrow translate. No arrow color shift to accent.
 const ROW =
-  "group/row grid grid-cols-[44px_1fr_auto] items-center gap-3 rounded-[14px] border border-transparent p-3 transition-all duration-150 hover:border-[rgba(44,193,235,0.18)] hover:bg-white/[0.05] hover:shadow-[0_0_0_1px_rgba(44,193,235,0.08),0_6px_20px_-10px_rgba(44,193,235,0.3)]";
+  "group/row grid grid-cols-[40px_1fr_auto] items-center gap-3 rounded-[10px] border border-transparent p-[10px_12px] transition-colors duration-120 hover:border-white/[0.06] hover:bg-white/[0.04]";
 const ICON_TILE =
-  "flex h-11 w-11 items-center justify-center rounded-[12px] border border-white/[0.07] bg-white/[0.04] text-white transition-all duration-200 group-hover/row:border-transparent group-hover/row:bg-[linear-gradient(135deg,rgba(71,31,195,0.55),rgba(44,193,235,0.55))] group-hover/row:shadow-[0_4px_14px_-4px_rgba(44,193,235,0.5)]";
+  "flex h-10 w-10 items-center justify-center rounded-[10px] border border-white/[0.06] bg-white/[0.04] text-white/75 transition-colors duration-120 group-hover/row:bg-white/[0.06] group-hover/row:text-white";
 const LABEL = "text-sm font-semibold leading-tight text-white";
-const DESC = "mt-0.5 text-xs leading-snug text-white/55 group-hover/row:text-white/65";
+const DESC = "mt-0.5 text-xs leading-snug text-white/55";
 const ARROW =
-  "text-base text-white/25 transition-all duration-200 group-hover/row:translate-x-0.5 group-hover/row:text-[#2cc1eb]";
+  "text-sm text-white/25 transition-colors duration-120 group-hover/row:text-white/60";
 
 export function PanelRow({ href, label, description, icon, built = true }: Props) {
   const inner = (
@@ -1302,27 +1308,20 @@ git commit -m "feat(nav): PanelRow — icon-led row with hover lift + active mir
 ```tsx
 import Link from "next/link";
 import type { ReactNode } from "react";
+import type { Accent } from "@/components/nav/pieces/PanelHeader";
 
-type Glow = "cyan" | "green" | "purple" | "magenta";
-
-const GLOW_BG: Record<Glow, string> = {
-  cyan: "radial-gradient(circle, rgba(44,193,235,0.35), transparent 70%)",
-  green: "radial-gradient(circle, rgba(108,255,194,0.30), transparent 70%)",
-  purple: "radial-gradient(circle, rgba(71,31,195,0.35), transparent 70%)",
-  magenta: "radial-gradient(circle, rgba(255,138,184,0.30), transparent 70%)",
-};
-
-const BG_GRADIENT: Record<Glow, string> = {
-  cyan: "linear-gradient(160deg, #231656 0%, #0d2c3a 100%)",
-  green: "linear-gradient(160deg, #2a1056 0%, #0d3a2c 100%)",
-  purple: "linear-gradient(160deg, #1a1430 0%, #0d2030 100%)",
-  magenta: "linear-gradient(160deg, #3a1644 0%, #0d2c3a 100%)",
+const ACCENT_BORDER: Record<Accent, string> = {
+  cyan: "rgba(44,193,235,0.15)",
+  green: "rgba(108,255,194,0.15)",
+  purple: "rgba(164,140,255,0.15)",
+  magenta: "rgba(255,138,184,0.15)",
 };
 
 type Props = {
   href: string;
-  glow: Glow;
-  pill: ReactNode;
+  accent: Accent;
+  /** Optional tracked-uppercase eyebrow ABOVE the headline. e.g. "NEXT EVENT · KUBECON EU". Replaces the old `pill` slot — no chip, just typography. */
+  eyebrow?: string;
   headline: string;
   sub?: string;
   body?: ReactNode;
@@ -1330,38 +1329,51 @@ type Props = {
   minHeight?: number;
 };
 
+const ACCENT_TEXT: Record<Accent, string> = {
+  cyan: "#2cc1eb",
+  green: "#6cffc2",
+  purple: "#a48cff",
+  magenta: "#ff8ab8",
+};
+
 export function FeaturedTile({
   href,
-  glow,
-  pill,
+  accent,
+  eyebrow,
   headline,
   sub,
   body,
   footer,
-  minHeight = 240,
+  minHeight = 220,
 }: Props) {
   return (
     <Link
       href={href}
-      className="relative flex flex-col justify-between overflow-hidden rounded-[16px] border border-white/[0.08] p-4 transition-transform duration-200 hover:scale-[1.005]"
-      style={{ background: BG_GRADIENT[glow], minHeight }}
+      className="flex flex-col justify-between rounded-[12px] border p-4 text-white transition-colors"
+      style={{
+        background: "#1c1530",
+        borderColor: ACCENT_BORDER[accent],
+        minHeight,
+      }}
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full"
-        style={{ background: GLOW_BG[glow] }}
-      />
-      <div className="relative z-[1]">
-        {pill}
-        <div className="mt-3.5 text-[18px] font-bold leading-tight tracking-[-0.01em] text-white">
+      <div>
+        {eyebrow && (
+          <div
+            className="text-[10px] font-bold uppercase tracking-[0.14em]"
+            style={{ color: ACCENT_TEXT[accent] }}
+          >
+            {eyebrow}
+          </div>
+        )}
+        <div className="mt-2 text-[17px] font-bold leading-tight tracking-[-0.01em] text-white">
           {headline}
         </div>
         {sub && (
-          <div className="mt-2 text-xs leading-relaxed text-white/70">{sub}</div>
+          <div className="mt-1.5 text-xs leading-relaxed text-white/65">{sub}</div>
         )}
-        {body && <div className="relative z-[1] mt-3">{body}</div>}
+        {body && <div className="mt-3">{body}</div>}
       </div>
-      {footer && <div className="relative z-[1] mt-3.5">{footer}</div>}
+      {footer && <div className="mt-3">{footer}</div>}
     </Link>
   );
 }
@@ -1371,7 +1383,12 @@ export function FeaturedTile({
 
 ```bash
 git add apps/web/src/components/nav/pieces/FeaturedTile.tsx
-git commit -m "feat(nav): FeaturedTile piece — gradient bg + radial glow + slot pattern"
+git commit -m "feat(nav): FeaturedTile — solid bg, accent border, no glow
+
+Restrained-professional per D1: single solid #1c1530 background,
+1px accent-color border, optional tracked-uppercase eyebrow.
+No corner glow blob. No gradient. No pill chip. No box-shadow.
+Color carries signal via eyebrow only."
 ```
 
 ---
@@ -1395,14 +1412,21 @@ type Props = {
 
 export function ContextualCTA({ headline, sub, ctaLabel, ctaHref }: Props) {
   return (
-    <div className="mt-4 flex items-center justify-between gap-2.5 rounded-[12px] border border-white/[0.06] bg-[linear-gradient(90deg,rgba(71,31,195,0.18),rgba(44,193,235,0.18))] px-3.5 py-2.5">
+    <div className="mt-4 flex items-center justify-between gap-2.5 rounded-[10px] border border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5">
       <div>
-        <div className="text-xs font-semibold text-white">{headline}</div>
-        {sub && <div className="mt-0.5 text-[10px] text-white/55">{sub}</div>}
+        <div className="text-xs font-semibold text-white">
+          {headline}
+          {sub && <span className="ml-1.5 font-normal text-white/55">{sub}</span>}
+        </div>
       </div>
       <Link
         href={ctaHref}
-        className="whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold text-[#0b0816] transition-opacity hover:opacity-90"
+        className="cs-btn-glass inline-flex items-center justify-center whitespace-nowrap"
+        style={{
+          ["--cs-btn-h" as string]: "34px",
+          ["--cs-btn-px" as string]: "14px",
+          ["--cs-btn-fs" as string]: "12px",
+        }}
         aria-label={ctaLabel}
       >
         {ctaLabel}
@@ -1416,10 +1440,11 @@ export function ContextualCTA({ headline, sub, ctaLabel, ctaHref }: Props) {
 
 ```bash
 git add apps/web/src/components/nav/pieces/ContextualCTA.tsx
-git commit -m "feat(nav): ContextualCTA piece — replaces generic Book-a-Demo card
+git commit -m "feat(nav): ContextualCTA — uses cs-btn-glass per panel
 
-Per-panel copy passed in; gradient bar pinned at the bottom.
-Audit issue #2."
+Reuses the existing brand button primitive (matches navbar Book-a-Demo).
+Quiet fill on the bar, no gradient, no glow. Sub-copy folded inline
+after the headline (single semantic sentence). Audit issue #2."
 ```
 
 ---
@@ -1504,24 +1529,11 @@ git commit -m "feat(nav): PersonaCard piece — Audience panel building block"
 
 ```tsx
 import type { ReactNode } from "react";
-import { PanelHeader } from "@/components/nav/pieces/PanelHeader";
-
-type Glow = "cyan" | "green" | "purple" | "magenta";
-
-const PANEL_BG: Record<Glow, string> = {
-  cyan:
-    "radial-gradient(120% 70% at 100% 0%, rgba(44,193,235,0.20), transparent 55%), linear-gradient(180deg, #1a1330 0%, #120c25 100%)",
-  green:
-    "radial-gradient(120% 70% at 0% 0%, rgba(108,255,194,0.14), transparent 55%), linear-gradient(180deg, #1a1330 0%, #120c25 100%)",
-  purple:
-    "radial-gradient(120% 70% at 0% 0%, rgba(71,31,195,0.22), transparent 55%), linear-gradient(180deg, #1a1330 0%, #120c25 100%)",
-  magenta:
-    "radial-gradient(120% 70% at 0% 0%, rgba(255,138,184,0.16), transparent 55%), linear-gradient(180deg, #1a1330 0%, #120c25 100%)",
-};
+import { PanelHeader, type Accent } from "@/components/nav/pieces/PanelHeader";
 
 type Props = {
   width: number;
-  glow: Glow;
+  accent: Accent;
   eyebrow: string;
   tagline: string;
   exitHref?: string;
@@ -1529,16 +1541,16 @@ type Props = {
   children: ReactNode;
 };
 
-export function PanelShell({ width, glow, eyebrow, tagline, exitHref, exitLabel, children }: Props) {
+export function PanelShell({ width, accent, eyebrow, tagline, exitHref, exitLabel, children }: Props) {
   return (
     <div
-      className="cs-mega-surface overflow-hidden p-5"
-      style={{ width, background: PANEL_BG[glow], borderRadius: 20 }}
+      className="overflow-hidden border border-white/[0.06] p-[18px] shadow-[0_18px_50px_-20px_rgba(0,0,0,0.5)]"
+      style={{ width, background: "#161126", borderRadius: 16 }}
     >
       <PanelHeader
         eyebrow={eyebrow}
         tagline={tagline}
-        glow={glow}
+        accent={accent}
         {...(exitHref && exitLabel ? { exitHref, exitLabel } : {})}
       />
       <div className="mt-3.5">{children}</div>
@@ -1551,10 +1563,12 @@ export function PanelShell({ width, glow, eyebrow, tagline, exitHref, exitLabel,
 
 ```bash
 git add apps/web/src/components/nav/panels/PanelShell.tsx
-git commit -m "feat(nav): PanelShell — common chrome reused by all 5 panels
+git commit -m "feat(nav): PanelShell — solid surface, no radial gradients
 
-Per-glow radial-gradient overlay + linear-gradient bg, 20px radius,
-20px padding, hairline border, PanelHeader at the top."
+Single solid #161126 background for every panel. 16px radius, 18px
+padding, hairline border, single drop shadow. No per-accent
+radial-gradient overlay. Accent prop is forwarded to PanelHeader
+only — used for eyebrow color, NOT background tinting."
 ```
 
 ---
@@ -1580,7 +1594,7 @@ export function PanelProducts({ item }: Props) {
   return (
     <PanelShell
       width={item.width ?? 760}
-      glow={item.glow}
+      accent={item.accent}
       eyebrow={item.label}
       tagline={item.tagline}
       {...(item.exitHref && item.exitLabel
@@ -1602,22 +1616,16 @@ export function PanelProducts({ item }: Props) {
         </div>
         <FeaturedTile
           href="/cleanstart-images"
-          glow="cyan"
-          pill={
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(44,193,235,0.3)] bg-[rgba(44,193,235,0.16)] px-2 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#2cc1eb]">
-              <span className="h-1 w-1 rounded-full bg-[#2cc1eb] shadow-[0_0_6px_#2cc1eb]" />
-              Featured
-            </span>
-          }
+          accent="cyan"
           headline="Stop patching. Replace the base."
           sub="Drop in hardened containers — keep your stack, lose the CVEs."
           footer={
             <div>
-              <div className="rounded-lg border border-[rgba(44,193,235,0.18)] bg-black/30 px-2.5 py-2 font-mono text-[11px] text-[#2cc1eb]">
+              <div className="rounded-md border border-white/[0.06] bg-black/25 px-2.5 py-2 font-mono text-[11px] text-white/85">
                 <span className="text-white/40">$</span> docker pull cleanstart/python:latest
               </div>
-              <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-white">
-                Try it now <span className="text-sm">→</span>
+              <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#2cc1eb]">
+                Try python <span className="text-sm">→</span>
               </div>
             </div>
           }
@@ -1664,7 +1672,7 @@ export function PanelSolutions({ item }: Props) {
   return (
     <PanelShell
       width={item.width ?? 760}
-      glow="green"
+      accent="green"
       eyebrow={item.label}
       tagline={item.tagline}
       {...(item.exitHref && item.exitLabel
@@ -1686,21 +1694,16 @@ export function PanelSolutions({ item }: Props) {
         </div>
         <FeaturedTile
           href="/fips"
-          glow="green"
-          minHeight={280}
-          pill={
-            <span className="inline-flex rounded-full border border-[rgba(108,255,194,0.3)] bg-[rgba(108,255,194,0.15)] px-2 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#6cffc2]">
-              FIPS 140-3
-            </span>
-          }
+          accent="green"
+          minHeight={260}
           headline="FIPS, drop-in."
           sub="Validated cryptography, no code change. Replace base images, inherit compliance."
           footer={
             <div>
-              <div className="rounded-lg border border-[rgba(108,255,194,0.18)] bg-black/30 px-2.5 py-2 font-mono text-[11px] text-[#6cffc2]">
+              <div className="rounded-md border border-white/[0.06] bg-black/25 px-2.5 py-2 font-mono text-[11px] text-white/85">
                 <span className="text-white/40">$</span> docker pull cleanstart/python-fips
               </div>
-              <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-white">
+              <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#6cffc2]">
                 See FIPS stack <span className="text-sm">→</span>
               </div>
             </div>
@@ -1746,7 +1749,7 @@ export function PanelAudience({ item }: Props) {
   return (
     <PanelShell
       width={item.width ?? 640}
-      glow="purple"
+      accent="purple"
       eyebrow={item.label}
       tagline={item.tagline}
     >
@@ -1877,7 +1880,7 @@ export function PanelResources({ item }: Props) {
   return (
     <PanelShell
       width={item.width ?? 880}
-      glow="cyan"
+      accent="cyan"
       eyebrow={item.label}
       tagline={item.tagline}
       {...(item.exitHref && item.exitLabel
@@ -1939,7 +1942,7 @@ export function PanelCompany({ item }: Props) {
   return (
     <PanelShell
       width={item.width ?? 760}
-      glow="magenta"
+      accent="magenta"
       eyebrow={item.label}
       tagline={item.tagline}
       {...(item.exitHref && item.exitLabel
@@ -1961,13 +1964,8 @@ export function PanelCompany({ item }: Props) {
         </div>
         <FeaturedTile
           href="/careers"
-          glow="magenta"
-          minHeight={300}
-          pill={
-            <span className="inline-flex rounded-full border border-[rgba(255,138,184,0.3)] bg-[rgba(255,138,184,0.16)] px-2 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#ff8ab8]">
-              We're hiring
-            </span>
-          }
+          accent="magenta"
+          minHeight={280}
           headline="Build the base layer with us."
           sub="Engineers, SEs, designers. Remote-friendly. Equity-led."
           footer={
@@ -1976,13 +1974,13 @@ export function PanelCompany({ item }: Props) {
                 {AVATAR_GRADIENTS.map((g, i) => (
                   <div
                     key={i}
-                    className="h-8 w-8 rounded-full border-2 border-[#1a1330]"
-                    style={{ background: g, marginLeft: i === 0 ? 0 : -10 }}
+                    className="h-[30px] w-[30px] rounded-full border-2 border-[#161126]"
+                    style={{ background: g, marginLeft: i === 0 ? 0 : -8 }}
                   />
                 ))}
-                <div className="ml-3 text-[10px] text-white/70">Open roles · see careers</div>
+                <div className="ml-3 text-[10px] text-white/70">Open roles</div>
               </div>
-              <div className="mt-3.5 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#ff8ab8]">
+              <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#ff8ab8]">
                 See careers <span className="text-sm">→</span>
               </div>
             </div>
@@ -2512,21 +2510,15 @@ export function PanelProducts({ item, latestImages }: Props) {
     ? (
       <FeaturedTile
         href={imageDetailsHref(chosen.name)}
-        glow="cyan"
-        pill={
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(44,193,235,0.3)] bg-[rgba(44,193,235,0.16)] px-2 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#2cc1eb]">
-            <span className="h-1 w-1 rounded-full bg-[#2cc1eb] shadow-[0_0_6px_#2cc1eb]" />
-            Featured
-          </span>
-        }
+        accent="cyan"
         headline="Stop patching. Replace the base."
         sub="Drop in hardened containers — keep your stack, lose the CVEs."
         footer={
           <div>
-            <div className="rounded-lg border border-[rgba(44,193,235,0.18)] bg-black/30 px-2.5 py-2 font-mono text-[11px] text-[#2cc1eb]">
+            <div className="rounded-md border border-white/[0.06] bg-black/25 px-2.5 py-2 font-mono text-[11px] text-white/85">
               <span className="text-white/40">$</span> docker pull cleanstart/{chosen.name}:latest
             </div>
-            <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-white">
+            <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#2cc1eb]">
               Try {chosen.name} <span className="text-sm">→</span>
             </div>
           </div>
@@ -2536,16 +2528,11 @@ export function PanelProducts({ item, latestImages }: Props) {
     : (
       <FeaturedTile
         href="/cleanstart-images"
-        glow="cyan"
-        pill={
-          <span className="inline-flex rounded-full border border-[rgba(44,193,235,0.3)] bg-[rgba(44,193,235,0.16)] px-2 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#2cc1eb]">
-            Featured
-          </span>
-        }
+        accent="cyan"
         headline="Stop patching. Replace the base."
         sub="Drop in hardened containers — keep your stack, lose the CVEs."
         footer={
-          <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-white">
+          <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#2cc1eb]">
             Browse images <span className="text-sm">→</span>
           </div>
         }
@@ -2555,7 +2542,7 @@ export function PanelProducts({ item, latestImages }: Props) {
   return (
     <PanelShell
       width={item.width ?? 760}
-      glow="cyan"
+      accent="cyan"
       eyebrow={item.label}
       tagline={item.tagline}
       {...(item.exitHref && item.exitLabel
@@ -3542,7 +3529,15 @@ the server-fetching Header. SpotlightColumn body lands in next task."
 - Modify: `apps/web/src/components/nav/panels/PanelResources.tsx`
 - Modify: `apps/web/src/components/nav/panels/PanelCompany.tsx`
 
-- [ ] **Step 1: Implement the shared renderer**
+> **Per spec D1 — apply these substitutions as you implement the code block below:**
+>
+> 1. **No pill chips.** Every place the reference JSX wraps text in `<span className="inline-flex … rounded-full border … bg-[rgba(…)] … text-[#…]">` and renders short categorical text ("Next event", "Webinar", "We're hiring", "Spotlight", "Newsletter", "Talent network"), replace it with a tracked-uppercase plain `<div>` styled `text-[10px] font-bold uppercase tracking-[0.14em]` and the accent color via `style={{ color: '#2cc1eb' }}` (or matching accent).
+> 2. **No glow blob `<div>`.** Remove every `<div aria-hidden … background: radial-gradient(...)` line — the new `FeaturedTile` does not render a glow.
+> 3. **Solid tile background.** Replace every variant's `style={{ background: 'linear-gradient(…)' }}` with `style={{ background: '#1c1530' }}` + 1 px accent-color border (see `ACCENT_BORDER` map in Task 2.5).
+> 4. **No pulse dot.** Remove every `<span className="… shadow-[0_0_6px_#…]">` inner span.
+> 5. **`evergreen` talent-network trust pills stay.** `~30 sec` + `no resume` carry concrete info, not category — keep them.
+
+- [ ] **Step 1: Implement the shared renderer** (apply the 5 substitutions above to every variant's `<span class="pill ...">`-style block)
 
 ```tsx
 // apps/web/src/components/nav/pieces/SpotlightRenderer.tsx
@@ -3952,147 +3947,18 @@ git push origin phase4-mobile
 
 ---
 
-## Phase 5 · Motion + delight (1–2 days)
+## Phase 5 · Motion polish + reduced-motion audit (1 day)
 
-### Task 5.1: Animated gradient sweep on featured tile
+Scope deliberately tight per spec D1 (restrained-professional). All decorative animations were cut from earlier drafts: no animated gradient sweep, no typewriter cycle, no micro-icon hover scale, no glow pulses. Phase 5 verifies the reduced-motion fallbacks land cleanly and closes out the project.
 
-**Files:**
-- Modify: `apps/web/src/components/nav/pieces/FeaturedTile.tsx`
-- Modify: `apps/web/src/app/globals.css`
-
-- [ ] **Step 1: Add the keyframes to globals.css**
-
-Append to `apps/web/src/app/globals.css`:
-
-```css
-@keyframes nav-glow-sweep {
-  0%   { transform: translate3d(-30%, -30%, 0); }
-  100% { transform: translate3d(30%, 30%, 0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .nav-glow-animated { animation: none !important; }
-}
-
-.nav-glow-animated {
-  animation: nav-glow-sweep 6s ease-in-out infinite alternate;
-  will-change: transform;
-}
-```
-
-- [ ] **Step 2: Apply the class to the glow blob in `FeaturedTile`**
-
-In `FeaturedTile.tsx`, add `nav-glow-animated` to the glow div className:
-
-```tsx
-<div
-  aria-hidden
-  className="nav-glow-animated pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full"
-  style={{ background: GLOW_BG[glow] }}
-/>
-```
-
-- [ ] **Step 3: Manual test**
-
-```bash
-pnpm --filter @cleanstart/web dev
-```
-
-Open Products. The corner glow drifts gently. Toggle `prefers-reduced-motion: reduce` in DevTools rendering panel — animation stops.
-
-- [ ] **Step 4: Commit**
-
-```bash
-git add apps/web/src/components/nav/pieces/FeaturedTile.tsx apps/web/src/app/globals.css
-git commit -m "feat(nav): animated gradient sweep on featured tile
-
-6s alternating translate3d on the corner glow blob. GPU-only.
-prefers-reduced-motion turns it off cleanly."
-```
-
----
-
-### Task 5.2: Code-snippet typewriter cycle on Products tile
-
-**Files:**
-- Modify: `apps/web/src/components/nav/panels/PanelProducts.tsx`
-
-- [ ] **Step 1: Wire a setInterval-based cycle**
-
-In `PanelProducts.tsx`, replace the `useState`/`useEffect` block with:
-
-```tsx
-const [index, setIndex] = useState(0);
-const [typedSuffix, setTypedSuffix] = useState('');
-const reducedMotion = useReducedMotion();
-
-useEffect(() => {
-  if (latestImages.length === 0) return;
-  if (reducedMotion) {
-    setIndex(Math.floor(Math.random() * latestImages.length));
-    return;
-  }
-
-  let cancelled = false;
-  let i = Math.floor(Math.random() * latestImages.length);
-
-  function advance() {
-    if (cancelled) return;
-    const next = (i + 1) % latestImages.length;
-    i = next;
-    setIndex(next);
-    setTypedSuffix('');
-    setTimeout(advance, 3500);
-  }
-
-  setIndex(i);
-  setTimeout(advance, 3500);
-  return () => { cancelled = true; };
-}, [latestImages, reducedMotion]);
-
-const chosen = latestImages[index];
-```
-
-Add the `useReducedMotion` hook:
-
-```tsx
-function useReducedMotion(): boolean {
-  const [v, setV] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setV(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-  return v;
-}
-```
-
-- [ ] **Step 2: Manual test the cycle behavior + reduced-motion**
-
-Open Products. Watch the command cycle every 3.5s. Toggle reduced-motion → cycle stops, random-on-mount.
-
-- [ ] **Step 3: Commit**
-
-```bash
-git add apps/web/src/components/nav/panels/PanelProducts.tsx
-git commit -m "feat(nav): cycling featured image (Phase 5 motion)
-
-Replaces random-on-open with a 3.5s cycle across the latest-images
-pool. prefers-reduced-motion: pin to a single random pick on mount."
-```
-
----
-
-### Task 5.3: Phase 5 closeout — reduced-motion audit + final sync
+### Task 5.1: Phase 5 closeout — reduced-motion audit + final sync
 
 - [ ] **Step 1: Manual reduced-motion audit**
 
 In DevTools Rendering panel, set `prefers-reduced-motion: reduce`. Walk through the navbar:
 - Mega panel open: no scale animation, just opacity
 - Row hover: color change only, no transform
-- Featured tile glow: static (no sweep)
+- Featured tile: solid background, no animation (no sweep, no pulse)
 - Products tile: static command (no cycle)
 - Cross-fade between triggers: instant
 
