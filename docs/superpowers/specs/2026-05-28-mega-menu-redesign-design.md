@@ -41,7 +41,7 @@ The goal of this redesign is to fix all eleven and lift the navbar from "functio
 
 ### Non-goals (deferred)
 - **No IA restructure.** The six top-level triggers stay: Products · Solutions · Audience · Resources · Company · Partners. Renaming or merging is out of scope and needs marketing/CEO sign-off in a separate brainstorm.
-- **No CMS schema changes.** Resources panel reads existing Payload collections (`blogs`, `events`) through the existing API clients. No new fields, no new collections.
+- **Minimal CMS schema delta.** Resources panel reads existing Payload collections (`blogs`, `news`, `resources`, `webinars`, `events`) through the existing API clients. The redesign adds **two additive Payload globals** — `resourcesSpotlight` and `companySpotlight` — each a 5-field global (image, headline, sub, ctaLabel, ctaHref, optional `expiresAt`). Additive only, no migration risk. No collection changes, no field renames.
 - **No new design system primitives** in `packages/ui` for this work. Everything lives in `apps/web/src/components/nav/`.
 - **No per-image landing pages** are built by this work — `images.cleanstart.com` already hosts them at `/images/<name>/details`. We deep-link to those.
 - **No search bar in the navbar.** Add later if it earns its place; not part of this scope.
@@ -59,9 +59,12 @@ The goal of this redesign is to fix all eleven and lift the navbar from "functio
 | D5 | IA changes | None |
 | D6 | Underlying primitive | Keep `@base-ui/react/navigation-menu` |
 | D7 | Default value of `NavLeaf.built` | Flipped to `true` — explicit `built: false` to mark unbuilt |
-| D8 | Resources panel data source | Existing Payload clients (`fetchLatestBlogs`, `getUpcomingEvents`); fall back to static content on empty/error |
+| D8 | Resources panel data sources | (a) Latest Updates feed = cross-collection query across `blogs` + `news` + `resources` + `webinars`, sorted by `publishedAt` desc, top 3, webinar omitted if no upcoming. (b) Spotlight = priority chain: next event ≤ 30 days → next webinar ≤ 30 days → `resourcesSpotlight` CMS global → Bulletin evergreen. |
 | D9 | Phasing | 5 phases, each independently shippable to `development` |
 | D10 | Branch | All work on `development`. Sync cycle (`development → main → farheen`) per repo CLAUDE.md after each phase. |
+| D11 | Company panel data sources | Spotlight 3-state chain: (1) live `careers.openRoles > 0` → "We're hiring · X open roles" + avatars. (2) Else `companySpotlight` CMS global if set and not expired → marketing self-serve card. (3) Else evergreen "Join the talent network" with `~30 sec` and `no resume` trust pills. |
+| D12 | CMS spotlight globals | Two additive Payload globals — `resourcesSpotlight`, `companySpotlight` — identical shape: `image` (upload), `headline` (text, req), `sub` (text), `ctaLabel` (text, req), `ctaHref` (text, req), `expiresAt` (date, optional). Editor self-serve. No collection changes. |
+| D13 | Talent network destination | `/careers/talent-network` form route. If the route does not exist when Phase 3 lands, v1 falls back to `mailto:careers@cleanstart.com?subject=Talent%20network`. Scaffolding the form is a deferred follow-up (§14). |
 
 ---
 
@@ -317,35 +320,154 @@ Replaces the compact menu. Two `PersonaCard`s in a 1fr/1fr grid.
 
 No featured tile, no bottom CTA bar.
 
-### 7.7 PanelResources (editorial)
+### 7.7 PanelResources (editorial — Browse · Latest Updates · Spotlight)
 
-Widest panel at 880 px. 3-column grid `1.5fr 1fr 1fr`.
+Widest panel at 880 px. 3-column grid `200px 1fr 1fr`, 16 px gap.
 
-**Left column — Latest from the blog (3 entries):**
-- Data source: existing `getBlogs({ limit: 3, sort: '-publishedAt' })` or equivalent in `lib/api/`.
-- Each row: 64 × 48 cover thumb · category pill · title (2 lines max, ellipsis) · "X min read · Yd ago".
-- Fallback: static 3-row list of headline articles defined in code.
+#### Column 1 · Browse (200 px, static IA preserved)
 
-**Center column — Don't miss (next event):**
-- Data source: existing `getUpcomingEvents({ limit: 1 })` from `CommunitySections` pattern.
-- Card: type pill (`Webinar` / `In-person`) · title · date+time · location/duration · 2-line description · "Save your seat →" CTA.
-- Fallback: static "Subscribe to be notified" tile.
+Two grouped lists, group headers in `#2cc1eb`, 9 px, 700 weight, 0.14em tracking:
 
-**Right column — Browse (static link list):**
-- Knowledge Hub · Resource Center · Newsroom · Podcast · In-Person Events · Webinars.
-- Each row 36 px tall, tiny leading icon at 60 % opacity.
+- **INSIGHTS** — Blogs · Resource Center · Newsroom · Knowledge Hub.
+- **EVENTS** — In-Person Events · Webinars · Podcast.
 
-**Bottom CTA bar:** "Subscribe to the CleanStart Bulletin — one email per month, new images, talks, advisories." / "Subscribe" → `/subscribe` (or whatever the existing newsletter endpoint is).
+Group divider: 1 px line, `rgba(255,255,255,0.06)`, 12 px vertical margin.
+Each row: tiny leading icon (14 × 14, 70 % opacity) + label (13 px / 500 weight). Hover background `rgba(255,255,255,0.04)`, 8 px row padding.
 
-### 7.8 PanelCompany
+#### Column 2 · Latest Updates (≈ 280 px, dynamic mixed feed)
+
+Header: `LATEST UPDATES` eyebrow + tiny "live" pill (cyan) to signal dynamism.
+
+3 cards, sorted by `publishedAt` desc across `blogs` + `news` + `resources` + `webinars`. Webinar card only appears if there is an upcoming session (`startsAt >= now`). If fewer than 3 items exist after filtering, render the available ones.
+
+Card shape:
+```
+┌─────────────────────────────────┐
+│ [TYPE pill] · meta              │
+│ Title (2 lines max, ellipsis)   │
+└─────────────────────────────────┘
+```
+
+Type pills color-coded:
+
+| Type | Color |
+|------|-------|
+| BLOG | cyan `#2cc1eb` |
+| NEWS | green `#6cffc2` |
+| RESOURCE | purple `#a48cff` |
+| WEBINAR | magenta `#ff8ab8` |
+
+Meta line: `Yd ago · X min` for blog/news/resource; `Mon DD · TIME TZ` for webinar.
+
+Card padding 11 × 12 px, radius 11 px, background `rgba(255,255,255,0.03)`, hairline border `rgba(255,255,255,0.04)`. Hover: lift border to `rgba(44,193,235,0.18)`.
+
+**Data source:** new server fetcher `apps/web/src/components/nav/data/latest-updates-feed.ts` that queries the four collections in parallel, merges, sorts by `publishedAt`, applies the webinar-upcoming filter, slices to 3. Returns shape `{ type, title, slug, publishedAt, readMinutes?, startsAt? }[]`.
+
+**Caching:** wrapped in `react.cache()` and `next: { revalidate: 600, tags: ['resources-latest-updates'] }`. Tag invalidated by a publish-time hook on each source collection.
+
+**Fallback:** if the fetch returns `[]`, hide column 2 entirely and let columns 1 + 3 stretch via grid `grid-template-columns: 200px 1fr` so the layout doesn't collapse.
+
+#### Column 3 · Spotlight (≈ 280 px, priority-chain hero)
+
+Single hero card with a 4-step priority chain. The first match renders; the rest are skipped.
+
+**Priority 1 · Next in-person event (≤ 30 days):**
+- Source: `getUpcomingEvents({ limit: 1, kind: 'inPerson' })` filtered to `startsAt <= now + 30d`.
+- Pill: "Next event" (cyan with pulse dot).
+- Eyebrow: event location (e.g. "KubeCon EU · Paris").
+- Headline: event hook copy (or fallback to event title).
+- Sub: date range + meeting offer.
+- CTA: "Save your seat →" → event slug.
+
+**Priority 2 · Next webinar (≤ 30 days):**
+- Source: `getUpcomingWebinars({ limit: 1 })` filtered to `startsAt <= now + 30d`.
+- Pill: "Webinar" (magenta).
+- Headline: webinar title.
+- Sub: date · time · duration.
+- CTA: "Register →" → webinar slug.
+
+**Priority 3 · `resourcesSpotlight` CMS global (set and not expired):**
+- Source: Payload global `resourcesSpotlight` — `image`, `headline`, `sub`, `ctaLabel`, `ctaHref`, `expiresAt?`.
+- Render: optional image at top, headline, sub, custom CTA.
+- Filter: skip if `expiresAt` is set and in the past.
+
+**Priority 4 · Evergreen "Subscribe to the Bulletin":**
+- Hardcoded card. Pill: "Newsletter" (cyan).
+- Headline: "Get the CleanStart Bulletin."
+- Sub: "One email per month — new images, talks, advisories."
+- CTA: "Subscribe →" → existing newsletter endpoint.
+
+Priority logic encoded in `data/spotlights.ts`:
+
+```ts
+export async function resolveResourcesSpotlight(): Promise<SpotlightCard> {
+  const event = await fetchNextEvent({ kind: 'inPerson', withinDays: 30 });
+  if (event) return toEventCard(event);
+
+  const webinar = await fetchNextWebinar({ withinDays: 30 });
+  if (webinar) return toWebinarCard(webinar);
+
+  const cms = await fetchResourcesSpotlightGlobal();
+  if (cms && !isExpired(cms.expiresAt)) return toCmsCard(cms);
+
+  return BULLETIN_EVERGREEN;
+}
+```
+
+#### Bottom CTA bar
+
+Same width as panel, 12 px above bottom. Copy: "Subscribe to the CleanStart Bulletin — one email per month, new images, talks, advisories." / "Subscribe" → existing newsletter endpoint. Hidden if Spotlight is currently showing Priority 4 (evergreen) — would be redundant.
+
+### 7.8 PanelCompany (3-state spotlight chain)
 
 Static. Five `PanelRow`s (About Us, Teams, Community, Careers, Contact Us).
 
-Featured tile: "We're hiring" pill (magenta) · headline "Build the base layer with us." · sub · team-avatar stack (4 overlapping circles) · "42 open roles" caption · CTA "See careers →" → `/careers`.
+#### Featured tile · 3-state priority chain
 
-Avatar count is hand-coded in v1. A follow-up can wire it to a Payload count on the `careers` collection — out of scope here.
+The first match renders; the rest are skipped.
 
-No bottom CTA bar (the featured tile covers the role).
+**State 1 · `careers.openRoles > 0` (default):**
+- Source: live count from Payload `careers` collection where `status === 'open'`.
+- Pill: "We're hiring" (magenta).
+- Headline: "Build the base layer with us."
+- Sub: "Engineers, SEs, designers. Remote-friendly. Equity-led."
+- Avatar row: 4 overlapping circles (hand-coded in v1 — a follow-up can wire to team-photo avatars from a Payload collection).
+- Count caption: "{count} open roles".
+- CTA: "See careers →" → `/careers`.
+- Background: magenta gradient.
+
+**State 2 · No roles but `companySpotlight` CMS global is set (and not expired):**
+- Source: Payload global `companySpotlight` — same shape as `resourcesSpotlight`.
+- Pill: derived from CMS or default "Milestone" (cyan).
+- Optional eyebrow (e.g. "Mar 2026").
+- Headline, sub, CTA — all from CMS.
+- Background: cyan/green gradient (different from State 1 so editors visually see the variant).
+- Filter: skip if `expiresAt` in the past.
+
+**State 3 · Evergreen "Join the talent network":**
+- Hardcoded.
+- Pill: "Talent network" (green).
+- Headline: "Not hiring right now?"
+- Sub: "Tell us what you do — we'll reach out when a role opens that fits."
+- Trust pills row: `~30 sec` + `no resume` (green, hairline borders).
+- CTA: "Join the network →" → `/careers/talent-network` (D13 — falls back to `mailto:careers@cleanstart.com?subject=Talent%20network` in v1 if the route doesn't exist yet).
+- Background: green gradient (different from States 1 + 2).
+
+Priority logic encoded in `data/spotlights.ts`:
+
+```ts
+export async function resolveCompanySpotlight(): Promise<SpotlightCard> {
+  const openRoles = await fetchOpenRolesCount();
+  if (openRoles > 0) return toCareersCard(openRoles);
+
+  const cms = await fetchCompanySpotlightGlobal();
+  if (cms && !isExpired(cms.expiresAt)) return toCmsCard(cms);
+
+  return TALENT_NETWORK_EVERGREEN;
+}
+```
+
+No bottom CTA bar (the featured tile already covers the conversion role).
 
 ### 7.9 Partners
 
@@ -433,13 +555,18 @@ Each phase is independently mergeable. After each: lint ✓ · typecheck ✓ · 
 - Delete the old `MegaMenu.tsx`. Wire `DesktopNav` to the new shells.
 - Mobile: copy the icon system into MobileNav (no editorial yet).
 
-### Phase 3 — Live data: Products images + Resources editorial (4–5 days)
-- Build `data/latest-images.ts` (sort + slice).
+### Phase 3 — Live data: Products images + Resources editorial + Company careers (5–6 days)
+- Build `data/latest-images.ts` (sort + slice from existing API).
 - Convert `Header.tsx` to fetch images server-side; pass to `DesktopNav` → `PanelProducts`.
 - Wire the random-on-open rotation + deep link on `PanelProducts`.
-- Build `data/resources-feed.ts` (blogs + next event).
-- Build `panels/PanelResources.tsx` with fallbacks.
-- Verify the existing `community-images` cache tag invalidates the menu (manual test: publish image → call `revalidateTag` → menu picks up).
+- Build `data/latest-updates-feed.ts` (cross-collection query across `blogs` + `news` + `resources` + `webinars`).
+- Build `data/spotlights.ts` with `resolveResourcesSpotlight()` and `resolveCompanySpotlight()` priority chains.
+- Build `data/careers-feed.ts` (live open-roles count from Payload).
+- Add two additive Payload globals — `resourcesSpotlight` + `companySpotlight` — in `apps/cms/src/payload/globals/`. Identical shape: `image`, `headline`, `sub`, `ctaLabel`, `ctaHref`, `expiresAt?`. Regenerate types via `pnpm --filter @cleanstart/cms generate:types` and commit.
+- Wire `PanelResources` with Browse + Latest Updates + Spotlight columns.
+- Wire `PanelCompany` 3-state spotlight chain.
+- Talent network route: if `/careers/talent-network` does not exist, encode the fallback `mailto:` and file a follow-up issue (§14).
+- Verify cache invalidation: publish a blog → trigger `revalidateTag('resources-latest-updates')` → confirm panel picks up on next open. Same for `community-images`, `resources-spotlight`, `company-spotlight`.
 
 ### Phase 4 — Mobile parity (2 days)
 - Mirror icon system + contextual CTAs into MobileNav (full pass).
@@ -488,8 +615,10 @@ Lighthouse perf at /, /cleanstart-images, /blogs must not regress more than 2 po
 | Should Pricing / Docs join the top nav? | Product-roadmap-level decision, not nav-redesign decision |
 | Should the featured Products tile show image OS/distro badges? | Possible Phase 3.5 enhancement once API exposes the field |
 | Should we add a global navbar search? | Separate spec — defer at least one full release after this redesign ships |
-| Should the careers "42 open roles" count be live from Payload? | Possible follow-up after careers collection schema firms up |
 | Mobile featured-tile rotation (code snippet on touch)? | Defer — static fallback is good enough; revisit if user testing flags it |
+| `/careers/talent-network` route + form | If the route doesn't exist when Phase 3 lands, v1 uses `mailto:` fallback. Scaffolding the form (Payload `talentSubmissions` collection or Typeform link) is a follow-up issue. |
+| Avatar stack on careers featured tile — live photos? | v1 = 4 hand-coded gradient circles. Follow-up wires to a Payload `teamPhotos` source if/when that exists. |
+| Image OS/distro badges on Products tile? | Possible Phase 3.5 once the community-images API exposes the field |
 
 ---
 
@@ -516,8 +645,14 @@ Lighthouse perf at /, /cleanstart-images, /blogs must not regress more than 2 po
 | `apps/web/src/components/nav/panels/PanelAudience.tsx` | New | 2 |
 | `apps/web/src/components/nav/panels/PanelResources.tsx` | New (static fallback in P2; live in P3) | 2/3 |
 | `apps/web/src/components/nav/panels/PanelCompany.tsx` | New | 2 |
-| `apps/web/src/components/nav/data/latest-images.ts` | New | 3 |
-| `apps/web/src/components/nav/data/resources-feed.ts` | New | 3 |
+| `apps/web/src/components/nav/data/latest-images.ts` | New (sort + slice from existing community-images API) | 3 |
+| `apps/web/src/components/nav/data/latest-updates-feed.ts` | New (cross-collection query, top 3, webinar conditional) | 3 |
+| `apps/web/src/components/nav/data/spotlights.ts` | New (`resolveResourcesSpotlight` + `resolveCompanySpotlight` priority chains) | 3 |
+| `apps/web/src/components/nav/data/careers-feed.ts` | New (live open-roles count) | 3 |
+| `apps/cms/src/payload/globals/ResourcesSpotlight.ts` | New (additive Payload global) | 3 |
+| `apps/cms/src/payload/globals/CompanySpotlight.ts` | New (additive Payload global) | 3 |
+| `apps/cms/src/payload/payload.config.ts` | Register the two new globals | 3 |
+| `apps/cms/payload-types.ts` | Regenerated via `pnpm --filter @cleanstart/cms generate:types` | 3 |
 | `apps/web/src/components/nav/MobileNav.tsx` | Add NavIcon + ContextualCTA + hide unbuilt | 2/4 |
 | `apps/web/src/components/nav/NavLink.tsx` | Active-route polish | 1 |
 
@@ -525,12 +660,12 @@ Lighthouse perf at /, /cleanstart-images, /blogs must not regress more than 2 po
 
 ## 16. Out of scope / will not touch
 
-- Anything in `apps/cms/`.
+- **Existing** `apps/cms/` collections, fields, hooks, and access rules. The only CMS additions are two new globals (`resourcesSpotlight`, `companySpotlight`) — additive, no migration. See §3 D12.
 - Anything in `packages/ui/` (no new shared primitives for this work).
-- The Payload CMS schema (`apps/cms/payload-types.ts`).
 - `cleanstart-logo.svg` and any logo treatment.
 - `globals.css` and the typography system (`apps/web/docs/TYPOGRAPHY-SYSTEM.md`) — the redesign consumes existing tokens; it does not add new ones.
 - The `cs-btn-glass` button — featured tile and contextual CTA buttons reuse existing button styles where they fit; no new variants.
+- IA changes (renaming or merging top-level triggers). Locked in §3 D5.
 
 ---
 
