@@ -41,12 +41,17 @@ export function FactoryHero() {
 
   // R3F's <Canvas> initializes its ResizeObserver on first paint, which can
   // race with our 200ms scene-mount defer and leave the canvas stuck at its
-  // 300x150 default. Once the scene has mounted, fire one resize event so the
-  // observer re-measures against the now-finalized parent dimensions.
+  // 300x150 default. Once the scene has mounted, fire resize events across a
+  // ~750ms window so the observer re-measures against the finalized parent
+  // dimensions whenever its own timing finally lands.
   useEffect(() => {
     if (!sceneReady || reduced || !supportsWebGL) return;
-    const id = window.setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
-    return () => window.clearTimeout(id);
+    const ids = [50, 150, 350, 750].map((delay) =>
+      window.setTimeout(() => window.dispatchEvent(new Event('resize')), delay),
+    );
+    return () => {
+      for (const id of ids) window.clearTimeout(id);
+    };
   }, [sceneReady, reduced, supportsWebGL]);
 
   return (
