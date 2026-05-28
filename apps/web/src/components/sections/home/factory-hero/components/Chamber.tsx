@@ -31,14 +31,12 @@ export function Chamber({ position, size, label, children }: ChamberProps) {
       </mesh>
       {/* label above the chamber */}
       <Text
-        position={[0, h / 2 + 0.18, 0]}
-        fontSize={0.14}
+        position={[0, h / 2 + 0.16, 0]}
+        fontSize={0.085}
         color={COLORS.neonPrimary}
-        letterSpacing={0.16}
+        letterSpacing={0.12}
         anchorX="center"
         anchorY="middle"
-        outlineWidth={0.005}
-        outlineColor={COLORS.neonPrimary}
       >
         {label}
       </Text>
