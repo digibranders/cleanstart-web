@@ -1,7 +1,12 @@
 'use client';
 
 import { Text } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { useRef, useState } from 'react';
+import type { MutableRefObject } from 'react';
+import { chamberDwell } from '../../lib/dwell';
 import { BLOOM_LAYER, COLORS } from '../../lib/materials';
+import type { CubePhase } from '../../lib/timeline';
 
 const HASH_ROWS = [
   '7f3a2c d91b',
@@ -15,19 +20,29 @@ const HASH_ROWS = [
 
 interface Props {
   position: [number, number, number];
-  /** 0..1 — progress through the SBOM print window. */
-  progress: number;
+  chamberIndex: 0 | 1 | 2 | 3;
+  phaseA: MutableRefObject<CubePhase>;
+  phaseB: MutableRefObject<CubePhase>;
 }
 
-/**
- * CH4 · ATTEST·SHIP — permanent printer head + signature stamp. While a cube
- * is dwelling, hash rows print out below the head in monospace.
- */
-export function SbomTicker({ position, progress }: Props) {
-  const rowsShown = Math.floor(progress * HASH_ROWS.length);
+/** CH4 · ATTEST·SHIP — permanent printer + signature seal; hash rows print on dwell. */
+export function SbomTicker({ position, chamberIndex, phaseA, phaseB }: Props) {
+  const [rowsShown, setRowsShown] = useState(0);
+  const lastShownRef = useRef(0);
+
+  useFrame(() => {
+    const a = chamberDwell(phaseA.current, chamberIndex);
+    const b = chamberDwell(phaseB.current, chamberIndex);
+    const progress = Math.max(a, b);
+    const target = Math.floor(progress * HASH_ROWS.length);
+    if (target !== lastShownRef.current) {
+      lastShownRef.current = target;
+      setRowsShown(target);
+    }
+  });
+
   return (
     <group position={position}>
-      {/* Permanent printer head (always visible) */}
       <mesh
         position={[-0.05, 0.08, 0]}
         ref={(m) => {
@@ -37,7 +52,6 @@ export function SbomTicker({ position, progress }: Props) {
         <boxGeometry args={[0.16, 0.06, 0.08]} />
         <meshBasicMaterial color={COLORS.neonSecondary} toneMapped={false} />
       </mesh>
-      {/* Permanent signature seal circle (always visible) */}
       <mesh
         position={[-0.2, 0.08, 0]}
         ref={(m) => {
@@ -47,7 +61,6 @@ export function SbomTicker({ position, progress }: Props) {
         <ringGeometry args={[0.04, 0.06, 24]} />
         <meshBasicMaterial color={COLORS.neonPrimary} toneMapped={false} side={2} />
       </mesh>
-      {/* Hash rows print out during dwell */}
       {HASH_ROWS.slice(0, rowsShown).map((row, i) => (
         <Text
           key={i}

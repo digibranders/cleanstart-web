@@ -1,10 +1,10 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Group, Mesh } from 'three';
 import { useLoopPhase } from '../hooks/useLoopPhase';
-import type { LogoSlug } from '../lib/logoPool';
+import { getLogoForCube, type LogoSlug } from '../lib/logoPool';
 import { BLOOM_LAYER, makeCubeCleanMaterial, makeCubeDirtyMaterial } from '../lib/materials';
 import { CubeLogoPlane } from './CubeLogoPlane';
 
@@ -25,10 +25,10 @@ const FACE_OFFSET = CUBE_SIZE / 2 + 0.001; // sit just outside the face, no z-fi
 
 /** Four vertical-face positions + outward rotations for logo planes. */
 const FACES: { position: [number, number, number]; rotation: [number, number, number] }[] = [
-  { position: [0, 0, FACE_OFFSET], rotation: [0, 0, 0] },                    // +Z (front)
-  { position: [0, 0, -FACE_OFFSET], rotation: [0, Math.PI, 0] },             // -Z (back)
-  { position: [FACE_OFFSET, 0, 0], rotation: [0, Math.PI / 2, 0] },          // +X (right)
-  { position: [-FACE_OFFSET, 0, 0], rotation: [0, -Math.PI / 2, 0] },        // -X (left)
+  { position: [0, 0, FACE_OFFSET], rotation: [0, 0, 0] }, // +Z (front)
+  { position: [0, 0, -FACE_OFFSET], rotation: [0, Math.PI, 0] }, // -Z (back)
+  { position: [FACE_OFFSET, 0, 0], rotation: [0, Math.PI / 2, 0] }, // +X (right)
+  { position: [-FACE_OFFSET, 0, 0], rotation: [0, -Math.PI / 2, 0] }, // -X (left)
 ];
 
 export function Cube({ loopOffset, logo, railY, xSpan, orientation }: CubeProps) {
@@ -41,9 +41,33 @@ export function Cube({ loopOffset, logo, railY, xSpan, orientation }: CubeProps)
   const dirtyMat = useMemo(() => makeCubeDirtyMaterial(), []);
   const cleanMat = useMemo(() => makeCubeCleanMaterial(), []);
 
+  // Free GPU resources when the cube unmounts (HMR, route change, viewport switch).
+  useEffect(
+    () => () => {
+      dirtyMat.dispose();
+      cleanMat.dispose();
+    },
+    [dirtyMat, cleanMat],
+  );
+
+  // Per-cube logo cycling. Initial logo comes from the prop; each time the cube
+  // wraps the loop (x crosses from end-of-loop back to start) we advance to the
+  // next entry in the logo pool.
+  const [currentLogo, setCurrentLogo] = useState<LogoSlug>(logo);
+  const generationRef = useRef(0);
+  const lastXRef = useRef(0);
+
   useFrame(() => {
     const p = phaseRef.current;
     if (!groupRef.current) return;
+
+    // Detect loop wrap: x runs monotonically from -1.0 → +1.0 then snaps back to -1.0.
+    const px = p.x;
+    if (lastXRef.current > 0.5 && px < -0.5) {
+      generationRef.current += 1;
+      setCurrentLogo(getLogoForCube(generationRef.current + (loopOffset === 0 ? 0 : 1)));
+    }
+    lastXRef.current = px;
 
     // Travel
     if (orientation === 'horizontal') {
@@ -99,7 +123,7 @@ export function Cube({ loopOffset, logo, railY, xSpan, orientation }: CubeProps)
       {FACES.map((face, i) => (
         <CubeLogoPlane
           key={i}
-          logo={logo}
+          logo={currentLogo}
           materialState={phaseRef.current.material}
           dwell={phaseRef.current.dwell}
           position={face.position}

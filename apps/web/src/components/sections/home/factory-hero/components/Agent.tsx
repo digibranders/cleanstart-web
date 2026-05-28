@@ -1,7 +1,7 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { Group } from 'three';
 import { buildAgentGeometry } from '../lib/geometry';
 import { BLOOM_LAYER, COLORS, makeAgentMaterial } from '../lib/materials';
@@ -17,6 +17,16 @@ const DRIFT_AMOUNT = 0.12;
 
 export function Agent({ position, driftSeed }: AgentProps) {
   const groupRef = useRef<Group>(null);
+  const geometry = useMemo(() => buildAgentGeometry(), []);
+  const material = useMemo(() => makeAgentMaterial(), []);
+
+  useEffect(
+    () => () => {
+      geometry.dispose();
+      material.dispose();
+    },
+    [geometry, material],
+  );
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
@@ -28,7 +38,7 @@ export function Agent({ position, driftSeed }: AgentProps) {
   return (
     <group ref={groupRef} position={position}>
       {/* Body */}
-      <mesh geometry={buildAgentGeometry()} material={makeAgentMaterial()} />
+      <mesh geometry={geometry} material={material} />
       {/* Glowing top antenna so they read as a distinct shape, on bloom layer */}
       <mesh
         position={[0, 0.28, 0]}

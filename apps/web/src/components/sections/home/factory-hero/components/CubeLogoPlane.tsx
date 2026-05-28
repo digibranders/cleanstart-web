@@ -3,8 +3,9 @@
 import { useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
-import type { ShaderMaterial } from 'three';
+import type { Mesh, ShaderMaterial } from 'three';
 import { getLogoAssetUrl, type LogoSlug } from '../lib/logoPool';
+import { BLOOM_LAYER } from '../lib/materials';
 import type { CubeMaterial } from '../lib/timeline';
 
 interface Props {
@@ -39,17 +40,23 @@ export function CubeLogoPlane({
 }: Props) {
   const texture = useTexture(getLogoAssetUrl(logo));
   const materialRef = useRef<ShaderMaterial>(null);
+  const meshRef = useRef<Mesh>(null);
 
   useFrame(() => {
-    if (!materialRef.current) return;
-    let color = 0;
-    if (materialState === 'clean') color = 1;
-    else if (materialState === 'transforming') color = Math.min(1, Math.max(0, dwell));
-    materialRef.current.uniforms.uColor!.value = color;
+    if (materialRef.current) {
+      let color = 0;
+      if (materialState === 'clean') color = 1;
+      else if (materialState === 'transforming') color = Math.min(1, Math.max(0, dwell));
+      materialRef.current.uniforms.uColor!.value = color;
+    }
+    if (meshRef.current) {
+      if (materialState === 'clean') meshRef.current.layers.enable(BLOOM_LAYER);
+      else meshRef.current.layers.disable(BLOOM_LAYER);
+    }
   });
 
   return (
-    <mesh position={position} rotation={rotation}>
+    <mesh ref={meshRef} position={position} rotation={rotation}>
       <planeGeometry args={[size, size]} />
       <shaderMaterial
         ref={materialRef}
