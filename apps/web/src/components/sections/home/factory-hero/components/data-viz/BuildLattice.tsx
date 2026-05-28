@@ -26,7 +26,7 @@ export function BuildLattice({ position, progress }: Props) {
           <mesh
             key={i}
             position={[0, y, 0]}
-            onUpdate={(m: Object3D) => m.layers.enable(BLOOM_LAYER)}
+            ref={(m: Object3D | null) => { if (m) m.layers.enable(BLOOM_LAYER); }}
           >
             <torusGeometry args={[0.28, 0.005, 8, 32]} />
             <meshBasicMaterial color={COLORS.neonPrimary} transparent opacity={0.85 * layerAlpha} />

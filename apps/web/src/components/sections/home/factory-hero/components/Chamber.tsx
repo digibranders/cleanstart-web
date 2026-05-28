@@ -30,7 +30,7 @@ export function Chamber({ position, size, label, children }: ChamberProps) {
       {/* neon edges (BloomLayer = 1 so the post pass picks them up) */}
       <lineSegments
         material={makeChamberEdgeMaterial()}
-        onUpdate={(self) => self.layers.set(BLOOM_LAYER)}
+        ref={(self) => { if (self) self.layers.set(BLOOM_LAYER); }}
       >
         <edgesGeometry
           args={[

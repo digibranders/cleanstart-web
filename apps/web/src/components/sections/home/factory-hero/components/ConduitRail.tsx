@@ -24,7 +24,7 @@ export function ConduitRail({ length, y }: Props) {
       gapSize={0.08}
       transparent
       opacity={0.6}
-      onUpdate={(l: Object3D) => l.layers.enable(BLOOM_LAYER)}
+      ref={(l: Object3D | null) => { if (l) l.layers.enable(BLOOM_LAYER); }}
     />
   );
 }

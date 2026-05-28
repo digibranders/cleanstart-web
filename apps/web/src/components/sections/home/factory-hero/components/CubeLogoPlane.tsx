@@ -23,7 +23,7 @@ interface Props {
 export function CubeLogoPlane({ logo, materialState, dwell }: Props) {
   const texture = useTexture(getLogoAssetUrl(logo));
   const materialRef = useRef<ShaderMaterial>(null);
-  const meshRef = useRef<Mesh>(null);
+  const meshRef = useRef<Mesh | null>(null);
 
   useFrame(() => {
     if (!materialRef.current) return;
@@ -37,11 +37,13 @@ export function CubeLogoPlane({ logo, materialState, dwell }: Props) {
   return (
     <Billboard>
       <mesh
-        ref={meshRef}
         position={[0, 0, 0.32]}
-        onUpdate={(m) => {
-          if (materialState === 'clean') m.layers.enable(BLOOM_LAYER);
-          else m.layers.disable(BLOOM_LAYER);
+        ref={(m) => {
+          meshRef.current = m;
+          if (m) {
+            if (materialState === 'clean') m.layers.enable(BLOOM_LAYER);
+            else m.layers.disable(BLOOM_LAYER);
+          }
         }}
       >
         <planeGeometry args={[0.72, 0.72]} />

@@ -48,7 +48,7 @@ export function Cube({ loopOffset, logo, railY, xSpan, orientation }: CubeProps)
       <mesh
         material={makeCubeCleanMaterial()}
         visible={false}
-        onUpdate={(m) => m.layers.enable(BLOOM_LAYER)}
+        ref={(m) => { if (m) m.layers.enable(BLOOM_LAYER); }}
       >
         <boxGeometry args={[0.6, 0.6, 0.6]} />
       </mesh>
