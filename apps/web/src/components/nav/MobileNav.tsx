@@ -44,6 +44,9 @@ export function MobileNav() {
         side="right"
         className="w-[88vw] max-w-[360px] sm:max-w-[360px] !border-l-white/8 flex flex-col gap-0 p-0"
       >
+        <div className="flex justify-center pt-2" aria-hidden>
+          <div className="h-1 w-10 rounded-full bg-white/15" />
+        </div>
         <SheetTitle className="sr-only">CleanStart navigation</SheetTitle>
         <SheetDescription className="sr-only">
           Browse CleanStart products, solutions, resources, and company links.
