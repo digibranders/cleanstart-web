@@ -2,9 +2,9 @@
 
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
-import type { Mesh } from 'three';
+import type { Group } from 'three';
 import { buildAgentGeometry } from '../lib/geometry';
-import { makeAgentMaterial } from '../lib/materials';
+import { BLOOM_LAYER, COLORS, makeAgentMaterial } from '../lib/materials';
 
 interface AgentProps {
   /** Base corner position inside the chamber. */
@@ -16,21 +16,29 @@ interface AgentProps {
 const DRIFT_AMOUNT = 0.12;
 
 export function Agent({ position, driftSeed }: AgentProps) {
-  const meshRef = useRef<Mesh>(null);
+  const groupRef = useRef<Group>(null);
 
   useFrame(({ clock }) => {
-    if (!meshRef.current) return;
+    if (!groupRef.current) return;
     const t = clock.elapsedTime + driftSeed;
-    meshRef.current.position.x = position[0] + Math.sin(t * 0.7) * DRIFT_AMOUNT;
-    meshRef.current.position.y = position[1] + Math.cos(t * 0.5) * DRIFT_AMOUNT;
+    groupRef.current.position.x = position[0] + Math.sin(t * 0.7) * DRIFT_AMOUNT;
+    groupRef.current.position.y = position[1] + Math.cos(t * 0.5) * DRIFT_AMOUNT;
   });
 
   return (
-    <mesh
-      ref={meshRef}
-      geometry={buildAgentGeometry()}
-      material={makeAgentMaterial()}
-      position={position}
-    />
+    <group ref={groupRef} position={position}>
+      {/* Body */}
+      <mesh geometry={buildAgentGeometry()} material={makeAgentMaterial()} />
+      {/* Glowing top antenna so they read as a distinct shape, on bloom layer */}
+      <mesh
+        position={[0, 0.28, 0]}
+        ref={(m) => {
+          if (m) m.layers.enable(BLOOM_LAYER);
+        }}
+      >
+        <sphereGeometry args={[0.05, 12, 12]} />
+        <meshBasicMaterial color={COLORS.neonSecondary} toneMapped={false} />
+      </mesh>
+    </group>
   );
 }
