@@ -150,6 +150,7 @@ export interface Config {
     announcements: Announcement;
     podcastPage: PodcastPage;
     resourcesSpotlight: ResourcesSpotlight;
+    companySpotlight: CompanySpotlight;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
@@ -161,6 +162,7 @@ export interface Config {
     announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
     podcastPage: PodcastPageSelect<false> | PodcastPageSelect<true>;
     resourcesSpotlight: ResourcesSpotlightSelect<false> | ResourcesSpotlightSelect<true>;
+    companySpotlight: CompanySpotlightSelect<false> | CompanySpotlightSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -10414,6 +10416,26 @@ export interface ResourcesSpotlight {
   createdAt?: string | null;
 }
 /**
+ * Optional spotlight card shown in the Company mega menu. Renders only when there are no open careers. Falls back to the Talent Network evergreen when empty or expired.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companySpotlight".
+ */
+export interface CompanySpotlight {
+  id: number;
+  image?: (number | null) | Media;
+  headline: string;
+  sub?: string | null;
+  ctaLabel: string;
+  ctaHref: string;
+  /**
+   * After this date, the card is skipped and the evergreen renders.
+   */
+  expiresAt?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
@@ -10704,6 +10726,21 @@ export interface PodcastPageSelect<T extends boolean = true> {
  * via the `definition` "resourcesSpotlight_select".
  */
 export interface ResourcesSpotlightSelect<T extends boolean = true> {
+  image?: T;
+  headline?: T;
+  sub?: T;
+  ctaLabel?: T;
+  ctaHref?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companySpotlight_select".
+ */
+export interface CompanySpotlightSelect<T extends boolean = true> {
   image?: T;
   headline?: T;
   sub?: T;

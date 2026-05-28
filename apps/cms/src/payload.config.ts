@@ -93,6 +93,7 @@ import { FooterNav } from './payload/globals/footerNav';
 import { Legal } from './payload/globals/legal';
 import { MainNav } from './payload/globals/mainNav';
 import { PodcastPage } from './payload/globals/podcastPage';
+import { CompanySpotlight } from './payload/globals/companySpotlight';
 import { ResourcesSpotlight } from './payload/globals/resourcesSpotlight';
 import { SeoDefaults } from './payload/globals/seoDefaults';
 import { SiteSettings } from './payload/globals/siteSettings';
@@ -300,7 +301,7 @@ export default buildConfig({
     .map(wireCustomEditView)
     .map(wireAnalyticsTab)
     .map(wireCustomFields),
-  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements, PodcastPage, ResourcesSpotlight]
+  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements, PodcastPage, ResourcesSpotlight, CompanySpotlight]
     .map(wireCustomEditView)
     .map(wireCustomFields),
   endpoints: [
