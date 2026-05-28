@@ -1,3 +1,5 @@
+import { Reveal } from '@/components/ui/Reveal';
+
 /**
  * Public images are bloated — Figma Group 2085665113 (366:6382).
  *
@@ -59,29 +61,31 @@ export function AsrPublicImages(): React.ReactElement {
 
       {/* Heading */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md">
-        <h2
-          className="text-center text-[#111111]"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-h2)',
-            fontWeight: 600,
-            letterSpacing: 'var(--text-t-display-2-ls)',
-            lineHeight: 'var(--text-t-display-2-lh)',
-            marginBottom: '48px',
-          }}
-        >
-          Public images are{' '}
-          <span
+        <Reveal header>
+          <h2
+            className="text-center text-[#111111]"
             style={{
-              background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-h2)',
+              fontWeight: 600,
+              letterSpacing: 'var(--text-t-display-2-ls)',
+              lineHeight: 'var(--text-t-display-2-lh)',
+              marginBottom: '48px',
             }}
           >
-            bloated
-          </span>
-        </h2>
+            Public images are{' '}
+            <span
+              style={{
+                background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              bloated
+            </span>
+          </h2>
+        </Reveal>
       </div>
 
       {/* Desktop diagram: container center, 4 cards at corners, dashed lines */}

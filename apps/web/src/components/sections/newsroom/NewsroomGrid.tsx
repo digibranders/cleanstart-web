@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { News } from "@/lib/news";
 import { Pagination } from "@/components/ui/Pagination";
+import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { NewsroomCard } from "./NewsroomCard";
 
 interface NewsroomGridProps {
@@ -154,14 +155,16 @@ export function NewsroomGrid({
           </p>
         ) : (
           <>
-            <div
+            <RevealStagger
               className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
               style={{ gap: "32px", justifyItems: "center" }}
             >
               {items.map((item) => (
-                <NewsroomCard key={item.id} item={item} />
+                <RevealItem key={item.id}>
+                  <NewsroomCard item={item} />
+                </RevealItem>
               ))}
-            </div>
+            </RevealStagger>
 
             {/* MOBILE — single "View More →" button per Figma 817:5660. */}
             {totalPages > 1 && currentPage < totalPages && (

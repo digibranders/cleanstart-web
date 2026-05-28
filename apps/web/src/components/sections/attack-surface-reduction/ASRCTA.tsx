@@ -5,7 +5,10 @@
  *   title/body: dark #111 · button: solid blue #3960F9
  */
 
+"use client";
+
 import Link from "next/link";
+import { Reveal } from "@/components/ui/Reveal";
 
 export function ASRCTA(): React.ReactElement {
   return (
@@ -124,23 +127,24 @@ export function ASRCTA(): React.ReactElement {
       />
 
       {/* ── Headline ─────────────────────────────────────────────────────────── */}
-      <p
-        className="relative z-10 font-display"
-        style={{
-          color: "#111111",
-          maxWidth: "min(460px, 100%)",
-          fontSize: "var(--cta-card-title)",
-          fontWeight: 600,
-          letterSpacing: "var(--cta-card-title-ls)",
-          lineHeight: "var(--cta-card-title-lh)",
-          textWrap: "balance",
-        }}
-      >
-        Reduce Attack Surface At The Source
-      </p>
+      <Reveal header className="relative z-10" style={{ maxWidth: "min(460px, 100%)" }}>
+        <p
+          className="font-display"
+          style={{
+            color: "#111111",
+            fontSize: "var(--cta-card-title)",
+            fontWeight: 600,
+            letterSpacing: "var(--cta-card-title-ls)",
+            lineHeight: "var(--cta-card-title-lh)",
+            textWrap: "balance",
+          }}
+        >
+          Reduce Attack Surface At The Source
+        </p>
+      </Reveal>
 
       {/* ── Body + blue CTA button ────────────────────────────────────────────── */}
-      <div className="relative z-10 flex flex-col items-center lg:items-start gap-[18px]">
+      <Reveal header delay={0.15} y={20} className="relative z-10 flex flex-col items-center lg:items-start gap-[18px]">
         <p
           className="font-normal text-center lg:text-left"
           style={{
@@ -190,7 +194,7 @@ export function ASRCTA(): React.ReactElement {
             />
           </svg>
         </Link>
-      </div>
+      </Reveal>
     </div>
   );
 }

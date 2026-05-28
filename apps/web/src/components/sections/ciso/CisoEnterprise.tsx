@@ -1,4 +1,5 @@
 import type React from "react";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 /*
  * Figma node 583:2596 — 1920×~720px, white background
@@ -276,46 +277,50 @@ export function CisoEnterprise(): React.ReactElement {
 
       {/* ── Heading — padded container so text has safe margins ── */}
       <div className="relative mx-auto px-6 sm:px-10" style={{ maxWidth: "1276px" }}>
-        <h2
-          className="text-center mx-auto"
-          style={{
-            maxWidth: "654px",
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1,
-            color: "#111",
-            marginBottom: "74px",
-          }}
-        >
-          Built for Enterprise{" "}
-          <span
+        <Reveal header>
+          <h2
+            className="text-center mx-auto"
             style={{
-              background:
-                "linear-gradient(100.87deg, rgb(154, 81, 255) 1.758%, rgb(44, 193, 235) 98.781%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
+              maxWidth: "654px",
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              letterSpacing: "-0.05em",
+              lineHeight: 1,
+              color: "#111",
+              marginBottom: "74px",
             }}
           >
-            Environments
-          </span>
-        </h2>
+            Built for Enterprise{" "}
+            <span
+              style={{
+                background:
+                  "linear-gradient(100.87deg, rgb(154, 81, 255) 1.758%, rgb(44, 193, 235) 98.781%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Environments
+            </span>
+          </h2>
+        </Reveal>
       </div>
 
       {/* ── Card container — NO horizontal padding so 4×295+3×32=1276px fills exactly ── */}
       <div className="relative mx-auto" style={{ maxWidth: "1276px" }}>
 
         {/* ════ DESKTOP — 4 cards in a flex row, centered ════ */}
-        <div
+        <RevealStagger
           className="hidden xl:flex items-start justify-center"
           style={{ gap: "32px" }}
         >
           {CARDS.map((card) => (
-            <EnterpriseCard key={card.title} {...card} />
+            <RevealItem key={card.title}>
+              <EnterpriseCard {...card} />
+            </RevealItem>
           ))}
-        </div>
+        </RevealStagger>
 
         {/* ════ MOBILE — 1-col stack ════
              Figma 856:1367 — cards 328×238px (10px margin each side in 360px)

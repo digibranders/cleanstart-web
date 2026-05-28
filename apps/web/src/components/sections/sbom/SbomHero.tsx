@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 /**
  * Figma frame 161:20839 — 1920 × 652 SBOM hero (header included).
@@ -77,38 +78,43 @@ export function SbomHero(): React.ReactElement {
           paddingBottom: "clamp(40px, 5vw, 80px)",
         }}
       >
-        <h1
-          className="text-white"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-display)",
-            fontWeight: 600,
-            letterSpacing: "var(--text-hero-product-ls, -0.04em)",
-            lineHeight: "var(--text-hero-lh, 1.05)",
-            marginBottom: "clamp(16px, 2.5vw, 32px)",
-            maxWidth: "623px",
-            textTransform: "capitalize",
-          }}
-        >
-          Continuously Verifiable{" "}
-          <span className="cs-text-gradient-impact">SBOMs</span>
-        </h1>
+        <HeroReveal y={50} duration={1.0}>
+          <h1
+            className="text-white"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-display)",
+              fontWeight: 600,
+              letterSpacing: "var(--text-hero-product-ls, -0.04em)",
+              lineHeight: "var(--text-hero-lh, 1.05)",
+              marginBottom: "clamp(16px, 2.5vw, 32px)",
+              maxWidth: "623px",
+              textTransform: "capitalize",
+            }}
+          >
+            Continuously Verifiable{" "}
+            <span className="cs-text-gradient-impact">SBOMs</span>
+          </h1>
+        </HeroReveal>
 
-        <p
-          style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "var(--fs-lead)",
-            fontWeight: 400,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.45,
-            color: "rgba(255,255,255,0.80)",
-            maxWidth: "623px",
-            marginBottom: "clamp(24px, 2.5vw, 32px)",
-          }}
-        >
-          Know what you ship with continuously updated, cryptographically verifiable software inventories.
-        </p>
+        <HeroReveal y={30} delay={0.2} duration={0.8}>
+          <p
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--fs-lead)",
+              fontWeight: 400,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.45,
+              color: "rgba(255,255,255,0.80)",
+              maxWidth: "623px",
+              marginBottom: "clamp(24px, 2.5vw, 32px)",
+            }}
+          >
+            Know what you ship with continuously updated, cryptographically verifiable software inventories.
+          </p>
+        </HeroReveal>
 
+        <HeroReveal y={30} delay={0.35} duration={0.8}>
         <Link
           href="/book-a-demo"
           className="cs-btn-glass"
@@ -137,6 +143,7 @@ export function SbomHero(): React.ReactElement {
             />
           </svg>
         </Link>
+        </HeroReveal>
       </div>
     </section>
   );

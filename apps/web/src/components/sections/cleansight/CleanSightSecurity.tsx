@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 // Title strings use \n to force a 2-line wrap matching the Figma reference.
 // FeatureCard sets whiteSpace: "pre-line" so the break renders.
 const FEATURE_CARDS = [
@@ -160,20 +162,22 @@ export function CleanSightSecurity(): React.ReactElement {
           paddingTop: "var(--spacing-section-md)",
         }}
       >
-        <h2
-          className="text-white text-center mx-auto"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            maxWidth: "744px",
-          }}
-        >
-          Built for Continuous Container{" "}
-          <span className="cs-text-gradient-impact">Security</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-white text-center mx-auto"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              maxWidth: "744px",
+            }}
+          >
+            Built for Continuous Container{" "}
+            <span className="cs-text-gradient-impact">Security</span>
+          </h2>
+        </Reveal>
 
         {/* Desktop layout: 2×2 card grid with the shield floating dead-centre on top.
             Cards have extra padding on the inner edge so text never collides with the shield. */}
@@ -307,30 +311,34 @@ export function CleanSightSecurity(): React.ReactElement {
           className="relative text-center text-white mx-auto flex flex-col"
           style={{ maxWidth: "753px", gap: "24px" }}
         >
-          <h2
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-            }}
-          >
-            From Visibility to{" "}
-            <span className="cs-text-gradient-impact">Action</span>
-          </h2>
-          <p
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.4,
-            }}
-          >
-            Move beyond fragmented visibility with continuous remediation and
-            operational security workflows.
-          </p>
+          <Reveal header>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+              }}
+            >
+              From Visibility to{" "}
+              <span className="cs-text-gradient-impact">Action</span>
+            </h2>
+          </Reveal>
+          <Reveal header delay={0.15} y={20}>
+            <p
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
+              }}
+            >
+              Move beyond fragmented visibility with continuous remediation and
+              operational security workflows.
+            </p>
+          </Reveal>
         </div>
 
         {/* Desktop chart — locked-group layout.

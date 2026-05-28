@@ -35,7 +35,10 @@
  * Corner vector: 534×534px at left=-87px top=-349px
  */
 
+"use client";
+
 import React from "react";
+import { Reveal } from "@/components/ui/Reveal";
 
 const COL_CENTERS = [
   "11.56%", // 147.5 / 1276
@@ -306,34 +309,38 @@ export function CisoSolution(): React.ReactElement {
 
           {/* Heading group */}
           <div className="text-center" style={{ marginBottom: "125px" }}>
-            <h2
-              className="text-white"
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-h2)",
-                fontWeight: 600,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-                marginBottom: "24px",
-              }}
-            >
-              Reduce Risk Before Deployment
-            </h2>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-lead)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.45,
-                color: "rgba(255,255,255,0.8)",
-                maxWidth: "835px",
-                margin: "0 auto",
-              }}
-            >
-              Minimal, hardened container images reduce inherited vulnerabilities
-              before they reach production environments.
-            </p>
+            <Reveal header>
+              <h2
+                className="text-white"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "var(--fs-h2)",
+                  fontWeight: 600,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.1,
+                  marginBottom: "24px",
+                }}
+              >
+                Reduce Risk Before Deployment
+              </h2>
+            </Reveal>
+            <Reveal header delay={0.15} y={20}>
+              <p
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "var(--fs-lead)",
+                  fontWeight: 400,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.45,
+                  color: "rgba(255,255,255,0.8)",
+                  maxWidth: "835px",
+                  margin: "0 auto",
+                }}
+              >
+                Minimal, hardened container images reduce inherited vulnerabilities
+                before they reach production environments.
+              </p>
+            </Reveal>
           </div>
 
           {/* ── Track section ── */}

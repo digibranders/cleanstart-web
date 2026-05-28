@@ -3,6 +3,7 @@ import {
   DETAIL_HERO_GRADIENT,
   DETAIL_HERO_TITLE_STYLE,
 } from "@/components/sections/_shared/DetailHero";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 interface MetaItem {
   label: string;
@@ -66,12 +67,14 @@ export function CareerDetailHero({
         <Breadcrumb title={title} />
 
         <div className="flex justify-center mt-6 md:mt-10">
-          <h1
-            className="font-display font-semibold text-white text-center"
-            style={{ ...DETAIL_HERO_TITLE_STYLE, maxWidth: "860px" }}
-          >
-            {title}
-          </h1>
+          <HeroReveal y={40} duration={0.9}>
+            <h1
+              className="font-display font-semibold text-white text-center"
+              style={{ ...DETAIL_HERO_TITLE_STYLE, maxWidth: "860px" }}
+            >
+              {title}
+            </h1>
+          </HeroReveal>
         </div>
 
         {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -3,6 +3,7 @@
 import type React from "react";
 import { useState } from "react";
 import type { BlogFaqItem } from "@/lib/blog";
+import { Reveal } from "@/components/ui/Reveal";
 
 interface BlogDetailFAQProps {
   faqs: BlogFaqItem[];
@@ -21,12 +22,14 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
           <div className="hidden xl:block shrink-0" style={{ width: "260px" }} aria-hidden />
 
           <div className="min-w-0 flex-1 mx-auto xl:mx-0" style={{ maxWidth: "680px" }}>
-            <h2
-              className="font-display font-bold leading-[1.1] tracking-[-0.04em]"
-              style={{ fontSize: "var(--fs-h3)", color: "#111111", marginBottom: "24px" }}
-            >
-              Frequently Asked Questions
-            </h2>
+            <Reveal header>
+              <h2
+                className="font-display font-bold leading-[1.1] tracking-[-0.04em]"
+                style={{ fontSize: "var(--fs-h3)", color: "#111111", marginBottom: "24px" }}
+              >
+                Frequently Asked Questions
+              </h2>
+            </Reveal>
 
             <div
               className="rounded-[24px]"

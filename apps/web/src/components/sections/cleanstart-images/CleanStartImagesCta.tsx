@@ -1,5 +1,6 @@
 import type React from "react";
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * CTA card content for the Footer's CTA slot — Figma node 792:3328.
@@ -72,21 +73,23 @@ export function CleanStartImagesCta(): React.ReactElement {
       >
         {/* Left: section heading */}
         {/* Figma: width=401px → scaled 354px; Manrope Bold → font-display (Manrope) */}
-        <h2
-          className="font-display text-white shrink-0"
-          style={{
-            fontSize: "var(--cta-card-title)",
-            fontWeight: 600,
-            letterSpacing: "var(--cta-card-title-ls)",
-            lineHeight: "var(--cta-card-title-lh)",
-            maxWidth: "354px",
-          }}
-        >
-          Start with Trusted Foundations
-        </h2>
+        <Reveal header className="shrink-0">
+          <h2
+            className="font-display text-white"
+            style={{
+              fontSize: "var(--cta-card-title)",
+              fontWeight: 600,
+              letterSpacing: "var(--cta-card-title-ls)",
+              lineHeight: "var(--cta-card-title-lh)",
+              maxWidth: "354px",
+            }}
+          >
+            Start with Trusted Foundations
+          </h2>
+        </Reveal>
 
         {/* Right: body copy + glass CTA button */}
-        <div className="flex flex-col items-start gap-6">
+        <Reveal header delay={0.15} y={20} className="flex flex-col items-start gap-6">
           <p
             className="font-sans"
             style={{
@@ -126,7 +129,7 @@ export function CleanStartImagesCta(): React.ReactElement {
               />
             </svg>
           </a>
-        </div>
+        </Reveal>
       </div>
     </div>
   );

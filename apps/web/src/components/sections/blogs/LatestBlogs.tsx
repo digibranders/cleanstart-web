@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Blog } from "@/lib/blog";
 import { Pagination } from "@/components/ui/Pagination";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { BlogCard } from "./BlogCard";
 
 interface LatestBlogsProps {
@@ -118,19 +119,21 @@ export function LatestBlogs({
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Section heading */}
-        <h2
-          className="font-display font-bold"
-          style={{
-            fontSize: "var(--fs-h1)",
-            letterSpacing: "var(--text-t-display-2-ls)",
-            lineHeight: "var(--text-t-display-2-lh)",
-            color: "#111",
-            paddingTop: "var(--spacing-section-sm)",
-            paddingBottom: "clamp(28px, 3.5vw, 56px)",
-          }}
-        >
-          Latest Blogs
-        </h2>
+        <Reveal header>
+          <h2
+            className="font-display font-bold"
+            style={{
+              fontSize: "var(--fs-h1)",
+              letterSpacing: "var(--text-t-display-2-ls)",
+              lineHeight: "var(--text-t-display-2-lh)",
+              color: "#111",
+              paddingTop: "var(--spacing-section-sm)",
+              paddingBottom: "clamp(28px, 3.5vw, 56px)",
+            }}
+          >
+            Latest Blogs
+          </h2>
+        </Reveal>
 
         {posts.length === 0 ? (
           <p
@@ -142,14 +145,16 @@ export function LatestBlogs({
         ) : (
           <>
             {/* 3-column grid of cards */}
-            <div
+            <RevealStagger
               className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
               style={{ gap: "32px", justifyItems: "center" }}
             >
               {posts.map((post) => (
-                <BlogCard key={post.id} post={post} />
+                <RevealItem key={post.id}>
+                  <BlogCard post={post} />
+                </RevealItem>
               ))}
-            </div>
+            </RevealStagger>
 
             {/* DESKTOP — full numbered pagination. */}
             <div className="hidden lg:block">

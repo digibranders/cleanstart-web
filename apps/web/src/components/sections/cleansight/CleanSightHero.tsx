@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 /*
  * CleanSight Hero — Figma node 926:2365 (Option2 redesign).
@@ -37,51 +38,57 @@ export function CleanSightHero(): React.ReactElement {
       >
         {/* Centred heading + description + CTA */}
         <div className="flex flex-col items-center text-center gap-6">
-          <h1
-            className="text-white"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-display)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.05,
-              textWrap: "balance",
-            }}
-          >
-            <span className="block">Continuous Visibility.</span>
-            <span className="block">
-              Continuous{" "}
-              <span className="cs-text-gradient-impact">Remediation.</span>
-            </span>
-          </h1>
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              className="text-white"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--fs-display)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.05,
+                textWrap: "balance",
+              }}
+            >
+              <span className="block">Continuous Visibility.</span>
+              <span className="block">
+                Continuous{" "}
+                <span className="cs-text-gradient-impact">Remediation.</span>
+              </span>
+            </h1>
+          </HeroReveal>
 
-          <p
-            className="text-white max-w-[640px]"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.4,
-              opacity: 0.8,
-            }}
-          >
-            Continuously discover, assess, and remediate container risk across
-            modern environments.
-          </p>
+          <HeroReveal y={30} delay={0.2} duration={0.8}>
+            <p
+              className="text-white max-w-[640px]"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
+                opacity: 0.8,
+              }}
+            >
+              Continuously discover, assess, and remediate container risk across
+              modern environments.
+            </p>
+          </HeroReveal>
 
-          <Link
-            href="/contact-us"
-            className="cs-btn-glass"
-            style={
-              {
-                "--cs-btn-px": "20px",
-                "--cs-btn-fs": "15px",
-              } as React.CSSProperties
-            }
-          >
-            <span>Contact Us</span>
-          </Link>
+          <HeroReveal y={30} delay={0.35} duration={0.8}>
+            <Link
+              href="/contact-us"
+              className="cs-btn-glass"
+              style={
+                {
+                  "--cs-btn-px": "20px",
+                  "--cs-btn-fs": "15px",
+                } as React.CSSProperties
+              }
+            >
+              <span>Contact Us</span>
+            </Link>
+          </HeroReveal>
         </div>
 
         {/* Dashboard screenshot + side glows. Mounted to the bottom of the

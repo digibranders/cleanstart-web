@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 /**
  * Dark gradient hero band for the Book a Demo page. Matches Figma node
@@ -81,27 +82,29 @@ export function DemoHero(): React.ReactElement {
           paddingBottom: "clamp(60px, 8vw, 200px)",
         }}
       >
-        <h1
-          className="text-white"
-          style={{
-            fontFamily: "var(--font-display), sans-serif",
-            fontWeight: 600,
-            fontSize: "var(--fs-display)",
-            lineHeight: 1.05,
-            letterSpacing: "-0.04em",
-          }}
-        >
-          Get a{" "}
-          <span
-            className="inline-block bg-clip-text text-transparent"
+        <HeroReveal y={50} duration={1.0}>
+          <h1
+            className="text-white"
             style={{
-              backgroundImage:
-                "linear-gradient(99deg, rgba(154, 81, 255, 1) 0%, rgba(44, 193, 235, 1) 100%)",
+              fontFamily: "var(--font-display), sans-serif",
+              fontWeight: 600,
+              fontSize: "var(--fs-display)",
+              lineHeight: 1.05,
+              letterSpacing: "-0.04em",
             }}
           >
-            Demo
-          </span>
-        </h1>
+            Get a{" "}
+            <span
+              className="inline-block bg-clip-text text-transparent"
+              style={{
+                backgroundImage:
+                  "linear-gradient(99deg, rgba(154, 81, 255, 1) 0%, rgba(44, 193, 235, 1) 100%)",
+              }}
+            >
+              Demo
+            </span>
+          </h1>
+        </HeroReveal>
       </div>
     </section>
   );

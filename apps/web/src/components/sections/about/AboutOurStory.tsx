@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 export function AboutOurStory() {
   return (
     <section
@@ -73,31 +75,35 @@ export function AboutOurStory() {
           className="flex flex-col items-center text-center mx-auto lg:items-start lg:text-left lg:mx-0 gap-6 py-[clamp(72px,11vw,150px)]"
           style={{ maxWidth: "514px" }}
         >
-          <h2
-            className="font-display text-white"
-            style={{
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              lineHeight: 1.1,
-              letterSpacing: "-0.04em",
-            }}
-          >
-            Our <span className="cs-text-gradient-impact">Story</span>
-          </h2>
+          <Reveal header>
+            <h2
+              className="font-display text-white"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                lineHeight: 1.1,
+                letterSpacing: "-0.04em",
+              }}
+            >
+              Our <span className="cs-text-gradient-impact">Story</span>
+            </h2>
+          </Reveal>
 
-          <p
-            className="text-white"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              lineHeight: 1.4,
-              letterSpacing: "-0.02em",
-              opacity: 0.8,
-            }}
-          >
-            CleanStart was founded on a simple belief: trusted software starts at the foundation. By integrating security, compliance, and provenance into every build, we help organizations confidently deliver open source and AI infrastructure at scale.
-          </p>
+          <Reveal header delay={0.15} y={20}>
+            <p
+              className="text-white"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                lineHeight: 1.4,
+                letterSpacing: "-0.02em",
+                opacity: 0.8,
+              }}
+            >
+              CleanStart was founded on a simple belief: trusted software starts at the foundation. By integrating security, compliance, and provenance into every build, we help organizations confidently deliver open source and AI infrastructure at scale.
+            </p>
+          </Reveal>
         </div>
       </div>
     </section>

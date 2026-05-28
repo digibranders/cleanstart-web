@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 export const DETAIL_HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123E 38%, #131E8F 67%, #471EC0 80%, #471FC3 100%)";
@@ -77,13 +78,15 @@ export function DetailHero({
         <Breadcrumb items={breadcrumb} />
 
         <div className="flex justify-center mt-10">
-          <h1
-            id={titleId}
-            className="font-display font-semibold text-white text-center"
-            style={{ ...DETAIL_HERO_TITLE_STYLE, maxWidth: titleMaxWidth }}
-          >
-            {title}
-          </h1>
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              id={titleId}
+              className="font-display font-semibold text-white text-center"
+              style={{ ...DETAIL_HERO_TITLE_STYLE, maxWidth: titleMaxWidth }}
+            >
+              {title}
+            </h1>
+          </HeroReveal>
         </div>
 
         {showDivider && (

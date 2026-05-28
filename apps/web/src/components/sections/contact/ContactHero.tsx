@@ -1,4 +1,5 @@
 import { Container } from "@/components/layout";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 /**
  * Hero — Figma node 857:14714.
@@ -106,40 +107,44 @@ export function ContactHero() {
         {/* Title block — Figma 857:14946, w=730, top=186, gap=24 between
             title and subtitle, centered. */}
         <div className="mx-auto flex flex-col items-center gap-5 pt-[clamp(112px,9vw,128px)] pb-[200px] text-center">
-          <h1
-            className="text-white whitespace-nowrap"
-            style={{
-              fontFamily: "var(--font-display), sans-serif",
-              fontSize: "var(--fs-display)",
-              lineHeight: 1.05,
-              letterSpacing: "-0.04em",
-              fontWeight: 600,
-            }}
-          >
-            Contact{" "}
-            <span
-              className="bg-clip-text text-transparent"
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              className="text-white whitespace-nowrap"
               style={{
-                backgroundImage:
-                  "linear-gradient(110.276deg, rgb(154, 81, 255) 1.7578%, rgb(44, 193, 235) 98.781%)",
+                fontFamily: "var(--font-display), sans-serif",
+                fontSize: "var(--fs-display)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.04em",
+                fontWeight: 600,
               }}
             >
-              US
-            </span>
-          </h1>
-          <p
-            className="text-white/80"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-body)",
-              fontWeight: 400,
-              lineHeight: 1.3,
-              letterSpacing: "-0.04em",
-              maxWidth: "730px",
-            }}
-          >
-            We would be happy to hear from you about any feedback or questions.
-          </p>
+              Contact{" "}
+              <span
+                className="bg-clip-text text-transparent"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(110.276deg, rgb(154, 81, 255) 1.7578%, rgb(44, 193, 235) 98.781%)",
+                }}
+              >
+                US
+              </span>
+            </h1>
+          </HeroReveal>
+          <HeroReveal y={30} delay={0.15} duration={0.8}>
+            <p
+              className="text-white/80"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-body)",
+                fontWeight: 400,
+                lineHeight: 1.3,
+                letterSpacing: "-0.04em",
+                maxWidth: "730px",
+              }}
+            >
+              We would be happy to hear from you about any feedback or questions.
+            </p>
+          </HeroReveal>
         </div>
       </Container>
     </section>

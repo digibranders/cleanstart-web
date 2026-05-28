@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Reveal } from '@/components/ui/Reveal';
 
 /**
  * Figma frame 516:5324 — 1920 × 926 "Generate. Verify. Validate."
@@ -118,32 +119,36 @@ export function SbomSelfUpdating(): React.ReactElement {
           gap: vw(24),
         }}
       >
-        <h2
-          className="text-white"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-h2)',
-            fontWeight: 600,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.1,
-          }}
-        >
-          Generate. Verify. Validate.
-        </h2>
-        <p
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--fs-lead)',
-            fontWeight: 400,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.45,
-            color: 'rgba(255,255,255,0.88)',
-            width: '100%',
-          }}
-        >
-          Automated SBOM generation with cryptographic signing and continuous validation across
-          build and runtime environments.
-        </p>
+        <Reveal header>
+          <h2
+            className="text-white"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-h2)',
+              fontWeight: 600,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.1,
+            }}
+          >
+            Generate. Verify. Validate.
+          </h2>
+        </Reveal>
+        <Reveal header delay={0.15} y={20}>
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--fs-lead)',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.45,
+              color: 'rgba(255,255,255,0.88)',
+              width: '100%',
+            }}
+          >
+            Automated SBOM generation with cryptographic signing and continuous validation across
+            build and runtime environments.
+          </p>
+        </Reveal>
       </div>
 
       {/* 3D platforms artwork (centred) */}
@@ -246,40 +251,44 @@ export function SbomSelfUpdating(): React.ReactElement {
         style={{ paddingTop: '32px', paddingBottom: '32px' }}
       >
         {/* Heading — Figma top:32px, w:257px, 2 lines → ends ≈ 99px */}
-        <h2
-          className="text-white text-center"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-h2)',
-            fontWeight: 600,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.1,
-            width: '257px',
-            marginBottom: '0',
-            textTransform: 'capitalize',
-          }}
-        >
-          Generate. Verify. Validate.
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-white text-center"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-h2)',
+              fontWeight: 600,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.1,
+              width: '257px',
+              marginBottom: '0',
+              textTransform: 'capitalize',
+            }}
+          >
+            Generate. Verify. Validate.
+          </h2>
+        </Reveal>
 
         {/* Subhead — Figma top:116px → gap after heading ≈ 17px */}
-        <p
-          className="text-center"
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--fs-lead)',
-            fontWeight: 400,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.45,
-            color: 'rgba(255,255,255,0.80)',
-            width: '319px',
-            marginTop: '17px',
-            marginBottom: '24px',
-          }}
-        >
-          Automated SBOM generation with cryptographic signing and continuous validation across
-          build and runtime environments.
-        </p>
+        <Reveal header delay={0.15} y={20}>
+          <p
+            className="text-center"
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--fs-lead)',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.45,
+              color: 'rgba(255,255,255,0.80)',
+              width: '319px',
+              marginTop: '17px',
+              marginBottom: '24px',
+            }}
+          >
+            Automated SBOM generation with cryptographic signing and continuous validation across
+            build and runtime environments.
+          </p>
+        </Reveal>
 
         {/* 4 stacked action cards */}
         <div

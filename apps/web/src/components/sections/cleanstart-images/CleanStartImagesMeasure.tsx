@@ -1,4 +1,5 @@
 import type React from "react";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * "Measure the Difference" section — Figma node 792:2940
@@ -212,32 +213,36 @@ export function CleanStartImagesMeasure(): React.ReactElement {
       {/* ── Content ─────────────────────────────────────────────────────────── */}
       {/* Figma text block: left=302px top=100px w=835px → centered at maxWidth 835px */}
       <div className="relative flex flex-col items-center text-center">
-        <h2
-          className="font-display text-[#111]"
-          style={{
-            fontSize: "var(--fs-h2)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            maxWidth: "clamp(500px, 58vw, 835px)",
-          }}
-        >
-          Measure the Difference
-        </h2>
-        <p
-          className="font-sans mt-6 mx-auto"
-          style={{
-            fontSize: "var(--fs-lead)",
-            fontWeight: 400,
-            lineHeight: 1.4,
-            letterSpacing: "-0.02em",
-            color: "rgba(17, 17, 17, 0.8)",
-            maxWidth: "clamp(400px, 58vw, 835px)",
-          }}
-        >
-          Estimate how smaller, hardened images can reduce inherited
-          vulnerabilities and operational overhead.
-        </p>
+        <Reveal header>
+          <h2
+            className="font-display text-[#111]"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              maxWidth: "clamp(500px, 58vw, 835px)",
+            }}
+          >
+            Measure the Difference
+          </h2>
+        </Reveal>
+        <Reveal header delay={0.15} y={20}>
+          <p
+            className="font-sans mt-6 mx-auto"
+            style={{
+              fontSize: "var(--fs-lead)",
+              fontWeight: 400,
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
+              color: "rgba(17, 17, 17, 0.8)",
+              maxWidth: "clamp(400px, 58vw, 835px)",
+            }}
+          >
+            Estimate how smaller, hardened images can reduce inherited
+            vulnerabilities and operational overhead.
+          </p>
+        </Reveal>
       </div>
     </section>
   );

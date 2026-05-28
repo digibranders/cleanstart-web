@@ -9,6 +9,8 @@
  *  - cards laid out in a 1276px container, white-card pitch = 437px, gap = 91px
  */
 
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
+
 type Card = {
   title: string;
   description: string;
@@ -116,40 +118,46 @@ export function AboutPowering() {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[100px] pb-16 lg:pb-[20px]">
         {/* Title group — 248:2152 (centered, max-w 969px) */}
         <div className="mx-auto flex max-w-[969px] flex-col items-center gap-6 text-center text-white">
-          <h2
-            className="font-display"
-            style={{
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-            }}
-          >
-            Powering Trusted Software Delivery for Global Leaders.
-          </h2>
-          <p
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              lineHeight: 1.4,
-              letterSpacing: "-0.02em",
-              opacity: 0.8,
-              maxWidth: "835px",
-            }}
-          >
-            Tailored solutions for every role in your organization — from security leaders to engineering teams.
-          </p>
+          <Reveal header>
+            <h2
+              className="font-display"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+              }}
+            >
+              Powering Trusted Software Delivery for Global Leaders.
+            </h2>
+          </Reveal>
+          <Reveal header delay={0.15} y={20}>
+            <p
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                lineHeight: 1.4,
+                letterSpacing: "-0.02em",
+                opacity: 0.8,
+                maxWidth: "835px",
+              }}
+            >
+              Tailored solutions for every role in your organization — from security leaders to engineering teams.
+            </p>
+          </Reveal>
         </div>
 
         {/* Cards row — Figma top=412 → 80px gap below title block.
             Tablet + mobile stack vertically (single column) with rectangle cards.
             3-up grid only kicks in at lg+. */}
-        <div className="mt-20 grid grid-cols-1 items-stretch gap-y-10 lg:gap-y-16 gap-x-[clamp(24px,6vw,91px)] lg:grid-cols-3 place-items-center">
+        <RevealStagger className="mt-20 grid grid-cols-1 items-stretch gap-y-10 lg:gap-y-16 gap-x-[clamp(24px,6vw,91px)] lg:grid-cols-3 place-items-center">
           {CARDS.map((card) => (
-            <FeatureCard key={card.title} {...card} />
+            <RevealItem key={card.title}>
+              <FeatureCard {...card} />
+            </RevealItem>
           ))}
-        </div>
+        </RevealStagger>
       </div>
 
     </section>

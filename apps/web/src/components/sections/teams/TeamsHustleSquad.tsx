@@ -2,34 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 interface Slide {
   src: string;
   alt: string;
 }
 
-const SLIDES: Slide[] = [
-  {
-    src: "/images/teams/hustle-squad-1.png",
-    alt: "CleanStart team collaborating in a strategy session",
-  },
-  {
-    src: "/images/teams/hustle-squad-1.png",
-    alt: "CleanStart team collaborating in a strategy session",
-  },
-  {
-    src: "/images/teams/hustle-squad-1.png",
-    alt: "CleanStart team collaborating in a strategy session",
-  },
-  {
-    src: "/images/teams/hustle-squad-1.png",
-    alt: "CleanStart team collaborating in a strategy session",
-  },
-  {
-    src: "/images/teams/hustle-squad-1.png",
-    alt: "CleanStart team collaborating in a strategy session",
-  },
-];
+const SLIDES: Slide[] = Array.from({ length: 9 }, (_, i) => ({
+  src: `/images/teams/squad/${i + 1}.jpeg`,
+  alt: `CleanStart Hustle Squad — moment ${i + 1}`,
+}));
 
 const AUTOPLAY_MS = 5000;
 
@@ -153,18 +136,20 @@ export function TeamsHustleSquad() {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         {/* Title */}
-        <h2
-          className="mb-[60px] text-center font-display text-white"
-          style={{
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            lineHeight: 1.1,
-            letterSpacing: "-0.04em",
-          }}
-        >
-          {"The Hustle "}
-          <span className="cs-text-gradient-impact">Squad</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="mb-[60px] text-center font-display text-white"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            {"The Hustle "}
+            <span className="cs-text-gradient-impact">Squad</span>
+          </h2>
+        </Reveal>
 
         {/* Carousel */}
         <div

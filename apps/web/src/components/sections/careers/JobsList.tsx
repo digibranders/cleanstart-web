@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Job, JobStatusFilter } from "@/lib/jobs";
 import { Pagination } from "@/components/ui/Pagination";
 import { JobCard } from "./JobCard";
+import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 interface JobsListProps {
   jobs: Job[];
@@ -69,9 +70,13 @@ export function JobsList({
 
   return (
     <div className="flex-1 flex flex-col gap-4">
-      {jobs.map((job) => (
-        <JobCard key={job.id} job={job} />
-      ))}
+      <RevealStagger className="flex flex-col gap-4">
+        {jobs.map((job) => (
+          <RevealItem key={job.id}>
+            <JobCard job={job} />
+          </RevealItem>
+        ))}
+      </RevealStagger>
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

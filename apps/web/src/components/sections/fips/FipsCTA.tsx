@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Inner content for the FIPS CTA card (Figma node 787:2343).
@@ -72,23 +73,27 @@ export function FipsCTA(): React.ReactElement {
         }}
       >
         {/* Heading — 401 / 1047 = 38.30% of content container */}
-        <p
-          className="text-white flex-shrink-0"
-          style={{
-            fontFamily: "var(--font-display)",
-            // Global CTA-card title token (`--cta-card-title`) per strict-fonts rule.
-            fontSize: "var(--cta-card-title)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            width: "38.30%",
-          }}
-        >
-          Ready to Secure Your Container Infrastructure?
-        </p>
+        <Reveal header className="flex-shrink-0" style={{ width: "38.30%" }}>
+          <p
+            className="text-white"
+            style={{
+              fontFamily: "var(--font-display)",
+              // Global CTA-card title token (`--cta-card-title`) per strict-fonts rule.
+              fontSize: "var(--cta-card-title)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+            }}
+          >
+            Ready to Secure Your Container Infrastructure?
+          </p>
+        </Reveal>
 
         {/* Right column — 493 / 1047 = 47.09% of content container */}
-        <div
+        <Reveal
+          header
+          delay={0.15}
+          y={20}
           className="flex flex-col flex-shrink-0"
           style={{ gap: "24px", width: "47.09%" }}
         >
@@ -136,7 +141,7 @@ export function FipsCTA(): React.ReactElement {
               />
             </svg>
           </Link>
-        </div>
+        </Reveal>
       </div>
 
       {/* ── Mobile fallback (under md) ── */}

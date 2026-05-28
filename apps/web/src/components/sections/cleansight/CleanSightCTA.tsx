@@ -11,7 +11,10 @@
  *   Button: solid blue (#3960F9), white text, "Book a Container Scan"
  */
 
+"use client";
+
 import Link from "next/link";
+import { Reveal } from "@/components/ui/Reveal";
 
 export function CleanSightCTA(): React.ReactElement {
   return (
@@ -131,25 +134,28 @@ export function CleanSightCTA(): React.ReactElement {
         }}
       >
         {/* Left: headline */}
-        <p
-          className="relative min-w-0 w-full font-display"
-          style={{
-            fontSize: "var(--cta-card-title)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            color: "#111111",
-            maxWidth: "min(460px, 100%)",
-            textWrap: "balance",
-            margin: 0,
-            zIndex: 2,
-          }}
-        >
-          See Everything. Fix Everything.
-        </p>
+        <Reveal header className="relative min-w-0 w-full" style={{ maxWidth: "min(460px, 100%)", zIndex: 2 }}>
+          <p
+            className="font-display"
+            style={{
+              fontSize: "var(--cta-card-title)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              color: "#111111",
+              textWrap: "balance",
+              margin: 0,
+            }}
+          >
+            See Everything. Fix Everything.
+          </p>
+        </Reveal>
 
         {/* Right: description + CTA button */}
-        <div
+        <Reveal
+          header
+          delay={0.15}
+          y={20}
           className="flex flex-col min-w-0 w-full"
           style={{
             maxWidth: "420px",
@@ -201,7 +207,7 @@ export function CleanSightCTA(): React.ReactElement {
               />
             </svg>
           </Link>
-        </div>
+        </Reveal>
       </div>
 
       {/* ── Mobile layout (< md) — centered column with cube decoration ──

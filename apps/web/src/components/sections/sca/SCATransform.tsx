@@ -1,4 +1,5 @@
 import type React from "react";
+import { Reveal } from "@/components/ui/Reveal";
 
 /* ─── Outcome chips (two-line labels) ───────────────────────────────────── */
 interface ChipItem {
@@ -1170,20 +1171,22 @@ export function SCATransform(): React.ReactElement {
     >
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Section heading */}
-        <h2
-          className="text-center"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            color: "#111",
-          }}
-        >
-          Transform SCA{" "}
-          <span className="cs-text-gradient-impact">outcomes</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-center"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              color: "#111",
+            }}
+          >
+            Transform SCA{" "}
+            <span className="cs-text-gradient-impact">outcomes</span>
+          </h2>
+        </Reveal>
 
         {/* Three-column card layout — desktop (lg+) only.
             Each card uses absolute positioning designed for ~500px wide; at

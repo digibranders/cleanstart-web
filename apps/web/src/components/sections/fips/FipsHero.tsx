@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 /**
  * Figma node 787:1918 — FIPS hero banner (desktop 1440 × 667 px).
@@ -170,72 +171,78 @@ export function FipsHero(): React.ReactElement {
           className="relative flex flex-col items-center text-center md:items-start md:text-left"
           style={{ maxWidth: "623px" }}
         >
-          <h1
-            className="text-white"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-display)",
-              fontWeight: 600,
-              letterSpacing: "var(--text-hero-product-ls, -0.04em)",
-              lineHeight: "var(--text-hero-lh, 1.05)",
-              marginBottom: "clamp(16px, 1.67vw, 24px)",
-            }}
-          >
-            FIPS-Validated. Always{" "}
-            <span className="cs-text-gradient-impact">Verified.</span>
-          </h1>
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              className="text-white"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--fs-display)",
+                fontWeight: 600,
+                letterSpacing: "var(--text-hero-product-ls, -0.04em)",
+                lineHeight: "var(--text-hero-lh, 1.05)",
+                marginBottom: "clamp(16px, 1.67vw, 24px)",
+              }}
+            >
+              FIPS-Validated. Always{" "}
+              <span className="cs-text-gradient-impact">Verified.</span>
+            </h1>
+          </HeroReveal>
 
-          <p
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.45,
-              color: "rgba(255,255,255,0.8)",
-              width: "100%",
-              marginBottom: "clamp(24px, 2.22vw, 32px)",
-            }}
-          >
-            Built on validated cryptographic foundations for secure, compliant
-            container environments
-          </p>
+          <HeroReveal y={30} delay={0.2} duration={0.8}>
+            <p
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.45,
+                color: "rgba(255,255,255,0.8)",
+                width: "100%",
+                marginBottom: "clamp(24px, 2.22vw, 32px)",
+              }}
+            >
+              Built on validated cryptographic foundations for secure, compliant
+              container environments
+            </p>
+          </HeroReveal>
 
           {/*
            * CTA button — appears BEFORE the shield on mobile (Figma 913:219 layout).
            * Mobile: px=24 py=12 (Figma 366:7880: px-[24px] py-[12px])
            * Desktop: px=18 py=9 (Figma 787:1948)
            */}
-          <Link
-            href="https://images.cleanstart.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cs-btn-glass"
-            style={
-              {
-                "--cs-btn-px": "24px",
-                "--cs-btn-fs": "16px",
-              } as React.CSSProperties
-            }
-          >
-            Explore FIPS Images
-            <svg
-              className="cs-cta-arrow"
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              aria-hidden
+          <HeroReveal y={30} delay={0.35} duration={0.8}>
+            <Link
+              href="https://images.cleanstart.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cs-btn-glass"
+              style={
+                {
+                  "--cs-btn-px": "24px",
+                  "--cs-btn-fs": "16px",
+                } as React.CSSProperties
+              }
             >
-              <path
-                d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </Link>
+              Explore FIPS Images
+              <svg
+                className="cs-cta-arrow"
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                aria-hidden
+              >
+                <path
+                  d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Link>
+          </HeroReveal>
         </div>
 
         {/*

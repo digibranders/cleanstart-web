@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 const VALUE_PROPS: readonly string[] = [
   "The industry's most high performance and lowest footprint images.",
   "Compliance, governance, and security features built-in.",
@@ -26,27 +28,30 @@ export function WhatsSetsUsApart(): React.ReactElement {
       }}
     >
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.1fr)] items-start gap-10 lg:gap-[60px]">
-        <h2
-          style={{
-            fontFamily: "var(--font-display), 'Manrope', sans-serif",
-            fontWeight: 700,
-            fontSize: "var(--fs-h2)",
-            lineHeight: 1,
-            letterSpacing: "-0.05em",
-            color: "#111111",
-          }}
-        >
-          <span className="block">What sets</span>
-          <span
-            className="block bg-clip-text text-transparent"
+        <Reveal header>
+          <h2
             style={{
-              backgroundImage:
-                "linear-gradient(-44deg, rgba(44, 193, 235, 1) 0%, rgba(154, 81, 255, 1) 65%)",
+              fontFamily: "var(--font-display), 'Manrope', sans-serif",
+              fontWeight: 700,
+              fontSize: "var(--fs-h2)",
+              lineHeight: 1,
+              letterSpacing: "-0.05em",
+              color: "#111111",
+              maxWidth: "360px",
             }}
           >
-            us Apart?
-          </span>
-        </h2>
+            What sets{" "}
+            <span
+              className="inline-block bg-clip-text text-transparent"
+              style={{
+                backgroundImage:
+                  "linear-gradient(-44deg, rgba(44, 193, 235, 1) 0%, rgba(154, 81, 255, 1) 65%)",
+              }}
+            >
+              us Apart?
+            </span>
+          </h2>
+        </Reveal>
 
         <ul className="flex flex-col" style={{ gap: "16px", maxWidth: "668px" }}>
           {VALUE_PROPS.map((prop) => (

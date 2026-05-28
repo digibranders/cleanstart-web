@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Reveal } from "@/components/ui/Reveal";
 
 const SIDEBAR_GROUPS: Array<{
   title: string;
@@ -78,33 +79,37 @@ export function KnowledgeHubArticle(): React.ReactElement {
           </aside>
 
           <article className="min-w-0">
-            <CategoryBadge>Emerging Standards</CategoryBadge>
+            <Reveal header>
+              <CategoryBadge>Emerging Standards</CategoryBadge>
 
-            <h1
-              className="font-display font-semibold mt-4"
-              style={{
-                fontSize: "var(--fs-h2)",
-                lineHeight: 1.15,
-                letterSpacing: "-0.03em",
-                color: "#0F1023",
-              }}
-            >
-              How to Use VEX Documents to Suppress Non-Exploitable CVEs in Your
-              Pipeline
-            </h1>
+              <h1
+                className="font-display font-semibold mt-4"
+                style={{
+                  fontSize: "var(--fs-h2)",
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.03em",
+                  color: "#0F1023",
+                }}
+              >
+                How to Use VEX Documents to Suppress Non-Exploitable CVEs in Your
+                Pipeline
+              </h1>
+            </Reveal>
 
-            <p
-              className="mt-6 font-medium"
-              style={{
-                fontSize: "var(--fs-body)",
-                lineHeight: 1.5,
-                letterSpacing: "-0.01em",
-                color: "#3A3F55",
-              }}
-            >
-              CleanStart addresses several critical challenges that plague
-              traditional container security approaches.
-            </p>
+            <Reveal header delay={0.15} y={20}>
+              <p
+                className="mt-6 font-medium"
+                style={{
+                  fontSize: "var(--fs-body)",
+                  lineHeight: 1.5,
+                  letterSpacing: "-0.01em",
+                  color: "#3A3F55",
+                }}
+              >
+                CleanStart addresses several critical challenges that plague
+                traditional container security approaches.
+              </p>
+            </Reveal>
 
             <div className="mt-12 flex flex-col gap-14">
               <Section heading="Overview">

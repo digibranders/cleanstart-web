@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Figma node 583:2481 — desktop
@@ -62,7 +63,7 @@ export function CisoComparison(): React.ReactElement {
 
           {/* Heading — mobile keeps the "Visibility Alone Doesn't Reduce Risk"
               copy; sm+ shifts to the desktop heading. */}
-          <div className="text-center">
+          <Reveal header className="text-center">
             <h2
               id="ciso-comparison-title"
               className="mx-auto sm:hidden"
@@ -100,7 +101,7 @@ export function CisoComparison(): React.ReactElement {
               From Visibility to Actionable{" "}
               <span className="cs-text-gradient-impact">Risk Reduction</span>
             </h2>
-          </div>
+          </Reveal>
 
           {/* Cards row — stacks on mobile, side-by-side from md+ (matches
               SecurityNotPatching on the homepage). VS badge sits centered on

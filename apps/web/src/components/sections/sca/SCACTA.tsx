@@ -1,5 +1,6 @@
 import type React from "react";
 import Link from "next/link";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * SCA CTA — Figma node 604:3631 (1276×335 px card in Footer slot)
@@ -86,25 +87,28 @@ export function SCACTA(): React.ReactElement {
         }}
       >
         {/* Left column — heading, auto-wraps 2 or 3 lines via balance */}
-        <p
-          className="relative min-w-0 w-full text-white"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--cta-card-title)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            maxWidth: "min(460px, 100%)",
-            textWrap: "balance",
-            margin: 0,
-            zIndex: 1,
-          }}
-        >
-          From Findings to Action
-        </p>
+        <Reveal header className="relative min-w-0 w-full" style={{ maxWidth: "min(460px, 100%)", zIndex: 1 }}>
+          <p
+            className="text-white"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--cta-card-title)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              textWrap: "balance",
+              margin: 0,
+            }}
+          >
+            From Findings to Action
+          </p>
+        </Reveal>
 
         {/* Right column — description + button */}
-        <div
+        <Reveal
+          header
+          delay={0.15}
+          y={20}
           className="flex flex-col min-w-0 w-full"
           style={{ maxWidth: "min(460px, 100%)", gap: "clamp(20px, 2vw, 32px)", zIndex: 1 }}
         >
@@ -152,7 +156,7 @@ export function SCACTA(): React.ReactElement {
               />
             </svg>
           </Link>
-        </div>
+        </Reveal>
       </div>
 
       {/* ══════════════════════════════════════════

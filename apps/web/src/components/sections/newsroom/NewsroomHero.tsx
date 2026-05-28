@@ -1,3 +1,5 @@
+import { HeroReveal } from "@/components/ui/Reveal";
+
 export function NewsroomHero(): React.ReactElement {
   return (
     <section
@@ -172,27 +174,31 @@ export function NewsroomHero(): React.ReactElement {
           className="flex flex-col items-center gap-6 mx-auto text-center"
           style={{ paddingTop: "clamp(88px, 11vw, 146px)", paddingBottom: "clamp(40px, 5vw, 80px)", maxWidth: "623px" }}
         >
-          <h1
-            id="newsroom-hero-title"
-            className="font-display font-semibold text-white"
-            style={{
-              fontSize: "var(--fs-h1)",
-              lineHeight: "var(--text-hero-lh)",
-              letterSpacing: "var(--text-hero-utility-ls)",
-            }}
-          >
-            Newsroom
-          </h1>
-          <p
-            className="font-sans font-normal text-white"
-            style={{
-              fontSize: "var(--fs-lead)",
-              lineHeight: "1.4",
-              letterSpacing: "-0.04em",
-            }}
-          >
-            Stay on top of the news and know what&apos;s happening
-          </p>
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              id="newsroom-hero-title"
+              className="font-display font-semibold text-white"
+              style={{
+                fontSize: "var(--fs-h1)",
+                lineHeight: "var(--text-hero-lh)",
+                letterSpacing: "var(--text-hero-utility-ls)",
+              }}
+            >
+              Newsroom
+            </h1>
+          </HeroReveal>
+          <HeroReveal y={30} delay={0.2} duration={0.8}>
+            <p
+              className="font-sans font-normal text-white"
+              style={{
+                fontSize: "var(--fs-lead)",
+                lineHeight: "1.4",
+                letterSpacing: "-0.04em",
+              }}
+            >
+              Stay on top of the news and know what&apos;s happening
+            </p>
+          </HeroReveal>
         </div>
       </div>
     </section>

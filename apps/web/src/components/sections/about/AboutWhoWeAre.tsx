@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 const PILLARS = [
   {
@@ -60,32 +61,36 @@ export function AboutWhoWeAre() {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Heading row */}
         <div className="flex flex-col items-center text-center gap-12 lg:flex-row lg:items-start lg:text-left lg:gap-[106px]">
-          <h2
-            className="shrink-0 font-display"
-            style={{
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              lineHeight: 1.1,
-              letterSpacing: "-0.04em",
-              color: "#111",
-            }}
-          >
-            Who We <span className="cs-text-gradient-impact">Are</span>
-          </h2>
+          <Reveal header className="shrink-0">
+            <h2
+              className="font-display"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                lineHeight: 1.1,
+                letterSpacing: "-0.04em",
+                color: "#111",
+              }}
+            >
+              Who We <span className="cs-text-gradient-impact">Are</span>
+            </h2>
+          </Reveal>
 
-          <p
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              lineHeight: 1.4,
-              letterSpacing: "-0.02em",
-              color: "rgba(17,17,17,0.8)",
-              maxWidth: "840px",
-            }}
-          >
-            CleanStart is building the foundation for trusted open source and AI infrastructure by embedding security, compliance, and provenance into every build, giving enterprises confidence from source to production. 
-          </p>
+          <Reveal header delay={0.15} y={20}>
+            <p
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                lineHeight: 1.4,
+                letterSpacing: "-0.02em",
+                color: "rgba(17,17,17,0.8)",
+                maxWidth: "840px",
+              }}
+            >
+              CleanStart is building the foundation for trusted open source and AI infrastructure by embedding security, compliance, and provenance into every build, giving enterprises confidence from source to production.
+            </p>
+          </Reveal>
         </div>
 
         {/* Three pillar columns */}
@@ -118,9 +123,9 @@ export function AboutWhoWeAre() {
             }}
           />
 
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+          <RevealStagger className="grid grid-cols-1 gap-10 sm:grid-cols-3">
             {PILLARS.map((pillar) => (
-              <div key={pillar.title} className="flex flex-col items-center text-center gap-6 px-0 sm:px-8 first:pl-0 last:pr-0">
+              <RevealItem key={pillar.title} className="flex flex-col items-center text-center sm:items-start sm:text-left gap-6 px-0 sm:px-8 first:pl-0 last:pr-0">
                 <div className="relative h-[100px] w-[100px] overflow-hidden rounded-lg shrink-0">
                   <Image
                     src={pillar.icon}
@@ -158,9 +163,9 @@ export function AboutWhoWeAre() {
                     {pillar.description}
                   </p>
                 </div>
-              </div>
+              </RevealItem>
             ))}
-          </div>
+          </RevealStagger>
         </div>
       </div>
     </section>

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Section, Container } from "@/components/layout";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * "How CleanStart Enables FIPS 140-3 Compliance" — Figma node 787:2093.
@@ -153,37 +154,41 @@ export function FipsEnables(): React.ReactElement {
             marginBottom: "clamp(2rem, 5vw, 3.25rem)",
           }}
         >
-          <h2
-            className="mx-auto text-white"
-            style={{
-              fontFamily: "var(--font-display)",
-              /* Section heading bumped from --fs-h2 to --fs-h1 per typography QA round 2 */
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.1,
-              maxWidth: "41.5rem",
-              marginBottom: "clamp(1rem, 2.2vw, 2rem)",
-            }}
-          >
-            How CleanStart Enables{" "}
-            <span className="cs-text-gradient-impact">FIPS 140-3 Compliance</span>
-          </h2>
-          <p
-            className="mx-auto text-white"
-            style={{
-              fontFamily: "var(--font-sans)",
-              /* Mobile: 16px (Figma 366:7788), desktop: 24px */
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.4,
-              opacity: 0.8,
-            }}
-          >
-            CleanStart embeds validated cryptographic foundations directly into
-            hardened container environments.
-          </p>
+          <Reveal header>
+            <h2
+              className="mx-auto text-white"
+              style={{
+                fontFamily: "var(--font-display)",
+                /* Section heading bumped from --fs-h2 to --fs-h1 per typography QA round 2 */
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.05em",
+                lineHeight: 1.1,
+                maxWidth: "41.5rem",
+                marginBottom: "clamp(1rem, 2.2vw, 2rem)",
+              }}
+            >
+              How CleanStart Enables{" "}
+              <span className="cs-text-gradient-impact">FIPS 140-3 Compliance</span>
+            </h2>
+          </Reveal>
+          <Reveal header delay={0.15} y={20}>
+            <p
+              className="mx-auto text-white"
+              style={{
+                fontFamily: "var(--font-sans)",
+                /* Mobile: 16px (Figma 366:7788), desktop: 24px */
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.4,
+                opacity: 0.8,
+              }}
+            >
+              CleanStart embeds validated cryptographic foundations directly into
+              hardened container environments.
+            </p>
+          </Reveal>
         </div>
 
         {/* ---------- Wheel (Figma render as background) + selectable text overlay ---------- */}

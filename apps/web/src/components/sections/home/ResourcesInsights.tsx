@@ -3,6 +3,7 @@ import {
   type ResourceCardsByTab,
   type TabId,
 } from "@/lib/resources-insights";
+import { Reveal } from "@/components/ui/Reveal";
 
 import { ResourcesInsightsClient } from "./ResourcesInsightsClient";
 
@@ -200,33 +201,37 @@ export async function ResourcesInsights() {
             least-priority "discover more" rail at the bottom of the page,
             so no heading-tag in the document outline.
             Matches the Vuln page treatment (VulnBlogsResources). */}
-        <p
-          id="resources-title"
-          className="font-display text-[#111111]"
-          style={{
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.05,
-            margin: 0,
-          }}
-        >
-          Resources &amp; Insights
-        </p>
-        <p
-          className="mt-4 max-w-[720px]"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-lead)",
-            fontWeight: 600,
-            color: "#555",
-            lineHeight: 1.4,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          Stay informed with the latest research, threat intelligence reports,
-          and expert analysis from our security team.
-        </p>
+        <Reveal header>
+          <p
+            id="resources-title"
+            className="font-display text-[#111111]"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
+              margin: 0,
+            }}
+          >
+            Resources &amp; Insights
+          </p>
+        </Reveal>
+        <Reveal header delay={0.15} y={20}>
+          <p
+            className="mt-4 max-w-[720px]"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-lead)",
+              fontWeight: 600,
+              color: "#555",
+              lineHeight: 1.4,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Stay informed with the latest research, threat intelligence reports,
+            and expert analysis from our security team.
+          </p>
+        </Reveal>
 
         <ResourcesInsightsClient articlesByTab={articlesByTab} />
       </div>

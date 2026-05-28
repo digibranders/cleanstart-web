@@ -1,3 +1,5 @@
+import { HeroReveal } from "@/components/ui/Reveal";
+
 export function CommunityHero() {
   return (
     // Figma frame 732:3193 is 1920×960px.
@@ -56,46 +58,52 @@ export function CommunityHero() {
         <div className="pt-[clamp(112px,10vw,172px)] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-8">
             {/* H1 — Figma: 72px Manrope SemiBold, tracking -3.6px */}
-            <h1
-              className="font-display font-semibold text-white lg:w-[48%]"
-              style={{
-                fontSize: 'var(--fs-display)',
-                lineHeight: 1.05,
-                letterSpacing: '-0.04em',
-              }}
-            >
-              Let&apos;s work together towards{" "}
-              <span className="cs-text-gradient-impact">secure development</span>
-            </h1>
-
-            {/* Subtitle + CTA — Figma: 30px Sora Regular, lh 1.4, tracking -1.2px, opacity 80% */}
-            <div className="flex flex-col gap-8 lg:w-[48%] lg:pt-2">
-              <p
-                className="font-sans font-normal text-white/80"
+            <HeroReveal y={50} duration={1.0} className="lg:w-[48%]">
+              <h1
+                className="font-display font-semibold text-white"
                 style={{
-                  fontSize: 'var(--fs-lead)',
-                  lineHeight: '1.4',
+                  fontSize: 'var(--fs-display)',
+                  lineHeight: 1.05,
                   letterSpacing: '-0.04em',
                 }}
               >
-                Connect with developers and security leaders sharing real-world strategies to reduce
-                risk, secure images, and ship faster with confidence.
-              </p>
-              <a
-                href="https://github.com/cleanstart"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cs-btn-glass self-start"
-                style={{
-                  ['--cs-btn-px' as string]: '22px',
-                  ['--cs-btn-fs' as string]: '18px',
-                  color: '#111111',
-                  letterSpacing: '-0.05em',
-                  fontWeight: 500,
-                }}
-              >
-                Join Community
-              </a>
+                Let&apos;s work together towards{" "}
+                <span className="cs-text-gradient-impact">secure development</span>
+              </h1>
+            </HeroReveal>
+
+            {/* Subtitle + CTA — Figma: 30px Sora Regular, lh 1.4, tracking -1.2px, opacity 80% */}
+            <div className="flex flex-col gap-8 lg:w-[48%] lg:pt-2">
+              <HeroReveal y={30} delay={0.15} duration={0.8}>
+                <p
+                  className="font-sans font-normal text-white/80"
+                  style={{
+                    fontSize: 'var(--fs-lead)',
+                    lineHeight: '1.4',
+                    letterSpacing: '-0.04em',
+                  }}
+                >
+                  Connect with developers and security leaders sharing real-world strategies to reduce
+                  risk, secure images, and ship faster with confidence.
+                </p>
+              </HeroReveal>
+              <HeroReveal y={30} delay={0.3} duration={0.8}>
+                <a
+                  href="https://github.com/cleanstart"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cs-btn-glass self-start"
+                  style={{
+                    ['--cs-btn-px' as string]: '22px',
+                    ['--cs-btn-fs' as string]: '18px',
+                    color: '#111111',
+                    letterSpacing: '-0.05em',
+                    fontWeight: 500,
+                  }}
+                >
+                  Join Community
+                </a>
+              </HeroReveal>
             </div>
           </div>
         </div>

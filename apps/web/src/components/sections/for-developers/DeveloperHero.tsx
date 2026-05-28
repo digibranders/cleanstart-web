@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type React from 'react';
+import { HeroReveal } from '@/components/ui/Reveal';
 
 /*
  * Figma node 732-413 — Developer page hero.
@@ -398,52 +399,58 @@ export function DeveloperHero(): React.ReactElement {
         className="relative mx-auto z-[2] flex w-full max-w-[840px] flex-col items-center px-6 sm:px-10 text-center"
         style={{ paddingTop: 'clamp(112px, 14vw, 203px)' }}
       >
-        <h1
-          className="text-white"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-display)',
-            fontWeight: 700,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.05,
-            marginBottom: '32px',
-          }}
-        >
-          Trusted Container{" "}
-          <span className="cs-text-gradient-impact">Foundations</span>
-        </h1>
+        <HeroReveal y={50} duration={1.0}>
+          <h1
+            className="text-white"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-display)',
+              fontWeight: 700,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.05,
+              marginBottom: '32px',
+            }}
+          >
+            Trusted Container{" "}
+            <span className="cs-text-gradient-impact">Foundations</span>
+          </h1>
+        </HeroReveal>
 
-        <p
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--fs-lead)',
-            fontWeight: 400,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.4,
-            color: 'rgba(255,255,255,0.8)',
-            maxWidth: '640px',
-            marginBottom: '32px',
-          }}
-        >
-          Minimal, hardened, verifiable container images that fit directly into existing developer
-          workflows.
-        </p>
+        <HeroReveal y={30} delay={0.15} duration={0.8}>
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--fs-lead)',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.4,
+              color: 'rgba(255,255,255,0.8)',
+              maxWidth: '640px',
+              marginBottom: '32px',
+            }}
+          >
+            Minimal, hardened, verifiable container images that fit directly into existing developer
+            workflows.
+          </p>
+        </HeroReveal>
 
-        <Link
-          href="https://images.cleanstart.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="cs-btn-glass"
-          style={
-            {
-              '--cs-btn-fs': '20px',
-              '--cs-btn-h': '44px',
-              '--cs-btn-px': '18px',
-            } as React.CSSProperties
-          }
-        >
-          Explore CleanStart Images
-        </Link>
+        <HeroReveal y={30} delay={0.3} duration={0.8}>
+          <Link
+            href="https://images.cleanstart.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cs-btn-glass"
+            style={
+              {
+                '--cs-btn-fs': '20px',
+                '--cs-btn-h': '44px',
+                '--cs-btn-px': '18px',
+              } as React.CSSProperties
+            }
+          >
+            Explore CleanStart Images
+          </Link>
+        </HeroReveal>
       </div>
 
       {/* ── Stack-card marquee strip ── */}

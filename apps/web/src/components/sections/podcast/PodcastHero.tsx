@@ -5,6 +5,7 @@ import {
   type PodcastEpisode,
   type PodcastPage,
 } from "@/lib/podcast";
+import { HeroReveal } from "@/components/ui/Reveal";
 import { Waveform } from "./_components/Waveform";
 // YouTubeEmbed wraps an <iframe>; defer it so the iframe code does not ship
 // in the initial podcast client bundle and does not block first paint.
@@ -108,40 +109,44 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
               {eyebrow}
             </span>
           ) : null}
-          <h1
-            id="podcast-hero-title"
-            className="font-display font-semibold text-white"
-            style={{
-              fontSize: "var(--fs-h1)",
-              lineHeight: "var(--text-hero-lh)",
-              letterSpacing: "var(--text-hero-utility-ls)",
-            }}
-          >
-            {before}
-            <span
-              className="bg-clip-text"
+          <HeroReveal y={50} duration={1.0}>
+            <h1
+              id="podcast-hero-title"
+              className="font-display font-semibold text-white"
               style={{
-                WebkitTextFillColor: "transparent",
-                backgroundImage:
-                  "linear-gradient(105.93deg, #9a51ff 1.76%, #2cc1eb 98.78%)",
+                fontSize: "var(--fs-h1)",
+                lineHeight: "var(--text-hero-lh)",
+                letterSpacing: "var(--text-hero-utility-ls)",
               }}
             >
-              {mark}
-            </span>
-            {after}
-          </h1>
-          <p
-            className="mt-6 font-sans font-normal text-white"
-            style={{
-              fontSize: "var(--fs-lead)",
-              lineHeight: 1.3,
-              letterSpacing: "-0.04em",
-              opacity: 0.8,
-              maxWidth: "674px",
-            }}
-          >
-            {subtitle}
-          </p>
+              {before}
+              <span
+                className="bg-clip-text"
+                style={{
+                  WebkitTextFillColor: "transparent",
+                  backgroundImage:
+                    "linear-gradient(105.93deg, #9a51ff 1.76%, #2cc1eb 98.78%)",
+                }}
+              >
+                {mark}
+              </span>
+              {after}
+            </h1>
+          </HeroReveal>
+          <HeroReveal y={30} delay={0.2} duration={0.8}>
+            <p
+              className="mt-6 font-sans font-normal text-white"
+              style={{
+                fontSize: "var(--fs-lead)",
+                lineHeight: 1.3,
+                letterSpacing: "-0.04em",
+                opacity: 0.8,
+                maxWidth: "674px",
+              }}
+            >
+              {subtitle}
+            </p>
+          </HeroReveal>
         </div>
 
         {/* Animated CSS waveform — vertically centered on the gradient region's bottom

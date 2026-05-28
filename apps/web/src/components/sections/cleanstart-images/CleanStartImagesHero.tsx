@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 export function CleanStartImagesHero(): React.ReactElement {
   return (
@@ -69,50 +70,56 @@ export function CleanStartImagesHero(): React.ReactElement {
             className="flex flex-col items-start"
             style={{ flexShrink: 0, maxWidth: "623px", gap: "32px" }}
           >
-            <h1
-              className="text-white w-full"
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-display)",
-                letterSpacing: "var(--fs-display-ls)",
-                lineHeight: "var(--fs-display-lh)",
-                fontWeight: 600,
-              }}
-            >
-              Trusted Container{" "}
-              <span className="cs-text-gradient-impact">Foundations</span>
-            </h1>
-
-            <div className="flex flex-col items-start w-full" style={{ gap: "32px" }}>
-              <p
+            <HeroReveal y={50} duration={1.0}>
+              <h1
+                className="text-white w-full"
                 style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--fs-lead)",
-                  fontWeight: 400,
-                  lineHeight: 1.45,
-                  letterSpacing: "-0.02em",
-                  color: "rgba(255,255,255,0.8)",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "var(--fs-display)",
+                  letterSpacing: "var(--fs-display-ls)",
+                  lineHeight: "var(--fs-display-lh)",
+                  fontWeight: 600,
                 }}
               >
-                Minimal, hardened, verifiable container images built from trusted
-                sources and continuously rebuilt to reduce inherited risk.
-              </p>
+                Trusted Container{" "}
+                <span className="cs-text-gradient-impact">Foundations</span>
+              </h1>
+            </HeroReveal>
 
-              <Link
-                href="https://images.cleanstart.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cs-btn-glass"
-                style={
-                  {
-                    "--cs-btn-fs": "var(--btn-fs-lg)",
-                    "--cs-btn-h": "var(--btn-h-xl)",
-                    "--cs-btn-px": "var(--btn-px-xl)",
-                  } as React.CSSProperties
-                }
-              >
-                Explore Images
-              </Link>
+            <div className="flex flex-col items-start w-full" style={{ gap: "32px" }}>
+              <HeroReveal y={30} delay={0.2} duration={0.8}>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-lead)",
+                    fontWeight: 400,
+                    lineHeight: 1.45,
+                    letterSpacing: "-0.02em",
+                    color: "rgba(255,255,255,0.8)",
+                  }}
+                >
+                  Minimal, hardened, verifiable container images built from trusted
+                  sources and continuously rebuilt to reduce inherited risk.
+                </p>
+              </HeroReveal>
+
+              <HeroReveal y={30} delay={0.35} duration={0.8}>
+                <Link
+                  href="https://images.cleanstart.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cs-btn-glass"
+                  style={
+                    {
+                      "--cs-btn-fs": "var(--btn-fs-lg)",
+                      "--cs-btn-h": "var(--btn-h-xl)",
+                      "--cs-btn-px": "var(--btn-px-xl)",
+                    } as React.CSSProperties
+                  }
+                >
+                  Explore Images
+                </Link>
+              </HeroReveal>
             </div>
           </div>
 

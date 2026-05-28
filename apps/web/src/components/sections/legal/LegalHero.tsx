@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123E 38%, #131E8F 67%, #471EC0 80%, #471FC3 100%)";
@@ -49,12 +50,14 @@ export function LegalHero({ title }: LegalHeroProps): React.ReactElement {
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[clamp(80px,10vw,140px)] pb-[clamp(60px,8vw,100px)]">
-        <h1
-          className="font-display font-semibold text-white text-center mx-auto"
-          style={{ ...TITLE_STYLE, maxWidth: "860px" }}
-        >
-          {title}
-        </h1>
+        <HeroReveal y={50} duration={1.0}>
+          <h1
+            className="font-display font-semibold text-white text-center mx-auto"
+            style={{ ...TITLE_STYLE, maxWidth: "860px" }}
+          >
+            {title}
+          </h1>
+        </HeroReveal>
       </div>
     </section>
   );

@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 const FEATURES = [
   {
     icon: "/images/sca/icon-runtime-images.svg",
@@ -79,33 +81,37 @@ export function SCAReduceNoise(): React.ReactElement {
         >
           {/* Heading + subtitle block (gap-[32px] between them) */}
           <div className="flex flex-col" style={{ gap: "32px" }}>
-            <h2
-              className="text-white"
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-h2)",
-                fontWeight: 700,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-              }}
-            >
-              Reduce Noise{" "}
-              <span className="cs-text-gradient-impact">at the Source</span>
-            </h2>
+            <Reveal header>
+              <h2
+                className="text-white"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "var(--fs-h2)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.1,
+                }}
+              >
+                Reduce Noise{" "}
+                <span className="cs-text-gradient-impact">at the Source</span>
+              </h2>
+            </Reveal>
 
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-lead)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                color: "rgba(255,255,255,0.8)",
-              }}
-            >
-              Minimal, hardened images reduce inherited vulnerabilities before
-              SCA scanning begins.
-            </p>
+            <Reveal header delay={0.15} y={20}>
+              <p
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "var(--fs-lead)",
+                  fontWeight: 400,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.4,
+                  color: "rgba(255,255,255,0.8)",
+                }}
+              >
+                Minimal, hardened images reduce inherited vulnerabilities before
+                SCA scanning begins.
+              </p>
+            </Reveal>
           </div>
 
           {/* Mobile-only mockup — sits between subtitle and feature rows.

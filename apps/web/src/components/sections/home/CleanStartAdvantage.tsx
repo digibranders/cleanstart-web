@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * CleanStart Advantage section — Figma frame 108:7864 (1920×817)
@@ -78,32 +79,36 @@ export function CleanStartAdvantage() {
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 py-section-lg">
         {/* Intro: title + description (Figma Frame 10 at 316,3438 — 517×265) */}
         <div className="max-w-[517px]">
-          <h2
-            id="advantage-title"
-            className="font-display text-white"
-            style={{
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-            }}
-          >
-            CleanStart{" "}
-            <span className="cs-text-gradient-impact">Advantage</span>
-          </h2>
-          <p
-            className="mt-6 text-white"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              lineHeight: 1.4,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Real results from teams that replaced vulnerable public images with
-            CleanStart&rsquo;s hardened, source-built containers
-          </p>
+          <Reveal header>
+            <h2
+              id="advantage-title"
+              className="font-display text-white"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+              }}
+            >
+              CleanStart{" "}
+              <span className="cs-text-gradient-impact">Advantage</span>
+            </h2>
+          </Reveal>
+          <Reveal header delay={0.15} y={20}>
+            <p
+              className="mt-6 text-white"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                lineHeight: 1.4,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              Real results from teams that replaced vulnerable public images with
+              CleanStart&rsquo;s hardened, source-built containers
+            </p>
+          </Reveal>
         </div>
 
         {/* Stats — two layouts:

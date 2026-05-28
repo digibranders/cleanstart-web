@@ -1,4 +1,5 @@
 import type React from "react";
+import { Reveal } from "@/components/ui/Reveal";
 
 type StackItem = {
   label: string;
@@ -301,20 +302,22 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
         }}
       >
         {/* Heading */}
-        <h2
-          className="text-white text-center mx-auto"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            maxWidth: "700px",
-          }}
-        >
-          Delivered Through Your Existing{" "}
-          <span className="cs-text-gradient-impact">Workflows</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-white text-center mx-auto"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              maxWidth: "700px",
+            }}
+          >
+            Delivered Through Your Existing{" "}
+            <span className="cs-text-gradient-impact">Workflows</span>
+          </h2>
+        </Reveal>
 
         {/* ── DIAGRAM AREA ── */}
         <div

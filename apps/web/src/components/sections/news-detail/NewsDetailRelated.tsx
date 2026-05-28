@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { News } from "@/lib/news";
 import { NewsroomCard } from "@/components/sections/newsroom/NewsroomCard";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 interface NewsDetailRelatedProps {
   items: News[];
@@ -18,7 +19,7 @@ export function NewsDetailRelated({
       style={{ minHeight: "580px" }}
     >
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <div className="flex items-center justify-between pt-[80px]">
+        <Reveal header className="flex items-center justify-between pt-[80px]">
           <h2 className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em]">
             <span className="text-white">Related </span>
             <span
@@ -54,7 +55,7 @@ export function NewsDetailRelated({
               decoding="async"
             />
           </Link>
-        </div>
+        </Reveal>
 
         {/*
           MOBILE (<sm): horizontal scroll-snap row matching the related-blogs
@@ -68,14 +69,16 @@ export function NewsDetailRelated({
             </div>
           ))}
         </div>
-        <div
+        <RevealStagger
           className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 mt-[60px] pb-[40px]"
           style={{ gap: "24px" }}
         >
           {items.map((item) => (
-            <NewsroomCard key={item.id} item={item} />
+            <RevealItem key={item.id}>
+              <NewsroomCard item={item} />
+            </RevealItem>
           ))}
-        </div>
+        </RevealStagger>
       </div>
     </section>
   );

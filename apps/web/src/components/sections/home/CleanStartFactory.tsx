@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Section, Container } from "@/components/layout";
+import { Reveal } from "@/components/ui/Reveal";
 
 type CardData = {
   title: string;
@@ -1357,17 +1358,19 @@ export function CleanStartFactory() {
             }}
           />
 
-          <h2
-            className="mt-[32px] text-center font-display text-white"
-            style={{
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              lineHeight: 1.1,
-              letterSpacing: "-0.04em",
-            }}
-          >
-            The CleanStart Factory
-          </h2>
+          <Reveal header>
+            <h2
+              className="mt-[32px] text-center font-display text-white"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                lineHeight: 1.1,
+                letterSpacing: "-0.04em",
+              }}
+            >
+              The CleanStart Factory
+            </h2>
+          </Reveal>
 
           {/* Tablet + desktop: 4 cards LOCKED in a single horizontal row,
               md → xl. CSS Grid with 4 equal columns (`minmax(0, 1fr)` so a

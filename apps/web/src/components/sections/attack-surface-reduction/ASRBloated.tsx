@@ -1,4 +1,5 @@
 import type React from 'react';
+import { Reveal } from '@/components/ui/Reveal';
 
 // ─── Card data ────────────────────────────────────────────────────────────────
 // mobileOrder matches Figma 920:610 top-to-bottom stacking:
@@ -45,6 +46,7 @@ export function ASRBloated(): React.ReactElement {
        *                         tracking -1.4px
        */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 md:pt-[88px]">
+        <Reveal header>
         <h2
           className="text-center text-[#111] text-[28px] lg:[font-size:var(--fs-h2)]"
           style={{
@@ -70,6 +72,7 @@ export function ASRBloated(): React.ReactElement {
             bloated
           </span>
         </h2>
+        </Reveal>
       </div>
 
       {/* ── Desktop layout ── */}
