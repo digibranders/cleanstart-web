@@ -18,9 +18,21 @@ const PARTNERS = [
   { name: "Notion",         src: "/images/about/ecosystems-color/notion.svg",     width: 58,  height: 60 },
 ];
 
-export function AboutEcosystems() {
+interface AboutEcosystemsProps {
+  /**
+   * Bottom padding variant.
+   *  - "cta"     → reserves space for an overlapping Footer CTA card (default,
+   *                matches the /about page where `<Footer cta={...} />` is used).
+   *  - "compact" → standard section padding for pages whose Footer has no CTA
+   *                overlap (e.g. /deal-registration).
+   */
+  bottomPadding?: "cta" | "compact";
+}
+
+export function AboutEcosystems({ bottomPadding = "cta" }: AboutEcosystemsProps = {}) {
+  const bottomClass = bottomPadding === "compact" ? "pb-section-md" : "pb-section-cta";
   return (
-    <section className="relative overflow-hidden bg-white pt-section-md pb-section-cta">
+    <section className={`relative overflow-hidden bg-white pt-section-md ${bottomClass}`}>
       {/* Decorative blobs */}
       <div
         aria-hidden

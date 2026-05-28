@@ -120,7 +120,7 @@ export function AboutWhoWeAre() {
 
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
             {PILLARS.map((pillar) => (
-              <div key={pillar.title} className="flex flex-col items-center text-center sm:items-start sm:text-left gap-6 px-0 sm:px-8 first:pl-0 last:pr-0">
+              <div key={pillar.title} className="flex flex-col items-center text-center gap-6 px-0 sm:px-8 first:pl-0 last:pr-0">
                 <div className="relative h-[100px] w-[100px] overflow-hidden rounded-lg shrink-0">
                   <Image
                     src={pillar.icon}
