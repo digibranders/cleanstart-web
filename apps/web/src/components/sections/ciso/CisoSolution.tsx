@@ -92,39 +92,179 @@ export function CisoSolution(): React.ReactElement {
     >
 
       {/* ══════════════════════════════════════════════════════════════════════
-          MOBILE — single PNG render of the Figma comp (heading + subtitle +
-          timeline + 4 cards baked into /images/ciso/rrsv.png, 360×781).
-          Accessibility: heading + body copy rendered as visually-hidden
-          siblings so screen readers and SEO still see them.
+          MOBILE — vertical timeline rebuilt in JSX to match the Figma comp
+          (heading + subtitle + cyan glow rail + 4 glassmorphic feature
+          cards). Replaces the previous flattened PNG so the layout is
+          fully selectable, responsive, and accessible to screen readers.
       ══════════════════════════════════════════════════════════════════════ */}
       <div
         className="sm:hidden relative"
         style={{ paddingTop: "32px", paddingBottom: "64px" }}
       >
-        <h2 className="sr-only">Reduce Risk Before Deployment</h2>
-        <p className="sr-only">
+        {/* Heading */}
+        <h2
+          className="text-center text-white mx-auto px-6"
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "var(--fs-h2)",
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.15,
+            marginBottom: "16px",
+            maxWidth: "320px",
+          }}
+        >
+          Reduce Risk Before Deployment
+        </h2>
+
+        {/* Subtitle */}
+        <p
+          className="text-center mx-auto px-6"
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--fs-body)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.5,
+            color: "rgba(255,255,255,0.8)",
+            maxWidth: "320px",
+            marginBottom: "40px",
+          }}
+        >
           Minimal, hardened container images reduce inherited vulnerabilities
           before they reach production environments.
         </p>
-        <ul className="sr-only">
-          {FEATURES.map((f) => (
-            <li key={f.titleMobile}>
-              {f.titleMobile}: {f.desc}
-            </li>
-          ))}
-        </ul>
 
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/ciso/rrsv.png"
-          alt=""
-          aria-hidden
-          width={360}
-          height={781}
-          loading="lazy"
-          decoding="async"
-          className="block mx-auto w-full max-w-[420px] h-auto pointer-events-none select-none"
-        />
+        {/* Timeline + Cards container */}
+        <div
+          className="relative mx-auto"
+          style={{ maxWidth: "420px", paddingLeft: "16px", paddingRight: "16px" }}
+        >
+          {/* Vertical cyan glow rail — centered at x = 60px from the
+              parent's padding box, which lines up with the dot centre inside
+              each <li> (li starts at parent content edge = 16, dot.left = 36,
+              dot.width/2 = 8 → centre = 60). */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: "59px",
+              top: "32px",
+              bottom: "32px",
+              width: "2px",
+              background:
+                "linear-gradient(180deg, rgba(122,189,255,0) 0%, rgba(122,189,255,0.7) 12%, rgba(122,189,255,0.7) 88%, rgba(122,189,255,0) 100%)",
+              borderRadius: "32px",
+              boxShadow: "0 0 12px rgba(122,189,255,0.45)",
+            }}
+          />
+
+          <ul className="flex flex-col" style={{ gap: "20px", listStyle: "none", padding: 0, margin: 0 }}>
+            {FEATURES.map((f) => (
+              <li
+                key={f.titleMobile}
+                style={{ position: "relative", paddingLeft: "72px" }}
+              >
+                {/* Outer halo */}
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: "16px",
+                    top: "50%",
+                    width: "56px",
+                    height: "56px",
+                    transform: "translateY(-50%)",
+                    borderRadius: "50%",
+                    background:
+                      "radial-gradient(circle, rgba(122,189,255,0.5) 0%, rgba(122,189,255,0) 65%)",
+                    pointerEvents: "none",
+                    mixBlendMode: "plus-lighter",
+                  }}
+                />
+                {/* Horizontal cross-glow ray */}
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: "8px",
+                    top: "50%",
+                    width: "72px",
+                    height: "2px",
+                    transform: "translateY(-50%)",
+                    background:
+                      "linear-gradient(90deg, rgba(122,189,255,0) 0%, rgba(180,225,255,0.9) 50%, rgba(122,189,255,0) 100%)",
+                    pointerEvents: "none",
+                    mixBlendMode: "plus-lighter",
+                    filter: "blur(0.4px)",
+                  }}
+                />
+                {/* Inner bright node */}
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: "36px",
+                    top: "50%",
+                    width: "16px",
+                    height: "16px",
+                    transform: "translateY(-50%)",
+                    borderRadius: "50%",
+                    background:
+                      "radial-gradient(circle, #ffffff 0%, #7ad6ff 40%, rgba(36,140,255,0) 75%)",
+                    boxShadow:
+                      "0 0 12px rgba(122,189,255,0.95), 0 0 24px rgba(80,160,255,0.6)",
+                    mixBlendMode: "plus-lighter",
+                  }}
+                />
+
+                {/* Card */}
+                <div
+                  style={{
+                    position: "relative",
+                    borderRadius: "16px",
+                    border: "1px solid rgba(122,189,255,0.35)",
+                    background:
+                      "linear-gradient(180deg, rgba(46,82,200,0.45) 0%, rgba(58,42,160,0.45) 60%, rgba(85,30,206,0.45) 100%)",
+                    backdropFilter: "blur(14px)",
+                    WebkitBackdropFilter: "blur(14px)",
+                    padding: "18px 20px",
+                    boxShadow:
+                      "0 12px 28px rgba(8,12,40,0.35), inset 0 1px 0 rgba(255,255,255,0.05)",
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: "var(--fs-h4)",
+                      fontWeight: 700,
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.15,
+                      color: "#fff",
+                      margin: 0,
+                      marginBottom: "6px",
+                    }}
+                  >
+                    {f.titleMobile}
+                  </h3>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "var(--fs-body-sm)",
+                      fontWeight: 400,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.5,
+                      color: "rgba(255,255,255,0.85)",
+                      margin: 0,
+                    }}
+                  >
+                    {f.desc}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════

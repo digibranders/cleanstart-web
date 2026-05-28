@@ -4,7 +4,6 @@ import { DemoHero } from "@/components/sections/book-a-demo/DemoHero";
 import { BookDemoBody } from "@/components/sections/book-a-demo/BookDemoBody";
 import { WhatsSetsUsApart } from "@/components/sections/book-a-demo/WhatsSetsUsApart";
 import { BookDemoForm } from "@/components/sections/forms/BookDemoForm";
-import { TrustedMarquee } from "@/components/sections/book-a-demo/TrustedMarquee";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
@@ -46,10 +45,6 @@ export default function BookDemoPage() {
             <BookDemoForm />
           </section>
         </BookDemoBody>
-
-        <FadeUp>
-          <TrustedMarquee />
-        </FadeUp>
       </main>
       <Footer />
     </>
