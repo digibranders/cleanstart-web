@@ -19,6 +19,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { NAV_TREE } from "@/lib/nav-config";
+import { NavIcon } from "@/components/nav/icons/NavIcon";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -98,8 +99,9 @@ export function MobileNav() {
                               <Link
                                 href={leaf.href}
                                 onClick={close}
-                                className="block rounded-[8px] px-3 py-2 text-sm text-white/80 no-underline transition-colors hover:bg-white/[0.06] hover:text-white"
+                                className="flex items-center gap-2.5 rounded-[8px] px-3 py-2 text-sm text-white/80 no-underline transition-colors hover:bg-white/[0.06] hover:text-white"
                               >
+                                {leaf.icon && <NavIcon id={leaf.icon} size={14} className="opacity-70" />}
                                 {leaf.label}
                               </Link>
                             )}
