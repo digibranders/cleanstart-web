@@ -16,9 +16,9 @@ import { PanelSolutions } from "@/components/nav/panels/PanelSolutions";
 import { PanelAudience } from "@/components/nav/panels/PanelAudience";
 import { PanelResources } from "@/components/nav/panels/PanelResources";
 import { PanelCompany } from "@/components/nav/panels/PanelCompany";
+import type { CommunityImage } from "@/lib/api/community-images";
 
 const PANELS: Record<string, (props: { item: NavMegaItem }) => React.ReactElement> = {
-  Products: PanelProducts,
   Solutions: PanelSolutions,
   Audience: PanelAudience,
   Resources: PanelResources,
@@ -33,7 +33,7 @@ function collectHrefs(item: NavItem): string[] {
   return [];
 }
 
-function TopLevelItem({ item }: { item: NavItem }) {
+function TopLevelItem({ item, latestImages }: { item: NavItem; latestImages: CommunityImage[] }) {
   const active = useIsActiveSection(collectHrefs(item));
 
   if (item.kind === "flat") {
@@ -54,26 +54,36 @@ function TopLevelItem({ item }: { item: NavItem }) {
     );
   }
 
+  let body: React.ReactElement | null = null;
+  if (item.kind === "mega" && item.label === "Products") {
+    // latestImages is passed through but not yet consumed — wired in Task 3.3.
+    void latestImages;
+    body = <PanelProducts item={item} />;
+  } else if (item.kind === "mega" && PANELS[item.label]) {
+    const Panel = PANELS[item.label]!;
+    body = <Panel item={item} />;
+  }
+
   return (
     <NavigationMenuItem>
       <NavigationMenuTrigger data-active={active}>
         {item.label}
       </NavigationMenuTrigger>
       <NavigationMenuContent>
-        {item.kind === "mega" && PANELS[item.label]
-          ? (() => { const Panel = PANELS[item.label]!; return <Panel item={item} />; })()
-          : null}
+        {body}
       </NavigationMenuContent>
     </NavigationMenuItem>
   );
 }
 
-export function DesktopNav() {
+type Props = { latestImages: CommunityImage[] };
+
+export function DesktopNav({ latestImages }: Props) {
   return (
     <NavigationMenu className="hidden lg:flex" align="center" delay={120} closeDelay={200}>
       <NavigationMenuList className="gap-7">
         {NAV_TREE.map((item) => (
-          <TopLevelItem key={item.label} item={item} />
+          <TopLevelItem key={item.label} item={item} latestImages={latestImages} />
         ))}
       </NavigationMenuList>
     </NavigationMenu>
