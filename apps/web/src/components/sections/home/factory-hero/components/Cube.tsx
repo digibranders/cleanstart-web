@@ -1,8 +1,8 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
-import type { Mesh } from 'three';
+import { useMemo, useRef } from 'react';
+import type { Group, Mesh } from 'three';
 import { useLoopPhase } from '../hooks/useLoopPhase';
 import type { LogoSlug } from '../lib/logoPool';
 import { BLOOM_LAYER, makeCubeCleanMaterial, makeCubeDirtyMaterial } from '../lib/materials';
@@ -20,43 +20,93 @@ interface CubeProps {
   orientation: 'horizontal' | 'vertical';
 }
 
+const CUBE_SIZE = 0.6;
+const FACE_OFFSET = CUBE_SIZE / 2 + 0.001; // sit just outside the face, no z-fight
+
+/** Four vertical-face positions + outward rotations for logo planes. */
+const FACES: { position: [number, number, number]; rotation: [number, number, number] }[] = [
+  { position: [0, 0, FACE_OFFSET], rotation: [0, 0, 0] },                    // +Z (front)
+  { position: [0, 0, -FACE_OFFSET], rotation: [0, Math.PI, 0] },             // -Z (back)
+  { position: [FACE_OFFSET, 0, 0], rotation: [0, Math.PI / 2, 0] },          // +X (right)
+  { position: [-FACE_OFFSET, 0, 0], rotation: [0, -Math.PI / 2, 0] },        // -X (left)
+];
+
 export function Cube({ loopOffset, logo, railY, xSpan, orientation }: CubeProps) {
   const phaseRef = useLoopPhase(loopOffset);
-  const groupRef = useRef<Mesh>(null);
+  const groupRef = useRef<Group>(null);
+  const dirtyRef = useRef<Mesh>(null);
+  const cleanRef = useRef<Mesh>(null);
+
+  // Cache materials so we're not recreating them on every render.
+  const dirtyMat = useMemo(() => makeCubeDirtyMaterial(), []);
+  const cleanMat = useMemo(() => makeCubeCleanMaterial(), []);
 
   useFrame(() => {
     const p = phaseRef.current;
     if (!groupRef.current) return;
+
+    // Travel
     if (orientation === 'horizontal') {
       groupRef.current.position.x = p.x * (xSpan / 2);
       groupRef.current.position.y = railY;
     } else {
       groupRef.current.position.x = 0;
-      // map +X (right) to -Y (down) so cube travels top→bottom
       groupRef.current.position.y = -p.x * (xSpan / 2);
     }
-    groupRef.current.rotation.y += 0.01047; // 1 rev / 10s at 60fps (2π / 600)
+    groupRef.current.rotation.y += 0.01047; // 1 rev / 10s at 60fps
+
+    // Material crossfade across phases. Dirty + Clean are both mounted; we
+    // swap visibility and tween opacities so the cube reads as transitioning
+    // through CleanCompile.
+    let cleanWeight = 0;
+    if (p.material === 'clean') cleanWeight = 1;
+    else if (p.material === 'transforming') cleanWeight = Math.min(1, Math.max(0, p.dwell));
+
+    if (dirtyRef.current && dirtyRef.current.visible !== cleanWeight < 1) {
+      dirtyRef.current.visible = cleanWeight < 1;
+    }
+    if (cleanRef.current) {
+      cleanRef.current.visible = cleanWeight > 0;
+      // Tween emissiveIntensity on the clean material so the transition is felt
+      const m = cleanMat;
+      m.opacity = 0.4 + 0.6 * cleanWeight;
+      m.emissiveIntensity = 0.3 + 0.9 * cleanWeight;
+    }
+    if (dirtyMat) {
+      // Pulse a tiny bit of emissive on the dirty cube too so it's not pitch-black
+      dirtyMat.emissiveIntensity = 0.4 + 0.2 * Math.sin(p.x * Math.PI);
+    }
   });
 
-  // Render BOTH materials and toggle visibility — avoids material-swap cost per frame.
-  // (`transforming` state shows dirty under the wireframe rebuild; spec § 4.1)
   return (
     <group ref={groupRef}>
-      <mesh material={makeCubeDirtyMaterial()}>
-        <boxGeometry args={[0.6, 0.6, 0.6]} />
+      {/* Dirty cube (default visible) */}
+      <mesh ref={dirtyRef} material={dirtyMat}>
+        <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} />
       </mesh>
+      {/* Clean cube (visibility toggled by phase) */}
       <mesh
-        material={makeCubeCleanMaterial()}
+        ref={(m) => {
+          cleanRef.current = m;
+          if (m) m.layers.enable(BLOOM_LAYER);
+        }}
+        material={cleanMat}
         visible={false}
-        ref={(m) => { if (m) m.layers.enable(BLOOM_LAYER); }}
       >
-        <boxGeometry args={[0.6, 0.6, 0.6]} />
+        <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} />
       </mesh>
-      <CubeLogoPlane
-        logo={logo}
-        materialState={phaseRef.current.material}
-        dwell={phaseRef.current.dwell}
-      />
+      {/* Logo on each of the 4 vertical faces — rotates with the cube */}
+      {FACES.map((face, i) => (
+        <CubeLogoPlane
+          key={i}
+          logo={logo}
+          materialState={phaseRef.current.material}
+          dwell={phaseRef.current.dwell}
+          position={face.position}
+          rotation={face.rotation}
+          size={0.5}
+        />
+      ))}
     </group>
   );
 }

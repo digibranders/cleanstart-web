@@ -12,13 +12,13 @@ import { FloorGrid } from './components/FloorGrid';
 import { useViewportMode } from './hooks/useViewportMode';
 import { getLogoForCube } from './lib/logoPool';
 
-const X_SPAN = 5.6; // total travel width in scene units
+const X_SPAN = 4.6; // total travel width in scene units (matches camera fov)
 
 const HORIZONTAL: { x: number; y: number; label: string }[] = [
-  { x: -2.1, y: 0, label: '[ 01 · INTAKE ]' },
-  { x: -0.7, y: 0, label: '[ 02 · AI_LOGIC ]' },
-  { x: 0.7, y: 0, label: '[ 03 · CLEANCOMPILE ]' },
-  { x: 2.1, y: 0, label: '[ 04 · ATTEST·SHIP ]' },
+  { x: -1.5, y: 0, label: '[ 01 · INTAKE ]' },
+  { x: -0.5, y: 0, label: '[ 02 · AI_LOGIC ]' },
+  { x: 0.5, y: 0, label: '[ 03 · CLEANCOMPILE ]' },
+  { x: 1.5, y: 0, label: '[ 04 · ATTEST·SHIP ]' },
 ];
 
 const VERTICAL: { x: number; y: number; label: string }[] = [
@@ -28,7 +28,7 @@ const VERTICAL: { x: number; y: number; label: string }[] = [
   { x: 0, y: -2.0, label: '[ 04 · ATTEST·SHIP ]' },
 ];
 
-const CHAMBER_SIZE: [number, number, number] = [1.5, 1.4, 1.0];
+const CHAMBER_SIZE: [number, number, number] = [0.95, 1.2, 0.9];
 
 const AGENT_OFFSETS: [number, number, number][] = [
   [-0.55, 0.45, 0.3],
@@ -40,8 +40,8 @@ export function FactoryScene() {
   const mode = useViewportMode();
   const chambers = mode === 'mobile' ? VERTICAL : HORIZONTAL;
   const showAgents = mode !== 'mobile';
-  const cameraPos: [number, number, number] = mode === 'mobile' ? [0, 0, 5.0] : [0, 0.5, 4.5];
-  const cameraFov = mode === 'mobile' ? 50 : 46;
+  const cameraPos: [number, number, number] = mode === 'mobile' ? [0, 0, 5.0] : [0, 0.4, 4.5];
+  const cameraFov = mode === 'mobile' ? 50 : 52;
   const cubeXSpan = mode === 'mobile' ? 5.0 : X_SPAN;
   const orientation = mode === 'mobile' ? 'vertical' : 'horizontal';
 
