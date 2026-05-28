@@ -22,9 +22,14 @@ const FEATURES = [
 ];
 
 const METRICS = [
-  { value: "3 Resolved", color: "#d5b7fa" },
-  { value: "0.02 / MB", color: "#bcbdf6" },
-  { value: "100% Secure", color: "#79d786" },
+  { label: "Total Findings", value: "3 Resolved", color: "#d5b7fa" },
+  { label: "Vulnerability Density", value: "0.02 / MB", color: "#bcbdf6" },
+  {
+    label: "Reachability Score",
+    value: "100% Secure",
+    color: "#79d786",
+    highlight: true,
+  },
 ];
 
 const BARS = [
@@ -310,17 +315,32 @@ function Mockup(): React.ReactElement {
           className="absolute flex flex-col"
           style={{ top: "103px", left: "30px", right: "30px", gap: "16px" }}
         >
-          {METRICS.map(({ value, color }) => (
+          {METRICS.map(({ label, value, color, highlight }) => (
             <div
-              key={value}
-              className="flex items-center justify-end rounded-[8px]"
+              key={label}
+              className="flex items-center justify-between rounded-[8px]"
               style={{
                 height: "48px",
                 padding: "0 16px",
                 background: "rgba(0,0,0,0.1)",
-                border: "0.5px solid #464646",
+                border: highlight ? "1px solid #2dd4ff" : "0.5px solid #464646",
+                boxShadow: highlight
+                  ? "0 0 0 1px rgba(45,212,255,0.35), 0 0 12px rgba(45,212,255,0.25)"
+                  : undefined,
               }}
             >
+              <span
+                style={{
+                  fontFamily: "var(--font-body)",
+                  // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored fontSize inside constrained component. See RESPONSIVE-AUDIT.md §14.3.
+                  fontSize: "var(--fs-body)",
+                  fontWeight: 500,
+                  letterSpacing: "-0.02em",
+                  color: "rgba(255,255,255,0.9)",
+                }}
+              >
+                {label}
+              </span>
               <span
                 style={{
                   fontFamily: "var(--font-body)",
@@ -329,7 +349,7 @@ function Mockup(): React.ReactElement {
                   fontWeight: 600,
                   letterSpacing: "-0.04em",
                   color,
-                  opacity: 0.8,
+                  opacity: 0.9,
                 }}
               >
                 {value}
@@ -352,19 +372,42 @@ function Mockup(): React.ReactElement {
             alignItems: "flex-end",
             padding: "0 16px",
             gap: "16px",
+            overflow: "hidden",
           }}
         >
           {BARS.map(({ h, c }, i) => (
             <div
               key={i}
               style={{
+                position: "relative",
                 width: "49px",
                 height: `${h}px`,
                 background: c,
                 borderRadius: "8px 8px 0 0",
                 flexShrink: 0,
               }}
-            />
+            >
+              {/* Cyan light bleed under each bar — sits just below the bar
+                  base, blurred, plus-lighter blend so it brightens the
+                  chart's black floor without darkening the bar above. */}
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  bottom: "-18px",
+                  width: "60px",
+                  height: "28px",
+                  transform: "translateX(-50%)",
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(ellipse at center, rgba(122,189,255,0.85) 0%, rgba(45,212,255,0.45) 35%, rgba(45,212,255,0) 70%)",
+                  filter: "blur(6px)",
+                  mixBlendMode: "plus-lighter",
+                  pointerEvents: "none",
+                }}
+              />
+            </div>
           ))}
         </div>
       </div>

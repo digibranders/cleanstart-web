@@ -80,14 +80,14 @@ export function BlogDetailCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Cube — bottom-left ── */}
+      {/* ── Cube — top-left ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/blog-detail/cta/cta-cube.png"
         alt=""
         className="absolute pointer-events-none select-none hidden xl:block object-contain"
-        style={{ left: "-63px", top: "220px", width: "206px", height: "207px" , opacity: 0.75,}}
+        style={{ left: "-63px", top: "-63px", width: "206px", height: "207px" , opacity: 0.75,}}
         loading="lazy"
         decoding="async"
       />

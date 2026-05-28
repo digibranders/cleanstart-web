@@ -7,19 +7,16 @@ const TARGETS = [
     title: 'Kubernetes Platforms',
     desc: 'Secure container foundations.',
     icon: '/images/attack-surface-reduction/modern-icon-k8s.svg',
-    iconDesktop: '/images/attack-surface-reduction/prod-icon-k8s.png',
   },
   {
     title: 'Regulated Environments',
     desc: 'Built for compliance-heavy workloads.',
     icon: '/images/attack-surface-reduction/modern-icon-regulated.svg',
-    iconDesktop: '/images/attack-surface-reduction/prod-icon-docs.png',
   },
   {
     title: 'Security-Focused Teams',
     desc: 'Reduce software supply chain risk.',
     icon: '/images/attack-surface-reduction/modern-icon-security.svg',
-    iconDesktop: '/images/attack-surface-reduction/prod-icon-security.png',
   },
 ] as const;
 
@@ -161,16 +158,7 @@ export function ASRModern(): React.ReactElement {
               className="flex flex-col items-start text-left"
               style={{ gap: '20px' }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={t.iconDesktop}
-                alt=""
-                aria-hidden
-                className="pointer-events-none select-none"
-                style={{ width: '72px', height: '72px', objectFit: 'contain' }}
-                loading="lazy"
-                decoding="async"
-              />
+              <IconBall icon={t.icon} size={72} iconSize={40} />
               <h3
                 style={{
                   fontFamily: 'var(--font-display)',
@@ -270,6 +258,70 @@ export function ASRModern(): React.ReactElement {
   );
 }
 
+// ─── Shared: IconBall ─────────────────────────────────────────────────────────
+/*
+ * Blue gradient sphere with inset highlights + a centered SVG icon. Used in
+ * both the mobile timeline list and the desktop 3-column grid so the icon
+ * visual is identical across breakpoints.
+ */
+function IconBall({
+  icon,
+  size,
+  iconSize,
+}: {
+  icon: string;
+  size: number;
+  iconSize: number;
+}): React.ReactElement {
+  // Box-shadow scales with size so larger balls keep the same visual depth
+  // ratio as the 60px mobile reference.
+  const scale = size / 60;
+  return (
+    <div
+      className="relative overflow-hidden shrink-0"
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        borderRadius: '100px',
+        background: 'linear-gradient(180deg, #239cff 0%, #005be3 100%)',
+        boxShadow:
+          `0px ${3.857 * scale}px ${9.086 * scale}px rgba(28,60,142,0.33),` +
+          `inset 0px ${-0.145 * scale}px ${0.182 * scale}px rgba(0,44,179,0.5),` +
+          `inset 0px ${0.073 * scale}px ${0.364 * scale}px rgba(255,255,255,0.81)`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <div
+        aria-hidden
+        className="absolute pointer-events-none"
+        style={{
+          inset: 0,
+          borderRadius: '100px',
+          background:
+            'radial-gradient(circle at 38% 28%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 55%)',
+        }}
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src={icon}
+        alt=""
+        className="relative pointer-events-none select-none"
+        style={{
+          width: `${iconSize}px`,
+          height: `${iconSize}px`,
+          objectFit: 'contain',
+          zIndex: 2,
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  );
+}
+
 // ─── Mobile: ModernItem ───────────────────────────────────────────────────────
 /*
  * Figma 366:6566/6590/6614:
@@ -301,46 +353,7 @@ function ModernItem({
         gap: '12px',
       }}
     >
-      {/* Blue gradient ball */}
-      <div
-        className="relative overflow-hidden shrink-0"
-        style={{
-          width: '60px',
-          height: '60px',
-          borderRadius: '100px',
-          background: 'linear-gradient(180deg, #239cff 0%, #005be3 100%)',
-          boxShadow:
-            '0px 3.857px 9.086px rgba(28,60,142,0.33),' +
-            'inset 0px -0.145px 0.182px rgba(0,44,179,0.5),' +
-            'inset 0px 0.073px 0.364px rgba(255,255,255,0.81)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {/* Simplified radial highlight (replaces Figma's mask+blend light effects) */}
-        <div
-          aria-hidden
-          className="absolute pointer-events-none"
-          style={{
-            inset: 0,
-            borderRadius: '100px',
-            background:
-              'radial-gradient(circle at 38% 28%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 55%)',
-          }}
-        />
-        {/* Icon */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          aria-hidden
-          src={icon}
-          alt=""
-          className="relative pointer-events-none select-none"
-          style={{ width: '33px', height: '33px', objectFit: 'contain', zIndex: 2 }}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
+      <IconBall icon={icon} size={60} iconSize={33} />
 
       {/* Text */}
       <div

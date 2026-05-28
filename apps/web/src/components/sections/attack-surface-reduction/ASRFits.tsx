@@ -4,19 +4,19 @@ const INTEGRATIONS: { title: string; desc: string; icon: string; iconAlt: string
   {
     title: 'Drop-in Images',
     desc: 'Works with existing workflows.',
-    icon: '/images/attack-surface-reduction/fits-icon-1.png',
+    icon: '/images/attack-surface-reduction/image 583136.png',
     iconAlt: 'Monitor icon',
   },
   {
     title: 'Pipeline Compatible',
     desc: 'Integrates into CI/CD environments.',
-    icon: '/images/attack-surface-reduction/fits-icon-2.png',
+    icon: '/images/attack-surface-reduction/image 583137.png',
     iconAlt: 'Pipeline icon',
   },
   {
     title: 'Deploy Anywhere',
     desc: 'Cloud, on-prem, or regulated environments.',
-    icon: '/images/attack-surface-reduction/fits-icon-3.png',
+    icon: '/images/attack-surface-reduction/Point.png',
     iconAlt: 'Deploy icon',
   },
 ];
