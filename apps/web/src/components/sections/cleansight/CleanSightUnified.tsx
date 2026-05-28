@@ -1,83 +1,23 @@
-/* Per-card white-line inline SVG icons. Mirrors the per-chip-icon pattern in
- * SCATransform — keeps visual weight consistent across the row and avoids
- * shipping 4 separate SVG asset files for a single use site. */
-function IconDiscovery(): React.ReactElement {
-  return (
-    <svg width="54" height="54" viewBox="0 0 32 32" fill="none" aria-hidden>
-      {/* Magnifying glass — circle + diagonal handle */}
-      <circle cx="14" cy="14" r="7.5" stroke="#fff" strokeWidth="1.8"/>
-      <path d="M19.5 19.5l5 5" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"/>
-      {/* Bulb inside the lens — top dome + filament base */}
-      <path d="M14 9.5a3 3 0 0 0-2 5.2v1.3h4v-1.3a3 3 0 0 0-2-5.2z" stroke="#fff" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
-      <path d="M13 16.5h2M13.3 17.5h1.4" stroke="#fff" strokeWidth="1.3" strokeLinecap="round"/>
-    </svg>
-  );
-}
-function IconClipboardCheck(): React.ReactElement {
-  return (
-    <svg width="54" height="54" viewBox="0 0 32 32" fill="none" aria-hidden>
-      {/* Clipboard body */}
-      <rect x="7" y="6.5" width="18" height="21" rx="2.4" stroke="#fff" strokeWidth="1.8"/>
-      {/* Clip at top */}
-      <rect x="12" y="3.5" width="8" height="5" rx="1.2" stroke="#fff" strokeWidth="1.8" fill="#fff"/>
-      {/* Big checkmark in the body */}
-      <path d="M11 16.5l3.2 3.2 6.2-6.4" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-      {/* Two short underlines for "list items" effect */}
-      <path d="M11 22h10" stroke="#fff" strokeWidth="1.3" strokeLinecap="round" opacity="0.7"/>
-    </svg>
-  );
-}
-function IconEnterprise(): React.ReactElement {
-  return (
-    <svg width="54" height="54" viewBox="0 0 32 32" fill="none" aria-hidden>
-      {/* Building outline — stepped pyramid skyscraper */}
-      <path d="M6 28V13l5-3 5 3v15M16 28V8l5-2.5 5 2.5v20" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round"/>
-      {/* Windows — left tower */}
-      <path d="M9 16h1M12 16h1M9 19h1M12 19h1M9 22h1M12 22h1" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
-      {/* Windows — right tower */}
-      <path d="M19 12h1M22 12h1M19 15h1M22 15h1M19 18h1M22 18h1M19 21h1M22 21h1" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
-      {/* Ground line */}
-      <path d="M4 28h24" stroke="#fff" strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-  );
-}
-function IconNetwork(): React.ReactElement {
-  return (
-    <svg width="54" height="54" viewBox="0 0 32 32" fill="none" aria-hidden>
-      {/* Connecting lines between the 4 nodes (drawn first so dots sit on top) */}
-      <path d="M16 10v5M16 17l-6 5M16 17l6 5" stroke="#fff" strokeWidth="1.7" strokeLinecap="round"/>
-      {/* Top center node (slightly larger — the "hub") */}
-      <circle cx="16" cy="16" r="3" fill="#fff"/>
-      {/* Top node */}
-      <circle cx="16" cy="7" r="2.8" fill="#fff"/>
-      {/* Bottom-left node */}
-      <circle cx="8" cy="24" r="2.8" fill="#fff"/>
-      {/* Bottom-right node */}
-      <circle cx="24" cy="24" r="2.8" fill="#fff"/>
-    </svg>
-  );
-}
-
 const CARDS = [
   {
     title: "Continuous Discovery",
     body: "Continuously inventory container environments.",
-    Icon: IconDiscovery,
+    iconSrc: "/images/cleansight/Ball1.png",
   },
   {
     title: "Risk Assessment",
     body: "Identify inherited vulnerabilities and runtime exposure.",
-    Icon: IconClipboardCheck,
+    iconSrc: "/images/cleansight/Ball2.png",
   },
   {
     title: "Enterprise SBOM Generation",
     body: "Generate software inventories automatically.",
-    Icon: IconEnterprise,
+    iconSrc: "/images/cleansight/Ball3.png",
   },
   {
     title: "Integrated Remediation",
     body: "Reduce remediation complexity and operational effort.",
-    Icon: IconNetwork,
+    iconSrc: "/images/cleansight/Ball4.png",
   },
 ];
 
@@ -238,19 +178,19 @@ export function CleanSightUnified(): React.ReactElement {
 
               {/* Card content */}
               <div className="relative flex flex-col flex-1 z-10" style={{ padding: "24px", paddingTop: "54px", gap: "12px" }}>
-                {/* Blue ball icon */}
-                <div
-                  className="flex items-center justify-center flex-shrink-0"
-                  style={{
-                    width: "96px",
-                    height: "96px",
-                    borderRadius: "50%",
-                    background: "linear-gradient(to bottom, #239CFF 0%, #005BE3 100%)",
-                    boxShadow: "0px 6.171px 14.537px 0px rgba(28,60,142,0.33), inset 0px -0.233px 0.291px 0px rgba(0,44,179,0.5), inset 0px 0.116px 0.582px 0px rgba(255,255,255,0.81)",
-                  }}
-                >
-                  <card.Icon />
-                </div>
+                {/* Ball icon (per-card PNG sphere with embedded glyph) */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={card.iconSrc}
+                  alt=""
+                  aria-hidden
+                  width={96}
+                  height={96}
+                  loading="lazy"
+                  decoding="async"
+                  className="flex-shrink-0 pointer-events-none select-none"
+                  style={{ width: "96px", height: "96px", objectFit: "contain" }}
+                />
 
                 {/* Title */}
                 <h3
