@@ -20,6 +20,9 @@ next-env.d.ts
 .claude/scheduled_tasks.lock
 .claude/launch.json
 
+# Superpowers / brainstorming visual-companion mockups (local only)
+.superpowers/
+
 # Generated types — Payload regenerates this; do not edit by hand
 # (still committed; ignore only local stale copies during regeneration)
 **/payload-types.bak.ts
