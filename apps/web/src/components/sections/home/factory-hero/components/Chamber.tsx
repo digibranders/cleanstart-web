@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect, useMemo } from 'react';
 import { Text } from '@react-three/drei';
+import { BoxGeometry } from 'three';
 import type { ReactNode } from 'react';
 import {
   BLOOM_LAYER,
@@ -21,6 +23,10 @@ interface ChamberProps {
 
 export function Chamber({ position, size, label, children }: ChamberProps) {
   const [w, h, d] = size;
+  // Cache one BoxGeometry per chamber size for edges extraction.
+  const edgeBox = useMemo(() => new BoxGeometry(w, h, d), [w, h, d]);
+  useEffect(() => () => edgeBox.dispose(), [edgeBox]);
+
   return (
     <group position={position}>
       {/* walls */}
@@ -32,15 +38,7 @@ export function Chamber({ position, size, label, children }: ChamberProps) {
         material={makeChamberEdgeMaterial()}
         ref={(self) => { if (self) self.layers.set(BLOOM_LAYER); }}
       >
-        <edgesGeometry
-          args={[
-            // re-using a temporary BoxGeometry for the edge extraction
-            (() => {
-              const { BoxGeometry } = require('three') as typeof import('three');
-              return new BoxGeometry(w, h, d);
-            })(),
-          ]}
-        />
+        <edgesGeometry args={[edgeBox]} />
       </lineSegments>
       {/* label above the chamber */}
       <Text
