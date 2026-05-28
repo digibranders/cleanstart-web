@@ -12,12 +12,27 @@ const FactoryScene = dynamic(() => import('./FactoryScene').then((m) => m.Factor
 const ARIA_LABEL =
   'CleanStart Factory pipeline: vulnerable upstream container images (such as nginx, postgres, redis) enter on the left, pass through four hardening stages — Intake, AI Logic Engine, CleanCompile, Attest and Handoff — and exit signed, verified, and CVE-free on the right.';
 
+function hasWebGL(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const canvas = document.createElement('canvas');
+    return Boolean(canvas.getContext('webgl2') || canvas.getContext('webgl'));
+  } catch {
+    return false;
+  }
+}
+
 export function FactoryHero() {
   const reduced = useReducedMotion();
+  // Reduced-motion strategy (spec § 4.3): show the poster only — no R3F scene,
+  // no cubes in motion, no flicker. The poster image is designed to depict a
+  // "settled" state of the pipeline so the visual story still reads as still life.
   const [mounted, setMounted] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
+  const [supportsWebGL, setSupportsWebGL] = useState(true);
 
   useEffect(() => {
+    setSupportsWebGL(hasWebGL());
     setMounted(true);
     // Tiny defer so the scene mount happens after first paint (poster already up).
     const id = window.setTimeout(() => setSceneReady(true), 200);
@@ -34,8 +49,8 @@ export function FactoryHero() {
         height: '100%',
       }}
     >
-      <FactoryHeroPoster fadeOut={sceneReady && !reduced ? 1 : 0} />
-      {mounted && !reduced && sceneReady && (
+      <FactoryHeroPoster fadeOut={sceneReady && !reduced && supportsWebGL ? 1 : 0} />
+      {mounted && !reduced && sceneReady && supportsWebGL && (
         <div style={{ position: 'absolute', inset: 0 }}>
           <FactoryScene />
         </div>
