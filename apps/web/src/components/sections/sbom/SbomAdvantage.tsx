@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Reveal } from '@/components/ui/Reveal';
 
 /**
  * Figma frame 516:5494 — 1920 × 889 "Built for Modern Software Supply Chains"
@@ -70,19 +71,21 @@ export function SbomAdvantage(): React.ReactElement {
       >
         {/* Heading */}
         <div className="text-center mb-10 md:mb-14">
-          <h2
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'var(--fs-h2)',
-              fontWeight: 700,
-              letterSpacing: '-0.04em',
-              lineHeight: 1.2,
-              color: '#111',
-            }}
-          >
-            <span className="block">Built for Modern Software</span>
-            <span className="cs-text-gradient-impact block">Supply Chains</span>
-          </h2>
+          <Reveal header>
+            <h2
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--fs-h2)',
+                fontWeight: 700,
+                letterSpacing: '-0.04em',
+                lineHeight: 1.2,
+                color: '#111',
+              }}
+            >
+              <span className="block">Built for Modern Software</span>
+              <span className="cs-text-gradient-impact block">Supply Chains</span>
+            </h2>
+          </Reveal>
         </div>
 
         {/* ── DESKTOP image + 2×2 cards ── */}

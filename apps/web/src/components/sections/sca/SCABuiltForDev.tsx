@@ -1,5 +1,6 @@
 import type React from "react";
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Built for Modern Development Workflows — Figma node 604:3117
@@ -106,20 +107,22 @@ export function SCABuiltForDev(): React.ReactElement {
 
       <div className="relative mx-auto" style={{ maxWidth: "1276px", padding: "0 24px" }}>
         {/* ── Heading ── */}
-        <h2
-          className="text-center"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            color: "#111111",
-          }}
-        >
-          Built for Modern Development{" "}
-          <span className="block cs-text-gradient-impact">Workflows</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-center"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              color: "#111111",
+            }}
+          >
+            Built for Modern Development{" "}
+            <span className="block cs-text-gradient-impact">Workflows</span>
+          </h2>
+        </Reveal>
 
         {/* ── Content row: image panel + cards grid.
             Mobile: column layout — image full-width on top, cards stack 1-col

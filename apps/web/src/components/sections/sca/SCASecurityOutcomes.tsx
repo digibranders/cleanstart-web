@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Security Outcomes — Figma node 604:3017
@@ -326,19 +327,21 @@ export function SCASecurityOutcomes(): React.ReactElement {
         }}
       >
         {/* ── Heading ── */}
-        <h2
-          className="text-center"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-          }}
-        >
-          <span style={{ color: "#ffffff" }}>Security </span>
-          <span className="cs-text-gradient-impact">Outcomes</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-center"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+            }}
+          >
+            <span style={{ color: "#ffffff" }}>Security </span>
+            <span className="cs-text-gradient-impact">Outcomes</span>
+          </h2>
+        </Reveal>
 
         {/* ── Card grid + shield ── */}
         <div className="relative" style={{ marginTop: "60px" }}>

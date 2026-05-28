@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 type LogoItem = {
   src: string;
   alt: string;
@@ -19,14 +21,14 @@ type LogoItem = {
 const LOGOS: LogoItem[] = [
   { src: "/images/cleanstart-images/stacks-color/nexus.svg",        alt: "Sonatype Nexus",      w: 68,  h: 60 },
   { src: "/images/cleanstart-images/stacks-color/quay.svg",         alt: "Quay",                w: 204, h: 60 },
-  { src: "/images/cleanstart-images/stacks-color/redhat.svg",       alt: "Red Hat",             w: 164, h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/redhat.svg",       alt: "Red Hat",             w: 199, h: 60 },
   { src: "/images/cleanstart-images/stacks-color/harbor.svg",       alt: "Harbor",              w: 207, h: 60 },
-  { src: "/images/cleanstart-images/stacks-color/azure.svg",        alt: "Microsoft Azure",     w: 205, h: 60 },
-  { src: "/images/cleanstart-images/stacks-color/aws.svg",          alt: "Amazon Web Services", w: 151, h: 60 },
-  { src: "/images/cleanstart-images/stacks-color/github.svg",       alt: "GitHub",              w: 196, h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/azure.svg",        alt: "Microsoft Azure",     w: 64,  h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/aws.svg",          alt: "Amazon Web Services", w: 99,  h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/github.svg",       alt: "GitHub",              w: 62,  h: 60 },
   { src: "/images/cleanstart-images/stacks-color/jfrog.svg",        alt: "JFrog",               w: 62,  h: 60 },
-  { src: "/images/cleanstart-images/stacks-color/docker.svg",       alt: "Docker",              w: 209, h: 60 },
-  { src: "/images/cleanstart-images/stacks-color/google-cloud.svg", alt: "Google Cloud",        w: 124, h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/docker.svg",       alt: "Docker",              w: 83,  h: 60 },
+  { src: "/images/cleanstart-images/stacks-color/google-cloud.svg", alt: "Google Cloud",        w: 346, h: 60 },
 ];
 
 export function CleanStartImagesEnvironment(): React.ReactElement {
@@ -180,20 +182,22 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
       <div className="relative flex flex-col items-center">
 
         {/* Heading — max-width forces "Images for Modern" / "Stacks" wrap */}
-        <h2
-          className="font-display text-white text-center"
-          style={{
-            fontSize: "var(--fs-h2)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            maxWidth: "clamp(280px, 43vw, 623px)",
-            textWrap: "wrap" as const,
-          }}
-        >
-          {"Images for Modern "}
-          <span className="cs-text-gradient-impact">Stacks</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="font-display text-white text-center"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              maxWidth: "clamp(280px, 43vw, 623px)",
+              textWrap: "wrap" as const,
+            }}
+          >
+            {"Images for Modern "}
+            <span className="cs-text-gradient-impact">Stacks</span>
+          </h2>
+        </Reveal>
 
         {/* ── Infinite logo marquee ──────────────────────────────────────────── */}
         {/* Edge fade uses a CSS mask so the logos themselves fade to transparent

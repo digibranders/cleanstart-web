@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { Reveal } from "@/components/ui/Reveal";
 import { RadarScanner } from "./RadarScanner";
 
 export function CleanSightBlindSpots(): React.ReactElement {
@@ -106,20 +107,22 @@ export function CleanSightBlindSpots(): React.ReactElement {
           maxWidth: "1200px",
         }}
       >
-        <h2
-          className="text-white text-center"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            maxWidth: "686px",
-          }}
-        >
-          Visibility Without Context Creates{" "}
-          <span className="cs-text-gradient-impact">Blind Spots</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-white text-center"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              maxWidth: "686px",
+            }}
+          >
+            Visibility Without Context Creates{" "}
+            <span className="cs-text-gradient-impact">Blind Spots</span>
+          </h2>
+        </Reveal>
 
         {/* Radar visualization — width is the lesser of 70vw, 60vh, and the 580px cap, with a 300px floor.
             Sweep is locked to dial radius via closest-side mask, so it always reaches the inner blue ring. */}

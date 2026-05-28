@@ -1,5 +1,6 @@
 import type React from "react";
 import Link from "next/link";
+import { HeroReveal } from "@/components/ui/Reveal";
 
 /**
  * SCA Hero — Figma node 690:217 / 604:2163
@@ -64,38 +65,42 @@ export function SCAHero(): React.ReactElement {
         style={{ paddingTop: "clamp(112px, 11vw, 160px)", paddingBottom: "clamp(56px, 7vw, 100px)" }}
       >
         {/* Headline — Figma node 604:2428, 805×160px */}
-        <h1
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-display)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.05,
-            color: "#ffffff",
-            maxWidth: "805px",
-            margin: 0,
-          }}
-        >
-          Smarter Software Composition{" "}
-          <span className="cs-text-gradient-impact">Analysis</span>
-        </h1>
+        <HeroReveal y={50} duration={1.0}>
+          <h1
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-display)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
+              color: "#ffffff",
+              maxWidth: "805px",
+              margin: 0,
+            }}
+          >
+            Smarter Software Composition{" "}
+            <span className="cs-text-gradient-impact">Analysis</span>
+          </h1>
+        </HeroReveal>
 
         {/* Subtitle — Figma node 604:2429, 688px wide */}
-        <p
-          style={{
-            marginTop: "clamp(16px, 1.67vw, 32px)",
-            fontFamily: "var(--font-sans)",
-            fontSize: "var(--fs-lead)",
-            fontWeight: 400,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.4,
-            color: "rgba(255,255,255,0.8)",
-            maxWidth: "688px",
-          }}
-        >
-          Reduce alert fatigue and improve SCA effectiveness with minimal,
-          hardened container foundations and contextualized risk insights.
-        </p>
+        <HeroReveal y={30} delay={0.2} duration={0.8}>
+          <p
+            style={{
+              marginTop: "clamp(16px, 1.67vw, 32px)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--fs-lead)",
+              fontWeight: 400,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.4,
+              color: "rgba(255,255,255,0.8)",
+              maxWidth: "688px",
+            }}
+          >
+            Reduce alert fatigue and improve SCA effectiveness with minimal,
+            hardened container foundations and contextualized risk insights.
+          </p>
+        </HeroReveal>
 
         {/* Glass CTA button — Figma node 604:2430.
             Uses the shared .cs-btn-glass utility (same style as every other hero

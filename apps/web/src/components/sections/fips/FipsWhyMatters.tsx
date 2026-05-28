@@ -1,4 +1,5 @@
 import { FipsBall } from "./FipsBall";
+import { Reveal } from "@/components/ui/Reveal";
 
 interface MatterCard {
   title: string;
@@ -49,36 +50,40 @@ export function FipsWhyMatters(): React.ReactElement {
          * Desktop: side-by-side 2-col, text-left.
          */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-12 mb-6 md:mb-[64px]">
-          <h2
-            className="text-[#111] text-center md:text-left"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-h2)",
-              fontWeight: 600,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-              maxWidth: "444px",
-            }}
-          >
-            Why FIPS 140-3{" "}
-            <span className="cs-text-gradient-impact">Matters</span>
-          </h2>
-          <p
-            className="text-[#333] text-center md:text-left"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.45,
-              maxWidth: "731px",
-            }}
-          >
-            FIPS 140-3 defines the standard for trusted cryptography. It governs
-            how encryption must be implemented and proven in regulated
-            industries. 79% of organizations have delayed releases due to
-            security or compliance gaps. FIPS exists to close that risk.
-          </p>
+          <Reveal header>
+            <h2
+              className="text-[#111] text-center md:text-left"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--fs-h2)",
+                fontWeight: 600,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+                maxWidth: "444px",
+              }}
+            >
+              Why FIPS 140-3{" "}
+              <span className="cs-text-gradient-impact">Matters</span>
+            </h2>
+          </Reveal>
+          <Reveal header delay={0.15} y={20}>
+            <p
+              className="text-[#333] text-center md:text-left"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.45,
+                maxWidth: "731px",
+              }}
+            >
+              FIPS 140-3 defines the standard for trusted cryptography. It governs
+              how encryption must be implemented and proven in regulated
+              industries. 79% of organizations have delayed releases due to
+              security or compliance gaps. FIPS exists to close that risk.
+            </p>
+          </Reveal>
         </div>
 
         {/* Top row — 3 cards at 33.33% each (Figma: 3 × 404w, 32px gap) */}

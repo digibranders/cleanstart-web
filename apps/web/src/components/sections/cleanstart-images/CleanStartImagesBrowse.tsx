@@ -1,4 +1,5 @@
 import type React from "react";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 type TrustCard = {
   title: string;
@@ -363,37 +364,43 @@ export function CleanStartImagesBrowse(): React.ReactElement {
         }}
       >
         {/* Heading — desktop: --text-display-md (~62px); mobile: ~28px via token clamp */}
-        <h2
-          className="text-center"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.2,
-            color: "#111",
-          }}
-        >
-          Built from Trusted{" "}
-          <span className="cs-text-gradient-impact">Sources</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-center"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.2,
+              color: "#111",
+            }}
+          >
+            Built from Trusted{" "}
+            <span className="cs-text-gradient-impact">Sources</span>
+          </h2>
+        </Reveal>
 
         {/* ── Mobile card list — vertical stacked, hidden at lg+ ────────────── */}
-        <div className="lg:hidden mt-10 w-full flex flex-col items-center gap-7">
+        <RevealStagger className="lg:hidden mt-10 w-full flex flex-col items-center gap-7">
           {TRUST_CARDS.map((card) => (
-            <MobileTrustCard key={card.title} card={card} />
+            <RevealItem key={card.title}>
+              <MobileTrustCard card={card} />
+            </RevealItem>
           ))}
-        </div>
+        </RevealStagger>
 
         {/* ── Desktop card row — 4-up horizontal, hidden below lg ──────────── */}
-        <div
+        <RevealStagger
           className="hidden lg:flex flex-row flex-nowrap justify-center mt-16"
           style={{ gap: "41px" }}
         >
           {TRUST_CARDS.map((card) => (
-            <DesktopTrustCard key={card.title} card={card} />
+            <RevealItem key={card.title}>
+              <DesktopTrustCard card={card} />
+            </RevealItem>
           ))}
-        </div>
+        </RevealStagger>
       </div>
     </section>
   );

@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 const CARDS = [
   {
     title: "Continuous Discovery",
@@ -73,38 +75,39 @@ export function CleanSightUnified(): React.ReactElement {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         {/* Heading row */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-[60px]">
-          <h2
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-              color: "#111",
-              maxWidth: "654px",
-              flexShrink: 0,
-            }}
-          >
-            Unified Visibility and{" "}
-            <span className="cs-text-gradient-impact">Remediation</span>
-          </h2>
+          <Reveal header style={{ maxWidth: "654px", flexShrink: 0 }}>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+                color: "#111",
+              }}
+            >
+              Unified Visibility and{" "}
+              <span className="cs-text-gradient-impact">Remediation</span>
+            </h2>
+          </Reveal>
 
-          <p
-            className="lg:pt-2"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-lead)",
-              fontWeight: 400,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.4,
-              color: "#111",
-              opacity: 0.8,
-              maxWidth: "571px",
-            }}
-          >
-            CleanSight continuously identifies, assesses, and recommends
-            remediation actions to reduce container risk across environments.
-          </p>
+          <Reveal header delay={0.15} y={20} style={{ maxWidth: "571px" }}>
+            <p
+              className="lg:pt-2"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.4,
+                color: "#111",
+                opacity: 0.8,
+              }}
+            >
+              CleanSight continuously identifies, assesses, and recommends
+              remediation actions to reduce container risk across environments.
+            </p>
+          </Reveal>
         </div>
 
         {/* Feature cards */}

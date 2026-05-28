@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { Reveal } from '@/components/ui/Reveal';
 
 interface Benefit {
   title: string;
@@ -52,19 +53,21 @@ export function ASRDelivers(): React.ReactElement {
 
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 py-section-lg">
         <div className="max-w-[519px]">
-          <h2
-            id="asr-delivers-title"
-            className="font-display text-white"
-            style={{
-              fontSize: 'var(--fs-h2)',
-              fontWeight: 700,
-              letterSpacing: '-0.04em',
-              lineHeight: 1.1,
-            }}
-          >
-            What this delivers for{' '}
-            <span className="cs-text-gradient-impact">your business</span>
-          </h2>
+          <Reveal header>
+            <h2
+              id="asr-delivers-title"
+              className="font-display text-white"
+              style={{
+                fontSize: 'var(--fs-h2)',
+                fontWeight: 700,
+                letterSpacing: '-0.04em',
+                lineHeight: 1.1,
+              }}
+            >
+              What this delivers for{' '}
+              <span className="cs-text-gradient-impact">your business</span>
+            </h2>
+          </Reveal>
         </div>
 
         {/* Mobile/tablet stack */}

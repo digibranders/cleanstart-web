@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { HeroReveal } from '@/components/ui/Reveal';
 
 /**
  * ASR Hero — pixel-perfect for both desktop (Figma 783:90) and mobile (Figma 920:609).
@@ -103,50 +104,54 @@ export function ASRHero(): React.ReactElement {
                * H1: 32px Bold mobile → 80px SemiBold desktop
                * Tracking: -0.05em works at both sizes.
                */}
-              <h1
-                className="font-bold lg:font-semibold"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 'var(--fs-display)',
-                  letterSpacing: 'var(--fs-display-ls)',
-                  lineHeight: 'var(--fs-display-lh)',
-                  color: 'white',
-                  margin: 0,
-                }}
-              >
-                <span className="block">Bigger Images,</span>
-                <span
+              <HeroReveal y={50} duration={1.0}>
+                <h1
+                  className="font-bold lg:font-semibold"
                   style={{
-                    background: 'linear-gradient(96.33deg, #9A51FF 1.76%, #2CC1EB 98.78%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    color: 'transparent',
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--fs-display)',
+                    letterSpacing: 'var(--fs-display-ls)',
+                    lineHeight: 'var(--fs-display-lh)',
+                    color: 'white',
+                    margin: 0,
                   }}
                 >
-                  Bigger Risk
-                </span>
-              </h1>
+                  <span className="block">Bigger Images,</span>
+                  <span
+                    style={{
+                      background: 'linear-gradient(96.33deg, #9A51FF 1.76%, #2CC1EB 98.78%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      color: 'transparent',
+                    }}
+                  >
+                    Bigger Risk
+                  </span>
+                </h1>
+              </HeroReveal>
 
               {/*
                * Description: 16px mobile → 30px desktop
                * Tracking: -0.04em = -0.64px at 16px = -1.2px at 30px
                */}
-              <p
-                className="text-base lg:[font-size:var(--text-t-subhead)]"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 400,
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.4,
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  maxWidth: '480px',
-                  margin: 0,
-                }}
-              >
-                CleanStart Images reduce attack surface by eliminating unnecessary components before
-                they enter production.
-              </p>
+              <HeroReveal y={30} delay={0.2} duration={0.8}>
+                <p
+                  className="text-base lg:[font-size:var(--text-t-subhead)]"
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontWeight: 400,
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.4,
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    maxWidth: '480px',
+                    margin: 0,
+                  }}
+                >
+                  CleanStart Images reduce attack surface by eliminating unnecessary components before
+                  they enter production.
+                </p>
+              </HeroReveal>
             </div>
 
             {/*

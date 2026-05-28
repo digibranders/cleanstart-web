@@ -1,4 +1,5 @@
 import type React from 'react';
+import { Reveal } from '@/components/ui/Reveal';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -134,22 +135,24 @@ export function ASRModern(): React.ReactElement {
       <div
         className="relative hidden md:block mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md pb-[var(--spacing-section-cta)]"
       >
-        <h2
-          className="text-center sm:text-left"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-h2)',
-            fontWeight: 600,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.1,
-            color: 'white',
-            maxWidth: '700px',
-            marginBottom: 'clamp(32px, 5vw, 64px)',
-          }}
-        >
-          Built for Modern Production{' '}
-          <span className="cs-text-gradient-impact">Environments</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-center sm:text-left"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-h2)',
+              fontWeight: 600,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.1,
+              color: 'white',
+              maxWidth: '700px',
+              marginBottom: 'clamp(32px, 5vw, 64px)',
+            }}
+          >
+            Built for Modern Production{' '}
+            <span className="cs-text-gradient-impact">Environments</span>
+          </h2>
+        </Reveal>
 
         <div className="grid grid-cols-3" style={{ gap: '40px' }}>
           {TARGETS.map((t) => (

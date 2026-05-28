@@ -145,10 +145,10 @@ export function CisoCTA(): React.ReactElement {
           alt=""
           className="absolute pointer-events-none select-none"
           style={{
-            right: "-20px",
-            bottom: "-30px",
-            width: "255px",
-            height: "259px",
+            right: "-60px",
+            bottom: "-80px",
+            width: "190px",
+            height: "193px",
             objectFit: "contain",
             opacity: 0.8,
             transform: "rotate(-0.15deg)",

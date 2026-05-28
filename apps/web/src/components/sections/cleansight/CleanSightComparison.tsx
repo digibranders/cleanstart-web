@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Section: "Visibility Alone Doesn't Reduce Risk"
@@ -39,20 +40,22 @@ export function CleanSightComparison(): React.ReactElement {
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Heading — centred */}
         <div className="text-center">
-          <h2
-            id="cleansight-comparison-title"
-            className="mx-auto font-display text-[#111111]"
-            style={{
-              maxWidth: "min(737px, 100%)",
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-            }}
-          >
-            Visibility Alone Doesn&rsquo;t{" "}
-            <span className="cs-text-gradient-impact">Reduce Risk</span>
-          </h2>
+          <Reveal header>
+            <h2
+              id="cleansight-comparison-title"
+              className="mx-auto font-display text-[#111111]"
+              style={{
+                maxWidth: "min(737px, 100%)",
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+              }}
+            >
+              Visibility Alone Doesn&rsquo;t{" "}
+              <span className="cs-text-gradient-impact">Reduce Risk</span>
+            </h2>
+          </Reveal>
         </div>
 
         {/* Cards row + VS badge centerpiece. Mirrors SecurityNotPatching's

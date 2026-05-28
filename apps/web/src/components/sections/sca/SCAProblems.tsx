@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 /* Each `icon` is a pre-baked PNG that contains the blue gradient ball + the
  * white-line glyph + the soft drop-shadow halo as a single composite, so the
  * card no longer wraps it in a CSS ball. */
@@ -39,20 +41,22 @@ export function SCAProblems(): React.ReactElement {
     >
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Section heading */}
-        <h2
-          className="text-center"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "var(--fs-h2)",
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-            color: "#111",
-          }}
-        >
-          <span className="block">Traditional SCA Creates</span>
-          <span className="block cs-text-gradient-impact">Too Much Noise</span>
-        </h2>
+        <Reveal header>
+          <h2
+            className="text-center"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              color: "#111",
+            }}
+          >
+            <span className="block">Traditional SCA Creates</span>
+            <span className="block cs-text-gradient-impact">Too Much Noise</span>
+          </h2>
+        </Reveal>
 
         {/* Cards — 4 in a row on desktop, 2 on tablet, 1 on mobile */}
         <div
