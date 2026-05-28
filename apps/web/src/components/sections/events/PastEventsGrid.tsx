@@ -126,11 +126,11 @@ export function PastEventsGrid({
         ) : (
           <>
             <RevealStagger
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center lg:justify-items-stretch"
               style={{ gap: "32px" }}
             >
               {events.map((event) => (
-                <RevealItem key={event.id}>
+                <RevealItem key={event.id} className="w-full flex justify-center">
                   <EventCard event={event} />
                 </RevealItem>
               ))}

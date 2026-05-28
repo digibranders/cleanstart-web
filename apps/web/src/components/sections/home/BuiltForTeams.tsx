@@ -724,8 +724,7 @@ function CompanyMark({
           maxWidth: maxW,
           width: "auto",
           objectFit: "contain",
-          opacity: 0.9,
-          filter: "grayscale(1) brightness(2) contrast(1.1)",
+          opacity: 1,
         }}
         loading="lazy"
         decoding="async"

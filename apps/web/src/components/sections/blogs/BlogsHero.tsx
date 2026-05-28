@@ -24,7 +24,7 @@ export function BlogsHero({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ minHeight: "clamp(820px, 75vw, 1059px)", background: HERO_GRADIENT }}
+      style={{ background: HERO_GRADIENT }}
       aria-labelledby="blogs-hero-title"
     >
       {/* Decorative glow — left side, mix-blend-hard-light (hidden on mobile) */}
@@ -50,7 +50,7 @@ export function BlogsHero({
         />
       </div>
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[clamp(24px,3vw,40px)]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[clamp(56px,7vw,96px)]">
         {/* Title + search + categories — centered block */}
         <div
           className="flex flex-col items-center gap-10 mx-auto"
