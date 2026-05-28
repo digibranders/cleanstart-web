@@ -1,5 +1,5 @@
 import { ArrowRightShort } from "@/components/icons/ArrowRightShort";
-import { HeroOrb } from "@/components/sections/home/HeroOrb";
+import { FactoryHero } from "@/components/sections/home/factory-hero/FactoryHero";
 import { TrustedByMarquee } from "@/components/sections/home/TrustedByMarquee";
 import { HeroReveal } from "@/components/ui/Reveal";
 
@@ -42,8 +42,8 @@ export function Hero() {
           </HeroReveal>
         </div>
 
-        <div className="mt-12" style={{ visibility: "hidden" }} aria-hidden>
-          <HeroOrb />
+        <div className="mt-12 relative w-full" style={{ height: 'clamp(360px, 50vw, 620px)' }}>
+          <FactoryHero />
         </div>
 
         <div className="pb-16">
