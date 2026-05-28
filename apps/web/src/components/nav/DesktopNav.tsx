@@ -63,7 +63,7 @@ function TopLevelItem({ item }: { item: NavItem }) {
 
 export function DesktopNav() {
   return (
-    <NavigationMenu className="hidden lg:flex" align="center">
+    <NavigationMenu className="hidden lg:flex" align="center" delay={120} closeDelay={200}>
       <NavigationMenuList className="gap-7">
         {NAV_TREE.map((item) => (
           <TopLevelItem key={item.label} item={item} />
