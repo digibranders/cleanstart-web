@@ -37,12 +37,11 @@ export function WhatsSetsUsApart(): React.ReactElement {
               lineHeight: 1,
               letterSpacing: "-0.05em",
               color: "#111111",
-              maxWidth: "360px",
             }}
           >
-            What sets{" "}
+            <span className="block">What sets</span>
             <span
-              className="inline-block bg-clip-text text-transparent"
+              className="block bg-clip-text text-transparent"
               style={{
                 backgroundImage:
                   "linear-gradient(-44deg, rgba(44, 193, 235, 1) 0%, rgba(154, 81, 255, 1) 65%)",
