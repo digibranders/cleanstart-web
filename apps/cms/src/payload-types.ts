@@ -149,6 +149,7 @@ export interface Config {
     legal: Legal;
     announcements: Announcement;
     podcastPage: PodcastPage;
+    resourcesSpotlight: ResourcesSpotlight;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
@@ -159,6 +160,7 @@ export interface Config {
     legal: LegalSelect<false> | LegalSelect<true>;
     announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
     podcastPage: PodcastPageSelect<false> | PodcastPageSelect<true>;
+    resourcesSpotlight: ResourcesSpotlightSelect<false> | ResourcesSpotlightSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -10392,6 +10394,26 @@ export interface PodcastPage {
   createdAt?: string | null;
 }
 /**
+ * Optional spotlight card shown in the Resources mega menu. Falls back to the Bulletin evergreen when no event/webinar is upcoming and this global is empty or expired.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resourcesSpotlight".
+ */
+export interface ResourcesSpotlight {
+  id: number;
+  image?: (number | null) | Media;
+  headline: string;
+  sub?: string | null;
+  ctaLabel: string;
+  ctaHref: string;
+  /**
+   * After this date, the card is skipped and the evergreen renders.
+   */
+  expiresAt?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
@@ -10673,6 +10695,21 @@ export interface PodcastPageSelect<T extends boolean = true> {
         ctaHref?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resourcesSpotlight_select".
+ */
+export interface ResourcesSpotlightSelect<T extends boolean = true> {
+  image?: T;
+  headline?: T;
+  sub?: T;
+  ctaLabel?: T;
+  ctaHref?: T;
+  expiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
