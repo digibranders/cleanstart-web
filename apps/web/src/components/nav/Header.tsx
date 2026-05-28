@@ -4,9 +4,21 @@ import { DesktopNav } from "@/components/nav/DesktopNav";
 import { MobileNav } from "@/components/nav/MobileNav";
 import { HeaderScrollShell } from "@/components/nav/HeaderScrollShell";
 import { fetchLatestImages } from "@/components/nav/data/latest-images";
+import { fetchLatestUpdates } from "@/components/nav/data/latest-updates-feed";
+import {
+  getResourcesSpotlight,
+  getCompanySpotlight,
+} from "@/components/nav/data/resolve-spotlights";
 
 export async function Header() {
-  const latestImages = await fetchLatestImages();
+  const [latestImages, latestUpdates, resourcesSpotlight, companySpotlight] =
+    await Promise.all([
+      fetchLatestImages(),
+      fetchLatestUpdates(),
+      getResourcesSpotlight(),
+      getCompanySpotlight(),
+    ]);
+
   return (
     <HeaderScrollShell>
       <Link
@@ -17,7 +29,12 @@ export async function Header() {
         <Logo className="h-7 w-auto" />
       </Link>
 
-      <DesktopNav latestImages={latestImages} />
+      <DesktopNav
+        latestImages={latestImages}
+        latestUpdates={latestUpdates}
+        resourcesSpotlight={resourcesSpotlight}
+        companySpotlight={companySpotlight}
+      />
 
       <div className="flex items-center gap-3">
         <Link

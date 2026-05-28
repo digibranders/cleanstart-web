@@ -17,12 +17,23 @@ import { PanelAudience } from "@/components/nav/panels/PanelAudience";
 import { PanelResources } from "@/components/nav/panels/PanelResources";
 import { PanelCompany } from "@/components/nav/panels/PanelCompany";
 import type { CommunityImage } from "@/lib/api/community-images";
+import type { FeedSource } from "@/components/nav/data/latest-updates-feed";
+import type { SpotlightCard } from "@/components/nav/data/spotlights";
 
-const PANELS: Record<string, (props: { item: NavMegaItem }) => React.ReactElement> = {
+type Props = {
+  latestImages: CommunityImage[];
+  latestUpdates: FeedSource[];
+  resourcesSpotlight: SpotlightCard;
+  companySpotlight: SpotlightCard;
+};
+
+// Fallback panel map for mega items not handled by explicit branches
+const PANELS: Record<
+  string,
+  (props: { item: NavMegaItem }) => React.ReactElement
+> = {
   Solutions: PanelSolutions,
   Audience: PanelAudience,
-  Resources: PanelResources,
-  Company: PanelCompany,
 };
 
 function collectHrefs(item: NavItem): string[] {
@@ -33,7 +44,13 @@ function collectHrefs(item: NavItem): string[] {
   return [];
 }
 
-function TopLevelItem({ item, latestImages }: { item: NavItem; latestImages: CommunityImage[] }) {
+function TopLevelItem({
+  item,
+  latestImages,
+  latestUpdates,
+  resourcesSpotlight,
+  companySpotlight,
+}: { item: NavItem } & Props) {
   const active = useIsActiveSection(collectHrefs(item));
 
   if (item.kind === "flat") {
@@ -55,33 +72,51 @@ function TopLevelItem({ item, latestImages }: { item: NavItem; latestImages: Com
   }
 
   let body: React.ReactElement | null = null;
-  if (item.kind === "mega" && item.label === "Products") {
-    body = <PanelProducts item={item} latestImages={latestImages} />;
-  } else if (item.kind === "mega" && PANELS[item.label]) {
-    const Panel = PANELS[item.label]!;
-    body = <Panel item={item} />;
+  if (item.kind === "mega") {
+    if (item.label === "Products") {
+      body = <PanelProducts item={item} latestImages={latestImages} />;
+    } else if (item.label === "Resources") {
+      body = (
+        <PanelResources
+          item={item}
+          latestUpdates={latestUpdates}
+          spotlight={resourcesSpotlight}
+        />
+      );
+    } else if (item.label === "Company") {
+      body = <PanelCompany item={item} spotlight={companySpotlight} />;
+    } else if (PANELS[item.label]) {
+      const Panel = PANELS[item.label]!;
+      body = <Panel item={item} />;
+    }
   }
 
   return (
     <NavigationMenuItem>
-      <NavigationMenuTrigger data-active={active}>
-        {item.label}
-      </NavigationMenuTrigger>
-      <NavigationMenuContent>
-        {body}
-      </NavigationMenuContent>
+      <NavigationMenuTrigger data-active={active}>{item.label}</NavigationMenuTrigger>
+      <NavigationMenuContent>{body}</NavigationMenuContent>
     </NavigationMenuItem>
   );
 }
 
-type Props = { latestImages: CommunityImage[] };
-
-export function DesktopNav({ latestImages }: Props) {
+export function DesktopNav({
+  latestImages,
+  latestUpdates,
+  resourcesSpotlight,
+  companySpotlight,
+}: Props) {
   return (
     <NavigationMenu className="hidden lg:flex" align="center" delay={120} closeDelay={200}>
       <NavigationMenuList className="gap-7">
         {NAV_TREE.map((item) => (
-          <TopLevelItem key={item.label} item={item} latestImages={latestImages} />
+          <TopLevelItem
+            key={item.label}
+            item={item}
+            latestImages={latestImages}
+            latestUpdates={latestUpdates}
+            resourcesSpotlight={resourcesSpotlight}
+            companySpotlight={companySpotlight}
+          />
         ))}
       </NavigationMenuList>
     </NavigationMenu>
