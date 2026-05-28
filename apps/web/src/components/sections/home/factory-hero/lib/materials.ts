@@ -36,23 +36,32 @@ export function makeChamberEdgeMaterial(): MeshBasicMaterial {
 }
 
 export function makeCubeDirtyMaterial(): MeshPhysicalMaterial {
+  // Dirty cube — dim purple body with subtle emissive purple glow so it reads
+  // as "the artifact" not "a void". Emissive intensity is animated by Cube.tsx.
   return new MeshPhysicalMaterial({
     color: COLORS.cubeDirtyFrom,
-    metalness: 0.4,
-    roughness: 0.6,
+    metalness: 0.3,
+    roughness: 0.55,
+    transparent: true,
+    opacity: 0.85,
+    emissive: COLORS.cubeDirtyFrom,
+    emissiveIntensity: 0.45,
   });
 }
 
 export function makeCubeCleanMaterial(): MeshPhysicalMaterial {
+  // Clean cube — glassy translucent cyan with strong emissive cyan glow so
+  // it reads as "transformed" once it exits CleanCompile.
   return new MeshPhysicalMaterial({
     color: COLORS.cubeCleanTo,
     metalness: 0.1,
-    roughness: 0.2,
+    roughness: 0.15,
     transmission: 0.5,
-    iridescence: 0.3,
+    iridescence: 0.4,
     transparent: true,
+    opacity: 0.9,
     emissive: COLORS.cubeCleanFrom,
-    emissiveIntensity: 0.4,
+    emissiveIntensity: 0.9,
   });
 }
 
