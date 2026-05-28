@@ -334,7 +334,7 @@ function SubmitButton({ submitted }: { submitted: boolean }): React.ReactElement
           letterSpacing: "-0.01em",
         }}
       >
-        {submitted ? "Submitted" : "Submit application"}
+        {submitted ? "Submitted" : "Submit Application"}
         {submitted && (
           <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden>
             <path

@@ -30,21 +30,21 @@ export default function BookDemoPage() {
       <main className="bg-white">
         <DemoHero />
 
-        <section
-          className="relative -mt-[140px]"
-          style={{
-            paddingLeft: "clamp(24px, 4vw, 80px)",
-            paddingRight: "clamp(24px, 4vw, 80px)",
-            paddingBottom: "clamp(48px, 6vw, 80px)",
-          }}
-        >
-          <BookDemoForm />
-        </section>
-
         <BookDemoBody>
           <FadeUp>
             <WhatsSetsUsApart />
           </FadeUp>
+
+          <section
+            className="relative"
+            style={{
+              paddingLeft: "clamp(24px, 4vw, 80px)",
+              paddingRight: "clamp(24px, 4vw, 80px)",
+              paddingBottom: "clamp(48px, 6vw, 80px)",
+            }}
+          >
+            <BookDemoForm />
+          </section>
         </BookDemoBody>
 
         <FadeUp>
