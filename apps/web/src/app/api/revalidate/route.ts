@@ -8,21 +8,79 @@ export const dynamic = "force-dynamic";
  * POST /api/revalidate
  *
  * Cross-process cache invalidation hook called by the CMS when content
- * that affects rendered pages changes (e.g. a Media filename rename).
- * Without this, the apps/web Next.js ISR cache continues to serve old
- * URLs for up to `DEFAULT_REVALIDATE_SECONDS` (60s in `cms-fetch.ts`)
- * which is exactly when stale media URLs would 404 against R2 after a
- * rename moves the underlying object.
+ * that affects rendered pages changes (e.g. a Media filename rename, or a
+ * Payload publish hook popping a nav cache tag).
  *
- * Auth: shared bearer token in `WEB_REVALIDATE_SECRET`. Set the same
- * value on the CMS and on apps/web. Missing/mismatching → 401.
+ * Two auth modes are supported:
  *
- * Request body:
- *   { tags?: string[]; paths?: string[] }
+ * 1. Bearer token (primary, CMS media + path revalidation):
+ *    Authorization: Bearer <WEB_REVALIDATE_SECRET>
+ *    Body: { tags?: string[]; paths?: string[] }
+ *    Accepts arbitrary tags and paths.
  *
- * Both are optional; supplying neither revalidates nothing and returns 200.
+ * 2. Body secret (Payload publish hooks, nav cache tags only):
+ *    Body: { secret: <REVALIDATE_SECRET>; tag: string }
+ *    Restricted to NAV_CACHE_TAGS allow-list. Single-tag per call.
+ *
+ * Missing / mismatching credentials → 401. Secret env var unset → 503.
  */
+
+/** Tags that Payload publish hooks are allowed to pop via mode-2. */
+const NAV_CACHE_TAGS = new Set([
+  "community-images",
+  "resources-latest-updates",
+  "resources-spotlight",
+  "company-spotlight",
+  "careers-open-count",
+]);
+
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  let body: {
+    tags?: unknown;
+    paths?: unknown;
+    secret?: unknown;
+    tag?: unknown;
+  } | null = null;
+
+  try {
+    body = (await req.json()) as {
+      tags?: unknown;
+      paths?: unknown;
+      secret?: unknown;
+      tag?: unknown;
+    };
+  } catch {
+    return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
+  }
+
+  // -------------------------------------------------------------------------
+  // Mode 2: body-secret, single nav cache tag (Payload publish hooks)
+  // -------------------------------------------------------------------------
+  if (body?.secret !== undefined) {
+    const navSecret = process.env.REVALIDATE_SECRET;
+    if (!navSecret) {
+      return NextResponse.json(
+        { ok: false, error: "revalidation_disabled" },
+        { status: 503 },
+      );
+    }
+    if (typeof body.secret !== "string" || body.secret !== navSecret) {
+      return NextResponse.json({ ok: false, error: "forbidden" }, { status: 401 });
+    }
+    const tag = body.tag;
+    if (typeof tag !== "string" || !NAV_CACHE_TAGS.has(tag)) {
+      return NextResponse.json(
+        { ok: false, error: "unknown tag" },
+        { status: 400 },
+      );
+    }
+    revalidateTag(tag, "default");
+    return NextResponse.json({ ok: true, tag });
+  }
+
+  // -------------------------------------------------------------------------
+  // Mode 1: Bearer token, arbitrary tags + paths (CMS media / content hooks)
+  // -------------------------------------------------------------------------
   const expected = process.env.WEB_REVALIDATE_SECRET;
   if (!expected) {
     return NextResponse.json(
@@ -34,16 +92,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const token = auth.startsWith("Bearer ") ? auth.slice("Bearer ".length) : "";
   if (token !== expected) {
     return NextResponse.json({ ok: false, error: "forbidden" }, { status: 401 });
-  }
-
-  let body: { tags?: unknown; paths?: unknown } | null = null;
-  try {
-    body = (await req.json()) as { tags?: unknown; paths?: unknown };
-  } catch {
-    return NextResponse.json(
-      { ok: false, error: "invalid_json" },
-      { status: 400 },
-    );
   }
 
   const tags = Array.isArray(body?.tags)
