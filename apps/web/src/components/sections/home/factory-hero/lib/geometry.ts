@@ -10,8 +10,11 @@ export function buildCubeGeometry(): BoxGeometry {
 }
 
 /**
- * Agent body geometry. Spec § 3.5: small rounded-box at 0.22 × 0.22 × 0.16.
+ * Agent body geometry. Spec § 3.5: small rounded-box.
+ * Bumped from spec 0.22 to 0.34 so agents read as recognizable elements at
+ * desktop camera distance. Spec called for "small geometric worker", not
+ * "invisible dot" — this restores the design-intent silhouette.
  */
 export function buildAgentGeometry(): BoxGeometry {
-  return new BoxGeometry(0.22, 0.22, 0.16);
+  return new BoxGeometry(0.34, 0.34, 0.22);
 }

@@ -12,13 +12,13 @@ import { FloorGrid } from './components/FloorGrid';
 import { useViewportMode } from './hooks/useViewportMode';
 import { getLogoForCube } from './lib/logoPool';
 
-const X_SPAN = 6.4; // total travel width in scene units
+const X_SPAN = 5.6; // total travel width in scene units
 
 const HORIZONTAL: { x: number; y: number; label: string }[] = [
-  { x: -2.4, y: 0, label: '[ 01 · INTAKE ]' },
-  { x: -0.8, y: 0, label: '[ 02 · AI_LOGIC ]' },
-  { x: 0.9, y: 0, label: '[ 03 · CLEANCOMPILE ]' },
-  { x: 2.5, y: 0, label: '[ 04 · ATTEST·SHIP ]' },
+  { x: -2.1, y: 0, label: '[ 01 · INTAKE ]' },
+  { x: -0.7, y: 0, label: '[ 02 · AI_LOGIC ]' },
+  { x: 0.7, y: 0, label: '[ 03 · CLEANCOMPILE ]' },
+  { x: 2.1, y: 0, label: '[ 04 · ATTEST·SHIP ]' },
 ];
 
 const VERTICAL: { x: number; y: number; label: string }[] = [
@@ -40,8 +40,8 @@ export function FactoryScene() {
   const mode = useViewportMode();
   const chambers = mode === 'mobile' ? VERTICAL : HORIZONTAL;
   const showAgents = mode !== 'mobile';
-  const cameraPos: [number, number, number] = mode === 'mobile' ? [0, 0, 5.0] : [0, 0.4, 4.0];
-  const cameraFov = mode === 'mobile' ? 50 : 38;
+  const cameraPos: [number, number, number] = mode === 'mobile' ? [0, 0, 5.0] : [0, 0.5, 4.5];
+  const cameraFov = mode === 'mobile' ? 50 : 46;
   const cubeXSpan = mode === 'mobile' ? 5.0 : X_SPAN;
   const orientation = mode === 'mobile' ? 'vertical' : 'horizontal';
 
@@ -66,8 +66,12 @@ export function FactoryScene() {
       gl={{ antialias: true, alpha: true }}
       style={{ width: '100%', height: '100%' }}
     >
-      <ambientLight intensity={0.15} color="#dab6f3" />
-      <pointLight position={[0, 2, 2]} intensity={0.4} color="#2cc1eb" />
+      {/* Brighter scene lights so chambers + cubes read clearly */}
+      <ambientLight intensity={0.6} color="#dab6f3" />
+      <pointLight position={[0, 3, 3]} intensity={1.2} color="#2cc1eb" />
+      <pointLight position={[-3, 2, 2]} intensity={0.6} color="#dab6f3" />
+      <pointLight position={[3, 2, 2]} intensity={0.6} color="#dab6f3" />
+      <directionalLight position={[0, 4, 2]} intensity={0.5} color="#ffffff" />
 
       <ConduitRail length={X_SPAN} y={0} />
       <FloorGrid width={X_SPAN + 1} depth={3} y={-0.95} />
@@ -98,7 +102,13 @@ export function FactoryScene() {
       />
 
       <EffectComposer>
-        <Bloom intensity={0.6} luminanceThreshold={0.3} luminanceSmoothing={0.4} />
+        <Bloom
+          intensity={1.8}
+          luminanceThreshold={0.15}
+          luminanceSmoothing={0.6}
+          mipmapBlur
+          radius={0.7}
+        />
       </EffectComposer>
     </Canvas>
   );

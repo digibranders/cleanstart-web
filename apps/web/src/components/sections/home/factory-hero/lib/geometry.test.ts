@@ -13,10 +13,10 @@ describe('geometry', () => {
     expect(params.depth).toBeCloseTo(0.6, 2);
   });
 
-  it('buildAgentGeometry returns a small box at spec dimensions', () => {
+  it('buildAgentGeometry returns a small box (bumped from spec 0.22 to 0.34 for readability)', () => {
     const g = buildAgentGeometry();
-    expect(g.parameters.width).toBeCloseTo(0.22, 2);
-    expect(g.parameters.height).toBeCloseTo(0.22, 2);
-    expect(g.parameters.depth).toBeCloseTo(0.16, 2);
+    expect(g.parameters.width).toBeCloseTo(0.34, 2);
+    expect(g.parameters.height).toBeCloseTo(0.34, 2);
+    expect(g.parameters.depth).toBeCloseTo(0.22, 2);
   });
 });

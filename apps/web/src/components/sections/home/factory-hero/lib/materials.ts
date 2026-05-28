@@ -1,4 +1,4 @@
-import { Color, MeshBasicMaterial, MeshPhysicalMaterial } from 'three';
+import { Color, DoubleSide, MeshBasicMaterial, MeshPhysicalMaterial } from 'three';
 
 /**
  * Bloom layer constant. Objects on this layer are processed by the selective
@@ -24,13 +24,15 @@ export function makeChamberWallMaterial(): MeshPhysicalMaterial {
     metalness: 0.2,
     roughness: 0.85,
     transparent: true,
-    opacity: 0.6,
+    opacity: 0.18,
+    side: DoubleSide,
   });
 }
 
 export function makeChamberEdgeMaterial(): MeshBasicMaterial {
-  const m = new MeshBasicMaterial({ color: COLORS.neonPrimary });
-  return m;
+  // toneMapped: false keeps the neon color saturated through R3F's ACES tone map,
+  // so the bloom pass picks up a luminance bright enough to glow strongly.
+  return new MeshBasicMaterial({ color: COLORS.neonPrimary, toneMapped: false });
 }
 
 export function makeCubeDirtyMaterial(): MeshPhysicalMaterial {
@@ -49,6 +51,8 @@ export function makeCubeCleanMaterial(): MeshPhysicalMaterial {
     transmission: 0.5,
     iridescence: 0.3,
     transparent: true,
+    emissive: COLORS.cubeCleanFrom,
+    emissiveIntensity: 0.4,
   });
 }
 
@@ -56,6 +60,7 @@ export function makeAgentMaterial(): MeshBasicMaterial {
   return new MeshBasicMaterial({
     color: COLORS.neonSecondary,
     transparent: true,
-    opacity: 0.75,
+    opacity: 0.9,
+    toneMapped: false,
   });
 }
