@@ -1,15 +1,8 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
-import { Text } from '@react-three/drei';
-import { BoxGeometry } from 'three';
+import { Edges, Text } from '@react-three/drei';
 import type { ReactNode } from 'react';
-import {
-  BLOOM_LAYER,
-  COLORS,
-  makeChamberEdgeMaterial,
-  makeChamberWallMaterial,
-} from '../lib/materials';
+import { COLORS, makeChamberWallMaterial } from '../lib/materials';
 
 interface ChamberProps {
   /** Center position in scene units */
@@ -23,31 +16,29 @@ interface ChamberProps {
 
 export function Chamber({ position, size, label, children }: ChamberProps) {
   const [w, h, d] = size;
-  // Cache one BoxGeometry per chamber size for edges extraction.
-  const edgeBox = useMemo(() => new BoxGeometry(w, h, d), [w, h, d]);
-  useEffect(() => () => edgeBox.dispose(), [edgeBox]);
 
   return (
     <group position={position}>
-      {/* walls */}
+      {/* walls — translucent dark glass */}
       <mesh material={makeChamberWallMaterial()}>
         <boxGeometry args={[w, h, d]} />
+        {/* neon edges via drei <Edges> — thick, unlit, picked up by bloom */}
+        <Edges
+          linewidth={3}
+          threshold={15}
+          color={COLORS.neonPrimary}
+        />
       </mesh>
-      {/* neon edges (BloomLayer = 1 so the post pass picks them up) */}
-      <lineSegments
-        material={makeChamberEdgeMaterial()}
-        ref={(self) => { if (self) self.layers.set(BLOOM_LAYER); }}
-      >
-        <edgesGeometry args={[edgeBox]} />
-      </lineSegments>
       {/* label above the chamber */}
       <Text
         position={[0, h / 2 + 0.18, 0]}
-        fontSize={0.11}
+        fontSize={0.14}
         color={COLORS.neonPrimary}
         letterSpacing={0.16}
         anchorX="center"
         anchorY="middle"
+        outlineWidth={0.005}
+        outlineColor={COLORS.neonPrimary}
       >
         {label}
       </Text>
