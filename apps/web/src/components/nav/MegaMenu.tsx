@@ -85,7 +85,7 @@ function GroupsArea({
                   "block rounded-[12px] px-3 py-2.5 transition-colors hover:bg-white/[0.06]";
                 return (
                   <li key={item.label}>
-                    {item.built ? (
+                    {item.built !== false ? (
                       <Link href={item.href} className={cls}>
                         {inner}
                       </Link>

@@ -58,7 +58,7 @@ export function MobileNav() {
               if (item.kind === "flat") {
                 const flatClass =
                   "block cursor-pointer rounded-[10px] px-3 py-3 text-base font-medium text-white/90 transition-colors hover:bg-white/[0.06] hover:text-white";
-                return item.built ? (
+                return item.built !== false ? (
                   <Link key={item.label} href={item.href} className={flatClass}>
                     {item.label}
                   </Link>
@@ -97,7 +97,7 @@ export function MobileNav() {
                           </li>
                         ) : (
                           <li key={leaf.label}>
-                            {leaf.built ? (
+                            {leaf.built !== false ? (
                               <Link
                                 href={leaf.href}
                                 onClick={close}
