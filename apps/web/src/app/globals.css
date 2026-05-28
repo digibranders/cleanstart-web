@@ -1025,6 +1025,36 @@ body {
   .cs-nav-link::after {
     transition: none !important;
   }
+
+  /* NavigationMenu: suppress transform/scale/translate transitions so
+     panel open/close and cross-panel slides are instant. Opacity fades
+     are intentionally preserved — they are safe under reduced-motion. */
+  [data-slot="navigation-menu-content"] {
+    transition-property: opacity !important;
+  }
+  [data-slot="navigation-menu-content"][data-starting-style],
+  [data-slot="navigation-menu-content"][data-ending-style] {
+    translate: none !important;
+    transform: none !important;
+  }
+
+  /* NavigationMenu popup (base-ui Popup element): keep opacity fade,
+     suppress scale. The Popup element is a direct child of the Positioner
+     that carries the rounded-[24px] class from our navigation-menu.tsx. */
+  [data-slot="navigation-menu"] [data-popup] {
+    transition-property: opacity !important;
+  }
+
+  /* ChevronDown trigger icon: disable the 180° rotation. */
+  [data-slot="navigation-menu-trigger"] svg {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  /* Positioner: disable positional sliding between triggers. */
+  [data-slot="navigation-menu"] [data-positioner] {
+    transition: none !important;
+  }
 }
 
 /* Factory card body — Figma 1440 exact (node 763:3610..3742):
