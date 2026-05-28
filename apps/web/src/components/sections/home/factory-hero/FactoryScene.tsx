@@ -7,6 +7,7 @@ import { Cube } from './components/Cube';
 import { Agent } from './components/Agent';
 import { ConduitRail } from './components/ConduitRail';
 import { FloorGrid } from './components/FloorGrid';
+import { ChamberContents } from './components/ChamberContents';
 import { getLogoForCube } from './lib/logoPool';
 
 const RAIL_Y = 0.0;
@@ -45,6 +46,7 @@ export function FactoryScene() {
           {AGENT_OFFSETS.map((off, j) => (
             <Agent key={j} position={off} driftSeed={i + j * 0.5} />
           ))}
+          <ChamberContents chamberIndex={i as 0 | 1 | 2 | 3} />
         </Chamber>
       ))}
 
