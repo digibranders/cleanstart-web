@@ -48,7 +48,7 @@ export function PanelSolutions({ item }: Props) {
       </div>
       <ContextualCTA
         headline="Mapping compliance for your stack?"
-        sub="A solutions engineer will identify gaps and a remediation path."
+        sub="An SE will map gaps and a path forward."
         ctaLabel="Talk to an SE"
         ctaHref="/book-a-demo?intent=se"
       />
