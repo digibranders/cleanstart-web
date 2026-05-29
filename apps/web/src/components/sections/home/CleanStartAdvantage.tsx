@@ -16,7 +16,7 @@ import { Reveal } from "@/components/ui/Reveal";
  *   separators (white-fading gradient). Exact x positions extracted from Figma:
  *     Stat 1  x=0   w=136   "88,000+"   "CVEs remediated"
  *     Sep 1   x=212
- *     Stat 2  x=288 w=126   "97.6%"     "Average CVE reduction"
+ *     Stat 2  x=288 w=126   "~90%"      "Average CVE reduction"
  *     Sep 2   x=490
  *     Stat 3  x=566 w=152   "352,000+"  "Engineering hours saved"
  *     Sep 3   x=794
@@ -35,7 +35,7 @@ interface Stat {
 
 const STATS: Stat[] = [
   { value: "88,000+",  label: "CVEs remediated" },
-  { value: "97.6%",    label: "Average CVE reduction" },
+  { value: "~90%",     label: "Average CVE reduction" },
   { value: "352,000+", label: "Engineering hours saved" },
   { value: "10M+",     label: "Packages from verified source" },
   { value: "100%",     label: "Deterministic builds" },
