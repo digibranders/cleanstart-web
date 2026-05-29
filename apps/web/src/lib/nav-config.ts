@@ -63,7 +63,7 @@ export const NAV_TREE: NavItem[] = [
   {
     kind: "mega",
     label: "Products",
-    tagline: "Hardened container supply chain — end to end.",
+    tagline: "Hardened images, signed provenance, runtime visibility.",
     accent: "cyan",
     exitHref: "https://images.cleanstart.com",
     exitLabel: "Browse all images",
@@ -95,7 +95,7 @@ export const NAV_TREE: NavItem[] = [
   {
     kind: "mega",
     label: "Solutions",
-    tagline: "Compliance, remediation, and a smaller attack surface.",
+    tagline: "FIPS compliance, vulnerability remediation, minimal attack surface.",
     accent: "green",
     groups: [
       {
@@ -156,7 +156,7 @@ export const NAV_TREE: NavItem[] = [
   {
     kind: "mega",
     label: "Resources",
-    tagline: "Read, watch, learn — and meet us in person.",
+    tagline: "Articles, advisories, talks, and events.",
     accent: "cyan", // intentional: Products + Resources both use cyan per design spec §4
     groups: [
       {
