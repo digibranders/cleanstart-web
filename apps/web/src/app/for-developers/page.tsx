@@ -16,6 +16,7 @@ export const metadata = buildPageMetadata({
   description:
     'Build and ship with pre-hardened, verifiable container foundations. Eliminate inherited vulnerabilities, automate SBOMs, and meet compliance requirements without changing your workflow.',
   path: '/for-developers',
+  eyebrow: 'Solutions',
 });
 
 export default function ForDevelopersPage(): React.ReactElement {

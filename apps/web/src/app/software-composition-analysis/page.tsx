@@ -16,6 +16,7 @@ export const metadata = buildPageMetadata({
   description:
     "Reduce alert fatigue and improve SCA effectiveness with minimal, hardened container foundations and contextualized risk insights.",
   path: "/software-composition-analysis",
+  eyebrow: "Solutions",
 });
 
 export default function SCAPage(): React.ReactElement {

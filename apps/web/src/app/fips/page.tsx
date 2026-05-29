@@ -16,6 +16,7 @@ export const metadata = buildPageMetadata({
   description:
     "FIPS 140-3 validated cryptography across your container stack. Built on validated cryptographic foundations for secure, compliant container environments.",
   path: "/fips",
+  eyebrow: "Solutions",
 });
 
 export default function FipsCompliancePage(): React.ReactElement {

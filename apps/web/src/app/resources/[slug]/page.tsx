@@ -49,6 +49,7 @@ export async function generateMetadata({
       resource.summary ??
       "Whitepapers, reports, datasheets, and case studies from CleanStart.",
     path: `/resources/${resource.slug}`,
+    eyebrow: resource.type ? resource.type.replace(/-/g, " ") : "Resource",
     type: "article",
     publishedTime: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
     ...(seo.noindex ? { noindex: true } : {}),

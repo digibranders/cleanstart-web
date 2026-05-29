@@ -34,6 +34,7 @@ export async function generateMetadata({
     title: TITLE,
     description: DESCRIPTION,
     path: "/webinars",
+    eyebrow: "Webinar",
     noindex: page >= 6,
   });
 }

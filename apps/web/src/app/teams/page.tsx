@@ -15,6 +15,7 @@ export const metadata = buildPageMetadata({
   description:
     "Meet the people behind CleanStart — our executive leadership, advisory board, and the team united by a shared commitment to trusted software.",
   path: "/teams",
+  eyebrow: "Team",
 });
 
 export default function TeamsPage() {
