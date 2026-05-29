@@ -9,6 +9,7 @@ import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 import { AgentationDev } from "@/components/dev/AgentationDev";
 import { WebVitals } from "@/components/observability/WebVitals";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
+import { ogImageUrl } from "@/lib/seo/og";
 import { JsonLd, organizationSchema } from "@/lib/seo/jsonld";
 
 // Display family — headings, section titles, card titles. Preloaded for LCP.
@@ -46,6 +47,13 @@ const TITLE = "CleanStart — Secure by Design. Built from Source.";
 const DESCRIPTION =
   "Verified container images. Built from source, hardened, signed, and continuously verified.";
 
+const HOME_OG = ogImageUrl({
+  variant: "hero",
+  title: "Secure by Design. Built from Source.",
+  titleAccent: "Built from Source.",
+  sub: DESCRIPTION,
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -75,26 +83,14 @@ export const metadata: Metadata = {
     url: SITE_URL,
     type: "website",
     siteName: SITE_NAME,
-    images: [
-      {
-        url: "/og/default.png",
-        width: 1200,
-        height: 630,
-        alt: "CleanStart — verified container images",
-      },
-    ],
+    images: [{ url: HOME_OG, width: 1200, height: 630, alt: TITLE }],
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
-    images: [
-      {
-        url: "/og/default.png",
-        alt: "CleanStart — verified container images",
-      },
-    ],
+    images: [{ url: HOME_OG, alt: TITLE }],
   },
 };
 

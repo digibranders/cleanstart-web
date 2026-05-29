@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogImageUrl, type OgVariant } from "./og";
 
 export const SITE_URL = "https://www.cleanstart.com";
 export const SITE_NAME = "CleanStart";
@@ -36,6 +37,14 @@ interface BuildPageMetadataInput {
    * `seo.canonicalOverride` field (syndication, migrated URLs, A/B variants).
    */
   canonicalUrl?: string | undefined;
+  /** Card composition: "hero" for flagship pages, "default" elsewhere. */
+  variant?: OgVariant | undefined;
+  /** Type/category label shown as the OG eyebrow + footer meta (e.g. "Blog"). */
+  eyebrow?: string | undefined;
+  /** Substring of the card title rendered in the gradient. */
+  titleAccent?: string | undefined;
+  /** Overrides the card title only (page <title> stays `title`). */
+  ogTitle?: string | undefined;
 }
 
 /**
@@ -54,12 +63,28 @@ export function buildPageMetadata({
   authors,
   noindex,
   canonicalUrl,
+  variant,
+  eyebrow,
+  titleAccent,
+  ogTitle,
 }: BuildPageMetadataInput): Metadata {
   const url = `${SITE_URL}${path}`;
   const isProduction = process.env.VERCEL_ENV === "production";
   const robotsBlocked = noindex || !isProduction;
 
-  const ogImage = image ?? DEFAULT_OG_IMAGE;
+  const dynamicOg = {
+    url: ogImageUrl({
+      variant,
+      title: ogTitle ?? title,
+      eyebrow,
+      titleAccent,
+      sub: description,
+    }),
+    width: 1200,
+    height: 630,
+    alt: image?.alt ?? title,
+  };
+  const ogImage = image ?? dynamicOg;
   const canonical = canonicalUrl ?? path;
   const ogUrl = canonicalUrl ?? url;
 
