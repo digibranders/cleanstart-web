@@ -26,7 +26,7 @@ type LexicalCodeNodeWithLines = Extract<LexicalNode, { type: "code" }> & {
   _content?: string;
 };
 
-// TEXT_FORMAT bitmask constants
+// Lexical TEXT_FORMAT bitmask flags.
 const FORMAT_BOLD = 1;
 const FORMAT_ITALIC = 2;
 const FORMAT_STRIKETHROUGH = 4;
@@ -92,9 +92,8 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
     case "paragraph": {
       const pNode = node as Extract<LexicalNode, { type: "paragraph" }>;
       const children = pNode.children ?? [];
-      // Empty paragraphs from Lexical editor output render as a single spacer
-      // line; this is structural (preserving authored vertical rhythm), not a
-      // prose line-break, so the v3 Consistency Layer no-br rule does not apply.
+      // Empty Lexical paragraphs are structural spacers preserving authored
+      // vertical rhythm, not prose line-breaks, so the no-br rule does not apply.
       if (children.length === 0) {
         // eslint-disable-next-line no-restricted-syntax -- structural editor spacer, not prose
         return <br key={key} />;

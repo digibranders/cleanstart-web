@@ -13,23 +13,16 @@ const CARD_ICONS = [
   "/images/podcast/update.png",
 ] as const;
 
-// Exact Figma tokens (node 373:3328 / card 373:3331)
-// Outer ring: 1.5px solid `#076eff`-like cyan tint with 0.3 alpha — rendered as a padded
-// container with a cyan-tinted gradient background so the inner white card sits inside it.
 const RING_BG =
   "linear-gradient(90deg, rgba(44, 193, 235, 0.30) 0%, rgba(44, 193, 235, 0.30) 100%)";
 
-// Button gradient (node 373:3344): `linear-gradient(90deg, #3960F9, #3960F9)` flat,
-// with crisp 1px outline `#3960F9` and a small shadow for elevation.
 const BUTTON_BG = "#3960F9";
 const BUTTON_SHADOW =
   "0 1px 2px -1px rgba(9,6,63,0.4), 0 0 0 1px #3960F9, inset 0 1px 0 rgba(255,255,255,0.16)";
 
-// Glow blobs behind each card (node 373:3332 / 373:3357)
 const GLOW_GRADIENT =
   "linear-gradient(90deg, #06b6d4 0%, #6366f1 75%, #6366f1 100%)";
 
-// Inner card grid lines (node 373:3352–3355): vertical fade lines at fractional positions
 const VERTICAL_LINE_FADE =
   "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%)";
 const HORIZONTAL_LINE_FADE =
@@ -66,7 +59,6 @@ function ResourceCard({
 }): React.ReactElement {
   return (
     <div className="relative flex w-full h-full">
-      {/* Glow blob behind the card */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -82,7 +74,6 @@ function ResourceCard({
         }}
       />
 
-      {/* Outer ring (cyan-tinted gradient frame) — flex so inner card fills it. */}
       <div
         className="relative flex w-full"
         style={{
@@ -91,7 +82,6 @@ function ResourceCard({
           padding: "clamp(6px, 0.6vw, 8px)",
         }}
       >
-        {/* Inner card — flex column. Content flows naturally, CTA pinned to bottom. */}
         <div
           className="relative flex w-full flex-col overflow-hidden bg-white"
           style={{
@@ -104,7 +94,6 @@ function ResourceCard({
             minHeight: "clamp(360px, 30vw, 435px)",
           }}
         >
-          {/* Purple glow inside card */}
           <div
             aria-hidden
             className="pointer-events-none absolute"
@@ -120,7 +109,6 @@ function ResourceCard({
             }}
           />
 
-          {/* Decorative grid lines */}
           {[20, 40, 56, 80].map((pct) => (
             <div
               key={pct}
@@ -161,7 +149,6 @@ function ResourceCard({
             }}
           />
 
-          {/* Icon */}
           <div
             className="relative"
             style={{
@@ -185,7 +172,6 @@ function ResourceCard({
             />
           </div>
 
-          {/* Text block — title + body, grows naturally */}
           <div
             className="relative flex flex-col"
             style={{ gap: "clamp(10px, 1.1vw, 16px)" }}
@@ -216,7 +202,7 @@ function ResourceCard({
             </p>
           </div>
 
-          {/* Button — pushed to bottom of card so CTAs align horizontally across cards */}
+          {/* Pin the CTA to the card bottom so buttons align across the row regardless of body length. */}
           <div className="relative mt-auto">
             <Link
               href={card.ctaHref}
@@ -255,7 +241,6 @@ export function PodcastCTACards({ cards }: Props): React.ReactElement | null {
       className="relative overflow-hidden bg-white"
       aria-label="Explore more from CleanStart"
     >
-      {/* Top-right decorative vector arc — large quarter-circle radial */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -270,7 +255,6 @@ export function PodcastCTACards({ cards }: Props): React.ReactElement | null {
         }}
       />
 
-      {/* Bottom-left soft cyan glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden md:block"
@@ -285,7 +269,6 @@ export function PodcastCTACards({ cards }: Props): React.ReactElement | null {
           opacity: 0.25,
         }}
       />
-      {/* Top-right soft purple glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden md:block"
@@ -301,7 +284,6 @@ export function PodcastCTACards({ cards }: Props): React.ReactElement | null {
         }}
       />
 
-      {/* Background SVG grid (subtle) */}
       <svg
         aria-hidden
         className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.18]"

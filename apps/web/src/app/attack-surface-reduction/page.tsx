@@ -32,12 +32,8 @@ export default function AttackSurfaceReductionPage(): React.ReactElement {
       <Header />
       <main>
         <ASRHero />
-        {/*
-         * ASRBloated + ASRApproach share a unified #F6F6F6 backdrop so the
-         * two sections read as one continuous grey canvas with no visible
-         * seam — both inner sections set their own bg transparent/F6F6F6,
-         * and this wrapper acts as the single source of truth for the colour.
-         */}
+        {/* Wrapper owns the shared #F6F6F6 backdrop so ASRBloated + ASRApproach
+            read as one continuous canvas with no visible seam between them. */}
         <div className="bg-[#F6F6F6]">
           <FadeUp>
             <ASRBloated />

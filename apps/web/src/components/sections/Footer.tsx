@@ -2,16 +2,8 @@ import React from "react";
 import Link from "next/link";
 
 /**
- * Footer — Figma Frame 2147238429 (108:8061), 1920×850
- *
- * Layout (top → bottom):
- *  1. Top row: tagline (left) + 5 social icons (right)
- *  2. Four nav columns: Contact, Solutions, Connect, Members of
- *  3. Awarded-with section: 4 badges
- *  4. Bottom row: Logo + © + legal links (Privacy Policy, Acceptable Use Policy)
- *
- * Background: linear gradient #151021 → #131E8F → #471EC0 with decorative
- * purple ellipses + faint glowing line accents (Figma "Line 104..108").
+ * Footer layout (top → bottom): tagline + social icons, four nav columns,
+ * awards row, and a bottom row with logo, copyright, and legal links.
  */
 
 interface FooterLink {
@@ -61,32 +53,20 @@ const LEGAL_LINKS = [
   { label: "Acceptable Use Policy", href: "/legal/acceptable-use-policy" },
 ];
 
-// CTA-card overlap is owned here, not by callers. Card is vertically CENTERED
-// on the Footer's top edge (half above, half below). Callers pass content only
-// via the `cta` prop. Do not re-add `topPadding` or negative section margins
-// per-page.
+// CTA-card overlap is owned here, not by callers. The card is vertically
+// centered on the footer's top edge (half above, half below) via
+// `top: 0; translateY(-50%)`. Callers pass content only via the `cta` prop and
+// must not re-add per-page top padding or negative section margins.
 //
-// IMPORTANT — Layout contract:
-//   - The CTA card wrapper uses `top: 0; translateY(-50%)` so the card's
-//     vertical center sits exactly on the footer's top edge. The card-slot
-//     heights below (350 mobile / 300 sm / 260 lg) mean ~175/150/130px of the
-//     card sits above the footer (overlapping the previous section) and the
-//     other half sits inside the footer.
-//   - Every page that uses `<Footer cta=...>` MUST make sure its last section
-//     extends at least `card_height / 2` below its natural content so the CTA
-//     card overlaps real section bg (gradient, pattern, decorative SVGs), NOT
-//     empty body white. The largest card-half is 175px (mobile, h=350).
-//   - Convention: every last bg-providing element of a CTA page uses
-//     `padding-bottom: 250px` (or `var(--spacing-section-cta)`). The Footer's
-//     `padding-top: var(--spacing-section-cta)` matches, producing symmetric
-//     spacing above and below the card at every breakpoint.
+// Layout contract: every page using `<Footer cta=...>` must extend its last
+// section at least one card-half below its natural content so the card overlaps
+// real section background (gradient, pattern, decorative SVGs), not empty body
+// white. Convention: the last background element uses
+// `padding-bottom: var(--spacing-section-cta)`, matching the footer's
+// `padding-top`, for symmetric spacing at every breakpoint.
 //
-// Locked card container contract (per-page CTAs must fit these bounds):
-//   width: 1276px (max-width: calc(100% - 48px))
-//   height: 330px (overflow: hidden — content that exceeds is clipped)
-//   border-radius: 40px
-//   z-index: 20
-//   The container itself is transparent; per-page CTA renders its own fill.
+// The card container is transparent (the per-page CTA renders its own fill) and
+// clips overflow to its rounded bounds.
 export function Footer({
   cta,
   ctaOverlay,
@@ -105,15 +85,14 @@ export function Footer({
           className="pointer-events-none absolute left-1/2 top-0 z-20 w-full max-w-[1152px] -translate-x-1/2 translate-y-[calc(-100%-30px)] sm:-translate-y-1/2 px-6 sm:px-10"
         >
           {/* Sizing wrapper — NO overflow:hidden so `ctaOverlay` children can
-              break out of the card. Card width capped at 1152 (intentionally
-              ~20% narrower than the global 1440 container) so it reads as a
-              focused conversion block, not a section-width banner. Heights
-              also reduced ~20% (420/360/300 → 336/288/240). */}
+              break out of the card. Card width is capped narrower than the
+              global container so it reads as a focused conversion block, not a
+              section-width banner. */}
           <div
             className="pointer-events-auto relative w-full h-[350px] sm:h-[300px] lg:h-[260px]"
           >
             {/* Clipped card surface — fills the slot and clips inner content
-                to the rounded 1276×330 box. */}
+                to the rounded box. */}
             <div
               className="absolute inset-0 overflow-hidden"
               style={{ borderRadius: "40px" }}
@@ -128,8 +107,7 @@ export function Footer({
         </div>
       )}
       <div className="relative w-full overflow-hidden">
-        {/* Big purple ellipse — Figma 46640 (974×863) at (308, -358), color #7A59FF, opacity 3%, blur 250px.
-            Very subtle huge soft glow that brightens the upper-left of the footer. */}
+        {/* Large soft glow that brightens the upper-left of the footer. */}
         <div
           aria-hidden
           className="pointer-events-none absolute"
@@ -143,8 +121,7 @@ export function Footer({
             filter: "blur(125px)",
           }}
         />
-        {/* Small purple ellipse — Figma 46639 (129×313) at (1481, -93), color #7A59FF, opacity 25%, blur 250px.
-            Vertical accent on the right side. */}
+        {/* Vertical glow accent on the right side. */}
         <div
           aria-hidden
           className="pointer-events-none absolute"
@@ -160,7 +137,7 @@ export function Footer({
         />
       <div className="relative">
        <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[var(--footer-cta-pt)]" : "pt-[80px]"}`}>
-        {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
+        {/* Top row — tagline (left) + social icons (right), both top-aligned. */}
         <div className="flex flex-wrap items-start justify-between gap-8">
           <p
             className="text-lg font-normal leading-[1.4] tracking-[-0.04em] text-white"
@@ -202,9 +179,8 @@ export function Footer({
           </ul>
         </div>
 
-        {/* 4 navigation columns — Figma: horizontal, hug-content, 272px gap
-            (1276 wide) on desktop; collapsible accordion stack on mobile
-            (Figma 817:3471 mobile layout). */}
+        {/* Navigation columns — horizontal on desktop, collapsible accordion
+            stack on mobile. */}
         <nav
           className="mt-[40px] flex flex-col sm:mt-[62px] sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-y-12"
           aria-label="Footer navigation"
@@ -215,7 +191,6 @@ export function Footer({
           <FooterColumn title="Members of" links={COL_MEMBERS} />
         </nav>
 
-        {/* Awarded with row — Figma 16px gap between heading and badges */}
         <div className="mt-[56px] flex flex-col items-center gap-[16px]">
           <h3 className="font-display text-base font-semibold leading-[1.3] tracking-[-0.04em] text-white">
             Awarded with
@@ -227,9 +202,8 @@ export function Footer({
           </div>
         </div>
 
-        {/* Bottom row — Logo + © + legal links (no divider line per Figma) */}
+        {/* Bottom row — logo + copyright + legal links */}
         <div className="mt-[32px] flex flex-wrap items-end justify-between gap-6">
-          {/* Left: Logo on top, copyright below — Figma stacks vertically */}
           <div className="flex flex-col items-start gap-[9px]">
             <div className="relative h-[32px] w-[153px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -251,7 +225,6 @@ export function Footer({
             </span>
           </div>
 
-          {/* Right: Legal links */}
           <ul className="flex items-center gap-2 leading-none">
             {LEGAL_LINKS.map((link, i) => (
               <React.Fragment key={link.href}>
@@ -282,9 +255,8 @@ export function Footer({
 }
 
 function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
-  // MOBILE (<sm): collapsible accordion per Figma 817:3475 — section header
-  // with arrow-down icon, expands on tap. Uses native <details>/<summary>.
-  // DESKTOP (sm+): always-expanded column with heading + flat link list.
+  // Mobile (<sm): collapsible native <details>/<summary> accordion.
+  // Desktop (sm+): always-expanded column with heading + flat link list.
   return (
     <div className="sm:contents">
       {/* Mobile accordion */}
@@ -374,7 +346,6 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
   );
 }
 
-// Figma 108:8426 path — rounded-corner shield (98×120, cornerRadius 15)
 const BADGE_SHIELD_PATH =
   "M0 15C0 6.71573 6.71573 0 15 0H82.5C90.7843 0 97.5 6.71573 97.5 15V95.6479C97.5 102.467 92.8997 108.429 86.3029 110.158L52.5529 119.003C50.0597 119.657 47.4403 119.657 44.9471 119.003L11.1971 110.158C4.60029 108.429 0 102.467 0 95.6479V15Z";
 
@@ -385,7 +356,7 @@ function AwardBadge({ award }: { award: (typeof AWARDS)[number] }) {
   };
   return (
     <div className="relative h-[120px] w-[98px]" title={award.name}>
-      {/* Glassy shield bg — same rounded-corner pentagon path as Figma */}
+      {/* Glassy shield background */}
       <div
         aria-hidden
         className="absolute inset-0 backdrop-blur-md"
@@ -394,7 +365,7 @@ function AwardBadge({ award }: { award: (typeof AWARDS)[number] }) {
           backgroundColor: "rgba(255, 255, 255, 0.08)",
         }}
       />
-      {/* Subtle inner highlight along the top edge for the GLASS feel */}
+      {/* Subtle inner highlight along the top edge for the glass feel */}
       <div
         aria-hidden
         className="absolute inset-0"
@@ -405,7 +376,7 @@ function AwardBadge({ award }: { award: (typeof AWARDS)[number] }) {
           mixBlendMode: "screen",
         }}
       />
-      {/* Image content — centered in the upper rectangular area, above the V */}
+      {/* Badge image — centered in the upper rectangular area, above the point */}
       <div className="absolute inset-x-0 top-0 flex h-[100px] items-center justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

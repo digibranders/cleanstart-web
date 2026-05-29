@@ -8,12 +8,10 @@ import { STATE_PRESETS, type StateVariant } from "./state-presets";
 const HERO_GRADIENT =
   "linear-gradient(180deg, #0B0820 0%, #131248 38%, #2E1D8E 70%, #5A2EE0 95%, #6E3CFF 100%)";
 
-// Full-page "glass" hero title — Figma spec (Manrope SemiBold, line-height
-// 100%, letter-spacing -0.05em, white @35%). Figma authors it at 190px on the
-// 1440 frame, but that reads oversized in-app; dialled back to a 128px desktop
-// cap (clamp(2.5rem, 9vw, 8rem)) that stays a bold display tier without
-// dominating the viewport. Scales fluidly down to 40px on phones. Inline
-// light-tone states use --fs-h3 instead.
+// Full-page "glass" hero title. Capped at a 128px desktop size
+// (clamp(2.5rem, 9vw, 8rem)) so it stays a bold display tier without dominating
+// the viewport, scaling down to 40px on phones. Inline light-tone states use
+// --fs-h3 instead.
 const TITLE_STYLE: CSSProperties = {
   fontSize: "clamp(2.5rem, 9vw, 8rem)",
   lineHeight: 1,
@@ -61,9 +59,6 @@ export function StateView({
         className={cn("relative w-full overflow-hidden", className)}
         style={{ background: HERO_GRADIENT }}
       >
-        {/* Bordered grid + purple glow ellipses + accent lines — exact Figma
-            asset (node 857:18365). 1920px-wide, centred and clipped to the
-            section like the design (left: calc(50% - 1920px/2)). */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/error/hero-grid.svg"
@@ -77,8 +72,7 @@ export function StateView({
 
         {/* Glassy title tint — soft cyan + purple light behind the title band.
             The 35%-opacity letters are translucent, so this colour bleeds
-            through them (neutral → teal → purple, matching the Figma "Glass"
-            reference). Screen blend adds light to the gradient, never darkens. */}
+            through them. Screen blend adds light to the gradient, never darkens. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 mix-blend-screen"

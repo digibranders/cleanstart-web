@@ -2,32 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
 
-/*
- * CleanSight Hero — Figma node 926:2365 (Option2 redesign).
- *
- * Stacked centred layout: heading + description + "Contact Us" CTA at top,
- * raw dashboard screenshot (no laptop frame) below. Two soft radial glows
- * flank the dashboard on the left and right. Background is the same
- * navy → indigo → violet gradient as before, fading to white into the
- * next section.
- */
 export function CleanSightHero(): React.ReactElement {
   return (
     <section
       data-section="CleanSightHero"
       className="relative overflow-hidden"
       style={{
-        // Bottom alpha-fade dropped — keep the violet solid all the way down
-        // so the section beneath isn't bleeding through as a white wash.
         background:
           "linear-gradient(179.996deg, rgb(21,16,33) 25.7%, rgb(16,18,62) 31.16%, rgb(19,30,143) 51%, rgb(71,30,192) 68.71%, rgb(71,31,195) 100%)",
       }}
     >
-      {/* Bottom white fade removed — the next section (WhyMattersGrid) now
-          owns its own top-edge gradient blend, so the hero can keep its
-          purple bottom intact. */}
-
-      {/* ── Content ── */}
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
@@ -36,7 +20,6 @@ export function CleanSightHero(): React.ReactElement {
           zIndex: 2,
         }}
       >
-        {/* Centred heading + description + CTA */}
         <div className="flex flex-col items-center text-center gap-6">
           <HeroReveal y={50} duration={1.0}>
             <h1
@@ -91,11 +74,6 @@ export function CleanSightHero(): React.ReactElement {
           </HeroReveal>
         </div>
 
-        {/* Dashboard screenshot + side glows. Mounted to the bottom of the
-            hero section: fixed 56 px gap below the CTA at every viewport,
-            and zero padding below so the dashboard's rounded bottom edge
-            sits flush with the section's bottom edge. The image keeps its
-            aspect ratio and scales down proportionally with the viewport. */}
         <div
           className="relative mx-auto"
           style={{
@@ -104,7 +82,6 @@ export function CleanSightHero(): React.ReactElement {
             paddingBottom: "0px",
           }}
         >
-          {/* Left glow — Ellipse 46683 */}
           <div
             aria-hidden
             className="pointer-events-none select-none absolute hidden md:block"
@@ -120,7 +97,6 @@ export function CleanSightHero(): React.ReactElement {
               zIndex: 0,
             }}
           />
-          {/* Right glow — Ellipse 46684 */}
           <div
             aria-hidden
             className="pointer-events-none select-none absolute hidden md:block"

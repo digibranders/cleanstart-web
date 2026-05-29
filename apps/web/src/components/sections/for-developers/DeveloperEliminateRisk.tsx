@@ -6,24 +6,12 @@ import { Reveal, RevealStagger, RevealItem } from '@/components/ui/Reveal';
 const ICON_BASE = '/images/for-developers/eliminate-risk';
 
 /*
- * "Eliminate Risk Earlier" — Glow-Anchor card variant (2026-05-25).
+ * "Eliminate Risk Earlier" — Glow-Anchor card variant.
  *
- * Card vocabulary:
- *   • Rectangular tile with a corner-anchored "L" gradient stripe (top-left)
- *     and a small gradient pip in the top-right — both act as visual anchors
- *     that distinguish these from generic glass cards.
- *   • Thin gradient bar across the bottom edge as the card's "signature".
- *   • Inner surface is a single dark gradient (no internal ellipse glows; that
- *     vocab is reserved for the marquee/CTA cards so each section keeps a
- *     distinct card identity).
- *   • Icon sits prominently at the top, big enough to read at a glance.
- *
- * Content per card — exactly what Figma 857:5144 specifies, nothing more:
- *   1. Title  (89% / Smaller Images / Faster Pull Times / Lower Risk)
- *   2. Label  (Fewer inherited vulnerabilities / Reduced runtime footprint / …)
+ * The inner surface is a single dark gradient with no internal ellipse glows;
+ * that glow vocabulary is reserved for the marquee and CTA cards so each
+ * section keeps a distinct card identity.
  */
-
-// ─── Data ───────────────────────────────────────────────────────────────────
 
 interface MetricCardData {
   kind: 'number' | 'headline';
@@ -35,7 +23,7 @@ interface MetricCardData {
   headline?: string;
   /** Subtitle / label sentence shown directly below the title. */
   label: string;
-  /** 3D icon PNG from Figma. */
+  /** 3D icon PNG. */
   iconSrc: string;
 }
 
@@ -67,8 +55,6 @@ const METRICS: MetricCardData[] = [
   },
 ];
 
-// ─── Card ───────────────────────────────────────────────────────────────────
-
 function GlowAnchorCard({
   kind,
   numberTo,
@@ -94,7 +80,6 @@ function GlowAnchorCard({
           'inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 40px rgba(7,5,30,0.45)',
       }}
     >
-      {/* ── Top-left L-anchor (gradient stripe forming an L in the corner) ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -135,7 +120,6 @@ function GlowAnchorCard({
         }}
       />
 
-      {/* ── Top-right gradient pip (small status dot) ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -150,12 +134,10 @@ function GlowAnchorCard({
         }}
       />
 
-      {/* ── Content ── */}
       <div
         className="relative flex h-full flex-col"
         style={{ padding: '32px 26px 30px' }}
       >
-        {/* Icon */}
         <div className="mb-6 flex items-start">
           <div
             className="relative inline-flex items-center justify-center"
@@ -186,7 +168,6 @@ function GlowAnchorCard({
           </div>
         </div>
 
-        {/* Title — big number (with count-up) or headline phrase */}
         {kind === 'number' && numberTo !== undefined ? (
           <div
             className="cs-text-gradient-impact"
@@ -217,7 +198,6 @@ function GlowAnchorCard({
           </h3>
         )}
 
-        {/* Label / subtitle (only this — no third caption line, per Figma) */}
         <p
           style={{
             fontFamily: 'var(--font-sans)',
@@ -233,7 +213,6 @@ function GlowAnchorCard({
         </p>
       </div>
 
-      {/* ── Bottom signature bar — thin gradient line as the card's signature ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -251,14 +230,11 @@ function GlowAnchorCard({
   );
 }
 
-// ─── Section ────────────────────────────────────────────────────────────────
-
 export function DeveloperEliminateRisk(): React.ReactElement {
   return (
     <section
       data-section="DeveloperEliminateRisk"
       className="relative overflow-hidden"
-      // Bg gradient verbatim from Figma node 857:5144.
       style={{
         background:
           'linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)',
@@ -267,7 +243,6 @@ export function DeveloperEliminateRisk(): React.ReactElement {
       }}
     >
       <div className="relative mx-auto w-full max-w-[1276px] px-6 sm:px-10">
-        {/* Heading */}
         <Reveal header>
           <h2
             className="mx-auto text-center text-white"
@@ -285,7 +260,6 @@ export function DeveloperEliminateRisk(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* Subtitle */}
         <Reveal header delay={0.15} y={20}>
           <p
             className="mx-auto text-center"
@@ -305,7 +279,6 @@ export function DeveloperEliminateRisk(): React.ReactElement {
           </p>
         </Reveal>
 
-        {/* 4-up grid */}
         <RevealStagger
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
           style={{ gap: '24px' }}

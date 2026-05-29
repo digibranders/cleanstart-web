@@ -3,13 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import type React from 'react';
 
-/*
- * Scroll-triggered count-up. Runs once when the element enters the viewport.
- * Respects prefers-reduced-motion — if set, jumps straight to the final value.
- *
- * Client-only island so the parent (DeveloperEliminateRisk) can stay an RSC.
+/**
+ * Scroll-triggered count-up that runs once when the element enters the viewport.
+ * Honours prefers-reduced-motion by jumping straight to the final value. Kept as
+ * a client island so the parent can remain a server component.
  */
-
 interface MetricCounterProps {
   /** Final integer value (e.g. 89). */
   to: number;
@@ -47,7 +45,6 @@ export function MetricCounter({
             const tick = (now: number): void => {
               const elapsed = now - start;
               const progress = Math.min(1, elapsed / durationMs);
-              // Ease-out cubic — quick start, soft landing.
               const eased = 1 - (1 - progress) ** 3;
               setValue(Math.round(eased * to));
               if (progress < 1) requestAnimationFrame(tick);

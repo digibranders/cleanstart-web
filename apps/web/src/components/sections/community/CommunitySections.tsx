@@ -17,8 +17,6 @@ import { effectivePublishedAt } from "@/lib/published-date";
 import { getResources, type Resource, type ResourceType } from "@/lib/resources";
 import { resourceTypeLabel } from "@/lib/resources-utils";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 type NewsItem = {
   date: string;
   title: string;
@@ -48,8 +46,6 @@ type EventItem = {
   href: string;
 };
 
-// ─── Static data (no CMS source) ─────────────────────────────────────────────
-
 const DISCUSSIONS: DiscussionItem[] = [
   {
     initials: "JS",
@@ -71,8 +67,7 @@ const DISCUSSIONS: DiscussionItem[] = [
   },
 ];
 
-// ─── Fallbacks (used when CMS / API is unreachable) ──────────────────────────
-
+// Used when the CMS / API is unreachable.
 const NEWS_FALLBACK: NewsItem[] = [
   { date: "OCT 08, 2023", title: "Zero-CVE pipeline Best Practices", href: "/resource-center" },
   { date: "OCT 08, 2023", title: "Zero-CVE pipeline Best Practices", href: "/resource-center" },
@@ -92,8 +87,6 @@ const EVENTS_FALLBACK: EventItem[] = [
   { month: "NOV", day: "02", title: "Clean Code: The SBOM deep dive", detail: "Austin, TX • 6:00 PM CST", href: "/events" },
   { month: "NOV", day: "15", title: "Q4 Community Town Hall", detail: "Virtual • 11:30 AM EST", href: "/events" },
 ];
-
-// ─── Formatters ──────────────────────────────────────────────────────────────
 
 const ARTICLE_DATE_FMT = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -176,8 +169,6 @@ function safeTypeLabel(type: Resource["type"]): string {
   return resourceTypeLabel(type as ResourceType);
 }
 
-// ─── Fetchers ────────────────────────────────────────────────────────────────
-
 async function fetchWhatsNew(): Promise<NewsItem[]> {
   try {
     const data = await getResources({ limit: 4 });
@@ -223,13 +214,6 @@ async function fetchEvents(): Promise<EventItem[]> {
   }
 }
 
-// ─── Shared sub-components ────────────────────────────────────────────────────
-
-/**
- * Blue gradient ball icon — 34×34px, matches Figma "Ball" node.
- * Hosts a Lucide icon (carried over from the previous CommunityResources
- * design — one icon per card domain instead of a single shared SVG).
- */
 function BlueBall({ icon: Icon }: { icon: LucideIcon }): React.ReactElement {
   return (
     <div
@@ -295,8 +279,6 @@ function ExploreLink({ href, label = "Explore All Resources" }: { href: string; 
     </Link>
   );
 }
-
-// ─── Card bodies ──────────────────────────────────────────────────────────────
 
 function WhatsNewCard({ items }: { items: NewsItem[] }): React.ReactElement {
   return (
@@ -475,8 +457,6 @@ function UpcomingEventsCard({ items }: { items: EventItem[] }): React.ReactEleme
   );
 }
 
-// ─── Card wrapper ─────────────────────────────────────────────────────────────
-
 function CardWrapper({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
     <div className="h-full rounded-[32px] p-2" style={{ background: "rgba(44, 193, 235, 0.3)" }}>
@@ -489,8 +469,6 @@ function CardWrapper({ children }: { children: React.ReactNode }): React.ReactEl
     </div>
   );
 }
-
-// ─── Section ──────────────────────────────────────────────────────────────────
 
 export async function CommunitySections(): Promise<React.ReactElement> {
   const [news, images, events] = await Promise.all([

@@ -23,9 +23,9 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
           "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
       }}
     >
-      {/* Card image — the OUTER wrapper is NOT overflow-hidden so the category
-          badge (positioned `bottom: -12px`) can spill below the image without
-          being clipped. The INNER div clips the image to the rounded corners. */}
+      {/* The outer wrapper must not clip overflow so the category badge
+          (positioned bottom: -12px) can spill below the image. The inner div
+          clips the image itself to the rounded corners. */}
       <div
         className="relative shrink-0 m-3"
         style={{ aspectRatio: "380 / 200" }}
@@ -53,7 +53,6 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
           )}
         </div>
 
-        {/* Category badge — overlaps image bottom (outside the clipping inner div) */}
         {primaryCategory && (
           <div className="absolute" style={{ left: "20px", bottom: "-12px", zIndex: 1 }}>
             <CategoryBadge label={primaryCategory.name} />
@@ -61,13 +60,10 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
         )}
       </div>
 
-      {/* Card content — fills remaining height, Read more pinned to bottom */}
       <div
         className="relative flex flex-1 flex-col justify-between pt-9 pb-8 px-8"
       >
-        {/* Top: meta + title + excerpt */}
         <div className="flex flex-col" style={{ gap: "12px" }}>
-          {/* Meta row: date + read time */}
           <div className="flex items-center" style={{ gap: "16px" }}>
             {date && (
               <div className="flex items-center" style={{ gap: "4px" }}>
@@ -113,7 +109,6 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
             )}
           </div>
 
-          {/* Title + excerpt */}
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <h3
               className="font-display text-card-title-md font-medium leading-[1.3] tracking-[-0.05em] overflow-hidden"
@@ -146,7 +141,6 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
           </div>
         </div>
 
-        {/* Read more — always at the bottom */}
         <Link
           href={`/blogs/${post.slug}`}
           className="flex items-center"

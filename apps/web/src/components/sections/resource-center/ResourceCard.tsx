@@ -16,10 +16,8 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
   const ctaLabel = resourceCtaLabel(resource.type, resource.ctaButtonText);
   const coverPoster = resourceCoverPoster(resource.type);
 
-  // Step the overlay title down for longer copy so it never overruns the
-  // dark area between the cover's logo block and the type badge.
-  // Sizing uses `cqw` so the text scales with the cover (card is now fluid),
-  // never pushing past the booklet's visible page edge.
+  // Scale the overlay title down for longer copy so it stays within the cover's
+  // dark area. Uses cqw so it tracks the fluid card width.
   const titleLen = resource.title.length;
   const coverTitleFontSize =
     titleLen <= 28
@@ -42,7 +40,6 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
           "0px 81px 23px 0px rgba(0,0,0,0), 0px 52px 21px 0px rgba(0,0,0,0), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 3px 7px 0px rgba(0,0,0,0.02)",
       }}
     >
-      {/* Cover — booklet poster mapped by type, with the resource title rendered over the dark inner area. */}
       <div
         className="absolute"
         style={{
@@ -85,7 +82,6 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
       </div>
 
 
-      {/* Type badge — overlaps image bottom */}
       <div
         className="absolute"
         style={{ top: "133px", left: "26px", zIndex: 1 }}
@@ -93,7 +89,6 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
         <CategoryBadge label={typeLabel} />
       </div>
 
-      {/* Content area */}
       <div
         className="absolute flex flex-col justify-between"
         style={{
@@ -103,7 +98,6 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
           bottom: "24px",
         }}
       >
-        {/* Title */}
         <h3
           className="font-display font-medium overflow-hidden"
           style={{
@@ -119,10 +113,9 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
           {resource.title}
         </h3>
 
-        {/* CTA link — small variant. Card content area is ~256 px wide so
-            long CTAs ("View Architecture Insights") were overflowing at the
-            old --fs-body / 20×14 arrow combo. Drop to --fs-body-sm (14 px)
-            and a 16×11 arrow so the link fits on one line. */}
+        {/* Small CTA variant: the ~256px content area overflows at --fs-body
+            with a 20×14 arrow, so use --fs-body-sm and a 16×11 arrow to keep
+            long labels on one line. */}
         <Link
           href={`/resources/${resource.slug}`}
           className="flex items-center gap-1.5"

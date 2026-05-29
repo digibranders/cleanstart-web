@@ -2,18 +2,6 @@ import type React from "react";
 import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
 
-/**
- * SCA Hero — Figma node 690:217 / 604:2163
- * 1920×824px section; dark gradient bg + grid; text left, 3D illustration right.
- *
- * Illustration positioning math (Figma 1920px canvas, 1276px content):
- *   Content left edge  = (1920 − 1276) / 2 = 322px
- *   Illustration x     = 1171px  → 849px from content left
- *   Illustration right = 1171 + 492 = 1663px  → 257px from viewport right
- *   right = 50vw − (492 / 2 + 849 − 638) = 50vw − 703px
- *   clamped to min 0 so it clips cleanly on narrow viewports.
- */
-
 export function SCAHero(): React.ReactElement {
   return (
     <section
@@ -24,7 +12,6 @@ export function SCAHero(): React.ReactElement {
           "linear-gradient(180deg, rgb(21,16,33) 25.7%, rgb(16,18,62) 31.2%, rgb(19,30,143) 51%, rgb(71,30,192) 68.7%, rgb(71,31,195) 79.8%, rgba(70,30,191,0.85) 85%, rgba(66,30,188,0.4) 93.7%, rgba(66,30,188,0) 98.9%)",
       }}
     >
-      {/* ── Decorative blue light flare — Figma node 604:2441–2444 ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -41,8 +28,7 @@ export function SCAHero(): React.ReactElement {
         }}
       />
 
-      {/* ── 3D isometric illustration — Figma node 604:2445 ── */}
-      {/* Positioned absolutely so it can overflow the right content edge, matching Figma. */}
+      {/* Positioned absolutely so it can overflow the right content edge. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/sca/hero-3d-illustration.png"
@@ -59,12 +45,10 @@ export function SCAHero(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Text content ── */}
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 text-center lg:text-left"
         style={{ paddingTop: "clamp(112px, 11vw, 160px)", paddingBottom: "clamp(56px, 7vw, 100px)" }}
       >
-        {/* Headline — Figma node 604:2428, 805×160px */}
         <HeroReveal y={50} duration={1.0}>
           <h1
             style={{
@@ -83,7 +67,6 @@ export function SCAHero(): React.ReactElement {
           </h1>
         </HeroReveal>
 
-        {/* Subtitle — Figma node 604:2429, 688px wide */}
         <HeroReveal y={30} delay={0.2} duration={0.8}>
           <p
             style={{
@@ -102,10 +85,6 @@ export function SCAHero(): React.ReactElement {
           </p>
         </HeroReveal>
 
-        {/* Glass CTA button — Figma node 604:2430.
-            Uses the shared .cs-btn-glass utility (same style as every other hero
-            CTA on the site) — play-icon prefix kept because this is a
-            "Watch How..." CTA, arrow slides on hover via .cs-cta-arrow. */}
         <Link
           href="/book-a-demo"
           className="cs-btn-glass self-start"
@@ -115,7 +94,6 @@ export function SCAHero(): React.ReactElement {
             ["--cs-btn-fs" as string]: "16px",
           } as React.CSSProperties}
         >
-          {/* Play icon */}
           <svg
             aria-hidden
             role="presentation"
@@ -129,7 +107,6 @@ export function SCAHero(): React.ReactElement {
 
           <span>Watch How SCA Works</span>
 
-          {/* Arrow right — animated via .cs-cta-arrow on hover */}
           <svg
             className="cs-cta-arrow"
             aria-hidden
@@ -147,8 +124,6 @@ export function SCAHero(): React.ReactElement {
           </svg>
         </Link>
 
-        {/* Mobile-only inline 3D illustration — desktop variant is the
-            absolute-positioned one above, hidden below lg. */}
         <div className="lg:hidden mt-10 flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

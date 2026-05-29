@@ -1,7 +1,6 @@
 import type React from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
-/* ─── Outcome chips (two-line labels) ───────────────────────────────────── */
 interface ChipItem {
   id: string;
   line1: string;
@@ -10,9 +9,6 @@ interface ChipItem {
   iconAlt: string;
 }
 
-/* Each `icon` is a pre-baked PNG that contains the blue gradient ball + the
- * white-line glyph + the soft drop-shadow halo as a single composite. The
- * chip just renders <img>; no CSS-built ball wrapper is needed. */
 const OUTCOME_CHIPS: ChipItem[] = [
   { id: "c1", line1: "Cleaner software",  line2: "foundations",  icon: "/images/sca/outcome-ball-cleaner.png", iconAlt: "Cleaner software foundations" },
   { id: "c2", line1: "Better SCA signal", line2: "quality",      icon: "/images/sca/outcome-ball-signal.png",  iconAlt: "Better SCA signal quality" },
@@ -20,14 +16,12 @@ const OUTCOME_CHIPS: ChipItem[] = [
   { id: "c4", line1: "Stronger security", line2: "outcomes",     icon: "/images/sca/outcome-ball-shield.png",  iconAlt: "Stronger security outcomes" },
 ];
 
-/* ─── Quick stats inside the CleanSight card ────────────────────────────── */
 const STATS = [
   { icon: "/images/sca/cs-stat-89.svg",          value: "89%",        label: "fewer inherited\nCVEs"       },
   { icon: "/images/sca/cs-stat-smaller.svg",      value: "SMALLER",    label: "dependency\ngraph"            },
   { icon: "/images/sca/cs-stat-prioritized.svg",  value: "PRIORITIZED",label: "Actionable\nremediation"     },
 ] as const;
 
-/* ─── Vulnerability rows for Traditional SCA card ───────────────────────── */
 interface VulnRow {
   id: string;
   dot: string;
@@ -58,7 +52,6 @@ const VULN_ROWS: VulnRow[] = [
   { id: "r8", dot: "#cbd5e1", label: "LOW",      labelColor: "#94a3b8", pkg: "xz-utils",            cve: "CVE-2024-35610", opacity: 0.4 },
 ];
 
-/* ─── Shared decorative vertical-gradient lines ─────────────────────────── */
 function GradLine({ left }: { left: string }): React.ReactElement {
   return (
     <div
@@ -78,7 +71,6 @@ function GradLine({ left }: { left: string }): React.ReactElement {
   );
 }
 
-/* ─── Center card bottom-row icons (inline SVG) ─────────────────────────── */
 function IconLayers(): React.ReactElement {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -104,7 +96,6 @@ function IconCode(): React.ReactElement {
   );
 }
 
-/* ─── LEFT PANEL: Traditional SCA card ──────────────────────────────────── */
 function TraditionalSCACard(): React.ReactElement {
   return (
     <div
@@ -117,7 +108,6 @@ function TraditionalSCACard(): React.ReactElement {
         minHeight: "726px",
       }}
     >
-      {/* Purple blur decoration */}
       <div
         aria-hidden
         style={{
@@ -135,13 +125,11 @@ function TraditionalSCACard(): React.ReactElement {
         }}
       />
 
-      {/* Decorative vertical gradient lines */}
       <GradLine left="48.47px" />
       <GradLine left="120.03px" />
       <GradLine left="162.38px" />
       <GradLine left="233.94px" />
 
-      {/* Decorative horizontal gradient lines */}
       {[67.54, 183.54].map((top) => (
         <div
           key={top}
@@ -159,7 +147,6 @@ function TraditionalSCACard(): React.ReactElement {
         />
       ))}
 
-      {/* Header bar — pink, equal 38px margins on both sides */}
       <div
         style={{
           position: "absolute",
@@ -172,7 +159,6 @@ function TraditionalSCACard(): React.ReactElement {
         }}
       />
 
-      {/* Header title — left:137px matches Figma left:125px + pl:12px */}
       <p
         style={{
           position: "absolute",
@@ -191,7 +177,6 @@ function TraditionalSCACard(): React.ReactElement {
         Traditional SCA
       </p>
 
-      {/* Header subtitle */}
       <p
         style={{
           position: "absolute",
@@ -210,7 +195,7 @@ function TraditionalSCACard(): React.ReactElement {
         Too much noise
       </p>
 
-      {/* Vulnerability list with fade-out mask */}
+      {/* fade-out mask trims the list visually at the bottom edge */}
       <div
         style={{
           position: "absolute",
@@ -235,7 +220,6 @@ function TraditionalSCACard(): React.ReactElement {
                 opacity: row.opacity,
               }}
             >
-              {/* Severity cell */}
               <div
                 style={{
                   width: "96px",
@@ -271,7 +255,6 @@ function TraditionalSCACard(): React.ReactElement {
                 </span>
               </div>
 
-              {/* Package cell */}
               <div style={{ flex: 1, paddingLeft: "16px", paddingRight: "16px" }}>
                 <div
                   style={{
@@ -287,7 +270,6 @@ function TraditionalSCACard(): React.ReactElement {
                 </div>
               </div>
 
-              {/* CVE cell */}
               <span
                 style={{
                   fontFamily: "var(--font-body)",
@@ -306,7 +288,6 @@ function TraditionalSCACard(): React.ReactElement {
         </div>
       </div>
 
-      {/* "... 12,834 more lines" */}
       <p
         style={{
           position: "absolute",
@@ -327,7 +308,6 @@ function TraditionalSCACard(): React.ReactElement {
         ... 12,834 more lines
       </p>
 
-      {/* Footer — top:612px */}
       <div
         style={{
           position: "absolute",
@@ -377,7 +357,6 @@ function TraditionalSCACard(): React.ReactElement {
   );
 }
 
-/* ─── CENTER PANEL: CleanStart Foundation card ───────────────────────────── */
 function CenterCard(): React.ReactElement {
   return (
     <div
@@ -392,7 +371,7 @@ function CenterCard(): React.ReactElement {
           "-160.259px 79.739px 50.032px rgba(0,0,0,0),-102.41px 50.814px 46.123px rgba(0,0,0,0.03),-57.85px 28.925px 38.306px rgba(0,0,0,0.12),-25.798px 12.508px 28.925px rgba(0,0,0,0.2),-6.254px 3.127px 15.635px rgba(0,0,0,0.23)",
       }}
     >
-      {/* ── Blue gradient header bar — centred, 336px wide (matches Figma) ── */}
+      {/* Blue gradient header bar — centred, 336px wide */}
       <div
         style={{
           position: "absolute",
@@ -407,7 +386,6 @@ function CenterCard(): React.ReactElement {
         }}
       />
 
-      {/* Header title — centred at top:54px (Figma: left:50% -translateX-1/2 pl:12px) */}
       <p
         style={{
           position: "absolute",
@@ -428,7 +406,6 @@ function CenterCard(): React.ReactElement {
         CleanStart Foundation
       </p>
 
-      {/* Header subtitle — centred at top:82px (Figma canvas 2770-2680=90px − half 16px line-height) */}
       <p
         style={{
           position: "absolute",
@@ -448,8 +425,7 @@ function CenterCard(): React.ReactElement {
         Reduce risk at the source
       </p>
 
-      {/* ── Concentric rings — all centred at 50% horizontal, Figma top values ── */}
-      {/* Outer ring — 292×292px */}
+      {/* Concentric rings — all centred at 50% horizontal */}
       <div
         aria-hidden
         style={{
@@ -465,7 +441,6 @@ function CenterCard(): React.ReactElement {
           pointerEvents: "none",
         }}
       />
-      {/* Middle ring — 238×238px */}
       <div
         aria-hidden
         style={{
@@ -482,7 +457,6 @@ function CenterCard(): React.ReactElement {
           pointerEvents: "none",
         }}
       />
-      {/* Inner ring — 182×182px */}
       <div
         aria-hidden
         style={{
@@ -500,7 +474,6 @@ function CenterCard(): React.ReactElement {
         }}
       />
 
-      {/* ── 3D cube image — 91×99px, centred horizontally at top:277px ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/sca/center-card-cube.png"
@@ -520,7 +493,6 @@ function CenterCard(): React.ReactElement {
         }}
       />
 
-      {/* ── Dark bottom bar — top:490px ── */}
       <div
         style={{
           position: "absolute",
@@ -533,7 +505,6 @@ function CenterCard(): React.ReactElement {
         }}
       />
 
-      {/* ── Bottom 3-item row — top:507px, centred ── */}
       <div
         style={{
           position: "absolute",
@@ -546,7 +517,6 @@ function CenterCard(): React.ReactElement {
           justifyContent: "center",
         }}
       >
-        {/* Item 1: Minimal image */}
         <div
           style={{
             display: "flex",
@@ -575,7 +545,6 @@ function CenterCard(): React.ReactElement {
           </p>
         </div>
 
-        {/* Divider */}
         <div
           aria-hidden
           style={{
@@ -586,7 +555,6 @@ function CenterCard(): React.ReactElement {
           }}
         />
 
-        {/* Item 2: Hardened by default */}
         <div
           style={{
             display: "flex",
@@ -615,7 +583,6 @@ function CenterCard(): React.ReactElement {
           </p>
         </div>
 
-        {/* Divider */}
         <div
           aria-hidden
           style={{
@@ -626,7 +593,6 @@ function CenterCard(): React.ReactElement {
           }}
         />
 
-        {/* Item 3: Minimal inherited CVEs */}
         <div
           style={{
             display: "flex",
@@ -656,7 +622,6 @@ function CenterCard(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Footer — top:622px, centred ── */}
       <div
         style={{
           position: "absolute",
@@ -707,7 +672,6 @@ function CenterCard(): React.ReactElement {
   );
 }
 
-/* ─── RIGHT PANEL: CleanSight card ──────────────────────────────────────── */
 function CleanSightCard(): React.ReactElement {
   return (
     <div
@@ -720,7 +684,6 @@ function CleanSightCard(): React.ReactElement {
         minHeight: "726px",
       }}
     >
-      {/* Purple blur decoration */}
       <div
         aria-hidden
         style={{
@@ -738,13 +701,11 @@ function CleanSightCard(): React.ReactElement {
         }}
       />
 
-      {/* Decorative vertical gradient lines */}
       <GradLine left="48px" />
       <GradLine left="120px" />
       <GradLine left="162px" />
       <GradLine left="234px" />
 
-      {/* Decorative horizontal gradient lines */}
       {[68, 184].map((top) => (
         <div
           key={top}
@@ -762,7 +723,6 @@ function CleanSightCard(): React.ReactElement {
         />
       ))}
 
-      {/* Indigo header bar — equal 38px margins on both sides */}
       <div
         style={{
           position: "absolute",
@@ -775,7 +735,6 @@ function CleanSightCard(): React.ReactElement {
         }}
       />
 
-      {/* Header title — centered in the indigo header bar */}
       <p
         style={{
           position: "absolute",
@@ -795,7 +754,6 @@ function CleanSightCard(): React.ReactElement {
         CleanSight Insight
       </p>
 
-      {/* Header subtitle — centered in the indigo header bar */}
       <p
         style={{
           position: "absolute",
@@ -815,7 +773,6 @@ function CleanSightCard(): React.ReactElement {
         Contextualize and act
       </p>
 
-      {/* ── RECOMMENDED ALTERNATIVE label — top:162px, centered ── */}
       <div
         style={{ position: "absolute", top: "162px", left: "38px", right: "38px" }}
         className="flex items-center justify-center"
@@ -847,7 +804,6 @@ function CleanSightCard(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Image swapping section — top:194px ── */}
       <div
         style={{
           position: "absolute",
@@ -859,7 +815,6 @@ function CleanSightCard(): React.ReactElement {
           gap: "16px",
         }}
       >
-        {/* Current image */}
         <div className="flex flex-col" style={{ gap: "8px" }}>
           <p
             style={{
@@ -920,7 +875,6 @@ function CleanSightCard(): React.ReactElement {
           </div>
         </div>
 
-        {/* Swap arrow */}
         <div className="flex items-center justify-center w-full">
           <div
             style={{
@@ -945,7 +899,6 @@ function CleanSightCard(): React.ReactElement {
           </div>
         </div>
 
-        {/* Recommended image */}
         <div className="flex flex-col" style={{ gap: "8px" }}>
           <p
             style={{
@@ -1021,7 +974,6 @@ function CleanSightCard(): React.ReactElement {
                 </p>
               </div>
             </div>
-            {/* Hardened badge */}
             <div
               style={{
                 display: "inline-flex",
@@ -1050,7 +1002,6 @@ function CleanSightCard(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Quick Stats — top:530px ── */}
       <div
         style={{
           position: "absolute",
@@ -1111,7 +1062,6 @@ function CleanSightCard(): React.ReactElement {
         ))}
       </div>
 
-      {/* ── Footer — top:622px, centred within card ── */}
       <div
         style={{
           position: "absolute",
@@ -1159,18 +1109,15 @@ function CleanSightCard(): React.ReactElement {
   );
 }
 
-/* ─── Main section export ────────────────────────────────────────────────── */
 export function SCATransform(): React.ReactElement {
   return (
     <section
-      /* max-lg:!pt-/pb- overrides the inline 120px padding only on mobile —
-         the 120/120 was creating dead white space above the "Transform SCA
-         outcomes" heading on mobile when stacked below SCAReduceNoise. */
+      /* Shrink the inline 120px padding to 60px below lg to avoid dead white
+         space above the heading when stacked below SCAReduceNoise. */
       className="relative overflow-hidden bg-white max-lg:!pt-[60px] max-lg:!pb-[60px]"
       style={{ paddingTop: "120px", paddingBottom: "120px" }}
     >
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Section heading */}
         <Reveal header>
           <h2
             className="text-center"
@@ -1188,11 +1135,9 @@ export function SCATransform(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* Three-column card layout — desktop (lg+) only.
-            Each card uses absolute positioning designed for ~500px wide; at
-            mobile widths the headers overflow and the bottom row text gets
-            cramped. Mobile renders only the CenterCard inside a CSS-transform
-            scaling wrapper below. */}
+        {/* Desktop (lg+) only. Each card uses absolute positioning designed
+            for ~500px wide; at mobile widths the headers overflow and the
+            bottom row gets cramped, so mobile renders scaled clones below. */}
         <div
           className="hidden lg:flex lg:flex-row"
           style={{ marginTop: "64px", gap: "32px", alignItems: "stretch" }}
@@ -1202,9 +1147,8 @@ export function SCATransform(): React.ReactElement {
           <CleanSightCard />
         </div>
 
-        {/* Mobile-only — Traditional SCA card at native 500px width,
-            CSS-scaled to fit. Sits at the top of the mobile stack so the
-            order matches the desktop left-to-right reading sequence. */}
+        {/* Native 500px width, CSS-scaled to fit. First in the mobile stack
+            so the order matches the desktop left-to-right sequence. */}
         <div
           className="lg:hidden mx-auto"
           style={{
@@ -1229,10 +1173,9 @@ export function SCATransform(): React.ReactElement {
           </div>
         </div>
 
-        {/* Mobile-only — CleanStart Foundation card at native design width
-            (500px), CSS-scaled to fit any narrow viewport. Outer wrapper
-            reserves scaled visual space via aspect-ratio so chips below
-            land at the right offset. */}
+        {/* Native 500px width, CSS-scaled to fit. The outer wrapper reserves
+            scaled visual space via aspect-ratio so chips below land at the
+            right offset. */}
         <div
           className="lg:hidden mx-auto"
           style={{
@@ -1257,9 +1200,7 @@ export function SCATransform(): React.ReactElement {
           </div>
         </div>
 
-        {/* Mobile-only — CleanSight Insight card, same scale pattern as
-            CenterCard above. Renders below CleanStart Foundation per the
-            reference design. */}
+        {/* Same scale pattern as CenterCard above, rendered below it. */}
         <div
           className="lg:hidden mx-auto"
           style={{
@@ -1284,8 +1225,7 @@ export function SCATransform(): React.ReactElement {
           </div>
         </div>
 
-        {/* Outcome chips row — mobile stacks vertically (one chip per row,
-            full-width), lg+ keeps the original 4-in-a-row horizontal layout. */}
+        {/* Mobile stacks one chip per row; lg+ keeps the 4-in-a-row layout. */}
         <div
           className="flex flex-col lg:flex-row lg:flex-nowrap justify-center"
           style={{ marginTop: "48px", gap: "16px" }}
@@ -1294,11 +1234,7 @@ export function SCATransform(): React.ReactElement {
             <div
               key={chip.id}
               /*
-               * Spacing rule (per design):
-               *   icon is left-aligned, vertically centered, and the
-               *   left/top/bottom gap around it is identical — icon sits in
-               *   a square inset on those three sides.
-               * Math (icons cropped flush to the visible ball):
+               * Icon sits in an equal square inset on left/top/bottom:
                *   mobile  chip 96 / icon 48 → inset (96 − 48) / 2 = 24
                *   lg+     chip 122 / icon 72 → inset (122 − 72) / 2 = 25
                */
@@ -1314,9 +1250,6 @@ export function SCATransform(): React.ReactElement {
                 minWidth: 0,
               }}
             >
-              {/* Pre-baked ball icon (gradient + glyph + shadow are baked
-                  into the PNG). The asset is cropped flush to the visible
-                  ball, so the box dimensions == the visible ball size. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={chip.icon}
@@ -1328,7 +1261,6 @@ export function SCATransform(): React.ReactElement {
                 className="shrink-0 select-none pointer-events-none block size-12 lg:size-[72px] object-contain"
               />
 
-              {/* Two-line label */}
               <div>
                 <p
                   style={{

@@ -46,7 +46,6 @@ export function Hero() {
         </div>
       </div>
 
-      {/* fade to white at bottom for next section transition */}
       <div className="pointer-events-none absolute inset-x-0 -bottom-px h-px" />
     </section>
   );

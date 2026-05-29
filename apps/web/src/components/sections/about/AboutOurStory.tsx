@@ -11,7 +11,7 @@ export function AboutOurStory() {
           portrait got upscaled 5× on desktop (blurry building tops, founders
           off-screen) or the landscape got cropped to nothing on mobile. */}
 
-      {/* Mobile: portrait photo (founders in the lower half, centered) */}
+      {/* Mobile: portrait photo (founders in the lower half, centered). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/about/founders-new.png"
@@ -33,9 +33,9 @@ export function AboutOurStory() {
         decoding="async"
       />
 
-      {/* Desktop overlay — Figma node 248:2108 left-to-right black fade.
-          Hidden on mobile because the text is centered, not left-aligned, so
-          a horizontal fade no longer matches the text position. */}
+      {/* Desktop overlay — left-to-right black fade. Hidden on mobile because
+          the text is centered, not left-aligned, so a horizontal fade no longer
+          matches the text position. */}
       <div
         aria-hidden
         className="absolute inset-0 hidden lg:block"
@@ -45,8 +45,8 @@ export function AboutOurStory() {
         }}
       />
 
-      {/* Desktop purple bottom gradient — Figma node 248:2107. Hidden on
-          mobile so the founders photo stays clean below the text overlay. */}
+      {/* Desktop purple bottom gradient. Hidden on mobile so the founders photo
+          stays clean below the text overlay. */}
       <div
         aria-hidden
         className="absolute inset-0 hidden lg:block"
@@ -69,7 +69,6 @@ export function AboutOurStory() {
         }}
       />
 
-      {/* Text content — centered on mobile, left-aligned on lg+ */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
           className="flex flex-col items-center text-center mx-auto lg:items-start lg:text-left lg:mx-0 gap-6 py-[clamp(72px,11vw,150px)]"

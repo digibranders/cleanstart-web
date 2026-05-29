@@ -2,32 +2,16 @@ import type React from 'react';
 import { Reveal } from '@/components/ui/Reveal';
 
 /*
- * WhyMattersGrid — shared layout for "problem cards" sections that follow the
- * for-developers "Why Does It Matter" pattern (Figma node 798:2209).
+ * WhyMattersGrid — shared layout for "problem cards" sections following the
+ * for-developers "Why Does It Matter" pattern.
  *
- * Consumed by:
- *   • DeveloperWhyItMatters         (canonical visual reference)
- *   • CleanStartImagesUVP           (Smaller Images. Lower Risk.)
- *   • SbomRisks                     (Static SBOMs Create Blind Spots)
- *   • CleanSightProblems            (When Container Visibility Falls Short, Risk Grows)
- *   • ASRApproach                   (The CleanStart Approach)
- *   • CisoRisks                     (Most Container Risk Is Inherited)
+ * Consumed by: DeveloperWhyItMatters (canonical reference), CleanStartImagesUVP,
+ * SbomRisks, CleanSightProblems, ASRApproach, CisoRisks.
  *
- * Visual contract:
- *   • Section bg: #F6F6F6 with two large hex-grid blob SVGs (top corners) and
- *     two soft purple glow ellipses (top corners). All four are hidden < lg.
- *   • Heading: 28→56px Manrope Bold tracking -0.04em, #111, centered.
- *   • Optional subheading: 14→18px Sora 400, opacity 0.8, centered below H2.
- *   • Tablet + Desktop (≥ md): 2×2 grid with 1px gradient hairline dividers —
- *     vertical center line + horizontal between rows. Each card is
- *     icon-left/text-right, with a purple glow halo behind the icon. Icons use
- *     vw-based clamps so they scale down through the tablet range, floor at the
- *     compact size, and keep the locked 2-column layout.
- *   • Mobile (< md): single column, each card becomes a white rounded tile
- *     with shadow; icon centered above, text centered below.
- *
- * The decoration assets live under /images/for-developers/why/ and are shared
- * across all consumers so we don't ship 5 copies of the same SVGs.
+ * At md+ the layout is a 2×2 grid with gradient hairline dividers; each card is
+ * icon-left/text-right with a glow halo behind the icon. Below md it collapses
+ * to a single column of white rounded tiles with the icon centered above the
+ * text. The shared decoration assets live under /images/for-developers/why/.
  */
 
 export interface WhyCard {
@@ -35,8 +19,8 @@ export interface WhyCard {
   imgSrc: string;
   imgAlt?: string;
   /** Optional per-card absolute positioning of the img inside the overflow
-   *  container (matches Figma per-card crops). Defaults to a sensible
-   *  inset:0 + object-contain layout that works for any centered illustration. */
+   *  container. Defaults to an inset:0 + object-contain layout that works for
+   *  any centered illustration. */
   imgStyle?: React.CSSProperties;
   /** Optional per-card mobile-only positioning override. */
   mobileImgStyle?: React.CSSProperties;
@@ -62,8 +46,7 @@ export interface WhyMattersGridProps {
   showLeftGrid?: boolean;
   /** Toggle the top-right hex-grid blob. Defaults to true. */
   showRightGrid?: boolean;
-  /** Render a single soft purple radial gradient at top-right
-   *  (Figma "Union": 1101×1101 at left=1347 top=-565, #640DFB / op 0.1).
+  /** Render a single soft purple radial gradient at top-right.
    *  Used on SbomRisks as a replacement for the corner glows. */
   showUnionTint?: boolean;
   /** Drop the #F6F6F6 wash entirely so the section is transparent and inherits
@@ -92,7 +75,7 @@ const DEFAULT_IMG_STYLE: React.CSSProperties = {
 function DesktopCard({ imgSrc, imgAlt, imgStyle, title, desc }: WhyCard): React.ReactElement {
   return (
     <div className="flex items-center" style={{ gap: 'clamp(16px, 1.67vw, 24px)' }}>
-      {/* ── Illustration area (compact: 170×125 max, scales down to 120×90) ── */}
+      {/* Illustration area */}
       <div
         className="relative shrink-0"
         style={{
@@ -115,7 +98,6 @@ function DesktopCard({ imgSrc, imgAlt, imgStyle, title, desc }: WhyCard): React.
             decoding="async"
           />
         </div>
-        {/* 3D illustration — clipped to container */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -129,7 +111,6 @@ function DesktopCard({ imgSrc, imgAlt, imgStyle, title, desc }: WhyCard): React.
         </div>
       </div>
 
-      {/* ── Title + description ── */}
       <div className="flex flex-col min-w-0" style={{ flex: '1 1 0', gap: '17px' }}>
         <h3
           style={{

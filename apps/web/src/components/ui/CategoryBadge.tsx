@@ -1,9 +1,7 @@
 import type React from "react";
 
 /**
- * Shared category/tag badge used across blog, news, resource cards and the
- * related-blogs grid. Lavender gradient background with a cyan glow + purple
- * blur tucked inside the pill, plus a 3px purple drop-shadow underneath.
+ * Shared category/tag badge used across blog, news, and resource cards.
  */
 export function CategoryBadge({ label }: { label: string }): React.ReactElement {
   return (
@@ -16,7 +14,6 @@ export function CategoryBadge({ label }: { label: string }): React.ReactElement 
         boxShadow: "0px 3px 0px 0px #3D3DF5",
       }}
     >
-      {/* Left cyan glow */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none"
@@ -32,7 +29,6 @@ export function CategoryBadge({ label }: { label: string }): React.ReactElement 
           opacity: 0.75,
         }}
       />
-      {/* Right purple blur */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none"

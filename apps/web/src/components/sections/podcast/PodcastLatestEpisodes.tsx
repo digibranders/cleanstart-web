@@ -18,10 +18,9 @@ export function PodcastLatestEpisodes({
       style={{ background: "#f6f6f6" }}
       aria-labelledby="podcast-latest-title"
     >
-      {/* White blending overlay at the top — pure white at the very top edge fading down
-          to transparent so the section's #f6f6f6 resumes. Paired with the hero's matching
-          bottom overlay, the two sections meet on a continuous white band that the embed
-          card (with its transparent bg) straddles seamlessly. */}
+      {/* Top overlay fades from pure white down to transparent so the section's #f6f6f6 resumes.
+          Paired with the hero's matching bottom overlay, the two sections meet on a continuous
+          white band that the transparent-background embed card straddles seamlessly. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0"
@@ -31,7 +30,6 @@ export function PodcastLatestEpisodes({
             "linear-gradient(180deg, #ffffff 0%, rgba(246,246,246,0.65) 55%, rgba(246,246,246,0) 100%)",
         }}
       />
-      {/* Subtle grid pattern */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute inset-0"

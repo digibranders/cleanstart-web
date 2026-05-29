@@ -7,11 +7,9 @@ type Props = {
 };
 
 /**
- * Single SVG icon rendering one glyph from the map.
- * stroke-width and viewBox are normalized — only the path content varies.
- * If the id is unknown, returns a low-opacity placeholder rect so layout
- * doesn't collapse (defensive; the glyphs.test.ts unit test asserts no
- * unknown ids ship from nav-config).
+ * Renders one glyph from the map as a normalized SVG icon (shared viewBox and
+ * stroke-width; only the path content varies). An unknown id falls back to a
+ * low-opacity placeholder rect so layout doesn't collapse.
  */
 export function NavIcon({ id, size = 20, className }: Props) {
   const node = glyphs[id as GlyphId];

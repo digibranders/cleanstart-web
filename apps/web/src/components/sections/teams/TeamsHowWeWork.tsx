@@ -10,7 +10,6 @@ export function TeamsHowWeWork() {
           "linear-gradient(180deg, #151021 0%, #131E8F 67.14%, #471EC0 107.43%)",
       }}
     >
-      {/* Decorative line accents */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -36,7 +35,6 @@ export function TeamsHowWeWork() {
         }}
       />
 
-      {/* ── Center-top purple radial blob (Figma Vector 583:3601) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden md:block"
@@ -51,7 +49,6 @@ export function TeamsHowWeWork() {
         }}
       />
 
-      {/* ── Top-right cube outline (Figma Union 583:3596) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden md:block"
@@ -81,7 +78,6 @@ export function TeamsHowWeWork() {
         />
       </div>
 
-      {/* ── Bottom-left cube outline (Figma Union 583:3597) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden md:block"

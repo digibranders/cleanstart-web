@@ -1,42 +1,34 @@
 import Image from 'next/image';
 import { Reveal } from '@/components/ui/Reveal';
 
-/**
- * Figma frame 516:5494 — 1920 × 889 "Built for Modern Software Supply Chains"
- *
- * Desktop: Light-gray (#f7f7f7) backdrop, infinity-loop circuit image + 2×2 card grid.
- * Mobile (Figma 817:1281 at y=3466): "Built for Modern Software Supply Chains" heading,
- * infinity circuit image, then 4 orbital/connection items with card backgrounds.
- */
-
 const CARDS = [
   {
     id: 'cicd',
     title: 'CI/CD Pipelines',
     body: 'Integrate into existing workflows.',
     cornerRadius: '8px 8px 62px 8px',
-    mobileBg: 'a', // mobile-builtfor-card-a.svg (plain border card, 122px)
+    mobileBg: 'a',
   },
   {
     id: 'container',
     title: 'Container Environments',
     body: 'Track software inventories across images.',
     cornerRadius: '8px 8px 8px 62px',
-    mobileBg: 'c', // mobile-builtfor-card-c.svg (flipped curve, 145px)
+    mobileBg: 'c',
   },
   {
     id: 'compliance',
     title: 'Compliance Programs',
     body: 'Support modern regulatory requirements.',
     cornerRadius: '8px 62px 8px 8px',
-    mobileBg: 'b', // mobile-builtfor-card-b.svg (curve, 145px)
+    mobileBg: 'b',
   },
   {
     id: 'security',
     title: 'Enterprise Security Teams',
     body: 'Improve software supply chain visibility.',
     cornerRadius: '62px 8px 8px 8px',
-    mobileBg: 'a', // mobile-builtfor-card-a.svg (plain border card, 122px)
+    mobileBg: 'a',
   },
 ] as const;
 
@@ -47,7 +39,6 @@ export function SbomAdvantage(): React.ReactElement {
       className="relative overflow-hidden bg-[#f7f7f7] w-full"
       style={{ minHeight: 'calc(250px + 42vw)' }}
     >
-      {/* Decorative cyan halo bottom-right */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden md:block"
@@ -69,7 +60,6 @@ export function SbomAdvantage(): React.ReactElement {
           paddingBottom: 'max(var(--spacing-section-cta), 175px)',
         }}
       >
-        {/* Heading */}
         <div className="text-center mb-10 md:mb-14">
           <Reveal header>
             <h2
@@ -88,9 +78,7 @@ export function SbomAdvantage(): React.ReactElement {
           </Reveal>
         </div>
 
-        {/* ── DESKTOP image + 2×2 cards ── */}
         <div className="hidden lg:grid grid-cols-[512fr_708fr] gap-8 items-stretch">
-          {/* Left: infinity circuit image */}
           <div
             className="relative overflow-hidden w-full"
             style={{
@@ -110,7 +98,6 @@ export function SbomAdvantage(): React.ReactElement {
             />
           </div>
 
-          {/* Right: 2×2 grid with central infinity ball icon */}
           <div className="relative grid grid-cols-2 gap-6">
             {CARDS.map((card) => (
               <article
@@ -153,7 +140,6 @@ export function SbomAdvantage(): React.ReactElement {
               </article>
             ))}
 
-            {/* Central infinity ball */}
             <div
               aria-hidden
               className="hidden sm:flex absolute items-center justify-center"
@@ -182,9 +168,7 @@ export function SbomAdvantage(): React.ReactElement {
           </div>
         </div>
 
-        {/* ── TABLET stacked (sm to lg) ── */}
         <div className="hidden sm:grid lg:hidden grid-cols-[1fr_1fr] gap-6 items-start">
-          {/* Infinity circuit image */}
           <div
             className="relative overflow-hidden w-full col-span-2"
             style={{
@@ -242,10 +226,7 @@ export function SbomAdvantage(): React.ReactElement {
           ))}
         </div>
 
-        {/* ── MOBILE (< sm) — Figma 817:1433, 360px canvas ── */}
         <div className="sm:hidden flex flex-col items-center" style={{ gap: '0' }}>
-          {/* Infinity circuit image — 328×183 with white base + cyan overlay + #076eff border
-              Figma: backgroundImage two layers (white base + rgba(44,193,235,0.4) overlay) */}
           <div
             className="relative overflow-hidden"
             style={{
@@ -259,7 +240,6 @@ export function SbomAdvantage(): React.ReactElement {
               flexShrink: 0,
             }}
           >
-            {/* Ellipse decoration — Figma: left:-78.16px top:-72.39px w:263px, rotate:34.99deg */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/sbom/mobile-builtfor-ellipse.svg"
@@ -275,7 +255,6 @@ export function SbomAdvantage(): React.ReactElement {
               }}
               loading="lazy"
             />
-            {/* Circuit image */}
             <Image
               src="/images/sbom/infinity-circuit.png"
               alt="CleanStart SBOM built for modern supply chains"
@@ -286,11 +265,9 @@ export function SbomAdvantage(): React.ReactElement {
             />
           </div>
 
-          {/* 4 built-for item cards with central ball overlapping adjacent cards.
-              Figma ball top:4021px overlaps Compliance (ends 4041) and Container (starts 4057)
-              by 20px each. With gap:16px → ball needs marginTop/Bottom:-36px (16+20=36). */}
+          {/* The central ball overlaps the two adjacent cards by 20px each; with
+              the 16px gap, its -36px vertical margins net to that 20px overlap. */}
           <div className="flex flex-col items-center" style={{ width: '328px', gap: '16px' }}>
-            {/* CI/CD Pipelines — plain border card, 122px. Figma titleW:169 bodyW:149 */}
             <MobileBuiltForCard
               title="CI/CD Pipelines"
               body="Integrate into existing workflows."
@@ -300,8 +277,6 @@ export function SbomAdvantage(): React.ReactElement {
               bodyW={149}
             />
 
-            {/* Compliance Programs — Figma card-b+scaleY(-1) = wavy bottom facing ball.
-                card-c already has the curve at bottom → same result without transform. */}
             <MobileBuiltForCard
               title="Compliance Programs"
               body="Support modern regulatory requirements."
@@ -311,8 +286,6 @@ export function SbomAdvantage(): React.ReactElement {
               bodyW={169}
             />
 
-            {/* Central ball — Figma size:56px, overlaps cards by 20px each side.
-                marginTop/Bottom:-36px with gap:16px → net overlap = 20px per side. */}
             <div
               aria-hidden
               className="flex items-center justify-center self-center shrink-0"
@@ -339,8 +312,6 @@ export function SbomAdvantage(): React.ReactElement {
               />
             </div>
 
-            {/* Container Environments — Figma card-c+scaleY(-1) = wavy top facing ball.
-                card-b already has the curve at top → same result without transform. */}
             <MobileBuiltForCard
               title="Container Environments"
               body="Track software inventories across images."
@@ -350,7 +321,6 @@ export function SbomAdvantage(): React.ReactElement {
               bodyW={205}
             />
 
-            {/* Enterprise Security Teams — plain border card, 122px. Figma titleW:255 bodyW:205 */}
             <MobileBuiltForCard
               title="Enterprise Security Teams"
               body="Improve software supply chain visibility."
@@ -366,14 +336,6 @@ export function SbomAdvantage(): React.ReactElement {
   );
 }
 
-/* ── Mobile built-for item card (Figma 817:1433) ───────────────────── */
-/**
- * Per-card text widths from Figma:
- *   CI/CD Pipelines:        titleW=169  bodyW=149
- *   Compliance Programs:    titleW=243  bodyW=169
- *   Container Environments: titleW=249  bodyW=205
- *   Enterprise Security:    titleW=255  bodyW=205
- */
 function MobileBuiltForCard({
   title,
   body,
@@ -386,9 +348,7 @@ function MobileBuiltForCard({
   body: string;
   bgSvg: string;
   height: number;
-  /** Figma exact title width in px */
   titleW: number;
-  /** Figma exact body width in px */
   bodyW: number;
 }): React.ReactElement {
   return (
@@ -396,7 +356,6 @@ function MobileBuiltForCard({
       className="relative flex flex-col items-center justify-center text-center"
       style={{ width: '328px', height: `${height}px` }}
     >
-      {/* Background SVG frame */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={bgSvg}
@@ -405,7 +364,6 @@ function MobileBuiltForCard({
         className="absolute inset-0 w-full h-full pointer-events-none"
         loading="lazy"
       />
-      {/* Content */}
       <div className="relative flex flex-col items-center gap-[12px] text-center">
         <p
           style={{

@@ -1,8 +1,5 @@
 import { Reveal } from "@/components/ui/Reveal";
 
-/* Each `icon` is a pre-baked PNG that contains the blue gradient ball + the
- * white-line glyph + the soft drop-shadow halo as a single composite, so the
- * card no longer wraps it in a CSS ball. */
 const CARDS = [
   {
     title: "Alert Overload",
@@ -33,14 +30,12 @@ const CARDS = [
 export function SCAProblems(): React.ReactElement {
   return (
     <section
-      /* max-lg:!pt-/pb- overrides the inline 120px padding only on mobile —
-         the 120/120 was too generous below lg and creating 240px of stacked
-         dead space between neighboring sections. */
+      /* Shrink the inline 120px padding to 60px below lg to avoid 240px of
+         stacked dead space between neighboring sections. */
       className="relative overflow-hidden bg-white max-lg:!pt-[60px] max-lg:!pb-[60px]"
       style={{ paddingTop: "120px", paddingBottom: "120px" }}
     >
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Section heading */}
         <Reveal header>
           <h2
             className="text-center"
@@ -58,7 +53,6 @@ export function SCAProblems(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* Cards — 4 in a row on desktop, 2 on tablet, 1 on mobile */}
         <div
           className="mt-[71px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
           style={{ gap: "32px" }}
@@ -66,10 +60,9 @@ export function SCAProblems(): React.ReactElement {
           {CARDS.map(({ title, desc, icon, iconAlt }) => (
             <div
               key={title}
-              /* Mobile aspect tightened (280 → 245) — text content is
-                 absolute-positioned at top:162 and ends around y=242 for the
-                 common 2-line body, so 245 leaves ~30px breathing instead of
-                 the ~70px dead space that 280 created. sm+ unchanged. */
+              /* Tighter mobile aspect ratio: text ends near y=242 for a
+                 2-line body, so 245 leaves a small margin instead of the dead
+                 space the prior 280 created. */
               className="relative w-full aspect-[295/245] sm:aspect-[295/354]"
             >
               {/* Outer cyan border layer at 30% opacity */}
@@ -91,7 +84,6 @@ export function SCAProblems(): React.ReactElement {
                   borderRadius: "36px",
                 }}
               >
-                {/* Purple glow blob at top */}
                 <div
                   aria-hidden
                   className="absolute pointer-events-none select-none"
@@ -108,7 +100,6 @@ export function SCAProblems(): React.ReactElement {
                   }}
                 />
 
-                {/* Vertical gradient lines */}
                 {[48.47, 120.03, 162.38, 233.94].map((x) => (
                   <div
                     key={x}
@@ -126,7 +117,6 @@ export function SCAProblems(): React.ReactElement {
                   />
                 ))}
 
-                {/* Horizontal gradient lines */}
                 {[67.54, 183.54].map((y) => (
                   <div
                     key={y}
@@ -144,11 +134,6 @@ export function SCAProblems(): React.ReactElement {
                   />
                 ))}
 
-                {/*
-                 * Pre-baked icon ball (blue gradient + glyph + shadow halo
-                 * baked into the PNG; cropped flush to the visible ball
-                 * so width/height == the visible ball footprint).
-                 */}
                 <div
                   className="absolute"
                   style={{
@@ -171,9 +156,6 @@ export function SCAProblems(): React.ReactElement {
                   />
                 </div>
 
-                {/* Text content — at y=162 from card top.
-                    Mobile: centered to match the per-card design; sm+: left-
-                    aligned as the original Figma intent. */}
                 <div
                   className="absolute flex flex-col text-center sm:text-left"
                   style={{

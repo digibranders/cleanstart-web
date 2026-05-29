@@ -54,7 +54,7 @@ export function DetailHero({
         decoding="async"
       />
 
-      {/* Decorative cube — left side, mirrored from right orb. Hidden below xl to match the right orb's breakpoint. */}
+      {/* Left-side decorative orb, mirrored from the right one. Hidden below xl to match the right orb's breakpoint. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden

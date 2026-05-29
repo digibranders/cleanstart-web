@@ -2,47 +2,36 @@ import type React from "react";
 import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 
-/**
- * Built for Modern Development Workflows — Figma node 604:3117
- * Layout: centred heading + flex row (image panel left, 2×2 cards grid right)
- * Blue gradient ball sits absolutely at the centre junction of all 4 cards.
- * Each card has one 62px corner facing the ball; the other three corners are 8px.
- */
-
-/* ─── Card data ─────────────────────────────────────────── */
-
 const CARDS = [
   {
     id: "cicd",
     title: "CI/CD Pipelines",
     desc: "Integrate into existing development workflows.",
-    // Bottom-right corner (62px) faces center ball
+    // 62px corner faces the centre ball
     borderRadius: "8px 8px 62px 8px",
   },
   {
     id: "devsecops",
     title: "DevSecOps Teams",
     desc: "Reduce remediation overhead and alert fatigue.",
-    // Bottom-left corner (62px) faces center ball
+    // 62px corner faces the centre ball
     borderRadius: "8px 8px 8px 62px",
   },
   {
     id: "container",
     title: "Container Environments",
     desc: "Improve visibility into inherited dependencies.",
-    // Top-right corner (62px) faces center ball
+    // 62px corner faces the centre ball
     borderRadius: "8px 62px 8px 8px",
   },
   {
     id: "enterprise",
     title: "Enterprise Security Teams",
     desc: "Focus on actionable risk instead of noise.",
-    // Top-left corner (62px) faces center ball
+    // 62px corner faces the centre ball
     borderRadius: "62px 8px 8px 8px",
   },
 ] as const;
-
-/* ─── Shared text styles ────────────────────────────────── */
 
 const CARD_TITLE: React.CSSProperties = {
   fontFamily: "var(--font-display)",
@@ -63,15 +52,12 @@ const CARD_DESC: React.CSSProperties = {
   color: "#333333",
 };
 
-/* ─── Component ─────────────────────────────────────────── */
-
 export function SCABuiltForDev(): React.ReactElement {
   return (
     <section
       className="relative overflow-hidden"
       style={{ background: "#f7f7f7", paddingTop: "120px", paddingBottom: "var(--spacing-section-cta)" }}
     >
-      {/* Decorative purple glow — left edge */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -88,7 +74,6 @@ export function SCABuiltForDev(): React.ReactElement {
         }}
       />
 
-      {/* Decorative purple glow — right edge */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -106,7 +91,6 @@ export function SCABuiltForDev(): React.ReactElement {
       />
 
       <div className="relative mx-auto" style={{ maxWidth: "1276px", padding: "0 24px" }}>
-        {/* ── Heading ── */}
         <Reveal header>
           <h2
             className="text-center"
@@ -124,11 +108,6 @@ export function SCABuiltForDev(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* ── Content row: image panel + cards grid.
-            Mobile: column layout — image full-width on top, cards stack 1-col
-            below, central blue ball moves to between cards 2 and 3 via order.
-            Desktop (lg+): original 2-col row with image left, 2×2 cards right,
-            ball absolute-centered at the grid intersection. */}
         <div
           className="flex flex-col lg:flex-row lg:items-center"
           style={{
@@ -136,7 +115,6 @@ export function SCABuiltForDev(): React.ReactElement {
             gap: "32px",
           }}
         >
-          {/* Left — circuit-board image panel. Mobile: full-width. lg+: ~40% */}
           <div
             className="w-full lg:w-[clamp(260px,40.1%,512px)] lg:flex-shrink-0"
             style={{
@@ -159,10 +137,6 @@ export function SCABuiltForDev(): React.ReactElement {
             />
           </div>
 
-          {/* Right — DESKTOP cards grid (lg+ only). 2×2 layout with the blue
-              ball absolute-centered at the grid intersection. Each card uses
-              its per-card 62px-on-one-corner borderRadius so the curve faces
-              the central ball. */}
           <div
             className="hidden lg:grid lg:grid-cols-2 lg:flex-1"
             style={{
@@ -192,7 +166,6 @@ export function SCABuiltForDev(): React.ReactElement {
               </div>
             ))}
 
-            {/* Blue gradient ball — absolute-centered at the 2×2 junction */}
             <div
               aria-hidden
               style={{
@@ -224,12 +197,10 @@ export function SCABuiltForDev(): React.ReactElement {
           </div>
         </div>
 
-        {/* ── MOBILE cards (sub-lg only) ──
-            Curved-card-cradle pattern matching SbomAdvantage: 4 stacked cards
-            with SVG backgrounds where cards 2 and 3 have concave curves that
-            "cradle" the central ball (positioned with negative margins so it
-            overlaps both cards by 20px each). Reuses the existing SBOM SVG
-            assets (the curve shapes are generic, not SBOM-specific). */}
+        {/* Curved-card-cradle pattern: cards 2 and 3 have concave curves that
+            cradle the central ball, positioned with negative margins so it
+            overlaps both cards by 20px each. Reuses the generic SBOM SVG curve
+            assets. */}
         <div
           className="lg:hidden flex flex-col items-center"
           style={{ marginTop: "clamp(32px,6vw,48px)", width: "100%" }}
@@ -238,7 +209,6 @@ export function SCABuiltForDev(): React.ReactElement {
             className="flex flex-col items-center"
             style={{ width: "min(328px, 100%)", gap: "16px" }}
           >
-            {/* CI/CD Pipelines — plain border (card-a), 122px */}
             <MobileBuiltForDevCard
               title="CI/CD Pipelines"
               body="Integrate into existing development workflows."
@@ -246,8 +216,7 @@ export function SCABuiltForDev(): React.ReactElement {
               height={122}
             />
 
-            {/* DevSecOps Teams — curve at bottom (card-c) facing the ball below.
-                145px tall to fit the longer 2-line body comfortably. */}
+            {/* 145px tall to fit the longer 2-line body comfortably. */}
             <MobileBuiltForDevCard
               title="DevSecOps Teams"
               body="Reduce remediation overhead and alert fatigue."
@@ -255,9 +224,8 @@ export function SCABuiltForDev(): React.ReactElement {
               height={145}
             />
 
-            {/* Central ball — overlaps DevSecOps (above) and Container (below)
-                by 20px each. With gap:16px the net negative margin needed for
-                a 20px overlap on each side is 16 + 20 = 36px. */}
+            {/* Ball overlaps the cards above and below by 20px each. With
+                gap:16px the net negative margin for a 20px overlap is 36px. */}
             <div
               aria-hidden
               className="flex items-center justify-center self-center shrink-0"
@@ -284,7 +252,6 @@ export function SCABuiltForDev(): React.ReactElement {
               />
             </div>
 
-            {/* Container Environments — curve at top (card-b) facing the ball above */}
             <MobileBuiltForDevCard
               title="Container Environments"
               body="Improve visibility into inherited dependencies."
@@ -292,7 +259,6 @@ export function SCABuiltForDev(): React.ReactElement {
               height={145}
             />
 
-            {/* Enterprise Security Teams — plain border (card-a), 122px */}
             <MobileBuiltForDevCard
               title="Enterprise Security Teams"
               body="Focus on actionable risk instead of noise."
@@ -306,11 +272,11 @@ export function SCABuiltForDev(): React.ReactElement {
   );
 }
 
-/* ─── Mobile card with SVG-curve background ─────────────────
- * Mirrors SbomAdvantage's MobileBuiltForCard pattern. The SVG is rendered as
- * a full-bleed background image; content sits centered on top of it. Fixed
- * 328px width matches the SBOM card geometry so the same curve assets line
- * up correctly with the central ball overlap. */
+/**
+ * Renders the SVG as a full-bleed background with content centred on top. The
+ * fixed 328px width matches the SBOM card geometry so the shared curve assets
+ * line up with the central ball overlap.
+ */
 function MobileBuiltForDevCard({
   title,
   body,
@@ -327,7 +293,6 @@ function MobileBuiltForDevCard({
       className="relative flex flex-col items-center justify-center text-center"
       style={{ width: "328px", height: `${height}px`, maxWidth: "100%" }}
     >
-      {/* Background SVG frame (curve + border) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={bgSvg}
@@ -336,7 +301,7 @@ function MobileBuiltForDevCard({
         className="absolute inset-0 w-full h-full pointer-events-none"
         loading="lazy"
       />
-      {/* Content — capped at 260px so it never touches the SVG's curved edges */}
+      {/* Capped at 260px so content never touches the SVG's curved edges. */}
       <div
         className="relative flex flex-col items-center gap-[10px] text-center"
         style={{ width: "260px" }}

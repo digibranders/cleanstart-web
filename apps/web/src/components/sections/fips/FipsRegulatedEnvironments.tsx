@@ -32,7 +32,6 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
       className="relative isolate overflow-hidden"
       aria-label="Built for Regulated Environments"
     >
-      {/* Background photo — mobile portrait below md, full-bleed photo above */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -54,7 +53,6 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Purple gradient overlay — matches home CleanStartAdvantage. */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10"
@@ -82,7 +80,6 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
           </Reveal>
         </div>
 
-        {/* Mobile/tablet stack — matches home CleanStartAdvantage mobile. */}
         <div className="mt-12 flex flex-col gap-6 sm:mt-14 lg:hidden">
           {SECTORS.map((sector, i) => (
             <React.Fragment key={sector.title}>
@@ -92,7 +89,6 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
           ))}
         </div>
 
-        {/* Desktop row — matches home CleanStartAdvantage desktop. */}
         <div className="hidden lg:mt-[120px] lg:flex lg:items-start lg:justify-between lg:gap-6">
           {SECTORS.map((sector, i) => (
             <React.Fragment key={sector.title}>

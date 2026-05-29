@@ -1,8 +1,6 @@
 /**
  * Community page CTA — rendered inside the Footer's locked 1200px × 300px
- * radius-40 slot. Matches the Figma "Ready to secure the future?" card
- * (node 732:4357): bg-gradient-to-b from-#131e8f to-#471ec0, left-aligned
- * two-column layout, 3D element on the right.
+ * radius-40 slot.
  */
 export function CommunityCTA() {
   return (
@@ -12,7 +10,6 @@ export function CommunityCTA() {
         background: 'linear-gradient(180deg, #131E8F 0%, #471EC0 111.05%)',
       }}
     >
-      {/* Decorative blob */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -26,7 +23,6 @@ export function CommunityCTA() {
         }}
       />
 
-      {/* Headline */}
       <p
         className="relative z-10 font-display font-bold text-white md:shrink-0"
         style={{
@@ -41,7 +37,6 @@ export function CommunityCTA() {
         Ready to secure the future?
       </p>
 
-      {/* Body + CTA */}
       <div className="relative z-10 flex flex-col items-center md:items-start gap-6 md:pl-[clamp(32px,5vw,72px)]" style={{ maxWidth: 'min(460px, 100%)' }}>
         <p
           className="font-sans font-normal text-white/80"
@@ -80,7 +75,6 @@ export function CommunityCTA() {
         </a>
       </div>
 
-      {/* Textured cube — far right bottom corner, bleeds below card */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden

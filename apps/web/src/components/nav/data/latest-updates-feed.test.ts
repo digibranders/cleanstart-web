@@ -9,13 +9,10 @@ function src(type: FeedSource['type'], slug: string, publishedAt: string, extra:
 
 describe('mergeAndRankFeed — diversity-first ranking', () => {
   it('returns one item per category when 3+ categories have content (diversity pass)', () => {
-    // The blog 'b1' is the NEWEST item overall — but we should NOT see two
-    // blog cards. Diversity pass should pick newest blog + newest news +
-    // newest resource, sorted by date.
     const out = mergeAndRankFeed(
       {
         blogs: [
-          src('BLOG', 'b1', '2026-05-25'), // newest blog
+          src('BLOG', 'b1', '2026-05-25'),
           src('BLOG', 'b2', '2026-05-20'),
           src('BLOG', 'b3', '2026-05-15'),
         ],
@@ -25,10 +22,7 @@ describe('mergeAndRankFeed — diversity-first ranking', () => {
       },
       now,
     );
-    // Expect one of each: blog (b1), news (n1), resource (r1). Order by date.
     expect(out.map((x) => x.slug)).toEqual(['b1', 'n1', 'r1']);
-    // CRITICAL: b2 and b3 must NOT be in the result, even though b2 is newer
-    // than r1. Diversity beats freshness when both can be satisfied.
     expect(out.find((x) => x.type === 'BLOG' && x.slug !== 'b1')).toBeUndefined();
   });
 
@@ -44,8 +38,6 @@ describe('mergeAndRankFeed — diversity-first ranking', () => {
       },
       now,
     );
-    // 4 categories available, take top 3 by date.
-    // w1 publishedAt is newest (5-26), then b1 (5-25), then n1 (5-20).
     expect(out.map((x) => x.slug)).toEqual(['w1', 'b1', 'n1']);
   });
 
@@ -67,8 +59,6 @@ describe('mergeAndRankFeed — diversity-first ranking', () => {
   });
 
   it('falls back to next-newest from any source when fewer than 3 categories have content', () => {
-    // Only 2 categories with content. After diversity pass we have b1, n1.
-    // Need a 3rd — fall back to next-newest blog (b2).
     const out = mergeAndRankFeed(
       {
         blogs: [
@@ -103,7 +93,6 @@ describe('mergeAndRankFeed — diversity-first ranking', () => {
   });
 
   it('finds the newest blog even when blogs are not pre-sorted (defensive)', () => {
-    // Caller may not sort. Verify reduce-based newest() picks correctly.
     const out = mergeAndRankFeed(
       {
         blogs: [
@@ -117,7 +106,6 @@ describe('mergeAndRankFeed — diversity-first ranking', () => {
       },
       now,
     );
-    // Diversity pass: newer (newest blog), n1, r1. Sorted by date.
     expect(out.map((x) => x.slug)).toEqual(['newer', 'n1', 'r1']);
   });
 });

@@ -7,7 +7,7 @@ export function NewsroomHero(): React.ReactElement {
       style={{ minHeight: "clamp(380px, 35vw, 498px)", background: "#151021" }}
       aria-labelledby="newsroom-hero-title"
     >
-      {/* Grid mask — 71.11px squares with #2A1F56 borders; full-section width so it scales with the viewport (1280, 1440, …). Masked so the pattern only appears at the four corners and fades toward the centre */}
+      {/* Grid mask: full-section width so it scales with the viewport; masked so the pattern only shows at the four corners and fades toward the centre. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute inset-0"
@@ -25,7 +25,7 @@ export function NewsroomHero(): React.ReactElement {
         }}
       />
 
-      {/* Hero gradient overlay — drawn above the grid with the violet stops translucent at the bottom so the gridlines still read through the gradient */}
+      {/* Gradient overlay drawn above the grid; violet stops stay translucent at the bottom so the gridlines read through. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute inset-0"
@@ -35,7 +35,6 @@ export function NewsroomHero(): React.ReactElement {
         }}
       />
 
-      {/* Blurred purple ellipses — Figma Ellipse 46639 (right) + 46640 (left) */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute left-1/2 -translate-x-1/2"
@@ -69,7 +68,6 @@ export function NewsroomHero(): React.ReactElement {
         />
       </div>
 
-      {/* Accent vertical lines — Figma Lines 104-108 */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute left-1/2 -translate-x-1/2"
@@ -132,7 +130,7 @@ export function NewsroomHero(): React.ReactElement {
         />
       </div>
 
-      {/* Centred SVG grid overlay — Figma Vector 730×708 radial-fade grid pinned over the earth area */}
+      {/* Radial-fade grid overlay pinned over the earth area. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute left-1/2 -translate-x-1/2"
@@ -148,7 +146,7 @@ export function NewsroomHero(): React.ReactElement {
         />
       </div>
 
-      {/* Earth image — anchored to bottom edge so only the top curve peeks above the hero floor; lighten blend merges atmosphere into the violet gradient */}
+      {/* Earth anchored to the bottom edge so only the top curve peeks above the hero floor; lighten blend merges the atmosphere into the violet gradient. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute left-1/2 -translate-x-1/2"

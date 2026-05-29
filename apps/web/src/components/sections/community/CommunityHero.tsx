@@ -2,17 +2,11 @@ import { HeroReveal } from "@/components/ui/Reveal";
 
 export function CommunityHero() {
   return (
-    // Figma frame 732:3193 is 1920×960px.
-    // 56vw (not 50vw) gives the section enough height at 1280–1700px viewports so that the
-    // proportional photo offset (48.33%) always clears the H1 bottom — without affecting
-    // the 960px max (still hit at ≈1714px+, matching Figma exactly at 1920px).
+    // 56vw (not 50vw) keeps the section tall enough at 1280–1700px viewports so the
+    // proportional photo offset (48.33%) always clears the H1 bottom, without raising
+    // the 960px max.
     <section className="relative overflow-hidden lg:[min-height:clamp(560px,56vw,960px)]">
 
-      {/* ── Hero photo (desktop) ─────────────────────────────────────────────────
-          Figma: top=464px, height=496px in a 960px-tall frame.
-          Proportional: top = 464/960 = 48.33 %, fills to bottom.
-          Gradient overlay on top edge softens the cut-in for both viewports.
-      ─────────────────────────────────────────────────────────────────────────── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute inset-x-0 hidden lg:block overflow-hidden"
@@ -28,7 +22,6 @@ export function CommunityHero() {
           decoding="async"
           className="w-full h-full object-cover object-top"
         />
-        {/* Brand-purple gradient tint covering the whole photo (Figma color cast) */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -38,7 +31,6 @@ export function CommunityHero() {
             mixBlendMode: 'multiply',
           }}
         />
-        {/* Dark-to-transparent gradient over the top of the photo */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 h-[80px]"
@@ -49,15 +41,9 @@ export function CommunityHero() {
         />
       </div>
 
-      {/* ── Text content ──────────────────────────────────────────────────────────
-          Figma: left=322px, top=172px, two 622px columns with 32px gap.
-          At 1440px (75 % scale): top ≈ 129px, columns ≈ 466px each — handled by
-          the clamp on pt and the lg:w-[48%] split.
-      ─────────────────────────────────────────────────────────────────────────── */}
       <div className="relative z-10 mx-auto max-w-[var(--container-default)] px-6">
         <div className="pt-[clamp(112px,10vw,172px)] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-8">
-            {/* H1 — Figma: 72px Manrope SemiBold, tracking -3.6px */}
             <HeroReveal y={50} duration={1.0} className="lg:w-[48%]">
               <h1
                 className="font-display font-semibold text-white"
@@ -72,7 +58,6 @@ export function CommunityHero() {
               </h1>
             </HeroReveal>
 
-            {/* Subtitle + CTA — Figma: 30px Sora Regular, lh 1.4, tracking -1.2px, opacity 80% */}
             <div className="flex flex-col gap-8 lg:w-[48%] lg:pt-2">
               <HeroReveal y={30} delay={0.15} duration={0.8}>
                 <p
@@ -109,10 +94,6 @@ export function CommunityHero() {
         </div>
       </div>
 
-      {/* ── Hero photo (mobile) ──────────────────────────────────────────────────
-          Mobile lays the photo below the text rather than absolute-positioned.
-          Gradient overlay top so the photo blends back into the dark hero bg.
-      ─────────────────────────────────────────────────────────────────────────── */}
       <div className="relative z-0 lg:hidden">
         <div className="relative h-[clamp(220px,55vw,360px)] overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -144,7 +125,7 @@ export function CommunityHero() {
         </div>
       </div>
 
-      {/* Bottom fade-out into the white Trusted-By section */}
+      {/* Fades the dark hero into the white Trusted-By section below. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 h-[200px]"

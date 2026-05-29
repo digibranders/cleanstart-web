@@ -7,7 +7,7 @@ interface FormCardProps {
 
 /**
  * White form card with a thin blue border, used on the dark-gradient form
- * pages (Book a Demo, Deal Registration). Matches Figma frames 834:3486 / 834:4422.
+ * pages (Book a Demo, Deal Registration).
  */
 export function FormCard({ children, maxWidth = 488 }: FormCardProps): React.ReactElement {
   return (
@@ -49,9 +49,8 @@ interface TextInputProps {
 }
 
 /**
- * Single-line text input. Styling matches the BookDemoForm `FigmaTextInput`:
- * #FBFBFB bg, 1.5px #DDDDDD border, rounded-8, 48px tall, Manrope Medium 16px,
- * placeholder #A3A3A3, focus border #3960F9.
+ * Single-line text input: #FBFBFB background, 1.5px #DDDDDD border, rounded-8,
+ * 48px tall, Manrope Medium 16px, placeholder #A3A3A3, focus border #3960F9.
  */
 export function TextInput({
   name,
@@ -129,10 +128,9 @@ export function TextArea({
 }
 
 /**
- * Primary submit button. Matches Figma frame 867:964 — #3960F9 fill, 44px
- * tall, rounded-8, Manrope Medium 18px white label, the exact effect_KNZQYT
- * box-shadow (1px ring + soft inner top-highlight), a blurred white-60%
- * glow ellipse offset right of the label, and the cursor + hover states.
+ * Primary submit button: #3960F9 fill, 44px tall, rounded-8, Manrope Medium
+ * 18px white label, a box-shadow (1px ring + soft inner top-highlight), and a
+ * blurred white-60% glow ellipse offset right of the label.
  */
 export function SubmitButton({
   children = "Submit application",
@@ -162,7 +160,6 @@ export function SubmitButton({
       >
         {children}
       </span>
-      {/* Blurred glow ellipse — Figma 867:970 (rgba(255,255,255,0.6) blur 20px) */}
       <span
         aria-hidden
         className="pointer-events-none absolute"

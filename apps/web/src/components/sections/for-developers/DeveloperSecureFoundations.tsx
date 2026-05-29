@@ -1,24 +1,6 @@
 import type React from 'react';
 import { Reveal } from '@/components/ui/Reveal';
 
-/*
- * Figma node 798:2243 — "Secure Foundations Without Workflow Changes" section (1920 px artboard)
- *
- * Background: dark gradient #151021 → #131e8f (62.497%) → #471ec0
- * Decorative: two Vector grid-pattern SVG blobs at top corners
- * H2: 62px Manrope Bold, white, tracking -3.1px, centered
- * Subtitle: 30px Sora Regular, white 80% opacity, centered
- * 4 Feature pillars with 1px vertical gradient dividers at y≈412
- * Two comparison cards (622×529px glow each) at y≈627:
- *   Left: "Traditional Security Operations" — grey glow, neutral card
- *   Right: "CleanStart image (Drop-in)" — teal/cyan glow, vivid gradient header
- *   Both cards: 130px header zone + dark code panel (bg #0c131c)
- *   Dockerfile code: #ff9ed0 keywords, #1ed88d string values
- * Center (between cards): 3D arrow assembly + badge-seal.png
- * Bottom banner: dark gradient rounded rect "One change. Same workflow. Strong foundation"
- * All interior dimensions scaled ×0.75 for the 1440px primary viewport.
- */
-
 interface PillarDef {
   title: string;
   desc: string;
@@ -63,16 +45,10 @@ interface DockerfileProps {
 }
 
 function DockerfileBlock({ fromImage }: DockerfileProps): React.ReactElement {
-  /*
-   * Figma: font-semibold 22px / leading-[1.4] / tracking-[-1.1px] at 1920px artboard.
-   * Scaled to 1440px primary: 22 × 0.75 = 16.5px.
-   * All 9 rows (5 code + 4 blank) use identical line-height so the card height
-   * matches Figma exactly. Blank rows render an invisible character at the same
-   * height — NOT a shorter height div (which under-measured by ~3px/row).
-   */
+  // All rows share one line-height; blank rows render an invisible character at
+  // the same height so the card height stays consistent (a shorter div under-measured).
   const base: React.CSSProperties = {
     fontFamily: 'var(--font-display)',
-    /* Figma: 22px at 1920px → 16.5px at 1440px.  clamp floor: 14px (mobile). */
     fontSize: 'var(--fs-body)',
     fontWeight: 600,
     letterSpacing: '-0.05em',
@@ -85,7 +61,6 @@ function DockerfileBlock({ fromImage }: DockerfileProps): React.ReactElement {
   };
   const kw: React.CSSProperties = { color: '#ff9ed0' };
   const str: React.CSSProperties = { color: '#1ed88d' };
-  /* Blank row: same dimensions as a code row, just invisible. */
   const blank: React.CSSProperties = { ...base, visibility: 'hidden' };
 
   return (
@@ -111,20 +86,11 @@ function DockerfileBlock({ fromImage }: DockerfileProps): React.ReactElement {
 interface CompCardProps {
   title: string;
   fromImage: string;
-  /** Whether this is the right (CleanStart) card — gets teal accent + hex vector */
+  /** The right (CleanStart) card gets the teal accent and chevron watermark. */
   isCleanStart: boolean;
 }
 
 function CompCard({ title, fromImage, isCleanStart }: CompCardProps): React.ReactElement {
-  /*
-   * Mirrors the home page SecurityNotPatching card chrome:
-   *   - Outer cyan rect (#2CC1EB), radius 40, 10px padding → reads as a 10px cyan border.
-   *   - Inner content radius 32, overflow hidden.
-   *   - Header: dark gradient with watermark vector (cube → Traditional, chevron →
-   *     CleanStart) at soft-light blend, plus a cyan light-flare across the bottom edge.
-   *   - Body: terminal panel (#0c131c) carrying the Dockerfile content — replaces the
-   *     home card's white body so the "drop-in code comparison" reading is preserved.
-   */
   return (
     <div
       className="relative flex h-full w-full flex-col"
@@ -132,7 +98,6 @@ function CompCard({ title, fromImage, isCleanStart }: CompCardProps): React.Reac
         flex: '1 1 0',
         minWidth: 0,
         borderRadius: 'clamp(24px, 2.78vw, 40px)',
-        /* Figma fill_BL89KJ: cyan #2CC1EB with 0.4 layer opacity — softer than solid. */
         background: 'rgba(44, 193, 235, 0.4)',
         padding: 'clamp(6px, 0.7vw, 10px)',
         boxShadow: CODE_PANEL_SHADOW,
@@ -143,7 +108,6 @@ function CompCard({ title, fromImage, isCleanStart }: CompCardProps): React.Reac
         className="relative flex flex-1 flex-col overflow-hidden"
         style={{ borderRadius: 32 }}
       >
-        {/* Header — dark gradient + watermark + cyan flare */}
         <div
           className="relative flex w-full items-center justify-center overflow-hidden"
           style={{
@@ -215,7 +179,6 @@ function CompCard({ title, fromImage, isCleanStart }: CompCardProps): React.Reac
           </h3>
         </div>
 
-        {/* Body — terminal code panel */}
         <div
           className="relative flex flex-1 flex-col"
           style={{
@@ -240,7 +203,6 @@ export function DeveloperSecureFoundations(): React.ReactElement {
       className="relative overflow-hidden"
       style={{ background: SECTION_BG }}
     >
-      {/* ── Left Vector grid blob (Figma: left=-423, top=-303, 979px) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -261,7 +223,6 @@ export function DeveloperSecureFoundations(): React.ReactElement {
         />
       </div>
 
-      {/* ── Right Vector grid blob (Figma: left=1444, top=-372, 979px) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -282,7 +243,6 @@ export function DeveloperSecureFoundations(): React.ReactElement {
         />
       </div>
 
-      {/* ── Content ── */}
       <div
         className="relative mx-auto"
         style={{
@@ -293,7 +253,6 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           paddingBottom: 'clamp(60px, 5.2vw, 100px)',
         }}
       >
-        {/* H2 — Figma: 62px Manrope Bold, tracking -3.1px */}
         <Reveal header>
           <h2
             className="text-white text-center mx-auto"
@@ -311,7 +270,6 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* Subtitle — Vuln spec body-lg */}
         <Reveal header delay={0.15} y={20}>
           <p
             className="text-center mx-auto"
@@ -331,17 +289,12 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           </p>
         </Reveal>
 
-        {/* ── 4 Feature pillars ── */}
-        {/* Mobile (Figma 857:6108): single column, 204px wide, ~24px gap, centered
-            text, thin horizontal divider between pillars.
-            Desktop (Figma 798:2243): 4 columns with vertical dividers between. */}
         <div
           className="relative"
           style={{
             marginBottom: 'clamp(40px, 3.65vw, 70px)',
           }}
         >
-          {/* Mobile-only flex column with horizontal dividers */}
           <div className="flex flex-col items-stretch lg:hidden mx-auto" style={{ maxWidth: '240px' }}>
             {PILLARS.map((pillar, i) => (
               <div key={`m-${pillar.title}`} className="flex flex-col">
@@ -389,7 +342,6 @@ export function DeveloperSecureFoundations(): React.ReactElement {
             ))}
           </div>
 
-          {/* Desktop-only 4-col grid with vertical dividers */}
           <div
             className="hidden lg:grid lg:grid-cols-4"
             style={{ columnGap: 0, rowGap: 'clamp(24px, 2.5vw, 40px)' }}
@@ -446,9 +398,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           </div>
         </div>
 
-        {/* ── Two comparison cards + center elements ── */}
         <div className="relative" style={{ marginBottom: 'clamp(32px, 3.13vw, 60px)' }}>
-          {/* Left card glow (Figma: 622×529, grey at 40% opacity) */}
           <div
             aria-hidden
             className="pointer-events-none absolute hidden lg:block"
@@ -462,7 +412,6 @@ export function DeveloperSecureFoundations(): React.ReactElement {
             }}
           />
 
-          {/* Right card glow (Figma: 622×529, teal at 40% opacity) */}
           <div
             aria-hidden
             className="pointer-events-none absolute hidden lg:block"
@@ -476,9 +425,6 @@ export function DeveloperSecureFoundations(): React.ReactElement {
             }}
           />
 
-          {/* Cards flex row (desktop) / column (mobile). The badge-seal arrow is
-              rendered inline between the cards on mobile so it sits in flow, and
-              absolutely positioned at the centre on desktop (see block below). */}
           <div
             className="relative flex flex-col lg:flex-row items-stretch gap-6 lg:gap-[clamp(16px,2.08vw,40px)]"
           >
@@ -488,10 +434,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
               isCleanStart={false}
             />
 
-            {/* Mobile-only arrow — absolutely positioned to overlap the joint
-                between the two stacked cards on the right edge. Sized to match
-                desktop (~64px), with overflow:hidden + cropped sprite + 90°
-                rotation so the horizontal `>>` reads as a downward chevron. */}
+            {/* Cropped + 90deg-rotated sprite so the horizontal chevron reads as a downward arrow between stacked cards. */}
             <div
               aria-hidden
               className="pointer-events-none absolute lg:hidden"
@@ -539,9 +482,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
             />
           </div>
 
-          {/* ── Center: blue 3D double-chevron arrow (badge-seal.png) ── */}
-          {/* Figma: 133×136px container at left=894, top=870 (from section top) */}
-          {/* Crop: image is 313.68% wide × 307.32% tall, offset left=-42.32%, top=-102.44% */}
+          {/* Center chevron sprite — same cropped badge-seal asset, shown only on desktop. */}
           <div
             aria-hidden
             className="pointer-events-none absolute hidden lg:block"
@@ -574,7 +515,6 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           </div>
         </div>
 
-        {/* ── Bottom banner — same dark→purple body + cyan flare, no cyan border ── */}
         <div
           className="relative overflow-hidden text-center"
           style={{
@@ -588,7 +528,6 @@ export function DeveloperSecureFoundations(): React.ReactElement {
             boxShadow: CODE_PANEL_SHADOW,
           }}
         >
-          {/* Cyan light-flare across the bottom edge — same recipe as the card headers */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 bottom-0"

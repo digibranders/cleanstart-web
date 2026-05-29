@@ -1,10 +1,5 @@
 import Link from "next/link";
 
-/**
- * News detail CTA — Figma 817:6078.
- * "Built. Tested. Trusted." — white bg + two #DF9BFF glow blobs (same pattern
- * as ASR CTA mobile) + Union hex pattern + purple 3D cubes top-right / bottom-left.
- */
 export function NewsDetailCTA(): React.ReactElement {
   return (
     <div
@@ -12,8 +7,6 @@ export function NewsDetailCTA(): React.ReactElement {
       style={{ background: "#FFFFFF" }}
       aria-labelledby="news-cta-title"
     >
-      {/* ── Top-left pink glow blob ──────────────────────────────────────────── */}
-      {/* Figma mobile: left=-158px top=-134px size=223.44px #DF9BFF blur=53px */}
       <div
         aria-hidden
         className="pointer-events-none absolute lg:hidden"
@@ -28,7 +21,6 @@ export function NewsDetailCTA(): React.ReactElement {
           filter: "blur(53px)",
         }}
       />
-      {/* Desktop: larger blob */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -44,8 +36,6 @@ export function NewsDetailCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Bottom-right pink glow blob ──────────────────────────────────────── */}
-      {/* Figma mobile: left=250px top=166px in 328×248px → right≈-145px bottom≈-141px */}
       <div
         aria-hidden
         className="pointer-events-none absolute lg:hidden"
@@ -60,7 +50,6 @@ export function NewsDetailCTA(): React.ReactElement {
           filter: "blur(53px)",
         }}
       />
-      {/* Desktop: larger blob */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -76,8 +65,6 @@ export function NewsDetailCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Union hex pattern ────────────────────────────────────────────────── */}
-      {/* Figma: left=55.5px top=54px size=378×378px */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -96,8 +83,6 @@ export function NewsDetailCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Top-right purple cube ─────────────────────────────────────────────── */}
-      {/* Mobile: 80px · Desktop: 120px */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -115,8 +100,6 @@ export function NewsDetailCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Bottom-left purple cube ───────────────────────────────────────────── */}
-      {/* Mobile: 80px · Desktop: 120px */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -134,7 +117,6 @@ export function NewsDetailCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Content ──────────────────────────────────────────────────────────── */}
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 gap-5 text-center">
         <h2
           id="news-cta-title"
@@ -151,7 +133,6 @@ export function NewsDetailCTA(): React.ReactElement {
           Built. Tested. Trusted.
         </h2>
 
-        {/* Solid blue button — Figma: #3960F9 h=42px radius=8px */}
         <Link
           href="/contact-us"
           className="relative z-10 inline-flex items-center gap-2 font-sans font-medium text-white shrink-0"

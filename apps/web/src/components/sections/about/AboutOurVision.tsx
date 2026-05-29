@@ -10,7 +10,6 @@ export function AboutOurVision() {
           "linear-gradient(180deg, #ffffff 0%, #f3f0ff 35%, #eaf1ff 100%)",
       }}
     >
-      {/* Left grid vector — Figma left: -393px, size: 755px, top: 306px on 1920px frame */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -26,7 +25,6 @@ export function AboutOurVision() {
         loading="lazy"
         decoding="async"
       />
-      {/* Right grid vector — Figma right: -368px, size: 727px, top: -428px */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -42,7 +40,6 @@ export function AboutOurVision() {
         loading="lazy"
         decoding="async"
       />
-      {/* Subtle left-side decorative blob */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -60,28 +57,25 @@ export function AboutOurVision() {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
-          {/* Target / bullseye 3D image — wrapper sized to tight Figma CONTENT
-              bounds (609×568) for max target size.
-              order-2 places it BELOW the text on mobile (per user spec: text →
-              CTA → image at bottom) and in the RIGHT column on lg+ (since the
-              text wrapper has order-1). justify-center on mobile centers the
-              image inside the section container; lg+ aligns to column start. */}
+          {/* Target / bullseye 3D image. order-2 places it BELOW the text on
+              mobile (text → CTA → image at bottom) and in the RIGHT column on
+              lg+ (since the text wrapper has order-1). justify-center on mobile
+              centers the image inside the section container; lg+ aligns to
+              column start. */}
           <div className="order-2 flex items-center justify-center lg:justify-start">
             <div
               className="relative"
               style={{
-                /* Mobile floor lowered (420 → 280) so the image fits
-                   centered on a 375px phone. Desktop max tightened (620 →
-                   440) because at 620 the image was 578px tall while the
-                   text+CTA column was only ~270px, leaving ~150px of dead
-                   space above AND below the text with items-center. 440 ×
-                   568/609 = ~410 tall → balanced row, no visible gap below
-                   the Contact Us button. */
+                /* Mobile floor (280px) fits the image centered on a 375px
+                   phone. Desktop max (440px) keeps the image height balanced
+                   against the ~270px text+CTA column under items-center; larger
+                   values leave dead space above and below the text. */
                 width: "clamp(280px, 50vw, 440px)",
                 aspectRatio: "609 / 568",
               }}
             >
-              {/* Background blobs from Figma (Ellipse 46683 + 46703) — large blurred purple + cyan circles that sit behind the graphic and make the white echo ellipses visible */}
+              {/* Background blobs — large blurred purple + cyan circles that sit
+                  behind the graphic and make the white echo ellipses visible. */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute"
@@ -109,10 +103,9 @@ export function AboutOurVision() {
                 }}
               />
 
-              {/* Echo ring trail — five SVG ellipses from Figma node 248:2129 (back to front render order) */}
-              {/* Each bbox is sized to its Figma rendered-bbox % of the CONTENT bounds (609×568); inner uses SVG-natural aspect to keep ellipse shape locked. */}
-
-              {/* Ellipse 46701 — reduced to 0.7× of disc size, center preserved */}
+              {/* Echo ring trail — five SVG ellipses in back-to-front render
+                  order. Each inner div uses the SVG-natural aspect to keep the
+                  ellipse shape locked while the outer bbox scales. */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute flex items-center justify-center"
@@ -137,7 +130,6 @@ export function AboutOurVision() {
                 </div>
               </div>
 
-              {/* Ellipse 46702 — reduced to 0.7×, center preserved */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute flex items-center justify-center"
@@ -162,7 +154,6 @@ export function AboutOurVision() {
                 </div>
               </div>
 
-              {/* Ellipse 46700 — reduced to 0.7×, center preserved */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute flex items-center justify-center"
@@ -187,7 +178,6 @@ export function AboutOurVision() {
                 </div>
               </div>
 
-              {/* Ellipse 46698 — reduced to 0.7×, center preserved */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute flex items-center justify-center"
@@ -212,7 +202,6 @@ export function AboutOurVision() {
                 </div>
               </div>
 
-              {/* Ellipse 46699 — reduced to 0.7×, center preserved */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute flex items-center justify-center"
@@ -237,7 +226,6 @@ export function AboutOurVision() {
                 </div>
               </div>
 
-              {/* Target image — exact Figma position (431.70×406.41 @ 449.03, 68.91 within content bounds origin 271, 68) */}
               <Image
                 src="/images/about/vision-target.png"
                 alt="Our Vision — target"
@@ -257,9 +245,9 @@ export function AboutOurVision() {
             </div>
           </div>
 
-          {/* Text + CTA — order-1 puts this FIRST: top of stack on mobile
-              (heading → paragraph → Contact Us button) and LEFT column on
-              lg+. Image wrapper above carries order-2 to land below/right. */}
+          {/* Text + CTA — order-1 puts this first: top of stack on mobile
+              (heading → paragraph → Contact Us button) and LEFT column on lg+.
+              Image wrapper above carries order-2 to land below/right. */}
           <div className="order-1 flex flex-col items-center text-center lg:items-start lg:text-left gap-10 lg:max-w-[622px]">
             <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-6">
               <Reveal header>
@@ -293,9 +281,9 @@ export function AboutOurVision() {
               </Reveal>
             </div>
 
-            {/* Blue "Contact Us" button — `self-start` keeps the button at
-                its content width (left-aligned with the heading + paragraph)
-                instead of stretching to the parent flex column's 622 px. */}
+            {/* `self-start` keeps the button at its content width (left-aligned
+                with the heading + paragraph) instead of stretching to the
+                parent flex column's 622px. */}
             <a
               href="#contact"
               className="cs-btn-blue self-center lg:self-start"

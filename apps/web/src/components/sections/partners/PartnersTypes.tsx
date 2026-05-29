@@ -68,10 +68,8 @@ export function PartnersTypes(): React.ReactElement {
 }
 
 /**
- * Matches the DeveloperWorkflows feature-card chrome — cyan gradient ring,
- * purple bloom, faint highlight lines — adapted to a 3-up layout with a hero
- * image panel at the top. Fluid width: fills its grid cell so the row never
- * overflows at any breakpoint between 320 and 1920+.
+ * Feature card with a hero image panel on top. Fills its grid cell so the row
+ * never overflows at any breakpoint.
  */
 function TypeCard({ type }: { type: PartnerType }): React.ReactElement {
   return (
@@ -84,7 +82,6 @@ function TypeCard({ type }: { type: PartnerType }): React.ReactElement {
       }}
     >
       <div className="relative flex h-full w-full flex-col overflow-hidden bg-white rounded-[16px] lg:rounded-[32px] p-5 sm:p-6">
-        {/* Purple bloom */}
         <div
           aria-hidden
           className="pointer-events-none absolute"
@@ -100,7 +97,7 @@ function TypeCard({ type }: { type: PartnerType }): React.ReactElement {
           }}
         />
 
-        {/* 4 faint vertical highlight lines — positioned by % so they scale */}
+        {/* Vertical highlight lines positioned by % so they scale with the card. */}
         {[17, 41, 58, 82].map((leftPct) => (
           <div
             key={leftPct}
@@ -118,7 +115,6 @@ function TypeCard({ type }: { type: PartnerType }): React.ReactElement {
           />
         ))}
 
-        {/* 2 faint horizontal highlight lines */}
         {[20, 53].map((topPct) => (
           <div
             key={topPct}
@@ -136,8 +132,6 @@ function TypeCard({ type }: { type: PartnerType }): React.ReactElement {
           />
         ))}
 
-        {/* Image — sits directly on the card surface (no inner container),
-            matching the PartnersWhy ball pattern. */}
         <div
           className="relative flex w-full items-center justify-center"
           style={{ height: "180px" }}
@@ -153,7 +147,6 @@ function TypeCard({ type }: { type: PartnerType }): React.ReactElement {
           />
         </div>
 
-        {/* Title + body */}
         <div className="relative mt-5 flex flex-col gap-3">
           <h3
             style={{

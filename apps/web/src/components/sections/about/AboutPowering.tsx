@@ -1,12 +1,5 @@
 /**
- * AboutPowering — Figma node 248:2141
- * Frame: 1920×1017, gradient bg, 3 feature cards on a starfield-grid background.
- *
- * Card geometry (per Figma):
- *  - outer shadow box: 404×478 (29px halo around white card)
- *  - cyan glow ring:   362×440 (8px halo around white card)
- *  - white card:       346×420 (rounded-16)
- *  - cards laid out in a 1276px container, white-card pitch = 437px, gap = 91px
+ * AboutPowering — three feature cards on a starfield-grid background.
  */
 
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
@@ -38,7 +31,7 @@ const CARDS: Card[] = [
   },
 ];
 
-// 6 white guide-line x-positions in the 1920px Figma frame (248:2145–2150).
+// Six white guide-line x-positions, proportional to the 1920px design frame.
 const GUIDE_LINES_X = [323, 726, 759, 1164, 1195, 1599] as const;
 
 export function AboutPowering() {
@@ -50,9 +43,6 @@ export function AboutPowering() {
           "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)",
       }}
     >
-      {/* ── Decorative background layer ─────────────────────────────── */}
-
-      {/* Purple ellipse blobs — 248:2142/2143, rotated 8.58deg */}
       {[130.75, 1306.73].map((leftPx) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img

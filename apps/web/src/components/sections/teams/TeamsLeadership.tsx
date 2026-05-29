@@ -55,8 +55,6 @@ function LinkedInIcon() {
   );
 }
 
-// Card background: radial gradient SVG data URL — exact Figma spec
-// gradientTransform matrix produces a top→bottom directional fill
 const CARD_BG_IMAGE = `url("data:image/svg+xml,<svg viewBox='0 0 404 469' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><rect x='0' y='0' height='100%25' width='100%25' fill='url(%23grad)' opacity='1'/><defs><radialGradient id='grad' gradientUnits='userSpaceOnUse' cx='0' cy='0' r='10' gradientTransform='matrix(-0.65 -56 48.239 -1.0303 221 469)'><stop stop-color='rgba(71,31,195,0.4)' offset='0'/><stop stop-color='rgba(45,31,169,0.7)' offset='0.36881'/><stop stop-color='rgba(19,30,143,1)' offset='0.73763'/><stop stop-color='rgba(18,24,103,1)' offset='0.86881'/><stop stop-color='rgba(16,18,62,1)' offset='1'/></radialGradient></defs></svg>")`;
 
 function TeamCard({ name, role, photo, linkedIn }: TeamMember) {
@@ -69,7 +67,6 @@ function TeamCard({ name, role, photo, linkedIn }: TeamMember) {
         backgroundSize: "100% 100%",
       }}
     >
-      {/* Photo — shifted 11px up to improve head-room framing (matches Figma) */}
       <div className="absolute inset-0" style={{ top: "-11px" }}>
         <Image
           src={photo}
@@ -80,7 +77,6 @@ function TeamCard({ name, role, photo, linkedIn }: TeamMember) {
         />
       </div>
 
-      {/* Bottom gradient overlay */}
       <div
         aria-hidden
         className="pointer-events-none absolute bottom-0 left-0 right-0"
@@ -90,7 +86,6 @@ function TeamCard({ name, role, photo, linkedIn }: TeamMember) {
         }}
       />
 
-      {/* Name + role + LinkedIn — top: 78.47% = 368px / 469px card height */}
       <div
         className="absolute left-[24px] right-[24px] flex items-center justify-between"
         style={{ top: "78.47%" }}
@@ -145,7 +140,6 @@ function TeamCard({ name, role, photo, linkedIn }: TeamMember) {
 export function TeamsLeadership() {
   return (
     <section className="relative overflow-hidden bg-white py-section-md">
-      {/* ── Left vector blob (Figma Vector 583:3476) ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden select-none lg:block"
@@ -163,7 +157,6 @@ export function TeamsLeadership() {
         />
       </div>
 
-      {/* ── Right vector blob (mirror of left top-left) ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden select-none lg:block"
@@ -181,7 +174,6 @@ export function TeamsLeadership() {
         />
       </div>
 
-      {/* ── Center vector blob — sits horizontally centered behind the Advisory Board (Anandamoy) card ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden select-none lg:block"
@@ -205,7 +197,6 @@ export function TeamsLeadership() {
         />
       </div>
 
-      {/* ── Bottom-left union shape (Figma Union 583:3480, rotate 141.39° scaleY-1) ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden select-none lg:flex items-center justify-center"
@@ -225,8 +216,6 @@ export function TeamsLeadership() {
         </div>
       </div>
 
-      {/* ── Bottom-left ellipse glow (Figma Ellipse 46684, 583:3484) ── */}
-      {/* Outer div = position anchor (258×258). Inner div uses inset:-94.19% to expand the glow. */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden select-none lg:block"
@@ -244,7 +233,6 @@ export function TeamsLeadership() {
         </div>
       </div>
 
-      {/* ── Bottom-right ellipse glow (Figma Ellipse 46684, 583:3483) ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden select-none lg:block"
@@ -267,9 +255,7 @@ export function TeamsLeadership() {
         </div>
       </div>
 
-      {/* ── Content ── */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Executive Leadership */}
         <Reveal header>
           <h2
             className="mb-[60px] text-center font-display text-[#111]"
@@ -295,7 +281,6 @@ export function TeamsLeadership() {
           ))}
         </RevealStagger>
 
-        {/* Advisory Board */}
         <Reveal header>
           <h2
             className="mb-[60px] text-center font-display text-[#111]"

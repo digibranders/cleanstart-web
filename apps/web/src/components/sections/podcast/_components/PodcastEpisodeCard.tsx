@@ -22,7 +22,6 @@ export function PodcastEpisodeCard({
   const thumb = episode.thumbnailOverride?.url ?? null;
 
   if (size === "featured") {
-    // Featured card — Figma node 373:3286/3304: 1.5px solid #076eff border, 20px radius.
     return (
       <article className="group flex flex-col w-full">
         <div
@@ -51,10 +50,6 @@ export function PodcastEpisodeCard({
     );
   }
 
-  // Listing card — exact Figma spec (node 373:3163):
-  // 404x306 white container, 8px radius, soft layered shadow,
-  // 380x200 thumbnail, episode chip with #4a3bf1 text + 3px blue underline-shadow,
-  // 24px Manrope Medium title.
   return (
     <article
       className="relative flex flex-col w-full bg-white"
@@ -65,9 +60,8 @@ export function PodcastEpisodeCard({
         padding: "12px",
       }}
     >
-      {/* Thumbnail wrapper — relative so we can anchor the badge to its own bottom edge
-          (overflow stays visible so the badge can extend slightly below the thumbnail
-          like in the Figma reference). The embed handles its own corner rounding. */}
+      {/* Relative wrapper anchors the badge to the thumbnail's bottom edge; overflow stays
+          visible so the badge can extend slightly below it. */}
       <div className="relative">
         <YouTubeEmbed
           videoId={videoId}

@@ -14,7 +14,6 @@ export function ReadyToSecureCTA() {
         background: "linear-gradient(180deg, #131E8F 0%, #471EC0 100%)",
       }}
     >
-      {/* Decorative purple radial blob */}
       <div
         aria-hidden
         className="pointer-events-none absolute"

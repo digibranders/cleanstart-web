@@ -20,7 +20,6 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
       style={{ minHeight: "580px" }}
     >
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Header row */}
         <Reveal header className="flex items-center justify-between pt-[60px]">
           <h2 className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em]">
             <span className="text-white">Related </span>
@@ -62,12 +61,10 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
         </Reveal>
 
         {/*
-          Cards layout
-          - MOBILE (<md): horizontal scroll snap row — each card has a min-width
-            so the next one peeks at the right edge, hinting scrollability.
-            Negative -mx-6 + px-6 lets the row bleed into the page gutter and
-            the first card aligns with the heading above.
-          - MD+: 2-column grid. XL+: 3-column grid.
+          Below md, the card row scrolls horizontally with snap points and each
+          card has a min-width so the next one peeks at the right edge to hint
+          scrollability. The negative -mx-6 with px-6 lets the row bleed into the
+          page gutter so the first card aligns with the heading above.
         */}
         <div
           className="flex md:hidden overflow-x-auto snap-x snap-mandatory gap-4 mt-[40px] -mx-6 pl-10 pr-6 pb-2 [scroll-padding-left:2.5rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -102,8 +99,8 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
         boxShadow: "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
       }}
     >
-      {/* Hero image — shorter on mobile (150px) to keep the card compact;
-          full 200px on md+ where the card sits in a grid with more vertical room. */}
+      {/* Shorter image on mobile keeps the card compact; the card sits in a grid
+          with more vertical room at md+, where it grows to full height. */}
       <div className="relative shrink-0 mx-3 mt-3 rounded-[20px] md:rounded-[24px] overflow-hidden h-[150px] md:h-[200px]">
           {post.heroImage ? (
             <Image
@@ -121,18 +118,13 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
           )}
         </div>
 
-        {/* Category badge — Figma 330:526, y=190 (22px above image bottom at y=212) */}
         {primaryCategory && (
           <div className="relative z-10 mx-5 md:mx-[32px] mt-[-18px] md:mt-[-22px] self-start">
             <CategoryBadge label={primaryCategory.name} />
           </div>
         )}
 
-        {/* Card content — tightened padding on mobile to reclaim height
-            without changing the desktop spec. */}
         <div className="flex flex-col gap-2.5 md:gap-[12px] p-5 md:p-[32px] flex-1">
-          {/* Meta: date + read time. Meta is secondary info — smaller type
-              and tighter icons on mobile, single-line via whitespace-nowrap. */}
           <div className="flex items-center gap-3 md:gap-4">
             {(() => {
               const displayDate = effectivePublishedAt(post);
@@ -158,7 +150,6 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
             )}
           </div>
 
-          {/* Title — 2 lines on mobile (matches the resources rail), 3 on md+. */}
           <h3
             className="line-clamp-2 md:line-clamp-3 flex-1 font-display text-card-title-md font-medium leading-[1.3]"
             style={{ color: "#111" }}
@@ -166,7 +157,6 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
             {post.title}
           </h3>
 
-          {/* Abstract — 3 lines on all viewports. */}
           {post.abstract && (
             <p
               className="line-clamp-3 text-body-md font-normal leading-[1.3]"
@@ -176,7 +166,6 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
             </p>
           )}
 
-          {/* Read more */}
           <Link
             href={`/blogs/${post.slug}`}
             aria-label={`Read ${post.title}`}

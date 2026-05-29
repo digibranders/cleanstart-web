@@ -1,30 +1,6 @@
 import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
 
-/**
- * Inner content for the FIPS CTA card (Figma node 787:2343).
- * Card natural size: 1276 × 335 px, border-radius 40px.
- *
- * Figma layout (inside 1276×335 slot, all measurements relative to card width):
- *   Content container: left=122px (9.56%), width=1047px (82.05%)
- *     vertically centred (top=85px = ~25% of 335px → use flex items-center)
- *     gap=115px (11.00% of 1047px content container)
- *   Heading col : 401px = 38.30% of content container
- *     55px Manrope Bold  ls=−0.05em  lh=1  white
- *   Right col   : 493px = 47.09% of content container
- *     flex-col gap=24px
- *     – body  : 21px Regular  ls=−0.04em  lh=1.4  opacity=0.8
- *     – button: cs-btn-glass 18px px=18px
- *   Cube image  : absolute bottom-right, w=255px = 19.98% of card width
- *
- * vw rates (value / 1440 × 100):
- *   heading font  55 / 1440 = 3.82vw
- *   body font     21 / 1440 = 1.46vw
- *
- * Using absolute inner container to pin left=9.56% and span 82.05% width
- * avoids percentage-of-content-box drift that occurs with CSS padding.
- */
-
 const CARD_BG =
   "linear-gradient(180deg, #131E8F 0%, #2A1EA5 50%, #401EBA 100%)";
 
@@ -35,7 +11,6 @@ export function FipsCTA(): React.ReactElement {
       className="absolute inset-0 overflow-hidden"
       style={{ background: CARD_BG }}
     >
-      {/* ── Cube — anchored bottom-right ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -45,7 +20,6 @@ export function FipsCTA(): React.ReactElement {
         style={{
           right: 0,
           bottom: 0,
-          /* Figma: 255px at 1276px card width → 19.98% */
           width: "19.98%",
           height: "auto",
           opacity: 0.75,
@@ -54,13 +28,6 @@ export function FipsCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Desktop layout (md+) ── */}
-      {/*
-       * Absolutely-positioned inner container that maps directly to Figma coords:
-       *   left  = 122 / 1276 = 9.56% of card width
-       *   width = 1047 / 1276 = 82.05% of card width
-       *   top/bottom = 0 → vertically centred via flex items-center
-       */}
       <div
         className="hidden md:flex absolute items-center"
         style={{
@@ -68,17 +35,14 @@ export function FipsCTA(): React.ReactElement {
           width: "82.05%",
           top: 0,
           bottom: 0,
-          /* gap = 115px at 1047px container = 10.98%, clamped */
           gap: "clamp(32px, 10.98%, 115px)",
         }}
       >
-        {/* Heading — 401 / 1047 = 38.30% of content container */}
         <Reveal header className="flex-shrink-0" style={{ width: "38.30%" }}>
           <p
             className="text-white"
             style={{
               fontFamily: "var(--font-display)",
-              // Global CTA-card title token (`--cta-card-title`) per strict-fonts rule.
               fontSize: "var(--cta-card-title)",
               fontWeight: 600,
               letterSpacing: "-0.04em",
@@ -89,7 +53,6 @@ export function FipsCTA(): React.ReactElement {
           </p>
         </Reveal>
 
-        {/* Right column — 493 / 1047 = 47.09% of content container */}
         <Reveal
           header
           delay={0.15}
@@ -97,7 +60,6 @@ export function FipsCTA(): React.ReactElement {
           className="flex flex-col flex-shrink-0"
           style={{ gap: "24px", width: "47.09%" }}
         >
-          {/* Body — 21px Regular, ls=−0.04em, lh=1.4, opacity=0.8 */}
           <p
             style={{
               fontFamily: "var(--font-display)",
@@ -112,7 +74,6 @@ export function FipsCTA(): React.ReactElement {
             knowing your containers are secured from the ground up.
           </p>
 
-          {/* Button — 18px font, px=18px (Figma node 787:2348) */}
           <Link
             href="/book-a-demo"
             className="cs-btn-glass self-start"
@@ -144,7 +105,6 @@ export function FipsCTA(): React.ReactElement {
         </Reveal>
       </div>
 
-      {/* ── Mobile fallback (under md) ── */}
       <div className="md:hidden relative h-full p-6 flex flex-col gap-5 justify-center items-center text-center">
         <p
           className="text-white"

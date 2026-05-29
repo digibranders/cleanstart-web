@@ -62,7 +62,6 @@ export function Waveform(): React.ReactElement {
         height: `${MAX_BAR_HEIGHT}px`,
       }}
     >
-      {/* Bars layer — each bar has its own breath */}
       <div
         className="absolute inset-0 flex items-center justify-between"
         style={{ paddingInline: "16px" }}

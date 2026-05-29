@@ -53,7 +53,6 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
         />
       </div>
 
-      {/* Date badge — overlaps the bottom of the cover image, mirrors blog card pattern */}
       {date && (
         <div
           className="absolute"

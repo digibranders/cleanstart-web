@@ -28,7 +28,6 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
           "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
       }}
     >
-      {/* Image */}
       <div
         className="relative overflow-hidden shrink-0"
         style={{
@@ -57,12 +56,10 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
         )}
       </div>
 
-      {/* Content */}
       <div
         className="flex flex-col flex-1"
         style={{ padding: "32px", gap: "12px" }}
       >
-        {/* Date row */}
         {shortDate && (
           <div className="flex items-center" style={{ gap: "4px" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -89,7 +86,6 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
           </div>
         )}
 
-        {/* Title */}
         <h3
           className="font-display text-card-title-md font-medium overflow-hidden"
           style={{
@@ -104,10 +100,8 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
           {event.title}
         </h3>
 
-        {/* Spacer pushes venue + button to bottom */}
         <div className="flex-1" />
 
-        {/* Venue row */}
         <div className="flex items-center" style={{ gap: "8px" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -131,7 +125,6 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
           </span>
         </div>
 
-        {/* Read more button — full-width */}
         <Link
           href={`/event/${event.slug}`}
           className="cs-btn-blue gap-2 w-full"

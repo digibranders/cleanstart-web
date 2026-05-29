@@ -26,7 +26,6 @@ export function BlogsCTA(): React.ReactElement {
       className="absolute inset-0"
       style={{ background: "linear-gradient(180deg, #471ec0 0%, #131e8f 100%)" }}
     >
-      {/* Left cube — anchored top-left to mirror the right cube. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute block"
@@ -48,7 +47,6 @@ export function BlogsCTA(): React.ReactElement {
         />
       </div>
 
-      {/* Right cube */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden sm:block"

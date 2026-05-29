@@ -53,9 +53,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
-  // -------------------------------------------------------------------------
-  // Mode 2: body-secret, single nav cache tag (Payload publish hooks)
-  // -------------------------------------------------------------------------
+  // Mode 2: body-secret, single nav cache tag (Payload publish hooks).
   if (body?.secret !== undefined) {
     const navSecret = process.env.REVALIDATE_SECRET;
     if (!navSecret) {
@@ -78,9 +76,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: true, tag });
   }
 
-  // -------------------------------------------------------------------------
-  // Mode 1: Bearer token, arbitrary tags + paths (CMS media / content hooks)
-  // -------------------------------------------------------------------------
+  // Mode 1: Bearer token, arbitrary tags + paths (CMS media / content hooks).
   const expected = process.env.WEB_REVALIDATE_SECRET;
   if (!expected) {
     return NextResponse.json(

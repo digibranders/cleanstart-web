@@ -13,11 +13,9 @@ export function ResourceDetailContent({
   const coverUrl = mediaUrl(resource.heroImage?.url);
   const fallbackPoster = resourceCoverPoster(resource.type);
 
-  // Step the overlay title down for longer copy so it stays clear of the
-  // CleanStart logo at the top and the booklet edge on the right.
-  // Sizing uses `cqw` (container-query width) so the text scales with the
-  // cover, not the viewport — long titles can never overrun the booklet
-  // regardless of how narrow the screen gets.
+  // Steps the overlay title down for longer copy so it clears the logo and the
+  // booklet edge. Sizes in `cqw` so the title scales with the cover, not the
+  // viewport — long titles can never overrun the booklet at any screen width.
   const titleLen = resource.title.length;
   const coverTitleFontSize =
     titleLen <= 28
@@ -43,7 +41,6 @@ export function ResourceDetailContent({
           paddingRight: "24px",
         }}
       >
-        {/* White content card */}
         <div
           className="relative mx-auto overflow-hidden pb-12 lg:pb-20"
           style={{
@@ -51,7 +48,7 @@ export function ResourceDetailContent({
             borderRadius: "24px",
           }}
         >
-          {/* Cover image — CMS heroImage if set, otherwise the type-mapped booklet poster with title overlay. */}
+          {/* CMS heroImage when set, otherwise the type-mapped booklet poster with title overlay. */}
           {coverUrl ? (
             <div className="flex justify-center pt-3 lg:pt-12 px-3 lg:px-6">
               <Image
@@ -109,7 +106,6 @@ export function ResourceDetailContent({
             </div>
           )}
 
-          {/* Body text */}
           <div
             className="mx-auto pt-6 lg:pt-12 px-6"
             style={{ maxWidth: "840px" }}

@@ -29,7 +29,6 @@ export function PastEventsGrid({
       style={{ background: "#f6f6f6", paddingBottom: "var(--spacing-section-cta)" }}
       data-section="PastEvents"
     >
-      {/* Radial gradient blobs — mirrors LatestBlogs (blogs page) */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
@@ -56,7 +55,6 @@ export function PastEventsGrid({
           opacity: 0.1,
         }}
       />
-      {/* Gridlines SVG — fades inside the SVG via radial gradients */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute left-0 right-0 bottom-0 overflow-hidden"
@@ -73,7 +71,6 @@ export function PastEventsGrid({
           decoding="async"
         />
       </div>
-      {/* Blur ellipses anchored to bottom — mirrors LatestBlogs */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
@@ -143,7 +140,6 @@ export function PastEventsGrid({
               ))}
             </RevealStagger>
 
-            {/* MOBILE — single "View More →" button per Figma 817:6541. */}
             {totalPages > 1 && currentPage < totalPages && (
               <div className="flex lg:hidden justify-center" style={{ marginTop: "40px" }}>
                 <Link
@@ -175,7 +171,6 @@ export function PastEventsGrid({
               </div>
             )}
 
-            {/* DESKTOP — full numbered pagination. */}
             <div className="hidden lg:block">
               <Pagination
                 currentPage={currentPage}

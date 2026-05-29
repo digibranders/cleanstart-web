@@ -168,28 +168,24 @@ function GroupIcon({
 }
 
 const ICON_PATHS: Record<string, React.ReactElement> = {
-  // Emerging Standards — sparkle
   "Emerging Standards": (
     <>
       <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" />
       <path d="M18.5 16.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z" />
     </>
   ),
-  // Security features — shield with check
   "Security features": (
     <>
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       <path d="m9 12 2 2 4-4" />
     </>
   ),
-  // Compliance and Certification — award rosette
   "Compliance and Certification": (
     <>
       <circle cx="12" cy="8" r="6" />
       <path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5" />
     </>
   ),
-  // DevOps Kyverno — git branch
   "DevOps Kyverno": (
     <>
       <line x1="6" x2="6" y1="3" y2="15" />

@@ -4,7 +4,6 @@ import { HeroReveal } from "@/components/ui/Reveal";
 export function PartnersHero(): React.ReactElement {
   return (
     <section className="relative bg-cs-hero bg-cs-grid overflow-hidden">
-      {/* Decorative purple glows */}
       <div
         aria-hidden
         className="pointer-events-none absolute"

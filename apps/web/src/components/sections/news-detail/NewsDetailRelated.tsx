@@ -57,11 +57,8 @@ export function NewsDetailRelated({
           </Link>
         </Reveal>
 
-        {/*
-          MOBILE (<sm): horizontal scroll-snap row matching the related-blogs
-          pattern (cards peek at the right edge to hint scrollability).
-          SM+: 2-column grid. LG+: 3-column grid.
-        */}
+        {/* Below sm, a scroll-snap row lets cards peek at the right edge to hint
+            scrollability; sm+ switches to a grid. */}
         <div className="flex sm:hidden overflow-x-auto snap-x snap-mandatory gap-4 mt-[40px] pb-[40px] -mx-6 pl-10 pr-6 [scroll-padding-left:2.5rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {items.map((item) => (
             <div key={item.id} className="snap-start shrink-0 w-[80%] min-w-[260px] max-w-[320px]">

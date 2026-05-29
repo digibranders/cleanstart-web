@@ -18,7 +18,6 @@ export function ResourceCenterHero({
       style={{ minHeight: "clamp(420px, 37vw, 521px)", background: HERO_GRADIENT }}
       aria-labelledby="rc-hero-title"
     >
-      {/* Background dot grid */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -30,7 +29,6 @@ export function ResourceCenterHero({
         decoding="async"
       />
 
-      {/* 3D cube — top right, color-dodge, -46.54deg rotation */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
@@ -53,7 +51,6 @@ export function ResourceCenterHero({
         />
       </div>
 
-      {/* Left glow — hard-light blend */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
@@ -76,14 +73,11 @@ export function ResourceCenterHero({
         />
       </div>
 
-      {/* Content */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Title block + search */}
         <div
           className="flex flex-col items-center gap-6 lg:gap-8 mx-auto pt-[clamp(72px,8vw,128px)]"
           style={{ maxWidth: "955px" }}
         >
-          {/* Title + subtitle */}
           <div
             className="flex flex-col items-center gap-6 text-center text-white"
             style={{ maxWidth: "674px" }}
@@ -126,7 +120,6 @@ export function ResourceCenterHero({
             </HeroReveal>
           </div>
 
-          {/* Search bar */}
           <Suspense
             fallback={
               <div

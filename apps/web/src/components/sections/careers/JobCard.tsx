@@ -40,7 +40,6 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
       }}
     >
       <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6">
-        {/* Title + tags */}
         <div className="flex-1 min-w-0 flex flex-col gap-2">
           <h2
             className="font-display"
@@ -54,10 +53,8 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
           >
             {job.title}
           </h2>
-          {/* Pills row — status, employment type, department. Keeping the
-              status badge in the pills row (rather than inline with the title)
-              keeps the alignment stable whether the title wraps to one line
-              or several. */}
+          {/* Status badge lives in the pills row, not inline with the title,
+              so alignment stays stable whether the title wraps or not. */}
           <div className="flex flex-wrap items-center gap-2">
             <StatusBadge status={status} />
             {employmentLabel && <Pill tone="violet">{employmentLabel}</Pill>}
@@ -65,11 +62,8 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
           </div>
         </div>
 
-        {/* Vertical separator — Figma Rectangle 1000001787 (1×77, gray gradient).
-            Only renders at lg+ where the row layout is horizontal. */}
         <VerticalSeparator />
 
-        {/* Location */}
         <div
           className="flex items-center gap-1.5 shrink-0 lg:w-[180px]"
           aria-label="Location"
@@ -88,10 +82,8 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
           </span>
         </div>
 
-        {/* Vertical separator — Figma Rectangle 1000001788. */}
         <VerticalSeparator />
 
-        {/* Experience */}
         <div
           className="shrink-0 lg:w-[140px]"
           aria-label="Experience required"
@@ -109,11 +101,8 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
           </span>
         </div>
 
-        {/* Apply CTA — same hover-lift + active-scale press feedback the
-            header CTA (cs-btn-blue / cs-btn-glass) uses. When the role is
-            closed, the CTA becomes a non-interactive "Applications closed"
-            label with no glow, hover, or press effect. */}
-        {/* Apply CTA — full-width on mobile per Figma 817:7317 spec, auto-width at lg+. */}
+        {/* When the role is closed the CTA becomes a non-interactive
+            "Applications closed" label with no glow, hover, or press effect. */}
         <div className="shrink-0 w-full lg:w-auto">
           {isClosed ? (
             <span
@@ -168,8 +157,7 @@ const applyButtonStyle: React.CSSProperties = {
   fontWeight: 500,
   letterSpacing: "-0.01em",
   whiteSpace: "nowrap",
-  // Same easing + duration as cs-btn-blue so the press feels uniform across
-  // the site. `transform-gpu` keeps the scale on the compositor.
+  // Matches cs-btn-blue easing and duration so the press feels uniform.
   transition:
     "transform 200ms ease, filter 200ms ease, box-shadow 200ms ease",
   WebkitTapHighlightColor: "transparent",
@@ -306,8 +294,6 @@ function StatusBadge({ status }: { status: JobStatusBadge }): React.ReactElement
 }
 
 function VerticalSeparator(): React.ReactElement {
-  // Per Figma Rectangles 1000001787 / 1000001788: 1px wide, 77px tall,
-  // vertical fade transparent → #D9D9D9 → transparent.
   return (
     <span
       aria-hidden
@@ -323,8 +309,6 @@ function VerticalSeparator(): React.ReactElement {
 }
 
 function ApplyButtonGlow(): React.ReactElement {
-  // Per Figma spec: 30.07px white ellipse at 60% opacity, 10.0245px blur,
-  // bottom-centered inside the button so the soft halo bleeds up into the fill.
   return (
     <span
       aria-hidden

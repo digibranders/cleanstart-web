@@ -54,9 +54,7 @@ export function Container({
   ...rest
 }: ContainerProps) {
   // `createElement` (not JSX) so the polymorphic `Tag: ElementType` doesn't
-  // collapse the intrinsic-attribute props down to `never`. Behaviour is
-  // identical to `<Tag ... />` but the type-checker stays happy when `Tag`
-  // varies across renders.
+  // collapse the intrinsic-attribute props to `never`. Equivalent to `<Tag />`.
   return createElement(
     Tag,
     {

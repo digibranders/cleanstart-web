@@ -58,7 +58,7 @@ export function mergeAndRankFeed(sources: Sources, now: Date = new Date()): Feed
     (w) => !w.startsAt || new Date(w.startsAt) >= now,
   );
 
-  // Pass 1: take the newest item from each available category.
+  // Pass 1: newest item from each category.
   const diverse: FeedSource[] = [
     newest(sources.blogs),
     newest(sources.news),
@@ -74,7 +74,7 @@ export function mergeAndRankFeed(sources: Sources, now: Date = new Date()): Feed
     return sortedDiverse.slice(0, 3);
   }
 
-  // Pass 2: not enough categories — fall back to next-newest from any source.
+  // Pass 2: too few categories, so top up with next-newest from any source.
   const used = new Set(sortedDiverse.map(dedupKey));
   const remaining = [
     ...sources.blogs,
@@ -97,10 +97,8 @@ export const fetchLatestUpdates = cache(async (): Promise<FeedSource[]> => {
             type: 'BLOG',
             slug: d.slug,
             title: d.title,
-            // Blog uses `publishedAt` (string | undefined)
             publishedAt: d.publishedAt ?? '',
           };
-          // Blog.readingMinutes is number | undefined
           if (typeof d.readingMinutes === 'number') {
             out.readMinutes = d.readingMinutes;
           }
@@ -112,7 +110,7 @@ export const fetchLatestUpdates = cache(async (): Promise<FeedSource[]> => {
           type: 'NEWS',
           slug: d.slug,
           title: d.title,
-          // News uses `publicationDate` (not publishedAt) — string | null | undefined
+          // News exposes the date as `publicationDate`, not `publishedAt`.
           publishedAt: d.publicationDate ?? '',
         })),
       ),
@@ -121,7 +119,6 @@ export const fetchLatestUpdates = cache(async (): Promise<FeedSource[]> => {
           type: 'RESOURCE',
           slug: d.slug,
           title: d.title,
-          // Resource uses `publishedAt` (string | null | undefined)
           publishedAt: d.publishedAt ?? '',
         })),
       ),
@@ -131,10 +128,8 @@ export const fetchLatestUpdates = cache(async (): Promise<FeedSource[]> => {
             type: 'WEBINAR',
             slug: d.slug,
             title: d.title,
-            // Webinar uses `publishedAt` (string | null | undefined)
             publishedAt: d.publishedAt ?? '',
           };
-          // Webinar.startsAt is string | null | undefined
           if (typeof d.startsAt === 'string') {
             out.startsAt = d.startsAt;
           }

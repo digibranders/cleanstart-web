@@ -2,12 +2,8 @@ import Link from 'next/link';
 import { Reveal } from '@/components/ui/Reveal';
 
 /**
- * Inner content for the SBOM CTA card, rendered inside the Footer's
- * fixed 1276 × 330 / radius-40 slot.
- *
- * Figma node 161:21812 — card 1276 × 375px (bottom 45px clipped by slot).
- * Background: #131E8F → #471EC0 diagonal gradient.
- * Bird sits at left-[308px] top-[221.5px], partially clipped at bottom.
+ * Inner content for the SBOM CTA card, rendered inside the Footer's fixed
+ * radius-40 slot. The card is taller than the slot, so its bottom is clipped.
  */
 
 const CARD_BG = 'linear-gradient(180deg, #131E8F 0%, #471EC0 100%)';
@@ -19,7 +15,6 @@ export function SbomCTA(): React.ReactElement {
       className="absolute inset-0 overflow-hidden"
       style={{ background: CARD_BG }}
     >
-      {/* ── SVG grid union (radial gradient pattern) ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -37,7 +32,6 @@ export function SbomCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Ellipse — top-left ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -53,7 +47,6 @@ export function SbomCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Ellipse — bottom-right ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -69,7 +62,6 @@ export function SbomCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Desktop layout (md+) — vertical stack until lg, then 2-col ── */}
       <div
         className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 lg:items-start"
         style={{
@@ -80,7 +72,6 @@ export function SbomCTA(): React.ReactElement {
           columnGap: 'clamp(32px, 5vw, 72px)',
         }}
       >
-        {/* Left column — heading, auto-wraps 2 or 3 lines via balance */}
         <Reveal header className="relative min-w-0 w-full" style={{ maxWidth: 'min(460px, 100%)' }}>
           <p
             style={{
@@ -98,7 +89,6 @@ export function SbomCTA(): React.ReactElement {
           </p>
         </Reveal>
 
-        {/* Right column — body + button */}
         <Reveal
           header
           delay={0.15}
@@ -153,7 +143,6 @@ export function SbomCTA(): React.ReactElement {
         </Reveal>
       </div>
 
-      {/* Cube decoration — overflows bottom-left corner, bleeds below slot */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -173,11 +162,6 @@ export function SbomCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Mobile layout (< md) — Figma node 817:1558, 360px canvas ──
-           Gradient: 212.81deg #131E8F → #471EC0.
-           Ellipse:  left:-159px top:-154px 223×223px.
-           Union:    left:56px  top:52px   378×378px (SVG has opacity baked in).
-           Content:  centered column, marginTop-based absolute offsets. */}
       <div
         className="md:hidden absolute inset-0 overflow-hidden"
         style={{
@@ -185,7 +169,6 @@ export function SbomCTA(): React.ReactElement {
           background: 'linear-gradient(212.81deg, #131E8F 36.343%, #471EC0 90.615%)',
         }}
       >
-        {/* Ellipse decoration — top-left bleed */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/sbom/mobile-cta-ellipse.svg"
@@ -196,7 +179,6 @@ export function SbomCTA(): React.ReactElement {
           loading="lazy"
           decoding="async"
         />
-        {/* Union radial pattern */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/sbom/mobile-cta-union.svg"
@@ -208,13 +190,10 @@ export function SbomCTA(): React.ReactElement {
           decoding="async"
         />
 
-        {/* Content column — top-aligned with Figma marginTops */}
         <div className="relative h-full flex flex-col items-center text-center">
-          {/* Heading — Figma: 28px / 700 / -0.04em / 1.2lh / w:276px / top:32px */}
           <p
             style={{
               fontFamily: 'var(--font-display)',
-              // Strict-fonts: global CTA-card title token.
               fontSize: 'var(--cta-card-title)',
               fontWeight: 600,
               letterSpacing: '-0.04em',
@@ -227,11 +206,9 @@ export function SbomCTA(): React.ReactElement {
           >
             Verify Every Component You Ship
           </p>
-          {/* Body — Figma: 16px / 400 / -0.64px / 1.5lh / w:265px / marginTop:17px */}
           <p
             style={{
               fontFamily: 'var(--font-sans)',
-              // Strict-fonts: global CTA-card desc token.
               fontSize: 'var(--cta-card-desc)',
               fontWeight: 400,
               letterSpacing: '-0.02em',
@@ -244,7 +221,6 @@ export function SbomCTA(): React.ReactElement {
             Continuously updated, cryptographically verifiable software inventories built for modern
             software supply chains.
           </p>
-          {/* Button — no arrow per Figma mobile spec */}
           <Link
             href="/resource-center"
             className="cs-btn-glass"
