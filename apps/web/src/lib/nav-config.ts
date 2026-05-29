@@ -73,13 +73,13 @@ export const NAV_TREE: NavItem[] = [
           {
             label: "CleanStart Images",
             href: "/cleanstart-images",
-            description: "Hardened, minimal container images with near-zero CVEs.",
+            description: "Hardened base images. Near-zero CVEs.",
             icon: "container",
           },
           {
             label: "CleanStart SBOM",
             href: "/software-bill-materials",
-            description: "Signed SBOMs and provenance for every artifact you ship.",
+            description: "Signed SBOMs. Provenance for every artifact.",
             icon: "doc-signed",
           },
           {
@@ -103,13 +103,13 @@ export const NAV_TREE: NavItem[] = [
           {
             label: "FIPS Compliance",
             href: "/fips",
-            description: "FIPS 140-3 validated cryptography across your stack.",
+            description: "Drop-in FIPS 140-3 validated crypto.",
             icon: "shield-check",
           },
           {
             label: "Enhance SCA",
             href: "/software-composition-analysis",
-            description: "Cut SCA noise with cleaner base images and signed SBOMs.",
+            description: "Cleaner base images. Less SCA noise.",
             icon: "gears",
           },
           {
@@ -121,7 +121,7 @@ export const NAV_TREE: NavItem[] = [
           {
             label: "Attack Surface Reduction",
             href: "/attack-surface-reduction",
-            description: "Distroless-style minimal images shrink your blast radius.",
+            description: "Minimal images. Smaller blast radius.",
             icon: "minimize",
           },
         ],

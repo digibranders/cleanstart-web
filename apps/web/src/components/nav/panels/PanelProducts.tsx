@@ -34,7 +34,7 @@ export function PanelProducts({ item, latestImages }: Props) {
       accent="cyan"
       external
       headline="Stop patching. Replace the base."
-      sub="Drop-in compatible with your stack. Near-zero CVEs at the base layer."
+      sub="Drop-in compatible. Near-zero CVEs at the base."
       footer={
         <div>
           <CopyableCommand command={`$ docker pull cleanstart/${chosen.name}:latest`} />
@@ -50,7 +50,7 @@ export function PanelProducts({ item, latestImages }: Props) {
       href="/cleanstart-images"
       accent="cyan"
       headline="Stop patching. Replace the base."
-      sub="Drop-in compatible with your stack. Near-zero CVEs at the base layer."
+      sub="Drop-in compatible. Near-zero CVEs at the base."
       footer={
         <div className="group/cta mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#2cc1eb]">
           Browse images <ArrowGlyph direction="right" size={12} />

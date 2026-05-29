@@ -35,7 +35,7 @@ export function PanelSolutions({ item }: Props) {
           accent="green"
           minHeight={260}
           headline="FIPS, drop-in."
-          sub="Validated cryptography, no code change. Replace base images, inherit compliance."
+          sub="Validated crypto. No code change. Inherit compliance."
           footer={
             <div>
               <CopyableCommand command="$ docker pull cleanstart/python-fips" />
