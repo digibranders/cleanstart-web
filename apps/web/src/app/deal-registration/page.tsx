@@ -82,13 +82,12 @@ export default function DealRegistrationPage() {
           />
 
           <div
-            className="relative mx-auto flex items-end justify-center text-center"
+            className="relative mx-auto flex items-end justify-center text-center pb-[600px] sm:pb-[clamp(180px,26vw,330px)]"
             style={{
               maxWidth: "var(--container-default)",
               paddingLeft: "24px",
               paddingRight: "24px",
-              paddingTop: "clamp(80px, 10vw, 160px)",
-              paddingBottom: "clamp(200px, 28vw, 330px)",
+              paddingTop: "clamp(94px, 11vw, 160px)",
             }}
           >
             <h1
@@ -139,10 +138,7 @@ export default function DealRegistrationPage() {
           }}
         >
           <div
-            className="relative z-10"
-            style={{
-              marginTop: "calc(-1 * clamp(240px, 23vw, 250px))",
-            }}
+            className="relative z-10 -mt-[580px] sm:mt-[calc(-1*clamp(60px,16vw,250px))]"
           >
             <DealRegistrationForm />
           </div>
