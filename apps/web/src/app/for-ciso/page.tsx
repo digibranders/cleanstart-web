@@ -1,4 +1,4 @@
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { CisoHero } from "@/components/sections/ciso/CisoHero";

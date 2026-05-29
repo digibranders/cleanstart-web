@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type React from "react";
 
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { AuthorHero } from "@/components/sections/author/AuthorHero";
 import { AuthorBio } from "@/components/sections/author/AuthorBio";

@@ -1025,6 +1025,36 @@ body {
   .cs-nav-link::after {
     transition: none !important;
   }
+
+  /* NavigationMenu: suppress transform/scale/translate transitions so
+     panel open/close and cross-panel slides are instant. Opacity fades
+     are intentionally preserved — they are safe under reduced-motion. */
+  [data-slot="navigation-menu-content"] {
+    transition-property: opacity !important;
+  }
+  [data-slot="navigation-menu-content"][data-starting-style],
+  [data-slot="navigation-menu-content"][data-ending-style] {
+    translate: none !important;
+    transform: none !important;
+  }
+
+  /* NavigationMenu popup (base-ui Popup element): keep opacity fade,
+     suppress scale. The Popup element is a direct child of the Positioner
+     that carries the rounded-[24px] class from our navigation-menu.tsx. */
+  [data-slot="navigation-menu"] [data-popup] {
+    transition-property: opacity !important;
+  }
+
+  /* ChevronDown trigger icon: disable the 180° rotation. */
+  [data-slot="navigation-menu-trigger"] svg {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  /* Positioner: disable positional sliding between triggers. */
+  [data-slot="navigation-menu"] [data-positioner] {
+    transition: none !important;
+  }
 }
 
 /* Factory card body — Figma 1440 exact (node 763:3610..3742):
@@ -2794,3 +2824,42 @@ body {
     overflow-x: clip;
   }
 }
+
+/* ─── Nav mega menu — premium glass surfaces (Phase 6) ───────────────────── */
+
+/* Premium glass feel earned via internal highlights — NOT translucency.
+   Content behind cannot bleed through. Glass character comes from:
+   - The top-edge inset highlight (1px) suggesting glass thickness
+   - A subtle radial highlight catching imaginary light from above
+   - A faint top-to-bottom gradient hint of refraction
+   - Deep drop shadow making the surface float above the page */
+.cs-panel-glass {
+  background:
+    radial-gradient(120% 60% at 80% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 30%),
+    #130e26;
+  box-shadow:
+    0 32px 80px -32px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.cs-tile-glass {
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, transparent 40%),
+    #1a1336;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.cs-cta-glass {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Surfaces are now fully solid — no backdrop-filter to fall back from.
+   The @supports block stays as a no-op marker in case we ever bring
+   translucency back. */

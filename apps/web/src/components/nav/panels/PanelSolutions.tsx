@@ -1,0 +1,57 @@
+import { FeaturedTile } from "@/components/nav/pieces/FeaturedTile";
+import { PanelRow } from "@/components/nav/pieces/PanelRow";
+import { PanelShell } from "@/components/nav/panels/PanelShell";
+import { ContextualCTA } from "@/components/nav/pieces/ContextualCTA";
+import { CopyableCommand } from "@/components/nav/pieces/CopyableCommand";
+import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
+import type { NavMegaItem } from "@/lib/nav-config";
+
+type Props = { item: NavMegaItem };
+
+export function PanelSolutions({ item }: Props) {
+  const solutions = item.groups[0]?.items ?? [];
+  return (
+    <PanelShell
+      width={item.width ?? 760}
+      accent="green"
+      eyebrow={item.label}
+      tagline={item.tagline}
+    >
+      <div className="grid grid-cols-[1.3fr_1fr] gap-3.5">
+        <div className="flex flex-col gap-0.5">
+          {solutions.map((s) => (
+            <PanelRow
+              key={s.label}
+              href={s.href}
+              label={s.label}
+              {...(s.description ? { description: s.description } : {})}
+              icon={s.icon ?? "shield-check"}
+              built={s.built !== false}
+            />
+          ))}
+        </div>
+        <FeaturedTile
+          href="/fips"
+          accent="green"
+          minHeight={260}
+          headline="FIPS, drop-in."
+          sub="Validated crypto. No code change. Inherit compliance."
+          footer={
+            <div>
+              <CopyableCommand command="$ docker pull cleanstart/python-fips" />
+              <div className="group/cta mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#6cffc2]">
+                See FIPS stack <ArrowGlyph direction="right" size={12} />
+              </div>
+            </div>
+          }
+        />
+      </div>
+      <ContextualCTA
+        headline="Compliance review for your stack?"
+        sub="30 mins with a solutions engineer."
+        ctaLabel="Talk to an SE"
+        ctaHref="/book-a-demo?intent=se"
+      />
+    </PanelShell>
+  );
+}

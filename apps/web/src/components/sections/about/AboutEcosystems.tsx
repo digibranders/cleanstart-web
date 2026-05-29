@@ -28,12 +28,68 @@ interface AboutEcosystemsProps {
    *                overlap (e.g. /deal-registration).
    */
   bottomPadding?: "cta" | "compact";
+  /**
+   * When true, render the top-right corner accent (purple grid + radial glow +
+   * soft ellipse) from the /deal-registration Figma. Off by default so the
+   * /about page keeps its plain treatment.
+   */
+  cornerAccent?: boolean;
 }
 
-export function AboutEcosystems({ bottomPadding = "cta" }: AboutEcosystemsProps = {}) {
+export function AboutEcosystems({
+  bottomPadding = "cta",
+  cornerAccent = false,
+}: AboutEcosystemsProps = {}) {
   const bottomClass = bottomPadding === "compact" ? "pb-section-md" : "pb-section-cta";
   return (
     <section className={`relative overflow-hidden bg-white pt-section-md ${bottomClass}`}>
+      {/* Top-right corner accent — grid + radial glow + soft ellipse
+          (Figma: Vector radial glow, Ellipse 46683, and the purple
+          gridline). Proportional horizontal offsets keep it pinned to the
+          corner across viewports; the section's overflow-hidden clips the
+          off-canvas bleed. */}
+      {cornerAccent && (
+        <>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute hidden lg:block"
+            style={{
+              right: "calc(20.25 / 1920 * 100%)",
+              top: "-316.5px",
+              width: "825.75px",
+              height: "825.75px",
+              background:
+                "radial-gradient(50% 50% at 50% 50%, #640DFB 0%, rgba(100, 13, 251, 0) 100%)",
+              opacity: 0.06,
+            }}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            aria-hidden
+            src="/images/deal-registration/ecosystems-corner-grid.svg"
+            alt=""
+            className="pointer-events-none select-none absolute right-0 top-0 hidden lg:block"
+            style={{ width: "366px", height: "369px" }}
+            loading="lazy"
+            decoding="async"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute hidden lg:block"
+            style={{
+              left: "calc(1265.25 / 1920 * 100%)",
+              top: "-68.25px",
+              width: "193.5px",
+              height: "193.5px",
+              borderRadius: "50%",
+              background: "#DF9BFF",
+              opacity: 0.45,
+              filter: "blur(91.125px)",
+            }}
+          />
+        </>
+      )}
+
       {/* Decorative blobs */}
       <div
         aria-hidden

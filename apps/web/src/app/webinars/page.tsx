@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { WebinarsHero } from "@/components/sections/webinars/WebinarsHero";
 import { WebinarsGrid } from "@/components/sections/webinars/WebinarsGrid";

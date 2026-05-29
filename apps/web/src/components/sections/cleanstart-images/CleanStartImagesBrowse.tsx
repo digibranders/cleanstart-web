@@ -384,7 +384,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
         {/* ── Mobile card list — vertical stacked, hidden at lg+ ────────────── */}
         <RevealStagger className="lg:hidden mt-10 w-full flex flex-col items-center gap-7">
           {TRUST_CARDS.map((card) => (
-            <RevealItem key={card.title}>
+            <RevealItem key={card.title} className="w-full max-w-[328px]">
               <MobileTrustCard card={card} />
             </RevealItem>
           ))}

@@ -12,7 +12,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
       style={{ minHeight: "418px", background: HERO_GRADIENT }}
       aria-labelledby="knowledge-hub-hero-title"
     >
-      {/* Decorative cube — top-left, mirrored */}
+      {/* Decorative cube — lower-left (Figma image 583141) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -20,29 +20,31 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
         alt=""
         className="pointer-events-none select-none absolute hidden xl:block"
         style={{
-          width: "265px",
-          height: "265px",
-          left: "-60px",
-          top: "20px",
-          mixBlendMode: "lighten",
+          width: "332px",
+          height: "313px",
+          left: "-95px",
+          top: "208px",
+          mixBlendMode: "hard-light",
           opacity: 0.4,
-          transform: "scaleX(-1)",
         }}
         loading="lazy"
         decoding="async"
       />
 
-      {/* Decorative cube — top-right */}
+      {/* Decorative cube — upper-right (Figma image 583137) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/blogs/hero-orb-top.png"
         alt=""
-        className="pointer-events-none select-none absolute top-5 right-0 hidden xl:block"
+        className="pointer-events-none select-none absolute hidden xl:block"
         style={{
-          width: "265px",
-          height: "265px",
-          mixBlendMode: "lighten",
+          width: "294px",
+          height: "298px",
+          left: "calc(1647 / 1920 * 100%)",
+          top: "-1px",
+          mixBlendMode: "color-dodge",
+          transform: "rotate(-46.54deg)",
           opacity: 0.4,
         }}
         loading="lazy"
@@ -64,7 +66,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
                 letterSpacing: "-0.05em",
               }}
             >
-              Knowledge <span style={{ color: "#C446EF" }}>Hub</span>
+              Knowledge <span style={{ color: "#FFFFFF" }}>Hub</span>
             </h1>
           </HeroReveal>
 

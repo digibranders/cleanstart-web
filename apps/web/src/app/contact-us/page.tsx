@@ -1,4 +1,4 @@
-import { Header } from "@/components/sections/Header";
+import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { ContactHero } from "@/components/sections/contact/ContactHero";
 import { ContactForm } from "@/components/sections/contact/ContactForm";

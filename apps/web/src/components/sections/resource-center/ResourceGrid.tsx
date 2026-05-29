@@ -61,7 +61,7 @@ export function ResourceGrid({
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center lg:justify-items-start"
       >
         {resources.map((resource) => (
-          <RevealItem key={resource.id}>
+          <RevealItem key={resource.id} className="w-full">
             <ResourceCard resource={resource} />
           </RevealItem>
         ))}

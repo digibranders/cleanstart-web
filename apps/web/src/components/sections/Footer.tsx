@@ -21,7 +21,7 @@ interface FooterLink {
 
 const COL_CONTACT: FooterLink[] = [
   { label: "About Us", href: "/about-us" },
-  { label: "How It Works", href: "#how-it-works" },
+  { label: "How It Works", href: "/cleanstart-images" },
   { label: "Events", href: "/events" },
 ];
 const COL_SOLUTIONS: FooterLink[] = [

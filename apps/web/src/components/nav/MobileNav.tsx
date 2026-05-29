@@ -19,6 +19,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { NAV_TREE } from "@/lib/nav-config";
+import { NavIcon } from "@/components/nav/icons/NavIcon";
+
+const MOBILE_CTA: Record<string, { headline: string; ctaLabel: string; ctaHref: string } | undefined> = {
+  Products: { headline: "Try CleanStart", ctaLabel: "Browse Images", ctaHref: "/cleanstart-images" },
+  Solutions: { headline: "Map your compliance", ctaLabel: "Talk to SE", ctaHref: "/book-a-demo?intent=se" },
+  Resources: { headline: "Get the Bulletin", ctaLabel: "Subscribe", ctaHref: "/subscribe" },
+  Company: { headline: "We're hiring", ctaLabel: "See Careers", ctaHref: "/careers" },
+};
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -36,6 +44,9 @@ export function MobileNav() {
         side="right"
         className="w-[88vw] max-w-[360px] sm:max-w-[360px] !border-l-white/8 flex flex-col gap-0 p-0"
       >
+        <div className="flex justify-center pt-2" aria-hidden>
+          <div className="h-1 w-10 rounded-full bg-white/15" />
+        </div>
         <SheetTitle className="sr-only">CleanStart navigation</SheetTitle>
         <SheetDescription className="sr-only">
           Browse CleanStart products, solutions, resources, and company links.
@@ -58,14 +69,11 @@ export function MobileNav() {
               if (item.kind === "flat") {
                 const flatClass =
                   "block cursor-pointer rounded-[10px] px-3 py-3 text-base font-medium text-white/90 transition-colors hover:bg-white/[0.06] hover:text-white";
-                return item.built ? (
+                if (item.built === false) return null;
+                return (
                   <Link key={item.label} href={item.href} className={flatClass}>
                     {item.label}
                   </Link>
-                ) : (
-                  <span key={item.label} className={flatClass}>
-                    {item.label}
-                  </span>
                 );
               }
               const leaves =
@@ -97,23 +105,39 @@ export function MobileNav() {
                           </li>
                         ) : (
                           <li key={leaf.label}>
-                            {leaf.built ? (
+                            {leaf.built === false ? null : (
                               <Link
                                 href={leaf.href}
                                 onClick={close}
-                                className="block rounded-[8px] px-3 py-2 text-sm text-white/80 no-underline transition-colors hover:bg-white/[0.06] hover:text-white"
+                                className="flex items-center gap-2.5 rounded-[8px] px-3 py-2 text-sm text-white/80 no-underline transition-colors hover:bg-white/[0.06] hover:text-white"
                               >
+                                {leaf.icon && <NavIcon id={leaf.icon} size={14} className="opacity-70" />}
                                 {leaf.label}
                               </Link>
-                            ) : (
-                              <span className="block cursor-pointer rounded-[8px] px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/[0.06] hover:text-white">
-                                {leaf.label}
-                              </span>
                             )}
                           </li>
                         )
                       )}
                     </ul>
+                    {MOBILE_CTA[item.label] && (
+                      <Link
+                        href={MOBILE_CTA[item.label]!.ctaHref}
+                        onClick={close}
+                        className="mx-3 mb-3 mt-2 flex items-center justify-between rounded-[10px] border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 no-underline"
+                      >
+                        <span className="text-xs font-semibold text-white">{MOBILE_CTA[item.label]!.headline}</span>
+                        <span
+                          className="cs-btn-glass inline-flex items-center justify-center"
+                          style={{
+                            ["--cs-btn-h" as string]: "30px",
+                            ["--cs-btn-px" as string]: "12px",
+                            ["--cs-btn-fs" as string]: "11px",
+                          }}
+                        >
+                          {MOBILE_CTA[item.label]!.ctaLabel}
+                        </span>
+                      </Link>
+                    )}
                   </AccordionContent>
                 </AccordionItem>
               );

@@ -18,10 +18,12 @@ import { Reveal } from '@/components/ui/Reveal';
  *     two soft purple glow ellipses (top corners). All four are hidden < lg.
  *   • Heading: 28→56px Manrope Bold tracking -0.04em, #111, centered.
  *   • Optional subheading: 14→18px Sora 400, opacity 0.8, centered below H2.
- *   • Desktop (≥ lg): 2×2 grid with 1px gradient hairline dividers — vertical
- *     center line + horizontal between rows. Each card is icon-left/text-right,
- *     with a purple glow halo behind the icon.
- *   • Mobile (< lg): single column, each card becomes a white rounded tile
+ *   • Tablet + Desktop (≥ md): 2×2 grid with 1px gradient hairline dividers —
+ *     vertical center line + horizontal between rows. Each card is
+ *     icon-left/text-right, with a purple glow halo behind the icon. Icons use
+ *     vw-based clamps so they scale down through the tablet range, floor at the
+ *     compact size, and keep the locked 2-column layout.
+ *   • Mobile (< md): single column, each card becomes a white rounded tile
  *     with shadow; icon centered above, text centered below.
  *
  * The decoration assets live under /images/for-developers/why/ and are shared
@@ -458,16 +460,16 @@ export function WhyMattersGrid({
         ) : null}
 
         <div style={{ marginTop: 'clamp(32px, 4.17vw, 80px)' }}>
-          {/* ── Mobile (< lg): single-column stack ── */}
-          <div className="flex flex-col gap-4 lg:hidden">
+          {/* ── Mobile (< md): single-column stack ── */}
+          <div className="flex flex-col gap-4 md:hidden">
             {mobileOrder.map((idx) => {
               const card = cards[idx] ?? cards[0];
               return <MobileCard key={`m-${idx}`} {...card} />;
             })}
           </div>
 
-          {/* ── Desktop (≥ lg): 2×2 grid with gradient cross dividers ── */}
-          <div className="relative hidden lg:block">
+          {/* ── Tablet + Desktop (≥ md): 2×2 grid with gradient cross dividers ── */}
+          <div className="relative hidden md:block">
             {/* Vertical centre divider */}
             <div
               aria-hidden
