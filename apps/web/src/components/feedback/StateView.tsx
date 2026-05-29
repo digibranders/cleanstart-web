@@ -8,14 +8,14 @@ import { STATE_PRESETS, type StateVariant } from "./state-presets";
 const HERO_GRADIENT =
   "linear-gradient(180deg, #0B0820 0%, #131248 38%, #2E1D8E 70%, #5A2EE0 95%, #6E3CFF 100%)";
 
-// Full-page "glass" hero title — exact Figma spec (Final 404 frame, 1440 width):
-// Manrope SemiBold, 190px / line-height 100% / letter-spacing -0.05em, white @35%.
-// Authored at 1440 (title box 1296px = 1440 − 144 margins), so 190px is the
-// literal desktop size; it scales down fluidly (~13vw) to 40px on phones and
-// locks at 190px from ~1440px up. This is the dedicated error-hero display tier
-// (deliberately larger than --fs-display); inline light-tone states use --fs-h3.
+// Full-page "glass" hero title — Figma spec (Manrope SemiBold, line-height
+// 100%, letter-spacing -0.05em, white @35%). Figma authors it at 190px on the
+// 1440 frame, but that reads oversized in-app; dialled back to a 128px desktop
+// cap (clamp(2.5rem, 9vw, 8rem)) that stays a bold display tier without
+// dominating the viewport. Scales fluidly down to 40px on phones. Inline
+// light-tone states use --fs-h3 instead.
 const TITLE_STYLE: CSSProperties = {
-  fontSize: "clamp(2.5rem, 13vw, 11.875rem)",
+  fontSize: "clamp(2.5rem, 9vw, 8rem)",
   lineHeight: 1,
   letterSpacing: "-0.05em",
   color: "rgba(255, 255, 255, 0.35)",
