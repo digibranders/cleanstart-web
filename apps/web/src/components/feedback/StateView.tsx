@@ -18,11 +18,16 @@ const GRID_BG: CSSProperties = {
   backgroundPosition: "0 0",
 };
 
+// Full-page "glass" hero title — translucent white (0.35) over the gradient,
+// 72px max at desktop scaling down to 40px on phones. Intentionally larger than
+// the --fs-display role token: this is the dedicated error-hero display tier
+// (Figma 857:18367), kept deliberately oversized and frosted for the 404/500
+// full-page states. Inline (light-tone) states use --fs-h3 instead.
 const TITLE_STYLE: CSSProperties = {
-  fontSize: "var(--fs-display)",
+  fontSize: "clamp(2.5rem, 5.5vw, 4.5rem)",
   lineHeight: 1.05,
   letterSpacing: "-0.03em",
-  color: "rgba(255, 255, 255, 0.92)",
+  color: "rgba(255, 255, 255, 0.35)",
   fontWeight: 600,
 };
 
