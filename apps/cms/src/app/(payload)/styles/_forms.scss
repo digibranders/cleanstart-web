@@ -667,6 +667,12 @@
       border-color: var(--color-error-500);
       color: var(--color-error-500);
     }
+
+    // Expand tap area on touch devices to meet WCAG 2.5.5 (44px floor)
+    @media (pointer: coarse) {
+      padding: 10px;
+      box-sizing: content-box;
+    }
   }
 
   &__add {

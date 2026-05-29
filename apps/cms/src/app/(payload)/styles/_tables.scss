@@ -207,6 +207,9 @@
 .table > table {
   table-layout: fixed;
   width: 100%;
+  // Prevents table from squashing below readable width on narrow viewports —
+  // the parent wrapper scrolls horizontally instead.
+  min-width: 600px;
 }
 
 .table thead th,

@@ -45,7 +45,7 @@ button.btn--style-pill-primary,
 .btn--style-primary[type='button'],
 .btn--style-pill-primary[type='button'] {
   background: var(--cs-cyan-500);
-  color: #04212a;
+  color: var(--cs-on-cyan, #04212a);
   border: 1px solid transparent;
   border-radius: var(--cs-radius-input);
   font-weight: 600;
@@ -97,6 +97,7 @@ div.btn--style-pill-primary {
 
   &:hover:not([disabled]) {
     border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
     color: var(--theme-text);
   }
 
@@ -147,7 +148,7 @@ button#action-save[disabled] {
   color: var(--theme-text-disabled) !important;
   border-color: transparent !important;
   cursor: not-allowed !important;
-  opacity: 0.7;
+  opacity: 0.5;
   box-shadow: none !important;
 }
 
@@ -163,7 +164,7 @@ button#action-save[disabled] {
 // Save Draft → primary cyan
 .doc-controls button#action-save-draft {
   background: var(--cs-cyan-500);
-  color: #04212a;
+  color: var(--cs-on-cyan, #04212a);
   border: 1px solid transparent;
   border-radius: var(--cs-radius-input);
   font-weight: 600;
@@ -188,7 +189,7 @@ button#action-save[disabled] {
     background: var(--theme-elevation-150) !important;
     color: var(--theme-text-disabled) !important;
     cursor: not-allowed !important;
-    opacity: 0.7;
+    opacity: 0.5;
     box-shadow: none !important;
   }
 }
@@ -220,7 +221,7 @@ button#action-save[disabled] {
     border-color: var(--theme-elevation-150) !important;
     background: transparent !important;
     cursor: not-allowed !important;
-    opacity: 0.7;
+    opacity: 0.5;
   }
 }
 

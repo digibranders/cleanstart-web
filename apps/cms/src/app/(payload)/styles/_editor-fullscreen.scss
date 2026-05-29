@@ -54,11 +54,12 @@ html[data-cs-fullscreen='true'] {
     overflow-x: hidden;
   }
 
-  // Reading-measure: cap the editable text width and centre it.
+  // Reading-measure: cap at ~680px (~75 chars) — ideal prose measure.
+  // 800px was too wide (95 chars, tiring for long-form editing).
   .rich-text-lexical__wrap.cs-fullscreen-host .ContentEditable__root {
-    max-width: 800px;
+    max-width: 680px;
     margin: 0 auto;
-    padding: var(--cs-space-12) var(--cs-space-6) var(--cs-space-16);
+    padding: var(--cs-space-16) var(--cs-space-8) var(--cs-space-16);
     min-height: 0;
   }
 

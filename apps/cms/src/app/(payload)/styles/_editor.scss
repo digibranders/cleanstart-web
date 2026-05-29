@@ -292,22 +292,34 @@
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.015em;
-  margin: var(--cs-space-6) 0 var(--cs-space-3) 0;
   color: var(--cs-text-heading);
 }
 
+// Tapered heading margins — H1 feels like a new chapter, H5/H6 are inline labels
 .LexicalEditorTheme__h1 {
   font-size: 28px;
   letter-spacing: -0.02em;
+  margin: 36px 0 12px 0;
 }
 .LexicalEditorTheme__h2 {
   font-size: 22px;
+  margin: 32px 0 10px 0;
 }
 .LexicalEditorTheme__h3 {
   font-size: 18px;
+  margin: 24px 0 8px 0;
 }
 .LexicalEditorTheme__h4 {
   font-size: 16px;
+  margin: 16px 0 6px 0;
+}
+.LexicalEditorTheme__h5 {
+  font-size: 14px;
+  margin: 12px 0 4px 0;
+}
+.LexicalEditorTheme__h6 {
+  font-size: 13px;
+  margin: 12px 0 4px 0;
 }
 
 .LexicalEditorTheme__ul,
@@ -350,21 +362,25 @@
 }
 
 .LexicalEditorTheme__quote {
-  border-inline-start: 3px solid var(--cs-cyan-500);
-  padding-inline-start: var(--cs-space-4);
+  border-inline-start: 4px solid var(--cs-cyan-500);
+  padding-inline-start: 20px;
   color: var(--theme-text-soft);
   font-style: italic;
-  margin: var(--cs-space-4) 0;
+  margin: var(--cs-space-6) 0;
+  opacity: 0.9;
 }
 
 .LexicalEditorTheme__code {
   background: var(--theme-elevation-100);
   border: 1px solid var(--theme-elevation-150);
-  border-radius: var(--cs-radius-input);
+  border-left: 3px solid var(--theme-elevation-300);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.08);
   font-family: var(--font-mono);
   font-size: 13px;
-  padding: var(--cs-space-3);
+  padding: 14px 16px;
   display: block;
+  position: relative;
   margin: var(--cs-space-3) 0;
   overflow-x: auto;
 }
@@ -421,6 +437,17 @@
   font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.65;
+  position: relative;
+
+  // Empty-canvas placeholder — discoverability hint for slash-menu
+  &:not(:focus):empty::before {
+    content: 'Start typing or press / for commands';
+    color: var(--theme-text-disabled);
+    font-size: 15px;
+    font-style: italic;
+    pointer-events: none;
+    position: absolute;
+  }
 
   // Branded text selection — visible without overpowering
   &::selection,

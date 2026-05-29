@@ -20,7 +20,7 @@
   border: 1px solid var(--theme-elevation-200);
   border-radius: var(--cs-radius-card);
   box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.45);
-  min-width: 180px;
+  min-width: 200px;
   padding: var(--cs-space-1);
   position: fixed;
   z-index: 9999;
@@ -29,7 +29,7 @@
     align-items: center;
     background: transparent;
     border: none;
-    border-radius: var(--cs-radius-chip);
+    border-radius: var(--cs-radius-input);
     color: var(--theme-text);
     cursor: pointer;
     display: flex;
@@ -37,12 +37,16 @@
     font-size: 13px;
     gap: 10px;
     line-height: 1;
-    padding: 6px 10px;
+    padding: 8px 12px;
     text-align: left;
     white-space: nowrap;
     width: 100%;
 
-    &:hover { background: var(--cs-tint-brand-soft); }
+    &:hover {
+      background: var(--cs-tint-brand-soft);
+
+      .cs-add-menu__icon { color: var(--theme-text); }
+    }
   }
 
   &__icon {
@@ -184,14 +188,12 @@
   z-index: 25;
   // Single hairline between toolbar and body, not two stacked borders.
   border-bottom: none;
-  // The Fullscreen pill (`.cs-fullscreen-toggle--inline`) is
-  // `position: absolute` of `.rich-text-lexical__wrap` at top:4
-  // right:8 — so it sits ON TOP of the toolbar's right cluster when
-  // the user is at the top of the editor. Reserve right-side
-  // breathing room so the pill never overlaps the rightmost button.
-  // Pill width ≈ 110px ("Fullscreen" label + chevron + padding) plus
-  // 8px right offset + 6px breathing room.
-  padding-right: 124px;
+  // Reserve space for the Fullscreen pill on wide viewports only.
+  // On narrow editors the pill's absolute positioning wraps under the toolbar
+  // anyway, so the reservation just forces premature wrapping.
+  @media (min-width: 1024px) {
+    padding-right: 124px;
+  }
 
   // When the wrap is in inline-fullscreen mode the pill repositions
   // itself (handled in _editor-fullscreen.scss). Drop the reservation
@@ -207,17 +209,19 @@
 .rich-text-lexical .toolbar-popup,
 .rich-text-lexical__wrap .toolbar-popup {
 
-  // Icon-only toolbar buttons — square 28×28, no border, no background
+  // Icon-only toolbar buttons — square 30×30, no border, no background
   // at rest. GitHub-style: the icon does the work; chrome only appears
-  // on hover or when the button is active.
+  // on hover or when the button is active. Active state adds a bottom
+  // border accent for a crisp, unambiguous selected indicator.
   .toolbar-popup__button {
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
     flex-shrink: 0;
     border-radius: var(--cs-radius-input);
     background: transparent;
     border: none;
+    border-bottom: 1.5px solid transparent;
     color: var(--theme-text-soft);
     cursor: pointer;
     padding: 0;
@@ -226,11 +230,12 @@
     justify-content: center;
     transition:
       background-color var(--cs-motion-micro),
-      color var(--cs-motion-micro);
+      color var(--cs-motion-micro),
+      border-bottom-color var(--cs-motion-micro);
 
     svg {
-      width: 14px;
-      height: 14px;
+      width: 15px;
+      height: 15px;
     }
 
     &:hover:not([disabled]):not(:disabled) {
@@ -243,28 +248,35 @@
     &[data-active='true'] {
       color: var(--cs-cyan-600);
       background: var(--cs-tint-brand-soft);
+      border-bottom-color: var(--cs-cyan-500);
     }
 
     &:focus-visible {
       outline: none;
       box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
     }
+
+    // Expand touch target on coarse-pointer devices without changing visual size
+    @media (pointer: coarse) {
+      min-width: 40px;
+      min-height: 40px;
+    }
   }
 
   // Dropdown trigger buttons (heading picker, alignment picker, etc).
   // Match by structure: any button that owns a dropdown label sizes to
-  // its content rather than collapsing to the 28px icon-button square.
+  // its content rather than collapsing to the 30px icon-button square.
   button:has(> .toolbar-popup__dropdown-label) {
     width: auto;
     min-width: 0;
-    height: 28px;
+    height: 30px;
     flex-shrink: 0;
     padding: 0 var(--cs-space-2);
     border-radius: var(--cs-radius-input);
     background: transparent;
     border: none;
     color: var(--theme-text);
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 500;
     line-height: 1;
     cursor: pointer;
@@ -280,7 +292,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 12ch;
+      max-width: 14ch;
     }
 
     .toolbar-popup__dropdown-caret {
@@ -322,13 +334,13 @@
     }
   }
 
-  // Toolbar separators — slim hairline group dividers (GitHub style).
+  // Toolbar separators — 28px height spans ~70% of the 44px bar (premium floor)
   .divider,
   .toolbar-popup__divider,
   hr {
     flex-shrink: 0;
     width: 1px;
-    height: 18px;
+    height: 28px;
     background: var(--theme-elevation-200);
     border: none;
     margin-inline: 6px;
@@ -550,13 +562,11 @@
   color: var(--theme-text);
   flex: 1;
   font-size: 14px;
-  // !important overrides Payload admin's global input[type="text"] height rule
-  // which wins over a class selector. The URL input (type="url") was unaffected
-  // by that rule, but text inputs were getting collapsed to ~18px.
-  height: 42px !important;
-  min-height: 42px !important;
+  // Lock to system 38px — matches all other admin inputs
+  height: 38px !important;
+  min-height: 38px !important;
   min-width: 0;
-  padding: 0 12px !important;
+  padding: 0 10px !important;
   transition: border-color var(--cs-motion-micro);
   width: 100%;
   box-sizing: border-box !important;
@@ -698,18 +708,18 @@
   display: flex;
   flex-direction: column;
   padding: 4px;
-  gap: 1px;
+  gap: 2px;
   background: var(--theme-elevation-0);
   border: 1px solid var(--theme-elevation-150);
   border-radius: var(--cs-radius-card);
   box-shadow: var(--cs-shadow-lift-md);
-  min-width: 180px;
+  min-width: 200px;
 
   .toolbar-popup__dropdown-item {
     display: inline-flex;
     align-items: center;
     gap: var(--cs-space-2);
-    padding: 6px 10px;
+    padding: 7px 12px;
     border-radius: var(--cs-radius-input);
     color: var(--theme-text);
     font-size: 13px;
@@ -737,7 +747,7 @@
     &.active {
       color: var(--cs-cyan-700);
       background: var(--cs-tint-brand-medium);
-      font-weight: 600;
+      font-weight: 500;
     }
 
     &.disabled {

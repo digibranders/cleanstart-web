@@ -31,8 +31,9 @@
 
 .cs-dialog::backdrop,
 .cs-drawer::backdrop {
-  background: rgba(8, 12, 28, 0.55);
-  backdrop-filter: blur(2px);
+  background: rgba(8, 12, 28, 0.60);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 // -----------------------------------------------------------------------------
@@ -124,10 +125,11 @@
 .cs-dialog__footer {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: var(--cs-space-2);
   padding: var(--cs-space-3) var(--cs-space-4);
   border-top: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
-  background: var(--theme-elevation-50, rgba(0, 0, 0, 0.02));
+  background: var(--theme-elevation-100);
 }
 
 @keyframes cs-dialog-in {
@@ -158,7 +160,11 @@
     -2px 0 8px rgba(8, 12, 28, 0.10);
   border-left: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.08));
   width: min(96vw, 540px);
-  animation: cs-drawer-in-right var(--cs-motion-modal);
+  animation: cs-drawer-in-right var(--cs-motion-drawer, 280ms cubic-bezier(0.16, 1, 0.3, 1));
+
+  &.is-closing {
+    animation: cs-drawer-out-right 180ms ease-in forwards;
+  }
 }
 
 // The side / size modifier classes sit on the panel itself, so use
@@ -172,7 +178,11 @@
   box-shadow:
     16px 0 48px rgba(8, 12, 28, 0.18),
     2px 0 8px rgba(8, 12, 28, 0.10);
-  animation: cs-drawer-in-left var(--cs-motion-modal);
+  animation: cs-drawer-in-left var(--cs-motion-drawer, 280ms cubic-bezier(0.16, 1, 0.3, 1));
+
+  &.is-closing {
+    animation: cs-drawer-out-left 180ms ease-in forwards;
+  }
 }
 
 .cs-drawer__panel.cs-drawer--sm { width: min(96vw, 420px); }
@@ -225,16 +235,30 @@
   gap: var(--cs-space-2);
   padding: var(--cs-space-3) var(--cs-space-4);
   border-top: 1px solid var(--theme-elevation-100, rgba(0, 0, 0, 0.06));
-  background: var(--theme-elevation-50, rgba(0, 0, 0, 0.02));
+  background: var(--theme-elevation-100);
 }
 
+// Drawer spring enter — subtle translateX instead of full-slide for perceptual weight
 @keyframes cs-drawer-in-right {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
+  from { transform: translateX(28px); opacity: 0.7; }
+  to   { transform: translateX(0);    opacity: 1;   }
 }
 @keyframes cs-drawer-in-left {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(0); }
+  from { transform: translateX(-28px); opacity: 0.7; }
+  to   { transform: translateX(0);     opacity: 1;   }
+}
+// Drawer exit keyframes (activated by .is-closing class)
+@keyframes cs-drawer-out-right {
+  to { transform: translateX(28px); opacity: 0; }
+}
+@keyframes cs-drawer-out-left {
+  to { transform: translateX(-28px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes cs-drawer-in-right  { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes cs-drawer-in-left   { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes cs-drawer-out-right { to   { opacity: 0; } }
+  @keyframes cs-drawer-out-left  { to   { opacity: 0; } }
 }
 
 // -----------------------------------------------------------------------------
@@ -253,8 +277,12 @@
 }
 
 @keyframes cs-popover-in {
-  from { opacity: 0; transform: translateY(-2px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(-4px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes cs-popover-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-4px) scale(0.99); }
 }
 
 // -----------------------------------------------------------------------------
@@ -318,7 +346,7 @@
   gap: var(--cs-space-3);
   padding: 8px 10px;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: var(--cs-radius-input);
 
   &.is-active {
     background: rgba(255, 255, 255, 0.07);
@@ -417,10 +445,12 @@
   appearance: none;
   border: 1px solid transparent;
   border-radius: var(--cs-radius-input);
-  padding: 6px 14px;
+  padding: 0 14px;
+  height: 36px;
   font: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -439,8 +469,8 @@
 
 .cs-btn--primary {
   background: var(--cs-cyan-500);
-  color: #fff;
-  &:hover:not(:disabled) { background: var(--cs-cyan-600); }
+  color: var(--cs-on-cyan, #04212a);
+  &:hover:not(:disabled) { background: var(--cs-cyan-600); color: var(--cs-on-cyan, #04212a); }
 }
 
 .cs-btn--subtle {
@@ -1046,6 +1076,12 @@
     outline: 2px solid var(--cs-cyan-500);
     outline-offset: 1px;
   }
+
+  // Enlarge tap target on touch devices without changing visual size
+  @media (pointer: coarse) {
+    padding: 13px;
+    box-sizing: content-box;
+  }
 }
 
 // Input row + "New" button + (in inline layout) inline chips.
@@ -1055,13 +1091,13 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  padding: 4px 4px 4px 6px;
+  padding: 6px 4px 6px 8px;
   border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
   background: var(--theme-input-bg, var(--theme-elevation-50));
   border-radius: var(--cs-radius-input);
   box-shadow: var(--cs-shadow-input-rest);
   transition: border-color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
-  min-height: 38px;
+  min-height: 40px;
   cursor: text;
 
   &:focus-within {
@@ -1084,7 +1120,7 @@
   color: inherit;
   font: inherit;
   font-size: 0.875rem;
-  padding: 4px 8px;
+  padding: 2px 8px;
   min-width: 80px;
   outline: none;
 
@@ -1433,7 +1469,7 @@
   outline-offset: 2px;
 }
 
-.cs-checkbox-field__label { font-size: 0.875rem; }
+.cs-checkbox-field__label { font-size: 13px; }
 
 // Radio group ----------------------------------------------------------------
 .cs-radio-field__group {
@@ -1446,7 +1482,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 5px 14px;
+  height: 30px;
   border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
   background: var(--theme-input-bg);
   border-radius: 999px;
@@ -1807,13 +1844,22 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    gap: var(--cs-space-1);
+    gap: 0;
     overflow: hidden;
     padding: 0;
-    transition: border-color var(--cs-motion-micro);
+    transition:
+      border-color var(--cs-motion-micro),
+      transform var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
     width: 100%;
 
-    &:hover { border-color: var(--cs-cyan-500); }
+    &:hover {
+      border-color: var(--cs-cyan-500);
+      transform: translateY(-1px);
+      box-shadow: var(--cs-shadow-lift-md);
+      background: var(--cs-tint-brand-soft);
+    }
 
     img {
       aspect-ratio: 4 / 3;
@@ -1837,7 +1883,7 @@
       color: var(--theme-text);
       font-size: 12px;
       overflow: hidden;
-      padding: 4px var(--cs-space-2) var(--cs-space-2);
+      padding: 4px 8px 6px;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -1894,16 +1940,16 @@
 .cs-schedule__select {
   appearance: none;
   background: var(--theme-input-bg);
-  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
-    linear-gradient(135deg, currentColor 50%, transparent 50%);
-  background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%;
+  // SVG chevron data-URL replaces the fragile gradient chevron for pixel-perfect rendering
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-position: calc(100% - 10px) 50%;
   background-repeat: no-repeat;
-  background-size: 5px 5px;
+  background-size: 16px 16px;
   border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
   border-radius: var(--cs-radius-input);
   color: var(--theme-text);
   font-size: 0.875rem;
-  height: 36px;
+  height: 38px;
   padding: 0 var(--cs-space-8) 0 var(--cs-space-3);
 
   &:focus-visible {
@@ -2474,5 +2520,78 @@
     font-size: 12.5px;
     color: var(--theme-text-disabled);
     text-align: center;
+  }
+}
+
+// =============================================================================
+// Segmented control — binary choice (e.g. Index / No-index toggle)
+// =============================================================================
+//
+// Usage: replace the two-pill radio group with a `.cs-segmented-control`
+// wrapping two `.cs-segmented-control__option` inputs (radio-style).
+// The selected segment fills with --cs-cyan-500; unselected segments
+// are transparent with shared border via overflow:hidden.
+//
+// Structure:
+//   <fieldset class="cs-segmented-control">
+//     <label class="cs-segmented-control__option">
+//       <input type="radio" ...>
+//       <span>Index</span>
+//     </label>
+//     <label class="cs-segmented-control__option">
+//       <input type="radio" ...>
+//       <span>No-index</span>
+//     </label>
+//   </fieldset>
+.cs-segmented-control {
+  display: inline-flex;
+  border: 1px solid var(--theme-elevation-250);
+  border-radius: var(--cs-radius-input);
+  overflow: hidden;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  background: var(--theme-input-bg);
+}
+
+.cs-segmented-control__option {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--theme-text-soft);
+  cursor: pointer;
+  white-space: nowrap;
+  border-right: 1px solid var(--theme-elevation-200);
+  transition:
+    background-color var(--cs-motion-micro),
+    color var(--cs-motion-micro);
+
+  &:last-child { border-right: none; }
+
+  input[type='radio'] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  // Selected segment — filled with brand cyan, dark text
+  &:has(input:checked) {
+    background: var(--cs-cyan-500);
+    color: var(--cs-on-cyan, #04212a);
+    font-weight: 600;
+  }
+
+  &:hover:not(:has(input:checked)) {
+    background: var(--cs-tint-brand-soft);
+    color: var(--theme-text);
   }
 }

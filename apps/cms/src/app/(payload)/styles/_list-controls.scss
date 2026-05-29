@@ -111,6 +111,32 @@
     // the inline SVG fails) and let the SVG overflow if needed.
     font-size: 0;
     overflow: visible;
+    position: relative;
+    border-radius: var(--cs-radius-input);
+    transition:
+      background-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--cs-tint-brand-soft);
+      color: var(--cs-cyan-500);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+
+    // Three-dot icon injection for empty button states (same pattern as drawer close)
+    &:empty::after {
+      content: '';
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      background: currentColor;
+      -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='3' r='1.5' fill='currentColor'/><circle cx='8' cy='8' r='1.5' fill='currentColor'/><circle cx='8' cy='13' r='1.5' fill='currentColor'/></svg>") no-repeat center / contain;
+      mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='3' r='1.5' fill='currentColor'/><circle cx='8' cy='8' r='1.5' fill='currentColor'/><circle cx='8' cy='13' r='1.5' fill='currentColor'/></svg>") no-repeat center / contain;
+    }
   }
 
   &__table {
@@ -123,6 +149,12 @@
     // still allowing the sticky thead to pin as rows scroll under it
     // (`hidden` would prevent scroll; `auto` would leak square corners).
     overflow: clip;
+
+    // On narrow viewports, allow horizontal scroll so fixed columns
+    // don't clip — min-width on the inner table prevents text squash.
+    @media (max-width: 1024px) {
+      overflow-x: auto;
+    }
 
     &--empty {
       min-height: 320px;

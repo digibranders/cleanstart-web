@@ -234,10 +234,25 @@
 // account, dashboard, and other Payload screens are unaffected.
 // =============================================================================
 
-html:has(.collection-edit .document-fields--has-sidebar),
-body:has(.collection-edit .document-fields--has-sidebar) {
-  height: 100%;
-  overflow: hidden;
+// Guard with min-width so the dual-pane scroll is only active at desktop
+// widths where the sidebar is alongside the main column. Below 1025px
+// (Payload's mid-break), the sidebar stacks below the main column and
+// the locked overflow would trap it below the fold.
+@media (min-width: 1025px) {
+  html:has(.collection-edit .document-fields--has-sidebar),
+  body:has(.collection-edit .document-fields--has-sidebar) {
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
+// Without the media guard, keep a non-hidden fallback
+@media (max-width: 1024px) {
+  html:has(.collection-edit .document-fields--has-sidebar),
+  body:has(.collection-edit .document-fields--has-sidebar) {
+    height: auto;
+    overflow: auto;
+  }
 }
 
 // Override the html-level scrollbar-gutter: stable from earlier; the
@@ -247,74 +262,78 @@ html:has(.collection-edit .document-fields--has-sidebar) {
   scrollbar-gutter: auto;
 }
 
-// The unnamed Next.js root + template wrappers fill the viewport.
-body:has(.collection-edit .document-fields--has-sidebar) > div:first-of-type {
-  height: 100vh;
-  overflow: hidden;
-}
-
-.template-default:has(.collection-edit .document-fields--has-sidebar) {
-  height: 100vh;
-}
-
-.template-default__wrap:has(.collection-edit .document-fields--has-sidebar) {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-width: 0;
-
-  // app-header at the top stays in the flow; everything below shares
-  // the remaining viewport height.
-  > .app-header {
-    flex: 0 0 auto;
+// The dual-pane overflow chain — all guarded behind 1025px min-width.
+// Below that threshold Payload stacks sidebar below main; body scroll is needed.
+@media (min-width: 1025px) {
+  // The unnamed Next.js root + template wrappers fill the viewport.
+  body:has(.collection-edit .document-fields--has-sidebar) > div:first-of-type {
+    height: 100vh;
+    overflow: hidden;
   }
 
-  > main.collection-edit {
-    flex: 1 1 auto;
-    overflow: hidden;
-    min-height: 0;
+  .template-default:has(.collection-edit .document-fields--has-sidebar) {
+    height: 100vh;
+  }
+
+  .template-default__wrap:has(.collection-edit .document-fields--has-sidebar) {
+    height: 100vh;
     display: flex;
     flex-direction: column;
-  }
-}
+    overflow: hidden;
+    min-width: 0;
 
-.collection-edit:has(.document-fields--has-sidebar) {
-  > .collection-edit__form {
+    // app-header at the top stays in the flow; everything below shares
+    // the remaining viewport height.
+    > .app-header {
+      flex: 0 0 auto;
+    }
+
+    > main.collection-edit {
+      flex: 1 1 auto;
+      overflow: hidden;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .collection-edit:has(.document-fields--has-sidebar) {
+    > .collection-edit__form {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+  }
+
+  // The form layer holds (in this order): the doc-controls strip
+  // (sticky), the breadcrumb/step-nav slot, and the main-wrapper that
+  // contains the actual form fields. Doc-controls and breadcrumb stay
+  // in the flow at fixed sizes; main-wrapper takes the rest.
+  .collection-edit__form:has(.document-fields--has-sidebar) {
+    > .doc-controls,
+    > .step-nav,
+    > .gutter--top {
+      flex: 0 0 auto;
+    }
+
+    > .collection-edit__main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+  }
+
+  .collection-edit__main:has(.document-fields--has-sidebar) {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     min-height: 0;
   }
-}
-
-// The form layer holds (in this order): the doc-controls strip
-// (sticky), the breadcrumb/step-nav slot, and the main-wrapper that
-// contains the actual form fields. Doc-controls and breadcrumb stay
-// in the flow at fixed sizes; main-wrapper takes the rest.
-.collection-edit__form:has(.document-fields--has-sidebar) {
-  > .doc-controls,
-  > .step-nav,
-  > .gutter--top {
-    flex: 0 0 auto;
-  }
-
-  > .collection-edit__main-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 0;
-  }
-}
-
-.collection-edit__main:has(.document-fields--has-sidebar) {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-height: 0;
 }
 
 // The actual two-column row.

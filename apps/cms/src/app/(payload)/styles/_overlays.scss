@@ -162,8 +162,8 @@ body:has(.drawer--is-open)::after {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 100; // below `.drawer` (101) but above the nav (50)
   pointer-events: none;
 }
@@ -407,13 +407,13 @@ body:has(.drawer--is-open) .nav-toggler {
   }
 }
 
-// Close button — calm circle that lights up brand cyan on hover
+// Close button — unified 32px target, destructive red on hover (matches drawer close)
 .close-modal-button {
   background: transparent;
   border: 1px solid var(--theme-elevation-200);
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -421,11 +421,13 @@ body:has(.drawer--is-open) .nav-toggler {
   cursor: pointer;
   transition:
     color var(--cs-motion-micro),
-    border-color var(--cs-motion-micro);
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
 
   &:hover {
-    color: var(--cs-cyan-500);
-    border-color: var(--cs-cyan-500);
+    color: var(--color-error-500);
+    border-color: var(--color-error-500);
+    background: rgba(220, 38, 38, 0.08);
   }
 }
 

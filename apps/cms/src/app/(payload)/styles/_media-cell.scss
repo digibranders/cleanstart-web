@@ -8,10 +8,10 @@
   min-width: 0;
 
   &__thumb {
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
-    border-radius: 4px;
+    border-radius: var(--cs-radius-chip);
     background: var(--theme-elevation-100);
     border: 1px solid var(--theme-elevation-150);
     overflow: hidden;
@@ -27,11 +27,16 @@
     }
   }
 
+  // MIME-type label fallback — renders file type abbreviation instead of a grey box
   &__thumb-fallback {
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
-    background: var(--theme-elevation-200);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--theme-text-soft);
+    text-align: center;
+    text-transform: uppercase;
+    padding: 0 2px;
   }
 
   &__name {

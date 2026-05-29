@@ -73,6 +73,9 @@
   --cs-motion-hover: 160ms ease;
   --cs-motion-macro: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --cs-motion-modal: 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  // Drawer uses a spring curve with a longer duration — panels carry more
+  // perceptual weight than dialogs and need a 40ms longer settle time.
+  --cs-motion-drawer: 280ms cubic-bezier(0.16, 1, 0.3, 1);
 
   // Brand-tinted overlays (used for hover/selected states)
   --cs-tint-brand-soft: rgba(6, 199, 242, 0.08);

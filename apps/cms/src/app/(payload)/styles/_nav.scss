@@ -116,6 +116,11 @@
     color var(--cs-motion-micro),
     box-shadow var(--cs-motion-micro);
 
+  // Touch devices — expand to 44px floor (WCAG 2.5.5)
+  @media (pointer: coarse) {
+    min-height: 44px;
+  }
+
   &:hover {
     color: var(--cs-text-primary);
     background: var(--cs-surface-raised);
