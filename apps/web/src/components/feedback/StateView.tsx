@@ -75,6 +75,45 @@ export function StateView({
           decoding="async"
         />
 
+        {/* Glassy title tint — soft cyan + purple light behind the title band.
+            The 35%-opacity letters are translucent, so this colour bleeds
+            through them (neutral → teal → purple, matching the Figma "Glass"
+            reference). Screen blend adds light to the gradient, never darkens. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 mix-blend-screen"
+          style={{ height: "clamp(300px, 32vw, 440px)" }}
+        >
+          <div
+            className="absolute"
+            style={{
+              left: "42%",
+              top: "58%",
+              width: "min(700px, 54vw)",
+              height: "min(320px, 24vw)",
+              transform: "translate(-50%, -50%)",
+              borderRadius: "50%",
+              background:
+                "radial-gradient(closest-side, rgba(51, 186, 236, 0.42) 0%, rgba(51, 186, 236, 0) 72%)",
+              filter: "blur(72px)",
+            }}
+          />
+          <div
+            className="absolute"
+            style={{
+              left: "71%",
+              top: "62%",
+              width: "min(640px, 48vw)",
+              height: "min(300px, 22vw)",
+              transform: "translate(-50%, -50%)",
+              borderRadius: "50%",
+              background:
+                "radial-gradient(closest-side, rgba(122, 89, 255, 0.50) 0%, rgba(122, 89, 255, 0) 72%)",
+              filter: "blur(72px)",
+            }}
+          />
+        </div>
+
         <div
           aria-hidden
           className="pointer-events-none absolute left-1/2 -translate-x-1/2"
