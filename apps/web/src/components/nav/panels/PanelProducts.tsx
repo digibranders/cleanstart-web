@@ -5,6 +5,7 @@ import { FeaturedTile } from "@/components/nav/pieces/FeaturedTile";
 import { PanelRow } from "@/components/nav/pieces/PanelRow";
 import { PanelShell } from "@/components/nav/panels/PanelShell";
 import { ContextualCTA } from "@/components/nav/pieces/ContextualCTA";
+import { CopyableCommand } from "@/components/nav/pieces/CopyableCommand";
 import { imageDetailsHref } from "@/components/nav/data/latest-images";
 import type { NavMegaItem } from "@/lib/nav-config";
 import type { CommunityImage } from "@/lib/api/community-images";
@@ -30,15 +31,18 @@ export function PanelProducts({ item, latestImages }: Props) {
     <FeaturedTile
       href={imageDetailsHref(chosen.name)}
       accent="cyan"
+      external
       headline="Stop patching. Replace the base."
       sub="Drop in hardened containers — keep your stack, lose the CVEs."
       footer={
         <div>
-          <div className="rounded-md border border-white/[0.06] bg-black/25 px-2.5 py-2 font-mono text-[11px] text-white/85">
-            <span className="text-white/40">$</span> docker pull cleanstart/{chosen.name}:latest
-          </div>
+          <CopyableCommand command={`$ docker pull cleanstart/${chosen.name}:latest`} />
           <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#2cc1eb]">
-            Try {chosen.name} <span className="text-sm">→</span>
+            Try {chosen.name}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M7 17 17 7" />
+              <path d="M7 7h10v10" />
+            </svg>
           </div>
         </div>
       }
