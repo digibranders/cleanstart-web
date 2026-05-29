@@ -2827,40 +2827,39 @@ body {
 
 /* ─── Nav mega menu — premium glass surfaces (Phase 6) ───────────────────── */
 
+/* Premium glass feel earned via internal highlights — NOT translucency.
+   Content behind cannot bleed through. Glass character comes from:
+   - The top-edge inset highlight (1px) suggesting glass thickness
+   - A subtle radial highlight catching imaginary light from above
+   - A faint top-to-bottom gradient hint of refraction
+   - Deep drop shadow making the surface float above the page */
 .cs-panel-glass {
-  background: rgba(18, 13, 34, 0.96);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  background:
+    radial-gradient(120% 60% at 80% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 30%),
+    #130e26;
   box-shadow:
-    0 32px 80px -32px rgba(0, 0, 0, 0.75),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    0 32px 80px -32px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 .cs-tile-glass {
-  background: rgba(24, 18, 52, 0.94);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, transparent 40%),
+    #1a1336;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .cs-cta-glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-/* Fallback for browsers without backdrop-filter support (old Safari, Firefox
-   when disabled, GPU-disabled rendering). Lock in a solid surface so the
-   panel never reads as transparent / unreadable. */
-@supports not (backdrop-filter: blur(8px)) {
-  .cs-panel-glass {
-    background: rgba(22, 17, 38, 0.96);
-  }
-  .cs-tile-glass {
-    background: rgba(28, 22, 56, 0.96);
-  }
-  .cs-cta-glass {
-    background: rgba(255, 255, 255, 0.04);
-  }
-}
+/* Surfaces are now fully solid — no backdrop-filter to fall back from.
+   The @supports block stays as a no-op marker in case we ever bring
+   translucency back. */
