@@ -41,8 +41,8 @@ export interface StatePreset {
 export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   "not-found": {
     illustration: "/error/404.webp",
-    width: 800,
-    height: 735,
+    width: 700,
+    height: 650,
     alt: "",
     title: "Page Not Found",
     description: "The page you're looking for doesn't exist or has moved.",

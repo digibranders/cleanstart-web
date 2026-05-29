@@ -166,18 +166,25 @@ export function StateView({
               ) : null}
             </HeroReveal>
 
-            <div
-              className="relative mt-[clamp(24px,3vw,48px)] w-full"
-              style={{ maxWidth: "clamp(320px, 58vw, 760px)" }}
-            >
+            {/* Scale the illustration to the smaller of viewport width / height
+                so it always fits without overflowing the fold or pushing the
+                CTA off-screen. width/height auto + dual max keeps the aspect
+                ratio while fitting within both bounds. */}
+            <div className="relative mt-[clamp(24px,3vw,48px)] flex w-full justify-center">
               <Image
                 src={preset.illustration}
                 alt={preset.alt}
                 width={preset.width}
                 height={preset.height}
                 priority
-                sizes="(min-width: 1280px) 760px, (min-width: 640px) 58vw, 85vw"
-                className="h-auto w-full select-none"
+                sizes="(min-width: 1280px) 600px, (min-width: 640px) 56vw, 85vw"
+                className="select-none"
+                style={{
+                  width: "auto",
+                  height: "auto",
+                  maxWidth: "min(56vw, 600px)",
+                  maxHeight: "min(50vh, 600px)",
+                }}
                 draggable={false}
               />
             </div>
