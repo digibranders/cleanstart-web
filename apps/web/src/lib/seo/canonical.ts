@@ -4,13 +4,6 @@ import { ogImageUrl, type OgVariant } from "./og";
 export const SITE_URL = "https://www.cleanstart.com";
 export const SITE_NAME = "CleanStart";
 
-export const DEFAULT_OG_IMAGE = {
-  url: "/og/default.png",
-  width: 1200,
-  height: 630,
-  alt: "CleanStart — verified container images",
-} as const;
-
 export type PageImage = {
   url: string;
   width?: number | undefined;
