@@ -12,15 +12,12 @@ import {
 // call it here or the breadcrumb stays stale on SPA nav and blank on hard
 // refresh. Functionally equivalent to useListQuery (already on the allow-list).
 import {
-  Gutter,
-  PageControls,
   SelectionProvider,
   TableColumnsProvider,
   useConfig,
   useListQuery,
   useStepNav,
 } from '@payloadcms/ui';
-import type { ClientCollectionConfig } from 'payload';
 import type { ListViewClientProps } from 'payload';
 import type { ReactElement } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -162,13 +159,14 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
     <SelectionProvider docs={data?.docs ?? []} totalDocs={data?.totalDocs ?? 0}>
       <TableColumnsProvider collectionSlug={collectionSlug} columnState={columnState}>
         <div className="cs-list">
-          <Gutter className="cs-list__gutter">
+          <div className="cs-list__gutter">
             {BeforeList}
             <ListHeader
               collectionLabel={collectionLabel}
               collectionSlug={collectionSlug}
               description={Description}
               hasCreatePermission={hasCreatePermission}
+              menuOpen={menuOpen}
               newDocumentURL={newDocumentURL}
               menuAnchorRef={menuAnchorRef}
               onMenuToggle={() => setMenuOpen((o) => !o)}
@@ -235,12 +233,42 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
             </section>
             {AfterListTable}
 
-            {collectionConfig && (data?.docs?.length ?? 0) > 0 ? (
-              <PageControls collectionConfig={collectionConfig as ClientCollectionConfig} />
+            {data && (data.totalPages ?? 0) > 1 ? (
+              <nav className="cs-list__pagination" aria-label="Pagination">
+                <button
+                  type="button"
+                  className="cs-btn cs-btn--subtle"
+                  disabled={!data.hasPrevPage}
+                  onClick={() => {
+                    if (data.page != null && data.page > 1 && refineListData) {
+                      void refineListData({ page: data.page - 1 });
+                    }
+                  }}
+                  aria-label="Previous page"
+                >
+                  ‹ Prev
+                </button>
+                <span className="cs-list__page-info">
+                  Page {data.page ?? 1} of {data.totalPages}
+                </span>
+                <button
+                  type="button"
+                  className="cs-btn cs-btn--subtle"
+                  disabled={!data.hasNextPage}
+                  onClick={() => {
+                    if (data.page != null && refineListData) {
+                      void refineListData({ page: data.page + 1 });
+                    }
+                  }}
+                  aria-label="Next page"
+                >
+                  Next ›
+                </button>
+              </nav>
             ) : null}
 
             {AfterList}
-          </Gutter>
+          </div>
 
           <Drawer
             open={columnPickerOpen}

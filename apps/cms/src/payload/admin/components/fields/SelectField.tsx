@@ -17,7 +17,7 @@ const labelOf = (raw: unknown): string => {
 
 export const SelectField = (props: SelectFieldClientProps): ReactElement => {
   const { field, path } = props;
-  const { value, setValue, showError, errorMessage } = useField<StoredValue>({ path });
+  const { value, setValue, disabled, showError, errorMessage } = useField<StoredValue>({ path });
 
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -29,6 +29,8 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
 
   const hasMany = field.hasMany === true;
   const readOnly = field.admin?.readOnly === true;
+  // Merge access-control driven disabled with field.admin.readOnly
+  const isInteractive = !disabled && !readOnly;
   const labelText = labelOf(field.label) || path;
   const description =
     typeof field.admin?.description === 'string' ? field.admin.description : undefined;
@@ -120,16 +122,16 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
       <div className={wrapperClass}>
         <div
           className="cs-collections-select__control"
-          onClick={() => !readOnly && inputRef.current?.focus()}
+          onClick={() => isInteractive && inputRef.current?.focus()}
           onKeyDown={(e) => {
-            if ((e.key === 'Enter' || e.key === ' ') && !readOnly) inputRef.current?.focus();
+            if ((e.key === 'Enter' || e.key === ' ') && isInteractive) inputRef.current?.focus();
           }}
         >
           {hasMany
             ? selected.map((val) => (
                 <span key={val} className="cs-collections-select__tag">
                   {labelFor(val)}
-                  {!readOnly && (
+                  {isInteractive && (
                     <button
                       type="button"
                       className="cs-collections-select__tag-remove"
@@ -146,7 +148,7 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
               ))
             : null}
 
-          {!readOnly ? (
+          {isInteractive ? (
             <input
               ref={inputRef}
               id={inputId}
@@ -187,7 +189,7 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
             </span>
           ) : null}
 
-          {!isEmpty && !readOnly && (
+          {!isEmpty && isInteractive && (
             <button
               type="button"
               className="cs-collections-select__reset"
@@ -202,7 +204,7 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
           )}
         </div>
 
-        {open && !readOnly && (
+        {open && isInteractive && (
           <div
             id={listboxId}
             // biome-ignore lint/a11y/useSemanticElements: custom select listbox; div is required here because a <select> cannot participate in a combobox composite widget

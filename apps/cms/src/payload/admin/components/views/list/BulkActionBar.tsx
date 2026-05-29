@@ -5,6 +5,8 @@ import { useConfig, useSelection } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
 
+import { showToast } from '../../ToastBus';
+
 type Props = {
   readonly collectionSlug: string;
   readonly hasDeletePermission?: boolean;
@@ -12,18 +14,47 @@ type Props = {
   readonly disableBulkEdit?: boolean;
 };
 
+type DeleteResult = {
+  readonly errors?: ReadonlyArray<{ message?: string }>;
+};
+
 const callBulkDelete = async (
   apiBase: string,
   collectionSlug: string,
   ids: ReadonlyArray<number | string>,
-): Promise<void> => {
+): Promise<{ ok: boolean; errors: string[] }> => {
   const url = new URL(`${apiBase}/${collectionSlug}`, window.location.origin);
   url.searchParams.set('where[id][in]', ids.join(','));
-  await fetch(url.toString(), {
-    method: 'DELETE',
-    credentials: 'include',
-    headers: { 'content-type': 'application/json' },
-  });
+  let res: Response;
+  try {
+    res = await fetch(url.toString(), {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'content-type': 'application/json' },
+    });
+  } catch (err) {
+    return { ok: false, errors: [err instanceof Error ? err.message : 'Network error'] };
+  }
+  if (!res.ok) {
+    let msg = `HTTP ${res.status}`;
+    try {
+      const body = (await res.json()) as { message?: string };
+      if (typeof body.message === 'string') msg = body.message;
+    } catch {
+      // ignore parse errors — the status code is the signal
+    }
+    return { ok: false, errors: [msg] };
+  }
+  let data: DeleteResult = {};
+  try {
+    data = (await res.json()) as DeleteResult;
+  } catch {
+    // if we can't parse the body but status was ok, treat as success
+  }
+  const errors = (data.errors ?? [])
+    .map((e) => e.message ?? 'Unknown error')
+    .filter((m) => m.length > 0);
+  return { ok: errors.length === 0, errors };
 };
 
 /**
@@ -52,7 +83,15 @@ export const BulkActionBar = (props: Props): ReactElement | null => {
   const onDeleteConfirm = async (): Promise<void> => {
     setBusy(true);
     try {
-      await callBulkDelete(apiBase, collectionSlug, ids);
+      const result = await callBulkDelete(apiBase, collectionSlug, ids);
+      if (!result.ok || result.errors.length > 0) {
+        const msg =
+          result.errors.length > 0
+            ? result.errors.join(' · ')
+            : 'Delete failed. Please try again.';
+        showToast({ message: msg, type: 'error' });
+        return;
+      }
       toggleAll(false);
       window.location.reload();
     } finally {

@@ -113,11 +113,19 @@ export const BlocksField = (props: BlocksFieldClientProps): ReactElement => {
               ]
                 .filter(Boolean)
                 .join(' ')}
-              draggable={!isDisabled}
-              {...handlers}
+              onDragOver={handlers.onDragOver}
+              onDragLeave={handlers.onDragLeave}
+              onDrop={handlers.onDrop}
             >
               <header className="cs-blocks__row-header">
-                <div className="cs-blocks__row-handle" aria-hidden="true">
+                <div
+                  className="cs-blocks__row-handle"
+                  aria-hidden="true"
+                  title={isDisabled ? undefined : 'Drag to reorder'}
+                  draggable={!isDisabled}
+                  onDragStart={handlers.onDragStart}
+                  onDragEnd={handlers.onDragEnd}
+                >
                   <svg width="14" height="14" viewBox="0 0 16 16">
                     <title>Drag to reorder</title>
                     <circle cx="6" cy="4" r="1" fill="currentColor" />

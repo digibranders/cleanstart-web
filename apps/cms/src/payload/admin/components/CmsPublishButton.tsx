@@ -10,7 +10,7 @@ import {
 } from '@payloadcms/ui';
 import { formatAdminURL, hasScheduledPublishEnabled } from 'payload/shared';
 import type { ReactElement } from 'react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { SchedulePublishDialog } from './SchedulePublishDialog';
 
@@ -107,6 +107,25 @@ export const CmsPublishButton = (): ReactElement | null => {
     submit,
     uploadStatus,
   ]);
+
+  // Cmd/Ctrl-Shift-S opens the schedule dialog — only when canSchedule and
+  // the dialog is not already open (guard prevents double-open).
+  useEffect(() => {
+    if (!canSchedule) return undefined;
+    const onKey = (e: KeyboardEvent): void => {
+      if (
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey &&
+        (e.key === 'S' || e.key === 's') &&
+        id != null
+      ) {
+        e.preventDefault();
+        setScheduleOpen((prev) => (prev ? prev : true));
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [canSchedule, id]);
 
   const items = useMemo<DropdownMenuItem[]>(
     () => [

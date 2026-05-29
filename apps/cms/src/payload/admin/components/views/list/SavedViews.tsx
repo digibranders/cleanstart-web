@@ -70,6 +70,7 @@ export const SavedViews = (props: Props): ReactElement | null => {
               ...(v.where !== undefined ? { where: v.where } : {}),
               ...(v.sort !== undefined ? { sort: v.sort } : {}),
               ...(v.limit !== undefined ? { limit: v.limit } : {}),
+              ...(v.search !== undefined ? { search: v.search } : {}),
               page: 1,
             });
           },
@@ -92,6 +93,9 @@ export const SavedViews = (props: Props): ReactElement | null => {
     if (!name.trim()) return;
     setBusy(true);
     try {
+      const searchVal = typeof query.search === 'string' && query.search.trim().length > 0
+        ? query.search.trim()
+        : undefined;
       const next: SavedView = newSavedView({
         name: name.trim(),
         ...(query.where ? { where: query.where } : {}),
@@ -99,6 +103,7 @@ export const SavedViews = (props: Props): ReactElement | null => {
         ...(query.limit != null
           ? { limit: typeof query.limit === 'number' ? query.limit : Number(query.limit) }
           : {}),
+        ...(searchVal !== undefined ? { search: searchVal } : {}),
       });
       const updated = { ...state, views: [...views, next] };
       setState(updated);
@@ -123,6 +128,7 @@ export const SavedViews = (props: Props): ReactElement | null => {
         className="cs-btn cs-btn--subtle cs-saved-views__trigger"
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu"
+        aria-expanded={open}
       >
         Views {views.length > 0 ? <span className="cs-saved-views__count">({views.length})</span> : null}
       </button>

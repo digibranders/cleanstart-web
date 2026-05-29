@@ -12,6 +12,7 @@ type Props = {
   readonly collectionSlug: string;
   readonly description?: ReactNode;
   readonly hasCreatePermission: boolean;
+  readonly menuOpen?: boolean;
   readonly newDocumentURL: string;
   readonly menuAnchorRef: RefObject<HTMLButtonElement | null>;
   readonly onMenuToggle: () => void;
@@ -27,6 +28,7 @@ export const ListHeader = (props: Props): ReactElement => {
     collectionLabel,
     description,
     hasCreatePermission,
+    menuOpen = false,
     newDocumentURL,
     menuAnchorRef,
     onMenuToggle,
@@ -78,6 +80,7 @@ export const ListHeader = (props: Props): ReactElement => {
           onClick={onMenuToggle}
           aria-label={`${collectionLabel} actions`}
           aria-haspopup="menu"
+          aria-expanded={menuOpen}
         >
           <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
             <circle cx="3" cy="8" r="1.4" fill="currentColor" />

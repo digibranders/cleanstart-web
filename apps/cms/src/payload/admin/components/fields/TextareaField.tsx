@@ -20,7 +20,7 @@ const labelOf = (raw: unknown): string => {
  */
 export const TextareaField = (props: TextareaFieldClientProps): ReactElement => {
   const { field, path } = props;
-  const { value, setValue, showError, errorMessage } = useField<string | null | undefined>({
+  const { value, setValue, disabled, showError, errorMessage } = useField<string | null | undefined>({
     path,
   });
 
@@ -33,6 +33,7 @@ export const TextareaField = (props: TextareaFieldClientProps): ReactElement => 
   const maxRowsAdmin = (field.admin as { maxRows?: number } | undefined)?.maxRows;
   const maxRows = typeof maxRowsAdmin === 'number' ? maxRowsAdmin : 12;
   const readOnly = field.admin?.readOnly === true;
+  const isDisabled = disabled || readOnly;
 
   const taRef = useRef<HTMLTextAreaElement | null>(null);
   const lineHeightRef = useRef<number | null>(null);
@@ -107,7 +108,9 @@ export const TextareaField = (props: TextareaFieldClientProps): ReactElement => 
         rows={minRows}
         maxLength={maxLength}
         readOnly={readOnly}
+        disabled={isDisabled && !readOnly}
         aria-readonly={readOnly || undefined}
+        aria-disabled={isDisabled || undefined}
       />
       {description ? <p className="field-description">{description}</p> : null}
       {showError && errorMessage ? (

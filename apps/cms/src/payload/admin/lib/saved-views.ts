@@ -17,6 +17,7 @@ export type SavedView = {
   readonly where?: Where;
   readonly sort?: string;
   readonly limit?: number;
+  readonly search?: string;
 };
 
 export type SavedViewsState = {

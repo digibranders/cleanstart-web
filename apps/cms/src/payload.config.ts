@@ -218,9 +218,11 @@ export default buildConfig({
         './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
         './payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer',
         './payload/admin/components/ToastBus.tsx#ToastBus',
-        // Wave 4 part 2 — Cmd/Ctrl-Shift-S opens our schedule-publish
-        // dialog (DateTimePicker + Dialog from @cleanstart/ui).
-        './payload/admin/components/SchedulePublishDialog.tsx#SchedulePublishDialog',
+        // Note: SchedulePublishDialog is NOT mounted here as a global action.
+        // The Cmd/Ctrl-Shift-S shortcut is wired inside CmsPublishButton so
+        // only one dialog instance ever mounts, eliminating the duplicate-
+        // dialog race when the shortcut fires while the controlled instance
+        // is already open.
       ],
       afterNavLinks: [
         './payload/admin/components/UserMenu.tsx#UserMenu',
