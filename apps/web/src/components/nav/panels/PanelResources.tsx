@@ -158,8 +158,8 @@ export function PanelResources({ item, latestUpdates, spotlight }: Props) {
       </div>
       {!hideBottomCTA && (
         <ContextualCTA
-          headline="Subscribe to the CleanStart Bulletin"
-          sub="One email per month, new images, talks, advisories."
+          headline="The CleanStart Bulletin."
+          sub="Once a month — new hardened images, security advisories, engineering talks."
           ctaLabel="Subscribe"
           ctaHref="/subscribe"
         />
