@@ -1,4 +1,5 @@
 import type { PodcastEpisode } from "@/lib/podcast";
+import { EmptyState } from "@/components/feedback";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { PodcastEpisodeCard } from "./_components/PodcastEpisodeCard";
 
@@ -59,7 +60,11 @@ export function PodcastLatestEpisodes({
           </h2>
         </Reveal>
         {episodes.length === 0 ? (
-          <p className="mt-10 text-[#475569]">New episodes coming soon.</p>
+          <EmptyState
+            variant="empty"
+            title="No episodes yet"
+            description="New episodes are coming soon — check back shortly."
+          />
         ) : (
           <RevealStagger className="mt-[44px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[32px] gap-y-[32px]">
             {episodes.map((ep) => (

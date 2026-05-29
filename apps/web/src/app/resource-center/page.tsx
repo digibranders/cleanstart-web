@@ -44,17 +44,21 @@ export default async function ResourceCenterPage({
   const activeType = params.type ?? "";
   const searchQuery = params.q ?? "";
 
+  let loadFailed = false;
   const resourcesData = await getResources({
     page,
     ...(activeType ? { type: activeType } : {}),
     ...(searchQuery ? { search: searchQuery } : {}),
-  }).catch(() => ({
-    docs: [],
-    hasNextPage: false,
-    page: 1,
-    totalDocs: 0,
-    totalPages: 1,
-  }));
+  }).catch(() => {
+    loadFailed = true;
+    return {
+      docs: [],
+      hasNextPage: false,
+      page: 1,
+      totalDocs: 0,
+      totalPages: 1,
+    };
+  });
 
   return (
     <>
@@ -110,6 +114,7 @@ export default async function ResourceCenterPage({
                   totalPages={resourcesData.totalPages}
                   activeType={activeType}
                   searchQuery={searchQuery}
+                  loadFailed={loadFailed}
                 />
               </div>
             </div>

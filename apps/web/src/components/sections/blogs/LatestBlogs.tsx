@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Blog } from "@/lib/blog";
+import { EmptyState } from "@/components/feedback";
 import { Pagination } from "@/components/ui/Pagination";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { BlogCard } from "./BlogCard";
@@ -136,12 +137,26 @@ export function LatestBlogs({
         </Reveal>
 
         {posts.length === 0 ? (
-          <p
-            className="font-sans text-center py-20"
-            style={{ color: "rgba(17,17,17,0.54)", fontSize: "var(--fs-lead)" }}
-          >
-            No posts found.
-          </p>
+          activeCategory || searchQuery ? (
+            <EmptyState
+              variant="no-results"
+              actions={
+                <Link
+                  href="/blogs"
+                  className="font-medium text-[#4a3bf1] underline underline-offset-4"
+                  style={{ fontSize: "var(--fs-body)" }}
+                >
+                  Clear filters
+                </Link>
+              }
+            />
+          ) : (
+            <EmptyState
+              variant="empty"
+              title="No posts yet"
+              description="Check back soon — new articles are on the way."
+            />
+          )
         ) : (
           <>
             {/* 3-column grid of cards */}

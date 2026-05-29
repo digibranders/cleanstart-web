@@ -16,6 +16,23 @@ import { draftMode } from "next/headers";
  *   to all draft-enabled collections.
  */
 
+/**
+ * Error thrown when the CMS REST API returns a non-2xx response. Carries the
+ * HTTP `status` so the app-level error boundary can map it to the right
+ * illustrated state (503 → maintenance, 400 → bad-request, else server-error).
+ * NOTE: Next.js redacts thrown-error details on the *client* error boundary in
+ * production (only `digest` survives), so this mapping is best-effort there;
+ * it is reliable in dev and anywhere the error is read server-side.
+ */
+export class CmsFetchError extends Error {
+  readonly status: number;
+  constructor(status: number, path: string) {
+    super(`CMS fetch failed: ${status} ${path}`);
+    this.name = "CmsFetchError";
+    this.status = status;
+  }
+}
+
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
 const CMS_API_KEY = process.env.CMS_API_KEY;
 const CMS_API_KEY_COLLECTION = process.env.CMS_API_KEY_COLLECTION ?? "users";
@@ -100,7 +117,7 @@ export async function fetchCMS<T>(
 
   const res = await fetch(`${CMS_URL}${effectivePath}`, init);
   if (!res.ok) {
-    throw new Error(`CMS fetch failed: ${res.status} ${effectivePath}`);
+    throw new CmsFetchError(res.status, effectivePath);
   }
   return res.json() as Promise<T>;
 }

@@ -42,18 +42,22 @@ export default async function NewsPage({
   const activeCategory = params.category ?? "";
   const searchQuery = params.q ?? "";
 
+  let loadFailed = false;
   const newsData = await getNews({
     page,
     ...(activeCategory ? { category: activeCategory } : {}),
     ...(searchQuery ? { search: searchQuery } : {}),
-  }).catch(() => ({
-    docs: [],
-    hasNextPage: false,
-    hasPrevPage: false,
-    page: 1,
-    totalDocs: 0,
-    totalPages: 1,
-  }));
+  }).catch(() => {
+    loadFailed = true;
+    return {
+      docs: [],
+      hasNextPage: false,
+      hasPrevPage: false,
+      page: 1,
+      totalDocs: 0,
+      totalPages: 1,
+    };
+  });
 
   return (
     <>
@@ -77,6 +81,7 @@ export default async function NewsPage({
             totalPages={newsData.totalPages}
             activeCategory={activeCategory}
             searchQuery={searchQuery}
+            loadFailed={loadFailed}
           />
         </FadeUp>
 

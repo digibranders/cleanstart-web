@@ -46,18 +46,22 @@ export default async function WebinarsPage({
   const activeType = parseTypeParam(params.type);
   const activeRegion = parseRegionParam(params.region);
 
+  let loadFailed = false;
   const data = await getWebinars({
     page,
     ...(activeType ? { type: activeType } : {}),
     ...(activeRegion ? { region: activeRegion } : {}),
-  }).catch(() => ({
-    docs: [],
-    hasNextPage: false,
-    hasPrevPage: false,
-    page: 1,
-    totalDocs: 0,
-    totalPages: 1,
-  }));
+  }).catch(() => {
+    loadFailed = true;
+    return {
+      docs: [],
+      hasNextPage: false,
+      hasPrevPage: false,
+      page: 1,
+      totalDocs: 0,
+      totalPages: 1,
+    };
+  });
 
   return (
     <>
@@ -81,6 +85,7 @@ export default async function WebinarsPage({
             totalPages={data.totalPages}
             activeType={activeType}
             activeRegion={activeRegion}
+            loadFailed={loadFailed}
           />
         </FadeUp>
 

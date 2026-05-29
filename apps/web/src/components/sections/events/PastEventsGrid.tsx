@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Event } from "@/lib/events";
+import { EmptyState } from "@/components/feedback";
 import { Pagination } from "@/components/ui/Pagination";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { EventCard } from "./EventCard";
@@ -8,6 +9,8 @@ interface PastEventsGridProps {
   events: Event[];
   currentPage: number;
   totalPages: number;
+  /** True when the CMS fetch failed (vs. a genuinely empty result). */
+  loadFailed?: boolean;
 }
 
 function buildPageHref(page: number): string {
@@ -18,6 +21,7 @@ export function PastEventsGrid({
   events,
   currentPage,
   totalPages,
+  loadFailed = false,
 }: PastEventsGridProps): React.ReactElement {
   return (
     <section
@@ -117,12 +121,15 @@ export function PastEventsGrid({
         </Reveal>
 
         {events.length === 0 ? (
-          <p
-            className="font-sans text-center py-20"
-            style={{ color: "rgba(17,17,17,0.54)", fontSize: "var(--fs-lead)" }}
-          >
-            No past events to show yet.
-          </p>
+          <EmptyState
+            variant={loadFailed ? "load-failed" : "empty"}
+            {...(loadFailed
+              ? {}
+              : {
+                  title: "No past events yet",
+                  description: "Check back after our next event wraps up.",
+                })}
+          />
         ) : (
           <>
             <RevealStagger

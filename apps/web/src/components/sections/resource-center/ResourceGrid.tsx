@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Resource } from "@/lib/resources";
+import { EmptyState } from "@/components/feedback";
 import { Pagination } from "@/components/ui/Pagination";
 import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { ResourceCard } from "./ResourceCard";
@@ -10,6 +11,8 @@ interface ResourceGridProps {
   totalPages: number;
   activeType: string;
   searchQuery: string;
+  /** True when the CMS fetch failed (vs. a genuinely empty result). */
+  loadFailed?: boolean;
 }
 
 function buildPageHref(
@@ -31,25 +34,37 @@ export function ResourceGrid({
   totalPages,
   activeType,
   searchQuery,
+  loadFailed = false,
 }: ResourceGridProps): React.ReactElement {
+  const hasFilters = Boolean(activeType || searchQuery);
   if (resources.length === 0) {
-    return (
-      <div
-        className="flex-1 flex items-center justify-center"
-        style={{ minHeight: "400px" }}
-      >
-        <p
-          className="text-xl font-normal leading-[1.4] tracking-[-0.04em] text-center"
-          style={{ color: "rgba(17,17,17,0.54)" }}
-        >
-          No resources found.{" "}
-          {activeType || searchQuery ? (
-            <Link href="/resource-center" className="text-[#4a3bf1] underline">
+    if (loadFailed) {
+      return <EmptyState variant="load-failed" className="flex-1" />;
+    }
+    if (hasFilters) {
+      return (
+        <EmptyState
+          variant="no-results"
+          className="flex-1"
+          actions={
+            <Link
+              href="/resource-center"
+              className="font-medium text-[#4a3bf1] underline underline-offset-4"
+              style={{ fontSize: "var(--fs-body)" }}
+            >
               Clear filters
             </Link>
-          ) : null}
-        </p>
-      </div>
+          }
+        />
+      );
+    }
+    return (
+      <EmptyState
+        variant="empty"
+        className="flex-1"
+        title="No resources yet"
+        description="Check back soon — new resources are on the way."
+      />
     );
   }
 
