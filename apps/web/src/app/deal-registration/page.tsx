@@ -47,7 +47,7 @@ export default function DealRegistrationPage() {
             width={419}
             height={419}
             aria-hidden
-            className="pointer-events-none select-none absolute left-[12px] top-[100px] w-[120px] sm:left-[clamp(8px,3vw,48px)] sm:top-[clamp(120px,12vw,220px)] sm:w-[clamp(160px,18vw,280px)]"
+            className="pointer-events-none select-none absolute hidden sm:block sm:left-[clamp(8px,3vw,48px)] sm:top-[clamp(120px,12vw,220px)] sm:w-[clamp(160px,18vw,280px)]"
             style={{
               height: "auto",
               opacity: 1,
@@ -63,7 +63,7 @@ export default function DealRegistrationPage() {
             width={419}
             height={419}
             aria-hidden
-            className="pointer-events-none select-none absolute right-[12px] top-[100px] w-[120px] sm:right-[clamp(8px,3vw,48px)] sm:top-[clamp(120px,12vw,220px)] sm:w-[clamp(160px,18vw,280px)]"
+            className="pointer-events-none select-none absolute hidden sm:block sm:right-[clamp(8px,3vw,48px)] sm:top-[clamp(120px,12vw,220px)] sm:w-[clamp(160px,18vw,280px)]"
             style={{
               height: "auto",
               opacity: 1,
@@ -72,13 +72,12 @@ export default function DealRegistrationPage() {
           />
 
           <div
-            className="relative mx-auto flex items-end justify-center text-center"
+            className="relative mx-auto flex items-end justify-center text-center pb-[600px] sm:pb-[clamp(180px,26vw,330px)]"
             style={{
               maxWidth: "var(--container-default)",
               paddingLeft: "24px",
               paddingRight: "24px",
-              paddingTop: "clamp(80px, 10vw, 160px)",
-              paddingBottom: "clamp(200px, 28vw, 330px)",
+              paddingTop: "clamp(94px, 11vw, 160px)",
             }}
           >
             <h1
@@ -129,10 +128,7 @@ export default function DealRegistrationPage() {
           }}
         >
           <div
-            className="relative z-10"
-            style={{
-              marginTop: "calc(-1 * clamp(240px, 23vw, 250px))",
-            }}
+            className="relative z-10 -mt-[580px] sm:mt-[calc(-1*clamp(60px,16vw,250px))]"
           >
             <DealRegistrationForm />
           </div>
