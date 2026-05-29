@@ -18,15 +18,16 @@ const GRID_BG: CSSProperties = {
   backgroundPosition: "0 0",
 };
 
-// Full-page "glass" hero title — translucent white (0.35) over the gradient,
-// 72px max at desktop scaling down to 40px on phones. Intentionally larger than
-// the --fs-display role token: this is the dedicated error-hero display tier
-// (Figma 857:18367), kept deliberately oversized and frosted for the 404/500
-// full-page states. Inline (light-tone) states use --fs-h3 instead.
+// Full-page "glass" hero title — exact Figma spec (Final 404 frame, 1440 width):
+// Manrope SemiBold, 190px / line-height 100% / letter-spacing -0.05em, white @35%.
+// Authored at 1440 (title box 1296px = 1440 − 144 margins), so 190px is the
+// literal desktop size; it scales down fluidly (~13vw) to 40px on phones and
+// locks at 190px from ~1440px up. This is the dedicated error-hero display tier
+// (deliberately larger than --fs-display); inline light-tone states use --fs-h3.
 const TITLE_STYLE: CSSProperties = {
-  fontSize: "clamp(2.5rem, 5.5vw, 4.5rem)",
-  lineHeight: 1.05,
-  letterSpacing: "-0.03em",
+  fontSize: "clamp(2.5rem, 13vw, 11.875rem)",
+  lineHeight: 1,
+  letterSpacing: "-0.05em",
   color: "rgba(255, 255, 255, 0.35)",
   fontWeight: 600,
 };
