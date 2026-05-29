@@ -4,10 +4,11 @@ import {
   LazyMotion,
   domAnimation,
   m,
+  useInView,
   useReducedMotion,
   type HTMLMotionProps,
 } from "motion/react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
 
 import {
   EASE_OUT,
@@ -16,6 +17,40 @@ import {
   staggerChild,
   staggerParent,
 } from "@/lib/motion";
+
+type RevealViewport = typeof REVEAL_VIEWPORT | typeof HEADER_VIEWPORT;
+
+/**
+ * Fail-open in-view detection. Drives reveals off `useInView`, but if the
+ * IntersectionObserver hasn't reported an element that is *already* within the
+ * viewport shortly after mount (a race that surfaces on client-side route
+ * navigation, leaving content stranded at `opacity:0`), a geometry check
+ * reveals it directly. Below-the-fold content is left for the scroll observer,
+ * so the scroll-reveal behaviour is preserved.
+ */
+function useRevealInView(
+  ref: RefObject<HTMLElement | null>,
+  viewport: RevealViewport,
+): boolean {
+  const inView = useInView(ref, viewport);
+  const [forceShow, setForceShow] = useState(false);
+
+  useEffect(() => {
+    if (inView || forceShow) return;
+    const id = window.setTimeout(() => {
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      // Any part of the element is within the viewport but the observer never
+      // fired — reveal it so data is never permanently hidden.
+      if (rect.top < vh && rect.bottom > 0) setForceShow(true);
+    }, 200);
+    return () => window.clearTimeout(id);
+  }, [inView, forceShow, ref]);
+
+  return inView || forceShow;
+}
 
 /**
  * Granular scroll-reveal primitive.
@@ -52,41 +87,26 @@ export function Reveal({
   ...rest
 }: RevealProps) {
   const reduce = useReducedMotion();
-  // Render a static placeholder on the server and first client render, then
-  // mount the motion element after hydration. When this element is above the
-  // fold, motion resolves the in-view state during the client's first render
-  // and disagrees with the server's initial state, causing a hydration
-  // mismatch. Keeping motion out of SSR sidesteps that while the freshly
-  // mounted whileInView observer still drives the reveal.
-  const reduceProps = rest as unknown as React.HTMLAttributes<HTMLDivElement>;
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const ref = useRef<HTMLDivElement>(null);
+  const show = useRevealInView(ref, header ? HEADER_VIEWPORT : REVEAL_VIEWPORT);
 
   if (reduce) {
-    return <div {...reduceProps}>{children}</div>;
-  }
-
-  if (!mounted) {
     return (
-      <div
-        {...reduceProps}
-        style={{
-          opacity: 0,
-          transform: `translateY(${y}px)`,
-          ...reduceProps.style,
-        }}
-      >
+      <div {...(rest as unknown as React.HTMLAttributes<HTMLDivElement>)}>
         {children}
       </div>
     );
   }
 
+  // `useInView` returns false on the server and first client render, so the
+  // SSR markup matches the client's initial state (no hydration mismatch).
+  // After mount the observer — or the fail-open fallback — flips `show`.
   return (
     <LazyMotion features={domAnimation} strict>
       <m.div
+        ref={ref}
         initial={{ opacity: 0, y }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={header ? HEADER_VIEWPORT : REVEAL_VIEWPORT}
+        animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y }}
         transition={{ duration, delay, ease: EASE_OUT }}
         {...rest}
       >
@@ -155,6 +175,8 @@ export function RevealStagger({
   ...rest
 }: RevealStaggerProps) {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const show = useRevealInView(ref, header ? HEADER_VIEWPORT : REVEAL_VIEWPORT);
 
   if (reduce) {
     return (
@@ -167,9 +189,9 @@ export function RevealStagger({
   return (
     <LazyMotion features={domAnimation} strict>
       <m.div
+        ref={ref}
         initial="hidden"
-        whileInView="visible"
-        viewport={header ? HEADER_VIEWPORT : REVEAL_VIEWPORT}
+        animate={show ? "visible" : "hidden"}
         variants={staggerParent(gap)}
         {...rest}
       >
