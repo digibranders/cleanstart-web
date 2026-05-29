@@ -167,8 +167,8 @@ export function StateView({
             </HeroReveal>
 
             <div
-              className="relative mt-[clamp(32px,4vw,56px)] w-full"
-              style={{ maxWidth: "clamp(260px, 42vw, 520px)" }}
+              className="relative mt-[clamp(24px,3vw,48px)] w-full"
+              style={{ maxWidth: "clamp(320px, 58vw, 760px)" }}
             >
               <Image
                 src={preset.illustration}
@@ -176,7 +176,7 @@ export function StateView({
                 width={preset.width}
                 height={preset.height}
                 priority
-                sizes="(min-width: 1280px) 520px, (min-width: 640px) 42vw, 80vw"
+                sizes="(min-width: 1280px) 760px, (min-width: 640px) 58vw, 85vw"
                 className="h-auto w-full select-none"
                 draggable={false}
               />

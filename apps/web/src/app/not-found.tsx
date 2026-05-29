@@ -20,8 +20,12 @@ export default function NotFound() {
           actions={
             <Link
               href="/"
-              className="inline-flex h-12 items-center rounded-full border border-white/30 bg-white/10 px-7 font-medium text-white backdrop-blur-md transition-all hover:border-white/50 hover:bg-white/20"
-              style={{ fontSize: "var(--fs-button)" }}
+              className="cs-btn-glass"
+              style={{
+                ["--cs-btn-h" as string]: "52px",
+                ["--cs-btn-px" as string]: "28px",
+                ["--cs-btn-fs" as string]: "16px",
+              }}
             >
               Back to home
             </Link>
