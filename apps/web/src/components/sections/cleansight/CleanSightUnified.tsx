@@ -30,7 +30,7 @@ export function CleanSightUnified(): React.ReactElement {
       className="relative overflow-hidden bg-white"
       style={{ minHeight: "792px" }}
     >
-      {/* Decorative vector — top-left, partially off-screen */}
+      {/* Decorative vector — top-left, partially off-screen. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -42,7 +42,7 @@ export function CleanSightUnified(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Decorative union — bottom-right, rotated, partially off-screen */}
+      {/* Decorative union — bottom-right, rotated, partially off-screen. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -60,7 +60,7 @@ export function CleanSightUnified(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Decorative ellipse glow — bottom-right */}
+      {/* Decorative ellipse glow — bottom-right. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -73,7 +73,7 @@ export function CleanSightUnified(): React.ReactElement {
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
-        {/* Heading row */}
+        {/* Heading row. */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-[60px]">
           <Reveal header style={{ maxWidth: "654px", flexShrink: 0 }}>
             <h2
@@ -110,7 +110,7 @@ export function CleanSightUnified(): React.ReactElement {
           </Reveal>
         </div>
 
-        {/* Feature cards */}
+        {/* Feature cards. */}
         <div className="mt-10 lg:mt-[72px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-8">
           {CARDS.map((card) => (
             <div
@@ -121,12 +121,12 @@ export function CleanSightUnified(): React.ReactElement {
               className="relative flex flex-col bg-white overflow-hidden max-sm:!min-h-0"
               style={{
                 borderRadius: "36px",
-                /* Figma: cyan shadow layer (295×354) at 30% opacity behind 287×346 card */
+                /* Cyan glow border at 30% opacity. */
                 boxShadow: "0 0 0 4px rgba(44, 193, 235, 0.30)",
                 minHeight: "346px",
               }}
             >
-              {/* Purple glow blob — top of card */}
+              {/* Purple glow blob — top of card. */}
               <div
                 aria-hidden
                 className="pointer-events-none select-none absolute"
@@ -143,7 +143,7 @@ export function CleanSightUnified(): React.ReactElement {
                 }}
               />
 
-              {/* Decorative vertical gradient lines — percentages of the 287px Figma card */}
+              {/* Decorative vertical gradient lines. */}
               {[16.9, 41.8, 56.6, 81.5].map((pct) => (
                 <div
                   key={pct}
@@ -161,7 +161,7 @@ export function CleanSightUnified(): React.ReactElement {
                 />
               ))}
 
-              {/* Decorative horizontal gradient lines — percentages of the 264px Figma stripe area */}
+              {/* Decorative horizontal gradient lines. */}
               {[25.6, 69.5].map((pct) => (
                 <div
                   key={pct}
@@ -179,9 +179,8 @@ export function CleanSightUnified(): React.ReactElement {
                 />
               ))}
 
-              {/* Card content */}
               <div className="relative flex flex-col flex-1 z-10" style={{ padding: "24px", paddingTop: "54px", gap: "12px" }}>
-                {/* Ball icon (per-card PNG sphere with embedded glyph) */}
+                {/* Per-card PNG sphere with embedded glyph. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={card.iconSrc}
@@ -195,7 +194,6 @@ export function CleanSightUnified(): React.ReactElement {
                   style={{ width: "96px", height: "96px", objectFit: "contain" }}
                 />
 
-                {/* Title */}
                 <h3
                   style={{
                     fontFamily: "var(--font-display)",
@@ -209,7 +207,6 @@ export function CleanSightUnified(): React.ReactElement {
                   {card.title}
                 </h3>
 
-                {/* Body */}
                 <p
                   style={{
                     fontFamily: "var(--font-sans)",

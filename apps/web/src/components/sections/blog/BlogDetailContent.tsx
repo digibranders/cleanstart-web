@@ -70,8 +70,7 @@ export function BlogDetailContent({
           {/* ── CENTER: Article body ── */}
           {/* mx-auto centers the column when the xl TOC sidebar is hidden; xl:mx-0 resets it once the sidebar is visible */}
           <article className="min-w-0 flex-1 mx-auto lg:mx-0" style={{ maxWidth: "680px" }}>
-            {/* Mobile-only collapsible TOC — Figma blog detail mobile shows a
-                "Blended" dropdown listing the article's sections (817:4497). */}
+            {/* Mobile-only collapsible TOC dropdown listing the article's sections. */}
             <div className="lg:hidden mb-8">
               <MobileTableOfContents toc={tableOfContents} />
             </div>

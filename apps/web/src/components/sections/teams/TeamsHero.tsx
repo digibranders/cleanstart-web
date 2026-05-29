@@ -3,9 +3,8 @@ import { HeroReveal } from "@/components/ui/Reveal";
 export function TeamsHero() {
   return (
     <section
-      /* No min-height: it left ~140px of dead gradient space below the
-         paragraph on desktop. The section hugs content; the pt/pb padding
-         still gives the hero adequate vertical breathing room. */
+      /* No min-height: it leaves dead gradient space below the paragraph on
+         desktop. The section hugs content; pt/pb padding handles vertical space. */
       className="relative overflow-hidden"
       style={{
         backgroundColor: "#151021",
@@ -13,7 +12,6 @@ export function TeamsHero() {
           "linear-gradient(179.998deg, rgb(21,16,33) 25.702%, rgb(16,18,62) 43.563%, rgb(19,30,143) 67.739%, rgb(71,30,192) 89.306%, rgb(71,31,195) 102.85%, rgba(70,30,191,0.85) 109.17%, rgba(66,30,188,0.4) 119.77%, rgba(66,30,188,0) 126.11%)",
       }}
     >
-      {/* Glow blob — large, left-center */}
       <div
         aria-hidden
         className="pointer-events-none absolute select-none"
@@ -41,7 +39,6 @@ export function TeamsHero() {
         </div>
       </div>
 
-      {/* Glow streak — narrow, top-right */}
       <div
         aria-hidden
         className="pointer-events-none absolute select-none hidden lg:flex"
@@ -68,7 +65,6 @@ export function TeamsHero() {
         </div>
       </div>
 
-      {/* Accent lines — vertical gradient strokes */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"

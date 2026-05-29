@@ -3,30 +3,11 @@ import Link from 'next/link';
 import { HeroReveal } from '@/components/ui/Reveal';
 
 /**
- * ASR Hero — pixel-perfect for both desktop (Figma 783:90) and mobile (Figma 920:609).
+ * ASR Hero — BLOATED vs CLEAN comparison cards beside the headline.
  *
- * Desktop specs (1440px / node 783:90):
- *  - Section height: 823px · bg gradient identical to mobile
- *  - Mesh background: hero-mesh.svg 1920×569px at left:-240px (overflows both edges)
- *  - Content position: left 82px · top 229px
- *  - Heading: Manrope SemiBold 80px / lh 1.2 / tracking -0.05em
- *  - "Bigger Risk": gradient 96.33deg #9A51FF 1.76% → #2CC1EB 98.78%
- *  - Description: Manrope Regular 30px / tracking -0.04em / opacity 0.8
- *  - CTA: px-18px py-9px · font Inter Medium 18px / tracking -0.01em · border #dab6f3 · glass
- *  - Content → CTA gap: 40px · Heading → Desc gap: 24px
- *  - BLOATED card: hero-cards.png rendered 360px wide (larger, on left).
- *  - CLEAN card: JSX 260×320px (smaller, on right). Both bottom-aligned per Figma 783:90.
- *
- * Mobile specs (360px / node 920:609):
- *  - Content starts at top: 136px
- *  - Heading: Manrope Bold 32px / lh 1.2 / white
- *  - "Bigger Risk": gradient 98.23deg #9A51FF→#2CC1EB, tracking -1.6px
- *  - Description: Manrope Regular 16px / tracking -0.64px / opacity 0.8
- *  - CTA: px-24px py-12px · border #dab6f3 · 16px Medium · tracking -0.8px
- *  - Cards: hero-mobile-cards.png composite
- *
- * CTA note: cs-btn-glass is unlayered CSS (beats @layer utilities), so padding / font-size
- * MUST be set via inline style — Tailwind responsive classes like py-[9px] won't win.
+ * CTA note: cs-btn-glass is unlayered CSS (beats @layer utilities), so padding
+ * and font-size MUST be set via inline style — Tailwind responsive classes
+ * like py-[9px] won't win.
  */
 export function ASRHero(): React.ReactElement {
   return (
@@ -40,12 +21,10 @@ export function ASRHero(): React.ReactElement {
       }}
     >
       {/*
-       * Grid mesh — same hero-mesh.svg across all viewports.
-       * Desktop (md+): 1920×569px positioned at left:-240px so it overflows
-       * 240px on each side of the 1440px viewport.
-       * Mobile: stretched to 100% width via preserveAspectRatio="none" baked
-       * into the SVG, so the grid stays continuous instead of being a different
-       * CSS pattern. overflow-hidden on the section clips it.
+       * Grid mesh — same hero-mesh.svg across all viewports. On md+ it is
+       * positioned so it overflows each side of the viewport; on mobile the
+       * SVG's baked-in preserveAspectRatio="none" stretches it to full width
+       * so the grid stays continuous. overflow-hidden on the section clips it.
        */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -78,32 +57,23 @@ export function ASRHero(): React.ReactElement {
         }}
       />
 
-      {/*
-       * Container: px-6 mobile · sm:px-10 tablet · lg:px-[82px] desktop
-       * At 1440px viewport the content left edge lands at exactly 82px.
-       */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 lg:px-[82px]">
         <div
           className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-6 lg:gap-10"
           style={{
             // Match FipsHero top padding so the H1 baseline lines up across product heroes.
             paddingTop: 'clamp(112px, 12.92vw, 200px)',
-            // Fixed bottom space below the cards/CTA at every viewport
-            // (was a clamp 56→120px which made the gap shift with width).
+            // Fixed bottom space below the cards/CTA at every viewport so the
+            // gap doesn't shift with width.
             paddingBottom: '96px',
           }}
         >
-          {/* ── Left: heading + description + CTA ── */}
+          {/* Left: heading + description + CTA */}
           <div
             className="w-full md:flex-1 flex flex-col items-center md:items-start text-center md:text-left gap-6 md:gap-6 lg:gap-10"
             style={{ maxWidth: '545px' }}
           >
-            {/* Text block — heading + description */}
             <div className="flex flex-col items-center md:items-start text-center md:text-left gap-4 md:gap-5 lg:gap-6 w-full">
-              {/*
-               * H1: 32px Bold mobile → 80px SemiBold desktop
-               * Tracking: -0.05em works at both sizes.
-               */}
               <HeroReveal y={50} duration={1.0}>
                 <h1
                   className="font-bold lg:font-semibold"
@@ -131,10 +101,6 @@ export function ASRHero(): React.ReactElement {
                 </h1>
               </HeroReveal>
 
-              {/*
-               * Description: 16px mobile → 30px desktop
-               * Tracking: -0.04em = -0.64px at 16px = -1.2px at 30px
-               */}
               <HeroReveal y={30} delay={0.2} duration={0.8}>
                 <p
                   className="text-base lg:[font-size:var(--text-t-subhead)]"
@@ -154,12 +120,8 @@ export function ASRHero(): React.ReactElement {
               </HeroReveal>
             </div>
 
-            {/*
-             * CTA — inline style overrides are required because cs-btn-glass is unlayered CSS
-             * and beats @layer utilities (Tailwind). Desktop: 18px / py-9px px-18px.
-             * Mobile: 16px / py-12px px-24px (served by the same inline style at all viewports —
-             * both sizes are close enough visually; a JS media-query could split them if needed).
-             */}
+            {/* Inline style overrides are required because cs-btn-glass is
+                unlayered CSS and beats @layer utilities (Tailwind). */}
             <Link
               href="https://images.cleanstart.com"
               target="_blank"
@@ -197,20 +159,15 @@ export function ASRHero(): React.ReactElement {
             </Link>
           </div>
 
-          {/* ── Tablet + Desktop: BLOATED + CLEAN cards side-by-side ── */}
+          {/* Tablet + Desktop: BLOATED + CLEAN cards side-by-side. */}
           {/*
            * Stage system: cards are authored at a fixed 650×440 "design canvas"
-           * and CSS-scaled uniformly via --asr-card-scale (0.55 at md → 1.0 at 1440+).
-           * The OUTER div reserves the post-scale footprint so flex layout is honest;
-           * the INNER div renders the design-size canvas and transforms it down.
-           * This preserves every absolute-positioned interior coordinate.
+           * and CSS-scaled uniformly via --asr-card-scale. The OUTER div reserves
+           * the post-scale footprint so flex layout is honest; the INNER div
+           * renders the design-size canvas and transforms it down, preserving
+           * every absolute-positioned interior coordinate.
            *
-           * BLOATED bottom-anchored at canvas bottom:0; the PNG carries ~38px of
-           * baked-in drop-shadow padding below the visible card frame, so CLEAN is
-           * anchored at bottom:38px to align the visible card frames at the same baseline.
-           */}
-          {/*
-           * Stage scale system, two regimes:
+           * Two regimes:
            *   • Mobile (<md): scale is computed so the VISIBLE card span
            *     (BLOATED visible-left → CLEAN visible-right = 586 canvas units)
            *     fills the container's content width (100vw - 48px, where 48px
@@ -249,7 +206,7 @@ export function ASRHero(): React.ReactElement {
                 transformOrigin: 'top left',
               }}
             >
-            {/* BLOATED card — larger, bottom-aligned, on the left */}
+            {/* BLOATED card — larger, bottom-aligned, on the left. */}
             <div style={{ position: 'absolute', left: 0, bottom: 0 }}>
               <Image
                 src="/images/attack-surface-reduction/hero-cards.png"
@@ -262,11 +219,10 @@ export function ASRHero(): React.ReactElement {
               />
             </div>
 
-            {/* CLEAN card — smaller, visually bottom-aligned with BLOATED.
-                Measured from the PNG: hero-cards.png is 484×493; the visible card
-                frame ends at y=464 (29px of drop-shadow padding underneath). At the
-                rendered 430px width (scale 430/484 = 0.888) that's ≈26px of shadow.
-                CLEAN bottom:26px matches BLOATED's visible bottom exactly. */}
+            {/* CLEAN card — smaller, visually bottom-aligned with BLOATED. The
+                hero-cards.png carries ~26px of drop-shadow padding below its
+                visible frame at the rendered width, so CLEAN's bottom:26px
+                matches BLOATED's visible bottom exactly. */}
             <div
               style={{
                 position: 'absolute',
@@ -282,7 +238,7 @@ export function ASRHero(): React.ReactElement {
                 overflow: 'hidden',
               }}
             >
-              {/* Glass shimmer overlay */}
+              {/* Glass shimmer overlay. */}
               <div
                 aria-hidden
                 style={{
@@ -294,7 +250,6 @@ export function ASRHero(): React.ReactElement {
                 }}
               />
 
-              {/* Content layer */}
               <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%' }}>
                 {/* 87 MB size badge — top-left */}
                 <div
@@ -359,7 +314,7 @@ export function ASRHero(): React.ReactElement {
                   </span>
                 </div>
 
-                {/* Logo backdrop — green blur ellipse (Figma "Ellipse 46693") */}
+                {/* Logo backdrop — green blur ellipse */}
                 <div
                   aria-hidden
                   style={{
@@ -375,7 +330,7 @@ export function ASRHero(): React.ReactElement {
                   }}
                 />
 
-                {/* Logo backdrop — soft radial wash (Figma "Union") */}
+                {/* Logo backdrop — soft radial wash */}
                 <div
                   aria-hidden
                   style={{
@@ -391,7 +346,7 @@ export function ASRHero(): React.ReactElement {
                   }}
                 />
 
-                {/* Logo backdrop — etched gridline pattern (Figma 366:6517) */}
+                {/* Logo backdrop — etched gridline pattern */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   aria-hidden
@@ -409,7 +364,7 @@ export function ASRHero(): React.ReactElement {
                   decoding="async"
                 />
 
-                {/* CleanStart geometric "N" logo — centred in card body */}
+                {/* CleanStart geometric "N" logo — centred in card body. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   aria-hidden
@@ -463,7 +418,7 @@ export function ASRHero(): React.ReactElement {
                   </span>
                 </div>
 
-                {/* CVES stat — bottom-right area */}
+                {/* CVES stat — bottom-right area. */}
                 <div
                   style={{
                     position: 'absolute',

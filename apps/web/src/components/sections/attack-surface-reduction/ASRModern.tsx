@@ -1,8 +1,6 @@
 import type React from 'react';
 import { Reveal } from '@/components/ui/Reveal';
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
 const TARGETS = [
   {
     title: 'Kubernetes Platforms',
@@ -21,22 +19,10 @@ const TARGETS = [
   },
 ] as const;
 
-// ─── Section ──────────────────────────────────────────────────────────────────
 /*
- * Desktop (existing): 3-column grid with PNG icon badges, heading left-aligned.
- *
- * Mobile (Figma 920:613 — 360×992px):
- *   BG  : linear-gradient(180deg, #151021 0%, #131e8f 69.941%, #471ec0 111.91%)
- *   Deco: two Union SVGs with mix-blend-overlay (top-right & bottom-left)
- *   H2  : Manrope Bold 28px / lh 1.2 / centred / w-254px / top: 32px
- *         "Environments" → gradient 95.18deg #9A51FF 42.34% → #2CC1EB 98.78%
- *   Items: centred flex-col, gap-24px, items separated by 245×1px dividers
- *   Ball: 60×60px · round · bg linear-gradient(180deg,#239cff,#005be3)
- *         box-shadow outer + inset highlights · icon 33×33px
- *   Title: Manrope Bold 24px / tracking -1.2px / white
- *   Desc : Manrope Regular 16px / tracking -0.8px / white
+ * Desktop: 3-column grid with PNG icon badges, heading left-aligned.
+ * Mobile: centred vertical list with divider lines between items.
  */
-
 export function ASRModern(): React.ReactElement {
   return (
     <section
@@ -46,7 +32,7 @@ export function ASRModern(): React.ReactElement {
         background: 'linear-gradient(180deg, #151021 0%, #131E8F 69.941%, #471EC0 111.91%)',
       }}
     >
-      {/* ── Desktop decorations ── */}
+      {/* Desktop decorations. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -68,12 +54,7 @@ export function ASRModern(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Mobile decorations: Union shapes with mix-blend-overlay ── */}
-      {/*
-       * Figma 366:6435 top-right: left calc(50%+184.87px), top:-25px, rotate-150 scale-y-flip
-       * Figma 366:6436 bottom-left: left calc(50%-180.13px), top:626px, rotate-30
-       * Both: 187.742×195.511px container → 129.669×150.892px inner Union
-       */}
+      {/* Mobile decorations: Union shapes with mix-blend-overlay. */}
       <div
         aria-hidden
         className="absolute md:hidden pointer-events-none select-none overflow-hidden"
@@ -131,7 +112,7 @@ export function ASRModern(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Desktop content ── */}
+      {/* Desktop content. */}
       <div
         className="relative hidden md:block mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md pb-[var(--spacing-section-cta)]"
       >
@@ -191,12 +172,7 @@ export function ASRModern(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Mobile content ── */}
-      {/*
-       * Figma positions (relative to section bg top):
-       *   Heading  : top 32px, centred, w-254px
-       *   Items div: top 158px, centred, flex-col gap-24px
-       */}
+      {/* Mobile content. */}
       <div
         className="md:hidden relative"
         style={{ minHeight: '660px' }}
@@ -261,7 +237,6 @@ export function ASRModern(): React.ReactElement {
   );
 }
 
-// ─── Shared: IconBall ─────────────────────────────────────────────────────────
 /*
  * Blue gradient sphere with inset highlights + a centered SVG icon. Used in
  * both the mobile timeline list and the desktop 3-column grid so the icon
@@ -325,19 +300,6 @@ function IconBall({
   );
 }
 
-// ─── Mobile: ModernItem ───────────────────────────────────────────────────────
-/*
- * Figma 366:6566/6590/6614:
- *   flex-col · gap-12px · items-center
- *   Ball: 60×60px · rounded-full
- *         bg linear-gradient(180deg, #239cff 0%, #005be3 100%)
- *         box-shadow: 0 3.857px 9.086px rgba(28,60,142,0.33)
- *         inset: 0 -0.145px 0.182px rgba(0,44,179,0.5), 0 0.073px 0.364px rgba(255,255,255,0.81)
- *         radial highlight (simplified from Figma's mask+blend effects)
- *         Icon: 33×33px centred
- *   Title: Manrope Bold 24px / tracking -1.2px / white / centre / lh 1.5
- *   Desc : Manrope Regular 16px / tracking -0.8px / white / centre / lh 1.5
- */
 function ModernItem({
   title,
   desc,
@@ -358,7 +320,6 @@ function ModernItem({
     >
       <IconBall icon={icon} size={60} iconSize={33} />
 
-      {/* Text */}
       <div
         style={{
           display: 'flex',
@@ -399,11 +360,7 @@ function ModernItem({
   );
 }
 
-// ─── Mobile: ModernDivider ────────────────────────────────────────────────────
-/*
- * Figma Rectangle 19 (same pattern as ASRDelivers) but 245px wide.
- * transparent → white → transparent horizontal gradient line.
- */
+// transparent → white → transparent horizontal gradient divider line.
 function ModernDivider(): React.ReactElement {
   return (
     <div

@@ -53,7 +53,6 @@ export function CareersSidebar({
       aria-label="Filter open roles"
       className="shrink-0 w-full lg:w-[295px]"
     >
-      {/* MOBILE — horizontal scrolling tab strips */}
       <div className="lg:hidden flex flex-col gap-4">
         <MobileTabStrip
           label="Status"
@@ -108,11 +107,10 @@ export function CareersSidebar({
         />
       </div>
 
-      {/* DESKTOP — sticky white card with two grouped lists. Sticks to the
-          header at 96px (header height = ~80px + 16px breathing room) the same
-          way the blog Table of Contents does. Scrollbar is hidden but vertical
-          scrolling remains possible if the filter list ever overflows the
-          viewport (Firefox `scrollbar-width:none` + WebKit pseudo-element). */}
+      {/* Sticks below the 80px header with 16px breathing room. Scrollbar is
+          hidden but vertical scrolling remains possible if the filter list
+          overflows the viewport (Firefox `scrollbar-width:none` + WebKit
+          pseudo-element). */}
       <div
         className="relative hidden lg:block lg:sticky [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{

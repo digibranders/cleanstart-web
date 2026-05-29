@@ -2,32 +2,9 @@ import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * Figma node 583:2481 — desktop
- * Figma node 910:263  — mobile (360×~750px)
- *
- * ── MOBILE (< sm) ────────────────────────────────────────────────────────────
- * Background: white section
- * Heading: 28px Manrope Bold, centered, maxW 264px, lh 1.2
- *   "Visibility Alone Doesn't " → #111
- *   "Reduce Risk" → gradient 98.05deg #9A51FF 71.726% → #2CC1EB 98.781%
- * Two cards stacked, gap 16px, each 328px wide centered
- *   Card: border-radius 17.435px, overflow hidden
- *   Background: linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)
- *   Header (h=85px): dark, centered title 20px Bold white tracking-1px
- *     Hex/vector watermark: mix-blend-soft-light, right side
- *     Teal flare at bottom: mix-blend-plus-lighter, comp-flare.svg
- *   Body (white): comp-gradient-left/right.png overlay, list items gap 16px
- *     Icons: comp-icon-gear.svg (12.672px) / comp-icon-check.svg
- *     Text: 16px Manrope Medium/SemiBold, #333, tracking -0.8px (-0.05em), lh 1.4
- * VS badge: comp-vs-badge.png 87×87px, absolute centered between cards
- * Card outer shadow: multi-layer CSS shadow + subtle purple glow
- *
- * ── DESKTOP (≥ sm) ───────────────────────────────────────────────────────────
- * Heading: "From Visibility to Actionable Risk Reduction", clamp(32px,4vw,56px)
- * Cards: outer radius 40, cyan #2CC1EB border via padding 10, inner radius 32
- * Header: clamp(76px,7vw,100px) dark→purple gradient, cyan flare at bottom
- * Body: white flex-1, two soft radial blobs
- * VS badge: centered between cards, clamp(72px,11vw,160px)
+ * Traditional-vs-CleanSight comparison. Two cards (dark header + white body
+ * with a bullet list) sit side-by-side on md+ and stack on mobile, with a VS
+ * badge centred between them. Mirrors the homepage SecurityNotPatching layout.
  */
 
 const TRADITIONAL = [
@@ -52,12 +29,8 @@ export function CisoComparison(): React.ReactElement {
       aria-labelledby="ciso-comparison-title"
     >
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          Unified layout — same card style at every breakpoint, mirroring the
-          homepage "Security isn't just patching" section. Cards stack vertically
-          on mobile and switch to side-by-side from md+.
-          Figma: 583:2481 (desktop) · 910:263 (mobile heading retained < sm)
-      ══════════════════════════════════════════════════════════════════════ */}
+      {/* Same card style at every breakpoint: cards stack vertically on mobile
+          and switch to side-by-side from md+. */}
       <div className="py-section-sm sm:py-section-md">
         <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
 
@@ -119,7 +92,6 @@ export function CisoComparison(): React.ReactElement {
   );
 }
 
-// ─── Card ─────────────────────────────────────────────────────────────────────
 function DesktopCard({
   kind,
   features,
@@ -143,7 +115,6 @@ function DesktopCard({
         className="relative flex flex-1 flex-col overflow-hidden"
         style={{ borderRadius: 32 }}
       >
-        {/* Header */}
         <div
           className="relative flex h-[clamp(76px,7vw,100px)] w-full items-center justify-center overflow-hidden"
           style={{
@@ -200,7 +171,6 @@ function DesktopCard({
           </h3>
         </div>
 
-        {/* White body */}
         <div
           className="relative flex flex-1 flex-col overflow-hidden bg-white py-[clamp(24px,2.5vw,36px)]"
           style={{ minHeight: "clamp(260px, 22vw, 340px)" }}
@@ -252,7 +222,6 @@ function DesktopCard({
   );
 }
 
-// ─── Desktop VS badge ─────────────────────────────────────────────────────────
 function DesktopVsBadge(): React.ReactElement {
   const SIZE = "clamp(72px, 11vw, 160px)";
   return (

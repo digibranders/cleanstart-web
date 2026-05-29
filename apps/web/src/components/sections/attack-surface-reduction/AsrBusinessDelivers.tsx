@@ -26,9 +26,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
     >
       <h2 className="sr-only">What this delivers for your business</h2>
 
-      {/* Background photo */}
       <div className="relative" style={{ minHeight: 'clamp(400px, 32vw, 580px)' }}>
-        {/* Background image */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
@@ -40,7 +38,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
           decoding="async"
         />
 
-        {/* Dark overlay — exact Figma stops (fill_RJ8WCA) with alpha so photo bleeds through */}
+        {/* Dark gradient overlay with alpha so the photo bleeds through. */}
         <div
           aria-hidden
           className="absolute inset-0 pointer-events-none"
@@ -50,9 +48,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
           }}
         />
 
-        {/* Content */}
         <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md flex flex-col justify-between h-full">
-          {/* Heading */}
           <div>
             <p
               className="text-white"
@@ -79,7 +75,6 @@ export function AsrBusinessDelivers(): React.ReactElement {
             </p>
           </div>
 
-          {/* Metric columns */}
           <div
             className="mt-12 md:mt-16 grid grid-cols-2 md:grid-cols-4 gap-y-8"
             style={{ borderTop: '1px solid rgba(255,255,255,0.15)' }}

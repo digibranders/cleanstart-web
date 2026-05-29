@@ -2,15 +2,11 @@
 
 /*
  * Client-only wrapper for the CISO Hero Lottie animation.
- * - Loaded eagerly (no lazy) to match Webflow's data-loading="eager".
  * - Honors prefers-reduced-motion: when reduced, renders a static
- *   poster (frame 0 of the Lottie) — no animation, no CPU spin.
+ *   poster (frame 0) — no animation, no CPU spin.
  * - The consumer (CisoHero.tsx) wraps this with next/dynamic
  *   `ssr: false` so the lottie-react runtime doesn't ship in the
  *   server bundle.
- *
- * viewBox: 0 0 498 416 — native aspect ratio 498:416 ≈ 1.197:1
- * Duration: 7.5 s, loops indefinitely.
  */
 
 import Lottie from "lottie-react";

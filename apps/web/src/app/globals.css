@@ -89,10 +89,9 @@
      `px-6` (24 px) inside the Container, every section gets exactly
      24 px of breathing room on each side at 1280, 1366, 1440 alike.
      Above 1440 the cap kicks in and auto-margins grow the gutter
-     uniformly. The 1276-with-82-px-gutter Figma reading was correct
-     for the artboard but felt over-gutter'd in product — the team
-     chose visual consistency across desktop widths instead.
-     --container-cs kept as alias for any legacy consumer. */
+     uniformly. A 1276 container with an 82px gutter felt over-gutter'd
+     in product — the team chose visual consistency across desktop widths
+     instead. --container-cs kept as alias for any legacy consumer. */
   --container-default: 1440px;
   --container-prose:    720px;
   --container-wide:    1600px;
@@ -461,7 +460,7 @@ body {
 }
 
 /* Hero gradient mesh — solid #151021 fallback under the gradient so the
-   alpha-fade at the top stop resolves to dark (matching Figma's canvas). */
+   alpha-fade at the top stop resolves to dark. */
 .bg-cs-hero {
   background-color: #151021;
   background-image: var(--bg-hero-mesh);
@@ -1123,7 +1122,7 @@ body {
   }
 }
 
-/* Slow-breathing brightness for the mobile Factory cards' Figma flares.
+/* Slow-breathing brightness for the mobile Factory cards' flares.
    Preserves the translateY(-50%) the flare uses for vertical centering;
    only opacity changes so the cyan glow gently pulses behind each card. */
 @keyframes cs-pulse-glow-flare {

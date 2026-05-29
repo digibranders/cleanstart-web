@@ -26,7 +26,6 @@ export function ASRFits(): React.ReactElement {
   return (
     <section data-section="ASRFits" className="bg-white py-section-md">
       <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Heading row: heading left, subtitle right */}
         <div
           className="flex flex-col lg:flex-row lg:items-end lg:justify-between"
           style={{ marginBottom: '64px', gap: '32px' }}
@@ -62,7 +61,6 @@ export function ASRFits(): React.ReactElement {
           </Reveal>
         </div>
 
-        {/* 3 integration cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: '24px' }}>
           {INTEGRATIONS.map((item) => (
             <div

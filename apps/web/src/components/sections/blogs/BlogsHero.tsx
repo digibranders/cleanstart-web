@@ -143,9 +143,9 @@ export function BlogsHero({
                   <h2
                     className="font-display font-bold leading-tight tracking-[-0.05em] text-white overflow-hidden"
                     style={{
-                      /* Featured-tier card title — explicit 32 px per design.
-                         Sits between standard card title (--fs-h3 = 28) and
-                         section H2 (--fs-h2 = 56) by design. */
+                      /* Featured-tier card title — explicit 32px, sized between
+                         the standard card title (--fs-h3 = 28) and section H2
+                         (--fs-h2 = 56). */
                       fontSize: "32px",
                       display: "-webkit-box",
                       WebkitLineClamp: 4,
@@ -157,8 +157,8 @@ export function BlogsHero({
                   {featuredPost.abstract && (
                     <p
                       className="font-normal leading-[1.4] tracking-[-0.05em]"
-                      /* Featured-tier card description — explicit 20 px per design.
-                         Pairs with the 32 px featured-card title above. */
+                      /* Featured-tier card description — explicit 20px, pairs
+                         with the 32px featured-card title above. */
                       style={{ fontSize: "20px", color: "#d1e5ff" }}
                     >
                       {featuredPost.abstract}
@@ -185,8 +185,8 @@ export function BlogsHero({
               </Link>
             </div>
 
-            {/* Right: featured image — outer purple border + inset image. On
-                mobile, ordered BEFORE the text per Figma 817:3470. */}
+            {/* Right: featured image — outer purple border + inset image.
+                On mobile, ordered BEFORE the text. */}
             <div
               className="relative w-full order-1 lg:order-2"
               style={{

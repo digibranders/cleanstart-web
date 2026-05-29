@@ -212,13 +212,7 @@ export function ASRBloated(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Mobile layout ── */}
-      {/*
-       * Figma 920:610 mobile layout:
-       *   10px side margins on 360px frame → px-[10px]
-       *   Cards: 340×114px each, 16px gap between cards
-       *   Order: Inherited (0) → Oversized (1) → TooMany (2) → Constant (3)
-       */}
+      {/* Mobile layout — stacked cards, ordered via mobileOrder. */}
       <div className="md:hidden mx-auto px-[10px] pb-12 flex flex-col items-center gap-4">
         {[...CARDS]
           .sort((a, b) => a.mobileOrder - b.mobileOrder)
@@ -230,8 +224,6 @@ export function ASRBloated(): React.ReactElement {
   );
 }
 
-// ─── BloatedCard ──────────────────────────────────────────────────────────────
-
 interface BloatedCardProps {
   card: (typeof CARDS)[number];
   mobile?: boolean;
@@ -239,25 +231,6 @@ interface BloatedCardProps {
 
 function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactElement {
   if (mobile) {
-    /*
-     * Mobile card — Figma 920:610 exact specs:
-     *
-     * Outer wrapper   : 340px wide, border-radius 20px
-     *                   background: rgba(255,76,76,0.4) — the #FF4C4C fill at opacity 0.4
-     *                   from bloated-card-bg.svg
-     *
-     * Inner white body: margin 6px on all sides (inset 6px from outer)
-     *                   border-radius 17px
-     *                   padding 16px all sides, gap 16px between icon and text
-     *                   box-shadow: 6-layer shadow from bloated-card-inner.svg filter
-     *
-     * Icon box        : 70×70px, border-radius 12px
-     *                   fill #fb6d6d + mix-blend-overlay gradient + mix-blend-color #ff7777
-     *                   Icon image: 40×40px centred (15px from each edge)
-     *
-     * Title           : Manrope SemiBold 20px / lh 1.0 / tracking -0.05em / #111
-     * Description     : Manrope Regular 14px / lh 1.5 / tracking -0.04em / #111 / opacity 0.8
-     */
     return (
       <div
         className="relative w-full rounded-[20px]"
@@ -289,18 +262,16 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
               '0 65.38px 65.38px rgba(223,155,255,0.08)',
           }}
         >
-          {/* Icon box — 70×70px with red-coral fill + overlay tints */}
+          {/* Icon box — red-coral fill + overlay tints */}
           <div
             className="relative shrink-0 overflow-hidden"
             style={{ width: '70px', height: '70px', borderRadius: '12px' }}
           >
-            {/* Base fill #fb6d6d */}
             <div
               aria-hidden
               className="absolute inset-0"
               style={{ borderRadius: '12px', background: '#fb6d6d' }}
             />
-            {/* Highlight gradient overlay */}
             <div
               aria-hidden
               className="absolute inset-0 mix-blend-overlay"
@@ -310,13 +281,11 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
                   'linear-gradient(-20.97deg, rgba(255,255,255,0) 52.8%, rgba(255,255,255,1) 95.95%)',
               }}
             />
-            {/* Color blend tint */}
             <div
               aria-hidden
               className="absolute inset-0 mix-blend-color"
               style={{ borderRadius: '12px', background: '#ff7777' }}
             />
-            {/* Shield icon: 40×40px centred in 70×70px → 15px each side */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               aria-hidden
@@ -329,12 +298,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             />
           </div>
 
-          {/* Text block */}
           <div className="flex flex-col min-w-0" style={{ gap: '8px' }}>
-            {/*
-             * Title: Manrope SemiBold 20px / lh 1.0 / tracking -1px (-0.05em) / #111
-             * Figma: font-['Manrope:SemiBold'] font-semibold text-[20px] tracking-[-1px] leading-none
-             */}
             <p
               className="text-[#111]"
               style={{
@@ -347,11 +311,6 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             >
               {card.title}
             </p>
-            {/*
-             * Description: Manrope Regular 14px / lh 1.5 / tracking -0.56px (-0.04em)
-             *              opacity 0.8 / #111
-             * Figma: font-['Manrope:Regular'] text-[14px] leading-[1.5] tracking-[-0.56px] opacity-80
-             */}
             <p
               style={{
                 fontFamily: 'var(--font-sans)',
@@ -371,7 +330,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
     );
   }
 
-  // ── Desktop card — 303×150 compact variant ───────────────────────────────
+  // Desktop card — 303×150 compact variant.
   return (
     <div
       className="relative"
@@ -446,7 +405,6 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
           />
         </div>
 
-        {/* Text — explicit 20 Manrope / 16 Sora per design spec */}
         <div className="flex flex-col min-w-0" style={{ gap: '6px', maxWidth: '180px' }}>
           <p
             className="text-[#111]"

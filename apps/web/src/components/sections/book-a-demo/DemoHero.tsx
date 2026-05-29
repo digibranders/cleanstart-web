@@ -2,17 +2,13 @@ import Image from "next/image";
 import { HeroReveal } from "@/components/ui/Reveal";
 
 /**
- * Dark gradient hero band for the Book a Demo page. Matches Figma node
- * 867:646 — a 1920×369 frame at x:-240, y:0 with the exact Figma
- * gradient and "Get a Demo" title (Manrope SemiBold 72px) at x:782, y:176
- * within the 1440 viewport. The "Demo" word carries the Figma ts1
- * gradient. Two iridescent cube images (Figma image 583137/583138)
- * flank the title.
+ * Dark gradient hero band for the Book a Demo page. A centred "Get a Demo"
+ * title (with a gradient "Demo" word) flanked by two iridescent cube images.
  */
 export function DemoHero(): React.ReactElement {
   return (
     <section className="relative w-full overflow-hidden">
-      {/* Background gradient — bleeds beyond the 1440 viewport (Figma x:-240, w:1920). */}
+      {/* Background gradient — bleeds beyond the 1440 viewport on each side. */}
       <div
         aria-hidden
         className="absolute inset-0 left-1/2 -translate-x-1/2"
@@ -23,12 +19,11 @@ export function DemoHero(): React.ReactElement {
         }}
       />
 
-      {/* Left cube — Figma image 583137 at x:50, y:148 in the 1920-wide bg
-          (≈ 910px left of center on desktop). On mobile we pull it back to
-          the visible left edge so it frames the title from the corner like
-          the Figma mobile comp. `mix-blend-mode: screen` lets the gradient
-          colour the cube's dark regions so it reads as embedded *in* the hero
-          atmosphere rather than sitting on top. */}
+      {/* Left cube — sits ~910px left of centre on desktop. On mobile it is
+          pulled to the visible left edge so it frames the title from the
+          corner. `mix-blend-mode: screen` lets the gradient colour the cube's
+          dark regions so it reads as embedded in the hero atmosphere rather
+          than sitting on top. */}
       <Image
         src="/images/book-a-demo/hero-cube-left.png"
         alt=""
@@ -49,9 +44,8 @@ export function DemoHero(): React.ReactElement {
         priority
       />
 
-      {/* Right cube — mirror of the left one so the title sits centered
-          between two purple-gem accents. Shown on both mobile and desktop;
-          on desktop it lives ~880px right of centre to mirror the left cube. */}
+      {/* Right cube — mirror of the left one so the title sits centred between
+          two purple-gem accents, ~910px right of centre on desktop. */}
       <Image
         src="/images/book-a-demo/hero-cube-right.png"
         alt=""
@@ -71,7 +65,7 @@ export function DemoHero(): React.ReactElement {
         sizes="(min-width: 1440px) 419px, (min-width: 768px) 22vw, 160px"
       />
 
-      {/* Content — title centered around Figma y:176 within a ~369px tall band */}
+      {/* Content — title centred within the hero band. */}
       <div
         className="relative mx-auto flex items-end justify-center text-center"
         style={{

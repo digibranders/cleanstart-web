@@ -1,7 +1,7 @@
 import { Reveal } from "@/components/ui/Reveal";
 
-// Title strings use \n to force a 2-line wrap matching the Figma reference.
-// FeatureCard sets whiteSpace: "pre-line" so the break renders.
+// Title strings use \n to force a 2-line wrap; FeatureCard sets
+// whiteSpace: "pre-line" so the break renders.
 const FEATURE_CARDS = [
   {
     title: "Runtime\nVisibility",
@@ -116,7 +116,7 @@ export function CleanSightSecurity(): React.ReactElement {
           "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)",
       }}
     >
-      {/* Decorative crystals — desktop only */}
+      {/* Decorative crystals — desktop only. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -152,7 +152,7 @@ export function CleanSightSecurity(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ════ PART 1: Heading + Cards + Shield ════ */}
+      {/* PART 1: Heading + Cards + Shield. */}
       <div
         className="relative mx-auto"
         style={{
@@ -200,10 +200,9 @@ export function CleanSightSecurity(): React.ReactElement {
             <FeatureCard {...FEATURE_CARDS[3]} side="right" />
           </div>
 
-          {/* Shield — absolutely centered on top of the 2×2 grid.
-              New asset (security-shield-complete.png, 444×470) already has the
-              CleanStart logo baked in and is cropped tight to the shield with
-              no extra padding, so a simple <img> at native aspect is all we need. */}
+          {/* Shield — absolutely centered on top of the 2×2 grid. The asset
+              has the CleanStart logo baked in and is cropped tight to the
+              shield, so a simple <img> at native aspect is all that's needed. */}
           <div
             className="absolute pointer-events-none"
             style={{
@@ -260,9 +259,9 @@ export function CleanSightSecurity(): React.ReactElement {
         />
       </div>
 
-      {/* ════ PART 2: From Visibility to Action — workflow chart ════
+      {/* PART 2: From Visibility to Action — workflow chart.
           paddingBottom is intentionally 0 so the chart's curve reaches the
-          bottom edge of the section, matching the Figma reference. */}
+          bottom edge of the section. */}
       <div
         className="relative mx-auto"
         style={{
@@ -273,7 +272,7 @@ export function CleanSightSecurity(): React.ReactElement {
           paddingBottom: "0",
         }}
       >
-        {/* Decorative unions (desktop only) */}
+        {/* Decorative unions — desktop only. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
@@ -385,8 +384,7 @@ export function CleanSightSecurity(): React.ReactElement {
              where chart x = 1% + (svg_x/1257)*98% and chart y = (30 + svg_y*510/513)/540*100%. */}
           {/* Per-pointer label positioning — each `labelY` is tuned independently
               so every label sits at a hand-picked distance from its own dot. */}
-          {/* Step 1 — Continuous Visibility. Dot 64%, label 70% (gap 6%, below).
-              Tightened from 80% so the label hugs its dot rather than floating at the bottom. */}
+          {/* Step 1 — Continuous Visibility. Dot 64%, label 70% (gap 6%, below). */}
           <WorkflowStep
             x="1%"
             nodeSrc="security-node-1.svg"
@@ -396,8 +394,7 @@ export function CleanSightSecurity(): React.ReactElement {
             label={WORKFLOW[0].label}
             body={WORKFLOW[0].body}
           />
-          {/* Step 2 — Risk Prioritization. Dot 26%, label 12% (gap 14%, above).
-              Brought down from 4% so it hugs the dot instead of floating at the top. */}
+          {/* Step 2 — Risk Prioritization. Dot 26%, label 12% (gap 14%, above). */}
           <WorkflowStep
             x="29%"
             nodeSrc="security-node-2.svg"

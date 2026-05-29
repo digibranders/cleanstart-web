@@ -63,7 +63,6 @@ export function AboutPowering() {
         />
       ))}
 
-      {/* Background grid vectors — 248:2144 / 248:2151 */}
       {(
         [
           [-525, 394],
@@ -88,7 +87,6 @@ export function AboutPowering() {
         />
       ))}
 
-      {/* Vertical white guide lines — 248:2145–2150 (6 lines, opacity 0.9) */}
       {GUIDE_LINES_X.map((x) => (
         <div
           key={x}
@@ -103,10 +101,7 @@ export function AboutPowering() {
         />
       ))}
 
-      {/* ── Foreground content ─────────────────────────────────────── */}
-
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[100px] pb-16 lg:pb-[20px]">
-        {/* Title group — 248:2152 (centered, max-w 969px) */}
         <div className="mx-auto flex max-w-[969px] flex-col items-center gap-6 text-center text-white">
           <Reveal header>
             <h2
@@ -138,9 +133,8 @@ export function AboutPowering() {
           </Reveal>
         </div>
 
-        {/* Cards row — Figma top=412 → 80px gap below title block.
-            Tablet + mobile stack vertically (single column) with rectangle cards.
-            3-up grid only kicks in at lg+. */}
+        {/* Tablet + mobile stack vertically (single column); the 3-up grid
+            only kicks in at lg+. */}
         <RevealStagger className="mt-20 grid grid-cols-1 items-stretch gap-y-10 lg:gap-y-16 gap-x-[clamp(24px,6vw,91px)] lg:grid-cols-3 place-items-center">
           {CARDS.map((card) => (
             <RevealItem key={card.title}>
@@ -159,8 +153,8 @@ function FeatureCard({ title, description, iconSrc }: Card) {
     <div
       className="relative w-full max-w-[560px] lg:max-w-[346px] lg:min-h-[clamp(360px,30vw,420px)]"
     >
-      {/* Outer shadow — 248:2159 (404×478, 29px halo, top-rounded glow PNG).
-          Desktop only — tablet/mobile show a single dark inner border instead. */}
+      {/* Outer glow halo — desktop only; tablet/mobile show a single dark
+          inner border instead. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -171,8 +165,8 @@ function FeatureCard({ title, description, iconSrc }: Card) {
         decoding="async"
       />
 
-      {/* Cyan glow ring — 248:2161 (362×440, #2CC1EB @ 0.3, rounded-24).
-          Shown at every breakpoint — acts as the single inner border on tablet/mobile. */}
+      {/* Cyan glow ring — shown at every breakpoint; acts as the single inner
+          border on tablet/mobile. */}
       <div
         aria-hidden
         className="pointer-events-none absolute -inset-2 rounded-[24px]"
@@ -180,9 +174,9 @@ function FeatureCard({ title, description, iconSrc }: Card) {
       />
 
       {/* White card — flex column, no absolute internals.
-          Mobile: ball + text centered. sm+: original left-aligned. */}
+          Mobile: ball + text centered. sm+: left-aligned. */}
       <div className="relative flex h-full w-full flex-col items-center text-center sm:items-start sm:text-left gap-[clamp(28px,3vw,56px)] overflow-hidden rounded-[24px] bg-white p-card-md">
-        {/* Ball — per-card PNG sphere with embedded glyph (Ball1/Ball2/Ball3). */}
+        {/* Per-card PNG sphere with embedded glyph. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={iconSrc}
@@ -194,7 +188,7 @@ function FeatureCard({ title, description, iconSrc }: Card) {
           decoding="async"
           className="shrink-0 pointer-events-none select-none"
           style={{
-            // Source PNG is 196×196 — supports up to ~98 px display at 2× DPR.
+            // Source PNG is 196×196 — supports up to ~98px display at 2× DPR.
             width: "clamp(88px, 8vw, 96px)",
             aspectRatio: "1 / 1",
             objectFit: "contain",

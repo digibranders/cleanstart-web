@@ -57,13 +57,13 @@ export interface WhyMattersGridProps {
   showBottomLeftGrid?: boolean;
 }
 
-// ── Divider gradients (fade in from the edges, 20%→80% solid) ────────────────
+// Divider gradients — fade in from the edges, 20%→80% solid.
 const DIVIDER_H =
   'linear-gradient(to right, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%)';
 const DIVIDER_V =
   'linear-gradient(to bottom, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%)';
 
-// ── Default crop for cards that don't ship per-card positioning ──────────────
+// Default crop for cards that don't ship per-card positioning.
 const DEFAULT_IMG_STYLE: React.CSSProperties = {
   position: 'absolute',
   inset: 0,
@@ -75,7 +75,6 @@ const DEFAULT_IMG_STYLE: React.CSSProperties = {
 function DesktopCard({ imgSrc, imgAlt, imgStyle, title, desc }: WhyCard): React.ReactElement {
   return (
     <div className="flex items-center" style={{ gap: 'clamp(16px, 1.67vw, 24px)' }}>
-      {/* Illustration area */}
       <div
         className="relative shrink-0"
         style={{
@@ -154,9 +153,7 @@ function MobileCard({ imgSrc, imgAlt, mobileImgStyle, title, desc }: WhyCard): R
           '0 1px 2px rgba(17, 17, 17, 0.04), 0 12px 32px -8px rgba(17, 17, 17, 0.06)',
       }}
     >
-      {/* ── Icon area (108×87 Figma frame) ── */}
       <div className="relative shrink-0" aria-hidden style={{ width: '108px', height: '87px' }}>
-        {/* Purple glow — 79.75×79.75, blur 20.78, opacity 0.35 */}
         <div
           aria-hidden
           className="pointer-events-none select-none absolute"
@@ -193,7 +190,6 @@ function MobileCard({ imgSrc, imgAlt, mobileImgStyle, title, desc }: WhyCard): R
         />
       </div>
 
-      {/* ── Title + description ── */}
       <div className="flex flex-col items-center text-center" style={{ marginTop: '12px', gap: '12px' }}>
         <h3
           style={{
@@ -257,7 +253,7 @@ export function WhyMattersGrid({
             'linear-gradient(180deg, rgba(246,246,246,0) 0%, #F6F6F6 96px, #F6F6F6 calc(100% - 96px), rgba(246,246,246,0) 100%)',
       }}
     >
-      {/* ── Left hex-grid blob (Figma: left=-500, top=-539, w=1181) ── */}
+      {/* Left hex-grid blob — negative offsets let it bleed off-canvas intentionally. */}
       {showLeftGrid ? (
         <div
           aria-hidden
@@ -280,7 +276,7 @@ export function WhyMattersGrid({
         </div>
       ) : null}
 
-      {/* ── Right hex-grid blob (Figma: left=1216, top=-535, w=1101) ── */}
+      {/* Right hex-grid blob — bleeds off the right edge intentionally. */}
       {showRightGrid ? (
         <div
           aria-hidden
@@ -303,7 +299,7 @@ export function WhyMattersGrid({
         </div>
       ) : null}
 
-      {/* ── Bottom-left hex-grid blob (low opacity) ── */}
+      {/* Bottom-left hex-grid blob at reduced opacity. */}
       {showBottomLeftGrid ? (
         <div
           aria-hidden
@@ -327,9 +323,8 @@ export function WhyMattersGrid({
         </div>
       ) : null}
 
-      {/* ── Soft purple Union radial gradient — top-right (Figma spec).
-            1101×1101 at left=1347 top=-565, opacity 0.1.
-            Used on SbomRisks as a single colour-wash decoration. ── */}
+      {/* Soft purple radial gradient at top-right — single colour-wash
+          decoration used on SbomRisks in place of the corner glows. */}
       {showUnionTint ? (
         <div
           aria-hidden
@@ -346,7 +341,7 @@ export function WhyMattersGrid({
         />
       ) : null}
 
-      {/* ── Top-left + top-right ellipse glows (opt-out via showCornerGlows) ── */}
+      {/* Top-left + top-right ellipse glows (opt-out via showCornerGlows). */}
       {showCornerGlows ? (
         <>
           <div
@@ -391,7 +386,6 @@ export function WhyMattersGrid({
         </>
       ) : null}
 
-      {/* ── Content ── */}
       <div
         className="relative mx-auto"
         style={{
@@ -441,7 +435,7 @@ export function WhyMattersGrid({
         ) : null}
 
         <div style={{ marginTop: 'clamp(32px, 4.17vw, 80px)' }}>
-          {/* ── Mobile (< md): single-column stack ── */}
+          {/* Mobile (< md): single-column stack. */}
           <div className="flex flex-col gap-4 md:hidden">
             {mobileOrder.map((idx) => {
               const card = cards[idx] ?? cards[0];
@@ -449,7 +443,7 @@ export function WhyMattersGrid({
             })}
           </div>
 
-          {/* ── Tablet + Desktop (≥ md): 2×2 grid with gradient cross dividers ── */}
+          {/* Tablet + Desktop (≥ md): 2×2 grid with gradient cross dividers. */}
           <div className="relative hidden md:block">
             {/* Vertical centre divider */}
             <div
