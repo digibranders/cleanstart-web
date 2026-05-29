@@ -14,8 +14,8 @@ type Props = {
 export function PanelShell({ width, accent, eyebrow, tagline, exitHref, exitLabel, children }: Props) {
   return (
     <div
-      className="overflow-hidden border border-white/[0.06] p-[18px] shadow-[0_18px_50px_-20px_rgba(0,0,0,0.5)]"
-      style={{ width, background: "#161126", borderRadius: 16 }}
+      className="cs-panel-glass overflow-hidden border border-white/[0.08] p-[18px]"
+      style={{ width, borderRadius: 18 }}
     >
       <PanelHeader
         eyebrow={eyebrow}
