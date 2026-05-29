@@ -37,18 +37,8 @@ The repo has **exactly three long-lived branches**. All three are kept in sync a
 ### No other long-lived branches
 
 - **No feature branches**, **no fix/* branches**, **no integration/* branches**, **no `web` branch**, **no worktrees** for routine development.
-- Hotfixes go directly on the branch that owns them (`development` for CMS, `farheen` for web), then through the normal merge cycle below.
+- Hotfixes go directly on the branch that owns them (`development` for CMS, `farheen` for web).
 - Exception: short-lived branches created by another developer (e.g. `feat/yatish-resume`) are tolerated for their owner's use, but they don't enter the merge cycle until promoted to `development`.
-
-### Sync cycle
-
-After any work lands on `development` or `farheen`, all three branches get re-synced:
-
-1. **Merge to main** — forward merge `development → main` (or `farheen → main` if web-only).
-2. **Back-merge** — `main → development` (CMS fixes that land on main flow back).
-3. **Fast-forward farheen** — `git push origin development:farheen` (only ever a fast-forward; never force-push the branch).
-
-All three branches must end at the same commit SHA after the cycle. If they diverge for more than one development session, stop and reconcile before continuing.
 
 ### Scoped-change rule on `farheen`
 
