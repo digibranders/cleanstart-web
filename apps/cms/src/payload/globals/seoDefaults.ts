@@ -2,7 +2,7 @@ import type { GlobalConfig } from 'payload';
 
 import { isAdmin, isAuthenticated } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
-import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
+import { isValidExternalLink, normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const SeoDefaults: GlobalConfig = {
   slug: 'seoDefaults',
@@ -148,7 +148,13 @@ export const SeoDefaults: GlobalConfig = {
       fields: [
         { name: 'name', type: 'text', defaultValue: 'CleanStart, Inc.' },
         { name: 'legalName', type: 'text' },
-        { name: 'url', type: 'text', defaultValue: 'https://cleanstart.com' },
+        {
+          name: 'url',
+          type: 'text',
+          defaultValue: 'https://cleanstart.com',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
+          validate: validateOptionalUrl,
+        },
         mediaUploadField({ name: 'logo', folderHint: 'web/general' }),
         {
           name: 'sameAs',
@@ -157,7 +163,20 @@ export const SeoDefaults: GlobalConfig = {
           admin: {
             description: 'Authoritative profile URLs (LinkedIn, GitHub, Crunchbase, etc.).',
           },
-          fields: [{ name: 'url', type: 'text', required: true }],
+          fields: [
+            {
+              name: 'url',
+              type: 'text',
+              required: true,
+              hooks: { beforeValidate: [normalizeOptionalUrlHook] },
+              // Stricter than validateOptionalUrl: this field is required, so an
+              // empty value is invalid (validateOptionalUrl passes blanks).
+              validate: (value: string | string[] | null | undefined): true | string =>
+                typeof value === 'string' && isValidExternalLink(value)
+                  ? true
+                  : 'Must be a valid URL (https?://, /path, mailto:, or tel:).',
+            },
+          ],
         },
       ],
     },
