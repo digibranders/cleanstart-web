@@ -133,9 +133,9 @@ export const isStale = (entry: CacheEntry<unknown>, ttlMs: number, now: Date = n
 
 /** Per-provider staleness thresholds. Match the cron cadence. */
 export const TTL_MS = {
-  ga4DataApi: 20 * 60 * 1000,            // 15-min cron + slack
+  ga4DataApi: 20 * 60 * 1000,            // 20-min TTL (15-min cron + 5 min slack)
   gscSearchAnalyticsApi: 26 * 60 * 60 * 1000, // daily cron + slack
   gscUrlInspectionApi: 60 * 60 * 1000,   // on-demand, 1h soft TTL
   msClarity: 26 * 60 * 60 * 1000,        // daily cron + slack
-  cloudflareWebAnalytics: 20 * 60 * 1000, // 15-min cron + slack
+  cloudflareWebAnalytics: 20 * 60 * 1000, // 20-min TTL (15-min cron + 5 min slack)
 } as const satisfies Record<CachedProvider, number>;

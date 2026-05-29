@@ -16,6 +16,17 @@ export const purgeLeadsPiiTask: TaskConfig<'purgeLeadsPii'> = {
     const result = await purgeLeadsPii(
       req.payload as unknown as Parameters<typeof purgeLeadsPii>[0],
     );
+    if (result.scanned > 0 && result.errors > 0) {
+      req.payload.logger?.warn?.(
+        { scanned: result.scanned, redacted: result.redacted, errors: result.errors },
+        'leads PII redaction: some rows failed to redact',
+      );
+    }
+    if (result.scanned > 0 && result.errors === result.scanned) {
+      throw new Error(
+        `purgeLeadsPii: all ${result.scanned} eligible leads failed to redact — GDPR obligation may be unmet.`,
+      );
+    }
     return { output: result };
   },
 };

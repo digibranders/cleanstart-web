@@ -1,4 +1,4 @@
-import type { CollectionBeforeChangeHook } from 'payload';
+import type { BasePayload, CollectionBeforeChangeHook } from 'payload';
 import { ValidationError } from 'payload';
 
 const MAX_HOPS = 10;
@@ -74,17 +74,7 @@ export const detectRedirectChain = async (args: {
   return { kind: 'cycle', via: current, hops };
 };
 
-interface RedirectsPayload {
-  find: (args: {
-    collection: 'redirects';
-    where: { from: { equals: string } };
-    limit: number;
-    depth: 0;
-    overrideAccess?: boolean;
-  }) => Promise<{ docs: { to?: string | null; status?: string | null }[] }>;
-}
-
-const lookupFromPayload = (payload: RedirectsPayload): RedirectLookup =>
+const lookupFromPayload = (payload: Pick<BasePayload, 'find'>): RedirectLookup =>
   async (from) => {
     const result = await payload.find({
       collection: 'redirects',
@@ -128,7 +118,7 @@ export const redirectCycleGuardHook: CollectionBeforeChangeHook = async ({
   const result = await detectRedirectChain({
     from,
     to,
-    lookup: lookupFromPayload(req.payload as unknown as RedirectsPayload),
+    lookup: lookupFromPayload(req.payload),
   });
 
   if (result.kind === 'cycle') {

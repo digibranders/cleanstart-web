@@ -437,7 +437,7 @@ const speakablePathField: Field = {
  * writing, and pushes advanced og/canonical/speakable controls into
  * a calmer, less-frequently visited section of the form.
  */
-export const seoField: GroupField = {
+const seoField: GroupField = {
   name: 'seo',
   type: 'group',
   label: 'SEO advanced',

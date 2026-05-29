@@ -241,7 +241,7 @@ export const Jobs: CollectionConfig = {
       admin: {
         date: { pickerAppearance: 'dayAndTime' },
         description:
-          'When the listing should auto-close. The auto-close cron (Phase G) uses this.',
+          'When the listing should auto-close. Not yet enforced — update hiringStatus manually when the deadline passes.',
         condition: (_data, sibling) => sibling?.hiringStatus === 'open',
       },
     },

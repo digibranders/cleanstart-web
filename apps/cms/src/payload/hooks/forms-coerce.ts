@@ -1,7 +1,7 @@
 import type { CollectionBeforeChangeHook } from 'payload';
 import { ValidationError } from 'payload';
 
-import { checkPattern } from '../lib/safe-regex';
+import { MAX_PATTERN_LENGTH, checkPattern } from '../lib/safe-regex';
 
 type FormFieldShape = {
   name?: string | null;
@@ -48,7 +48,9 @@ export const formsCoerceHook: CollectionBeforeChangeHook = ({ data }) => {
         const reason =
           check.reason === 'catastrophic-backtracking'
             ? 'pattern looks unsafe (catastrophic backtracking risk)'
-            : 'pattern is invalid regex syntax';
+            : check.reason === 'too-long'
+              ? `pattern exceeds the maximum allowed length of ${MAX_PATTERN_LENGTH} characters`
+              : 'pattern is invalid regex syntax';
         throw new ValidationError({
           errors: [
             {

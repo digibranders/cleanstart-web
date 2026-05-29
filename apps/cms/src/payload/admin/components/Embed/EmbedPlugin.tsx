@@ -3,6 +3,7 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   $getNodeByKey,
+  $getRoot,
   $getSelection,
   $insertNodes,
   COMMAND_PRIORITY_LOW,
@@ -105,9 +106,10 @@ export const EmbedPlugin = (): ReactElement | null => {
           if (sel) {
             $insertNodes([embedNode]);
           } else {
-            // Fallback: append to root
-            const root = editor.getRootElement();
-            if (root) $insertNodes([embedNode]);
+            // No active selection: move focus to the end of the root node
+            // and insert there so the embed lands somewhere meaningful.
+            $getRoot().selectEnd();
+            $insertNodes([embedNode]);
           }
         }
       });

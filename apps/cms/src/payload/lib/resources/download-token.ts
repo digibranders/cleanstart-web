@@ -3,7 +3,9 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 /**
  * Short-lived HMAC-signed token authorising a single resource download.
  *
- * Wire format: base64url("<resourceId>.<expiresAt>.<sig>")
+ * Wire format: "v1.<base64url("<resourceId>.<expiresAt>.<sig>")>"
+ *   v1        — version prefix, allowing algorithm migration without
+ *               breaking in-flight tokens (short TTL limits blast radius).
  *   resourceId — the Payload Resources row id (numeric or uuid).
  *   expiresAt  — unix ms when the token expires.
  *   sig        — HMAC-SHA256("<resourceId>.<expiresAt>", PAYLOAD_SECRET), base64url.
@@ -54,7 +56,7 @@ export const signDownloadToken = (params: {
   const expiresAt = now + ttl;
   const payload = `${String(params.resourceId)}.${expiresAt}`;
   const sig = sign(payload, params.secret);
-  const token = toBase64Url(`${payload}.${sig}`);
+  const token = `v1.${toBase64Url(`${payload}.${sig}`)}`;
   return { token, expiresAt };
 };
 
@@ -68,9 +70,11 @@ export const verifyDownloadToken = (params: {
   now?: number;
 }): VerifyDownloadTokenResult => {
   const now = params.now ?? Date.now();
+  // Strip the version prefix before decoding.
+  const raw = params.token.startsWith('v1.') ? params.token.slice(3) : params.token;
   let decoded: string;
   try {
-    decoded = fromBase64Url(params.token).toString('utf8');
+    decoded = fromBase64Url(raw).toString('utf8');
   } catch {
     return { ok: false, reason: 'malformed' };
   }

@@ -43,8 +43,8 @@ const fixtureEvent = (event: WebhookEventName) =>
         event: 'lead.submitted' as const,
         data: {
           formSlug: '_integration_test',
-          email: 'test@cleanstart.com',
-          title: 'Integration test',
+          duplicate: false,
+          source: 'cms' as const,
         },
       }
     : {

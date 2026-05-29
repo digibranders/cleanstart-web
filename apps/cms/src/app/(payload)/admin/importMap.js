@@ -37,7 +37,7 @@ import { FixedToolbarFeatureClient as FixedToolbarFeatureClient_e70f5e05f09f93e0
 import { CleanstartInlineImageFeatureClient as CleanstartInlineImageFeatureClient_74586527eb72192e6c6a27300883f3de } from '@/payload/admin/components/InlineImage/CleanstartInlineImageFeatureClient.ts'
 import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { CleanstartAddMenuFeatureClient as CleanstartAddMenuFeatureClient_3bb091ca9ee97b5a57a7d5234ea492d1 } from '@/payload/admin/components/AddMenu/CleanstartAddMenuFeatureClient'
+import { CleanstartAddMenuFeatureClient as CleanstartAddMenuFeatureClient_0974987c6bea70ce5af25a8293446fc1 } from '@/payload/admin/components/AddMenu/CleanstartAddMenuFeatureClient.ts'
 import { CleanstartEmbedFeatureClient as CleanstartEmbedFeatureClient_0d8d46efc1fc83e23b5f221c6e92ed8f } from '@/payload/admin/components/Embed/CleanstartEmbedFeatureClient.ts'
 import { RelationshipFeatureClient as RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { CleanstartLinkPopoverFeatureClient as CleanstartLinkPopoverFeatureClient_aa209658d47709ec5b8e1bfbaac37adb } from '@/payload/admin/components/CleanstartLinkPopoverFeatureClient.ts'
@@ -76,7 +76,6 @@ import { OutboundRedirectField as OutboundRedirectField_6ddb1aebe33d308a1f37b1ba
 import { HeadTagsCard as HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462 } from '@/payload/admin/components/HeadTagsCard.tsx'
 import { UrlChangeHistoryField as UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c } from '@/payload/admin/components/UrlChangeHistoryField.tsx'
 import { SeoAdvancedPanel as SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50 } from '@/payload/admin/components/SeoAdvancedPanel.tsx'
-import { PreviewMenu as PreviewMenu_50b93d8a0176cb6161ede3dcf4f0f442 } from '@/payload/admin/components/PreviewMenu.tsx'
 import { LeadsImmutableBanner as LeadsImmutableBanner_c4273dccee2521e4317461376b79e241 } from '@/payload/admin/components/LeadsImmutableBanner.tsx'
 import { LeadsCsvTruncationBanner as LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb } from '@/payload/admin/components/LeadsCsvTruncationBanner.tsx'
 import { DsarActionsPanel as DsarActionsPanel_270b8398021fd191ac147b0b8d59049c } from '@/payload/admin/components/DsarActionsPanel.tsx'
@@ -93,6 +92,7 @@ import { AnalyticsTab as AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b } from '@
 import { PublishChecklistBanner as PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec } from '@/payload/admin/components/PublishChecklistBanner.tsx'
 import { PublishOverrideGuard as PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02 } from '@/payload/admin/components/PublishOverrideGuard.tsx'
 import { SlugRequirementGuard as SlugRequirementGuard_96979dae1465790bd97b2f570fed4659 } from '@/payload/admin/components/SlugRequirementGuard.tsx'
+import { PreviewMenu as PreviewMenu_50b93d8a0176cb6161ede3dcf4f0f442 } from '@/payload/admin/components/PreviewMenu.tsx'
 import { GateFormLabel as GateFormLabel_c191dd670871074ae1a1cea086f78af8 } from '@/payload/admin/components/GateFormLabel.tsx'
 import { UploadField as UploadField_9a37057695692a15b6c8aaeb6d981611 } from '@/payload/admin/components/fields/UploadField.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
@@ -166,7 +166,7 @@ export const importMap = {
   "@/payload/admin/components/InlineImage/CleanstartInlineImageFeatureClient.ts#CleanstartInlineImageFeatureClient": CleanstartInlineImageFeatureClient_74586527eb72192e6c6a27300883f3de,
   "@payloadcms/richtext-lexical/client#UploadFeatureClient": UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "@/payload/admin/components/AddMenu/CleanstartAddMenuFeatureClient#CleanstartAddMenuFeatureClient": CleanstartAddMenuFeatureClient_3bb091ca9ee97b5a57a7d5234ea492d1,
+  "@/payload/admin/components/AddMenu/CleanstartAddMenuFeatureClient.ts#CleanstartAddMenuFeatureClient": CleanstartAddMenuFeatureClient_0974987c6bea70ce5af25a8293446fc1,
   "@/payload/admin/components/Embed/CleanstartEmbedFeatureClient.ts#CleanstartEmbedFeatureClient": CleanstartEmbedFeatureClient_0d8d46efc1fc83e23b5f221c6e92ed8f,
   "@payloadcms/richtext-lexical/client#RelationshipFeatureClient": RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/payload/admin/components/CleanstartLinkPopoverFeatureClient.ts#CleanstartLinkPopoverFeatureClient": CleanstartLinkPopoverFeatureClient_aa209658d47709ec5b8e1bfbaac37adb,
@@ -205,7 +205,6 @@ export const importMap = {
   "@/payload/admin/components/HeadTagsCard.tsx#HeadTagsCard": HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462,
   "@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField": UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c,
   "@/payload/admin/components/SeoAdvancedPanel.tsx#SeoAdvancedPanel": SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50,
-  "@/payload/admin/components/PreviewMenu.tsx#PreviewMenu": PreviewMenu_50b93d8a0176cb6161ede3dcf4f0f442,
   "@/payload/admin/components/LeadsImmutableBanner.tsx#LeadsImmutableBanner": LeadsImmutableBanner_c4273dccee2521e4317461376b79e241,
   "@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner": LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb,
   "@/payload/admin/components/DsarActionsPanel.tsx#DsarActionsPanel": DsarActionsPanel_270b8398021fd191ac147b0b8d59049c,
@@ -222,6 +221,7 @@ export const importMap = {
   "@/payload/admin/components/PublishChecklistBanner.tsx#PublishChecklistBanner": PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec,
   "@/payload/admin/components/PublishOverrideGuard.tsx#PublishOverrideGuard": PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02,
   "@/payload/admin/components/SlugRequirementGuard.tsx#SlugRequirementGuard": SlugRequirementGuard_96979dae1465790bd97b2f570fed4659,
+  "@/payload/admin/components/PreviewMenu.tsx#PreviewMenu": PreviewMenu_50b93d8a0176cb6161ede3dcf4f0f442,
   "@/payload/admin/components/GateFormLabel.tsx#GateFormLabel": GateFormLabel_c191dd670871074ae1a1cea086f78af8,
   "@/payload/admin/components/fields/UploadField.tsx#UploadField": UploadField_9a37057695692a15b6c8aaeb6d981611,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,

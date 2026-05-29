@@ -125,7 +125,9 @@ export const refreshClarity = async (
 export const refreshAllClarity = async (payload: BasePayload): Promise<RefreshResult> => {
   const rows = await findRowsOfKind(payload, 'msClarity');
   const firstRow = rows[0];
-  if (!firstRow) return { ok: true, cached: 0 };
+  if (!firstRow) {
+    return { ok: true, cached: 0, skipped: true, skipReason: 'no-rows-configured' };
+  }
 
   // Clarity is a singleton env-token provider: all msClarity rows share the
   // same CLARITY_API_TOKEN and hit the same project. Running one call per

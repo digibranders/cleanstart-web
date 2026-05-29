@@ -31,7 +31,7 @@ export const analyticsCachePruneTask: TaskConfig<'analyticsCachePrune'> = {
         { error: err instanceof Error ? err.message : String(err) },
         'analyticsCache prune failed',
       );
-      return { output: { deleted: 0, error: 'prune-failed' } };
+      throw err instanceof Error ? err : new Error(String(err));
     }
   },
 };

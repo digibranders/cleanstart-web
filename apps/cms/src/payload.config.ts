@@ -82,7 +82,6 @@ import { analyticsCachePruneTask } from './payload/jobs/analytics-cache-prune';
 import { dashboardRefreshDailyTask } from './payload/jobs/dashboard-refresh-daily';
 import { dashboardRefreshFrequentTask } from './payload/jobs/dashboard-refresh-frequent';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
-import { wireCustomEditView } from './payload/lib/wire-custom-edit-view';
 import { wirePreviewControls } from './payload/lib/wire-preview';
 import { wireAnalyticsTab } from './payload/lib/wire-analytics-tab';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
@@ -320,11 +319,9 @@ export default buildConfig({
     .map(wirePublishGate)
     .map(wirePreviewControls)
     .map(wireCustomListView)
-    .map(wireCustomEditView)
     .map(wireAnalyticsTab)
     .map(wireCustomFields),
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements, PodcastPage, ResourcesSpotlight, CompanySpotlight]
-    .map(wireCustomEditView)
     .map(wireCustomFields),
   endpoints: [
     jsonLdEndpoint,

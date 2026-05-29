@@ -94,6 +94,7 @@ export const collectImageSitemapEntries = async (
         depth: 1,
         overrideAccess: false,
         draft: false,
+        where: { _status: { equals: 'published' } },
       });
       const docs = result.docs as DocWithImage[];
       for (const doc of docs) {
