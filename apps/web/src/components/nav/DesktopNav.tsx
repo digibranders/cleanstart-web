@@ -55,7 +55,7 @@ function TopLevelItem({
 
   if (item.kind === "flat") {
     const flatClass =
-      "cs-nav-link relative inline-flex cursor-pointer items-center text-base font-medium leading-none text-white/85 transition-colors hover:text-white data-[active=true]:text-white after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[2px] after:rounded-full after:bg-[#2cc1eb] after:opacity-0 after:transition-opacity data-[active=true]:after:opacity-100";
+      "cs-nav-link inline-flex cursor-pointer items-center text-base font-medium leading-none text-white/85 transition-colors hover:text-white data-[active=true]:text-white";
     return (
       <NavigationMenuItem>
         {item.built !== false ? (
