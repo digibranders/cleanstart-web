@@ -28,6 +28,7 @@ export const dbPrimaryHandler: LeadHandler = {
         },
         limit: 50,
         depth: 0,
+        overrideAccess: true,
       });
       for (const candidate of existing.docs) {
         const candidateFields =

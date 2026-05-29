@@ -146,7 +146,7 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
               ))
             : null}
 
-          {!readOnly && (
+          {!readOnly ? (
             <input
               ref={inputRef}
               id={inputId}
@@ -178,7 +178,14 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
               onBlur={() => setTimeout(() => setOpen(false), 150)}
               onKeyDown={onKeyDown}
             />
-          )}
+          ) : !hasMany ? (
+            <span
+              className="cs-collections-select__input cs-collections-select__input--readonly"
+              aria-labelledby={labelId}
+            >
+              {isEmpty ? <em>No selection</em> : labelFor(selected[0] as string)}
+            </span>
+          ) : null}
 
           {!isEmpty && !readOnly && (
             <button

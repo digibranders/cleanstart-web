@@ -55,13 +55,18 @@ const RASTER_MIME_TO_EXT: Record<string, string> = {
 const PASSTHROUGH_MIME_TO_EXT: Record<string, string> = {
   'image/svg+xml': 'svg',
   'application/pdf': 'pdf',
+  'video/mp4': 'mp4',
+  'application/zip': 'zip',
+  'application/x-zip-compressed': 'zip',
 };
 
 /**
  * The Media collection converts every raster image to WebP via Payload's
  * `formatOptions`. The on-disk extension after conversion is `.webp`
  * regardless of the source MIME, so the canonical filename written to
- * R2 must use `.webp` too. SVG and PDF are passed through unchanged.
+ * R2 must use `.webp` too. SVG, PDF, MP4, and ZIP are passed through
+ * unchanged — every non-image entry in `ALLOWED_MIME_TYPES` must have an
+ * explicit mapping here so the filename keeps a servable extension.
  */
 export const canonicalExtensionForMime = (mimeType: string | undefined | null): string => {
   if (!mimeType) return 'bin';

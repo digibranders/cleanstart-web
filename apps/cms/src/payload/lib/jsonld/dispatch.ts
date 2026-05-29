@@ -462,7 +462,7 @@ const dispatchEvent = (
     collection === 'events'
       ? [
           { name: 'Home', path: '/' },
-          { name: 'Events', path: '/event' },
+          { name: 'Events', path: '/events' },
           { name: doc.title, path: `/event/${doc.slug}` },
         ]
       : [

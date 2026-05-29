@@ -6,7 +6,7 @@
  * Values match the actual `apps/web` route segments under
  * `apps/web/src/app/<prefix>/[slug]/`. They are NOT the legacy Webflow
  * URLs — the marketing site was rebuilt with redesigned routes
- * (`/blog/[slug]`, `/events/[slug]`, `/resource/[slug]` etc.), and any
+ * (`/blogs/[slug]`, `/event/[slug]`, `/resources/[slug]` etc.), and any
  * Webflow-era URLs are handled by seeded rows in the `redirects`
  * collection, not by this map.
  *
@@ -14,11 +14,11 @@
  * field (handles parent nesting), not a fixed prefix.
  */
 export const ROUTE_PREFIX = {
-  blogs: '/blog',
+  blogs: '/blogs',
   news: '/news',
   guides: '/guide',
-  resources: '/resource',
-  events: '/events',
+  resources: '/resources',
+  events: '/event',
   webinars: '/webinar',
   jobs: '/job',
   authors: '/author',
