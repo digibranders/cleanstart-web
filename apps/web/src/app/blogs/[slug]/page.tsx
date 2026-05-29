@@ -21,6 +21,7 @@ import { BlogScrollReset } from "@/components/sections/blog/BlogScrollReset";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { Footer } from "@/components/sections/Footer";
 import { absoluteUrl, buildPageMetadata } from "@/lib/seo/canonical";
+import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { effectivePublishedAt } from "@/lib/published-date";
 import {
   JsonLd,
@@ -39,33 +40,39 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
     return buildPageMetadata({
       title: "Blog post",
       description: "CleanStart blog post.",
-      path: `/blog/${slug}`,
+      path: `/blogs/${slug}`,
       noindex: true,
     });
   }
 
   const heroAbsolute = mediaUrl(post.heroImage?.url);
+  const seo = resolveCmsSeo(post.seo, { absolutize: mediaUrl });
 
   return buildPageMetadata({
-    title: post.title,
+    title: seo.title ?? post.title,
     description:
+      seo.description ??
       post.abstract ??
       "Insights and writings from the CleanStart team on container security, DevOps, and compliance.",
-    path: `/blog/${post.slug}`,
+    path: `/blogs/${post.slug}`,
     type: "article",
     publishedTime: effectivePublishedAt(post) ?? post.publishedAt,
     modifiedTime: post.updatedAt,
     authors: post.authors?.map((a) => a.name),
-    ...(heroAbsolute && post.heroImage
-      ? {
-          image: {
-            url: heroAbsolute,
-            width: post.heroImage.width,
-            height: post.heroImage.height,
-            alt: post.heroImage.alt ?? post.title,
-          },
-        }
-      : {}),
+    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
+    ...(seo.image
+      ? { image: seo.image }
+      : heroAbsolute && post.heroImage
+        ? {
+            image: {
+              url: heroAbsolute,
+              width: post.heroImage.width,
+              height: post.heroImage.height,
+              alt: post.heroImage.alt ?? post.title,
+            },
+          }
+        : {}),
   });
 }
 
@@ -108,18 +115,18 @@ export async function renderBlogDetail({
 
   const heroAbsolute = mediaUrl(post.heroImage?.url);
   const journeyLinks = [
-    ...(previousTarget ? [`/blog/${previousTarget.slug}`] : []),
-    ...(nextTarget ? [`/blog/${nextTarget.slug}`] : []),
+    ...(previousTarget ? [`/blogs/${previousTarget.slug}`] : []),
+    ...(nextTarget ? [`/blogs/${nextTarget.slug}`] : []),
   ];
 
   return (
     <>
       <BlogScrollReset />
       {previousTarget ? (
-        <link rel="prev" href={absoluteUrl(`/blog/${previousTarget.slug}`)} />
+        <link rel="prev" href={absoluteUrl(`/blogs/${previousTarget.slug}`)} />
       ) : null}
       {nextTarget ? (
-        <link rel="next" href={absoluteUrl(`/blog/${nextTarget.slug}`)} />
+        <link rel="next" href={absoluteUrl(`/blogs/${nextTarget.slug}`)} />
       ) : null}
       <JsonLd
         id={`blog-breadcrumbs-${post.slug}`}
@@ -134,7 +141,7 @@ export async function renderBlogDetail({
         data={blogPostingSchema({
           title: post.title,
           description: post.abstract ?? undefined,
-          path: `/blog/${post.slug}`,
+          path: `/blogs/${post.slug}`,
           publishedAt,
           modifiedAt: post.updatedAt,
           imageUrl: heroAbsolute,

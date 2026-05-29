@@ -4,6 +4,7 @@
 import { cache } from "react";
 
 import { cmsBaseUrl, fetchCMS } from "./cms-fetch";
+import type { CmsSeo } from "./seo/cms-seo";
 
 export type ResourceType =
   | "whitepaper"
@@ -32,6 +33,7 @@ export type Resource = {
   gated?: boolean;
   ctaButtonText?: string | null;
   asset?: ResourceImage | null;
+  seo?: CmsSeo | null;
 };
 
 export type ResourceDetail = Resource & {

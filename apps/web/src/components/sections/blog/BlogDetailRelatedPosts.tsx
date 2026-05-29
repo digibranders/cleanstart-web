@@ -178,7 +178,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
 
           {/* Read more */}
           <Link
-            href={`/blog/${post.slug}`}
+            href={`/blogs/${post.slug}`}
             aria-label={`Read ${post.title}`}
             className="group inline-flex items-center gap-2 mt-auto pt-2 self-start"
           >

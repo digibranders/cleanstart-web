@@ -186,7 +186,7 @@ async function loadBlogs(): Promise<ResourceCard[]> {
         image: image ?? "/images/resource-1.png",
         title: d.title,
         description: d.abstract?.trim() ?? "",
-        href: `/blog/${d.slug}`,
+        href: `/blogs/${d.slug}`,
       };
     })
     .filter((c): c is ResourceCard => c !== null);
@@ -205,7 +205,7 @@ async function loadResources(): Promise<ResourceCard[]> {
         image: resourceCoverPoster(d.type),
         title: d.title,
         description: d.summary?.trim() ?? "",
-        href: `/resource/${d.slug}`,
+        href: `/resources/${d.slug}`,
         isCoverPoster: true,
       };
     })
@@ -246,7 +246,7 @@ async function loadEvents(): Promise<ResourceCard[]> {
         image: image ?? "/images/resource-1.png",
         title: d.title,
         description: d.abstract?.trim() ?? "",
-        href: `/events/${d.slug}`,
+        href: `/event/${d.slug}`,
       };
     })
     .filter((c): c is ResourceCard => c !== null);

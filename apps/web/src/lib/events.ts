@@ -1,5 +1,6 @@
 import { cache } from "react";
 import type { BlogImage, LexicalRoot } from "@/lib/blog";
+import type { CmsSeo } from "@/lib/seo/cms-seo";
 
 import { fetchCMS } from "./cms-fetch";
 
@@ -33,6 +34,7 @@ export type Event = {
   cancelledAt?: string | null;
   previousStartDate?: string | null;
   publishedAt?: string | null;
+  seo?: CmsSeo | null;
 };
 
 export type EventDetail = Event & {

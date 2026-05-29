@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { Webinar, WebinarRegion, WebinarType } from "@/lib/webinars";
+import { EmptyState } from "@/components/feedback";
 import { Pagination } from "@/components/ui/Pagination";
 import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { WebinarCard } from "./WebinarCard";
@@ -16,6 +17,8 @@ interface WebinarsGridProps {
   totalPages: number;
   activeType?: WebinarType | undefined;
   activeRegion?: WebinarRegion | undefined;
+  /** True when the CMS fetch failed (vs. a genuinely empty result). */
+  loadFailed?: boolean;
 }
 
 function buildPageHref(
@@ -37,7 +40,9 @@ export function WebinarsGrid({
   totalPages,
   activeType,
   activeRegion,
+  loadFailed = false,
 }: WebinarsGridProps): React.ReactElement {
+  const hasFilters = Boolean(activeType || activeRegion);
   return (
     <section
       className="relative"
@@ -88,12 +93,29 @@ export function WebinarsGrid({
 
           <div className="flex-1 min-w-0">
             {items.length === 0 ? (
-              <p
-                className="font-sans text-body-lg text-center py-20"
-                style={{ color: "rgba(17,17,17,0.54)" }}
-              >
-                No webinars match these filters yet.
-              </p>
+              loadFailed ? (
+                <EmptyState variant="load-failed" />
+              ) : hasFilters ? (
+                <EmptyState
+                  variant="no-results"
+                  title="No webinars match these filters"
+                  actions={
+                    <Link
+                      href="/webinars"
+                      className="font-sans font-medium text-[#4a3bf1] underline underline-offset-4"
+                      style={{ fontSize: "var(--fs-body)" }}
+                    >
+                      Clear filters
+                    </Link>
+                  }
+                />
+              ) : (
+                <EmptyState
+                  variant="empty"
+                  title="No webinars yet"
+                  description="Check back soon — new sessions are on the way."
+                />
+              )
             ) : (
               <>
                 <RevealStagger

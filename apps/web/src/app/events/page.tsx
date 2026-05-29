@@ -49,9 +49,13 @@ export default async function EventsPage({
   const params = await searchParams;
   const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
 
+  let pastFailed = false;
   const [upcoming, past] = await Promise.all([
     getUpcomingEvents({ limit: 1 }).catch(emptyList),
-    getPastEvents({ page, limit: 9 }).catch(emptyList),
+    getPastEvents({ page, limit: 9 }).catch(() => {
+      pastFailed = true;
+      return emptyList();
+    }),
   ]);
 
   const upcomingEvent = upcoming.docs[0] ?? null;
@@ -73,6 +77,7 @@ export default async function EventsPage({
             events={past.docs}
             currentPage={past.page}
             totalPages={past.totalPages}
+            loadFailed={pastFailed}
           />
         </FadeUp>
       </main>

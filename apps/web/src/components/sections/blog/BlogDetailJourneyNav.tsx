@@ -87,7 +87,7 @@ function JourneyCell({
 }: JourneyCellProps): React.ReactElement {
   return (
     <Link
-      href={`/blog/${target.slug}`}
+      href={`/blogs/${target.slug}`}
       rel={rel}
       aria-label={`${label} ${target.title}`}
       className={[

@@ -18,7 +18,7 @@ const CleanSightComparison = dynamic(() =>
 import { CleanSightStats } from "@/components/sections/cleansight/CleanSightStats";
 import { CleanSightCTA } from "@/components/sections/cleansight/CleanSightCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
   title: "CleanSight — Continuous Container Visibility & Remediation",
@@ -36,6 +36,15 @@ export default function CleanSightPage(): React.ReactElement {
           { name: "Home", path: "/" },
           { name: "CleanSight" },
         ])}
+      />
+      <JsonLd
+        id="cleansight-software"
+        data={softwareApplicationSchema({
+          name: "CleanSight",
+          description:
+            "Continuously discover, assess, and remediate container risk across modern environments — unified visibility with integrated remediation.",
+          path: "/cleansight",
+        })}
       />
       <Header />
       <main>

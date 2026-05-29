@@ -20,7 +20,7 @@ export type PageImage = {
 interface BuildPageMetadataInput {
   title: string;
   description: string;
-  /** Path-only canonical, e.g. `/blogs` or `/blog/${slug}`. Always with a leading slash. */
+  /** Path-only canonical, e.g. `/blogs` or `/blogs/${slug}`. Always with a leading slash. */
   path: string;
   image?: PageImage | undefined;
   /** `article` for blog/resource detail pages, `website` everywhere else. */
@@ -30,6 +30,12 @@ interface BuildPageMetadataInput {
   authors?: string[] | undefined;
   /** Per-page noindex override. Default follows the global production gate. */
   noindex?: boolean | undefined;
+  /**
+   * Absolute canonical URL override (any domain). When set, replaces the
+   * default self-canonical derived from `path`. Used for the CMS
+   * `seo.canonicalOverride` field (syndication, migrated URLs, A/B variants).
+   */
+  canonicalUrl?: string | undefined;
 }
 
 /**
@@ -47,21 +53,24 @@ export function buildPageMetadata({
   modifiedTime,
   authors,
   noindex,
+  canonicalUrl,
 }: BuildPageMetadataInput): Metadata {
   const url = `${SITE_URL}${path}`;
   const isProduction = process.env.VERCEL_ENV === "production";
   const robotsBlocked = noindex || !isProduction;
 
   const ogImage = image ?? DEFAULT_OG_IMAGE;
+  const canonical = canonicalUrl ?? path;
+  const ogUrl = canonicalUrl ?? url;
 
   return {
     title,
     description,
-    alternates: { canonical: path },
+    alternates: { canonical },
     openGraph: {
       title,
       description,
-      url,
+      url: ogUrl,
       siteName: SITE_NAME,
       type,
       locale: "en_US",
