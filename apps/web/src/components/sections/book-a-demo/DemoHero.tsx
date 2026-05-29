@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { HeroReveal } from "@/components/ui/Reveal";
 
 /**
@@ -23,53 +22,89 @@ export function DemoHero(): React.ReactElement {
         }}
       />
 
-      {/* Left cube — Figma image 583137 at x:50, y:148 in the 1920-wide bg
-          (≈ 910px left of center on desktop). On mobile we pull it back to
-          the visible left edge so it frames the title from the corner like
-          the Figma mobile comp. `mix-blend-mode: screen` lets the gradient
-          colour the cube's dark regions so it reads as embedded *in* the hero
-          atmosphere rather than sitting on top. */}
-      <Image
-        src="/images/book-a-demo/hero-cube-left.png"
-        alt=""
-        width={419}
-        height={419}
+      {/* Left 3D cube — matches the ContactHero treatment: 419×419 frame
+          with the 294×298 cube tilted via rotate(-46.54deg), `mix-blend-mode:
+          color-dodge` so it tints into the gradient, opacity 0.4. Desktop-only
+          decoration (`hidden lg:block`) so mobile gets a clean text-only hero. */}
+      {/* biome-ignore lint/a11y/useAltText: decorative element */}
+      <div
         aria-hidden
-        className="pointer-events-none select-none absolute left-[-60px] top-[40px] w-[160px] md:left-[calc(50%-910px)] md:top-[148px] md:w-[clamp(220px,22vw,419px)]"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
-          height: "auto",
-          mixBlendMode: "screen",
-          opacity: 0.85,
-          maskImage:
-            "linear-gradient(180deg, black 0%, black 55%, rgba(0,0,0,0.6) 78%, rgba(0,0,0,0) 100%)",
-          WebkitMaskImage:
-            "linear-gradient(180deg, black 0%, black 55%, rgba(0,0,0,0.6) 78%, rgba(0,0,0,0) 100%)",
+          left: "-40px",
+          top: "150px",
+          width: "419px",
+          height: "419px",
+          mixBlendMode: "color-dodge",
         }}
-        sizes="(min-width: 1440px) 419px, (min-width: 768px) 22vw, 160px"
-        priority
-      />
+      >
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            transform: "rotate(-46.54deg)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/contact/hero-cube.png"
+            alt=""
+            width={294}
+            height={298}
+            loading="eager"
+            decoding="async"
+            style={{
+              width: "294px",
+              height: "298px",
+              opacity: 0.4,
+              objectFit: "contain",
+            }}
+          />
+        </div>
+      </div>
 
-      {/* Right cube — mirror of the left one so the title sits centered
-          between two purple-gem accents. Shown on both mobile and desktop;
-          on desktop it lives ~880px right of centre to mirror the left cube. */}
-      <Image
-        src="/images/book-a-demo/hero-cube-right.png"
-        alt=""
-        width={419}
-        height={419}
+      {/* Right 3D cube — mirror of the left one. */}
+      <div
         aria-hidden
-        className="pointer-events-none select-none absolute right-[-60px] top-[40px] w-[160px] md:right-[calc(50%-910px)] md:top-[148px] md:w-[clamp(220px,22vw,419px)] md:left-auto"
+        className="pointer-events-none absolute hidden lg:block"
         style={{
-          height: "auto",
-          mixBlendMode: "screen",
-          opacity: 0.85,
-          maskImage:
-            "linear-gradient(180deg, black 0%, black 55%, rgba(0,0,0,0.6) 78%, rgba(0,0,0,0) 100%)",
-          WebkitMaskImage:
-            "linear-gradient(180deg, black 0%, black 55%, rgba(0,0,0,0.6) 78%, rgba(0,0,0,0) 100%)",
+          right: "-40px",
+          top: "40px",
+          width: "419px",
+          height: "419px",
+          mixBlendMode: "color-dodge",
         }}
-        sizes="(min-width: 1440px) 419px, (min-width: 768px) 22vw, 160px"
-      />
+      >
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            transform: "rotate(46.54deg)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/contact/hero-cube.png"
+            alt=""
+            width={294}
+            height={298}
+            loading="eager"
+            decoding="async"
+            style={{
+              width: "294px",
+              height: "298px",
+              opacity: 0.4,
+              objectFit: "contain",
+            }}
+          />
+        </div>
+      </div>
 
       {/* Content — title centered around Figma y:176 within a ~369px tall band */}
       <div
