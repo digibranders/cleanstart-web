@@ -69,7 +69,7 @@ function PostCard({ post }: { post: Blog }): React.ReactElement {
 
   return (
     <Link
-      href={`/blog/${post.slug}`}
+      href={`/blogs/${post.slug}`}
       className="group flex flex-col overflow-hidden h-full transition-transform hover:-translate-y-0.5"
       style={{
         background: "rgba(255,255,255,0.04)",

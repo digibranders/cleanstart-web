@@ -39,7 +39,7 @@ export function BlogDetailHero({
   const showUpdated = shouldShowUpdated(publishedAt, updatedAt);
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.cleanstart.com";
-  const shareUrl = `${siteUrl}/blog/${slug}`;
+  const shareUrl = `${siteUrl}/blogs/${slug}`;
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedTitle = encodeURIComponent(title);
 

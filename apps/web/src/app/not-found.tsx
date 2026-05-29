@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
-import { ErrorHero } from "@/components/sections/error/ErrorHero";
+import { StateView } from "@/components/feedback";
 
 export const metadata: Metadata = {
   title: "Page Not Found · CleanStart",
@@ -14,7 +15,18 @@ export default function NotFound() {
     <>
       <Header />
       <main>
-        <ErrorHero title="Page Not Found" />
+        <StateView
+          variant="not-found"
+          actions={
+            <Link
+              href="/"
+              className="inline-flex h-11 items-center rounded-xl bg-white px-6 font-medium text-[#2E1D8E] transition-colors hover:bg-white/90"
+              style={{ fontSize: "var(--fs-button)" }}
+            >
+              Back to home
+            </Link>
+          }
+        />
       </main>
       <Footer />
     </>

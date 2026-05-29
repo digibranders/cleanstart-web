@@ -1,6 +1,7 @@
 import { cache } from "react";
 
 import { cmsBaseUrl, fetchCMS } from "./cms-fetch";
+import type { CmsSeo } from "./seo/cms-seo";
 
 export type BlogCategory = {
   id: string;
@@ -53,6 +54,7 @@ export type Blog = {
   updatedAt?: string;
   readingMinutes?: number;
   featured?: boolean;
+  seo?: CmsSeo | null;
 };
 
 // Lexical rich-text node types from Payload CMS

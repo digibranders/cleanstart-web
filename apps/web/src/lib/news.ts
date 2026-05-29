@@ -1,5 +1,6 @@
 import { cache } from "react";
 import type { LexicalRoot, BlogImage, TocEntry } from "@/lib/blog";
+import type { CmsSeo } from "@/lib/seo/cms-seo";
 
 import { fetchCMS } from "./cms-fetch";
 
@@ -31,6 +32,7 @@ export type News = {
   externalUrl?: string | null;
   publicationDate?: string | null;
   readingMinutes?: number | null;
+  seo?: CmsSeo | null;
 };
 
 export type NewsDetail = News & {

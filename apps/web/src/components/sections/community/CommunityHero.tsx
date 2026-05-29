@@ -89,7 +89,7 @@ export function CommunityHero() {
               </HeroReveal>
               <HeroReveal y={30} delay={0.3} duration={0.8}>
                 <a
-                  href="https://github.com/cleanstart"
+                  href="https://www.linkedin.com/groups/18324021/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="cs-btn-glass self-start"

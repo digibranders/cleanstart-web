@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { News } from "@/lib/news";
+import { EmptyState } from "@/components/feedback";
 import { Pagination } from "@/components/ui/Pagination";
 import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { NewsroomCard } from "./NewsroomCard";
@@ -10,6 +11,8 @@ interface NewsroomGridProps {
   totalPages: number;
   activeCategory: string;
   searchQuery: string;
+  /** True when the CMS fetch failed (vs. a genuinely empty result). */
+  loadFailed?: boolean;
 }
 
 function buildPageHref(
@@ -31,7 +34,9 @@ export function NewsroomGrid({
   totalPages,
   activeCategory,
   searchQuery,
+  loadFailed = false,
 }: NewsroomGridProps): React.ReactElement {
+  const hasFilters = Boolean(activeCategory || searchQuery);
   return (
     <section
       className="relative overflow-hidden"
@@ -147,12 +152,28 @@ export function NewsroomGrid({
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {items.length === 0 ? (
-          <p
-            className="font-sans text-center py-20"
-            style={{ color: "rgba(17,17,17,0.54)", fontSize: "var(--fs-lead)" }}
-          >
-            No news yet — check back soon.
-          </p>
+          loadFailed ? (
+            <EmptyState variant="load-failed" />
+          ) : hasFilters ? (
+            <EmptyState
+              variant="no-results"
+              actions={
+                <Link
+                  href="/news"
+                  className="font-sans font-medium text-[#4a3bf1] underline underline-offset-4"
+                  style={{ fontSize: "var(--fs-body)" }}
+                >
+                  Clear filters
+                </Link>
+              }
+            />
+          ) : (
+            <EmptyState
+              variant="empty"
+              title="No news yet"
+              description="Check back soon — new stories are on the way."
+            />
+          )
         ) : (
           <>
             <RevealStagger

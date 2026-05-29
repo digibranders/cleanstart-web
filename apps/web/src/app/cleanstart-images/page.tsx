@@ -9,7 +9,7 @@ import { CleanStartImagesEnvironment } from "@/components/sections/cleanstart-im
 import { CleanStartImagesMeasure } from "@/components/sections/cleanstart-images/CleanStartImagesMeasure";
 import { CleanStartImagesCta } from "@/components/sections/cleanstart-images/CleanStartImagesCta";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
   title: "CleanStart Images — CVE-Free Container & VM Images",
@@ -27,6 +27,15 @@ export default function CleanStartImagesPage(): React.ReactElement {
           { name: "Home", path: "/" },
           { name: "CleanStart Images" },
         ])}
+      />
+      <JsonLd
+        id="cleanstart-images-software"
+        data={softwareApplicationSchema({
+          name: "CleanStart Images",
+          description:
+            "Hardened, near-zero-CVE container and virtual machine images — a drop-in replacement for your base image with smaller, faster, FIPS-ready builds.",
+          path: "/cleanstart-images",
+        })}
       />
       <Header />
       <main>

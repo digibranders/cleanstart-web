@@ -10,9 +10,19 @@ import {
   EXPERIENCE_LABEL,
   getJobBySlug,
   locationDisplay,
+  resolvedLocations,
+  type JobEmploymentType,
 } from "@/lib/jobs";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, jobPostingSchema } from "@/lib/seo/jsonld";
+
+// schema.org employmentType enum mapping for JobPosting.
+const SCHEMA_EMPLOYMENT_TYPE: Record<JobEmploymentType, string> = {
+  "full-time": "FULL_TIME",
+  "part-time": "PART_TIME",
+  contract: "CONTRACTOR",
+  internship: "INTERN",
+};
 
 const CONTACT_EMAIL = "hr@cleanstart.com";
 
@@ -29,7 +39,7 @@ export async function generateMetadata({
     return buildPageMetadata({
       title: "Career opening",
       description: "Open role at CleanStart.",
-      path: `/careers/${slug}`,
+      path: `/job/${slug}`,
       noindex: true,
     });
   }
@@ -44,7 +54,7 @@ export async function generateMetadata({
   return buildPageMetadata({
     title: job.title,
     description: descriptionParts.join(" "),
-    path: `/careers/${job.slug}`,
+    path: `/job/${job.slug}`,
     type: "article",
     modifiedTime: job.updatedAt ?? undefined,
     noindex: job.hiringStatus === "closed",
@@ -82,6 +92,17 @@ export default async function CareerDetailPage({
       : []),
   ];
 
+  // JobPosting requires a description. Build it from the body paragraphs,
+  // falling back to a one-line summary when the body is empty.
+  const jobDescription =
+    (bodyWithoutDeptLine?.root?.children ?? [])
+      .map((node) => collectText(node as unknown as LexicalTextLike).trim())
+      .filter(Boolean)
+      .join("\n\n") ||
+    `Apply for the ${job.title} role at CleanStart${
+      departmentLabel ? ` in ${departmentLabel}` : ""
+    } (${locationDisplay(job)}).`;
+
   return (
     <>
       <JsonLd
@@ -92,6 +113,31 @@ export default async function CareerDetailPage({
           { name: job.title },
         ])}
       />
+      {/* Omit JobPosting on closed roles — Google penalises expired postings
+          that linger in the index, and closed roles are already noindex. */}
+      {job.hiringStatus !== "closed" ? (
+        <JsonLd
+          id={`career-jobposting-${job.slug}`}
+          data={jobPostingSchema({
+            title: job.title,
+            description: jobDescription,
+            path: `/job/${job.slug}`,
+            datePosted: job.publishedAt ?? job.updatedAt ?? undefined,
+            validThrough: job.applicationDeadline ?? job.expiresAt ?? undefined,
+            employmentType: job.employmentType
+              ? SCHEMA_EMPLOYMENT_TYPE[job.employmentType]
+              : undefined,
+            locations: resolvedLocations(job).map((l) => ({
+              name: l.name,
+              isoCountry: l.isoCountry,
+              type: l.type,
+            })),
+            remote: job.remote ?? undefined,
+            baseSalary: job.salaryRange ?? undefined,
+            identifier: job.slug,
+          })}
+        />
+      ) : null}
       <Header />
       <main>
         <CareerDetailHero title={job.title} meta={meta} />

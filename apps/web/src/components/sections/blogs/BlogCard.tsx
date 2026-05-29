@@ -148,7 +148,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
 
         {/* Read more — always at the bottom */}
         <Link
-          href={`/blog/${post.slug}`}
+          href={`/blogs/${post.slug}`}
           className="flex items-center"
           style={{ gap: "8px" }}
           aria-label={`Read more about ${post.title}`}

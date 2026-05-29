@@ -11,7 +11,7 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Teams",
+  title: "Meet the Team & Leadership",
   description:
     "Meet the people behind CleanStart — our executive leadership, advisory board, and the team united by a shared commitment to trusted software.",
   path: "/teams",

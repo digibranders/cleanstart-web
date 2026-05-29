@@ -175,7 +175,7 @@ export function BlogsHero({
 
               {/* Read more link */}
               <Link
-                href={`/blog/${featuredPost.slug}`}
+                href={`/blogs/${featuredPost.slug}`}
                 className="flex items-center gap-2 text-body-lg font-medium leading-[1.5] text-white text-center"
               >
                 Read more

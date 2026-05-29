@@ -278,7 +278,7 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
           </div>
 
           <Link
-            href={`/events/${event.slug}`}
+            href={`/event/${event.slug}`}
             className="cs-btn-glass"
             style={{
               alignSelf: "flex-start",

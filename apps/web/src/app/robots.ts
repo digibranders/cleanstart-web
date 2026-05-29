@@ -8,7 +8,10 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const isProduction = process.env.VERCEL_ENV === "production";
   const headerList = await headers();
   const host = headerList.get("host")?.split(":")[0]?.toLowerCase() ?? "";
-  const isNoindexHost = NOINDEX_HOSTS.has(host);
+  // The production deployment is also reachable at its `*.vercel.app` aliases,
+  // which run with VERCEL_ENV=production and would otherwise pass the index
+  // gate — creating a duplicate-content host. Block them regardless of env.
+  const isNoindexHost = NOINDEX_HOSTS.has(host) || host.endsWith(".vercel.app");
 
   if (!isProduction || isNoindexHost) {
     return {

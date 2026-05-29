@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/icons/Logo";
-import { ErrorHero } from "@/components/sections/error/ErrorHero";
+import { StateView, type StateVariant } from "@/components/feedback";
 
 // NOTE: Header and Footer are async Server Components that transitively
 // import cms-fetch.ts → next/headers, which cannot be statically imported
@@ -33,10 +33,32 @@ function MinimalHeader() {
   );
 }
 
+/**
+ * Picks the illustrated variant from the caught error. Offline takes priority
+ * (the request never reached the server); otherwise map the carried HTTP
+ * status. Falls back to a generic server error.
+ */
+function resolveVariant(error: Error & { status?: number }): StateVariant {
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+    return "offline";
+  }
+  switch (error.status) {
+    case 503:
+      return "maintenance";
+    case 400:
+      return "bad-request";
+    case 403:
+      return "forbidden";
+    default:
+      return "server-error";
+  }
+}
+
 export default function ErrorBoundary({
   error,
+  reset,
 }: {
-  error: Error & { digest?: string };
+  error: Error & { digest?: string; status?: number };
   reset: () => void;
 }) {
   useEffect(() => {
@@ -51,7 +73,29 @@ export default function ErrorBoundary({
     <>
       <MinimalHeader />
       <main>
-        <ErrorHero title="Server Error" referenceId={error.digest} />
+        <StateView
+          variant={resolveVariant(error)}
+          referenceId={error.digest}
+          actions={
+            <>
+              <button
+                type="button"
+                onClick={reset}
+                className="inline-flex h-11 items-center rounded-xl bg-white px-6 font-medium text-[#2E1D8E] transition-colors hover:bg-white/90"
+                style={{ fontSize: "var(--fs-button)" }}
+              >
+                Try again
+              </button>
+              <Link
+                href="/"
+                className="inline-flex h-11 items-center rounded-xl border border-white/25 px-6 font-medium text-white transition-colors hover:bg-white/10"
+                style={{ fontSize: "var(--fs-button)" }}
+              >
+                Back to home
+              </Link>
+            </>
+          }
+        />
       </main>
     </>
   );

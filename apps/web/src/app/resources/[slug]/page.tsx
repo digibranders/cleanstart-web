@@ -15,6 +15,7 @@ import {
 import { highlightLexical } from "@/lib/highlightLexical";
 import { getFormById, type Form } from "@/lib/forms";
 import { buildPageMetadata } from "@/lib/seo/canonical";
+import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { effectivePublishedAt } from "@/lib/published-date";
 import {
   JsonLd,
@@ -35,29 +36,35 @@ export async function generateMetadata({
     return buildPageMetadata({
       title: "Resource",
       description: "CleanStart resource.",
-      path: `/resource/${slug}`,
+      path: `/resources/${slug}`,
       noindex: true,
     });
   }
   const assetAbsolute = mediaUrl(resource.asset?.url);
+  const seo = resolveCmsSeo(resource.seo, { absolutize: mediaUrl });
   return buildPageMetadata({
-    title: resource.title,
+    title: seo.title ?? resource.title,
     description:
+      seo.description ??
       resource.summary ??
       "Whitepapers, reports, datasheets, and case studies from CleanStart.",
-    path: `/resource/${resource.slug}`,
+    path: `/resources/${resource.slug}`,
     type: "article",
     publishedTime: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
-    ...(assetAbsolute && resource.asset
-      ? {
-          image: {
-            url: assetAbsolute,
-            width: resource.asset.width,
-            height: resource.asset.height,
-            alt: resource.asset.alt ?? resource.title,
-          },
-        }
-      : {}),
+    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
+    ...(seo.image
+      ? { image: seo.image }
+      : assetAbsolute && resource.asset
+        ? {
+            image: {
+              url: assetAbsolute,
+              width: resource.asset.width,
+              height: resource.asset.height,
+              alt: resource.asset.alt ?? resource.title,
+            },
+          }
+        : {}),
   });
 }
 
@@ -104,7 +111,7 @@ export async function renderResourceDetail({
         data={articleSchema({
           title: resource.title,
           description: resource.summary ?? undefined,
-          path: `/resource/${resource.slug}`,
+          path: `/resources/${resource.slug}`,
           publishedAt: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
           imageUrl: assetAbsolute,
           type: resourceTypeLabel(resource.type),

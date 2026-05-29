@@ -10,7 +10,7 @@ import { buildPageMetadata } from '@/lib/seo/canonical';
 import { JsonLd, breadcrumbSchema } from '@/lib/seo/jsonld';
 
 export const metadata = buildPageMetadata({
-  title: 'Community',
+  title: 'Developer & Security Community',
   description:
     'Connect with developers and security leaders sharing real-world strategies to reduce risk, secure images, and ship faster with confidence.',
   path: '/community',

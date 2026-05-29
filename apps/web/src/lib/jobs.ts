@@ -59,6 +59,7 @@ export type Job = {
     currency?: "USD" | "EUR" | "GBP" | "INR" | null;
   };
   body?: LexicalRoot | null;
+  publishedAt?: string | null;
   updatedAt?: string | null;
 };
 
@@ -190,7 +191,7 @@ export function experienceDisplay(job: Job): string | null {
 export function applyHref(job: Job): string {
   if (job.source === "ats" && job.atsUrl) return job.atsUrl;
   if (job.applyUrl) return job.applyUrl;
-  return `/careers/${job.slug}`;
+  return `/job/${job.slug}`;
 }
 
 export type JobStatusBadge = "open" | "closing-soon" | "closed";

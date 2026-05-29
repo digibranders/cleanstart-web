@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/seo/canonical";
+import { ARTICLE_SLUGS } from "@/components/sections/knowledge-hub/articles";
 
 /**
  * Single sitemap.xml — we're orders of magnitude below the 50k URL cap.
@@ -11,6 +12,9 @@ import { SITE_URL } from "@/lib/seo/canonical";
  *
  * Off-production we return an empty sitemap; robots.ts blocks indexing
  * entirely on previews, so emitting the URLs would only invite scrapers.
+ *
+ * Docs flagged `seo.indexable = noindex` are excluded — the sitemap must never
+ * advertise a URL the page itself tells Google not to index.
  */
 
 type CmsDoc = {
@@ -18,37 +22,77 @@ type CmsDoc = {
   updatedAt?: string | null;
   publishedAt?: string | null;
   displayPublishedAt?: string | null;
+  publicationDate?: string | null;
+  seo?: { indexable?: string | null } | null;
 };
 
 type CmsList<T> = { docs: T[] };
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
 
-const PUBLISHED_FILTER =
+// Per-collection published filters mirror each collection's lifecycle field:
+// blogs/resources/events/authors use `publishedAt`, news uses `publicationDate`,
+// jobs surface only open + published roles.
+const BLOG_FILTER =
   "where[_status][equals]=published&where[publishedAt][exists]=true";
+const NEWS_FILTER =
+  "where[_status][equals]=published&where[publicationDate][exists]=true";
+const JOBS_FILTER =
+  "where[_status][equals]=published&where[hiringStatus][equals]=open";
 
-async function fetchPublished(collection: string): Promise<CmsDoc[]> {
+async function fetchDocs(collection: string, filter: string): Promise<CmsDoc[]> {
   try {
     const res = await fetch(
-      `${CMS_URL}/api/${collection}?${PUBLISHED_FILTER}&depth=0&limit=1000&sort=-publishedAt`,
+      `${CMS_URL}/api/${collection}?${filter}&depth=0&limit=1000`,
       { next: { revalidate: 3600, tags: [`sitemap:${collection}`] } },
     );
     if (!res.ok) return [];
     const data = (await res.json()) as CmsList<CmsDoc>;
-    return data.docs ?? [];
+    return (data.docs ?? []).filter(isIndexable);
   } catch {
     return [];
   }
 }
 
-// Keep in sync with docs/WEB-PAGES.md as new static pages ship
-// (pricing, contact-us, products, careers, etc. — currently not built).
+// A doc is indexable unless the editor explicitly set seo.indexable to a
+// noindex value. Missing/empty → default index.
+function isIndexable(doc: CmsDoc): boolean {
+  const value = doc.seo?.indexable;
+  return !value || value === "index";
+}
+
+// Every built non-dynamic route. Keep in sync with docs/WEB-PAGES.md.
+// `/pricing` and `/webinars/[slug]` are intentionally omitted (not built — see
+// docs/SEO-IMPLEMENTATION-PLAN.md tasks 1.3/1.4).
 const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: "/" },
   { path: "/about-us" },
+  { path: "/attack-surface-reduction" },
   { path: "/blogs" },
+  { path: "/book-a-demo" },
+  { path: "/careers" },
+  { path: "/cleansight" },
+  { path: "/cleanstart-images" },
+  { path: "/community" },
+  { path: "/contact-us" },
+  { path: "/deal-registration" },
+  { path: "/events" },
+  { path: "/fips" },
+  { path: "/for-ciso" },
+  { path: "/for-developers" },
+  { path: "/knowledge-hub" },
+  { path: "/legal" },
+  { path: "/legal/acceptable-use-policy" },
+  { path: "/news" },
+  { path: "/partners" },
+  { path: "/podcast" },
+  { path: "/privacy-policy" },
   { path: "/resource-center" },
+  { path: "/software-bill-materials" },
+  { path: "/software-composition-analysis" },
+  { path: "/teams" },
   { path: "/vulnerability-remediation" },
+  { path: "/webinars" },
 ];
 
 function entry(path: string, lastModified?: string): MetadataRoute.Sitemap[number] {
@@ -62,23 +106,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const isProduction = process.env.VERCEL_ENV === "production";
   if (!isProduction) return [];
 
-  const [blogs, resources, authors] = await Promise.all([
-    fetchPublished("blogs"),
-    fetchPublished("resources"),
-    fetchPublished("authors"),
-  ]);
+  const [blogs, resources, authors, news, events, jobs, guides] =
+    await Promise.all([
+      fetchDocs("blogs", BLOG_FILTER),
+      fetchDocs("resources", BLOG_FILTER),
+      fetchDocs("authors", BLOG_FILTER),
+      fetchDocs("news", NEWS_FILTER),
+      fetchDocs("events", BLOG_FILTER),
+      fetchDocs("jobs", JOBS_FILTER),
+      fetchDocs("guides", BLOG_FILTER),
+    ]);
 
   return [
     ...STATIC_ROUTES.map((r) => entry(r.path)),
+    ...ARTICLE_SLUGS.map((slug) => entry(`/knowledge-hub/${slug}`)),
     ...blogs.map((b) =>
       entry(
-        `/blog/${b.slug}`,
+        `/blogs/${b.slug}`,
         b.updatedAt ?? b.displayPublishedAt ?? b.publishedAt ?? undefined,
       ),
     ),
     ...resources.map((r) =>
       entry(
-        `/resource/${r.slug}`,
+        `/resources/${r.slug}`,
         r.updatedAt ?? r.displayPublishedAt ?? r.publishedAt ?? undefined,
       ),
     ),
@@ -87,6 +137,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         `/author/${a.slug}`,
         a.updatedAt ?? a.displayPublishedAt ?? a.publishedAt ?? undefined,
       ),
+    ),
+    ...news.map((n) =>
+      entry(`/news/${n.slug}`, n.updatedAt ?? n.publicationDate ?? undefined),
+    ),
+    ...events.map((e) =>
+      entry(`/event/${e.slug}`, e.updatedAt ?? e.publishedAt ?? undefined),
+    ),
+    ...jobs.map((j) => entry(`/job/${j.slug}`, j.updatedAt ?? undefined)),
+    ...guides.map((g) =>
+      entry(`/guide/${g.slug}`, g.updatedAt ?? g.publishedAt ?? undefined),
     ),
   ];
 }
