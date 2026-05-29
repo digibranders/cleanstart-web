@@ -86,9 +86,9 @@ function rectToPct(x: number, y: number, w: number, h: number) {
 export function FipsEnables(): React.ReactElement {
   return (
     <Section
-      padding="lg"
+      padding="sm"
       data-section="FipsEnables"
-      className="relative overflow-hidden"
+      className="relative overflow-hidden !pt-6 md:!pt-8"
       style={{
         background:
           "linear-gradient(180deg, #151021 0%, #131e8f 62%, #471ec0 100%)",
@@ -151,7 +151,7 @@ export function FipsEnables(): React.ReactElement {
           className="mx-auto text-center"
           style={{
             maxWidth: "47rem", // Figma 752 / 16
-            marginBottom: "clamp(2rem, 5vw, 3.25rem)",
+            marginBottom: "clamp(1rem, 2vw, 1.5rem)",
           }}
         >
           <Reveal header>

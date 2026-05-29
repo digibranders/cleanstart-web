@@ -27,7 +27,7 @@ export function BookDemoBody({ children }: { children: ReactNode }): React.React
           width: "1101px",
           height: "1101px",
           background:
-            "radial-gradient(circle at 50% 50%, rgba(100, 13, 251, 1) 0%, rgba(100, 13, 251, 0) 100%)",
+            "radial-gradient(circle closest-side at 50% 50%, rgba(100, 13, 251, 1) 0%, rgba(100, 13, 251, 0) 100%)",
           opacity: 0.1,
         }}
       />
