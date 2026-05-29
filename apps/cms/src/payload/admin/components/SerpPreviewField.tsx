@@ -4,6 +4,8 @@ import { useField } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
+import { DEFAULT_SITE_URL } from './_site-url';
+
 type SerpPreviewFieldProps = {
   /**
    * URL path prefix for this collection, e.g. `/blog`, `/guides`.
@@ -34,10 +36,6 @@ type SerpPreviewFieldProps = {
    */
   siteUrl?: string;
 };
-
-const DEFAULT_SITE_URL =
-  (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SITE_URL) ||
-  'https://cleanstart.com';
 
 const trimSlash = (s: string): string => s.replace(/^\/+|\/+$/g, '');
 

@@ -3,16 +3,14 @@
 import { useField } from '@payloadcms/ui';
 import { useMemo } from 'react';
 
+import { DEFAULT_SITE_URL } from './_site-url';
+
 /**
  * Shared URL derivation helpers for the SEO sidebar's redirect-aware
  * fields (Inbound / Outbound / URL change history). Three components
  * need the same `publicUrl` + `sitePath` shape — extract per the
  * CLAUDE.md "three similar lines beats a premature abstraction" rule.
  */
-
-const DEFAULT_SITE_URL =
-  (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SITE_URL) ||
-  'https://cleanstart.com';
 
 const trimSlash = (s: string): string => s.replace(/^\/+|\/+$/g, '');
 

@@ -30,6 +30,7 @@ export const CheckboxField = (props: CheckboxFieldClientProps): ReactElement => 
   const readOnly = field.admin?.readOnly === true;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    if (readOnly) return;
     setValue(e.target.checked);
   };
 
@@ -37,7 +38,7 @@ export const CheckboxField = (props: CheckboxFieldClientProps): ReactElement => 
     <div
       className={`field-type checkbox cs-checkbox-field${
         showError ? ' cs-checkbox-field--error' : ''
-      }`}
+      }${readOnly ? ' cs-checkbox-field--readonly' : ''}`}
     >
       <label className="cs-checkbox-field__row" htmlFor={id}>
         <input
@@ -46,7 +47,8 @@ export const CheckboxField = (props: CheckboxFieldClientProps): ReactElement => 
           className="cs-checkbox-field__input"
           checked={value === true}
           onChange={handleChange}
-          disabled={readOnly}
+          aria-readonly={readOnly}
+          onClick={readOnly ? (e) => e.preventDefault() : undefined}
         />
         <span className="cs-checkbox-field__visual" aria-hidden="true">
           <svg width="10" height="10" viewBox="0 0 16 16" fill="none" role="presentation">

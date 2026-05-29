@@ -39,6 +39,14 @@ export const ListHeader = (props: Props): ReactElement => {
   );
   const debounceRef = useRef<number | null>(null);
 
+  // Clear any pending debounce on unmount so it cannot call
+  // handleSearchChange after the list-view has been torn down.
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    };
+  }, []);
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: depending on `search` would create a feedback loop with the local debounced setter
   useEffect(() => {
     const next = typeof query.search === 'string' ? query.search : '';

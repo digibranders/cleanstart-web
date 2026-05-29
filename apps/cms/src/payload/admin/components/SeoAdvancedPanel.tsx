@@ -124,7 +124,7 @@ export const SeoAdvancedPanel = (props: SeoAdvancedPanelProps): ReactElement => 
     noimageindex,
     notranslate,
     maxImagePreview,
-    speakableSelectors.length,
+    speakableSelectors,
   ]);
 
   const [subOpen, setSubOpen] = useState<{
