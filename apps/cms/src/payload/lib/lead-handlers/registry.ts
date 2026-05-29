@@ -111,7 +111,17 @@ export const submitLead = async (
   );
 
   // Persist sync outcomes back onto the lead.
-  await writeSyncedTo(payload, ctx.leadId, [primary, ...secondaryResults]);
+  // Wrap in try/catch: a writeSyncedTo failure must not propagate to
+  // parkSubmission, which would re-queue the lead and create a duplicate
+  // row on the drain cron's next submitLead call.
+  try {
+    await writeSyncedTo(payload, ctx.leadId, [primary, ...secondaryResults]);
+  } catch (err) {
+    console.warn(
+      `[lead-handlers] writeSyncedTo failed for lead ${ctx.leadId} — syncedTo metadata lost, but the lead row is captured.`,
+      err instanceof Error ? err.message : String(err),
+    );
+  }
 
   return {
     ok: true,

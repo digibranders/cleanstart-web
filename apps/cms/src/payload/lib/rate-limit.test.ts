@@ -93,13 +93,15 @@ describe('checkAndRecord', () => {
       ).toThrow(RateLimitMisconfigured);
     });
 
-    it('allows redis/postgres backends regardless of concurrency', () => {
+    it('throws for redis/postgres backends (not yet implemented)', () => {
+      // redis/postgres are unimplemented — accepting them silently would let
+      // operators bypass the multi-worker guard while the store stays in-memory.
       expect(() =>
         validateRateLimitBootConfig({ backend: 'redis', concurrency: '4' }),
-      ).not.toThrow();
+      ).toThrow(RateLimitMisconfigured);
       expect(() =>
         validateRateLimitBootConfig({ backend: 'postgres', concurrency: '8' }),
-      ).not.toThrow();
+      ).toThrow(RateLimitMisconfigured);
     });
 
     it('throws on non-numeric WEB_CONCURRENCY', () => {
