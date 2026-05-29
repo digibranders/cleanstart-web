@@ -39,36 +39,46 @@ export default function DealRegistrationPage() {
             }}
           />
 
-          {/* Left cube — fully visible inside the viewport, sitting in the
-              top-left quadrant of the hero. */}
+          {/* Left cube — lower-left (Figma image 583141), matching the
+              Knowledge Hub hero placement. */}
           <Image
             src="/images/book-a-demo/hero-cube-left.png"
             alt=""
-            width={419}
-            height={419}
+            width={332}
+            height={313}
             aria-hidden
-            className="pointer-events-none select-none absolute left-[12px] top-[100px] w-[120px] sm:left-[clamp(8px,3vw,48px)] sm:top-[clamp(120px,12vw,220px)] sm:w-[clamp(160px,18vw,280px)]"
+            className="pointer-events-none select-none absolute hidden xl:block"
             style={{
-              height: "auto",
-              opacity: 1,
+              width: "332px",
+              height: "313px",
+              left: "-95px",
+              top: "208px",
+              mixBlendMode: "hard-light",
+              opacity: 0.4,
             }}
-            sizes="(min-width: 1440px) 280px, (min-width: 768px) 18vw, 120px"
+            sizes="332px"
             priority
           />
 
-          {/* Right cube — mirror */}
+          {/* Right cube — upper-right (Figma image 583137), matching the
+              Knowledge Hub hero placement. */}
           <Image
             src="/images/book-a-demo/hero-cube-right.png"
             alt=""
-            width={419}
-            height={419}
+            width={294}
+            height={298}
             aria-hidden
-            className="pointer-events-none select-none absolute right-[12px] top-[100px] w-[120px] sm:right-[clamp(8px,3vw,48px)] sm:top-[clamp(120px,12vw,220px)] sm:w-[clamp(160px,18vw,280px)]"
+            className="pointer-events-none select-none absolute hidden xl:block"
             style={{
-              height: "auto",
-              opacity: 1,
+              width: "294px",
+              height: "298px",
+              left: "calc(1647 / 1920 * 100%)",
+              top: "-1px",
+              mixBlendMode: "color-dodge",
+              transform: "rotate(-46.54deg)",
+              opacity: 0.4,
             }}
-            sizes="(min-width: 1440px) 280px, (min-width: 768px) 18vw, 120px"
+            sizes="294px"
           />
 
           <div
@@ -141,7 +151,7 @@ export default function DealRegistrationPage() {
         {/* ── Ecosystems marquee — same logos used on /about's
             "Built for the Ecosystems You Trust" section. */}
         <FadeUp>
-          <AboutEcosystems bottomPadding="compact" />
+          <AboutEcosystems bottomPadding="compact" cornerAccent />
         </FadeUp>
       </main>
       <Footer />
