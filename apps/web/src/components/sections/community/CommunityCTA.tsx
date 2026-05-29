@@ -55,7 +55,7 @@ export function CommunityCTA() {
           Join the community building the world&apos;s most trusted software ecosystem.
         </p>
         <a
-          href="https://github.com/cleanstart"
+          href="https://www.linkedin.com/groups/18324021/"
           target="_blank"
           rel="noopener noreferrer"
           className="cs-btn-glass flex items-center gap-2"
