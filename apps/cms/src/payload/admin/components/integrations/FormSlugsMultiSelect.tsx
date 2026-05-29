@@ -32,6 +32,7 @@ export const FormSlugsMultiSelect = ({ path = 'routing.formSlugs' }: Props): Rea
 
   const [options, setOptions] = useState<FormOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
@@ -41,10 +42,25 @@ export const FormSlugsMultiSelect = ({ path = 'routing.formSlugs' }: Props): Rea
 
   useEffect(() => {
     if (!serverURL) return;
+    let cancelled = false;
     setLoading(true);
+    setFetchError(false);
     fetchForms(serverURL)
-      .then(setOptions)
-      .finally(() => setLoading(false));
+      .then((opts) => {
+        if (!cancelled) setOptions(opts);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setOptions([]);
+          setFetchError(true);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [serverURL]);
 
   const isAll = selected.length === 0;
@@ -153,9 +169,11 @@ export const FormSlugsMultiSelect = ({ path = 'routing.formSlugs' }: Props): Rea
             placeholder={
               loading
                 ? 'Loading forms…'
-                : isAll
-                  ? 'Filter to specific forms…'
-                  : ''
+                : fetchError
+                  ? 'Could not load forms'
+                  : isAll
+                    ? 'Filter to specific forms…'
+                    : ''
             }
             disabled={loading}
             onChange={(e) => {
@@ -210,7 +228,11 @@ export const FormSlugsMultiSelect = ({ path = 'routing.formSlugs' }: Props): Rea
                 ✕ All forms (clear filter)
               </button>
             )}
-            {options.length === 0 ? (
+            {fetchError ? (
+              <div className="cs-collections-select__empty cs-collections-select__empty--error">
+                Could not load forms — check your connection and try again.
+              </div>
+            ) : options.length === 0 ? (
               <div className="cs-collections-select__empty">
                 No forms found — create a form first.
               </div>

@@ -193,6 +193,26 @@ export default buildConfig({
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+      // wireCustomFields stamps component paths onto field types at runtime;
+      // generate:importmap can only discover paths from static config. For
+      // the seven field types that no collection uses today, register them
+      // here so the importMap is populated before those field types appear.
+      generators: [
+        ({ addToImportMap }) => {
+          const FORWARD_COMPAT_FIELD_PATHS = [
+            '@/payload/admin/components/fields/PointField.tsx#PointField',
+            '@/payload/admin/components/fields/RadioField.tsx#RadioField',
+            '@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField',
+            '@/payload/admin/components/fields/TabsField.tsx#TabsField',
+            '@/payload/admin/components/fields/RowField.tsx#RowField',
+            '@/payload/admin/components/fields/JoinField.tsx#JoinField',
+            '@/payload/admin/components/fields/CodeField.tsx#CodeField',
+          ] as const;
+          for (const p of FORWARD_COMPAT_FIELD_PATHS) {
+            addToImportMap(p);
+          }
+        },
+      ],
     },
     components: {
       actions: [

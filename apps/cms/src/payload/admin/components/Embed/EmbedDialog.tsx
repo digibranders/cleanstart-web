@@ -231,22 +231,28 @@ export function EmbedDialog({ open, initialData, onClose, onConfirm }: Props): R
       />
 
       <DialogBody>
-        {/* Tab bar */}
+        {/* Tab bar — ids wire up aria-controls / aria-labelledby below */}
         <div className="cs-embed-dialog__tabs" role="tablist">
           <button
+            id={`${titleId}-tab-iframe`}
+            aria-controls={`${titleId}-panel-iframe`}
             aria-selected={state.tab === 'iframe'}
             className={`cs-embed-dialog__tab${state.tab === 'iframe' ? ' is-active' : ''}`}
             onClick={() => dispatch({ type: 'SET_TAB', tab: 'iframe' })}
             role="tab"
+            tabIndex={state.tab === 'iframe' ? 0 : -1}
             type="button"
           >
             URL / iframe
           </button>
           <button
+            id={`${titleId}-tab-script`}
+            aria-controls={`${titleId}-panel-script`}
             aria-selected={state.tab === 'script'}
             className={`cs-embed-dialog__tab${state.tab === 'script' ? ' is-active' : ''}`}
             onClick={() => dispatch({ type: 'SET_TAB', tab: 'script' })}
             role="tab"
+            tabIndex={state.tab === 'script' ? 0 : -1}
             type="button"
           >
             Script / HTML
@@ -255,7 +261,12 @@ export function EmbedDialog({ open, initialData, onClose, onConfirm }: Props): R
 
         {/* Tab: URL / iframe */}
         {state.tab === 'iframe' && (
-          <div className="cs-embed-dialog__panel">
+          <div
+            id={`${titleId}-panel-iframe`}
+            role="tabpanel"
+            aria-labelledby={`${titleId}-tab-iframe`}
+            className="cs-embed-dialog__panel"
+          >
             <div className="cs-embed-dialog__field">
               <label className="cs-embed-dialog__label" htmlFor="cs-embed-url">
                 URL
@@ -353,7 +364,12 @@ export function EmbedDialog({ open, initialData, onClose, onConfirm }: Props): R
 
         {/* Tab: Script / HTML */}
         {state.tab === 'script' && (
-          <div className="cs-embed-dialog__panel">
+          <div
+            id={`${titleId}-panel-script`}
+            role="tabpanel"
+            aria-labelledby={`${titleId}-tab-script`}
+            className="cs-embed-dialog__panel"
+          >
             <div className="cs-embed-dialog__notice" role="note">
               <svg
                 aria-hidden="true"

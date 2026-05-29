@@ -11,6 +11,7 @@ import {
   useState,
 } from 'react';
 
+import { MediaBrowseDialog, type MediaBrowseDoc } from '../MediaBrowseDialog';
 import { PdfThumb } from './PdfThumb';
 
 type MediaSize = {
@@ -85,11 +86,6 @@ const MIME_LABELS: Record<string, string> = {
   'video/mp4': 'MP4',
   'application/zip': 'ZIP',
   'application/x-zip-compressed': 'ZIP',
-};
-
-const typeLabelForMime = (mime: string | undefined | null): string => {
-  if (!mime) return '—';
-  return MIME_LABELS[mime] ?? mime.split('/').pop()?.toUpperCase() ?? mime;
 };
 
 const formatAcceptList = (mimes: readonly string[]): string => {
@@ -181,7 +177,6 @@ export const MediaField = (props: Props): ReactElement => {
       : 'Image');
   const inputId = useId();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const browseRef = useRef<HTMLDivElement | null>(null);
 
   const { value, setValue } = useField<string | undefined | null>({ path });
 
@@ -197,15 +192,10 @@ export const MediaField = (props: Props): ReactElement => {
   const [altDraft, setAltDraft] = useState('');
   const [altSaving, setAltSaving] = useState(false);
   const [browseOpen, setBrowseOpen] = useState(false);
-  const [browseQuery, setBrowseQuery] = useState('');
-  const [browseResults, setBrowseResults] = useState<MediaDoc[]>([]);
-  const [browseLoading, setBrowseLoading] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
 
   const altInputRef = useRef<HTMLInputElement | null>(null);
   const filenameInputRef = useRef<HTMLInputElement | null>(null);
-  const browseSearchRef = useRef<HTMLInputElement | null>(null);
-  const browseDialogRef = useRef<HTMLDialogElement | null>(null);
   const previewDialogRef = useRef<HTMLDialogElement | null>(null);
 
   const [editingFilename, setEditingFilename] = useState(false);
@@ -224,17 +214,6 @@ export const MediaField = (props: Props): ReactElement => {
       filenameInputRef.current?.select();
     }
   }, [editingFilename]);
-
-  useEffect(() => {
-    const dlg = browseDialogRef.current;
-    if (!dlg) return;
-    if (browseOpen) {
-      if (!dlg.open) dlg.showModal?.();
-      browseSearchRef.current?.focus();
-    } else if (dlg.open) {
-      dlg.close?.();
-    }
-  }, [browseOpen]);
 
   useEffect(() => {
     const dlg = previewDialogRef.current;
@@ -276,55 +255,11 @@ export const MediaField = (props: Props): ReactElement => {
     };
   }, [value]);
 
-  // Browse popover — debounced search against /api/media.
-  useEffect(() => {
-    if (!browseOpen) return undefined;
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      setBrowseLoading(true);
-      const url = new URL('/api/media', window.location.origin);
-      url.searchParams.set('limit', '24');
-      url.searchParams.set('sort', '-createdAt');
-      url.searchParams.set('depth', '0');
-      if (browseQuery.trim().length > 0) {
-        url.searchParams.set('where[filename][like]', browseQuery.trim());
-      }
-      fetch(url.toString(), { credentials: 'include' })
-        .then((r) => r.json())
-        .then((data: { docs?: MediaDoc[] }) => {
-          if (cancelled) return;
-          setBrowseResults(Array.isArray(data?.docs) ? data.docs : []);
-        })
-        .catch(() => {
-          if (!cancelled) setBrowseResults([]);
-        })
-        .finally(() => {
-          if (!cancelled) setBrowseLoading(false);
-        });
-    }, 220);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [browseOpen, browseQuery]);
-
-  // Click-outside for the browse popover.
-  useEffect(() => {
-    if (!browseOpen) return undefined;
-    const onClick = (e: MouseEvent): void => {
-      if (!browseRef.current) return;
-      if (!browseRef.current.contains(e.target as Node)) setBrowseOpen(false);
-    };
-    document.addEventListener('mousedown', onClick);
-    return () => document.removeEventListener('mousedown', onClick);
-  }, [browseOpen]);
-
-  // Esc closes overlays.
+  // Esc closes the preview overlay (browse dialog manages its own Esc).
   useEffect(() => {
     const onKey = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') {
         setPreviewOpen(false);
-        setBrowseOpen(false);
       }
     };
     document.addEventListener('keydown', onKey);
@@ -493,20 +428,23 @@ export const MediaField = (props: Props): ReactElement => {
     }
     setFilenameSaving(true);
     try {
-      // Payload's upload collections route a `filename` PATCH through the
-      // storage adapter (S3 / R2 rename, or local-FS rename) and emit a
-      // fresh `url` reflecting the new path. The Media collection's
-      // beforeChange hook keeps alt/folder intact, so only filename + url
-      // change.
-      const res = await fetch(`/api/media/${doc.id}?depth=0`, {
-        method: 'PATCH',
+      // POST to /rename moves the R2 object and updates media.url in a
+      // single atomic operation — a bare PATCH would only update the DB
+      // column, leaving the storage object at the old key (broken URL).
+      // The stem is the filename without extension; the endpoint appends
+      // the original extension automatically.
+      const dotIdx = next.lastIndexOf('.');
+      const stem = dotIdx > 0 ? next.slice(0, dotIdx) : next;
+      const res = await fetch(`/api/media/${doc.id}/rename`, {
+        method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: next }),
+        body: JSON.stringify({ stem }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = (await res.json()) as { doc?: MediaDoc };
-      if (json?.doc) setDoc(json.doc);
+      const json = (await res.json()) as { ok?: boolean; filename?: string; doc?: MediaDoc; error?: string };
+      if (!json.ok) throw new Error(json.error ?? 'Rename failed');
+      if (json.doc) setDoc(json.doc);
       else {
         // Fall back to a fresh fetch so the URL is read from storage truth.
         const refetch = await fetch(`/api/media/${doc.id}?depth=0`, {
@@ -949,112 +887,14 @@ export const MediaField = (props: Props): ReactElement => {
         disabled={props.readOnly}
       />
 
-      <dialog
-        ref={browseDialogRef}
-        className="cs-media-field__browse-dialog"
-        aria-label="Browse media"
+      {/* Shared browse dialog — replaces the inline copy that diverged */}
+      <MediaBrowseDialog
+        open={browseOpen}
         onClose={() => setBrowseOpen(false)}
-      >
-        <div className="cs-media-field__browse" ref={browseRef}>
-          <div className="cs-media-field__browse-head">
-            <input
-              ref={browseSearchRef}
-              type="search"
-              className="cs-media-field__browse-search"
-              placeholder="Search by filename…"
-              value={browseQuery}
-              onChange={(e) => setBrowseQuery(e.target.value)}
-            />
-            <button
-              type="button"
-              className="cs-media-field__icon-btn"
-              onClick={() => setBrowseOpen(false)}
-              aria-label="Close"
-              title="Close"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 16 16"
-                fill="none"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-              </svg>
-            </button>
-          </div>
-          <div
-            className="cs-media-field__browse-grid"
-            onKeyDown={(e) => {
-              const grid = e.currentTarget;
-              const tiles = Array.from(
-                grid.querySelectorAll<HTMLButtonElement>('button.cs-media-field__browse-tile'),
-              );
-              if (tiles.length === 0) return;
-              const cols = Math.max(
-                1,
-                Math.floor(grid.clientWidth / (140 + 8)),
-              );
-              const active = document.activeElement;
-              let idx = tiles.findIndex((t) => t === active);
-              if (idx === -1) idx = 0;
-              let nextIdx = idx;
-              if (e.key === 'ArrowRight') nextIdx = Math.min(tiles.length - 1, idx + 1);
-              else if (e.key === 'ArrowLeft') nextIdx = Math.max(0, idx - 1);
-              else if (e.key === 'ArrowDown') nextIdx = Math.min(tiles.length - 1, idx + cols);
-              else if (e.key === 'ArrowUp') nextIdx = Math.max(0, idx - cols);
-              else if (e.key === 'Home') nextIdx = 0;
-              else if (e.key === 'End') nextIdx = tiles.length - 1;
-              else return;
-              e.preventDefault();
-              tiles[nextIdx]?.focus();
-            }}
-          >
-            {browseLoading && browseResults.length === 0 ? (
-              <div className="cs-media-field__browse-empty">Loading…</div>
-            ) : browseResults.length === 0 ? (
-              <div className="cs-media-field__browse-empty">No matches.</div>
-            ) : (
-              browseResults.map((m) => {
-                const tileMime = m.mimeType ?? '';
-                const isImage = tileMime.startsWith('image/');
-                const isPdfTile = tileMime === 'application/pdf';
-                const t = isImage ? pickThumbUrl(m) : null;
-                const pdfTileUrl =
-                  isPdfTile && m.url ? toAbsoluteUrl(m.url) : null;
-                const typeLabel = typeLabelForMime(m.mimeType);
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    className="cs-media-field__browse-tile"
-                    onClick={() => onSelectExisting(m)}
-                    title={m.filename ?? m.id}
-                  >
-                    {t ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={t} alt={m.alt ?? ''} loading="lazy" />
-                    ) : pdfTileUrl ? (
-                      <PdfThumb
-                        url={pdfTileUrl}
-                        width={140}
-                        filename={m.filename ?? undefined}
-                      />
-                    ) : (
-                      <span className="cs-media-field__browse-tile-fallback">
-                        {typeLabel}
-                      </span>
-                    )}
-                    <span className="cs-media-field__browse-tile-name">{m.filename}</span>
-                    <span className="cs-media-field__browse-tile-type">{typeLabel}</span>
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </div>
-      </dialog>
+        onSelect={(m: MediaBrowseDoc) => {
+          onSelectExisting(m as MediaDoc);
+        }}
+      />
 
       <dialog
         ref={previewDialogRef}

@@ -2,7 +2,7 @@
 
 import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
-import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { ChevronDown } from './icons/Chevron';
 import {
@@ -149,16 +149,16 @@ export const OutboundRedirectField = (
     [],
   );
 
+  const handleSaveRef = useRef<(() => Promise<void>) | null>(null);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
       if (e.key === 'Enter' && !e.shiftKey && e.currentTarget.tagName !== 'TEXTAREA') {
         e.preventDefault();
         e.stopPropagation();
-        if (!form.saving) void handleSave();
+        if (!form.saving) void handleSaveRef.current?.();
       }
     },
-    // handleSave defined below; bound at call-site via closure
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [form.saving],
   );
 
@@ -218,6 +218,9 @@ export const OutboundRedirectField = (
       setForm((p) => ({ ...p, saving: false, error: message }));
     }
   }, [form, sitePath, publicUrl, fetchState.row, refetch]);
+
+  // Keep the ref in sync so handleKeyDown always calls the latest handleSave.
+  handleSaveRef.current = handleSave;
 
   const handleDisable = useCallback(async (): Promise<void> => {
     if (!fetchState.row) return;

@@ -58,6 +58,7 @@ export const AuditTrail = (): ReactElement | null => {
         const res = await fetch(`${serverURL}/api/integrations/${id}/audit`, {
           credentials: 'include',
         });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const body = (await res.json()) as AuditResponse;
         if (cancelled) return;
         if (body.ok) {

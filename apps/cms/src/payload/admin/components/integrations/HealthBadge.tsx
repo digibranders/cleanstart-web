@@ -47,6 +47,7 @@ export const HealthBadge = (): ReactElement | null => {
         const res = await fetch(`${serverURL}/api/integrations/${id}/health`, {
           credentials: 'include',
         });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const body = (await res.json()) as HealthResponse;
         if (cancelled) return;
         if (body.ok && body.badge) {
