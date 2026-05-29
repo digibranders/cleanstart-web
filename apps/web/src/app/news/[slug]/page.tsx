@@ -14,6 +14,7 @@ import { NewsDetailBody } from "@/components/sections/news-detail/NewsDetailBody
 import { NewsDetailRelated } from "@/components/sections/news-detail/NewsDetailRelated";
 import { NewsDetailCTA } from "@/components/sections/news-detail/NewsDetailCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
+import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { JsonLd, breadcrumbSchema, newsArticleSchema } from "@/lib/seo/jsonld";
 
 interface NewsDetailPageProps {
@@ -35,23 +36,29 @@ export async function generateMetadata({
   }
 
   const heroAbsolute = mediaUrl(item.heroImage?.url ?? item.publisherLogo?.url);
+  const seo = resolveCmsSeo(item.seo, { absolutize: mediaUrl });
 
   return buildPageMetadata({
-    title: item.title,
+    title: seo.title ?? item.title,
     description:
+      seo.description ??
       item.abstract ??
       "Press release and announcements from CleanStart.",
     path: `/news/${item.slug}`,
     type: "article",
     publishedTime: item.publicationDate ?? undefined,
-    ...(heroAbsolute
-      ? {
-          image: {
-            url: heroAbsolute,
-            alt: item.title,
-          },
-        }
-      : {}),
+    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
+    ...(seo.image
+      ? { image: seo.image }
+      : heroAbsolute
+        ? {
+            image: {
+              url: heroAbsolute,
+              alt: item.title,
+            },
+          }
+        : {}),
   });
 }
 

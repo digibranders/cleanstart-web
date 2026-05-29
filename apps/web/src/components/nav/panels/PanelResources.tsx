@@ -23,11 +23,11 @@ const TYPE_ACCENT: Record<FeedSource["type"], string> = {
 function feedHref(s: FeedSource): string {
   switch (s.type) {
     case "BLOG":
-      return `/blog/${s.slug}`;
+      return `/blogs/${s.slug}`;
     case "NEWS":
       return `/news/${s.slug}`;
     case "RESOURCE":
-      return `/resource/${s.slug}`;
+      return `/resources/${s.slug}`;
     case "WEBINAR":
       return `/webinar/${s.slug}`;
   }

@@ -45,7 +45,7 @@ export function EventDetailMobileCard({
   const heroUrl = heroImageUrl ?? null;
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.cleanstart.com";
-  const shareUrl = `${siteUrl}/events/${slug}`;
+  const shareUrl = `${siteUrl}/event/${slug}`;
   const isCancelled = eventStatus === "cancelled";
 
   const handleShare = useCallback(async (): Promise<void> => {

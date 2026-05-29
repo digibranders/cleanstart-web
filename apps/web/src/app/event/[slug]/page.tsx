@@ -13,6 +13,7 @@ import {
 import { mediaUrl } from "@/lib/blog";
 import { RenderLexical } from "@/lib/renderLexical";
 import { buildPageMetadata, absoluteUrl } from "@/lib/seo/canonical";
+import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 interface EventDetailPageProps {
@@ -28,29 +29,35 @@ export async function generateMetadata({
     return buildPageMetadata({
       title: "Event",
       description: "CleanStart event.",
-      path: `/events/${slug}`,
+      path: `/event/${slug}`,
       noindex: true,
     });
   }
 
   const heroAbsolute = mediaUrl(event.heroImage?.url);
+  const seo = resolveCmsSeo(event.seo, { absolutize: mediaUrl });
 
   return buildPageMetadata({
-    title: event.title,
+    title: seo.title ?? event.title,
     description:
+      seo.description ??
       event.abstract ??
       `Join CleanStart at ${event.title}${event.venue ? ` — ${event.venue}` : ""}.`,
-    path: `/events/${event.slug}`,
-    ...(heroAbsolute && event.heroImage
-      ? {
-          image: {
-            url: heroAbsolute,
-            width: event.heroImage.width,
-            height: event.heroImage.height,
-            alt: event.heroImage.alt ?? event.title,
-          },
-        }
-      : {}),
+    path: `/event/${event.slug}`,
+    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
+    ...(seo.image
+      ? { image: seo.image }
+      : heroAbsolute && event.heroImage
+        ? {
+            image: {
+              url: heroAbsolute,
+              width: event.heroImage.width,
+              height: event.heroImage.height,
+              alt: event.heroImage.alt ?? event.title,
+            },
+          }
+        : {}),
   });
 }
 
@@ -75,7 +82,7 @@ function eventJsonLd(event: {
     "@context": "https://schema.org",
     "@type": "Event",
     name: event.title,
-    url: absoluteUrl(`/events/${event.slug}`),
+    url: absoluteUrl(`/event/${event.slug}`),
     ...(event.startsAt ? { startDate: event.startsAt } : {}),
     ...(event.endsAt ? { endDate: event.endsAt } : {}),
     eventStatus:

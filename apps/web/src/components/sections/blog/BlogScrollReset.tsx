@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 
 /**
  * Force scroll-to-top on every blog-detail mount and whenever the slug
- * changes within the `/blog/[slug]` route. Belt-and-suspenders for the
+ * changes within the `/blogs/[slug]` route. Belt-and-suspenders for the
  * Next.js App Router behavior where dynamic-route param transitions
- * (e.g. `/blog/foo` → `/blog/bar` via the JourneyNav or RelatedPosts grid)
+ * (e.g. `/blogs/foo` → `/blogs/bar` via the JourneyNav or RelatedPosts grid)
  * intermittently preserve scroll position across the navigation — leaving
  * the reader mid-article on the destination post instead of at the hero.
  *

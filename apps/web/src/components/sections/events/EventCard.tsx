@@ -133,7 +133,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
 
         {/* Read more button — full-width */}
         <Link
-          href={`/events/${event.slug}`}
+          href={`/event/${event.slug}`}
           className="cs-btn-blue gap-2 w-full"
           style={{ marginTop: "8px" }}
           aria-label={`Read more about ${event.title}`}

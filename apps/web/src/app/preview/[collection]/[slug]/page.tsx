@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 
-import { renderBlogDetail } from "@/app/blog/[slug]/page";
-import { renderEventDetail } from "@/app/events/[slug]/page";
+import { renderBlogDetail } from "@/app/blogs/[slug]/page";
+import { renderEventDetail } from "@/app/event/[slug]/page";
 import { renderNewsDetail } from "@/app/news/[slug]/page";
-import { renderResourceDetail } from "@/app/resource/[slug]/page";
+import { renderResourceDetail } from "@/app/resources/[slug]/page";
+import { renderGuideDetail } from "@/app/guide/[slug]/page";
 import { cmsBaseUrl } from "@/lib/cms-fetch";
 
 export const dynamic = "force-dynamic";
@@ -75,6 +76,7 @@ const renderers: Record<string, (args: { slug: string; draft?: boolean }) => Pro
   news: renderNewsDetail,
   events: renderEventDetail,
   resources: renderResourceDetail,
+  guides: renderGuideDetail,
 };
 
 function ErrorPage({ message }: { message: string }): React.ReactElement {

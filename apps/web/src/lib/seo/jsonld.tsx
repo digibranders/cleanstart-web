@@ -76,7 +76,7 @@ export interface BlogPostingSchemaInput {
   imageUrl?: string | undefined;
   authors?: Array<{ name: string }> | undefined;
   category?: string | undefined;
-  /** Site-relative paths (`/blog/foo`) for editorially-linked sibling posts. */
+  /** Site-relative paths (`/blogs/foo`) for editorially-linked sibling posts. */
   relatedLinks?: string[] | undefined;
 }
 
@@ -196,5 +196,161 @@ export function newsArticleSchema({
         }
       : {}),
     publisher: { "@id": ORGANIZATION_ID },
+  };
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+/**
+ * FAQPage structured data. Use on pages with a genuine list of question/answer
+ * pairs (guides, support pages). Answers are plain text — callers must strip
+ * any markup before passing.
+ */
+export function faqPageSchema(items: FaqItem[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
+  };
+}
+
+export interface SoftwareApplicationSchemaInput {
+  name: string;
+  description?: string | undefined;
+  path: string;
+  /** schema.org applicationCategory; defaults to "SecurityApplication". */
+  applicationCategory?: string | undefined;
+  /** Defaults to "Linux". */
+  operatingSystem?: string | undefined;
+  imageUrl?: string | undefined;
+}
+
+/**
+ * SoftwareApplication for product pages (CleanStart Images, CleanSight).
+ * We omit `offers` / `aggregateRating` deliberately — there's no public
+ * pricing or review corpus, so this gives entity clarity (Knowledge Graph)
+ * without claiming a rich-result eligibility we can't substantiate.
+ */
+export function softwareApplicationSchema({
+  name,
+  description,
+  path,
+  applicationCategory,
+  operatingSystem,
+  imageUrl,
+}: SoftwareApplicationSchemaInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name,
+    ...(description ? { description } : {}),
+    url: absoluteUrl(path),
+    applicationCategory: applicationCategory ?? "SecurityApplication",
+    operatingSystem: operatingSystem ?? "Linux",
+    ...(imageUrl ? { image: [imageUrl] } : {}),
+    publisher: { "@id": ORGANIZATION_ID },
+  };
+}
+
+export interface JobPostingSchemaInput {
+  title: string;
+  /** Plain-text or HTML job description. Required by Google for JobPosting. */
+  description: string;
+  path: string;
+  datePosted?: string | undefined;
+  validThrough?: string | undefined;
+  /** Already mapped to a schema.org enum (FULL_TIME, PART_TIME, CONTRACTOR, INTERN). */
+  employmentType?: string | undefined;
+  locations?: ReadonlyArray<{
+    name: string;
+    isoCountry: string;
+    type: "country" | "region" | "city";
+  }> | undefined;
+  remote?: boolean | undefined;
+  baseSalary?: {
+    min?: number | null;
+    max?: number | null;
+    currency?: string | null;
+  } | undefined;
+  /** Stable per-posting identifier (the job slug). */
+  identifier?: string | undefined;
+}
+
+export function jobPostingSchema({
+  title,
+  description,
+  path,
+  datePosted,
+  validThrough,
+  employmentType,
+  locations,
+  remote,
+  baseSalary,
+  identifier,
+}: JobPostingSchemaInput) {
+  const hasSalary =
+    baseSalary != null &&
+    (baseSalary.min != null || baseSalary.max != null);
+
+  const jobLocation =
+    locations && locations.length > 0
+      ? locations.map((l) => ({
+          "@type": "Place",
+          address: {
+            "@type": "PostalAddress",
+            ...(l.type === "city" ? { addressLocality: l.name } : {}),
+            ...(l.type === "region" ? { addressRegion: l.name } : {}),
+            addressCountry: l.isoCountry,
+          },
+        }))
+      : undefined;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title,
+    description,
+    ...(datePosted ? { datePosted } : {}),
+    ...(validThrough ? { validThrough } : {}),
+    ...(employmentType ? { employmentType } : {}),
+    hiringOrganization: {
+      "@type": "Organization",
+      "@id": ORGANIZATION_ID,
+      name: SITE_NAME,
+      sameAs: SITE_URL,
+    },
+    ...(jobLocation ? { jobLocation } : {}),
+    ...(remote ? { jobLocationType: "TELECOMMUTE" } : {}),
+    ...(hasSalary
+      ? {
+          baseSalary: {
+            "@type": "MonetaryAmount",
+            currency: baseSalary?.currency ?? "USD",
+            value: {
+              "@type": "QuantitativeValue",
+              ...(baseSalary?.min != null ? { minValue: baseSalary.min } : {}),
+              ...(baseSalary?.max != null ? { maxValue: baseSalary.max } : {}),
+              unitText: "YEAR",
+            },
+          },
+        }
+      : {}),
+    ...(identifier
+      ? {
+          identifier: {
+            "@type": "PropertyValue",
+            name: SITE_NAME,
+            value: identifier,
+          },
+        }
+      : {}),
+    url: absoluteUrl(path),
   };
 }

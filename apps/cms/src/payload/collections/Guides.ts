@@ -231,7 +231,7 @@ export const Guides: CollectionConfig = {
     schemaAddonsField,
     publishedAtField,
     displayPublishedAtField,
-    ...seoSidebarFields({ pathPrefix: '/guides', descriptionSource: 'abstract' }),
+    ...seoSidebarFields({ pathPrefix: '/guide', descriptionSource: 'abstract' }),
     {
       // Data-only — surfaced via the DocStatusBar in the top status bar.
       // Hidden here so the form doesn't double-render.

@@ -167,7 +167,7 @@ function toEventItem(e: CmsEvent): EventItem {
     day: chip.day,
     title: e.title,
     detail: eventDetail(e),
-    href: `/events/${e.slug}`,
+    href: `/event/${e.slug}`,
   };
 }
 
@@ -186,7 +186,7 @@ async function fetchWhatsNew(): Promise<NewsItem[]> {
     return docs.map((r) => ({
       date: formatArticleDate(effectivePublishedAt(r) ?? r.updatedAt ?? undefined),
       title: `${r.title}${safeTypeLabel(r.type) === "Resource" ? "" : ""}`,
-      href: `/resource/${r.slug}`,
+      href: `/resources/${r.slug}`,
     }));
   } catch {
     return NEWS_FALLBACK;

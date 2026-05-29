@@ -124,7 +124,7 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
             old --fs-body / 20×14 arrow combo. Drop to --fs-body-sm (14 px)
             and a 16×11 arrow so the link fits on one line. */}
         <Link
-          href={`/resource/${resource.slug}`}
+          href={`/resources/${resource.slug}`}
           className="flex items-center gap-1.5"
           aria-label={`${ctaLabel} — ${resource.title}`}
         >
