@@ -46,9 +46,9 @@ export function PanelSolutions({ item }: Props) {
         />
       </div>
       <ContextualCTA
-        headline="Need help mapping your compliance scope?"
-        sub="Our solution engineers will walk it with you."
-        ctaLabel="Talk to SE"
+        headline="Mapping compliance for your stack?"
+        sub="A solutions engineer will identify gaps and a remediation path."
+        ctaLabel="Talk to an SE"
         ctaHref="/book-a-demo?intent=se"
       />
     </PanelShell>
