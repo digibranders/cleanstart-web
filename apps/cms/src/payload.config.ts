@@ -225,11 +225,11 @@ export default buildConfig({
         './payload/admin/components/ScrollToInvalidField.tsx#ScrollToInvalidField',
         './payload/admin/components/CommandPalette.tsx#CommandPalette',
         './payload/admin/components/FieldDescriptionTooltip.tsx#FieldDescriptionTooltip',
-        // SavedStateIndicator removed — the floating "Saved X ago"
-        // pill in the bottom-right was redundant with Payload's own
-        // toast system and added visual noise on every edit view.
-        // The error-toast surface is preserved via `dispatchSaveError`,
-        // which routes through the standard ToastBus.
+        // SavedStateIndicator — floating "Saved X ago" chip in the
+        // bottom-right corner. Re-enabled: it is a trust signal on par
+        // with Webflow/Notion/Linear. Renders position:fixed so it
+        // interferes with nothing else in the doc-controls strip.
+        './payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator',
         './payload/admin/components/NavBadges.tsx#NavBadges',
         './payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence',
         './payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop',

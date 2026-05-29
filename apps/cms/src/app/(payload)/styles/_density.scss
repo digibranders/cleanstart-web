@@ -97,9 +97,12 @@
   margin-bottom: var(--cs-space-3);
 }
 
-// ─── Sidebar nav rhythm — predictable link height and gap
+// ─── Sidebar nav rhythm — predictable link height and gap.
+// Unified at 34px to match _nav.scss:.nav__link { min-height: 34px }.
+// Previously 36px here overrode the 30px in _nav.scss; now both sources
+// agree so the rendered floor is consistent.
 .nav .nav-group__content a {
-  min-height: 36px;
+  min-height: 34px;
 }
 
 // ─── Doc controls strip — keep Payload's two-row layout (title row + meta

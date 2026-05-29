@@ -51,8 +51,14 @@
   --cs-space-5: 20px;
   --cs-space-6: 24px;
   --cs-space-8: 32px;
+  --cs-space-10: 40px;
   --cs-space-12: 48px;
   --cs-space-16: 64px;
+
+  // Explicit whole-pixel field-rhythm tokens — avoids the 0.75rem → 9.75px
+  // fractional-pixel issue that affects Payload's 13px-base admin shell.
+  --cs-space-field-gap: 20px;
+  --cs-space-label-input: 6px;
 
   // Radius
   --cs-radius-chip: 4px;
@@ -95,8 +101,20 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 0 0 1px var(--theme-elevation-150);
 
-  // Slim the nav rail. Payload defaults to 275px which crowds the
-  // doc-edit two-column layout on a 13"–14" laptop; 240px keeps the
-  // nav scannable while giving the form back ~35px of working width.
-  --nav-width: 240px;
+  // Nav rail — 256px matches Vercel/Linear's comfortable floor and
+  // prevents "Knowledge Hub" + draft badge from clipping.
+  --nav-width: 256px;
+
+  // Right sidebar — 300px gives SEO cards enough room so the health
+  // chip, permalink URL, and OG-preview column don't truncate.
+  --sidebar-width: 300px;
+
+  // Button text on cyan — brand ink, not white. Used by primary buttons
+  // rendered on a --cs-cyan-500 background. A dedicated token means a
+  // brand hue shift only needs one edit here.
+  --cs-on-cyan: #04212a;
+
+  // Login-card radius — larger than modal (12px) because the centered
+  // auth surface benefits from a deliberate card treatment.
+  --cs-radius-login: 16px;
 }

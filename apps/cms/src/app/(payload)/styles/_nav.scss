@@ -45,13 +45,7 @@
   // Breathing room between groups so categories register as section
   // dividers, not adjacent rows.
   margin-bottom: 4px;
-  padding-top: 12px;
-
-  // First group sits under the SidebarHeader divider — kill its top
-  // padding so the GLOBALS eyebrow doesn't double-space.
-  &:first-of-type {
-    padding-top: 4px;
-  }
+  padding-top: 8px;
 
   &__toggle {
     display: flex;
@@ -63,7 +57,7 @@
     color: var(--cs-text-muted);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     cursor: pointer;
     text-align: left;
@@ -116,7 +110,7 @@
   line-height: 1.3;
   border-radius: var(--cs-radius-input);
   text-decoration: none;
-  min-height: 30px;
+  min-height: 34px;
   transition:
     background-color var(--cs-motion-micro),
     color var(--cs-motion-micro),
@@ -127,16 +121,18 @@
     background: var(--cs-surface-raised);
   }
 
-  // Active item — Payload sets `.nav__link--active`. Brand stripe + tint
-  // + slightly bolder weight so it reads as the current location even
-  // at peripheral-vision distance.
+  // Active item — Payload sets `.nav__link--active`. A 3px brand stripe
+  // plus a faint bloom so the active state registers peripherally even
+  // without reading the item text (Linear/Vercel pattern).
   &--active,
   &.active,
   &[aria-current='page'] {
     color: var(--cs-text-primary);
     font-weight: 600;
     background: var(--cs-tint-brand-soft);
-    box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
+    box-shadow:
+      inset 3px 0 0 0 var(--cs-cyan-500),
+      inset 8px 0 12px -6px rgba(6, 199, 242, 0.15);
   }
 
   &:focus-visible {
@@ -172,4 +168,14 @@
 .nav__link--active .cs-nav-badge,
 .nav__link.active .cs-nav-badge {
   background: var(--cs-tint-brand-medium);
+}
+
+// ─── Nav group chevron — synced to Payload's real toggle state class
+//
+// NavGroupPersistence.tsx toggles `.nav-group__toggle--open` on the
+// button. Use that as the single chevron-rotation source so we don't
+// need a pseudo-element that can desync from the DOM state.
+.nav-group__toggle--open svg {
+  transform: rotate(180deg);
+  transition: transform var(--cs-motion-micro);
 }

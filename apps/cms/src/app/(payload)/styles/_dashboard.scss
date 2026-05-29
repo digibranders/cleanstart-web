@@ -5,17 +5,17 @@
   // Header — no horizontal rule under the greeting; the gap to the
   // KPI cards reads cleanly as whitespace alone.
   &__header {
-    margin-bottom: var(--cs-space-6);
+    margin-bottom: var(--cs-space-5);
     padding-bottom: 0;
     border-bottom: none;
   }
 
   &__title {
     font-family: var(--font-display);
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.018em;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.014em;
     color: var(--cs-text-heading);
     margin: 0 0 4px 0;
   }
@@ -27,7 +27,7 @@
   &__subtitle {
     margin: 0;
     color: var(--theme-text-soft);
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.45;
   }
 
@@ -35,8 +35,8 @@
   &__pulse-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--cs-space-3);
-    margin-bottom: var(--cs-space-8);
+    gap: var(--cs-space-4);
+    margin-bottom: var(--cs-space-10);
 
     @media (max-width: 1100px) {
       grid-template-columns: repeat(2, 1fr);
@@ -50,27 +50,27 @@
   &__pulse {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    padding: var(--cs-space-4);
+    gap: 0;
+    padding: 20px 20px 16px;
     background: var(--theme-input-bg);
     border: 1px solid var(--theme-elevation-150);
-    border-left: 3px solid var(--theme-elevation-200);
+    border-left: 4px solid var(--theme-elevation-200);
     border-radius: var(--cs-radius-card);
+    box-shadow: var(--cs-shadow-lift-sm);
     text-decoration: none;
     color: inherit;
     cursor: default;
     transition:
       border-color var(--cs-motion-micro),
       background-color var(--cs-motion-micro),
-      transform var(--cs-motion-micro);
+      box-shadow var(--cs-motion-micro);
 
     &[href] {
       cursor: pointer;
 
       &:hover {
         border-color: var(--cs-cyan-500);
-        background: var(--theme-elevation-50);
-        transform: translateY(-1px);
+        box-shadow: var(--cs-shadow-lift-md);
       }
 
       &:focus-visible {
@@ -79,13 +79,16 @@
       }
     }
 
-    // Number stays neutral; the left-accent border carries the semantic colour.
+    // Tinted surface variants — a subtle hue shift differentiates the
+    // primary signal card (cyan) from neutral counters.
     &--cyan {
       border-left-color: var(--cs-cyan-500);
+      background: color-mix(in srgb, var(--cs-cyan-500) 6%, var(--theme-input-bg));
     }
 
     &--amber {
       border-left-color: var(--color-warning-500);
+      background: color-mix(in srgb, var(--color-warning-500) 5%, var(--theme-input-bg));
     }
   }
 
@@ -95,35 +98,37 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--theme-text-soft);
+    margin-bottom: 6px;
   }
 
   &__pulse-value {
     font-family: var(--font-display);
     font-size: 32px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.05;
     letter-spacing: -0.02em;
     color: var(--cs-text-heading);
     font-feature-settings: 'tnum' 1;
+    margin-bottom: 4px;
   }
 
   &__pulse-caption {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--theme-text-soft);
     line-height: 1.4;
   }
 
   // Sections
   &__section {
-    margin-bottom: var(--cs-space-8);
+    margin-bottom: var(--cs-space-10);
   }
 
   &__section-head {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: var(--cs-space-3);
-    margin-bottom: var(--cs-space-3);
+    margin-bottom: var(--cs-space-4);
   }
 
   &__section-title {
@@ -133,6 +138,17 @@
     line-height: 1.2;
     color: var(--cs-text-heading);
     margin: 0;
+
+    // Utility section title (Quick actions) — lighter treatment so it
+    // reads as a navigation label, not a content heading.
+    &--utility {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--theme-text-soft);
+    }
   }
 
   &__section-meta {
@@ -193,13 +209,13 @@
 
   &__type-cell {
     color: var(--theme-text-soft);
-    font-size: 13px;
+    font-size: 12px;
   }
 
   &__time-cell {
     color: var(--theme-text-soft);
     font-feature-settings: 'tnum' 1;
-    font-size: 13px;
+    font-size: 12px;
     white-space: nowrap;
   }
 
@@ -261,7 +277,7 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--cs-space-5, var(--cs-space-4));
+    gap: var(--cs-space-5);
   }
 
   &__timeline-group {
@@ -289,12 +305,14 @@
     // what makes the list read as a timeline rather than a flat
     // bulleted list. Fades to transparent at top + bottom so the
     // line doesn't visually overshoot the first/last row.
+    // left: 7px = half 16px column (8px) − 1px (half line width)
+    // so the hairline threads the dot centres at any row height.
     &::before {
       content: '';
       position: absolute;
-      top: 12px;
-      bottom: 12px;
-      left: 5px;
+      top: 20px;
+      bottom: 20px;
+      left: 7px;
       width: 1px;
       background: linear-gradient(
         to bottom,
@@ -329,7 +347,9 @@
 
     &--live {
       background: var(--cs-cyan-500);
-      box-shadow: 0 0 0 1px var(--cs-cyan-500), 0 0 0 4px var(--cs-tint-brand-soft);
+      // Cyan fill is sufficient signal; the 4px tint-halo was noisy
+      // in dense timelines and bled into the guide-rail spacing.
+      box-shadow: 0 0 0 1px var(--cs-cyan-500);
     }
 
     &--draft {
@@ -388,7 +408,8 @@
   &__analytics-grid-cards {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--cs-space-3);
+    gap: var(--cs-space-4);
+    grid-auto-rows: 1fr;
 
     @media (max-width: 1100px) {
       grid-template-columns: repeat(2, 1fr);
@@ -403,13 +424,12 @@
     display: flex;
     flex-direction: column;
     gap: var(--cs-space-2);
-    padding: var(--cs-space-4);
+    padding: 20px;
     background: var(--theme-input-bg);
     border: 1px solid var(--theme-elevation-150);
     border-radius: var(--cs-radius-card);
     text-decoration: none;
     color: inherit;
-    min-height: 110px;
 
     &[href] {
       cursor: pointer;
@@ -446,7 +466,7 @@
   }
 
   &__analytics-title {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: -0.01em;
     color: var(--cs-text-heading);
@@ -454,7 +474,7 @@
   }
 
   &__analytics-meta {
-    font-size: 11px;
+    font-size: 11px; /* intentional 11px — compact secondary meta in tight header row */
     color: var(--theme-text-soft);
     white-space: nowrap;
 
@@ -518,6 +538,7 @@
     white-space: nowrap;
     max-width: 100%;
     color: var(--theme-text);
+    /* font-size intentionally 12px — URL is secondary metadata */
   }
 
   // Compact "Connect analytics" strip that replaces the empty placeholder
@@ -550,7 +571,7 @@
   }
 
   &__analytics-connect-label {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--cs-text-heading);
     letter-spacing: -0.005em;
@@ -585,11 +606,12 @@
 
   // "Manage integrations →" link in the section header
   &__section-link {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--cs-cyan-500);
     text-decoration: none;
     white-space: nowrap;
+    line-height: 1;
     transition: opacity var(--cs-motion-micro);
 
     &:hover {
@@ -653,13 +675,14 @@
   }
 
   &__quick-label {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--theme-text);
+    padding-right: 28px;
   }
 
   &__quick-desc {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--theme-text-soft);
     line-height: 1.45;
   }
@@ -739,7 +762,7 @@ body:has(.cs-dashboard) {
 
   .cs-dashboard__header {
     margin-top: 0;
-    margin-bottom: var(--cs-space-6);
+    margin-bottom: var(--cs-space-5);
     padding-bottom: 0;
     border-bottom: none;
   }

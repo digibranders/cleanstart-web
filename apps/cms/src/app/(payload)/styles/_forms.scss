@@ -12,7 +12,7 @@
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.005em;
-  margin-bottom: 4px;
+  margin-bottom: var(--cs-space-label-input, 6px);
 }
 
 // Helper / description text under fields
@@ -74,8 +74,8 @@
   justify-content: center;
   margin-inline-start: var(--cs-space-2);
   margin-inline-end: var(--cs-space-1);
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   padding: 0;
   border-radius: 50%;
   background: transparent;
@@ -83,9 +83,9 @@
   color: var(--theme-text-soft);
   cursor: help;
   font-family: var(--font-display);
-  font-size: 9px;
-  font-weight: 700;
-  font-style: italic;
+  font-size: 10px;
+  font-weight: 600;
+  font-style: normal;
   line-height: 1;
   letter-spacing: 0;
   vertical-align: middle;
@@ -124,7 +124,7 @@
   top: 0;
   left: 0;
   z-index: 99999;
-  max-width: 280px;
+  max-width: 300px;
   padding: 8px 10px;
   background: var(--theme-elevation-900);
   color: var(--theme-elevation-50);
@@ -136,7 +136,7 @@
   font-style: normal;
   font-weight: 400;
   letter-spacing: 0;
-  line-height: 1.45;
+  line-height: 1.5;
   text-align: left;
   white-space: normal;
   pointer-events: none;
@@ -158,6 +158,17 @@
   color: var(--color-error-500);
   opacity: 0.7;
   margin-inline-start: 0.15em;
+}
+
+// Top-level field-to-field gap on the edit view — use an explicit
+// whole-pixel token so we get clean 20px gaps instead of the fractional
+// 9.75px (0.75rem on a 13px base) Payload ships by default.
+.collection-edit .field-type {
+  margin-bottom: var(--cs-space-field-gap, 20px);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 // Pressed-in inputs — Webflow's "hole punched into the panel" treatment
@@ -209,13 +220,15 @@
     }
   }
 
-  // Select / react-select
+  // Select / react-select — lock height to exactly 38px so the control
+  // sits flush with text inputs in a RowField layout.
   &.select .rs__control,
   &.select .react-select__control {
     background: var(--theme-input-bg);
     border: 1px solid var(--theme-elevation-200);
     border-radius: var(--cs-radius-input);
     min-height: 38px;
+    height: 38px;
     box-shadow: var(--cs-shadow-input-rest);
     transition: border-color var(--cs-motion-micro), box-shadow var(--cs-motion-micro);
 
@@ -229,6 +242,16 @@
         0 0 0 3px var(--cs-tint-focus-ring),
         var(--cs-shadow-input-focus);
     }
+  }
+
+  &.select .rs__value-container,
+  &.select .react-select__value-container {
+    padding: 0 8px;
+  }
+
+  &.select .rs__indicators,
+  &.select .react-select__indicators {
+    height: 36px;
   }
 
   // Checkbox + radio — slightly tighter
@@ -419,22 +442,22 @@
   background: var(--theme-elevation-50);
   border: 1px solid var(--theme-elevation-150);
   border-radius: var(--cs-radius-card);
-  // Breathing room between this card and the surrounding form
-  // sections (e.g. Body → FAQs → Authors). Inner padding stays tight
-  // so the card doesn't feel airy.
-  margin: var(--cs-space-6) 0;
+  // 20px top/bottom margin = clean 1× the field-gap token — sits as a
+  // 2× separation (field-gap above + this margin) rather than the old
+  // 24+12 = 36px triple-gap that made arrays float away from the form.
+  margin: var(--cs-space-5, 20px) 0;
   padding: var(--cs-space-3);
 
   &__legend {
     align-items: center;
     box-sizing: border-box;
-    color: var(--cs-text-heading);
+    color: var(--theme-text-soft);
     display: flex;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     gap: var(--cs-space-3);
     justify-content: space-between;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.08em;
     margin-bottom: var(--cs-space-3);
     padding: 0 var(--cs-space-1);
     text-transform: uppercase;
@@ -464,7 +487,8 @@
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 0;
-    padding: 4px var(--cs-space-2);
+    padding: 0 var(--cs-space-2);
+    height: 28px;
     text-transform: none;
     transition: border-color var(--cs-motion-micro), color var(--cs-motion-micro);
 
@@ -527,7 +551,7 @@
     display: grid;
     gap: var(--cs-space-2);
     grid-template-columns: 20px 1fr 28px;
-    padding: 6px var(--cs-space-2) 6px var(--cs-space-2);
+    padding: 8px var(--cs-space-2) 8px var(--cs-space-2);
 
     &.is-readonly {
       grid-template-columns: 24px 1fr;
@@ -617,7 +641,7 @@
 
     .field-label {
       font-size: 12px;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     .cs-textarea-field__input,
@@ -647,6 +671,14 @@
 
   &__add {
     margin-top: var(--cs-space-3);
+
+    // Bottom "＋ Add item" child button — minimum 36px so it matches
+    // other primary add-actions and meets touch accessibility targets.
+    button,
+    [role='button'] {
+      height: 36px;
+      padding-inline: var(--cs-space-4);
+    }
   }
 }
 
@@ -786,17 +818,18 @@
   background: var(--theme-elevation-50);
   border: 1px solid var(--theme-elevation-150);
   border-radius: var(--cs-radius-card);
-  margin: var(--cs-space-6) 0;
+  margin: var(--cs-space-5, 20px) 0;
   padding: var(--cs-space-3);
 
   &__legend {
-    color: var(--cs-text-heading);
+    color: var(--theme-text-soft);
     display: block;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     margin-bottom: var(--cs-space-3);
     padding: 0 var(--cs-space-1);
+    text-transform: uppercase;
     text-transform: uppercase;
   }
 
@@ -828,10 +861,10 @@
     cursor: pointer;
     display: flex;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     gap: var(--cs-space-2);
     list-style: none;
-    padding: var(--cs-space-3) var(--cs-space-4);
+    padding: 14px var(--cs-space-4);
     user-select: none;
 
     &::-webkit-details-marker { display: none; }
@@ -845,6 +878,8 @@
   &__chevron {
     color: var(--theme-text-soft);
     display: inline-flex;
+    width: 16px;
+    height: 16px;
     transition: transform var(--cs-motion-micro);
   }
 

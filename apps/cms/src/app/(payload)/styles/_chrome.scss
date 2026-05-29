@@ -73,8 +73,8 @@
   // ships zeroing rules for the `gutter` class set this element
   // carries (`gutter gutter--left gutter--right`) that win by source
   // order at our viewport width.
-  padding-top: var(--cs-space-3, 12px) !important;
-  padding-bottom: var(--cs-space-3, 12px) !important;
+  padding-top: var(--cs-space-2, 8px) !important;
+  padding-bottom: var(--cs-space-2, 8px) !important;
   padding-left: var(--gutter-h, 60px) !important;
   padding-right: var(--gutter-h, 60px) !important;
   backdrop-filter: saturate(140%) blur(6px);
@@ -82,7 +82,7 @@
 
   &__wrapper {
     height: auto;
-    min-height: 60px;
+    min-height: 52px;
     align-items: center;
     // Payload's default `gap: 20px` between `__content` (left slot,
     // which we hide) and `__controls-wrapper` would still push the
@@ -322,6 +322,8 @@ body:has(.collection-edit .document-fields--has-sidebar) > div:first-of-type {
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  // 20px column gap so the main column and sidebar don't touch.
+  column-gap: 20px;
 
   // Each column: own scroll container. `min-width: 0` keeps long
   // titles ellipsizing inside the rail's child cards.
@@ -335,10 +337,27 @@ body:has(.collection-edit .document-fields--has-sidebar) > div:first-of-type {
     scrollbar-gutter: stable;
   }
 
+  // Cap the main form column so inputs don't stretch past ~760px —
+  // beyond that the eye loses the end of the line and fields look
+  // orphaned in space (Vercel/Linear/Stripe all cap at 640–760px).
+  // Scoped to wide viewports so narrow / tablet breakpoints remain
+  // full-width.
+  @media (min-width: 1280px) {
+    > .document-fields__main {
+      > .render-fields,
+      > .field-type {
+        max-width: 760px;
+      }
+    }
+  }
+
   > .document-fields__sidebar {
     overflow-y: auto;
     height: 100%;
     max-height: 100%;
+    // Side padding so card labels don't press against the column edge
+    // at the widened 300px rail.
+    padding-inline: var(--cs-space-4);
   }
 }
 
