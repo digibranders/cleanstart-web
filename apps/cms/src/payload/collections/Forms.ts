@@ -19,7 +19,11 @@ export const Forms: CollectionConfig = {
     group: 'Marketing',
   },
   access: {
-    read: () => true,
+    // Forms contain field names, validation regex, consent text, and select
+    // options — exposing them publicly would allow scraping of the schema.
+    // The web app fetches form definitions server-side (authenticated) or via
+    // a scoped endpoint that returns only the visitor-facing subset.
+    read: isAdminOrEditor,
     create: isAdminOrEditor,
     update: isAdminOrEditor,
     delete: isAdminOrEditor,

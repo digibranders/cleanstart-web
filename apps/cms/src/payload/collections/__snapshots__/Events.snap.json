@@ -36,7 +36,8 @@
     },
     {
       "type": "date",
-      "name": "startsAt"
+      "name": "startsAt",
+      "required": true
     },
     {
       "type": "date",

@@ -142,6 +142,14 @@ export const Pages: CollectionConfig = {
       },
     },
     {
+      name: 'abstract',
+      type: 'textarea',
+      admin: {
+        description:
+          'Optional summary. Drives the SEO description fallback when set. Keep under 160 characters.',
+      },
+    },
+    {
       name: 'layout',
       type: 'blocks',
       blocks: pageBuilderBlocks,

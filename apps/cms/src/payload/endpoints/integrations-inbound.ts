@@ -155,9 +155,26 @@ export const calcomInboundEndpoint: Endpoint = {
       );
     }
 
+    // Fetch the current schemaVersion from the fallback form so the lead
+    // records the schema version that was active at submission time.
+    let formSchemaVersion = 1;
+    try {
+      const form = (await req.payload.findByID({
+        collection: 'forms',
+        id: creds.fallbackFormId,
+        depth: 0,
+        overrideAccess: true,
+      })) as { schemaVersion?: number | null } | null;
+      if (typeof form?.schemaVersion === 'number') {
+        formSchemaVersion = form.schemaVersion;
+      }
+    } catch {
+      // Fall back to 1 if the form cannot be fetched
+    }
+
     const submission: LeadSubmission = {
       formId: creds.fallbackFormId,
-      formSchemaVersion: 1,
+      formSchemaVersion,
       fields: {
         email,
         name: attendee?.name ?? body.payload?.organizer?.name ?? '',

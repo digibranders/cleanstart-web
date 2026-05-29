@@ -1,7 +1,8 @@
-import type { CollectionConfig } from 'payload';
+import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
@@ -22,6 +23,25 @@ import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
+
+/**
+ * Stamps `closedAt` when `hiringStatus` transitions to `'closed'`.
+ * Runs in beforeChange so the field access (`update: () => false`) is
+ * bypassed via the hook's data mutation before Payload's access check
+ * evaluates the field diff.
+ */
+const stampClosedAtHook: CollectionBeforeChangeHook = ({ data, originalDoc }) => {
+  const next = data as Record<string, unknown>;
+  const prev = originalDoc as Record<string, unknown> | undefined;
+  if (
+    next.hiringStatus === 'closed' &&
+    prev?.hiringStatus !== 'closed' &&
+    next.closedAt == null
+  ) {
+    next.closedAt = new Date().toISOString();
+  }
+  return next;
+};
 
 export const Jobs: CollectionConfig = {
   slug: 'jobs',
@@ -159,6 +179,15 @@ export const Jobs: CollectionConfig = {
       ],
     },
     {
+      name: 'abstract',
+      type: 'textarea',
+      admin: {
+        description:
+          'Short summary shown on listing cards and drives the SEO description fallback. Keep under 160 characters.',
+        condition: (_data, sibling) => sibling?.source === 'cms',
+      },
+    },
+    {
       name: 'body',
       type: 'richText',
       admin: {
@@ -234,7 +263,7 @@ export const Jobs: CollectionConfig = {
         components: {
           Field: {
             path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
-            clientProps: { pathPrefix: '/jobs' },
+            clientProps: { pathPrefix: ROUTE_PREFIX.jobs },
           },
         },
       },
@@ -242,11 +271,11 @@ export const Jobs: CollectionConfig = {
     schemaAddonsField,
     publishedAtField,
     displayPublishedAtField,
-    ...seoSidebarFields({ pathPrefix: '/jobs', descriptionSource: 'abstract' }),
+    ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.jobs, descriptionSource: 'abstract' }),
     ...seoFieldsForSidebar('jobs'),
   ],
   hooks: {
-    beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook],
+    beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook, stampClosedAtHook],
     afterChange: [
       slugChangeRedirectHook('jobs'),
       schemaOverrideAuditHook('jobs'),

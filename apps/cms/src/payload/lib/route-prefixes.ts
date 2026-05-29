@@ -38,7 +38,8 @@ export const collectionUrlFromSlug = (collection: string, slug: string): string 
 
 /**
  * URL resolver that prefers the doc-level `path` field for Pages
- * (which encodes the full nested path) and falls back to
+ * (which encodes the full nested path), uses the nested
+ * `/podcast/episode/<slug>` path for podcast episodes, and falls back to
  * `prefix + slug` for everything else.
  */
 export const collectionUrlFromDoc = (
@@ -49,6 +50,10 @@ export const collectionUrlFromDoc = (
     if (typeof doc.path === 'string' && doc.path.length > 0) return doc.path;
     if (typeof doc.slug === 'string' && doc.slug.length > 0) return `/${doc.slug}`;
     return null;
+  }
+  if (collection === 'podcastEpisodes') {
+    if (typeof doc.slug !== 'string' || doc.slug.length === 0) return null;
+    return `/podcast/episode/${doc.slug}`;
   }
   if (typeof doc.slug !== 'string' || doc.slug.length === 0) return null;
   return collectionUrlFromSlug(collection, doc.slug);

@@ -48,6 +48,7 @@ export const Events: CollectionConfig = {
     {
       name: 'startsAt',
       type: 'date',
+      required: true,
       admin: { date: { pickerAppearance: 'dayAndTime' } },
     },
     {

@@ -36,12 +36,14 @@ export const PreviewAudit: CollectionConfig = {
       name: 'collection',
       type: 'text',
       required: true,
+      access: { update: () => false },
       admin: { description: 'Payload collection slug the token targets.' },
     },
     {
       name: 'docId',
       type: 'text',
       required: true,
+      access: { update: () => false },
       admin: { description: 'Doc id within the collection.' },
     },
     {
@@ -49,6 +51,7 @@ export const PreviewAudit: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       required: true,
+      access: { update: () => false },
       admin: { description: 'Editor who minted the link.' },
     },
     {
@@ -60,12 +63,14 @@ export const PreviewAudit: CollectionConfig = {
       name: 'ttlSeconds',
       type: 'number',
       required: true,
+      access: { update: () => false },
       admin: { readOnly: true, description: 'TTL chosen at mint time.' },
     },
     {
       name: 'expiresAt',
       type: 'date',
       required: true,
+      access: { update: () => false },
       admin: { readOnly: true, date: { pickerAppearance: 'dayAndTime' } },
     },
     {

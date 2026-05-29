@@ -5,17 +5,25 @@ import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { mediaUploadField } from '../fields/media-upload';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
+import { schemaAddonsField } from '../fields/schema-addons';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
+import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
+
+/** Canonical detail-page prefix for podcast episodes — distinct from the
+ *  flat ROUTE_PREFIX map because the nested path is `/podcast/episode/<slug>`. */
+export const PODCAST_EPISODE_PREFIX = '/podcast/episode';
 
 const YT_ID_RE = /^[A-Za-z0-9_-]{11}$/;
 
@@ -174,12 +182,30 @@ export const PodcastEpisodes: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'permalink',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
+            clientProps: { pathPrefix: PODCAST_EPISODE_PREFIX },
+          },
+        },
+      },
+    },
+    schemaAddonsField,
     publishedAtField,
     displayPublishedAtField,
+    ...seoSidebarFields({ pathPrefix: PODCAST_EPISODE_PREFIX, descriptionSource: 'abstract' }),
+    ...seoFieldsForSidebar('podcastEpisodes'),
   ],
   hooks: {
     beforeChange: [stampYoutubeVideoIdHook, firstPublishHook(), displayPublishedAtBackfillHook],
     afterChange: [
+      slugChangeRedirectHook('podcastEpisodes'),
+      schemaOverrideAuditHook('podcastEpisodes'),
       displayPublishedAtAuditHook('podcastEpisodes'),
       searchSyncAfterChangeHook('podcastEpisodes'),
       webhooksPublishAfterChangeHook('podcastEpisodes'),
