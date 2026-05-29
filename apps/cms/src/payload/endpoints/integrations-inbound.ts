@@ -100,7 +100,15 @@ export const calcomInboundEndpoint: Endpoint = {
   handler: async (req) => {
     const ip = clientIpFromHeaders(req.headers);
     const limited = checkAndRecord(`calcom-inbound:${ip}`, RATE_LIMITS);
-    if (limited) return json({ ok: false, error: 'rate_limited' }, { status: 429 });
+    if (!limited.ok)
+      return json(
+        {
+          ok: false,
+          error: 'rate_limited',
+          retryAfterSeconds: Math.ceil(limited.retryAfterMs / 1000),
+        },
+        { status: 429 },
+      );
 
     const rawBody = req.text ? await req.text() : '';
     if (!rawBody) return json({ ok: false, error: 'empty_body' }, { status: 400 });
@@ -232,7 +240,15 @@ export const brevoBounceInboundEndpoint: Endpoint = {
   handler: async (req) => {
     const ip = clientIpFromHeaders(req.headers);
     const limited = checkAndRecord(`brevo-inbound:${ip}`, RATE_LIMITS);
-    if (limited) return json({ ok: false, error: 'rate_limited' }, { status: 429 });
+    if (!limited.ok)
+      return json(
+        {
+          ok: false,
+          error: 'rate_limited',
+          retryAfterSeconds: Math.ceil(limited.retryAfterMs / 1000),
+        },
+        { status: 429 },
+      );
 
     const row = await findBrevoRow(req.payload);
     if (!row) {

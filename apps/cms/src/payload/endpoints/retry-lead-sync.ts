@@ -59,7 +59,15 @@ export const retryLeadSyncEndpoint: Endpoint = {
     const ip = clientIpFromHeaders(req.headers);
     const rateLimitKey = `retry-lead-sync:${ip}`;
     const limited = checkAndRecord(rateLimitKey, RETRY_RATE_LIMITS);
-    if (limited) return json({ ok: false, error: 'rate_limited' }, { status: 429 });
+    if (!limited.ok)
+      return json(
+        {
+          ok: false,
+          error: 'rate_limited',
+          retryAfterSeconds: Math.ceil(limited.retryAfterMs / 1000),
+        },
+        { status: 429 },
+      );
 
     const paramsResult = paramsSchema.safeParse(req.routeParams);
     if (!paramsResult.success) {

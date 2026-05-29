@@ -15,6 +15,7 @@ import {
   Gutter,
   PageControls,
   SelectionProvider,
+  TableColumnsProvider,
   useConfig,
   useListQuery,
   useStepNav,
@@ -159,7 +160,8 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
 
   return (
     <SelectionProvider docs={data?.docs ?? []} totalDocs={data?.totalDocs ?? 0}>
-      <div className="cs-list">
+      <TableColumnsProvider collectionSlug={collectionSlug} columnState={columnState}>
+        <div className="cs-list">
           <Gutter className="cs-list__gutter">
             {BeforeList}
             <ListHeader
@@ -256,7 +258,8 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
               <ColumnPicker columnState={columnState} />
             </DrawerBody>
           </Drawer>
-      </div>
+        </div>
+      </TableColumnsProvider>
     </SelectionProvider>
   );
 };

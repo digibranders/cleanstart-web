@@ -14,6 +14,7 @@ const RETENTION_DAYS = 90;
 export const analyticsCachePruneTask: TaskConfig<'analyticsCachePrune'> = {
   slug: 'analyticsCachePrune',
   retries: 0,
+  schedule: [{ cron: '0 7 * * *', queue: 'analyticsCachePrune' }],
   handler: async ({ req }) => {
     const cutoff = new Date(Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000).toISOString();
     try {

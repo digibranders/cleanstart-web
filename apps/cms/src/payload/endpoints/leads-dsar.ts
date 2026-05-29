@@ -51,7 +51,15 @@ export const dsarFindEndpoint: Endpoint = {
 
     const ip = clientIpFromHeaders(req.headers);
     const limited = checkAndRecord(`dsar-find:${ip}`, DSAR_RATE_LIMITS);
-    if (limited) return json({ ok: false, error: 'rate_limited' }, { status: 429 });
+    if (!limited.ok)
+      return json(
+        {
+          ok: false,
+          error: 'rate_limited',
+          retryAfterSeconds: Math.ceil(limited.retryAfterMs / 1000),
+        },
+        { status: 429 },
+      );
 
     const url = new URL(req.url ?? '', 'http://localhost');
     const emailParam = url.searchParams.get('email')?.trim() ?? '';
@@ -111,7 +119,15 @@ export const dsarDeleteEndpoint: Endpoint = {
 
     const ip = clientIpFromHeaders(req.headers);
     const limited = checkAndRecord(`dsar-delete:${ip}`, DSAR_RATE_LIMITS);
-    if (limited) return json({ ok: false, error: 'rate_limited' }, { status: 429 });
+    if (!limited.ok)
+      return json(
+        {
+          ok: false,
+          error: 'rate_limited',
+          retryAfterSeconds: Math.ceil(limited.retryAfterMs / 1000),
+        },
+        { status: 429 },
+      );
 
     let raw: unknown;
     try {

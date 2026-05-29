@@ -33,6 +33,7 @@ const LEASE_TTL_MS = 4 * 60 * 1000; // 4 min — shorter than the 5-min cron int
 export const drainLeadQueueTask: TaskConfig<'drainLeadQueue'> = {
   slug: 'drainLeadQueue',
   retries: 0,
+  schedule: [{ cron: '*/5 * * * *', queue: 'leadQueueDrain' }],
   handler: async ({ req }) => {
     const workerId = `${process.pid}-${randomUUID().slice(0, 8)}`;
     const claimed = await claimNextBatch(workerId, LEASE_TTL_MS, 100);
