@@ -28,4 +28,12 @@ describe("splitTitleAccent", () => {
   it("is case-insensitive and keeps original casing", () => {
     expect(splitTitleAccent("The Big Reveal", "big reveal").accent).toBe("Big Reveal");
   });
+  it("returns all-lead when the accent is not a trailing phrase", () => {
+    expect(splitTitleAccent("Foundations of Trust", "Foundations"))
+      .toEqual({ lead: "Foundations of Trust", accent: "" });
+  });
+  it("does not match a mid-word substring", () => {
+    expect(splitTitleAccent("Ship Securely", "secure"))
+      .toEqual({ lead: "Ship Securely", accent: "" });
+  });
 });
