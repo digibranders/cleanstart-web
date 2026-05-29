@@ -658,8 +658,8 @@
   ],
   "hooks": {
     "beforeChange": 3,
-    "afterChange": 3,
+    "afterChange": 6,
     "beforeValidate": 0,
-    "afterDelete": 0
+    "afterDelete": 1
   }
 }

@@ -10,6 +10,12 @@ import { contentTitleField } from '../fields/title';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 const YT_ID_RE = /^[A-Za-z0-9_-]{11}$/;
 
@@ -173,7 +179,13 @@ export const PodcastEpisodes: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [stampYoutubeVideoIdHook, firstPublishHook(), displayPublishedAtBackfillHook],
-    afterChange: [displayPublishedAtAuditHook('podcastEpisodes')],
+    afterChange: [
+      displayPublishedAtAuditHook('podcastEpisodes'),
+      searchSyncAfterChangeHook('podcastEpisodes'),
+      webhooksPublishAfterChangeHook('podcastEpisodes'),
+      indexNowPublishAfterChangeHook('podcastEpisodes'),
+    ],
+    afterDelete: [searchSyncAfterDeleteHook('podcastEpisodes')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

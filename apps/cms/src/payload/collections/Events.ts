@@ -13,7 +13,13 @@ import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
 import { firstPublishHook } from '../hooks/first-publish';
 import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 export const Events: CollectionConfig = {
   slug: 'events',
@@ -280,7 +286,11 @@ export const Events: CollectionConfig = {
     afterChange: [
       slugChangeRedirectHook('events'),
       schemaOverrideAuditHook('events'),
+      searchSyncAfterChangeHook('events'),
+      webhooksPublishAfterChangeHook('events'),
+      indexNowPublishAfterChangeHook('events'),
     ],
+    afterDelete: [searchSyncAfterDeleteHook('events')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

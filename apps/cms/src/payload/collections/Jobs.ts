@@ -14,7 +14,13 @@ import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-ba
 import { firstPublishHook } from '../hooks/first-publish';
 import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const Jobs: CollectionConfig = {
@@ -245,7 +251,11 @@ export const Jobs: CollectionConfig = {
       slugChangeRedirectHook('jobs'),
       schemaOverrideAuditHook('jobs'),
       displayPublishedAtAuditHook('jobs'),
+      searchSyncAfterChangeHook('jobs'),
+      webhooksPublishAfterChangeHook('jobs'),
+      indexNowPublishAfterChangeHook('jobs'),
     ],
+    afterDelete: [searchSyncAfterDeleteHook('jobs')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

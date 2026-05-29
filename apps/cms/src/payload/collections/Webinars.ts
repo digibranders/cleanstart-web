@@ -16,7 +16,13 @@ import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
 import { firstPublishHook } from '../hooks/first-publish';
 import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const Webinars: CollectionConfig = {
@@ -240,7 +246,11 @@ export const Webinars: CollectionConfig = {
       slugChangeRedirectHook('webinars'),
       schemaOverrideAuditHook('webinars'),
       displayPublishedAtAuditHook('webinars'),
+      searchSyncAfterChangeHook('webinars'),
+      webhooksPublishAfterChangeHook('webinars'),
+      indexNowPublishAfterChangeHook('webinars'),
     ],
+    afterDelete: [searchSyncAfterDeleteHook('webinars')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

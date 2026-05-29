@@ -63,8 +63,8 @@
   ],
   "hooks": {
     "beforeChange": 3,
-    "afterChange": 1,
+    "afterChange": 4,
     "beforeValidate": 0,
-    "afterDelete": 0
+    "afterDelete": 1
   }
 }
