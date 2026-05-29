@@ -1,2 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+// CleanStart brand fonts (Manrope / Sora / JetBrains Mono) are self-hosted
+// via next/font in app/(payload)/layout.tsx — served same-origin so they load
+// under the admin CSP (`font-src 'self'`). They expose the CSS variables
+// --font-manrope / --font-sora / --font-jbmono, which the --font-* token
+// stacks in _tokens.scss consume. Matches the marketing site (apps/web).
+//
+// Do NOT re-add a Google Fonts @import here: the admin CSP
+// (`style-src 'self'`; `font-src 'self' data:`) blocks fonts.googleapis.com
+// and fonts.gstatic.com, so a remote @import silently falls back to system
+// fonts (the bug this replaced).
 
