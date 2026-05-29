@@ -12,7 +12,7 @@ const ACCENT_GRAD = "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)";
 
 // Uniform 80px grid at 0.045 white, baked as an SVG so Satori needn't tile it.
 const GRID_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(
-  `<svg xmlns='http://www.w3.org/2000/svg' width='${WIDTH}' height='${HEIGHT}'><defs><pattern id='g' width='80' height='80' patternUnits='userSpaceOnUse'><path d='M80 0H0V80' fill='none' stroke='rgba(255,255,255,0.045)' stroke-width='1'/></pattern></defs><rect width='${WIDTH}' height='${HEIGHT}' fill='url(%23g)'/></svg>`,
+  `<svg xmlns='http://www.w3.org/2000/svg' width='${WIDTH}' height='${HEIGHT}'><defs><pattern id='g' width='80' height='80' patternUnits='userSpaceOnUse'><path d='M80 0H0V80' fill='none' stroke='rgba(255,255,255,0.045)' stroke-width='1'/></pattern></defs><rect width='${WIDTH}' height='${HEIGHT}' fill='url(#g)'/></svg>`,
 )}`;
 
 const fonts = (async () => {
