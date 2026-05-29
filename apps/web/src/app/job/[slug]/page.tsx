@@ -53,6 +53,7 @@ export async function generateMetadata({
   ].filter(Boolean);
   return buildPageMetadata({
     title: job.title,
+    eyebrow: "Careers",
     description: descriptionParts.join(" "),
     path: `/job/${job.slug}`,
     type: "article",
