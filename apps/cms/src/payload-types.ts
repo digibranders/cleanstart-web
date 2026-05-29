@@ -3061,7 +3061,7 @@ export interface Resource {
    */
   displayPublishedAt?: string | null;
   /**
-   * Incremented by the resource-download endpoint when added (Phase F). Always 0 today.
+   * Automatically incremented each time a visitor downloads this resource.
    */
   downloadCount?: number | null;
   /**
@@ -4691,7 +4691,7 @@ export interface Job {
    */
   applicationDeadline?: string | null;
   /**
-   * When the listing should auto-close. The auto-close cron (Phase G) uses this.
+   * When the listing should auto-close. Not yet enforced — update hiringStatus manually when the deadline passes.
    */
   expiresAt?: string | null;
   closedAt?: string | null;
@@ -5000,7 +5000,7 @@ export interface AboutGallery {
    */
   imageLink?: string | null;
   /**
-   * Drag to reorder in the list view (Phase D admin UX).
+   * Enter a number to control display order (lower = first).
    */
   displayOrder?: number | null;
   updatedAt: string;
@@ -10321,12 +10321,12 @@ export interface SiteSetting {
   id: number;
   siteName: string;
   /**
-   * Used to build absolute URLs for SEO and emails.
+   * Used to build absolute URLs for SEO and emails. Must be a valid https:// URL with no trailing slash.
    */
   baseUrl: string;
   defaultLocale: string;
   /**
-   * IANA timezone. Default for events / webinars.
+   * IANA timezone identifier (e.g. Asia/Kolkata, America/New_York). Default for events / webinars.
    */
   organizationTimezone?: string | null;
   listing?: {
@@ -10389,7 +10389,7 @@ export interface SeoDefault {
    */
   twitterHandle?: string | null;
   /**
-   * Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`.
+   * Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`. Note: web production phase — not yet consumed by apps/web.
    */
   brandIcons?: {
     /**
@@ -10418,7 +10418,7 @@ export interface SeoDefault {
     themeColor?: string | null;
   };
   /**
-   * Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper.
+   * Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper. Note: web production phase — not yet consumed by apps/web.
    */
   verification?: {
     /**
@@ -10831,6 +10831,9 @@ export interface ResourcesSpotlight {
   headline: string;
   sub?: string | null;
   ctaLabel: string;
+  /**
+   * Destination URL or path. Accepts `/site-path` or `https://…`.
+   */
   ctaHref: string;
   /**
    * After this date, the card is skipped and the evergreen renders.
@@ -10851,6 +10854,9 @@ export interface CompanySpotlight {
   headline: string;
   sub?: string | null;
   ctaLabel: string;
+  /**
+   * Destination URL or path. Accepts `/site-path` or `https://…`.
+   */
   ctaHref: string;
   /**
    * After this date, the card is skipped and the evergreen renders.
