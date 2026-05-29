@@ -39,15 +39,20 @@
   --font-mono: var(--font-jbmono), ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
     Consolas, monospace;
 
-  // Spacing scale (4-pt grid)
-  --cs-space-1: 0.25rem; //  4px
-  --cs-space-2: 0.5rem; //   8px
-  --cs-space-3: 0.75rem; // 12px
-  --cs-space-4: 1rem; //    16px
-  --cs-space-6: 1.5rem; //  24px
-  --cs-space-8: 2rem; //    32px
-  --cs-space-12: 3rem; //   48px
-  --cs-space-16: 4rem; //   64px
+  // Spacing scale (4-pt grid). Whole-px, not rem: Payload's admin shell
+  // runs `html` at ~13px, so rem-based steps resolve to half-pixels
+  // (0.75rem → 9.75px) that poison every cell/pill/form gutter. Pinning
+  // to px keeps the scale immune to the root-font cascade. rem is only
+  // valuable where chrome must scale with user font prefs — not here.
+  --cs-space-1: 4px;
+  --cs-space-2: 8px;
+  --cs-space-3: 12px;
+  --cs-space-4: 16px;
+  --cs-space-5: 20px;
+  --cs-space-6: 24px;
+  --cs-space-8: 32px;
+  --cs-space-12: 48px;
+  --cs-space-16: 64px;
 
   // Radius
   --cs-radius-chip: 4px;
@@ -57,24 +62,38 @@
 
   // Motion
   --cs-motion-micro: 120ms ease-out;
+  // Passive hover (row sweep, nav, cards) — slightly longer than the
+  // active-press micro so a fast cursor sweep down a list doesn't strobe.
+  --cs-motion-hover: 160ms ease;
   --cs-motion-macro: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --cs-motion-modal: 240ms cubic-bezier(0.16, 1, 0.3, 1);
 
   // Brand-tinted overlays (used for hover/selected states)
   --cs-tint-brand-soft: rgba(6, 199, 242, 0.08);
   --cs-tint-brand-medium: rgba(6, 199, 242, 0.14);
-  --cs-tint-focus-ring: rgba(6, 199, 242, 0.22);
+  --cs-tint-focus-ring: rgba(6, 199, 242, 0.4);
   --cs-tint-focus-glow: rgba(6, 199, 242, 0.12);
 
-  // Premium depth — subtle inset + lift for inputs / buttons / cards
-  --cs-shadow-input-rest: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  // Premium depth — layered elevation for a dark theme: a bright top
+  // inner edge (hairline highlight) + a darker-than-canvas outer shadow
+  // + a border one step above canvas. A single faint glow reads flat.
+  --cs-shadow-input-rest: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --cs-shadow-input-focus:
     inset 0 1px 2px rgba(0, 0, 0, 0.04),
     0 4px 12px var(--cs-tint-focus-glow);
   --cs-shadow-press: inset 0 1px 2px rgba(0, 0, 0, 0.12);
   --cs-shadow-press-soft: inset 0 1px 2px rgba(0, 0, 0, 0.06);
-  --cs-shadow-lift-sm: 0 2px 6px rgba(0, 0, 0, 0.06);
-  --cs-shadow-lift-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --cs-shadow-lift-sm:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 2px 8px rgba(0, 0, 0, 0.16);
+  --cs-shadow-lift-md:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 4px 16px rgba(0, 0, 0, 0.24);
+  // Raised surface — inner highlight + a 1px ring one step above canvas.
+  // Replaces a bare border on cards/panels so they read as lifted.
+  --cs-shadow-surface-raised:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px var(--theme-elevation-150);
 
   // Slim the nav rail. Payload defaults to 275px which crowds the
   // doc-edit two-column layout on a 13"–14" laptop; 240px keeps the

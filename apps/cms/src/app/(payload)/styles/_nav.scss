@@ -4,7 +4,7 @@
 //
 // Visual model:
 //
-//   GLOBALS                     ← category eyebrow: 10.5px / 700 / muted /
+//   GLOBALS                     ← category eyebrow: 11px / 700 / muted /
 //                                   uppercase / generous top spacing
 //     Site settings             ← item: 13px / 400 / secondary text
 //     SEO defaults                  + indented from category by 12px
@@ -61,7 +61,7 @@
     background: transparent;
     border: none;
     color: var(--cs-text-muted);
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -155,13 +155,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
   background: var(--cs-tint-brand-soft);
   color: var(--cs-cyan-500);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1;
   font-feature-settings: 'tnum' 1;

@@ -40,6 +40,14 @@ time {
   font-feature-settings: 'tnum' 1, 'cv11' 1;
 }
 
+// Date list-columns are metadata — right-align so trailing digits form
+// a hard vertical wall (matches the header alignment in _tables.scss).
+.cell-updatedAt,
+.cell-createdAt,
+.cell-publicationDate {
+  text-align: right;
+}
+
 // Mono everywhere code or anchor slugs render
 code,
 pre,

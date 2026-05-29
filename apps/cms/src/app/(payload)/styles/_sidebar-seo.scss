@@ -90,7 +90,7 @@
   }
 
   &__hint {
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--theme-text-disabled);
     margin: 0;
@@ -128,7 +128,7 @@
     justify-content: center;
     background: var(--theme-elevation-100);
     color: var(--theme-text-disabled);
-    font-size: 10.5px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -236,7 +236,7 @@
 
     code {
       font-family: var(--font-mono);
-      font-size: 11.5px;
+      font-size: 12px;
       background: transparent;
       padding: 0;
     }
@@ -267,7 +267,7 @@
     border: 1px solid var(--theme-elevation-250);
     border-radius: var(--cs-radius-input);
     padding: 0 var(--cs-space-3);
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--theme-text);
     cursor: pointer;
@@ -299,7 +299,7 @@
     border-radius: var(--cs-radius-input);
     padding: 0 var(--cs-space-3);
     height: 30px;
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--theme-text);
     cursor: pointer;
@@ -345,7 +345,7 @@
     border-radius: var(--cs-radius-input);
     padding: 0 var(--cs-space-3);
     height: 30px;
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--cs-cyan-500);
     cursor: pointer;
@@ -411,7 +411,7 @@
   }
 
   &__warning {
-    font-size: 11.5px;
+    font-size: 12px;
     color: var(--color-warning-500);
     line-height: 1.4;
   }
@@ -425,7 +425,7 @@
   }
 
   &__count {
-    font-size: 10.5px;
+    font-size: 11px;
     font-family: var(--font-mono);
     letter-spacing: 0;
     flex-shrink: 0;
@@ -642,7 +642,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -703,7 +703,7 @@
     code {
       flex: 1;
       font-family: var(--font-mono);
-      font-size: 11.5px;
+      font-size: 12px;
       color: var(--theme-text);
       background: transparent;
       padding: 0;
@@ -743,7 +743,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.4;
 
     li {
@@ -806,7 +806,7 @@
     flex: 1;
     padding: 0.4rem 0.65rem;
     border-radius: var(--cs-radius-input);
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 500;
     text-align: center;
     text-decoration: none;
@@ -971,7 +971,7 @@
 
   &__from {
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 12px;
     color: var(--theme-text);
     background: transparent;
     padding: 0;
@@ -994,7 +994,7 @@
     background: var(--cs-tint-brand-medium);
     color: var(--cs-cyan-700);
     font-family: var(--font-mono);
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.02em;
   }
@@ -1022,7 +1022,7 @@
     border: 1px dashed var(--theme-elevation-250);
     background: transparent;
     color: var(--theme-text);
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
@@ -1083,7 +1083,7 @@
   }
 
   &__hint {
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.5;
     color: var(--theme-text-soft);
     margin: 0;
@@ -1153,7 +1153,7 @@
     color: var(--theme-text-soft);
 
     li {
-      font-size: 11.5px;
+      font-size: 12px;
     }
 
     code {
@@ -1212,7 +1212,7 @@
   }
 
   &__form-label {
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--theme-text-soft);
     letter-spacing: 0.02em;
@@ -1233,7 +1233,7 @@
   }
 
   &__lock-hint {
-    font-size: 11.5px;
+    font-size: 12px;
     color: var(--theme-text-soft);
     background: var(--theme-elevation-100);
     border-radius: var(--cs-radius-input);
@@ -1249,7 +1249,7 @@
     border: 1px solid var(--theme-elevation-200);
     border-radius: var(--cs-radius-input);
     padding: 6px 10px;
-    font-size: 12.5px;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--theme-text);
     font-family: inherit;
@@ -1288,7 +1288,7 @@
 
   &__form-error {
     margin: 4px 0 0 0;
-    font-size: 11.5px;
+    font-size: 12px;
     color: var(--color-error-500);
     line-height: 1.4;
   }
@@ -1368,7 +1368,7 @@
     background: rgba(217, 119, 6, 0.08); // amber-500 @ 8%
     border: 1px solid rgba(217, 119, 6, 0.32);
     border-radius: var(--cs-radius-input);
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.45;
     color: var(--theme-text);
   }
@@ -1389,7 +1389,7 @@
     background: var(--theme-elevation-150);
     color: var(--theme-text-soft);
     border-radius: var(--cs-radius-chip);
-    font-size: 10.5px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-weight: 600;
@@ -1459,7 +1459,7 @@
     // rail visually quiet. Standard tag idiom across the sidebar.
     flex: 0 0 auto;
     margin-left: auto;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -1513,7 +1513,7 @@
     background: rgba(217, 119, 6, 0.10);
     border: 1px solid rgba(217, 119, 6, 0.40);
     border-radius: var(--cs-radius-input);
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.45;
     color: var(--theme-text);
   }
@@ -1527,7 +1527,7 @@
   }
 
   &__hint {
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.5;
     color: var(--theme-text-soft);
     margin: 0;
@@ -1553,7 +1553,7 @@
     }
 
     dt {
-      font-size: 10.5px;
+      font-size: 11px;
       color: var(--theme-text-soft);
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -1567,7 +1567,7 @@
 
       code {
         font-family: var(--font-mono);
-        font-size: 11.5px;
+        font-size: 12px;
         background: var(--theme-elevation-100);
         padding: 1px 6px;
         border-radius: 3px;
@@ -1610,7 +1610,7 @@
   }
 
   &__form-label {
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--theme-text-soft);
     letter-spacing: 0.02em;
@@ -1631,7 +1631,7 @@
 
     code {
       font-family: var(--font-mono);
-      font-size: 10.5px;
+      font-size: 11px;
       background: var(--theme-elevation-100);
       padding: 0 4px;
       border-radius: 3px;
@@ -1647,7 +1647,7 @@
     border: 1px solid var(--theme-elevation-200);
     border-radius: var(--cs-radius-input);
     padding: 6px 10px;
-    font-size: 12.5px;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--theme-text);
     font-family: inherit;
@@ -1679,7 +1679,7 @@
 
   &__form-error {
     margin: 4px 0 0 0;
-    font-size: 11.5px;
+    font-size: 12px;
     color: var(--color-error-500);
     line-height: 1.4;
   }
@@ -1780,7 +1780,7 @@
     // Right-aligned colored dot + text. No background.
     flex: 0 0 auto;
     margin-left: auto;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -1821,7 +1821,7 @@
   }
 
   &__hint {
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.5;
     color: var(--theme-text-soft);
     margin: 0 0 var(--cs-space-2) 0;
@@ -1884,7 +1884,7 @@
   &__from,
   &__to {
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: 12px;
     background: var(--theme-elevation-100);
     padding: 1px 6px;
     border-radius: 3px;
@@ -1901,7 +1901,7 @@
     display: flex;
     gap: 4px;
     margin-top: 2px;
-    font-size: 10.5px;
+    font-size: 11px;
     color: var(--theme-text-soft);
   }
 }
@@ -1954,7 +1954,7 @@
   &__chip {
     display: inline-flex;
     align-items: center;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -2096,7 +2096,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--color-error-500, #f08f8f);
 
@@ -2225,7 +2225,7 @@
 
   &__summary {
     margin-left: auto;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -2275,7 +2275,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--cs-space-2);
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--theme-text);
     cursor: pointer;
 
@@ -2294,7 +2294,7 @@
   }
 
   &__label {
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--theme-text-soft);
     letter-spacing: 0.01em;
@@ -2335,7 +2335,7 @@
   }
 
   &__health {
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.4;
     margin: 4px 0 0;
 
@@ -2364,13 +2364,13 @@
   // on the 99% case.
   &__explainer {
     margin: 4px 0 0;
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.45;
     color: var(--theme-text-soft);
 
     > summary {
       cursor: pointer;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 500;
       color: var(--theme-text-soft);
       list-style: none;
@@ -2459,9 +2459,9 @@
     gap: 6px;
     padding: 3px 10px;
     border-radius: 999px;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
     flex-shrink: 0;
     line-height: 1;
@@ -2487,10 +2487,10 @@
   &__title {
     margin: 0;
     padding: 0;
-    font-size: 22px;
-    line-height: 1.2;
+    font-size: 24px;
+    line-height: 1.15;
     font-weight: 700;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
     color: var(--theme-text);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2508,7 +2508,7 @@
     align-items: center;
     flex-wrap: nowrap;
     gap: 2px 14px;
-    font-size: 12.5px;
+    font-size: 12px;
     line-height: 1.3;
     color: var(--theme-text-soft);
     overflow: hidden;
@@ -2607,7 +2607,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -2731,7 +2731,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
     flex-shrink: 0;
@@ -2748,7 +2748,7 @@
   &__score {
     display: inline-flex;
     align-items: center;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -2892,7 +2892,7 @@
     border: 0;
     border-radius: 4px;
     padding: 5px 3px;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 500;
     line-height: 1.2;
     letter-spacing: -0.01em;
@@ -2965,7 +2965,7 @@
   }
 
   &__summary {
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -3027,7 +3027,7 @@
 
   &__section-title {
     margin: 0;
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -3051,7 +3051,7 @@
     border: 1px solid var(--theme-elevation-200);
     background: var(--theme-input-bg);
     color: var(--theme-text);
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.4;
     font-family: inherit;
 
@@ -3092,7 +3092,7 @@
     border: 1px solid var(--theme-elevation-200);
     background: var(--theme-elevation-50);
     color: var(--theme-text);
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition:
@@ -3277,7 +3277,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -3403,7 +3403,7 @@
     border: 1px solid var(--theme-elevation-200);
     background: var(--theme-elevation-50);
     color: var(--theme-text);
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition:
@@ -3451,7 +3451,7 @@
 
   &__hint {
     margin: 0;
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--theme-text-soft);
 
@@ -3463,7 +3463,7 @@
 
   &__error {
     margin: 0;
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--color-error-500);
   }
@@ -3476,7 +3476,7 @@
     border-radius: var(--cs-radius-input);
     background: rgba(251, 191, 36, 0.06);
     color: var(--color-warning-500, #fbbf24);
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.4;
     display: flex;
     flex-direction: column;
@@ -3529,7 +3529,7 @@
   }
 
   &__field-label {
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--theme-text-soft);
   }
@@ -3542,7 +3542,7 @@
   }
 
   &__counter {
-    font-size: 10.5px;
+    font-size: 11px;
     font-variant-numeric: tabular-nums;
     color: var(--theme-text-soft);
 
@@ -3630,7 +3630,7 @@
   &__chip {
     display: inline-flex;
     align-items: center;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -3658,7 +3658,7 @@
 
   &__hint {
     margin: 4px 0 0;
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--theme-text-soft);
 
@@ -3672,7 +3672,7 @@
     display: flex;
     align-items: flex-start;
     gap: 6px;
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--color-error-500, #f08f8f);
 
@@ -3688,7 +3688,7 @@
     border-radius: 4px;
     background: rgba(6, 199, 242, 0.08);
     border: 1px solid rgba(6, 199, 242, 0.25);
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.45;
     color: var(--theme-text);
 

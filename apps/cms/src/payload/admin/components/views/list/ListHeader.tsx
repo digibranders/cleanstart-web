@@ -66,7 +66,9 @@ export const ListHeader = (props: Props): ReactElement => {
   return (
     <header className="cs-list__header">
       <div className="cs-list__heading">
-        <h1 className="cs-list__title">{collectionLabel}</h1>
+        <div className="cs-list__title-row">
+          <h1 className="cs-list__title">{collectionLabel}</h1>
+        </div>
         {description ? <div className="cs-list__description">{description}</div> : null}
       </div>
       <div className="cs-list__controls">
@@ -90,7 +92,14 @@ export const ListHeader = (props: Props): ReactElement => {
           aria-haspopup="menu"
           aria-expanded={menuOpen}
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+            style={{ display: 'block', flexShrink: 0 }}
+          >
             <circle cx="3" cy="8" r="1.4" fill="currentColor" />
             <circle cx="8" cy="8" r="1.4" fill="currentColor" />
             <circle cx="13" cy="8" r="1.4" fill="currentColor" />

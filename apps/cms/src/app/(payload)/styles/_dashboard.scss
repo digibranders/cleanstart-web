@@ -108,7 +108,7 @@
   }
 
   &__pulse-caption {
-    font-size: 12.5px;
+    font-size: 13px;
     color: var(--theme-text-soft);
     line-height: 1.4;
   }
@@ -165,7 +165,7 @@
 
     td {
       padding: var(--cs-space-3);
-      font-size: 13.5px;
+      font-size: 13px;
       color: var(--theme-text);
       border-top: 1px solid var(--theme-elevation-150);
       vertical-align: middle;
@@ -193,13 +193,13 @@
 
   &__type-cell {
     color: var(--theme-text-soft);
-    font-size: 12.5px;
+    font-size: 13px;
   }
 
   &__time-cell {
     color: var(--theme-text-soft);
     font-feature-settings: 'tnum' 1;
-    font-size: 12.5px;
+    font-size: 13px;
     white-space: nowrap;
   }
 
@@ -358,7 +358,7 @@
 
   &__timeline-type {
     flex-shrink: 0;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -374,7 +374,7 @@
 
   &__timeline-time {
     flex-shrink: 0;
-    font-size: 11.5px;
+    font-size: 12px;
     color: var(--theme-text-soft);
     font-feature-settings: 'tnum' 1;
     font-variant-numeric: tabular-nums;
@@ -446,7 +446,7 @@
   }
 
   &__analytics-title {
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: -0.01em;
     color: var(--cs-text-heading);
@@ -454,7 +454,7 @@
   }
 
   &__analytics-meta {
-    font-size: 10.5px;
+    font-size: 11px;
     color: var(--theme-text-soft);
     white-space: nowrap;
 
@@ -492,7 +492,7 @@
     }
 
     dt {
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -512,7 +512,7 @@
   }
 
   &__analytics-url {
-    font-size: 11.5px;
+    font-size: 12px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -550,7 +550,7 @@
   }
 
   &__analytics-connect-label {
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--cs-text-heading);
     letter-spacing: -0.005em;
@@ -571,7 +571,7 @@
     border-radius: var(--cs-radius-chip);
     background: var(--theme-input-bg);
     border: 1px solid var(--theme-elevation-150);
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--theme-text-soft);
     letter-spacing: 0.01em;
@@ -585,7 +585,7 @@
 
   // "Manage integrations →" link in the section header
   &__section-link {
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--cs-cyan-500);
     text-decoration: none;
@@ -659,7 +659,7 @@
   }
 
   &__quick-desc {
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--theme-text-soft);
     line-height: 1.45;
   }

@@ -109,6 +109,7 @@
   display: flex;
   align-items: center;
   gap: var(--cs-space-2);
+  column-gap: var(--cs-space-5);
 }
 
 // Every actionable element in the doc-controls strip — Save Draft,
@@ -221,7 +222,7 @@
   border-radius: var(--cs-radius-input);
   padding-inline: var(--cs-space-4);
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: 14px;
   letter-spacing: 0.005em;
   transition:
     background-color var(--cs-motion-micro),
@@ -243,7 +244,7 @@
 .btn--size-small,
 .btn--size-sm {
   height: 30px;
-  font-size: 12.5px;
+  font-size: 12px;
   padding-inline: var(--cs-space-3);
 }
 
@@ -265,14 +266,14 @@
   padding: 0;
 }
 
-// ─── Pills — uniform 22px height across statuses
+// ─── Pills — MD chip tier, uniform 24px height across statuses
 .pill {
-  min-height: 22px;
-  height: 22px;
+  min-height: 24px;
+  height: 24px;
 
   &--size-medium {
     height: 26px;
-    font-size: 12.5px;
+    font-size: 12px;
   }
 }
 

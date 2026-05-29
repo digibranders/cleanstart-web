@@ -38,28 +38,35 @@
 // =============================================================================
 
 .table {
-  font-size: 13.5px;
+  font-size: 13px;
   width: 100%;
   // Drop the bottom divider — `td` rules handle row separation, and a
   // table-level border doubled-up on the last row.
   border-collapse: separate;
   border-spacing: 0;
 
-  // Header row: a subtle band that anchors the column rhythm without
-  // competing with row content.
+  // Header row: a raised band one step above canvas that pins to the top
+  // as rows scroll under it, so the column labels never disappear.
   thead {
-    background: transparent;
+    background: var(--theme-elevation-100);
 
     th {
       color: var(--theme-text-soft);
-      font-weight: 600;
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: var(--cs-space-3) var(--cs-space-3);
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: -0.01em;
+      text-transform: none;
+      padding: 8px var(--cs-space-3);
       border-bottom: 1px solid var(--theme-elevation-200);
       vertical-align: middle;
       white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--theme-elevation-100);
+      // box-shadow renders above the sticky band where a border-bottom
+      // would scroll out of view as rows pass under it.
+      box-shadow: 0 1px 0 0 var(--theme-elevation-200);
       // Active sort: 2px cyan top hairline + saturated label.
       &[aria-sort='ascending'],
       &[aria-sort='descending'] {
@@ -78,27 +85,29 @@
   }
 
   tbody tr {
-    transition: background-color var(--cs-motion-micro);
-    height: 52px;
+    transition: background-color var(--cs-motion-hover);
+    height: 48px;
 
+    // Brand-tinged whisper instead of a flat gray slab that jumps.
     &:hover {
-      background: var(--theme-elevation-100);
+      background: var(--cs-tint-brand-soft);
     }
 
     // Active / current row (Next router supplies aria-current on links)
     &[aria-current='true'],
     &.is-active {
-      background: var(--cs-tint-brand-soft);
+      background: var(--cs-tint-brand-medium);
       box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
     }
   }
 
   td {
-    padding: var(--cs-space-3) var(--cs-space-3);
+    padding: 10px var(--cs-space-4);
     color: var(--theme-text);
     border-top: 1px solid var(--theme-elevation-150);
     vertical-align: middle;
     line-height: 1.45;
+    font-size: 14px;
   }
 
   // First / last cell in a row — flush to the gutter so the table
@@ -207,34 +216,50 @@
   text-overflow: ellipsis;
 }
 
+// ─── Column-width strategy — radically Title-greedy ──────────────
+//
+// Title gets NO explicit width so it absorbs all leftover space under
+// `table-layout: fixed`; every metadata column is tight. A premium
+// table makes the primary scan/click target (Title) the widest column
+// and starves the one-word pill / short-string columns.
 .table thead th[id='heading-_select'],
 .table tbody td.cell-_select {
-  width: 36px;
+  width: 40px;
   padding-inline: var(--cs-space-2);
 
   input[type='checkbox'] { margin: 0; }
 }
 
-// Status / updatedAt / date columns — content fits in 160-200px.
+// Status — a ≤90px pill; centered.
 .table thead th[id='heading-_status'],
-.table tbody td.cell-_status { width: 200px; }
+.table tbody td.cell-_status {
+  width: 108px;
+  text-align: center;
+}
 
-.table thead th[id='heading-updatedAt'],
-.table thead th[id='heading-createdAt'],
-.table thead th[id='heading-publicationDate'],
+// Date columns — tight, right-aligned with tabular figures so the
+// trailing digits form a hard vertical wall (header + cells).
+.table thead th[id^='heading-updatedAt'],
+.table thead th[id^='heading-createdAt'],
+.table thead th[id^='heading-publicationDate'],
 .table tbody td.cell-updatedAt,
 .table tbody td.cell-createdAt,
-.table tbody td.cell-publicationDate { width: 160px; }
+.table tbody td.cell-publicationDate {
+  width: 128px;
+  text-align: right;
+}
 
-// Relationship columns (authors, categories, etc.) — natural pill width.
+// Authors — one tight relationship column.
 .table thead th[id='heading-authors'],
+.table tbody td.cell-authors { width: 140px; }
+
+// Category relationship columns (and their per-collection variants).
 .table thead th[id='heading-categories'],
-.table thead th[id='heading-newsCategories'],
-.table thead th[id='heading-knowledgeCategories'],
-.table tbody td.cell-authors,
+.table thead th[id^='heading-newsCategories'],
+.table thead th[id^='heading-knowledgeCategories'],
 .table tbody td.cell-categories,
 .table tbody td.cell-newsCategories,
-.table tbody td.cell-knowledgeCategories { width: 180px; }
+.table tbody td.cell-knowledgeCategories { width: 120px; }
 
 // Title-style cells (the primary link column) — soak up remaining
 // width. With table-layout: fixed and no explicit width on these,

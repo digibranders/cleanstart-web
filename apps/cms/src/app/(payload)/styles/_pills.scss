@@ -1,22 +1,24 @@
 // 11. Pills & status indicators — colored dot + label
 // =============================================================================
 
+// MD chip tier — whole-px geometry locked to a 24px height.
 .pill {
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.01em;
-  padding: 0.15rem 0.65rem;
+  padding: 0 10px;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  height: 22px;
+  gap: 6px;
+  height: 24px;
+  line-height: 24px;
 
   // Status dot — color-blind-safe pattern: dot + label, never color alone
   &::before {
     content: '';
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background: currentColor;
     flex-shrink: 0;
