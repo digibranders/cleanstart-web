@@ -1,4 +1,5 @@
 import type { CollectionBeforeChangeHook } from 'payload';
+import { ValidationError } from 'payload';
 
 const MAX_HOPS = 10;
 const FLATTEN_AFTER_HOPS = 3;
@@ -131,9 +132,14 @@ export const redirectCycleGuardHook: CollectionBeforeChangeHook = async ({
   });
 
   if (result.kind === 'cycle') {
-    throw new Error(
-      `Redirect cycle detected via "${result.via}" after ${result.hops} hop(s). Resolve the chain before saving.`,
-    );
+    throw new ValidationError({
+      errors: [
+        {
+          message: `Redirect cycle detected via "${result.via}" after ${result.hops} hop(s). Resolve the chain before saving.`,
+          path: 'to',
+        },
+      ],
+    });
   }
 
   if (result.kind === 'flatten') {

@@ -1,4 +1,5 @@
 import type { CollectionBeforeChangeHook } from 'payload';
+import { ValidationError } from 'payload';
 
 import { checkPattern } from '../lib/safe-regex';
 
@@ -32,7 +33,7 @@ type FormFieldShape = {
 export const formsCoerceHook: CollectionBeforeChangeHook = ({ data }) => {
   if (!data || !Array.isArray((data as { fields?: unknown }).fields)) return data;
   const fields = (data as { fields: FormFieldShape[] }).fields;
-  const next = fields.map((field) => {
+  const next = fields.map((field, index) => {
     const out: FormFieldShape = { ...field };
     // (1) consent ⇒ required.
     if (out.type === 'consent') {
@@ -48,9 +49,14 @@ export const formsCoerceHook: CollectionBeforeChangeHook = ({ data }) => {
           check.reason === 'catastrophic-backtracking'
             ? 'pattern looks unsafe (catastrophic backtracking risk)'
             : 'pattern is invalid regex syntax';
-        throw new Error(
-          `Cannot save form: ${label} validation pattern rejected — ${reason}.`,
-        );
+        throw new ValidationError({
+          errors: [
+            {
+              message: `Cannot save form: ${label} validation pattern rejected — ${reason}.`,
+              path: `fields.${index}.validation.pattern`,
+            },
+          ],
+        });
       }
     }
     return out;

@@ -213,7 +213,9 @@ export const Media: CollectionConfig = {
         if (!file) return data;
         const result = checkUploadSize(file.mimetype, file.size);
         if (!result.ok) {
-          throw new Error(result.reason);
+          throw new ValidationError({
+            errors: [{ message: result.reason, path: 'filename' }],
+          });
         }
         // Sanitize SVGs in place — DOMPurify-strip <script>, on* handlers,
         // <foreignObject>, and javascript:/data:/vbscript: hrefs before the
