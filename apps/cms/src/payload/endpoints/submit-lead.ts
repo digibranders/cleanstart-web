@@ -272,6 +272,30 @@ export const submitLeadEndpoint: Endpoint = {
       }
     }
 
+    // Server-side injection of the current Legal policyVersion into the
+    // consent snapshot. The web form never sends this — injecting it here
+    // prevents spoofing and guarantees every lead records the live version
+    // at submit time for GDPR audit defensibility.
+    let consentWithPolicy = data.consent;
+    if (data.consent != null) {
+      try {
+        const legalGlobal = (await req.payload.findGlobal({
+          slug: 'legal',
+          depth: 0,
+          overrideAccess: true,
+        })) as { policyVersion?: string | null } | null;
+        const policyVersion = legalGlobal?.policyVersion ?? undefined;
+        if (policyVersion != null) {
+          consentWithPolicy = { ...data.consent, policyVersion };
+        }
+      } catch (err) {
+        req.payload.logger.warn(
+          { err: err instanceof Error ? err.message : String(err) },
+          'Could not fetch Legal global for policyVersion — consent stored without it',
+        );
+      }
+    }
+
     const submission: LeadSubmission = {
       formId: numericFormId,
       formSchemaVersion: data.formSchemaVersion,
@@ -280,7 +304,7 @@ export const submitLeadEndpoint: Endpoint = {
       utm: data.utm,
       ip,
       userAgent,
-      consent: data.consent,
+      consent: consentWithPolicy,
     };
 
     try {

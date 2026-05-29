@@ -75,6 +75,15 @@ export const Table: Block = {
             {
               name: 'value',
               type: 'text',
+              // Required when type=text; optional override caption for check/cross/partial cells.
+              validate: (
+                value: string | null | undefined,
+                { siblingData }: { siblingData: Record<string, unknown> },
+              ): true | string =>
+                siblingData?.type !== 'text' ||
+                (typeof value === 'string' && value.trim().length > 0)
+                  ? true
+                  : 'Cell value is required for type=text cells.',
               admin: {
                 description:
                   'Text contents. Required for type=text; optional override caption for check/cross/partial cells.',
