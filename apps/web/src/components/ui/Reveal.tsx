@@ -7,7 +7,7 @@ import {
   useReducedMotion,
   type HTMLMotionProps,
 } from "motion/react";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import {
   EASE_OUT,
@@ -52,10 +52,30 @@ export function Reveal({
   ...rest
 }: RevealProps) {
   const reduce = useReducedMotion();
+  // Render a static placeholder on the server and first client render, then
+  // mount the motion element after hydration. When this element is above the
+  // fold, motion resolves the in-view state during the client's first render
+  // and disagrees with the server's initial state, causing a hydration
+  // mismatch. Keeping motion out of SSR sidesteps that while the freshly
+  // mounted whileInView observer still drives the reveal.
+  const reduceProps = rest as unknown as React.HTMLAttributes<HTMLDivElement>;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   if (reduce) {
+    return <div {...reduceProps}>{children}</div>;
+  }
+
+  if (!mounted) {
     return (
-      <div {...(rest as unknown as React.HTMLAttributes<HTMLDivElement>)}>
+      <div
+        {...reduceProps}
+        style={{
+          opacity: 0,
+          transform: `translateY(${y}px)`,
+          ...reduceProps.style,
+        }}
+      >
         {children}
       </div>
     );
