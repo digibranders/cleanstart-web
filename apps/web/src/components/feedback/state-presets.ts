@@ -41,8 +41,8 @@ export interface StatePreset {
 export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   "not-found": {
     illustration: "/error/404.webp",
-    width: 720,
-    height: 652,
+    width: 800,
+    height: 735,
     alt: "",
     title: "Page Not Found",
     description: "The page you're looking for doesn't exist or has moved.",
@@ -50,8 +50,8 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   },
   "server-error": {
     illustration: "/error/500.webp",
-    width: 616,
-    height: 557,
+    width: 760,
+    height: 679,
     alt: "",
     title: "Something Went Wrong",
     description: "An unexpected error occurred on our end. Please try again.",
@@ -59,8 +59,8 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   },
   maintenance: {
     illustration: "/error/503.webp",
-    width: 1021,
-    height: 679,
+    width: 839,
+    height: 752,
     alt: "",
     title: "We'll Be Right Back",
     description: "This service is temporarily unavailable for maintenance.",
@@ -68,8 +68,8 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   },
   "bad-request": {
     illustration: "/error/400.webp",
-    width: 546,
-    height: 565,
+    width: 720,
+    height: 705,
     alt: "",
     title: "That Request Didn't Work",
     description: "Something about that request wasn't valid. Try again.",
@@ -77,8 +77,8 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   },
   offline: {
     illustration: "/error/no-internet.webp",
-    width: 1024,
-    height: 619,
+    width: 751,
+    height: 729,
     alt: "",
     title: "You're Offline",
     description: "Check your internet connection and try again.",
@@ -87,7 +87,7 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   forbidden: {
     illustration: "/error/403.webp",
     width: 511,
-    height: 482,
+    height: 470,
     alt: "",
     title: "Access Denied",
     description: "You don't have permission to view this.",
@@ -96,7 +96,7 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   "rate-limited": {
     illustration: "/error/429.webp",
     width: 482,
-    height: 510,
+    height: 496,
     alt: "",
     title: "Slow Down a Moment",
     description: "Too many requests in a short time. Please wait and retry.",
@@ -113,8 +113,8 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   },
   "no-results": {
     illustration: "/error/empty-search.webp",
-    width: 549,
-    height: 487,
+    width: 760,
+    height: 667,
     alt: "",
     title: "No results found",
     description: "Try a different search or clear your filters.",
@@ -122,8 +122,8 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   },
   "load-failed": {
     illustration: "/error/offline.webp",
-    width: 513,
-    height: 492,
+    width: 700,
+    height: 667,
     alt: "",
     title: "Couldn't load this",
     description: "We hit a problem loading this content. Please try again.",
@@ -131,8 +131,8 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   },
   success: {
     illustration: "/error/success.webp",
-    width: 515,
-    height: 501,
+    width: 514,
+    height: 494,
     alt: "",
     title: "Thank you!",
     description: "We've received your submission and will be in touch.",
