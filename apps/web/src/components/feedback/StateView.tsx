@@ -8,16 +8,6 @@ import { STATE_PRESETS, type StateVariant } from "./state-presets";
 const HERO_GRADIENT =
   "linear-gradient(180deg, #0B0820 0%, #131248 38%, #2E1D8E 70%, #5A2EE0 95%, #6E3CFF 100%)";
 
-const GRID_CELL = "71.11px";
-const GRID_BORDER = "1px";
-const GRID_COLOR = "rgba(255, 255, 255, 0.06)";
-
-const GRID_BG: CSSProperties = {
-  backgroundImage: `linear-gradient(to right, ${GRID_COLOR} ${GRID_BORDER}, transparent ${GRID_BORDER}), linear-gradient(to bottom, ${GRID_COLOR} ${GRID_BORDER}, transparent ${GRID_BORDER})`,
-  backgroundSize: `${GRID_CELL} ${GRID_CELL}`,
-  backgroundPosition: "0 0",
-};
-
 // Full-page "glass" hero title — exact Figma spec (Final 404 frame, 1440 width):
 // Manrope SemiBold, 190px / line-height 100% / letter-spacing -0.05em, white @35%.
 // Authored at 1440 (title box 1296px = 1440 − 144 margins), so 190px is the
@@ -71,70 +61,18 @@ export function StateView({
         className={cn("relative w-full overflow-hidden", className)}
         style={{ background: HERO_GRADIENT }}
       >
-        <div
+        {/* Bordered grid + purple glow ellipses + accent lines — exact Figma
+            asset (node 857:18365). 1920px-wide, centred and clipped to the
+            section like the design (left: calc(50% - 1920px/2)). */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/error/hero-grid.svg"
+          alt=""
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0"
-          style={{
-            ...GRID_BG,
-            height: "clamp(420px, 32vw, 498px)",
-            maskImage:
-              "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
-            WebkitMaskImage:
-              "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
-          }}
-        />
-
-        <div
-          aria-hidden
-          className="pointer-events-none absolute"
-          style={{
-            left: "calc(-280.57px / 1920 * 100%)",
-            top: "-358px",
-            width: "min(974px, 60vw)",
-            aspectRatio: "974 / 862",
-            background: "#7A59FF",
-            opacity: 0.08,
-            filter: "blur(125px)",
-            transform: "rotate(43deg)",
-            borderRadius: "50%",
-          }}
-        />
-
-        <span
-          aria-hidden
-          className="pointer-events-none absolute hidden md:block"
-          style={{
-            left: "calc(213.33px / 1920 * 100%)",
-            top: "142.22px",
-            width: "1px",
-            height: "142.22px",
-            background: "rgba(255,255,255,0.55)",
-            opacity: 0.28,
-          }}
-        />
-        <span
-          aria-hidden
-          className="pointer-events-none absolute hidden md:block"
-          style={{
-            left: "calc(426.67px / 1920 * 100%)",
-            top: "285.74px",
-            width: "1px",
-            height: "142.22px",
-            background: "rgba(255,255,255,0.55)",
-            opacity: 0.28,
-          }}
-        />
-        <span
-          aria-hidden
-          className="pointer-events-none absolute hidden md:block"
-          style={{
-            left: "calc(142.22px / 1920 * 100%)",
-            top: "355.56px",
-            width: "1px",
-            height: "142.22px",
-            background: "rgba(255,255,255,0.55)",
-            opacity: 0.18,
-          }}
+          className="pointer-events-none select-none absolute top-0 left-1/2 -translate-x-1/2"
+          style={{ width: "1920px", maxWidth: "none", height: "auto" }}
+          loading="lazy"
+          decoding="async"
         />
 
         <div
@@ -157,14 +95,6 @@ export function StateView({
               <h1 className="font-display text-balance" style={TITLE_STYLE}>
                 {resolvedTitle}
               </h1>
-              {resolvedDescription ? (
-                <p
-                  className="mx-auto mt-4 max-w-[36ch] text-balance text-white/70"
-                  style={{ fontSize: "var(--fs-lead)" }}
-                >
-                  {resolvedDescription}
-                </p>
-              ) : null}
             </HeroReveal>
 
             {/* Scale the illustration to the smaller of viewport width / height
