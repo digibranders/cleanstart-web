@@ -40,7 +40,7 @@ export function FeaturedTile({
   minHeight = 220,
 }: Props) {
   const className =
-    "cs-tile-glass flex flex-col justify-between rounded-[14px] border p-4 text-white transition-[transform,border-color] duration-200 hover:-translate-y-px";
+    "group/cta cs-tile-glass flex flex-col justify-between rounded-[14px] border p-4 text-white transition-[transform,border-color] duration-200 hover:-translate-y-px";
   const style = {
     borderColor: ACCENT_BORDER[accent],
     minHeight,

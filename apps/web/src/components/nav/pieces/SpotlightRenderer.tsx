@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { SpotlightCard } from "@/components/nav/data/spotlights";
+import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
 
 const ACCENT = {
   cyan: { color: "#2cc1eb", border: "rgba(44,193,235,0.15)" },
@@ -31,7 +32,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
     return (
       <Link
         href={`/event/${spotlight.slug}`}
-        className="flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
+        className="group/cta flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
         style={{ background: "#1c1530", borderColor: ACCENT.cyan.border }}
       >
         <div>
@@ -50,7 +51,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
           className="mt-auto pt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
           style={{ color: ACCENT.cyan.color }}
         >
-          Save your seat <span className="text-sm">→</span>
+          Save your seat <ArrowGlyph direction="right" size={12} />
         </div>
       </Link>
     );
@@ -60,7 +61,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
     return (
       <Link
         href={`/webinar/${spotlight.slug}`}
-        className="flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
+        className="group/cta flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
         style={{ background: "#1c1530", borderColor: ACCENT.magenta.border }}
       >
         <div>
@@ -79,7 +80,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
           className="mt-auto pt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
           style={{ color: ACCENT.magenta.color }}
         >
-          Register <span className="text-sm">→</span>
+          Register <ArrowGlyph direction="right" size={12} />
         </div>
       </Link>
     );
@@ -89,7 +90,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
     return (
       <Link
         href="/careers"
-        className="flex min-h-[280px] flex-col rounded-[12px] border p-4 text-white transition-colors"
+        className="group/cta flex min-h-[280px] flex-col rounded-[12px] border p-4 text-white transition-colors"
         style={{ background: "#1c1530", borderColor: ACCENT.magenta.border }}
       >
         <div>
@@ -117,7 +118,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
             className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
             style={{ color: ACCENT.magenta.color }}
           >
-            See careers <span className="text-sm">→</span>
+            See careers <ArrowGlyph direction="right" size={12} />
           </div>
         </div>
       </Link>
@@ -129,7 +130,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
     return (
       <Link
         href={spotlight.ctaHref}
-        className="flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
+        className="group/cta flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
         style={{ background: "#1c1530", borderColor: a.border }}
       >
         <div>
@@ -148,7 +149,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
           className="mt-auto pt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
           style={{ color: a.color }}
         >
-          {spotlight.ctaLabel} <span className="text-sm">→</span>
+          {spotlight.ctaLabel} <ArrowGlyph direction="right" size={12} />
         </div>
       </Link>
     );
@@ -159,7 +160,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
     return (
       <Link
         href="/subscribe"
-        className="flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
+        className="group/cta flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
         style={{ background: "#1c1530", borderColor: ACCENT.cyan.border }}
       >
         <div>
@@ -180,7 +181,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
           className="mt-auto pt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
           style={{ color: ACCENT.cyan.color }}
         >
-          Subscribe <span className="text-sm">→</span>
+          Subscribe <ArrowGlyph direction="right" size={12} />
         </div>
       </Link>
     );
@@ -191,7 +192,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
   return (
     <Link
       href="mailto:careers@cleanstart.com?subject=Talent%20network"
-      className="flex min-h-[280px] flex-col rounded-[12px] border p-4 text-white transition-colors"
+      className="group/cta flex min-h-[280px] flex-col rounded-[12px] border p-4 text-white transition-colors"
       style={{ background: "#1c1530", borderColor: ACCENT.green.border }}
     >
       <div>
@@ -233,7 +234,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
           className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
           style={{ color: ACCENT.green.color }}
         >
-          Join the network <span className="text-sm">→</span>
+          Join the network <ArrowGlyph direction="right" size={12} />
         </div>
       </div>
     </Link>

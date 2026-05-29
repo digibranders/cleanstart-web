@@ -6,6 +6,7 @@ import { PanelRow } from "@/components/nav/pieces/PanelRow";
 import { PanelShell } from "@/components/nav/panels/PanelShell";
 import { ContextualCTA } from "@/components/nav/pieces/ContextualCTA";
 import { CopyableCommand } from "@/components/nav/pieces/CopyableCommand";
+import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
 import { imageDetailsHref } from "@/components/nav/data/latest-images";
 import type { NavMegaItem } from "@/lib/nav-config";
 import type { CommunityImage } from "@/lib/api/community-images";
@@ -37,12 +38,9 @@ export function PanelProducts({ item, latestImages }: Props) {
       footer={
         <div>
           <CopyableCommand command={`$ docker pull cleanstart/${chosen.name}:latest`} />
-          <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#2cc1eb]">
+          <div className="group/cta mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#2cc1eb]">
             Try {chosen.name}
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M7 17 17 7" />
-              <path d="M7 7h10v10" />
-            </svg>
+            <ArrowGlyph direction="up-right" size={12} />
           </div>
         </div>
       }
@@ -54,8 +52,8 @@ export function PanelProducts({ item, latestImages }: Props) {
       headline="Stop patching. Replace the base."
       sub="Drop-in compatible with your stack. Near-zero CVEs at the base layer."
       footer={
-        <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#2cc1eb]">
-          Browse images <span className="text-sm">→</span>
+        <div className="group/cta mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#2cc1eb]">
+          Browse images <ArrowGlyph direction="right" size={12} />
         </div>
       }
     />

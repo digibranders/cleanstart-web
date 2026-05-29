@@ -3,6 +3,7 @@ import { PanelRow } from "@/components/nav/pieces/PanelRow";
 import { PanelShell } from "@/components/nav/panels/PanelShell";
 import { ContextualCTA } from "@/components/nav/pieces/ContextualCTA";
 import { CopyableCommand } from "@/components/nav/pieces/CopyableCommand";
+import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
 import type { NavMegaItem } from "@/lib/nav-config";
 
 type Props = { item: NavMegaItem };
@@ -38,8 +39,8 @@ export function PanelSolutions({ item }: Props) {
           footer={
             <div>
               <CopyableCommand command="$ docker pull cleanstart/python-fips" />
-              <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#6cffc2]">
-                See FIPS stack <span className="text-sm">→</span>
+              <div className="group/cta mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#6cffc2]">
+                See FIPS stack <ArrowGlyph direction="right" size={12} />
               </div>
             </div>
           }
