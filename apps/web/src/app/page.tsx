@@ -24,6 +24,9 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Verified container images. Built from source, hardened, signed, and continuously verified.",
   path: "/",
+  variant: "hero",
+  ogTitle: "Secure by Design. Built from Source.",
+  titleAccent: "Built from Source.",
 });
 
 export default function Home() {

@@ -16,6 +16,10 @@ export const metadata = buildPageMetadata({
   description:
     "Hardened, near-zero-CVE container and virtual machine images. Replace your base image with CleanStart for smaller, faster, FIPS-ready builds — no code changes required.",
   path: "/cleanstart-images",
+  variant: "hero",
+  eyebrow: "CleanStart Images",
+  ogTitle: "Trusted Container Foundations",
+  titleAccent: "Foundations",
 });
 
 export default function CleanStartImagesPage(): React.ReactElement {
