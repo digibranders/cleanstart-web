@@ -33,11 +33,36 @@
 }
 
 .cs-sidebar-header {
+  // Pin the brand + search + Dashboard block to the top of the nav so it
+  // stays put while only the category groups below scroll. `.nav__scroll`
+  // is the scrolling ancestor; this block is its first child, so
+  // `top: 0` sticks it to the top of the scroll viewport.
+  //
+  // An opaque background is required: the nav itself is transparent (the
+  // sidebar colour comes from an ancestor), so without it the scrolling
+  // groups would show through the pinned header. The block must also end
+  // exactly at its divider — no `margin-bottom`. A transparent bottom
+  // margin sits below the opaque box, so scrolling links would bleed
+  // through it just above the divider. The first nav-group's own top
+  // padding (8px group + 6px toggle) supplies the breathing room below
+  // the divider instead, and scrolls cleanly under the pinned box.
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--theme-bg);
+
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 0 12px 8px;
-  margin-bottom: 12px;
+  // Bleed ±20px to break out of `.nav__scroll`'s 20px horizontal padding
+  // so the opaque background spans the full sidebar width. Payload paints
+  // the active-link indicator (`.nav__link-indicator`) in that left gutter
+  // (x≈4), *outside* the padded content column — without the bleed the
+  // header can't mask it and it shows above the pinned block when the
+  // active row scrolls up. Inner padding is bumped by the same 20px
+  // (12 → 32) so the brand row, search and Dashboard stay put.
+  margin: 0 -20px;
+  padding: 0 32px 12px;
   border-bottom: 1px solid var(--cs-border-subtle);
 
   // Brand link (logo + CMS pill). Left padding leaves a 36px seat for
@@ -298,5 +323,55 @@
   svg {
     width: 14px !important;
     height: 14px !important;
+  }
+}
+
+// ─── Sidebar auto-collapse policy (visual layer) ──────────────────────
+//
+// `.template-default` is a CSS grid whose first column is the nav rail:
+// open = `var(--nav-width) auto`, collapsed = `0 auto`. Payload's
+// NavProvider force-collapses that column on every viewport ≤ 1440px
+// after hydration, regardless of the saved preference — so a JS-only
+// re-open always flashes (collapse → expand) and, in dev, lags ~seconds
+// behind hydration. We hold the open grid here in CSS so the rail is
+// docked from the first paint with no flash:
+//
+//   - ≥ 1280px            → docked on every route.
+//   - 1025–1279px         → docked on browse routes (dashboard, lists);
+//                           editor routes keep Payload's collapse.
+//   - ≤ 1024px            → Payload's overlay drawer owns the nav; left
+//                           untouched.
+//
+// `[data-cs-nav-route]` is set on <html> by `NavOpenOnDesktop.tsx`, which
+// also keeps Payload's `navOpen` state in sync so the collapse toggler
+// reflects the docked rail. `!important` is required to beat Payload's
+// `.template-default--nav-hydrated` collapse rule.
+//
+// Two properties must be forced together. Payload reserves the rail via
+// the grid column AND fades the `.nav` element itself to `opacity: 0`
+// when `navOpen` is false (only `.nav--nav-open` sets `opacity: 1`).
+// Forcing the column alone leaves a reserved-but-empty column — a blank
+// space where the rail should be — whenever the JS `navOpen` re-assert
+// lags. Pin the opacity here too so the rail is genuinely visible, not
+// just allocated, independent of the JS state.
+@media (min-width: 1280px) {
+  .template-default {
+    grid-template-columns: var(--nav-width) auto !important;
+  }
+
+  .nav {
+    opacity: 1 !important;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1279px) {
+  html[data-cs-nav-route='browse'] {
+    .template-default {
+      grid-template-columns: var(--nav-width) auto !important;
+    }
+
+    .nav {
+      opacity: 1 !important;
+    }
   }
 }

@@ -232,7 +232,6 @@ export default buildConfig({
         './payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator',
         './payload/admin/components/NavBadges.tsx#NavBadges',
         './payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence',
-        './payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop',
         './payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle',
         './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
         './payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer',
@@ -245,6 +244,12 @@ export default buildConfig({
       ],
       afterNavLinks: [
         './payload/admin/components/UserMenu.tsx#UserMenu',
+        // Mounted here (inside the nav) rather than in `actions` so the
+        // sidebar auto-collapse policy runs on every admin page — the
+        // custom document-edit chrome (CmsEditView) doesn't render the
+        // `actions` slot, so an actions-mounted policy never ran on
+        // editor views.
+        './payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop',
       ],
       beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
       // Wave 5 — branded hero injected above the stock LoginForm. Full

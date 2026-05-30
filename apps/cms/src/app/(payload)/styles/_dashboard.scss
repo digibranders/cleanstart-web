@@ -2,6 +2,28 @@
 // =============================================================================
 
 .cs-dashboard {
+  // Restore the horizontal gutter the removed Payload <Gutter> used to
+  // provide (see Dashboard.tsx) — without it the greeting and cards run
+  // edge-to-edge against the viewport. Matches Payload's editor-canvas
+  // gutter (--gutter-h) on desktop so the dashboard aligns with document
+  // edit views, and steps down on tablet/mobile so content isn't
+  // over-inset on small screens. `padding-top` stays owned by the
+  // `body:has(.cs-dashboard)` block below (greeting aligns with the
+  // sidebar brand row); the bottom gutter keeps Quick actions off the edge.
+  padding-left: var(--gutter-h, 60px);
+  padding-right: var(--gutter-h, 60px);
+  padding-bottom: var(--cs-space-10);
+
+  @media (max-width: 1024px) {
+    padding-left: var(--cs-space-6, 24px);
+    padding-right: var(--cs-space-6, 24px);
+  }
+
+  @media (max-width: 600px) {
+    padding-left: var(--cs-space-4, 16px);
+    padding-right: var(--cs-space-4, 16px);
+  }
+
   // Header — no horizontal rule under the greeting; the gap to the
   // KPI cards reads cleanly as whitespace alone.
   &__header {
@@ -700,64 +722,30 @@
   }
 }
 
-// ─── Hide the breadcrumb on the dashboard view + tighten chrome ──
+// ─── Dashboard greeting alignment ───────────────────────────────
 //
-// Payload's dashboard view calls `SetStepNav({ nav: [] })` so the
-// crumb list is empty, but the surrounding `.step-nav` chrome (the
-// brand icon + slash separator) still renders. Hide it so the dashboard
-// — which IS the root — doesn't show a meaningless route above it.
-//
-// Hiding the step-nav alone leaves the `.app-header` allocating its
-// full height for the avatar row + (now-empty) breadcrumb row. On the
-// dashboard route there's no breadcrumb to host, so collapse the
-// header padding too. The avatar bar still renders for logout/account
-// access; it just hugs the top of the viewport.
-//
-// All scoped via `:has()` so the rest of the admin (collection lists,
-// document edits, globals) keeps full breadcrumb chrome.
+// The breadcrumb step-nav and the empty app-header band are hidden
+// CMS-wide in `_user-menu.scss` (the dashboard's root view is no
+// exception). What remains dashboard-specific is aligning the greeting's
+// top edge with the sidebar brand row now that the header above it is
+// gone.
 body:has(.cs-dashboard) {
-  // 1) The breadcrumb step-nav is empty on the dashboard route — hide it.
-  .step-nav,
-  :has(> .cs-dashboard) > .step-nav {
-    display: none;
-  }
-
-  // 2) Collapse the .app-header to ZERO height instead of `display:
-  //    none`. The header hosts Payload's `actions` slot — that's
-  //    where our CommandPalette `<dialog>` gets mounted. Hiding the
-  //    parent with display:none collapses every descendant in the
-  //    top layer too, so the palette would open with state but
-  //    render at 0×0 (visually invisible). Zero-height + visible
-  //    overflow keeps the actions slot mountable while reclaiming
-  //    the empty band above the greeting.
-  .app-header,
-  .template-default__app-header {
-    min-height: 0 !important;
-    height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border: 0 !important;
-    overflow: visible !important;
-  }
-
-  // Hide the visible chrome that lived inside the app-header (step-
-  // nav was already hidden above; the avatar/user-controls are
-  // already hidden globally because we moved them to the sidebar
-  // UserMenu). This is a belt-and-braces guard for any other
-  // bordered children Payload might add later.
-  .app-header__step-nav,
-  .app-header__user-controls,
-  .app-header__avatar {
-    display: none !important;
-  }
-
-  // 3) Greeting top-edge aligns with the SidebarHeader brand row on
-  //    the left column — both start at exactly the wrap's 12px top
-  //    inset. No extra dashboard top padding here, no header top
-  //    margin: the greeting sits flush with the wordmark across the
-  //    horizontal axis, which reads as one editor-canvas line.
+  // Greeting top-edge aligns with the SidebarHeader brand row on the left
+  // column — both start at exactly the wrap's 12px top inset. No extra
+  // dashboard top padding here, no header top margin: the greeting sits
+  // flush with the wordmark across the horizontal axis, which reads as one
+  // editor-canvas line.
+  //
+  // Below 1024px the docked sidebar collapses and Payload overlays an
+  // "Open Menu" hamburger at the top-left. With the reduced mobile gutter
+  // the greeting would slide under that hamburger, so drop the canvas below
+  // the hamburger row on collapsed-nav widths.
   .cs-dashboard {
     padding-top: 0;
+
+    @media (max-width: 1024px) {
+      padding-top: var(--cs-space-12, 48px);
+    }
   }
 
   .cs-dashboard__header {

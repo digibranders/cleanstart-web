@@ -258,31 +258,36 @@ a.nav__log-out,
 }
 
 // =============================================================================
-// App-header — breadcrumb-only row, top-aligned with the sidebar brand
+// App-header — breadcrumb removed CMS-wide, header collapsed to zero height
 // =============================================================================
 //
-// On non-dashboard views the only thing left inside `.app-header` is the
-// step-nav breadcrumb (avatar moved to the sidebar UserMenu). We want
-// its top edge to land at the same y-coordinate as the SidebarHeader
-// brand row (y=16, set by the wrap's `padding-top: 16px` in
-// `_sidebar-header.scss`).
+// The step-nav breadcrumb is hidden across the entire admin (collection
+// lists, document edits, globals, dashboard). The sidebar nav already
+// carries section context, so the crumb row above each view was redundant
+// chrome.
 //
-// Zero the top padding so the wrap padding is the only top contribution,
-// drop background + border so the row reads as content rather than
-// chrome, and top-align the children so the breadcrumb hugs the
-// container's top rather than floating to vertical-centre.
+// The `.app-header` is NOT removed with `display: none` — it hosts
+// Payload's `actions` slot (registered in `payload.config.ts`), where the
+// CommandPalette `<dialog>` and SaveShortcut mount. `display: none` on the
+// parent collapses its descendants in the top layer too, so the palette
+// would open with state but render at 0×0 (invisible). Instead collapse the
+// header to zero height with visible overflow: the actions slot stays
+// mountable while the empty breadcrumb band is reclaimed.
 .app-header,
 .template-default__app-header {
-  min-height: 32px;
-  padding-top: 0;
-  padding-bottom: var(--cs-space-2);
+  min-height: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
   background: transparent;
-  border-bottom: 0;
-  align-items: flex-start;
+  border: 0 !important;
+  overflow: visible !important;
 }
 
+// Hide the breadcrumb wherever Payload renders it — the app-header slot on
+// list/global views, and the in-form slot on document edit views
+// (`.collection-edit__form > .step-nav`, see _chrome.scss).
 .app-header__step-nav,
 .step-nav {
-  margin-top: 0;
-  padding-top: 0;
+  display: none !important;
 }
