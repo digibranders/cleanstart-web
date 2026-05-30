@@ -1,11 +1,37 @@
-// CleanStart brand fonts (Manrope / Sora / JetBrains Mono) are self-hosted
-// via next/font in app/(payload)/layout.tsx — served same-origin so they load
-// under the admin CSP (`font-src 'self'`). They expose the CSS variables
-// --font-manrope / --font-sora / --font-jbmono, which the --font-* token
-// stacks in _tokens.scss consume. Matches the marketing site (apps/web).
+// CleanStart brand fonts — self-hosted @font-face. Matches the marketing site
+// (apps/web): Manrope = display/headings, Sora = body/UI, JetBrains Mono = code.
 //
-// Do NOT re-add a Google Fonts @import here: the admin CSP
-// (`style-src 'self'`; `font-src 'self' data:`) blocks fonts.googleapis.com
-// and fonts.gstatic.com, so a remote @import silently falls back to system
-// fonts (the bug this replaced).
+// Why @font-face and not next/font: the admin CSP (`style-src 'self'`;
+// `font-src 'self'`) blocks a remote Google Fonts @import, and next/font in the
+// (payload)/layout.tsx module graph breaks the layout's `'use server'` action
+// under Turbopack dev ("Functions cannot be passed to Client Components").
+// Self-hosting the woff2 in /public/fonts and declaring @font-face here avoids
+// both: the files are served same-origin (CSP-safe) and there is zero coupling
+// to the layout/server-action module.
+//
+// These are Google's variable-font woff2 (latin subset), so one file per family
+// covers the full weight range. Files live in apps/cms/public/fonts/.
 
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/manrope.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Sora';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('/fonts/sora.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono.woff2') format('woff2');
+}
