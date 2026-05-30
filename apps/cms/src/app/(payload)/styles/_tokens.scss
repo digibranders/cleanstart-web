@@ -28,12 +28,15 @@
   --cs-text-link: #0b6ec7;
   --cs-text-link-hover: #084e8e;
 
-  // Typography stacks
+  // Typography stacks — CleanStart brand fonts, matching apps/web. Loaded via
+  // next/font in app/(payload)/layout.tsx (self-hosted to satisfy the admin
+  // CSP); the --font-manrope/--font-sora/--font-jbmono variables come from
+  // there. body/UI = Sora, display/headings = Manrope.
   --font-body:
-    'Plus Jakarta Sans', 'Manrope', ui-sans-serif, system-ui, -apple-system,
+    var(--font-sora), ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-display: 'Sora', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+  --font-display: var(--font-manrope), var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jbmono), ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
     Consolas, monospace;
 
   // Spacing scale (4-pt grid)

@@ -26,6 +26,7 @@ export async function generateMetadata({
     title: article.title,
     description: article.lead,
     path: `/knowledge-hub/${article.slug}`,
+    eyebrow: "Guide",
     type: "article",
   });
 }

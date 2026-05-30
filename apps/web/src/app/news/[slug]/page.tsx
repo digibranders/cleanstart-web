@@ -45,6 +45,7 @@ export async function generateMetadata({
       item.abstract ??
       "Press release and announcements from CleanStart.",
     path: `/news/${item.slug}`,
+    eyebrow: "News",
     type: "article",
     publishedTime: item.publicationDate ?? undefined,
     ...(seo.noindex ? { noindex: true } : {}),

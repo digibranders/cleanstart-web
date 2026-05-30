@@ -55,6 +55,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
       post.abstract ??
       "Insights and writings from the CleanStart team on container security, DevOps, and compliance.",
     path: `/blogs/${post.slug}`,
+    eyebrow: post.categories?.name ?? "Blog",
     type: "article",
     publishedTime: effectivePublishedAt(post) ?? post.publishedAt,
     modifiedTime: post.updatedAt,

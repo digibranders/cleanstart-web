@@ -48,6 +48,7 @@ export async function generateMetadata({
     title: TITLE,
     description: DESCRIPTION,
     path: "/careers",
+    eyebrow: "Careers",
     noindex: page >= 6,
   });
 }
