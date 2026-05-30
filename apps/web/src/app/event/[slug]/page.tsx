@@ -44,6 +44,7 @@ export async function generateMetadata({
       event.abstract ??
       `Join CleanStart at ${event.title}${event.venue ? ` — ${event.venue}` : ""}.`,
     path: `/event/${event.slug}`,
+    eyebrow: "Event",
     ...(seo.noindex ? { noindex: true } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image

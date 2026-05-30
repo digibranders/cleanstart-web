@@ -32,6 +32,7 @@ export async function generateMetadata({
     title: TITLE,
     description: DESCRIPTION,
     path: "/resource-center",
+    eyebrow: "Resources",
     noindex: page >= 6,
   });
 }

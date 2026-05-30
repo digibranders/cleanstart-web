@@ -17,6 +17,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Practical guides on container security, software supply-chain integrity, and compliance — VEX, keyless signing, SLSA provenance, attestation, and runtime evidence.",
   path: "/knowledge-hub",
+  eyebrow: "Knowledge Hub",
 });
 
 export default function KnowledgeHubPage(): React.ReactElement {

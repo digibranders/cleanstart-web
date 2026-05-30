@@ -16,6 +16,7 @@ export const metadata = buildPageMetadata({
   description:
     "CleanStart Images reduce attack surface by eliminating unnecessary components before they enter production.",
   path: "/attack-surface-reduction",
+  eyebrow: "Solutions",
 });
 
 export default function AttackSurfaceReductionPage(): React.ReactElement {

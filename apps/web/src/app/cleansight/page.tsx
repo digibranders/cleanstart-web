@@ -25,6 +25,10 @@ export const metadata = buildPageMetadata({
   description:
     "Continuously discover, assess, and remediate container risk across modern environments. CleanSight delivers unified visibility with integrated remediation.",
   path: "/cleansight",
+  variant: "hero",
+  eyebrow: "CleanSight",
+  ogTitle: "Continuous Visibility. Continuous Remediation.",
+  titleAccent: "Remediation.",
 });
 
 export default function CleanSightPage(): React.ReactElement {

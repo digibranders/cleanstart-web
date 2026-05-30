@@ -16,6 +16,7 @@ export const metadata = buildPageMetadata({
   description:
     "Reduce inherited software risk with minimal, hardened, verifiable container foundations built for modern enterprise environments. Purpose-built for CISOs.",
   path: "/for-ciso",
+  eyebrow: "Solutions",
 });
 
 export default function ForCisoPage(): React.ReactElement {

@@ -81,14 +81,18 @@ export default function ErrorBoundary({
               <button
                 type="button"
                 onClick={reset}
-                className="inline-flex h-11 items-center rounded-xl bg-white px-6 font-medium text-[#2E1D8E] transition-colors hover:bg-white/90"
-                style={{ fontSize: "var(--fs-button)" }}
+                className="cs-btn-glass"
+                style={{
+                  ["--cs-btn-h" as string]: "52px",
+                  ["--cs-btn-px" as string]: "28px",
+                  ["--cs-btn-fs" as string]: "16px",
+                }}
               >
                 Try again
               </button>
               <Link
                 href="/"
-                className="inline-flex h-11 items-center rounded-xl border border-white/25 px-6 font-medium text-white transition-colors hover:bg-white/10"
+                className="inline-flex h-[52px] items-center px-6 font-medium text-white/70 transition-colors hover:text-white"
                 style={{ fontSize: "var(--fs-button)" }}
               >
                 Back to home

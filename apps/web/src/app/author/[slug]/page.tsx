@@ -39,6 +39,7 @@ export async function generateMetadata({
     title: `${author.name}${author.role ? ` — ${author.role}` : ""}`,
     description,
     path: `/author/${author.slug}`,
+    eyebrow: author.role ?? "Team",
     ...(photoAbsolute && author.photo
       ? {
           image: {

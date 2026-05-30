@@ -30,6 +30,7 @@ export async function generateMetadata({
     title: TITLE,
     description: DESCRIPTION,
     path: "/news",
+    eyebrow: "Newsroom",
     noindex: page >= 6,
   });
 }

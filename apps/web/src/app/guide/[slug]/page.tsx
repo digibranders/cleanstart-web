@@ -41,6 +41,7 @@ export async function generateMetadata({
 
   return buildPageMetadata({
     title: seo.title ?? guide.title,
+    eyebrow: "Guide",
     description:
       seo.description ??
       guide.abstract ??
