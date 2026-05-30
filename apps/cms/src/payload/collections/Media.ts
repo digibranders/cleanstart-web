@@ -213,7 +213,9 @@ export const Media: CollectionConfig = {
         if (!file) return data;
         const result = checkUploadSize(file.mimetype, file.size);
         if (!result.ok) {
-          throw new Error(result.reason);
+          throw new ValidationError({
+            errors: [{ message: result.reason, path: 'filename' }],
+          });
         }
         // Sanitize SVGs in place — DOMPurify-strip <script>, on* handlers,
         // <foreignObject>, and javascript:/data:/vbscript: hrefs before the
@@ -298,7 +300,10 @@ export const Media: CollectionConfig = {
         const stem = dotIdx > 0 ? baseFilename.slice(0, dotIdx) : baseFilename;
         const extWithDot = dotIdx > 0 ? baseFilename.slice(dotIdx) : '';
         let candidate = baseFilename;
-        for (let suffix = 2; suffix <= 50; suffix += 1) {
+        // Check the current candidate first; if occupied, advance to stem-N.ext
+        // and check that too. The loop ends only after verifying the final
+        // candidate, so no slot is assigned without confirmation.
+        for (let suffix = 2; ; suffix += 1) {
           const existing = await req.payload.find({
             collection: 'media',
             where: { filename: { equals: candidate } },
@@ -307,6 +312,7 @@ export const Media: CollectionConfig = {
             pagination: false,
           });
           if (existing.docs.length === 0) break;
+          if (suffix > 50) break; // hard cap — accept collision in the extremely rare case
           candidate = `${stem}-${suffix}${extWithDot}`;
         }
 

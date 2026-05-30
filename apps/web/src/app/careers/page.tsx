@@ -123,8 +123,6 @@ export default async function CareersPage({
             }}
             aria-label="Open roles"
           >
-            {/* Decorative top-left grid corner — column + row lines fading
-                radially from the top-left of the body, matching Figma. */}
             <div
               aria-hidden
               className="pointer-events-none absolute hidden md:block"
@@ -142,7 +140,6 @@ export default async function CareersPage({
                   "radial-gradient(ellipse at top left, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0) 80%)",
               }}
             />
-            {/* Decorative top-right grid corner — mirrored from the top-left. */}
             <div
               aria-hidden
               className="pointer-events-none absolute hidden md:block"
@@ -160,7 +157,6 @@ export default async function CareersPage({
                   "radial-gradient(ellipse at top right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0) 80%)",
               }}
             />
-            {/* Top-left violet radial glow — Figma Union, 1181x1181 at (-552,-413). */}
             <div
               aria-hidden
               className="pointer-events-none absolute"
@@ -174,7 +170,6 @@ export default async function CareersPage({
                 opacity: 0.1,
               }}
             />
-            {/* Top-right violet radial glow — Figma Union, 1181x1181 at (1470,-367). */}
             <div
               aria-hidden
               className="pointer-events-none absolute"
@@ -190,10 +185,9 @@ export default async function CareersPage({
             />
 
             <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-              {/* Default `align-items: stretch` so the <nav> column matches the
-                  job list's height — that's what gives the inner sticky white
-                  card a tall enough parent to anchor against while scrolling
-                  (same trick the blog detail TOC uses). */}
+              {/* `align-items: stretch` makes the nav column match the job
+                  list's height, giving the inner sticky card a tall enough
+                  parent to anchor against while scrolling. */}
               <div className="flex flex-col lg:flex-row items-stretch gap-6 lg:gap-8">
                 <CareersSidebar
                   activeDepartment={activeDepartment}

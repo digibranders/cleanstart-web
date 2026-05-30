@@ -1,54 +1,17 @@
 import Image from 'next/image';
 import { Reveal } from '@/components/ui/Reveal';
 
-/**
- * Figma frame 516:5324 — 1920 × 926 "Generate. Verify. Validate."
- *
- * Dark navy → purple section. Centred heading + subhead at the top, an 872 × 468
- * 3D isometric-platforms render in the middle (PNG), and four numbered tiles
- * with caption labels around it:
- *   ┌───────┐    ┌───────┐
- *   │ Generate│  │ Verify  │   ← top labels (y=394), big circles ø82 (top)
- *   └───────┘    └───────┘
- *        ╲ ╱  Σ  ╲ ╱
- *        ╳         ╳            ← 3D platforms artwork (centred image)
- *        ╱ ╲     ╱ ╲
- *   ┌───────┐    ┌───────┐
- *   │  Track  │  │Validate │   ← bottom labels (y=716/728), small circles ø76
- *   └───────┘    └───────┘
- *
- * Desktop uses absolute positioning from Figma coords, fluid-scaled with
- * `clamp(min, vw, max)` per the v3 consistency layer. Mobile collapses to a
- * stacked layout: heading → subhead → image → 2×2 captioned tiles.
- *
- * Figma coords (1920 × 926 frame):
- *   Heading       x=599  y=80   w=753  (h2-w=593)
- *   Platforms     x=525  y=378  w=872  h=468  (centred)
- *   Generate lbl  x=503  y=394  w=256  body width 266
- *   Verify   lbl  x=1153 y=394  w=256  body width 218
- *   Track    lbl  x=431  y=716  w=256
- *   Validate lbl  x=1234 y=728  w=256
- *   Circle 1 ø82  x=768  y=459  (top-left big)
- *   Circle 2 ø82  x=1076 y=457  (top-right big)
- *   Circle 3 ø76  x=698  y=567  (bottom-left small)
- *   Circle 4 ø76  x=1148 y=569  (bottom-right small)
- */
-
-// Fluid scaler — projects a 1920-canvas px value to vw on viewports < 1920px.
 const vw = (n: number): string => `${(n / 1920) * 100}vw`;
 
-// Vertical shift applied to the absolute-positioned image + labels group at
-// narrow desktop viewports. The heading copy doesn't scale with vw, so on
-// viewports < ~1420px the heading would otherwise crash into the labels.
-// Shift activates once `vw(378)` (the image's natural top) drops below 280px.
+// The heading copy doesn't scale with vw, so on narrow desktop viewports
+// (< ~1420px) it would crash into the labels. This shift activates once the
+// image's natural top drops below 280px, keeping the image/labels group clear.
 const VERT_SHIFT = `max(0px, calc(280px - ${vw(378)}))`;
 
-// Extra breathing room added below the bottom labels. Kept small so the
-// padding under the labels visually matches the padding above the heading
-// (top is `vw(80)` ≈ 60 px at a 1456 viewport).
+// Extra breathing room below the bottom labels so the padding under them
+// visually matches the padding above the heading.
 const SECTION_BREATHING_ROOM = '24px';
 
-// top: vw(y) + VERT_SHIFT — keeps the whole image/labels group together.
 const topShift = (y: number): string => `calc(${vw(y)} + ${VERT_SHIFT})`;
 
 export function SbomSelfUpdating(): React.ReactElement {
@@ -61,7 +24,6 @@ export function SbomSelfUpdating(): React.ReactElement {
         minHeight: `max(620px, calc(${vw(926)} + ${VERT_SHIFT} + ${SECTION_BREATHING_ROOM}))`,
       }}
     >
-      {/* Decorative purple blobs */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -91,7 +53,6 @@ export function SbomSelfUpdating(): React.ReactElement {
         }}
       />
 
-      {/* Corner glyph */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -103,12 +64,9 @@ export function SbomSelfUpdating(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ═════════════ DESKTOP (lg+) ═════════════ */}
-
-      {/* Heading block — centered. Container width is wide enough that the
-          subtitle lands on 3 lines at every desktop viewport instead of
-          collapsing to 4 lines on narrow screens. H2 width follows the
-          container so it stays on 1 line when there's room. */}
+      {/* Container width is wide enough that the subtitle lands on 3 lines at
+          every desktop viewport instead of collapsing to 4 on narrow screens.
+          H2 width follows the container so it stays on 1 line when there's room. */}
       <div
         className="hidden lg:flex absolute flex-col items-center text-center"
         style={{
@@ -151,7 +109,6 @@ export function SbomSelfUpdating(): React.ReactElement {
         </Reveal>
       </div>
 
-      {/* 3D platforms artwork (centred) */}
       <div
         className="hidden lg:block absolute"
         style={{
@@ -174,7 +131,6 @@ export function SbomSelfUpdating(): React.ReactElement {
         />
       </div>
 
-      {/* Numbered circles */}
       <FigmaCircle
         size={82}
         x={768}
@@ -214,8 +170,8 @@ export function SbomSelfUpdating(): React.ReactElement {
         small
       />
 
-      {/* Captions — top row nudged outward (Generate further left, Verify
-          further right) so the body copy clears the platform illustration. */}
+      {/* Top-row captions are nudged outward so the body copy clears the
+          platform illustration. */}
       <FeatureLabel
         x={423}
         y={394}
@@ -243,14 +199,10 @@ export function SbomSelfUpdating(): React.ReactElement {
         body="Continuously assess inventory accuracy and integrity."
       />
 
-      {/* ═════════════ MOBILE (< lg) ═════════════
-           Figma mobile node 817:1281 — dark gradient 360×812px section.
-           4 stacked action cards (130×328px each) with light card backgrounds. */}
       <div
         className="lg:hidden flex flex-col items-center"
         style={{ paddingTop: '32px', paddingBottom: '32px' }}
       >
-        {/* Heading — Figma top:32px, w:257px, 2 lines → ends ≈ 99px */}
         <Reveal header>
           <h2
             className="text-white text-center"
@@ -269,7 +221,6 @@ export function SbomSelfUpdating(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* Subhead — Figma top:116px → gap after heading ≈ 17px */}
         <Reveal header delay={0.15} y={20}>
           <p
             className="text-center"
@@ -290,7 +241,6 @@ export function SbomSelfUpdating(): React.ReactElement {
           </p>
         </Reveal>
 
-        {/* 4 stacked action cards */}
         <div
           className="flex flex-col items-center"
           style={{ gap: '16px', width: '100%', paddingLeft: '16px', paddingRight: '16px' }}
@@ -306,7 +256,6 @@ export function SbomSelfUpdating(): React.ReactElement {
                 borderRadius: '24px',
               }}
             >
-              {/* Card background SVG */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/sbom/mobile-action-card-bg.svg"
@@ -315,7 +264,6 @@ export function SbomSelfUpdating(): React.ReactElement {
                 className="absolute inset-0 w-full h-full pointer-events-none"
                 loading="lazy"
               />
-              {/* Content */}
               <div
                 className="absolute inset-0 flex flex-col items-center justify-center text-center"
                 style={{ gap: '12px' }}
@@ -356,8 +304,6 @@ export function SbomSelfUpdating(): React.ReactElement {
   );
 }
 
-/* ── data ─────────────────────────────────────────────────────────── */
-
 const MOBILE_FEATURES = [
   {
     num: 1,
@@ -368,8 +314,6 @@ const MOBILE_FEATURES = [
   { num: 3, title: 'Track', body: 'Monitor dependencies and component changes over time.' },
   { num: 4, title: 'Validate', body: 'Continuously assess inventory accuracy and integrity.' },
 ];
-
-/* ── sub-components ───────────────────────────────────────────────── */
 
 type FigmaCircleProps = {
   size: number;
@@ -426,7 +370,7 @@ function FigmaCircle({
         loading="lazy"
         decoding="async"
       />
-      {/* TODO: needs new --stat-number-* token — 15→30px decorative numeral inside a circle, no matching role token */}
+      {/* TODO: add a --stat-number-* token for this 15→30px decorative numeral; no matching role token exists yet. */}
       <span
         className="relative"
         style={{

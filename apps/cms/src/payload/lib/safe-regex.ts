@@ -18,16 +18,16 @@ import safeRegex from 'safe-regex';
  */
 export type RegexCheck =
   | { ok: true; regex: RegExp }
-  | { ok: false; reason: 'invalid-syntax' | 'catastrophic-backtracking' };
+  | { ok: false; reason: 'invalid-syntax' | 'catastrophic-backtracking' | 'too-long' };
 
-const MAX_PATTERN_LENGTH = 256;
+export const MAX_PATTERN_LENGTH = 256;
 
 export const checkPattern = (pattern: string | null | undefined): RegexCheck => {
   if (!pattern || typeof pattern !== 'string') {
     return { ok: false, reason: 'invalid-syntax' };
   }
   if (pattern.length > MAX_PATTERN_LENGTH) {
-    return { ok: false, reason: 'catastrophic-backtracking' };
+    return { ok: false, reason: 'too-long' };
   }
   // Try to compile first so genuine syntax errors are reported as such
   // rather than passed to safe-regex (which returns false for unparseable

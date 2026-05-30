@@ -1,8 +1,7 @@
 import type { ThemeRegistrationRaw } from "shiki";
 
-// Custom CleanStart code theme — tuned to the brand palette.
-// Surface uses #0C131C (deep navy) as the design implies; token colors
-// are picked from the existing brand tokens and accessible contrast pairs.
+// CleanStart code theme — token colors are drawn from the brand tokens
+// and accessible contrast pairs against the #0C131C surface.
 export const cleanstartCodeTheme: ThemeRegistrationRaw = {
   name: "cleanstart-dark",
   type: "dark",

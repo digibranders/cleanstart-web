@@ -59,9 +59,17 @@ describe('integrations/router', () => {
     expect(routingMatches(routing, event)).toBe(false);
   });
 
-  it('rejects an empty events list outright', () => {
+  it('treats an empty events list as ALL events (no filter)', () => {
     const routing: IntegrationRouting = { events: [] };
-    expect(routingMatches(routing, publishEvent('blogs'))).toBe(false);
-    expect(routingMatches(routing, leadEvent('contact'))).toBe(false);
+    expect(routingMatches(routing, publishEvent('blogs'))).toBe(true);
+    expect(routingMatches(routing, leadEvent('contact'))).toBe(true);
+  });
+
+  it('still applies collection/formSlug filters when events is empty (all events)', () => {
+    const routing: IntegrationRouting = { events: [], collections: ['blogs'] };
+    expect(routingMatches(routing, publishEvent('blogs'))).toBe(true);
+    expect(routingMatches(routing, publishEvent('pages'))).toBe(false);
+    // lead events are unaffected by the collections filter.
+    expect(routingMatches(routing, leadEvent('contact'))).toBe(true);
   });
 });

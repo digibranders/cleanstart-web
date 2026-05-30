@@ -55,25 +55,33 @@ export const MediaPicker = (props: Props): ReactElement => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: search-driven refetch is handled by onSearchChange (which resets page to 1)
+  // Single effect owns all fetches. `search` and `page` are both deps;
+  // changing either cancels the in-flight request via AbortController so
+  // the last-to-resolve race that previously existed on rapid search
+  // changes is eliminated.
   useEffect(() => {
     if (!open) return;
+    const controller = new AbortController();
     setLoading(true);
-    void fetchMedia(page, search).then((rows) => {
-      if (page === 1) setDocs(rows);
-      else setDocs((prev) => [...prev, ...rows]);
-      setLoading(false);
-    });
-  }, [open, page]);
+    fetchMedia(page, search)
+      .then((rows) => {
+        if (controller.signal.aborted) return;
+        if (page === 1) setDocs(rows);
+        else setDocs((prev) => [...prev, ...rows]);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => {
+      controller.abort();
+    };
+  }, [open, page, search]);
 
   const onSearchChange = (next: string): void => {
     setSearch(next);
     setPage(1);
-    setLoading(true);
-    void fetchMedia(1, next).then((rows) => {
-      setDocs(rows);
-      setLoading(false);
-    });
+    // The effect above will re-run with the new search + page=1.
   };
 
   return (

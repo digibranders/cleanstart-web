@@ -45,6 +45,10 @@
       "name": "permalink"
     },
     {
+      "type": "textarea",
+      "name": "abstract"
+    },
+    {
       "type": "blocks",
       "name": "layout",
       "blocks": [

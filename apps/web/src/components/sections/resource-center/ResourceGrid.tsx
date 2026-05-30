@@ -70,7 +70,6 @@ export function ResourceGrid({
 
   return (
     <div className="flex-1 flex flex-col">
-      {/* Grid — single column on mobile, 2-col on tablet, 3-col on desktop */}
       <RevealStagger
         gap={0.08}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center lg:justify-items-start"
@@ -82,7 +81,7 @@ export function ResourceGrid({
         ))}
       </RevealStagger>
 
-      {/* MOBILE — single "View More →" button per Figma mobile spec (444:401). */}
+      {/* Mobile uses a single "View More" button instead of numbered pagination. */}
       {totalPages > 1 && currentPage < totalPages && (
         <div className="flex lg:hidden justify-center" style={{ marginTop: "40px" }}>
           <Link
@@ -116,7 +115,6 @@ export function ResourceGrid({
         </div>
       )}
 
-      {/* DESKTOP — full numbered pagination. */}
       <div className="hidden lg:block">
         <Pagination
           currentPage={currentPage}

@@ -84,7 +84,6 @@ export function YouTubeEmbed({
               }
             }}
           />
-          {/* Subtle dark gradient so the play button always reads */}
           <span
             aria-hidden
             className="absolute inset-0 pointer-events-none"
@@ -93,7 +92,6 @@ export function YouTubeEmbed({
                 "linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.35) 100%)",
             }}
           />
-          {/* Play button overlay */}
           <span
             aria-hidden
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center transition-transform duration-200 group-hover:scale-105"

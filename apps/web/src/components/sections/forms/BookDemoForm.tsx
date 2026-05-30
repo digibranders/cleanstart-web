@@ -4,13 +4,6 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 
-/**
- * Book a Demo form. Mirrors Figma node 867:962 — an 840px-wide outer card
- * carrying the page gradient with a 24px inset white inner card (rounded
- * 14px, 1px white-7% border). Field order and styling track the Figma
- * spec exactly; font sizes follow the vulnerability-remediation page
- * convention (inline clamp).
- */
 function newSubmissionId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
@@ -28,7 +21,7 @@ export function BookDemoForm(): React.ReactElement {
     if (inFlightRef.current) return;
     inFlightRef.current = true;
     submissionIdRef.current = newSubmissionId();
-    // submissionIdRef.current would travel to LeadHandler as Idempotency-Key.
+    // This id will travel to LeadHandler as the Idempotency-Key once the edge is wired.
     e.currentTarget.reset();
     setSubmitted(true);
     window.setTimeout(() => {
@@ -39,7 +32,6 @@ export function BookDemoForm(): React.ReactElement {
 
   return (
     <div className="mx-auto w-full" style={{ maxWidth: "760px" }}>
-      {/* Outer gradient card — Figma fill_39F7LQ, 24px radius, 24px inset */}
       <div
         className="rounded-[24px]"
         style={{
@@ -48,7 +40,6 @@ export function BookDemoForm(): React.ReactElement {
             "linear-gradient(181deg, rgba(21, 16, 33, 1) 0%, rgba(16, 18, 62, 1) 0%, rgba(19, 30, 143, 1) 2%, rgba(71, 30, 192, 1) 32%, rgba(71, 31, 195, 1) 61%, rgba(70, 30, 191, 0.85) 75%, rgba(66, 30, 188, 0.4) 97%, rgba(66, 30, 188, 0) 100%)",
         }}
       >
-        {/* Inner white card — rounded 14, 1px rgba(255,255,255,0.07) border */}
         <div
           className="rounded-[14px] bg-white"
           style={{
@@ -304,12 +295,6 @@ function FigmaCheckbox({ name, label, required }: CheckboxProps): React.ReactEle
   );
 }
 
-/**
- * Submit button — Figma frame 2147238317 (867:964), fill #3960F9 with a
- * 1px ring + soft inner highlight, 744px wide × 44px tall, rounded 8px,
- * Manrope Medium 18px white label. A blurred 30px white-60% ellipse
- * (867:970) glows just right of the label.
- */
 function SubmitButton({ submitted }: { submitted: boolean }): React.ReactElement {
   return (
     <button
@@ -348,7 +333,6 @@ function SubmitButton({ submitted }: { submitted: boolean }): React.ReactElement
           </svg>
         )}
       </span>
-      {/* Blurred glow ellipse — Figma 867:970 (rgba(255,255,255,0.6) blur 20px) */}
       <span
         aria-hidden
         className="pointer-events-none absolute"

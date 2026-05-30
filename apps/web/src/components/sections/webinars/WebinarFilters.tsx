@@ -99,12 +99,8 @@ export function WebinarFilters({
   return (
     <aside
       aria-label="Filter webinars"
-      // Mobile: full-width <details> disclosure; collapses by default so the
-      // listing isn't crushed by the 299px sidebar. lg+: sticky white-card
-      // sidebar as before.
       className="w-full lg:w-[299px] rounded-[24px] bg-white lg:p-6 lg:border lg:border-[#E5E7EB] lg:shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
     >
-      {/* MOBILE (< lg) — native <details> disclosure */}
       <details className="lg:hidden group rounded-[24px] border border-[#E5E7EB] bg-white">
         <summary
           className="flex items-center justify-between gap-2 px-4 py-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden"
@@ -164,7 +160,6 @@ export function WebinarFilters({
         </div>
       </details>
 
-      {/* DESKTOP (lg+) — existing sticky sidebar layout */}
       <div className="hidden lg:block">
         <div className="flex items-center gap-2" style={{ marginBottom: "24px" }}>
           <FilterIcon />
@@ -296,8 +291,6 @@ function Checkbox({ checked }: { checked: boolean }): React.ReactElement {
     </span>
   );
 }
-
-/* ---------- Icons (currentColor, inherited from row state) ---------- */
 
 function FilterIcon(): React.ReactElement {
   return (

@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import {
   useCallback,
   useEffect,
@@ -228,6 +229,7 @@ const stripHashFromTitle = (raw: unknown): string => {
  * collections that fail (access-denied, missing) are silently skipped.
  */
 export const CommandPalette = (): ReactElement | null => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [docHits, setDocHits] = useState<DocHit[]>([]);
@@ -249,10 +251,12 @@ export const CommandPalette = (): ReactElement | null => {
   const activate = useCallback(
     (action: Action): void => {
       saveRecent(action);
-      window.location.href = action.href;
+      // Client-side navigation avoids a full page reload and preserves
+      // the SPA state (scroll position, open panels, etc.).
+      router.push(action.href);
       close();
     },
-    [close],
+    [close, router],
   );
 
   // Global Cmd+K listener + custom-event opener (the SidebarHeader

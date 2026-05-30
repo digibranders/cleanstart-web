@@ -1,8 +1,7 @@
 /**
  * Attack Surface Reduction CTA card — rendered inside the Footer's locked
- * CTA slot. Figma node 366:6867 (mobile) + desktop specs:
- *   bg: white · two #DF9BFF corner glow blobs · Union radial gradient
- *   title/body: dark #111 · button: solid blue #3960F9
+ * CTA slot. White card with two corner glow blobs, a radial grid, and a
+ * solid blue CTA button.
  */
 
 "use client";
@@ -16,8 +15,7 @@ export function ASRCTA(): React.ReactElement {
       className="absolute inset-0 overflow-hidden flex flex-col items-center justify-center text-center gap-5 px-8 md:px-12 lg:grid lg:grid-cols-[minmax(0,460px)_minmax(0,460px)] lg:items-center lg:gap-x-[clamp(32px,5vw,72px)] lg:justify-center lg:text-left lg:p-[clamp(32px,4vw,48px)_clamp(32px,5vw,80px)]"
       style={{ background: "#FFFFFF" }}
     >
-      {/* ── Mobile: top-left pink glow blob (Figma 366:6869) ─────────────────── */}
-      {/* left=-159px top=-154px size=223.44px blur=53.1276px */}
+      {/* Mobile: top-left pink glow blob — bleeds off-canvas intentionally. */}
       <div
         aria-hidden
         className="pointer-events-none absolute lg:hidden"
@@ -33,8 +31,7 @@ export function ASRCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Mobile: bottom-right pink glow blob ──────────────────────────────── */}
-      {/* Figma: left=253px top=289px in 328×368 card → right=-148px bottom=-144px */}
+      {/* Mobile: bottom-right pink glow blob — bleeds off-canvas intentionally. */}
       <div
         aria-hidden
         className="pointer-events-none absolute lg:hidden"
@@ -50,8 +47,7 @@ export function ASRCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Desktop: top-left pink glow blob (Ellipse 46683) ─────────────────── */}
-      {/* left=-139px top=-168px size=320px blur=121.5px */}
+      {/* Desktop: top-left pink glow blob. */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -67,8 +63,7 @@ export function ASRCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Desktop: right pink glow blob (Ellipse 46682) ────────────────────── */}
-      {/* left=1159px top=244px size=511px blur=121.5px — bleeds off right edge */}
+      {/* Desktop: right pink glow blob — bleeds off the right edge intentionally. */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -84,8 +79,7 @@ export function ASRCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Desktop: Union grid SVG ───────────────────────────────────────────── */}
-      {/* Figma: left=547px top=-220px size=1101×1101px · opacity already baked in SVG path */}
+      {/* Desktop: radial grid SVG — opacity is baked into the SVG path. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -104,8 +98,7 @@ export function ASRCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Mobile: Union hex decorative pattern (PNG) ───────────────────────── */}
-      {/* Figma 366:6870 · left=56px top=98px size=378px — mobile only */}
+      {/* Mobile: hex decorative pattern (PNG). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -126,7 +119,6 @@ export function ASRCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Headline ─────────────────────────────────────────────────────────── */}
       <Reveal header className="relative z-10" style={{ maxWidth: "min(460px, 100%)" }}>
         <p
           className="font-display"
@@ -143,7 +135,6 @@ export function ASRCTA(): React.ReactElement {
         </p>
       </Reveal>
 
-      {/* ── Body + blue CTA button ────────────────────────────────────────────── */}
       <Reveal header delay={0.15} y={20} className="relative z-10 flex flex-col items-center lg:items-start gap-[18px]">
         <p
           className="font-normal text-center lg:text-left"
@@ -160,7 +151,6 @@ export function ASRCTA(): React.ReactElement {
           Build with only what production needs.
         </p>
 
-        {/* Solid blue button — Figma: #3960F9 h=44px radius=8px */}
         <Link
           href="/book-a-demo"
           className="inline-flex items-center gap-2 font-sans font-medium text-white shrink-0"

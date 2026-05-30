@@ -2,16 +2,10 @@
 // SavedStateIndicator — floating "Saved X ago" chip on edit views
 // =============================================================================
 //
-// REMOVED. The component is unmounted from `payload.config.ts` actions.
-// This `display: none` is belt-and-suspenders so the pill never
-// reappears even if a different code path re-mounts it during a Payload
-// runtime restart.
-.cs-saved-indicator,
-.cs-saved-indicator--saving,
-.cs-saved-indicator--error {
-  display: none !important;
-}
-
+// Re-enabled. The chip is a trust signal (Webflow/Notion/Linear surface it
+// permanently) and renders position:fixed so it interferes with nothing.
+// Removed the display:none block; component re-added to payload.config.ts
+// admin.components.actions.
 .cs-saved-indicator {
   position: fixed;
   bottom: 16px;

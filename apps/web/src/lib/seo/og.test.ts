@@ -1,4 +1,3 @@
-// apps/web/src/lib/seo/og.test.ts
 import { describe, it, expect } from "vitest";
 import { ogImageUrl, OG_IMAGE_WIDTH, OG_IMAGE_HEIGHT } from "./og";
 

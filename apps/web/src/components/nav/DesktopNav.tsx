@@ -27,7 +27,7 @@ type Props = {
   companySpotlight: SpotlightCard;
 };
 
-// Fallback panel map for mega items not handled by explicit branches
+// Panels for mega items without a dedicated branch above.
 const PANELS: Record<
   string,
   (props: { item: NavMegaItem }) => React.ReactElement

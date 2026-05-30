@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { hasAnyRole } from '../access/typed-user';
 import { ALLOWED_MIME_TYPES, checkUploadSize } from '../lib/upload-limits';
+import { followWithSsrfGuard } from '../lib/url-safety/follow-with-ssrf-guard';
 
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
@@ -22,22 +23,6 @@ const Body = z.object({
   folder: z.string().optional(),
   alt: z.string().optional(),
 });
-
-// SSRF guard: reject hostnames that would let an authed editor pivot the
-// server into the internal network. We do not resolve DNS — a host that
-// rebinds to localhost is out of scope here; the admin/editor auth gate
-// is the primary defence. This catches the obvious mistakes.
-const isForbiddenHost = (hostname: string): boolean => {
-  const h = hostname.toLowerCase();
-  if (h === 'localhost' || h.endsWith('.localhost')) return true;
-  if (h === '127.0.0.1' || h === '0.0.0.0' || h === '::1' || h === '[::1]') return true;
-  if (h === '169.254.169.254') return true;
-  if (h.endsWith('.local') || h.endsWith('.internal')) return true;
-  if (/^10\./.test(h)) return true;
-  if (/^192\.168\./.test(h)) return true;
-  if (/^172\.(1[6-9]|2[0-9]|3[01])\./.test(h)) return true;
-  return false;
-};
 
 const inferredFilename = (url: URL, mimetype: string): string => {
   const last = url.pathname.split('/').filter(Boolean).pop() ?? '';
@@ -117,18 +102,14 @@ export const mediaIngestUrlEndpoint: Endpoint = {
     if (target.protocol !== 'http:' && target.protocol !== 'https:') {
       return json({ ok: false, error: 'unsupported_protocol' }, { status: 400 });
     }
-    if (isForbiddenHost(target.hostname)) {
-      return json({ ok: false, error: 'host_not_allowed' }, { status: 400 });
-    }
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
-    let response: Response;
+    let followed: Awaited<ReturnType<typeof followWithSsrfGuard>>;
     try {
-      response = await fetch(target.toString(), {
+      followed = await followWithSsrfGuard(target.toString(), {
         signal: controller.signal,
-        redirect: 'follow',
         headers: { Accept: 'image/*' },
       });
     } catch (err) {
@@ -141,6 +122,14 @@ export const mediaIngestUrlEndpoint: Endpoint = {
     }
     clearTimeout(timer);
 
+    if (!followed.ok) {
+      if (followed.kind === 'unsafe-url' || followed.kind === 'invalid-url') {
+        return json({ ok: false, error: 'host_not_allowed' }, { status: 400 });
+      }
+      return json({ ok: false, error: 'fetch_failed' }, { status: 502 });
+    }
+
+    const response = followed.response;
     if (!response.ok) {
       return json(
         { ok: false, error: 'fetch_failed', status: response.status },

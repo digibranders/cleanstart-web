@@ -27,7 +27,6 @@ export function BlogsHero({
       style={{ background: HERO_GRADIENT }}
       aria-labelledby="blogs-hero-title"
     >
-      {/* Decorative glow — left side, mix-blend-hard-light (hidden on mobile) */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden sm:block"
@@ -51,12 +50,10 @@ export function BlogsHero({
       </div>
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[clamp(56px,7vw,96px)]">
-        {/* Title + search + categories — centered block */}
         <div
           className="flex flex-col items-center gap-10 mx-auto"
           style={{ paddingTop: "clamp(72px, 9vw, 122px)", maxWidth: "864px" }}
         >
-          {/* Title + subtitle + search */}
           <div
             className="flex flex-col items-center gap-10 w-full mx-auto"
             style={{ maxWidth: "702px" }}
@@ -90,7 +87,6 @@ export function BlogsHero({
               </HeroReveal>
             </div>
 
-            {/* Search bar */}
             <Suspense
               fallback={
                 <div
@@ -107,9 +103,8 @@ export function BlogsHero({
             </Suspense>
           </div>
 
-          {/* Category filter pills.
-              MOBILE (<lg): single horizontally-scrollable row per Figma 817:3566.
-              LG+: wrap-to-multiple-rows centered within the hero. */}
+          {/* Below lg the pills are a single horizontally-scrollable row; at lg+
+              they wrap to multiple centered rows. */}
           <nav
             className="-mx-6 sm:mx-0 lg:flex-wrap lg:justify-center flex items-center gap-[10px] overflow-x-auto lg:overflow-visible px-6 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden w-screen sm:w-auto"
             aria-label="Blog categories"
@@ -130,13 +125,12 @@ export function BlogsHero({
           </nav>
         </div>
 
-        {/* Featured Blog — 2-column: text left, image right */}
         {featuredPost ? (
           <Reveal
             className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(420px,580px)] mt-[clamp(56px,7vw,102px)]"
             style={{ gap: "32px" }}
           >
-            {/* Left: text — on mobile, ordered AFTER the image per Figma 817:3470 layout. */}
+            {/* On mobile the text is ordered after the image. */}
             <div className="flex flex-col gap-6 items-start order-2 lg:order-1">
               <div className="flex flex-col gap-6 w-full">
                 <p
@@ -149,9 +143,9 @@ export function BlogsHero({
                   <h2
                     className="font-display font-bold leading-tight tracking-[-0.05em] text-white overflow-hidden"
                     style={{
-                      /* Featured-tier card title — explicit 32 px per design.
-                         Sits between standard card title (--fs-h3 = 28) and
-                         section H2 (--fs-h2 = 56) by design. */
+                      /* Featured-tier card title — explicit 32px, sized between
+                         the standard card title (--fs-h3 = 28) and section H2
+                         (--fs-h2 = 56). */
                       fontSize: "32px",
                       display: "-webkit-box",
                       WebkitLineClamp: 4,
@@ -163,8 +157,8 @@ export function BlogsHero({
                   {featuredPost.abstract && (
                     <p
                       className="font-normal leading-[1.4] tracking-[-0.05em]"
-                      /* Featured-tier card description — explicit 20 px per design.
-                         Pairs with the 32 px featured-card title above. */
+                      /* Featured-tier card description — explicit 20px, pairs
+                         with the 32px featured-card title above. */
                       style={{ fontSize: "20px", color: "#d1e5ff" }}
                     >
                       {featuredPost.abstract}
@@ -191,8 +185,8 @@ export function BlogsHero({
               </Link>
             </div>
 
-            {/* Right: featured image — outer purple border + inset image. On
-                mobile, ordered BEFORE the text per Figma 817:3470. */}
+            {/* Right: featured image — outer purple border + inset image.
+                On mobile, ordered BEFORE the text. */}
             <div
               className="relative w-full order-1 lg:order-2"
               style={{

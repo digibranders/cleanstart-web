@@ -2,20 +2,9 @@ import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * Section: "Visibility Alone Doesn't Reduce Risk"
- * Figma node 373:1168
- *
- * Visual style and layout mirror SecurityNotPatching (Home page):
- *  - Cards: outer radius 40, cyan #2CC1EB border via padding 10, inner radius 32
- *  - Header: clamp(76px, 7vw, 100px) tall, linear dark→purple gradient (variant
- *    per card), cyan flare at bottom
- *  - White body: flex-1, items vertically centered, two soft radial blobs
- *  - VS badge centered between the two cards on md+
- *
- * Content preserved from the original CleanSight comparison:
- *  - Titles "Traditional Visibility Tools" / "CleanSight"
- *  - 3-item lists per card with comp-icon-traditional.svg / comp-icon-cleansight.svg
- *  - vs-badge.png centerpiece
+ * "Visibility Alone Doesn't Reduce Risk" comparison. Visual style and layout
+ * mirror the homepage SecurityNotPatching section: two cards (dark header +
+ * white body bullet list) with a VS badge centred between them on md+.
  */
 
 const TRADITIONAL = [
@@ -38,7 +27,6 @@ export function CleanSightComparison(): React.ReactElement {
       aria-labelledby="cleansight-comparison-title"
     >
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Heading — centred */}
         <div className="text-center">
           <Reveal header>
             <h2
@@ -58,14 +46,11 @@ export function CleanSightComparison(): React.ReactElement {
           </Reveal>
         </div>
 
-        {/* Cards row + VS badge centerpiece. Mirrors SecurityNotPatching's
-            responsive-flex layout exactly: cards stack on mobile, sit side-by-
-            side on md+, VS badge centered absolutely above both. */}
+        {/* Cards stack on mobile, sit side-by-side on md+; the VS badge is
+            centred absolutely above both. */}
         <div className="relative mt-12 flex flex-col items-center gap-6 md:mt-[60px] md:flex-row md:justify-center md:gap-10">
           <ComparisonCard kind="traditional" features={TRADITIONAL} />
           <ComparisonCard kind="cleansight" features={CLEANSIGHT} />
-
-          {/* VS badge — centered between the two cards, above both */}
           <VsBadge />
         </div>
       </div>
@@ -85,7 +70,6 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
     <div
       className="relative flex h-full w-full flex-col lg:max-w-[500px]"
       style={{
-        // SecurityNotPatching match: outer radius 40, cyan border via padding 10
         borderRadius: 40,
         background: "#2CC1EB",
         padding: 10,
@@ -96,7 +80,7 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
         className="relative flex flex-1 flex-col overflow-hidden"
         style={{ borderRadius: 32 }}
       >
-        {/* Header — clamp height, dark→purple gradient with cyan flare at bottom.
+        {/* Header — dark→purple gradient with a cyan flare at the bottom.
             Traditional reads near-black; CleanSight reads vivid purple. */}
         <div
           className="relative flex h-[clamp(76px,7vw,100px)] w-full items-center justify-center overflow-hidden"
@@ -106,9 +90,9 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
               : "linear-gradient(135deg, #1B0E33 0%, #2B1456 40%, #471EC0 100%)",
           }}
         >
-          {/* Decorative right-side watermark (Figma 34% white SOFT_LIGHT) —
-              cube on the Traditional card, chevron on the CleanSight card.
-              Same assets and treatment used by SecurityNotPatching. */}
+          {/* Decorative right-side soft-light watermark — cube on the
+              Traditional card, chevron on the CleanSight card. Same assets and
+              treatment used by SecurityNotPatching. */}
           {isTraditional ? (
             <Image
               aria-hidden
@@ -145,7 +129,7 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
             />
           )}
 
-          {/* Cyan light flare at the bottom (same as SecurityNotPatching) */}
+          {/* Cyan light flare at the bottom. */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 bottom-0 h-[60px]"
@@ -156,7 +140,6 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
             }}
           />
 
-          {/* Title */}
           <h3
             className="relative z-10 text-center font-display text-white"
             style={{
@@ -170,7 +153,7 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
           </h3>
         </div>
 
-        {/* White content area — flex-1 with min-height (mirrors SecurityNotPatching) */}
+        {/* White content area — flex-1 with min-height. */}
         <div
           className="relative flex flex-1 flex-col overflow-hidden bg-white py-[clamp(24px,2.5vw,36px)]"
           style={{ minHeight: "clamp(260px, 22vw, 340px)" }}
@@ -205,7 +188,7 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
             }}
           />
 
-          {/* Bullet list — vertically centered, max-w-[400px] (same as SecurityNotPatching) */}
+          {/* Bullet list — vertically centered. */}
           <ul className="relative z-10 mx-auto flex h-full max-w-[400px] flex-col justify-center gap-[clamp(20px,2.5vw,36px)]">
             {features.map((label) => (
               <li key={label} className="flex items-center gap-6">
@@ -247,7 +230,7 @@ function ComparisonCard({ kind, features }: ComparisonCardProps) {
 }
 
 /** VS badge — glossy 3D "VS" letterform, centered absolutely in the gap
- *  between the two cards (matches SecurityNotPatching's VsBadge). */
+ *  between the two cards. */
 function VsBadge() {
   const SIZE = "clamp(72px, 11vw, 160px)";
   return (

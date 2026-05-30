@@ -100,7 +100,15 @@ export const calcomInboundEndpoint: Endpoint = {
   handler: async (req) => {
     const ip = clientIpFromHeaders(req.headers);
     const limited = checkAndRecord(`calcom-inbound:${ip}`, RATE_LIMITS);
-    if (limited) return json({ ok: false, error: 'rate_limited' }, { status: 429 });
+    if (!limited.ok)
+      return json(
+        {
+          ok: false,
+          error: 'rate_limited',
+          retryAfterSeconds: Math.ceil(limited.retryAfterMs / 1000),
+        },
+        { status: 429 },
+      );
 
     const rawBody = req.text ? await req.text() : '';
     if (!rawBody) return json({ ok: false, error: 'empty_body' }, { status: 400 });
@@ -147,9 +155,26 @@ export const calcomInboundEndpoint: Endpoint = {
       );
     }
 
+    // Fetch the current schemaVersion from the fallback form so the lead
+    // records the schema version that was active at submission time.
+    let formSchemaVersion = 1;
+    try {
+      const form = (await req.payload.findByID({
+        collection: 'forms',
+        id: creds.fallbackFormId,
+        depth: 0,
+        overrideAccess: true,
+      })) as { schemaVersion?: number | null } | null;
+      if (typeof form?.schemaVersion === 'number') {
+        formSchemaVersion = form.schemaVersion;
+      }
+    } catch {
+      // Fall back to 1 if the form cannot be fetched
+    }
+
     const submission: LeadSubmission = {
       formId: creds.fallbackFormId,
-      formSchemaVersion: 1,
+      formSchemaVersion,
       fields: {
         email,
         name: attendee?.name ?? body.payload?.organizer?.name ?? '',
@@ -232,7 +257,15 @@ export const brevoBounceInboundEndpoint: Endpoint = {
   handler: async (req) => {
     const ip = clientIpFromHeaders(req.headers);
     const limited = checkAndRecord(`brevo-inbound:${ip}`, RATE_LIMITS);
-    if (limited) return json({ ok: false, error: 'rate_limited' }, { status: 429 });
+    if (!limited.ok)
+      return json(
+        {
+          ok: false,
+          error: 'rate_limited',
+          retryAfterSeconds: Math.ceil(limited.retryAfterMs / 1000),
+        },
+        { status: 429 },
+      );
 
     const row = await findBrevoRow(req.payload);
     if (!row) {
@@ -270,21 +303,40 @@ export const brevoBounceInboundEndpoint: Endpoint = {
     }
 
     const email = evt.email.toLowerCase();
-    const matches = await req.payload.find({
-      collection: 'leads',
-      limit: 1000,
-      depth: 0,
-      overrideAccess: true,
-    });
+
+    // The lead email lives in the per-form `fields` JSON and is not
+    // queryable on the json column, so we page through all rows and
+    // match in memory. Collect matching IDs up front, then update —
+    // beyond the first page, leads past row 1000 would otherwise never
+    // get their emailHealth updated.
+    const matchingIds: number[] = [];
+    let page = 1;
+    for (;;) {
+      const result = await req.payload.find({
+        collection: 'leads',
+        limit: 500,
+        page,
+        depth: 0,
+        overrideAccess: true,
+      });
+      for (const lead of result.docs as unknown as LeadWithEmailHealth[]) {
+        const fieldEmail = lead.fields?.email;
+        if (typeof fieldEmail === 'string' && fieldEmail.toLowerCase() === email) {
+          matchingIds.push(lead.id);
+        }
+      }
+      if (!result.hasNextPage) break;
+      page += 1;
+    }
+
+    const updatedAt = new Date().toISOString();
     let updated = 0;
-    for (const lead of matches.docs as unknown as LeadWithEmailHealth[]) {
-      const fieldEmail = lead.fields?.email;
-      if (typeof fieldEmail !== 'string' || fieldEmail.toLowerCase() !== email) continue;
+    for (const id of matchingIds) {
       try {
         await req.payload.update({
           collection: 'leads',
-          id: lead.id,
-          data: { emailHealth: health, emailHealthAt: new Date().toISOString() },
+          id,
+          data: { emailHealth: health, emailHealthAt: updatedAt },
           overrideAccess: true,
         });
         updated += 1;

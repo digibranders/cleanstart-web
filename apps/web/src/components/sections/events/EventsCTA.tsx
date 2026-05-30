@@ -27,7 +27,6 @@ export function EventsCTA(): React.ReactElement {
       className="absolute inset-0 overflow-hidden"
       style={{ background: "linear-gradient(180deg, #471ec0 0%, #131e8f 100%)" }}
     >
-      {/* ── Ellipse — top-left ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
@@ -43,7 +42,6 @@ export function EventsCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Ellipse — bottom-right ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
@@ -59,7 +57,6 @@ export function EventsCTA(): React.ReactElement {
         }}
       />
 
-      {/* Left cube */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden sm:block"
@@ -81,7 +78,6 @@ export function EventsCTA(): React.ReactElement {
         />
       </div>
 
-      {/* Right cube */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden sm:block"

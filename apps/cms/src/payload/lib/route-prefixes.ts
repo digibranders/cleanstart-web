@@ -6,7 +6,7 @@
  * Values match the actual `apps/web` route segments under
  * `apps/web/src/app/<prefix>/[slug]/`. They are NOT the legacy Webflow
  * URLs — the marketing site was rebuilt with redesigned routes
- * (`/blog/[slug]`, `/events/[slug]`, `/resource/[slug]` etc.), and any
+ * (`/blogs/[slug]`, `/event/[slug]`, `/resources/[slug]` etc.), and any
  * Webflow-era URLs are handled by seeded rows in the `redirects`
  * collection, not by this map.
  *
@@ -14,11 +14,11 @@
  * field (handles parent nesting), not a fixed prefix.
  */
 export const ROUTE_PREFIX = {
-  blogs: '/blog',
+  blogs: '/blogs',
   news: '/news',
   guides: '/guide',
-  resources: '/resource',
-  events: '/events',
+  resources: '/resources',
+  events: '/event',
   webinars: '/webinar',
   jobs: '/job',
   authors: '/author',
@@ -38,7 +38,8 @@ export const collectionUrlFromSlug = (collection: string, slug: string): string 
 
 /**
  * URL resolver that prefers the doc-level `path` field for Pages
- * (which encodes the full nested path) and falls back to
+ * (which encodes the full nested path), uses the nested
+ * `/podcast/episode/<slug>` path for podcast episodes, and falls back to
  * `prefix + slug` for everything else.
  */
 export const collectionUrlFromDoc = (
@@ -49,6 +50,10 @@ export const collectionUrlFromDoc = (
     if (typeof doc.path === 'string' && doc.path.length > 0) return doc.path;
     if (typeof doc.slug === 'string' && doc.slug.length > 0) return `/${doc.slug}`;
     return null;
+  }
+  if (collection === 'podcastEpisodes') {
+    if (typeof doc.slug !== 'string' || doc.slug.length === 0) return null;
+    return `/podcast/episode/${doc.slug}`;
   }
   if (typeof doc.slug !== 'string' || doc.slug.length === 0) return null;
   return collectionUrlFromSlug(collection, doc.slug);

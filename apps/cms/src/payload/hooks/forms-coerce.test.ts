@@ -1,3 +1,4 @@
+import { ValidationError } from 'payload';
 import { describe, expect, it } from 'vitest';
 
 import { formsCoerceHook } from './forms-coerce';
@@ -7,6 +8,20 @@ const run = (data: Record<string, unknown>) =>
     data,
     operation: 'update',
   } as unknown as Parameters<typeof formsCoerceHook>[0]);
+
+const expectFieldValidationError = (fn: () => unknown, matcher: RegExp): void => {
+  let caught: unknown;
+  try {
+    fn();
+  } catch (error) {
+    caught = error;
+  }
+  expect(caught).toBeInstanceOf(ValidationError);
+  const errors = (caught as ValidationError).data?.errors ?? [];
+  expect(
+    errors.some((e) => e.path.startsWith('fields.') && matcher.test(e.message)),
+  ).toBe(true);
+};
 
 describe('formsCoerceHook', () => {
   it('returns data unchanged when fields is missing', async () => {
@@ -33,20 +48,24 @@ describe('formsCoerceHook', () => {
   });
 
   it('throws on catastrophically backtracking patterns', () => {
-    expect(() =>
-      run({ fields: [{ name: 'q', type: 'text', validation: { pattern: '(a+)+' } }] }),
-    ).toThrow(/pattern/);
+    expectFieldValidationError(
+      () => run({ fields: [{ name: 'q', type: 'text', validation: { pattern: '(a+)+' } }] }),
+      /pattern/,
+    );
   });
 
   it('throws on invalid regex syntax', () => {
-    expect(() =>
-      run({ fields: [{ name: 'q', type: 'text', validation: { pattern: '[' } }] }),
-    ).toThrow(/pattern/);
+    expectFieldValidationError(
+      () => run({ fields: [{ name: 'q', type: 'text', validation: { pattern: '[' } }] }),
+      /pattern/,
+    );
   });
 
   it('uses the field name in the error message when present', () => {
-    expect(() =>
-      run({ fields: [{ name: 'phone', type: 'text', validation: { pattern: '(a+)+' } }] }),
-    ).toThrow(/phone/);
+    expectFieldValidationError(
+      () =>
+        run({ fields: [{ name: 'phone', type: 'text', validation: { pattern: '(a+)+' } }] }),
+      /phone/,
+    );
   });
 });

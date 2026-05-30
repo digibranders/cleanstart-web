@@ -8,19 +8,9 @@ import { Reveal } from "@/components/ui/Reveal";
 import { ResourcesInsightsClient } from "./ResourcesInsightsClient";
 
 /**
- * Section: "Resources & Insights"
- * Figma title 108:8526 + tab bar 108:8529 (929×64) + 3 article cards
+ * Server component for the "Resources & Insights" rail.
  *
- * - Title: Manrope Bold 62px, color #111111
- * - Description: Sora Regular 21px, color #333333
- * - Tab bar: 6 tabs ("Blogs" active by default), white bg, 30px corner radius, 64h
- *   - Active tab: gradient pill #2B97D1→#3960F9 with white text + small white dot underneath
- *   - Inactive tabs: gray text #666
- * - 3 article cards: image 404×231, then title (Bold 22px) + description (Regular 16px) + Explore link
- *
- * --- Data flow -----------------------------------------------------
- *
- * This is now a SERVER component. It calls `getResourcesInsightsData()`
+ * It calls `getResourcesInsightsData()`
  * which fetches the latest 3 published items from each of 6 Payload
  * collections in parallel and caches each response for 5 minutes via
  * Next.js ISR (`fetch(..., { next: { revalidate: 300 } })`).
@@ -39,12 +29,8 @@ import { ResourcesInsightsClient } from "./ResourcesInsightsClient";
  * Interactive tab UI lives in `./ResourcesInsightsClient.tsx`.
  */
 
-// =============================================================================
-// Placeholder fallbacks — render when a CMS collection returns zero items
-// (empty collection, fetch failed, or cold cache). Each fallback is hand-
-// curated to be on-brand and slot-pluggable into the same `ResourceCard`
-// shape the CMS produces.
-// =============================================================================
+// Placeholder fallbacks render when a CMS collection returns zero items
+// (empty collection, fetch failed, or cold cache).
 const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
   blogs: [
     {
@@ -169,7 +155,6 @@ export async function ResourcesInsights() {
       className="relative w-full pt-20 lg:pt-24"
       aria-labelledby="resources-title"
     >
-      {/* Figma 108:7625 — soft purple radial bleed off the bottom-left edge (10% opacity, 1101×1101) */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -182,7 +167,6 @@ export async function ResourcesInsights() {
             "radial-gradient(circle, rgba(100,13,251,0.10) 0%, rgba(100,13,251,0) 70%)",
         }}
       />
-      {/* Figma 108:8524 — soft purple radial bleed off the top-right edge */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -197,10 +181,8 @@ export async function ResourcesInsights() {
       />
 
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Section label — intentionally a <p>, not an <h2>. This is a
-            least-priority "discover more" rail at the bottom of the page,
-            so no heading-tag in the document outline.
-            Matches the Vuln page treatment (VulnBlogsResources). */}
+        {/* Intentionally a <p>, not an <h2>: this is a least-priority
+            "discover more" rail, so it stays out of the document outline. */}
         <Reveal header>
           <p
             id="resources-title"

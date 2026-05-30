@@ -13,7 +13,7 @@ export function CleanStartImagesHero(): React.ReactElement {
         minHeight: "clamp(580px, 52vw, 741px)",
       }}
     >
-      {/* Decorative ellipse glow — behind 3D image (Figma: left-777, top-151 in full frame; minus ~72px nav → top ~79px in section) */}
+      {/* Decorative ellipse glow behind the 3D image */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden lg:block"
@@ -32,7 +32,7 @@ export function CleanStartImagesHero(): React.ReactElement {
         </div>
       </div>
 
-      {/* Decorative vector grid — overlays behind 3D image (Figma: left-690, top-63 in full frame; minus nav → top ~0) */}
+      {/* Decorative vector grid behind the 3D image */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden lg:block"
@@ -49,7 +49,6 @@ export function CleanStartImagesHero(): React.ReactElement {
         />
       </div>
 
-      {/* Two-column layout — section is flex-col + justify-center so content sits vertically centred in the hero */}
       <div
         className="absolute inset-0 z-10 flex flex-col justify-center pointer-events-none"
         aria-hidden
@@ -65,7 +64,6 @@ export function CleanStartImagesHero(): React.ReactElement {
             gap: "clamp(40px, 4vw, 60px)",
           }}
         >
-          {/* Left column — Figma: w-623px, gap-32px */}
           <div
             className="flex flex-col items-start"
             style={{ flexShrink: 0, maxWidth: "623px", gap: "32px" }}
@@ -123,7 +121,6 @@ export function CleanStartImagesHero(): React.ReactElement {
             </div>
           </div>
 
-          {/* Right column — 3D container illustration, vertically centred with left column */}
           <div className="relative flex-1 flex items-center justify-center lg:justify-end">
             <Image
               src="/images/cleanstart-images/hero-3d-container.png"

@@ -43,9 +43,7 @@ export function NewsroomGrid({
       style={{ background: "#f6f6f6", paddingTop: "clamp(48px, 6vw, 80px)", paddingBottom: "var(--spacing-section-cta)" }}
       data-section="NewsroomGrid"
     >
-      {/* Radial gradient unions — Figma node 402:5013, four 1181×1181 #640DFB blobs at 10% opacity.
-          Top pair anchored to section top; bottom pair anchored to section bottom so the lower
-          unions track the listing's actual height regardless of page count. */}
+      {/* Bottom blob pair anchors to section bottom so it tracks the listing height regardless of page count. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
@@ -99,8 +97,6 @@ export function NewsroomGrid({
         }}
       />
 
-      {/* Gridlines — reuses LatestBlogs SVG (same visual treatment in Figma 402:5013).
-          1920×719 SVG with baked-in radial-gradient fade pinned to section bottom. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute left-0 right-0 bottom-0 overflow-hidden"
@@ -118,9 +114,7 @@ export function NewsroomGrid({
         />
       </div>
 
-      {/* Blur ellipses — Figma Ellipse 46683 (pink, left, 258×258, blur 121.5px, op 80%)
-          and Ellipse 46692 (cyan, right, 315×315, blur 101.5px, op 20%). Anchored to
-          section bottom so they sit just above the CTA/footer. */}
+      {/* Blur ellipses anchored to section bottom so they sit just above the CTA/footer. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
@@ -187,7 +181,6 @@ export function NewsroomGrid({
               ))}
             </RevealStagger>
 
-            {/* MOBILE — single "View More →" button per Figma 817:5660. */}
             {totalPages > 1 && currentPage < totalPages && (
               <div
                 className="flex lg:hidden justify-center"
@@ -222,7 +215,6 @@ export function NewsroomGrid({
               </div>
             )}
 
-            {/* DESKTOP — full numbered pagination. */}
             <div className="hidden lg:block">
               <Pagination
                 currentPage={currentPage}

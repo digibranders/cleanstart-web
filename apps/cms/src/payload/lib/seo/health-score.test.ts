@@ -56,8 +56,10 @@ describe('scoreSeoHealth', () => {
       ...baseInputs,
       slugOrPath: `/${'x'.repeat(80)}`,
     });
+    // slug-length now carries weight 2 and implicitly covers "URL is set".
+    // The separate url-set check was removed to avoid double-counting.
     expect(result.checks.find((c) => c.id === 'slug-length')?.pass).toBe(false);
-    expect(result.checks.find((c) => c.id === 'url-set')?.pass).toBe(true);
+    expect(result.checks.find((c) => c.id === 'url-set')).toBeUndefined();
   });
 
   it('treats empty indexable as indexable (default behavior)', () => {

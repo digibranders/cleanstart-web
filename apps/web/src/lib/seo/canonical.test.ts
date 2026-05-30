@@ -1,4 +1,3 @@
-// apps/web/src/lib/seo/canonical.test.ts
 import { describe, it, expect } from "vitest";
 import { buildPageMetadata } from "./canonical";
 

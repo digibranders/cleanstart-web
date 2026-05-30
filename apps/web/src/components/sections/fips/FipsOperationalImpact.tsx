@@ -3,29 +3,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
-/**
- * Figma node 787:2316 — Operational Impact section.
- * Frame: 1440 × 627 px.
- *
- * Layout (centred, total content width = 1275px):
- *   Left column:  cube image  369 × 446 px
- *   Gap:          67 px
- *   Right column: 839 px
- *     • H2   62px Manrope Bold  ls=-3.1px(−0.05em)  w=654px
- *     • gap  80px
- *     • Stats 4 × 176px columns, 45px gaps (absolute offsets 0/221/442/663)
- *       – number  52px Manrope Bold  ls=-2.6px(−0.05em)
- *       – label   20px Manrope Reg   ls=-1px(−0.05em)  lh=1.4  #333
- *
- * vw rates (value / 1440 × 100):
- *   paddingTop   120 / 1440 = 8.33vw
- *   h2 font       62 / 1440 = 4.31vw
- *   stat num      52 / 1440 = 3.61vw
- *   stat label    20 / 1440 = 1.39vw
- *   h2 gap        80 / 1440 = 5.56vw
- *   cube width   369 / 1440 = 25.63vw
- */
-
 interface Stat {
   target: number;
   label: string;
@@ -82,9 +59,6 @@ export function FipsOperationalImpact(): React.ReactElement {
       data-section="FipsOperationalImpact"
       className="relative bg-white overflow-hidden"
     >
-      {/*
-       * Top-right soft halo — Figma: x=1663 y=−40 w=371 h=371
-       */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden md:block"
@@ -104,19 +78,16 @@ export function FipsOperationalImpact(): React.ReactElement {
         className="relative mx-auto px-6"
         style={{
           maxWidth: "1276px",
-          /*
-           * Figma: content top y=120px at 1440px → 120/1440 = 8.33vw
-           */
           paddingTop: "clamp(60px, 8.33vw, 120px)",
           /*
-           * Footer contract: the last bg-providing element on a CTA page uses
-           * --spacing-section-cta (160 → 250px) so the centered CTA card has
-           * matching breathing room above and below the footer's top edge.
+           * Footer contract: the last background-providing element on a CTA
+           * page uses --spacing-section-cta (160 → 250px) so the centered CTA
+           * card has matching breathing room above and below the footer's top
+           * edge.
            */
           paddingBottom: "var(--spacing-section-cta)",
         }}
       >
-        {/* Mobile-only heading — sits above the cube. */}
         <Reveal header className="md:hidden">
           <h2
             className="text-[#111] text-center mx-auto"
@@ -138,13 +109,11 @@ export function FipsOperationalImpact(): React.ReactElement {
           className="flex flex-col md:flex-row items-center md:items-start"
           style={{ gap: "clamp(24px, 4.65vw, 67px)" }}
         >
-          {/* ── Cube image — left on desktop, between heading and stats on mobile ── */}
           <div className="flex-shrink-0 flex justify-center md:justify-start">
             <div
               className="relative flex items-center justify-center"
               style={{ width: "clamp(220px, 28vw, 401px)" }}
             >
-              {/* Radial purple grid backdrop — sits behind the cube only. */}
               <CubeGridBackdrop />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -162,7 +131,6 @@ export function FipsOperationalImpact(): React.ReactElement {
             </div>
           </div>
 
-          {/* ── Right column on desktop: heading + stats; mobile: stats only, centered ── */}
           <div className="flex-1 min-w-0 w-full">
             <Reveal header className="hidden md:block">
               <h2
@@ -182,11 +150,6 @@ export function FipsOperationalImpact(): React.ReactElement {
               </h2>
             </Reveal>
 
-            {/*
-             * Stats — 1-col centered stack on mobile, 4-col flex row on
-             * desktop. Same dashed cyan gradient dividers between items
-             * (horizontal on mobile, vertical on desktop).
-             */}
             <div
               className="flex flex-col items-stretch md:flex-row md:items-stretch md:justify-between"
               style={{ gap: "clamp(20px, 3.13vw, 45px)" }}
@@ -194,7 +157,6 @@ export function FipsOperationalImpact(): React.ReactElement {
               {STATS.map((stat, idx) => (
                 <React.Fragment key={stat.label}>
                   <div className="relative text-center md:text-left md:flex-1 md:min-w-0">
-                    {/* Number */}
                     <p
                       aria-live="polite"
                       aria-label={`${stat.target}% ${stat.label}`}
@@ -212,7 +174,6 @@ export function FipsOperationalImpact(): React.ReactElement {
                       {counts[idx] ?? 0}%
                     </p>
 
-                    {/* Label */}
                     <p
                       className="mx-auto md:mx-0"
                       style={{
@@ -328,9 +289,9 @@ function DesktopDashedDivider() {
 }
 
 /**
- * Radial purple pixel-grid backdrop behind the cube image (Figma 366:8051).
- * Sits absolutely centred behind the cube and is masked by a radial purple
- * gradient so the grid fades to nothing at the edges.
+ * Radial purple pixel-grid backdrop behind the cube image. Sits absolutely
+ * centred behind the cube and is masked by a radial purple gradient so the
+ * grid fades to nothing at the edges.
  */
 function CubeGridBackdrop() {
   return (

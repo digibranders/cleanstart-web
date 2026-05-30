@@ -24,8 +24,6 @@ export function CareerDetailHero({
       className="relative w-full overflow-hidden"
       style={{ background: DETAIL_HERO_GRADIENT }}
     >
-      {/* Right cube — anchored top-right. Hidden on small screens; revealed
-          progressively from md+ at a reduced size, full size from xl+. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -44,7 +42,6 @@ export function CareerDetailHero({
         decoding="async"
       />
 
-      {/* Left cube — anchored bottom-left, mirrored from the right cube. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden

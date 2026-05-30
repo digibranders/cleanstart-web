@@ -1,4 +1,5 @@
 import type { CollectionBeforeChangeHook } from 'payload';
+import { ValidationError } from 'payload';
 
 const MAX_DEPTH = 16;
 
@@ -53,10 +54,24 @@ export const pagesPathBuilderHook: CollectionBeforeChangeHook = async ({
   let depth = 0;
   while (cursor != null) {
     if (seen.has(cursor)) {
-      throw new Error('Pages: parent chain creates a cycle; cannot compute path.');
+      throw new ValidationError({
+        errors: [
+          {
+            message: 'Parent chain creates a cycle; cannot compute path.',
+            path: 'parent',
+          },
+        ],
+      });
     }
     if (depth >= MAX_DEPTH) {
-      throw new Error(`Pages: parent chain exceeds maximum depth of ${MAX_DEPTH}.`);
+      throw new ValidationError({
+        errors: [
+          {
+            message: `Parent chain exceeds maximum depth of ${MAX_DEPTH}.`,
+            path: 'parent',
+          },
+        ],
+      });
     }
     seen.add(cursor);
     depth += 1;

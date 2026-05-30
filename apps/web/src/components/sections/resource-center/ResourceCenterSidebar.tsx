@@ -23,8 +23,6 @@ export function ResourceCenterSidebar({
       className="shrink-0 w-full lg:sticky lg:w-[295px] lg:self-start"
       style={{ top: "96px" }}
     >
-      {/* MOBILE (< lg) — horizontal scrolling tab strip per Figma 444:401.
-          No icons, no card chrome; underline marks the active tab. */}
       <div className="lg:hidden -mx-6 px-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <ul className="flex items-center gap-6 border-b border-[rgba(17,17,17,0.10)] min-w-max">
           <li className="shrink-0">
@@ -61,7 +59,6 @@ export function ResourceCenterSidebar({
         </ul>
       </div>
 
-      {/* DESKTOP (lg+) — existing white card sidebar */}
       <div
         className="relative hidden lg:block"
         style={{
@@ -74,7 +71,6 @@ export function ResourceCenterSidebar({
             "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01)",
         }}
       >
-        {/* Heading */}
         <h3
           className="font-display text-2xl font-bold leading-[1.2] tracking-[-0.05em] mb-4"
           style={{ color: "#111" }}
@@ -82,7 +78,6 @@ export function ResourceCenterSidebar({
           Categories
         </h3>
 
-        {/* Divider */}
         <div
           style={{
             height: "1px",
@@ -91,9 +86,7 @@ export function ResourceCenterSidebar({
           }}
         />
 
-        {/* Filter items */}
         <ul className="flex flex-col" style={{ gap: "20px" }}>
-          {/* All */}
           <li>
             <Link
               href={hrefFor("")}

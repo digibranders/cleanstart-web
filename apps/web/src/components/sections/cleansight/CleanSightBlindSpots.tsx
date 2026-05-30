@@ -13,7 +13,6 @@ export function CleanSightBlindSpots(): React.ReactElement {
           "linear-gradient(180deg, #151021 0%, #131e8f 67.139%, #471ec0 107.43%)",
       }}
     >
-      {/* Union right — decorative geometric shape, right side */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -30,7 +29,7 @@ export function CleanSightBlindSpots(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Union left — decorative geometric shape, top-left (intentionally off-screen) */}
+      {/* Positioned partly off-screen by design; the negative offset must not be clamped. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -47,7 +46,6 @@ export function CleanSightBlindSpots(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Corner hex — bottom-left, rotated, opacity 20% */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -70,7 +68,6 @@ export function CleanSightBlindSpots(): React.ReactElement {
         />
       </div>
 
-      {/* Corner hex — top-right, rotated, opacity 20% */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -93,9 +90,8 @@ export function CleanSightBlindSpots(): React.ReactElement {
         />
       </div>
 
-      {/* Content stack — heading + radar share a flex column so spacing scales fluidly across viewports.
-          Padding / gap / radar size are all bound to viewport HEIGHT as well so the whole section
-          stays inside a typical laptop viewport (~813px effective) without scroll-clipping the dial. */}
+      {/* Padding, gap, and radar size are bound to viewport height so the dial stays
+          fully visible on a typical laptop viewport without scroll-clipping. */}
       <div
         className="relative flex flex-col items-center mx-auto"
         style={{
@@ -124,8 +120,8 @@ export function CleanSightBlindSpots(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* Radar visualization — width is the lesser of 70vw, 60vh, and the 580px cap, with a 300px floor.
-            Sweep is locked to dial radius via closest-side mask, so it always reaches the inner blue ring. */}
+        {/* Sweep is locked to the dial radius via a closest-side mask so it always
+            reaches the inner ring regardless of the clamped width. */}
         <div
           className="relative"
           style={{

@@ -18,7 +18,7 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
     <section className="relative w-full bg-white" data-section="BlogDetailFAQ">
       <div className="relative mx-auto max-w-[1120px] px-6 pb-20">
         <div className="relative flex gap-12">
-          {/* Spacer matching TOC sidebar width so FAQ aligns with article body */}
+          {/* Spacer matches the TOC sidebar width so the FAQ aligns with the article body. */}
           <div className="hidden xl:block shrink-0" style={{ width: "260px" }} aria-hidden />
 
           <div className="min-w-0 flex-1 mx-auto xl:mx-0" style={{ maxWidth: "680px" }}>

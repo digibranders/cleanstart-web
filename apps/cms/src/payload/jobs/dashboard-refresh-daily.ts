@@ -17,6 +17,7 @@ import { refreshAllGsc } from '../lib/integrations/kinds/gsc-search-analytics';
 export const dashboardRefreshDailyTask: TaskConfig<'dashboardRefreshDaily'> = {
   slug: 'dashboardRefreshDaily',
   retries: 0,
+  schedule: [{ cron: '0 6 * * *', queue: 'dashboardRefreshDaily' }],
   handler: async ({ req }) => {
     const [gsc, clarity] = await Promise.all([
       refreshAllGsc(req.payload),

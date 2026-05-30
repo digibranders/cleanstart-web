@@ -9,11 +9,9 @@ type Props = {
   built?: boolean;
 };
 
-// Restrained-professional per D1: subtle fill + neutral border on hover.
-// No glow. No accent-color border. Icon tiles get a slightly more present
-// surface so the glyph reads cleanly against the new tighter glass.
-// Arrows removed entirely — the row's hover lift + label brightness IS the
-// affordance. Trailing arrows were redundant + dim.
+// Hover affordance is the row's fill and label brightness; trailing arrows
+// were dropped as redundant. Icon tiles keep a slightly stronger surface so
+// the glyph stays legible against the glass background.
 const ROW =
   "group/row grid grid-cols-[44px_1fr] items-center gap-3 rounded-[10px] border border-transparent px-3 py-2.5 transition-colors duration-150 hover:border-white/[0.08] hover:bg-white/[0.05]";
 const ICON_TILE =

@@ -1,51 +1,9 @@
-/*
- * Figma node 583:2360 — 1922×789 px (desktop)
- * Figma node 856:1120 — 360×964 px (mobile)
- *
- * Background: linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)
- *
- * ── DESKTOP (≥ sm) ───────────────────────────────────────────────────────────
- * paddingTop: 120px · paddingBottom: 120px
- * Heading: 62px Manrope Bold, white, tracking -0.05em, lh 1
- * Subtitle: 30px Sora Regular, opacity 0.8, tracking -0.04em, lh 1.4, maxW 835px
- * Heading → track bar gap: 125px
- * Track bar: h=12px · rgba(255,255,255,0.1) · rounded-[32px] · full 1276px
- * Vertical bars: 4× · h=142px · w=4px · rgba(255,255,255,0.1) · rounded-[20px]
- * Column flares: 267×289px · mix-blend-plus-lighter · solution-flare-gradient.svg
- * Track spotlights: 369×48px · mix-blend-plus-lighter · solution-track-gradient.svg
- * Cards: 4×295px + 3×32px = 1276px · h=164px · border-radius=13.5px · border=1.688px #dab6f3
- *   gradient: #151021→#131e8f(71.2%)→#551ece · padding=24px
- * Corner vectors: 979×979 · calc-centered from 1922px Figma frame
- *
- * ── MOBILE (< sm) ────────────────────────────────────────────────────────────
- * paddingTop: 32px
- * Heading: 28px Manrope SemiBold, white, tracking -0.05em, lh 1.2, maxW 259px, centered
- * Subtitle: 16px Sora Regular, opacity 0.8, tracking -0.07em, lh 1.4, maxW 282px, centered
- * Layout: left column (connector + teal glow nodes) + right column (cards)
- * Vertical connector: 4×456px · rgba(255,255,255,0.1) · left=60px · rounded-[32px]
- * Teal glow nodes: 98×87px · mix-blend-plus-lighter at each row (left=40px)
- * Cards: 226×114px · right=41px from section right · left=93px
- *   border: 2.241px solid #dab6f3 · border-radius: 17.928px
- *   gradient: #151021→#131e8f(71.2%)→#551ece
- *   shadow: multi-layer rgba(0,0,0,...)
- * Card text: title=18px Manrope Medium tracking=-0.05em lh=1
- *            desc=14px Sora Regular tracking=-0.07em lh=1.5 opacity=0.8
- *   padding: left=24px top=24px gap=6px
- * Row gap: 16px between cards
- * Corner vector: 534×534px at left=-87px top=-349px
- */
-
 "use client";
 
 import React from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
-const COL_CENTERS = [
-  "11.56%", // 147.5 / 1276
-  "37.19%", // 474.5 / 1276
-  "62.81%", // 801.5 / 1276
-  "88.44%", // 1128.5 / 1276
-] as const;
+const COL_CENTERS = ["11.56%", "37.19%", "62.81%", "88.44%"] as const;
 
 const FEATURES = [
   {
@@ -74,7 +32,6 @@ const FEATURES = [
   },
 ] as const;
 
-// Mask CSS shared properties
 const maskBase: React.CSSProperties = {
   maskMode: "alpha",
   maskComposite: "intersect" as const,
@@ -94,17 +51,11 @@ export function CisoSolution(): React.ReactElement {
       }}
     >
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          MOBILE — vertical timeline rebuilt in JSX to match the Figma comp
-          (heading + subtitle + cyan glow rail + 4 glassmorphic feature
-          cards). Replaces the previous flattened PNG so the layout is
-          fully selectable, responsive, and accessible to screen readers.
-      ══════════════════════════════════════════════════════════════════════ */}
+      {/* Mobile timeline is rebuilt in JSX rather than a flattened image so it stays selectable, responsive, and accessible to screen readers. */}
       <div
         className="sm:hidden relative"
         style={{ paddingTop: "32px", paddingBottom: "64px" }}
       >
-        {/* Heading */}
         <h2
           className="text-center text-white mx-auto px-6"
           style={{
@@ -120,7 +71,6 @@ export function CisoSolution(): React.ReactElement {
           Reduce Risk Before Deployment
         </h2>
 
-        {/* Subtitle */}
         <p
           className="text-center mx-auto px-6"
           style={{
@@ -138,15 +88,11 @@ export function CisoSolution(): React.ReactElement {
           before they reach production environments.
         </p>
 
-        {/* Timeline + Cards container */}
         <div
           className="relative mx-auto"
           style={{ maxWidth: "420px", paddingLeft: "16px", paddingRight: "16px" }}
         >
-          {/* Vertical cyan glow rail — centered at x = 60px from the
-              parent's padding box, which lines up with the dot centre inside
-              each <li> (li starts at parent content edge = 16, dot.left = 36,
-              dot.width/2 = 8 → centre = 60). */}
+          {/* Rail x=59px aligns with each row's dot centre (content edge 16 + dot.left 36 + dot radius 8). */}
           <div
             aria-hidden
             style={{
@@ -168,7 +114,6 @@ export function CisoSolution(): React.ReactElement {
                 key={f.titleMobile}
                 style={{ position: "relative", paddingLeft: "72px" }}
               >
-                {/* Outer halo */}
                 <span
                   aria-hidden
                   style={{
@@ -185,7 +130,6 @@ export function CisoSolution(): React.ReactElement {
                     mixBlendMode: "plus-lighter",
                   }}
                 />
-                {/* Horizontal cross-glow ray */}
                 <span
                   aria-hidden
                   style={{
@@ -202,7 +146,6 @@ export function CisoSolution(): React.ReactElement {
                     filter: "blur(0.4px)",
                   }}
                 />
-                {/* Inner bright node */}
                 <span
                   aria-hidden
                   style={{
@@ -221,7 +164,6 @@ export function CisoSolution(): React.ReactElement {
                   }}
                 />
 
-                {/* Card */}
                 <div
                   style={{
                     position: "relative",
@@ -270,16 +212,11 @@ export function CisoSolution(): React.ReactElement {
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          DESKTOP — horizontal track + 4 cards (≥ sm = 640px)
-          Figma node 583:2360 — 1922×789px
-      ══════════════════════════════════════════════════════════════════════ */}
       <div
         className="hidden sm:block"
         style={{ paddingTop: "120px", paddingBottom: "120px" }}
       >
 
-        {/* ── Corner vector — top-left: Figma x=-423, frame-center=961 → calc(50% - 1384px) ── */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
@@ -291,7 +228,6 @@ export function CisoSolution(): React.ReactElement {
           decoding="async"
         />
 
-        {/* ── Corner vector — top-right: Figma x=1444 → calc(50% + 483px) ── */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
@@ -303,11 +239,9 @@ export function CisoSolution(): React.ReactElement {
           decoding="async"
         />
 
-        {/* ── 1276px content container with shared side gutter so cards
-              don't overflow the viewport below 1276px. ── */}
+        {/* Side gutter keeps the cards from overflowing the viewport below 1276px. */}
         <div className="relative mx-auto px-6 sm:px-10" style={{ maxWidth: "1276px" }}>
 
-          {/* Heading group */}
           <div className="text-center" style={{ marginBottom: "125px" }}>
             <Reveal header>
               <h2
@@ -343,10 +277,8 @@ export function CisoSolution(): React.ReactElement {
             </Reveal>
           </div>
 
-          {/* ── Track section ── */}
           <div className="relative" style={{ overflow: "visible" }}>
 
-            {/* Track rail */}
             <div
               aria-hidden
               className="hidden lg:block"
@@ -357,11 +289,9 @@ export function CisoSolution(): React.ReactElement {
               }}
             />
 
-            {/* ── Per-column decorations (lg only) ── */}
             {COL_CENTERS.map((centerPct) => (
               <React.Fragment key={centerPct}>
 
-                {/* Column teal flare */}
                 <div
                   aria-hidden
                   className="hidden lg:flex absolute pointer-events-none"
@@ -392,7 +322,6 @@ export function CisoSolution(): React.ReactElement {
                   </div>
                 </div>
 
-                {/* Track spotlight */}
                 <div
                   aria-hidden
                   className="hidden lg:flex absolute pointer-events-none"
@@ -423,7 +352,6 @@ export function CisoSolution(): React.ReactElement {
                   </div>
                 </div>
 
-                {/* Vertical indicator bar */}
                 <div
                   aria-hidden
                   className="hidden lg:block absolute pointer-events-none"
@@ -440,7 +368,6 @@ export function CisoSolution(): React.ReactElement {
               </React.Fragment>
             ))}
 
-            {/* ── Feature cards ── */}
             <div
               className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-[32px]"
               style={{ marginTop: "120px" }}
@@ -462,7 +389,6 @@ export function CisoSolution(): React.ReactElement {
                     padding: "24px",
                   }}
                 >
-                  {/* Card inner glow A */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     aria-hidden
@@ -479,7 +405,6 @@ export function CisoSolution(): React.ReactElement {
                     loading="lazy"
                     decoding="async"
                   />
-                  {/* Card inner glow B */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     aria-hidden

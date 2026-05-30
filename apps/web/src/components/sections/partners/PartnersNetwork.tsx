@@ -92,7 +92,6 @@ export function PartnersNetwork(): React.ReactElement {
           "linear-gradient(180deg, #151021 0%, #10123E 30%, #131E8F 65%, #471EC0 100%)",
       }}
     >
-      {/* Decorative glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -146,7 +145,6 @@ export function PartnersNetwork(): React.ReactElement {
         </div>
 
         <LazyMotion features={domAnimation}>
-          {/* Region tabs */}
           <div
             ref={tablistRef}
             className="relative mx-auto mt-10 flex w-fit items-center gap-1 rounded-full p-1"
@@ -186,7 +184,6 @@ export function PartnersNetwork(): React.ReactElement {
             })}
           </div>
 
-          {/* Partner cards grid */}
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {partners.length === 0 ? (
               <div className="col-span-full text-center text-white/70 py-12" style={{ fontSize: "var(--fs-body)" }}>

@@ -292,7 +292,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -300,6 +299,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -595,7 +595,7 @@ export interface Integration {
    * Choose which activity on the site triggers a notification. Leave all filters empty to receive everything.
    */
   routing?: {
-    events: ('document.published' | 'lead.submitted')[];
+    events?: ('document.published' | 'lead.submitted')[] | null;
     /**
      * Filter document.published events by collection. Empty = all collections.
      */
@@ -620,8 +620,17 @@ export interface Integration {
      */
     mentions?:
       | {
+          /**
+           * The name shown in the notification, e.g. "@Alex". This is just the visible label — the actual person is identified by the two fields below.
+           */
           displayName: string;
+          /**
+           * The person's Microsoft Entra (Azure AD) Object ID — a GUID that uniquely identifies them. Required for the @mention to actually notify them. The Teams app does NOT show this — get it from the Entra admin center → Identity → Users → select the person → copy "Object ID", or ask your IT admin.
+           */
           aadObjectId: string;
+          /**
+           * The person's work email (called "User Principal Name" in Microsoft). This is the email they sign in to Teams / Microsoft 365 with. External guests use the special "user_domain#EXT#@tenant.onmicrosoft.com" form.
+           */
           upn: string;
           /**
            * Optional — only mention this person for specific event types. Leave empty to mention them on all notifications.
@@ -2468,6 +2477,10 @@ export interface Guide {
    * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
+  /**
+   * Drives the SEO description fallback and listing-card lede. Aim for ≤ 160 characters.
+   */
+  abstract?: string | null;
   heroImage?: (number | null) | Media;
   body?: {
     root: {
@@ -2712,6 +2725,10 @@ export interface Guide {
    * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
    */
   displayPublishedAt?: string | null;
+  /**
+   * Heading levels that appear in the Table of Contents. Re-save to apply.
+   */
+  tocDepth?: ('h2' | 'h2_h3' | 'h2_h3_h4') | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
   tableOfContents?:
@@ -3053,7 +3070,7 @@ export interface Resource {
    */
   displayPublishedAt?: string | null;
   /**
-   * Incremented by the resource-download endpoint when added (Phase F). Always 0 today.
+   * Automatically incremented each time a visitor downloads this resource.
    */
   downloadCount?: number | null;
   /**
@@ -3397,6 +3414,10 @@ export interface KnowledgeBase {
    * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
    */
   displayPublishedAt?: string | null;
+  /**
+   * Heading levels that appear in the Table of Contents. Re-save to apply.
+   */
+  tocDepth?: ('h2' | 'h2_h3' | 'h2_h3_h4') | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
   tableOfContents?:
@@ -3576,7 +3597,7 @@ export interface Event {
     };
     [k: string]: unknown;
   } | null;
-  startsAt?: string | null;
+  startsAt: string;
   endsAt?: string | null;
   /**
    * IANA timezone string (e.g. Asia/Kolkata). Falls back to siteSettings.organizationTimezone.
@@ -4328,6 +4349,143 @@ export interface PodcastEpisode {
    */
   publicationDate: string;
   /**
+   * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
+   */
+  schemaAddons?:
+    | (
+        | {
+            name: string;
+            /**
+             * One-paragraph summary of the procedure.
+             */
+            description: string;
+            /**
+             * ISO 8601 duration (e.g. PT15M = 15 minutes, PT1H30M = 1.5 hours).
+             */
+            totalTime?: string | null;
+            steps?:
+              | {
+                  name: string;
+                  /**
+                   * What the reader should do for this step.
+                   */
+                  text: string;
+                  /**
+                   * Optional supporting image (1200×675 ideal).
+                   */
+                  image?: (number | null) | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'howTo';
+          }
+        | {
+            name: string;
+            description: string;
+            /**
+             * Required by Google. 1200×675 ideal, 16:9 minimum.
+             */
+            thumbnail: number | Media;
+            uploadDate: string;
+            /**
+             * Direct video URL (e.g. .mp4) — used by Google for in-SERP playback. Use embedUrl below for YouTube/Vimeo embeds.
+             */
+            contentUrl: string;
+            /**
+             * Optional iframe-embeddable URL (YouTube/Vimeo). Required by Google when the player is embedded rather than self-hosted.
+             */
+            embedUrl?: string | null;
+            /**
+             * ISO 8601 duration (e.g. PT5M30S).
+             */
+            duration?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'videoObject';
+          }
+        | {
+            /**
+             * Curated Q&A merged into the page FAQPage blob. If the doc already auto-emits FAQ from its `faqs[]` field, these entries are concatenated rather than duplicated.
+             */
+            questions?:
+              | {
+                  question: string;
+                  answer: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faqPage';
+          }
+        | {
+            itemReviewedType: 'Product' | 'Service' | 'SoftwareApplication' | 'Organization';
+            itemReviewedName: string;
+            /**
+             * 0–5 (use whole or half-stars: 0, 0.5, 1, 1.5, …, 5).
+             */
+            ratingValue: number;
+            reviewBody?: string | null;
+            /**
+             * Reviewer name (Person). Falls back to the doc author.
+             */
+            authorName?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'review';
+          }
+        | {
+            name: string;
+            category:
+              | 'BusinessApplication'
+              | 'DeveloperApplication'
+              | 'SecurityApplication'
+              | 'CommunicationApplication';
+            /**
+             * OS support (e.g. "Linux", "macOS, Windows", "Web").
+             */
+            os: string;
+            /**
+             * Price as a string (e.g. "0", "29.00"). Use "0" for free / open-source.
+             */
+            price: string;
+            currency: 'USD' | 'EUR' | 'GBP' | 'INR';
+            /**
+             * Average rating, 0–5. Optional.
+             */
+            ratingValue?: number | null;
+            /**
+             * Number of ratings. Required if Average rating is set.
+             */
+            ratingCount?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'softwareApp';
+          }
+        | {
+            /**
+             * BreadcrumbList is auto-emitted today. Use this override to suppress the auto crumb on a flat page, or to replace it with custom crumbs.
+             */
+            mode: 'suppress' | 'replace';
+            crumbs?:
+              | {
+                  name: string;
+                  /**
+                   * Site-relative path (e.g. /solutions/pricing) or full URL.
+                   */
+                  path: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'breadcrumbList';
+          }
+      )[]
+    | null;
+  /**
    * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
    */
   publishedAt?: string | null;
@@ -4335,6 +4493,142 @@ export interface PodcastEpisode {
    * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
    */
   displayPublishedAt?: string | null;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -4370,6 +4664,10 @@ export interface Job {
     max?: number | null;
     currency?: ('USD' | 'EUR' | 'GBP' | 'INR') | null;
   };
+  /**
+   * Short summary shown on listing cards and drives the SEO description fallback. Keep under 160 characters.
+   */
+  abstract?: string | null;
   body?: {
     root: {
       type: string;
@@ -4402,7 +4700,7 @@ export interface Job {
    */
   applicationDeadline?: string | null;
   /**
-   * When the listing should auto-close. The auto-close cron (Phase G) uses this.
+   * When the listing should auto-close. Not yet enforced — update hiringStatus manually when the deadline passes.
    */
   expiresAt?: string | null;
   closedAt?: string | null;
@@ -4711,7 +5009,7 @@ export interface AboutGallery {
    */
   imageLink?: string | null;
   /**
-   * Drag to reorder in the list view (Phase D admin UX).
+   * Enter a number to control display order (lower = first).
    */
   displayOrder?: number | null;
   updatedAt: string;
@@ -4741,6 +5039,10 @@ export interface Page {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Optional summary. Drives the SEO description fallback when set. Keep under 160 characters.
+   */
+  abstract?: string | null;
   /**
    * Compose the page from typed blocks. Section is a layout primitive — every other block is a content unit.
    */
@@ -6931,13 +7233,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -7899,6 +8201,7 @@ export interface NewsSelect<T extends boolean = true> {
 export interface GuidesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  abstract?: T;
   heroImage?: T;
   body?: T;
   faqs?:
@@ -8029,6 +8332,7 @@ export interface GuidesSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   displayPublishedAt?: T;
+  tocDepth?: T;
   readingMinutes?: T;
   wordCount?: T;
   tableOfContents?:
@@ -8340,6 +8644,7 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   displayPublishedAt?: T;
+  tocDepth?: T;
   readingMinutes?: T;
   wordCount?: T;
   tableOfContents?:
@@ -8738,8 +9043,134 @@ export interface PodcastEpisodesSelect<T extends boolean = true> {
   durationSeconds?: T;
   featured?: T;
   publicationDate?: T;
+  schemaAddons?:
+    | T
+    | {
+        howTo?:
+          | T
+          | {
+              name?: T;
+              description?: T;
+              totalTime?: T;
+              steps?:
+                | T
+                | {
+                    name?: T;
+                    text?: T;
+                    image?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        videoObject?:
+          | T
+          | {
+              name?: T;
+              description?: T;
+              thumbnail?: T;
+              uploadDate?: T;
+              contentUrl?: T;
+              embedUrl?: T;
+              duration?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faqPage?:
+          | T
+          | {
+              questions?:
+                | T
+                | {
+                    question?: T;
+                    answer?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        review?:
+          | T
+          | {
+              itemReviewedType?: T;
+              itemReviewedName?: T;
+              ratingValue?: T;
+              reviewBody?: T;
+              authorName?: T;
+              id?: T;
+              blockName?: T;
+            };
+        softwareApp?:
+          | T
+          | {
+              name?: T;
+              category?: T;
+              os?: T;
+              price?: T;
+              currency?: T;
+              ratingValue?: T;
+              ratingCount?: T;
+              id?: T;
+              blockName?: T;
+            };
+        breadcrumbList?:
+          | T
+          | {
+              mode?: T;
+              crumbs?:
+                | T
+                | {
+                    name?: T;
+                    path?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
   publishedAt?: T;
   displayPublishedAt?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -8765,6 +9196,7 @@ export interface JobsSelect<T extends boolean = true> {
         max?: T;
         currency?: T;
       };
+  abstract?: T;
   body?: T;
   descriptionPdf?: T;
   applyUrl?: T;
@@ -8935,6 +9367,7 @@ export interface PagesSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  abstract?: T;
   layout?:
     | T
     | {
@@ -9897,12 +10330,12 @@ export interface SiteSetting {
   id: number;
   siteName: string;
   /**
-   * Used to build absolute URLs for SEO and emails.
+   * Used to build absolute URLs for SEO and emails. Must be a valid https:// URL with no trailing slash.
    */
   baseUrl: string;
   defaultLocale: string;
   /**
-   * IANA timezone. Default for events / webinars.
+   * IANA timezone identifier (e.g. Asia/Kolkata, America/New_York). Default for events / webinars.
    */
   organizationTimezone?: string | null;
   listing?: {
@@ -9965,7 +10398,7 @@ export interface SeoDefault {
    */
   twitterHandle?: string | null;
   /**
-   * Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`.
+   * Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`. Note: web production phase — not yet consumed by apps/web.
    */
   brandIcons?: {
     /**
@@ -9994,7 +10427,7 @@ export interface SeoDefault {
     themeColor?: string | null;
   };
   /**
-   * Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper.
+   * Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper. Note: web production phase — not yet consumed by apps/web.
    */
   verification?: {
     /**
@@ -10407,6 +10840,9 @@ export interface ResourcesSpotlight {
   headline: string;
   sub?: string | null;
   ctaLabel: string;
+  /**
+   * Destination URL or path. Accepts `/site-path` or `https://…`.
+   */
   ctaHref: string;
   /**
    * After this date, the card is skipped and the evergreen renders.
@@ -10427,6 +10863,9 @@ export interface CompanySpotlight {
   headline: string;
   sub?: string | null;
   ctaLabel: string;
+  /**
+   * Destination URL or path. Accepts `/site-path` or `https://…`.
+   */
   ctaHref: string;
   /**
    * After this date, the card is skipped and the evergreen renders.

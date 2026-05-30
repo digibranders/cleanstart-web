@@ -40,6 +40,7 @@ export const TestButton = (): ReactElement => {
         method: 'POST',
         credentials: 'include',
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const body = (await res.json()) as TestResponse;
       if (body.ok) {
         setState({

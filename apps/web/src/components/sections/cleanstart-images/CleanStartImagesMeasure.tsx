@@ -2,11 +2,10 @@ import type React from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * "Measure the Difference" section — Figma node 792:2940
+ * "Measure the Difference" section.
  *
- * White background section. All decorative element positions are in the
- * 1920 px Figma artboard coordinate space; proportional calc() converts
- * them to the 1440 px target viewport.
+ * White background. Decorative element positions are in 1920px artboard
+ * coordinates; proportional calc() converts them to the 1440px target viewport.
  */
 export function CleanStartImagesMeasure(): React.ReactElement {
   return (
@@ -21,10 +20,7 @@ export function CleanStartImagesMeasure(): React.ReactElement {
         paddingBottom: "var(--spacing-section-cta)",
       }}
     >
-      {/* Right-side grid vector removed per design — only the left grid stays. */}
-
-      {/* ── Union hexagon — top-left corner ─────────────────────────────────── */}
-      {/* Figma: left=-109px top=-94px size=305.606×318.251px mix-blend:overlay */}
+      {/* Union hexagon — top-left corner */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden xl:block"
@@ -58,8 +54,7 @@ export function CleanStartImagesMeasure(): React.ReactElement {
         />
       </div>
 
-      {/* ── Union hexagon — top-right corner ────────────────────────────────── */}
-      {/* Figma: left=1214px top=-84px in 1920px frame → proportional left */}
+      {/* Union hexagon — top-right corner */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden xl:block"
@@ -93,8 +88,7 @@ export function CleanStartImagesMeasure(): React.ReactElement {
         />
       </div>
 
-      {/* ── Pink / purple ellipse glow — top-right ──────────────────────────── */}
-      {/* Figma: left=1238px top=-40px size=258px, inner inset=-94.19% */}
+      {/* Pink / purple ellipse glow — top-right */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none"
@@ -124,8 +118,7 @@ export function CleanStartImagesMeasure(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Blue ellipse glow — left mid ────────────────────────────────────── */}
-      {/* Figma: left=-90px top=153px size=315px, inner inset=-64.44% */}
+      {/* Blue ellipse glow — left mid */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none"
@@ -155,8 +148,7 @@ export function CleanStartImagesMeasure(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Left grid vector ─────────────────────────────────────────────────── */}
-      {/* Figma: left=-163px top=-143px size=565×548px */}
+      {/* Left grid vector */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden xl:block"
@@ -179,8 +171,7 @@ export function CleanStartImagesMeasure(): React.ReactElement {
         />
       </div>
 
-      {/* ── Blue ellipse glow — bottom-left ─────────────────────────────────── */}
-      {/* Figma: left=-72px top=587px size=315px (clips below section fold) */}
+      {/* Blue ellipse glow — bottom-left (clips below the section fold) */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none"
@@ -210,8 +201,6 @@ export function CleanStartImagesMeasure(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Content ─────────────────────────────────────────────────────────── */}
-      {/* Figma text block: left=302px top=100px w=835px → centered at maxWidth 835px */}
       <div className="relative flex flex-col items-center text-center">
         <Reveal header>
           <h2

@@ -2,6 +2,7 @@ import type { GlobalConfig } from 'payload';
 
 import { isAdminOrEditor, isAuthenticated } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
+import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 import { navItemFields } from './_navItem';
 
@@ -51,7 +52,13 @@ export const FooterNav: GlobalConfig = {
             { label: 'Bluesky', value: 'bluesky' },
           ],
         },
-        { name: 'url', type: 'text', required: true },
+        {
+          name: 'url',
+          type: 'text',
+          required: true,
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
+          validate: validateOptionalUrl,
+        },
       ],
     },
     {

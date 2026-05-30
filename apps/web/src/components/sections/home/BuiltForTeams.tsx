@@ -1,29 +1,16 @@
 "use client";
 
 import type React from "react";
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * Section: "Built for Teams That Can't Afford Uncertainty"
- * Figma Group 2085665059 (108:8437) at y=5104, 1922×1067.
+ * "Built for Teams That Can't Afford Uncertainty" testimonial carousel.
  *
- * Layout (per Figma frames 108:8456 / 108:8480 / 108:8500):
- *   • Active card 798×329, centred, full opacity (z-30)
- *   • Two side cards 638.4×263.2, 56 px gutter to the active card,
- *     extending 132 px off-stage at each end (z-10, blurred + dimmed)
- *   • Nav row (108:8443): two 56×56 circles with #DAB6F3 1px ring,
- *     base lavender tint + plus-lighter top-right + bottom radial glows,
- *     20 px gap.
- *   • No pagination dots in Figma — removed.
- *
- * Interactions:
- *   • prev/next buttons + arrow keys + touch swipe + auto-advance (7 s,
- *     pauses on hover/focus/tab-hidden/reduced motion)
- *   • Subtle floating motion on the active card for life (3 px y-bob)
- *   • Cross-fade + slide animation on every change (direction-aware)
- *   • Side cards lift slightly on hover (preview affordance)
- *   • Reduced motion: no auto-advance, no float, transitions cap at 80 ms
+ * Interactions: prev/next buttons, arrow keys, touch swipe, drag-to-rotate,
+ * and auto-advance (7s, pauses on hover/focus/tab-hidden/reduced motion).
+ * Under reduced motion: no auto-advance, no float, transitions cap at 80ms.
  */
 
 export interface Testimonial {
@@ -337,7 +324,6 @@ export function BuiltForTeams({
       className="relative w-full overflow-hidden text-white"
       aria-labelledby="testimonials-title"
       style={{
-        // Figma Frame 2147238429 (108:8061) — vertical gradient (top→bottom).
         background:
           "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
@@ -418,14 +404,12 @@ export function BuiltForTeams({
             {TESTIMONIALS[active]?.name}, {TESTIMONIALS[active]?.role}.
           </div>
 
-          {/* Shared-element morph stage — every testimonial keeps a stable
-              React element across renders (keyed by name), and its position
-              (data-pos: -1 | 0 | 1) drives CSS transitions on transform,
-              size, opacity, and inner font sizes. The card moving from a
-              peek slot to centre visibly travels and grows. The one card
-              that wraps around the stage (only possible with N=3) is marked
-              data-wrap during the transition and fades through 0 to mask
-              its teleport. */}
+          {/* Each testimonial keeps a stable React element across renders
+              (keyed by name); its position (data-pos: -1 | 0 | 1) drives CSS
+              transitions on transform, size, opacity, and inner font sizes so
+              a card moving between a peek slot and centre visibly travels and
+              grows. The card that wraps around the stage (only possible with
+              N=3) is marked data-wrap and fades through 0 to mask its teleport. */}
           <div
             className="cs-tt-stage"
             data-direction={direction}
@@ -460,8 +444,7 @@ export function BuiltForTeams({
             })}
           </div>
 
-          {/* Auto-rotation progress bar — gives users feedback that the
-              carousel is rotating, and how long until the next slide. */}
+          {/* Auto-rotation progress bar — shows how long until the next slide. */}
           <div
             aria-hidden
             className="mx-auto mt-8 h-[3px] w-[280px] overflow-hidden rounded-full"
@@ -480,7 +463,6 @@ export function BuiltForTeams({
             />
           </div>
 
-          {/* Controls row: prev / pagination dots / next */}
           <div className="mt-6 flex items-center justify-center gap-6">
             <NavButton direction="prev" onClick={goPrev} label="Previous testimonial" />
             <div
@@ -520,12 +502,9 @@ export function BuiltForTeams({
   );
 }
 
-// =============================================================================
-// Shared-element morph card — used for every visible testimonial. The same
-// DOM element is reused across renders (keyed by name in the parent), and
-// data-pos drives the size + position transitions so cards visibly travel
-// between peek and centre slots.
-// =============================================================================
+// Reused for every visible testimonial: the same DOM element persists across
+// renders (keyed by name in the parent), and data-pos drives the size +
+// position transitions so cards visibly travel between peek and centre slots.
 function MorphCard({
   testimonial,
   pos,
@@ -649,10 +628,6 @@ function MorphCard({
   );
 }
 
-// =============================================================================
-// Nav button — 56×56 circle. Re-creates Figma node 108:8444 / 108:8448 with the
-// 1.002 px lavender ring + plus-lighter top-right and bottom radial glows.
-// =============================================================================
 function NavButton({
   direction,
   onClick,
@@ -692,13 +667,8 @@ function NavButton({
   );
 }
 
-// =============================================================================
-// Company mark — renders the real wordmark image when `logoSrc` is supplied
-// (uses the same grayscale-on-dark treatment as TrustedByMarquee so the logo
-// reads as a subtle attribution rather than a competing brand badge). Falls
-// back to the gradient-orb + text placeholder for testimonials that don't
-// have a logo file yet.
-// =============================================================================
+// Renders the real wordmark image when `logoSrc` is supplied; falls back to
+// the gradient-orb + text placeholder for testimonials without a logo file.
 function CompanyMark({
   company,
   logoSrc,
@@ -714,11 +684,12 @@ function CompanyMark({
     const h = small ? 18 : 24;
     const maxW = small ? 80 : 110;
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      <Image
         src={logoSrc}
         alt={company}
+        width={maxW}
         height={h}
+        sizes="110px"
         style={{
           height: h,
           maxWidth: maxW,
@@ -726,8 +697,6 @@ function CompanyMark({
           objectFit: "contain",
           opacity: 1,
         }}
-        loading="lazy"
-        decoding="async"
       />
     );
   }

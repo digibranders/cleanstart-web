@@ -1,20 +1,6 @@
 import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
 
-/**
- * Figma frame 161:20839 — 1920 × 652 SBOM hero (header included).
- *
- * Layout:
- *   Text frame: x=649 y=186  w=623 h=304 (centered in 1920 frame)
- *     • h1       h=160  "Software Bill of Materials"
- *     • subhead  y=192  "Know What you Ship. Verify Component"
- *     • button   y=266  "Learn More"
- *   Light-ray vector: x=603 y=0 w=730 h=708 (decorative, extends below hero)
- *   Grid bg: full width, 568px tall (rows of rounded squares)
- *
- * Background gradient: navy → deep-blue → purple (same token as .bg-cs-hero).
- * The grid overlay uses .bg-cs-grid for the horizontal/vertical line texture.
- */
 export function SbomHero(): React.ReactElement {
   return (
     <section
@@ -22,9 +8,6 @@ export function SbomHero(): React.ReactElement {
       className="relative overflow-hidden bg-cs-hero"
       style={{ minHeight: "clamp(480px, 40vw, 652px)" }}
     >
-      {/* SVG grid overlay — Figma Vector 730×708 centered at top, radial fade
-          (white → #DBD8E0 transparent), opacity 0.15 baked into the SVG path.
-          Replaces the section-wide .bg-cs-grid CSS line pattern. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute left-1/2 -translate-x-1/2 hidden md:block"
@@ -40,7 +23,6 @@ export function SbomHero(): React.ReactElement {
         />
       </div>
 
-      {/* Light-ray decorative vector (x=603 of 1920 ≈ 31.4%, y=0, w=730/1920=38%) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -59,7 +41,7 @@ export function SbomHero(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Bottom fade — blends the hero gradient into the white section below */}
+      {/* Blends the hero gradient into the white section below. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute inset-x-0 bottom-0 z-[1]"
@@ -70,7 +52,6 @@ export function SbomHero(): React.ReactElement {
         }}
       />
 
-      {/* Content container — max-width 1276px centred, same as all other pages */}
       <div
         className="relative mx-auto z-[2] flex w-full max-w-[var(--container-default)] flex-col items-center px-6 sm:px-10 text-center"
         style={{

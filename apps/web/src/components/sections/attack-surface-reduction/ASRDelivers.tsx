@@ -21,7 +21,7 @@ export function ASRDelivers(): React.ReactElement {
       className="relative isolate overflow-hidden"
       aria-labelledby="asr-delivers-title"
     >
-      {/* Background photo — mobile portrait below md, full-bleed photo above */}
+      {/* Portrait crop below md, full-bleed photo at md and above. */}
       <Image
         src="/images/attack-surface-reduction/business-photo-mobile.png"
         alt=""
@@ -41,7 +41,6 @@ export function ASRDelivers(): React.ReactElement {
         priority={false}
       />
 
-      {/* Purple gradient overlay — matches home CleanStartAdvantage. */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10"
@@ -70,7 +69,6 @@ export function ASRDelivers(): React.ReactElement {
           </Reveal>
         </div>
 
-        {/* Mobile/tablet stack */}
         <div className="mt-12 flex flex-col gap-6 sm:mt-14 lg:hidden">
           {BENEFITS.map((b, i) => (
             <React.Fragment key={b.title}>
@@ -80,7 +78,6 @@ export function ASRDelivers(): React.ReactElement {
           ))}
         </div>
 
-        {/* Desktop row — 5 stats / 4 dividers pattern from home. */}
         <div className="hidden lg:mt-[120px] lg:flex lg:items-start lg:justify-between lg:gap-6">
           {BENEFITS.map((b, i) => (
             <React.Fragment key={b.title}>

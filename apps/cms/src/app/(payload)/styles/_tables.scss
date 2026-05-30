@@ -38,28 +38,38 @@
 // =============================================================================
 
 .table {
-  font-size: 13.5px;
+  font-size: 13px;
   width: 100%;
   // Drop the bottom divider — `td` rules handle row separation, and a
   // table-level border doubled-up on the last row.
   border-collapse: separate;
   border-spacing: 0;
 
-  // Header row: a subtle band that anchors the column rhythm without
-  // competing with row content.
+  // Header row: a raised band one step above canvas that pins to the top
+  // as rows scroll under it, so the column labels never disappear.
   thead {
-    background: transparent;
+    background: var(--theme-elevation-100);
 
     th {
       color: var(--theme-text-soft);
-      font-weight: 600;
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: var(--cs-space-3) var(--cs-space-3);
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: -0.01em;
+      text-transform: none;
+      // Match the body cells' horizontal padding (--cs-space-4) so every
+      // column header sits directly above its cell content — th was 12px
+      // vs td's 16px, leaving every label 4px left of its values.
+      padding: 8px var(--cs-space-4);
       border-bottom: 1px solid var(--theme-elevation-200);
       vertical-align: middle;
       white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--theme-elevation-100);
+      // box-shadow renders above the sticky band where a border-bottom
+      // would scroll out of view as rows pass under it.
+      box-shadow: 0 1px 0 0 var(--theme-elevation-200);
       // Active sort: 2px cyan top hairline + saturated label.
       &[aria-sort='ascending'],
       &[aria-sort='descending'] {
@@ -78,27 +88,29 @@
   }
 
   tbody tr {
-    transition: background-color var(--cs-motion-micro);
-    height: 52px;
+    transition: background-color var(--cs-motion-hover);
+    height: 48px;
 
+    // Brand-tinged whisper instead of a flat gray slab that jumps.
     &:hover {
-      background: var(--theme-elevation-100);
+      background: var(--cs-tint-brand-soft);
     }
 
     // Active / current row (Next router supplies aria-current on links)
     &[aria-current='true'],
     &.is-active {
-      background: var(--cs-tint-brand-soft);
+      background: var(--cs-tint-brand-medium);
       box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
     }
   }
 
   td {
-    padding: var(--cs-space-3) var(--cs-space-3);
+    padding: 10px var(--cs-space-4);
     color: var(--theme-text);
     border-top: 1px solid var(--theme-elevation-150);
     vertical-align: middle;
     line-height: 1.45;
+    font-size: 14px;
   }
 
   // First / last cell in a row — flush to the gutter so the table
@@ -185,21 +197,35 @@
   }
 }
 
-// Column widths — switch to fixed table-layout so per-column `width`
-// declarations are honoured strictly. With auto-layout the browser
-// ignored both `width: 1px` (couldn't shrink below intrinsic min) and
-// `max-width: 320px` (auto-layout ignores max-width on cells). Fixed
-// layout treats the first row's column widths as authoritative.
+// ─── Column sizing — AUTO layout, content-fit, scroll on overflow ─
 //
-// Payload renders list tables as `<div class="table"><table>...`, so
-// the wrapper carries `.table` but the `<table>` element itself is
-// class-less. Target the actual `<table>` via the `.table > table`
-// child combinator so our table-layout / width takes effect.
+// `table-layout: auto` sizes every column to fit BOTH its header and its
+// content, so no header is ever truncated — regardless of which of the
+// ~70 drawer fields the editor adds. Only long-text columns are capped
+// (the `max-width` block lower down) and ellipsised; everything else is
+// content-sized and fully visible. `min-width: max-content` means the
+// table never compresses a column below its natural width — when the
+// total exceeds the card the wrapper (`.cs-list__table`) scrolls
+// horizontally instead of clipping headers/values.
+//
+// Payload renders list tables as `<div class="table"><table>…`, so the
+// wrapper carries `.table` but the `<table>` is class-less — target it via
+// the `.table > table` child combinator.
+//
+// The ColumnResizer overrides any column the editor drags (width + min +
+// max on th AND td, forcing an exact width under auto layout). If that JS
+// never runs, this layout still renders every header + value cleanly.
 .table > table {
-  table-layout: fixed;
+  table-layout: auto;
+  // Fill the card exactly when the columns fit (no phantom 1-of-a-few-px
+  // scrollbar from rounding). When a column's content can't be satisfied
+  // within 100%, auto layout grows the table past the card and the wrapper
+  // scrolls horizontally — headers/values are never clipped to fit.
   width: 100%;
 }
 
+// All cells stay single-line. Capped columns ellipsise; the rest size to
+// fit their content under auto layout.
 .table thead th,
 .table tbody td {
   white-space: nowrap;
@@ -207,38 +233,49 @@
   text-overflow: ellipsis;
 }
 
-.table thead th[id='heading-_select'],
+// Row-select checkbox — pinned narrow (content is a single checkbox).
+.table > table thead th[id='heading-_select'],
 .table tbody td.cell-_select {
-  width: 36px;
+  width: 44px;
+  min-width: 44px;
+  max-width: 44px;
   padding-inline: var(--cs-space-2);
 
   input[type='checkbox'] { margin: 0; }
 }
 
-// Status / updatedAt / date columns — content fits in 160-200px.
+// Publish-status pill (`_status`) — centered, trimmed gutters so the pill
+// (not cell padding) owns the column. Auto layout sizes the column to the
+// pill + header, so it never clips.
 .table thead th[id='heading-_status'],
-.table tbody td.cell-_status { width: 200px; }
+.table tbody td.cell-_status {
+  text-align: center;
+}
+.table tbody td.cell-_status {
+  padding-inline: var(--cs-space-2);
+}
 
-.table thead th[id='heading-updatedAt'],
-.table thead th[id='heading-createdAt'],
-.table thead th[id='heading-publicationDate'],
-.table tbody td.cell-updatedAt,
-.table tbody td.cell-createdAt,
-.table tbody td.cell-publicationDate { width: 160px; }
+// Boolean columns — centered.
+.table tbody td.cell-enabled,
+.table tbody td.cell-gated,
+.table tbody td.cell-featured,
+.table tbody td.cell-acceptingNewBylines {
+  text-align: center;
+}
 
-// Relationship columns (authors, categories, etc.) — natural pill width.
-.table thead th[id='heading-authors'],
-.table thead th[id='heading-categories'],
-.table thead th[id='heading-newsCategories'],
-.table thead th[id='heading-knowledgeCategories'],
-.table tbody td.cell-authors,
-.table tbody td.cell-categories,
-.table tbody td.cell-newsCategories,
-.table tbody td.cell-knowledgeCategories { width: 180px; }
+// Numeric columns — right-aligned (tabular-nums treatment lives below).
+.table tbody td.cell-hitCount,
+.table tbody td.cell-resultsCount,
+.table tbody td.cell-attemptCount,
+.table tbody td.cell-filesize,
+.table tbody td.cell-episodeNumber,
+.table tbody td.cell-displayOrder,
+.table tbody td.cell-schemaVersion {
+  text-align: right;
+}
 
-// Title-style cells (the primary link column) — soak up remaining
-// width. With table-layout: fixed and no explicit width on these,
-// they absorb the leftover proportionally.
+// Title-style cells (the primary link column) — clamp the inner link so a
+// long title ellipsises within the column's capped width.
 .table tbody td.cell-title > a,
 .table tbody td.cell-name > a,
 .table tbody td.cell-question > a {
@@ -293,24 +330,70 @@
   margin-bottom: var(--cs-space-4);
 }
 
-// ─── Truncate freeform-text cells with ellipsis ──────────────────
+// ─── Cap freeform-text columns so they ellipsise, not dominate ────
 //
-// Long titles (News, Knowledge Hub, Resources) and long URLs (Redirects
-// FROM/TO) consume the row width and push trailing columns past the
-// viewport. Clamp the text-shaped cells; a `title` tooltip from Payload
-// already exposes the full value on hover.
+// Under auto layout an uncapped text column (a long title, URL, or
+// abstract) would set its own `max-content` to the full string and force
+// the whole table — and thus the horizontal scroll — absurdly wide. A
+// `max-width` bounds that contribution: the cell caps and ellipsises, the
+// full value stays in Payload's `title` tooltip on hover. Two tiers:
+// primary identifiers get the most room; secondary strings are tighter.
 //
-// Tunable per-collection: if a collection genuinely needs more width
-// here, expose it via that collection's admin.components.Cell.
+// Headers on these columns are short ("Title", "Slug", "Abstract"…), so
+// the cap never truncates a header.
 .cell-title,
 .cell-name,
+.cell-filename,
+.cell-email,
+.cell-label,
 .cell-heading,
 .cell-headline,
+.cell-question {
+  max-width: 460px;
+}
+
+.cell-slug,
+.cell-permalink,
+.cell-path,
 .cell-from,
 .cell-to,
+.cell-url,
+.cell-abstract,
+.cell-query,
+.cell-alt,
+.cell-lastError,
+.cell-key,
+.cell-docId,
+.cell-targetId,
+.cell-sourceDocId,
+.cell-destinationId {
+  max-width: 300px;
+}
+
+// Shared truncation mechanics for every capped text cell above.
+.cell-title,
+.cell-name,
+.cell-filename,
+.cell-email,
+.cell-label,
+.cell-heading,
+.cell-headline,
+.cell-question,
+.cell-slug,
 .cell-permalink,
-.cell-slug {
-  max-width: 480px;
+.cell-path,
+.cell-from,
+.cell-to,
+.cell-url,
+.cell-abstract,
+.cell-query,
+.cell-alt,
+.cell-lastError,
+.cell-key,
+.cell-docId,
+.cell-targetId,
+.cell-sourceDocId,
+.cell-destinationId {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

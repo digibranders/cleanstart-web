@@ -56,7 +56,6 @@ export function ResourceCenterCTA(): React.ReactElement {
         />
       </div>
 
-      {/* Decorative cube — desktop placement (xl+) at fixed coords. */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden xl:block"
@@ -79,10 +78,6 @@ export function ResourceCenterCTA(): React.ReactElement {
         />
       </div>
 
-      {/* Decorative cube — mobile/tablet placement per Figma 444:680 (image 583137).
-          Smaller cube anchored to the bottom-right of the CTA card, fading into
-          the white background. Hidden at xl+ where the desktop placement above
-          takes over. */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none xl:hidden"

@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
@@ -23,6 +24,8 @@ import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
+const ABSTRACT_CHAR_HINT = 160;
+
 export const Guides: CollectionConfig = {
   slug: 'guides',
   labels: { singular: 'Guide', plural: 'Guides' },
@@ -43,6 +46,13 @@ export const Guides: CollectionConfig = {
   fields: [
     contentTitleField,
     slugField({ source: 'title' }),
+    {
+      name: 'abstract',
+      type: 'textarea',
+      admin: {
+        description: `Drives the SEO description fallback and listing-card lede. Aim for ≤ ${ABSTRACT_CHAR_HINT} characters.`,
+      },
+    },
     mediaUploadField({ name: 'heroImage', folderHint: 'web/guide' }),
     { name: 'body', type: 'richText' },
     {
@@ -223,7 +233,7 @@ export const Guides: CollectionConfig = {
         components: {
           Field: {
             path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
-            clientProps: { pathPrefix: '/guides' },
+            clientProps: { pathPrefix: ROUTE_PREFIX.guides },
           },
         },
       },
@@ -232,6 +242,20 @@ export const Guides: CollectionConfig = {
     publishedAtField,
     displayPublishedAtField,
     ...seoSidebarFields({ pathPrefix: '/guide', descriptionSource: 'abstract' }),
+    {
+      name: 'tocDepth',
+      type: 'select',
+      defaultValue: 'h2',
+      options: [
+        { label: 'H2 only', value: 'h2' },
+        { label: 'H2 + H3', value: 'h2_h3' },
+        { label: 'H2 + H3 + H4', value: 'h2_h3_h4' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Heading levels that appear in the Table of Contents. Re-save to apply.',
+      },
+    },
     {
       // Data-only — surfaced via the DocStatusBar in the top status bar.
       // Hidden here so the form doesn't double-render.
@@ -295,6 +319,7 @@ export const Guides: CollectionConfig = {
           wordCount: 'wordCount',
           tableOfContents: 'tableOfContents',
         },
+        tocLevelsField: 'tocDepth',
       }),
     ],
     afterChange: [

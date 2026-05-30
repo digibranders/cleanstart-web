@@ -37,7 +37,18 @@ export const loadConfig = <T>(row: IntegrationRow): T | null => {
       return null;
     }
   }
-  if (typeof row.config === 'object') return row.config as T;
+  if (typeof row.config === 'object') {
+    // Plain-object configs bypass encryption. This is a legacy / test path
+    // — production rows must always carry a `v1:` envelope. Log a warning
+    // so operators can identify and migrate any plaintext rows.
+    if (process.env.NODE_ENV !== 'test') {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[integrations] Row ${String(row.id)} (kind: ${row.kind}) has an unencrypted plain-object config. Migrate to the encrypted \`v1:\` envelope via encryptJson().`,
+      );
+    }
+    return row.config as T;
+  }
   return null;
 };
 
@@ -48,6 +59,11 @@ export interface RefreshResult {
   readonly ok: boolean;
   readonly cached: number;
   readonly error?: string;
+  /** Populated when the refresh was skipped due to configuration absence. */
+  readonly skipped?: boolean;
+  /** Human-readable reason for a skip — allows health dashboards to
+   * distinguish "nothing configured" from a successful empty refresh. */
+  readonly skipReason?: string;
 }
 
 export type Refresher = (payload: BasePayload, row: IntegrationRow) => Promise<RefreshResult>;

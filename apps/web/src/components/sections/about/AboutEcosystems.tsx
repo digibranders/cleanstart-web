@@ -2,12 +2,12 @@ import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * Ecosystem partners on the About Us page. Full-colour brand SVGs from
- * vectorlogo.zone (and Notion from svgl.app) — render directly on this
- * section's white background with no recolouring required.
+ * Ecosystem partners on the About Us page. Full-colour brand SVGs render
+ * directly on this section's white background with no recolouring required.
+ *
+ * Intrinsic dimensions match each SVG's tight content-bbox viewBox so all
+ * logos render at the same effective height with no transparent padding.
  */
-// Intrinsic dimensions match each SVG's tight content-bbox viewBox so all
-// logos render at the same effective height with no transparent padding.
 const PARTNERS = [
   { name: "Debian",         src: "/images/about/ecosystems-color/debian.svg",     width: 48,  height: 60 },
   { name: "Apache CouchDB", src: "/images/about/ecosystems-color/couchdb.svg",    width: 247, height: 60 },
@@ -30,8 +30,8 @@ interface AboutEcosystemsProps {
   bottomPadding?: "cta" | "compact";
   /**
    * When true, render the top-right corner accent (purple grid + radial glow +
-   * soft ellipse) from the /deal-registration Figma. Off by default so the
-   * /about page keeps its plain treatment.
+   * soft ellipse) used on /deal-registration. Off by default so the /about page
+   * keeps its plain treatment.
    */
   cornerAccent?: boolean;
 }
@@ -43,11 +43,9 @@ export function AboutEcosystems({
   const bottomClass = bottomPadding === "compact" ? "pb-section-md" : "pb-section-cta";
   return (
     <section className={`relative overflow-hidden bg-white pt-section-md ${bottomClass}`}>
-      {/* Top-right corner accent — grid + radial glow + soft ellipse
-          (Figma: Vector radial glow, Ellipse 46683, and the purple
-          gridline). Proportional horizontal offsets keep it pinned to the
-          corner across viewports; the section's overflow-hidden clips the
-          off-canvas bleed. */}
+      {/* Top-right corner accent — grid + radial glow + soft ellipse.
+          Proportional horizontal offsets keep it pinned to the corner across
+          viewports; the section's overflow-hidden clips the off-canvas bleed. */}
       {cornerAccent && (
         <>
           <div
@@ -90,7 +88,6 @@ export function AboutEcosystems({
         </>
       )}
 
-      {/* Decorative blobs */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -119,7 +116,6 @@ export function AboutEcosystems({
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Heading */}
         <Reveal header>
           <h2
             className="text-center font-display text-black"
@@ -140,7 +136,7 @@ export function AboutEcosystems({
 
       </div>
 
-      {/* Logo strip — infinite RTL marquee, single line, faded edges */}
+      {/* Logo strip — infinite RTL marquee, single line, faded edges. */}
       <div
         className="relative mt-[60px] w-full overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]"
       >

@@ -88,11 +88,31 @@ export const MainNav: GlobalConfig = {
                   type: 'relationship',
                   relationTo: 'pages',
                   admin: { condition: (_data, sibling) => sibling?.kind === 'internal-doc' },
+                  validate: (
+                    value: unknown,
+                    { siblingData }: { siblingData?: Record<string, unknown> },
+                  ): true | string => {
+                    if (siblingData?.kind === 'internal-doc' && value == null) {
+                      return 'A page target is required for internal-doc featured cards.';
+                    }
+                    return true;
+                  },
                 },
                 {
                   name: 'href',
                   type: 'text',
                   admin: { condition: (_data, sibling) => sibling?.kind === 'external-url' },
+                  validate: (
+                    value: unknown,
+                    { siblingData }: { siblingData?: Record<string, unknown> },
+                  ): true | string => {
+                    if (siblingData?.kind === 'external-url') {
+                      if (typeof value !== 'string' || value.trim().length === 0) {
+                        return 'A URL is required for external-url featured cards.';
+                      }
+                    }
+                    return true;
+                  },
                 },
                 { name: 'eyebrow', type: 'text' },
                 { name: 'title', type: 'text' },

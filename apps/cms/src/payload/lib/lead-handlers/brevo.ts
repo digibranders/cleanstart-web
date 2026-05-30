@@ -1,3 +1,4 @@
+import { redactWebhookErrorBody } from '../webhooks/redact-error-body';
 import { extractEmail, extractName } from './extract-fields';
 import type { LeadHandler, LeadSubmission } from './types';
 
@@ -117,7 +118,10 @@ export const brevoHandler: LeadHandler = {
       return {
         handler: 'brevo',
         status: 'failed',
-        error: `Brevo ${response.status}: ${text.slice(0, 200)}`,
+        // Redact before storing — raw Brevo bodies may contain template IDs,
+        // list names, and other account-identifiable information that should
+        // not sit in an editor-readable field.
+        error: `Brevo ${response.status}: ${redactWebhookErrorBody(text)}`,
       };
     }
 

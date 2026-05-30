@@ -148,24 +148,36 @@ export const InlineImageInsertDialog = (props: Props): ReactElement => {
             </button>
           </header>
 
-          <nav className="cs-inline-image-dialog__tabs" aria-label="Source">
+          <div
+            role="tablist"
+            aria-label="Source"
+            className="cs-inline-image-dialog__tabs"
+          >
             {(['device', 'browse', 'url'] as const).map((id) => (
               <button
                 key={id}
+                id={`${titleId}-tab-${id}`}
                 type="button"
                 role="tab"
                 aria-selected={tab === id}
+                aria-controls={id !== 'browse' ? `${titleId}-panel-${id}` : undefined}
+                tabIndex={tab === id ? 0 : -1}
                 className={`cs-inline-image-dialog__tab${tab === id ? ' is-active' : ''}`}
                 onClick={() => setTab(id)}
               >
                 {id === 'device' ? 'Upload' : id === 'browse' ? 'Browse media' : 'From URL'}
               </button>
             ))}
-          </nav>
+          </div>
 
           <div className="cs-inline-image-dialog__body">
             {tab === 'device' && (
-              <div className="cs-inline-image-dialog__device">
+              <div
+                id={`${titleId}-panel-device`}
+                role="tabpanel"
+                aria-labelledby={`${titleId}-tab-device`}
+                className="cs-inline-image-dialog__device"
+              >
                 <p className="cs-inline-image-dialog__hint">
                   JPEG, PNG, WebP, AVIF, GIF, SVG up to 25 MB. Image will land in <code>{folder}</code>.
                 </p>
@@ -192,7 +204,12 @@ export const InlineImageInsertDialog = (props: Props): ReactElement => {
             )}
 
             {tab === 'url' && (
-              <div className="cs-inline-image-dialog__url">
+              <div
+                id={`${titleId}-panel-url`}
+                role="tabpanel"
+                aria-labelledby={`${titleId}-tab-url`}
+                className="cs-inline-image-dialog__url"
+              >
                 <label className="cs-inline-image-dialog__label" htmlFor={`${titleId}-url`}>
                   Image URL
                 </label>

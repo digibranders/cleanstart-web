@@ -40,19 +40,16 @@ function Sparkle({ id }: { id: string }) {
           <stop offset="100%" stopColor="#0166CC" stopOpacity="0" />
         </radialGradient>
       </defs>
-      {/* Vertical beam */}
       <path
         d="M98 0 L104 98 L98 196 L92 98 Z"
         fill={`url(#${id}-beam)`}
         opacity="0.95"
       />
-      {/* Horizontal beam */}
       <path
         d="M0 98 L98 104 L196 98 L98 92 Z"
         fill={`url(#${id}-beam)`}
         opacity="0.95"
       />
-      {/* Bright core */}
       <circle cx="98" cy="98" r="28" fill={`url(#${id}-core)`} />
     </svg>
   );
@@ -86,7 +83,6 @@ export function TeamsHustleSquad() {
       }}
       aria-label="The Hustle Squad"
     >
-      {/* ── Top-center halo (Figma 583:3531) — 1280 × 285 radial flare, screen-blended over the section gradient ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute select-none"
@@ -106,7 +102,6 @@ export function TeamsHustleSquad() {
         }}
       />
 
-      {/* ── Outer decorative purple glow blobs (Figma Vectors 583:3541 / 3542) ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -135,7 +130,6 @@ export function TeamsHustleSquad() {
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
-        {/* Title */}
         <Reveal header>
           <h2
             className="mb-[60px] text-center font-display text-white"
@@ -151,7 +145,6 @@ export function TeamsHustleSquad() {
           </h2>
         </Reveal>
 
-        {/* Carousel */}
         <div
           className="relative mx-auto w-full max-w-[840px]"
           onMouseEnter={() => setPaused(true)}
@@ -159,7 +152,6 @@ export function TeamsHustleSquad() {
           onFocus={() => setPaused(true)}
           onBlur={() => setPaused(false)}
         >
-          {/* ── Sparkle star — top-left corner of image ── */}
           <div
             aria-hidden
             className="pointer-events-none absolute hidden md:block"
@@ -174,7 +166,6 @@ export function TeamsHustleSquad() {
             <Sparkle id="hustle-sparkle-tl" />
           </div>
 
-          {/* ── Sparkle star — bottom-right corner of image ── */}
           <div
             aria-hidden
             className="pointer-events-none absolute hidden md:block"
@@ -222,7 +213,6 @@ export function TeamsHustleSquad() {
           </button>
         </div>
 
-        {/* Pagination dots */}
         <div
           className="mt-[40px] flex items-center justify-center gap-[12px]"
           role="tablist"

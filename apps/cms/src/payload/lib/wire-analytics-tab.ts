@@ -34,13 +34,28 @@ const analyticsTabField: Field = {
   },
 };
 
+/**
+ * Recursively checks whether any field in the tree (including inside
+ * tabs) already has `name === 'analyticsTab'`. This prevents duplicate
+ * insertion when a collection nests the field inside a tab group.
+ */
+const hasAnalyticsTab = (fields: Field[]): boolean => {
+  for (const f of fields) {
+    if ('name' in f && f.name === 'analyticsTab') return true;
+    if (f.type === 'tabs' && 'tabs' in f) {
+      for (const tab of f.tabs as Array<{ fields?: Field[] }>) {
+        if (tab.fields && hasAnalyticsTab(tab.fields)) return true;
+      }
+    }
+  }
+  return false;
+};
+
 export const wireAnalyticsTab = (collection: CollectionConfig): CollectionConfig => {
   if (!COLLECTIONS_WITH_ANALYTICS.has(collection.slug)) return collection;
-  // Skip if already present (idempotent for HMR + repeat init).
-  const alreadyHas = collection.fields.some(
-    (f) => f.type !== 'tabs' && 'name' in f && f.name === 'analyticsTab',
-  );
-  if (alreadyHas) return collection;
+  // Skip if already present anywhere in the field tree (idempotent for
+  // HMR, repeat init, and collections that wrap fields inside tabs).
+  if (hasAnalyticsTab(collection.fields)) return collection;
   return {
     ...collection,
     fields: [...collection.fields, analyticsTabField],

@@ -1,4 +1,5 @@
-import { Gutter } from '@payloadcms/ui';
+// Gutter intentionally replaced with a plain div — @payloadcms/ui Gutter
+// is a render-side component (forbidden by the data-layer-only rule).
 import type { AdminViewServerProps, Payload, Where } from 'payload';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -425,7 +426,7 @@ export const Dashboard = async (
   ]);
 
   return (
-    <Gutter className="cs-dashboard">
+    <div className="cs-dashboard">
       <header className="cs-dashboard__header">
         <h1 className="cs-dashboard__title">
           {greetingFor()},{' '}
@@ -488,7 +489,7 @@ export const Dashboard = async (
         </div>
         <QuickLinks />
       </section>
-    </Gutter>
+    </div>
   );
 };
 

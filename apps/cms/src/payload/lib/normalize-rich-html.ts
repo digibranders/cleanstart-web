@@ -114,6 +114,10 @@ const stripStripTagsRecursive = (root: Element): void => {
     }
   }
   // Sweep namespaced tags (v:imagedata, w:sdt, m:oMath, o:smarttagtype, etc.).
+  // Array.from snapshots the live collection before iteration, so removing a
+  // parent node here also removes its descendants from the DOM — subsequent
+  // iterations that encounter a detached child are no-ops because `tagName`
+  // still evaluates but `remove()` is idempotent on detached nodes.
   for (const node of Array.from(root.getElementsByTagName('*'))) {
     const tag = node.tagName.toLowerCase();
     if (STRIP_TAG_PREFIXES.some((prefix) => tag.startsWith(prefix))) {
@@ -187,11 +191,15 @@ const promoteAriaHeadingDivs = (root: Element): void => {
 };
 
 const normalizeAllSpans = (root: Element): void => {
-  // We must collect first because each unwrap mutates the live list.
-  for (const span of Array.from(root.getElementsByTagName('span'))) {
+  // Process innermost spans first (reverse document order) so a child span
+  // is normalised before its parent. This prevents a parent bold-span from
+  // wrapping an already-normalised child and producing a double <strong>.
+  const spans = Array.from(root.getElementsByTagName('span')).reverse();
+  for (const span of spans) {
     normalizeSpan(span);
   }
-  for (const font of Array.from(root.getElementsByTagName('font'))) {
+  const fonts = Array.from(root.getElementsByTagName('font')).reverse();
+  for (const font of fonts) {
     normalizeFont(font);
   }
 };

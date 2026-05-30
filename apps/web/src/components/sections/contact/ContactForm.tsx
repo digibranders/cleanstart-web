@@ -46,7 +46,6 @@ export function ContactForm() {
     if (inFlightRef.current) return;
     inFlightRef.current = true;
     submissionIdRef.current = newSubmissionId();
-    // submissionIdRef.current would travel to LeadHandler as Idempotency-Key.
     setSubmitting(true);
     window.setTimeout(() => {
       setSubmitting(false);
@@ -63,7 +62,6 @@ export function ContactForm() {
     <section className="relative -mt-[140px] pb-16 sm:pb-20">
       <Container>
         <div className="mx-auto w-full max-w-[860px]">
-          {/* Outer cyan border — solid 2px cyan ring + slight outer glow */}
           <div
             className="overflow-hidden rounded-[16px] p-[3px]"
             style={{
@@ -73,9 +71,6 @@ export function ContactForm() {
             }}
           >
             <div className="overflow-hidden rounded-[13px] bg-white px-3 py-[18px] sm:px-3">
-              {/* Purple header card — 19px radius. BG is the Figma painted-purple
-                  texture (cyan→purple sweep on the left); decorative cube SVG
-                  sits on the right with mix-blend-mode soft-light. */}
               <div
                 className="relative overflow-hidden rounded-[19px] px-6 py-6 sm:px-[60px] sm:py-[26px]"
                 style={{
@@ -88,7 +83,6 @@ export function ContactForm() {
                   minHeight: "123px",
                 }}
               >
-                {/* Decorative cube (mix-blend soft-light, white at 34% opacity in Figma) */}
                 <div
                   aria-hidden
                   className="pointer-events-none absolute hidden sm:block"
@@ -135,7 +129,6 @@ export function ContactForm() {
                 </div>
               </div>
 
-              {/* Form body */}
               <form
                 onSubmit={onSubmit}
                 className="px-3 pt-6 pb-3 sm:px-[24px] sm:pt-[30px] sm:pb-[18px]"
@@ -222,8 +215,6 @@ export function ContactForm() {
                   <TurnstileWidget />
                 </div>
 
-                {/* Submit — full-width, h=48, rounded 8, with soft inner top-highlight
-                    and a subtle radial glow at the bottom-center (Figma Ellipse3938). */}
                 <button
                   type="submit"
                   disabled={submitting || submitted}
@@ -235,7 +226,6 @@ export function ContactForm() {
                       : "0 1px 2px -1px rgba(9,6,63,0.4), 0 0 0 1px #3960F9, inset 0 1px 0 rgba(255,255,255,0.16)",
                   }}
                 >
-                  {/* Bottom-center radial glow */}
                   <span
                     aria-hidden
                     className="pointer-events-none absolute"
@@ -347,9 +337,7 @@ function Field({
   title,
   filterInput,
 }: FieldProps) {
-  // Aligned with the BookDemoForm Figma spec: 1.5px border #DDD, bg #FBFBFB,
-  // rounded 8, height 48, Manrope Medium 16px, padding 15px 17px.
-  // 16px font enforced inline (iOS Safari zoom rule).
+  // Font size is fixed at 16px inline to prevent iOS Safari zoom-on-focus.
   const sharedClass =
     "block w-full rounded-[8px] bg-[#FBFBFB] text-[#111111] placeholder:text-transparent outline-none transition-colors focus:border-[#3960F9]";
   const baseStyle: React.CSSProperties = {

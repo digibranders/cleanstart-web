@@ -63,10 +63,10 @@ describe('collectSitemapEntries', () => {
     const payload: SitemapPayload = { find: makeFind(map) };
     const entries = await collectSitemapEntries(payload, 'https://cleanstart.com');
 
-    const blogEntries = entries.filter((e) => e.loc.startsWith('https://cleanstart.com/blog/'));
+    const blogEntries = entries.filter((e) => e.loc.startsWith('https://cleanstart.com/blogs/'));
     expect(blogEntries.map((e) => e.loc)).toEqual([
-      'https://cleanstart.com/blog/a',
-      'https://cleanstart.com/blog/b',
+      'https://cleanstart.com/blogs/a',
+      'https://cleanstart.com/blogs/b',
     ]);
     expect(blogEntries[0]?.lastmod).toBe('2026-05-05T12:00:00Z');
     expect(blogEntries[0]?.changefreq).toBe('weekly');
@@ -97,8 +97,8 @@ describe('collectSitemapEntries', () => {
     ];
     const payload: SitemapPayload = { find: makeFind(map) };
     const entries = await collectSitemapEntries(payload, 'https://cleanstart.com');
-    const blogEntries = entries.filter((e) => e.loc.startsWith('https://cleanstart.com/blog/'));
-    expect(blogEntries.map((e) => e.loc)).toEqual(['https://cleanstart.com/blog/published']);
+    const blogEntries = entries.filter((e) => e.loc.startsWith('https://cleanstart.com/blogs/'));
+    expect(blogEntries.map((e) => e.loc)).toEqual(['https://cleanstart.com/blogs/published']);
   });
 
   it('emits a listing entry for each collection that has a listingPath', async () => {
@@ -155,11 +155,11 @@ describe('collectSitemapEntries', () => {
     const payload: SitemapPayload = { find: makeFind(map) };
     const entries = await collectSitemapEntries(payload, 'https://cleanstart.com');
     const slugs = entries
-      .filter((e) => e.loc.startsWith('https://cleanstart.com/blog/'))
+      .filter((e) => e.loc.startsWith('https://cleanstart.com/blogs/'))
       .map((e) => e.loc);
     expect(slugs).toEqual([
-      'https://cleanstart.com/blog/p1',
-      'https://cleanstart.com/blog/p2',
+      'https://cleanstart.com/blogs/p1',
+      'https://cleanstart.com/blogs/p2',
     ]);
   });
 });

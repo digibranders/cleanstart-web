@@ -7,6 +7,7 @@ import {
   pickSlugSource,
   shortHash,
 } from './media-filename';
+import { ALLOWED_MIME_TYPES } from './upload-limits';
 
 describe('shortHash', () => {
   it('is deterministic for the same bytes', () => {
@@ -33,15 +34,24 @@ describe('canonicalExtensionForMime', () => {
     expect(canonicalExtensionForMime(mime)).toBe(expected);
   });
 
-  it('passes through SVG and PDF', () => {
+  it('passes through SVG, PDF, MP4, and ZIP', () => {
     expect(canonicalExtensionForMime('image/svg+xml')).toBe('svg');
     expect(canonicalExtensionForMime('application/pdf')).toBe('pdf');
+    expect(canonicalExtensionForMime('video/mp4')).toBe('mp4');
+    expect(canonicalExtensionForMime('application/zip')).toBe('zip');
+    expect(canonicalExtensionForMime('application/x-zip-compressed')).toBe('zip');
   });
 
   it('falls back to bin for unknown types', () => {
-    expect(canonicalExtensionForMime('application/zip')).toBe('bin');
+    expect(canonicalExtensionForMime('application/octet-stream')).toBe('bin');
     expect(canonicalExtensionForMime(undefined)).toBe('bin');
     expect(canonicalExtensionForMime(null)).toBe('bin');
+  });
+
+  it('maps every allow-listed MIME type to a servable extension', () => {
+    for (const mime of ALLOWED_MIME_TYPES) {
+      expect(canonicalExtensionForMime(mime)).not.toBe('bin');
+    }
   });
 });
 

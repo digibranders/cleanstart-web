@@ -5,7 +5,7 @@
 .btn {
   border-radius: var(--cs-radius-input);
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: 14px;
   letter-spacing: 0.005em;
   padding-inline: var(--cs-space-4);
   height: 36px;
@@ -19,9 +19,12 @@
     box-shadow var(--cs-motion-micro),
     transform var(--cs-motion-micro);
 
+  // Crisp 2px solid ring with offset — sharper and WCAG 2.2 SC 2.4.11
+  // compliant vs a fuzzy low-alpha glow.
   &:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+    outline: 2px solid var(--cs-cyan-500);
+    outline-offset: 2px;
+    box-shadow: none;
   }
 
   &:active:not([disabled]) {
@@ -42,11 +45,11 @@ button.btn--style-pill-primary,
 .btn--style-primary[type='button'],
 .btn--style-pill-primary[type='button'] {
   background: var(--cs-cyan-500);
-  color: #04212a;
+  color: var(--cs-on-cyan, #04212a);
   border: 1px solid transparent;
   border-radius: var(--cs-radius-input);
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: 14px;
   letter-spacing: 0.005em;
   padding-inline: var(--cs-space-4);
   height: 36px;
@@ -94,6 +97,7 @@ div.btn--style-pill-primary {
 
   &:hover:not([disabled]) {
     border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
     color: var(--theme-text);
   }
 
@@ -144,7 +148,7 @@ button#action-save[disabled] {
   color: var(--theme-text-disabled) !important;
   border-color: transparent !important;
   cursor: not-allowed !important;
-  opacity: 0.7;
+  opacity: 0.5;
   box-shadow: none !important;
 }
 
@@ -160,11 +164,11 @@ button#action-save[disabled] {
 // Save Draft → primary cyan
 .doc-controls button#action-save-draft {
   background: var(--cs-cyan-500);
-  color: #04212a;
+  color: var(--cs-on-cyan, #04212a);
   border: 1px solid transparent;
   border-radius: var(--cs-radius-input);
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: 14px;
   letter-spacing: 0.005em;
   padding-inline: var(--cs-space-4);
   height: 36px;
@@ -185,7 +189,7 @@ button#action-save[disabled] {
     background: var(--theme-elevation-150) !important;
     color: var(--theme-text-disabled) !important;
     cursor: not-allowed !important;
-    opacity: 0.7;
+    opacity: 0.5;
     box-shadow: none !important;
   }
 }
@@ -217,7 +221,7 @@ button#action-save[disabled] {
     border-color: var(--theme-elevation-150) !important;
     background: transparent !important;
     cursor: not-allowed !important;
-    opacity: 0.7;
+    opacity: 0.5;
   }
 }
 

@@ -21,19 +21,28 @@ export const SITEMAP_COLLECTIONS: ReadonlyArray<{
   defaultChangeFreq: ChangeFreq;
   /** Listing-page path emitted alongside detail pages. */
   listingPath: string | null;
+  /**
+   * When true, per-document detail URLs are not emitted — only the
+   * `listingPath` entry is included. Use for collections that have a
+   * listing page but no detail route yet (e.g. webinars).
+   */
+  skipDetailDocs?: boolean;
 }> = [
   { collection: 'blogs', defaultPriority: 0.7, defaultChangeFreq: 'weekly', listingPath: '/blogs' },
   { collection: 'news', defaultPriority: 0.7, defaultChangeFreq: 'weekly', listingPath: '/news' },
-  { collection: 'guides', defaultPriority: 0.8, defaultChangeFreq: 'monthly', listingPath: '/guide' },
+  // No /guide listing page — detail pages use /guide/[slug]; set listingPath: null.
+  { collection: 'guides', defaultPriority: 0.8, defaultChangeFreq: 'monthly', listingPath: null },
   { collection: 'knowledgeBase', defaultPriority: 0.7, defaultChangeFreq: 'weekly', listingPath: '/knowledge-hub' },
-  { collection: 'resources', defaultPriority: 0.5, defaultChangeFreq: 'monthly', listingPath: '/resources' },
+  // Resource detail pages use /resources/[slug]; listing page is /resource-center.
+  { collection: 'resources', defaultPriority: 0.5, defaultChangeFreq: 'monthly', listingPath: '/resource-center' },
   { collection: 'events', defaultPriority: 0.5, defaultChangeFreq: 'monthly', listingPath: '/events' },
-  { collection: 'webinars', defaultPriority: 0.5, defaultChangeFreq: 'monthly', listingPath: '/webinars' },
-  { collection: 'jobs', defaultPriority: 0.5, defaultChangeFreq: 'daily', listingPath: '/jobs' },
+  // No /webinar/[slug] detail route yet; emit listing only.
+  { collection: 'webinars', defaultPriority: 0.5, defaultChangeFreq: 'monthly', listingPath: '/webinars', skipDetailDocs: true },
+  // Job detail pages use /job/[slug]; listing page is /careers.
+  { collection: 'jobs', defaultPriority: 0.5, defaultChangeFreq: 'daily', listingPath: '/careers' },
   { collection: 'authors', defaultPriority: 0.3, defaultChangeFreq: 'monthly', listingPath: '/author' },
-  { collection: 'categories', defaultPriority: 0.4, defaultChangeFreq: 'monthly', listingPath: null },
-  { collection: 'newsCategories', defaultPriority: 0.4, defaultChangeFreq: 'monthly', listingPath: null },
-  { collection: 'knowledgeCategories', defaultPriority: 0.4, defaultChangeFreq: 'monthly', listingPath: null },
+  // Taxonomy collections (categories / newsCategories / knowledgeCategories) have
+  // no web detail routes — removed to prevent 404-able sitemap entries.
   { collection: 'pages', defaultPriority: 0.6, defaultChangeFreq: 'monthly', listingPath: null },
 ];
 
@@ -119,56 +128,62 @@ export const collectSitemapEntries = async (
 
   for (const config of SITEMAP_COLLECTIONS) {
     let listingLastmod: string | null = null;
-    let page = 1;
 
-    while (page <= MAX_PAGES) {
-      const result = await payload.find({
-        collection: config.collection,
-        // Explicit status filter — `draft: false` is a hint Payload uses
-        // to pick the latest draft over the latest published when both
-        // exist, but it doesn't exclude documents that are draft-only.
-        // Belt-and-braces with the post-filter below.
-        where: { _status: { equals: 'published' } },
-        limit: PER_PAGE,
-        page,
-        sort: '-updatedAt',
-        depth: 0,
-        overrideAccess: false,
-        draft: false,
-      });
-      for (const doc of result.docs) {
-        if (!isIndexable(doc)) continue;
-        if (doc._status !== 'published') continue;
-        const loc = buildLoc(baseUrl, config.collection, doc);
-        if (!loc) continue;
-        if (!listingLastmod && doc.updatedAt) {
-          listingLastmod = doc.updatedAt;
-        }
-        // Mirror per-page hreflang exactly: whatever the editor pasted
-        // on the doc surfaces here as `<xhtml:link>` rows. Cluster
-        // symmetry / self-ref / x-default are the editor's call —
-        // page-level emission and sitemap stay in lock-step.
-        const rawAlternates = doc.seo?.alternates;
-        const alternates =
-          Array.isArray(rawAlternates) && rawAlternates.length > 0
-            ? rawAlternates
-                .map((alt) => ({
-                  hreflang:
-                    typeof alt.hreflang === 'string' ? alt.hreflang.trim() : '',
-                  href: typeof alt.href === 'string' ? alt.href.trim() : '',
-                }))
-                .filter((alt) => alt.hreflang.length > 0 && alt.href.length > 0)
-            : undefined;
-        entries.push({
-          loc,
-          lastmod: doc.updatedAt ?? null,
-          changefreq: config.defaultChangeFreq,
-          priority: config.defaultPriority,
-          ...(alternates && alternates.length > 0 ? { alternates } : {}),
+    // Skip per-document detail URL generation for collections that have a
+    // listing page but no detail route (e.g. webinars until /webinar/[slug]
+    // lands). The listing entry is still emitted below.
+    if (!config.skipDetailDocs) {
+      let page = 1;
+
+      while (page <= MAX_PAGES) {
+        const result = await payload.find({
+          collection: config.collection,
+          // Explicit status filter — `draft: false` is a hint Payload uses
+          // to pick the latest draft over the latest published when both
+          // exist, but it doesn't exclude documents that are draft-only.
+          // Belt-and-braces with the post-filter below.
+          where: { _status: { equals: 'published' } },
+          limit: PER_PAGE,
+          page,
+          sort: '-updatedAt',
+          depth: 0,
+          overrideAccess: false,
+          draft: false,
         });
+        for (const doc of result.docs) {
+          if (!isIndexable(doc)) continue;
+          if (doc._status !== 'published') continue;
+          const loc = buildLoc(baseUrl, config.collection, doc);
+          if (!loc) continue;
+          if (!listingLastmod && doc.updatedAt) {
+            listingLastmod = doc.updatedAt;
+          }
+          // Mirror per-page hreflang exactly: whatever the editor pasted
+          // on the doc surfaces here as `<xhtml:link>` rows. Cluster
+          // symmetry / self-ref / x-default are the editor's call —
+          // page-level emission and sitemap stay in lock-step.
+          const rawAlternates = doc.seo?.alternates;
+          const alternates =
+            Array.isArray(rawAlternates) && rawAlternates.length > 0
+              ? rawAlternates
+                  .map((alt) => ({
+                    hreflang:
+                      typeof alt.hreflang === 'string' ? alt.hreflang.trim() : '',
+                    href: typeof alt.href === 'string' ? alt.href.trim() : '',
+                  }))
+                  .filter((alt) => alt.hreflang.length > 0 && alt.href.length > 0)
+              : undefined;
+          entries.push({
+            loc,
+            lastmod: doc.updatedAt ?? null,
+            changefreq: config.defaultChangeFreq,
+            priority: config.defaultPriority,
+            ...(alternates && alternates.length > 0 ? { alternates } : {}),
+          });
+        }
+        if (!result.hasNextPage) break;
+        page += 1;
       }
-      if (!result.hasNextPage) break;
-      page += 1;
     }
 
     if (config.listingPath) {

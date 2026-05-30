@@ -59,7 +59,6 @@ type WalkableNode = LexicalNode & {
 };
 
 async function walk(node: WalkableNode): Promise<void> {
-  // Lexical native code node
   if (node.type === "code") {
     const text = extractText(node.children);
     const lines = await highlightToLines(text, (node as { language?: string }).language);
@@ -67,7 +66,6 @@ async function walk(node: WalkableNode): Promise<void> {
     node._content = text;
     return;
   }
-  // Payload BlocksFeature embedded block
   if (node.type === "block") {
     const fields = (node as { fields?: { blockType?: string; content?: string; language?: string } }).fields;
     if (fields?.blockType === "codeBlock" && typeof fields.content === "string") {

@@ -30,12 +30,11 @@ const TRUST_CARDS: TrustCard[] = [
   },
 ];
 
-/* Vertical line x-positions from Figma (px within 287px card) */
+// Vertical line x-positions (px within the 287px card).
 const VERTICAL_LINES = [48.47, 120.03, 162.38, 233.94];
 
 /**
- * Mobile card — vertical layout matching Figma 856:549
- * 328×226 px, rounded-16, icon centered at top, text centered below
+ * Mobile card — vertical layout: icon centered at top, text centered below.
  */
 function MobileTrustCard({ card }: { card: TrustCard }): React.ReactElement {
   return (
@@ -48,12 +47,12 @@ function MobileTrustCard({ card }: { card: TrustCard }): React.ReactElement {
         borderRadius: "16px",
         background: "white",
         overflow: "hidden",
-        /* Subtle cyan glow border — simulates Figma rect1000001781 asset */
+        /* Subtle cyan glow border. */
         boxShadow:
           "0 0 0 1.5px rgba(44,193,235,0.22), 0 6px 24px rgba(44,193,235,0.14), 0 2px 8px rgba(0,0,0,0.06)",
       }}
     >
-      {/* Purple glow blob — 209×90 px, blur 66.5 px, opacity 50 % — sits behind ball */}
+      {/* Purple glow blob — sits behind the ball. */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none"
@@ -70,7 +69,7 @@ function MobileTrustCard({ card }: { card: TrustCard }): React.ReactElement {
         }}
       />
 
-      {/* Blue ball — 70×70 px, centered horizontally, top 10 px */}
+      {/* Blue ball — centered horizontally. */}
       <div
         className="absolute flex items-center justify-center"
         style={{
@@ -99,7 +98,7 @@ function MobileTrustCard({ card }: { card: TrustCard }): React.ReactElement {
         />
       </div>
 
-      {/* Text block — centered, top 108 px, gap 12 px */}
+      {/* Text block — centered. */}
       <div
         className="absolute flex flex-col items-center text-center"
         style={{
@@ -139,12 +138,11 @@ function MobileTrustCard({ card }: { card: TrustCard }): React.ReactElement {
 }
 
 /**
- * Desktop card — Figma: 295×354 outer, 287×346 inner
- * Cyan glow border wrapper, white card, grid lines, left-aligned ball + text
+ * Desktop card — cyan glow border wrapper, white card, grid lines,
+ * left-aligned ball + text.
  */
 function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
   return (
-    /* Outer cyan glow wrapper — Figma: 295×354, rounded-40, rgba(44,193,235,0.3) */
     <div
       className="shrink-0"
       style={{
@@ -153,7 +151,7 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
         padding: "4px",
       }}
     >
-      {/* Inner white card — Figma: 287×346, rounded-36, overflow-clip */}
+      {/* Inner white card. */}
       <div
         className="relative bg-white overflow-hidden"
         style={{
@@ -162,7 +160,7 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
           borderRadius: "36px",
         }}
       >
-        {/* Purple glow blob — Figma: #df9bff, blur 66.5px, opacity 30%, w-262px, h-153px, top-28px, centered */}
+        {/* Purple glow blob — centered near the top. */}
         <div
           aria-hidden
           className="absolute pointer-events-none"
@@ -179,7 +177,7 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
           }}
         />
 
-        {/* Horizontal gradient lines — Figma: top 67.54px and 183.54px, opacity 30% */}
+        {/* Horizontal gradient lines. */}
         {[67.54, 183.54].map((y) => (
           <div
             key={y}
@@ -197,7 +195,7 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
           />
         ))}
 
-        {/* Vertical gradient lines — Figma: 4 lines, h-264px, w-0.73px, opacity 80% */}
+        {/* Vertical gradient lines. */}
         {VERTICAL_LINES.map((x) => (
           <div
             key={x}
@@ -215,7 +213,7 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
           />
         ))}
 
-        {/* Blue ball icon — Figma: 96×96px, top 24px, left 24px (left-aligned with text) */}
+        {/* Blue ball icon — left-aligned with the text below. */}
         <div
           className="absolute flex items-center justify-center"
           style={{
@@ -243,7 +241,7 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
           />
         </div>
 
-        {/* Text — Figma: left 24px, top 162px, width 251px, gap 12px */}
+        {/* Text. */}
         <div
           className="absolute flex flex-col"
           style={{ left: "24px", top: "162px", width: "251px", gap: "12px" }}
@@ -284,7 +282,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
       data-section="CleanStartImagesTrustedSources"
       className="relative overflow-hidden bg-white"
     >
-      {/* Corner vector — top-left (Figma: left-[-414px], top-[-174px], 568×551) */}
+      {/* Corner vector — top-left. */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden lg:block"
@@ -301,7 +299,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
         />
       </div>
 
-      {/* Corner vector — top-right (Figma: left-[1260px], top-[-156px], 568×551) */}
+      {/* Corner vector — top-right. */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden lg:block"
@@ -318,7 +316,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
         />
       </div>
 
-      {/* Ellipse glow — left (Figma: left-[-305px], top-578, size-315, inset-[-64.44%]) */}
+      {/* Ellipse glow — left. */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden lg:block"
@@ -337,7 +335,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
         </div>
       </div>
 
-      {/* Ellipse glow — right (Figma: left-[1487px], top-578, size-315, inset-[-64.44%]) */}
+      {/* Ellipse glow — right. */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden lg:block"
@@ -363,7 +361,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
           paddingBottom: "var(--spacing-section-md)",
         }}
       >
-        {/* Heading — desktop: --text-display-md (~62px); mobile: ~28px via token clamp */}
+        {/* Heading. */}
         <Reveal header>
           <h2
             className="text-center"
@@ -381,7 +379,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* ── Mobile card list — vertical stacked, hidden at lg+ ────────────── */}
+        {/* Mobile card list — vertical stack, hidden at lg+. */}
         <RevealStagger className="lg:hidden mt-10 w-full flex flex-col items-center gap-7">
           {TRUST_CARDS.map((card) => (
             <RevealItem key={card.title} className="w-full max-w-[328px]">
@@ -390,7 +388,7 @@ export function CleanStartImagesBrowse(): React.ReactElement {
           ))}
         </RevealStagger>
 
-        {/* ── Desktop card row — 4-up horizontal, hidden below lg ──────────── */}
+        {/* Desktop card row — 4-up horizontal, hidden below lg. */}
         <RevealStagger
           className="hidden lg:flex flex-row flex-nowrap justify-center mt-16"
           style={{ gap: "41px" }}

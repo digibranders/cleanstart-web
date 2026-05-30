@@ -44,7 +44,7 @@ input[type='button'][disabled],
 input[type='submit'][disabled],
 .popup-button[disabled] {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 // ─── Unify focus rings on all button-like controls (3px brand halo)
@@ -86,8 +86,10 @@ a[role='button']:focus-visible,
   letter-spacing: 0.005em;
 
   &:hover:not([disabled]) {
+    // Calm hover: bright border + faint tint only — cyan text reads as "selected"
     border-color: var(--cs-cyan-500);
-    color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+    color: var(--theme-text);
   }
 }
 
@@ -129,6 +131,8 @@ a[role='button']:focus-visible,
 }
 
 // ─── Icon-only buttons everywhere — square 30px, brand-cyan on hover
+// Note: Lexical `.toolbar-popup__button` intentionally stays 28px for toolbar
+// density (defined in _lexical-toolbar.scss) — do not align to global 30px.
 .btn--icon-only,
 .btn[aria-label][data-icon-only='true'] {
   cursor: pointer;

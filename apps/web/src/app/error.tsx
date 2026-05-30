@@ -5,13 +5,11 @@ import Link from "next/link";
 import { Logo } from "@/components/icons/Logo";
 import { StateView, type StateVariant } from "@/components/feedback";
 
-// NOTE: Header and Footer are async Server Components that transitively
-// import cms-fetch.ts → next/headers, which cannot be statically imported
-// inside a "use client" boundary (Turbopack traces the import graph and
-// rejects the build). The error boundary intentionally renders a minimal
-// static header so it never depends on server-only APIs. The full Header/
-// Footer are rendered by each page's own layout; the error boundary is a
-// last-resort fallback where a simplified chrome is acceptable.
+// Header and Footer are async Server Components that transitively import
+// cms-fetch.ts → next/headers, which cannot be statically imported inside a
+// "use client" boundary (Turbopack traces the import graph and rejects the
+// build). This boundary renders a minimal static header so it never depends on
+// server-only APIs.
 
 function MinimalHeader() {
   return (

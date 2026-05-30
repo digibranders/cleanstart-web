@@ -30,6 +30,7 @@ import {
 export const retryWebhookTask: TaskConfig<'retryWebhook'> = {
   slug: 'retryWebhook',
   retries: 0,
+  schedule: [{ cron: '*/5 * * * *', queue: 'webhookRetry' }],
   handler: async ({ req }) => {
     const now = new Date();
 

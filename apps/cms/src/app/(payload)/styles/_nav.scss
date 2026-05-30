@@ -4,7 +4,7 @@
 //
 // Visual model:
 //
-//   GLOBALS                     ← category eyebrow: 10.5px / 700 / muted /
+//   GLOBALS                     ← category eyebrow: 11px / 700 / muted /
 //                                   uppercase / generous top spacing
 //     Site settings             ← item: 13px / 400 / secondary text
 //     SEO defaults                  + indented from category by 12px
@@ -45,13 +45,7 @@
   // Breathing room between groups so categories register as section
   // dividers, not adjacent rows.
   margin-bottom: 4px;
-  padding-top: 12px;
-
-  // First group sits under the SidebarHeader divider — kill its top
-  // padding so the GLOBALS eyebrow doesn't double-space.
-  &:first-of-type {
-    padding-top: 4px;
-  }
+  padding-top: 8px;
 
   &__toggle {
     display: flex;
@@ -61,9 +55,9 @@
     background: transparent;
     border: none;
     color: var(--cs-text-muted);
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     cursor: pointer;
     text-align: left;
@@ -116,27 +110,34 @@
   line-height: 1.3;
   border-radius: var(--cs-radius-input);
   text-decoration: none;
-  min-height: 30px;
+  min-height: 34px;
   transition:
     background-color var(--cs-motion-micro),
     color var(--cs-motion-micro),
     box-shadow var(--cs-motion-micro);
+
+  // Touch devices — expand to 44px floor (WCAG 2.5.5)
+  @media (pointer: coarse) {
+    min-height: 44px;
+  }
 
   &:hover {
     color: var(--cs-text-primary);
     background: var(--cs-surface-raised);
   }
 
-  // Active item — Payload sets `.nav__link--active`. Brand stripe + tint
-  // + slightly bolder weight so it reads as the current location even
-  // at peripheral-vision distance.
+  // Active item — Payload sets `.nav__link--active`. A 3px brand stripe
+  // plus a faint bloom so the active state registers peripherally even
+  // without reading the item text (Linear/Vercel pattern).
   &--active,
   &.active,
   &[aria-current='page'] {
     color: var(--cs-text-primary);
     font-weight: 600;
     background: var(--cs-tint-brand-soft);
-    box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
+    box-shadow:
+      inset 3px 0 0 0 var(--cs-cyan-500),
+      inset 8px 0 12px -6px rgba(6, 199, 242, 0.15);
   }
 
   &:focus-visible {
@@ -155,13 +156,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
   background: var(--cs-tint-brand-soft);
   color: var(--cs-cyan-500);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1;
   font-feature-settings: 'tnum' 1;
@@ -172,4 +173,14 @@
 .nav__link--active .cs-nav-badge,
 .nav__link.active .cs-nav-badge {
   background: var(--cs-tint-brand-medium);
+}
+
+// ─── Nav group chevron — synced to Payload's real toggle state class
+//
+// NavGroupPersistence.tsx toggles `.nav-group__toggle--open` on the
+// button. Use that as the single chevron-rotation source so we don't
+// need a pseudo-element that can desync from the DOM state.
+.nav-group__toggle--open svg {
+  transform: rotate(180deg);
+  transition: transform var(--cs-motion-micro);
 }

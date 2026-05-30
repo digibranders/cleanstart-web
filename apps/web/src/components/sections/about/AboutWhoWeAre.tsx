@@ -22,7 +22,6 @@ const PILLARS = [
 export function AboutWhoWeAre() {
   return (
     <section className="relative overflow-hidden bg-white py-section-md">
-      {/* Decorative vector — Figma left edge, x=38 y=-244, 701×680 */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -39,7 +38,6 @@ export function AboutWhoWeAre() {
         loading="lazy"
         decoding="async"
       />
-      {/* Decorative union — Figma right edge, rotated 141deg -scaleY */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -59,7 +57,6 @@ export function AboutWhoWeAre() {
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Heading row */}
         <div className="flex flex-col items-center text-center gap-12 lg:flex-row lg:items-start lg:text-left lg:gap-[106px]">
           <Reveal header className="shrink-0">
             <h2
@@ -93,9 +90,7 @@ export function AboutWhoWeAre() {
           </Reveal>
         </div>
 
-        {/* Three pillar columns */}
         <div className="relative mt-[60px]">
-          {/* Vertical dividers */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             aria-hidden

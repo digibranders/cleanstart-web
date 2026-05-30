@@ -3,10 +3,8 @@
 import { useRef, useState } from "react";
 
 /**
- * Blog/News detail CTA — Figma 516:4898.
- *
- * White-background newsletter capture card with cubes and union grids in the
- * corners, plus a solid blue→teal "Subscribe" gradient button.
+ * Blog/News detail CTA — white newsletter capture card with cubes and grids
+ * in the corners, plus a blue→teal "Subscribe" gradient button.
  */
 export function BlogDetailCTA(): React.ReactElement {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -25,7 +23,7 @@ export function BlogDetailCTA(): React.ReactElement {
 
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: "#fff" }}>
-      {/* ── Union grid (right) ── */}
+      {/* Grid (right). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -36,7 +34,7 @@ export function BlogDetailCTA(): React.ReactElement {
         loading="lazy"
         decoding="async"
       />
-      {/* ── Union grid (left) ── */}
+      {/* Grid (left). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -48,7 +46,7 @@ export function BlogDetailCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Ellipse — top-left ── */}
+      {/* Ellipse — top-left. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
@@ -64,7 +62,7 @@ export function BlogDetailCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Ellipse — bottom-right ── */}
+      {/* Ellipse — bottom-right. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
@@ -80,7 +78,7 @@ export function BlogDetailCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Cube — top-left ── */}
+      {/* Cube — top-left. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -92,7 +90,7 @@ export function BlogDetailCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Cube — top-right ── */}
+      {/* Cube — top-right. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -104,7 +102,6 @@ export function BlogDetailCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Content ── */}
       <div className="absolute inset-0 flex items-center justify-center px-6">
         <div
           className="flex flex-col lg:flex-row items-center lg:items-start gap-y-4 lg:gap-y-0 lg:gap-x-[clamp(40px,9vw,115px)] w-full"

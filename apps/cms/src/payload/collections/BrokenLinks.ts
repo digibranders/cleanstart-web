@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 
-import { isAdmin } from '../access';
+import { isAdmin, isAdminOrEditor } from '../access';
 
 /**
  * Shadow collection populated by the nightly `checkBrokenLinks` cron.
@@ -22,7 +22,7 @@ export const BrokenLinks: CollectionConfig = {
       'Auto-populated by the nightly link-check cron. Read-only — fix the URL on the source doc and re-publish, the next cron run clears the row.',
   },
   access: {
-    read: isAdmin,
+    read: isAdminOrEditor,
     create: () => false,
     update: () => false,
     delete: isAdmin,

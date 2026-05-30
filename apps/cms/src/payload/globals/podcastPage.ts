@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 /**
  * Page-level configuration for the public `/podcast` route. Read access
@@ -115,6 +116,8 @@ export const PodcastPage: GlobalConfig = {
           name: 'ctaHref',
           type: 'text',
           required: true,
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
+          validate: validateOptionalUrl,
           admin: {
             description:
               'Destination URL or path. Accepts `/site-path` or `https://…`.',

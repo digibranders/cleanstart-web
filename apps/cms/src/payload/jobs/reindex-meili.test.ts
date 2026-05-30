@@ -20,10 +20,10 @@ const makeClient = (overrides: Partial<clientModule.SearchClient> = {}): clientM
 const makePayload = (
   totalDocs = 0,
   docs: unknown[] = [],
-): { find: ReturnType<typeof vi.fn>; findGlobal: ReturnType<typeof vi.fn>; logger: { warn: ReturnType<typeof vi.fn> } } => ({
+): { find: ReturnType<typeof vi.fn>; findGlobal: ReturnType<typeof vi.fn>; logger: { info: ReturnType<typeof vi.fn>; warn: ReturnType<typeof vi.fn> } } => ({
   find: vi.fn().mockResolvedValue({ docs, totalDocs, hasNextPage: false }),
   findGlobal: vi.fn().mockResolvedValue({ baseUrl: 'https://cleanstart.com' }),
-  logger: { warn: vi.fn() },
+  logger: { info: vi.fn(), warn: vi.fn() },
 });
 
 describe('reindexMeiliTask', () => {
@@ -52,14 +52,14 @@ describe('reindexMeiliTask', () => {
 
   it('skips reindex when meili count is within 5% of postgres count', async () => {
     const client = makeClient({
-      getStats: vi.fn().mockResolvedValue({ numberOfDocuments: 100, isIndexing: false }),
+      getStats: vi.fn().mockResolvedValue({ numberOfDocuments: 110, isIndexing: false }),
     });
     vi.spyOn(clientModule, 'createSearchClient').mockReturnValue(client);
-    // postgres count: 10 collections × 10 docs = 100
+    // postgres count: 11 collections × 10 docs = 110
     const payload = makePayload(10);
     const { output } = await handler({ req: { payload } });
     expect(output.reindexed).toBe(0);
-    expect((output.skipped as number) + (output.reindexed as number)).toBe(100);
+    expect((output.skipped as number) + (output.reindexed as number)).toBe(110);
     expect(client.upsertDocuments).not.toHaveBeenCalled();
   });
 
@@ -90,8 +90,8 @@ describe('reindexMeiliTask', () => {
     const payload = makePayload(10);
     await handler({ req: { payload } });
     // upsertDocuments may be called 0 times if docs array is empty (limit:0 returns no docs)
-    // but needsReindex flag should be true — verify stats were logged
-    expect(payload.logger.warn).toHaveBeenCalled();
+    // but needsReindex flag should be true — verify stats were logged at info level.
+    expect(payload.logger.info).toHaveBeenCalled();
   });
 
   it('logs completion with stats on success', async () => {
@@ -101,6 +101,7 @@ describe('reindexMeiliTask', () => {
     vi.spyOn(clientModule, 'createSearchClient').mockReturnValue(client);
     const payload = makePayload(100);
     await handler({ req: { payload } });
-    expect(payload.logger.warn).toHaveBeenCalled();
+    // Routine stats/completion logs at info (not warn) to avoid polluting aggregators.
+    expect(payload.logger.info).toHaveBeenCalled();
   });
 });

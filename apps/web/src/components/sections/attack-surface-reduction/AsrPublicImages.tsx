@@ -1,22 +1,8 @@
 import { Reveal } from '@/components/ui/Reveal';
 
 /**
- * Public images are bloated — Figma Group 2085665113 (366:6382).
- *
- * Layout (1260×540 in Figma):
- *  - Center: shipping-container 3D illustration (621×511)
- *  - 4 small cards (303×166) at the four corners with dashed connector lines
- *    going to the container:
- *      TL Inherited Vulnerabilities  ─ ─ →  container top-left
- *      TR Too Many Components        ← ─ ─  container top-right
- *      BL Oversized SBOMs            ─ ─ →  container bottom-left
- *      BR Constant Patching          ← ─ ─  container bottom-right
- *
- * Card spec (Figma 366:6388 et al.):
- *  - Outer: 303×166, radius 20, gradient fill (red→white border halo)
- *  - Inner: 287×150 (8px inset), white, radius 16, big stacked shadow
- *  - Text:  Manrope SemiBold 20px title + Manrope Regular 14-15px description
- *  - Icon:  small red shield on the left
+ * Public images are bloated — a shipping-container illustration centred with
+ * four problem cards at the corners, joined by dashed connector lines.
  */
 const CARDS: Array<{
   pos: 'tl' | 'tr' | 'bl' | 'br';
@@ -48,7 +34,7 @@ const CARDS: Array<{
 export function AsrPublicImages(): React.ReactElement {
   return (
     <section data-section="AsrPublicImages" className="relative overflow-hidden">
-      {/* White-glow band at top edge — Figma section transition */}
+      {/* White-glow band at the top edge for the section transition. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0"
@@ -59,7 +45,6 @@ export function AsrPublicImages(): React.ReactElement {
         }}
       />
 
-      {/* Heading */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md">
         <Reveal header>
           <h2
@@ -88,7 +73,7 @@ export function AsrPublicImages(): React.ReactElement {
         </Reveal>
       </div>
 
-      {/* Desktop diagram: container center, 4 cards at corners, dashed lines */}
+      {/* Desktop diagram: container centre, 4 corner cards, dashed lines. */}
       <div className="hidden md:block relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-section-md">
         <div className="relative" style={{ aspectRatio: '1276 / 540' }}>
           {/* Soft red radial glow under the container */}
@@ -107,7 +92,7 @@ export function AsrPublicImages(): React.ReactElement {
             }}
           />
 
-          {/* Dashed connector lines (SVG paths from card corners → container corners) */}
+          {/* Dashed connector lines from card corners to container corners. */}
           <svg
             aria-hidden
             className="absolute pointer-events-none"
@@ -149,7 +134,7 @@ export function AsrPublicImages(): React.ReactElement {
             />
           </svg>
 
-          {/* Container illustration — Figma image 583110, 621×511 */}
+          {/* Container illustration. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             aria-hidden
@@ -169,8 +154,7 @@ export function AsrPublicImages(): React.ReactElement {
             decoding="async"
           />
 
-          {/* 4 cards at corner positions — Figma exact coords:
-              TL (0,0), TR (957,0), BL (23,284), BR (924,284) on a 1260 grid */}
+          {/* 4 cards at corner positions. */}
           {CARDS.map((card) => {
             const positionStyle: React.CSSProperties = {
               tl: { left: 0, top: 0 },
@@ -187,7 +171,7 @@ export function AsrPublicImages(): React.ReactElement {
         </div>
       </div>
 
-      {/* Mobile: container then stacked cards */}
+      {/* Mobile: container then stacked cards. */}
       <div className="md:hidden mx-auto px-5 pb-12 flex flex-col items-center gap-5">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -215,7 +199,7 @@ interface BloatedCardProps {
 function BloatedCard({ title, description }: BloatedCardProps): React.ReactElement {
   return (
     <div className="relative" style={{ width: 'clamp(240px, 24vw, 303px)', maxWidth: '100%' }}>
-      {/* Outer red→white border halo — Figma fill_UB7EN2 [#FF4C4C, #FFFFFF] */}
+      {/* Outer red→white border halo. */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
@@ -226,7 +210,7 @@ function BloatedCard({ title, description }: BloatedCardProps): React.ReactEleme
           opacity: 0.85,
         }}
       />
-      {/* White inner card — Figma Rectangle 1000001830, 8px inset, radius 16 */}
+      {/* White inner card — 8px inset from the halo. */}
       <div
         className="relative bg-white flex items-center gap-3"
         style={{
@@ -238,7 +222,7 @@ function BloatedCard({ title, description }: BloatedCardProps): React.ReactEleme
             '0px 4px 4px 0px rgba(22,34,51,0.04), 0px 4px 24px 0px rgba(22,34,51,0.04), 0px 24px 24px 0px rgba(22,34,51,0.04), 0px 32px 32px 0px rgba(22,34,51,0.04), 0px 64px 64px 0px rgba(22,34,51,0.12), 0px 120px 120px 0px rgba(22,34,51,0.08)',
         }}
       >
-        {/* Red shield icon box */}
+        {/* Red shield icon box. */}
         <div
           className="relative shrink-0 self-start"
           style={{
@@ -274,7 +258,6 @@ function BloatedCard({ title, description }: BloatedCardProps): React.ReactEleme
           </svg>
         </div>
 
-        {/* Text */}
         <div className="flex flex-col gap-1 min-w-0">
           <p
             className="text-[#111111]"

@@ -1,11 +1,6 @@
 import type React from 'react';
 import { WhyMattersGrid, type WhyCard } from '../_shared/WhyMattersGrid';
 
-/*
- * "Most Container Risk Is Inherited" — uses the shared WhyMattersGrid layout
- * (for-developers "Why Does It Matter" pattern).
- */
-
 const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [
   {
     title: 'Bloated Public Images',

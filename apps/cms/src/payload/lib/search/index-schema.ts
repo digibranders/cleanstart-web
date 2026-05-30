@@ -82,6 +82,7 @@ const COLLECTION_WEIGHT: Record<string, number> = {
   events: 70,
   webinars: 70,
   jobs: 70,
+  podcastEpisodes: 70,
   pages: 60,
   authors: 30,
   categories: 20,
@@ -103,6 +104,7 @@ export const SEARCH_INDEXED_COLLECTIONS: ReadonlyArray<string> = [
   'events',
   'webinars',
   'jobs',
+  'podcastEpisodes',
   'authors',
   'pages',
 ];

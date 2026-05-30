@@ -64,9 +64,10 @@ export const CanonicalField = (props: CanonicalFieldProps): ReactElement => {
       setHealth({ kind: 'idle' });
       return undefined;
     }
-    setHealth({ kind: 'checking' });
     let cancelled = false;
     const timer = window.setTimeout(async () => {
+      if (cancelled) return;
+      setHealth({ kind: 'checking' });
       try {
         const url = new URL('/api/canonical/health-check', window.location.origin);
         url.searchParams.set('url', value);

@@ -23,9 +23,6 @@ export function NewsDetailBody({ item }: NewsDetailBodyProps): React.ReactElemen
       data-section="NewsDetailBody"
     >
       <div className="relative mx-auto max-w-[820px] px-6 pt-[40px] sm:pt-[64px] pb-[80px]">
-        {/* Hero image — Figma 817:5939 (Newsroom Detail Mobile, image 583153).
-            Sits between the dark hero meta row and the article body, with the
-            full-width responsive aspect retained from the source. */}
         {heroUrl && item.heroImage?.width && item.heroImage?.height && (
           <div
             className="relative w-full overflow-hidden mb-8"
@@ -46,7 +43,6 @@ export function NewsDetailBody({ item }: NewsDetailBodyProps): React.ReactElemen
           </div>
         )}
 
-        {/* Publisher logo card */}
         {logoUrl && (
           <div
             className="relative flex items-center justify-center overflow-hidden mb-10"
@@ -70,7 +66,6 @@ export function NewsDetailBody({ item }: NewsDetailBodyProps): React.ReactElemen
           </div>
         )}
 
-        {/* Dateline */}
         {dateline && (
           <p
             className="font-sans font-medium leading-[1.6] mb-6"
@@ -83,7 +78,6 @@ export function NewsDetailBody({ item }: NewsDetailBodyProps): React.ReactElemen
           </p>
         )}
 
-        {/* Body */}
         <div className="article-body">
           <RenderLexical content={item.body} />
         </div>

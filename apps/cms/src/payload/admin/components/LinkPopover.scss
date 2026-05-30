@@ -17,13 +17,15 @@
 .cs-link-popover {
   position: absolute;
   z-index: 50;
-  width: 360px;
-  padding: 12px;
-  background: var(--theme-elevation-0, #fff);
-  border: 1px solid var(--theme-elevation-150, #e5e7eb);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  // Responsive: clamp to viewport on narrow screens
+  width: min(360px, calc(100vw - 16px));
+  padding: 14px;
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.50);
   font-size: 13px;
+  color: var(--theme-text);
 
   &__form {
     display: flex;
@@ -35,7 +37,7 @@
     display: flex;
     gap: 8px;
     padding: 2px;
-    background: var(--theme-elevation-50, #f3f4f6);
+    background: var(--theme-elevation-50);
     border-radius: 6px;
     border: 0;
     margin: 0;
@@ -64,16 +66,16 @@
     border-radius: 4px;
     cursor: pointer;
     user-select: none;
-    color: var(--theme-elevation-600, #4b5563);
+    color: var(--theme-text-soft);
 
     input {
-      accent-color: var(--theme-success-500, #2563eb);
+      accent-color: var(--cs-cyan-500);
       margin: 0;
     }
 
     &:has(input:checked) {
-      background: var(--theme-elevation-0, #fff);
-      color: var(--theme-elevation-900, #111827);
+      background: var(--theme-elevation-100);
+      color: var(--theme-text);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
     }
   }
@@ -89,7 +91,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--theme-elevation-600, #4b5563);
+    color: var(--theme-text-soft);
 
     &--inline {
       text-transform: none;
@@ -101,16 +103,16 @@
   &__input {
     width: 100%;
     padding: 6px 8px;
-    border: 1px solid var(--theme-elevation-150, #d1d5db);
+    border: 1px solid var(--theme-elevation-200);
     border-radius: 4px;
-    background: var(--theme-elevation-0, #fff);
-    color: var(--theme-elevation-900, #111827);
+    background: var(--theme-input-bg, var(--theme-elevation-50));
+    color: var(--theme-text);
     font: inherit;
 
     &:focus {
       outline: none;
-      border-color: var(--theme-success-500, #2563eb);
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+      border-color: var(--cs-cyan-500);
+      box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
     }
   }
 
@@ -126,14 +128,14 @@
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    color: var(--theme-elevation-700, #374151);
+    color: var(--theme-text);
   }
 
   &__select {
     padding: 4px 6px;
-    border: 1px solid var(--theme-elevation-150, #d1d5db);
+    border: 1px solid var(--theme-elevation-200);
     border-radius: 4px;
-    background: var(--theme-elevation-0, #fff);
+    background: var(--theme-input-bg, var(--theme-elevation-50));
     color: inherit;
     font: inherit;
   }
@@ -156,10 +158,10 @@
     top: calc(100% + 4px);
     max-height: 220px;
     overflow-y: auto;
-    background: var(--theme-elevation-0, #fff);
-    border: 1px solid var(--theme-elevation-150, #e5e7eb);
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-200);
     border-radius: 6px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.24);
     z-index: 1;
     display: flex;
     flex-direction: column;
@@ -167,7 +169,7 @@
 
   &__results-empty {
     padding: 8px 10px;
-    color: var(--theme-elevation-500, #6b7280);
+    color: var(--theme-text-soft);
     font-size: 12px;
   }
 
@@ -186,7 +188,7 @@
 
     &--active,
     &:hover {
-      background: var(--theme-elevation-50, #f3f4f6);
+      background: var(--cs-tint-brand-soft);
     }
   }
 
@@ -194,12 +196,12 @@
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--theme-elevation-500, #6b7280);
+    color: var(--theme-text-soft);
   }
 
   &__result-title {
     font-size: 13px;
-    color: var(--theme-elevation-900, #111827);
+    color: var(--theme-text);
     line-height: 1.3;
   }
 
@@ -211,11 +213,11 @@
     cursor: pointer;
 
     &--primary {
-      background: var(--theme-success-500, #2563eb);
-      color: #fff;
+      background: var(--cs-cyan-600);
+      color: var(--cs-on-cyan, #04212a);
 
       &:hover:not(:disabled) {
-        background: var(--theme-success-600, #1d4ed8);
+        background: var(--cs-cyan-700);
       }
 
       &:disabled {
@@ -226,8 +228,8 @@
 
     &--ghost {
       background: transparent;
-      color: var(--theme-error-500, #dc2626);
-      border-color: var(--theme-elevation-150, #e5e7eb);
+      color: var(--color-error-500);
+      border-color: var(--theme-elevation-200);
 
       &:hover {
         background: rgba(220, 38, 38, 0.06);

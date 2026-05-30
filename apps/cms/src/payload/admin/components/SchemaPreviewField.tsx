@@ -18,6 +18,7 @@ import {
   auditBlobList,
 } from '../../lib/jsonld/spec/required-fields';
 import { ChevronDown } from './icons/Chevron';
+import { DEFAULT_SITE_URL } from './_site-url';
 
 const CopyIcon = (): ReactElement => (
   <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -47,10 +48,6 @@ type SchemaPreviewFieldProps = {
   pathPrefix?: string;
   sourceField?: string;
 };
-
-const DEFAULT_SITE_URL =
-  (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SITE_URL) ||
-  'https://cleanstart.com';
 
 const SUPPORTED_COLLECTIONS = new Set([
   'blogs',
@@ -726,9 +723,9 @@ const SchemaOverrideModal = (props: SchemaOverrideModalProps): ReactElement | nu
     const merged: Record<string, unknown>[] = [];
     rows.forEach((row, idx) => {
       const checked = decisions[idx] ?? row.item.action === 'merge';
-      if (checked && row.item.overridable) {
-        merged.push(row.item.blob);
-      } else if (checked && row.item.action === 'merge') {
+      // Collapsed from two identical branches: both pushed row.item.blob
+      // when (checked && overridable) or (checked && action === 'merge').
+      if (checked && (row.item.overridable || row.item.action === 'merge')) {
         merged.push(row.item.blob);
       }
     });
@@ -736,7 +733,12 @@ const SchemaOverrideModal = (props: SchemaOverrideModalProps): ReactElement | nu
   }, [rows, decisions, onApply]);
 
   const summary = useMemo(() => {
-    const mergeCount = rows.filter((r) => (decisions[rows.indexOf(r)] ?? r.item.action === 'merge')).length;
+    // Build the count in O(n) with an explicit index rather than indexOf
+    // (which would be O(n²) inside a filter).
+    let mergeCount = 0;
+    rows.forEach((row, idx) => {
+      if (decisions[idx] ?? row.item.action === 'merge') mergeCount += 1;
+    });
     return { mergeCount, total: rows.length };
   }, [rows, decisions]);
 

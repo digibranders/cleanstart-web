@@ -1,14 +1,6 @@
 /*
- * Figma node 799:1339 — CleanSight CTA (white card variant)
- *
- *   Card bg: white (handled by the Footer's locked 1276×330 slot)
- *   Union SVG grid: 1101×1101 at left:547 top:-220 (decorative purple radial-grid)
- *   Ellipse top-left: 320×320 at left:-139 top:-168 (cyan glow)
- *   Ellipse bottom-right: 511×511 at left:1159 top:244 (purple glow)
- *   Screenshot mockup: 211×213, rotate(-15deg), at left:330 top:238
- *   Heading: 55px Manrope Bold, #111 — capped at 44px to match other CTAs
- *   Description: 21px Manrope Regular, #111 @ 80%
- *   Button: solid blue (#3960F9), white text, "Book a Container Scan"
+ * CleanSight CTA — white card (rendered in the Footer's locked CTA slot) with
+ * a decorative grid, corner glow ellipses, and a solid blue button.
  */
 
 "use client";
@@ -22,7 +14,7 @@ export function CleanSightCTA(): React.ReactElement {
       className="relative w-full h-full overflow-hidden"
       style={{ background: "#ffffff" }}
     >
-      {/* ── Decorative grid (Union SVG, radial-faded purple) ── */}
+      {/* Decorative radial-faded purple grid. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -40,7 +32,7 @@ export function CleanSightCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Ellipse — top-left · mobile: 223px/53px · desktop: 320px/121.5px ── */}
+      {/* Ellipse glow — top-left. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute lg:hidden"
@@ -71,7 +63,7 @@ export function CleanSightCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Ellipse — bottom-right · mobile: 223px/53px · desktop: 511px/121.5px ── */}
+      {/* Ellipse glow — bottom-right. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute lg:hidden"
@@ -102,7 +94,7 @@ export function CleanSightCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Decorative pink/violet cube — bottom-left corner of the card ── */}
+      {/* Decorative pink/violet cube — bottom-left corner of the card. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -122,7 +114,7 @@ export function CleanSightCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Content row — Vuln CTA pattern (absolute inset-0 + items-center) ── */}
+      {/* Content row — absolute inset-0 + items-start. */}
       <div
         className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 items-start"
         style={{
@@ -133,7 +125,7 @@ export function CleanSightCTA(): React.ReactElement {
           columnGap: "clamp(32px, 5vw, 72px)",
         }}
       >
-        {/* Left: headline */}
+        {/* Left: headline. */}
         <Reveal header className="relative min-w-0 w-full" style={{ maxWidth: "min(460px, 100%)", zIndex: 2 }}>
           <p
             className="font-display"
@@ -151,7 +143,7 @@ export function CleanSightCTA(): React.ReactElement {
           </p>
         </Reveal>
 
-        {/* Right: description + CTA button */}
+        {/* Right: description + CTA button. */}
         <Reveal
           header
           delay={0.15}
@@ -210,17 +202,17 @@ export function CleanSightCTA(): React.ReactElement {
         </Reveal>
       </div>
 
-      {/* ── Mobile layout (< md) — centered column with cube decoration ──
-          The desktop content row above is `hidden md:flex`, so this is the
-          only path that renders content inside the Footer's CTA slot at
-          mobile widths. */}
+      {/* Mobile layout (< md) — centered column with cube decoration. The
+          desktop content row above is `hidden md:flex`, so this is the only
+          path that renders content inside the Footer's CTA slot at mobile
+          widths. */}
       <div
         className="md:hidden absolute inset-0 overflow-hidden flex flex-col items-center justify-center text-center"
         style={{
           padding: "32px 28px",
         }}
       >
-        {/* Purple cube — bottom-right corner decoration */}
+        {/* Purple cube — bottom-right corner decoration. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
@@ -240,7 +232,7 @@ export function CleanSightCTA(): React.ReactElement {
           decoding="async"
         />
 
-        {/* Heading */}
+        {/* Heading. */}
         <p
           className="font-display"
           style={{
@@ -259,7 +251,7 @@ export function CleanSightCTA(): React.ReactElement {
           See Everything. Fix Everything.
         </p>
 
-        {/* Subtitle */}
+        {/* Subtitle. */}
         <p
           style={{
             position: "relative",
@@ -278,7 +270,7 @@ export function CleanSightCTA(): React.ReactElement {
           modern environments.
         </p>
 
-        {/* Button — centered (not self-start like the desktop variant) */}
+        {/* Button — centered (not self-start like the desktop variant). */}
         <Link
           href="/book-a-demo"
           className="cs-btn-blue"

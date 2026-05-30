@@ -25,7 +25,6 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
           "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
       }}
     >
-      {/* Card image */}
       <div
         className="relative shrink-0 overflow-hidden flex items-center justify-center m-3"
         style={{
@@ -36,15 +35,15 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
         }}
       >
         {logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={logoUrl}
-            alt={item.publisher ?? item.title}
-            className="object-contain pointer-events-none select-none"
-            style={{ maxHeight: "96px", maxWidth: "78%" }}
-            loading="lazy"
-            decoding="async"
-          />
+          <div className="relative h-24 w-[78%]">
+            <Image
+              src={logoUrl}
+              alt={item.publisher ?? item.title}
+              fill
+              className="object-contain pointer-events-none select-none"
+              sizes="(min-width: 1280px) 300px, (min-width: 768px) 35vw, 70vw"
+            />
+          </div>
         ) : heroUrl ? (
           <Image
             src={heroUrl}
@@ -67,18 +66,15 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
         )}
       </div>
 
-      {/* Category badge — overlaps image bottom */}
+      {/* Negative margin pulls the badge up to overlap the image bottom edge. */}
       <div className="relative px-5 md:px-8" style={{ marginTop: "-12px", zIndex: 1 }}>
         <CategoryBadge label={pillLabel} />
       </div>
 
-      {/* Card content — fills remaining height, Read more pinned to bottom.
-          Mobile uses tighter padding to reclaim height. */}
       <div
         className="relative flex flex-1 flex-col justify-between pt-3 pb-5 px-5 md:pt-4 md:pb-8 md:px-8"
       >
         <div className="flex flex-col gap-2.5 md:gap-3">
-          {/* Meta row: date + read time. Smaller on mobile, no wrapping. */}
           <div className="flex items-center gap-3 md:gap-4">
             {date && (
               <div className="flex items-center gap-1">
@@ -124,7 +120,6 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
             )}
           </div>
 
-          {/* Title + abstract */}
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <h3
               className="font-display text-card-title-md font-medium leading-[1.3] tracking-[-0.05em] overflow-hidden"
@@ -157,7 +152,6 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
           </div>
         </div>
 
-        {/* Read more */}
         <Link
           href={`/news/${item.slug}`}
           className="flex items-center group"

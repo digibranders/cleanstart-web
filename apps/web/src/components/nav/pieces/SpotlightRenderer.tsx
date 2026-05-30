@@ -155,7 +155,6 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
     );
   }
 
-  // Evergreen variants — narrow on spotlight.id
   if (spotlight.kind === "evergreen" && spotlight.id === "bulletin") {
     return (
       <Link
@@ -187,8 +186,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
     );
   }
 
-  // Talent network evergreen (kind === 'evergreen', id === 'talent-network')
-  // /careers/talent-network route does not exist — use mailto fallback
+  // No /careers/talent-network route exists yet, so fall back to mailto.
   return (
     <Link
       href="mailto:careers@cleanstart.com?subject=Talent%20network"

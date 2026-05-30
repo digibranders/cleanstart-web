@@ -19,9 +19,9 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     };
   }
 
-  // Decision §8 of WEB-PRODUCTION.md: allow all AI crawlers except Bytespider.
-  // ByteDance's Bytespider ignores robots.txt — the symbolic disallow here is
-  // backed by a Vercel Firewall rule on User-Agent.
+  // Allow all AI crawlers except Bytespider. ByteDance's Bytespider ignores
+  // robots.txt, so the disallow here is symbolic — it is backed by a Vercel
+  // Firewall rule matching on User-Agent.
   return {
     rules: [
       { userAgent: "*", allow: "/", disallow: ["/preview/", "/api/preview/"] },

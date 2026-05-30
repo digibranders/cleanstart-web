@@ -1,6 +1,21 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
+
+const validateEndsAfterStarts = (
+  value: Date | string | null | undefined,
+  { siblingData }: { siblingData?: { startsAt?: Date | string | null } },
+): true | string => {
+  if (value == null || siblingData?.startsAt == null) return true;
+  const end = typeof value === 'string' ? Date.parse(value) : value.getTime();
+  const start =
+    typeof siblingData.startsAt === 'string'
+      ? Date.parse(siblingData.startsAt)
+      : siblingData.startsAt.getTime();
+  if (Number.isNaN(end) || Number.isNaN(start)) return true;
+  if (end < start) return 'End time cannot be before start time.';
+  return true;
+};
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
@@ -16,7 +31,13 @@ import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
 import { firstPublishHook } from '../hooks/first-publish';
 import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const Webinars: CollectionConfig = {
@@ -81,6 +102,7 @@ export const Webinars: CollectionConfig = {
         date: { pickerAppearance: 'dayAndTime' },
         condition: (_data, sibling) => sibling?.webinarType !== 'on-demand',
       },
+      validate: validateEndsAfterStarts,
     },
     {
       name: 'timezone',
@@ -108,8 +130,11 @@ export const Webinars: CollectionConfig = {
       },
       validate: (
         value: string | string[] | null | undefined,
-        { siblingData }: { siblingData?: { registrationMode?: string } },
+        {
+          siblingData,
+        }: { siblingData?: { registrationMode?: string; webinarType?: string } },
       ): true | string => {
+        if (siblingData?.webinarType === 'on-demand') return true;
         if (siblingData?.registrationMode !== 'external') return true;
         if (typeof value !== 'string' || value.trim().length === 0) {
           return 'Registration URL is required when registration mode is External URL.';
@@ -127,8 +152,11 @@ export const Webinars: CollectionConfig = {
       },
       validate: (
         value: unknown,
-        { siblingData }: { siblingData?: { registrationMode?: string } },
+        {
+          siblingData,
+        }: { siblingData?: { registrationMode?: string; webinarType?: string } },
       ): true | string => {
+        if (siblingData?.webinarType === 'on-demand') return true;
         if (siblingData?.registrationMode !== 'internal') return true;
         if (value == null) {
           return 'Registration form is required when registration mode is In-house form.';
@@ -240,7 +268,11 @@ export const Webinars: CollectionConfig = {
       slugChangeRedirectHook('webinars'),
       schemaOverrideAuditHook('webinars'),
       displayPublishedAtAuditHook('webinars'),
+      searchSyncAfterChangeHook('webinars'),
+      webhooksPublishAfterChangeHook('webinars'),
+      indexNowPublishAfterChangeHook('webinars'),
     ],
+    afterDelete: [searchSyncAfterDeleteHook('webinars')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

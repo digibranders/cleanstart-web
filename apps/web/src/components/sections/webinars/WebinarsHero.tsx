@@ -47,7 +47,6 @@ function HexCluster({
             <feGaussianBlur stdDeviation="0.6" />
           </filter>
         </defs>
-        {/* Large hex */}
         <g filter={`url(#hex-blur-${side})`}>
           <polygon
             points="220,30 360,110 360,270 220,350 80,270 80,110"
@@ -56,7 +55,6 @@ function HexCluster({
             strokeWidth="1.5"
           />
         </g>
-        {/* Medium hex */}
         <g filter={`url(#hex-blur-${side})`}>
           <polygon
             points="330,140 410,186 410,278 330,324 250,278 250,186"
@@ -66,7 +64,6 @@ function HexCluster({
             opacity="0.85"
           />
         </g>
-        {/* Small hex */}
         <g filter={`url(#hex-blur-${side})`}>
           <polygon
             points="120,250 180,284 180,352 120,386 60,352 60,284"
@@ -91,7 +88,6 @@ export function WebinarsHero(): React.ReactElement {
       <HexCluster side="left" />
       <HexCluster side="right" />
 
-      {/* Soft center glow to lift the title (matches Figma's halo behind the wordmark) */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"

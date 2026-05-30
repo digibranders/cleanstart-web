@@ -8,16 +8,8 @@ export interface FactoryCardProps {
 export function FactoryCard({ title, description }: FactoryCardProps) {
   return (
     <>
-      {/* MOBILE + TABLET (< lg) — horizontal list-row per Figma 403:15244 (orb
-          left, title + description middle, arrow right). Stacks vertically all
-          the way through tablet; the absolute-positioned desktop variant only
-          kicks in at lg+ where the 5-up grid + engine flames can fit. */}
-      {/* MOBILE + TABLET (< lg) — Figma 403:15301 exact:
-          Card 295×88, radius 18, 2.24 px lavender (#DAB6F3) border, dark→purple
-          gradient (top-to-bottom: #151021 → #131E8F at 71.2% → #551ECE).
-          Orb 97×72 on the left, title (Manrope Medium 20 / lh 1 / -1 px) +
-          desc (Sora Regular 14 / lh 1.1 / -0.98 px / opacity 0.8) middle,
-          chevron 28×28 on the right. */}
+      {/* Mobile and tablet variant; the absolute-positioned desktop variant
+          only applies at lg+ where the 5-up grid fits. */}
       <div
         className="relative lg:hidden"
         style={{
@@ -29,8 +21,6 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
         }}
       >
 
-        {/* Orb — 97×72 area, blends into the dark gradient via color-dodge.
-            Positioned absolutely outside the overflow-hidden wrapper at left: -7px, top: 8px. */}
         <div
           className="absolute mix-blend-color-dodge pointer-events-none"
           style={{
@@ -51,7 +41,6 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           />
         </div>
 
-        {/* Title + description — Figma 4 px gap. Centered vertically, offset left 85px, right 64px. */}
         <div
           className="absolute flex flex-col gap-1 justify-center text-white"
           style={{
@@ -84,7 +73,6 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           </p>
         </div>
 
-        {/* Arrow chevron — 28×28 circle outline. Absolute positioned at right: 24px, top: 30px. */}
         <button
           type="button"
           aria-label={`Learn more about ${title}`}
@@ -106,16 +94,12 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
         </button>
       </div>
 
-      {/* DESKTOP (lg+) — Figma 1440 spec (node 763:3610..3742):
-          Fixed 374 px height, 24 px corner radius, 3 px lavender (#DAB6F3)
-          border. Title and description sized to Figma values (32 / 16). */}
       <div
         className="cs-factory-card relative hidden w-full overflow-hidden rounded-[24px] lg:flex lg:flex-col lg:items-center lg:gap-3 lg:pt-4 lg:pb-4"
         style={{ height: "374px" }}
       >
 
 
-        {/* Orb icon — Figma 1440 spec: 220 × 164 px (placed top-aligned). */}
         <div className="pointer-events-none relative flex w-full items-center justify-center">
           <Image
             src="/images/factory-orb.png"
@@ -129,9 +113,6 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           />
         </div>
 
-        {/* Title + description — Figma 1440 exact:
-            Title Manrope Regular 32px / lh 1.0 / tracking -1.6px (-0.05em)
-            Desc  Sora    Regular 16px / lh 1.1 / tracking -0.64px (-0.04em) / opacity 0.8 */}
         <div className="relative flex w-full flex-col items-center gap-3 px-3 text-center">
           <h3
             className="font-display font-normal text-white"
@@ -156,7 +137,6 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           </p>
         </div>
 
-        {/* Arrow circle — anchored at bottom via mt-auto */}
         <button
           type="button"
           aria-label={`Learn more about ${title}`}
@@ -177,10 +157,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
   );
 }
 
-// "Clean Images" → renders "Clean" / "Images" on two lines (per Figma height=66 = 2 lines @ 33px)
-// "Clean AI Models" → "Clean" / "AI Models" or "Clean AI" / "Models"? Figma shows the latter.
 function renderTitle(title: string) {
-  // Special case: 3-word titles where word 2 stays with word 1 (e.g. Clean AI Models, Clean Sight)
   const parts = title.split(" ");
   if (parts.length === 1) return <>{title}</>;
   if (parts.length === 2) {
@@ -192,7 +169,6 @@ function renderTitle(title: string) {
       </>
     );
   }
-  // 3 words → "Word1 Word2" / "Word3"
   return (
     <>
       {parts.slice(0, 2).join(" ")}

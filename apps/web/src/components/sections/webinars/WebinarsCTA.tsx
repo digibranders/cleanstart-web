@@ -3,9 +3,7 @@
 import { useRef, useState } from "react";
 
 /**
- * Newsletter CTA for the Webinars page — "Get notified about our upcoming webinar".
- * Rendered inside the Footer's fixed 1276×330 / radius-40 slot.
- * Mirrors BlogsCTA structure and styling for visual consistency.
+ * Newsletter CTA for the Webinars page, rendered inside the Footer's CTA slot.
  */
 export function WebinarsCTA(): React.ReactElement {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -27,7 +25,6 @@ export function WebinarsCTA(): React.ReactElement {
       className="absolute inset-0 overflow-hidden"
       style={{ background: "linear-gradient(180deg, #471ec0 0%, #131e8f 100%)" }}
     >
-      {/* ── Ellipse — top-left ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
@@ -43,7 +40,6 @@ export function WebinarsCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Ellipse — bottom-right ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
@@ -59,7 +55,6 @@ export function WebinarsCTA(): React.ReactElement {
         }}
       />
 
-      {/* Left cube */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden sm:block"
@@ -81,7 +76,6 @@ export function WebinarsCTA(): React.ReactElement {
         />
       </div>
 
-      {/* Right cube */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden sm:block"

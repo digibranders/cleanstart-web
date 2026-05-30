@@ -48,11 +48,6 @@ import { publishChecklistEndpoint } from './payload/endpoints/publish-checklist'
 import { dsarFindEndpoint, dsarDeleteEndpoint } from './payload/endpoints/leads-dsar';
 import { retryLeadSyncEndpoint } from './payload/endpoints/retry-lead-sync';
 import {
-  integrationsAuditEndpoint,
-  integrationsHealthEndpoint,
-  integrationsTestEndpoint,
-} from './payload/endpoints/integrations-actions';
-import {
   dashboardsGlobalEndpoint,
   dashboardsGscInspectEndpoint,
   dashboardsGscPerDocEndpoint,
@@ -82,7 +77,6 @@ import { analyticsCachePruneTask } from './payload/jobs/analytics-cache-prune';
 import { dashboardRefreshDailyTask } from './payload/jobs/dashboard-refresh-daily';
 import { dashboardRefreshFrequentTask } from './payload/jobs/dashboard-refresh-frequent';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
-import { wireCustomEditView } from './payload/lib/wire-custom-edit-view';
 import { wirePreviewControls } from './payload/lib/wire-preview';
 import { wireAnalyticsTab } from './payload/lib/wire-analytics-tab';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
@@ -193,6 +187,26 @@ export default buildConfig({
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+      // wireCustomFields stamps component paths onto field types at runtime;
+      // generate:importmap can only discover paths from static config. For
+      // the seven field types that no collection uses today, register them
+      // here so the importMap is populated before those field types appear.
+      generators: [
+        ({ addToImportMap }) => {
+          const FORWARD_COMPAT_FIELD_PATHS = [
+            '@/payload/admin/components/fields/PointField.tsx#PointField',
+            '@/payload/admin/components/fields/RadioField.tsx#RadioField',
+            '@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField',
+            '@/payload/admin/components/fields/TabsField.tsx#TabsField',
+            '@/payload/admin/components/fields/RowField.tsx#RowField',
+            '@/payload/admin/components/fields/JoinField.tsx#JoinField',
+            '@/payload/admin/components/fields/CodeField.tsx#CodeField',
+          ] as const;
+          for (const p of FORWARD_COMPAT_FIELD_PATHS) {
+            addToImportMap(p);
+          }
+        },
+      ],
     },
     components: {
       actions: [
@@ -206,24 +220,40 @@ export default buildConfig({
         './payload/admin/components/ScrollToInvalidField.tsx#ScrollToInvalidField',
         './payload/admin/components/CommandPalette.tsx#CommandPalette',
         './payload/admin/components/FieldDescriptionTooltip.tsx#FieldDescriptionTooltip',
-        // SavedStateIndicator removed — the floating "Saved X ago"
-        // pill in the bottom-right was redundant with Payload's own
-        // toast system and added visual noise on every edit view.
-        // The error-toast surface is preserved via `dispatchSaveError`,
-        // which routes through the standard ToastBus.
+        // SavedStateIndicator — floating "Saved X ago" chip in the
+        // bottom-right corner. Re-enabled: it is a trust signal on par
+        // with Webflow/Notion/Linear. Renders position:fixed so it
+        // interferes with nothing else in the doc-controls strip.
+        './payload/admin/components/SavedStateIndicator.tsx#SavedStateIndicator',
         './payload/admin/components/NavBadges.tsx#NavBadges',
         './payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence',
-        './payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop',
         './payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle',
         './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
-        './payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer',
+        // ListCellEnhancer removed — list-cell formatting now uses
+        // React-rendered Cell components (DateCell / BooleanChipCell /
+        // BytesCell) wired in wire-custom-fields.ts. The old approach
+        // rewrote cell DOM via a global MutationObserver and crashed
+        // React's reconciler on sort (removeChild NotFoundError).
         './payload/admin/components/ToastBus.tsx#ToastBus',
-        // Wave 4 part 2 — Cmd/Ctrl-Shift-S opens our schedule-publish
-        // dialog (DateTimePicker + Dialog from @cleanstart/ui).
-        './payload/admin/components/SchedulePublishDialog.tsx#SchedulePublishDialog',
+        // Note: SchedulePublishDialog is NOT mounted here as a global action.
+        // The Cmd/Ctrl-Shift-S shortcut is wired inside CmsPublishButton so
+        // only one dialog instance ever mounts, eliminating the duplicate-
+        // dialog race when the shortcut fires while the controlled instance
+        // is already open.
       ],
       afterNavLinks: [
         './payload/admin/components/UserMenu.tsx#UserMenu',
+        // Mounted here (inside the nav) rather than in `actions` so the
+        // sidebar auto-collapse policy runs on every admin page — the
+        // custom document-edit chrome (CmsEditView) doesn't render the
+        // `actions` slot, so an actions-mounted policy never ran on
+        // editor views.
+        './payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop',
+        // Resizable + collapsible SEO/meta rail on document edit views.
+        // Mounted in the nav (like NavOpenOnDesktop) so it renders on every
+        // admin page; it's a DOM enhancer that self-activates only when an
+        // edit-view sidebar (`.document-fields--has-sidebar`) is present.
+        './payload/admin/components/DocSidebarResizer.tsx#DocSidebarResizer',
       ],
       beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
       // Wave 5 — branded hero injected above the stock LoginForm. Full
@@ -298,11 +328,9 @@ export default buildConfig({
     .map(wirePublishGate)
     .map(wirePreviewControls)
     .map(wireCustomListView)
-    .map(wireCustomEditView)
     .map(wireAnalyticsTab)
     .map(wireCustomFields),
   globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements, PodcastPage, ResourcesSpotlight, CompanySpotlight]
-    .map(wireCustomEditView)
     .map(wireCustomFields),
   endpoints: [
     jsonLdEndpoint,
@@ -321,9 +349,6 @@ export default buildConfig({
     dsarFindEndpoint,
     dsarDeleteEndpoint,
     retryLeadSyncEndpoint,
-    integrationsTestEndpoint,
-    integrationsHealthEndpoint,
-    integrationsAuditEndpoint,
     previewTokenMintEndpoint,
     previewVerifyEndpoint,
     previewRevokeEndpoint,

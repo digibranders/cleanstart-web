@@ -1,13 +1,5 @@
 import { Reveal } from "@/components/ui/Reveal";
 
-/**
- * Figma frame 516:5364 — 1920 × 762 "SBOM Intelligence That Drives Action"
- *
- * Desktop: White backdrop, 4-up card grid with blue 3D ball icons.
- * Mobile (Figma 817:1281): Stacked cards with cyan-framed white cards,
- * blue ball with unique icon per card. Cards at y=2434–3450px on mobile canvas.
- */
-
 const CARDS = [
   {
     id: "coverage",
@@ -15,7 +7,6 @@ const CARDS = [
     body: "Continuously updated software inventories.",
     icon: "/images/sbom/mobile-adv-1.svg",
     mobileIcon: "/images/sbom/mobile-adv-1.svg",
-    // Figma mobile text widths (node 817:1349–1351)
     mobileTitleW: 135,
     mobileBodyW: 155,
   },
@@ -54,7 +45,6 @@ export function SbomIntelligence(): React.ReactElement {
       data-section="SbomIntelligence"
       className="relative overflow-hidden bg-white"
     >
-      {/* Decorative cyan halos — Figma "Union" shapes top-right + bottom-left */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden md:block"
@@ -82,7 +72,6 @@ export function SbomIntelligence(): React.ReactElement {
         }}
       />
 
-      {/* ── Heading (shared) ── */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md">
         <div className="text-center mb-10 md:mb-14">
           <Reveal header>
@@ -106,7 +95,6 @@ export function SbomIntelligence(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── DESKTOP 4-up card grid (sm+) ── */}
       <div className="relative hidden sm:block mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-section-md">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4" style={{ gap: "32px" }}>
           {CARDS.map((card) => (
@@ -115,7 +103,6 @@ export function SbomIntelligence(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── MOBILE stacked cards (< sm) ── Figma pixel-perfect 360px design ── */}
       <div
         className="sm:hidden flex flex-col items-center pb-10"
         style={{ gap: "16px", paddingLeft: "10px", paddingRight: "10px" }}
@@ -135,7 +122,6 @@ export function SbomIntelligence(): React.ReactElement {
   );
 }
 
-/* ── Desktop card ─────────────────────────────────────────────────── */
 function IntelligenceCard({
   title,
   body,
@@ -165,7 +151,6 @@ function IntelligenceCard({
           paddingRight: "clamp(20px, 1.67vw, 32px)",
         }}
       >
-        {/* Upper purple-pink glow */}
         <div
           aria-hidden
           className="pointer-events-none select-none absolute"
@@ -181,7 +166,6 @@ function IntelligenceCard({
             borderRadius: "50%",
           }}
         />
-        {/* Faint vertical grid lines */}
         <div
           aria-hidden
           className="pointer-events-none select-none absolute inset-0"
@@ -191,7 +175,6 @@ function IntelligenceCard({
             opacity: 0.4,
           }}
         />
-        {/* Blue 3D ball icon */}
         <div
           className="relative mx-auto flex items-center justify-center"
           style={{
@@ -246,7 +229,6 @@ function IntelligenceCard({
   );
 }
 
-/* ── Mobile card (Figma pixel-perfect) ─────────────────────────────── */
 function MobileIntelligenceCard({
   title,
   body,
@@ -260,10 +242,7 @@ function MobileIntelligenceCard({
   titleW: number;
   bodyW: number;
 }): React.ReactElement {
-  // Figma: icon-area container h=87px top=10px, ball 70px centered vertically.
-  // Ball center = 10 + 87/2 = 53.5px → ball top = 53.5 - 35 = 18.5px ≈ 18px.
   const BALL_TOP = 18;
-  // Text starts at 108px from inner card top (Figma absolute coord delta).
   const TEXT_TOP = 108;
 
   return (
@@ -271,7 +250,6 @@ function MobileIntelligenceCard({
       className="relative"
       style={{ width: "340px", height: "238px" }}
     >
-      {/* Outer cyan frame SVG (340×238, opacity 0.3 per Figma) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/sbom/mobile-intel-card-frame.svg"
@@ -281,7 +259,6 @@ function MobileIntelligenceCard({
         loading="lazy"
       />
 
-      {/* Inner white card — left:6px top:6px w:328px h:226px (Figma delta) */}
       <div
         className="absolute bg-white overflow-hidden"
         style={{
@@ -292,7 +269,6 @@ function MobileIntelligenceCard({
           borderRadius: "16px",
         }}
       >
-        {/* Purple glow behind ball — w:209 h:90 blur:66.5 top:13px centered */}
         <div
           aria-hidden
           className="absolute pointer-events-none"
@@ -309,7 +285,6 @@ function MobileIntelligenceCard({
           }}
         />
 
-        {/* Blue ball — 70px, centered, top:18px (centered in 87px container at top:10px) */}
         <div
           className="absolute flex items-center justify-center overflow-hidden"
           style={{
@@ -337,7 +312,6 @@ function MobileIntelligenceCard({
           />
         </div>
 
-        {/* Title + body — top:108px matches Figma (ball bottom 88px → 20px gap) */}
         <div
           className="absolute flex flex-col items-center text-center"
           style={{

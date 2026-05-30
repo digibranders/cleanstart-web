@@ -23,7 +23,10 @@ export const DisableUserAction = (): ReactElement | null => {
   const [busy, setBusy] = useState(false);
 
   const isSelf = user && id != null && String(user.id) === String(id);
-  const alreadyDisabled = (data as { enabled?: boolean } | null)?.enabled === false;
+  // Guard: while document data is loading, treat the account as already
+  // disabled so the button does not flash briefly for accounts that are
+  // in fact disabled. Once data arrives the correct state renders.
+  const alreadyDisabled = !data || (data as { enabled?: boolean }).enabled === false;
 
   const handleConfirm = useCallback(async () => {
     if (id == null) return;

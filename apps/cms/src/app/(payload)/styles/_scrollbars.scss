@@ -25,3 +25,14 @@
   }
 }
 
+// Nav rail uses a narrower 5px scrollbar so it doesn't compress the
+// already-tight 256px column. Global 10px stays for main content areas.
+aside.nav ::-webkit-scrollbar,
+.nav__scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+aside.nav {
+  scrollbar-width: thin;
+}
+

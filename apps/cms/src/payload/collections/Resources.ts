@@ -151,7 +151,7 @@ export const Resources: CollectionConfig = {
       admin: {
         readOnly: true,
         description:
-          'Incremented by the resource-download endpoint when added (Phase F). Always 0 today.',
+          'Automatically incremented each time a visitor downloads this resource.',
         position: 'sidebar',
         condition: (_data, sibling) => sibling?.gated === true,
       },

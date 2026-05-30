@@ -18,10 +18,6 @@ function windowCutoff(now: Date, days: number): string {
   return d.toISOString();
 }
 
-// ---------------------------------------------------------------------------
-// Event adapter
-// ---------------------------------------------------------------------------
-
 type MinimalEventDoc = {
   title: string;
   slug: string;
@@ -57,14 +53,9 @@ async function fetchNextInPersonEvent(
   }
 }
 
-// ---------------------------------------------------------------------------
-// Webinar adapter
-//
-// `getWebinars` sorts by `-startsAt` (descending) and has no future-only
-// filter, so we call the API directly with `startsAt > now` and ascending
-// sort to get the next upcoming webinar within the spotlight window.
-// ---------------------------------------------------------------------------
-
+// `getWebinars` sorts by `-startsAt` and has no future-only filter, so this
+// calls the API directly with `startsAt > now` and ascending sort to get the
+// next upcoming webinar within the spotlight window.
 type MinimalWebinarDoc = {
   title: string;
   slug: string;
@@ -88,7 +79,6 @@ async function fetchNextWebinarSpotlight(
     const res = await fetchCMS<PayloadListResponse<MinimalWebinarDoc>>(
       `/api/webinars?${params.toString()}`,
     );
-    // Webinar.startsAt is `string | null | undefined` — confirmed in webinars.ts
     const doc = res.docs?.[0];
     const startsAt = doc?.startsAt ?? null;
     if (!doc || !startsAt) return null;
@@ -97,10 +87,6 @@ async function fetchNextWebinarSpotlight(
     return null;
   }
 }
-
-// ---------------------------------------------------------------------------
-// CMS global adapters
-// ---------------------------------------------------------------------------
 
 type CmsGlobalRaw = {
   headline?: string | null;
@@ -147,10 +133,6 @@ async function fetchCompanySpotlightGlobal(): Promise<CmsSpotlightResolved | nul
     return null;
   }
 }
-
-// ---------------------------------------------------------------------------
-// Cached production entry points
-// ---------------------------------------------------------------------------
 
 export const getResourcesSpotlight = cache(async (): Promise<SpotlightCard> => {
   const now = new Date();

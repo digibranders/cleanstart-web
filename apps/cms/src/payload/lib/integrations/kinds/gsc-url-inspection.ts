@@ -34,9 +34,14 @@ export const inspectUrl = async (
 ): Promise<UrlInspectionResult | null> => {
   const creds = resolveGscCredentials(row as unknown as { gscConfig?: { siteUrl?: string } });
   if (!creds) return null;
+  const email = creds.serviceAccountJson.client_email;
+  const key = creds.serviceAccountJson.private_key;
+  // Guard missing fields explicitly — an unsafe `as string` cast would turn
+  // undefined into an opaque 401 from Google's auth library.
+  if (typeof email !== 'string' || typeof key !== 'string') return null;
   const auth = new google.auth.JWT({
-    email: creds.serviceAccountJson.client_email as string,
-    key: creds.serviceAccountJson.private_key as string,
+    email,
+    key,
     scopes: SCOPES,
   });
   const client = google.searchconsole({ version: 'v1', auth });

@@ -4,6 +4,8 @@ import { useField } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
+import { DEFAULT_SITE_URL } from './_site-url';
+
 type PermalinkFieldProps = {
   /**
    * URL path prefix for this collection's public route on the marketing
@@ -26,10 +28,6 @@ type PermalinkFieldProps = {
    */
   sourceField?: string;
 };
-
-const DEFAULT_SITE_URL =
-  (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SITE_URL) ||
-  'https://cleanstart.com';
 
 const trimSlash = (s: string): string => s.replace(/^\/+|\/+$/g, '');
 

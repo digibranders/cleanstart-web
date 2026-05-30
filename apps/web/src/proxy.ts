@@ -26,7 +26,7 @@ function isNoindexHost(host: string | null) {
 
 const DRAFT_BYPASS_COOKIE = "__prerender_bypass";
 
-// Flip to "enforce" once the CSP burn-in is complete (see WEB-PRODUCTION.md §4).
+// Stays report-only until the CSP burn-in is complete; set CSP_ENFORCE=1 to flip.
 const CSP_MODE: "report-only" | "enforce" =
   process.env.CSP_ENFORCE === "1" ? "enforce" : "report-only";
 
@@ -38,7 +38,6 @@ function isLocalhost(host: string | null) {
 function shouldRedirectApex(host: string | null) {
   if (!host) return false;
   if (isLocalhost(host)) return false;
-  // Strip port for comparison.
   const bare = host.split(":")[0];
   return bare === APEX_HOST;
 }
@@ -46,7 +45,7 @@ function shouldRedirectApex(host: string | null) {
 function shouldRedirectTrailingSlash(pathname: string) {
   if (pathname === "/") return false;
   if (!pathname.endsWith("/")) return false;
-  // Leave file-style routes alone (e.g. `/sitemap.xml/` is implausible but be safe).
+  // Leave file-style routes alone (e.g. a trailing-slashed `/sitemap.xml/`).
   if (/\.[a-z0-9]+\/$/i.test(pathname)) return false;
   return true;
 }
@@ -66,7 +65,7 @@ export async function proxy(request: NextRequest) {
     nextUrl.pathname.startsWith("/preview/") ||
     nextUrl.pathname.startsWith("/api/preview/");
 
-  // ---- 308 redirects (run before headers — saves work on the discarded response).
+  // Redirects run before header work to avoid building headers for a discarded response.
 
   if (shouldRedirectApex(host)) {
     const url = new URL(nextUrl.toString());
@@ -87,8 +86,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  // ---- CMS-managed redirects (slug-change, manual, archive, migration seeds).
-  // Consulted before the request is forwarded so renamed pages don't 404.
+  // CMS-managed redirects are consulted before forwarding so renamed pages don't 404.
   // Fails open: any lookup error falls through to normal request handling.
   if (!shouldSkipRedirectLookup(nextUrl.pathname)) {
     const row = await lookupRedirect(nextUrl.pathname);
@@ -107,8 +105,6 @@ export async function proxy(request: NextRequest) {
       }
     }
   }
-
-  // ---- Security headers on the forwarded response.
 
   const nonce = generateNonce();
   const requestHeaders = new Headers(headers);

@@ -1,0 +1,169 @@
+// =============================================================================
+// Document edit SEO/meta rail — tighter spacing, resizable, collapsible.
+// =============================================================================
+//
+// The editor is Payload's STOCK chrome, so the two-column edit row is
+// `.document-fields--has-sidebar` (main | gap | rail). `DocSidebarResizer`
+// (a DOM enhancer mounted via afterNavLinks) sets `--cs-doc-sidebar-w` +
+// `data-cs-sidebar-collapsed` on that row and portals a control overlay into a
+// wrapper it appends there; everything here is the presentation. Falls back to
+// a fixed 440px rail if that JS never runs — progressive enhancement.
+
+.document-fields--has-sidebar {
+  position: relative;
+  --cs-doc-sidebar-w: 440px;
+  --cs-doc-sidebar-collapsed-w: 40px;
+}
+
+// Resizing/collapsing only applies on the two-column desktop layout; below
+// Payload's 1025px breakpoint the rail stacks under the main column.
+@media (min-width: 1025px) {
+  // The rail column is the `…__sidebar-wrap` (the flex item; the inner
+  // `…__sidebar` just fills it). It's sized via flex-basis, not `width`: as a
+  // flex item with `min-width: auto` it won't shrink below its content, so the
+  // collapse below needs an explicit basis + `min-width: 0`. `!important`
+  // overrides Payload's vendor sizing.
+  // The rail column. `flex-basis` + `width` are set INLINE by DocSidebarResizer
+  // (a `var()` flex-basis doesn't re-resolve reliably across changes); here we
+  // just pin the flex behaviour so the inline basis is honoured exactly and the
+  // column can shrink to the collapsed strip (`min-width: 0` clears the flex
+  // auto-min). Falls back to 440px if the JS never runs.
+  .document-fields--has-sidebar > .document-fields__sidebar-wrap {
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    flex-basis: 440px;
+    min-width: 0 !important;
+  }
+
+  // Reclaim Payload's lopsided rail padding (40px left / 60px right ≈ 100px of
+  // dead space) with a tight symmetric gutter, so the fields fill the rail.
+  .document-fields--has-sidebar .document-fields__sidebar-fields {
+    padding-inline: var(--cs-space-4) !important;
+  }
+
+  // Collapsed — the rail shrinks to a thin strip and the editing column
+  // reclaims the width. The strip itself is the expand target.
+  .document-fields--has-sidebar[data-cs-sidebar-collapsed='1'] {
+    // (flex-basis/width set inline by the component.)
+    > .document-fields__sidebar-wrap {
+      overflow: hidden;
+    }
+
+    // Hide the field content so the strip reads as an empty rail, not a
+    // column of clipped labels.
+    .document-fields__sidebar {
+      visibility: hidden;
+    }
+  }
+}
+
+// ─── Resize handle + collapse toggle overlay ──────────────────────────────
+//
+// A click-through layer portaled into the row; only the thin grip and the
+// toggle capture input, so the form underneath stays fully interactive. The
+// grip sits on the rail's left edge via the SAME width variable — no
+// measurement, so it tracks resize/collapse automatically.
+.cs-doc-sidebar-ctl {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+.cs-doc-sidebar-ctl__handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  // Rail is flush to the row's right edge, so its left edge is `rail width` in
+  // from the right. Centre the grip on that boundary.
+  right: var(--cs-doc-sidebar-w, 440px);
+  width: 14px;
+  transform: translateX(50%);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: col-resize;
+  touch-action: none;
+  pointer-events: auto;
+
+  // The visible grip line — quiet until hovered/focused.
+  &::before {
+    content: '';
+    width: 2px;
+    border-radius: 1px;
+    background: transparent;
+    transition: background-color var(--cs-motion-micro);
+  }
+
+  &:hover::before,
+  &:focus-visible::before {
+    background: var(--cs-cyan-500);
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  // Meaningless while collapsed — the strip is the expand target instead.
+  .document-fields--has-sidebar[data-cs-sidebar-collapsed='1'] & {
+    display: none;
+  }
+}
+
+.cs-doc-sidebar-ctl__toggle {
+  position: absolute;
+  top: var(--cs-space-3, 12px);
+  // Centred on the rail's left edge (in the column gap) when expanded, so it
+  // never overlaps the rail's first field.
+  right: var(--cs-doc-sidebar-w, 440px);
+  transform: translateX(50%);
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  appearance: none;
+  padding: 0;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-input, 6px);
+  background: var(--theme-input-bg);
+  color: var(--theme-text-soft);
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    color var(--cs-motion-micro),
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
+
+  &:hover {
+    color: var(--cs-cyan-500);
+    border-color: var(--cs-cyan-500);
+    background: var(--cs-tint-brand-soft);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--cs-tint-focus-ring);
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+  }
+
+  // Collapsed — recentre horizontally inside the thin strip, but keep the same
+  // top offset as the expanded state so the toggle doesn't jump vertically.
+  .document-fields--has-sidebar[data-cs-sidebar-collapsed='1'] & {
+    right: calc(var(--cs-doc-sidebar-collapsed-w, 40px) / 2);
+  }
+}
