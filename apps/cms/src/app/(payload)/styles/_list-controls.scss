@@ -140,21 +140,18 @@
   }
 
   &__table {
+    position: relative;
     background: var(--theme-elevation-50);
     border-radius: var(--cs-radius-card);
     // Raised-surface elevation: inner highlight + a 1px ring one step
     // above canvas, in place of a flat bare border.
     box-shadow: var(--cs-shadow-surface-raised);
-    // `clip` keeps the card's border-radius clipping its corners while
-    // still allowing the sticky thead to pin as rows scroll under it
-    // (`hidden` would prevent scroll; `auto` would leak square corners).
+    // Horizontal scroll is owned by Payload's inner `.table` div (it carries
+    // `overflow-x: auto`), so the auto-layout table overflows into THAT
+    // scroller. The card itself stays `clip`: it keeps border-radius clipping
+    // its corners and clips the resize-handle overlay's edge grip, without
+    // becoming a second (phantom-scrolling) scroll container.
     overflow: clip;
-
-    // On narrow viewports, allow horizontal scroll so fixed columns
-    // don't clip — min-width on the inner table prevents text squash.
-    @media (max-width: 1024px) {
-      overflow-x: auto;
-    }
 
     &--empty {
       min-height: 320px;
@@ -405,6 +402,81 @@
   font-feature-settings: 'tnum' 1;
 }
 
+// ─── CmsListView footer — result range · page nav · rows-per-page ──
+//
+// The custom list view renders its own footer (`.cs-list__pagination`),
+// not Payload's stock `.page-controls`. The bare markup had no layout —
+// Prev/Next collapsed against the "Page X of Y" label with no gap. Lay
+// it out as a proper table footer: result range on the left, page nav +
+// rows-per-page on the right, separated from the table by a hairline.
+// Wraps gracefully on narrow widths.
+.cs-list__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--cs-space-3) var(--cs-space-4);
+  margin-top: var(--cs-space-2);
+  padding-block: var(--cs-space-3);
+  border-top: 1px solid var(--theme-elevation-150);
+}
+
+.cs-list__pagination-count {
+  font-size: 12px;
+  color: var(--theme-text-soft);
+  font-feature-settings: 'tnum' 1;
+  font-variant-numeric: tabular-nums;
+
+  strong {
+    color: var(--theme-text);
+    font-weight: 600;
+  }
+}
+
+.cs-list__pagination-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--cs-space-3) var(--cs-space-5);
+  margin-left: auto;
+}
+
+.cs-list__pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+}
+
+.cs-list__page-info {
+  font-size: 12px;
+  color: var(--theme-text-soft);
+  font-feature-settings: 'tnum' 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cs-list__per-page {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cs-space-2);
+}
+
+.cs-list__per-page-label {
+  font-size: 12px;
+  color: var(--theme-text-soft);
+  white-space: nowrap;
+}
+
+// Compact override on the shared `.cs-native-select` primitive — auto
+// width + the 30px control rhythm the rest of the list chrome uses.
+.cs-list__per-page-select {
+  width: auto;
+  height: 30px;
+  padding: 0 30px 0 10px;
+  font-size: 12px;
+  font-feature-settings: 'tnum' 1;
+}
+
 // ─── Smart relationship & date cells ───────────────────────────────
 .cs-relationship-cell {
   display: inline-flex;
@@ -554,4 +626,61 @@
 // shifted between Payload majors.
 a[href='/admin/collections/leads/create'] {
   display: none !important;
+}
+
+// ─── Resizable columns — drag-handle overlay (ColumnResizer) ───────
+//
+// The overlay lives inside `.cs-list__table` (position: relative) and is
+// click-through except for the thin grips, so the header underneath keeps
+// its sort + column-menu affordances. Each grip sits on a column's right
+// edge; dragging rewrites that column's width live via an injected
+// <style>. Grips track the (sticky) header as the page scrolls.
+.cs-col-resize-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  // Above the sticky thead (z-index: 2) so grips receive pointer input.
+  z-index: 5;
+}
+
+.cs-col-resize-handle {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: 13px;
+  // Reset native <button> chrome — the grip span is the only visible part.
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  // Centre the hit area on the column boundary.
+  transform: translateX(-50%);
+  pointer-events: auto;
+  cursor: col-resize;
+  touch-action: none;
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &__grip {
+    width: 2px;
+    height: 100%;
+    background: transparent;
+    border-radius: 1px;
+    transition: background-color var(--cs-motion-micro);
+  }
+
+  &:hover &__grip,
+  &:focus-visible &__grip {
+    background: var(--cs-cyan-500);
+  }
+}
+
+// During an active drag, lock the cursor + suppress selection document-wide
+// so the resize reads as one continuous gesture.
+body.cs-col-resizing,
+body.cs-col-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
 }

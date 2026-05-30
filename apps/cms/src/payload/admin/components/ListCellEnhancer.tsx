@@ -4,12 +4,13 @@ import type { ReactElement } from 'react';
 import { useEffect } from 'react';
 
 /**
- * Reformat verbose list-view cell content client-side. Payload's
- * auto-injected fields (`filesize`, `updatedAt`, `createdAt`) render
- * as raw bytes / `Mon Day(th) Year, hh:mm AM` — neither is glanceable
- * in a dense table. This component finds those cells and rewrites
- * their text in place. Idempotent — safe to re-run on every DOM
- * mutation.
+ * Reformat verbose list-view cell content client-side. Payload renders
+ * `filesize` as raw bytes and every date column as
+ * `Mon Day(th) Year, hh:mm AM` — neither is glanceable in a dense table.
+ * This component finds those cells (all date fields across every
+ * collection, plus filesize and booleans) and rewrites their text in
+ * place, keeping the full value in a `title` tooltip. Idempotent — safe
+ * to re-run on every DOM mutation via the MutationObserver below.
  *
  * Renders nothing visible.
  */
@@ -74,13 +75,24 @@ export const ListCellEnhancer = (): ReactElement | null => {
         }
         cell.setAttribute(ATTR, '1');
       }
-      // Date cells (updatedAt / createdAt / publishedAt).
+      // Date cells across every collection. Payload names date fields by
+      // convention (`…At`: updatedAt/createdAt/publishedAt/startsAt/
+      // lastReviewedAt/lastHitAt/nextRetryAt/resolvedAt/expiresAt/
+      // revokedAt/capturedAt; `…Date`: publicationDate), plus two
+      // non-conventional names (lastChecked, timestamp). `formatDate`
+      // returns null for any cell whose text isn't a parseable date, so a
+      // broad selector is self-correcting — a non-date match is a no-op.
       const dateCells = document.querySelectorAll<HTMLElement>(
-        '.cell-updatedAt, .cell-createdAt, .cell-publishedAt',
+        'td[class*="cell-"][class$="At"], td[class*="cell-"][class$="Date"], td.cell-lastChecked, td.cell-timestamp',
       );
       for (const cell of dateCells) {
         if (cell.getAttribute(ATTR) === '1') continue;
         const original = (cell.textContent ?? '').trim();
+        // An empty cell hasn't been populated yet (React is still hydrating /
+        // the column was just toggled on). Leave it UNMARKED so a later
+        // observer pass reformats it once the date lands — marking it now
+        // would freeze the verbose value forever.
+        if (original === '') continue;
         const next = formatDate(original);
         if (next) {
           cell.setAttribute('title', original);
