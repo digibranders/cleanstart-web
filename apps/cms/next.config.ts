@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import type { NextConfig } from 'next';
 import { withPayload } from '@payloadcms/next/withPayload';
 import { withSentryConfig } from '@sentry/nextjs';
@@ -77,6 +79,12 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Pin Turbopack's workspace root to the monorepo root. Without this, Next
+  // infers the root from the nearest lockfile and can mis-resolve in the pnpm
+  // workspace; Turbopack also requires an absolute path here.
+  turbopack: {
+    root: path.resolve(import.meta.dirname, '../..'),
+  },
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },
