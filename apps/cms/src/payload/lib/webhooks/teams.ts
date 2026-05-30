@@ -29,10 +29,14 @@ interface AdaptiveFact {
 /**
  * Per arch doc §webhooks and INTEGRATIONS-RESEARCH v1 §1.2, Adaptive
  * Cards posted via Teams Workflows resolve `<at>Name</at>` tokens
- * against an `msteams.entities[]` array. Each entry needs the AAD
- * Object ID (GUID) and the UPN — plain `@displayName` strings do not
- * notify. Cross-tenant guests use a UPN of the form
- * `user_fynix.digital#EXT#@cleanstart.onmicrosoft.com`.
+ * against an `msteams.entities[]` array. The `mentioned.id` (AAD Object
+ * ID GUID) is what actually resolves the person and triggers the
+ * notification — a plain `@displayName` with no entity does not notify.
+ * The `mentioned.name` is the TEXT Teams renders in place of the `<at>`
+ * token, so it must be the human display name (NOT the UPN/email, or the
+ * card shows the raw email). The UPN is still collected (cross-tenant
+ * guests use `user_domain#EXT#@tenant.onmicrosoft.com`) and passed to
+ * Workflows that key off it, but it is never the rendered name.
  */
 export interface TeamsMention {
   readonly displayName: string;
@@ -59,23 +63,85 @@ const truncateValue = (raw: unknown, max = 240): string => {
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
 };
 
-const factsFromData = (data: Record<string, unknown>): AdaptiveFact[] => {
-  // Surface up to six top-level fields. Flat sample keeps the card
-  // glanceable; a future iteration can map per-event-type to a
-  // hand-tuned shape.
-  const entries = Object.entries(data).slice(0, 6);
-  return entries.map(([title, value]) => ({ title, value: truncateValue(value) }));
+// Keys that are surfaced as buttons or are noise to a human reader, so
+// they don't also clutter the key/value FactSet.
+//   url / adminUrl → rendered as Action.OpenUrl buttons
+//   id            → an opaque numeric, meaningless in a chat card
+const FACT_EXCLUDE = new Set(['url', 'adminUrl', 'id']);
+
+const FACT_LABELS: Record<string, string> = {
+  collection: 'Collection',
+  slug: 'Slug',
+  title: 'Title',
+  publishedAt: 'Published',
+  formSlug: 'Form',
+  formId: 'Form ID',
+  source: 'Source',
+  duplicate: 'Duplicate',
 };
 
-const headlineFromEvent = (event: WebhookEvent): string => {
+const formatFactValue = (key: string, raw: unknown): string => {
+  if (key === 'publishedAt' && typeof raw === 'string' && raw.length > 0) {
+    const d = new Date(raw);
+    if (!Number.isNaN(d.getTime())) {
+      return d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+    }
+  }
+  return truncateValue(raw);
+};
+
+const factsFromData = (data: Record<string, unknown>): AdaptiveFact[] => {
+  // Surface up to six top-level fields (excluding button/noise keys),
+  // mapping known keys to friendly labels. Keeps the card glanceable.
+  const entries = Object.entries(data)
+    .filter(([key]) => !FACT_EXCLUDE.has(key))
+    .slice(0, 6);
+  return entries.map(([key, value]) => ({
+    title: FACT_LABELS[key] ?? key,
+    value: formatFactValue(key, value),
+  }));
+};
+
+interface AdaptiveOpenUrlAction {
+  readonly type: 'Action.OpenUrl';
+  readonly title: string;
+  readonly url: string;
+}
+
+const isHttpUrl = (raw: unknown): raw is string =>
+  typeof raw === 'string' && /^https?:\/\//i.test(raw);
+
+const actionsFromData = (data: Record<string, unknown>): AdaptiveOpenUrlAction[] => {
+  const actions: AdaptiveOpenUrlAction[] = [];
+  if (isHttpUrl(data.url)) {
+    actions.push({ type: 'Action.OpenUrl', title: 'View live page', url: data.url });
+  }
+  // `adminUrl` (the CMS edit-view deep link) is intentionally NOT rendered
+  // as a card button: it only works for logged-in editors and would send
+  // everyone else to a login wall, plus it surfaces an internal URL into a
+  // potentially wide channel audience. It stays in the event payload for
+  // generic-webhook/automation subscribers that want it.
+  return actions;
+};
+
+/**
+ * The card's primary heading — the human-recognisable name of what
+ * happened. For content this is the doc title; for leads it falls back
+ * to the submitter email, then the form, then a friendly default. The
+ * slug is intentionally NOT appended (it lives in the FactSet and the
+ * "View live page" button) so the title reads cleanly at the top.
+ */
+const titleFromEvent = (event: WebhookEvent): string => {
   const data = event.data as Record<string, unknown>;
   const title = typeof data.title === 'string' && data.title.length > 0 ? data.title : null;
-  const slug = typeof data.slug === 'string' && data.slug.length > 0 ? data.slug : null;
-  if (title && slug) return `${title} (${slug})`;
   if (title) return title;
-  if (slug) return slug;
-  if (typeof data.email === 'string') return data.email;
-  return '(no headline)';
+  if (typeof data.email === 'string' && data.email.length > 0) return data.email;
+  if (typeof data.formSlug === 'string' && data.formSlug.length > 0) {
+    return `New submission · ${data.formSlug}`;
+  }
+  if (typeof data.slug === 'string' && data.slug.length > 0) return data.slug;
+  if (event.event === 'lead.submitted') return 'New form submission';
+  return 'New publish';
 };
 
 export interface BuildTeamsPayloadOptions {
@@ -97,11 +163,15 @@ export const buildTeamsPayload = (
   options: BuildTeamsPayloadOptions = {},
 ): string => {
   const facts = factsFromData(event.data);
+  const actions = actionsFromData(event.data);
   const eligible = (options.mentions ?? []).filter((m) => isMentionEligible(m, event));
   const entities: TeamsEntity[] = eligible.map((m) => ({
     type: 'mention',
     text: `<at>${m.displayName}</at>`,
-    mentioned: { id: m.aadObjectId, name: m.upn },
+    // name = the display text Teams renders for the mention; id = the AAD
+    // Object ID that resolves the user and fires the ping. Using the UPN
+    // as `name` (the old behaviour) made the card show the raw email.
+    mentioned: { id: m.aadObjectId, name: m.displayName },
   }));
   const mentionLine =
     entities.length > 0
@@ -119,18 +189,23 @@ export const buildTeamsPayload = (
           type: 'AdaptiveCard',
           version: '1.4',
           body: [
+            // Content title leads — the human-recognisable headline a
+            // reader scans for in a busy channel.
             {
               type: 'TextBlock',
-              size: 'Medium',
+              size: 'Large',
               weight: 'Bolder',
-              text: `CleanStart · ${event.event}`,
+              wrap: true,
+              text: titleFromEvent(event),
             },
+            // Event type as a small, subtle eyebrow beneath the title —
+            // useful for at-a-glance triage without dominating the card.
             {
               type: 'TextBlock',
               spacing: 'None',
+              size: 'Small',
               isSubtle: true,
-              wrap: true,
-              text: headlineFromEvent(event),
+              text: `CleanStart · ${event.event}`,
             },
             ...(mentionLine
               ? [{ type: 'TextBlock', wrap: true, text: mentionLine }]
@@ -144,6 +219,7 @@ export const buildTeamsPayload = (
                 ]
               : []),
           ],
+          ...(actions.length > 0 ? { actions } : {}),
           ...(entities.length > 0 ? { msteams: { entities } } : {}),
         },
       },

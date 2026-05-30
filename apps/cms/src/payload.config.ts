@@ -48,11 +48,6 @@ import { publishChecklistEndpoint } from './payload/endpoints/publish-checklist'
 import { dsarFindEndpoint, dsarDeleteEndpoint } from './payload/endpoints/leads-dsar';
 import { retryLeadSyncEndpoint } from './payload/endpoints/retry-lead-sync';
 import {
-  integrationsAuditEndpoint,
-  integrationsHealthEndpoint,
-  integrationsTestEndpoint,
-} from './payload/endpoints/integrations-actions';
-import {
   dashboardsGlobalEndpoint,
   dashboardsGscInspectEndpoint,
   dashboardsGscPerDocEndpoint,
@@ -234,7 +229,11 @@ export default buildConfig({
         './payload/admin/components/NavGroupPersistence.tsx#NavGroupPersistence',
         './payload/admin/components/EditorFullscreenToggle.tsx#EditorFullscreenToggle',
         './payload/admin/components/ShortcutHelpDialog.tsx#ShortcutHelpDialog',
-        './payload/admin/components/ListCellEnhancer.tsx#ListCellEnhancer',
+        // ListCellEnhancer removed — list-cell formatting now uses
+        // React-rendered Cell components (DateCell / BooleanChipCell /
+        // BytesCell) wired in wire-custom-fields.ts. The old approach
+        // rewrote cell DOM via a global MutationObserver and crashed
+        // React's reconciler on sort (removeChild NotFoundError).
         './payload/admin/components/ToastBus.tsx#ToastBus',
         // Note: SchedulePublishDialog is NOT mounted here as a global action.
         // The Cmd/Ctrl-Shift-S shortcut is wired inside CmsPublishButton so
@@ -250,6 +249,11 @@ export default buildConfig({
         // `actions` slot, so an actions-mounted policy never ran on
         // editor views.
         './payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop',
+        // Resizable + collapsible SEO/meta rail on document edit views.
+        // Mounted in the nav (like NavOpenOnDesktop) so it renders on every
+        // admin page; it's a DOM enhancer that self-activates only when an
+        // edit-view sidebar (`.document-fields--has-sidebar`) is present.
+        './payload/admin/components/DocSidebarResizer.tsx#DocSidebarResizer',
       ],
       beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
       // Wave 5 — branded hero injected above the stock LoginForm. Full
@@ -345,9 +349,6 @@ export default buildConfig({
     dsarFindEndpoint,
     dsarDeleteEndpoint,
     retryLeadSyncEndpoint,
-    integrationsTestEndpoint,
-    integrationsHealthEndpoint,
-    integrationsAuditEndpoint,
     previewTokenMintEndpoint,
     previewVerifyEndpoint,
     previewRevokeEndpoint,

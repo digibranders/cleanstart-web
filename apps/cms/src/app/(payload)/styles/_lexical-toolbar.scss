@@ -1,6 +1,17 @@
 // 25. Lexical toolbar — tighten density, right-align secondary actions
 // =============================================================================
 
+// Suppress the stock BlocksFeature dropdown. With CodeBlock as the only
+// registered block, Payload renders a redundant "Code block" dropdown
+// (groupKey `blocks` → `.toolbar-popup__dropdown-blocks`) alongside our
+// custom `<>` button (cs-code-block), which inserts the very same block.
+// Hide the dropdown so there is one unambiguous code affordance. The block
+// node, slash-menu entry, and serialization are untouched — only the
+// duplicate toolbar trigger is removed.
+.toolbar-popup__dropdown-blocks {
+  display: none !important;
+}
+
 // Custom Add Menu — replaces the stock Payload `add` dropdown group.
 // The `+` button sits at the left of the fixed toolbar (group order 10).
 // Clicking it opens a portal-rendered popover listing all insertable blocks.

@@ -3,13 +3,15 @@ import type { WebhookEvent, WebhookEventName } from '../webhooks/dispatch';
 /**
  * Per-row routing predicate. Three independent filters, all optional:
  *
- *   events       — required subscription list (empty = subscribe to none)
+ *   events       — subscribe to specific event types (empty = ALL events)
  *   collections  — limit `document.published` to specific collection slugs
  *   formSlugs    — limit `lead.submitted` to specific form slugs
  *
- * Empty arrays mean "no filter" *only* for `collections` and `formSlugs`.
- * `events` is the required subscription — an integration with `events: []`
- * receives nothing.
+ * Empty arrays mean "no filter" for all three. An empty `events` list is
+ * "subscribe to everything" — matching the admin UI, which shows an "All
+ * events" chip and the guidance "Leave all filters empty to receive
+ * everything". (Disable a row via the `enabled` toggle, not by clearing
+ * its events.)
  */
 export interface IntegrationRouting {
   readonly events: readonly WebhookEventName[];
@@ -41,7 +43,8 @@ export const routingMatches = (
   routing: IntegrationRouting,
   event: WebhookEvent,
 ): boolean => {
-  if (!routing.events.includes(event.event)) return false;
+  // Empty events list = subscribe to ALL event types (no filter).
+  if (isNonEmpty(routing.events) && !routing.events.includes(event.event)) return false;
 
   if (event.event === 'document.published' && isNonEmpty(routing.collections)) {
     const collection = stringField(event.data, 'collection');

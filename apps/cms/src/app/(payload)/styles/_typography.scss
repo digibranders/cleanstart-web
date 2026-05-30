@@ -40,12 +40,14 @@ time {
   font-feature-settings: 'tnum' 1, 'cv11' 1;
 }
 
-// Date list-columns are metadata — right-align so trailing digits form
-// a hard vertical wall (matches the header alignment in _tables.scss).
+// Date list-columns: left-align so the value sits directly under its
+// (left-aligned) column header. Right-aligning these read as misaligned
+// because they're variable-width date strings ("May 30th 2026, 6:11 PM"),
+// not pure digits — the ragged left edge never lined up with the header.
 .cell-updatedAt,
 .cell-createdAt,
 .cell-publicationDate {
-  text-align: right;
+  text-align: left;
 }
 
 // Mono everywhere code or anchor slugs render

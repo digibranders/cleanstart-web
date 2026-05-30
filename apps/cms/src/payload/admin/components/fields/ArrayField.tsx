@@ -322,7 +322,7 @@ export const ArrayField = (props: ArrayFieldClientProps): ReactElement => {
                 <button
                   type="button"
                   className={`cs-array__row-toggle${
-                    isDisabled && row.customComponents?.RowLabel
+                    row.customComponents?.RowLabel
                       ? ' cs-array__row-toggle--rowlabel'
                       : ''
                   }`}
@@ -344,7 +344,12 @@ export const ArrayField = (props: ArrayFieldClientProps): ReactElement => {
                       />
                     </svg>
                   </span>
-                  {isDisabled && row.customComponents?.RowLabel ? (
+                  {row.customComponents?.RowLabel ? (
+                    // Honour a field-configured RowLabel in BOTH edit and
+                    // read-only mode. The label components are 'use client'
+                    // and read live form state via useRowLabel(), so the
+                    // header updates as the editor types. Without this the
+                    // header fell back to a single-field `rowSummary`.
                     <span className="cs-array__row-summary">
                       <RowLabelProvider path={`${path}.${i}`} rowNumber={i}>
                         {row.customComponents.RowLabel}

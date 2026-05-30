@@ -30,6 +30,26 @@
     position: sticky;
     top: 0;
     z-index: 30;
+
+    // Sleeker toolbar — trim the stock 36px medium button to a compact
+    // 32px row so the bar reads as a pro toolbar rather than chunky chrome.
+    // Scoped to the bar, so buttons elsewhere keep their default size.
+    // `!important` beats the several global 36px height rules
+    // (_buttons / _button-audit / _density). Height applies to every
+    // control (incl. the icon-only kebab) so the row stays even; the
+    // tighter side padding + smaller label apply only to text buttons.
+    // The split-button chevron caps are excluded — they own their own
+    // square geometry and stretch to the primary's height.
+    .btn:not(.cs-publish-menu__chevron):not(.cs-preview-menu__chevron) {
+      height: 32px !important;
+      min-height: 32px !important;
+    }
+
+    .btn--size-medium:not(.cs-publish-menu__chevron):not(.cs-preview-menu__chevron):not(.btn--icon-only) {
+      padding-block: 0 !important;
+      padding-inline: 12px !important;
+      font-size: 13px;
+    }
   }
 
   &__bar-left {
@@ -43,7 +63,12 @@
   &__bar-right {
     align-items: center;
     display: flex;
+    // Keep the action buttons on one line and hard-pinned to the right
+    // edge regardless of how wide the left-hand meta (Modified / Published
+    // / word-count) grows, with one consistent gap between every control.
+    flex-wrap: nowrap;
     gap: var(--cs-space-2);
+    margin-left: auto;
   }
 
   &__status { font-size: 13px; }
@@ -148,15 +173,17 @@
   display: inline-flex;
   // Lock the chevron's footprint so it's identical whether it sits next
   // to a Payload `.btn` (which carries its own padding) or a bare custom
-  // button. 36px matches the medium-button height for a square cap.
-  flex: 0 0 36px;
+  // button. 30px gives a compact square cap next to the 32px-tall sleek
+  // toolbar buttons; height stretches to the primary via the menu's
+  // align-items: stretch.
+  flex: 0 0 30px;
   height: auto;
   justify-content: center;
-  min-width: 36px;
+  min-width: 30px;
   padding: 0;
   position: relative;
   transition: background var(--cs-motion-micro);
-  width: 36px;
+  width: 30px;
 
   // The chevron sits at margin-left: -1px so its left border overlaps the
   // primary's right border. Without z-index management, the chevron's
@@ -165,6 +192,14 @@
   &:hover,
   &:focus-visible {
     z-index: 1;
+  }
+
+  // The chevron glyph is a flex child. SVGs resolve `min-width: auto` to
+  // 0, so the flex layout was collapsing it to ~2px wide — it read as a
+  // faint dot instead of a chevron. Pin flex-shrink so it always renders
+  // at its declared 12px.
+  svg {
+    flex-shrink: 0;
   }
 }
 
@@ -251,6 +286,53 @@
       outline: 2px solid var(--cs-cyan-500);
       outline-offset: -2px;
     }
+  }
+}
+
+// ─── Document toolbar (Payload's `.doc-controls`) — sleek + tidy ──────
+//
+// Most collections render Payload's stock `.doc-controls` doc header (the
+// custom `.cs-edit__bar` is the exception). Its action cluster
+// (Preview / Save Draft / Publish / ⋮) lives in `.doc-controls__controls-w`
+// (a flex row whose gap was 20px) and is right-aligned to the 60px form
+// gutter on `.doc-controls`. Bring it to the same compact rhythm as the
+// rest of the chrome: 32px controls, a single consistent 8px gap, and a
+// tighter right inset so the cluster sits nearer the edge.
+.doc-controls {
+  // Pull the cluster tight to the right edge — the stock 60px gutter left a
+  // wide dead strip after the kebab.
+  padding-inline-end: var(--cs-space-3) !important;
+
+  // One consistent, tight gap between every control (stock is `8px 20px`, so
+  // the horizontal gap was 20px). The chevron caps stay joined to their
+  // primary via their own -1px margin, inside the menu wrapper.
+  &__controls-wrapper {
+    gap: 6px !important;
+  }
+
+  // The ⋮ kebab is a compact secondary affordance — snug it closer to the
+  // Publish button than the inter-button gap so it reads as a trailing cap,
+  // not a standalone control.
+  &__dots {
+    margin-inline-start: -4px;
+  }
+
+  // Compact 32px height for EVERY control — including the split-button
+  // chevron caps. `_density` forces `.doc-controls .btn` to 36px; if we
+  // shrink only the primary the chevron stays 36px and the split button
+  // goes uneven, so override the chevron too (its width + zero padding come
+  // from %cs-split-chevron and are untouched).
+  .btn,
+  &__dots,
+  &__dots > button {
+    height: 32px !important;
+    min-height: 32px !important;
+  }
+
+  .btn--size-medium:not([class*='-menu__chevron']):not(.btn--icon-only) {
+    padding-block: 0 !important;
+    padding-inline: 12px !important;
+    font-size: 13px;
   }
 }
 

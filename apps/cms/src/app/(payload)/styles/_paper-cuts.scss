@@ -137,11 +137,11 @@
 
 // ─── Boolean chips (`<code class="bool-cell">true|false</code>`) ──
 //
-// Payload renders boolean fields in list views as a `<code>` block
-// with raw "true" / "false" text — reads like a debug log. Promote
-// to a coloured chip: green for true, neutral for false. The `data-
-// bool` attr is added by `ListCellEnhancer` (CSS can't match by
-// text content alone).
+// Payload renders boolean fields in list views as raw "true" / "false"
+// text — reads like a debug log. `BooleanChipCell` (wired onto every
+// checkbox field in wire-custom-fields.ts) renders a `.bool-cell` span
+// with a `data-bool` attr; these rules promote it to a coloured chip:
+// green for true, neutral for false.
 .bool-cell {
   @extend %cs-chip-sm;
   font-family: inherit;
@@ -217,6 +217,160 @@
     color: var(--theme-text-soft);
     background: var(--theme-elevation-150);
     border-color: var(--theme-elevation-200);
+  }
+}
+
+// ─── Integrations audit trail — delivery-history table ─────────────
+//
+// `AuditTrail.tsx` renders the last 50 webhooks_dead_letter rows for a
+// row. Previously unstyled (raw <table>); this gives it a proper card +
+// table treatment matching the rest of the admin chrome.
+.cs-integrations-audit {
+  margin-top: var(--cs-space-3);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--cs-radius-card);
+  overflow: hidden;
+  background: var(--theme-elevation-50);
+
+  &--empty,
+  &--error {
+    padding: var(--cs-space-3) var(--cs-space-4);
+    font-size: 13px;
+    color: var(--theme-text-soft);
+  }
+
+  &--error {
+    color: var(--color-error-500, #ff5c5c);
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    thead th {
+      text-align: left;
+      padding: var(--cs-space-2) var(--cs-space-3);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--theme-text-soft);
+      background: var(--theme-elevation-100);
+      border-bottom: 1px solid var(--theme-elevation-150);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: var(--cs-space-2) var(--cs-space-3);
+      border-bottom: 1px solid var(--theme-elevation-100);
+      color: var(--theme-text);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover td {
+      background: var(--theme-elevation-100);
+    }
+  }
+
+  &__when {
+    white-space: nowrap;
+    color: var(--theme-text-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__num {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // Event name as a subtle mono chip.
+  &__event {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--theme-elevation-150);
+    color: var(--theme-text-soft);
+    white-space: nowrap;
+  }
+
+  // Status traffic-light chips.
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    border: 1px solid transparent;
+
+    &--resolved {
+      color: var(--color-success-500, #00c46a);
+      background: rgba(0, 196, 106, 0.14);
+      border-color: rgba(0, 196, 106, 0.28);
+    }
+
+    &--retry {
+      color: var(--color-warning-500, #fbbf24);
+      background: rgba(251, 191, 36, 0.14);
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    &--exhausted {
+      color: var(--color-error-500, #ff5c5c);
+      background: rgba(220, 38, 38, 0.14);
+      border-color: rgba(220, 38, 38, 0.28);
+    }
+  }
+
+  // Last-error cell — clamp long messages to one line with ellipsis;
+  // full text on hover via title attr.
+  &__error {
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--theme-text-soft);
+    font-size: 12px;
+  }
+}
+
+// ─── Integrations test-fire panel ──────────────────────────────────
+.cs-integrations-test {
+  margin-top: var(--cs-space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+  flex-wrap: wrap;
+
+  &--disabled {
+    font-size: 13px;
+    color: var(--theme-text-soft);
+    font-style: italic;
+  }
+
+  &__result {
+    font-size: 12px;
+    font-weight: 500;
+
+    &--ok {
+      color: var(--color-success-500, #00c46a);
+    }
+    &--fail {
+      color: var(--color-error-500, #ff5c5c);
+    }
+    &--running {
+      color: var(--theme-text-soft);
+    }
   }
 }
 

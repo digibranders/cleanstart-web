@@ -49,12 +49,30 @@ export const Events: CollectionConfig = {
       name: 'startsAt',
       type: 'date',
       required: true,
-      admin: { date: { pickerAppearance: 'dayAndTime' } },
+      admin: {
+        date: { pickerAppearance: 'dayAndTime' },
+        // Custom calendar so it matches `endsAt` (which needs a dynamic
+        // min-date the stock picker can't express).
+        components: {
+          Field: '@/payload/admin/components/fields/DateField.tsx#DateField',
+        },
+      },
     },
     {
       name: 'endsAt',
       type: 'date',
-      admin: { date: { pickerAppearance: 'dayAndTime' } },
+      admin: {
+        date: { pickerAppearance: 'dayAndTime' },
+        // `minFromField: 'startsAt'` greys out any date before the start in
+        // the calendar, so an end-before-start can't be selected. The
+        // `validate` below is the server-side backstop.
+        components: {
+          Field: {
+            path: '@/payload/admin/components/fields/DateField.tsx#DateField',
+            clientProps: { minFromField: 'startsAt' },
+          },
+        },
+      },
       validate: (
         value: Date | string | null | undefined,
         { siblingData }: { siblingData?: { startsAt?: Date | string | null } },

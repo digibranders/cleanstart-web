@@ -65,7 +65,11 @@ const fixtureEvent = (event: WebhookEventName) =>
  * — test fires are isolated from the production retry queue.
  */
 export const integrationsTestEndpoint: Endpoint = {
-  path: '/integrations/:id/test',
+  // Registered as a COLLECTION endpoint on `integrations`, so the path is
+  // relative to /api/integrations → resolves to /api/integrations/:id/test.
+  // Config-level (root) endpoints with 3+ path segments are shadowed by
+  // Payload's REST router and 404; collection endpoints are not.
+  path: '/:id/test',
   method: 'post',
   handler: async (req) => {
     if (!hasRole(req.user, 'admin')) {
@@ -83,19 +87,18 @@ export const integrationsTestEndpoint: Endpoint = {
         id: params.data.id,
         overrideAccess: true,
         depth: 0,
+        // Bypass secret-masking so we get the real encrypted webhook URL
+        // to decrypt — not the admin-UI sentinel string.
+        context: { skipSecretMask: true },
       })) as unknown as IntegrationRow;
     } catch {
       return json({ ok: false, error: 'not_found' }, { status: 404 });
     }
 
+    // Empty events = "all events" (see routingMatches), so default the
+    // test fire to document.published rather than erroring.
     const events = row.routing?.events ?? [];
-    const firstEvent = events[0];
-    if (!firstEvent) {
-      return json(
-        { ok: false, error: 'row has no subscribed events to test' },
-        { status: 400 },
-      );
-    }
+    const firstEvent: WebhookEventName = events[0] ?? 'document.published';
 
     let destinations: Parameters<typeof dispatchEvent>[1] extends infer T
       ? T extends { destinations?: infer D }
@@ -175,7 +178,8 @@ export const integrationsTestEndpoint: Endpoint = {
  * Thresholds: 0 dead-letters = green, 1–2 = yellow, ≥3 = red.
  */
 export const integrationsHealthEndpoint: Endpoint = {
-  path: '/integrations/:id/health',
+  // Collection endpoint on `integrations` → /api/integrations/:id/health.
+  path: '/:id/health',
   method: 'get',
   handler: async (req) => {
     if (!hasRole(req.user, 'admin')) {
@@ -240,7 +244,8 @@ interface DeadLetterRow {
  * through to webhooks_dead_letter for the full payload.
  */
 export const integrationsAuditEndpoint: Endpoint = {
-  path: '/integrations/:id/audit',
+  // Collection endpoint on `integrations` → /api/integrations/:id/audit.
+  path: '/:id/audit',
   method: 'get',
   handler: async (req) => {
     if (!hasRole(req.user, 'admin')) {

@@ -55,14 +55,15 @@ const FIELD_OVERRIDES: Partial<Record<Field['type'], string>> = {
  * Stamping `relationship` centrally gives every collection a resolved
  * relationship title (instead of an opaque id) plus the stable
  * `.cs-relationship-cell` class the table CSS keys column widths off.
- * Per-field `Cell` overrides win (e.g. a collection that passes a
- * polymorphic `collectionSlug` explicitly).
+ * `date` columns get a relative/compact `DateCell` and `checkbox`
+ * columns a coloured `BooleanChipCell`. Per-field `Cell` overrides win
+ * (e.g. a collection that passes a polymorphic `collectionSlug`).
  *
- * Date columns are deliberately NOT stamped here: they're reformatted
- * client-side by `ListCellEnhancer` (relative "3d ago" / compact
- * "12 Aug 2025"), which rewrites the cell's text node directly. A
- * component-rendered DateCell would be clobbered by that enhancer's
- * `textContent` rewrite, so the two must not both own date cells.
+ * These are pure React-rendered cells — they replaced the former
+ * `ListCellEnhancer`, which rewrote cell text nodes via a global
+ * MutationObserver and desynced React's reconciler (a `removeChild`
+ * crash on sort). Rendering through Payload's own Cell slot keeps React
+ * the sole owner of the DOM, so re-sorting/re-rendering is safe.
  *
  * NOTE: any path added here must resolve in the generated import map —
  * run `pnpm --filter @cleanstart/cms generate:importmap` and commit the
@@ -71,6 +72,18 @@ const FIELD_OVERRIDES: Partial<Record<Field['type'], string>> = {
 const CELL_OVERRIDES: Partial<Record<Field['type'], string>> = {
   relationship:
     '@/payload/admin/components/RelationshipCell.tsx#RelationshipCell',
+  date: '@/payload/admin/components/DateCell.tsx#DateCell',
+  checkbox: '@/payload/admin/components/BooleanChipCell.tsx#BooleanChipCell',
+};
+
+/**
+ * Name-based Cell overrides for fields the type map can't target.
+ * `filesize` is a `number` (so a type override would hit every numeric
+ * column), and is declared explicitly on upload collections that want
+ * the human-readable `BytesCell` rather than raw bytes.
+ */
+const CELL_OVERRIDES_BY_NAME: Record<string, string> = {
+  filesize: '@/payload/admin/components/BytesCell.tsx#BytesCell',
 };
 
 const hasOwnFieldOverride = (field: Field): boolean => {
@@ -147,7 +160,9 @@ const walkFields = (fields: Field[]): Field[] =>
     const override = FIELD_OVERRIDES[field.type];
     if (override) next = stampField(next, override);
 
-    const cellOverride = CELL_OVERRIDES[field.type];
+    const fieldName = (field as { name?: string }).name;
+    const cellByName = fieldName ? CELL_OVERRIDES_BY_NAME[fieldName] : undefined;
+    const cellOverride = cellByName ?? CELL_OVERRIDES[field.type];
     if (cellOverride) next = stampCell(next, cellOverride);
 
     // Recurse into containers that hold sub-fields.

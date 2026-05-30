@@ -595,7 +595,7 @@ export interface Integration {
    * Choose which activity on the site triggers a notification. Leave all filters empty to receive everything.
    */
   routing?: {
-    events: ('document.published' | 'lead.submitted')[];
+    events?: ('document.published' | 'lead.submitted')[] | null;
     /**
      * Filter document.published events by collection. Empty = all collections.
      */
@@ -620,8 +620,17 @@ export interface Integration {
      */
     mentions?:
       | {
+          /**
+           * The name shown in the notification, e.g. "@Alex". This is just the visible label — the actual person is identified by the two fields below.
+           */
           displayName: string;
+          /**
+           * The person's Microsoft Entra (Azure AD) Object ID — a GUID that uniquely identifies them. Required for the @mention to actually notify them. The Teams app does NOT show this — get it from the Entra admin center → Identity → Users → select the person → copy "Object ID", or ask your IT admin.
+           */
           aadObjectId: string;
+          /**
+           * The person's work email (called "User Principal Name" in Microsoft). This is the email they sign in to Teams / Microsoft 365 with. External guests use the special "user_domain#EXT#@tenant.onmicrosoft.com" form.
+           */
           upn: string;
           /**
            * Optional — only mention this person for specific event types. Leave empty to mention them on all notifications.

@@ -109,27 +109,44 @@ export const AuditTrail = (): ReactElement | null => {
           <tr>
             <th>When</th>
             <th>Event</th>
-            <th>Attempts</th>
+            <th className="cs-integrations-audit__num">Attempts</th>
             <th>Status</th>
             <th>Last error</th>
           </tr>
         </thead>
         <tbody>
-          {state.rows.map((r) => (
-            <tr key={String(r.id)}>
-              <td>{formatDate(r.createdAt)}</td>
-              <td>{r.event}</td>
-              <td>{r.attemptCount}</td>
-              <td>
-                {r.resolvedAt
-                  ? 'Resolved'
-                  : r.nextRetryAt
-                    ? `Retry ${formatDate(r.nextRetryAt)}`
-                    : 'Exhausted'}
-              </td>
-              <td className="cs-integrations-audit__error">{r.lastError ?? '—'}</td>
-            </tr>
-          ))}
+          {state.rows.map((r) => {
+            const status: 'resolved' | 'retry' | 'exhausted' = r.resolvedAt
+              ? 'resolved'
+              : r.nextRetryAt
+                ? 'retry'
+                : 'exhausted';
+            const statusLabel =
+              status === 'resolved'
+                ? 'Resolved'
+                : status === 'retry'
+                  ? `Retry ${formatDate(r.nextRetryAt as string)}`
+                  : 'Exhausted';
+            return (
+              <tr key={String(r.id)}>
+                <td className="cs-integrations-audit__when">{formatDate(r.createdAt)}</td>
+                <td>
+                  <span className="cs-integrations-audit__event">{r.event}</span>
+                </td>
+                <td className="cs-integrations-audit__num">{r.attemptCount}</td>
+                <td>
+                  <span
+                    className={`cs-integrations-audit__status cs-integrations-audit__status--${status}`}
+                  >
+                    {statusLabel}
+                  </span>
+                </td>
+                <td className="cs-integrations-audit__error" title={r.lastError ?? undefined}>
+                  {r.lastError ?? '—'}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

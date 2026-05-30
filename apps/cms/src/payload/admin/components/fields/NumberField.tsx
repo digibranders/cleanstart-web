@@ -14,11 +14,12 @@ const labelOf = (raw: unknown): string => {
 };
 
 /**
- * Custom number field with stepper buttons.
+ * Custom number field — a plain number input (no +/- stepper buttons; the
+ * native browser spin arrows are hidden in CSS, and ↑/↓ keys still step).
  *
  * Supports both scalar and `hasMany` number arrays. In hasMany mode an
  * input + Remove button renders per value; a separate Add row appends
- * new values. The stepper buttons are only shown for scalar mode.
+ * new values.
  */
 export const NumberField = (props: NumberFieldClientProps): ReactElement => {
   const { field, path } = props;
@@ -51,14 +52,6 @@ export const NumberField = (props: NumberFieldClientProps): ReactElement => {
     if (raw === '') { setValue(null); return; }
     const parsed = Number(raw);
     if (Number.isFinite(parsed)) setValue(parsed);
-  };
-
-  const bump = (delta: number): void => {
-    const current = scalarValue ?? 0;
-    let next = current + delta;
-    if (typeof min === 'number' && next < min) next = min;
-    if (typeof max === 'number' && next > max) next = max;
-    setValue(next);
   };
 
   // --- hasMany helpers ---
@@ -154,41 +147,21 @@ export const NumberField = (props: NumberFieldClientProps): ReactElement => {
           </span>
         ) : null}
       </label>
-      <div className="cs-number-field__row">
-        <button
-          type="button"
-          className="cs-number-field__step"
-          onClick={() => bump(-step)}
-          aria-label="Decrement"
-          disabled={isDisabled}
-        >
-          −
-        </button>
-        <input
-          id={inputId}
-          type="number"
-          className="cs-number-field__input"
-          value={scalarValue == null ? '' : scalarValue}
-          onChange={onScalarInput}
-          min={min}
-          max={max}
-          step={step}
-          required={field.required}
-          readOnly={readOnly}
-          disabled={disabled && !readOnly}
-          aria-readonly={readOnly || undefined}
-          aria-disabled={disabled || undefined}
-        />
-        <button
-          type="button"
-          className="cs-number-field__step"
-          onClick={() => bump(step)}
-          aria-label="Increment"
-          disabled={isDisabled}
-        >
-          +
-        </button>
-      </div>
+      <input
+        id={inputId}
+        type="number"
+        className="cs-number-field__input"
+        value={scalarValue == null ? '' : scalarValue}
+        onChange={onScalarInput}
+        min={min}
+        max={max}
+        step={step}
+        required={field.required}
+        readOnly={readOnly}
+        disabled={disabled && !readOnly}
+        aria-readonly={readOnly || undefined}
+        aria-disabled={disabled || undefined}
+      />
       {description ? <p className="field-description">{description}</p> : null}
       {showError && errorMessage ? (
         <output className="field-error" aria-live="polite">

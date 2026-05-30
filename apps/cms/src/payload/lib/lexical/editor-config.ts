@@ -9,7 +9,6 @@ import {
   HeadingFeature,
   HorizontalRuleFeature,
   IndentFeature,
-  InlineCodeFeature,
   InlineToolbarFeature,
   ItalicFeature,
   LinkFeature,
@@ -27,6 +26,7 @@ import {
 
 import { CodeBlock } from '../../blocks/CodeBlock';
 import { cleanstartAddMenuFeature } from './add-menu-feature';
+import { cleanstartCodeBlockFeature } from './code-block-feature';
 import { cleanstartEmbedFeature } from './embed-feature';
 import { cleanstartInlineImageFeature } from './inline-image-feature';
 import { cleanstartLinkPopoverFeature } from './link-popover-feature';
@@ -44,7 +44,6 @@ export const cleanstartLexicalEditor = () =>
       ItalicFeature(),
       UnderlineFeature(),
       StrikethroughFeature(),
-      InlineCodeFeature(),
       SubscriptFeature(),
       SuperscriptFeature(),
 
@@ -83,6 +82,12 @@ export const cleanstartLexicalEditor = () =>
       // authoring is identical whether the block sits inline in a body
       // field or as a top-level page section.
       BlocksFeature({ blocks: [CodeBlock] }),
+
+      // Single `<>` toolbar button that inserts the CodeBlock above. It
+      // takes the slot the inline-code button used to occupy and stands in
+      // for the stock BlocksFeature dropdown (hidden in _lexical-toolbar.scss),
+      // so editors see one unambiguous code affordance instead of two.
+      cleanstartCodeBlockFeature(),
 
       // Per-placement metadata fields. They live on each upload node's
       // `fields` object inside the Lexical JSON — no Media collection

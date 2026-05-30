@@ -56,7 +56,10 @@
       font-size: 12px;
       letter-spacing: -0.01em;
       text-transform: none;
-      padding: 8px var(--cs-space-3);
+      // Match the body cells' horizontal padding (--cs-space-4) so every
+      // column header sits directly above its cell content — th was 12px
+      // vs td's 16px, leaving every label 4px left of its values.
+      padding: 8px var(--cs-space-4);
       border-bottom: 1px solid var(--theme-elevation-200);
       vertical-align: middle;
       white-space: nowrap;
