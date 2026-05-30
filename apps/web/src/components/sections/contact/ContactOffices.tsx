@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 
@@ -225,14 +226,12 @@ function OfficeCard({ office }: { office: Office }) {
   return (
     <div className="flex h-full flex-col gap-5 px-2 sm:px-4 lg:px-5">
       <div className="relative h-[51px] w-[77px] overflow-hidden rounded-[8px]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={office.flag}
           alt={office.flagAlt}
           width={77}
           height={51}
-          loading="lazy"
-          decoding="async"
+          sizes="77px"
           className="block h-full w-full object-cover"
         />
       </div>
@@ -291,14 +290,12 @@ function AwardBadge({ award }: { award: (typeof AWARDS)[number] }) {
         }}
       />
       <div className="absolute inset-x-0 top-0 flex h-[100px] items-center justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={award.src}
           alt={award.name}
           width={award.w}
           height={award.h}
-          loading="lazy"
-          decoding="async"
+          sizes="82px"
           className="object-contain"
         />
       </div>

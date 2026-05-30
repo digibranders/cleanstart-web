@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
@@ -683,11 +684,12 @@ function CompanyMark({
     const h = small ? 18 : 24;
     const maxW = small ? 80 : 110;
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      <Image
         src={logoSrc}
         alt={company}
+        width={maxW}
         height={h}
+        sizes="110px"
         style={{
           height: h,
           maxWidth: maxW,
@@ -695,8 +697,6 @@ function CompanyMark({
           objectFit: "contain",
           opacity: 1,
         }}
-        loading="lazy"
-        decoding="async"
       />
     );
   }

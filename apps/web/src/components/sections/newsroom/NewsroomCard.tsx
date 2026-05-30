@@ -35,15 +35,15 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
         }}
       >
         {logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={logoUrl}
-            alt={item.publisher ?? item.title}
-            className="object-contain pointer-events-none select-none"
-            style={{ maxHeight: "96px", maxWidth: "78%" }}
-            loading="lazy"
-            decoding="async"
-          />
+          <div className="relative h-24 w-[78%]">
+            <Image
+              src={logoUrl}
+              alt={item.publisher ?? item.title}
+              fill
+              className="object-contain pointer-events-none select-none"
+              sizes="(min-width: 1280px) 300px, (min-width: 768px) 35vw, 70vw"
+            />
+          </div>
         ) : heroUrl ? (
           <Image
             src={heroUrl}
