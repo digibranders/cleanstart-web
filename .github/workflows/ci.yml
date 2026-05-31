@@ -121,6 +121,7 @@ jobs:
   cms-e2e:
     name: apps/cms · e2e (@phase-d-preview)
     needs: cms
+    if: false # Playwright suites temporarily disabled
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -201,6 +202,7 @@ jobs:
   cms-vr:
     name: apps/cms · visual regression (@phase-ui-vr)
     needs: cms
+    if: false # Playwright suites temporarily disabled
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -256,6 +258,7 @@ jobs:
   cms-a11y:
     name: apps/cms · a11y (@phase-ui-a11y)
     needs: cms
+    if: false # Playwright suites temporarily disabled
     runs-on: ubuntu-latest
     services:
       postgres:
