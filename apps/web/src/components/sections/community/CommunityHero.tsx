@@ -1,3 +1,4 @@
+import { Container } from "@/components/layout";
 import { HeroReveal } from "@/components/ui/Reveal";
 
 export function CommunityHero() {
@@ -41,8 +42,8 @@ export function CommunityHero() {
         />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[var(--container-default)] px-6">
-        <div className="pt-[clamp(112px,10vw,172px)] pb-[clamp(40px,5vw,80px)]">
+      <Container className="relative z-10">
+        <div className="mx-auto w-full max-w-[1200px] pt-[clamp(112px,10vw,172px)] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-8">
             <HeroReveal y={50} duration={1.0} className="lg:w-[48%]">
               <h1
@@ -92,7 +93,7 @@ export function CommunityHero() {
             </div>
           </div>
         </div>
-      </div>
+      </Container>
 
       <div className="relative z-0 lg:hidden">
         <div className="relative h-[clamp(220px,55vw,360px)] overflow-hidden">

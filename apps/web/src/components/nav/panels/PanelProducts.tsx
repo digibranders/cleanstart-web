@@ -21,12 +21,16 @@ export function PanelProducts({ item, latestImages }: Props) {
 
   return (
     <PanelShell
-      width={item.width ?? 760}
+      width={item.width ?? 880}
       eyebrow={item.label}
       tagline={item.tagline}
       atmosphere={ATMOSPHERE}
     >
-      <div className="grid grid-cols-[1.55fr_1fr] gap-3.5">
+      {/* Hero column is widened (≈360px inner) so the image-attribute chips —
+          arch + license + "Security Hardened" — stay on one line. The panel
+          still fits the site frame: the nav positioner clamps it 40px off the
+          edge (matching the header gutter). */}
+      <div className="grid grid-cols-[1.1fr_1fr] gap-3.5">
         <div className="flex flex-col gap-1.5">
           {products.map((p) => (
             <PanelRow

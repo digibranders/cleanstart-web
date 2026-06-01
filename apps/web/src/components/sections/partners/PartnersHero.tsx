@@ -76,19 +76,30 @@ export function PartnersHero(): React.ReactElement {
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <Link
               href="/book-a-demo"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-white text-[#0F123E] px-5 py-3 font-semibold transition-colors hover:bg-white/90"
-              style={{ fontSize: "var(--fs-button)", minHeight: "44px" }}
+              className="cs-btn-glass"
+              style={
+                {
+                  ["--cs-btn-fs" as string]: "var(--fs-button)",
+                  ["--cs-btn-px" as string]: "22px",
+                } as React.CSSProperties
+              }
             >
-              Become a Partner
-              <ArrowIcon />
+              <span>Become a Partner</span>
+              <ArrowIcon className="cs-cta-arrow" />
             </Link>
             <Link
               href="/deal-registration"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2F49E5] text-white px-5 py-3 font-semibold transition-colors hover:bg-[#2438C2]"
-              style={{ fontSize: "var(--fs-button)", minHeight: "44px" }}
+              className="cs-btn-blue"
+              style={
+                {
+                  ["--cs-btn-fs" as string]: "var(--fs-button)",
+                  ["--cs-btn-px" as string]: "22px",
+                  gap: "10px",
+                } as React.CSSProperties
+              }
             >
-              Deal Registration
-              <ArrowIcon className="text-white" />
+              <span>Deal Registration</span>
+              <ArrowIcon />
             </Link>
           </div>
         </div>

@@ -8,8 +8,19 @@ vi.mock('@/lib/api/community-images', () => ({
 import { fetchCommunityImages } from '@/lib/api/community-images';
 import { fetchLatestImages, imageDetailsHref, IMAGES_SUBDOMAIN_BASE, LATEST_IMAGES_POOL_SIZE } from './latest-images';
 
-function img(name: string, publishedAt?: string, updatedAt?: string): CommunityImage {
-  const out: CommunityImage = { id: name, name, description: '', imageUrl: `https://cdn/${name}.png` };
+function img(
+  name: string,
+  publishedAt?: string,
+  updatedAt?: string,
+  isPublic = true,
+): CommunityImage {
+  const out: CommunityImage = {
+    id: name,
+    name,
+    description: '',
+    imageUrl: `https://cdn/${name}.png`,
+    isPublic,
+  };
   if (publishedAt) out.publishedAt = publishedAt;
   if (updatedAt) out.updatedAt = updatedAt;
   return out;
@@ -31,6 +42,15 @@ describe('fetchLatestImages', () => {
     ]);
     const out = await fetchLatestImages();
     expect(out.map((x) => x.name)).toEqual(['a', 'c', 'b']);
+  });
+
+  it('excludes non-public (enterprise) images so the hero command stays pullable', async () => {
+    vi.mocked(fetchCommunityImages).mockResolvedValue([
+      img('enterprise-newer', undefined, '2026-06-01', false), // newest, but not pullable
+      img('public-older', undefined, '2026-05-01', true),
+    ]);
+    const out = await fetchLatestImages();
+    expect(out.map((x) => x.name)).toEqual(['public-older']);
   });
 
   it('slices to LATEST_IMAGES_POOL_SIZE', async () => {
