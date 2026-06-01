@@ -3,10 +3,12 @@ export type SpotlightCard =
   | { kind: 'webinar'; title: string; slug: string; startsAt: string }
   | { kind: 'careers'; openRoles: number }
   | { kind: 'cms'; headline: string; sub?: string; ctaLabel: string; ctaHref: string; image?: string }
-  | { kind: 'evergreen'; id: 'bulletin' | 'talent-network' };
+  | { kind: 'evergreen'; id: 'bulletin' | 'community' };
 
 export const BULLETIN_EVERGREEN: SpotlightCard = { kind: 'evergreen', id: 'bulletin' };
-export const TALENT_NETWORK_EVERGREEN: SpotlightCard = { kind: 'evergreen', id: 'talent-network' };
+// Company's evergreen fallback when there are no open roles: point people to the
+// open-source community instead of ending the menu on a "not hiring" note.
+export const COMMUNITY_EVERGREEN: SpotlightCard = { kind: 'evergreen', id: 'community' };
 
 type CmsSpotlight = {
   headline: string;
@@ -63,5 +65,5 @@ export async function resolveCompanySpotlight(deps: {
   const cms = await deps.fetchSpotlightGlobal();
   if (cms && !isExpired(cms.expiresAt, deps.now)) return toCmsCard(cms);
 
-  return TALENT_NETWORK_EVERGREEN;
+  return COMMUNITY_EVERGREEN;
 }

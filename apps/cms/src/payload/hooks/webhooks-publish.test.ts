@@ -47,6 +47,47 @@ describe('webhooksPublishAfterChangeHook', () => {
     );
   });
 
+  it('includes updatedAt only when re-publishing older content (publishedAt much earlier)', async () => {
+    dispatchSpy.mockResolvedValueOnce([]);
+    const hook = webhooksPublishAfterChangeHook('blogs');
+    // Unpublished → edited → re-published: original Feb publish date, fresh updatedAt.
+    await hook({
+      doc: {
+        id: 9,
+        slug: 'old',
+        title: 'Old',
+        _status: 'published',
+        publishedAt: '2026-02-25T05:30:00Z',
+        updatedAt: '2026-05-30T13:16:00Z',
+      },
+      previousDoc: { _status: 'draft' },
+      req: makeReq(),
+    } as unknown as Parameters<ReturnType<typeof webhooksPublishAfterChangeHook>>[0]);
+    const data = (dispatchSpy.mock.calls[0]?.[0] as unknown as { data: Record<string, unknown> }).data;
+    expect(data.publishedAt).toBe('2026-02-25T05:30:00Z');
+    expect(data.updatedAt).toBe('2026-05-30T13:16:00Z');
+  });
+
+  it('omits updatedAt on a first publish (published/updated within a minute)', async () => {
+    dispatchSpy.mockResolvedValueOnce([]);
+    const hook = webhooksPublishAfterChangeHook('blogs');
+    await hook({
+      doc: {
+        id: 10,
+        slug: 'fresh',
+        title: 'Fresh',
+        _status: 'published',
+        publishedAt: '2026-05-30T13:16:00Z',
+        updatedAt: '2026-05-30T13:16:10Z',
+      },
+      previousDoc: { _status: 'draft' },
+      req: makeReq(),
+    } as unknown as Parameters<ReturnType<typeof webhooksPublishAfterChangeHook>>[0]);
+    const data = (dispatchSpy.mock.calls[0]?.[0] as unknown as { data: Record<string, unknown> }).data;
+    expect(data.publishedAt).toBe('2026-05-30T13:16:00Z');
+    expect(data.updatedAt).toBeUndefined();
+  });
+
   it('fires on first publish for a doc with no previous version (new draft → published)', async () => {
     dispatchSpy.mockResolvedValueOnce([]);
     const hook = webhooksPublishAfterChangeHook('blogs');

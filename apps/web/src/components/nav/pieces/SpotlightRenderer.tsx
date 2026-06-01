@@ -2,18 +2,34 @@ import Link from "next/link";
 import type { SpotlightCard } from "@/components/nav/data/spotlights";
 import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
 
-const ACCENT = {
-  cyan: { color: "#2cc1eb", border: "rgba(44,193,235,0.15)" },
-  green: { color: "#6cffc2", border: "rgba(108,255,194,0.15)" },
-  magenta: { color: "#ff8ab8", border: "rgba(255,138,184,0.15)" },
-};
+// Phase-8 rule: a single brand accent (cyan) on the one actionable line per
+// card. No multicolor text — category eyebrows stay muted neutral so the cards
+// read as one quiet system.
+const ACCENT = "#2cc1eb";
 
 const AVATAR_GRADIENTS = [
   "linear-gradient(135deg,#471FC3,#2cc1eb)",
-  "linear-gradient(135deg,#2cc1eb,#6cffc2)",
-  "linear-gradient(135deg,#ff8ab8,#471FC3)",
-  "linear-gradient(135deg,#6cffc2,#ff8ab8)",
+  "linear-gradient(135deg,#131e8f,#2cc1eb)",
+  "linear-gradient(135deg,#640DFB,#471FC3)",
+  "linear-gradient(135deg,#2cc1eb,#dab6f3)",
 ];
+
+const EYEBROW =
+  "text-[10px] font-bold uppercase tracking-[0.14em] text-white/45";
+
+// The live CleanStart community lives in the LinkedIn group; the chips name the
+// channels where the community is active (the card itself opens the primary one).
+const COMMUNITY_LINKEDIN_URL = "https://www.linkedin.com/groups/18324021/";
+const COMMUNITY_CHANNELS = ["LinkedIn"];
+
+// Shared card surface. `hero` swaps the Level-2 tile for the elevated, brand-
+// edged hero surface (used where the spotlight IS the featured zone — Company).
+// Full static class strings so Tailwind's scanner emits every arbitrary value.
+function cardClass(hero: boolean): string {
+  return hero
+    ? "cs-hero-surface group/cta flex flex-col rounded-[14px] p-4 text-white"
+    : "cs-tile-glass cs-tile-interactive group/cta flex flex-col rounded-[12px] p-4 text-white";
+}
 
 function formatShortDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -24,33 +40,29 @@ function formatShortDate(iso: string): string {
 
 type Props = {
   spotlight: SpotlightCard;
-  context: "resources" | "company";
+  /** Render on the elevated hero surface — used where the spotlight is the featured zone. */
+  hero?: boolean;
 };
 
-export function SpotlightRenderer({ spotlight, context }: Props) {
+export function SpotlightRenderer({ spotlight, hero = false }: Props) {
+  const CARD = cardClass(hero);
+  const ACTION =
+    "mt-auto pt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold";
+  const headlineClass = hero
+    ? "text-[19px] font-semibold leading-[1.15] tracking-[-0.015em] text-white/95"
+    : "text-[15px] font-bold leading-tight text-white";
+
   if (spotlight.kind === "event") {
     return (
-      <Link
-        href={`/event/${spotlight.slug}`}
-        className="group/cta flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
-        style={{ background: "#1c1530", borderColor: ACCENT.cyan.border }}
-      >
+      <Link href={`/event/${spotlight.slug}`} className={`${CARD} min-h-[230px]`}>
         <div>
-          <div
-            className="text-[10px] font-bold uppercase tracking-[0.14em]"
-            style={{ color: ACCENT.cyan.color }}
-          >
-            Next event
-          </div>
-          <div className="mt-2 text-[15px] font-bold leading-tight">{spotlight.title}</div>
+          <div className={EYEBROW}>Next event</div>
+          <div className={`mt-2 ${headlineClass}`}>{spotlight.title}</div>
           <div className="mt-1.5 text-[11px] text-white/65">
             {formatShortDate(spotlight.startsAt)}
           </div>
         </div>
-        <div
-          className="mt-auto pt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
-          style={{ color: ACCENT.cyan.color }}
-        >
+        <div className={ACTION} style={{ color: ACCENT }}>
           Save your seat <ArrowGlyph direction="right" size={12} />
         </div>
       </Link>
@@ -59,27 +71,15 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
 
   if (spotlight.kind === "webinar") {
     return (
-      <Link
-        href={`/webinar/${spotlight.slug}`}
-        className="group/cta flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
-        style={{ background: "#1c1530", borderColor: ACCENT.magenta.border }}
-      >
+      <Link href={`/webinar/${spotlight.slug}`} className={`${CARD} min-h-[230px]`}>
         <div>
-          <div
-            className="text-[10px] font-bold uppercase tracking-[0.14em]"
-            style={{ color: ACCENT.magenta.color }}
-          >
-            Next webinar
-          </div>
-          <div className="mt-2 text-[15px] font-bold leading-tight">{spotlight.title}</div>
+          <div className={EYEBROW}>Next webinar</div>
+          <div className={`mt-2 ${headlineClass}`}>{spotlight.title}</div>
           <div className="mt-1.5 text-[11px] text-white/65">
             {formatShortDate(spotlight.startsAt)}
           </div>
         </div>
-        <div
-          className="mt-auto pt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
-          style={{ color: ACCENT.magenta.color }}
-        >
+        <div className={ACTION} style={{ color: ACCENT }}>
           Register <ArrowGlyph direction="right" size={12} />
         </div>
       </Link>
@@ -88,15 +88,9 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
 
   if (spotlight.kind === "careers") {
     return (
-      <Link
-        href="/careers"
-        className="group/cta flex min-h-[280px] flex-col rounded-[12px] border p-4 text-white transition-colors"
-        style={{ background: "#1c1530", borderColor: ACCENT.magenta.border }}
-      >
+      <Link href="/careers" className={`${CARD} min-h-[280px]`}>
         <div>
-          <div className="text-[17px] font-bold leading-tight tracking-[-0.01em]">
-            Build the base layer with us.
-          </div>
+          <div className={headlineClass}>Build the base layer with us.</div>
           <div className="mt-1.5 text-xs leading-relaxed text-white/65">
             Engineers, SEs, designers. Remote-friendly. Equity-led.
           </div>
@@ -106,7 +100,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
             {AVATAR_GRADIENTS.map((g, i) => (
               <div
                 key={i}
-                className="h-[30px] w-[30px] rounded-full border-2 border-[#1c1530]"
+                className="h-[30px] w-[30px] rounded-full border-2 border-[#1b1640]"
                 style={{ background: g, marginLeft: i === 0 ? 0 : -8 }}
               />
             ))}
@@ -116,7 +110,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
           </div>
           <div
             className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
-            style={{ color: ACCENT.magenta.color }}
+            style={{ color: ACCENT }}
           >
             See careers <ArrowGlyph direction="right" size={12} />
           </div>
@@ -126,29 +120,16 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
   }
 
   if (spotlight.kind === "cms") {
-    const a = context === "resources" ? ACCENT.cyan : ACCENT.green;
     return (
-      <Link
-        href={spotlight.ctaHref}
-        className="group/cta flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
-        style={{ background: "#1c1530", borderColor: a.border }}
-      >
+      <Link href={spotlight.ctaHref} className={`${CARD} min-h-[230px]`}>
         <div>
-          <div
-            className="text-[10px] font-bold uppercase tracking-[0.14em]"
-            style={{ color: a.color }}
-          >
-            Spotlight
-          </div>
-          <div className="mt-2 text-[15px] font-bold leading-tight">{spotlight.headline}</div>
+          <div className={EYEBROW}>Spotlight</div>
+          <div className={`mt-2 ${headlineClass}`}>{spotlight.headline}</div>
           {spotlight.sub && (
             <div className="mt-1.5 text-xs leading-relaxed text-white/65">{spotlight.sub}</div>
           )}
         </div>
-        <div
-          className="mt-auto pt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
-          style={{ color: a.color }}
-        >
+        <div className={ACTION} style={{ color: ACCENT }}>
           {spotlight.ctaLabel} <ArrowGlyph direction="right" size={12} />
         </div>
       </Link>
@@ -157,84 +138,57 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
 
   if (spotlight.kind === "evergreen" && spotlight.id === "bulletin") {
     return (
-      <Link
-        href="/subscribe"
-        className="group/cta flex min-h-[230px] flex-col rounded-[12px] border p-4 text-white transition-colors"
-        style={{ background: "#1c1530", borderColor: ACCENT.cyan.border }}
-      >
+      <Link href="/subscribe" className={`${CARD} min-h-[230px]`}>
         <div>
-          <div
-            className="text-[10px] font-bold uppercase tracking-[0.14em]"
-            style={{ color: ACCENT.cyan.color }}
-          >
-            Newsletter
-          </div>
-          <div className="mt-2 text-[15px] font-bold leading-tight">
-            Get the CleanStart Bulletin.
-          </div>
+          <div className={EYEBROW}>Newsletter</div>
+          <div className={`mt-2 ${headlineClass}`}>Get the CleanStart Bulletin.</div>
           <div className="mt-1.5 text-xs leading-relaxed text-white/65">
             One email per month — new images, talks, advisories.
           </div>
         </div>
-        <div
-          className="mt-auto pt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
-          style={{ color: ACCENT.cyan.color }}
-        >
+        <div className={ACTION} style={{ color: ACCENT }}>
           Subscribe <ArrowGlyph direction="right" size={12} />
         </div>
       </Link>
     );
   }
 
-  // No /careers/talent-network route exists yet, so fall back to mailto.
+  // Evergreen community fallback (id: 'community') — shown when there are no open
+  // roles and no CMS spotlight. Ends the Company menu on an open-source invitation
+  // rather than a "not hiring" note. Opens the live LinkedIn community group in a
+  // new tab; the chips name the channels where the community is active.
   return (
-    <Link
-      href="mailto:careers@cleanstart.com?subject=Talent%20network"
-      className="group/cta flex min-h-[280px] flex-col rounded-[12px] border p-4 text-white transition-colors"
-      style={{ background: "#1c1530", borderColor: ACCENT.green.border }}
+    <a
+      href={COMMUNITY_LINKEDIN_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`${CARD} min-h-[280px]`}
     >
       <div>
-        <div
-          className="text-[10px] font-bold uppercase tracking-[0.14em]"
-          style={{ color: ACCENT.green.color }}
-        >
-          Talent network
-        </div>
-        <div className="mt-2 text-[15px] font-bold leading-tight">Not hiring right now?</div>
+        <div className={EYEBROW}>Community</div>
+        <div className={`mt-2 ${headlineClass}`}>Build in the open with us.</div>
         <div className="mt-1.5 text-xs leading-relaxed text-white/65">
-          Tell us what you do — we&apos;ll reach out when a role opens that fits.
+          Open builds, public discussions, and a contributor program — jump in.
         </div>
       </div>
       <div className="mt-auto pt-3">
         <div className="flex items-center gap-1.5">
-          <div
-            className="rounded-full border px-2 py-0.5 text-[10px] font-semibold"
-            style={{
-              color: ACCENT.green.color,
-              background: "rgba(108,255,194,0.10)",
-              borderColor: ACCENT.green.border,
-            }}
-          >
-            ~30 sec
-          </div>
-          <div
-            className="rounded-full border px-2 py-0.5 text-[10px] font-semibold"
-            style={{
-              color: ACCENT.green.color,
-              background: "rgba(108,255,194,0.10)",
-              borderColor: ACCENT.green.border,
-            }}
-          >
-            no resume
-          </div>
+          {COMMUNITY_CHANNELS.map((channel) => (
+            <div
+              key={channel}
+              className="cs-chip rounded-[6px] px-2 py-0.5 text-[10px] font-semibold text-white/65"
+            >
+              {channel}
+            </div>
+          ))}
         </div>
         <div
           className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold"
-          style={{ color: ACCENT.green.color }}
+          style={{ color: ACCENT }}
         >
-          Join the network <ArrowGlyph direction="right" size={12} />
+          Join the community <ArrowGlyph direction="up-right" size={12} />
         </div>
       </div>
-    </Link>
+    </a>
   );
 }

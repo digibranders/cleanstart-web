@@ -50,6 +50,21 @@ export const webhooksPublishAfterChangeHook =
       const baseUrl = await readBaseUrl(req.payload);
       const liveUrl = docCanonicalUrl(baseUrl, collection, typed as CanonicalDoc);
       const editUrl = adminEditUrl(collection, typed.id);
+
+      const publishedAt =
+        (typed.publishedAt as string | undefined) ??
+        (typed.publicationDate as string | undefined) ??
+        (typed.updatedAt as string | undefined);
+      const updatedAt = typed.updatedAt as string | undefined;
+      // Only surface `updatedAt` when this is a RE-publish of older content
+      // — i.e. the doc's update time is meaningfully later than its original
+      // publish date. On a first publish the two are within seconds of each
+      // other, so we skip it to avoid a redundant "Published / Updated" pair.
+      const isRepublishOfOlderContent =
+        typeof publishedAt === 'string' &&
+        typeof updatedAt === 'string' &&
+        new Date(updatedAt).getTime() - new Date(publishedAt).getTime() > 60_000;
+
       await dispatchEvent(
         {
           event: 'document.published',
@@ -58,10 +73,10 @@ export const webhooksPublishAfterChangeHook =
             id: typed.id,
             slug: typed.slug,
             title: (typed.title as string | undefined) ?? (typed.name as string | undefined),
-            publishedAt:
-              (typed.publishedAt as string | undefined) ??
-              (typed.publicationDate as string | undefined) ??
-              (typed.updatedAt as string | undefined),
+            ...(publishedAt ? { publishedAt } : {}),
+            // Re-publish: include the update time so the card can show both
+            // the original "Published" date and a distinct "Updated" date.
+            ...(isRepublishOfOlderContent && updatedAt ? { updatedAt } : {}),
             // Public live-page URL — rendered as a "View live page" button on
             // the Teams card and surfaced to generic webhook subscribers.
             ...(liveUrl ? { url: liveUrl } : {}),

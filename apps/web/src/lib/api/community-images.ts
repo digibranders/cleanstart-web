@@ -36,6 +36,16 @@ export interface CommunityImage {
   updatedAt?: string;
   publishedAt?: string;
   isFips?: boolean;
+  /** Supported CPU architectures, e.g. ["amd64", "arm64"]. */
+  architecture?: string[];
+  /** SPDX license id, e.g. "Apache-2.0". */
+  license?: string;
+  /**
+   * Curated "featured" tag labels from the API (e.g. "Security Hardened").
+   * The FIPS tag is intentionally excluded in `parseItem` because the per-image
+   * `is_fips` flag can disagree with it — we don't surface a mixed signal.
+   */
+  featuredTags?: string[];
 }
 
 interface RawApiItem {
@@ -48,6 +58,25 @@ interface RawApiItem {
   is_fips?: unknown;
   is_public?: unknown;
   is_valid?: unknown;
+  architecture?: unknown;
+  license?: unknown;
+  tags?: unknown;
+}
+
+/** Extract non-FIPS featured tag labels from the raw `tags.featured` array. */
+function parseFeaturedTags(rawTags: unknown): string[] {
+  if (rawTags === null || typeof rawTags !== 'object') return [];
+  const featured = (rawTags as { featured?: unknown }).featured;
+  if (!Array.isArray(featured)) return [];
+  return featured
+    .filter(
+      (t): t is { label: string; value?: unknown } =>
+        t !== null &&
+        typeof t === 'object' &&
+        typeof (t as { label?: unknown }).label === 'string',
+    )
+    .filter((t) => t.value !== 'fips-available' && !/fips/i.test(t.label))
+    .map((t) => t.label);
 }
 
 function parseItem(raw: RawApiItem): CommunityImage | null {
@@ -65,6 +94,18 @@ function parseItem(raw: RawApiItem): CommunityImage | null {
   if (typeof raw.updated_at === 'string') out.updatedAt = raw.updated_at;
   if (typeof raw.published_at === 'string') out.publishedAt = raw.published_at;
   if (typeof raw.is_fips === 'boolean') out.isFips = raw.is_fips;
+
+  if (Array.isArray(raw.architecture)) {
+    const arch = raw.architecture.filter(
+      (a): a is string => typeof a === 'string' && a.length > 0,
+    );
+    if (arch.length > 0) out.architecture = arch;
+  }
+  if (typeof raw.license === 'string' && raw.license.length > 0) out.license = raw.license;
+
+  const featuredTags = parseFeaturedTags(raw.tags);
+  if (featuredTags.length > 0) out.featuredTags = featuredTags;
+
   return out;
 }
 
