@@ -232,3 +232,12 @@ button#action-save[disabled] {
 .doc-controls .btn--style-pill-primary {
   border-color: var(--theme-elevation-250) !important;
 }
+
+// Unpublish now lives in the Publish split-button dropdown (CmsPublishButton),
+// below "Schedule publish…". Hide Payload's native kebab Unpublish entries so
+// the action isn't duplicated across two menus. `#action-unpublish-locale`
+// only renders on localize-status collections; covered here for completeness.
+#action-unpublish,
+#action-unpublish-locale {
+  display: none !important;
+}
