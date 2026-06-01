@@ -15,6 +15,9 @@ export function PanelProducts({ item, latestImages }: Props) {
   const products = item.groups[0]?.items ?? [];
   // The pool is sorted most-recent-first, so index 0 is the latest-updated image.
   const chosen = latestImages[0];
+  // The hero CTA owns the catalog action, so the panel header carries no
+  // separate "Browse all images" exit link (it would duplicate the CTA).
+  const catalogHref = item.exitHref ?? "https://images.cleanstart.com";
 
   return (
     <PanelShell
@@ -22,9 +25,6 @@ export function PanelProducts({ item, latestImages }: Props) {
       eyebrow={item.label}
       tagline={item.tagline}
       atmosphere={ATMOSPHERE}
-      {...(item.exitHref && item.exitLabel
-        ? { exitHref: item.exitHref, exitLabel: item.exitLabel }
-        : {})}
     >
       <div className="grid grid-cols-[1.55fr_1fr] gap-3.5">
         <div className="flex flex-col gap-1.5">
@@ -44,7 +44,8 @@ export function PanelProducts({ item, latestImages }: Props) {
           headline="Stop patching. Replace the base."
           sub="Drop-in compatible, hardened base images — signed, minimal, and built to cut your CVE surface."
           ctaLabel="Explore hardened images"
-          ctaHref="/cleanstart-images"
+          ctaHref={catalogHref}
+          ctaExternal
           minHeight={216}
         >
           {chosen && (
