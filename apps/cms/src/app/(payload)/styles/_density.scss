@@ -226,6 +226,21 @@
   }
 }
 
+// ─── 3-dots kebab double-border fix. The kebab's `.popup-button` picks up
+// the outline rule above (shared with the chevron split button), while
+// Payload's own `.doc-controls__dots` div nested inside it carries its own
+// default border — so the kebab renders two concentric rings. Drop the
+// outer `.popup-button` outline on the kebab only (`:has` scopes it away
+// from the chevron, which still needs its outline), leaving the inner
+// `.doc-controls__dots` border as the single outline.
+.doc-controls__popup .popup-button:has(.doc-controls__dots) {
+  border-color: transparent;
+
+  &:hover {
+    border-color: transparent;
+  }
+}
+
 // Save Draft button — explicit outlined treatment (Payload's stock class
 // `.btn--style-secondary` covers most of this, but the doc-controls'
 // version of Save Draft uses `.save-draft` plus other modifiers and
