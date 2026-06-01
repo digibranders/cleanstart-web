@@ -344,6 +344,81 @@
   }
 }
 
+// ─── Audit trail in the SIDEBAR — collapse the 5-col table to stacked ──
+//
+// The delivery-history table needs ~780px; the doc sidebar is ~440px, so
+// the table overflows. Inside the sidebar we relabel each row as a small
+// stacked card (label + value per line) using the `data-label` attrs on
+// each <td>. Scoped to `.document-fields__sidebar` so the wide table
+// layout is untouched when the field renders in the main column.
+.document-fields__sidebar .cs-integrations-audit {
+  margin-top: var(--cs-space-2);
+
+  &__table {
+    display: block;
+
+    thead {
+      // Column headers are meaningless once rows stack — each cell carries
+      // its own label via ::before. Hide accessibly (not display:none, so
+      // screen readers still announce the row labels we add below).
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    tbody,
+    tr {
+      display: block;
+    }
+
+    tr {
+      padding: var(--cs-space-2) var(--cs-space-1);
+      border-bottom: 1px solid var(--theme-elevation-150);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover td {
+        background: transparent;
+      }
+    }
+
+    td {
+      display: flex;
+      gap: var(--cs-space-2);
+      align-items: baseline;
+      padding: 2px var(--cs-space-2);
+      border-bottom: none;
+      white-space: normal;
+
+      // Field label, from the cell's data-label.
+      &::before {
+        content: attr(data-label);
+        flex: 0 0 5.25rem;
+        color: var(--theme-text-soft);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  // Error wraps fully in the stacked layout (no ellipsis — vertical space
+  // is cheap here, and the whole point of the panel is to read the error).
+  &__error {
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
 // ─── Integrations test-fire panel ──────────────────────────────────
 .cs-integrations-test {
   margin-top: var(--cs-space-3);

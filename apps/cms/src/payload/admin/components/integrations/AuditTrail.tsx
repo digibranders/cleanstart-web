@@ -129,19 +129,27 @@ export const AuditTrail = (): ReactElement | null => {
                   : 'Exhausted';
             return (
               <tr key={String(r.id)}>
-                <td className="cs-integrations-audit__when">{formatDate(r.createdAt)}</td>
-                <td>
+                <td className="cs-integrations-audit__when" data-label="When">
+                  {formatDate(r.createdAt)}
+                </td>
+                <td data-label="Event">
                   <span className="cs-integrations-audit__event">{r.event}</span>
                 </td>
-                <td className="cs-integrations-audit__num">{r.attemptCount}</td>
-                <td>
+                <td className="cs-integrations-audit__num" data-label="Attempts">
+                  {r.attemptCount}
+                </td>
+                <td data-label="Status">
                   <span
                     className={`cs-integrations-audit__status cs-integrations-audit__status--${status}`}
                   >
                     {statusLabel}
                   </span>
                 </td>
-                <td className="cs-integrations-audit__error" title={r.lastError ?? undefined}>
+                <td
+                  className="cs-integrations-audit__error"
+                  data-label="Last error"
+                  title={r.lastError ?? undefined}
+                >
                   {r.lastError ?? '—'}
                 </td>
               </tr>
