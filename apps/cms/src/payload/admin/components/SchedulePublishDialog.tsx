@@ -8,7 +8,6 @@ import {
   DialogHeader,
   Spinner,
 } from '@cleanstart/ui';
-import type { ServerFunctionsContextType } from '@payloadcms/ui';
 import {
   useConfig,
   useDocumentInfo,
@@ -18,10 +17,15 @@ import {
 
 /**
  * Extract the arg type from the `schedulePublish` client function so we
- * can call it without a double-cast. `Parameters<>[0]` gives us the
+ * can call it without a double-cast. Derived from the allow-listed
+ * `useServerFunctions` hook's return type rather than importing the
+ * render-side `ServerFunctionsContextType` (per the @payloadcms/ui
+ * data-layer-only contract in CLAUDE.md). `Parameters<>[0]` gives us the
  * `{ signal?: AbortSignal } & Omit<SchedulePublishHandlerArgs, 'clientConfig'|'req'>` shape.
  */
-type SchedulePublishArgs = Parameters<ServerFunctionsContextType['schedulePublish']>[0];
+type SchedulePublishArgs = Parameters<
+  ReturnType<typeof useServerFunctions>['schedulePublish']
+>[0];
 
 import { showToast } from './ToastBus';
 import type { ReactElement } from 'react';
