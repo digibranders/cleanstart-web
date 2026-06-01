@@ -182,31 +182,45 @@ const storagePlugins = r2EnvComplete()
     ]
   : [];
 
+// Field component paths for the seven field types no collection uses yet.
+// They are registered into the import map so they resolve if/when those field
+// types appear, without a regenerate. Already baked into the committed
+// importMap.js — see GENERATING_IMPORT_MAP below.
+const FORWARD_COMPAT_FIELD_PATHS = [
+  '@/payload/admin/components/fields/PointField.tsx#PointField',
+  '@/payload/admin/components/fields/RadioField.tsx#RadioField',
+  '@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField',
+  '@/payload/admin/components/fields/TabsField.tsx#TabsField',
+  '@/payload/admin/components/fields/RowField.tsx#RowField',
+  '@/payload/admin/components/fields/JoinField.tsx#JoinField',
+  '@/payload/admin/components/fields/CodeField.tsx#CodeField',
+] as const;
+
+// `importMap.generators` run ONLY during `payload generate:importmap`. Payload
+// does NOT strip generators from the client config (getClientConfig keeps
+// `admin.importMap`), so a generator left in the runtime config serializes a
+// function into the client `RootProvider` and throws "Functions cannot be
+// passed directly to Client Components" on every /admin render. Gate the
+// generator to the generate:importmap invocation; the runtime config then
+// carries no function and the committed importMap.js already has these paths.
+const GENERATING_IMPORT_MAP = process.argv.some(
+  (arg) => arg === 'generate:importmap' || arg.endsWith(':importmap'),
+);
+
 export default buildConfig({
   admin: {
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
-      // wireCustomFields stamps component paths onto field types at runtime;
-      // generate:importmap can only discover paths from static config. For
-      // the seven field types that no collection uses today, register them
-      // here so the importMap is populated before those field types appear.
-      generators: [
-        ({ addToImportMap }) => {
-          const FORWARD_COMPAT_FIELD_PATHS = [
-            '@/payload/admin/components/fields/PointField.tsx#PointField',
-            '@/payload/admin/components/fields/RadioField.tsx#RadioField',
-            '@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField',
-            '@/payload/admin/components/fields/TabsField.tsx#TabsField',
-            '@/payload/admin/components/fields/RowField.tsx#RowField',
-            '@/payload/admin/components/fields/JoinField.tsx#JoinField',
-            '@/payload/admin/components/fields/CodeField.tsx#CodeField',
-          ] as const;
-          for (const p of FORWARD_COMPAT_FIELD_PATHS) {
-            addToImportMap(p);
-          }
-        },
-      ],
+      generators: GENERATING_IMPORT_MAP
+        ? [
+            ({ addToImportMap }) => {
+              for (const p of FORWARD_COMPAT_FIELD_PATHS) {
+                addToImportMap(p);
+              }
+            },
+          ]
+        : [],
     },
     components: {
       actions: [
