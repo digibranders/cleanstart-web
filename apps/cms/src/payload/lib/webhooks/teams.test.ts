@@ -68,6 +68,32 @@ describe('buildTeamsPayload', () => {
     expect(fact?.facts?.map((f) => f.title)).not.toContain('g');
   });
 
+  it('does NOT repeat the title as a FactSet row (it is already the card heading)', () => {
+    const raw = buildTeamsPayload(baseEvent);
+    const parsed = JSON.parse(raw) as {
+      attachments: { content: { body: { type: string; text?: string; facts?: { title: string }[] }[] } }[];
+    };
+    const body = parsed.attachments[0]?.content.body ?? [];
+    // Title is the heading (first block) ...
+    expect(body[0]?.text).toBe('My Post');
+    // ... but must NOT also appear as a "Title" fact row.
+    const facts = body.find((b) => b.type === 'FactSet')?.facts ?? [];
+    expect(facts.map((f) => f.title)).not.toContain('Title');
+  });
+
+  it('orders facts predictably (Collection, Slug, then dates)', () => {
+    const raw = buildTeamsPayload({
+      event: 'document.published',
+      // intentionally out of order in the payload
+      data: { updatedAt: '2026-05-30T13:16:00Z', title: 'X', slug: 'x', collection: 'blogs', publishedAt: '2026-02-25T05:30:00Z' },
+    });
+    const parsed = JSON.parse(raw) as {
+      attachments: { content: { body: { type: string; facts?: { title: string }[] }[] } }[];
+    };
+    const titles = (parsed.attachments[0]?.content.body.find((b) => b.type === 'FactSet')?.facts ?? []).map((f) => f.title);
+    expect(titles).toEqual(['Collection', 'Slug', 'Published', 'Updated']);
+  });
+
   it('renders both Published and Updated date facts (re-publish of older content)', () => {
     const raw = buildTeamsPayload({
       event: 'document.published',

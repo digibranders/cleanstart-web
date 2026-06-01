@@ -23,14 +23,14 @@ describe('fetchLatestImages', () => {
     expect(await fetchLatestImages()).toEqual([]);
   });
 
-  it('sorts by publishedAt desc, falling back to updatedAt', async () => {
+  it('sorts by updatedAt desc, falling back to publishedAt', async () => {
     vi.mocked(fetchCommunityImages).mockResolvedValue([
-      img('a', '2026-01-01', '2026-05-01'),
-      img('b', '2026-03-01'),
-      img('c', undefined, '2026-04-01'),
+      img('a', '2026-01-01', '2026-05-01'), // updatedAt 2026-05-01
+      img('b', '2026-03-01'), // no updatedAt → falls back to publishedAt 2026-03-01
+      img('c', undefined, '2026-04-01'), // updatedAt 2026-04-01
     ]);
     const out = await fetchLatestImages();
-    expect(out.map((x) => x.name)).toEqual(['c', 'b', 'a']);
+    expect(out.map((x) => x.name)).toEqual(['a', 'c', 'b']);
   });
 
   it('slices to LATEST_IMAGES_POOL_SIZE', async () => {

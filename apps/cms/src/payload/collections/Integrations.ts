@@ -686,10 +686,15 @@ export const Integrations: CollectionConfig = {
         description: 'When the health badge last polled.',
       },
     },
+    // Operational controls (health, test-fire, delivery history) live in
+    // the sidebar — they're monitoring affordances, not config the editor
+    // is filling in, so they belong beside the doc rather than in the main
+    // editing column.
     {
       name: 'healthBadge',
       type: 'ui',
       admin: {
+        position: 'sidebar',
         components: {
           Field: {
             path: '@/payload/admin/components/integrations/HealthBadge.tsx#HealthBadge',
@@ -701,6 +706,7 @@ export const Integrations: CollectionConfig = {
       name: 'testAction',
       type: 'ui',
       admin: {
+        position: 'sidebar',
         condition: (_, sibling) => isDispatching(sibling),
         components: {
           Field: {
@@ -713,6 +719,7 @@ export const Integrations: CollectionConfig = {
       name: 'auditTrail',
       type: 'ui',
       admin: {
+        position: 'sidebar',
         condition: (_, sibling) => isDispatching(sibling),
         components: {
           Field: {
