@@ -221,6 +221,7 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
             {enableRowSelections ? (
               <BulkActionBar
                 collectionSlug={collectionSlug}
+                {...(hasCreatePermission !== undefined ? { hasCreatePermission } : {})}
                 {...(hasDeletePermission !== undefined ? { hasDeletePermission } : {})}
                 {...(disableBulkDelete !== undefined ? { disableBulkDelete } : {})}
                 {...(disableBulkEdit !== undefined ? { disableBulkEdit } : {})}
