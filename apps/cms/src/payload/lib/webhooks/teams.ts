@@ -63,11 +63,16 @@ const truncateValue = (raw: unknown, max = 240): string => {
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
 };
 
-// Keys that are surfaced as buttons or are noise to a human reader, so
-// they don't also clutter the key/value FactSet.
+// Keys that are surfaced elsewhere on the card or are noise to a human
+// reader, so they don't also clutter the key/value FactSet.
+//   title         → already the card heading (titleFromEvent)
 //   url / adminUrl → rendered as Action.OpenUrl buttons
 //   id            → an opaque numeric, meaningless in a chat card
-const FACT_EXCLUDE = new Set(['url', 'adminUrl', 'id']);
+const FACT_EXCLUDE = new Set(['title', 'url', 'adminUrl', 'id']);
+
+// Preferred display order for known facts; unknown keys keep their
+// natural (insertion) order after these.
+const FACT_ORDER = ['collection', 'slug', 'formSlug', 'source', 'publishedAt', 'updatedAt'];
 
 const FACT_LABELS: Record<string, string> = {
   collection: 'Collection',
@@ -95,12 +100,16 @@ const formatFactValue = (key: string, raw: unknown): string => {
 };
 
 const factsFromData = (data: Record<string, unknown>): AdaptiveFact[] => {
-  // Surface up to six top-level fields (excluding button/noise keys),
-  // mapping known keys to friendly labels. Keeps the card glanceable.
-  const entries = Object.entries(data)
-    .filter(([key]) => !FACT_EXCLUDE.has(key))
-    .slice(0, 6);
-  return entries.map(([key, value]) => ({
+  // Surface up to six top-level fields (excluding heading/button/noise
+  // keys), in a stable preferred order, mapping known keys to friendly
+  // labels. Keeps the card glanceable.
+  const entries = Object.entries(data).filter(([key]) => !FACT_EXCLUDE.has(key));
+  const rank = (key: string): number => {
+    const i = FACT_ORDER.indexOf(key);
+    return i === -1 ? FACT_ORDER.length : i;
+  };
+  entries.sort(([a], [b]) => rank(a) - rank(b));
+  return entries.slice(0, 6).map(([key, value]) => ({
     title: FACT_LABELS[key] ?? key,
     value: formatFactValue(key, value),
   }));
