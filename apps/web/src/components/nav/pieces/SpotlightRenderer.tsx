@@ -20,7 +20,7 @@ const EYEBROW =
 // The live CleanStart community lives in the LinkedIn group; the chips name the
 // channels where the community is active (the card itself opens the primary one).
 const COMMUNITY_LINKEDIN_URL = "https://www.linkedin.com/groups/18324021/";
-const COMMUNITY_CHANNELS = ["LinkedIn", "Discord", "GitHub"];
+const COMMUNITY_CHANNELS = ["LinkedIn"];
 
 // Shared card surface. `hero` swaps the Level-2 tile for the elevated, brand-
 // edged hero surface (used where the spotlight IS the featured zone — Company).
