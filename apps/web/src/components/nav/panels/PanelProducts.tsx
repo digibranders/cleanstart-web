@@ -1,71 +1,30 @@
-import { FeaturedTile } from "@/components/nav/pieces/FeaturedTile";
 import { PanelRow } from "@/components/nav/pieces/PanelRow";
 import { PanelShell } from "@/components/nav/panels/PanelShell";
+import { HeroTile } from "@/components/nav/pieces/HeroTile";
+import { ImageMeta } from "@/components/nav/pieces/ImageMeta";
 import { CopyableCommand } from "@/components/nav/pieces/CopyableCommand";
-import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
-import { imageDetailsHref } from "@/components/nav/data/latest-images";
 import type { NavMegaItem } from "@/lib/nav-config";
 import type { CommunityImage } from "@/lib/api/community-images";
 
 type Props = { item: NavMegaItem; latestImages: CommunityImage[] };
 
-const PRIMARY_CTA =
-  "group/cta inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#2cc1eb]";
-const SECONDARY_CTA =
-  "group/cta inline-flex items-center gap-1.5 text-[11px] font-medium text-white/55 transition-colors hover:text-white/80";
+// Brand-family atmosphere for Products: a 5% indigo wash in the top-right.
+const ATMOSPHERE = "rgba(100, 13, 251, 0.05)";
 
 export function PanelProducts({ item, latestImages }: Props) {
   const products = item.groups[0]?.items ?? [];
   // The pool is sorted most-recent-first, so index 0 is the latest-updated image.
   const chosen = latestImages[0];
-  const browseAllHref = item.exitHref;
-  const browseAllLabel = item.exitLabel ?? "Browse all images";
-
-  const tile = (
-    <FeaturedTile
-      accent="cyan"
-      headline="Stop patching. Replace the base."
-      sub="Drop-in compatible. Near-zero CVEs at the base."
-      footer={
-        <div>
-          {chosen && (
-            <CopyableCommand command={`$ docker pull cleanstart/${chosen.name}:latest`} />
-          )}
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-            {chosen && (
-              <a
-                href={imageDetailsHref(chosen.name)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={PRIMARY_CTA}
-              >
-                View {chosen.name}
-                <ArrowGlyph direction="up-right" size={12} />
-              </a>
-            )}
-            {browseAllHref && (
-              <a
-                href={browseAllHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={SECONDARY_CTA}
-              >
-                {browseAllLabel}
-                <ArrowGlyph direction="up-right" size={12} />
-              </a>
-            )}
-          </div>
-        </div>
-      }
-    />
-  );
 
   return (
     <PanelShell
       width={item.width ?? 760}
-      accent="cyan"
       eyebrow={item.label}
       tagline={item.tagline}
+      atmosphere={ATMOSPHERE}
+      {...(item.exitHref && item.exitLabel
+        ? { exitHref: item.exitHref, exitLabel: item.exitLabel }
+        : {})}
     >
       <div className="grid grid-cols-[1.55fr_1fr] gap-3.5">
         <div className="flex flex-col gap-1.5">
@@ -80,7 +39,21 @@ export function PanelProducts({ item, latestImages }: Props) {
             />
           ))}
         </div>
-        {tile}
+
+        <HeroTile
+          headline="Stop patching. Replace the base."
+          sub="Drop-in compatible, hardened base images — signed, minimal, and built to cut your CVE surface."
+          ctaLabel="Explore hardened images"
+          ctaHref="/cleanstart-images"
+          minHeight={216}
+        >
+          {chosen && (
+            <div className="flex flex-col gap-3">
+              <ImageMeta image={chosen} />
+              <CopyableCommand command={`$ docker pull cleanstart/${chosen.name}:latest`} />
+            </div>
+          )}
+        </HeroTile>
       </div>
     </PanelShell>
   );

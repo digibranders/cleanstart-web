@@ -1,20 +1,23 @@
-import { FeaturedTile } from "@/components/nav/pieces/FeaturedTile";
 import { PanelRow } from "@/components/nav/pieces/PanelRow";
 import { PanelShell } from "@/components/nav/panels/PanelShell";
+import { HeroTile } from "@/components/nav/pieces/HeroTile";
+import { ComplianceProof } from "@/components/nav/pieces/ComplianceProof";
 import { CopyableCommand } from "@/components/nav/pieces/CopyableCommand";
-import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
 import type { NavMegaItem } from "@/lib/nav-config";
 
 type Props = { item: NavMegaItem };
+
+// Brand-family atmosphere for Solutions: a low cyan-teal wash in the top-right.
+const ATMOSPHERE = "rgba(44, 193, 235, 0.05)";
 
 export function PanelSolutions({ item }: Props) {
   const solutions = item.groups[0]?.items ?? [];
   return (
     <PanelShell
       width={item.width ?? 760}
-      accent="green"
       eyebrow={item.label}
       tagline={item.tagline}
+      atmosphere={ATMOSPHERE}
     >
       <div className="grid grid-cols-[1.3fr_1fr] gap-3.5">
         <div className="flex flex-col gap-0.5">
@@ -29,21 +32,19 @@ export function PanelSolutions({ item }: Props) {
             />
           ))}
         </div>
-        <FeaturedTile
-          href="/fips"
-          accent="green"
-          minHeight={260}
+
+        <HeroTile
           headline="FIPS, drop-in."
-          sub="Validated crypto. No code change. Inherit compliance."
-          footer={
-            <div>
-              <CopyableCommand command="$ docker pull cleanstart/python-fips" />
-              <div className="group/cta mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#6cffc2]">
-                See FIPS stack <ArrowGlyph direction="right" size={12} />
-              </div>
-            </div>
-          }
-        />
+          sub="Validated crypto, no code change. Inherit compliance from the base."
+          ctaLabel="Inherit FIPS compliance"
+          ctaHref="/fips"
+          minHeight={262}
+        >
+          <ComplianceProof />
+          <div className="mt-3">
+            <CopyableCommand command="$ docker pull cleanstart/python-fips" />
+          </div>
+        </HeroTile>
       </div>
     </PanelShell>
   );

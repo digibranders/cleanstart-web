@@ -61,7 +61,7 @@ export function CopyableCommand({ command, clipboardText }: Props) {
         onClick={handleCopy}
         className={`inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-[6px] border transition-colors duration-150 ${
           copied
-            ? "border-[rgba(108,255,194,0.35)] bg-[rgba(108,255,194,0.10)] text-[#6cffc2]"
+            ? "border-[rgba(44,193,235,0.35)] bg-[rgba(44,193,235,0.10)] text-[#2cc1eb]"
             : "cs-chip border-transparent text-white/55 hover:text-white"
         }`}
         aria-label={copied ? "Copied" : "Copy command to clipboard"}
