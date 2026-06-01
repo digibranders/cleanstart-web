@@ -101,6 +101,10 @@ function NavigationMenuPositioner({
   sideOffset = 18,
   align = "start",
   alignOffset = 0,
+  // Keep every panel inside the site's content frame: 40px matches the header's
+  // desktop gutter (sm:px-[2.5rem]). Without it, base-ui only holds ~5px off the
+  // viewport edge, so a wide or leftmost menu (Products) spills into the gutter.
+  collisionPadding = 40,
   ...props
 }: NavigationMenuPrimitive.Positioner.Props) {
   return (
@@ -110,6 +114,7 @@ function NavigationMenuPositioner({
         sideOffset={sideOffset}
         align={align}
         alignOffset={alignOffset}
+        collisionPadding={collisionPadding}
         className={cn(
           "isolate z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom] duration-[0.35s] ease-[cubic-bezier(0.22,1,0.36,1)] data-instant:transition-none data-[side=bottom]:before:top-[-10px] data-[side=bottom]:before:right-0 data-[side=bottom]:before:left-0",
           className
