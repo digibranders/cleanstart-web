@@ -115,10 +115,14 @@ const nextConfig: NextConfig = {
 // chunk graph at the cost of slightly slower cold-start in dev.
 const withCleanstart = withPayload(nextConfig, { devBundleServerPackages: true });
 
-// Sentry wrapper is a no-op when SENTRY_DSN is unset (the runtime
-// configs early-return). Source-map upload is gated on the auth token
-// — when SENTRY_AUTH_TOKEN is unset it skips the upload step too.
-export default withSentryConfig(withCleanstart, {
+// Sentry's build-time instrumentation (withSentryConfig) injects wrappers
+// into the RSC/Turbopack graph. On the amd64 production build this surfaced
+// as "Functions cannot be passed directly to Client Components" on every
+// /admin render (digest varies per build) — while arm64 builds render fine.
+// Gating the wrapper behind SENTRY_BUILD=1 keeps it available for local /
+// arm64 use while keeping the amd64 prod build clean. Re-enable once the
+// upstream Turbopack/Sentry interaction is fixed.
+const sentryOptions = {
   silent: !process.env.SENTRY_AUTH_TOKEN,
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
@@ -127,4 +131,8 @@ export default withSentryConfig(withCleanstart, {
   hideSourceMaps: true,
   disableLogger: true,
   automaticVercelMonitors: false,
-});
+};
+
+export default process.env.SENTRY_BUILD === '1'
+  ? withSentryConfig(withCleanstart, sentryOptions)
+  : withCleanstart;
