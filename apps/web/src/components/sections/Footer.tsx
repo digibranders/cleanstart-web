@@ -222,7 +222,7 @@ export function Footer({
             "Members of" logo strip stacked over the credential groups (right).
             Columns are an accordion stack on mobile, a row on desktop. */}
         <nav
-          className="mt-[40px] flex flex-col gap-12 sm:mt-[62px] sm:flex-row sm:items-start sm:gap-x-14 lg:gap-x-20"
+          className="mt-[28px] flex flex-col gap-12 sm:mt-[36px] sm:flex-row sm:items-start sm:gap-x-14 lg:gap-x-20"
           aria-label="Footer navigation"
         >
           <div className="flex flex-col sm:flex-row sm:gap-10 lg:gap-14">
