@@ -11,7 +11,12 @@ const ACCENT_BORDER: Record<Accent, string> = {
 };
 
 type Props = {
-  href: string;
+  /**
+   * When set, the whole tile is a single link. When omitted, the tile renders
+   * as a plain container (`<div>`) so its footer can host its own real links
+   * without nesting anchors — used by Products, which has two distinct CTAs.
+   */
+  href?: string;
   accent: Accent;
   /** External destination — opens in a new tab with noopener noreferrer. Used by Products → images.cleanstart.com. */
   external?: boolean;
@@ -39,8 +44,11 @@ export function FeaturedTile({
   footer,
   minHeight = 220,
 }: Props) {
-  const className =
+  const linkClassName =
     "group/cta cs-tile-glass flex flex-col justify-between rounded-[14px] border p-4 text-white transition-[transform,border-color] duration-200 hover:-translate-y-px";
+  const containerClassName =
+    "cs-tile-glass flex flex-col justify-between rounded-[14px] border p-4 text-white";
+  const className = href ? linkClassName : containerClassName;
   const style = {
     borderColor: ACCENT_BORDER[accent],
     minHeight,
@@ -67,6 +75,14 @@ export function FeaturedTile({
       {footer && <div className="mt-3">{footer}</div>}
     </>
   );
+
+  if (!href) {
+    return (
+      <div className={className} style={style}>
+        {inner}
+      </div>
+    );
+  }
 
   if (external) {
     return (
