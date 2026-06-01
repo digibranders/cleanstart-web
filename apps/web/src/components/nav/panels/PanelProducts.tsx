@@ -42,7 +42,7 @@ export function PanelProducts({ item, latestImages }: Props) {
 
         <HeroTile
           headline="Stop patching. Replace the base."
-          sub="Drop-in compatible, hardened base images — signed, minimal, and built to cut your CVE surface."
+          sub="Drop-in replacements that shrink your attack surface."
           ctaLabel="Explore hardened images"
           ctaHref={catalogHref}
           ctaExternal
