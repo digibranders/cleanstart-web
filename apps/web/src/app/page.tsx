@@ -108,13 +108,13 @@ export default function Home() {
           <SecurityNotPatching />
         </FadeUp>
         <FadeUp>
-          <CleanStartAdvantage />
+          <BuiltForTeams />
         </FadeUp>
         <FadeUp>
           <HowCleanStartHelp />
         </FadeUp>
         <FadeUp>
-          <BuiltForTeams />
+          <CleanStartAdvantage />
         </FadeUp>
         {/* FAQ + Resources share one continuous #F6F6F6 canvas so their
             transparent backgrounds and decorative blobs/grids bleed across
