@@ -33,8 +33,12 @@ const IMAGE_LIST_URL = 'https://images.cleanstart.com/api/image-list';
  */
 const IMAGE_LIST_LIMIT = 48;
 
-/** Revalidate window in seconds — 10 min. */
-const REVALIDATE_SECONDS = 600;
+/**
+ * Revalidate window in seconds — 30 min. The catalog list is fetched from the
+ * images server at most once per window and shared across all visitors/loads
+ * (stale-while-revalidate), so reloads and menu opens never hit the origin.
+ */
+const REVALIDATE_SECONDS = 1800;
 
 /** Subset of the API payload the web app actually consumes. */
 export interface CommunityImage {
