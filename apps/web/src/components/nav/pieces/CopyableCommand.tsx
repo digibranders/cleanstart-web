@@ -44,7 +44,7 @@ export function CopyableCommand({ command, clipboardText }: Props) {
       role="presentation"
       onClick={handleBoxInteraction}
       onKeyDown={handleBoxInteraction}
-      className="flex items-center gap-2 rounded-[8px] border border-white/[0.08] bg-white/[0.025] py-1.5 pl-2.5 pr-1.5 font-mono text-[11px] text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+      className="flex items-center gap-2 rounded-[8px] border border-white/[0.05] bg-white/[0.02] py-1.5 pl-2.5 pr-1.5 font-mono text-[11px] text-white/90"
     >
       <code className="flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
         {command.startsWith("$") ? (
@@ -62,7 +62,7 @@ export function CopyableCommand({ command, clipboardText }: Props) {
         className={`inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-[6px] border transition-colors duration-150 ${
           copied
             ? "border-[rgba(108,255,194,0.35)] bg-[rgba(108,255,194,0.10)] text-[#6cffc2]"
-            : "border-white/[0.10] bg-white/[0.04] text-white/55 hover:bg-white/[0.10] hover:text-white"
+            : "border-white/[0.06] bg-white/[0.04] text-white/55 hover:bg-white/[0.08] hover:text-white"
         }`}
         aria-label={copied ? "Copied" : "Copy command to clipboard"}
         title={copied ? "Copied!" : "Copy"}

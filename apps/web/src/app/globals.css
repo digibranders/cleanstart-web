@@ -2814,24 +2814,25 @@ body {
    - A faint top-to-bottom gradient hint of refraction
    - Deep drop shadow making the surface float above the page */
 .cs-panel-glass {
+  /* Layer 1 — the menu container. Depth comes from a single soft drop shadow
+     and a faint top-edge highlight, NOT from a visible ring or glow. */
   background:
-    radial-gradient(120% 60% at 80% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 30%),
+    radial-gradient(120% 60% at 80% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, transparent 30%),
     #130e26;
   box-shadow:
-    0 32px 80px -32px rgba(0, 0, 0, 0.8),
-    0 0 0 1px rgba(255, 255, 255, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    0 24px 64px -28px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .cs-tile-glass {
+  /* Layer 2 — content surfaces. Sits one step lighter than Layer 1 so the
+     separation reads as elevation rather than a drawn border. */
   background:
-    radial-gradient(120% 80% at 100% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, transparent 40%),
+    radial-gradient(120% 80% at 100% 0%, rgba(255, 255, 255, 0.035) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 40%),
     #1a1336;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .cs-cta-glass {

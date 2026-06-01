@@ -32,14 +32,11 @@ function isExternalUrl(href: string): boolean {
 const EXIT_LINK =
   "group/cta inline-flex items-center gap-1 text-[11px] text-white/45 transition-colors hover:text-white/80";
 
-export function PanelHeader({ eyebrow, tagline, accent, exitHref, exitLabel }: Props) {
+export function PanelHeader({ eyebrow, tagline, exitHref, exitLabel }: Props) {
   return (
-    <div className="flex items-start justify-between border-b border-white/[0.05] pb-3.5">
+    <div className="flex items-start justify-between border-b border-white/[0.04] pb-3.5">
       <div>
-        <div
-          className="text-[10px] font-bold uppercase tracking-[0.16em]"
-          style={{ color: ACCENT_COLOR[accent] }}
-        >
+        <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
           {eyebrow}
         </div>
         <div className="mt-0.5 text-[11px] text-white/55">{tagline}</div>

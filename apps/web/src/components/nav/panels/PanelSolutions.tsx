@@ -1,7 +1,6 @@
 import { FeaturedTile } from "@/components/nav/pieces/FeaturedTile";
 import { PanelRow } from "@/components/nav/pieces/PanelRow";
 import { PanelShell } from "@/components/nav/panels/PanelShell";
-import { ContextualCTA } from "@/components/nav/pieces/ContextualCTA";
 import { CopyableCommand } from "@/components/nav/pieces/CopyableCommand";
 import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
 import type { NavMegaItem } from "@/lib/nav-config";
@@ -46,12 +45,6 @@ export function PanelSolutions({ item }: Props) {
           }
         />
       </div>
-      <ContextualCTA
-        headline="Compliance review for your stack?"
-        sub="30 mins with a solutions engineer."
-        ctaLabel="Talk to an SE"
-        ctaHref="/book-a-demo?intent=se"
-      />
     </PanelShell>
   );
 }

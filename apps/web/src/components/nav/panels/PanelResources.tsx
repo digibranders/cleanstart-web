@@ -62,7 +62,7 @@ function BrowseColumn({ groups }: { groups: NavMegaItem["groups"] }) {
         <div key={g.title ?? gi} className={gi > 0 ? "mt-3" : ""}>
           {gi > 0 && <div className="mx-2 mb-3 h-px bg-white/[0.05]" />}
           {g.title && (
-            <div className="mb-1.5 px-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#2cc1eb]">
+            <div className="mb-1.5 px-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/45">
               {g.title}
             </div>
           )}
@@ -90,7 +90,7 @@ function LatestUpdatesColumn({ items }: { items: FeedSource[] }) {
   if (items.length === 0) {
     return (
       <div>
-        <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/50">
+        <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/45">
           Latest updates
         </div>
         <div className="text-[11px] italic text-white/40">No recent updates.</div>
@@ -99,7 +99,7 @@ function LatestUpdatesColumn({ items }: { items: FeedSource[] }) {
   }
   return (
     <div>
-      <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/50">
+      <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/45">
         Latest updates
       </div>
       <div className="flex flex-col gap-2">
@@ -107,7 +107,7 @@ function LatestUpdatesColumn({ items }: { items: FeedSource[] }) {
           <Link
             key={`${s.type}-${s.slug}`}
             href={feedHref(s)}
-            className="block rounded-[9px] border border-white/[0.05] bg-white/[0.025] p-2.5 transition-colors hover:border-white/[0.10]"
+            className="block rounded-[10px] border border-white/[0.05] bg-white/[0.02] p-2.5 transition-colors duration-200 ease-out hover:border-white/[0.08] hover:bg-white/[0.03]"
           >
             <div className="flex items-center gap-2">
               <span
@@ -132,7 +132,7 @@ function LatestUpdatesColumn({ items }: { items: FeedSource[] }) {
 function SpotlightColumn({ spotlight }: { spotlight: SpotlightCard }) {
   return (
     <div>
-      <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/50">
+      <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/45">
         Spotlight
       </div>
       <SpotlightRenderer spotlight={spotlight} context="resources" />

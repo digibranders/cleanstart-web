@@ -3,13 +3,6 @@ import type { ReactNode } from "react";
 import type { Accent } from "@/components/nav/pieces/PanelHeader";
 import { ACCENT_COLOR } from "@/components/nav/pieces/PanelHeader";
 
-const ACCENT_BORDER: Record<Accent, string> = {
-  cyan: "rgba(44,193,235,0.20)",
-  green: "rgba(108,255,194,0.20)",
-  purple: "rgba(164,140,255,0.20)",
-  magenta: "rgba(255,138,184,0.20)",
-};
-
 type Props = {
   /**
    * When set, the whole tile is a single link. When omitted, the tile renders
@@ -45,14 +38,11 @@ export function FeaturedTile({
   minHeight = 220,
 }: Props) {
   const linkClassName =
-    "group/cta cs-tile-glass flex flex-col justify-between rounded-[14px] border p-4 text-white transition-[transform,border-color] duration-200 hover:-translate-y-px";
+    "group/cta cs-tile-glass flex flex-col justify-between rounded-[14px] border border-white/[0.06] p-4 text-white transition-colors duration-200 ease-out hover:border-white/[0.10]";
   const containerClassName =
-    "cs-tile-glass flex flex-col justify-between rounded-[14px] border p-4 text-white";
+    "cs-tile-glass flex flex-col justify-between rounded-[14px] border border-white/[0.06] p-4 text-white";
   const className = href ? linkClassName : containerClassName;
-  const style = {
-    borderColor: ACCENT_BORDER[accent],
-    minHeight,
-  };
+  const style = { minHeight };
   const inner = (
     <>
       <div>
