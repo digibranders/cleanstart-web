@@ -286,11 +286,11 @@ function StackCard({ name, logoUrl, description, logoScale }: StackCardData): Re
         className="relative flex h-full flex-col"
         style={{ padding: '5.86cqi', gap: '2.5cqi' }}
       >
-        {/* White logo plate. The img fills the plate via object-fit:contain so
-            the browser picks the binding axis per logo aspect: square logos use
+        {/* Transparent logo plate. The img fills the plate via object-fit:contain
+            so the browser picks the binding axis per logo aspect: square logos use
             full height, wordmark logos use full width. */}
         <div
-          className="relative overflow-hidden bg-white"
+          className="relative overflow-hidden"
           style={{
             width: '100%',
             height: '26.36cqi',
