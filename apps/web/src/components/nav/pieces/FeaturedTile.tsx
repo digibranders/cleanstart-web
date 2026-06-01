@@ -38,9 +38,9 @@ export function FeaturedTile({
   minHeight = 220,
 }: Props) {
   const linkClassName =
-    "group/cta cs-tile-glass flex flex-col justify-between rounded-[14px] border border-white/[0.06] p-4 text-white transition-colors duration-200 ease-out hover:border-white/[0.10]";
+    "group/cta cs-tile-glass cs-tile-interactive flex flex-col justify-between rounded-[12px] p-4 text-white";
   const containerClassName =
-    "cs-tile-glass flex flex-col justify-between rounded-[14px] border border-white/[0.06] p-4 text-white";
+    "cs-tile-glass flex flex-col justify-between rounded-[12px] p-4 text-white";
   const className = href ? linkClassName : containerClassName;
   const style = { minHeight };
   const inner = (

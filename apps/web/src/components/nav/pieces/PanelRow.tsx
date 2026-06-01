@@ -13,12 +13,12 @@ type Props = {
 // the glyph and label — no accent tint, no border flash. The icon tile is a
 // neutral elevated surface so the glyph stays legible without color.
 const ROW =
-  "group/row grid grid-cols-[44px_1fr] items-center gap-3 rounded-[10px] px-3 py-2.5 transition-colors duration-200 ease-out hover:bg-white/[0.04]";
+  "group/row grid grid-cols-[44px_1fr] items-center gap-3 rounded-[8px] px-3 py-2.5 transition-colors duration-200 ease-out hover:bg-white/[0.035]";
 const ICON_TILE =
-  "flex h-11 w-11 items-center justify-center rounded-[10px] border border-white/[0.06] bg-white/[0.04] text-white/75 transition-colors duration-200 ease-out group-hover/row:bg-white/[0.07] group-hover/row:text-white";
+  "cs-chip flex h-11 w-11 items-center justify-center rounded-[8px] text-white/70 transition-colors duration-200 ease-out group-hover/row:text-white";
 const LABEL =
-  "text-sm font-semibold leading-tight text-white/90 transition-colors duration-200 ease-out group-hover/row:text-white";
-const DESC = "mt-0.5 text-xs leading-snug text-white/55";
+  "text-sm font-semibold leading-tight text-white/95 transition-colors duration-200 ease-out group-hover/row:text-white";
+const DESC = "mt-0.5 text-xs leading-snug text-white/60";
 
 export function PanelRow({ href, label, description, icon, built = true }: Props) {
   const inner = (

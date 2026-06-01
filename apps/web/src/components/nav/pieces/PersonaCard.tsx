@@ -24,10 +24,10 @@ export function PersonaCard({ href, variant, icon, label, description }: Props) 
   return (
     <Link
       href={href}
-      className="cs-tile-glass flex min-h-[150px] flex-col rounded-[14px] border border-white/[0.06] p-4 transition-colors duration-200 ease-out hover:border-white/[0.10]"
+      className="cs-tile-glass cs-tile-interactive flex min-h-[150px] flex-col rounded-[12px] p-4"
     >
       <div
-        className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/[0.06] bg-white/[0.04]"
+        className="cs-chip flex h-9 w-9 items-center justify-center rounded-[8px]"
         style={{ color: accent }}
       >
         <NavIcon id={icon} size={18} />

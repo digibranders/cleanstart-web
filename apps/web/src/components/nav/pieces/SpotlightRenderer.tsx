@@ -21,7 +21,7 @@ const AVATAR_GRADIENTS = [
 // Shared card surface — one radius, one border, one elevated surface for every
 // spotlight variant. Depth comes from the cs-tile-glass surface, not borders.
 const CARD =
-  "cs-tile-glass group/cta flex flex-col rounded-[14px] border border-white/[0.06] p-4 text-white transition-colors duration-200 ease-out hover:border-white/[0.10]";
+  "cs-tile-glass cs-tile-interactive group/cta flex flex-col rounded-[12px] p-4 text-white";
 const EYEBROW =
   "text-[10px] font-bold uppercase tracking-[0.14em] text-white/45";
 
@@ -94,7 +94,7 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
             {AVATAR_GRADIENTS.map((g, i) => (
               <div
                 key={i}
-                className="h-[30px] w-[30px] rounded-full border-2 border-[#1a1336]"
+                className="h-[30px] w-[30px] rounded-full border-2 border-[#1b1640]"
                 style={{ background: g, marginLeft: i === 0 ? 0 : -8 }}
               />
             ))}
@@ -171,10 +171,10 @@ export function SpotlightRenderer({ spotlight, context }: Props) {
       </div>
       <div className="mt-auto pt-3">
         <div className="flex items-center gap-1.5">
-          <div className="rounded-full border border-white/[0.06] bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold text-white/60">
+          <div className="cs-chip rounded-[6px] px-2 py-0.5 text-[10px] font-semibold text-white/65">
             ~30 sec
           </div>
-          <div className="rounded-full border border-white/[0.06] bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold text-white/60">
+          <div className="cs-chip rounded-[6px] px-2 py-0.5 text-[10px] font-semibold text-white/65">
             no resume
           </div>
         </div>
