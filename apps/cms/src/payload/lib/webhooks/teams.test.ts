@@ -68,6 +68,28 @@ describe('buildTeamsPayload', () => {
     expect(fact?.facts?.map((f) => f.title)).not.toContain('g');
   });
 
+  it('renders both Published and Updated date facts (re-publish of older content)', () => {
+    const raw = buildTeamsPayload({
+      event: 'document.published',
+      data: {
+        title: 'Old post',
+        slug: 'old-post',
+        publishedAt: '2026-02-25T05:30:00Z',
+        updatedAt: '2026-05-30T13:16:00Z',
+      },
+    });
+    const parsed = JSON.parse(raw) as {
+      attachments: { content: { body: { type: string; facts?: { title: string; value: string }[] }[] } }[];
+    };
+    const facts = parsed.attachments[0]?.content.body.find((b) => b.type === 'FactSet')?.facts ?? [];
+    const titles = facts.map((f) => f.title);
+    expect(titles).toContain('Published');
+    expect(titles).toContain('Updated');
+    // Both render as human-readable dates, not raw ISO.
+    expect(facts.find((f) => f.title === 'Published')?.value).toContain('Feb 25, 2026');
+    expect(facts.find((f) => f.title === 'Updated')?.value).toContain('May 30, 2026');
+  });
+
   it('truncates long values rather than blowing up the card', () => {
     const raw = buildTeamsPayload({
       event: 'document.published',

@@ -74,14 +74,18 @@ const FACT_LABELS: Record<string, string> = {
   slug: 'Slug',
   title: 'Title',
   publishedAt: 'Published',
+  updatedAt: 'Updated',
   formSlug: 'Form',
   formId: 'Form ID',
   source: 'Source',
   duplicate: 'Duplicate',
 };
 
+// Keys whose ISO value should render as a human-readable date in the card.
+const DATE_FACT_KEYS = new Set(['publishedAt', 'updatedAt']);
+
 const formatFactValue = (key: string, raw: unknown): string => {
-  if (key === 'publishedAt' && typeof raw === 'string' && raw.length > 0) {
+  if (DATE_FACT_KEYS.has(key) && typeof raw === 'string' && raw.length > 0) {
     const d = new Date(raw);
     if (!Number.isNaN(d.getTime())) {
       return d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
