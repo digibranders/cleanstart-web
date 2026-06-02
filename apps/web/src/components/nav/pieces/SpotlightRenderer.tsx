@@ -42,10 +42,15 @@ type Props = {
   spotlight: SpotlightCard;
   /** Render on the elevated hero surface — used where the spotlight is the featured zone. */
   hero?: boolean;
+  /** Drop the fixed min-height so the card sizes to its content (for stacked layouts). */
+  dense?: boolean;
 };
 
-export function SpotlightRenderer({ spotlight, hero = false }: Props) {
+export function SpotlightRenderer({ spotlight, hero = false, dense = false }: Props) {
   const CARD = cardClass(hero);
+  // In stacked layouts the card shares the column with a sibling, so the
+  // floor-filling min-height is dropped and the card hugs its content.
+  const minH = (cls: string): string => (dense ? "" : cls);
   const ACTION =
     "mt-auto pt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold";
   const headlineClass = hero
@@ -54,7 +59,7 @@ export function SpotlightRenderer({ spotlight, hero = false }: Props) {
 
   if (spotlight.kind === "event") {
     return (
-      <Link href={`/event/${spotlight.slug}`} className={`${CARD} min-h-[230px]`}>
+      <Link href={`/event/${spotlight.slug}`} className={`${CARD} ${minH("min-h-[230px]")}`}>
         <div>
           <div className={EYEBROW}>Next event</div>
           <div className={`mt-2 ${headlineClass}`}>{spotlight.title}</div>
@@ -71,7 +76,7 @@ export function SpotlightRenderer({ spotlight, hero = false }: Props) {
 
   if (spotlight.kind === "webinar") {
     return (
-      <Link href={`/webinar/${spotlight.slug}`} className={`${CARD} min-h-[230px]`}>
+      <Link href={`/webinar/${spotlight.slug}`} className={`${CARD} ${minH("min-h-[230px]")}`}>
         <div>
           <div className={EYEBROW}>Next webinar</div>
           <div className={`mt-2 ${headlineClass}`}>{spotlight.title}</div>
@@ -88,7 +93,7 @@ export function SpotlightRenderer({ spotlight, hero = false }: Props) {
 
   if (spotlight.kind === "careers") {
     return (
-      <Link href="/careers" className={`${CARD} min-h-[280px]`}>
+      <Link href="/careers" className={`${CARD} ${minH("min-h-[280px]")}`}>
         <div>
           <div className={headlineClass}>Build the base layer with us.</div>
           <div className="mt-1.5 text-xs leading-relaxed text-white/65">
@@ -121,7 +126,7 @@ export function SpotlightRenderer({ spotlight, hero = false }: Props) {
 
   if (spotlight.kind === "cms") {
     return (
-      <Link href={spotlight.ctaHref} className={`${CARD} min-h-[230px]`}>
+      <Link href={spotlight.ctaHref} className={`${CARD} ${minH("min-h-[230px]")}`}>
         <div>
           <div className={EYEBROW}>Spotlight</div>
           <div className={`mt-2 ${headlineClass}`}>{spotlight.headline}</div>
@@ -138,7 +143,7 @@ export function SpotlightRenderer({ spotlight, hero = false }: Props) {
 
   if (spotlight.kind === "evergreen" && spotlight.id === "bulletin") {
     return (
-      <Link href="/subscribe" className={`${CARD} min-h-[230px]`}>
+      <Link href="/subscribe" className={`${CARD} ${minH("min-h-[230px]")}`}>
         <div>
           <div className={EYEBROW}>Newsletter</div>
           <div className={`mt-2 ${headlineClass}`}>Get the CleanStart Bulletin.</div>
@@ -162,7 +167,7 @@ export function SpotlightRenderer({ spotlight, hero = false }: Props) {
       href={COMMUNITY_LINKEDIN_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${CARD} min-h-[280px]`}
+      className={`${CARD} ${minH("min-h-[280px]")}`}
     >
       <div>
         <div className={EYEBROW}>Community</div>

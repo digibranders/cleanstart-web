@@ -9,7 +9,7 @@ import {
   getResourcesSpotlight,
   getCompanySpotlight,
 } from "@/components/nav/data/resolve-spotlights";
-import { fetchOpenRoles } from "@/components/nav/data/open-roles";
+import { fetchOpenRolesCount } from "@/components/nav/data/careers-feed";
 
 export async function Header() {
   const [
@@ -17,13 +17,13 @@ export async function Header() {
     latestUpdates,
     resourcesSpotlight,
     companySpotlight,
-    openRoles,
+    openRolesCount,
   ] = await Promise.all([
     fetchLatestImages(),
     fetchLatestUpdates(),
     getResourcesSpotlight(),
     getCompanySpotlight(),
-    fetchOpenRoles(),
+    fetchOpenRolesCount(),
   ]);
 
   return (
@@ -41,7 +41,7 @@ export async function Header() {
         latestUpdates={latestUpdates}
         resourcesSpotlight={resourcesSpotlight}
         companySpotlight={companySpotlight}
-        openRoles={openRoles}
+        openRolesCount={openRolesCount}
       />
 
       <div className="flex items-center gap-3">
@@ -56,7 +56,7 @@ export async function Header() {
         >
           Book a Demo
         </Link>
-        <MobileNav openRolesCount={openRoles.length} />
+        <MobileNav openRolesCount={openRolesCount} />
       </div>
     </HeaderScrollShell>
   );

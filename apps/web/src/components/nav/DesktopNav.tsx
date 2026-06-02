@@ -19,14 +19,13 @@ import { PanelCompany } from "@/components/nav/panels/PanelCompany";
 import type { CommunityImage } from "@/lib/api/community-images";
 import type { FeedSource } from "@/components/nav/data/latest-updates-feed";
 import type { SpotlightCard } from "@/components/nav/data/spotlights";
-import type { OpenRole } from "@/components/nav/data/open-roles";
 
 type Props = {
   latestImages: CommunityImage[];
   latestUpdates: FeedSource[];
   resourcesSpotlight: SpotlightCard;
   companySpotlight: SpotlightCard;
-  openRoles: OpenRole[];
+  openRolesCount: number;
 };
 
 // Panels for mega items without a dedicated branch above.
@@ -52,7 +51,7 @@ function TopLevelItem({
   latestUpdates,
   resourcesSpotlight,
   companySpotlight,
-  openRoles,
+  openRolesCount,
 }: { item: NavItem } & Props) {
   const active = useIsActiveSection(collectHrefs(item));
 
@@ -88,7 +87,7 @@ function TopLevelItem({
       );
     } else if (item.label === "Company") {
       body = (
-        <PanelCompany item={item} spotlight={companySpotlight} openRoles={openRoles} />
+        <PanelCompany item={item} spotlight={companySpotlight} openRolesCount={openRolesCount} />
       );
     } else if (PANELS[item.label]) {
       const Panel = PANELS[item.label]!;
@@ -109,7 +108,7 @@ export function DesktopNav({
   latestUpdates,
   resourcesSpotlight,
   companySpotlight,
-  openRoles,
+  openRolesCount,
 }: Props) {
   return (
     <NavigationMenu className="hidden lg:flex" align="center" delay={120} closeDelay={200}>
@@ -122,7 +121,7 @@ export function DesktopNav({
             latestUpdates={latestUpdates}
             resourcesSpotlight={resourcesSpotlight}
             companySpotlight={companySpotlight}
-            openRoles={openRoles}
+            openRolesCount={openRolesCount}
           />
         ))}
       </NavigationMenuList>
