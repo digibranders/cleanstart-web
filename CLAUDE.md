@@ -319,7 +319,7 @@ These are hard rules. Do not work around them — flag and stop instead.
 - **Never bypass the `LeadHandler` adapter** for lead writes. Even one-off scripts go through it. Arch doc §`#forms` makes the R2 fallback queue load-bearing for "no lead lost during outage" — bypassing it breaks that guarantee.
 - **Never hand-edit the `config` column in the `integrations` table.** Values are encrypted blobs produced by `lib/integrations/secrets.ts`. Use the admin UI or the `encryptJson` helper.
 - **Never rename a Next.js route segment post-launch** (e.g. `/webinar/[slug]` → `/webinars/[slug]`). It breaks every indexed URL. Arch doc §`#migration` last subsection is explicit.
-- **Never commit `.env*`, secrets, R2 keys, Brevo keys, Webflow tokens, or 2FA seeds.** They live in the operator's secrets store (1Password / Bitwarden / macOS Keychain — whichever the team uses), GitHub Actions repository secrets, and `/opt/cleanstart/.env` on the production droplet (chmod 600).
+- **Never commit `.env*`, secrets, R2 keys, HubSpot tokens, Webflow tokens, or 2FA seeds.** They live in the operator's secrets store (1Password / Bitwarden / macOS Keychain — whichever the team uses), GitHub Actions repository secrets, and `/opt/cleanstart/.env` on the production droplet (chmod 600).
 - **Never enable GraphQL on the Payload admin.** Arch doc §`#decisions`: `graphQL: { disable: true }` at launch.
 - **Never `git add -A` or `git add .`** at repo root. Stage specific paths.
 - **Never `--no-verify`** on commits. If a hook fails, fix it.
@@ -365,7 +365,7 @@ These channels are wired and active (env-var configured). See `apps/cms/.env.exa
 | Integration | Purpose | Key env vars |
 |---|---|---|
 | Cloudflare R2 | Media storage + lead fallback queue | `R2_BUCKET`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_BASE` |
-| Brevo | Transactional email on `lead.submitted` | `BREVO_API_KEY`, `BREVO_TEMPLATE_ID` |
+| HubSpot | Lead relay (secondary handler) → Forms Submissions API; owns all lead email (follow-up + notifications). Forms keyed by `forms.hubspotFormGuid`. See `docs/forms-hubspot-verification.md`. | `HUBSPOT_PORTAL_ID` (relay), `HUBSPOT_PRIVATE_APP_TOKEN` (GDPR erasure only) |
 | Microsoft Teams (Workflows) | Publish + lead notifications via Adaptive Cards | `WEBHOOK_TEAMS_URL`, `WEBHOOK_TEAMS_EVENTS` |
 | Standard Webhooks | Generic HMAC-signed outbound webhook | `WEBHOOK_GENERIC_URL`, `WEBHOOK_GENERIC_EVENTS`, `WEBHOOK_GENERIC_SIGNING_SECRET` |
 | Meilisearch | Full-text search + analytics | `MEILISEARCH_URL`, `MEILISEARCH_MASTER_KEY`, `MEILISEARCH_API_KEY` |

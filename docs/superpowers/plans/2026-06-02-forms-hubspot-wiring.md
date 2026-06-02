@@ -1,5 +1,14 @@
 # Forms → Payload → HubSpot Wiring Implementation Plan
 
+> **✅ COMPLETED & VERIFIED END-TO-END (2026-06-02).** All 5 forms (book-a-demo, contact, become-a-partner, newsletter, resource-capture) submit → Payload lead row → HubSpot contact, confirmed in HubSpot. See `docs/forms-hubspot-verification.md` for the runbook, final field map, and the gotchas found during verification.
+>
+> **Deviations from this plan as written:**
+> - **Slug, not formId.** Web forms key on the stable `formSlug` (env-safe); the endpoint resolves slug → id + schemaVersion. `submitLeadBodySchema` accepts `formId` OR `formSlug`; `submit-lead.ts` resolves either.
+> - **Phase 2 via seed script.** `apps/cms/scripts/seed-website-forms.ts` (idempotent upsert by slug) instead of hand-creating rows.
+> - **Turnstile exemption.** `newsletter` + `resource-capture` (email-only, no widget) are exempt server-side via `LEAD_SUBMIT_TURNSTILE_EXEMPT_SLUGS` (default `newsletter,resource-capture`).
+> - **HubSpot form config was load-bearing.** CAPTCHA had to be disabled on all 5 forms (it 400s the API); "create new contacts" had to be enabled on the 4 new-editor forms; book-a-demo's phone field was re-bound from a `number` property to standard `phone`.
+> - **Partner fields.** `website` + `enter_message` were added to the HubSpot `website-partner` form so the modal's website + partnerReason map cleanly.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make the marketing-site forms actually submit — web form → Payload `/api/leads/submit` (lead row + R2 fallback) → HubSpot via the Forms API — so every submission lands as a lead in Payload and a contact in HubSpot.
