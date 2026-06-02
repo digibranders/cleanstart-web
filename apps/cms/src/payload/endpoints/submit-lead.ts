@@ -168,6 +168,82 @@ export const submitLeadEndpoint: Endpoint = {
     const data = parsed.data;
     const userAgent = req.headers.get('user-agent') ?? undefined;
 
+    // Collapse "invalid id/slug shape" and "form does not exist" into one
+    // generic 400 so an attacker can't enumerate valid forms by diffing
+    // 400 vs 404 response shapes.
+    const invalidFormResponse = json(
+      { ok: false, error: 'invalid_form' },
+      { status: 400, headers: responseCors },
+    );
+
+    type FormLookup = {
+      id?: number | string;
+      _status?: string | null;
+      fields?: FormFieldDef[] | null;
+      slug?: string | null;
+      schemaVersion?: number | null;
+    };
+
+    // Resolve the target form by numeric `formId` (FormRenderer-driven forms,
+    // which know the live id) or by stable `formSlug` (the statically-built
+    // marketing forms — the DB id differs across environments). Returns null
+    // for any miss; the caller maps that to invalidFormResponse.
+    const resolveForm = async (): Promise<{
+      id: number;
+      schemaVersion: number;
+      status: string | null | undefined;
+      fields: FormFieldDef[];
+      slug: string | null | undefined;
+    } | null> => {
+      try {
+        if (data.formId != null) {
+          const numericId =
+            typeof data.formId === 'number' ? data.formId : Number.parseInt(data.formId, 10);
+          if (!Number.isInteger(numericId) || numericId <= 0) return null;
+          const doc = (await req.payload.findByID({
+            collection: 'forms',
+            id: numericId,
+            depth: 0,
+            overrideAccess: true,
+          })) as FormLookup | null;
+          if (!doc) return null;
+          return {
+            id: numericId,
+            schemaVersion: doc.schemaVersion ?? 1,
+            status: doc._status,
+            fields: doc.fields ?? [],
+            slug: doc.slug,
+          };
+        }
+        if (data.formSlug != null) {
+          const res = await req.payload.find({
+            collection: 'forms',
+            where: { slug: { equals: data.formSlug } },
+            limit: 1,
+            depth: 0,
+            overrideAccess: true,
+          });
+          const doc = res.docs[0] as FormLookup | undefined;
+          if (!doc || doc.id == null) return null;
+          const numericId =
+            typeof doc.id === 'number' ? doc.id : Number.parseInt(String(doc.id), 10);
+          if (!Number.isInteger(numericId) || numericId <= 0) return null;
+          return {
+            id: numericId,
+            schemaVersion: doc.schemaVersion ?? 1,
+            status: doc._status,
+            fields: doc.fields ?? [],
+            slug: doc.slug,
+          };
+        }
+        return null;
+      } catch {
+        return null;
+      }
+    };
+
+    const resolvedForm = await resolveForm();
+
     // Honeypot — return 200 OK so bots don't learn they tripped the trap.
     // Store the submission with the honeypot value set for admin visibility
     // and GDPR audit completeness. CRM secondaries are intentionally skipped.
@@ -176,14 +252,12 @@ export const submitLeadEndpoint: Endpoint = {
         { ip, userAgent: userAgent ?? null },
         'Lead submission flagged — honeypot tripped',
       );
-      const numericHoneypotFormId =
-        typeof data.formId === 'number' ? data.formId : Number.parseInt(String(data.formId), 10);
-      if (Number.isInteger(numericHoneypotFormId) && numericHoneypotFormId > 0) {
+      if (resolvedForm && resolvedForm.status === 'published') {
         try {
           await req.payload.create({
             collection: 'leads',
             data: {
-              form: numericHoneypotFormId,
+              form: resolvedForm.id,
               formSchemaVersion: 0,
               fields: typeof data.fields === 'object' && data.fields !== null ? data.fields : {},
               source: data.source ?? null,
@@ -216,52 +290,20 @@ export const submitLeadEndpoint: Endpoint = {
       );
     }
 
-    const numericFormId =
-      typeof data.formId === 'number' ? data.formId : Number.parseInt(data.formId, 10);
-    // Collapse "invalid id shape" and "form does not exist" into one
-    // generic 400 so an attacker can't enumerate valid form IDs by
-    // diffing 400 vs 404 response shapes.
-    const invalidFormResponse = json(
-      { ok: false, error: 'invalid_form' },
-      { status: 400, headers: responseCors },
-    );
-    if (!Number.isInteger(numericFormId) || numericFormId <= 0) {
+    // Draft forms must not accept public submissions — an editor working on a
+    // new form shouldn't capture leads against it until they publish. Forms
+    // always carries `versions: { drafts: true }`, so a missing `_status`
+    // indicates a misconfiguration rather than a publishable row; reject those
+    // too. A null resolution (bad id/slug or unknown form) maps here as well.
+    if (!resolvedForm || resolvedForm.status !== 'published') {
       return invalidFormResponse;
     }
+    const numericFormId = resolvedForm.id;
 
     // Server-side re-application of forms.fields[].validation rules.
     // The public form enforces these client-side; this stops a tampered
     // DOM or hand-crafted POST from shipping junk into the leads table.
-    let formDoc: {
-      _status?: string | null;
-      fields?: FormFieldDef[] | null;
-      slug?: string | null;
-    } | null;
-    try {
-      formDoc = (await req.payload.findByID({
-        collection: 'forms',
-        id: numericFormId,
-        depth: 0,
-        overrideAccess: true,
-      })) as {
-        _status?: string | null;
-        fields?: FormFieldDef[] | null;
-        slug?: string | null;
-      } | null;
-    } catch {
-      return invalidFormResponse;
-    }
-    if (!formDoc) return invalidFormResponse;
-    // Draft forms must not accept public submissions — an editor working
-    // on a new form shouldn't capture leads against it until they publish.
-    // Forms always carries `versions: { drafts: true }`, so a missing
-    // `_status` indicates a misconfiguration rather than a publishable
-    // row; reject those too.
-    if (formDoc._status !== 'published') {
-      return invalidFormResponse;
-    }
-
-    const fieldDefs = formDoc?.fields ?? [];
+    const fieldDefs = resolvedForm.fields;
     if (fieldDefs.length > 0) {
       const validation = validateFields(fieldDefs, data.fields);
       if (!validation.ok) {
@@ -298,7 +340,7 @@ export const submitLeadEndpoint: Endpoint = {
 
     const submission: LeadSubmission = {
       formId: numericFormId,
-      formSchemaVersion: data.formSchemaVersion,
+      formSchemaVersion: data.formSchemaVersion ?? resolvedForm.schemaVersion,
       fields: data.fields,
       source: data.source,
       utm: data.utm,
@@ -339,7 +381,7 @@ export const submitLeadEndpoint: Endpoint = {
             event: 'lead.submitted',
             data: {
               formId: numericFormId,
-              ...(formDoc?.slug ? { formSlug: formDoc.slug } : {}),
+              ...(resolvedForm.slug ? { formSlug: resolvedForm.slug } : {}),
               duplicate: result.duplicateOfLeadId != null,
               ...(submission.source ? { source: submission.source } : {}),
             },
