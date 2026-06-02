@@ -3,31 +3,66 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { submitLead } from "@/lib/leads/submitLead";
 
-function newSubmissionId(): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-  return `sub_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-}
+/** Web input name → HubSpot internal property name (the `forms` field names). */
+const NAME_MAP: Record<string, string> = {
+  firstName: "firstname",
+  lastName: "lastname",
+  email: "email",
+  company: "company",
+  country: "country",
+  phone: "phone",
+  referralSource: "how_did_you_hear_about_cleanstart_",
+};
+
+const STORAGE_CONSENT_TEXT =
+  "I agree to allow CleanStart to store and process my personal data.";
 
 export function BookDemoForm(): React.ReactElement {
   const [submitted, setSubmitted] = useState(false);
+  const [topError, setTopError] = useState<string | null>(null);
   const inFlightRef = useRef(false);
-  const submissionIdRef = useRef<string | null>(null);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (inFlightRef.current) return;
     inFlightRef.current = true;
-    submissionIdRef.current = newSubmissionId();
-    // This id will travel to LeadHandler as the Idempotency-Key once the edge is wired.
-    e.currentTarget.reset();
-    setSubmitted(true);
-    window.setTimeout(() => {
-      setSubmitted(false);
-      inFlightRef.current = false;
-    }, 5000);
+    setTopError(null);
+
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const fields: Record<string, string> = {};
+    for (const [inputName, hsName] of Object.entries(NAME_MAP)) {
+      const value = fd.get(inputName);
+      if (typeof value === "string" && value.trim()) fields[hsName] = value.trim();
+    }
+
+    const categories = ["storage", ...(fd.get("consent_marketing") != null ? ["marketing"] : [])];
+    const turnstileToken = fd.get("cf-turnstile-response");
+
+    const result = await submitLead({
+      formSlug: "book-a-demo",
+      fields,
+      consent: {
+        snapshot: STORAGE_CONSENT_TEXT,
+        givenAt: new Date().toISOString(),
+        categories,
+      },
+      ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
+      ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
+    });
+
+    if (result.ok) {
+      form.reset();
+      setSubmitted(true);
+    } else {
+      setTopError("We couldn't submit your request. Please try again.");
+    }
+    inFlightRef.current = false;
+    if (result.ok) {
+      window.setTimeout(() => setSubmitted(false), 5000);
+    }
   };
 
   return (
@@ -107,6 +142,20 @@ export function BookDemoForm(): React.ReactElement {
               </ConsentText>
 
               <TurnstileWidget />
+              {topError && (
+                <p
+                  role="alert"
+                  style={{
+                    fontFamily: "var(--font-sans), 'Sora', sans-serif",
+                    fontSize: "var(--fs-body-sm)",
+                    fontWeight: 500,
+                    lineHeight: 1.45,
+                    color: "#B42318",
+                  }}
+                >
+                  {topError}
+                </p>
+              )}
               <SubmitButton submitted={submitted} />
             </form>
         </div>
