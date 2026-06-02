@@ -90,8 +90,12 @@ export default function ErrorBoundary({
               </button>
               <Link
                 href="/"
-                className="inline-flex h-[52px] items-center px-6 font-medium text-white/70 transition-colors hover:text-white"
-                style={{ fontSize: "var(--fs-button)" }}
+                className="cs-btn-blue"
+                style={{
+                  ["--cs-btn-h" as string]: "52px",
+                  ["--cs-btn-px" as string]: "28px",
+                  ["--cs-btn-fs" as string]: "16px",
+                }}
               >
                 Back to home
               </Link>
