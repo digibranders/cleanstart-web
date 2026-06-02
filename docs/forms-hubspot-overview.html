@@ -131,7 +131,7 @@
   <div class="callout good"><b>The big finding:</b> the CMS backend is already built — there is a working <code>/api/leads/submit</code> pipeline (Zod → Turnstile → LeadHandler chain → R2 fallback queue) and a <b>registered, boot-wired HubSpot handler</b>. The main gap is that the marketing-site forms aren't connected to it yet. This is mostly a <b>wiring + config</b> job, not a build-from-scratch.</div>
   <div class="callout warn"><b>The big risk:</b> all 900 HubSpot contacts are currently flagged <b>"Marketing contact."</b> At ~45% of the 2,000 cap with active lead flow, this fills fast. We must set API-created contacts to <b>non-marketing by default</b> and only promote on explicit <code>consent_marketing</code> opt-in.</div>
 
-  <div class="callout good"><b>Done (2 Jun 2026):</b> all 8 HubSpot forms have been created in the new <code>website</code> folder (originals untouched), including the newly-added <code>website-partner</code> (Become-a-Partner). These are the live submission targets for the Forms API. Field/email config is still pending per form.</div>
+  <div class="callout good"><b>Shipped (2 Jun 2026):</b> (1) all 8 HubSpot forms staged in the <code>website</code> folder (incl. <code>website-partner</code>); (2) <b>Brevo fully removed</b> — HubSpot owns all email (migration <code>20260602_095540_remove_brevo</code>); (3) <b>consent + Privacy Policy link added</b> to the Contact, Deal Registration &amp; Become-a-Partner forms (shared <code>LeadConsent</code>); (4) the <b>Become-a-Partner modal is built</b>. Still pending: wiring the web forms to the Forms API + per-form field/email config in HubSpot.</div>
   <h3>HubSpot forms staged in the <code>website</code> folder — GUIDs</h3>
   <div class="tablewrap">
   <table>
@@ -144,7 +144,7 @@
       <tr><td>website-newsletter</td><td><code>d23691e3-fabd-41d1-8d19-3384d6043179</code></td><td>Modern</td><td>Blog/Blogs/Webinars/Events CTA</td></tr>
       <tr><td>website-resource-capture</td><td><code>82790e37-d079-428c-8145-70749a164fe8</code></td><td>Modern</td><td>ResourceDetailLeadCapture.tsx</td></tr>
       <tr><td>website-career</td><td><code>e60649e7-66e4-4a50-84c7-394c9b3ebeab</code></td><td>Modern</td><td>CareerApplyForm.tsx</td></tr>
-      <tr><td>website-partner</td><td><code>ea66c444-acfe-4237-9a54-aea500f5e6d7</code></td><td>Modern</td><td><b>NEW</b> — needs PartnerModal (Become-a-Partner CTA)</td></tr>
+      <tr><td>website-partner</td><td><code>ea66c444-acfe-4237-9a54-aea500f5e6d7</code></td><td>Modern</td><td><code>BecomePartnerCta.tsx</code> <span class="badge b-live">modal built</span></td></tr>
     </tbody>
   </table>
   </div>
@@ -200,6 +200,7 @@
           <span class="field-chip req">prospectFirstName</span><span class="field-chip req">prospectLastName</span>
           <span class="field-chip">prospectPhone</span><span class="field-chip req">prospectEmail</span>
           <span class="field-chip">dealDetails</span>
+          <span class="field-chip">consent_marketing</span><span class="field-chip req">consent_storage</span>
         </div></td>
         <td>No — UI only</td>
         <td><span class="badge b-stub">STUB</span> + Turnstile</td>
@@ -210,7 +211,8 @@
           <span class="field-chip req">firstName</span><span class="field-chip">lastName</span>
           <span class="field-chip req">email</span><span class="field-chip">company</span>
           <span class="field-chip">phone</span><span class="field-chip req">brief</span>
-        </div><div class="sub" style="font-size:12px">brief: min 10 / max 1000 chars</div></td>
+          <span class="field-chip">consent_marketing</span><span class="field-chip req">consent_storage</span>
+        </div><div class="sub" style="font-size:12px">brief: min 10 / max 1000 chars · consent added</div></td>
         <td>No — 600ms fake delay</td>
         <td><span class="badge b-stub">STUB</span> + Turnstile</td>
       </tr>
@@ -243,12 +245,12 @@
         <td><span class="badge b-stub">STUB</span></td>
       </tr>
       <tr>
-        <td><b>Become a Partner</b><br><code>BecomePartnerCta.tsx</code> <span class="badge b-new">NEW</span><br><span class="sub" style="font-size:11.5px">modal on <code>/partners</code></span></td>
+        <td><b>Become a Partner</b><br><code>BecomePartnerCta.tsx</code> <span class="badge b-live">built</span><br><span class="sub" style="font-size:11.5px">modal on <code>/partners</code></span></td>
         <td><div class="field-list">
           <span class="field-chip req">firstName</span><span class="field-chip req">lastName</span>
           <span class="field-chip">phone</span><span class="field-chip req">email</span>
           <span class="field-chip req">company</span><span class="field-chip">website</span>
-          <span class="field-chip">partnerReason</span><span class="field-chip req">consent_storage</span>
+          <span class="field-chip">partnerReason</span><span class="field-chip">consent_marketing</span><span class="field-chip req">consent_storage</span>
         </div></td>
         <td>No — modal, client-side stub</td>
         <td><span class="badge b-stub">STUB</span> + Turnstile</td>
@@ -320,7 +322,7 @@
   </table>
   </div>
   <p class="sub" style="margin:8px 0 0;font-size:12.5px"><b>Reading it (Option B):</b> with the Forms API, both emails are <b>native form settings</b> — each HubSpot form has a "send a follow-up email" (→ <span class="who user">USER</span>) and a "send notifications to" recipient list (→ <span class="who admin">TEAM</span>). No workflows to build for these basic confirmations. The pre-scaffolded <i>"Send a follow-up email after form submission"</i> workflow is therefore <b>not needed</b> here — keep it only if you later want branching/nurture beyond a single confirmation. Marketing self-serves every email by editing the form.</p>
-  <div class="callout warn"><b>One transactional gap:</b> the gated-resource <b>download link</b> must reach the user even if unsubscribed — but HubSpot transactional email is <b>not</b> in your plan. Decision taken: <b>deliver the link in-page</b> (already built in <code>FormRenderer</code>) and skip the transactional email. No Brevo, no add-on needed.</div>
+  <div class="callout warn"><b>One transactional gap:</b> the gated-resource <b>download link</b> must reach the user even if unsubscribed — but HubSpot transactional email is <b>not</b> in your plan. Decision taken: <b>deliver the link in-page</b> (already built in <code>FormRenderer</code>) and skip the transactional email. No add-on needed; HubSpot owns all email.</div>
 
   <!-- 5. ARCHITECTURE -->
   <h2 id="arch"><span class="num">5</span>Current vs. planned architecture</h2>
@@ -377,7 +379,6 @@
         <li><span class="badge b-new">CMS</span> Create <code>forms</code> rows for each web form (fields, consent)</li>
         <li><span class="badge b-new">WEB</span> Wire Demo / Deal / Contact / Resource / Newsletter forms to the endpoint</li>
         <li><span class="badge b-new">ENV</span> Set <code>HUBSPOT_PRIVATE_APP_TOKEN</code> (or portalId) on the droplet</li>
-        <li><span class="badge b-new">CMS</span> Remove the Brevo handler + bounce endpoint</li>
       </ul>
     </div>
   </div>
@@ -446,9 +447,6 @@
     <li><b>WEB: wire the forms to the endpoint</b>
       Replace each stub <code>onSubmit</code> with the FormRenderer POST to <code>/api/leads/submit</code>; pass the <code>hubspotutk</code> cookie so HubSpot ties the submission to the visitor's session.
       <div class="where">Where: apps/web/src/components/sections/forms/*, contact/*, resource/*</div></li>
-    <li><b>CMS: remove Brevo</b>
-      Delete the <code>brevo</code> lead handler, the <code>brevoBounceCallback</code> inbound endpoint, and stop feeding <code>leads.emailHealth</code> from Brevo. HubSpot now owns all email.
-      <div class="where">Where: apps/cms/src/payload/lib/lead-handlers/brevo.ts + endpoints/integrations-inbound.ts</div></li>
     <li><b>QA &amp; verify</b>
       End-to-end per form: submit → lead row written in Payload, submission lands on the HubSpot form, contact created/updated, user follow-up + team notification sent, gated download works in-page, fallback queue drains on simulated outage, non-consenting contact stays non-marketing.
       <div class="where">Where: staging (cms-dev) + new web build</div></li>
@@ -483,13 +481,13 @@
 
   <div class="grid g4">
     <div class="card"><div class="label">Backend (CMS)</div><div class="kpi" style="color:var(--green)">Strong</div><div class="sub">consent proof, retention, DSAR, erasure, redaction</div></div>
-    <div class="card"><div class="label">Frontend (web)</div><div class="kpi" style="color:var(--amber)">Gaps</div><div class="sub">no cookie consent; uneven form consent</div></div>
+    <div class="card"><div class="label">Frontend (web)</div><div class="kpi" style="color:var(--amber)">Gaps</div><div class="sub">cookie consent missing (form consent now added ✓)</div></div>
     <div class="card"><div class="label">Governance docs</div><div class="kpi" style="color:var(--red)">Missing</div><div class="sub">RoPA / LIA / TIA / DPAs absent</div></div>
     <div class="card"><div class="label">Admin 2FA</div><div class="kpi" style="color:var(--amber)">Deferred</div><div class="sub">password-only at v1</div></div>
   </div>
 
   <div class="callout good"><b>What's genuinely done (backend):</b> per-lead consent snapshot + policy-version (server-injected, tamper-proof), retention cron jobs that null PII, full DSAR tooling (find / delete / CSV-export + admin panel + immutable audit log), erasure with HubSpot cascade, Sentry/​log PII redaction, AES-256-GCM secrets, Turnstile, rate-limiting, HMAC webhooks, and metadata-only event payloads.</div>
-  <div class="callout warn"><b>Biggest real gaps:</b> (1) <b>no cookie-consent banner / CMP exists</b> on the web app — it's fully specified in the docs but never built; (2) <b>3 of the marketing forms collect PII with no consent checkbox</b> (Contact, Deal Registration, Become-a-Partner); (3) the <b>GDPR governance documents are referenced everywhere but none exist in the repo</b> (RoPA, LIA, TIA, retention policy, breach runbook, signed DPAs).</div>
+  <div class="callout warn"><b>Biggest real gaps:</b> (1) <b>no cookie-consent banner / CMP exists</b> on the web app — it's fully specified in the docs but never built; (2) the <b>GDPR governance documents are referenced everywhere but none exist in the repo</b> (RoPA, LIA, TIA, retention policy, breach runbook, signed DPAs). <span style="color:var(--green)">✓ Resolved: the Contact / Deal / Partner forms now have consent + a Privacy Policy link.</span></div>
 
   <h3>A · Backend (CMS) — mostly implemented ✅</h3>
   <div class="tablewrap">
@@ -502,7 +500,6 @@
       <tr><td>Right to erasure (Art. 17)</td><td><span class="badge b-live">DONE</span></td><td><code>/api/leads/dsar/delete</code> → <code>hubspotGdprDeleteByEmail()</code> cascade + <code>writeLeadDeletionAudit</code> → immutable <code>audit-log</code> (<code>dsar_erasure</code>)</td></tr>
       <tr><td>PII redaction in telemetry/logs</td><td><span class="badge b-live">DONE</span></td><td>Sentry <code>sendDefaultPii:false</code> + <code>beforeSend</code>/<code>beforeBreadcrumb</code> · <code>redact-error-body.ts</code> · <code>lead.submitted</code> webhook is metadata-only</td></tr>
       <tr><td>Security of processing (Art. 32)</td><td><span class="badge b-live">DONE</span></td><td>AES-256-GCM secrets (<code>secrets.ts</code>) · Turnstile · rate-limit · HMAC-signed webhooks</td></tr>
-      <tr><td>Erasure cascade to <b>Brevo</b></td><td><span class="badge b-stub">MISSING</span></td><td>only HubSpot is cascaded; <code>brevo.ts</code> has no <code>deleteByEmail</code> — arch doc says it should</td></tr>
       <tr><td>Lawful-basis / consent categories</td><td><span class="badge b-partial">PENDING</span></td><td><code>consentCategories</code> field exists but stays empty until a CMP feeds it</td></tr>
       <tr><td>Art. 16 update / per-subject JSON export</td><td><span class="badge b-partial">PARTIAL</span></td><td>find + CSV-all only; no per-subject JSON export or "update by email" endpoint found (arch doc claims both)</td></tr>
     </tbody>
@@ -516,7 +513,7 @@
     <tbody>
       <tr><td>Cookie-consent banner / CMP</td><td><span class="badge b-stub">MISSING</span></td><td>No banner, no CMP library, no <code>/api/consent</code>, no <code>ConsentLog</code> collection. <code>WEB-PRODUCTION.md</code> fully specs it (Consent Mode v2, geo-gated EEA/UK/CH/CA, <code>cs_consent</code> cookie) — none of it is built.</td></tr>
       <tr><td>Analytics fire without consent</td><td><span class="badge b-partial">GREY</span></td><td>Vercel Analytics + Speed Insights + Sentry web-vitals load unconditionally (<code>layout.tsx</code>). Defensible <i>today</i> because they're cookieless (project's documented stance) — but a CMP <b>must</b> land before GA4 / any HubSpot tracking script ships.</td></tr>
-      <tr><td>Form consent UX</td><td><span class="badge b-partial">UNEVEN</span></td><td><span class="badge b-live">has it</span> Book a Demo (marketing + storage), Resource Lead Capture (1). <span class="badge b-stub">none</span> <b>Contact, Deal Registration, Become-a-Partner</b> collect PII with no consent checkbox or privacy link.</td></tr>
+      <tr><td>Form consent UX</td><td><span class="badge b-live">DONE</span></td><td>All lead forms now carry consent + a Privacy Policy link — Book a Demo (its own copy), and Contact / Deal Registration / Become-a-Partner via the shared <code>LeadConsent</code> (optional marketing + required storage).</td></tr>
       <tr><td>Privacy Policy page</td><td><span class="badge b-live">DONE</span></td><td><code>/privacy-policy</code> — real, dated content.</td></tr>
       <tr><td>Cookie Policy &amp; Terms pages</td><td><span class="badge b-stub">MISSING</span></td><td>no <code>/cookies</code>, no <code>/terms</code> route.</td></tr>
       <tr><td>DNT / GPC signals</td><td><span class="badge b-stub">MISSING</span></td><td>no Do-Not-Track / Global Privacy Control handling.</td></tr>
@@ -532,7 +529,6 @@
     <thead><tr><th>Processor</th><th>Personal data</th><th>Region</th><th>Transfer basis</th></tr></thead>
     <tbody>
       <tr><td><b>HubSpot</b> (CRM)</td><td>contact/lead fields</td><td><span class="badge b-info">US (NA2)</span></td><td>SCCs / DPF — DPA to sign before go-live</td></tr>
-      <tr><td>Brevo</td><td>email + lead notify</td><td>EU + US</td><td>SCCs (EU primary)</td></tr>
       <tr><td>Cloudflare R2</td><td>lead fallback queue + media</td><td>US</td><td>SCCs · encrypted at rest</td></tr>
       <tr><td>Cloudflare Turnstile</td><td>IP (bot check)</td><td>US</td><td>SCCs (Cloudflare DPA)</td></tr>
       <tr><td>Sentry</td><td>error telemetry (PII-scrubbed)</td><td>US</td><td>SCCs · PII redaction on</td></tr>
@@ -559,15 +555,12 @@
     <li><b>P0 · Build the cookie-consent CMP before any cookie-setting tracker ships</b>
       Geo-gated banner (EEA/UK/CH/CA), Consent Mode v2 (4 signals default-denied), <code>cs_consent</code> cookie, <code>/api/consent</code> → <code>ConsentLog</code> collection. "Reject all" must have one-click parity with "Accept all". Required before GA4 / HubSpot tracking goes live.
       <div class="where">Where: apps/web (new CMP) + apps/cms (ConsentLog collection + /api/consent)</div></li>
-    <li><b>P0 · Add consent + privacy link to the 3 bare forms</b>
-      Contact, Deal Registration, Become-a-Partner — mirror Book a Demo's marketing + storage consent checkboxes and the <code>/privacy-policy</code> link.
-      <div class="where">Where: ContactForm.tsx · DealRegistrationForm.tsx · BecomePartnerCta.tsx</div></li>
+    <li><b>P0 · Add consent + privacy link to the forms</b> <span class="badge b-live">DONE</span>
+      Contact, Deal Registration &amp; Become-a-Partner now use the shared <code>LeadConsent</code> (optional marketing + required storage + Privacy Policy link). Book a Demo keeps its own copy.
+      <div class="where">Where: LeadConsent.tsx + the 3 forms — committed</div></li>
     <li><b>P0 · Create RoPA + LIA and sign/file the processor DPAs</b>
-      Art. 30 record + legitimate-interest assessment for B2B forms; counter-sign DPAs for HubSpot, Brevo, Cloudflare, Sentry, Vercel, DigitalOcean and file under <code>docs/dpa/</code>.
+      Art. 30 record + legitimate-interest assessment for B2B forms; counter-sign DPAs for HubSpot, Cloudflare, Sentry, Vercel, DigitalOcean and file under <code>docs/dpa/</code>.
       <div class="where">Where: docs/ (legal)</div></li>
-    <li><b>P1 · Brevo erasure cascade</b>
-      Add a <code>deleteByEmail</code> to the Brevo handler so Art. 17 deletions remove the contact from Brevo too (today only HubSpot cascades).
-      <div class="where">Where: apps/cms/src/payload/lib/lead-handlers/brevo.ts</div></li>
     <li><b>P1 · Cookie Policy + Terms pages; HubSpot non-marketing default</b>
       Add <code>/cookies</code> + <code>/terms</code>; set HubSpot contacts non-marketing-by-default and only promote on <code>consent_marketing</code> (ties to the 2,000-contact cap).
       <div class="where">Where: apps/web + HubSpot settings</div></li>
