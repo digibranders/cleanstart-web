@@ -56,7 +56,7 @@ export async function Header() {
         >
           Book a Demo
         </Link>
-        <MobileNav />
+        <MobileNav openRolesCount={openRoles.length} />
       </div>
     </HeaderScrollShell>
   );

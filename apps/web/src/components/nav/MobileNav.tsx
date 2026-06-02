@@ -28,7 +28,7 @@ const MOBILE_CTA: Record<string, { headline: string; ctaLabel: string; ctaHref: 
   Company: { headline: "We're hiring", ctaLabel: "See Careers", ctaHref: "/careers" },
 };
 
-export function MobileNav() {
+export function MobileNav({ openRolesCount = 0 }: { openRolesCount?: number }) {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
 
@@ -125,7 +125,11 @@ export function MobileNav() {
                         onClick={close}
                         className="mx-3 mb-3 mt-2 flex items-center justify-between rounded-[10px] border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 no-underline"
                       >
-                        <span className="text-xs font-semibold text-white">{MOBILE_CTA[item.label]!.headline}</span>
+                        <span className="text-xs font-semibold text-white">
+                          {item.label === "Company" && openRolesCount > 0
+                            ? `${openRolesCount} open roles`
+                            : MOBILE_CTA[item.label]!.headline}
+                        </span>
                         <span
                           className="cs-btn-glass inline-flex items-center justify-center"
                           style={{
