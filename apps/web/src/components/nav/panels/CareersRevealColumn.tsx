@@ -23,9 +23,16 @@ export function CareersRevealColumn({ rows, spotlight, openRoles }: Props) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasRoles = openRoles.length > 0;
 
+  // `show` initiates the reveal — only the Careers row calls it. `keepOpen`
+  // merely cancels a pending revert so the cursor can travel from the row into
+  // the roster card without it closing; it never opens from the resting state,
+  // so hovering the default community card does nothing.
   const show = () => {
     if (timer.current) clearTimeout(timer.current);
     if (hasRoles) setRevealed(true);
+  };
+  const keepOpen = () => {
+    if (timer.current) clearTimeout(timer.current);
   };
   const hide = () => {
     if (timer.current) clearTimeout(timer.current);
@@ -63,7 +70,7 @@ export function CareersRevealColumn({ rows, spotlight, openRoles }: Props) {
       </div>
       {/* `relative` so the revealed roster can fill the cell (sized by the
           rows column) via `absolute inset-0` instead of growing the menu. */}
-      <div className="relative" onPointerEnter={show} onPointerLeave={hide}>
+      <div className="relative" onPointerEnter={keepOpen} onPointerLeave={hide}>
         {revealed ? (
           <div className="absolute inset-0">
             <OpenRolesCard roles={openRoles} />
