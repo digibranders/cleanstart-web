@@ -17,7 +17,9 @@ function primaryLocation(job: Job): string | null {
  */
 export async function loadOpenRoles(): Promise<OpenRole[]> {
   try {
-    const { docs } = await getJobs({ status: "open", limit: 50 });
+    // Limit covers any realistic open-roles count so the badge ("N open") and
+    // "View all N roles" reflect the true total; the roster list itself scrolls.
+    const { docs } = await getJobs({ status: "open", limit: 100 });
     return docs.map((job) => ({
       title: job.title,
       slug: job.slug,

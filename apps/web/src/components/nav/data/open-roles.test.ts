@@ -34,7 +34,7 @@ describe("loadOpenRoles", () => {
     expect(await loadOpenRoles()).toEqual([
       { title: "Sales Engineer", slug: "sales-engineer", location: "Singapore" },
     ]);
-    expect(getJobs).toHaveBeenCalledWith({ status: "open", limit: 50 });
+    expect(getJobs).toHaveBeenCalledWith({ status: "open", limit: 100 });
   });
 
   it("falls back to Remote then null when there is no resolved location", async () => {
