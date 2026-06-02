@@ -1,25 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
 
 /**
  * Blog/News detail CTA — white newsletter capture card with cubes and grids
  * in the corners, plus a blue→teal "Subscribe" gradient button.
  */
 export function BlogDetailCTA(): React.ReactElement {
-  const emailRef = useRef<HTMLInputElement>(null);
-  const [submitted, setSubmitted] = useState(false);
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
-    e.preventDefault();
-    const email = emailRef.current?.value.trim();
-    if (!email) return;
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      if (emailRef.current) emailRef.current.value = "";
-    }, 3000);
-  }
+  const { emailRef, submitted, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: "#fff" }}>
@@ -188,6 +176,11 @@ export function BlogDetailCTA(): React.ReactElement {
                   Subscribe
                 </button>
               </form>
+            )}
+            {error && (
+              <p role="alert" className="text-sm font-medium" style={{ color: "#B42318" }}>
+                {error}
+              </p>
             )}
           </div>
         </div>

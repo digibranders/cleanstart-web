@@ -1,24 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
 
 /**
  * Newsletter CTA for the Webinars page, rendered inside the Footer's CTA slot.
  */
 export function WebinarsCTA(): React.ReactElement {
-  const emailRef = useRef<HTMLInputElement>(null);
-  const [submitted, setSubmitted] = useState(false);
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
-    e.preventDefault();
-    const email = emailRef.current?.value.trim();
-    if (!email) return;
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      if (emailRef.current) emailRef.current.value = "";
-    }, 3000);
-  }
+  const { emailRef, submitted, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div
@@ -179,6 +167,11 @@ export function WebinarsCTA(): React.ReactElement {
                   Subscribe
                 </button>
               </form>
+            )}
+            {error && (
+              <p role="alert" className="text-sm font-medium text-white" style={{ opacity: 0.9 }}>
+                {error}
+              </p>
             )}
           </div>
         </div>

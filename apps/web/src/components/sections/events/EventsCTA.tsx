@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
 
 /**
  * Newsletter CTA for the Events page — "Never miss an event".
@@ -8,19 +8,7 @@ import { useRef, useState } from "react";
  * Mirrors BlogsCTA structure and styling for visual consistency.
  */
 export function EventsCTA(): React.ReactElement {
-  const emailRef = useRef<HTMLInputElement>(null);
-  const [submitted, setSubmitted] = useState(false);
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
-    e.preventDefault();
-    const email = emailRef.current?.value.trim();
-    if (!email) return;
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      if (emailRef.current) emailRef.current.value = "";
-    }, 3000);
-  }
+  const { emailRef, submitted, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div
@@ -180,6 +168,11 @@ export function EventsCTA(): React.ReactElement {
                   Subscribe
                 </button>
               </form>
+            )}
+            {error && (
+              <p role="alert" className="text-sm font-medium text-white" style={{ opacity: 0.9 }}>
+                {error}
+              </p>
             )}
           </div>
         </div>
