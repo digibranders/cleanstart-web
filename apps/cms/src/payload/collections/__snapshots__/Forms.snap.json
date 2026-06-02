@@ -227,6 +227,10 @@
     {
       "type": "number",
       "name": "schemaVersion"
+    },
+    {
+      "type": "text",
+      "name": "hubspotFormGuid"
     }
   ],
   "hooks": {

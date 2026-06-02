@@ -1636,6 +1636,10 @@ export interface Form {
    * System-managed. Auto-increments when fields[] changes after the form has at least one submission.
    */
   schemaVersion?: number | null;
+  /**
+   * GUID of the matching HubSpot form in the "website" folder. Set this to relay submissions to HubSpot via the Forms API. Leave empty to skip HubSpot sync.
+   */
+  hubspotFormGuid?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -7807,6 +7811,7 @@ export interface FormsSelect<T extends boolean = true> {
         id?: T;
       };
   schemaVersion?: T;
+  hubspotFormGuid?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
