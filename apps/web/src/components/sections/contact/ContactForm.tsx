@@ -3,6 +3,7 @@
 import { Container } from "@/components/layout";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { LeadConsent } from "@/components/forms/LeadConsent";
+import { submitLead } from "@/lib/leads/submitLead";
 import { useRef, useState } from "react";
 
 interface FieldState {
@@ -23,44 +24,72 @@ const initialState: FieldState = {
   brief: "",
 };
 
-function newSubmissionId(): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-  return `sub_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-}
+/** Controlled field key → HubSpot internal property name. */
+const FIELD_TO_HUBSPOT: Record<keyof FieldState, string> = {
+  firstName: "firstname",
+  lastName: "lastname",
+  email: "email",
+  company: "company",
+  phone: "phone",
+  brief: "enter_message",
+};
+
+const STORAGE_CONSENT_TEXT =
+  "I agree to allow CleanStart to store and process my personal data.";
 
 export function ContactForm() {
   const [values, setValues] = useState<FieldState>(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [topError, setTopError] = useState<string | null>(null);
   const inFlightRef = useRef(false);
-  const submissionIdRef = useRef<string | null>(null);
 
   const onChange =
     (key: keyof FieldState) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setValues((prev) => ({ ...prev, [key]: e.target.value }));
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (inFlightRef.current) return;
     inFlightRef.current = true;
-    submissionIdRef.current = newSubmissionId();
+    setTopError(null);
     setSubmitting(true);
-    window.setTimeout(() => {
-      setSubmitting(false);
+
+    const fd = new FormData(e.currentTarget);
+    const fields: Record<string, string> = {};
+    for (const [key, hsName] of Object.entries(FIELD_TO_HUBSPOT)) {
+      const value = values[key as keyof FieldState].trim();
+      if (value) fields[hsName] = value;
+    }
+    const categories = ["storage", ...(fd.get("consent_marketing") != null ? ["marketing"] : [])];
+    const turnstileToken = fd.get("cf-turnstile-response");
+
+    const result = await submitLead({
+      formSlug: "contact",
+      fields,
+      consent: {
+        snapshot: STORAGE_CONSENT_TEXT,
+        givenAt: new Date().toISOString(),
+        categories,
+      },
+      ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
+      ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
+    });
+
+    setSubmitting(false);
+    inFlightRef.current = false;
+    if (result.ok) {
       setSubmitted(true);
       setValues(initialState);
-      window.setTimeout(() => {
-        setSubmitted(false);
-        inFlightRef.current = false;
-      }, 5000);
-    }, 600);
+      window.setTimeout(() => setSubmitted(false), 5000);
+    } else {
+      setTopError("We couldn't send your message. Please try again.");
+    }
   };
 
   return (
-    <section className="relative -mt-[140px] pb-16 sm:pb-20">
+    <section className="relative -mt-[140px] pb-4 sm:pb-6">
       <Container>
         <div className="mx-auto w-full max-w-[860px]">
           <div
@@ -219,6 +248,22 @@ export function ContactForm() {
                 <div className="mt-7 flex justify-start">
                   <TurnstileWidget />
                 </div>
+
+                {topError && (
+                  <p
+                    role="alert"
+                    className="mt-4"
+                    style={{
+                      fontFamily: "var(--font-sans), 'Sora', sans-serif",
+                      fontSize: "var(--fs-input-label)",
+                      fontWeight: 500,
+                      lineHeight: 1.45,
+                      color: "#B42318",
+                    }}
+                  >
+                    {topError}
+                  </p>
+                )}
 
                 <button
                   type="submit"

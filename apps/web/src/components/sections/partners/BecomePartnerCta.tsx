@@ -9,14 +9,29 @@ import {
   TextArea,
   TextInput,
 } from "@/components/sections/forms/FormCard";
+import { submitLead } from "@/lib/leads/submitLead";
+
+/** Web input name → HubSpot internal property name (the `forms` field names). */
+const NAME_MAP: Record<string, string> = {
+  firstName: "firstname",
+  lastName: "lastname",
+  phone: "phone",
+  email: "email",
+  company: "company",
+  website: "website",
+  partnerReason: "enter_message",
+};
+
+const STORAGE_CONSENT_TEXT =
+  "I agree to allow CleanStart to store and process my personal data.";
 
 /**
  * "Become a Partner" CTA + modal. The old Webflow site opened a popup
  * ("Join Forces with CleanStart") from this CTA; this reproduces it on the
  * new site using the shared FormCard design language (white card / blue
- * border) so it matches its sibling, the Deal Registration form. The form is
- * client-side UX only until it is wired through the CMS LeadHandler / HubSpot
- * `website-partner` form — matching the other marketing forms on the site.
+ * border) so it matches its sibling, the Deal Registration form. Submissions
+ * post through the shared `submitLead` helper to `/api/leads/submit` (form
+ * slug `become-a-partner`), which relays to the HubSpot `website-partner` form.
  */
 export function BecomePartnerCta(): React.ReactElement {
   const [open, setOpen] = useState(false);
@@ -49,6 +64,7 @@ interface PartnerModalProps {
 function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [topError, setTopError] = useState<string | null>(null);
   const inFlightRef = useRef(false);
 
   useEffect(() => {
@@ -63,19 +79,54 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
         }
       }
       setSubmitted(false);
+      setTopError(null);
       inFlightRef.current = false;
     } else if (dlg.open) {
       dlg.close();
     }
   }, [open]);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    // The lead intake adapter is not yet exposed at the web edge; this form is
-    // client-side UX only until it is wired through LeadHandler.
     if (inFlightRef.current) return;
+    setTopError(null);
+
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    // The form is noValidate, so the required consent checkbox isn't enforced
+    // by the browser — gate on it here before sending.
+    if (fd.get("consent_storage") == null) {
+      setTopError("Please agree to the storage & processing of your data to continue.");
+      return;
+    }
     inFlightRef.current = true;
-    setSubmitted(true);
+
+    const fields: Record<string, string> = {};
+    for (const [inputName, hsName] of Object.entries(NAME_MAP)) {
+      const value = fd.get(inputName);
+      if (typeof value === "string" && value.trim()) fields[hsName] = value.trim();
+    }
+    const categories = ["storage", ...(fd.get("consent_marketing") != null ? ["marketing"] : [])];
+    const turnstileToken = fd.get("cf-turnstile-response");
+
+    const result = await submitLead({
+      formSlug: "become-a-partner",
+      fields,
+      consent: {
+        snapshot: STORAGE_CONSENT_TEXT,
+        givenAt: new Date().toISOString(),
+        categories,
+      },
+      ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
+      ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
+    });
+
+    if (result.ok) {
+      setSubmitted(true);
+    } else {
+      setTopError("We couldn't submit your request. Please try again.");
+      inFlightRef.current = false;
+    }
   };
 
   return (
@@ -205,6 +256,20 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
                 <div className="flex justify-start">
                   <TurnstileWidget />
                 </div>
+                {topError && (
+                  <p
+                    role="alert"
+                    style={{
+                      fontFamily: "var(--font-sans), 'Sora', sans-serif",
+                      fontSize: "var(--fs-body-sm)",
+                      fontWeight: 500,
+                      lineHeight: 1.45,
+                      color: "#B42318",
+                    }}
+                  >
+                    {topError}
+                  </p>
+                )}
                 <SubmitButton>Join Now</SubmitButton>
               </form>
             )}
