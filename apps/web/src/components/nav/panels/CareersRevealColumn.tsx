@@ -61,9 +61,13 @@ export function CareersRevealColumn({ rows, spotlight, openRoles }: Props) {
           );
         })}
       </div>
-      <div onPointerEnter={show} onPointerLeave={hide}>
+      {/* `relative` so the revealed roster can fill the cell (sized by the
+          rows column) via `absolute inset-0` instead of growing the menu. */}
+      <div className="relative" onPointerEnter={show} onPointerLeave={hide}>
         {revealed ? (
-          <OpenRolesCard roles={openRoles} />
+          <div className="absolute inset-0">
+            <OpenRolesCard roles={openRoles} />
+          </div>
         ) : (
           <SpotlightRenderer spotlight={spotlight} hero />
         )}

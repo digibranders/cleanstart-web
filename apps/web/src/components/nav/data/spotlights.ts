@@ -56,12 +56,11 @@ export async function resolveResourcesSpotlight(deps: {
 
 export async function resolveCompanySpotlight(deps: {
   now: Date;
-  fetchOpenRoles: () => Promise<number>;
   fetchSpotlightGlobal: () => Promise<CmsSpotlight | null>;
 }): Promise<SpotlightCard> {
-  const roles = await deps.fetchOpenRoles();
-  if (roles > 0) return { kind: 'careers', openRoles: roles };
-
+  // Default Company spotlight is the CMS card (when live) or the community
+  // evergreen. Open roles are surfaced by the Careers-row hover reveal, not by
+  // hijacking the spotlight, so the community card stays the resting state.
   const cms = await deps.fetchSpotlightGlobal();
   if (cms && !isExpired(cms.expiresAt, deps.now)) return toCmsCard(cms);
 

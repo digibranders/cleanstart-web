@@ -4,7 +4,6 @@ import {
   resolveCompanySpotlight,
   type SpotlightCard,
 } from './spotlights';
-import { fetchOpenRolesCount } from './careers-feed';
 import { fetchCMS } from '@/lib/cms-fetch';
 
 export const RESOURCES_SPOTLIGHT_TAG = 'resources-spotlight';
@@ -148,7 +147,6 @@ export const getCompanySpotlight = cache(async (): Promise<SpotlightCard> => {
   const now = new Date();
   return resolveCompanySpotlight({
     now,
-    fetchOpenRoles: fetchOpenRolesCount,
     fetchSpotlightGlobal: fetchCompanySpotlightGlobal,
   });
 });

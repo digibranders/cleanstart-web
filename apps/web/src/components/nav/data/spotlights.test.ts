@@ -70,19 +70,9 @@ describe('resolveResourcesSpotlight', () => {
 });
 
 describe('resolveCompanySpotlight', () => {
-  it('returns hiring card when openRoles > 0', async () => {
+  it('returns the CMS spotlight when one is live', async () => {
     const out = await resolveCompanySpotlight({
       now: new Date('2026-06-01'),
-      fetchOpenRoles: async () => 7,
-      fetchSpotlightGlobal: async () => null,
-    });
-    expect(out.kind).toBe('careers');
-  });
-
-  it('falls through to CMS spotlight when no roles', async () => {
-    const out = await resolveCompanySpotlight({
-      now: new Date('2026-06-01'),
-      fetchOpenRoles: async () => 0,
       fetchSpotlightGlobal: async () => ({
         headline: 'Series B',
         sub: 'sub',
@@ -93,10 +83,9 @@ describe('resolveCompanySpotlight', () => {
     expect(out.kind).toBe('cms');
   });
 
-  it('returns community evergreen when nothing else', async () => {
+  it('returns the community evergreen by default', async () => {
     const out = await resolveCompanySpotlight({
       now: new Date('2026-06-01'),
-      fetchOpenRoles: async () => 0,
       fetchSpotlightGlobal: async () => null,
     });
     expect(out).toBe(COMMUNITY_EVERGREEN);

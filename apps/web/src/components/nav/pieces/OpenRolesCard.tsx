@@ -11,7 +11,7 @@ const ACCENT = "#a78bfa";
  */
 export function OpenRolesCard({ roles }: { roles: OpenRole[] }) {
   return (
-    <div className="flex min-h-[280px] flex-col rounded-[14px] border border-white/10 bg-white/[0.03] p-3">
+    <div className="flex h-full flex-col rounded-[14px] border border-white/10 bg-white/[0.03] p-3">
       <div className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/55">
         Open roles · {roles.length}
       </div>
