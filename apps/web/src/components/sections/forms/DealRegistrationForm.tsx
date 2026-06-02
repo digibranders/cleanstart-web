@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { LeadConsent } from "@/components/forms/LeadConsent";
 import {
   FormCard,
   FormSectionTitle,
@@ -63,7 +64,11 @@ export function DealRegistrationForm(): React.ReactElement {
           <TextArea name="dealDetails" placeholder="Deal Details" label="Deal Details" />
         </div>
 
-        <TurnstileWidget />
+        <LeadConsent />
+
+        <div className="flex justify-start">
+          <TurnstileWidget />
+        </div>
         <SubmitButton>Submit Application</SubmitButton>
       </form>
     </FormCard>

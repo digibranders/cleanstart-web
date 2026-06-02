@@ -2,6 +2,7 @@
 
 import { Container } from "@/components/layout";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { LeadConsent } from "@/components/forms/LeadConsent";
 import { useRef, useState } from "react";
 
 interface FieldState {
@@ -209,6 +210,10 @@ export function ContactForm() {
                       onChange={onChange("brief")}
                     />
                   </div>
+                </div>
+
+                <div className="mt-6">
+                  <LeadConsent />
                 </div>
 
                 <div className="mt-7 flex justify-start">
