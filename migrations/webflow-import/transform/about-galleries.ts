@@ -1,3 +1,4 @@
+import { webflowStatus } from './status';
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
 import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
 
@@ -15,7 +16,7 @@ export const transformAboutGallery = (row: Record<string, unknown>): Record<stri
     typeof imageLinkRaw === 'string' && imageLinkRaw.trim().length > 0 ? imageLinkRaw.trim() : null;
   return {
     _webflowId: row.webflowId,
-    _status: 'published',
+    _status: webflowStatus(row),
     name,
     slug,
     caption: asString(row.caption),
