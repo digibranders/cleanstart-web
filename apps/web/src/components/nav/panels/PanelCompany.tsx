@@ -1,15 +1,15 @@
-import { PanelRow } from "@/components/nav/pieces/PanelRow";
 import { PanelShell } from "@/components/nav/panels/PanelShell";
-import { SpotlightRenderer } from "@/components/nav/pieces/SpotlightRenderer";
+import { CareersRevealColumn } from "@/components/nav/panels/CareersRevealColumn";
 import type { NavMegaItem } from "@/lib/nav-config";
 import type { SpotlightCard } from "@/components/nav/data/spotlights";
+import type { OpenRole } from "@/components/nav/data/open-roles";
 
-type Props = { item: NavMegaItem; spotlight: SpotlightCard };
+type Props = { item: NavMegaItem; spotlight: SpotlightCard; openRoles: OpenRole[] };
 
 // Brand-family atmosphere for Company: a low lavender-violet wash in the top-right.
 const ATMOSPHERE = "rgba(170, 130, 245, 0.05)";
 
-export function PanelCompany({ item, spotlight }: Props) {
+export function PanelCompany({ item, spotlight, openRoles }: Props) {
   const rows = item.groups[0]?.items ?? [];
   return (
     <PanelShell
@@ -21,21 +21,7 @@ export function PanelCompany({ item, spotlight }: Props) {
         ? { exitHref: item.exitHref, exitLabel: item.exitLabel }
         : {})}
     >
-      <div className="grid grid-cols-[1.3fr_1fr] gap-3.5">
-        <div className="flex flex-col gap-0.5">
-          {rows.map((r) => (
-            <PanelRow
-              key={r.label}
-              href={r.href}
-              label={r.label}
-              {...(r.description ? { description: r.description } : {})}
-              icon={r.icon ?? "info"}
-              built={r.built !== false}
-            />
-          ))}
-        </div>
-        <SpotlightRenderer spotlight={spotlight} hero />
-      </div>
+      <CareersRevealColumn rows={rows} spotlight={spotlight} openRoles={openRoles} />
     </PanelShell>
   );
 }

@@ -9,15 +9,22 @@ import {
   getResourcesSpotlight,
   getCompanySpotlight,
 } from "@/components/nav/data/resolve-spotlights";
+import { fetchOpenRoles } from "@/components/nav/data/open-roles";
 
 export async function Header() {
-  const [latestImages, latestUpdates, resourcesSpotlight, companySpotlight] =
-    await Promise.all([
-      fetchLatestImages(),
-      fetchLatestUpdates(),
-      getResourcesSpotlight(),
-      getCompanySpotlight(),
-    ]);
+  const [
+    latestImages,
+    latestUpdates,
+    resourcesSpotlight,
+    companySpotlight,
+    openRoles,
+  ] = await Promise.all([
+    fetchLatestImages(),
+    fetchLatestUpdates(),
+    getResourcesSpotlight(),
+    getCompanySpotlight(),
+    fetchOpenRoles(),
+  ]);
 
   return (
     <HeaderScrollShell>
@@ -34,6 +41,7 @@ export async function Header() {
         latestUpdates={latestUpdates}
         resourcesSpotlight={resourcesSpotlight}
         companySpotlight={companySpotlight}
+        openRoles={openRoles}
       />
 
       <div className="flex items-center gap-3">

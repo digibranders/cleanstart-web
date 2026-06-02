@@ -15,7 +15,7 @@ export function OpenRolesCard({ roles }: { roles: OpenRole[] }) {
       <div className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/55">
         Open roles · {roles.length}
       </div>
-      <ul className="min-h-0 flex-1 overflow-y-auto pr-1" role="list">
+      <ul className="min-h-0 flex-1 overflow-y-auto pr-1">
         {roles.map((role) => (
           <li key={role.slug}>
             <Link
