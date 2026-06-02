@@ -376,38 +376,36 @@
 // after hydration, regardless of the saved preference — so a JS-only
 // re-open always flashes (collapse → expand) and, in dev, lags ~seconds
 // behind hydration. We hold the open grid here in CSS so the rail is
-// docked from the first paint with no flash:
+// docked from the first paint with no flash.
 //
-//   - ≥ 1280px            → docked on every route.
-//   - 1025–1279px         → docked on browse routes (dashboard, lists);
-//                           editor routes keep Payload's collapse.
-//   - ≤ 1024px            → Payload's overlay drawer owns the nav; left
-//                           untouched.
+// The hold is gated on `html[data-cs-nav-docked='true']`, owned by
+// `NavOpenOnDesktop.tsx`. That component sets the attribute from the
+// auto-collapse policy during the hydration settling window, then mirrors
+// genuine user toggles into it once settled. So:
 //
-// `[data-cs-nav-route]` is set on <html> by `NavOpenOnDesktop.tsx`, which
-// also keeps Payload's `navOpen` state in sync so the collapse toggler
-// reflects the docked rail. `!important` is required to beat Payload's
-// `.template-default--nav-hydrated` collapse rule.
+//   - During hydration → policy keeps it `'true'` on browse/wide → no flash.
+//   - User clicks collapse → `navOpen` flips false → attribute flips
+//     `'false'` → this rule stops matching → Payload's own
+//     `.template-default--nav-hydrated` collapse takes over and the rail
+//     actually closes. Without the gate the bare `!important` here pinned
+//     the grid open and the collapse toggle did nothing.
+//   - ≤ 1024px → `NavOpenOnDesktop` removes the attribute; the overlay
+//     drawer owns the nav, untouched.
 //
-// Two properties must be forced together. Payload reserves the rail via
-// the grid column AND fades the `.nav` element itself to `opacity: 0`
-// when `navOpen` is false (only `.nav--nav-open` sets `opacity: 1`).
-// Forcing the column alone leaves a reserved-but-empty column — a blank
-// space where the rail should be — whenever the JS `navOpen` re-assert
-// lags. Pin the opacity here too so the rail is genuinely visible, not
-// just allocated, independent of the JS state.
-@media (min-width: 1280px) {
-  .template-default {
-    grid-template-columns: var(--nav-width) auto !important;
-  }
-
-  .nav {
-    opacity: 1 !important;
-  }
-}
-
-@media (min-width: 1025px) and (max-width: 1279px) {
-  html[data-cs-nav-route='browse'] {
+// The per-viewport / per-route policy (≥1280 docked everywhere; 1025–1279
+// docked on browse only) is encoded in the attribute value by the JS, so a
+// single `min-width: 1025px` gate is all the CSS needs.
+//
+// `!important` is required to beat Payload's `.template-default--nav-hydrated`
+// collapse rule. Two properties must be forced together: Payload reserves the
+// rail via the grid column AND fades the `.nav` element itself to `opacity: 0`
+// when `navOpen` is false (only `.nav--nav-open` sets `opacity: 1`). Forcing
+// the column alone leaves a reserved-but-empty column — a blank space where
+// the rail should be — whenever the JS `navOpen` re-assert lags. Pin the
+// opacity here too so the docked rail is genuinely visible, not just
+// allocated, independent of the JS state.
+@media (min-width: 1025px) {
+  html[data-cs-nav-docked='true'] {
     .template-default {
       grid-template-columns: var(--nav-width) auto !important;
     }
