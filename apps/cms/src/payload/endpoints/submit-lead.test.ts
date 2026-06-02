@@ -18,6 +18,7 @@ import {
   submitLeadOptionsEndpoint,
 } from './submit-lead';
 import { __resetRateLimitStore } from '../lib/rate-limit';
+import { verifyTurnstileToken } from '../lib/turnstile';
 
 type FakeHeaders = { get: (name: string) => string | null };
 
@@ -245,5 +246,16 @@ describe('POST /submit form resolution by slug', () => {
     expect(res.status).toBe(400);
     const json = (await res.json()) as { error: string };
     expect(json.error).toBe('invalid_form');
+  });
+
+  it('skips Turnstile verification for the exempt newsletter form', async () => {
+    vi.mocked(verifyTurnstileToken).mockClear();
+    fakePayload.find.mockResolvedValueOnce({
+      docs: [{ ...SEEDED_FORM, slug: 'newsletter', fields: [] }],
+    });
+    // No turnstileToken sent — would 403 for a non-exempt form.
+    const res = await submit({ formSlug: 'newsletter', fields: { email: 'a@b.com' } });
+    expect(res.status).toBe(200);
+    expect(verifyTurnstileToken).not.toHaveBeenCalled();
   });
 });

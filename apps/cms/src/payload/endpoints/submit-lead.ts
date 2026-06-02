@@ -44,6 +44,25 @@ const allowedOrigins = (): string[] => {
 const isAllowedOrigin = (origin: string | null): origin is string =>
   origin != null && allowedOrigins().includes(origin);
 
+/**
+ * Form slugs exempt from Turnstile verification. Low-value, high-friction
+ * signups (e.g. the email-only newsletter CTA) don't render a Turnstile
+ * widget; they stay protected by the rate limit, the honeypot, and the CORS
+ * allow-list. The exemption is keyed on the *resolved* form slug, so it can't
+ * be used to bypass Turnstile for any other form. Override via
+ * LEAD_SUBMIT_TURNSTILE_EXEMPT_SLUGS (CSV).
+ */
+const turnstileExemptSlugs = (): Set<string> => {
+  const raw = process.env.LEAD_SUBMIT_TURNSTILE_EXEMPT_SLUGS;
+  if (!raw || raw.trim().length === 0) return new Set(['newsletter']);
+  return new Set(
+    raw
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0),
+  );
+};
+
 const corsHeaders = (origin: string): Record<string, string> => ({
   'access-control-allow-origin': origin,
   'access-control-allow-methods': 'POST, OPTIONS',
@@ -278,16 +297,20 @@ export const submitLeadEndpoint: Endpoint = {
       return json({ ok: true }, { headers: responseCors });
     }
 
-    const turnstile = await verifyTurnstileToken(data.turnstileToken, ip);
-    if (!turnstile.ok) {
-      return json(
-        {
-          ok: false,
-          error: 'turnstile_failed',
-          reason: turnstile.reason,
-        },
-        { status: 403, headers: responseCors },
-      );
+    const turnstileExempt =
+      resolvedForm?.slug != null && turnstileExemptSlugs().has(resolvedForm.slug);
+    if (!turnstileExempt) {
+      const turnstile = await verifyTurnstileToken(data.turnstileToken, ip);
+      if (!turnstile.ok) {
+        return json(
+          {
+            ok: false,
+            error: 'turnstile_failed',
+            reason: turnstile.reason,
+          },
+          { status: 403, headers: responseCors },
+        );
+      }
     }
 
     // Draft forms must not accept public submissions — an editor working on a
