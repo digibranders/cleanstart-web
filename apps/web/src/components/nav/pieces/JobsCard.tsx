@@ -3,10 +3,10 @@ import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
 
 const ACCENT = "#2cc1eb";
 
-// Proper brand gradient (the testimonial-deck indigo→violet) so the jobs card
-// reads as a distinct, branded surface beside the flat community card while
-// keeping white text fully legible. Exact stops per the design system.
-const BRAND_GRADIENT = "linear-gradient(135deg, #1F1740 0%, #242682 55%, #3F279E 100%)";
+// Brand gradient (the testimonial-deck indigo→violet) shared by the Company
+// menu's stacked cards so they read as a matched pair. Exact stops per the
+// design system; white text stays fully legible across the range.
+export const BRAND_GRADIENT = "linear-gradient(135deg, #1F1740 0%, #242682 55%, #3F279E 100%)";
 
 const EYEBROW = "text-[10px] font-bold uppercase tracking-[0.14em] text-white/55";
 
@@ -20,7 +20,7 @@ export function JobsCard({ count }: { count: number }) {
   return (
     <Link
       href="/careers"
-      className="group/cta flex flex-col rounded-[14px] border border-white/10 p-4 text-white"
+      className="cs-hero-surface group/cta flex flex-col rounded-[14px] p-4 text-white"
       style={{ background: BRAND_GRADIENT }}
     >
       <div className={EYEBROW}>Careers</div>

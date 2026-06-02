@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import type { SpotlightCard } from "@/components/nav/data/spotlights";
 import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
 
@@ -44,9 +45,11 @@ type Props = {
   hero?: boolean;
   /** Drop the fixed min-height so the card sizes to its content (for stacked layouts). */
   dense?: boolean;
+  /** Inline style applied to the card root — e.g. a brand-gradient background. */
+  style?: CSSProperties;
 };
 
-export function SpotlightRenderer({ spotlight, hero = false, dense = false }: Props) {
+export function SpotlightRenderer({ spotlight, hero = false, dense = false, style }: Props) {
   const CARD = cardClass(hero);
   // In stacked layouts the card shares the column with a sibling, so the
   // floor-filling min-height is dropped and the card hugs its content.
@@ -59,7 +62,7 @@ export function SpotlightRenderer({ spotlight, hero = false, dense = false }: Pr
 
   if (spotlight.kind === "event") {
     return (
-      <Link href={`/event/${spotlight.slug}`} className={`${CARD} ${minH("min-h-[230px]")}`}>
+      <Link href={`/event/${spotlight.slug}`} className={`${CARD} ${minH("min-h-[230px]")}`} style={style}>
         <div>
           <div className={EYEBROW}>Next event</div>
           <div className={`mt-2 ${headlineClass}`}>{spotlight.title}</div>
@@ -76,7 +79,7 @@ export function SpotlightRenderer({ spotlight, hero = false, dense = false }: Pr
 
   if (spotlight.kind === "webinar") {
     return (
-      <Link href={`/webinar/${spotlight.slug}`} className={`${CARD} ${minH("min-h-[230px]")}`}>
+      <Link href={`/webinar/${spotlight.slug}`} className={`${CARD} ${minH("min-h-[230px]")}`} style={style}>
         <div>
           <div className={EYEBROW}>Next webinar</div>
           <div className={`mt-2 ${headlineClass}`}>{spotlight.title}</div>
@@ -93,7 +96,7 @@ export function SpotlightRenderer({ spotlight, hero = false, dense = false }: Pr
 
   if (spotlight.kind === "careers") {
     return (
-      <Link href="/careers" className={`${CARD} ${minH("min-h-[280px]")}`}>
+      <Link href="/careers" className={`${CARD} ${minH("min-h-[280px]")}`} style={style}>
         <div>
           <div className={headlineClass}>Build the base layer with us.</div>
           <div className="mt-1.5 text-xs leading-relaxed text-white/65">
@@ -126,7 +129,7 @@ export function SpotlightRenderer({ spotlight, hero = false, dense = false }: Pr
 
   if (spotlight.kind === "cms") {
     return (
-      <Link href={spotlight.ctaHref} className={`${CARD} ${minH("min-h-[230px]")}`}>
+      <Link href={spotlight.ctaHref} className={`${CARD} ${minH("min-h-[230px]")}`} style={style}>
         <div>
           <div className={EYEBROW}>Spotlight</div>
           <div className={`mt-2 ${headlineClass}`}>{spotlight.headline}</div>
@@ -143,7 +146,7 @@ export function SpotlightRenderer({ spotlight, hero = false, dense = false }: Pr
 
   if (spotlight.kind === "evergreen" && spotlight.id === "bulletin") {
     return (
-      <Link href="/subscribe" className={`${CARD} ${minH("min-h-[230px]")}`}>
+      <Link href="/subscribe" className={`${CARD} ${minH("min-h-[230px]")}`} style={style}>
         <div>
           <div className={EYEBROW}>Newsletter</div>
           <div className={`mt-2 ${headlineClass}`}>Get the CleanStart Bulletin.</div>

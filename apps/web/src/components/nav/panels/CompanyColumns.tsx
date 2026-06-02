@@ -1,6 +1,6 @@
 import { PanelRow } from "@/components/nav/pieces/PanelRow";
 import { SpotlightRenderer } from "@/components/nav/pieces/SpotlightRenderer";
-import { JobsCard } from "@/components/nav/pieces/JobsCard";
+import { JobsCard, BRAND_GRADIENT } from "@/components/nav/pieces/JobsCard";
 import type { NavLeaf } from "@/lib/nav-config";
 import type { SpotlightCard } from "@/components/nav/data/spotlights";
 
@@ -31,7 +31,12 @@ export function CompanyColumns({ rows, spotlight, openRolesCount }: Props) {
       <div className="flex flex-col gap-3.5">
         {hasRoles ? (
           <>
-            <SpotlightRenderer spotlight={spotlight} hero dense />
+            <SpotlightRenderer
+              spotlight={spotlight}
+              hero
+              dense
+              style={{ background: BRAND_GRADIENT }}
+            />
             <JobsCard count={openRolesCount} />
           </>
         ) : (
