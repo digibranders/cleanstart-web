@@ -292,7 +292,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -300,6 +299,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -585,7 +585,6 @@ export interface Integration {
     | 'msClarity'
     | 'cloudflareWebAnalytics'
     | 'calComInbound'
-    | 'brevoBounceCallback'
     | 'zohoCrm';
   /**
    * Turn this connection on or off without removing it.
@@ -746,10 +745,6 @@ export interface Integration {
      */
     fallbackFormId: number;
   };
-  /**
-   * Keeps your email list clean by automatically marking contacts who bounced or complained. Everything is set up by the technical team — no configuration needed here.
-   */
-  brevoConfig?: {};
   /**
    * DB-backed rows = editable. Legacy (env) rows are read-only.
    */
@@ -1717,7 +1712,7 @@ export interface Lead {
       }[]
     | null;
   /**
-   * One row per secondary handler (Brevo, Teams, future HubSpot/Salesforce). Failed rows are retryable.
+   * One row per secondary handler (HubSpot, company-from-domain). Failed rows are retryable.
    */
   syncedTo?:
     | {
@@ -1757,14 +1752,6 @@ export interface Lead {
    * False when the Cloudflare Turnstile challenge was not passed at submit time.
    */
   turnstilePassed?: boolean | null;
-  /**
-   * Updated by the Brevo bounce/complaint webhook. Hard bounce / complaint / unsubscribed = stop sending transactional email to this address.
-   */
-  emailHealth?: ('good' | 'soft_bounce' | 'hard_bounce' | 'complaint' | 'unsubscribed') | null;
-  /**
-   * When emailHealth was last set by the Brevo callback.
-   */
-  emailHealthAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -7233,13 +7220,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -7454,7 +7441,6 @@ export interface IntegrationsSelect<T extends boolean = true> {
     | {
         fallbackFormId?: T;
       };
-  brevoConfig?: T | {};
   source?: T;
   lastHealthAt?: T;
   updatedAt?: T;
@@ -7869,8 +7855,6 @@ export interface LeadsSelect<T extends boolean = true> {
   piiRedactedAt?: T;
   honeypot?: T;
   turnstilePassed?: T;
-  emailHealth?: T;
-  emailHealthAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

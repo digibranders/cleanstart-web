@@ -24,7 +24,6 @@ import { FormSlugsMultiSelect as FormSlugsMultiSelect_11ab94aa8a76e3e72d0050cdfa
 import { ArrayField as ArrayField_bd55658ce5d98c1c995dbb3e9e65c4e7 } from '@/payload/admin/components/fields/ArrayField.tsx'
 import { MentionRowLabel as MentionRowLabel_918a88e07ffa362117b32190a0bd8c51 } from '@/payload/admin/components/MentionRowLabel.tsx'
 import { ClarityConfigNote as ClarityConfigNote_dd07c5d802b83ad4ca896a67326d6b90 } from '@/payload/admin/components/integrations/ConfigNote.tsx'
-import { BrevoConfigNote as BrevoConfigNote_dd07c5d802b83ad4ca896a67326d6b90 } from '@/payload/admin/components/integrations/ConfigNote.tsx'
 import { HealthBadge as HealthBadge_89f48d3894398c6d1021775cfdeaf211 } from '@/payload/admin/components/integrations/HealthBadge.tsx'
 import { TestButton as TestButton_0a975e83e531dadfb4f8fa6589a5704a } from '@/payload/admin/components/integrations/TestButton.tsx'
 import { AuditTrail as AuditTrail_eca9fb91faa70a942f7e3507305e451c } from '@/payload/admin/components/integrations/AuditTrail.tsx'
@@ -158,7 +157,6 @@ export const importMap = {
   "@/payload/admin/components/fields/ArrayField.tsx#ArrayField": ArrayField_bd55658ce5d98c1c995dbb3e9e65c4e7,
   "@/payload/admin/components/MentionRowLabel.tsx#MentionRowLabel": MentionRowLabel_918a88e07ffa362117b32190a0bd8c51,
   "@/payload/admin/components/integrations/ConfigNote.tsx#ClarityConfigNote": ClarityConfigNote_dd07c5d802b83ad4ca896a67326d6b90,
-  "@/payload/admin/components/integrations/ConfigNote.tsx#BrevoConfigNote": BrevoConfigNote_dd07c5d802b83ad4ca896a67326d6b90,
   "@/payload/admin/components/integrations/HealthBadge.tsx#HealthBadge": HealthBadge_89f48d3894398c6d1021775cfdeaf211,
   "@/payload/admin/components/integrations/TestButton.tsx#TestButton": TestButton_0a975e83e531dadfb4f8fa6589a5704a,
   "@/payload/admin/components/integrations/AuditTrail.tsx#AuditTrail": AuditTrail_eca9fb91faa70a942f7e3507305e451c,

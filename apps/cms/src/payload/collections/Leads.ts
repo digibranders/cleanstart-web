@@ -223,7 +223,7 @@ export const Leads: CollectionConfig = {
       labels: { singular: 'Sync', plural: 'Sync attempts' },
       admin: {
         description:
-          'One row per secondary handler (Brevo, Teams, future HubSpot/Salesforce). Failed rows are retryable.',
+          'One row per secondary handler (HubSpot, company-from-domain). Failed rows are retryable.',
         readOnly: true,
       },
       fields: [
@@ -291,34 +291,6 @@ export const Leads: CollectionConfig = {
       defaultValue: true,
       admin: {
         description: 'False when the Cloudflare Turnstile challenge was not passed at submit time.',
-        readOnly: true,
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'emailHealth',
-      type: 'select',
-      defaultValue: 'good',
-      options: [
-        { label: 'Good', value: 'good' },
-        { label: 'Soft bounce', value: 'soft_bounce' },
-        { label: 'Hard bounce', value: 'hard_bounce' },
-        { label: 'Complaint (spam)', value: 'complaint' },
-        { label: 'Unsubscribed', value: 'unsubscribed' },
-      ],
-      admin: {
-        description:
-          'Updated by the Brevo bounce/complaint webhook. Hard bounce / complaint / unsubscribed = stop sending transactional email to this address.',
-        readOnly: true,
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'emailHealthAt',
-      type: 'date',
-      admin: {
-        date: { displayFormat: 'PPpp' },
-        description: 'When emailHealth was last set by the Brevo callback.',
         readOnly: true,
         position: 'sidebar',
       },

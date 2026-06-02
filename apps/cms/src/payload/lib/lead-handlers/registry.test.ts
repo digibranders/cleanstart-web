@@ -63,7 +63,7 @@ describe('submitLead orchestrator', () => {
       status: 'failed',
       error: 'db-down',
     });
-    const secondary = makeSecondary('brevo', 'synced');
+    const secondary = makeSecondary('crm', 'synced');
     const spy = vi.spyOn(secondary, 'run');
     registerSecondaryHandler(secondary);
 

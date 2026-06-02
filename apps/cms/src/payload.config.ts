@@ -52,10 +52,7 @@ import {
   dashboardsGscInspectEndpoint,
   dashboardsGscPerDocEndpoint,
 } from './payload/endpoints/dashboards';
-import {
-  brevoBounceInboundEndpoint,
-  calcomInboundEndpoint,
-} from './payload/endpoints/integrations-inbound';
+import { calcomInboundEndpoint } from './payload/endpoints/integrations-inbound';
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
 import { mediaIngestUrlEndpoint } from './payload/endpoints/media-ingest-url';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
@@ -371,7 +368,6 @@ export default buildConfig({
     dashboardsGscPerDocEndpoint,
     dashboardsGscInspectEndpoint,
     calcomInboundEndpoint,
-    brevoBounceInboundEndpoint,
   ],
   jobs: {
     tasks: [

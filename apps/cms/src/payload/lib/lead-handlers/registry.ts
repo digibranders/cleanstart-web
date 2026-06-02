@@ -7,8 +7,8 @@ import type { FormFieldDef } from './validate-fields';
 const secondaryHandlers: LeadHandler[] = [];
 
 /**
- * Register a secondary handler at module-init time. Brevo, Teams webhook,
- * future HubSpot/Salesforce, etc. each call this once. Idempotent — a
+ * Register a secondary handler at module-init time. company-from-domain,
+ * HubSpot, etc. each call this once. Idempotent — a
  * second register with the same name replaces the existing entry so dev
  * hot-reload doesn't accumulate duplicates.
  */

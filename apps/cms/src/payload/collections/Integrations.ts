@@ -18,7 +18,7 @@ import { encrypt, isEncrypted } from '../lib/integrations/secrets';
  *
  * Design intent (per user feedback 2026-05-12): no raw JSON config.
  * Each kind exposes a small set of friendly fields. Secret tokens
- * (HubSpot, GA4 service account, Clarity, Cloudflare, Cal.com, Brevo)
+ * (HubSpot, GA4 service account, Clarity, Cloudflare, Cal.com)
  * are NOT in the row at all — they live in env vars set by ops via
  * the droplet `.env`, and the handler reads them at run time via
  * `lib/integrations/credentials.ts`. The admin row only carries the
@@ -49,7 +49,6 @@ const ACTIVE_KIND_OPTIONS = [
   { label: 'Microsoft Clarity', value: 'msClarity' },
   { label: 'Cloudflare Web Analytics', value: 'cloudflareWebAnalytics' },
   { label: 'Cal.com inbound (booking → lead)', value: 'calComInbound' },
-  { label: 'Brevo bounce / complaint callback', value: 'brevoBounceCallback' },
 ] as const;
 
 const RESERVED_KIND_OPTIONS = [
@@ -503,30 +502,6 @@ const calcomConfigGroup: Field = {
   ],
 };
 
-const brevoConfigGroup: Field = {
-  name: 'brevoConfig',
-  type: 'group',
-  label: 'Brevo bounce callback settings',
-  admin: {
-    condition: kindIs('brevoBounceCallback'),
-    description:
-      'Keeps your email list clean by automatically marking contacts who bounced or complained. Everything is set up by the technical team — no configuration needed here.',
-  },
-  fields: [
-    {
-      name: 'note',
-      type: 'ui',
-      admin: {
-        components: {
-          Field: {
-            path: '@/payload/admin/components/integrations/ConfigNote.tsx#BrevoConfigNote',
-          },
-        },
-      },
-    },
-  ],
-};
-
 // ─── Collection ──────────────────────────────────────────────────
 
 export const Integrations: CollectionConfig = {
@@ -661,7 +636,6 @@ export const Integrations: CollectionConfig = {
     clarityConfigGroup,
     cloudflareConfigGroup,
     calcomConfigGroup,
-    brevoConfigGroup,
     {
       name: 'source',
       type: 'select',

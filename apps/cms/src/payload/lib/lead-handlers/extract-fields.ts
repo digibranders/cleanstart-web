@@ -2,8 +2,8 @@ import type { FormFieldDef } from './validate-fields';
 
 /**
  * Single source of truth for "what's the visitor's email / name?" used
- * across handlers (db-primary for duplicate detection, brevo for the
- * notification template, company-from-domain for enrichment input).
+ * across handlers (db-primary for duplicate detection, hubspot for the
+ * CRM contact, company-from-domain for enrichment input).
  *
  * Strategy:
  *   1. Walk the form definition. The first `type: 'email'` field with a

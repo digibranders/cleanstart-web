@@ -16,7 +16,7 @@ import { decrypt, isEncrypted } from './secrets';
  * Per-row credential overrides are still supported for Teams URLs
  * (per-channel by design) and generic webhook URLs/secrets (per-
  * subscriber). For HubSpot / GA4 / GSC / Clarity / Cloudflare /
- * Brevo / Cal.com the token is exclusively env-based.
+ * Cal.com the token is exclusively env-based.
  */
 
 const readEnv = (name: string): string | null => {
@@ -234,15 +234,4 @@ export const resolveCalcomCredentials = (
     signingSecret: secret,
     fallbackFormId: row?.calcomConfig?.fallbackFormId ?? null,
   };
-};
-
-// ─── Brevo bounce callback ───────────────────────────────────────
-
-export interface BrevoCredentials {
-  readonly bearerToken: string;
-}
-
-export const resolveBrevoCredentials = (): BrevoCredentials | null => {
-  const token = readEnv('BREVO_INBOUND_TOKEN');
-  return token ? { bearerToken: token } : null;
 };
