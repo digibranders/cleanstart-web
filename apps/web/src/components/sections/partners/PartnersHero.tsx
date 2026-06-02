@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
+import { BecomePartnerCta } from "@/components/sections/partners/BecomePartnerCta";
 
 export function PartnersHero(): React.ReactElement {
   return (
@@ -74,19 +75,7 @@ export function PartnersHero(): React.ReactElement {
           </HeroReveal>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-            <Link
-              href="/book-a-demo"
-              className="cs-btn-glass"
-              style={
-                {
-                  ["--cs-btn-fs" as string]: "var(--fs-button)",
-                  ["--cs-btn-px" as string]: "22px",
-                } as React.CSSProperties
-              }
-            >
-              <span>Become a Partner</span>
-              <ArrowIcon className="cs-cta-arrow" />
-            </Link>
+            <BecomePartnerCta />
             <Link
               href="/deal-registration"
               className="cs-btn-blue"
