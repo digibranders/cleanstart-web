@@ -54,7 +54,7 @@ const isAllowedOrigin = (origin: string | null): origin is string =>
  */
 const turnstileExemptSlugs = (): Set<string> => {
   const raw = process.env.LEAD_SUBMIT_TURNSTILE_EXEMPT_SLUGS;
-  if (!raw || raw.trim().length === 0) return new Set(['newsletter']);
+  if (!raw || raw.trim().length === 0) return new Set(['newsletter', 'resource-capture']);
   return new Set(
     raw
       .split(',')

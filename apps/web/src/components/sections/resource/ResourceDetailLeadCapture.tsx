@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { ResourceDetail } from "@/lib/resources";
 import { resourceLeadCaptureHeading } from "@/lib/resources-utils";
+import { submitLead } from "@/lib/leads/submitLead";
 
 interface ResourceDetailLeadCaptureProps {
   resource: ResourceDetail;
 }
+
+const RESOURCE_CONSENT_TEXT =
+  "I agree to receive communications from CleanStart and to the storage & processing of my email per the Privacy Policy.";
 
 export function ResourceDetailLeadCapture({
   resource,
@@ -14,10 +18,39 @@ export function ResourceDetailLeadCapture({
   const heading = resourceLeadCaptureHeading(resource.type);
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [topError, setTopError] = useState<string | null>(null);
+  const inFlightRef = useRef(false);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
-    // TODO: wire submission through the CMS LeadHandler once the backend is ready.
+    if (inFlightRef.current) return;
+    setTopError(null);
+    if (!agreed) {
+      setTopError("Please agree to be contacted to continue.");
+      return;
+    }
+    inFlightRef.current = true;
+
+    const result = await submitLead({
+      formSlug: "resource-capture",
+      fields: { email: email.trim() },
+      consent: {
+        snapshot: RESOURCE_CONSENT_TEXT,
+        givenAt: new Date().toISOString(),
+        categories: ["marketing"],
+      },
+      ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
+    });
+
+    inFlightRef.current = false;
+    if (result.ok) {
+      setSubmitted(true);
+      setEmail("");
+      setAgreed(false);
+    } else {
+      setTopError("Something went wrong. Please try again.");
+    }
   }
 
   return (
@@ -254,6 +287,21 @@ export function ResourceDetailLeadCapture({
                   />
                   <span>I agree to receive other communications from CleanStart.*</span>
                 </label>
+
+                {submitted && (
+                  <output
+                    aria-live="polite"
+                    className="block text-sm font-medium text-white"
+                    style={{ opacity: 0.95 }}
+                  >
+                    Thanks — you&apos;re on the list. We&apos;ll be in touch.
+                  </output>
+                )}
+                {topError && (
+                  <p role="alert" className="text-sm font-medium text-white" style={{ opacity: 0.95 }}>
+                    {topError}
+                  </p>
+                )}
               </form>
             </div>
           </div>
