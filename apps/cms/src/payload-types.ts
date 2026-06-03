@@ -87,6 +87,7 @@ export interface Config {
     jobLocations: JobLocation;
     forms: Form;
     leads: Lead;
+    'partner-applications': PartnerApplication;
     blogs: Blog;
     news: News;
     guides: Guide;
@@ -131,6 +132,7 @@ export interface Config {
     jobLocations: JobLocationsSelect<false> | JobLocationsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
+    'partner-applications': PartnerApplicationsSelect<false> | PartnerApplicationsSelect<true>;
     blogs: BlogsSelect<false> | BlogsSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     guides: GuidesSelect<false> | GuidesSelect<true>;
@@ -305,6 +307,7 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
+  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -312,7 +315,6 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -359,7 +361,6 @@ export interface Media {
  */
 export interface Resume {
   id: number;
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -2243,6 +2244,52 @@ export interface Lead {
    * False when the Cloudflare Turnstile challenge was not passed at submit time.
    */
   turnstilePassed?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Partner inquiries (append-only). Submitted via the Become-a-Partner form; emailed to the team via Brevo.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partner-applications".
+ */
+export interface PartnerApplication {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string | null;
+  company: string;
+  website?: string | null;
+  partnerReason?: string | null;
+  /**
+   * Referrer URL.
+   */
+  source?: string | null;
+  ip?: string | null;
+  userAgent?: string | null;
+  consentGivenAt?: string | null;
+  consentSnapshot?: string | null;
+  privacyPolicyVersion?: string | null;
+  consentCategories?:
+    | {
+        category?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  emailDeliveryApplicant?: {
+    status?: ('synced' | 'failed' | 'skipped') | null;
+    messageId?: string | null;
+    error?: string | null;
+  };
+  emailDeliveryAdmin?: {
+    status?: ('synced' | 'failed' | 'skipped') | null;
+    messageId?: string | null;
+    error?: string | null;
+  };
+  honeypot?: string | null;
+  turnstilePassed?: boolean | null;
+  piiRedactedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -7288,6 +7335,10 @@ export interface PayloadLockedDocument {
         value: number | Lead;
       } | null)
     | ({
+        relationTo: 'partner-applications';
+        value: number | PartnerApplication;
+      } | null)
+    | ({
         relationTo: 'blogs';
         value: number | Blog;
       } | null)
@@ -7413,13 +7464,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
+  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -7471,7 +7522,6 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -8117,6 +8167,50 @@ export interface LeadsSelect<T extends boolean = true> {
   piiRedactedAt?: T;
   honeypot?: T;
   turnstilePassed?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partner-applications_select".
+ */
+export interface PartnerApplicationsSelect<T extends boolean = true> {
+  firstName?: T;
+  lastName?: T;
+  email?: T;
+  phone?: T;
+  company?: T;
+  website?: T;
+  partnerReason?: T;
+  source?: T;
+  ip?: T;
+  userAgent?: T;
+  consentGivenAt?: T;
+  consentSnapshot?: T;
+  privacyPolicyVersion?: T;
+  consentCategories?:
+    | T
+    | {
+        category?: T;
+        id?: T;
+      };
+  emailDeliveryApplicant?:
+    | T
+    | {
+        status?: T;
+        messageId?: T;
+        error?: T;
+      };
+  emailDeliveryAdmin?:
+    | T
+    | {
+        status?: T;
+        messageId?: T;
+        error?: T;
+      };
+  honeypot?: T;
+  turnstilePassed?: T;
+  piiRedactedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -27,6 +27,7 @@ import { KnowledgeBase } from './payload/collections/KnowledgeBase';
 import { KnowledgeCategories } from './payload/collections/KnowledgeCategories';
 import { Leads } from './payload/collections/Leads';
 import { Media } from './payload/collections/Media';
+import { PartnerApplications } from './payload/collections/PartnerApplications';
 import { News } from './payload/collections/News';
 import { NewsCategories } from './payload/collections/NewsCategories';
 import { Pages } from './payload/collections/Pages';
@@ -337,6 +338,7 @@ export default buildConfig({
     JobLocations,
     Forms,
     Leads,
+    PartnerApplications,
     Blogs,
     News,
     Guides,
