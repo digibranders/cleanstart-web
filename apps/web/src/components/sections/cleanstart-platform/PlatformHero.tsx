@@ -136,18 +136,6 @@ export function PlatformHero() {
         </Link>
       </div>
 
-      {/* Mobile cube — below the text (desktop uses the absolute cube on the right) */}
-      <div className="relative z-10 mx-auto w-[248px] max-w-[68%] pb-12 lg:hidden" aria-hidden>
-        <Image
-          src="/images/cleanstart-platform/hero-cube.png"
-          alt="CleanStart Platform Architecture"
-          width={248}
-          height={258}
-          priority
-          className="h-auto w-full object-contain"
-          sizes="248px"
-        />
-      </div>
     </section>
   );
 }

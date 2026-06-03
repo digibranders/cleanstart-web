@@ -489,7 +489,7 @@ function ShieldBadge({ badge }: { badge: Badge }) {
           }}
         />
         {/* Badge image — centered in the upper rectangular area, above the point */}
-        <div className="absolute inset-x-0 top-0 flex h-[117px] items-center justify-center px-3.5">
+        <div className="absolute inset-x-0 top-0 flex h-[117px] items-center justify-center px-1.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={badge.src}
@@ -498,7 +498,7 @@ function ShieldBadge({ badge }: { badge: Badge }) {
             height={badge.h}
             loading="lazy"
             decoding="async"
-            className="max-h-[80px] w-auto max-w-full object-contain"
+            className="max-h-[104px] w-auto max-w-full object-contain"
           />
         </div>
       </div>

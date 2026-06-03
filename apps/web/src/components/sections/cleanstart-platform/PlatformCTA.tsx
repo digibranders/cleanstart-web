@@ -108,7 +108,9 @@ export function PlatformCTA() {
           </p>
 
           <Link
-            href="/book-a-demo"
+            href="https://images.cleanstart.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="cs-btn-glass self-start"
             style={
               {
@@ -121,7 +123,7 @@ export function PlatformCTA() {
               } as React.CSSProperties
             }
           >
-            <span>Read the Architecture Brief</span>
+            <span>Browse Images</span>
             <ArrowRightShort className="cs-cta-arrow text-[#111111]" />
           </Link>
         </div>
