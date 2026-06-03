@@ -79,6 +79,7 @@ import { OutboundRedirectField as OutboundRedirectField_6ddb1aebe33d308a1f37b1ba
 import { HeadTagsCard as HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462 } from '@/payload/admin/components/HeadTagsCard.tsx'
 import { UrlChangeHistoryField as UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c } from '@/payload/admin/components/UrlChangeHistoryField.tsx'
 import { SeoAdvancedPanel as SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50 } from '@/payload/admin/components/SeoAdvancedPanel.tsx'
+import { LeadContactCell as LeadContactCell_7859b912766a925a1159bc4804dbdd5b } from '@/payload/admin/components/LeadContactCell.tsx'
 import { LeadsImmutableBanner as LeadsImmutableBanner_c4273dccee2521e4317461376b79e241 } from '@/payload/admin/components/LeadsImmutableBanner.tsx'
 import { LeadsCsvTruncationBanner as LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb } from '@/payload/admin/components/LeadsCsvTruncationBanner.tsx'
 import { DsarActionsPanel as DsarActionsPanel_270b8398021fd191ac147b0b8d59049c } from '@/payload/admin/components/DsarActionsPanel.tsx'
@@ -212,6 +213,7 @@ export const importMap = {
   "@/payload/admin/components/HeadTagsCard.tsx#HeadTagsCard": HeadTagsCard_e59b83ed6b221ad6f57bbdc266d16462,
   "@/payload/admin/components/UrlChangeHistoryField.tsx#UrlChangeHistoryField": UrlChangeHistoryField_d95aa15f020dc2f13d667ec7fd900e4c,
   "@/payload/admin/components/SeoAdvancedPanel.tsx#SeoAdvancedPanel": SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50,
+  "@/payload/admin/components/LeadContactCell.tsx#LeadContactCell": LeadContactCell_7859b912766a925a1159bc4804dbdd5b,
   "@/payload/admin/components/LeadsImmutableBanner.tsx#LeadsImmutableBanner": LeadsImmutableBanner_c4273dccee2521e4317461376b79e241,
   "@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner": LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb,
   "@/payload/admin/components/DsarActionsPanel.tsx#DsarActionsPanel": DsarActionsPanel_270b8398021fd191ac147b0b8d59049c,

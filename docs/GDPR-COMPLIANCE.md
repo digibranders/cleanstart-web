@@ -1,6 +1,6 @@
 # GDPR & Privacy Compliance — CleanStart Website
 
-**Status:** Audit snapshot · **Date:** 2026-06-02 · **Scope:** `apps/cms`, `apps/web`, integrations/infra
+**Status:** Audit snapshot · **Date:** 2026-06-03 · **Scope:** `apps/cms`, `apps/web`, integrations/infra
 **Companion:** [`docs/forms-hubspot-overview.html`](forms-hubspot-overview.html) §9 is the at-a-glance version; this file is the detailed reference.
 
 > This is an engineering compliance audit (what the codebase does today), **not legal advice**. Where the architecture doc (`docs/cleanstart-cms-architecture.html` §`#privacy-gdpr`) describes *intent*, this document records what is *actually implemented*, verified against the code on 2026-06-02.
@@ -16,7 +16,9 @@
 | **Governance docs** | 🔴 Missing | RoPA, LIA, TIA, retention policy, breach runbook, signed DPAs — referenced everywhere, none exist in repo. |
 | **Admin security** | 🟠 Deferred | Admin is password-only at v1; 2FA (TOTP) deferred to a hardening phase (backlog A9). |
 
-**The shape of the work:** the hard engineering (consent capture, retention, erasure, redaction, security of processing) is done. The remaining work is mostly **web-frontend wiring** (cookie consent, form consent parity) and **legal/governance paperwork** (RoPA/LIA/TIA/DPAs) — plus a few backend follow-ups (Brevo erasure cascade).
+**The shape of the work:** the hard engineering (consent capture, retention, erasure, redaction, security of processing) is done. The remaining work is mostly **web-frontend wiring** (cookie consent, form consent parity) and **legal/governance paperwork** (RoPA/LIA/TIA/DPAs).
+
+> **2026-06-03 update:** the marketing-site forms are now wired live and submit lead PII to **HubSpot** (Forms Submissions API) on every submission — see `docs/forms-hubspot-verification.md`. **Brevo has been removed** from the stack (the secondary email handler and its `leads.emailHealth` field no longer exist); HubSpot is now the sole CRM **and** email sub-processor. References to Brevo below have been retired accordingly.
 
 ---
 
@@ -31,12 +33,11 @@ All paths under `apps/cms/src/payload/` unless noted.
 | **Right of access (Art. 15)** | ✅ | `endpoints/leads-dsar.ts` → `GET /api/leads/dsar/find?email=` (admin-only, rate-limited). Admin UI: `admin/components/DsarActionsPanel.tsx`. |
 | **Right to data portability (Art. 20)** | 🟠 Partial | `endpoints/export-leads-csv.ts` exports leads as CSV (includes `consentGivenAt`, `privacyPolicyVersion`; hard cap ~20,000 rows). **Gap:** no per-subject JSON export endpoint — CSV is export-all, not per-data-subject. |
 | **Right to rectification (Art. 16)** | 🟠 Partial | The arch doc describes an "update by email" admin action; **not confirmed in code** (only find / delete / export endpoints found). Treat as unverified / to-build. |
-| **Right to erasure (Art. 17)** | ✅ (with one gap) | `POST /api/leads/dsar/delete` hard-deletes matching leads; cascades to HubSpot via `lib/lead-handlers/hubspot.ts` → `hubspotGdprDeleteByEmail()` (`POST /crm/v3/objects/contacts/gdpr-delete`, fail-soft). Every deletion writes an immutable row via the `writeLeadDeletionAudit` hook → `collections/audit-log.ts` (`dsar_erasure` / `lead_deleted`). **Gap:** does **not** cascade to Brevo — `lib/lead-handlers/brevo.ts` has no `deleteByEmail`. |
+| **Right to erasure (Art. 17)** | ✅ | `POST /api/leads/dsar/delete` hard-deletes matching leads; cascades to HubSpot via `lib/lead-handlers/hubspot.ts` → `hubspotGdprDeleteByEmail()` (`POST /crm/v3/objects/contacts/gdpr-delete`, fail-soft). Every deletion writes an immutable row via the `writeLeadDeletionAudit` hook → `collections/audit-log.ts` (`dsar_erasure` / `lead_deleted`). HubSpot is the only downstream processor that receives lead PII, so the cascade is complete. |
 | **PII in telemetry / logs** | ✅ | `sentry.server.config.ts` — `sendDefaultPii:false` + `beforeSend`/`beforeBreadcrumb` redaction (keys: `fields`, `ip`, `userAgent`, `email`, `password`, `turnstileToken`, `consent`). `sentry.client.config.ts` — session replay disabled. `lib/webhooks/redact-error-body.ts` scrubs secrets from webhook error logs. The `lead.submitted` webhook payload is **metadata-only** (formId, formSlug, duplicate flag, source) — never field values (`endpoints/submit-lead.ts`). |
 | **Security of processing (Art. 32)** | ✅ | AES-256-GCM encryption of integration secrets via `lib/integrations/secrets.ts` (HKDF-SHA256 key from `PAYLOAD_SECRET`, wire format `v1:<base64(iv‖tag‖ct)>`). Cloudflare Turnstile (`lib/turnstile.ts`). Per-IP rate limiting (`lib/rate-limit.ts`, 5/min · 50/day; single-process — multi-worker needs a shared store). Standard-Webhooks HMAC-SHA256 signing (`lib/webhooks/sign.ts`). |
 
 ### Backend gaps / deferred
-- **Brevo erasure cascade** — only HubSpot is cascaded on Art. 17 deletion. *(P1)*
 - **`consentCategories` empty** — field exists but stays unpopulated until a CMP feeds it. *(blocked on web CMP)*
 - **No `ConsentLog` collection** — `WEB-PRODUCTION.md` specs `/api/consent` → `ConsentLog`; neither exists yet. *(P0, ships with the CMP)*
 - **Rate limiter is in-memory / single-process** — would need Redis/Postgres backing on a multi-worker deploy. *(scaling note)*
@@ -68,7 +69,7 @@ All paths under `apps/web/src/`.
 | Consent (lawful basis) | 7 | ✅ backend / 🟠 web | Lead consent snapshot + policy version; web form consent uneven |
 | Access | 15 | ✅ | `/api/leads/dsar/find` + CSV export + admin panel |
 | Rectification | 16 | 🟠 | "update by email" not confirmed in code |
-| Erasure | 17 | ✅ (Brevo gap) | `/api/leads/dsar/delete` + HubSpot cascade + audit log |
+| Erasure | 17 | ✅ | `/api/leads/dsar/delete` + HubSpot cascade + audit log |
 | Portability | 20 | 🟠 | CSV export-all only; no per-subject JSON |
 | Object / restrict | 18, 21 | 🟠 | manual via admin DSAR; no self-service |
 | Security of processing | 32 | ✅ (2FA gap) | encryption, Turnstile, rate-limit, HMAC, redaction; admin 2FA deferred |
@@ -99,8 +100,7 @@ Every third party that processes personal/lead data. EU→US transfers rely on e
 
 | Processor | Personal data | Region | Transfer basis / notes |
 |---|---|---|---|
-| **HubSpot** (CRM) | contact/lead fields | 🇺🇸 US (`app-na2` = NA2) | SCCs/DPF — **DPA to sign before go-live**; region fixed at portal creation |
-| **Brevo** | email + lead-notify params | 🇪🇺 EU + 🇺🇸 US | SCCs (EU primary) |
+| **HubSpot** (CRM + email) | contact/lead fields (name, email, phone, company, message) — **received live on every form submission** | 🇺🇸 US (`app-na2` = NA2) | SCCs/DPF — **DPA to sign before go-live**; region fixed at portal creation. Sole CRM + email sub-processor (Brevo retired 2026-06-02). |
 | **Cloudflare R2** | lead fallback queue + media | 🇺🇸 US | SCCs · encrypted at rest |
 | **Cloudflare Turnstile** | IP (bot check) | 🇺🇸 US | Cloudflare DPA |
 | **Sentry** | error telemetry (PII-scrubbed) | 🇺🇸 US | SCCs · `sendDefaultPii:false` |
@@ -122,8 +122,7 @@ Every third party that processes personal/lead data. EU→US transfers rely on e
 | Name, email, phone, company | marketing forms → `/api/leads/submit` | `leads.fields` (Postgres) | 365d then PII nulled |
 | IP, user-agent | captured at submit (spam analysis) | `leads.ip` / `leads.userAgent` | 365d then nulled |
 | Consent record | at submit | `leads.consentSnapshot` + `consentGivenAt` + `privacyPolicyVersion` | lifetime of lead |
-| CRM mirror | secondary handler | HubSpot (US) | per HubSpot config |
-| Email-deliverability events | Brevo webhook | `leads.emailHealth` | with lead |
+| CRM mirror + follow-up/notification email | secondary handler (Forms Submissions API, live) | HubSpot (US) | per HubSpot config |
 | Error telemetry | runtime | Sentry (US, PII-scrubbed) | per Sentry config |
 | Analytics (anonymous) | page views | Vercel (US, cookieless) | per Vercel |
 
@@ -162,13 +161,12 @@ Per the architecture doc's stated design:
 ### P0 — pre-launch / legal-risk
 1. **Build the cookie-consent CMP** before any cookie-setting tracker ships. Geo-gated banner (EEA/UK/CH/CA), Consent Mode v2 (4 signals default-denied), `cs_consent` cookie, `/api/consent` → new `ConsentLog` collection, one-click "Reject all" parity. *(apps/web + apps/cms)*
 2. **Add consent + privacy link to the 3 bare forms** — Contact, Deal Registration, Become-a-Partner — mirroring Book a Demo's marketing + storage consent. *(apps/web)*
-3. **Create RoPA + LIA; sign & file processor DPAs** (HubSpot, Brevo, Cloudflare, Sentry, Vercel, DigitalOcean) under `docs/dpa/`. *(docs/legal)*
+3. **Create RoPA + LIA; sign & file processor DPAs** (HubSpot, Cloudflare, Sentry, Vercel, DigitalOcean) under `docs/dpa/`. *(docs/legal)*
 
 ### P1 — compliance hardening
-4. **Brevo erasure cascade** — add `deleteByEmail` to the Brevo handler so Art. 17 deletions remove the Brevo contact too. *(apps/cms `lead-handlers/brevo.ts`)*
-5. **Cookie Policy + Terms pages** (`/cookies`, `/terms`). *(apps/web)*
-6. **HubSpot non-marketing default** — set API-created contacts non-marketing unless `consent_marketing`; protects the 2,000-contact cap. *(HubSpot settings)*
-7. **Write the TIA**; confirm HubSpot region (NA2 = US) transfer posture. *(docs/legal)*
+4. **Cookie Policy + Terms pages** (`/cookies`, `/terms`). *(apps/web)*
+5. **HubSpot non-marketing default** — set API-created contacts non-marketing unless `consent_marketing`; protects the 2,000-contact cap. *(HubSpot settings)*
+6. **Write the TIA**; confirm HubSpot region (NA2 = US) transfer posture. *(docs/legal)*
 
 ### P2 — best practice
 8. **Admin 2FA (TOTP)** — land the deferred hardening (backlog A9).
