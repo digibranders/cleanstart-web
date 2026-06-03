@@ -134,7 +134,12 @@ const run = async (): Promise<void> => {
   process.exit(0);
 };
 
-run().catch((err: unknown) => {
+// Top-level await so the seeding completes before the process exits — works
+// under both `tsx` (local) and `payload run` (in-container, prod), the latter
+// of which exits as soon as module evaluation settles.
+try {
+  await run();
+} catch (err: unknown) {
   console.error(err);
   process.exit(1);
-});
+}
