@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { checkUploadSize, limitForMime } from './upload-limits';
+import { ALLOWED_MIME_TYPES, RESUME_MIME_TYPES, checkUploadSize, limitForMime } from './upload-limits';
 
 const MB = 1024 * 1024;
 
@@ -44,5 +44,25 @@ describe('checkUploadSize', () => {
   it('passes when filesize is unknown', () => {
     expect(checkUploadSize('image/jpeg', null)).toEqual({ ok: true });
     expect(checkUploadSize('image/jpeg', undefined)).toEqual({ ok: true });
+  });
+});
+
+describe('resume upload limits', () => {
+  const DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+  it('accepts pdf/doc/docx as resume mime types', () => {
+    expect(RESUME_MIME_TYPES).toContain('application/pdf');
+    expect(RESUME_MIME_TYPES).toContain('application/msword');
+    expect(RESUME_MIME_TYPES).toContain(DOCX);
+  });
+
+  it('docx is in the global allow-list', () => {
+    expect(ALLOWED_MIME_TYPES).toContain(DOCX);
+  });
+
+  it('caps doc/docx at 10 MB', () => {
+    expect(limitForMime(DOCX)).toBe(10 * MB);
+    expect(checkUploadSize(DOCX, 9 * MB)).toEqual({ ok: true });
+    expect(checkUploadSize(DOCX, 11 * MB).ok).toBe(false);
   });
 });
