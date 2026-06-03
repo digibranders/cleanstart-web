@@ -59,7 +59,6 @@ export async function submitApplication(
   try {
     res = await fetch(`${CMS_URL}/api/career-applications/apply`, {
       method: "POST",
-      credentials: "include",
       body: fd,
     });
   } catch {
