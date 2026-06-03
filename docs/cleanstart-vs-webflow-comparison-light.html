@@ -323,7 +323,7 @@ footer h3{color:#f4f2ef;font-family:var(--sans);font-size:15px}
     <div class="statgrid">
       <div class="stat reveal"><div class="n em" data-count="98">–</div><div class="l">Lighthouse Performance — new site, desktop <span class="fact">measured</span></div></div>
       <div class="stat reveal"><div class="n cy" data-count="84">–</div><div class="l">Lighthouse Performance — new site, mobile <span class="fact">measured</span></div></div>
-      <div class="stat reveal"><div class="n in" data-count="41">–</div><div class="l">Lighthouse Performance — old Webflow, mobile <span class="fact">measured</span></div></div>
+      <div class="stat reveal"><div class="n in" data-count="32">–</div><div class="l">Lighthouse Performance — old Webflow, mobile <span class="fact">measured</span></div></div>
       <div class="stat reveal"><div class="n cy" data-count="10">–</div><div class="l">Automated background jobs in the new CMS <span class="fact">in code</span></div></div>
     </div>
 
@@ -345,7 +345,7 @@ footer h3{color:#f4f2ef;font-family:var(--sans);font-size:15px}
       <p class="lead">Webflow gave CleanStart a fast start: hosted, visual, and capable for small-scale editorial work. The new platform is a code-first Next.js&nbsp;16 front end backed by a self-hosted custom Payload&nbsp;3 CMS — eliminating structural performance ceilings, replacing hand-bolted SEO embeds with a programmatic engine, and owning the full stack from Postgres to CDN.</p>
     </div>
     <div class="grid3">
-      <div class="card reveal"><h3 style="color:var(--cyan)">Faster, measurably</h3><p class="small">Mobile Lighthouse roughly doubled (<strong>41 → 84</strong>) and desktop hit <strong>98</strong>. The old Webflow site fails Core Web Vitals for real mobile users right now. The new architecture removes the structural blockers: no forced jQuery runtime, static/ISR delivery, AVIF/WebP image pipeline.</p></div>
+      <div class="card reveal"><h3 style="color:var(--cyan)">Faster, measurably</h3><p class="small">Mobile Lighthouse more than doubled (<strong>32 → 84</strong>) and desktop jumped from <strong>61 → 98</strong>. Webflow's desktop TBT hits <strong>3,150&nbsp;ms</strong> — 63× the new site's 50&nbsp;ms. The jQuery&nbsp;+&nbsp;interactions runtime is structural and non-removable on any Webflow plan.</p></div>
       <div class="card reveal"><h3 style="color:var(--cyan)">Automated end-to-end</h3><p class="small">Ten scheduled jobs, a three-layer JSON-LD engine, automatic image derivatives, IndexNow pings, auto 301 redirects on slug changes, nightly broken-link scans, GDPR PII purges, a self-healing search index, and a fault-tolerant lead pipeline — none of which Webflow can do natively.</p></div>
       <div class="card reveal"><h3 style="color:var(--cyan)">Owned &amp; cheaper to scale</h3><p class="small">No per-seat editor fees, no CMS item caps, no API quotas. Media on Cloudflare R2 with <strong>zero egress fees</strong>. Full control of CSP, caching strategy and data — and a real migration path instead of vendor lock-in.</p></div>
     </div>
@@ -390,10 +390,14 @@ footer h3{color:#f4f2ef;font-family:var(--sans);font-size:15px}
         <div class="track"><div class="fill cy" data-w="84">84</div></div>
       </div>
       <div class="barrow">
-        <div class="top"><strong>Old · Webflow — Mobile</strong><span class="muted">41 / 100</span></div>
-        <div class="track"><div class="fill red" data-w="41">41</div></div>
+        <div class="top"><strong>Old · Webflow — Desktop</strong><span class="muted">61 / 100</span></div>
+        <div class="track"><div class="fill in" data-w="61">61</div></div>
       </div>
-      <p class="small muted" style="margin:8px 0 0">The Webflow desktop lab run timed out on Google's side in the cached analysis (<span class="mono">RPC::DEADLINE_EXCEEDED</span>). Its real-user desktop data appears in the table below — which is more authoritative than a synthetic lab run.</p>
+      <div class="barrow">
+        <div class="top"><strong>Old · Webflow — Mobile</strong><span class="muted">32 / 100</span></div>
+        <div class="track"><div class="fill red" data-w="32">32</div></div>
+      </div>
+      <p class="small muted" style="margin:8px 0 0">New analysis run: <span class="mono">maf3ofud2h</span>, 3 Jun 2026 13:34. All four scores now measured. Lighthouse mobile uses emulated Moto&nbsp;G&nbsp;Power on Slow&nbsp;4G; desktop uses a custom throttle.</p>
     </div>
 
     <h3 class="reveal">Real-user CrUX field data — old Webflow site (28-day period) <span class="fact">measured</span></h3>
@@ -421,22 +425,26 @@ footer h3{color:#f4f2ef;font-family:var(--sans);font-size:15px}
       <p><strong>The mobile gap is the headline.</strong> Most marketing-site traffic is mobile, and that is exactly where the Webflow site <strong>fails</strong> Google's real-user Core Web Vitals today — LCP 3.3&nbsp;s and INP 239&nbsp;ms both exceed the "good" thresholds. A failing CWV assessment is a live, ongoing SEO and conversion drag.</p>
     </div>
 
-    <h3 class="reveal" style="margin-top:28px">Lab metrics — new site (Lighthouse 13.3) <span class="fact">measured</span></h3>
+    <h3 class="reveal" style="margin-top:28px">Full lab metrics — head to head (Lighthouse 13.3) <span class="fact">measured</span></h3>
     <div class="tablewrap reveal">
       <table>
-        <thead><tr><th>Metric</th><th>New · Desktop</th><th>New · Mobile</th><th>"Good" threshold</th></tr></thead>
+        <thead><tr><th>Metric</th><th>Old · Webflow Desktop</th><th>Old · Webflow Mobile</th><th>New · Desktop</th><th>New · Mobile</th><th>"Good" threshold</th></tr></thead>
         <tbody>
-          <tr><td class="col-feat">First Contentful Paint</td><td><span class="yes">0.3 s</span></td><td><span class="yes">1.4 s</span></td><td>≤ 1.8 s</td></tr>
-          <tr><td class="col-feat">Largest Contentful Paint</td><td><span class="yes">0.8 s</span></td><td><span class="partial">4.0 s</span></td><td>≤ 2.5 s</td></tr>
-          <tr><td class="col-feat">Total Blocking Time</td><td><span class="yes">50 ms</span></td><td><span class="yes">120 ms</span></td><td>≤ 200 ms</td></tr>
-          <tr><td class="col-feat">Cumulative Layout Shift</td><td><span class="yes">0</span></td><td><span class="yes">0</span></td><td>&lt; 0.1</td></tr>
-          <tr><td class="col-feat">Speed Index</td><td><span class="yes">1.6 s</span></td><td><span class="partial">4.2 s</span></td><td>≤ 3.4 s</td></tr>
+          <tr><td class="col-feat">Lighthouse Score</td><td><span class="partial">61</span></td><td><span class="no">32</span></td><td><span class="yes">98</span></td><td><span class="yes">84</span></td><td>≥ 90</td></tr>
+          <tr><td class="col-feat">First Contentful Paint</td><td><span class="yes">1.0 s</span></td><td><span class="no">6.5 s</span></td><td><span class="yes">0.3 s</span></td><td><span class="yes">1.4 s</span></td><td>≤ 1.8 s</td></tr>
+          <tr><td class="col-feat">Largest Contentful Paint</td><td><span class="yes">1.7 s</span></td><td><span class="no">42.2 s</span></td><td><span class="yes">0.8 s</span></td><td><span class="partial">4.0 s</span></td><td>≤ 2.5 s</td></tr>
+          <tr><td class="col-feat">Total Blocking Time</td><td><span class="no">3,150 ms</span></td><td><span class="no">1,890 ms</span></td><td><span class="yes">50 ms</span></td><td><span class="yes">120 ms</span></td><td>≤ 200 ms</td></tr>
+          <tr><td class="col-feat">Cumulative Layout Shift</td><td><span class="yes">0.002</span></td><td><span class="yes">0.004</span></td><td><span class="yes">0</span></td><td><span class="yes">0</span></td><td>&lt; 0.1</td></tr>
+          <tr><td class="col-feat">Speed Index</td><td><span class="yes">1.4 s</span></td><td><span class="no">6.5 s</span></td><td><span class="yes">1.6 s</span></td><td><span class="partial">4.2 s</span></td><td>≤ 3.4 s</td></tr>
         </tbody>
-        <caption>New-site figures are Lighthouse lab runs (staging, Slow-4G throttle on mobile). Old-site field data above is real-user CrUX. This is field-vs-lab where noted; staging has no CrUX data yet (no real-user traffic). Methodological difference is explicit, not hidden.</caption>
+        <caption>Webflow: analysis maf3ofud2h, 3 Jun 2026 13:34. New site: analysis hymmtaextj, 3 Jun 2026 13:15. Staging has no CrUX field data; Webflow real-user field data is in the table above. Lab and field figures are separately labelled throughout.</caption>
       </table>
     </div>
+    <div class="callout danger reveal">
+      <p><strong>The TBT story — the jQuery floor laid bare.</strong> Webflow's desktop Total Blocking Time is <strong>3,150 ms</strong> — 63× the new site's 50 ms. Mobile TBT is <strong>1,890 ms</strong> — 15× the new site's 120 ms. This is the non-removable jQuery + underscore + webflow.js bundle blocking the main thread on every page, every load. The mobile LCP of <strong>42.2 s</strong> (Slow-4G lab) is a direct consequence of that blocked thread delaying render entirely. No Webflow optimization guide can remove it — it is structural.</p>
+    </div>
     <div class="callout reveal">
-      <p><strong>The honest weak spot.</strong> The new site's mobile LCP (4.0&nbsp;s lab, Slow-4G) is the one soft metric — a large hero asset under heavy throttling. Total Blocking Time stays tight (50–120&nbsp;ms) because there is no mandatory framework runtime, unlike Webflow's non-removable jQuery bundle. Hero-image priority/preload tuning is the next win, and uniquely within our control to ship.</p>
+      <p><strong>The honest weak spot — new site.</strong> The new site's mobile LCP (4.0 s lab, Slow-4G) is the one soft metric — a large hero asset under heavy throttling. Total Blocking Time stays tight (50–120 ms) because there is no mandatory framework runtime. Hero-image priority/preload tuning is the next win, and uniquely within our control to ship.</p>
     </div>
   </div>
 </section>
@@ -458,7 +466,7 @@ footer h3{color:#f4f2ef;font-family:var(--sans);font-size:15px}
         <div class="tag wf">Old · Webflow</div>
         <ul>
           <li><strong>Fixed client runtime.</strong> Every page ships jQuery + underscore + <span class="mono">webflow.js</span> — render-blocking, non-removable on every plan including Enterprise.</li>
-          <li><strong>JS-driven interactions.</strong> Animations run on the main thread, inflating Total Blocking Time.</li>
+          <li><strong>JS-driven interactions.</strong> Animations run on the main thread, inflating Total Blocking Time — measured at <strong>3,150 ms desktop / 1,890 ms mobile</strong> in the fresh Lighthouse run.</li>
           <li><strong>Publish = full rebuild.</strong> No incremental regeneration, no per-route cache control, no on-demand revalidation.</li>
           <li><strong>Opaque cache.</strong> CDN behaviour is the platform's; you cannot set route-level revalidation windows.</li>
         </ul>
