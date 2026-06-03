@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { NavIcon } from "@/components/nav/icons/NavIcon";
 import { PanelShell } from "@/components/nav/panels/PanelShell";
-import { ContextualCTA } from "@/components/nav/pieces/ContextualCTA";
 import { SpotlightRenderer } from "@/components/nav/pieces/SpotlightRenderer";
 import type { NavMegaItem, NavLeaf } from "@/lib/nav-config";
 import type { FeedSource } from "@/components/nav/data/latest-updates-feed";
@@ -158,9 +157,6 @@ function SpotlightColumn({ spotlight }: { spotlight: SpotlightCard }) {
 }
 
 export function PanelResources({ item, latestUpdates, spotlight }: Props) {
-  const hideBottomCTA =
-    spotlight.kind === "evergreen" && spotlight.id === "bulletin";
-
   return (
     <PanelShell
       width={item.width ?? 880}
@@ -173,14 +169,6 @@ export function PanelResources({ item, latestUpdates, spotlight }: Props) {
         <LatestUpdatesColumn items={latestUpdates} />
         <SpotlightColumn spotlight={spotlight} />
       </div>
-      {!hideBottomCTA && (
-        <ContextualCTA
-          headline="The CleanStart Bulletin."
-          sub="Once a month — new hardened images, security advisories, engineering talks."
-          ctaLabel="Subscribe"
-          ctaHref="/subscribe"
-        />
-      )}
     </PanelShell>
   );
 }
