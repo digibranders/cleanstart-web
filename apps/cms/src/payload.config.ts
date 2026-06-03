@@ -32,6 +32,7 @@ import { PodcastEpisodes } from './payload/collections/PodcastEpisodes';
 import { PreviewAudit } from './payload/collections/PreviewAudit';
 import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
+import { Resumes } from './payload/collections/Resumes';
 import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
@@ -163,6 +164,11 @@ const storagePlugins = r2EnvComplete()
               const effectivePrefix = prefix || r2UploadPrefix;
               return `${publicBase}/${effectivePrefix}/${encodeURIComponent(filename)}`;
             },
+          },
+          resumes: {
+            prefix:
+              process.env.R2_RESUME_PREFIX ??
+              (process.env.NODE_ENV === 'production' ? 'web/resumes' : 'dev/resumes'),
           },
         },
         bucket: requireEnv('R2_BUCKET'),
@@ -309,6 +315,7 @@ export default buildConfig({
     // array order drives the order *within* each group.
     Users,
     Media,
+    Resumes,
     Redirects,
     BrokenLinks,
     AuditLog,

@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    resumes: Resume;
     redirects: Redirect;
     brokenLinks: BrokenLink;
     'audit-log': AuditLog;
@@ -105,6 +106,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    resumes: ResumesSelect<false> | ResumesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
@@ -337,6 +339,26 @@ export interface Media {
       filename?: string | null;
     };
   };
+}
+/**
+ * Applicant resumes (private). Access-controlled — never public.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resumes".
+ */
+export interface Resume {
+  id: number;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -7043,6 +7065,10 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'resumes';
+        value: number | Resume;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -7276,6 +7302,23 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resumes_select".
+ */
+export interface ResumesSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
