@@ -1,6 +1,7 @@
 import type { CollectionConfig, Field } from 'payload';
 
 import { isAdmin, isAdminOrEditor } from '../access';
+import { partnerApplyEndpoint, partnerApplyOptionsEndpoint } from '../endpoints/partner-apply';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 const DELIVERY_STATUSES: { label: string; value: string }[] = [
@@ -49,6 +50,7 @@ export const PartnerApplications: CollectionConfig = {
     update: () => false,
     delete: isAdmin,
   },
+  endpoints: [partnerApplyEndpoint, partnerApplyOptionsEndpoint],
   fields: [
     { name: 'firstName', type: 'text', required: true },
     { name: 'lastName', type: 'text', required: true },
