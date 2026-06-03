@@ -183,6 +183,7 @@ export interface Config {
       drainLeadQueue: TaskDrainLeadQueue;
       purgeSearchLog: TaskPurgeSearchLog;
       purgeLeadsPii: TaskPurgeLeadsPii;
+      purgeCareerApplications: TaskPurgeCareerApplications;
       purgePreviewAudit: TaskPurgePreviewAudit;
       checkBrokenLinks: TaskCheckBrokenLinks;
       retryWebhook: TaskRetryWebhook;
@@ -379,9 +380,9 @@ export interface CareerApplication {
    * Job title at apply time — survives later job edits/deletes.
    */
   jobTitleSnapshot: string;
-  firstName: string;
-  lastName: string;
-  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
   phone?: string | null;
   coverLetter?: string | null;
   linkedinUrl?: string | null;
@@ -7032,6 +7033,7 @@ export interface PayloadJob {
           | 'drainLeadQueue'
           | 'purgeSearchLog'
           | 'purgeLeadsPii'
+          | 'purgeCareerApplications'
           | 'purgePreviewAudit'
           | 'checkBrokenLinks'
           | 'retryWebhook'
@@ -7078,6 +7080,7 @@ export interface PayloadJob {
         | 'drainLeadQueue'
         | 'purgeSearchLog'
         | 'purgeLeadsPii'
+        | 'purgeCareerApplications'
         | 'purgePreviewAudit'
         | 'checkBrokenLinks'
         | 'retryWebhook'
@@ -11355,6 +11358,14 @@ export interface TaskPurgeSearchLog {
  * via the `definition` "TaskPurgeLeadsPii".
  */
 export interface TaskPurgeLeadsPii {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPurgeCareerApplications".
+ */
+export interface TaskPurgeCareerApplications {
   input?: unknown;
   output?: unknown;
 }

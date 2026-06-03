@@ -67,6 +67,7 @@ import {
 } from './payload/endpoints/sitemap';
 import { checkBrokenLinksTask } from './payload/jobs/check-broken-links';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
+import { purgeCareerApplicationsTask } from './payload/jobs/purge-career-applications';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgePreviewAuditTask } from './payload/jobs/purge-preview-audit';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
@@ -383,6 +384,7 @@ export default buildConfig({
       drainLeadQueueTask,
       purgeSearchLogTask,
       purgeLeadsPiiTask,
+      purgeCareerApplicationsTask,
       purgePreviewAuditTask,
       checkBrokenLinksTask,
       retryWebhookTask,
@@ -411,6 +413,10 @@ export default buildConfig({
       {
         cron: '30 3 * * *', // daily at 03:30 UTC — previewAudit 90-day retention
         queue: 'previewAuditPurge',
+      },
+      {
+        cron: '45 3 * * *', // daily at 03:45 UTC — career-applications PII + resume 365-day purge
+        queue: 'careerApplicationsPurge',
       },
       {
         cron: '30 4 * * *', // daily at 04:30 UTC — broken-link scan
