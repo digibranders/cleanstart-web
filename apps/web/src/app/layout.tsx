@@ -11,6 +11,7 @@ import { WebVitals } from "@/components/observability/WebVitals";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
 import { ogImageUrl } from "@/lib/seo/og";
 import { JsonLd, organizationSchema } from "@/lib/seo/jsonld";
+import Script from 'next/script';
 
 // Display family — headings, section titles, card titles. Preloaded for LCP.
 const manrope = Manrope({
@@ -66,16 +67,16 @@ export const metadata: Metadata = {
   },
   robots: isProduction
     ? {
+      index: true,
+      follow: true,
+      googleBot: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-          "max-video-preview": -1,
-        },
-      }
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
+    }
     : { index: false, follow: false, googleBot: { index: false, follow: false } },
   openGraph: {
     title: TITLE,
@@ -117,6 +118,12 @@ export default function RootLayout({
       }}
     >
       <body suppressHydrationWarning>
+        {children}
+        <Script
+          src="https://cdn.oyechats.com/oyechats-widget.js"
+          data-bot-key="bot-d255b910fa83"
+          strategy="lazyOnload"
+        />
         <JsonLd id="org-jsonld" data={organizationSchema()} />
         <WebVitals />
         <PreviewBanner />

@@ -66,10 +66,21 @@ export function buildCsp({
     GA4_COLLECT,
     GA4_REGION,
   ];
+  const frameSrc: string[] = ["'self'"];
+
   if (!isProduction) {
     // Local dev: web (3010/3001) calls the CMS at localhost:3000 for
     // /api/leads/submit and /api/resources/:slug/{token,download}.
     connectSrc.push("http://localhost:3000");
+    // Local dev: OyeChats chatbot — widget script (4173), backend API (8000),
+    // and embedded chat frontend iframe (5174).
+    connectSrc.push(
+      "http://localhost:4173",
+      "http://localhost:5174",
+      "http://localhost:8000",
+      "ws://localhost:8000",
+    );
+    frameSrc.push("http://localhost:5174", "http://localhost:4173");
   }
 
   const frameAncestors =
@@ -82,6 +93,7 @@ export function buildCsp({
     ["img-src", imgSrc.join(" ")],
     ["font-src", fontSrc.join(" ")],
     ["connect-src", connectSrc.join(" ")],
+    ["frame-src", frameSrc.join(" ")],
     ["frame-ancestors", frameAncestors.join(" ")],
     ["base-uri", "'self'"],
     ["form-action", "'self'"],
