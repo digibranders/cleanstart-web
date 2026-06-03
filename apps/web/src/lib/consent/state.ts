@@ -60,7 +60,7 @@ interface DecisionInput {
   id: string;
   gpc: boolean;
   now: Date;
-  analytics?: boolean;
+  analytics?: boolean | undefined;
 }
 
 export const recordFromDecision = (
