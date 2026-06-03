@@ -869,6 +869,7 @@ export interface AuditLog {
   action:
     | 'lead_deleted'
     | 'lead_exported'
+    | 'partner_exported'
     | 'dsar_export'
     | 'dsar_erasure'
     | 'schema_override_changed'

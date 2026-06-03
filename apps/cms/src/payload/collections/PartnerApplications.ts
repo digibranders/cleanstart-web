@@ -1,6 +1,7 @@
 import type { CollectionConfig, Field } from 'payload';
 
 import { isAdmin, isAdminOrEditor } from '../access';
+import { exportPartnersCsvEndpoint } from '../endpoints/export-partners-csv';
 import { partnerApplyEndpoint, partnerApplyOptionsEndpoint } from '../endpoints/partner-apply';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
@@ -50,7 +51,7 @@ export const PartnerApplications: CollectionConfig = {
     update: () => false,
     delete: isAdmin,
   },
-  endpoints: [partnerApplyEndpoint, partnerApplyOptionsEndpoint],
+  endpoints: [partnerApplyEndpoint, partnerApplyOptionsEndpoint, exportPartnersCsvEndpoint],
   fields: [
     { name: 'firstName', type: 'text', required: true },
     { name: 'lastName', type: 'text', required: true },
