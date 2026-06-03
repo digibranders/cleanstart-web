@@ -164,6 +164,7 @@ export const NAV_TREE: NavItem[] = [
         items: [
           { label: "Blogs", href: "/blogs", icon: "book" },
           { label: "Resource Center", href: "/resource-center", icon: "folder" },
+          { label: "Case Studies", href: "/case-studies", icon: "doc-signed" },
           { label: "Newsroom", href: "/news", icon: "newspaper" },
           { label: "Knowledge Hub", href: "/knowledge-hub/vex-documents", icon: "book-open" },
         ],
