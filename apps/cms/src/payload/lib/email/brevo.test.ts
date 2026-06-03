@@ -50,6 +50,30 @@ describe('sendBrevoEmail', () => {
     expect(init.headers).toMatchObject({ 'api-key': 'key' });
   });
 
+  it('uses the per-send senderEmail/senderName override over the env', async () => {
+    vi.stubEnv('BREVO_API_KEY', 'key');
+    vi.stubEnv('BREVO_SENDER_EMAIL', 'global@cleanstart.com');
+    vi.stubEnv('BREVO_SENDER_NAME', 'Global');
+    const fetchMock = vi.fn<typeof fetch>(
+      async () => new Response(JSON.stringify({ messageId: 'mid-3' }), { status: 201 }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await sendBrevoEmail({
+      to: [{ email: 'x@cleanstart.com' }],
+      subject: 's',
+      htmlContent: '<p>x</p>',
+      senderEmail: 'hr@cleanstart.com',
+      senderName: 'CleanStart Careers',
+    });
+
+    const call = fetchMock.mock.calls[0];
+    expect(call).toBeDefined();
+    const [, init] = call as [RequestInfo | URL, RequestInit];
+    const body = JSON.parse(init.body as string);
+    expect(body.sender).toEqual({ email: 'hr@cleanstart.com', name: 'CleanStart Careers' });
+  });
+
   it('sends a template (templateId + params) without requiring a sender env', async () => {
     vi.stubEnv('BREVO_API_KEY', 'key');
     vi.stubEnv('BREVO_SENDER_EMAIL', '');

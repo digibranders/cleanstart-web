@@ -20,6 +20,13 @@ export type SendBrevoEmailInput = {
   htmlContent?: string;
   templateId?: number;
   params?: Record<string, unknown>;
+  /**
+   * Per-send sender override. Lets each form use its own From identity
+   * (e.g. careers from hr@, partner from marketing@). Falls back to the
+   * BREVO_SENDER_EMAIL / BREVO_SENDER_NAME env when omitted.
+   */
+  senderEmail?: string;
+  senderName?: string;
 };
 
 export type BrevoSendResult =
@@ -44,8 +51,8 @@ export const sendBrevoEmail = async (input: SendBrevoEmailInput): Promise<BrevoS
   if (!apiKey) {
     return { status: 'skipped', reason: 'env-not-configured' };
   }
-  const senderEmail = process.env.BREVO_SENDER_EMAIL;
-  const senderName = process.env.BREVO_SENDER_NAME;
+  const senderEmail = input.senderEmail ?? process.env.BREVO_SENDER_EMAIL;
+  const senderName = input.senderName ?? process.env.BREVO_SENDER_NAME;
   const useTemplate = input.templateId != null;
   // HTML mode needs an explicit sender; template mode can inherit the
   // template's sender, so a missing BREVO_SENDER_EMAIL only blocks HTML mode.

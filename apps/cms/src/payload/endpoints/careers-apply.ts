@@ -274,11 +274,19 @@ export const careersApplyEndpoint: Endpoint = {
     const templateId =
       Number.isInteger(templateIdParsed) && templateIdParsed > 0 ? templateIdParsed : undefined;
 
+    // Careers emails are sent from the careers sender identity (falls back to
+    // the global BREVO_SENDER_* env when CAREERS_SENDER_* is unset).
+    const careersSender: { senderEmail?: string; senderName?: string } = {
+      ...(process.env.CAREERS_SENDER_EMAIL ? { senderEmail: process.env.CAREERS_SENDER_EMAIL } : {}),
+      ...(process.env.CAREERS_SENDER_NAME ? { senderName: process.env.CAREERS_SENDER_NAME } : {}),
+    };
+
     let delivery: BrevoSendResult;
     if (!hrEmail) {
       delivery = { status: 'skipped', reason: 'no-hr-recipient' };
     } else if (templateId != null) {
       delivery = await sendBrevoEmail({
+        ...careersSender,
         to: [{ email: hrEmail }],
         replyTo: { email: data.email, name: fullName },
         templateId,
@@ -308,6 +316,7 @@ export const careersApplyEndpoint: Endpoint = {
         linkedinUrl: data.linkedinUrl,
       });
       delivery = await sendBrevoEmail({
+        ...careersSender,
         to: [{ email: hrEmail }],
         replyTo: { email: data.email, name: fullName },
         subject,

@@ -157,18 +157,26 @@ export const partnerApplyEndpoint: Endpoint = {
     const userTemplate = numericTemplateId(process.env.PARTNER_USER_TEMPLATE_ID);
     const adminEmail = process.env.PARTNERS_NOTIFY_EMAIL;
 
+    // Partner emails are sent from the partner sender identity (falls back to
+    // the global BREVO_SENDER_* env when PARTNERS_SENDER_* is unset).
+    const partnerSender: { senderEmail?: string; senderName?: string } = {
+      ...(process.env.PARTNERS_SENDER_EMAIL ? { senderEmail: process.env.PARTNERS_SENDER_EMAIL } : {}),
+      ...(process.env.PARTNERS_SENDER_NAME ? { senderName: process.env.PARTNERS_SENDER_NAME } : {}),
+    };
+
     // Admin notification (non-fatal).
     let adminDelivery: BrevoSendResult;
     if (!adminEmail) {
       adminDelivery = { status: 'skipped', reason: 'no-admin-recipient' };
     } else if (adminTemplate != null) {
       adminDelivery = await sendBrevoEmail({
+        ...partnerSender,
         to: [{ email: adminEmail }], replyTo: { email: data.email, name: fullName },
         templateId: adminTemplate, params,
       });
     } else {
       const { subject, htmlContent } = buildPartnerAdminEmail(emailInput);
-      adminDelivery = await sendBrevoEmail({ to: [{ email: adminEmail }], replyTo: { email: data.email, name: fullName }, subject, htmlContent });
+      adminDelivery = await sendBrevoEmail({ ...partnerSender, to: [{ email: adminEmail }], replyTo: { email: data.email, name: fullName }, subject, htmlContent });
     }
 
     // Applicant confirmation (non-fatal). replyTo = the partnerships inbox when set.
@@ -176,6 +184,7 @@ export const partnerApplyEndpoint: Endpoint = {
     const applicantReplyTo = adminEmail ? { email: adminEmail } : undefined;
     if (userTemplate != null) {
       applicantDelivery = await sendBrevoEmail({
+        ...partnerSender,
         to: [{ email: data.email, name: fullName }],
         ...(applicantReplyTo ? { replyTo: applicantReplyTo } : {}),
         templateId: userTemplate, params,
@@ -183,6 +192,7 @@ export const partnerApplyEndpoint: Endpoint = {
     } else {
       const { subject, htmlContent } = buildPartnerApplicantEmail(emailInput);
       applicantDelivery = await sendBrevoEmail({
+        ...partnerSender,
         to: [{ email: data.email, name: fullName }],
         ...(applicantReplyTo ? { replyTo: applicantReplyTo } : {}),
         subject, htmlContent,
