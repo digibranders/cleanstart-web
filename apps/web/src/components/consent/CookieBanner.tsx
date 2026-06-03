@@ -134,7 +134,7 @@ function CategoryRow({
  * - "Cookies Settings" expands the 4-category preference panel inline.
  */
 export function CookieBanner() {
-  const { promptOpen, gpc, decide, record } = useConsent();
+  const { promptOpen, gpc, decide, record, closePrompt } = useConsent();
   const [showPrefs, setShowPrefs] = useState(false);
   // Single open accordion key — only one category description is shown at a time.
   const [openCategory, setOpenCategory] = useState<string | null>(null);
@@ -192,9 +192,19 @@ export function CookieBanner() {
       className="fixed inset-x-0 bottom-0 z-[60] border-t border-white/10 bg-[#131a2e] text-white shadow-[0_-8px_30px_rgba(0,0,0,0.35)]"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="mx-auto flex max-w-[1100px] flex-col gap-4 px-6 py-5">
+      <div className="relative mx-auto flex max-w-[1100px] flex-col gap-4 px-6 py-5">
+        <button
+          type="button"
+          onClick={closePrompt}
+          aria-label="Close"
+          className="absolute right-4 top-3 inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-white/60 transition hover:bg-white/10 hover:text-white"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+        </button>
         <p
-          className="text-white/80"
+          className="pr-8 text-white/80"
           style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.55 }}
         >
           This website uses cookies and other tracking technologies to enhance
