@@ -40,7 +40,7 @@ page slugs, categories, types, and build status across the dev journey.
 |---|-----------|----------|------|--------|-------|
 | 1 | Homepage | `/` | Static | ✅ | Built |
 | 11 | Book a Demo | `/book-a-demo` | Static | ✅ | Lead capture form page (form is static UI; LeadHandler wiring pending) |
-| 20 | Partners | `/partners` | Static | ✅ | Hero, Why Partner, Global Network (region tabs), Testimonials, Partner Types |
+| 20 | Partners | `/partners` | Static | ✅ | Hero, Why Partner, Global Network (region tabs), Testimonials, Partner Types. Become-a-Partner form posts to the dedicated CMS endpoint `/api/partner-applications/apply` (off HubSpot/`forms`). |
 | 21 | Pricing | `/pricing` | Static | ⬜ | |
 | 31 | Deal Registration | `/deal-registration` | Static | ✅ | Form is static UI; LeadHandler wiring pending |
 
@@ -51,7 +51,7 @@ page slugs, categories, types, and build status across the dev journey.
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
 | 22 | About Us | `/about-us` | Static | ✅ | Route at `src/app/about-us/` |
-| 23 | Careers | `/careers` | CMS Listing | ✅ | Backed by Payload `jobs` + `jobLocations` collections; published roles only. |
+| 23 | Careers | `/careers` | CMS Listing | ✅ | Backed by Payload `jobs` + `jobLocations` collections; published roles only. Apply form is live on CMS-native open jobs → `POST /api/career-applications/apply` (resume to private R2, application row, Brevo HR notification). |
 | 24 | Community | `/community` | Static | ✅ | Built 2026-05-22 from Figma 732:3192 |
 | 25 | Contact Us | `/contact-us` | Static | ✅ | Built 2026-05-23 from Figma 817:14719 |
 | 26 | Teams | `/teams` | Static | ✅ | All 5 sections built (farheen integration 2026-05-20) |
@@ -92,6 +92,7 @@ page slugs, categories, types, and build status across the dev journey.
 | 16 | Podcast | `/podcast` | CMS Listing | ✅ | Route at `src/app/podcast/`; Payload `podcastEpisodes` collection + `podcastPage` global (YT embeds) |
 | 17 | Resource Center | `/resource-center` | CMS Listing | ✅ | Route at `src/app/resource-center/` |
 | 17b | Resource Detail | `/resource/[slug]` | CMS Detail | ✅ | Route at `src/app/resource/[slug]/` |
+| 17c | Case Studies | `/case-studies` | CMS Listing | ✅ | Payload `case-studies` collection (listing-only, no detail). Cards link straight to the public R2 PDF download. Reuses home `BuiltForTeams` (no CMS). Built 2026-06-03 from Figma 1198:1231. |
 | — | Author Page | `/author/[slug]` | CMS Detail | ⬜ | Dynamic route, Payload `authors` |
 
 ---

@@ -101,6 +101,12 @@ export const NAV_TREE: NavItem[] = [
       {
         items: [
           {
+            label: "CleanStart Platform",
+            href: "/cleanstart-platform",
+            description: "AI-native trust architecture, source to runtime.",
+            icon: "network",
+          },
+          {
             label: "FIPS Compliance",
             href: "/fips",
             description: "Drop-in FIPS 140-3 validated crypto.",
@@ -164,6 +170,7 @@ export const NAV_TREE: NavItem[] = [
         items: [
           { label: "Blogs", href: "/blogs", icon: "book" },
           { label: "Resource Center", href: "/resource-center", icon: "folder" },
+          { label: "Case Studies", href: "/case-studies", icon: "doc-signed" },
           { label: "Newsroom", href: "/news", icon: "newspaper" },
           { label: "Knowledge Hub", href: "/knowledge-hub/vex-documents", icon: "book-open" },
         ],

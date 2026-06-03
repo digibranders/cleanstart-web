@@ -13,11 +13,13 @@ import { WebhookDeadLetter } from './payload/collections/WebhookDeadLetter';
 import { Authors } from './payload/collections/Authors';
 import { Blogs } from './payload/collections/Blogs';
 import { BrokenLinks } from './payload/collections/BrokenLinks';
+import { CaseStudies } from './payload/collections/CaseStudies';
 import { Categories } from './payload/collections/Categories';
 import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
 import { AnalyticsCache } from './payload/collections/AnalyticsCache';
+import { ConsentLog } from './payload/collections/ConsentLog';
 import { Integrations } from './payload/collections/Integrations';
 import { JobLocations } from './payload/collections/JobLocations';
 import { Jobs } from './payload/collections/Jobs';
@@ -25,6 +27,7 @@ import { KnowledgeBase } from './payload/collections/KnowledgeBase';
 import { KnowledgeCategories } from './payload/collections/KnowledgeCategories';
 import { Leads } from './payload/collections/Leads';
 import { Media } from './payload/collections/Media';
+import { PartnerApplications } from './payload/collections/PartnerApplications';
 import { News } from './payload/collections/News';
 import { NewsCategories } from './payload/collections/NewsCategories';
 import { Pages } from './payload/collections/Pages';
@@ -32,6 +35,8 @@ import { PodcastEpisodes } from './payload/collections/PodcastEpisodes';
 import { PreviewAudit } from './payload/collections/PreviewAudit';
 import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
+import { CareerApplications } from './payload/collections/CareerApplications';
+import { Resumes } from './payload/collections/Resumes';
 import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
@@ -65,6 +70,7 @@ import {
 } from './payload/endpoints/sitemap';
 import { checkBrokenLinksTask } from './payload/jobs/check-broken-links';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
+import { purgeCareerApplicationsTask } from './payload/jobs/purge-career-applications';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgePreviewAuditTask } from './payload/jobs/purge-preview-audit';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
@@ -163,6 +169,11 @@ const storagePlugins = r2EnvComplete()
               const effectivePrefix = prefix || r2UploadPrefix;
               return `${publicBase}/${effectivePrefix}/${encodeURIComponent(filename)}`;
             },
+          },
+          resumes: {
+            prefix:
+              process.env.R2_RESUME_PREFIX ??
+              (process.env.NODE_ENV === 'production' ? 'web/resumes' : 'dev/resumes'),
           },
         },
         bucket: requireEnv('R2_BUCKET'),
@@ -309,6 +320,8 @@ export default buildConfig({
     // array order drives the order *within* each group.
     Users,
     Media,
+    Resumes,
+    CareerApplications,
     Redirects,
     BrokenLinks,
     AuditLog,
@@ -317,6 +330,7 @@ export default buildConfig({
     WebhookDeadLetter,
     Integrations,
     AnalyticsCache,
+    ConsentLog,
     Authors,
     Categories,
     NewsCategories,
@@ -324,10 +338,12 @@ export default buildConfig({
     JobLocations,
     Forms,
     Leads,
+    PartnerApplications,
     Blogs,
     News,
     Guides,
     Resources,
+    CaseStudies,
     KnowledgeBase,
     Events,
     Webinars,
@@ -374,6 +390,7 @@ export default buildConfig({
       drainLeadQueueTask,
       purgeSearchLogTask,
       purgeLeadsPiiTask,
+      purgeCareerApplicationsTask,
       purgePreviewAuditTask,
       checkBrokenLinksTask,
       retryWebhookTask,
@@ -402,6 +419,10 @@ export default buildConfig({
       {
         cron: '30 3 * * *', // daily at 03:30 UTC — previewAudit 90-day retention
         queue: 'previewAuditPurge',
+      },
+      {
+        cron: '45 3 * * *', // daily at 03:45 UTC — career-applications PII + resume 365-day purge
+        queue: 'careerApplicationsPurge',
       },
       {
         cron: '30 4 * * *', // daily at 04:30 UTC — broken-link scan

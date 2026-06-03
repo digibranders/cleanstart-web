@@ -6,11 +6,10 @@ export function CleanStartImagesHero(): React.ReactElement {
   return (
     <section
       data-section="CleanStartImagesHero"
-      className="relative overflow-hidden"
+      className="relative overflow-hidden lg:min-h-[clamp(580px,52vw,741px)]"
       style={{
         background:
           "linear-gradient(179.99deg, rgb(21,16,33) 0%, rgb(21,16,33) 25.702%, rgb(16,18,62) 31.159%, rgb(19,30,143) 51.006%, rgb(71,30,192) 68.711%, rgb(71,31,195) 79.832%, rgba(70,30,191,0.85) 85.018%, rgba(66,30,188,0.4) 93.72%, rgba(66,30,188,0) 98.921%)",
-        minHeight: "clamp(580px, 52vw, 741px)",
       }}
     >
       {/* Decorative ellipse glow behind the 3D image */}
@@ -121,7 +120,7 @@ export function CleanStartImagesHero(): React.ReactElement {
             </div>
           </div>
 
-          <div className="relative flex-1 flex items-center justify-center lg:justify-end">
+          <div className="relative flex-1 hidden lg:flex items-center justify-center lg:justify-end">
             <Image
               src="/images/cleanstart-images/hero-3d-container.png"
               alt="3D isometric container image illustrating CleanStart's hardened, FIPS-compliant image pipeline with security shield and code modules."

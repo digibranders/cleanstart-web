@@ -124,7 +124,9 @@ export default withSentryConfig(withCleanstart, {
   project: process.env.SENTRY_PROJECT,
   widenClientFileUpload: true,
   tunnelRoute: '/monitoring',
-  hideSourceMaps: true,
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
   disableLogger: true,
   automaticVercelMonitors: false,
 });

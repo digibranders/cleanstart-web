@@ -3,8 +3,7 @@ import { HeroReveal } from "@/components/ui/Reveal";
 export function AboutHero() {
   return (
     <section
-      className="relative bg-cs-hero bg-cs-grid overflow-visible lg:overflow-hidden"
-      style={{ minHeight: "clamp(440px, 40vw, 569px)" }}
+      className="relative bg-cs-hero bg-cs-grid overflow-visible lg:overflow-hidden lg:min-h-[clamp(440px,40vw,569px)]"
     >
       <div
         aria-hidden
@@ -97,7 +96,7 @@ export function AboutHero() {
                 the breakout behavior into the white WhoWeAre section below. */}
             <div
               aria-hidden
-              className="lg:hidden block relative z-10 mb-[-130px] lg:mb-0 pointer-events-none select-none"
+              className="hidden relative z-10 lg:mb-0 pointer-events-none select-none"
               style={{
                 width: "clamp(300px, 95vw, 380px)",
                 aspectRatio: "347 / 378",

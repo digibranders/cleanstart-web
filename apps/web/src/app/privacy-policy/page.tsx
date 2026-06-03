@@ -320,7 +320,9 @@ export default function PrivacyPolicyPage() {
               <li className="article-li"><strong>Right to nominate:</strong> You have the right to nominate another individual to exercise your rights under the DPDP Act in the event of your death or incapacity.</li>
             </ul>
 
-            <h2 className="article-h2">6. Information We Collect Automatically</h2>
+            <h2 id="cookies" className="article-h2 scroll-mt-24">
+              6. Information We Collect Automatically
+            </h2>
             <p className="article-paragraph">
               When you access or interact with our website, we automatically gather certain limited
               technical and usage-related information. This data does not directly identify you

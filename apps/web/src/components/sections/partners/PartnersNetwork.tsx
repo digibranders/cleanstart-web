@@ -59,6 +59,12 @@ const PARTNERS: Record<Region, Partner[]> = {
       logo: "/images/partners/global/fortifire-icon.png",
       wordmark: "FORTIFIRE",
     },
+    {
+      name: "Zensar",
+      country: "San Jose, USA",
+      logo: "/images/partners/global/zensar.svg",
+      invertOnLight: true,
+    },
   ],
 };
 
@@ -236,15 +242,31 @@ function PartnerCard({ partner }: { partner: Partner }): React.ReactElement {
       style={{ border: "1px solid rgba(255,255,255,0.12)" }}
     >
       <div className="flex h-9 items-center gap-2">
-        <Image
-          src={partner.logo}
-          alt={`${partner.name} logo`}
-          width={partner.wordmark ? 36 : 160}
-          height={36}
-          sizes={partner.wordmark ? "36px" : "160px"}
-          className="h-full w-auto object-contain object-left"
-          style={partner.invertOnLight ? { filter: "brightness(0)" } : undefined}
-        />
+        {partner.logo.endsWith(".svg") ? (
+          // SVG logos render via plain <img> — next/image needs dangerouslyAllowSVG, and
+          // vectors gain nothing from the optimizer.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={partner.logo}
+            alt={`${partner.name} logo`}
+            width={partner.wordmark ? 36 : 160}
+            height={36}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-auto object-contain object-left"
+            style={partner.invertOnLight ? { filter: "brightness(0)" } : undefined}
+          />
+        ) : (
+          <Image
+            src={partner.logo}
+            alt={`${partner.name} logo`}
+            width={partner.wordmark ? 36 : 160}
+            height={36}
+            sizes={partner.wordmark ? "36px" : "160px"}
+            className="h-full w-auto object-contain object-left"
+            style={partner.invertOnLight ? { filter: "brightness(0)" } : undefined}
+          />
+        )}
         {partner.wordmark ? (
           <span
             className="font-display font-bold text-[#0F123E] tracking-tight"

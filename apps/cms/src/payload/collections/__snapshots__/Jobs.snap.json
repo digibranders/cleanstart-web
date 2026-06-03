@@ -189,6 +189,10 @@
       "name": "closedAt"
     },
     {
+      "type": "join",
+      "name": "applications"
+    },
+    {
       "type": "ui",
       "name": "permalink"
     },
