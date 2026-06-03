@@ -109,6 +109,11 @@ export const Users: CollectionConfig = {
     //         }>;
     //       };
     //     };
+    //     // List-table column widths per collection (px), managed via
+    //     // @/payload/admin/lib/column-widths.ts.
+    //     columnWidths?: {
+    //       [collectionSlug: string]: { [accessor: string]: number };
+    //     };
     //   }
     // ---------------------------------------------------------------
     {

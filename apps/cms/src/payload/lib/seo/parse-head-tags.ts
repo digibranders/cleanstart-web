@@ -53,24 +53,22 @@ const parseAttrs = (tag: string): Record<string, string> => {
 };
 
 export const parseHeadTags = (input: string | null | undefined): ParsedHeadTags => {
-  const result: ParsedHeadTags = {
-    alternates: [],
-    metaTags: [],
-    commentCount: 0,
-    unrecognised: [],
-  };
-
   if (typeof input !== 'string' || input.trim().length === 0) {
-    return result;
+    return { alternates: [], metaTags: [], commentCount: 0, unrecognised: [] };
   }
 
   // Count comments and strip them so they don't interfere with tag matching.
-  let stripped = input;
   COMMENT_RE.lastIndex = 0;
   const comments = input.match(COMMENT_RE) ?? [];
-  // biome-ignore lint/suspicious/noExplicitAny: typed write below
-  (result as any).commentCount = comments.length;
-  stripped = input.replace(COMMENT_RE, '');
+  const commentCount = comments.length;
+  const stripped = input.replace(COMMENT_RE, '');
+
+  const result: ParsedHeadTags = {
+    alternates: [],
+    metaTags: [],
+    commentCount,
+    unrecognised: [],
+  };
 
   const seenAlt = new Set<string>();
   const seenMeta = new Set<string>();

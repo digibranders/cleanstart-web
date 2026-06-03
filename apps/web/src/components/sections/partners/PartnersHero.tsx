@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
+import { BecomePartnerCta } from "@/components/sections/partners/BecomePartnerCta";
 
 export function PartnersHero(): React.ReactElement {
   return (
     <section className="relative bg-cs-hero bg-cs-grid overflow-hidden">
-      {/* Decorative purple glows */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -75,21 +75,20 @@ export function PartnersHero(): React.ReactElement {
           </HeroReveal>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-            <Link
-              href="/book-a-demo"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-white text-[#0F123E] px-5 py-3 font-semibold transition-colors hover:bg-white/90"
-              style={{ fontSize: "var(--fs-button)", minHeight: "44px" }}
-            >
-              Become a Partner
-              <ArrowIcon />
-            </Link>
+            <BecomePartnerCta />
             <Link
               href="/deal-registration"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2F49E5] text-white px-5 py-3 font-semibold transition-colors hover:bg-[#2438C2]"
-              style={{ fontSize: "var(--fs-button)", minHeight: "44px" }}
+              className="cs-btn-blue"
+              style={
+                {
+                  ["--cs-btn-fs" as string]: "var(--fs-button)",
+                  ["--cs-btn-px" as string]: "22px",
+                  gap: "10px",
+                } as React.CSSProperties
+              }
             >
-              Deal Registration
-              <ArrowIcon className="text-white" />
+              <span>Deal Registration</span>
+              <ArrowIcon />
             </Link>
           </div>
         </div>

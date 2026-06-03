@@ -16,7 +16,6 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
       style={{ minHeight: "clamp(420px, 37vw, 521px)", background: HERO_GRADIENT }}
       aria-labelledby="careers-hero-title"
     >
-      {/* Background dot grid */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -27,7 +26,6 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
         decoding="async"
       />
 
-      {/* 3D cube — top right */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
@@ -50,7 +48,6 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
         />
       </div>
 
-      {/* Left glow */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
@@ -73,7 +70,6 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
         />
       </div>
 
-      {/* Content */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
           className="flex flex-col items-center gap-6 lg:gap-8 mx-auto pt-[clamp(112px,8vw,128px)]"

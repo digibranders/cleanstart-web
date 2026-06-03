@@ -1,29 +1,14 @@
 import type React from 'react';
 import { Reveal } from '@/components/ui/Reveal';
 
-/*
- * Figma node 798:2209 (desktop) + 857:6066 (mobile).
- *
- * Desktop: 2×2 grid of problem cards with 1px gradient dividers — illustration on the
- *   left, text on the right, no per-card background.
- * Mobile (below lg / 1024px): single-column stack. Each card is a self-contained white
- *   tile with 24px radius and soft shadow, icon centered at top with a purple glow
- *   halo, title + description centered below.
- *
- * Mobile order in Figma: Bloated → Remediation → Inherited Vulnerabilities → Slower.
- * Desktop order in Figma: Bloated → Inherited Vulnerabilities → Remediation → Slower.
- * Each card carries its own desktop / mobile slot to honour both orderings without
- * re-shuffling the data array.
- */
-
 interface CardDef {
   /** Desktop side-by-side illustration (large 3D render). */
   desktopImg: string;
-  /** Figma absolute-percentage positioning for the desktop img inside its overflow container */
+  /** Absolute-percentage positioning for the desktop image inside its overflow container. */
   desktopImgStyle: React.CSSProperties;
   /** Mobile centered icon (smaller, standalone). */
   mobileIcon: string;
-  /** Mobile icon sizing inside the 108×87 frame — Figma positions per card. */
+  /** Mobile icon sizing inside the 108x87 frame, positioned per card. */
   mobileIconStyle: React.CSSProperties;
   title: string;
   desc: string;
@@ -64,7 +49,7 @@ const CARDS: [CardDef, CardDef, CardDef, CardDef] = [
   },
 ];
 
-/** Mobile card ordering — Figma reflows Remediation above Vulnerabilities. */
+/** Mobile reflows Remediation above Inherited Vulnerabilities. */
 const MOBILE_ORDER = [0, 2, 1, 3] as const;
 
 const DIVIDER_H =
@@ -75,16 +60,13 @@ const DIVIDER_V =
 function DesktopWhyCard({ desktopImg, desktopImgStyle, title, desc }: CardDef): React.ReactElement {
   return (
     <div className="flex items-center" style={{ gap: 'clamp(16px, 1.67vw, 24px)' }}>
-      {/* ── Illustration area ── */}
       <div
         className="relative shrink-0"
         style={{
-          /* 296×220 in Figma → 222×165 at 1440px (×0.75); clamps down gracefully */
           width: 'clamp(160px, 15.4vw, 222px)',
           height: 'clamp(120px, 11.46vw, 165px)',
         }}
       >
-        {/* Purple glow — Figma Ellipse 46681, 165 px, positioned at left=32px top=12px */}
         <div
           aria-hidden
           className="pointer-events-none select-none absolute"
@@ -97,7 +79,6 @@ function DesktopWhyCard({ desktopImg, desktopImgStyle, title, desc }: CardDef): 
             style={{ display: 'block', width: '100%', height: '100%' }}
           />
         </div>
-        {/* 3D illustration — clipped to container, exact Figma proportional offsets */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -111,7 +92,6 @@ function DesktopWhyCard({ desktopImg, desktopImgStyle, title, desc }: CardDef): 
         </div>
       </div>
 
-      {/* ── Text ── */}
       <div className="flex flex-col min-w-0" style={{ flex: '1 1 0', gap: '17px' }}>
         <h3
           style={{
@@ -153,13 +133,11 @@ function MobileWhyCard({ mobileIcon, mobileIconStyle, title, desc }: CardDef): R
           '0 1px 2px rgba(17, 17, 17, 0.04), 0 12px 32px -8px rgba(17, 17, 17, 0.06)',
       }}
     >
-      {/* ── Icon area (108×87 Figma frame) ── */}
       <div
         className="relative shrink-0"
         aria-hidden
         style={{ width: '108px', height: '87px' }}
       >
-        {/* Purple glow — 79.75×79.75, blur 20.78, opacity 0.35 (Ellipse 46679) */}
         <div
           aria-hidden
           className="pointer-events-none select-none absolute"
@@ -185,7 +163,6 @@ function MobileWhyCard({ mobileIcon, mobileIconStyle, title, desc }: CardDef): R
         />
       </div>
 
-      {/* ── Text ── */}
       <div className="flex flex-col items-center text-center" style={{ marginTop: '12px', gap: '12px' }}>
         <h3
           style={{
@@ -224,7 +201,6 @@ export function DeveloperWhyItMatters(): React.ReactElement {
       className="relative overflow-hidden"
       style={{ backgroundColor: '#F6F6F6' }}
     >
-      {/* ── Left Union grid-pattern blob (Figma: left=-500, top=-539, w=1181) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -245,7 +221,6 @@ export function DeveloperWhyItMatters(): React.ReactElement {
         />
       </div>
 
-      {/* ── Right Union grid-pattern blob (Figma: left=1216, top=-535, w=1101) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -266,13 +241,10 @@ export function DeveloperWhyItMatters(): React.ReactElement {
         />
       </div>
 
-      {/* ── Top-left ellipse glow (Figma: left=-68, top=-76, 258px + inset-[-94.19%]) ── */}
-      {/* Rendered size at 1920: 258 × (1 + 2×0.9419) ≈ 744px; center at (61, 53) */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
         style={{
-          /* left = center_x - half_rendered = 61 - 372 = -311 */
           left: 'calc(-311 / 1920 * 100vw)',
           top: 'calc(-319 / 1920 * 100vw)',
           width: 'calc(744 / 1920 * 100vw)',
@@ -289,8 +261,6 @@ export function DeveloperWhyItMatters(): React.ReactElement {
         />
       </div>
 
-      {/* ── Top-right ellipse glow (Figma: left=1720, top=-76, 258px + inset-[-94.19%]) ── */}
-      {/* center at (1849, 53); rendered 744px */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -311,7 +281,6 @@ export function DeveloperWhyItMatters(): React.ReactElement {
         />
       </div>
 
-      {/* ── Content ── */}
       <div
         className="relative mx-auto"
         style={{
@@ -322,7 +291,6 @@ export function DeveloperWhyItMatters(): React.ReactElement {
           paddingBottom: 'clamp(48px, 5.2vw, 100px)',
         }}
       >
-        {/* H2 — Figma desktop: 62px Manrope Bold tracking -3.1px · Figma mobile: 28px tracking 0 */}
         <Reveal header>
           <h2
             className="text-center mx-auto"
@@ -340,16 +308,13 @@ export function DeveloperWhyItMatters(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* ── Mobile: single-column card stack ── */}
         <div className="flex flex-col gap-4 lg:hidden">
           {MOBILE_ORDER.map((idx) => (
             <MobileWhyCard key={`m-${idx}`} {...CARDS[idx as 0 | 1 | 2 | 3]} />
           ))}
         </div>
 
-        {/* ── Desktop: 2×2 problem-card grid with gradient dividers ── */}
         <div className="relative hidden lg:block">
-          {/* Vertical centre divider — Figma: 1px line at x=962 (page centre) */}
           <div
             aria-hidden
             className="pointer-events-none absolute"
@@ -366,7 +331,6 @@ export function DeveloperWhyItMatters(): React.ReactElement {
             className="grid grid-cols-2"
             style={{ rowGap: 0, columnGap: 0 }}
           >
-            {/* ── Row 1 ── */}
             <div style={{ paddingRight: '32px', paddingBottom: '48px' }}>
               <DesktopWhyCard {...CARDS[0]} />
             </div>
@@ -374,7 +338,6 @@ export function DeveloperWhyItMatters(): React.ReactElement {
               <DesktopWhyCard {...CARDS[1]} />
             </div>
 
-            {/* Horizontal divider spanning both columns — Figma: 1234px × 1px at y=530 */}
             <div
               aria-hidden
               className="pointer-events-none"
@@ -385,7 +348,6 @@ export function DeveloperWhyItMatters(): React.ReactElement {
               }}
             />
 
-            {/* ── Row 2 ── */}
             <div style={{ paddingRight: '32px', paddingTop: '48px' }}>
               <DesktopWhyCard {...CARDS[2]} />
             </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type ToastType = 'info' | 'success' | 'warning' | 'error';
 
@@ -63,8 +63,13 @@ export const showToast = (args: {
  */
 export const ToastBus = (): ReactElement | null => {
   const [items, setItems] = useState<ToastEntry[]>([]);
+  // Track auto-dismiss handles so they can be cleared on unmount,
+  // preventing post-unmount setState calls in React 18+.
+  // Use `number` — window.setTimeout returns a numeric id in browsers.
+  const timersRef = useRef<Map<number, number>>(new Map());
 
   const dismiss = useCallback((id: number) => {
+    timersRef.current.delete(id);
     setItems((cur) => {
       const next = cur.filter((t) => t.id !== id);
       // Drop the registered action if any (memory hygiene).
@@ -72,6 +77,15 @@ export const ToastBus = (): ReactElement | null => {
       if (dropped?.actionId) actionRegistry.delete(dropped.actionId);
       return next;
     });
+  }, []);
+
+  // Clear all pending timers when the component unmounts.
+  useEffect(() => {
+    const timers = timersRef.current;
+    return () => {
+      for (const handle of timers.values()) window.clearTimeout(handle);
+      timers.clear();
+    };
   }, []);
 
   useEffect(() => {
@@ -95,7 +109,8 @@ export const ToastBus = (): ReactElement | null => {
       if (detail?.actionId) entry.actionId = detail.actionId;
       setItems((cur) => [...cur, entry].slice(-MAX_VISIBLE));
       const ttl = entry.actionId ? TOAST_TTL_MS_WITH_ACTION : TOAST_TTL_MS_DEFAULT;
-      window.setTimeout(() => dismiss(id), ttl);
+      const handle = window.setTimeout(() => dismiss(id), ttl);
+      timersRef.current.set(id, handle);
     };
     window.addEventListener('cs-cms:toast', onToast);
     return () => window.removeEventListener('cs-cms:toast', onToast);

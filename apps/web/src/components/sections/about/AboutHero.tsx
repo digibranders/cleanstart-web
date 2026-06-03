@@ -6,7 +6,6 @@ export function AboutHero() {
       className="relative bg-cs-hero bg-cs-grid overflow-visible lg:overflow-hidden"
       style={{ minHeight: "clamp(440px, 40vw, 569px)" }}
     >
-      {/* Purple radial blobs — matching Figma ellipse overlays */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -34,8 +33,7 @@ export function AboutHero() {
         }}
       />
 
-      {/* 3D cube — Figma node 248:1803: top 47px, center at 50%+327.5px, 743×811px.
-          Overflows the section bottom intentionally; clipped by overflow-hidden. */}
+      {/* 3D cube overflows the section bottom intentionally; clipped by overflow-hidden. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -60,7 +58,6 @@ export function AboutHero() {
       </div>
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Text at top: 178px from section top, matching Figma node 248:2066 */}
         <div className="pt-[clamp(112px,8vw,128px)] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-14 lg:max-w-[436px]">
             <HeroReveal y={50} duration={1.0}>
@@ -93,13 +90,11 @@ export function AboutHero() {
               </a>
             </HeroReveal>
 
-            {/* Mobile-only Figma-accurate cube (node 817:1850).
-                Outer wrapper uses mix-blend-mode: color-dodge so the cube
-                glows into the dark hero gradient instead of sitting flat
-                like a sprite. Inner div clips the slightly-oversized image
-                (per Figma's negative offsets) so the cube reads as cropped
-                naturally. mb-[-130px] + z-10 keeps the existing breakout
-                behavior into the white WhoWeAre section below. */}
+            {/* Mobile-only cube. Outer wrapper uses mix-blend-mode: color-dodge
+                so the cube glows into the dark hero gradient instead of sitting
+                flat like a sprite. Inner div clips the slightly-oversized image
+                so the cube reads as cropped naturally. mb-[-130px] + z-10 keeps
+                the breakout behavior into the white WhoWeAre section below. */}
             <div
               aria-hidden
               className="lg:hidden block relative z-10 mb-[-130px] lg:mb-0 pointer-events-none select-none"
@@ -110,7 +105,6 @@ export function AboutHero() {
               }}
             >
               <div className="absolute inset-0 overflow-hidden">
-                {/* Figma positions: left:-14.75%, top:-8.5%, w:131.09%, h:120.19% */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/about/hero-3d-figma.png"
@@ -131,7 +125,6 @@ export function AboutHero() {
         </div>
       </div>
 
-      {/* Bottom fade into next white section */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 h-32"

@@ -16,15 +16,14 @@ type Props = {
  */
 export const ColumnPicker = (props: Props): ReactElement => {
   const { columnState } = props;
-  const { setActiveColumns } = useTableColumns();
+  const { columns, toggleColumn } = useTableColumns();
 
-  const visibleAccessors = columnState.filter((c) => c.active).map((c) => c.accessor);
+  const activeByAccessor = new Map<string, boolean>(
+    columns.map((c) => [c.accessor, !!c.active]),
+  );
 
   const toggle = (accessor: string): void => {
-    const next = visibleAccessors.includes(accessor)
-      ? visibleAccessors.filter((a) => a !== accessor)
-      : [...visibleAccessors, accessor];
-    void setActiveColumns(next);
+    void toggleColumn(accessor);
   };
 
   const labelOf = (col: Column): string => {
@@ -41,7 +40,7 @@ export const ColumnPicker = (props: Props): ReactElement => {
       <ul className="cs-column-picker__list">
         {columnState.map((col) => {
           const label = labelOf(col);
-          const checked = !!col.active;
+          const checked = activeByAccessor.get(col.accessor) ?? !!col.active;
           return (
             <li key={col.accessor} className="cs-column-picker__row">
               <label className="cs-column-picker__row-label">

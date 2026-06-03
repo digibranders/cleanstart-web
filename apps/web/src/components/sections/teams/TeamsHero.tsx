@@ -3,11 +3,8 @@ import { HeroReveal } from "@/components/ui/Reveal";
 export function TeamsHero() {
   return (
     <section
-      /* min-height removed entirely — was leaving ~140px of dead gradient
-         space below the paragraph on desktop (content only needs ~350px,
-         old floor was 490px). Section now hugs content on both viewports;
-         pt-[clamp(72,8vw,128)] + pb-[80px] padding still gives the hero
-         plenty of vertical breathing room. */
+      /* No min-height: it leaves dead gradient space below the paragraph on
+         desktop. The section hugs content; pt/pb padding handles vertical space. */
       className="relative overflow-hidden"
       style={{
         backgroundColor: "#151021",
@@ -15,7 +12,6 @@ export function TeamsHero() {
           "linear-gradient(179.998deg, rgb(21,16,33) 25.702%, rgb(16,18,62) 43.563%, rgb(19,30,143) 67.739%, rgb(71,30,192) 89.306%, rgb(71,31,195) 102.85%, rgba(70,30,191,0.85) 109.17%, rgba(66,30,188,0.4) 119.77%, rgba(66,30,188,0) 126.11%)",
       }}
     >
-      {/* ── Glow blob — large, left-center (Figma Ellipse 46641, rotate 43°) ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute select-none"
@@ -43,7 +39,6 @@ export function TeamsHero() {
         </div>
       </div>
 
-      {/* ── Glow streak — narrow, top-right (Figma Ellipse 46640, rotate 43°) ── */}
       <div
         aria-hidden
         className="pointer-events-none absolute select-none hidden lg:flex"
@@ -70,8 +65,6 @@ export function TeamsHero() {
         </div>
       </div>
 
-      {/* ── Accent lines — vertical gradient strokes matching Figma layout ── */}
-      {/* Line 104: left 1351px, top 72px, h 70px — one-sided fade */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -84,7 +77,6 @@ export function TeamsHero() {
             "linear-gradient(to bottom, rgba(133,107,255,0.5), rgba(133,107,255,0))",
         }}
       />
-      {/* Line 106: left 213px, top 142px, h 142px — both-end fade */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -97,7 +89,6 @@ export function TeamsHero() {
             "linear-gradient(to bottom, transparent, rgba(133,107,255,0.28), transparent)",
         }}
       />
-      {/* Line 106: left 426px, top 285px, h 142px — both-end fade */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -110,7 +101,6 @@ export function TeamsHero() {
             "linear-gradient(to bottom, transparent, rgba(133,107,255,0.28), transparent)",
         }}
       />
-      {/* Line 108: left 142px, top 355px, h 142px — both-end fade */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -123,7 +113,6 @@ export function TeamsHero() {
             "linear-gradient(to bottom, transparent, rgba(133,107,255,0.28), transparent)",
         }}
       />
-      {/* Line 105: left 1564px, top 142px, h 70px — reversed one-sided fade */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -137,7 +126,6 @@ export function TeamsHero() {
         }}
       />
 
-      {/* ── Content ── */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div className="flex flex-col items-center gap-6 pb-[80px] pt-[clamp(112px,8vw,128px)] text-center">
           <HeroReveal y={50} duration={1.0}>

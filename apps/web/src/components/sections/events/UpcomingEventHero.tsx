@@ -23,7 +23,6 @@ export function UpcomingEventHero({
       style={{ background: HERO_GRADIENT }}
       aria-labelledby="events-hero-title"
     >
-      {/* Decorative isometric cube — left side */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -47,7 +46,6 @@ export function UpcomingEventHero({
         />
       </div>
 
-      {/* Decorative isometric cube — right side */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -75,7 +73,6 @@ export function UpcomingEventHero({
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(48px, 6vw, 80px)" }}
       >
-        {/* Page title */}
         <HeroReveal y={50} duration={1.0}>
           <h1
             id="events-hero-title"
@@ -103,7 +100,6 @@ export function UpcomingEventHero({
           </h1>
         </HeroReveal>
 
-        {/* Featured hero card */}
         <Reveal y={30} delay={0.2}>
           {event ? <FeaturedEventCard event={event} /> : <EmptyHeroCard />}
         </Reveal>
@@ -135,7 +131,6 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
           "0 30px 60px rgba(20,12,60,0.45), 0 0 0 1px rgba(255,255,255,0.12) inset",
       }}
     >
-      {/* Noise texture overlay — matches Figma "Noise" effect */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -147,13 +142,11 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
           opacity: 0.55,
         }}
       />
-      {/* Corner date chip — sits above-left of the card per Figma */}
       {longDate && (
         <div
           className="absolute z-10"
           style={{ top: "-8px", left: "-9.92px" }}
         >
-          {/* Top-right tail (small folded-corner shadow) */}
           <div
             aria-hidden
             className="absolute"
@@ -168,7 +161,6 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
               transform: "rotate(180deg)",
             }}
           />
-          {/* Bottom-left tail (small folded-corner shadow) */}
           <div
             aria-hidden
             className="absolute"
@@ -181,7 +173,6 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
               clipPath: "polygon(100% 0, 100% 100%, 0 0)",
             }}
           />
-          {/* Badge body */}
           <div
             className="relative flex items-center"
             style={{
@@ -214,7 +205,6 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
       )}
 
       <div className="relative flex h-full flex-col lg:flex-row items-stretch" style={{ padding: "32px", gap: "44px" }}>
-        {/* Left: image */}
         <div
           className="relative w-full lg:max-w-[585px] shrink-0 overflow-hidden"
           style={{
@@ -243,7 +233,6 @@ function FeaturedEventCard({ event }: { event: Event }): React.ReactElement {
           )}
         </div>
 
-        {/* Right: content */}
         <div
           className="flex flex-col justify-between"
           style={{
@@ -323,7 +312,6 @@ function EmptyHeroCard(): React.ReactElement {
           "0 30px 60px rgba(20,12,60,0.45), 0 0 0 1px rgba(255,255,255,0.12) inset",
       }}
     >
-      {/* Noise texture overlay — matches Figma "Noise" effect (same as FeaturedEventCard) */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"

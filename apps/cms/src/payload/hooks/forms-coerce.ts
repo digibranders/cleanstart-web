@@ -1,6 +1,7 @@
 import type { CollectionBeforeChangeHook } from 'payload';
+import { ValidationError } from 'payload';
 
-import { checkPattern } from '../lib/safe-regex';
+import { MAX_PATTERN_LENGTH, checkPattern } from '../lib/safe-regex';
 
 type FormFieldShape = {
   name?: string | null;
@@ -32,7 +33,7 @@ type FormFieldShape = {
 export const formsCoerceHook: CollectionBeforeChangeHook = ({ data }) => {
   if (!data || !Array.isArray((data as { fields?: unknown }).fields)) return data;
   const fields = (data as { fields: FormFieldShape[] }).fields;
-  const next = fields.map((field) => {
+  const next = fields.map((field, index) => {
     const out: FormFieldShape = { ...field };
     // (1) consent ⇒ required.
     if (out.type === 'consent') {
@@ -47,10 +48,17 @@ export const formsCoerceHook: CollectionBeforeChangeHook = ({ data }) => {
         const reason =
           check.reason === 'catastrophic-backtracking'
             ? 'pattern looks unsafe (catastrophic backtracking risk)'
-            : 'pattern is invalid regex syntax';
-        throw new Error(
-          `Cannot save form: ${label} validation pattern rejected — ${reason}.`,
-        );
+            : check.reason === 'too-long'
+              ? `pattern exceeds the maximum allowed length of ${MAX_PATTERN_LENGTH} characters`
+              : 'pattern is invalid regex syntax';
+        throw new ValidationError({
+          errors: [
+            {
+              message: `Cannot save form: ${label} validation pattern rejected — ${reason}.`,
+              path: `fields.${index}.validation.pattern`,
+            },
+          ],
+        });
       }
     }
     return out;

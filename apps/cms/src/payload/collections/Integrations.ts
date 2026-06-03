@@ -6,6 +6,11 @@ import type {
 } from 'payload';
 
 import { isAdmin } from '../access';
+import {
+  integrationsAuditEndpoint,
+  integrationsHealthEndpoint,
+  integrationsTestEndpoint,
+} from '../endpoints/integrations-actions';
 import { encrypt, isEncrypted } from '../lib/integrations/secrets';
 
 /**
@@ -13,7 +18,7 @@ import { encrypt, isEncrypted } from '../lib/integrations/secrets';
  *
  * Design intent (per user feedback 2026-05-12): no raw JSON config.
  * Each kind exposes a small set of friendly fields. Secret tokens
- * (HubSpot, GA4 service account, Clarity, Cloudflare, Cal.com, Brevo)
+ * (HubSpot, GA4 service account, Clarity, Cloudflare, Cal.com)
  * are NOT in the row at all — they live in env vars set by ops via
  * the droplet `.env`, and the handler reads them at run time via
  * `lib/integrations/credentials.ts`. The admin row only carries the
@@ -44,7 +49,6 @@ const ACTIVE_KIND_OPTIONS = [
   { label: 'Microsoft Clarity', value: 'msClarity' },
   { label: 'Cloudflare Web Analytics', value: 'cloudflareWebAnalytics' },
   { label: 'Cal.com inbound (booking → lead)', value: 'calComInbound' },
-  { label: 'Brevo bounce / complaint callback', value: 'brevoBounceCallback' },
 ] as const;
 
 const RESERVED_KIND_OPTIONS = [
@@ -94,6 +98,13 @@ const kindIs =
 
 // ─── beforeChange + afterRead ────────────────────────────────────
 
+// Sentinel shown in the admin UI in place of a saved encrypted secret.
+// `beforeChange` must treat an incoming value equal to this as "unchanged
+// — keep the prior ciphertext"; persisting it would overwrite the real
+// secret with the placeholder (which then can't be decrypted, breaking
+// webhook dispatch with "Failed to parse URL from •••••••").
+const SECRET_MASK_SENTINEL = '••••••• (saved — paste a new value to replace)';
+
 const encryptSecretsBeforeChange: CollectionBeforeChangeHook = async ({
   data,
   operation,
@@ -123,24 +134,35 @@ const encryptSecretsBeforeChange: CollectionBeforeChangeHook = async ({
     const groupData = (data as Record<string, Record<string, unknown> | null>)[group];
     if (!groupData) continue;
     const value = groupData[field];
-    if (typeof value === 'string' && value.length > 0 && !isEncrypted(value)) {
-      groupData[field] = encrypt(value);
-    } else if (value === '' || value == null) {
-      // Empty → restore prior encrypted value, if any, so editor can
-      // leave secret fields blank to keep them unchanged.
+    // Empty OR the masking sentinel both mean "editor didn't change this
+    // secret" → restore the prior ciphertext. Without the sentinel check,
+    // saving an unchanged row persists the placeholder over the real
+    // secret and corrupts it.
+    const isUnchanged = value === '' || value == null || value === SECRET_MASK_SENTINEL;
+    if (isUnchanged) {
       const prior = (originalDoc as Record<string, Record<string, unknown> | null> | null)?.[
         group
       ]?.[field];
       if (typeof prior === 'string' && isEncrypted(prior)) {
         groupData[field] = prior;
       }
+    } else if (typeof value === 'string' && value.length > 0 && !isEncrypted(value)) {
+      groupData[field] = encrypt(value);
     }
   }
 
   return data;
 };
 
-const maskSecretsAfterRead: CollectionAfterReadHook = async ({ doc }) => {
+const maskSecretsAfterRead: CollectionAfterReadHook = async ({ context, doc }) => {
+  // Internal credential reads (webhook dispatch, the test endpoint) pass
+  // `context.skipSecretMask` so they receive the real ciphertext and can
+  // decrypt it. Without this bypass the masking sentinel would replace the
+  // URL on EVERY read — including dispatch — and outbound delivery would
+  // fail with "Failed to parse URL from •••••••".
+  if ((context as { skipSecretMask?: boolean } | undefined)?.skipSecretMask) {
+    return doc;
+  }
   const paths = SECRET_PATHS[doc.kind as string] ?? [];
   // Show encrypted secrets as a sentinel so the editor knows a secret
   // is set, without exposing the ciphertext blob in the form. The
@@ -153,7 +175,7 @@ const maskSecretsAfterRead: CollectionAfterReadHook = async ({ doc }) => {
     if (!groupData) continue;
     const value = groupData[field];
     if (typeof value === 'string' && isEncrypted(value)) {
-      masked[group] = { ...groupData, [field]: '••••••• (saved — paste a new value to replace)' };
+      masked[group] = { ...groupData, [field]: SECRET_MASK_SENTINEL };
     }
   }
   return masked;
@@ -188,28 +210,52 @@ const teamsConfigGroup: Field = {
       admin: {
         description:
           'Optional — tag specific team members in notifications. Ask your IT admin for each person\'s User ID and email address from Microsoft Entra (Azure AD).',
+        components: {
+          RowLabel: '@/payload/admin/components/MentionRowLabel.tsx#MentionRowLabel',
+        },
       },
       fields: [
-        { name: 'displayName', type: 'text', required: true, admin: { placeholder: 'Alex' } },
+        {
+          name: 'displayName',
+          type: 'text',
+          label: 'Display name (name shown in the alert)',
+          required: true,
+          admin: {
+            placeholder: 'Alex',
+            description:
+              'The name shown in the notification, e.g. "@Alex". This is just the visible label — the actual person is identified by the two fields below.',
+          },
+        },
         {
           name: 'aadObjectId',
           type: 'text',
+          label: 'Microsoft user ID (Azure AD Object ID)',
           required: true,
-          admin: { placeholder: '00000000-0000-0000-0000-000000000000' },
+          admin: {
+            placeholder: '00000000-0000-0000-0000-000000000000',
+            description:
+              'The person\'s Microsoft Entra (Azure AD) Object ID — a GUID that uniquely identifies them. Required for the @mention to actually notify them. The Teams app does NOT show this — get it from the Entra admin center → Identity → Users → select the person → copy "Object ID", or ask your IT admin.',
+          },
         },
         {
           name: 'upn',
           type: 'text',
+          label: 'Work email (User Principal Name)',
           required: true,
-          admin: { placeholder: 'alex@cleanstart.com' },
+          admin: {
+            placeholder: 'alex@cleanstart.com',
+            description:
+              'The person\'s work email (called "User Principal Name" in Microsoft). This is the email they sign in to Teams / Microsoft 365 with. External guests use the special "user_domain#EXT#@tenant.onmicrosoft.com" form.',
+          },
         },
         {
           name: 'triggerOn',
           type: 'select',
+          label: 'Tag them only for (leave empty = all alerts)',
           hasMany: true,
           options: [
-            { label: 'document.published', value: 'document.published' },
-            { label: 'lead.submitted', value: 'lead.submitted' },
+            { label: 'When content is published', value: 'document.published' },
+            { label: 'When a form is submitted', value: 'lead.submitted' },
           ],
           admin: {
             description: 'Optional — only mention this person for specific event types. Leave empty to mention them on all notifications.',
@@ -456,30 +502,6 @@ const calcomConfigGroup: Field = {
   ],
 };
 
-const brevoConfigGroup: Field = {
-  name: 'brevoConfig',
-  type: 'group',
-  label: 'Brevo bounce callback settings',
-  admin: {
-    condition: kindIs('brevoBounceCallback'),
-    description:
-      'Keeps your email list clean by automatically marking contacts who bounced or complained. Everything is set up by the technical team — no configuration needed here.',
-  },
-  fields: [
-    {
-      name: 'note',
-      type: 'ui',
-      admin: {
-        components: {
-          Field: {
-            path: '@/payload/admin/components/integrations/ConfigNote.tsx#BrevoConfigNote',
-          },
-        },
-      },
-    },
-  ],
-};
-
 // ─── Collection ──────────────────────────────────────────────────
 
 export const Integrations: CollectionConfig = {
@@ -499,6 +521,15 @@ export const Integrations: CollectionConfig = {
     delete: isAdmin,
   },
   timestamps: true,
+  // Mounted as collection endpoints (→ /api/integrations/:id/{test,health,audit}).
+  // They were previously config-level root endpoints, but Payload's REST router
+  // shadows root endpoints with 3+ path segments, so they 404'd. Collection
+  // endpoints resolve to the same URLs the admin components fetch.
+  endpoints: [
+    integrationsTestEndpoint,
+    integrationsHealthEndpoint,
+    integrationsAuditEndpoint,
+  ],
   hooks: {
     beforeChange: [encryptSecretsBeforeChange],
     afterRead: [maskSecretsAfterRead],
@@ -541,7 +572,11 @@ export const Integrations: CollectionConfig = {
           name: 'events',
           type: 'select',
           hasMany: true,
-          required: true,
+          // NOT required: an empty selection means "all events" — matches
+          // the section description, the "All events" placeholder, and the
+          // dispatch logic (routingMatches treats an empty events array as
+          // match-all). Marking it required contradicted all three and
+          // forced editors to pick events just to save.
           options: [
             { label: 'document.published — on first publish of a content doc', value: 'document.published' },
             { label: 'lead.submitted — on every public form submission', value: 'lead.submitted' },
@@ -601,7 +636,6 @@ export const Integrations: CollectionConfig = {
     clarityConfigGroup,
     cloudflareConfigGroup,
     calcomConfigGroup,
-    brevoConfigGroup,
     {
       name: 'source',
       type: 'select',
@@ -626,10 +660,15 @@ export const Integrations: CollectionConfig = {
         description: 'When the health badge last polled.',
       },
     },
+    // Operational controls (health, test-fire, delivery history) live in
+    // the sidebar — they're monitoring affordances, not config the editor
+    // is filling in, so they belong beside the doc rather than in the main
+    // editing column.
     {
       name: 'healthBadge',
       type: 'ui',
       admin: {
+        position: 'sidebar',
         components: {
           Field: {
             path: '@/payload/admin/components/integrations/HealthBadge.tsx#HealthBadge',
@@ -641,6 +680,7 @@ export const Integrations: CollectionConfig = {
       name: 'testAction',
       type: 'ui',
       admin: {
+        position: 'sidebar',
         condition: (_, sibling) => isDispatching(sibling),
         components: {
           Field: {
@@ -653,6 +693,7 @@ export const Integrations: CollectionConfig = {
       name: 'auditTrail',
       type: 'ui',
       admin: {
+        position: 'sidebar',
         condition: (_, sibling) => isDispatching(sibling),
         components: {
           Field: {

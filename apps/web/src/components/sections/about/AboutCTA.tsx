@@ -76,13 +76,6 @@ export function AboutCTA() {
         >
           Contact Sales
         </a>
-        {/* <a
-          href="/cleansight"
-          className="cs-btn-blue"
-          style={{ minWidth: "163px" }}
-        >
-          How it works
-        </a> */}
         <a
           href="/careers"
           className="cs-btn-blue"

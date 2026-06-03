@@ -8,12 +8,10 @@ const VALUE_PROPS: readonly string[] = [
 ];
 
 /**
- * Light-section row with the "What sets us Apart?" headline on the left
- * and four shielded value props on the right. Mirrors Figma frame 867:935
- * (layout_99XIKT — row, gap 60, starts at x:197.5, y:473). The section
- * itself is transparent so the parent `BookDemoBody` wrapper's shared
- * decorative layers (grid, radials, ellipse) bleed through into the form
- * area below without a visible seam.
+ * Light-section row with the "What sets us Apart?" headline on the left and
+ * four shielded value props on the right. The section itself is transparent
+ * so the parent `BookDemoBody` wrapper's shared decorative layers bleed
+ * through into the form area below without a visible seam.
  */
 export function WhatsSetsUsApart(): React.ReactElement {
   return (

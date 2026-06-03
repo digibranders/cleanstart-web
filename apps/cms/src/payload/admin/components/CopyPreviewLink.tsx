@@ -3,7 +3,7 @@
 import { Dialog, DialogBody, DialogFooter, DialogHeader } from '@cleanstart/ui';
 import { useDocumentInfo } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { showToast } from './ToastBus';
 
@@ -39,6 +39,12 @@ export const ShareLinkDialog = ({ open, onClose }: ShareLinkDialogProps): ReactE
   const [ttl, setTtl] = useState<number>(DEFAULT_TTL_SECONDS);
   const [label, setLabel] = useState<string>('');
   const [busy, setBusy] = useState(false);
+
+  // Reset label when the dialog closes so a subsequent open starts clean,
+  // regardless of whether the previous mint succeeded or failed.
+  useEffect(() => {
+    if (!open) setLabel('');
+  }, [open]);
 
   if (!collectionSlug || id == null) return null;
 

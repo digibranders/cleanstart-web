@@ -73,10 +73,9 @@ export function PartnersWhy(): React.ReactElement {
 }
 
 /**
- * Matches the DeveloperWorkflows feature-card style — cyan gradient ring,
- * purple bloom, faint highlight lines, ball icon at top. Fluid width: fills
- * its grid cell on every breakpoint so the row never overflows. Heights
- * align via `h-full` on the grid item + flex content.
+ * Feature card with a ball icon on top. Fills its grid cell on every breakpoint
+ * so the row never overflows; heights align via `h-full` on the grid item plus
+ * flex content.
  */
 function BenefitCardView({ card }: { card: BenefitCard }): React.ReactElement {
   return (
@@ -89,7 +88,6 @@ function BenefitCardView({ card }: { card: BenefitCard }): React.ReactElement {
       }}
     >
       <div className="relative flex h-full w-full flex-col overflow-hidden bg-white rounded-[16px] lg:rounded-[32px] p-6">
-        {/* Purple bloom — centred, sized off the card */}
         <div
           aria-hidden
           className="pointer-events-none absolute"
@@ -105,7 +103,7 @@ function BenefitCardView({ card }: { card: BenefitCard }): React.ReactElement {
           }}
         />
 
-        {/* 4 faint vertical highlight lines — positioned by % so they scale */}
+        {/* Vertical highlight lines positioned by % so they scale with the card. */}
         {[17, 41, 58, 82].map((leftPct) => (
           <div
             key={leftPct}
@@ -123,7 +121,6 @@ function BenefitCardView({ card }: { card: BenefitCard }): React.ReactElement {
           />
         ))}
 
-        {/* 2 faint horizontal highlight lines */}
         {[23, 56].map((topPct) => (
           <div
             key={topPct}
@@ -141,7 +138,6 @@ function BenefitCardView({ card }: { card: BenefitCard }): React.ReactElement {
           />
         ))}
 
-        {/* Ball icon (top) */}
         <div
           className="relative shrink-0"
           style={{ width: "88px", height: "88px" }}
@@ -156,7 +152,6 @@ function BenefitCardView({ card }: { card: BenefitCard }): React.ReactElement {
           />
         </div>
 
-        {/* Title + body */}
         <div className="relative mt-5 flex flex-col gap-3">
           <h3
             style={{

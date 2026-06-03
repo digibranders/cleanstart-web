@@ -1,33 +1,6 @@
 import type React from "react";
 import Link from "next/link";
 
-/*
- * ── DESKTOP — Figma node 817:11498 — 1276×330px card ─────────────────────────
- * Background: linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)
- * Border-radius: 40px (applied by Footer wrapper)
- *
- * Content block: left=122px, right=107px, top=85px, flex row, gap=115px
- *   Left: heading w=462px — Manrope Bold 55px, lh=1, tracking=-0.05em, white
- *   Right: w=493px, flex-col, gap=24px
- *     Desc: Sora Regular 21px, opacity=0.8, tracking=-0.04em, lh=1.4
- *     Button: cs-btn-glass — Manrope Medium 18px, #111, border #dab6f3
- *
- * Cube: 255×259px at right side, overflows right+bottom, opacity=0.8
- * Cyan glow: left=-139px, top=-168px, 320×320px, rgba(44,193,235,0.12), blur 80px
- *
- * ── MOBILE — Figma node 856:1031 — 328×338px card ────────────────────────────
- * Border-radius: 24px (applied by Footer wrapper: rounded-3xl)
- *
- * Heading: absolute, top=32px, w=260px, centered
- *   Manrope Bold, 28px, lh=1.2, color=white
- * Description: absolute, top=150px, w=265px, centered
- *   Sora Regular, 16px, lh=1.4, tracking=−1.12px, white opacity 80%
- * Button: absolute, top=262px, centered
- *   border: 1px solid #dab6f3, radius=8px, px=24px py=12px
- *   bg: white 65% + radial gradients, Manrope Medium 16px, tracking=−0.8px, #111
- * Cube: bottom-right corner, ~80px, opacity=0.8, overflow clips via card
- */
-
 export function CisoCTA(): React.ReactElement {
   return (
     <div
@@ -36,7 +9,6 @@ export function CisoCTA(): React.ReactElement {
         background: "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)",
       }}
     >
-      {/* ── Cyan glow — top-left (both breakpoints) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
@@ -51,16 +23,11 @@ export function CisoCTA(): React.ReactElement {
         }}
       />
 
-      {/* ════════════════════════════════════════════════════════════════════
-          MOBILE (< sm) — absolute-positioned layout matching node 856:1031
-          Card: 328×338px provided by Footer wrapper
-      ════════════════════════════════════════════════════════════════════ */}
       <div className="sm:hidden absolute inset-0">
 
-        {/* Mobile cube intentionally omitted per design — no decorative images
-            on mobile CTA cards (only gradient/colors/gridlines). */}
+        {/* Cube intentionally omitted on mobile: CTA cards carry no decorative
+            images at this breakpoint, only the gradient and gridlines. */}
 
-        {/* Heading — top=32px, w=260px, centered */}
         <p
           className="absolute text-center text-white"
           style={{
@@ -69,7 +36,6 @@ export function CisoCTA(): React.ReactElement {
             transform: "translateX(-50%)",
             width: "260px",
             fontFamily: "var(--font-display)",
-            // Strict-fonts: global CTA-card title token replaces the literal.
             fontSize: "var(--cta-card-title)",
             fontWeight: 600,
             lineHeight: 1.1,
@@ -79,7 +45,6 @@ export function CisoCTA(): React.ReactElement {
           Strengthen Your Software Supply Chain Foundations
         </p>
 
-        {/* Description — top=150px, w=265px, centered, opacity 80% */}
         <p
           className="absolute text-center text-white"
           style={{
@@ -88,7 +53,6 @@ export function CisoCTA(): React.ReactElement {
             transform: "translateX(-50%)",
             width: "265px",
             fontFamily: "var(--font-sans)",
-            // Strict-fonts: global CTA-card desc token replaces the literal.
             fontSize: "var(--cta-card-desc)",
             fontWeight: 400,
             lineHeight: 1.4,
@@ -100,7 +64,6 @@ export function CisoCTA(): React.ReactElement {
           container images built for enterprise environments.
         </p>
 
-        {/* Button — top=262px, centered */}
         <div
           className="absolute"
           style={{ top: "262px", left: "50%", transform: "translateX(-50%)" }}
@@ -127,9 +90,6 @@ export function CisoCTA(): React.ReactElement {
         </div>
       </div>
 
-      {/* ════════════════════════════════════════════════════════════════════
-          DESKTOP (≥ sm) — absolute inset-0, flex-row, vertically centred
-      ════════════════════════════════════════════════════════════════════ */}
       <div
         className="hidden sm:flex absolute inset-0 flex-row items-center overflow-hidden"
         style={{
@@ -137,7 +97,6 @@ export function CisoCTA(): React.ReactElement {
           gap: "clamp(32px, 5.99vw, 115px)",
         }}
       >
-        {/* Cube decoration — 255×259px, anchored bottom-right, bleeds below */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
@@ -157,7 +116,6 @@ export function CisoCTA(): React.ReactElement {
           decoding="async"
         />
 
-        {/* Left: headline */}
         <p
           className="relative text-white flex-shrink-0"
           style={{
@@ -172,7 +130,6 @@ export function CisoCTA(): React.ReactElement {
           Strengthen Your Software Supply Chain Foundations
         </p>
 
-        {/* Right: description + CTA button */}
         <div
           className="relative flex flex-col"
           style={{ maxWidth: "min(493px, 100%)", gap: "clamp(16px, 1.25vw, 24px)" }}

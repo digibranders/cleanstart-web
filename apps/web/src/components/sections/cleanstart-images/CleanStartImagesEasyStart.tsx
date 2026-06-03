@@ -104,7 +104,7 @@ const CHECKLIST = [
 function ConnectorBeam({
   alignPct,
 }: {
-  // Horizontal center of the rod, as a percent of content width (matches Figma serpentine offsets).
+  // Horizontal center of the rod, as a percent of content width.
   alignPct: number;
 }): React.ReactElement {
   return (
@@ -248,7 +248,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
           "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)",
       }}
     >
-      {/* Corner Union — top-left (Figma: left-[-208px], top-[-191px], mix-blend-overlay) */}
+      {/* Corner Union — top-left */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden md:block"
@@ -271,7 +271,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
         />
       </div>
 
-      {/* Corner Union — top-right (Figma: left-[1226px], top-[-118px], mix-blend-overlay) */}
+      {/* Corner Union — top-right */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden md:block"
@@ -301,7 +301,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
           paddingBottom: "var(--spacing-section-md)",
         }}
       >
-        {/* Heading */}
         <Reveal header>
           <h2
             className="text-white text-center mx-auto"
@@ -319,22 +318,20 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* ── DIAGRAM AREA ── */}
         <div
           className="mt-12 md:mt-16 mx-auto"
           style={{ maxWidth: "1058px" }}
         >
           {/*
-           * Desktop: 5-column grid — [panel] [66px connector] [255px center card] [66px connector] [panel]
-           * The center column contains ONLY the card (header + glowing card).
-           * The callout sits in its own row below the grid, wider than the card.
+           * Desktop: 5-column grid — [panel] [connector] [center card] [connector] [panel].
+           * The center column holds only the card; the callout sits in its own
+           * row below the grid, wider than the card.
            */}
           <div className="grid grid-cols-1 md:grid-cols-[1fr_66px_255px_66px_1fr] items-start">
 
-            {/* ── LEFT PANEL ── */}
             <StackPanel label="YOUR EXISTING STACK" items={YOUR_STACK} />
 
-            {/* Mobile beam: stack → hardened images (Figma: x=13 in 360 → 19.7%) — z-index:0 so card border paints over it */}
+            {/* Mobile beam: stack → hardened images. z-index:0 so the card border paints over it. */}
             <div
               className="md:hidden relative"
               style={{ marginTop: "-30px", marginBottom: "-90px", zIndex: 0 }}
@@ -342,7 +339,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               <ConnectorBeam alignPct={19.7} />
             </div>
 
-            {/* ── LEFT CONNECTOR BEAM (desktop only — rod PNG rotated 90° to run horizontally between stack and hardened card) ── */}
+            {/* Left connector beam — desktop only; rod rotated 90° to run horizontally between stack and hardened card */}
             <div
               aria-hidden
               className="hidden md:flex items-center justify-center"
@@ -367,13 +364,11 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               />
             </div>
 
-            {/* ── CENTER CARD COLUMN (header + glowing card only) ── */}
-            {/* Mobile: slightly narrower than content so the rod beams have side room and the card border paints over them (z-index:10). */}
+            {/* Center card column. On mobile it is slightly narrower than the content so the rod beams have side room and the card border (z-index:10) paints over them. */}
             <div
               className="flex flex-col items-center mt-2 md:mt-0 relative w-full max-w-[288px] md:max-w-none mx-auto"
               style={{ zIndex: 10 }}
             >
-              {/* Center header labels */}
               <div className="text-center" style={{ paddingBottom: "8px" }}>
                 <p
                   style={{
@@ -403,7 +398,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 </p>
               </div>
 
-              {/* Glowing card — Figma: border 1.658px #b23eff, rounded-[14.925px], p-[30.678px], gap-[36.483px] */}
               <div
                 className="relative overflow-hidden w-full"
                 style={{
@@ -417,7 +411,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                   gap: "36.483px",
                 }}
               >
-                {/* Inner inset glow */}
                 <div
                   aria-hidden
                   className="absolute inset-0 pointer-events-none rounded-[inherit]"
@@ -427,7 +420,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                   }}
                 />
 
-                {/* Background corner glow — Figma: top-[-36.56px], right-[-36.32px], 117.556px, blur 29.389px */}
                 <div
                   aria-hidden
                   className="absolute pointer-events-none"
@@ -442,7 +434,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                   }}
                 />
 
-                {/* 3D Cube icon — Figma: 77.111×89.549px inside 117.556px container w/ purple blur */}
                 <div className="flex justify-center" style={{ position: "relative", zIndex: 1 }}>
                   <div
                     className="relative flex items-center justify-center"
@@ -476,7 +467,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                   </div>
                 </div>
 
-                {/* Feature checklist — Figma: gap-[14.694px], circle 22.042px border #8b5cf6 */}
                 <div
                   style={{
                     display: "flex",
@@ -537,11 +527,9 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                   ))}
                 </div>
               </div>
-              {/* END center glowing card */}
             </div>
-            {/* END center column */}
 
-            {/* Mobile beam: hardened images → deployments (Figma: x=219 in 360 → 81.5%) — z-index:0 so card paints over it. Mirrors rod 1: small top overlap (into hardened bottom), large bottom overlap (through YOUR DEPLOYMENTS label into items card). */}
+            {/* Mobile beam: hardened images → deployments. z-index:0 so the card paints over it. Small top overlap into the hardened card bottom, large bottom overlap through the deployments label into its items card. */}
             <div
               className="md:hidden relative"
               style={{ marginTop: "-30px", marginBottom: "-90px", zIndex: 0 }}
@@ -549,7 +537,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               <ConnectorBeam alignPct={81.5} />
             </div>
 
-            {/* ── RIGHT CONNECTOR BEAM (desktop only — rod PNG rotated 90° between hardened card and deployments) ── */}
+            {/* Right connector beam — desktop only; rod rotated 90° between hardened card and deployments */}
             <div
               aria-hidden
               className="hidden md:flex items-center justify-center"
@@ -574,23 +562,15 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               />
             </div>
 
-            {/* ── RIGHT PANEL ── */}
-            {/* Mobile: top margin keeps the gap between HARDENED card and deployments items card matching the rest. */}
+            {/* Mobile top margin keeps the gap between the hardened card and the deployments items card consistent. */}
             <div className="mt-[22px] md:mt-0">
               <StackPanel label="YOUR DEPLOYMENTS" items={YOUR_DEPLOYMENTS} />
             </div>
           </div>
-          {/* END diagram grid */}
 
-          {/*
-           * ── CALLOUT ROW ──
-           * Figma: callout is 470px wide, left-[343px] in 1058px container.
-           * Vector paths start at grid bottom (top:0) and extend 121px downward.
-           * Left vector at left-[168.32px], right vector at left-[708.07px] (scaleX -1).
-           * The paths extend 47px into the callout box creating the visual connection.
-           */}
+          {/* Callout row. The vector paths start at the grid bottom and extend downward into the callout box to create the visual connection. */}
           <div className="flex flex-col relative">
-            {/* Vector path — left (176×122). Positioned so the curve's right edge meets the callout's left edge (callout 320px centered in 1058px container → callout_left = 369px → curve_left = 369 - 176 = 193px). Desktop only. */}
+            {/* Left curve, positioned so its right edge meets the callout's left edge. Desktop only. */}
             <div
               aria-hidden
               className="absolute pointer-events-none select-none hidden md:block"
@@ -612,7 +592,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               />
             </div>
 
-            {/* Vector path — right (171×121). Positioned so the curve's left edge meets the callout's right edge (callout 320px centered → callout_right = 369 + 320 = 689px). Desktop only. */}
+            {/* Right curve, positioned so its left edge meets the callout's right edge. Desktop only. */}
             <div
               aria-hidden
               className="absolute pointer-events-none select-none hidden md:block"
@@ -634,7 +614,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               />
             </div>
 
-            {/* Mobile beam: deployments → callout (Figma: x=114 in 360 → 50% centered). Margins tuned to match the ~80px gap on either side of the HARDENED card. z-index:0 so the callout border paints over the beam's bottom tail. */}
+            {/* Mobile beam: deployments → callout, centered. Margins match the ~80px gap on either side of the hardened card. z-index:0 so the callout border paints over the beam's bottom tail. */}
             <div
               className="md:hidden relative"
               style={{ marginTop: "-31px", marginBottom: "-31px", zIndex: 0 }}
@@ -642,7 +622,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               <ConnectorBeam alignPct={50} />
             </div>
 
-            {/* Vertical connector beam from card bottom → callout — desktop only (rod PNG, natural orientation). Negative margins + zIndex:0 let it overlap both the HARDENED card above and the callout below so it visibly connects them. */}
+            {/* Vertical connector beam from card bottom → callout — desktop only. Negative margins and zIndex:0 let it overlap both the hardened card above and the callout below so it visibly connects them. */}
             <div
               aria-hidden
               className="hidden md:block relative"
@@ -668,7 +648,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               />
             </div>
 
-            {/* Always up-to-date callout — width sized to content (icon + gap + 185px text + 22.9px padding × 2 ≈ 304px). Centered horizontally on both desktop and mobile. Position:relative + zIndex:10 so the callout paints over the rod beam tail. */}
+            {/* Always-up-to-date callout, width sized to content and centered. Position:relative + zIndex:10 so it paints over the rod beam tail. */}
             <div
               className="w-full max-w-[320px] mx-auto relative"
               style={{
@@ -683,7 +663,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 zIndex: 10,
               }}
             >
-              {/* Clock circle — Figma: size-[51.431px], border 0.918px #8b5cf6, drop-shadow */}
               <div
                 style={{
                   background: "#030014",
@@ -712,7 +691,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 />
               </div>
 
-              {/* Text — constrained to 185px (Figma) to allow body to wrap on mobile */}
+              {/* Text constrained to 185px so the body wraps on mobile */}
               <div style={{ maxWidth: "185px" }}>
                 <p
                   style={{
@@ -740,22 +719,17 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               </div>
             </div>
           </div>
-          {/* END callout row */}
         </div>
-        {/* END diagram area */}
 
-        {/* ── FEATURE ROW ── */}
         <div
           className="mt-14 md:mt-20 relative mx-auto"
           style={{ maxWidth: "1058px" }}
         >
-          {/* ── Mobile: centered vertical stack with separator lines ─────────── */}
-          {/* Figma 856:364 — 70px ball, 20px title, 14px body, 187px separator */}
+          {/* Mobile: centered vertical stack with separator lines */}
           <div className="sm:hidden flex flex-col items-center">
             {FEATURES.map((f, i) => (
               <div key={f.title} className="flex flex-col items-center w-full">
                 <div className="flex flex-col items-center text-center py-8">
-                  {/* Blue ball — Figma mobile: 70×70px */}
                   <div
                     style={{
                       width: "70px",
@@ -786,7 +760,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                     />
                   </div>
 
-                  {/* Title — card-title-md token (18 → 24 px) */}
                   <h3
                     className="text-white font-display"
                     style={{
@@ -800,7 +773,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                     {f.title}
                   </h3>
 
-                  {/* Body — body-sm token (14 → 16 px) */}
                   <p
                     className="font-sans"
                     style={{
@@ -817,7 +789,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                   </p>
                 </div>
 
-                {/* Separator line between items — Figma: w-187px, gradient fade */}
                 {i < FEATURES.length - 1 && (
                   <div
                     aria-hidden
@@ -834,9 +805,8 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
             ))}
           </div>
 
-          {/* ── Desktop: 3-column grid with vertical dividers ─────────────── */}
+          {/* Desktop: 3-column grid with vertical dividers */}
           <div className="hidden sm:block">
-            {/* Vertical dividers between columns */}
             <div className="relative">
               <div
                 aria-hidden
@@ -870,7 +840,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                       .filter(Boolean)
                       .join(" ")}
                   >
-                    {/* Blue ball — Figma desktop: 73×73px */}
                     <div
                       style={{
                         width: "73.038px",
@@ -931,7 +900,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
             </div>
           </div>
         </div>
-        {/* END feature row */}
       </div>
     </section>
   );

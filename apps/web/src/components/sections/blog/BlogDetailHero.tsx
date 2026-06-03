@@ -53,10 +53,6 @@ export function BlogDetailHero({
       ]}
       meta={
         <>
-          {/* ── MOBILE LAYOUT (<lg) — 3 rows per user spec:
-                Row 1 (centered): Author
-                Row 2 (left/right): Read time | Date
-                Row 3 (centered): Share + social icons */}
           <div className="basis-full lg:hidden flex flex-col items-stretch w-full gap-[10px]">
             {primaryAuthor && (
               <div className="flex items-center justify-center gap-[7px]">
@@ -149,7 +145,6 @@ export function BlogDetailHero({
             </div>
           </div>
 
-          {/* ── DESKTOP LAYOUT (lg+) — inline meta with separators. */}
           {readingMinutes != null && (
             <div className="hidden lg:flex items-center gap-[8px] shrink-0 text-white">
               <ClockIcon />

@@ -2,16 +2,11 @@ import React from "react";
 import Link from "next/link";
 
 /**
- * Footer — Figma Frame 2147238429 (108:8061), 1920×850
- *
- * Layout (top → bottom):
- *  1. Top row: tagline (left) + 5 social icons (right)
- *  2. Four nav columns: Contact, Solutions, Connect, Members of
- *  3. Awarded-with section: 4 badges
- *  4. Bottom row: Logo + © + legal links (Privacy Policy, Acceptable Use Policy)
- *
- * Background: linear gradient #151021 → #131E8F → #471EC0 with decorative
- * purple ellipses + faint glowing line accents (Figma "Line 104..108").
+ * Footer layout (top → bottom): tagline + social icons, then a band with three
+ * nav columns (Contact / Solutions / Connect) on the left and a "Members of"
+ * logo strip stacked over the credential groups (Awarded with / Docker verified
+ * / Certifications) on the right, and a bottom row with logo, copyright, and
+ * legal links.
  */
 
 interface FooterLink {
@@ -35,25 +30,61 @@ const COL_CONNECT: FooterLink[] = [
   { label: "Newsroom", href: "/news" },
   { label: "Legal", href: "/legal" },
 ];
-const COL_MEMBERS: FooterLink[] = [
-  { label: "OpenSSF", href: "https://openssf.org" },
-  { label: "Linux Foundation", href: "https://linuxfoundation.org" },
-  { label: "Cloud Native", href: "https://cncf.io" },
+// White wordmark logos sit bare on the dark footer; each links to the org.
+interface FooterLogo {
+  name: string;
+  src: string;
+  w: number;
+  h: number;
+  /** Rendered height in px; width scales to preserve aspect ratio. */
+  renderH: number;
+  href: string;
+}
+
+const MEMBERS: FooterLogo[] = [
+  { name: "OpenSSF — Open Source Security Foundation", src: "/images/footer/openssf.webp", w: 134, h: 52, renderH: 36, href: "https://openssf.org" },
+  { name: "The Linux Foundation", src: "/images/footer/linux-foundation.webp", w: 126, h: 43, renderH: 34, href: "https://linuxfoundation.org" },
+  { name: "Cloud Native Computing Foundation", src: "/images/footer/cloud-native.webp", w: 174, h: 29, renderH: 24, href: "https://cncf.io" },
 ];
 
 const SOCIAL_ICONS = [
-  { name: "X (Twitter)", href: "https://x.com/cleanstart", path: "M17.53 2.477h3.05L13.94 10.06l7.84 10.36h-6.13l-4.8-6.27-5.5 6.27H2.3l7.13-8.13L1.92 2.477h6.28l4.34 5.74 4.99-5.74Zm-1.07 16.04h1.69L7.62 4.06H5.81l10.65 14.46Z" },
-  { name: "LinkedIn", href: "https://linkedin.com/company/cleanstart", path: "M19 3H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8.34 17.34H5.67V9.34h2.67v8zM7 8.17C6.07 8.17 5.33 7.43 5.33 6.5S6.07 4.83 7 4.83s1.67.74 1.67 1.67S7.93 8.17 7 8.17zm11.34 9.17h-2.67v-4.34c0-1.04-.36-1.74-1.27-1.74-.7 0-1.11.47-1.29.92-.07.16-.08.39-.08.62v4.54h-2.67s.04-7.36 0-8.13h2.67v1.15c.35-.55.99-1.34 2.4-1.34 1.75 0 3.06 1.14 3.06 3.6v4.72z" },
-  { name: "GitHub", href: "https://github.com/cleanstart", path: "M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.305-5.466-1.335-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" },
-  { name: "YouTube", href: "https://youtube.com/@cleanstart", path: "M23.5 6.5a3.02 3.02 0 0 0-2.12-2.13C19.5 4 12 4 12 4s-7.5 0-9.38.37A3.02 3.02 0 0 0 .5 6.5C.13 8.38.13 12 .13 12s0 3.62.37 5.5a3.02 3.02 0 0 0 2.12 2.13C4.5 20 12 20 12 20s7.5 0 9.38-.37a3.02 3.02 0 0 0 2.12-2.13c.37-1.88.37-5.5.37-5.5s0-3.62-.37-5.5ZM9.75 15.5v-7l6 3.5-6 3.5Z" },
-  { name: "Discord", href: "https://discord.gg/cleanstart", path: "M20.32 4.37A19.79 19.79 0 0 0 16.43 3.04a.07.07 0 0 0-.08.04 13.2 13.2 0 0 0-.6 1.23 18.27 18.27 0 0 0-5.5 0 12.65 12.65 0 0 0-.62-1.23.08.08 0 0 0-.08-.04 19.74 19.74 0 0 0-3.89 1.33.07.07 0 0 0-.03.03A20.39 20.39 0 0 0 1.94 17.4a.08.08 0 0 0 .03.06 19.93 19.93 0 0 0 6 3.04.08.08 0 0 0 .09-.03c.46-.62.87-1.28 1.22-1.97a.08.08 0 0 0-.04-.1 13.13 13.13 0 0 1-1.87-.89.08.08 0 0 1-.01-.13c.13-.1.25-.2.37-.3a.08.08 0 0 1 .07-.01 14.21 14.21 0 0 0 12.07 0 .08.08 0 0 1 .08.01c.12.1.25.2.37.3a.08.08 0 0 1-.01.13c-.6.35-1.22.65-1.87.89a.08.08 0 0 0-.04.1c.36.69.78 1.35 1.22 1.97a.08.08 0 0 0 .09.03 19.86 19.86 0 0 0 6-3.04.08.08 0 0 0 .04-.06A20.27 20.27 0 0 0 20.35 4.4a.06.06 0 0 0-.03-.03ZM8.02 15.33c-1.18 0-2.16-1.08-2.16-2.42 0-1.33.96-2.42 2.16-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.96 2.42-2.16 2.42Zm7.97 0c-1.19 0-2.16-1.08-2.16-2.42 0-1.33.96-2.42 2.16-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.95 2.42-2.16 2.42Z" },
+  { name: "X (Twitter)", href: "https://x.com/CleanStartX", path: "M17.53 2.477h3.05L13.94 10.06l7.84 10.36h-6.13l-4.8-6.27-5.5 6.27H2.3l7.13-8.13L1.92 2.477h6.28l4.34 5.74 4.99-5.74Zm-1.07 16.04h1.69L7.62 4.06H5.81l10.65 14.46Z" },
+  { name: "LinkedIn", href: "https://www.linkedin.com/company/cleanstart-official", path: "M19 3H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8.34 17.34H5.67V9.34h2.67v8zM7 8.17C6.07 8.17 5.33 7.43 5.33 6.5S6.07 4.83 7 4.83s1.67.74 1.67 1.67S7.93 8.17 7 8.17zm11.34 9.17h-2.67v-4.34c0-1.04-.36-1.74-1.27-1.74-.7 0-1.11.47-1.29.92-.07.16-.08.39-.08.62v4.54h-2.67s.04-7.36 0-8.13h2.67v1.15c.35-.55.99-1.34 2.4-1.34 1.75 0 3.06 1.14 3.06 3.6v4.72z" },
+  { name: "YouTube", href: "https://www.youtube.com/@CleanStartOfficial", path: "M23.5 6.5a3.02 3.02 0 0 0-2.12-2.13C19.5 4 12 4 12 4s-7.5 0-9.38.37A3.02 3.02 0 0 0 .5 6.5C.13 8.38.13 12 .13 12s0 3.62.37 5.5a3.02 3.02 0 0 0 2.12 2.13C4.5 20 12 20 12 20s7.5 0 9.38-.37a3.02 3.02 0 0 0 2.12-2.13c.37-1.88.37-5.5.37-5.5s0-3.62-.37-5.5ZM9.75 15.5v-7l6 3.5-6 3.5Z" },
+  { name: "GitHub", href: "https://github.com/cleanstart-dev", path: "M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.305-5.466-1.335-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" },
+  { name: "Docker", href: "https://hub.docker.com/u/cleanstart", path: "M13.983 11.078h2.119a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.119a.185.185 0 0 0-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 0 0 .186-.186V3.574a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 0 0 .186-.186V6.29a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 0 0 .184-.186V6.29a.185.185 0 0 0-.185-.185H8.1a.185.185 0 0 0-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 0 0 .185-.186V6.29a.185.185 0 0 0-.184-.185H5.136a.186.186 0 0 0-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.082.185.184.185m-2.964 0h2.119a.185.185 0 0 0 .185-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.186.186 0 0 0-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.082.185.184.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 0 0-.75.748 11.376 11.376 0 0 0 .692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 0 0 3.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288z" },
 ];
 
-const AWARDS: { name: string; src: string; w: number; h: number }[] = [
-  { name: "Cyber Security Excellence Awards", src: "/images/awards/award-1.png", w: 64, h: 81 },
-  { name: "Trusted Vendor", src: "/images/awards/award-2.png", w: 80, h: 87 },
-  { name: "ISO/IEC 27001", src: "/images/awards/award-3.png", w: 81, h: 76 },
-  { name: "AICPA SOC 2", src: "/images/awards/award-4.png", w: 82, h: 92 },
+// Credential badges render inside the glassy shield; the shield normalizes
+// their footprint, so only the intrinsic dimensions are tracked here.
+interface Badge {
+  name: string;
+  src: string;
+  w: number;
+  h: number;
+}
+
+const CREDENTIALS: { title: string; badges: Badge[] }[] = [
+  {
+    title: "Awarded with",
+    badges: [
+      { name: "Fortress Cyber Security Award", src: "/images/footer/fortress.webp", w: 76, h: 80 },
+      { name: "Cyber Security Excellence Awards — Winner", src: "/images/awards/award-1.png", w: 486, h: 616 },
+    ],
+  },
+  {
+    title: "Docker verified",
+    badges: [
+      { name: "Docker Verified Publisher", src: "/images/awards/award-2.png", w: 268, h: 267 },
+    ],
+  },
+  {
+    title: "Certifications",
+    badges: [
+      { name: "AICPA SOC 2", src: "/images/awards/award-4.png", w: 1024, h: 1023 },
+      { name: "ISO/IEC 27001", src: "/images/awards/award-3.png", w: 200, h: 200 },
+    ],
+  },
 ];
 
 const LEGAL_LINKS = [
@@ -61,32 +92,20 @@ const LEGAL_LINKS = [
   { label: "Acceptable Use Policy", href: "/legal/acceptable-use-policy" },
 ];
 
-// CTA-card overlap is owned here, not by callers. Card is vertically CENTERED
-// on the Footer's top edge (half above, half below). Callers pass content only
-// via the `cta` prop. Do not re-add `topPadding` or negative section margins
-// per-page.
+// CTA-card overlap is owned here, not by callers. The card is vertically
+// centered on the footer's top edge (half above, half below) via
+// `top: 0; translateY(-50%)`. Callers pass content only via the `cta` prop and
+// must not re-add per-page top padding or negative section margins.
 //
-// IMPORTANT — Layout contract:
-//   - The CTA card wrapper uses `top: 0; translateY(-50%)` so the card's
-//     vertical center sits exactly on the footer's top edge. The card-slot
-//     heights below (350 mobile / 300 sm / 260 lg) mean ~175/150/130px of the
-//     card sits above the footer (overlapping the previous section) and the
-//     other half sits inside the footer.
-//   - Every page that uses `<Footer cta=...>` MUST make sure its last section
-//     extends at least `card_height / 2` below its natural content so the CTA
-//     card overlaps real section bg (gradient, pattern, decorative SVGs), NOT
-//     empty body white. The largest card-half is 175px (mobile, h=350).
-//   - Convention: every last bg-providing element of a CTA page uses
-//     `padding-bottom: 250px` (or `var(--spacing-section-cta)`). The Footer's
-//     `padding-top: var(--spacing-section-cta)` matches, producing symmetric
-//     spacing above and below the card at every breakpoint.
+// Layout contract: every page using `<Footer cta=...>` must extend its last
+// section at least one card-half below its natural content so the card overlaps
+// real section background (gradient, pattern, decorative SVGs), not empty body
+// white. Convention: the last background element uses
+// `padding-bottom: var(--spacing-section-cta)`, matching the footer's
+// `padding-top`, for symmetric spacing at every breakpoint.
 //
-// Locked card container contract (per-page CTAs must fit these bounds):
-//   width: 1276px (max-width: calc(100% - 48px))
-//   height: 330px (overflow: hidden — content that exceeds is clipped)
-//   border-radius: 40px
-//   z-index: 20
-//   The container itself is transparent; per-page CTA renders its own fill.
+// The card container is transparent (the per-page CTA renders its own fill) and
+// clips overflow to its rounded bounds.
 export function Footer({
   cta,
   ctaOverlay,
@@ -105,15 +124,14 @@ export function Footer({
           className="pointer-events-none absolute left-1/2 top-0 z-20 w-full max-w-[1152px] -translate-x-1/2 translate-y-[calc(-100%-30px)] sm:-translate-y-1/2 px-6 sm:px-10"
         >
           {/* Sizing wrapper — NO overflow:hidden so `ctaOverlay` children can
-              break out of the card. Card width capped at 1152 (intentionally
-              ~20% narrower than the global 1440 container) so it reads as a
-              focused conversion block, not a section-width banner. Heights
-              also reduced ~20% (420/360/300 → 336/288/240). */}
+              break out of the card. Card width is capped narrower than the
+              global container so it reads as a focused conversion block, not a
+              section-width banner. */}
           <div
             className="pointer-events-auto relative w-full h-[350px] sm:h-[300px] lg:h-[260px]"
           >
             {/* Clipped card surface — fills the slot and clips inner content
-                to the rounded 1276×330 box. */}
+                to the rounded box. */}
             <div
               className="absolute inset-0 overflow-hidden"
               style={{ borderRadius: "40px" }}
@@ -128,8 +146,7 @@ export function Footer({
         </div>
       )}
       <div className="relative w-full overflow-hidden">
-        {/* Big purple ellipse — Figma 46640 (974×863) at (308, -358), color #7A59FF, opacity 3%, blur 250px.
-            Very subtle huge soft glow that brightens the upper-left of the footer. */}
+        {/* Large soft glow that brightens the upper-left of the footer. */}
         <div
           aria-hidden
           className="pointer-events-none absolute"
@@ -143,8 +160,7 @@ export function Footer({
             filter: "blur(125px)",
           }}
         />
-        {/* Small purple ellipse — Figma 46639 (129×313) at (1481, -93), color #7A59FF, opacity 25%, blur 250px.
-            Vertical accent on the right side. */}
+        {/* Vertical glow accent on the right side. */}
         <div
           aria-hidden
           className="pointer-events-none absolute"
@@ -160,7 +176,7 @@ export function Footer({
         />
       <div className="relative">
        <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[var(--footer-cta-pt)]" : "pt-[80px]"}`}>
-        {/* Top row — tagline (left) + social icons (right). Figma: tagline at y=179, icons at y=183 — both top-aligned. */}
+        {/* Top row — tagline (left) + social icons (right), both top-aligned. */}
         <div className="flex flex-wrap items-start justify-between gap-8">
           <p
             className="text-lg font-normal leading-[1.4] tracking-[-0.04em] text-white"
@@ -202,34 +218,61 @@ export function Footer({
           </ul>
         </div>
 
-        {/* 4 navigation columns — Figma: horizontal, hug-content, 272px gap
-            (1276 wide) on desktop; collapsible accordion stack on mobile
-            (Figma 817:3471 mobile layout). */}
+        {/* Nav band — three collapsible text columns (left) and the
+            "Members of" logo strip stacked over the credential groups (right).
+            Columns are an accordion stack on mobile, a row on desktop. */}
         <nav
-          className="mt-[40px] flex flex-col sm:mt-[62px] sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-y-12"
+          className="mt-[28px] flex flex-col gap-12 sm:mt-[36px] sm:flex-row sm:items-start sm:gap-x-14 lg:gap-x-20"
           aria-label="Footer navigation"
         >
-          <FooterColumn title="Contact" links={COL_CONTACT} />
-          <FooterColumn title="Solutions" links={COL_SOLUTIONS} />
-          <FooterColumn title="Connect" links={COL_CONNECT} />
-          <FooterColumn title="Members of" links={COL_MEMBERS} />
+          <div className="flex flex-col sm:flex-row sm:gap-10 lg:gap-14">
+            <FooterColumn title="Contact" links={COL_CONTACT} />
+            <FooterColumn title="Solutions" links={COL_SOLUTIONS} />
+            <FooterColumn title="Connect" links={COL_CONNECT} />
+          </div>
+
+          <div className="flex flex-col gap-10">
+            <div>
+              <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
+                Members of
+              </h3>
+              <ul className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-5">
+                {MEMBERS.map((m) => (
+                  <li key={m.src} className="flex">
+                    <a
+                      href={m.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={m.name}
+                      className="inline-flex items-center transition-opacity duration-200 hover:opacity-80 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={m.src}
+                        alt={m.name}
+                        width={m.w}
+                        height={m.h}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-auto object-contain"
+                        style={{ height: `${m.renderH}px` }}
+                      />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex flex-wrap gap-x-12 gap-y-8">
+              {CREDENTIALS.map((group) => (
+                <CredentialGroup key={group.title} group={group} />
+              ))}
+            </div>
+          </div>
         </nav>
 
-        {/* Awarded with row — Figma 16px gap between heading and badges */}
-        <div className="mt-[56px] flex flex-col items-center gap-[16px]">
-          <h3 className="font-display text-base font-semibold leading-[1.3] tracking-[-0.04em] text-white">
-            Awarded with
-          </h3>
-          <div className="flex flex-wrap items-center justify-center gap-[25px]">
-            {AWARDS.map((award) => (
-              <AwardBadge key={award.name} award={award} />
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom row — Logo + © + legal links (no divider line per Figma) */}
+        {/* Bottom row — logo + copyright + legal links */}
         <div className="mt-[32px] flex flex-wrap items-end justify-between gap-6">
-          {/* Left: Logo on top, copyright below — Figma stacks vertically */}
           <div className="flex flex-col items-start gap-[9px]">
             <div className="relative h-[32px] w-[153px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -251,7 +294,6 @@ export function Footer({
             </span>
           </div>
 
-          {/* Right: Legal links */}
           <ul className="flex items-center gap-2 leading-none">
             {LEGAL_LINKS.map((link, i) => (
               <React.Fragment key={link.href}>
@@ -282,9 +324,8 @@ export function Footer({
 }
 
 function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
-  // MOBILE (<sm): collapsible accordion per Figma 817:3475 — section header
-  // with arrow-down icon, expands on tap. Uses native <details>/<summary>.
-  // DESKTOP (sm+): always-expanded column with heading + flat link list.
+  // Mobile (<sm): collapsible native <details>/<summary> accordion.
+  // Desktop (sm+): always-expanded column with heading + flat link list.
   return (
     <div className="sm:contents">
       {/* Mobile accordion */}
@@ -292,7 +333,7 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
         <summary
           className="flex items-center justify-between cursor-pointer list-none py-3"
         >
-          <h3 className="font-display text-base font-semibold leading-[1.3] tracking-[-0.04em] text-white">
+          <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
             {title}
           </h3>
           <svg
@@ -341,7 +382,7 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
 
       {/* Desktop column (always expanded) */}
       <div className="hidden sm:block">
-        <h3 className="font-display text-base font-semibold leading-[1.3] tracking-[-0.04em] text-white">
+        <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
           {title}
         </h3>
         <ul className="mt-6 flex flex-col gap-3">
@@ -374,27 +415,39 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
   );
 }
 
-// Figma 108:8426 path — rounded-corner shield (98×120, cornerRadius 15)
-const BADGE_SHIELD_PATH =
-  "M0 15C0 6.71573 6.71573 0 15 0H82.5C90.7843 0 97.5 6.71573 97.5 15V95.6479C97.5 102.467 92.8997 108.429 86.3029 110.158L52.5529 119.003C50.0597 119.657 47.4403 119.657 44.9471 119.003L11.1971 110.158C4.60029 108.429 0 102.467 0 95.6479V15Z";
+function CredentialGroup({ group }: { group: (typeof CREDENTIALS)[number] }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
+        {group.title}
+      </h3>
+      <div className="flex flex-wrap items-start gap-3">
+        {group.badges.map((badge) => (
+          <ShieldBadge key={badge.src} badge={badge} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
-function AwardBadge({ award }: { award: (typeof AWARDS)[number] }) {
+const BADGE_SHIELD_PATH =
+  "M0 17.7C0 7.925 7.925 0 17.7 0H97.35C107.125 0 115.05 7.925 115.05 17.7V112.865C115.05 120.911 109.622 127.946 101.837 129.986L62.012 140.424C59.07 141.195 55.98 141.195 53.038 140.424L13.213 129.986C5.428 127.946 0 120.911 0 112.865V17.7Z";
+
+// Glassy pentagonal shield housing a single credential badge image.
+function ShieldBadge({ badge }: { badge: Badge }) {
   const shield: React.CSSProperties = {
     clipPath: `path('${BADGE_SHIELD_PATH}')`,
     WebkitClipPath: `path('${BADGE_SHIELD_PATH}')`,
   };
   return (
-    <div className="relative h-[120px] w-[98px]" title={award.name}>
-      {/* Glassy shield bg — same rounded-corner pentagon path as Figma */}
+    <div className="relative h-[140px] w-[115px]" title={badge.name}>
+      {/* Glassy shield background */}
       <div
         aria-hidden
         className="absolute inset-0 backdrop-blur-md"
-        style={{
-          ...shield,
-          backgroundColor: "rgba(255, 255, 255, 0.08)",
-        }}
+        style={{ ...shield, backgroundColor: "rgba(255, 255, 255, 0.08)" }}
       />
-      {/* Subtle inner highlight along the top edge for the GLASS feel */}
+      {/* Subtle inner highlight along the top edge for the glass feel */}
       <div
         aria-hidden
         className="absolute inset-0"
@@ -405,17 +458,17 @@ function AwardBadge({ award }: { award: (typeof AWARDS)[number] }) {
           mixBlendMode: "screen",
         }}
       />
-      {/* Image content — centered in the upper rectangular area, above the V */}
-      <div className="absolute inset-x-0 top-0 flex h-[100px] items-center justify-center">
+      {/* Badge image — centered in the upper rectangular area, above the point */}
+      <div className="absolute inset-x-0 top-0 flex h-[117px] items-center justify-center px-3.5">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={award.src}
-          alt={award.name}
-          width={award.w}
-          height={award.h}
-          loading="eager"
+          src={badge.src}
+          alt={badge.name}
+          width={badge.w}
+          height={badge.h}
+          loading="lazy"
           decoding="async"
-          className="object-contain"
+          className="max-h-[80px] w-auto max-w-full object-contain"
         />
       </div>
     </div>

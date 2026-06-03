@@ -34,7 +34,6 @@ export function AsrProductionEnv(): React.ReactElement {
     >
       <h2 className="sr-only">Built for Modern Production Environments</h2>
 
-      {/* Decorative mesh — top-left */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -52,7 +51,6 @@ export function AsrProductionEnv(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Decorative mesh — top-right */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -70,9 +68,7 @@ export function AsrProductionEnv(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Content */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md pb-section-cta">
-        {/* Heading */}
         <p
           className="text-white mb-14 md:mb-[88px]"
           style={{
@@ -97,7 +93,6 @@ export function AsrProductionEnv(): React.ReactElement {
           </span>
         </p>
 
-        {/* Items row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-0">
           {items.map((item, idx) => (
             <div
@@ -112,7 +107,6 @@ export function AsrProductionEnv(): React.ReactElement {
                   : undefined
               }
             >
-              {/* Blue gradient icon ball */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={item.icon}
@@ -124,7 +118,6 @@ export function AsrProductionEnv(): React.ReactElement {
                 decoding="async"
               />
 
-              {/* Title */}
               <p
                 className="text-white mb-3"
                 style={{
@@ -139,7 +132,6 @@ export function AsrProductionEnv(): React.ReactElement {
                 {item.title}
               </p>
 
-              {/* Description */}
               <p
                 className="text-white"
                 style={{

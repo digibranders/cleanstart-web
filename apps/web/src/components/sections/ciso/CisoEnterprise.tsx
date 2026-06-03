@@ -2,34 +2,8 @@ import type React from "react";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 /*
- * Figma node 583:2596 — 1920×~720px, white background
- *
- * Corner decorations (absolute, relative to section):
- *   Right Union: right=-185px, top=-193px, 488×496px, rotate(141.39deg) scaleY(-1)
- *   Left  Union: left=-218px,  top=-139px, 488×496px, rotate(141.39deg) scaleY(-1)
- *   Right Ellipse: right=-127px, top=-74px, 315×315px (SVG overflows via -64.44% inset)
- *   Left  Ellipse: left=-103px,  top=-20px, 315×315px
- *
- * Heading: 62px Manrope Bold, centered, #111, tracking -0.05em, lineHeight 1, maxW 654px
- *   "Environments" → gradient(100.87°, #9A51FF → #2CC1EB)
- *   marginBottom: 74px
- *
- * 4 Cards — 4×295 + 3×32 = 1276px; container has NO horizontal padding
- *   Outer: 295×324px, borderRadius 40px, bg #2cc1eb opacity 0.3 (cyan glow border)
- *   Inner: 287×316px (inset 4px), borderRadius 36px, bg white, overflow hidden
- *   Decoratives inside inner:
- *     • Purple blur: top=28px, centered, 263×153px, #df9bff, blur(66.5px), opacity 0.3
- *     • H-lines: y=68 and y=184, 1px, white gradient, opacity 0.3
- *     • V-lines: x=48.47, 120.03, 162.38, 233.94; h=264px, 0.73px, opacity 0.8
- *   Ball: 96×96px circle, bg linear-gradient(180°,#239cff→#005be3)
- *     top-edge at 33px (centered horizontally)
- *     Icon: 54×54px centered inside ball
- *   Text block: top=136px (moved up 16px from Figma 152px for 180px clearance),
- *               left=24px, width=251px, gap 12px
- *     Title: Manrope Bold, titleSize px (32 or 29), tracking -0.05em, #111, lh 1
- *     Desc:  Sora Regular 20px, tracking -0.05em, #555, lh 1.4
- *
- * Section: paddingTop 120px, paddingBottom 80px
+ * "Built for Enterprise Environments" — four feature cards in a row on xl,
+ * stacked on mobile, with corner Union + ellipse decorations.
  */
 
 interface CardDef {
@@ -66,19 +40,17 @@ const CARDS: CardDef[] = [
   },
 ];
 
-// ─── Desktop card ─────────────────────────────────────────────────────────────
 function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactElement {
   return (
-    /* Outer: 295×324px, cyan glow at 30% opacity behind inner white card */
     <div className="relative flex-shrink-0" style={{ width: "295px", height: "324px" }}>
-      {/* Outer cyan glow — creates the border halo effect */}
+      {/* Outer cyan glow — creates the border halo effect. */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{ borderRadius: "40px", background: "#2cc1eb", opacity: 0.3 }}
       />
 
-      {/* Inner white card: 287×316px (4px inset on each side) */}
+      {/* Inner white card — 4px inset on each side. */}
       <div
         className="absolute overflow-hidden bg-white"
         style={{ inset: "4px", borderRadius: "36px" }}
@@ -99,7 +71,7 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           }}
         />
 
-        {/* Horizontal grid lines at y=68 and y=184 */}
+        {/* Horizontal grid lines. */}
         {([68, 184] as const).map((y) => (
           <div
             key={y}
@@ -115,7 +87,7 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           />
         ))}
 
-        {/* Vertical accent lines at Figma x positions */}
+        {/* Vertical accent lines. */}
         {([48.47, 120.03, 162.38, 233.94] as const).map((x) => (
           <div
             key={x}
@@ -133,7 +105,7 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           />
         ))}
 
-        {/* Blue gradient ball — top=33px, left=24px (left-aligned, matching text block) */}
+        {/* Blue gradient ball — left-aligned with the text block below. */}
         <div
           className="absolute flex items-center justify-center overflow-hidden"
           style={{
@@ -158,7 +130,7 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           />
         </div>
 
-        {/* Text block — top=152px (Figma spec: 24px gap below ball bottom at 129px) */}
+        {/* Text block. */}
         <div
           className="absolute flex flex-col"
           style={{ top: "152px", left: "24px", width: "251px", gap: "12px" }}
@@ -195,7 +167,6 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
   );
 }
 
-// ─── Main export ──────────────────────────────────────────────────────────────
 export function CisoEnterprise(): React.ReactElement {
   return (
     <section
@@ -203,7 +174,7 @@ export function CisoEnterprise(): React.ReactElement {
       className="relative overflow-hidden bg-white"
       style={{ paddingTop: "120px", paddingBottom: "var(--spacing-section-cta)" }}
     >
-      {/* ── Corner Union — top-right ── */}
+      {/* Corner Union — top-right. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -221,7 +192,7 @@ export function CisoEnterprise(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Corner Union — top-left ── */}
+      {/* Corner Union — top-left. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -239,7 +210,7 @@ export function CisoEnterprise(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Ellipse glow — top-right ── */}
+      {/* Ellipse glow — top-right. */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden lg:block"
@@ -257,7 +228,7 @@ export function CisoEnterprise(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Ellipse glow — top-left ── */}
+      {/* Ellipse glow — top-left. */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden lg:block"
@@ -275,7 +246,7 @@ export function CisoEnterprise(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Heading — padded container so text has safe margins ── */}
+      {/* Heading — padded container so text has safe margins. */}
       <div className="relative mx-auto px-6 sm:px-10" style={{ maxWidth: "1276px" }}>
         <Reveal header>
           <h2
@@ -307,10 +278,11 @@ export function CisoEnterprise(): React.ReactElement {
         </Reveal>
       </div>
 
-      {/* ── Card container — NO horizontal padding so 4×295+3×32=1276px fills exactly ── */}
+      {/* Card container — no horizontal padding so the 4 cards + gaps fill the
+          1276px width exactly. */}
       <div className="relative mx-auto" style={{ maxWidth: "1276px" }}>
 
-        {/* ════ DESKTOP — 4 cards in a flex row, centered ════ */}
+        {/* DESKTOP — 4 cards in a centred flex row. */}
         <RevealStagger
           className="hidden xl:flex items-start justify-center"
           style={{ gap: "32px" }}
@@ -322,11 +294,7 @@ export function CisoEnterprise(): React.ReactElement {
           ))}
         </RevealStagger>
 
-        {/* ════ MOBILE — 1-col stack ════
-             Figma 856:1367 — cards 328×238px (10px margin each side in 360px)
-             Ball: 70×70px centered, top=20px
-             Icon: 40×40px inside ball
-             Text block: top=108px, centered, title 20px Bold, desc 14px Regular */}
+        {/* MOBILE — single-column stack. */}
         <div className="xl:hidden flex flex-col gap-4 px-4">
           {CARDS.map((card) => (
             <div
@@ -340,7 +308,7 @@ export function CisoEnterprise(): React.ReactElement {
                 className="absolute inset-0 pointer-events-none"
                 style={{ borderRadius: "40px", background: "#2cc1eb", opacity: 0.3 }}
               />
-              {/* Inner white card: 6px inset */}
+              {/* Inner white card — 6px inset. */}
               <div
                 className="absolute overflow-hidden bg-white"
                 style={{ inset: "6px", borderRadius: "34px" }}
@@ -361,7 +329,7 @@ export function CisoEnterprise(): React.ReactElement {
                   }}
                 />
 
-                {/* Blue gradient ball — 70×70px, centered, top=20px */}
+                {/* Blue gradient ball — centered near the top. */}
                 <div
                   className="absolute flex items-center justify-center overflow-hidden"
                   style={{
@@ -387,7 +355,7 @@ export function CisoEnterprise(): React.ReactElement {
                   />
                 </div>
 
-                {/* Text block — centered, top=108px */}
+                {/* Text block — centered. */}
                 <div
                   className="absolute flex flex-col items-center text-center"
                   style={{

@@ -2,18 +2,6 @@ import type React from "react";
 import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
 
-/**
- * SCA CTA — Figma node 604:3631 (1276×335 px card in Footer slot)
- *
- * Two-column layout: heading left, description + button right.
- * 3D teal cube peeks from the bottom-right corner (clips via parent overflow:hidden).
- *
- * Background: linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)
- * Heading:    clamp(26-44) / 600 / Manrope, white
- * Body:       clamp(16-20) / 400 / Sora, white @ 80%
- * Button:     "Make SCA Actionable" — glass
- */
-
 export function SCACTA(): React.ReactElement {
   return (
     <div
@@ -22,7 +10,6 @@ export function SCACTA(): React.ReactElement {
         background: "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)",
       }}
     >
-      {/* ── Decorative purple glow — right ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -38,7 +25,6 @@ export function SCACTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Decorative cyan glow — top-left ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -53,7 +39,6 @@ export function SCACTA(): React.ReactElement {
         }}
       />
 
-      {/* ── 3D teal cube — bottom-right corner (desktop only) ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -73,9 +58,6 @@ export function SCACTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ══════════════════════════════════════════
-          Desktop layout (md+) — heading left, desc+button right
-      ══════════════════════════════════════════ */}
       <div
         className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 lg:items-start"
         style={{
@@ -86,7 +68,6 @@ export function SCACTA(): React.ReactElement {
           columnGap: "clamp(32px, 5vw, 72px)",
         }}
       >
-        {/* Left column — heading, auto-wraps 2 or 3 lines via balance */}
         <Reveal header className="relative min-w-0 w-full" style={{ maxWidth: "min(460px, 100%)", zIndex: 1 }}>
           <p
             className="text-white"
@@ -104,7 +85,6 @@ export function SCACTA(): React.ReactElement {
           </p>
         </Reveal>
 
-        {/* Right column — description + button */}
         <Reveal
           header
           delay={0.15}
@@ -159,9 +139,6 @@ export function SCACTA(): React.ReactElement {
         </Reveal>
       </div>
 
-      {/* ══════════════════════════════════════════
-          Mobile fallback (under md)
-      ══════════════════════════════════════════ */}
       <div className="md:hidden relative h-full flex flex-col items-center justify-center gap-5 p-6 text-center">
         <p
           style={{

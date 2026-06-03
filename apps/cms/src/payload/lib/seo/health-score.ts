@@ -99,18 +99,14 @@ export const scoreSeoHealth = (inputs: HealthCheckInputs): HealthScoreResult => 
     },
     {
       id: 'slug-length',
-      label: `Slug ≤ ${SLUG_MAX} chars`,
-      weight: 1,
+      label: `Slug ≤ ${SLUG_MAX} chars (URL is set)`,
+      // Weight 2: this check implicitly covers both "URL is set" and "slug is short enough".
+      // The former url-set check was a subset and double-counted the same field.
+      weight: 2,
       pass:
         typeof inputs.slugOrPath === 'string' &&
         inputs.slugOrPath.length > 0 &&
         inputs.slugOrPath.length <= SLUG_MAX,
-    },
-    {
-      id: 'url-set',
-      label: 'URL is set',
-      weight: 1,
-      pass: typeof inputs.slugOrPath === 'string' && inputs.slugOrPath.length > 0,
     },
   ];
 

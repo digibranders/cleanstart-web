@@ -180,6 +180,10 @@ export const destinationsFromPayload = async (
       limit: 200,
       depth: 0,
       overrideAccess: true,
+      // Bypass the secret-masking afterRead hook so we get the real
+      // encrypted webhook URL (which resolveCredentials then decrypts),
+      // not the admin-UI sentinel string.
+      context: { skipSecretMask: true },
     });
     const rows = (result.docs as unknown as IntegrationRow[]) ?? [];
     return rows

@@ -48,6 +48,26 @@ const onlyCollection = (() => {
   return idx >= 0 ? process.argv[idx + 1] : null;
 })();
 
+// Extension → MIME for fileless media docs (must stay within the Media
+// collection's ALLOWED_MIME_TYPES allow-list).
+const EXT_TO_MIME: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  avif: 'image/avif',
+  svg: 'image/svg+xml',
+  gif: 'image/gif',
+  pdf: 'application/pdf',
+  mp4: 'video/mp4',
+  zip: 'application/zip',
+};
+
+// Extensions where Payload's url-only `image/<ext>` derivation already equals
+// the real MIME — safe to import fileless. Everything else (jpg, svg, pdf, …)
+// must be uploaded through Payload with a real buffer so the true MIME is read.
+const FILELESS_SAFE_EXT = new Set(['png', 'gif', 'webp', 'avif']);
+
 type AssetRecord = {
   webflowUrl: string;
   r2Key: string;
@@ -164,7 +184,9 @@ const resolveMany = (raw: unknown, collection: string): number[] => {
 const resolveRefs = (row: Record<string, unknown>): Record<string, unknown> => {
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(row)) {
-    if (key.startsWith('_')) continue;
+    // Strip migration scaffolding (`_webflowId`, `_rawX`, …) but keep
+    // `_status` — it's a real Payload field that controls draft/published.
+    if (key.startsWith('_') && key !== '_status') continue;
     out[key] = value;
   }
   for (const [rawKey, spec] of Object.entries(REF_MAP)) {
@@ -207,13 +229,14 @@ const upsert = async (
   slug: string | null,
   data: Record<string, unknown>,
   webflowKey: string,
+  lookupField = 'slug',
 ): Promise<number | null> => {
   if (dryRun) {
     console.log(`  [import] DRY RUN: ${collection}/${slug ?? webflowKey}`);
     return null;
   }
 
-  const where = slug ? { slug: { equals: slug } } : { id: { equals: -1 } };
+  const where = slug ? { [lookupField]: { equals: slug } } : { id: { equals: -1 } };
   const existing = slug
     ? await payload.find({
         collection: collection as Parameters<typeof payload.find>[0]['collection'],
@@ -297,12 +320,68 @@ const importCollection = async (
   if (rows.length === 0) return;
   console.log(`[import] ${collectionSlug}: ${rows.length} rows`);
   for (const row of rows) {
-    const slug = typeof row.slug === 'string' ? row.slug : null;
+    const rawSlug = typeof row.slug === 'string' ? row.slug : null;
+    // Slug field caps at 120 chars; trim over-long Webflow slugs at a
+    // hyphen boundary so the record imports instead of failing validation.
+    const slug =
+      rawSlug && rawSlug.length > 120
+        ? rawSlug.slice(0, 120).replace(/-[^-]*$/, '')
+        : rawSlug;
     const webflowId =
       typeof row._webflowId === 'string' ? row._webflowId : `unknown-${Math.random()}`;
     const resolved = resolveRefs(row);
+    // resolveRefs preserves the original (possibly over-long) `slug`; apply the
+    // capped value to the data too, not just the lookup key.
+    if (slug != null) resolved.slug = slug;
     const id = await upsert(payload, collectionSlug, slug, resolved, webflowId);
     if (id != null) recordMapping(collectionSlug, webflowId, id);
+  }
+};
+
+const createMediaFromBuffer = async (
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  record: AssetRecord,
+  filename: string,
+  alt: string,
+  folder: string,
+  mimeType: string,
+): Promise<number | null> => {
+  if (dryRun) {
+    console.log(`  [import] DRY RUN: media/${filename}`);
+    return null;
+  }
+  try {
+    const resp = await fetch(record.r2PublicUrl);
+    if (!resp.ok) throw new Error(`fetch ${resp.status}`);
+    const buf = Buffer.from(await resp.arrayBuffer());
+    const doc = await payload.create({
+      collection: 'media',
+      data: { alt, folder } as Parameters<typeof payload.create>[0]['data'],
+      file: { data: buf, mimetype: mimeType, name: filename, size: buf.length },
+      overrideAccess: true,
+    });
+    const id = (doc as { id: number }).id;
+    appendLog({
+      collection: 'media',
+      webflowId: record.webflowUrl,
+      payloadId: id,
+      action: 'created',
+      timestamp: new Date().toISOString(),
+    });
+    console.log(`  [import] created media/${filename} (id=${id})`);
+    return id;
+  } catch (err) {
+    const note = err instanceof Error ? err.message : String(err);
+    appendLog({
+      collection: 'media',
+      webflowId: record.webflowUrl,
+      payloadId: -1,
+      action: 'skipped',
+      timestamp: new Date().toISOString(),
+      note,
+    });
+    console.error(`  [import] FAILED create media/${filename}: ${note}`);
+    return null;
   }
 };
 
@@ -327,13 +406,23 @@ const importMedia = async (
         ? record.altHint.trim()
         : humaniseFilename(filename);
     const folder = record.folder ?? 'web/general';
-    const id = await upsert(
-      payload,
-      'media',
-      filename, // dedup by filename for media so re-runs are idempotent
-      { filename, url: record.r2PublicUrl, alt, folder },
-      record.webflowUrl,
-    );
+    const ext = path.extname(filename).slice(1).toLowerCase();
+    const mimeType = EXT_TO_MIME[ext];
+    let id: number | null;
+    if (mimeType && !FILELESS_SAFE_EXT.has(ext)) {
+      // Upload through Payload with a real buffer so the correct MIME is read
+      // (url-only creates derive a broken `image/<ext>` for jpg/svg/pdf/…).
+      id = await createMediaFromBuffer(payload, record, filename, alt, folder, mimeType);
+    } else {
+      id = await upsert(
+        payload,
+        'media',
+        filename, // dedup by filename for media so re-runs are idempotent
+        { filename, url: record.r2PublicUrl, alt, folder, ...(mimeType ? { mimeType } : {}) },
+        record.webflowUrl,
+        'filename', // media has no slug; dedup query targets `filename`
+      );
+    }
     if (id != null) recordMapping('media', record.webflowUrl, id);
   }
 };

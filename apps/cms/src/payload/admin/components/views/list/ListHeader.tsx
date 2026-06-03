@@ -12,6 +12,7 @@ type Props = {
   readonly collectionSlug: string;
   readonly description?: ReactNode;
   readonly hasCreatePermission: boolean;
+  readonly menuOpen?: boolean;
   readonly newDocumentURL: string;
   readonly menuAnchorRef: RefObject<HTMLButtonElement | null>;
   readonly onMenuToggle: () => void;
@@ -27,6 +28,7 @@ export const ListHeader = (props: Props): ReactElement => {
     collectionLabel,
     description,
     hasCreatePermission,
+    menuOpen = false,
     newDocumentURL,
     menuAnchorRef,
     onMenuToggle,
@@ -36,6 +38,14 @@ export const ListHeader = (props: Props): ReactElement => {
     typeof query.search === 'string' ? query.search : '',
   );
   const debounceRef = useRef<number | null>(null);
+
+  // Clear any pending debounce on unmount so it cannot call
+  // handleSearchChange after the list-view has been torn down.
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current != null) window.clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: depending on `search` would create a feedback loop with the local debounced setter
   useEffect(() => {
@@ -56,7 +66,9 @@ export const ListHeader = (props: Props): ReactElement => {
   return (
     <header className="cs-list__header">
       <div className="cs-list__heading">
-        <h1 className="cs-list__title">{collectionLabel}</h1>
+        <div className="cs-list__title-row">
+          <h1 className="cs-list__title">{collectionLabel}</h1>
+        </div>
         {description ? <div className="cs-list__description">{description}</div> : null}
       </div>
       <div className="cs-list__controls">
@@ -78,8 +90,16 @@ export const ListHeader = (props: Props): ReactElement => {
           onClick={onMenuToggle}
           aria-label={`${collectionLabel} actions`}
           aria-haspopup="menu"
+          aria-expanded={menuOpen}
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+            style={{ display: 'block', flexShrink: 0 }}
+          >
             <circle cx="3" cy="8" r="1.4" fill="currentColor" />
             <circle cx="8" cy="8" r="1.4" fill="currentColor" />
             <circle cx="13" cy="8" r="1.4" fill="currentColor" />

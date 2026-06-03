@@ -3,9 +3,9 @@ import { Reveal } from "@/components/ui/Reveal";
 type LogoItem = {
   src: string;
   alt: string;
-  /** Figma intrinsic width */
+  /** Intrinsic width */
   w: number;
-  /** Figma intrinsic height */
+  /** Intrinsic height */
   h: number;
 };
 
@@ -42,7 +42,7 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
         paddingBottom: "clamp(56px, 7vw, 100px)",
       }}
     >
-      {/* ── Subtle grid pattern ──────────────────────────────────────────────── */}
+      {/* Subtle grid pattern */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none select-none"
@@ -53,8 +53,7 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
         }}
       />
 
-      {/* ── Large top-right grid vector (node 792:2887) ─────────────────────── */}
-      {/* Figma: left=1432px top=-422px size=1101px in 1920px frame → right anchor */}
+      {/* Large top-right grid vector */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden xl:block"
@@ -77,8 +76,7 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
         />
       </div>
 
-      {/* ── Union hexagon — top-left corner ─────────────────────────────────── */}
-      {/* Figma: left=-109px top=-94px size=305.606×318.251px mix-blend:overlay */}
+      {/* Union hexagon — top-left corner */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden xl:block"
@@ -112,8 +110,7 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
         />
       </div>
 
-      {/* ── Union hexagon — top-right corner ────────────────────────────────── */}
-      {/* Figma: left=1214px top=-84px in 1920px frame → proportional right */}
+      {/* Union hexagon — top-right corner */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden xl:block"
@@ -147,8 +144,7 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
         />
       </div>
 
-      {/* ── Ellipse glow — bottom-left ───────────────────────────────────────── */}
-      {/* Figma: left=-72px size=315px, inner image at inset=-64.44% → 721px */}
+      {/* Ellipse glow — bottom-left */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none"
@@ -178,10 +174,9 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Content ─────────────────────────────────────────────────────────── */}
       <div className="relative flex flex-col items-center">
 
-        {/* Heading — max-width forces "Images for Modern" / "Stacks" wrap */}
+        {/* Heading max-width forces the "Images for Modern" / "Stacks" wrap */}
         <Reveal header>
           <h2
             className="font-display text-white text-center"
@@ -199,12 +194,12 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* ── Infinite logo marquee ──────────────────────────────────────────── */}
-        {/* Edge fade uses a CSS mask so the logos themselves fade to transparent
-            against whatever lies behind. The fade band is kept narrow (≈40px)
-            so it never exceeds the inter-logo gap — otherwise the mask reveals
-            pure section background between logos and reads as a darker column,
-            especially on mobile where the viewport is narrower than the gap. */}
+        {/* Infinite logo marquee. The edge fade uses a CSS mask so the logos
+            fade to transparent against whatever lies behind. The fade band is
+            kept narrow (~40px) so it never exceeds the inter-logo gap; a wider
+            band would reveal the section background between logos and read as a
+            darker column, especially on mobile where the viewport is narrower
+            than the gap. */}
         <div
           className="relative w-full overflow-hidden"
           style={{
@@ -215,7 +210,7 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
               "linear-gradient(to right, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%)",
           }}
         >
-          {/* Marquee track — two full copies for seamless loop */}
+          {/* Two full copies of the track produce a seamless infinite loop */}
           <div
             className="cs-marquee"
             style={{
@@ -225,7 +220,6 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
             }}
             aria-hidden
           >
-            {/* Copy A */}
             {LOGOS.map((logo) => (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -244,7 +238,6 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
                 decoding="async"
               />
             ))}
-            {/* Copy B — identical, enables seamless infinite loop */}
             {LOGOS.map((logo) => (
               // eslint-disable-next-line @next/next/no-img-element
               <img

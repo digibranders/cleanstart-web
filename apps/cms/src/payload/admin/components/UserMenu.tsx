@@ -13,12 +13,18 @@ import {
 
 const initialsFor = (name: string | null | undefined): string => {
   if (!name || typeof name !== 'string') return '?';
-  const parts = name.trim().split(/\s+/);
+  const trimmed = name.trim();
+  if (!trimmed) return '?';
+  const parts = trimmed.split(/\s+/);
   if (parts.length === 0) return '?';
-  if (parts.length === 1) return (parts[0]?.slice(0, 2) ?? '?').toUpperCase();
+  if (parts.length === 1) {
+    const slice = parts[0]?.slice(0, 2) ?? '';
+    return slice.length > 0 ? slice.toUpperCase() : '?';
+  }
   const first = parts[0]?.[0] ?? '';
   const last = parts[parts.length - 1]?.[0] ?? '';
-  return (first + last).toUpperCase();
+  const initials = (first + last).toUpperCase();
+  return initials.length > 0 ? initials : '?';
 };
 
 type AuthUser = {

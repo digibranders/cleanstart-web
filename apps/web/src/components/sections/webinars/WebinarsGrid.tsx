@@ -5,8 +5,7 @@ import { EmptyState } from "@/components/feedback";
 import { Pagination } from "@/components/ui/Pagination";
 import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { WebinarCard } from "./WebinarCard";
-// WebinarFilters is a "use client" interactive sidebar; code-split so it
-// does not ship in the initial /webinars client bundle.
+// Code-split the interactive client sidebar out of the initial /webinars bundle.
 const WebinarFilters = dynamic(() =>
   import("./WebinarFilters").then((m) => ({ default: m.WebinarFilters })),
 );
@@ -54,14 +53,9 @@ export function WebinarsGrid({
       }}
       data-section="WebinarsGrid"
     >
-      {/* Figma bg gridlines — two radial-gradient grids (purple #640DFB @10%)
-          fading from top-left and top-right corners. The fade is baked into
-          the SVG via two radialGradient fills (centers (59.5,82.5) and
-          (1746.5,158.5), r=590.5). Render at intrinsic 1922×749, anchored
-          top-center so the corner blobs sit where Figma placed them.
-          NOTE: section uses overflow-x: clip (not overflow: hidden) so
-          `position: sticky` on the filter sidebar still tracks the window
-          scroll instead of being trapped inside a scroll container. */}
+      {/* Section uses overflow-x: clip (not overflow: hidden) so the sticky
+          filter sidebar tracks the window scroll instead of being trapped
+          inside a scroll container. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute top-0 left-1/2 -translate-x-1/2"
@@ -129,7 +123,6 @@ export function WebinarsGrid({
                   ))}
                 </RevealStagger>
 
-                {/* MOBILE — single "View More →" button per Figma 817:6997. */}
                 {totalPages > 1 && currentPage < totalPages && (
                   <div className="flex lg:hidden justify-center" style={{ marginTop: "40px" }}>
                     <Link
@@ -161,7 +154,6 @@ export function WebinarsGrid({
                   </div>
                 )}
 
-                {/* DESKTOP — full numbered pagination. */}
                 <div className="hidden lg:block">
                   <Pagination
                     currentPage={currentPage}

@@ -3,12 +3,11 @@ import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * CTA card content for the Footer's CTA slot — Figma node 792:3328.
+ * CTA card content for the Footer's CTA slot.
  *
  * Two-column layout at lg+: heading (left) | body copy + glass button (right).
- * Stacks vertically on smaller screens.
- * 3D cube decorative image anchored top-right, bleeds below the card's
- * overflow-hidden boundary (intentional clip).
+ * Stacks vertically on smaller screens. The 3D cube image anchored top-right
+ * intentionally bleeds below the card's overflow-hidden boundary.
  */
 export function CleanStartImagesCta(): React.ReactElement {
   return (
@@ -19,7 +18,6 @@ export function CleanStartImagesCta(): React.ReactElement {
       }}
     >
       {/* 3D cube — desktop only; top-right anchor bleeds off the bottom edge */}
-      {/* Figma: left=1054px top=167px size=255×258px in ~1309px card, scaled to 1152px */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden lg:block"
@@ -63,7 +61,6 @@ export function CleanStartImagesCta(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Content — stacked (mobile/sm) → side-by-side (lg+) */}
       <div
         className="relative flex h-full flex-col items-start justify-center gap-5 pt-6 pb-6 sm:pt-4 sm:pb-4 lg:flex-row lg:items-center lg:justify-start lg:gap-[100px] lg:pt-0 lg:pb-0"
         style={{
@@ -71,8 +68,6 @@ export function CleanStartImagesCta(): React.ReactElement {
           paddingRight: "clamp(32px, 5.2vw, 60px)",
         }}
       >
-        {/* Left: section heading */}
-        {/* Figma: width=401px → scaled 354px; Manrope Bold → font-display (Manrope) */}
         <Reveal header className="shrink-0">
           <h2
             className="font-display text-white"
@@ -88,7 +83,6 @@ export function CleanStartImagesCta(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* Right: body copy + glass CTA button */}
         <Reveal header delay={0.15} y={20} className="flex flex-col items-start gap-6">
           <p
             className="font-sans"

@@ -122,7 +122,10 @@ export const CodeField = (props: CodeFieldClientProps): ReactElement => {
 
   return (
     <div className={`field-type code cs-code-field${showError ? ' cs-code-field--error' : ''}`}>
-      <label className="field-label" htmlFor={inputId}>
+      {/* CodeMirror hosts its editor in a div (not a labelable element).
+          Using aria-labelledby on the host div and a matching id on the
+          label keeps AT association without an invalid htmlFor target. */}
+      <span id={inputId} className="field-label">
         {labelText}
         {field.required ? (
           <span className="required" aria-hidden="true">
@@ -130,8 +133,8 @@ export const CodeField = (props: CodeFieldClientProps): ReactElement => {
             *
           </span>
         ) : null}
-      </label>
-      <div id={inputId} ref={hostRef} className="cs-code-field__editor" />
+      </span>
+      <div aria-labelledby={inputId} ref={hostRef} className="cs-code-field__editor" />
       {description ? <p className="field-description">{description}</p> : null}
       {showError && errorMessage ? (
         <output className="field-error" aria-live="polite">

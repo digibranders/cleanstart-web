@@ -154,7 +154,7 @@ export async function renderEventDetail({
       <JsonLd id={`event-schema-${event.slug}`} data={eventJsonLd(event)} />
       <Header />
       <main style={{ background: "#f6f6f6" }}>
-        {/* MOBILE — compact card-style layout per Figma 926:1443. */}
+        {/* Mobile: compact card-style layout. */}
         <EventDetailMobileCard
           title={event.title}
           slug={event.slug}
@@ -175,7 +175,7 @@ export async function renderEventDetail({
           eventStatus={event.eventStatus}
         />
 
-        {/* DESKTOP — existing hero + image + body layout. */}
+        {/* Desktop: hero + image + body layout. */}
         <div className="hidden lg:block">
           <EventDetailHero
             title={event.title}

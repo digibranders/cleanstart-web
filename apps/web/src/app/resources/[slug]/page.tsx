@@ -125,10 +125,8 @@ export async function renderResourceDetail({
             "linear-gradient(180deg, #151021 0%, #10123E 22%, #131E8F 48%, #471EC0 72%, #471FC3 100%)",
         }}
       >
-        {/* Hero — dark gradient, breadcrumb, title, download button */}
         <ResourceDetailHero resource={resource} gateForm={gateForm} />
 
-        {/* Content — cover image + rich-text body */}
         <FadeUp>
           <ResourceDetailContent resource={resourceWithHighlighted} />
         </FadeUp>

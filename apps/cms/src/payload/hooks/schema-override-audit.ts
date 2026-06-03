@@ -36,7 +36,7 @@ export const schemaOverrideAuditHook = (
       typeof actorRaw === 'number' && Number.isFinite(actorRaw)
         ? actorRaw
         : typeof actorRaw === 'string'
-          ? Number.parseInt(actorRaw, 10) || null
+          ? (Number.isFinite(Number.parseInt(actorRaw, 10)) ? Number.parseInt(actorRaw, 10) : null)
           : null;
 
     const meta = extractRequestMeta(req.headers);

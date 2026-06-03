@@ -1,0 +1,130 @@
+// =============================================================================
+// 25. Branded full-page admin error states — 404 + 403
+// =============================================================================
+//
+// Payload renders the not-found and unauthorized views with a small text
+// heading + a single button inside the Minimal template. We promote both to
+// a centred, branded layout topped with the shared 3D illustration set
+// (apps/cms/public/error/*.webp, mirrored from apps/web). Same SCSS-injection
+// approach as `_empty-state.scss` — no React view replacement, so we keep
+// Payload's routing, i18n strings, and button behaviour untouched.
+//
+// The artwork is transparent, so it composites cleanly on both the light and
+// dark admin themes without a per-theme variant.
+
+@mixin admin-error-illustration($url, $size: 200px) {
+  &::before {
+    content: '';
+    display: block;
+    width: $size;
+    height: $size;
+    margin: 0 auto var(--cs-space-6);
+    background-image: url($url);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
+}
+
+// 404 — page / record not found inside /admin.
+.not-found__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  @include admin-error-illustration('/error/404.webp');
+}
+
+// 403 — authenticated but lacking access to the resource.
+.unauthorized {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  @include admin-error-illustration('/error/403.webp');
+}
+
+// 500 — render-time crash caught by the (payload)/error.tsx boundary.
+.cs-admin-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 70vh;
+  padding: var(--cs-space-12) var(--cs-space-6);
+
+  &__art {
+    width: 220px;
+    height: auto;
+    margin-bottom: var(--cs-space-6);
+  }
+
+  &__title {
+    margin: 0;
+    color: var(--cs-text-heading);
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  &__sub {
+    margin: var(--cs-space-3) 0 0;
+    max-width: 460px;
+    color: var(--theme-text-soft);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  &__digest {
+    margin: var(--cs-space-3) 0 0;
+    color: var(--theme-text-disabled);
+    font-family: var(--font-mono, monospace);
+    font-size: 12px;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--cs-space-3);
+    margin-top: var(--cs-space-6);
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: var(--cs-radius-input);
+    border: 1px solid var(--theme-elevation-200);
+    background: transparent;
+    color: var(--theme-text);
+    font-weight: 600;
+    font-size: 13.5px;
+    line-height: 1.25;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color var(--cs-motion-micro),
+      box-shadow var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    &--primary {
+      border-color: transparent;
+      background: var(--cs-cyan-500);
+      color: #04212a;
+
+      &:hover {
+        background: var(--cs-cyan-400);
+        box-shadow:
+          0 1px 0 0 rgba(6, 199, 242, 0.25),
+          0 6px 16px -8px rgba(6, 199, 242, 0.4);
+      }
+    }
+  }
+}

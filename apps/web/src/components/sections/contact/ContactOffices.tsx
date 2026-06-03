@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 
@@ -53,7 +54,6 @@ export function ContactOffices() {
   return (
     <Section padding="md">
       <Container>
-        {/* Title row with flanking solid hairlines + diamond endcaps (Figma). */}
         <Reveal header className="mb-10 flex items-center gap-4 sm:mb-12 sm:gap-6">
           <Hairline />
           <h2
@@ -78,7 +78,6 @@ export function ContactOffices() {
           <Hairline />
         </Reveal>
 
-        {/* Dark purple container that wraps offices + awards */}
         <div
           className="relative overflow-hidden rounded-[28px] px-6 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-14"
           style={{
@@ -88,7 +87,6 @@ export function ContactOffices() {
               "0 1px 0 rgba(255,255,255,0.06) inset, 0 30px 60px -30px rgba(60,30,150,0.40)",
           }}
         >
-          {/* Decorative radial glow */}
           <div
             aria-hidden
             className="pointer-events-none absolute"
@@ -118,15 +116,12 @@ export function ContactOffices() {
             }}
           />
 
-          {/* Offices — vertical stack on mobile (horizontal dashed dividers),
-              2-up at sm, 4-up with vertical dashed dividers at lg. */}
           <div className="relative flex flex-col gap-6 sm:grid sm:grid-cols-2 sm:gap-y-8 lg:grid lg:[grid-template-columns:1fr_1px_1fr_1px_1fr_1px_1fr] lg:gap-0">
             {OFFICES.map((o, i) => (
               <React.Fragment key={o.name}>
                 <OfficeCard office={o} />
                 {i < OFFICES.length - 1 && (
                   <>
-                    {/* Horizontal dashed divider — mobile only (stacked layout) */}
                     <div
                       aria-hidden
                       className="block h-px w-full sm:hidden"
@@ -137,7 +132,6 @@ export function ContactOffices() {
                         backgroundRepeat: "repeat-x",
                       }}
                     />
-                    {/* Vertical dashed divider — desktop only */}
                     <div
                       aria-hidden
                       className="hidden self-stretch lg:block"
@@ -155,7 +149,6 @@ export function ContactOffices() {
             ))}
           </div>
 
-          {/* Awarded with title + badges row */}
           <div className="relative mt-12 flex flex-col items-center sm:mt-16">
             <div className="mb-8 flex w-full items-center gap-4 sm:gap-6">
               <DarkHairline />
@@ -232,17 +225,13 @@ function DarkHairline() {
 function OfficeCard({ office }: { office: Office }) {
   return (
     <div className="flex h-full flex-col gap-5 px-2 sm:px-4 lg:px-5">
-      {/* Flag — Figma uses real flag artwork, no pill background.
-          77×51 in Figma; kept proportional here. */}
       <div className="relative h-[51px] w-[77px] overflow-hidden rounded-[8px]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={office.flag}
           alt={office.flagAlt}
           width={77}
           height={51}
-          loading="lazy"
-          decoding="async"
+          sizes="77px"
           className="block h-full w-full object-cover"
         />
       </div>
@@ -301,14 +290,12 @@ function AwardBadge({ award }: { award: (typeof AWARDS)[number] }) {
         }}
       />
       <div className="absolute inset-x-0 top-0 flex h-[100px] items-center justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={award.src}
           alt={award.name}
           width={award.w}
           height={award.h}
-          loading="lazy"
-          decoding="async"
+          sizes="82px"
           className="object-contain"
         />
       </div>

@@ -1,32 +1,19 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
 
 /**
  * Inner content for the Blogs/News/Webinars newsletter CTA, rendered inside
  * the Footer's fixed 1276×330 / radius-40 slot.
  */
 export function BlogsCTA(): React.ReactElement {
-  const emailRef = useRef<HTMLInputElement>(null);
-  const [submitted, setSubmitted] = useState(false);
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
-    e.preventDefault();
-    const email = emailRef.current?.value.trim();
-    if (!email) return;
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      if (emailRef.current) emailRef.current.value = "";
-    }, 3000);
-  }
+  const { emailRef, submitted, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div
       className="absolute inset-0"
       style={{ background: "linear-gradient(180deg, #471ec0 0%, #131e8f 100%)" }}
     >
-      {/* Left cube — anchored top-left to mirror the right cube. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute block"
@@ -48,7 +35,6 @@ export function BlogsCTA(): React.ReactElement {
         />
       </div>
 
-      {/* Right cube */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden sm:block"
@@ -152,6 +138,11 @@ export function BlogsCTA(): React.ReactElement {
                   Subscribe
                 </button>
               </form>
+            )}
+            {error && (
+              <p role="alert" className="text-sm font-medium text-white" style={{ opacity: 0.9 }}>
+                {error}
+              </p>
             )}
           </div>
         </div>

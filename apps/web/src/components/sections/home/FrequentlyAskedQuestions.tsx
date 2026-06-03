@@ -4,28 +4,13 @@ import React, { useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * Section: "Frequently Asked Questions"
- * Figma 108:8525 (title) + 108:8527 (description) + 108:8555 (left card) + 108:8575 (right card)
+ * Frequently Asked Questions section: two columns of toggleable FAQ items.
  *
- * Figma exact specs:
- * - Title: Manrope Bold 62px, color #111
- * - Description: Sora Regular 30px, color #111
- * - Each card: 622×variable, 40px corner radius, 40px padding all sides, white bg
- * - Vertical layout, 32px gap between FAQ items
- * - Item question: Manrope Bold 32px, color #111
- * - Item answer: Sora Regular 20px, color #666
- * - Question-to-answer gap (open): 16px
- * - Toggle icon: 32×32 frame with 21×21 black filled +/× vector
- * - Divider between items: 1px solid #D9D9D9
- * - Card-to-card horizontal gap: 32px
- *
- * UX:
- * - Each column has INDEPENDENT open state — opening a left FAQ does not affect the right card,
- *   and the layout never shifts horizontally. Both columns can have one item open simultaneously.
- * - Open animation uses CSS grid `grid-template-rows: 0fr → 1fr` so heights are exact and never
- *   clipped, regardless of font-load timing or rich-text content.
- * - Plus icon rotates 45° to become an × when open.
- * - Full keyboard accessibility (Enter/Space) and proper ARIA expanded/controls.
+ * Only one item across all columns is open at a time, but the two-column
+ * layout never shifts horizontally — opening a left FAQ grows the left card
+ * downward only. The open animation uses CSS grid `grid-template-rows: 0fr ->
+ * 1fr` so heights are exact and never clipped regardless of font-load timing
+ * or rich-text content. Keyboard-accessible (Enter/Space) with proper ARIA.
  */
 
 interface FaqItem {
@@ -84,24 +69,17 @@ const RIGHT_FAQS: FaqItem[] = [
 ];
 
 export function FrequentlyAskedQuestions() {
-  // Single shared open state — only ONE FAQ across all 6 can be open at a time.
-  // The two-column layout still preserves horizontal stability: opening a left FAQ
-  // grows the left card downward only; the right card stays put (items-start grid).
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
     <section
-      // Note: no overflow-hidden — lets the decorative lavender/cyan/purple
-      // blobs bleed across the top/bottom section boundaries. Body has
-      // overflow-x: hidden so horizontal scroll is still prevented.
+      // No overflow-hidden, so the decorative blobs can bleed across the
+      // top/bottom section boundaries. Horizontal scroll is still prevented by
+      // overflow-x: hidden on the body.
       className="relative w-full pt-8 pb-14 sm:pt-10 sm:pb-16 lg:pt-12 lg:pb-20 mb-[-50px]"
       aria-labelledby="faq-title"
     >
-      {/* Figma 108:7627 "Ellipse 46691" — cyan glow at top-right of FAQ.
-          Figma absolute: x=1496, y=6374, 262×262 in 1920-wide frame.
-          With FAQ section top at y=6231 (title y=6311 minus py-20 80px),
-          section-relative top = 6374−6231 = 143px.
-          Horizontal: right = 1920−1496−262 = 162px from viewport right edge. */}
+      {/* Cyan glow at the top-right of the FAQ section. */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -116,9 +94,7 @@ export function FrequentlyAskedQuestions() {
           filter: "blur(101.5px)",
         }}
       />
-      {/* Figma 108:7626 "Ellipse 46681" — pink/lavender glow on the left of FAQ.
-          Figma absolute: x=215, y=6884, 262×262.
-          Section-relative top = 6884−6231 = 653px; left = 215px from viewport. */}
+      {/* Pink/lavender glow on the left of the FAQ section. */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -135,8 +111,8 @@ export function FrequentlyAskedQuestions() {
       />
 
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Title row — title flush-left, separator centered, description right-aligned.
-            Same 1fr_auto_1fr grid pattern used by SecurityNotPatching and
+        {/* Title flush-left, separator centered, description right-aligned —
+            the same 1fr_auto_1fr grid used by SecurityNotPatching and
             HowCleanStartHelp for visual parity. */}
         <div className="mb-8 flex flex-col items-start gap-5 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <Reveal header className="justify-self-start" style={{ maxWidth: "493px" }}>
@@ -153,7 +129,6 @@ export function FrequentlyAskedQuestions() {
               Frequently Asked Questions
             </h2>
           </Reveal>
-          {/* Vertical 1×90 fading-gray separator */}
           <div
             aria-hidden
             className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
@@ -186,11 +161,8 @@ export function FrequentlyAskedQuestions() {
           </Reveal>
         </div>
 
-        {/* Cards size to their natural content. Opening a FAQ grows the card
-            (and the section) by the answer height — standard FAQ behavior with
-            no permanent empty space below the cards in the closed state.
-            On mobile the outer grid hosts the white card chrome and the two
-            columns share a single continuous list; on md+ each column is its
+        {/* On mobile the outer grid hosts the white card chrome and the two
+            columns share a single continuous list; at md+ each column is its
             own card. */}
         <div
           className="grid grid-cols-1 items-start gap-5 rounded-[24px] bg-white p-6 max-md:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)] sm:rounded-[40px] sm:p-8 md:grid-cols-2 md:gap-6 md:rounded-none md:bg-transparent md:p-0 md:shadow-none"
@@ -201,7 +173,6 @@ export function FrequentlyAskedQuestions() {
             setOpenId={setOpenId}
             idPrefix="left"
           />
-          {/* Divider between the two FAQ groups on mobile only. */}
           <div aria-hidden className="h-px w-full bg-[#D9D9D9] md:hidden" />
           <FaqColumn
             items={RIGHT_FAQS}
@@ -282,10 +253,8 @@ function FaqItemRow({
         <ToggleIcon isOpen={isOpen} />
       </button>
 
-      {/* Smooth open/close — modern accordion pattern.
-          Per Google Core Web Vitals: layout shifts within 500 ms of user input
-          are excluded from CLS, so animating the section's natural growth here
-          is the correct UX (not a CLS regression).
+      {/* Animating the section's natural growth is not a CLS regression:
+          layout shifts within 500ms of user input are excluded from CLS.
           Inline styles for the height/opacity transition keep the cascade
           deterministic across browsers. */}
       <section
@@ -320,7 +289,6 @@ function FaqItemRow({
 }
 
 function ToggleIcon({ isOpen }: { isOpen: boolean }) {
-  // 28×28 frame to match the smaller question type — keeps optical balance.
   return (
     <span
       className="relative mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center"
@@ -337,9 +305,7 @@ function ToggleIcon({ isOpen }: { isOpen: boolean }) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Horizontal bar */}
         <rect x="2" y="8" width="14" height="2" rx="1" fill="#111111" />
-        {/* Vertical bar */}
         <rect x="8" y="2" width="2" height="14" rx="1" fill="#111111" />
       </svg>
     </span>

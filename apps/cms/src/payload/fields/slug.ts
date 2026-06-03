@@ -1,4 +1,4 @@
-import type { Field, Payload, Where } from 'payload';
+import type { CollectionSlug, Field, Payload, Where } from 'payload';
 
 import { slugify } from '../lib/slugify';
 
@@ -120,7 +120,7 @@ export const slugField = ({ source = 'name', composite = false }: SlugFieldOptio
     });
 
     const result = await payload.find({
-      collection: collectionSlug as never,
+      collection: collectionSlug as CollectionSlug,
       where,
       limit: 1,
       depth: 0,

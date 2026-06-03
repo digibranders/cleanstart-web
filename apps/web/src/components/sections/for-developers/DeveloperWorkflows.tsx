@@ -2,37 +2,12 @@ import Image from 'next/image';
 import type React from 'react';
 import { Reveal, RevealStagger, RevealItem } from '@/components/ui/Reveal';
 
-/*
- * Figma node 857-4900 — "Designed for Developer Workflows" (rebuilt 1:1).
- *
- * Layout (1922×1090 in Figma, scaled to fit the container at 1276 max-width):
- *   • #f6f6f6 base bg with decorative hex shapes at the top corners + a soft
- *     glow blob behind each, and a faint center hex pattern behind the title.
- *   • Heading: "Designed for Developer Workflows" — "Workflows" rendered with
- *     the cs-text-gradient-impact (purple→cyan, 100.878°).
- *   • Pipeline row of 7 small step cards (Code · Git · CI/CD · Build · Registry
- *     · Deploy · Runtime) with the centre slot replaced by the highlighted
- *     "CleanStart Hardened Image" card (dark blue gradient + ellipse glows,
- *     reusing the layered approach from the StackCard marquee). Arrows
- *     connect the cards left→right.
- *   • "Minimal . Hardened . Verifiable" pill below the CleanStart card.
- *   • 4 feature cards (Existing CI/CD Pipelines · Registry Compatible ·
- *     Faster Builds · Cleaner SBOMs) in a row at the bottom. Each has a
- *     gradient border ring (3-4 px), a soft purple bloom inside, faint
- *     vertical guide lines, and a 96 px blue gradient "ball" icon at the
- *     top-left.
- *
- * Asset folder: /images/for-developers/workflows/
- */
-
 const ASSET_BASE = '/images/for-developers/workflows';
-
-// ─── Pipeline step data ─────────────────────────────────────────────────────
 
 interface PipelineStep {
   label: string;
   icon: string;
-  /** Some icons render slightly smaller per Figma — overrides the default 64 px. */
+  /** Per-icon override for the default 60 px size. */
   iconSize?: number;
 }
 
@@ -49,12 +24,10 @@ const PIPELINE_STEPS_RIGHT: PipelineStep[] = [
   { label: 'Runtime', icon: `${ASSET_BASE}/logo-runtime.svg`, iconSize: 56 },
 ];
 
-// ─── Feature card data ──────────────────────────────────────────────────────
-
 interface FeatureCard {
   title: string;
   body: string;
-  /** Per-card glyph SVG rendered inside the blue ball — exported from Figma node 857:6287. */
+  /** Per-card glyph SVG rendered inside the blue ball. */
   icon: string;
 }
 
@@ -81,13 +54,6 @@ const FEATURE_CARDS: FeatureCard[] = [
   },
 ];
 
-// ─── Sub-components ─────────────────────────────────────────────────────────
-
-/**
- * Small pipeline step card — 112×126 in Figma. Light cyan-tinted background
- * with rounded 16 px corners, white inner panel, single subtle vertical
- * gradient line for depth, icon centered on top, label at the bottom.
- */
 function PipelineStepCard({ label, icon, iconSize = 60 }: PipelineStep): React.ReactElement {
   return (
     <div
@@ -105,7 +71,6 @@ function PipelineStepCard({ label, icon, iconSize = 60 }: PipelineStep): React.R
         className="relative flex h-full w-full flex-col items-center justify-between overflow-hidden bg-white"
         style={{ borderRadius: '14px', padding: '14px 10px 12px' }}
       >
-        {/* Subtle vertical highlight line — Figma Rectangle 1000001839 */}
         <div
           aria-hidden
           className="pointer-events-none absolute"
@@ -148,12 +113,6 @@ function PipelineStepCard({ label, icon, iconSize = 60 }: PipelineStep): React.R
   );
 }
 
-/**
- * Highlighted "CleanStart Hardened Image" card — 146×154 in Figma, dark blue
- * gradient with layered ellipse glows (same construction as the marquee
- * StackCard but adapted for portrait aspect). Houses the cube illustration
- * + 2-line white label.
- */
 function CleanStartCard(): React.ReactElement {
   return (
     <div
@@ -164,7 +123,6 @@ function CleanStartCard(): React.ReactElement {
         borderRadius: '13.5px',
         border: '1.688px solid #dab6f3',
         background: 'linear-gradient(180deg, #151021 0%, #131E8F 71.2%, #551ECE 100%)',
-        // Full 5-shadow stack from Figma — soft left-fall cascade for depth.
         boxShadow: [
           '-115.368px 57.403px 36.017px 0 rgba(0,0,0,0)',
           '-73.723px 36.580px 33.203px 0 rgba(0,0,0,0.03)',
@@ -174,7 +132,6 @@ function CleanStartCard(): React.ReactElement {
         ].join(', '),
       }}
     >
-      {/* Purple wash */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -189,7 +146,6 @@ function CleanStartCard(): React.ReactElement {
           borderRadius: '50%',
         }}
       />
-      {/* Dominant cyan glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -204,7 +160,6 @@ function CleanStartCard(): React.ReactElement {
           borderRadius: '50%',
         }}
       />
-      {/* Right-edge color-dodge flare */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -220,9 +175,7 @@ function CleanStartCard(): React.ReactElement {
         }}
       />
 
-      {/* Grain/noise texture overlay — SVG feTurbulence inline. ~200 bytes,
-          no extra request. Overlay blend adds fine speckles to the gradient
-          surface without washing out the cyan/purple glows. */}
+      {/* Inline feTurbulence grain avoids an extra network request; overlay blend keeps the glows intact. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -235,7 +188,6 @@ function CleanStartCard(): React.ReactElement {
         }}
       />
 
-      {/* Cube illustration */}
       <Image
         src={`${ASSET_BASE}/cube-image.png`}
         alt=""
@@ -247,7 +199,6 @@ function CleanStartCard(): React.ReactElement {
         style={{ marginTop: '12px', objectFit: 'contain' }}
       />
 
-      {/* Label */}
       <p
         className="relative z-10 text-center"
         style={{
@@ -269,9 +220,6 @@ function CleanStartCard(): React.ReactElement {
   );
 }
 
-/**
- * Arrow between pipeline steps — dashed right-arrow vector from Figma.
- */
 function PipelineArrow(): React.ReactElement {
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -286,9 +234,7 @@ function PipelineArrow(): React.ReactElement {
   );
 }
 
-/**
- * Mobile-only vertical arrow — same dashed asset, rotated 90deg to point down.
- */
+/** Same dashed arrow asset rotated 90deg to point down for the mobile column. */
 function MobilePipelineArrow(): React.ReactElement {
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -309,10 +255,6 @@ function MobilePipelineArrow(): React.ReactElement {
   );
 }
 
-/**
- * Mobile horizontal pipeline step card — icon on left, label on right.
- * Matches the Figma mobile layout: 244×80 with rounded 16px, soft cyan tint.
- */
 function MobilePipelineCard({ label, icon, iconSize = 56 }: PipelineStep): React.ReactElement {
   return (
     <div
@@ -330,7 +272,6 @@ function MobilePipelineCard({ label, icon, iconSize = 56 }: PipelineStep): React
         className="relative flex h-full w-full items-center overflow-hidden bg-white"
         style={{ borderRadius: '14px', padding: '12px 20px' }}
       >
-        {/* Subtle vertical highlight line */}
         <div
           aria-hidden
           className="pointer-events-none absolute"
@@ -380,11 +321,6 @@ function MobilePipelineCard({ label, icon, iconSize = 56 }: PipelineStep): React
   );
 }
 
-/**
- * Mobile horizontal CleanStart card — icon on left, "CleanStart Hardened Image"
- * label on right, dark gradient background. Same 244×80 footprint as the step
- * cards so the column stays aligned.
- */
 function MobileCleanStartCard(): React.ReactElement {
   return (
     <div
@@ -404,7 +340,6 @@ function MobileCleanStartCard(): React.ReactElement {
         padding: '12px 18px',
       }}
     >
-      {/* Purple wash */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -419,7 +354,6 @@ function MobileCleanStartCard(): React.ReactElement {
           borderRadius: '50%',
         }}
       />
-      {/* Cyan glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -466,11 +400,6 @@ function MobileCleanStartCard(): React.ReactElement {
   );
 }
 
-/**
- * 96 px blue gradient "ball" icon for feature cards. Uses the shared cube SVG
- * inside a blue radial gradient sphere — approximates the Figma 3D ball
- * without the (heavy) Light/HardLight/Pattern overlays.
- */
 function FeatureBall({ icon }: { icon: string }): React.ReactElement {
   return (
     <div
@@ -484,7 +413,6 @@ function FeatureBall({ icon }: { icon: string }): React.ReactElement {
           '0 6.17px 14.54px rgba(28,60,142,0.33), inset 0 -0.23px 0.29px rgba(0,44,179,0.5), inset 0 0.12px 0.58px rgba(255,255,255,0.81)',
       }}
     >
-      {/* Soft top highlight — approximates the Figma 3D shine */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -508,16 +436,7 @@ function FeatureBall({ icon }: { icon: string }): React.ReactElement {
   );
 }
 
-/**
- * Feature card — 295×324 outer, 287×316 inner with 4 px gradient ring.
- * Soft purple bloom inside, 4 faint vertical highlight lines + 2 horizontal,
- * blue ball icon at top-left, title + body at the bottom.
- */
 function FeatureCardView({ title, body, icon }: FeatureCard): React.ReactElement {
-  /* Figma mobile (857:6287): 320×253, outer radius 20, inner radius 16, padding 6.
-     Figma desktop (857-4900 / earlier): 295×324, outer radius 40, inner radius 36, padding 4.
-     The radii/padding shrink on mobile because the card is shorter; we keep the
-     desktop styling above lg. */
   return (
     <div
       className="relative flex shrink-0 w-[320px] lg:w-[295px] rounded-[20px] lg:rounded-[40px] p-[6px] lg:p-[4px]"
@@ -530,7 +449,6 @@ function FeatureCardView({ title, body, icon }: FeatureCard): React.ReactElement
       <div
         className="relative h-full w-full overflow-hidden bg-white rounded-[14px] lg:rounded-[36px]"
       >
-        {/* Purple bloom */}
         <div
           aria-hidden
           className="pointer-events-none absolute"
@@ -546,7 +464,6 @@ function FeatureCardView({ title, body, icon }: FeatureCard): React.ReactElement
           }}
         />
 
-        {/* 4 faint vertical highlight lines — Figma Rectangle 100000183[8,9,1,2] */}
         {[48.47, 120.03, 162.38, 233.94].map((left) => (
           <div
             key={left}
@@ -564,7 +481,6 @@ function FeatureCardView({ title, body, icon }: FeatureCard): React.ReactElement
           />
         ))}
 
-        {/* 2 faint horizontal highlight lines — Figma Rectangle 100000184[3,4] */}
         {[67.5, 183.5].map((top) => (
           <div
             key={top}
@@ -582,12 +498,10 @@ function FeatureCardView({ title, body, icon }: FeatureCard): React.ReactElement
           />
         ))}
 
-        {/* Ball icon */}
         <div className="absolute" style={{ top: '32px', left: '24px' }}>
           <FeatureBall icon={icon} />
         </div>
 
-        {/* Title + body */}
         <div
           className="absolute flex flex-col"
           style={{ top: '152px', left: '24px', width: '251px', gap: '12px' }}
@@ -624,8 +538,6 @@ function FeatureCardView({ title, body, icon }: FeatureCard): React.ReactElement
   );
 }
 
-// ─── Main section ───────────────────────────────────────────────────────────
-
 export function DeveloperWorkflows(): React.ReactElement {
   return (
     <section
@@ -637,8 +549,6 @@ export function DeveloperWorkflows(): React.ReactElement {
         paddingBottom: 'clamp(56px, 6.25vw, 120px)',
       }}
     >
-      {/* ── Decorative background ── */}
-      {/* Center hex pattern behind title */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`${ASSET_BASE}/arc-pattern.svg`}
@@ -648,7 +558,6 @@ export function DeveloperWorkflows(): React.ReactElement {
         style={{ width: '701px', height: '680px', opacity: 0.5 }}
       />
 
-      {/* Left + right corner hex shapes */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`${ASSET_BASE}/corner-blob.svg`}
@@ -678,7 +587,6 @@ export function DeveloperWorkflows(): React.ReactElement {
         }}
       />
 
-      {/* Corner glow ellipses */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`${ASSET_BASE}/ellipse-glow.svg`}
@@ -696,9 +604,7 @@ export function DeveloperWorkflows(): React.ReactElement {
         style={{ width: '500px', height: '500px', right: '-103px', top: '-74px' }}
       />
 
-      {/* ── Content column ── */}
       <div className="relative mx-auto w-full max-w-[1276px] px-6 sm:px-10">
-        {/* Heading */}
         <Reveal header>
           <h2
             className="mx-auto text-center"
@@ -718,9 +624,7 @@ export function DeveloperWorkflows(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* ── Pipeline ── */}
         <div className="relative mb-20 flex flex-col items-center">
-          {/* Desktop pipeline */}
           <div className="hidden md:flex items-center justify-center" style={{ gap: '14px' }}>
             {PIPELINE_STEPS_LEFT.map((step, i) => (
               <PipelineRow key={step.label} step={step} showArrowAfter={i < PIPELINE_STEPS_LEFT.length - 1} />
@@ -733,10 +637,6 @@ export function DeveloperWorkflows(): React.ReactElement {
             ))}
           </div>
 
-          {/* Mobile pipeline — vertical single column, horizontal cards with
-              vertical dashed arrows between them. Order mirrors desktop:
-              Code → Git → CI/CD → Build → CleanStart → Registry → Deploy →
-              Runtime. */}
           <div className="md:hidden flex flex-col items-center gap-2">
             {[
               { label: 'Code', icon: `${ASSET_BASE}/logo-code.png`, iconSize: 52 },
@@ -763,7 +663,6 @@ export function DeveloperWorkflows(): React.ReactElement {
             ))}
           </div>
 
-          {/* "Minimal . Hardened . Verifiable" pill */}
           <div
             className="relative mt-6 flex items-center justify-center"
             style={{
@@ -789,7 +688,6 @@ export function DeveloperWorkflows(): React.ReactElement {
           </div>
         </div>
 
-        {/* ── 4 feature cards ── */}
         <RevealStagger
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 justify-items-center gap-4 lg:gap-8"
         >
@@ -804,11 +702,7 @@ export function DeveloperWorkflows(): React.ReactElement {
   );
 }
 
-/**
- * Small helper to keep the desktop pipeline JSX flat — renders a step card
- * optionally followed by an arrow. (The center CleanStart card breaks the
- * left/right rows so the arrows around it are placed manually above.)
- */
+/** Renders a step card optionally followed by an arrow, keeping the pipeline JSX flat. */
 function PipelineRow({
   step,
   showArrowAfter,

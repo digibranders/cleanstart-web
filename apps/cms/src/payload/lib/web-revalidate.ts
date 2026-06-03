@@ -33,7 +33,7 @@ export const revalidateWeb = async (
   const secret = process.env.WEB_REVALIDATE_SECRET;
   if (!url || !secret) {
     if (!warnedDisabled) {
-      payload.logger.info?.(
+      payload.logger.info(
         '[web-revalidate] WEB_REVALIDATE_URL / WEB_REVALIDATE_SECRET unset; ' +
           'cross-process cache invalidation is disabled (ISR will catch up within ~60s).',
       );

@@ -1,4 +1,3 @@
-// apps/web/src/app/api/og/render.test.ts
 import { describe, it, expect } from "vitest";
 import { pickTitleSize, splitTitleAccent } from "./render";
 

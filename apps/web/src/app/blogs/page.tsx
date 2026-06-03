@@ -71,7 +71,6 @@ export default async function BlogsPage({
       />
       <Header />
       <main style={{ background: "#f6f6f6" }}>
-        {/* Hero — dark gradient, includes featured post */}
         <div className="relative overflow-hidden">
           <BlogsHero
             featuredPost={featuredPost}
@@ -81,7 +80,6 @@ export default async function BlogsPage({
           />
         </div>
 
-        {/* Latest articles grid */}
         <FadeUp>
           <LatestBlogs
             posts={blogsData.docs}

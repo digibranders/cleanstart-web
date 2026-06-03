@@ -2,11 +2,8 @@ import type React from 'react';
 import { WhyMattersGrid, type WhyCard } from '../_shared/WhyMattersGrid';
 
 /*
- * "Smaller Images. Lower Risk." section.
- *
- * Visual + layout shell lives in WhyMattersGrid (the shared for-developers
- * "Why Does It Matter" pattern). This file only owns the page-specific copy
- * and the per-card 3D illustration positioning inside the 222×165 slot.
+ * The visual and layout shell lives in the shared WhyMattersGrid; this file
+ * only owns the page-specific copy and per-card illustration positioning.
  */
 
 const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [

@@ -22,17 +22,20 @@
 
 [data-theme='dark'] .template-minimal::before {
   background:
-    radial-gradient(60% 50% at 80% 0%, rgba(6, 199, 242, 0.15) 0%, transparent 60%),
-    radial-gradient(45% 45% at 0% 100%, rgba(93, 4, 216, 0.18) 0%, transparent 60%);
+    radial-gradient(60% 50% at 80% 0%, rgba(6, 199, 242, 0.22) 0%, transparent 60%),
+    radial-gradient(45% 45% at 0% 100%, rgba(93, 4, 216, 0.22) 0%, transparent 60%);
 }
 
-// Login card — soft elevation shadow, rounder, never garish
+// Login card — crafted centered auth surface, max 400px, 40px padding
 .template-minimal .form-wrap,
 .template-minimal form {
   background: var(--theme-elevation-100);
   border: 1px solid var(--theme-elevation-150);
-  border-radius: var(--cs-radius-modal);
-  padding: var(--cs-space-8);
+  border-radius: var(--cs-radius-login, 16px);
+  padding: 40px;
+  max-width: 400px;
+  width: 100%;
+  margin-inline: auto;
   box-shadow: 0 12px 40px -16px rgba(0, 0, 0, 0.18);
 }
 
@@ -71,17 +74,73 @@
   &__brand {
     color: var(--theme-text-soft);
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 0.04em;
     margin: 0;
-    opacity: 0.7;
+    opacity: 0.5;
+  }
+}
+
+// Input height lock — rock-solid regardless of cascade order
+.template-minimal {
+  input[type='email'],
+  input[type='password'],
+  input[type='text'] {
+    height: 40px !important;
+    padding: 0 12px !important;
+    font-size: 14px !important;
+  }
+
+  form button[type='submit'],
+  form .btn--style-primary {
+    height: 44px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    width: 100% !important;
+    border-radius: var(--cs-radius-input) !important;
   }
 }
 
 // Wave 5 — branded login hero injected above the form via beforeLogin.
 .cs-login-hero {
-  margin-bottom: var(--cs-space-6);
+  margin-bottom: var(--cs-space-8);
   text-align: center;
+
+  &__eyebrow {
+    color: var(--cs-cyan-500);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    margin: 0 0 var(--cs-space-2);
+    text-transform: uppercase;
+  }
+
+  &__title {
+    color: var(--cs-text-heading);
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 var(--cs-space-3);
+    line-height: 1.2;
+  }
+
+  &__lede {
+    color: var(--theme-text-soft);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+// Wave 5 — account view (replaces stock views.account).
+.cs-account {
+  margin: 0 auto;
+  max-width: 720px;
+  padding: var(--cs-space-8);
+
+  &__header { margin-bottom: var(--cs-space-8); }
 
   &__eyebrow {
     color: var(--cs-cyan-600);
@@ -99,40 +158,7 @@
     font-size: 28px;
     font-weight: 600;
     letter-spacing: -0.01em;
-    margin: 0 0 var(--cs-space-2);
-  }
-
-  &__lede {
-    color: var(--theme-text-soft);
-    font-size: 14px;
-    line-height: 1.5;
-    margin: 0;
-  }
-}
-
-// Wave 5 — account view (replaces stock views.account).
-.cs-account {
-  margin: 0 auto;
-  max-width: 720px;
-  padding: var(--cs-space-8) var(--cs-space-6);
-
-  &__header { margin-bottom: var(--cs-space-8); }
-
-  &__eyebrow {
-    color: var(--cs-cyan-600);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    margin: 0 0 var(--cs-space-1);
-    text-transform: uppercase;
-  }
-
-  &__title {
-    color: var(--cs-text-heading);
-    font-family: var(--font-display);
-    font-size: 26px;
-    font-weight: 600;
+    line-height: 1.2;
     margin: 0 0 var(--cs-space-2);
   }
 
@@ -153,23 +179,26 @@
 
     legend {
       color: var(--cs-text-heading);
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.08em;
       padding: 0 var(--cs-space-2);
       text-transform: uppercase;
     }
 
+    // 2FA reserved section — show as a dimmed solid outline, not a wireframe dashed border
     &--reserved {
-      background: transparent;
-      border-style: dashed;
+      opacity: 0.45;
+      border-color: var(--theme-elevation-100);
+      border-style: solid;
+      pointer-events: none;
     }
   }
 
   &__field {
     display: flex;
     flex-direction: column;
-    gap: var(--cs-space-1);
+    gap: var(--cs-space-2);
     margin-top: var(--cs-space-3);
 
     > span {
@@ -202,7 +231,7 @@
     background: rgba(220, 38, 38, 0.08);
     border: 1px solid rgba(220, 38, 38, 0.3);
     border-left-width: 3px;
-    border-radius: var(--cs-radius-card);
+    border-radius: var(--cs-radius-input);
     padding: var(--cs-space-3);
     margin-bottom: var(--cs-space-3);
     color: var(--color-error-500);

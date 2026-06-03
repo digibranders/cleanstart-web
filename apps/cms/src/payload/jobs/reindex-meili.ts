@@ -27,7 +27,10 @@ interface ReindexPayload {
     pagination: boolean;
   }) => Promise<{ docs: unknown[]; totalDocs: number; hasNextPage: boolean }>;
   findGlobal: (args: { slug: 'siteSettings' }) => Promise<unknown>;
-  logger?: { warn?: (meta: Record<string, unknown>, msg: string) => void };
+  logger?: {
+    info?: (meta: Record<string, unknown>, msg: string) => void;
+    warn?: (meta: Record<string, unknown>, msg: string) => void;
+  };
 }
 
 const readBaseUrl = async (payload: ReindexPayload): Promise<string> => {
@@ -86,7 +89,7 @@ export const reindexMeiliTask: TaskConfig<'meiliReindex'> = {
         : Math.abs(postgresCount - meiliCount) / Math.max(postgresCount, 1);
     const needsReindex = meiliCount < 0 || delta > DRIFT_THRESHOLD;
 
-    payload.logger?.warn?.(
+    payload.logger?.info?.(
       { postgresCount, meiliCount, delta: Math.round(delta * 1000) / 10, needsReindex },
       'meiliReindex.stats',
     );
@@ -156,7 +159,7 @@ export const reindexMeiliTask: TaskConfig<'meiliReindex'> = {
       }
     }
 
-    payload.logger?.warn?.(
+    payload.logger?.info?.(
       { postgresCount, meiliCount, delta, reindexed, skipped },
       'meiliReindex.complete',
     );

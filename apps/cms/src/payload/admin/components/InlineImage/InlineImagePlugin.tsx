@@ -408,10 +408,11 @@ export const InlineImagePlugin = (): ReactElement => {
       }
     };
 
-    document.addEventListener('click', onCapture, true);
+    // mousedown is used (not click) so each button action dispatches
+    // exactly one command — click fires after mousedown and would cause
+    // duplicate open/close/reopen for Upload, Edit, and Swap buttons.
     document.addEventListener('mousedown', onCapture, true);
     return () => {
-      document.removeEventListener('click', onCapture, true);
       document.removeEventListener('mousedown', onCapture, true);
     };
   }, [editor, findUploadNodeKeyForElement, openEditForNode]);

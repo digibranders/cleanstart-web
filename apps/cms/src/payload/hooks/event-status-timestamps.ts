@@ -54,5 +54,11 @@ export const eventStatusTimestampsHook: CollectionBeforeChangeHook = ({
     result.previousStartDate = prev.startsAt;
   }
 
+  // Clear previousStartDate when returning from postponed to any other
+  // status — a stale date would otherwise appear in Schema.org JSON-LD.
+  if (next.eventStatus !== 'postponed' && prev.eventStatus === 'postponed') {
+    result.previousStartDate = null;
+  }
+
   return result;
 };

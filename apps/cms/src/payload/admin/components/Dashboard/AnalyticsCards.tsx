@@ -1,4 +1,4 @@
-import type { Payload } from 'payload';
+import type { BasePayload } from 'payload';
 import type { ReactElement, ReactNode } from 'react';
 
 import { TTL_MS, isStale, readCache, type CachedProvider } from '../../../lib/integrations/cache';
@@ -68,9 +68,9 @@ interface CardResult {
   element: ReactElement | null;
 }
 
-const renderGa4 = async (payload: Payload): Promise<CardResult> => {
+const renderGa4 = async (payload: BasePayload): Promise<CardResult> => {
   const entry = await readCache<Ga4Cached>(
-    payload as unknown as Parameters<typeof readCache>[0],
+    payload,
     'ga4DataApi' as CachedProvider,
     'global',
     'default',
@@ -105,9 +105,9 @@ const renderGa4 = async (payload: Payload): Promise<CardResult> => {
   };
 };
 
-const renderGsc = async (payload: Payload): Promise<CardResult> => {
+const renderGsc = async (payload: BasePayload): Promise<CardResult> => {
   const entry = await readCache<GscCached>(
-    payload as unknown as Parameters<typeof readCache>[0],
+    payload,
     'gscSearchAnalyticsApi' as CachedProvider,
     'global',
     'default',
@@ -138,9 +138,9 @@ const renderGsc = async (payload: Payload): Promise<CardResult> => {
   };
 };
 
-const renderClarity = async (payload: Payload): Promise<CardResult> => {
+const renderClarity = async (payload: BasePayload): Promise<CardResult> => {
   const entry = await readCache<ClarityCached>(
-    payload as unknown as Parameters<typeof readCache>[0],
+    payload,
     'msClarity' as CachedProvider,
     'global',
     'default',
@@ -172,9 +172,9 @@ const renderClarity = async (payload: Payload): Promise<CardResult> => {
   };
 };
 
-const renderCfWa = async (payload: Payload): Promise<CardResult> => {
+const renderCfWa = async (payload: BasePayload): Promise<CardResult> => {
   const entry = await readCache<CfWaCached>(
-    payload as unknown as Parameters<typeof readCache>[0],
+    payload,
     'cloudflareWebAnalytics' as CachedProvider,
     'global',
     'default',
@@ -209,7 +209,7 @@ const renderCfWa = async (payload: Payload): Promise<CardResult> => {
 export const AnalyticsCards = async ({
   payload,
 }: {
-  payload: Payload;
+  payload: BasePayload;
 }): Promise<ReactElement> => {
   const results = await Promise.all([
     renderGa4(payload),

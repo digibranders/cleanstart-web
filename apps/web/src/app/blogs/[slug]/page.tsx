@@ -179,12 +179,9 @@ export async function renderBlogDetail({
           <BlogDetailFAQ faqs={post.faqs} />
         )}
 
-        {/* Trailing buffer ensures consistent visible gap between the last
-            section's content and the CTA card. CTA behavior is responsive:
-            mobile = card fully detached above footer (needs ~440px clearance);
-            sm/lg = card centered on footer edge (needs ~210/190px). The
-            `--spacing-section-cta` token holds the per-breakpoint value; each
-            branch subtracts the inner pb of its last rendered section. */}
+        {/* Trailing buffer keeps a consistent gap between the last section and
+            the CTA card. `--spacing-section-cta` holds the per-breakpoint clearance;
+            each branch subtracts the inner pb of its last rendered section. */}
         {relatedPosts.length > 0 ? (
           <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)", paddingBottom: "calc(var(--spacing-section-cta) - 20px)" }}>
             <BlogDetailRelatedPosts posts={relatedPosts} />

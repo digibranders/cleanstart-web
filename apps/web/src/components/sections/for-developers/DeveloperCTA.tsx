@@ -2,17 +2,11 @@ import Link from 'next/link';
 
 /**
  * Inner content for the For Developers CTA card, rendered inside the Footer's
- * fixed 1276 × 240 (lg) / radius-40 slot. Figma node 857:5874.
- *
- * Distinguishing detail vs every other page CTA: this one uses a **light**
- * background per Figma — white card with two soft purple-pink ellipse blooms
- * (one top-left, one bottom-right) and the shared cleansight grid union, all
- * the same source assets as VulnCTA. Text is dark (#111), button is the solid
- * blue cs-btn-blue (matches Figma's #3960F9 button). Single CTA: "Read the
- * Guide" — no secondary "Talk to an expert" link.
- *
- * Layout mirrors VulnCTA's two-column structure (heading left, body+button
- * right) so the visual rhythm matches the rest of the site's CTAs.
+ * fixed 1276 × 240 (lg) / radius-40 slot. Unlike every other page CTA this one
+ * uses a light background: a white card with two soft purple-pink ellipse
+ * blooms and the shared cleansight grid union. Layout mirrors VulnCTA's
+ * two-column structure (heading left, body and button right) so the visual
+ * rhythm matches the rest of the site's CTAs.
  */
 export function DeveloperCTA(): React.ReactElement {
   return (
@@ -21,12 +15,9 @@ export function DeveloperCTA(): React.ReactElement {
       className="absolute inset-0 overflow-hidden"
       style={{ background: '#ffffff' }}
     >
-      {/* ── Grid union (radial-gradient grid pattern) — shared cleansight
-          asset. The SVG already has `opacity="0.08"` baked into its <path>,
-          so no wrapper opacity is needed; adding one here just compounds and
-          renders the grid invisible. Position matches Figma node 857:5875
-          exactly so the visible grid quadrant lands on the right half of
-          the card. */}
+      {/* Grid union shared cleansight asset. The SVG already has
+          opacity="0.08" baked into its path, so no wrapper opacity is needed;
+          adding one here compounds and renders the grid invisible. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -43,7 +34,6 @@ export function DeveloperCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Purple bloom — top-left (Figma Ellipse 46683) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -59,7 +49,6 @@ export function DeveloperCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Purple bloom — bottom-right (Figma Ellipse 46682) ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -75,7 +64,6 @@ export function DeveloperCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Content row ── */}
       <div
         className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 items-start"
         style={{
@@ -86,7 +74,6 @@ export function DeveloperCTA(): React.ReactElement {
           columnGap: 'clamp(32px, 5vw, 100px)',
         }}
       >
-        {/* Left column — heading. */}
         <p
           className="relative min-w-0 w-full font-display font-bold"
           style={{
@@ -104,7 +91,6 @@ export function DeveloperCTA(): React.ReactElement {
           Build on Trusted Foundations
         </p>
 
-        {/* Right column — description + button. */}
         <div
           className="flex flex-col min-w-0 w-full"
           style={{ maxWidth: '500px', gap: 'clamp(16px, 1.5vw, 24px)', zIndex: 1 }}
@@ -157,7 +143,6 @@ export function DeveloperCTA(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Mobile layout ── */}
       <div className="flex md:hidden absolute inset-0 flex-col items-center justify-center text-center" style={{ padding: '32px 28px' }}>
         <p
           className="font-display font-bold"

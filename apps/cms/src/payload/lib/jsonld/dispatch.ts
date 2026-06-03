@@ -18,7 +18,6 @@ import type { JsonLdBlob } from './types';
 import { docCanonicalUrl } from './url';
 import { type WebPageVariant, buildWebPageBlob, webPageVariantForPath } from './web-page';
 import { buildWebsiteBlob } from './website';
-import { extractFromLexical } from '../lexical-extract';
 
 /** Collections this dispatcher can emit blobs for. */
 export type EmittableCollection =
@@ -462,7 +461,7 @@ const dispatchEvent = (
     collection === 'events'
       ? [
           { name: 'Home', path: '/' },
-          { name: 'Events', path: '/event' },
+          { name: 'Events', path: '/events' },
           { name: doc.title, path: `/event/${doc.slug}` },
         ]
       : [
@@ -493,15 +492,8 @@ const extractDescriptionForJob = (doc: AnyDoc): string => {
 
   const body = (doc as { body?: unknown }).body;
   if (body && typeof body === 'object') {
-    const summary = extractFromLexical(body);
-    if (summary.wordCount > 0) {
-      // We only need text — `extractFromLexical` doesn't return it
-      // verbatim, so reduce one more time. Acceptable inefficiency
-      // since this only runs on the JSON-LD endpoint, behind a 60s
-      // cache.
-      const text = collectLexicalText(body);
-      if (text.length > 0) return text.slice(0, 5000);
-    }
+    const text = collectLexicalText(body);
+    if (text.length > 0) return text.slice(0, 5000);
   }
 
   return doc.title ?? 'Job description';

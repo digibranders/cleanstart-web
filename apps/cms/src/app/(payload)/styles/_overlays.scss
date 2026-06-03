@@ -27,6 +27,88 @@
   box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
 }
 
+// ─── Doc-controls kebab (3-dots) menu — unify item styling with our
+// `.cs-menu` dropdowns (the Publish split-button menu). The kebab popup mixes
+// Payload-native rows (`.popup-button-list__button`: Create New / Duplicate /
+// Delete) with our injected DocKebabExtras rows (`.popup-list__item`: Discard
+// changes / Versions / API URL), which otherwise paint as bare links with no
+// padding. `:has(.popup-list__item)` scopes to the kebab only — that class is
+// unique to DocKebabExtras — so field / relationship / Lexical popups, which
+// reuse `.popup-button-list__button`, stay untouched.
+.popup__content:has(.popup-list__item) {
+  padding: var(--cs-space-1);
+
+  .popup-button-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  // Every actionable row — native + injected — gets the cs-menu item look.
+  .popup-button-list__button,
+  .popup-list__item {
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--cs-radius-chip);
+    color: var(--theme-text);
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    font-weight: 500;
+    gap: var(--cs-space-2);
+    line-height: 1.4;
+    margin: 0;
+    padding: 6px 10px;
+    text-align: left;
+    text-decoration: none;
+    width: 100%;
+    transition:
+      background-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover:not(:disabled):not([aria-disabled='true']),
+    &:focus-visible {
+      background: var(--cs-tint-brand-soft);
+      color: var(--theme-text);
+      outline: none;
+    }
+
+    &:disabled,
+    &[aria-disabled='true'] {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+  }
+
+  // Delete → danger tone, matching `.cs-menu__item--danger`.
+  #action-delete {
+    color: var(--color-error-500);
+
+    &:hover:not(:disabled) {
+      background: rgba(220, 38, 38, 0.08);
+      color: var(--color-error-500);
+    }
+  }
+
+  // Hairline divider between the native action group and our injected
+  // Discard / Versions / API URL group (mirrors the cs-menu separator).
+  .popup-button-list__button + .popup-list__item {
+    margin-top: 5px;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: 4px;
+      right: 4px;
+      height: 1px;
+      background: var(--theme-elevation-200);
+    }
+  }
+}
+
 // kbd shortcuts inside tooltips & menus — mac-style key caps
 kbd {
   background: var(--theme-elevation-150);
@@ -162,8 +244,8 @@ body:has(.drawer--is-open)::after {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 100; // below `.drawer` (101) but above the nav (50)
   pointer-events: none;
 }
@@ -407,13 +489,13 @@ body:has(.drawer--is-open) .nav-toggler {
   }
 }
 
-// Close button — calm circle that lights up brand cyan on hover
+// Close button — unified 32px target, destructive red on hover (matches drawer close)
 .close-modal-button {
   background: transparent;
   border: 1px solid var(--theme-elevation-200);
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -421,11 +503,13 @@ body:has(.drawer--is-open) .nav-toggler {
   cursor: pointer;
   transition:
     color var(--cs-motion-micro),
-    border-color var(--cs-motion-micro);
+    border-color var(--cs-motion-micro),
+    background-color var(--cs-motion-micro);
 
   &:hover {
-    color: var(--cs-cyan-500);
-    border-color: var(--cs-cyan-500);
+    color: var(--color-error-500);
+    border-color: var(--color-error-500);
+    background: rgba(220, 38, 38, 0.08);
   }
 }
 

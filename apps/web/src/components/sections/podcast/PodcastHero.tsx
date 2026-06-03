@@ -13,7 +13,6 @@ const YouTubeEmbed = dynamic(() =>
   import("./_components/YouTubeEmbed").then((m) => ({ default: m.YouTubeEmbed })),
 );
 
-// Exact Figma gradient (node 373:2909).
 const HERO_GRADIENT =
   "linear-gradient(179.997deg, rgb(21, 16, 33) 25.702%, rgb(16, 18, 62) 31.159%, rgb(19, 30, 143) 51.006%, rgb(71, 30, 192) 68.711%, rgb(71, 31, 195) 79.832%, rgba(70, 30, 191, 0.85) 85.018%, rgba(66, 30, 188, 0.4) 93.72%, rgba(66, 30, 188, 0) 100.66%)";
 
@@ -63,10 +62,9 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
       }}
       aria-labelledby="podcast-hero-title"
     >
-      {/* Desktop: the card vertical-center sits on the gradient's bottom edge (=
-          waveform centerline). On mobile we want the waveform centerline to sit on the
-          card's BOTTOM edge instead, so we shift the card up by its FULL height (not
-          half) and stop pulling LatestEpisodes upward — it flows naturally below. */}
+      {/* Desktop centers the card on the gradient's bottom edge (the waveform centerline).
+          Mobile instead seats the waveform centerline on the card's bottom edge, so the card
+          shifts up by its full height (not half) and LatestEpisodes flows naturally below. */}
       <style>{`
         .podcast-hero {
           --podcast-card-overlap: ${VIDEO_OVERLAP_PX}px;
@@ -85,13 +83,11 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
           }
         }
       `}</style>
-      {/* Hero gradient region (Figma gradient) with a white blending overlay near the
-          bottom edge. The same overlay continues at the top of LatestEpisodes (fading the
-          other way), so where the two sections meet they are both pure white — the embed
-          card straddles that white band with a transparent background, exactly like the
-          CTA → Footer overlap pattern. */}
+      {/* A white blending overlay fades the gradient to pure white at its bottom edge. The
+          matching overlay at the top of LatestEpisodes fades the other way, so the two
+          sections meet on a continuous white band that the transparent-background embed card
+          straddles — the same approach as the CTA-to-Footer overlap pattern. */}
       <div className="relative" style={{ background: HERO_GRADIENT }}>
-        {/* White blending overlay — transparent at top, solid white at the bottom edge */}
         <div
           aria-hidden
           className="absolute inset-x-0 bottom-0 pointer-events-none"
@@ -101,8 +97,7 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
               "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.65) 60%, #ffffff 100%)",
           }}
         />
-        {/* Text content — heading style + top-spacing aligned with Resource Center hero
-            for cross-page consistency. */}
+        {/* Heading style and top spacing match the Resource Center hero for cross-page consistency. */}
         <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[clamp(72px,8vw,128px)] pb-[260px] flex flex-col items-center text-center">
           {eyebrow ? (
             <span className="text-[#cdd6ff] text-[14px] tracking-[0.18em] uppercase mb-3">
@@ -149,13 +144,10 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
           </HeroReveal>
         </div>
 
-        {/* Animated CSS waveform — vertically centered on the gradient region's bottom
-            edge, edge-to-edge. Bars pulse on a staggered animation-delay so a wave
-            visibly travels across the section. Honors prefers-reduced-motion. */}
         <Waveform />
       </div>
 
-      {/* Video — vertical center sits at the hero's bottom edge (= waveform centerline) */}
+      {/* The video's vertical center sits on the hero's bottom edge (the waveform centerline). */}
       <div
         className="relative z-20 mx-auto px-6"
         style={{

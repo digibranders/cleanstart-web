@@ -101,7 +101,7 @@ describe('buildSearchDocument', () => {
       collection: 'blogs',
       title: 'My Post',
       description: 'A short lede.',
-      url: 'https://cleanstart.com/blog/my-post',
+      url: 'https://cleanstart.com/blogs/my-post',
       slug: 'my-post',
       publishedAt: '2026-05-01',
       updatedAt: '2026-05-05',

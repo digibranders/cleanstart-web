@@ -13,7 +13,13 @@ import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
 import { firstPublishHook } from '../hooks/first-publish';
 import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
+import {
+  searchSyncAfterChangeHook,
+  searchSyncAfterDeleteHook,
+} from '../hooks/search-sync';
+import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 export const Events: CollectionConfig = {
   slug: 'events',
@@ -42,12 +48,31 @@ export const Events: CollectionConfig = {
     {
       name: 'startsAt',
       type: 'date',
-      admin: { date: { pickerAppearance: 'dayAndTime' } },
+      required: true,
+      admin: {
+        date: { pickerAppearance: 'dayAndTime' },
+        // Custom calendar so it matches `endsAt` (which needs a dynamic
+        // min-date the stock picker can't express).
+        components: {
+          Field: '@/payload/admin/components/fields/DateField.tsx#DateField',
+        },
+      },
     },
     {
       name: 'endsAt',
       type: 'date',
-      admin: { date: { pickerAppearance: 'dayAndTime' } },
+      admin: {
+        date: { pickerAppearance: 'dayAndTime' },
+        // `minFromField: 'startsAt'` greys out any date before the start in
+        // the calendar, so an end-before-start can't be selected. The
+        // `validate` below is the server-side backstop.
+        components: {
+          Field: {
+            path: '@/payload/admin/components/fields/DateField.tsx#DateField',
+            clientProps: { minFromField: 'startsAt' },
+          },
+        },
+      },
       validate: (
         value: Date | string | null | undefined,
         { siblingData }: { siblingData?: { startsAt?: Date | string | null } },
@@ -280,7 +305,11 @@ export const Events: CollectionConfig = {
     afterChange: [
       slugChangeRedirectHook('events'),
       schemaOverrideAuditHook('events'),
+      searchSyncAfterChangeHook('events'),
+      webhooksPublishAfterChangeHook('events'),
+      indexNowPublishAfterChangeHook('events'),
     ],
+    afterDelete: [searchSyncAfterDeleteHook('events')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

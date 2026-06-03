@@ -41,8 +41,8 @@ describe('buildJsonLdBlobs', () => {
 
       const article = blobs.find((b) => b['@type'] === 'Article');
       expect(article).toMatchObject({
-        '@id': 'https://cleanstart.com/blog/example',
-        url: 'https://cleanstart.com/blog/example',
+        '@id': 'https://cleanstart.com/blogs/example',
+        url: 'https://cleanstart.com/blogs/example',
         headline: 'Example post',
         description: 'A short lede.',
         dateModified: '2026-05-05T12:00:00Z',
@@ -303,7 +303,7 @@ describe('buildJsonLdBlobs', () => {
       expect(digitalDoc?.encodingFormat).toBe('application/pdf');
       expect(digitalDoc?.url).toBe('https://cdn.example/whitepapers/sbom.pdf');
       expect(digitalDoc?.contentSize).toBe('1.4 MB');
-      expect(digitalDoc?.isPartOf?.['@id']).toBe('https://cleanstart.com/resource/sbom-whitepaper');
+      expect(digitalDoc?.isPartOf?.['@id']).toBe('https://cleanstart.com/resources/sbom-whitepaper');
     });
 
     it('omits DigitalDocument when the resource has no asset', () => {
@@ -345,7 +345,7 @@ describe('buildJsonLdBlobs', () => {
       const blobs = buildJsonLdBlobs(ctx, 'events', baseEvent);
       const event = blobs.find((b) => b['@type'] === 'Event');
       expect(event).toMatchObject({
-        '@id': 'https://cleanstart.com/events/kubecon-25',
+        '@id': 'https://cleanstart.com/event/kubecon-25',
         startDate: '2026-09-10T17:00:00Z',
         endDate: '2026-09-12T01:00:00Z',
         eventStatus: 'https://schema.org/EventScheduled',

@@ -9,7 +9,7 @@ type Props = {
 
 export function ContextualCTA({ headline, sub, ctaLabel, ctaHref }: Props) {
   return (
-    <div className="cs-cta-glass mt-4 flex items-center justify-between gap-2.5 rounded-[12px] border border-white/[0.06] px-3.5 py-2.5">
+    <div className="cs-cta-glass mt-4 flex items-center justify-between gap-2.5 rounded-[10px] px-3.5 py-2.5">
       <div className="text-xs font-semibold text-white">
         {headline}
         {sub && <span className="ml-1.5 font-normal text-white/55">{sub}</span>}

@@ -1,4 +1,4 @@
-import type { Endpoint } from 'payload';
+import type { Endpoint, Payload } from 'payload';
 import { z } from 'zod';
 
 import { hasRole } from '../access/typed-user';
@@ -35,6 +35,40 @@ const matchesEmail = (lead: LeadRow, targetEmail: string): boolean => {
   return found.toLowerCase() === targetEmail.toLowerCase();
 };
 
+const LEAD_PAGE_SIZE = 500;
+
+/**
+ * Collect every lead matching `targetEmail` across the full table.
+ *
+ * The email lives inside the per-form `fields` JSON (the field name
+ * varies per form, so `extractEmail` walks the values) and is not
+ * queryable on the json column — so we page through all rows and filter
+ * in memory. Pagination is exhausted up front; callers must not delete
+ * mid-iteration or a later page's offset would skip rows.
+ */
+const collectMatchingLeads = async (
+  payload: Payload,
+  targetEmail: string,
+): Promise<LeadRow[]> => {
+  const matches: LeadRow[] = [];
+  let page = 1;
+  for (;;) {
+    const result = await payload.find({
+      collection: 'leads',
+      limit: LEAD_PAGE_SIZE,
+      page,
+      depth: 0,
+      overrideAccess: true,
+    });
+    for (const lead of result.docs as unknown as LeadRow[]) {
+      if (matchesEmail(lead, targetEmail)) matches.push(lead);
+    }
+    if (!result.hasNextPage) break;
+    page += 1;
+  }
+  return matches;
+};
+
 /**
  * GET /api/leads/dsar/find?email=...
  *
@@ -51,7 +85,15 @@ export const dsarFindEndpoint: Endpoint = {
 
     const ip = clientIpFromHeaders(req.headers);
     const limited = checkAndRecord(`dsar-find:${ip}`, DSAR_RATE_LIMITS);
-    if (limited) return json({ ok: false, error: 'rate_limited' }, { status: 429 });
+    if (!limited.ok)
+      return json(
+        {
+          ok: false,
+          error: 'rate_limited',
+          retryAfterSeconds: Math.ceil(limited.retryAfterMs / 1000),
+        },
+        { status: 429 },
+      );
 
     const url = new URL(req.url ?? '', 'http://localhost');
     const emailParam = url.searchParams.get('email')?.trim() ?? '';
@@ -61,20 +103,11 @@ export const dsarFindEndpoint: Endpoint = {
 
     const targetEmail = emailParam.toLowerCase();
 
-    const result = await req.payload.find({
-      collection: 'leads',
-      limit: 1000,
-      depth: 0,
-      overrideAccess: true,
-    });
-
-    const matches = (result.docs as unknown as LeadRow[])
-      .filter((lead) => matchesEmail(lead, targetEmail))
-      .map((lead) => ({
-        id: lead.id,
-        createdAt: lead.createdAt,
-        formId: resolveFormId(lead.form),
-      }));
+    const matches = (await collectMatchingLeads(req.payload, targetEmail)).map((lead) => ({
+      id: lead.id,
+      createdAt: lead.createdAt,
+      formId: resolveFormId(lead.form),
+    }));
 
     // Audit trail.
     await req.payload.create({
@@ -111,7 +144,15 @@ export const dsarDeleteEndpoint: Endpoint = {
 
     const ip = clientIpFromHeaders(req.headers);
     const limited = checkAndRecord(`dsar-delete:${ip}`, DSAR_RATE_LIMITS);
-    if (limited) return json({ ok: false, error: 'rate_limited' }, { status: 429 });
+    if (!limited.ok)
+      return json(
+        {
+          ok: false,
+          error: 'rate_limited',
+          retryAfterSeconds: Math.ceil(limited.retryAfterMs / 1000),
+        },
+        { status: 429 },
+      );
 
     let raw: unknown;
     try {
@@ -128,16 +169,7 @@ export const dsarDeleteEndpoint: Endpoint = {
     const targetEmail = parsed.data.email.toLowerCase();
     const actorId = (req.user as { id: number } | null)?.id ?? null;
 
-    const result = await req.payload.find({
-      collection: 'leads',
-      limit: 1000,
-      depth: 0,
-      overrideAccess: true,
-    });
-
-    const matching = (result.docs as unknown as LeadRow[]).filter((lead) =>
-      matchesEmail(lead, targetEmail),
-    );
+    const matching = await collectMatchingLeads(req.payload, targetEmail);
 
     // Cascade to HubSpot first — irreversible (permanently blocklists
     // the email in the CRM). Fail-soft: if HubSpot can't be reached,

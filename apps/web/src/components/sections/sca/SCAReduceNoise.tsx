@@ -52,7 +52,6 @@ export function SCAReduceNoise(): React.ReactElement {
           "linear-gradient(180deg, #151021 0%, #131e8f 62.5%, #471ec0 100%)",
       }}
     >
-      {/* Cyan glow flare — top-right */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -67,19 +66,16 @@ export function SCAReduceNoise(): React.ReactElement {
         }}
       />
 
-      {/* Content: two columns — max-lg:!pt-/pb- shrinks the 120/120 inline
-          padding to 60/60 only on mobile to remove dead space between this
-          section and SCATransform below. */}
+      {/* Shrink the inline 120px padding to 60px below lg to remove dead
+          space between this section and SCATransform below. */}
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col lg:flex-row items-start justify-between max-lg:!pt-[60px] max-lg:!pb-[60px]"
         style={{ paddingTop: "120px", paddingBottom: "120px", gap: "40px" }}
       >
-        {/* Left — heading + subtitle + 4 feature rows */}
         <div
           className="flex-shrink-0 flex flex-col"
           style={{ maxWidth: "596px", width: "100%", gap: "24px" }}
         >
-          {/* Heading + subtitle block (gap-[32px] between them) */}
           <div className="flex flex-col" style={{ gap: "32px" }}>
             <Reveal header>
               <h2
@@ -114,11 +110,10 @@ export function SCAReduceNoise(): React.ReactElement {
             </Reveal>
           </div>
 
-          {/* Mobile-only mockup — sits between subtitle and feature rows.
-              Mockup body is natively 512×541 with absolute positioning, so it
-              can't fluid-resize. We render it at native size and CSS-transform
-              scale to fit the viewport. Outer wrapper reserves layout space
-              that matches the scaled visual size via aspect-ratio. */}
+          {/* Mockup body is natively 512×541 with absolute positioning and
+              can't fluid-resize; render at native size and CSS-transform scale
+              to fit. The outer wrapper reserves scaled layout space via
+              aspect-ratio. */}
           <div
             className="lg:hidden mx-auto"
             style={{
@@ -143,11 +138,9 @@ export function SCAReduceNoise(): React.ReactElement {
             </div>
           </div>
 
-          {/* Feature rows — gap 24px between rows */}
           <div className="flex flex-col" style={{ gap: "24px" }}>
             {FEATURES.map(({ icon, title, desc }) => (
               <div key={title} className="flex items-start" style={{ gap: "16px" }}>
-                {/* Icon container */}
                 <div
                   className="flex-shrink-0 flex items-center justify-center rounded-[8px]"
                   style={{
@@ -169,7 +162,6 @@ export function SCAReduceNoise(): React.ReactElement {
                   />
                 </div>
 
-                {/* Text */}
                 <div className="flex flex-col" style={{ gap: "8px" }}>
                   <p
                     style={{
@@ -201,8 +193,7 @@ export function SCAReduceNoise(): React.ReactElement {
           </div>
         </div>
 
-        {/* Right — cyan glassmorphic bg + dark mockup card stacked.
-            Desktop only — mobile renders a scaled clone inside the left column
+        {/* Desktop only; mobile renders a scaled clone inside the left column
             above the feature rows. */}
         <div
           className="flex-shrink-0 hidden lg:block"
@@ -215,14 +206,12 @@ export function SCAReduceNoise(): React.ReactElement {
   );
 }
 
-/** Sca-analyzer mockup body — natively 512×541. Used directly at native size
- * on desktop (right column) and inside a CSS-transform scaling wrapper on
- * mobile (between subtitle and feature rows). All internals use absolute
- * positioning pinned to those native dimensions. */
+/** Sca-analyzer mockup body, natively 512×541. Rendered at native size on
+ * desktop and inside a CSS-transform scaling wrapper on mobile. All internals
+ * use absolute positioning pinned to those native dimensions. */
 function Mockup(): React.ReactElement {
   return (
     <>
-      {/* Cyan glassmorphic background (604:2925) */}
       <div
         style={{
           position: "absolute",
@@ -234,9 +223,6 @@ function Mockup(): React.ReactElement {
           overflow: "hidden",
         }}
       >
-        {/* Ellipse 46704 — Figma 817:9438 exact spec.
-            315×267 ellipse, rotated 34.99°, top-left −113/−122, blur 105px,
-            linear-gradient(183.65deg, #7A29E3 −32.17%, #EF38E8 147.02%) */}
         <div
           aria-hidden
           style={{
@@ -254,7 +240,6 @@ function Mockup(): React.ReactElement {
         />
       </div>
 
-      {/* Dark gradient mockup card (604:2961) — 25px right, 19px down */}
       <div
         style={{
           position: "absolute",
@@ -271,7 +256,6 @@ function Mockup(): React.ReactElement {
           overflow: "hidden",
         }}
       >
-        {/* Window chrome dots + title — at y=23 from card top */}
         <div
           className="absolute flex items-center"
           style={{ top: "23px", left: "30px", gap: "10px" }}
@@ -303,7 +287,6 @@ function Mockup(): React.ReactElement {
           </span>
         </div>
 
-        {/* Divider — at y=74 from card top */}
         <div
           aria-hidden
           style={{
@@ -316,7 +299,6 @@ function Mockup(): React.ReactElement {
           }}
         />
 
-        {/* Metric rows — first at y=103 from card top, gap 16px, h=48px each */}
         <div
           className="absolute flex flex-col"
           style={{ top: "103px", left: "30px", right: "30px", gap: "16px" }}
@@ -364,7 +346,6 @@ function Mockup(): React.ReactElement {
           ))}
         </div>
 
-        {/* Bar chart area — bottom 30px from card bottom */}
         <div
           style={{
             position: "absolute",
@@ -393,9 +374,8 @@ function Mockup(): React.ReactElement {
                 flexShrink: 0,
               }}
             >
-              {/* Cyan light bleed under each bar — sits just below the bar
-                  base, blurred, plus-lighter blend so it brightens the
-                  chart's black floor without darkening the bar above. */}
+              {/* plus-lighter blend brightens the chart's black floor under
+                  each bar without darkening the bar itself. */}
               <div
                 aria-hidden
                 style={{

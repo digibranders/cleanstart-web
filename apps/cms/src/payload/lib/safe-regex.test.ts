@@ -43,7 +43,7 @@ describe('safe-regex / checkPattern', () => {
     const huge = `${'a'.repeat(257)}`;
     expect(checkPattern(huge)).toMatchObject({
       ok: false,
-      reason: 'catastrophic-backtracking',
+      reason: 'too-long',
     });
   });
 });

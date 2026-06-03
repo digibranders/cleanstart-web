@@ -22,6 +22,8 @@ type ArrayRow = {
 type UseFieldWithRows = {
   readonly rows?: ReadonlyArray<ArrayRow>;
   readonly value?: number;
+  readonly showError?: boolean;
+  readonly errorMessage?: string;
 };
 
 /**
@@ -46,6 +48,8 @@ export const ArrayField = (props: ArrayFieldClientProps): ReactElement => {
   const { field, path, schemaPath, permissions, readOnly, forceRender } = props;
   const fieldState = useField({ hasRows: true, path }) as UseFieldWithRows;
   const rows: ReadonlyArray<ArrayRow> = Array.isArray(fieldState.rows) ? fieldState.rows : [];
+  const showError = fieldState.showError === true;
+  const errorMessage = typeof fieldState.errorMessage === 'string' ? fieldState.errorMessage : undefined;
 
   const { addFieldRow, removeFieldRow, moveFieldRow, getDataByPath } = useForm();
 
@@ -247,7 +251,12 @@ export const ArrayField = (props: ArrayFieldClientProps): ReactElement => {
         ) : null}
       </header>
       {description ? <p className="cs-array__description">{description}</p> : null}
-      {belowMin ? (
+      {showError && errorMessage ? (
+        <output className="field-error cs-array__error" aria-live="polite">
+          {errorMessage}
+        </output>
+      ) : null}
+      {belowMin && !showError ? (
         <output className="cs-array__warn">
           At least {min} {min === 1 ? 'item' : 'items'} required.
         </output>
@@ -313,7 +322,7 @@ export const ArrayField = (props: ArrayFieldClientProps): ReactElement => {
                 <button
                   type="button"
                   className={`cs-array__row-toggle${
-                    isDisabled && row.customComponents?.RowLabel
+                    row.customComponents?.RowLabel
                       ? ' cs-array__row-toggle--rowlabel'
                       : ''
                   }`}
@@ -335,7 +344,12 @@ export const ArrayField = (props: ArrayFieldClientProps): ReactElement => {
                       />
                     </svg>
                   </span>
-                  {isDisabled && row.customComponents?.RowLabel ? (
+                  {row.customComponents?.RowLabel ? (
+                    // Honour a field-configured RowLabel in BOTH edit and
+                    // read-only mode. The label components are 'use client'
+                    // and read live form state via useRowLabel(), so the
+                    // header updates as the editor types. Without this the
+                    // header fell back to a single-field `rowSummary`.
                     <span className="cs-array__row-summary">
                       <RowLabelProvider path={`${path}.${i}`} rowNumber={i}>
                         {row.customComponents.RowLabel}

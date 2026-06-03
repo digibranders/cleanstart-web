@@ -359,6 +359,7 @@ export function LinkPopoverPlugin({
   return createPortal(
     <LinkPopover
       anchorRect={state.rect}
+      anchorElem={anchorElem}
       initial={state.initial}
       mode={state.mode}
       onClose={close}

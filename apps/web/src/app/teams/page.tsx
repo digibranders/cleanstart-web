@@ -31,33 +31,27 @@ export default function TeamsPage() {
       />
       <Header />
       <main>
-        {/* Hero — dark gradient bg-cs-hero + grid overlay */}
         <div className="bg-cs-hero bg-cs-grid relative overflow-hidden">
           <TeamsHero />
         </div>
 
-        {/* Executive Leadership + Advisory Board */}
         <FadeUp>
           <TeamsLeadership />
         </FadeUp>
 
-        {/* The Hustle Squad — team photo carousel on dark gradient */}
         <FadeUp>
           <TeamsHustleSquad />
         </FadeUp>
 
-        {/* CleanStart Insiders testimonials */}
         <FadeUp>
           <TeamsInsiders />
         </FadeUp>
 
-        {/* How We Work — dark gradient, pb-250 to accommodate CTA overlap */}
         <FadeUp>
           <TeamsHowWeWork />
         </FadeUp>
       </main>
 
-      {/* Footer with Join-the-Team CTA card overlapping TeamsHowWeWork */}
       <Footer cta={<TeamsCTA />} />
     </>
   );

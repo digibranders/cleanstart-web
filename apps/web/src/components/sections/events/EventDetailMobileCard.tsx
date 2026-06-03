@@ -21,7 +21,7 @@ interface EventDetailMobileCardProps {
 }
 
 /**
- * Card-style mobile layout for the event detail page, matching Figma 926:1443.
+ * Card-style mobile layout for the event detail page.
  *
  * Replaces the desktop hero+image+body stack on smaller viewports. Renders a
  * compact card on the dark gradient with the date pill, event image, title,
@@ -55,14 +55,14 @@ export function EventDetailMobileCard({
         await navigator.share({ title, url: shareUrl });
         return;
       } catch {
-        // user dismissed share sheet — fall through to clipboard
+        // Share sheet dismissed; fall through to clipboard copy.
       }
     }
     if (navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(shareUrl);
       } catch {
-        // clipboard blocked — silently no-op
+        // Clipboard access blocked; nothing more we can do.
       }
     }
   }, [title, shareUrl]);
@@ -77,7 +77,6 @@ export function EventDetailMobileCard({
       aria-labelledby={`ev-detail-mobile-${slug}`}
     >
       <div className="relative mx-auto px-6" style={{ maxWidth: "420px" }}>
-        {/* Breadcrumb */}
         <nav
           aria-label="Breadcrumb"
           className="flex flex-wrap items-center gap-1 pt-6"
@@ -107,7 +106,6 @@ export function EventDetailMobileCard({
           </span>
         </nav>
 
-        {/* Card */}
         <div
           className="mt-6"
           style={{
@@ -119,7 +117,6 @@ export function EventDetailMobileCard({
             WebkitBackdropFilter: "blur(6px)",
           }}
         >
-          {/* Date pill — top of card */}
           {(shortDate ?? longDate) && (
             <div className="flex">
               <span
@@ -140,7 +137,6 @@ export function EventDetailMobileCard({
             </div>
           )}
 
-          {/* Event image */}
           {heroUrl && heroImageWidth && heroImageHeight && (
             <div
               className="relative w-full overflow-hidden mt-4"
@@ -161,7 +157,6 @@ export function EventDetailMobileCard({
             </div>
           )}
 
-          {/* Title */}
           <h1
             id={`ev-detail-mobile-${slug}`}
             className="font-display text-white mt-5"
@@ -175,7 +170,6 @@ export function EventDetailMobileCard({
             {title}
           </h1>
 
-          {/* Date row */}
           {longDate && (
             <div className="flex items-center gap-2 mt-4 text-white">
               <CalendarIcon size={18} />
@@ -192,7 +186,6 @@ export function EventDetailMobileCard({
             </div>
           )}
 
-          {/* Location row */}
           {venue && (
             <div className="flex items-center gap-2 mt-2 text-white">
               <PinIcon />
@@ -209,7 +202,6 @@ export function EventDetailMobileCard({
             </div>
           )}
 
-          {/* Status pill (only for non-scheduled/cancelled/past) */}
           {(isPast || isCancelled || eventStatus !== "scheduled") && (
             <div className="mt-4">
               <span
@@ -233,7 +225,6 @@ export function EventDetailMobileCard({
             </div>
           )}
 
-          {/* Share button */}
           <button
             type="button"
             onClick={handleShare}
@@ -255,7 +246,6 @@ export function EventDetailMobileCard({
           </button>
         </div>
 
-        {/* Abstract / description */}
         {abstract && (
           <p
             className="font-sans text-white mt-6"
@@ -270,7 +260,6 @@ export function EventDetailMobileCard({
           </p>
         )}
 
-        {/* Trailing spacer so the gradient blends into the next white section. */}
         <div aria-hidden style={{ height: "48px" }} />
       </div>
     </section>

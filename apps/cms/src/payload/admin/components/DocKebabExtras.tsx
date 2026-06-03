@@ -2,17 +2,47 @@
 
 import { ConfirmDialog } from '@cleanstart/ui';
 import {
-  PopupList,
   useConfig,
   useDocumentInfo,
   useForm,
   useFormModified,
 } from '@payloadcms/ui';
 import { hasAutosaveEnabled } from 'payload/shared';
-import type { ReactElement } from 'react';
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactElement } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { showToast } from './ToastBus';
+
+/**
+ * Thin replacement for `PopupList.Button` from @payloadcms/ui that
+ * only uses @cleanstart/ui + native elements. Renders either a plain
+ * `<button>` or an `<a>` depending on whether `href` is provided.
+ * Visually styled to blend with Payload's kebab-menu item list.
+ */
+const KebabItem = (
+  props:
+    | ({ href: string } & AnchorHTMLAttributes<HTMLAnchorElement>)
+    | ({ href?: undefined } & ButtonHTMLAttributes<HTMLButtonElement>),
+): ReactElement => {
+  if (props.href !== undefined) {
+    const { href, className, ...rest } = props as { href: string } & AnchorHTMLAttributes<HTMLAnchorElement>;
+    return (
+      <a
+        href={href}
+        className={`popup-list__item${className ? ` ${className}` : ''}`}
+        {...rest}
+      />
+    );
+  }
+  const { href: _href, className, ...rest } = props as { href?: undefined } & ButtonHTMLAttributes<HTMLButtonElement>;
+  return (
+    <button
+      type="button"
+      className={`popup-list__item${className ? ` ${className}` : ''}`}
+      {...rest}
+    />
+  );
+};
 
 /**
  * Items mounted into the native document-controls kebab dropdown via
@@ -80,15 +110,15 @@ export const DocKebabExtras = (): ReactElement | null => {
   return (
     <>
       {!autosave ? (
-        <PopupList.Button
+        <KebabItem
           disabled={!modified || busy}
           onClick={() => setConfirmOpen(true)}
         >
           Discard changes
-        </PopupList.Button>
+        </KebabItem>
       ) : null}
-      <PopupList.Button href={versionsHref}>Versions</PopupList.Button>
-      <PopupList.Button href={apiHref}>API URL</PopupList.Button>
+      <KebabItem href={versionsHref}>Versions</KebabItem>
+      <KebabItem href={apiHref}>API URL</KebabItem>
 
       <ConfirmDialog
         open={confirmOpen}

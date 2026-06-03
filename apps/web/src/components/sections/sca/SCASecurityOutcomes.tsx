@@ -3,15 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
-/**
- * Security Outcomes — Figma node 604:3017
- * 2×2 CSS Grid: dark stat cards (top) + white feature cards (bottom)
- * 3D shield (Figma PNG + CleanStart emblem) centred, overlapping both rows
- * Stat numbers animate from 0 → target when section enters viewport
- */
-
-/* ─── Counter hook ───────────────────────────────────────── */
-
 function useCountUp(
   target: number,
   duration: number,
@@ -28,7 +19,6 @@ function useCountUp(
     const tick = (now: number): void => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // easeOutQuart
       const eased = 1 - (1 - progress) ** 4;
       setCount(Math.round(eased * target));
       if (progress < 1) {
@@ -42,8 +32,6 @@ function useCountUp(
 
   return count;
 }
-
-/* ─── CleanStart emblem (inline SVG) ────────────────────── */
 
 function ShieldEmblem(): React.ReactElement {
   return (
@@ -66,26 +54,21 @@ function ShieldEmblem(): React.ReactElement {
   );
 }
 
-/* ─── Shared styles ──────────────────────────────────────── */
-
 /*
- * Dark "stat" card.
- *
- * Figma 857:9953 stacks five visual layers; we render them as positioned
- * children of the card so the geometry scales with the card box:
+ * Dark "stat" card — five stacked visual layers rendered as positioned
+ * children so the geometry scales with the card box:
  *
  *   1. Base linear gradient (top→bottom dark-navy→indigo→violet)
  *   2. Radial gradient border highlighting the top-right (#dab6f3 → 0)
  *   3. Cyan halo (#04C7F2) — wide, heavily blurred, ~70% opacity, anchored
- *      to the card's upper band; gives the card its characteristic cyan
- *      gleam along the top edge.
+ *      to the card's upper band; gives the cyan gleam along the top edge.
  *   4. Violet halo (#5D04D7) — heavily blurred, ~34% opacity, anchored to
  *      the lower-left; produces the purple under-glow.
  *   5. Soft black ellipse (opacity 0.2) tucked just outside the upper-right
  *      corner, adding a subtle vignette that lets the highlight read.
  *
  * Positions are expressed as % of the card box so the layers stay anchored
- * at every viewport (cards are flex/minHeight-driven, not fixed at 328×105).
+ * at every viewport (cards are flex/minHeight-driven, not fixed-size).
  */
 const TOP_CARD_SHELL: React.CSSProperties = {
   position: "relative",
@@ -108,7 +91,7 @@ function TopCard({
 }): React.ReactElement {
   return (
     <div className={className} style={TOP_CARD_SHELL}>
-      {/* Layer 3 — cyan halo (top-anchored, wide) */}
+      {/* Layer 3: cyan halo (top-anchored, wide) */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -172,14 +155,14 @@ function TopCard({
       />
 
       {/*
-       * Figma effects on the card surface:
+       * Card-surface effects:
        *   • Layer blur — a soft Gaussian blur copy of the gradient base
        *     softens the seams between the cyan/violet halos and the
        *     underlying gradient so they read as one diffused surface
        *     instead of three discrete blobs.
        *   • Noise — fractal-noise grain (SVG feTurbulence) overlaid with
-       *     mix-blend-mode: overlay, low opacity. Adds the film-grain
-       *     texture from the Effects panel without dragging in a bitmap.
+       *     mix-blend-mode: overlay, low opacity. Adds film-grain texture
+       *     without dragging in a bitmap.
        */}
       <div
         aria-hidden
@@ -204,7 +187,6 @@ function TopCard({
         }}
       />
 
-      {/* Content slot */}
       <div
         className="relative flex flex-col justify-center h-full"
         style={{
@@ -267,7 +249,7 @@ const FEAT_DESC: React.CSSProperties = {
 };
 
 /*
- * Shield overlap math (Figma 1920px canvas, content 1276px):
+ * Shield overlap math (content width 1276px):
  *   shield width  = 34.8% of content = 444px
  *   column gap    = 86px
  *   overlap/card  = (444 − 86) / 2 = 179px  →  14.05vw
@@ -278,13 +260,10 @@ const FEAT_DESC: React.CSSProperties = {
  * one-per-row and the shield is hidden).
  */
 
-/* ─── Component ─────────────────────────────────────────── */
-
 export function SCASecurityOutcomes(): React.ReactElement {
   const sectionRef = useRef<HTMLElement>(null);
   const [triggered, setTriggered] = useState(false);
 
-  /* Trigger counters once section is 30% visible */
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -326,7 +305,6 @@ export function SCASecurityOutcomes(): React.ReactElement {
           paddingBottom: "clamp(48px, 6vw, 80px)",
         }}
       >
-        {/* ── Heading ── */}
         <Reveal header>
           <h2
             className="text-center"
@@ -343,12 +321,11 @@ export function SCASecurityOutcomes(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* ── Card grid + shield ── */}
         <div className="relative" style={{ marginTop: "60px" }}>
 
-          {/* Shield — centred, spans both rows. Hidden on mobile because the
-              cards stack 1-per-row there; the shield only makes sense over
-              the 2×2 desktop grid. */}
+          {/* Centred, spans both rows. Hidden on mobile because the cards
+              stack 1-per-row there; the shield only makes sense over the
+              2×2 desktop grid. */}
           <div
             aria-hidden
             className="pointer-events-none select-none absolute hidden lg:block"
@@ -362,7 +339,6 @@ export function SCASecurityOutcomes(): React.ReactElement {
               overflow: "hidden",
             }}
           >
-            {/* 3D shield PNG (Figma crop: 196.86% wide, offset −49.08% left, −19.78% top) */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/sca/security-shield.png"
@@ -378,7 +354,6 @@ export function SCASecurityOutcomes(): React.ReactElement {
               decoding="async"
             />
 
-            {/* CleanStart emblem — centred on shield face */}
             <div
               style={{
                 position: "absolute",
@@ -393,36 +368,32 @@ export function SCASecurityOutcomes(): React.ReactElement {
             </div>
           </div>
 
-          {/* Card grid — mobile: 1-col stacked alternating blue/white per
-              reference, lg+: original 2×2 with the shield overlap. Mobile
-              order is controlled via `order-*` utilities so each card lands
-              in the right slot of the stack without changing DOM order
-              (which the lg grid still consumes left-to-right, top-to-bottom). */}
+          {/* Mobile stacks 1-col alternating blue/white; lg+ is the 2×2 grid
+              with the shield overlap. `order-*` utilities place each card in
+              the right mobile slot without changing DOM order (which the lg
+              grid still consumes left-to-right, top-to-bottom). */}
           <div
             className="grid grid-cols-1 lg:grid-cols-2 gap-y-4 lg:gap-y-[clamp(8px,3.4vw,44px)] lg:gap-x-[clamp(40px,6.7vw,86px)]"
           >
-            {/* Top-left — 89% (mobile slot 1) */}
             <TopCard className="order-1 lg:order-none">
               <p style={STAT_NUM}>{count89}%</p>
               <p style={STAT_LABEL}>Fewer inherited vulnerabilities</p>
             </TopCard>
 
-            {/* Top-right — 75% (mobile slot 3; lg+ gets extra left padding
-                to clear the shield via !pl which beats the inline padding
-                shorthand). */}
+            {/* lg+ gets extra left padding to clear the shield via !pl, which
+                beats the inline padding shorthand. */}
             <TopCard className="order-3 lg:order-none lg:[&>div:last-child]:!pl-[clamp(100px,15vw,195px)]">
               <p style={STAT_NUM}>{count75}%</p>
               <p style={STAT_LABEL}>Faster remediation cycles</p>
             </TopCard>
 
-            {/* Bottom-left — Smaller SBOMs (mobile slot 2) */}
             <div className="order-2 lg:order-none" style={BOTTOM_CARD}>
               <p style={FEAT_TITLE}>Smaller SBOMs</p>
               <p style={FEAT_DESC}>Reduced dependency complexity</p>
             </div>
 
-            {/* Bottom-right — Faster Reviews (mobile slot 4; lg+ gets the
-                same shield-clearance left padding as the 75% card above). */}
+            {/* lg+ gets the same shield-clearance left padding as the 75%
+                card above. */}
             <div
               className="order-4 lg:order-none lg:!pl-[clamp(100px,15vw,195px)]"
               style={BOTTOM_CARD}

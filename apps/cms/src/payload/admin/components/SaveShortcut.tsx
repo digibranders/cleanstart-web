@@ -31,16 +31,10 @@ export const SaveShortcut = (): ReactElement | null => {
       }
 
       // Find the document save button. Payload renders publish on top
-      // when versioning is on; save-draft sits next to it. Try publish
-      // first, fall back to save-draft, then any save button.
-      const button =
-        document.getElementById('action-save') ||
-        document.querySelector<HTMLButtonElement>(
-          '.doc-controls__publish > button, .doc-controls .btn--style-primary > button',
-        ) ||
-        document.querySelector<HTMLButtonElement>(
-          '.doc-controls .save-draft, .doc-controls .btn.save-draft',
-        );
+      // when versioning is on; save-draft sits next to it. Target the
+      // stable `#action-save` id first; fall back to nothing (no edit
+      // view = let the browser handle Cmd+S as a page-save).
+      const button = document.getElementById('action-save') as HTMLButtonElement | null;
 
       if (!button) return; // not on an edit view — let the browser handle it
       e.preventDefault();

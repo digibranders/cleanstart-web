@@ -1,3 +1,4 @@
+import { webflowStatus } from './status';
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
 import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
 
@@ -12,7 +13,7 @@ export const transformPage = (row: Record<string, unknown>): Record<string, unkn
   const slug = (row.slug as string | undefined) ?? slugify(title);
   return {
     _webflowId: row.webflowId,
-    _status: 'published',
+    _status: webflowStatus(row),
     title,
     slug,
     _rawBody: row.body ?? row.content ?? null,

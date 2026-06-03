@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ogImageUrl, type OgVariant } from "./og";
 
-export const SITE_URL = "https://www.cleanstart.com";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.cleanstart.com";
 export const SITE_NAME = "CleanStart";
 
 export type PageImage = {

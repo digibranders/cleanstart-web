@@ -1,16 +1,14 @@
-import { cache } from 'react';
+import { cache } from "react";
+import { fetchOpenRoles } from "./open-roles";
 
-export const CAREERS_TAG = 'careers-open-count';
+export const CAREERS_TAG = "careers-open-count";
 
 /**
- * Returns the count of currently open careers/roles.
- *
- * TODO: Wire to a real Payload `careers` collection fetcher once that
- * collection ships. Until then this returns 0 — which is correct per
- * the spotlight priority chain spec (§3 D11): when openRoles === 0,
- * the chain falls through to State 2 (CMS spotlight) or State 3
- * (Talent Network evergreen), both of which are valid renderings.
+ * Count of currently open roles, derived from the live open-roles list.
+ * Fail-soft via `fetchOpenRoles` (returns [] on CMS error → count 0), which
+ * correctly falls the spotlight priority chain through to the CMS/community
+ * card instead of advertising a "0 open roles" state.
  */
 export const fetchOpenRolesCount = cache(async (): Promise<number> => {
-  return 0;
+  return (await fetchOpenRoles()).length;
 });

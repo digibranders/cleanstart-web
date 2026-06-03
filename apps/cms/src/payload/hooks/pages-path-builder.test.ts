@@ -1,3 +1,4 @@
+import { ValidationError } from 'payload';
 import { describe, expect, it, vi } from 'vitest';
 
 import { pagesPathBuilderHook } from './pages-path-builder';
@@ -7,6 +8,19 @@ type PageRow = {
   slug?: string | null;
   title?: string | null;
   parent?: number | null;
+};
+
+const expectParentValidationError = async (
+  promise: Promise<unknown>,
+  matcher: RegExp,
+): Promise<void> => {
+  await expect(promise).rejects.toBeInstanceOf(ValidationError);
+  const error = await promise.then(
+    () => null,
+    (caught: unknown) => caught,
+  );
+  const errors = (error as ValidationError).data?.errors ?? [];
+  expect(errors.some((e) => e.path === 'parent' && matcher.test(e.message))).toBe(true);
 };
 
 const makeReq = (rows: PageRow[]) => {
@@ -65,13 +79,14 @@ describe('pagesPathBuilderHook', () => {
   });
 
   it('throws on a parent chain cycle (self in chain)', async () => {
-    await expect(
+    await expectParentValidationError(
       run(
         { slug: 'self', title: 'Self', parent: 5 },
         [{ id: 5, slug: 'a', parent: 99 }],
         { id: 99, slug: 'old' },
       ),
-    ).rejects.toThrow(/cycle/);
+      /cycle/,
+    );
   });
 
   it('throws when parent chain exceeds MAX_DEPTH', async () => {
@@ -80,9 +95,10 @@ describe('pagesPathBuilderHook', () => {
     for (let i = 1; i <= 20; i++) {
       rows.push({ id: i, slug: `p${i}`, parent: i === 20 ? null : i + 1 });
     }
-    await expect(
+    await expectParentValidationError(
       run({ slug: 'leaf', parent: 1 }, rows),
-    ).rejects.toThrow(/exceeds maximum depth/);
+      /exceeds maximum depth/,
+    );
   });
 
   it('handles parent given as object with id', async () => {

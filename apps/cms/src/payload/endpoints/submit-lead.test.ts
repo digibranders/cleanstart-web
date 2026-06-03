@@ -18,6 +18,7 @@ import {
   submitLeadOptionsEndpoint,
 } from './submit-lead';
 import { __resetRateLimitStore } from '../lib/rate-limit';
+import { verifyTurnstileToken } from '../lib/turnstile';
 
 type FakeHeaders = { get: (name: string) => string | null };
 
@@ -25,9 +26,24 @@ const makeHeaders = (entries: Record<string, string | undefined>): FakeHeaders =
   get: (name: string) => entries[name.toLowerCase()] ?? null,
 });
 
+const SEEDED_FORM = {
+  id: 7,
+  _status: 'published',
+  slug: 'book-a-demo',
+  schemaVersion: 1,
+  fields: [{ name: 'email', type: 'email', required: true }],
+};
+
 const fakePayload = {
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
   findByID: vi.fn().mockResolvedValue({ _status: 'published', fields: [] }),
+  // `forms` lookups resolve a slug to the seeded row; every other collection
+  // (e.g. webhook destinations queried by dispatchEvent) resolves empty.
+  find: vi.fn(async ({ collection }: { collection: string }) =>
+    collection === 'forms' ? { docs: [SEEDED_FORM] } : { docs: [] },
+  ),
+  create: vi.fn().mockResolvedValue({ id: 99 }),
+  findGlobal: vi.fn().mockResolvedValue({ policyVersion: '2026-06-01' }),
 };
 
 const ORIGINAL_ALLOWED = process.env.LEAD_SUBMIT_ALLOWED_ORIGINS;
@@ -191,5 +207,55 @@ describe('POST /submit CORS allow-list (W-D-13)', () => {
       body: '{}',
     });
     expect(res.headers.get('access-control-allow-origin')).toBe('https://www.cleanstart.com');
+  });
+});
+
+describe('POST /submit form resolution by slug', () => {
+  const submit = (body: Record<string, unknown>): Promise<Response> =>
+    callPost({ headers: { origin: 'https://cleanstart.com' }, body: JSON.stringify(body) });
+
+  it('resolves a published form by slug and accepts the submission', async () => {
+    const res = await submit({
+      formSlug: 'book-a-demo',
+      fields: { email: 'cto@acme.com' },
+      turnstileToken: 'tok',
+    });
+    expect(res.status).toBe(200);
+    const json = (await res.json()) as { ok: boolean };
+    expect(json.ok).toBe(true);
+    // Slug path goes through find(), not findByID().
+    expect(fakePayload.find).toHaveBeenCalledWith(
+      expect.objectContaining({ collection: 'forms', where: { slug: { equals: 'book-a-demo' } } }),
+    );
+  });
+
+  it('rejects a body with neither formId nor formSlug as invalid_body', async () => {
+    const res = await submit({ fields: { email: 'a@b.com' }, turnstileToken: 'tok' });
+    expect(res.status).toBe(400);
+    const json = (await res.json()) as { error: string };
+    expect(json.error).toBe('invalid_body');
+  });
+
+  it('returns invalid_form when the slug matches no published form', async () => {
+    fakePayload.find.mockResolvedValueOnce({ docs: [] });
+    const res = await submit({
+      formSlug: 'does-not-exist',
+      fields: { email: 'a@b.com' },
+      turnstileToken: 'tok',
+    });
+    expect(res.status).toBe(400);
+    const json = (await res.json()) as { error: string };
+    expect(json.error).toBe('invalid_form');
+  });
+
+  it('skips Turnstile verification for the exempt newsletter form', async () => {
+    vi.mocked(verifyTurnstileToken).mockClear();
+    fakePayload.find.mockResolvedValueOnce({
+      docs: [{ ...SEEDED_FORM, slug: 'newsletter', fields: [] }],
+    });
+    // No turnstileToken sent — would 403 for a non-exempt form.
+    const res = await submit({ formSlug: 'newsletter', fields: { email: 'a@b.com' } });
+    expect(res.status).toBe(200);
+    expect(verifyTurnstileToken).not.toHaveBeenCalled();
   });
 });

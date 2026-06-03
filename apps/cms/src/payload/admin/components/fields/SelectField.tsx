@@ -2,8 +2,9 @@
 
 import { useField } from '@payloadcms/ui';
 import type { SelectFieldClientProps } from 'payload';
-import type { KeyboardEvent, ReactElement } from 'react';
-import { useId, useRef, useState } from 'react';
+import type { CSSProperties, KeyboardEvent, ReactElement } from 'react';
+import { useCallback, useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 type StoredValue = string | string[] | null | undefined;
 
@@ -17,18 +18,52 @@ const labelOf = (raw: unknown): string => {
 
 export const SelectField = (props: SelectFieldClientProps): ReactElement => {
   const { field, path } = props;
-  const { value, setValue, showError, errorMessage } = useField<StoredValue>({ path });
+  const { value, setValue, disabled, showError, errorMessage } = useField<StoredValue>({ path });
 
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const controlRef = useRef<HTMLDivElement>(null);
   const labelId = useId();
   const inputId = useId();
   const listboxId = useId();
 
+  // The dropdown is rendered in a portal on document.body (position:
+  // fixed) so it escapes the array-row's `overflow: hidden` clip — inside
+  // a `.cs-array__row` an absolutely-positioned menu was cut off and
+  // invisible. We track the control's viewport rect to anchor it.
+  const [menuRect, setMenuRect] = useState<{ top: number; left: number; width: number } | null>(
+    null,
+  );
+
+  const measure = useCallback((): void => {
+    const el = controlRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setMenuRect({ top: r.bottom + 4, left: r.left, width: r.width });
+  }, []);
+
+  // Re-measure on open and whenever the selection count changes (adding
+  // chips can wrap the control onto a new line, moving the anchor), and
+  // keep the portaled menu pinned to the control while scrolling/resizing.
+  const selectedCount = Array.isArray(value) ? value.length : value == null ? 0 : 1;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: selectedCount is intentionally a trigger — its change must re-run measure() to reposition the portal when chips wrap the control.
+  useLayoutEffect(() => {
+    if (!open) return;
+    measure();
+    window.addEventListener('scroll', measure, true);
+    window.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('scroll', measure, true);
+      window.removeEventListener('resize', measure);
+    };
+  }, [open, selectedCount, measure]);
+
   const hasMany = field.hasMany === true;
   const readOnly = field.admin?.readOnly === true;
+  // Merge access-control driven disabled with field.admin.readOnly
+  const isInteractive = !disabled && !readOnly;
   const labelText = labelOf(field.label) || path;
   const description =
     typeof field.admin?.description === 'string' ? field.admin.description : undefined;
@@ -119,17 +154,18 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
 
       <div className={wrapperClass}>
         <div
+          ref={controlRef}
           className="cs-collections-select__control"
-          onClick={() => !readOnly && inputRef.current?.focus()}
+          onClick={() => isInteractive && inputRef.current?.focus()}
           onKeyDown={(e) => {
-            if ((e.key === 'Enter' || e.key === ' ') && !readOnly) inputRef.current?.focus();
+            if ((e.key === 'Enter' || e.key === ' ') && isInteractive) inputRef.current?.focus();
           }}
         >
           {hasMany
             ? selected.map((val) => (
                 <span key={val} className="cs-collections-select__tag">
                   {labelFor(val)}
-                  {!readOnly && (
+                  {isInteractive && (
                     <button
                       type="button"
                       className="cs-collections-select__tag-remove"
@@ -146,7 +182,7 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
               ))
             : null}
 
-          {!readOnly && (
+          {isInteractive ? (
             <input
               ref={inputRef}
               id={inputId}
@@ -178,9 +214,16 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
               onBlur={() => setTimeout(() => setOpen(false), 150)}
               onKeyDown={onKeyDown}
             />
-          )}
+          ) : !hasMany ? (
+            <span
+              className="cs-collections-select__input cs-collections-select__input--readonly"
+              aria-labelledby={labelId}
+            >
+              {isEmpty ? <em>No selection</em> : labelFor(selected[0] as string)}
+            </span>
+          ) : null}
 
-          {!isEmpty && !readOnly && (
+          {!isEmpty && isInteractive && (
             <button
               type="button"
               className="cs-collections-select__reset"
@@ -195,47 +238,60 @@ export const SelectField = (props: SelectFieldClientProps): ReactElement => {
           )}
         </div>
 
-        {open && !readOnly && (
-          <div
-            id={listboxId}
-            // biome-ignore lint/a11y/useSemanticElements: custom select listbox; div is required here because a <select> cannot participate in a combobox composite widget
-            role="listbox"
-            tabIndex={-1}
-            aria-label={labelText}
-            aria-multiselectable={hasMany}
-            className="cs-collections-select__dropdown"
-          >
-            {filtered.length === 0 ? (
-              <div className="cs-collections-select__empty">
-                {query
-                  ? 'No matching options'
-                  : hasMany
-                    ? 'All options selected'
-                    : 'No options'}
-              </div>
-            ) : (
-              filtered.map((opt, i) => (
-                <button
-                  key={opt.value}
-                  id={`${listboxId}-opt-${i}`}
-                  type="button"
-                  // biome-ignore lint/a11y/useSemanticElements: option inside a custom listbox; native <option> is only valid inside <select>
-                  role="option"
-                  tabIndex={-1}
-                  aria-selected={selected.includes(opt.value)}
-                  className={`cs-collections-select__option${i === activeIdx ? ' is-active' : ''}`}
-                  onMouseEnter={() => setActiveIdx(i)}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    pick(opt.value);
-                  }}
-                >
-                  {opt.label}
-                </button>
-              ))
-            )}
-          </div>
-        )}
+        {open && isInteractive && menuRect && typeof document !== 'undefined'
+          ? createPortal(
+              <div
+                id={listboxId}
+                // biome-ignore lint/a11y/useSemanticElements: custom select listbox; div is required here because a <select> cannot participate in a combobox composite widget
+                role="listbox"
+                tabIndex={-1}
+                aria-label={labelText}
+                aria-multiselectable={hasMany}
+                className="cs-collections-select__dropdown cs-collections-select__dropdown--portal"
+                style={
+                  {
+                    top: `${menuRect.top}px`,
+                    left: `${menuRect.left}px`,
+                    width: `${menuRect.width}px`,
+                  } as CSSProperties
+                }
+                // Keep the input focused (don't let the menu steal it and
+                // trigger the input's onBlur close) while interacting.
+                onMouseDown={(e) => e.preventDefault()}
+              >
+                {filtered.length === 0 ? (
+                  <div className="cs-collections-select__empty">
+                    {query
+                      ? 'No matching options'
+                      : hasMany
+                        ? 'All options selected'
+                        : 'No options'}
+                  </div>
+                ) : (
+                  filtered.map((opt, i) => (
+                    <button
+                      key={opt.value}
+                      id={`${listboxId}-opt-${i}`}
+                      type="button"
+                      // biome-ignore lint/a11y/useSemanticElements: option inside a custom listbox; native <option> is only valid inside <select>
+                      role="option"
+                      tabIndex={-1}
+                      aria-selected={selected.includes(opt.value)}
+                      className={`cs-collections-select__option${i === activeIdx ? ' is-active' : ''}`}
+                      onMouseEnter={() => setActiveIdx(i)}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        pick(opt.value);
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))
+                )}
+              </div>,
+              document.body,
+            )
+          : null}
       </div>
 
       {description ? <p className="field-description">{description}</p> : null}

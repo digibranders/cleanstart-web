@@ -139,6 +139,20 @@ export const KnowledgeBase: CollectionConfig = {
     displayPublishedAtField,
     ...seoSidebarFields({ pathPrefix: '/knowledge-hub', descriptionSource: 'abstract' }),
     {
+      name: 'tocDepth',
+      type: 'select',
+      defaultValue: 'h2',
+      options: [
+        { label: 'H2 only', value: 'h2' },
+        { label: 'H2 + H3', value: 'h2_h3' },
+        { label: 'H2 + H3 + H4', value: 'h2_h3_h4' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Heading levels that appear in the Table of Contents. Re-save to apply.',
+      },
+    },
+    {
       // Data-only — surfaced via the DocStatusBar in the top status bar.
       // Hidden here so the form doesn't double-render.
       name: 'readingMinutes',
@@ -201,6 +215,7 @@ export const KnowledgeBase: CollectionConfig = {
           wordCount: 'wordCount',
           tableOfContents: 'tableOfContents',
         },
+        tocLevelsField: 'tocDepth',
       }),
     ],
     afterChange: [

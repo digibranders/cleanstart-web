@@ -19,7 +19,7 @@ const labelOf = (raw: unknown): string => {
  */
 export const TextField = (props: TextFieldClientProps): ReactElement => {
   const { field, path } = props;
-  const { value, setValue, showError, errorMessage } = useField<string | null | undefined>({
+  const { value, setValue, disabled, showError, errorMessage } = useField<string | null | undefined>({
     path,
   });
 
@@ -31,6 +31,7 @@ export const TextField = (props: TextFieldClientProps): ReactElement => {
   const placeholder =
     typeof field.admin?.placeholder === 'string' ? field.admin.placeholder : undefined;
   const readOnly = field.admin?.readOnly === true;
+  const isDisabled = disabled || readOnly;
 
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setValue(e.target.value);
@@ -71,7 +72,9 @@ export const TextField = (props: TextFieldClientProps): ReactElement => {
         maxLength={maxLength}
         autoComplete={field.admin?.autoComplete}
         readOnly={readOnly}
+        disabled={isDisabled && !readOnly}
         aria-readonly={readOnly || undefined}
+        aria-disabled={isDisabled || undefined}
       />
       {description ? <p className="field-description">{description}</p> : null}
       {showError && errorMessage ? (

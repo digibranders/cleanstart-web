@@ -59,8 +59,8 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   },
   maintenance: {
     illustration: "/error/503.webp",
-    width: 839,
-    height: 752,
+    width: 900,
+    height: 604,
     alt: "",
     title: "We'll Be Right Back",
     description: "This service is temporarily unavailable for maintenance.",
@@ -77,8 +77,8 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   },
   offline: {
     illustration: "/error/no-internet.webp",
-    width: 751,
-    height: 729,
+    width: 900,
+    height: 600,
     alt: "",
     title: "You're Offline",
     description: "Check your internet connection and try again.",
@@ -104,8 +104,8 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
   },
   empty: {
     illustration: "/error/empty-state.webp",
-    width: 1024,
-    height: 1024,
+    width: 822,
+    height: 852,
     alt: "",
     title: "Nothing here yet",
     description: "Check back soon — new content is on the way.",

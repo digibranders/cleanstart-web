@@ -60,6 +60,9 @@ apps/cms/playwright-report/
 apps/web/tests/e2e/**/__screenshots__/
 apps/web/tests/e2e/**/*-snapshots/
 
+# Playwright MCP scratch (browser-automation snapshots / console logs)
+.playwright-mcp/
+
 # Lighthouse CI local output
 .lighthouseci/
 

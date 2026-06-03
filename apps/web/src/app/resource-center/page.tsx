@@ -72,14 +72,12 @@ export default async function ResourceCenterPage({
       />
       <Header />
       <main style={{ background: "#f6f6f6" }}>
-        {/* Hero — dark gradient, search, popular tags */}
         <div className="relative overflow-hidden">
           <Suspense>
             <ResourceCenterHero initialQuery={searchQuery} />
           </Suspense>
         </div>
 
-        {/* Body — sidebar + grid */}
         <FadeUp>
           <section
             className="relative"
@@ -102,13 +100,11 @@ export default async function ResourceCenterPage({
               }}
             >
               <div className="flex flex-col lg:flex-row items-stretch lg:items-start gap-6 lg:gap-8">
-                {/* Left sidebar */}
                 <ResourceCenterSidebar
                   activeType={activeType}
                   searchQuery={searchQuery}
                 />
 
-                {/* Right: 3-col grid */}
                 <ResourceGrid
                   resources={resourcesData.docs}
                   currentPage={page}

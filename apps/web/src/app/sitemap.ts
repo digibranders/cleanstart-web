@@ -62,8 +62,7 @@ function isIndexable(doc: CmsDoc): boolean {
 }
 
 // Every built non-dynamic route. Keep in sync with docs/WEB-PAGES.md.
-// `/pricing` and `/webinars/[slug]` are intentionally omitted (not built — see
-// docs/SEO-IMPLEMENTATION-PLAN.md tasks 1.3/1.4).
+// `/pricing` and `/webinars/[slug]` are intentionally omitted (not built).
 const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: "/" },
   { path: "/about-us" },

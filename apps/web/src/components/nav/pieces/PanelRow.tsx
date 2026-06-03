@@ -9,16 +9,15 @@ type Props = {
   built?: boolean;
 };
 
-// Restrained-professional per D1: subtle fill + neutral border on hover.
-// No glow. No accent-color border. Icon tiles get a slightly more present
-// surface so the glyph reads cleanly against the new tighter glass.
-// Arrows removed entirely — the row's hover lift + label brightness IS the
-// affordance. Trailing arrows were redundant + dim.
+// Hover affordance is a quiet surface lift plus a subtle contrast increase on
+// the glyph and label — no accent tint, no border flash. The icon tile is a
+// neutral elevated surface so the glyph stays legible without color.
 const ROW =
-  "group/row grid grid-cols-[44px_1fr] items-center gap-3 rounded-[10px] border border-transparent px-3 py-2.5 transition-colors duration-150 hover:border-white/[0.08] hover:bg-white/[0.05]";
+  "group/row grid grid-cols-[44px_1fr] items-center gap-3 rounded-[8px] px-3 py-2.5 transition-colors duration-200 ease-out hover:bg-white/[0.035]";
 const ICON_TILE =
-  "flex h-11 w-11 items-center justify-center rounded-[10px] border border-white/[0.10] bg-white/[0.06] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-colors duration-150 group-hover/row:border-[rgba(44,193,235,0.30)] group-hover/row:bg-[rgba(44,193,235,0.08)] group-hover/row:text-[#2cc1eb]";
-const LABEL = "text-sm font-semibold leading-tight text-white";
+  "cs-chip flex h-11 w-11 items-center justify-center rounded-[8px] text-white/70 transition-colors duration-200 ease-out group-hover/row:text-white";
+const LABEL =
+  "text-sm font-semibold leading-tight text-white/95 transition-colors duration-200 ease-out group-hover/row:text-white";
 const DESC = "mt-0.5 text-xs leading-snug text-white/60";
 
 export function PanelRow({ href, label, description, icon, built = true }: Props) {

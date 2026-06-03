@@ -26,3 +26,18 @@ export const hasAnyRole = (user: unknown, roles: readonly Role[]): boolean => {
   const ours = userRoles(user);
   return roles.some((r) => ours.includes(r));
 };
+
+/**
+ * Returns the numeric ID of the authenticated user, or null when the user is
+ * unauthenticated or their ID cannot be resolved to a finite integer.
+ */
+export const userId = (user: unknown): number | null => {
+  if (!isUserShape(user)) return null;
+  const id = (user as { id?: unknown }).id;
+  if (typeof id === 'number' && Number.isFinite(id)) return id;
+  if (typeof id === 'string') {
+    const parsed = Number.parseInt(id, 10);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+};

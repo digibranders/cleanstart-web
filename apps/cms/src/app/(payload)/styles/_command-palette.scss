@@ -36,7 +36,13 @@
 
   &::backdrop {
     background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  // Exit animation — add [data-closing] attribute from JS before removing
+  &[data-closing] {
+    animation: cs-cmdk-out 120ms ease-in forwards !important;
   }
 
   &:not([open]) {
@@ -98,14 +104,14 @@
 
   &__esc {
     flex-shrink: 0;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     color: var(--cs-text-muted);
-    padding: 2px 6px;
+    padding: 2px 5px;
     border: 1px solid var(--cs-border-subtle);
-    border-radius: var(--cs-radius-chip);
+    border-radius: 3px;
     line-height: 1;
   }
 
@@ -312,8 +318,8 @@
   &__foot {
     display: flex;
     gap: var(--cs-space-4);
-    padding: 6px var(--cs-space-4);
-    border-top: 1px solid var(--cs-border-subtle);
+    padding: 7px var(--cs-space-4);
+    border-top: 1px solid var(--cs-border-strong);
     background: var(--cs-surface-canvas);
     color: var(--cs-text-muted);
     font-size: 11px;
@@ -328,16 +334,34 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 16px;
-      height: 16px;
-      padding: 0 4px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
       background: var(--cs-surface-raised);
       border: 1px solid var(--cs-border-subtle);
-      border-radius: 3px;
+      border-bottom-width: 2px;
+      border-radius: 4px;
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 11px;
       line-height: 1;
       color: var(--cs-text-secondary);
     }
+  }
+}
+
+// ─── Command palette enter / exit keyframes ───────────────────────
+@keyframes cs-cmdk-out {
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px) scale(0.99);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-cmdk {
+    animation: none;
+  }
+  @keyframes cs-cmdk-out {
+    to { opacity: 0; }
   }
 }

@@ -296,15 +296,16 @@ export const schemaAddonsField: Field = {
   type: 'blocks',
   labels: { singular: 'Schema add-on', plural: 'Schema add-ons' },
   admin: {
-    // Hidden from the form UI. Payload's blocks-renderer mounts each
-    // row's wrapper but never the per-block fields, so the editor
-    // could add chips but never fill the actual fields — half-broken
-    // and visually misleading. The data column stays so any existing
-    // values survive and the JSON-LD dispatcher
-    // (`lib/jsonld/addons/dispatch.ts`) keeps reading the field for
-    // legacy / API-driven writes. To re-surface the editor UI, set
-    // `hidden: false` here AND fix the per-block field rendering
-    // (tracked in `SchemaPreviewField.tsx` comment).
+    // Hidden from the form UI. The per-block field rendering in Payload's
+    // blocks renderer does not correctly render nested fields at this depth,
+    // so exposing the field would let editors add block chips but never fill
+    // the actual fields — half-broken and visually misleading. The data
+    // column is kept so any existing values survive and the JSON-LD
+    // dispatcher (`lib/jsonld/addons/dispatch.ts`) can read the field for
+    // API-driven writes. The legacy `SchemaAddonsAdder` UI component was
+    // removed (dead code — never wired to importMap or any field component
+    // path). To re-surface editor UI, fix per-block rendering and set
+    // `hidden: false` here (tracked as BACKLOG P2.18-schema).
     hidden: true,
     position: 'sidebar',
     description:

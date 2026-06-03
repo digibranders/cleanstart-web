@@ -75,18 +75,48 @@ interface GscQueriesResponse {
   queries: GscQuery[];
 }
 
+/**
+ * Resolves the public web URL for the current document.
+ *
+ * Fetches `baseUrl` from the `siteSettings` global on first mount so the
+ * URL points at the web frontend (e.g. `https://cleanstart.com`) rather
+ * than `window.location.origin` (which is the CMS host).
+ */
 const useDocUrl = (): string | null => {
   const slug = useFormFields(([fields]) => {
     const f = fields?.slug?.value;
     return typeof f === 'string' ? f : null;
   });
+  const { config } = useConfig();
+  const serverURL = config?.serverURL ?? '';
+
+  const [baseUrl, setBaseUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!serverURL) return;
+    let cancelled = false;
+    void fetch(`${serverURL}/api/globals/siteSettings?depth=0`, {
+      credentials: 'include',
+    })
+      .then(async (res) => {
+        if (!res.ok || cancelled) return;
+        const body = (await res.json()) as { baseUrl?: string };
+        if (!cancelled && typeof body.baseUrl === 'string' && body.baseUrl.length > 0) {
+          setBaseUrl(body.baseUrl.replace(/\/+$/, ''));
+        }
+      })
+      .catch(() => {
+        // Silently fall back to null; callers show "not configured" state.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [serverURL]);
+
   return useMemo(() => {
-    if (!slug) return null;
-    const base =
-      (typeof window !== 'undefined' && window.location.origin.replace(/\/admin.*/, '')) ||
-      'https://cleanstart.com';
-    return `${base.replace(/\/+$/, '')}/${slug.replace(/^\/+/, '')}`;
-  }, [slug]);
+    if (!slug || !baseUrl) return null;
+    return `${baseUrl}/${slug.replace(/^\/+/, '')}`;
+  }, [slug, baseUrl]);
 };
 
 const Sparkline = ({

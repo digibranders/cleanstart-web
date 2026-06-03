@@ -1,4 +1,3 @@
-// apps/web/src/app/api/og/render.ts
 import type { OgVariant } from "@/lib/seo/og";
 
 export function pickTitleSize(title: string, variant: OgVariant): number {

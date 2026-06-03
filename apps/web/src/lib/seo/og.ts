@@ -1,4 +1,3 @@
-// apps/web/src/lib/seo/og.ts
 import { SITE_URL } from "./canonical";
 
 export const OG_IMAGE_WIDTH = 1200;

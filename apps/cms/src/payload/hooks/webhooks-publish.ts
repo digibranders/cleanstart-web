@@ -1,7 +1,25 @@
-import type { CollectionAfterChangeHook } from 'payload';
+import type { CollectionAfterChangeHook, Payload } from 'payload';
 
+import { type CanonicalDoc, docCanonicalUrl } from '../lib/jsonld/url';
 import { dispatchEvent } from '../lib/webhooks/dispatch';
 import { getRequestId } from '../lib/request-id';
+
+const readBaseUrl = async (payload: Payload): Promise<string> => {
+  try {
+    const settings = (await payload.findGlobal({ slug: 'siteSettings' })) as {
+      baseUrl?: string;
+    };
+    return (settings.baseUrl ?? 'https://cleanstart.com').replace(/\/+$/, '');
+  } catch {
+    return 'https://cleanstart.com';
+  }
+};
+
+const adminEditUrl = (collection: string, id: unknown): string | null => {
+  const base = process.env.PAYLOAD_PUBLIC_SERVER_URL;
+  if (!base || id == null) return null;
+  return `${base.replace(/\/+$/, '')}/admin/collections/${collection}/${String(id)}`;
+};
 
 /**
  * afterChange hook factory — fires `document.published` when a doc
@@ -29,6 +47,24 @@ export const webhooksPublishAfterChangeHook =
 
       const requestId = getRequestId(req.headers as { get(name: string): string | null });
       const typed = doc as Record<string, unknown>;
+      const baseUrl = await readBaseUrl(req.payload);
+      const liveUrl = docCanonicalUrl(baseUrl, collection, typed as CanonicalDoc);
+      const editUrl = adminEditUrl(collection, typed.id);
+
+      const publishedAt =
+        (typed.publishedAt as string | undefined) ??
+        (typed.publicationDate as string | undefined) ??
+        (typed.updatedAt as string | undefined);
+      const updatedAt = typed.updatedAt as string | undefined;
+      // Only surface `updatedAt` when this is a RE-publish of older content
+      // — i.e. the doc's update time is meaningfully later than its original
+      // publish date. On a first publish the two are within seconds of each
+      // other, so we skip it to avoid a redundant "Published / Updated" pair.
+      const isRepublishOfOlderContent =
+        typeof publishedAt === 'string' &&
+        typeof updatedAt === 'string' &&
+        new Date(updatedAt).getTime() - new Date(publishedAt).getTime() > 60_000;
+
       await dispatchEvent(
         {
           event: 'document.published',
@@ -37,10 +73,15 @@ export const webhooksPublishAfterChangeHook =
             id: typed.id,
             slug: typed.slug,
             title: (typed.title as string | undefined) ?? (typed.name as string | undefined),
-            publishedAt:
-              (typed.publishedAt as string | undefined) ??
-              (typed.publicationDate as string | undefined) ??
-              (typed.updatedAt as string | undefined),
+            ...(publishedAt ? { publishedAt } : {}),
+            // Re-publish: include the update time so the card can show both
+            // the original "Published" date and a distinct "Updated" date.
+            ...(isRepublishOfOlderContent && updatedAt ? { updatedAt } : {}),
+            // Public live-page URL — rendered as a "View live page" button on
+            // the Teams card and surfaced to generic webhook subscribers.
+            ...(liveUrl ? { url: liveUrl } : {}),
+            // CMS edit-view deep link — "Edit in CMS" button on the card.
+            ...(editUrl ? { adminUrl: editUrl } : {}),
           },
         },
         {

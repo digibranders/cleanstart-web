@@ -15,6 +15,18 @@ import {
   useTranslation,
 } from '@payloadcms/ui';
 
+/**
+ * Extract the arg type from the `schedulePublish` client function so we
+ * can call it without a double-cast. Derived from the allow-listed
+ * `useServerFunctions` hook's return type rather than importing the
+ * render-side `ServerFunctionsContextType` (per the @payloadcms/ui
+ * data-layer-only contract in CLAUDE.md). `Parameters<>[0]` gives us the
+ * `{ signal?: AbortSignal } & Omit<SchedulePublishHandlerArgs, 'clientConfig'|'req'>` shape.
+ */
+type SchedulePublishArgs = Parameters<
+  ReturnType<typeof useServerFunctions>['schedulePublish']
+>[0];
+
 import { showToast } from './ToastBus';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
@@ -31,6 +43,10 @@ type SchedulePublishDialogProps = {
 };
 
 type ScheduleType = 'publish' | 'unpublish';
+
+/** Type-guard for the opaque return from `schedulePublish`. */
+const hasError = (v: unknown): v is { error: string } =>
+  typeof v === 'object' && v !== null && typeof (v as Record<string, unknown>).error === 'string';
 
 type UpcomingDoc = {
   id: number | string;
@@ -208,21 +224,19 @@ export const SchedulePublishDialog = ({
     setBusy(true);
     setError(null);
     try {
-      const args: Record<string, unknown> = {
-        type,
-        date: new Date(when),
-        timezone: tz,
-      };
-      if (collectionSlug && id != null) {
-        args.doc = { relationTo: collectionSlug, value: String(id) };
-      }
-      if (globalSlug) {
-        args.global = globalSlug;
-      }
-      const result = (await (
-        schedulePublish as unknown as (a: Record<string, unknown>) => Promise<{ error?: string } | undefined>
-      )(args)) ?? undefined;
-      if (result?.error) {
+      // Cast via SchedulePublishArgs to call with the correct server-function
+      // arg shape. The conditional branches construct a structurally valid
+      // object; exactOptionalPropertyTypes prevents a cleaner spread so we
+      // use a single cast on the final object.
+      const scheduleArgs = (
+        collectionSlug && id != null
+          ? { type, date: new Date(when), timezone: tz, doc: { relationTo: collectionSlug, value: String(id) } }
+          : globalSlug
+            ? { type, date: new Date(when), timezone: tz, global: globalSlug }
+            : { type, date: new Date(when), timezone: tz }
+      ) as SchedulePublishArgs;
+      const result = await schedulePublish(scheduleArgs);
+      if (hasError(result)) {
         setError(result.error);
         return;
       }
@@ -242,8 +256,8 @@ export const SchedulePublishDialog = ({
   const onDelete = async (deleteID: number | string): Promise<void> => {
     setDeletingId(deleteID);
     try {
-      const result = (await schedulePublish({ deleteID })) as { error?: string } | undefined;
-      if (result?.error) {
+      const result = await schedulePublish({ deleteID });
+      if (hasError(result)) {
         showToast({ message: result.error, type: 'error' });
         return;
       }

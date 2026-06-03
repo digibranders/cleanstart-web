@@ -22,17 +22,29 @@ describe('buildTeamsPayload', () => {
     expect(parsed.attachments[0]?.content.version).toBe('1.4');
   });
 
-  it('uses title (slug) as the headline when both are present', () => {
+  it('leads with the clean content title (no slug appended) and the event eyebrow below', () => {
     const raw = buildTeamsPayload(baseEvent);
-    expect(raw).toContain('My Post (my-post)');
+    const parsed = JSON.parse(raw) as {
+      attachments: { content: { body: { type: string; size?: string; text: string }[] } }[];
+    };
+    const body = parsed.attachments[0]?.content.body ?? [];
+    // First block: the title, Large/Bolder, no "(slug)".
+    expect(body[0]?.size).toBe('Large');
+    expect(body[0]?.text).toBe('My Post');
+    // Second block: the small event eyebrow.
+    expect(body[1]?.size).toBe('Small');
+    expect(body[1]?.text).toBe('CleanStart · document.published');
   });
 
-  it('falls back to email when no title/slug is set (lead.submitted shape)', () => {
+  it('falls back to email as the title when no title is set (lead.submitted shape)', () => {
     const raw = buildTeamsPayload({
       event: 'lead.submitted',
-      data: { email: 'jane@example.com', formName: 'Contact' },
+      data: { email: 'jane@example.com', formSlug: 'contact' },
     });
-    expect(raw).toContain('jane@example.com');
+    const parsed = JSON.parse(raw) as {
+      attachments: { content: { body: { text: string }[] } }[];
+    };
+    expect(parsed.attachments[0]?.content.body[0]?.text).toBe('jane@example.com');
   });
 
   it('renders a FactSet of up to six top-level fields', () => {
@@ -54,6 +66,54 @@ describe('buildTeamsPayload', () => {
     const fact = parsed.attachments[0]?.content.body.find((b) => b.type === 'FactSet');
     expect(fact?.facts?.length).toBe(6);
     expect(fact?.facts?.map((f) => f.title)).not.toContain('g');
+  });
+
+  it('does NOT repeat the title as a FactSet row (it is already the card heading)', () => {
+    const raw = buildTeamsPayload(baseEvent);
+    const parsed = JSON.parse(raw) as {
+      attachments: { content: { body: { type: string; text?: string; facts?: { title: string }[] }[] } }[];
+    };
+    const body = parsed.attachments[0]?.content.body ?? [];
+    // Title is the heading (first block) ...
+    expect(body[0]?.text).toBe('My Post');
+    // ... but must NOT also appear as a "Title" fact row.
+    const facts = body.find((b) => b.type === 'FactSet')?.facts ?? [];
+    expect(facts.map((f) => f.title)).not.toContain('Title');
+  });
+
+  it('orders facts predictably (Collection, Slug, then dates)', () => {
+    const raw = buildTeamsPayload({
+      event: 'document.published',
+      // intentionally out of order in the payload
+      data: { updatedAt: '2026-05-30T13:16:00Z', title: 'X', slug: 'x', collection: 'blogs', publishedAt: '2026-02-25T05:30:00Z' },
+    });
+    const parsed = JSON.parse(raw) as {
+      attachments: { content: { body: { type: string; facts?: { title: string }[] }[] } }[];
+    };
+    const titles = (parsed.attachments[0]?.content.body.find((b) => b.type === 'FactSet')?.facts ?? []).map((f) => f.title);
+    expect(titles).toEqual(['Collection', 'Slug', 'Published', 'Updated']);
+  });
+
+  it('renders both Published and Updated date facts (re-publish of older content)', () => {
+    const raw = buildTeamsPayload({
+      event: 'document.published',
+      data: {
+        title: 'Old post',
+        slug: 'old-post',
+        publishedAt: '2026-02-25T05:30:00Z',
+        updatedAt: '2026-05-30T13:16:00Z',
+      },
+    });
+    const parsed = JSON.parse(raw) as {
+      attachments: { content: { body: { type: string; facts?: { title: string; value: string }[] }[] } }[];
+    };
+    const facts = parsed.attachments[0]?.content.body.find((b) => b.type === 'FactSet')?.facts ?? [];
+    const titles = facts.map((f) => f.title);
+    expect(titles).toContain('Published');
+    expect(titles).toContain('Updated');
+    // Both render as human-readable dates, not raw ISO.
+    expect(facts.find((f) => f.title === 'Published')?.value).toContain('Feb 25, 2026');
+    expect(facts.find((f) => f.title === 'Updated')?.value).toContain('May 30, 2026');
   });
 
   it('truncates long values rather than blowing up the card', () => {
@@ -90,9 +150,44 @@ describe('buildTeamsPayload', () => {
     };
     expect(parsed.attachments[0]?.content.msteams?.entities.length).toBe(2);
     expect(parsed.attachments[0]?.content.msteams?.entities[0]?.mentioned.id).toBe('aad-1');
-    expect(parsed.attachments[0]?.content.msteams?.entities[1]?.mentioned.name).toContain(
-      '#EXT#',
-    );
+    // mentioned.name is the display name Teams renders (NOT the UPN/email).
+    expect(parsed.attachments[0]?.content.msteams?.entities[0]?.mentioned.name).toBe('Alex');
+    expect(parsed.attachments[0]?.content.msteams?.entities[1]?.mentioned.name).toBe('Priya');
+    expect(parsed.attachments[0]?.content.msteams?.entities[1]?.mentioned.id).toBe('aad-2');
+  });
+
+  it('renders an Action.OpenUrl "View live page" button when data.url is set', () => {
+    const raw = buildTeamsPayload({
+      event: 'document.published',
+      data: { title: 'My Post', slug: 'my-post', collection: 'blogs', url: 'https://cleanstart.com/blogs/my-post' },
+    });
+    const parsed = JSON.parse(raw) as {
+      attachments: {
+        content: {
+          actions?: { type: string; title: string; url: string }[];
+          body: { type: string; facts?: { title: string }[] }[];
+        };
+      }[];
+    };
+    const action = parsed.attachments[0]?.content.actions?.[0];
+    expect(action?.type).toBe('Action.OpenUrl');
+    expect(action?.title).toBe('View live page');
+    expect(action?.url).toBe('https://cleanstart.com/blogs/my-post');
+    // url must NOT also appear as a FactSet row.
+    const fact = parsed.attachments[0]?.content.body.find((b) => b.type === 'FactSet');
+    expect(fact?.facts?.map((f) => f.title)).not.toContain('url');
+  });
+
+  it('does NOT render an "Edit in CMS" button even when data.adminUrl is set', () => {
+    const raw = buildTeamsPayload({
+      event: 'document.published',
+      data: { title: 'X', slug: 'x', adminUrl: 'https://cms.cleanstart.com/admin/collections/blogs/1' },
+    });
+    const parsed = JSON.parse(raw) as {
+      attachments: { content: { actions?: { title: string }[] } }[];
+    };
+    const titles = parsed.attachments[0]?.content.actions?.map((a) => a.title) ?? [];
+    expect(titles).not.toContain('Edit in CMS');
   });
 
   it('skips mentions whose triggerOn list does not include the event', () => {

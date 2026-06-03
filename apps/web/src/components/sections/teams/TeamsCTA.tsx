@@ -1,15 +1,11 @@
 /**
  * Inner content for the Teams page CTA, rendered inside the Footer's
- * 1276×330 slot (overflow-hidden, border-radius 40px).
- *
- * Figma 583:4213 — white card with Union grid + two #DF9BFF corner ellipses,
- * 3-D cube on the left, "Join the Team" copy + solid-gradient Careers button
- * on the right. Cube overflows card top — clipped by Footer's overflow-hidden.
+ * 1276×330 slot (overflow-hidden, border-radius 40px). The 3-D cube overflows
+ * the card top and is clipped by the Footer's overflow-hidden.
  */
 export function TeamsCTA() {
   return (
     <div className="absolute inset-0 overflow-hidden bg-white">
-      {/* ── Union gridlines — visible at md+ ── */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -26,7 +22,6 @@ export function TeamsCTA() {
         decoding="async"
       />
 
-      {/* ── Ellipse — top-left ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -42,7 +37,6 @@ export function TeamsCTA() {
         }}
       />
 
-      {/* ── Ellipse — bottom-right ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -58,8 +52,6 @@ export function TeamsCTA() {
         }}
       />
 
-      {/* 3-D cube — height = full card height, width derived by image's own
-          aspect ratio. Fully visible, no clipping. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -76,7 +68,6 @@ export function TeamsCTA() {
         decoding="async"
       />
 
-      {/* Text content — centered column on mobile, anchored to right-half on md+ */}
       <div className="absolute inset-x-6 inset-y-0 flex flex-col items-center justify-center gap-4 text-center md:inset-auto md:left-[clamp(24px,45%,547px)] md:top-1/2 md:-translate-y-1/2 md:items-start md:text-left md:w-[min(607px,calc(100%-clamp(24px,45%,547px)-24px))]">
         <p
           className="font-display font-bold text-[#111]"
@@ -118,7 +109,7 @@ export function TeamsCTA() {
                 "0 0 0 1px #3960F9, 0 1px 2px -1px rgba(9,6,63,0.4), inset 0 1px 0 0 rgba(255,255,255,0.16)",
             }}
           >
-            {/* Bottom-center white glow — Figma Ellipse 3938 */}
+            {/* Bottom-center white glow */}
             <span
               aria-hidden
               className="pointer-events-none select-none absolute"

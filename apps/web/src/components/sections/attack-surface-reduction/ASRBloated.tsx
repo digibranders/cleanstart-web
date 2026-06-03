@@ -1,9 +1,7 @@
 import type React from 'react';
 import { Reveal } from '@/components/ui/Reveal';
 
-// ─── Card data ────────────────────────────────────────────────────────────────
-// mobileOrder matches Figma 920:610 top-to-bottom stacking:
-// 0 Inherited Vulnerabilities → 1 Oversized SBOM's → 2 Too Many Components → 3 Constant Patching
+// mobileOrder controls the top-to-bottom stacking order of the cards on mobile.
 
 const CARDS = [
   {
@@ -32,19 +30,10 @@ const CARDS = [
   },
 ] as const;
 
-// ─── Section ──────────────────────────────────────────────────────────────────
-
 export function ASRBloated(): React.ReactElement {
   return (
     <section data-section="ASRBloated" className="relative overflow-hidden">
 
-      {/* ── Heading ── */}
-      {/*
-       * Figma 920:610 heading specs:
-       *   "Public images are" → Manrope SemiBold 28px / lh 1.2 / #111 / centered
-       *   "bloated"           → gradient 97.33deg #9A51FF 26.48% → #2CC1EB 98.78%
-       *                         tracking -1.4px
-       */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 md:pt-[88px]">
         <Reveal header>
         <h2
@@ -75,31 +64,14 @@ export function ASRBloated(): React.ReactElement {
         </Reveal>
       </div>
 
-      {/* ── Desktop + tablet layout ── locked, uniformly-scaling composition.
-       *
-       * Every element inside the inner box uses INTRINSIC pixel coordinates
-       * against a fixed 1250×508 canvas. The outer wrapper establishes a
-       * container query context (container-type: inline-size) and the inner
-       * box applies `transform: scale(calc(100cqw / 1250))` from its
-       * top-left origin. The whole composition — cards, halo thickness,
-       * icon boxes, typography, the connector SVG, the container PNG and
-       * its glow — scales as a single group, like an SVG.
-       *
-       * Geometry (Figma 655×270 connector SVG drives everything):
-       *   Canvas        : 1140 × 425
-       *   SVG (540×222.5, scaled 82% from 655×270): (300, 101.25)
-       *                   centred on (570, 212.5)
-       *   Container PNG : centred on (570, 212.5), 440px wide
-       *   Cards (303×150): dot meets the vertical centre of the inner edge
-       *                    Dots resolve to TL/TR (304.39, 105.64) /
-       *                    (835.36, 105.64) and BL/BR (323.35, 319.12) /
-       *                    (807.34, 319.12) — top = dot.y − 75.
-       *     TL → (1.39,  30.64)   TR → (835.36, 30.64)
-       *     BL → (20.35, 244.12)  BR → (807.34, 244.12)
-       *
-       * Wrapper's `aspect-ratio: 1250 / 508` keeps the flow height in sync
-       * with the scaled content so nothing below jumps. On <md viewports we
-       * fall through to the mobile stacked layout.
+      {/*
+       * Desktop/tablet composition scales as a single group: every child uses
+       * intrinsic pixel coordinates against a fixed 1140×425 canvas, the wrapper
+       * establishes a container-query context, and the inner box applies
+       * `transform: scale(calc(100cqw / 1140px))` from its top-left origin so
+       * cards, glows, the connector SVG, and the container PNG scale together.
+       * The wrapper's aspect-ratio keeps flow height in sync so nothing below
+       * jumps; below md the layout falls through to the mobile stack.
        */}
       <div className="hidden md:block relative pb-[88px] px-6 sm:px-10">
         <div
@@ -122,7 +94,7 @@ export function ASRBloated(): React.ReactElement {
             transform: 'scale(calc(100cqw / 1140px))',
           }}
         >
-          {/* Sky-blue radial glow behind the container — matches new accent */}
+          {/* Radial glow behind the container */}
           <div
             aria-hidden
             className="absolute pointer-events-none select-none"
@@ -139,8 +111,8 @@ export function ASRBloated(): React.ReactElement {
             }}
           />
 
-          {/* Combined connector SVG — scaled to 82% of intrinsic so cards
-              sit closer to the container without breaking the dot anchor. */}
+          {/* Connector SVG scaled below its intrinsic size so the cards sit
+              closer to the container without breaking the dot anchor points. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             aria-hidden
@@ -159,26 +131,14 @@ export function ASRBloated(): React.ReactElement {
           />
 
           {/*
-           * Container PNG + Figma colour tints (group 2085665234).
-           *
-           * The wrapper carries:
-           *   - the soft radial mask  → preserves the existing fade-to-edge
-           *   - `isolation: isolate`  → blend-modes only mix with siblings
-           *                             inside this group (not with the
-           *                             pink glow / page background behind)
-           *   - `overflow: hidden`    → the 42px blur halos of the tints
-           *                             stop at the wrapper box so they
-           *                             can't leak past the masked edges
-           *
-           * The PNG itself stays fully opaque — no opacity tricks — so the
-           * cropped edges of the source asset never reveal themselves.
-           * Tints sit on top with `mix-blend-mode: color`: hue & saturation
-           * come from the tint, luminance comes from the PNG, so every box,
-           * label, and door retains its full detail and contrast.
-           *
-           * Tint geometry derived from Figma group (509×437):
-           *   Purple #DF9BFF  → 433×286 at (0, 0)        ≈ 85% × 65% top-left
-           *   Blue   #2CC1EB  → 301×244 at (208, 193)    ≈ 59% × 56% bottom-right
+           * Container PNG with two colour tints overlaid. The wrapper uses a
+           * radial mask to fade the edges, `isolation: isolate` so the blend
+           * modes only mix with siblings in this group (not the glow or page
+           * background behind), and `overflow: hidden` so the tints' blur halos
+           * stop at the wrapper box and can't leak past the masked edges. The
+           * PNG stays fully opaque; the tints sit on top with
+           * `mix-blend-mode: color` so hue and saturation come from the tint
+           * while luminance comes from the PNG, preserving detail and contrast.
            */}
           <div
             aria-hidden
@@ -206,7 +166,7 @@ export function ASRBloated(): React.ReactElement {
               decoding="async"
             />
 
-            {/* Purple tint — upper-left quadrant of the container */}
+            {/* Purple tint — upper-left quadrant */}
             <div
               style={{
                 position: 'absolute',
@@ -220,7 +180,7 @@ export function ASRBloated(): React.ReactElement {
               }}
             />
 
-            {/* Blue tint — lower-right quadrant of the container */}
+            {/* Blue tint — lower-right quadrant */}
             <div
               style={{
                 position: 'absolute',
@@ -235,7 +195,7 @@ export function ASRBloated(): React.ReactElement {
             />
           </div>
 
-          {/* ── Cards ── dot lands at the centre of each card's inner edge */}
+          {/* Each card is positioned so the connector dot lands at the centre of its inner edge */}
           <div className="absolute" style={{ left: '1.39px', top: '30.64px', zIndex: 3 }}>
             <BloatedCard card={CARDS[0]} />
           </div>
@@ -252,13 +212,7 @@ export function ASRBloated(): React.ReactElement {
         </div>
       </div>
 
-      {/* ── Mobile layout ── */}
-      {/*
-       * Figma 920:610 mobile layout:
-       *   10px side margins on 360px frame → px-[10px]
-       *   Cards: 340×114px each, 16px gap between cards
-       *   Order: Inherited (0) → Oversized (1) → TooMany (2) → Constant (3)
-       */}
+      {/* Mobile layout — stacked cards, ordered via mobileOrder. */}
       <div className="md:hidden mx-auto px-[10px] pb-12 flex flex-col items-center gap-4">
         {[...CARDS]
           .sort((a, b) => a.mobileOrder - b.mobileOrder)
@@ -270,8 +224,6 @@ export function ASRBloated(): React.ReactElement {
   );
 }
 
-// ─── BloatedCard ──────────────────────────────────────────────────────────────
-
 interface BloatedCardProps {
   card: (typeof CARDS)[number];
   mobile?: boolean;
@@ -279,25 +231,6 @@ interface BloatedCardProps {
 
 function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactElement {
   if (mobile) {
-    /*
-     * Mobile card — Figma 920:610 exact specs:
-     *
-     * Outer wrapper   : 340px wide, border-radius 20px
-     *                   background: rgba(255,76,76,0.4) — the #FF4C4C fill at opacity 0.4
-     *                   from bloated-card-bg.svg
-     *
-     * Inner white body: margin 6px on all sides (inset 6px from outer)
-     *                   border-radius 17px
-     *                   padding 16px all sides, gap 16px between icon and text
-     *                   box-shadow: 6-layer shadow from bloated-card-inner.svg filter
-     *
-     * Icon box        : 70×70px, border-radius 12px
-     *                   fill #fb6d6d + mix-blend-overlay gradient + mix-blend-color #ff7777
-     *                   Icon image: 40×40px centred (15px from each edge)
-     *
-     * Title           : Manrope SemiBold 20px / lh 1.0 / tracking -0.05em / #111
-     * Description     : Manrope Regular 14px / lh 1.5 / tracking -0.04em / #111 / opacity 0.8
-     */
     return (
       <div
         className="relative w-full rounded-[20px]"
@@ -329,18 +262,16 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
               '0 65.38px 65.38px rgba(223,155,255,0.08)',
           }}
         >
-          {/* Icon box — 70×70px with red-coral fill + overlay tints */}
+          {/* Icon box — red-coral fill + overlay tints */}
           <div
             className="relative shrink-0 overflow-hidden"
             style={{ width: '70px', height: '70px', borderRadius: '12px' }}
           >
-            {/* Base fill #fb6d6d */}
             <div
               aria-hidden
               className="absolute inset-0"
               style={{ borderRadius: '12px', background: '#fb6d6d' }}
             />
-            {/* Highlight gradient overlay */}
             <div
               aria-hidden
               className="absolute inset-0 mix-blend-overlay"
@@ -350,13 +281,11 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
                   'linear-gradient(-20.97deg, rgba(255,255,255,0) 52.8%, rgba(255,255,255,1) 95.95%)',
               }}
             />
-            {/* Color blend tint */}
             <div
               aria-hidden
               className="absolute inset-0 mix-blend-color"
               style={{ borderRadius: '12px', background: '#ff7777' }}
             />
-            {/* Shield icon: 40×40px centred in 70×70px → 15px each side */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               aria-hidden
@@ -369,12 +298,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             />
           </div>
 
-          {/* Text block */}
           <div className="flex flex-col min-w-0" style={{ gap: '8px' }}>
-            {/*
-             * Title: Manrope SemiBold 20px / lh 1.0 / tracking -1px (-0.05em) / #111
-             * Figma: font-['Manrope:SemiBold'] font-semibold text-[20px] tracking-[-1px] leading-none
-             */}
             <p
               className="text-[#111]"
               style={{
@@ -387,11 +311,6 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
             >
               {card.title}
             </p>
-            {/*
-             * Description: Manrope Regular 14px / lh 1.5 / tracking -0.56px (-0.04em)
-             *              opacity 0.8 / #111
-             * Figma: font-['Manrope:Regular'] text-[14px] leading-[1.5] tracking-[-0.56px] opacity-80
-             */}
             <p
               style={{
                 fontFamily: 'var(--font-sans)',
@@ -411,7 +330,7 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
     );
   }
 
-  // ── Desktop card — 303×150 compact variant ───────────────────────────────
+  // Desktop card — 303×150 compact variant.
   return (
     <div
       className="relative"
@@ -486,7 +405,6 @@ function BloatedCard({ card, mobile = false }: BloatedCardProps): React.ReactEle
           />
         </div>
 
-        {/* Text — explicit 20 Manrope / 16 Sora per design spec */}
         <div className="flex flex-col min-w-0" style={{ gap: '6px', maxWidth: '180px' }}>
           <p
             className="text-[#111]"

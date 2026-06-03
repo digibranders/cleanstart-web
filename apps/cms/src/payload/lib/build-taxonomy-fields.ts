@@ -1,5 +1,6 @@
 import type { Field } from 'payload';
 
+import { mediaUploadField } from '../fields/media-upload';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 
@@ -26,7 +27,7 @@ export const buildTaxonomyFields = (
   { name: 'name', type: 'text', required: true },
   slugField({ source: 'name' }),
   { name: 'description', type: 'textarea' },
-  { name: 'icon', type: 'upload', relationTo: 'media' },
+  mediaUploadField({ name: 'icon', folderHint: 'web/general' }),
   {
     name: 'parent',
     type: 'relationship',

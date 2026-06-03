@@ -218,15 +218,24 @@ export const InlineImageEditDialog = (props: Props): ReactElement => {
       return;
     }
     try {
-      const res = await fetch(`/api/media/${doc.id}?depth=0`, {
-        method: 'PATCH',
+      // POST to /rename moves the R2 object and updates media.url in
+      // a single atomic operation. A bare PATCH only updates the DB
+      // column, leaving the storage object at the old key (broken URL).
+      const res = await fetch(`/api/media/${doc.id}/rename`, {
+        method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: next }),
+        body: JSON.stringify({ stem }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = (await res.json()) as { doc?: MediaDoc };
-      if (json?.doc) setDoc(json.doc);
+      const json = (await res.json()) as { ok?: boolean; filename?: string; doc?: MediaDoc; error?: string };
+      if (!json.ok) throw new Error(json.error ?? 'Rename failed');
+      if (json.doc) setDoc(json.doc);
+      else if (json.filename && doc) {
+        // Minimal optimistic update when the endpoint returns only the
+        // new filename rather than the full doc.
+        setDoc({ ...doc, filename: json.filename });
+      }
       setEditingFilename(false);
       setError(null);
     } catch {

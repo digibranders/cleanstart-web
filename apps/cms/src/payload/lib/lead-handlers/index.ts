@@ -1,17 +1,16 @@
-import { brevoHandler } from './brevo';
 import { companyFromDomainHandler } from './company-from-domain';
 import { hubspotHandler } from './hubspot';
 import { registerSecondaryHandler } from './registry';
 
 // Secondary chain:
 //   - company-from-domain  (free enrichment, no env gate)
-//   - brevo                (template-based notification, env-gated)
 //   - hubspot              (primary CRM — Phase J3; reads DB-backed
 //                           integration row, no env gate)
 //
-// Slack/Discord/Teams move to a later "Integrations" admin surface
-// where editors connect each channel from a CMS settings page, not
-// env vars. See docs/BACKLOG.md "Future — Integrations dashboard".
+// Email is owned entirely by HubSpot (form follow-up + internal
+// notifications). Brevo was removed once HubSpot became the single
+// email channel. Slack/Discord/Teams connect from the Integrations
+// admin surface, not env vars.
 
 let registered = false;
 
@@ -24,11 +23,10 @@ export const registerLeadHandlers = (): void => {
   if (registered) return;
   registered = true;
   registerSecondaryHandler(companyFromDomainHandler);
-  registerSecondaryHandler(brevoHandler);
   registerSecondaryHandler(hubspotHandler);
 };
 
-export { brevoHandler, companyFromDomainHandler, hubspotHandler };
+export { companyFromDomainHandler, hubspotHandler };
 export { hubspotGdprDeleteByEmail } from './hubspot';
 export {
   registerSecondaryHandler,

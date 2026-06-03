@@ -47,7 +47,7 @@ export const SeoDefaults: GlobalConfig = {
       label: 'Brand icons',
       admin: {
         description:
-          'Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`.',
+          'Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`. Note: web production phase — not yet consumed by apps/web.',
       },
       fields: [
         mediaUploadField({
@@ -92,7 +92,7 @@ export const SeoDefaults: GlobalConfig = {
       label: 'Search engine verification',
       admin: {
         description:
-          'Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper.',
+          'Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper. Note: web production phase — not yet consumed by apps/web.',
       },
       fields: [
         {

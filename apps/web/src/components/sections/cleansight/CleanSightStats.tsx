@@ -1,16 +1,9 @@
 "use client";
 
 /*
- * Figma node 373:1236 — 1920×550 px
- *
- * Background: linear-gradient(180deg, #151021 0%, #131e8f 67.139%, #471ec0 107.43%)
- * Heading at y=100 (100 px from top)
- * Stats group at y=224, 1276 px wide, centred
- *   — 4 items × 209.328 px wide, gap=18 px between value and label
- *   — 3 vertical divider lines between columns (x=604, 960, 1315 within 1276 content)
- * Decorative Union shape: top-right, mix-blend-overlay, -rotate-150, -scale-y-100
- *
- * Numbers count up from 0 when the section first enters the viewport.
+ * Stats band — four count-up metrics in a row with vertical dividers and a
+ * decorative overlay shape. Numbers count up from 0 when the section first
+ * enters the viewport.
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -103,7 +96,7 @@ export function CleanSightStats(): React.ReactElement {
         background: "linear-gradient(180deg, #151021 0%, #131e8f 67.139%, #471ec0 107.43%)",
       }}
     >
-      {/* ── Decorative Union — top-right, mix-blend-overlay ── */}
+      {/* Decorative overlay shape — top-right. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -125,7 +118,7 @@ export function CleanSightStats(): React.ReactElement {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md" style={{ paddingBottom: "var(--spacing-section-cta)" }}>
 
-        {/* ── Heading ── */}
+        {/* Heading. */}
         <div className="text-center" style={{ marginBottom: "62px" }}>
           <Reveal header>
             <h2
@@ -146,7 +139,7 @@ export function CleanSightStats(): React.ReactElement {
           </Reveal>
         </div>
 
-        {/* ── Stats row — 4 columns with vertical dividers ── */}
+        {/* Stats row — 4 columns with vertical dividers. */}
         <div className="relative grid grid-cols-2 lg:grid-cols-4">
 
           {/* Vertical dividers — 3 lines between the 4 columns */}
@@ -193,7 +186,7 @@ export function CleanSightStats(): React.ReactElement {
               className="text-center text-white flex flex-col items-center py-6 lg:py-0"
               style={{ gap: "18px" }}
             >
-              {/* Animated stat number */}
+              {/* Animated stat number. */}
               <AnimatedStatValue
                 prefix={s.prefix}
                 end={s.end}
@@ -207,7 +200,6 @@ export function CleanSightStats(): React.ReactElement {
                   letterSpacing: "var(--fs-display-ls)",
                 }}
               />
-              {/* Label */}
               <p
                 style={{
                   fontFamily: "var(--font-sans)",

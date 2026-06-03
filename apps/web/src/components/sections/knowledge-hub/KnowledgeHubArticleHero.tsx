@@ -12,7 +12,6 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
       style={{ minHeight: "418px", background: HERO_GRADIENT }}
       aria-labelledby="knowledge-hub-hero-title"
     >
-      {/* Decorative cube — lower-left (Figma image 583141) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -31,7 +30,6 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Decorative cube — upper-right (Figma image 583137) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden

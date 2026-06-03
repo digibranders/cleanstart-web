@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { ResourceDetail } from "@/lib/resources";
 import { resourceLeadCaptureHeading } from "@/lib/resources-utils";
+import { submitLead } from "@/lib/leads/submitLead";
 
 interface ResourceDetailLeadCaptureProps {
   resource: ResourceDetail;
 }
+
+const RESOURCE_CONSENT_TEXT =
+  "I agree to receive communications from CleanStart and to the storage & processing of my email per the Privacy Policy.";
 
 export function ResourceDetailLeadCapture({
   resource,
@@ -14,11 +18,39 @@ export function ResourceDetailLeadCapture({
   const heading = resourceLeadCaptureHeading(resource.type);
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [topError, setTopError] = useState<string | null>(null);
+  const inFlightRef = useRef(false);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
-    // Lead submission wired through the CMS LeadHandler when backend is ready.
-    // For now: placeholder — the UI is the deliverable at this phase.
+    if (inFlightRef.current) return;
+    setTopError(null);
+    if (!agreed) {
+      setTopError("Please agree to be contacted to continue.");
+      return;
+    }
+    inFlightRef.current = true;
+
+    const result = await submitLead({
+      formSlug: "resource-capture",
+      fields: { email: email.trim() },
+      consent: {
+        snapshot: RESOURCE_CONSENT_TEXT,
+        givenAt: new Date().toISOString(),
+        categories: ["marketing"],
+      },
+      ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
+    });
+
+    inFlightRef.current = false;
+    if (result.ok) {
+      setSubmitted(true);
+      setEmail("");
+      setAgreed(false);
+    } else {
+      setTopError("Something went wrong. Please try again.");
+    }
   }
 
   return (
@@ -27,7 +59,6 @@ export function ResourceDetailLeadCapture({
       style={{ background: "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)" }}
       aria-labelledby="rd-cta-title"
     >
-          {/* Union pattern */}
           <div
             aria-hidden
             className="absolute pointer-events-none select-none"
@@ -48,7 +79,6 @@ export function ResourceDetailLeadCapture({
             />
           </div>
 
-          {/* Glow ellipse — right */}
           <div
             aria-hidden
             className="absolute pointer-events-none select-none"
@@ -69,7 +99,6 @@ export function ResourceDetailLeadCapture({
             />
           </div>
 
-          {/* Glow ellipse — left */}
           <div
             aria-hidden
             className="absolute pointer-events-none select-none"
@@ -90,7 +119,6 @@ export function ResourceDetailLeadCapture({
             />
           </div>
 
-          {/* Lead cube — bottom-left, rotated + flipped (desktop only) */}
           <div
             aria-hidden
             className="absolute pointer-events-none select-none hidden sm:block"
@@ -122,13 +150,11 @@ export function ResourceDetailLeadCapture({
             </div>
           </div>
 
-          {/* Content row */}
           <div
             className="absolute inset-0 flex items-center px-6 py-8"
             style={{ paddingLeft: "clamp(32px, 5.2vw, 100px)", paddingRight: "clamp(32px, 5.2vw, 100px)" }}
           >
             <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 lg:gap-[clamp(32px,3.5vw,68px)] w-full min-w-0">
-              {/* Headline */}
               <h2
                 id="rd-cta-title"
                 className="font-display text-white text-center lg:text-left w-full lg:w-auto lg:flex-shrink-0"
@@ -143,12 +169,10 @@ export function ResourceDetailLeadCapture({
                 {heading}
               </h2>
 
-              {/* Form */}
               <form
                 onSubmit={handleSubmit}
                 className="flex flex-col items-stretch lg:items-start w-full lg:flex-1 lg:min-w-0 gap-4 lg:gap-5"
               >
-                {/* Legal teaser */}
                 <p
                   className="font-normal text-white text-center lg:text-left w-full"
                   style={{
@@ -170,7 +194,6 @@ export function ResourceDetailLeadCapture({
                   </a>
                 </p>
 
-                {/* Email row */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full">
                   <input
                     type="email"
@@ -194,7 +217,6 @@ export function ResourceDetailLeadCapture({
                     }}
                   />
 
-                  {/* Glass "Get in Touch" button */}
                   <button
                     type="submit"
                     className="relative overflow-hidden inline-flex items-center justify-center gap-2 font-medium tracking-[-0.01em] shrink-0 w-full sm:w-auto"
@@ -245,7 +267,7 @@ export function ResourceDetailLeadCapture({
                   </button>
                 </div>
 
-                {/* Consent checkbox — 44px min-height for WCAG 2.5.8 target-size */}
+                {/* 44px min-height satisfies WCAG 2.5.8 target size. */}
                 <label
                   htmlFor="rd-consent"
                   className="flex items-center gap-2 w-full text-xs font-normal leading-none tracking-[-0.04em] text-white cursor-pointer"
@@ -265,6 +287,21 @@ export function ResourceDetailLeadCapture({
                   />
                   <span>I agree to receive other communications from CleanStart.*</span>
                 </label>
+
+                {submitted && (
+                  <output
+                    aria-live="polite"
+                    className="block text-sm font-medium text-white"
+                    style={{ opacity: 0.95 }}
+                  >
+                    Thanks — you&apos;re on the list. We&apos;ll be in touch.
+                  </output>
+                )}
+                {topError && (
+                  <p role="alert" className="text-sm font-medium text-white" style={{ opacity: 0.95 }}>
+                    {topError}
+                  </p>
+                )}
               </form>
             </div>
           </div>

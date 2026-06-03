@@ -14,6 +14,7 @@ const RETENTION_DAYS = 90;
 export const analyticsCachePruneTask: TaskConfig<'analyticsCachePrune'> = {
   slug: 'analyticsCachePrune',
   retries: 0,
+  schedule: [{ cron: '0 7 * * *', queue: 'analyticsCachePrune' }],
   handler: async ({ req }) => {
     const cutoff = new Date(Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000).toISOString();
     try {
@@ -30,7 +31,7 @@ export const analyticsCachePruneTask: TaskConfig<'analyticsCachePrune'> = {
         { error: err instanceof Error ? err.message : String(err) },
         'analyticsCache prune failed',
       );
-      return { output: { deleted: 0, error: 'prune-failed' } };
+      throw err instanceof Error ? err : new Error(String(err));
     }
   },
 };

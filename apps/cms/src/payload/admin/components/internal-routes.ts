@@ -56,12 +56,14 @@ export const toStoredUrl = (input: string): string => {
   const trimmed = input.trim();
   if (!trimmed) return trimmed;
   if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return trimmed;
-  if (
-    trimmed.startsWith('/') ||
-    trimmed.startsWith('#') ||
-    trimmed.startsWith('?')
-  ) {
-    return `${SITE_ORIGIN}${trimmed.startsWith('/') ? '' : '/'}${trimmed}`;
+  if (trimmed.startsWith('/')) {
+    return `${SITE_ORIGIN}${trimmed}`;
+  }
+  // Hash and query fragments are relative to the site root without a path
+  // separator — `#anchor` → `https://origin#anchor` round-trips back to
+  // `#anchor`, while inserting a `/` would yield `/#anchor` on decode.
+  if (trimmed.startsWith('#') || trimmed.startsWith('?')) {
+    return `${SITE_ORIGIN}${trimmed}`;
   }
   return trimmed;
 };

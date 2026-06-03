@@ -3,7 +3,7 @@
 import { useField } from '@payloadcms/ui';
 import type { JSONFieldClientProps } from 'payload';
 import type { ChangeEvent, ReactElement } from 'react';
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 const labelOf = (raw: unknown): string => {
   if (typeof raw === 'string') return raw;
@@ -44,6 +44,19 @@ export const JsonField = (props: JSONFieldClientProps): ReactElement => {
 
   const [text, setText] = useState<string>(() => stringify(value));
   const [parseError, setParseError] = useState<string | null>(null);
+  // Track focus so external value changes (version restore, autosave) are not
+  // applied while the editor is actively typing — we only resync when unfocused.
+  const hasFocusRef = useRef(false);
+
+  // Resync local text when the form value changes externally (e.g. version
+  // restore, autosave overwrite) — but only when the textarea is not focused,
+  // so in-progress edits are never clobbered.
+  useEffect(() => {
+    if (!hasFocusRef.current) {
+      setText(stringify(value));
+      setParseError(null);
+    }
+  }, [value]);
 
   const onChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
     setText(e.target.value);
@@ -83,7 +96,11 @@ export const JsonField = (props: JSONFieldClientProps): ReactElement => {
         className="cs-textarea cs-textarea--mono"
         value={text}
         onChange={onChange}
-        onBlur={onBlur}
+        onFocus={() => { hasFocusRef.current = true; }}
+        onBlur={() => {
+          hasFocusRef.current = false;
+          onBlur();
+        }}
         rows={10}
         spellCheck={false}
         readOnly={readOnly}

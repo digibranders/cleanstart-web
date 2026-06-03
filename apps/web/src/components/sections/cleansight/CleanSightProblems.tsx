@@ -1,11 +1,6 @@
 import type React from 'react';
 import { WhyMattersGrid, type WhyCard } from '../_shared/WhyMattersGrid';
 
-/*
- * "When Container Visibility Falls Short, Risk Grows" section — uses the
- * shared WhyMattersGrid layout (for-developers "Why Does It Matter" pattern).
- */
-
 const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [
   {
     title: 'Shadow Containers',

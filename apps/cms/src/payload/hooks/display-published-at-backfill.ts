@@ -14,7 +14,9 @@ import type { CollectionBeforeChangeHook } from 'payload';
  *  - **Legacy rows**: same source preference — `publishedAt` (always
  *    present after the first save) → `createdAt` (defensive fallback).
  *  - **Editor-set values** are preserved — the hook is a no-op when
- *    the field is already non-empty in either `next` or `previous`.
+ *    the field is already non-empty in `next` (the incoming save data).
+ *  - **Editor clears the field** — re-stamped to the publish date so
+ *    the field is never left permanently empty on a published doc.
  *
  * Read precedence in the JSON-LD dispatcher + byline helpers:
  *   publicationDate > displayPublishedAt > publishedAt > createdAt
@@ -38,10 +40,11 @@ export const displayPublishedAtBackfillHook: CollectionBeforeChangeHook = ({
   const isSet =
     typeof next.displayPublishedAt === 'string' &&
     (next.displayPublishedAt as string).length > 0;
-  const wasSet =
-    typeof previous.displayPublishedAt === 'string' &&
-    (previous.displayPublishedAt as string).length > 0;
-  if (isSet || wasSet) return next;
+  // Only skip when the incoming data already has the field populated.
+  // When the editor clears the field (wasSet but !isSet), we intentionally
+  // re-stamp so clearing then republishing produces a sensible date rather
+  // than leaving the field permanently empty.
+  if (isSet) return next;
 
   const source =
     (typeof next.publishedAt === 'string' && next.publishedAt) ||

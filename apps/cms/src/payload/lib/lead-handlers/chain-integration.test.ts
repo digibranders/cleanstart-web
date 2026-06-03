@@ -1,18 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { brevoHandler } from './brevo';
 import { companyFromDomainHandler } from './company-from-domain';
 import {
   __resetSecondaryHandlers,
   registerSecondaryHandler,
   submitLead,
 } from './registry';
-import type { LeadSubmission } from './types';
+import type { LeadHandler, LeadSubmission } from './types';
 
 /**
- * Integration test: full LeadHandler chain wired with the *real*
- * primary, brevo, and company-from-domain handlers. Validates the
- * end-to-end orchestration, not any single handler in isolation.
+ * Integration test: the full LeadHandler chain wired with the *real*
+ * primary + company-from-domain handlers plus mock secondaries. Validates
+ * the end-to-end orchestration (parallel fan-out, syncedTo persistence,
+ * duplicate-skip propagation, failure isolation) — not any single handler.
  */
 
 type Lead = {
@@ -29,6 +29,19 @@ type Form = {
   name: string;
   notifyTo: { email: string }[];
 };
+
+/** A configurable mock secondary handler for exercising the chain. */
+const mockSecondary = (
+  name: string,
+  behavior: (ctx: { duplicateOfLeadId?: number | undefined }) =>
+    | { status: 'synced'; externalId?: string }
+    | { status: 'failed'; error: string }
+    | { status: 'skipped'; reason: string },
+): LeadHandler => ({
+  name,
+  kind: 'secondary',
+  run: async (_submission, ctx) => ({ handler: name, ...behavior(ctx) }),
+});
 
 const makeFakePayload = () => {
   const leads = new Map<number, Lead>();
@@ -83,8 +96,6 @@ const formFieldDefs = [
 
 beforeEach(() => {
   __resetSecondaryHandlers();
-  Reflect.deleteProperty(process.env, 'BREVO_API_KEY');
-  Reflect.deleteProperty(process.env, 'BREVO_TEMPLATE_ID');
 });
 
 afterEach(() => {
@@ -93,19 +104,9 @@ afterEach(() => {
 });
 
 describe('LeadHandler chain (integration)', () => {
-  it('writes a lead row, runs brevo + enrichment in parallel, and persists syncedTo', async () => {
-    process.env.BREVO_API_KEY = 'k';
-    process.env.BREVO_TEMPLATE_ID = '42';
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ messageId: 'msg-1' }),
-      } as never),
-    );
-
-    registerSecondaryHandler(brevoHandler);
+  it('writes a lead row, runs secondaries in parallel, and persists syncedTo', async () => {
     registerSecondaryHandler(companyFromDomainHandler);
+    registerSecondaryHandler(mockSecondary('crm', () => ({ status: 'synced', externalId: 'ext-1' })));
 
     const { payload, state } = makeFakePayload();
     const result = await submitLead(payload, submission, { formFieldDefs });
@@ -122,20 +123,18 @@ describe('LeadHandler chain (integration)', () => {
     const syncedTo = (lead?.syncedTo ?? []) as { handler: string; status: string }[];
     const byHandler = Object.fromEntries(syncedTo.map((s) => [s.handler, s.status]));
     expect(byHandler['db-primary']).toBe('synced');
-    expect(byHandler.brevo).toBe('synced');
+    expect(byHandler.crm).toBe('synced');
     expect(byHandler['company-from-domain']).toBe('synced');
   });
 
-  it('flags a duplicate within 24h and skips brevo (via duplicate-submission)', async () => {
-    process.env.BREVO_API_KEY = 'k';
-    process.env.BREVO_TEMPLATE_ID = '42';
-    const fetchSpy = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ messageId: 'msg-1' }),
-    } as never);
-    vi.stubGlobal('fetch', fetchSpy);
-
-    registerSecondaryHandler(brevoHandler);
+  it('flags a duplicate within 24h and propagates duplicateOfLeadId to secondaries', async () => {
+    registerSecondaryHandler(
+      mockSecondary('crm', (ctx) =>
+        ctx.duplicateOfLeadId != null
+          ? { status: 'skipped', reason: 'duplicate-submission' }
+          : { status: 'synced' },
+      ),
+    );
 
     const { payload, state } = makeFakePayload();
     // Pre-seed a recent lead with the same email on the same form.
@@ -149,24 +148,12 @@ describe('LeadHandler chain (integration)', () => {
     expect(result.ok).toBe(true);
     expect(result.duplicateOfLeadId).toBe(99);
 
-    const brevoEntry = result.secondaries.find((s) => s.handler === 'brevo');
-    expect(brevoEntry?.status).toBe('skipped');
-    expect(fetchSpy).not.toHaveBeenCalled();
+    const crmEntry = result.secondaries.find((s) => s.handler === 'crm');
+    expect(crmEntry?.status).toBe('skipped');
   });
 
-  it('records brevo failure on syncedTo without aborting the chain', async () => {
-    process.env.BREVO_API_KEY = 'k';
-    process.env.BREVO_TEMPLATE_ID = '42';
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: false,
-        status: 502,
-        text: async () => 'bad gateway',
-      } as never),
-    );
-
-    registerSecondaryHandler(brevoHandler);
+  it('records a secondary failure on syncedTo without aborting the chain', async () => {
+    registerSecondaryHandler(mockSecondary('crm', () => ({ status: 'failed', error: 'upstream 502' })));
     registerSecondaryHandler(companyFromDomainHandler);
 
     const { payload, state } = makeFakePayload();
@@ -175,7 +162,7 @@ describe('LeadHandler chain (integration)', () => {
     expect(result.ok).toBe(true);
     const lead = state.leads.get(1);
     const syncedTo = (lead?.syncedTo ?? []) as { handler: string; status: string }[];
-    expect(syncedTo.find((s) => s.handler === 'brevo')?.status).toBe('failed');
+    expect(syncedTo.find((s) => s.handler === 'crm')?.status).toBe('failed');
     expect(syncedTo.find((s) => s.handler === 'company-from-domain')?.status).toBe('synced');
   });
 });

@@ -4,20 +4,15 @@ import type React from 'react';
 import { HeroReveal } from '@/components/ui/Reveal';
 
 /*
- * Figma node 732-413 — Developer page hero.
- * Marquee (Figma 857-4663 / single card 857-4691): 239×171 gradient tiles with
- * a white logo plate, stack name and short description.
+ * Developer page hero with a stack-card marquee.
  *
- * Data model: hardcoded list of 15 popular stacks. This is intentional — the
- * marquee is a marketing surface, not a catalog viewer, so freshness doesn't
- * matter here (the live catalog lives at /cleanstart-images and
- * images.cleanstart.com). When the upstream /api/community-images endpoint
- * grows to support `?limit=N`, swap STACKS for the dynamic fetcher in
- * lib/api/community-images.ts — the card component below doesn't change.
+ * The stack list is hardcoded intentionally — the marquee is a marketing
+ * surface, not a catalog viewer, so freshness does not matter (the live
+ * catalog lives at /cleanstart-images and images.cleanstart.com).
  *
- * Logo URLs follow the CleanStart catalog convention:
- *   https://storage.googleapis.com/cdpimages/<slug>/<slug>.svg
- * (allowlisted in next.config.ts → images.remotePatterns and the CSP img-src).
+ * TODO: when the upstream /api/community-images endpoint supports `?limit=N`,
+ * swap STACKS for the dynamic fetcher in lib/api/community-images.ts — the
+ * card component below does not change.
  */
 
 interface StackCardData {
@@ -35,14 +30,12 @@ interface StackCardData {
 }
 
 /**
- * Brand-colored stack logos from devicons (jsDelivr CDN). Devicons gives us
- * consistent, brand-accurate SVGs across the marquee — the upstream cdpimages
- * GCS bucket only has real logos for ~half the catalog (the rest fall back to
- * a generic white "stacked layers" placeholder, which is invisible on the
- * white logo plate). Devicons fixes that for every stack we render here.
- *
- * URL shape: https://cdn.jsdelivr.net/gh/devicons/devicon/icons/<folder>/<folder>-<variant>.svg
- * Allowlisted in next.config.ts → images.remotePatterns and the CSP img-src.
+ * Brand-colored stack logos from devicons (jsDelivr CDN). Devicons provides
+ * consistent, brand-accurate SVGs across the marquee; the upstream cdpimages
+ * GCS bucket only has real logos for about half the catalog (the rest fall
+ * back to a generic white "stacked layers" placeholder, which is invisible on
+ * the white logo plate). The devicons host is allowlisted in next.config.ts
+ * (images.remotePatterns) and the CSP img-src.
  */
 function deviconLogo(folder: string, variant: string): string {
   return `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${folder}/${folder}-${variant}.svg`;
@@ -145,10 +138,9 @@ const STACKS: StackCardData[] = [
 ];
 
 /**
- * Single marquee card — Figma 857:4691 baseline geometry (239×171).
- * Card root is a `container-type: inline-size` container so every interior size
- * (plate, logo, title, description, padding) is expressed in `cqi` units and
- * scales proportionally with the card width.
+ * Single marquee card. The root is a `container-type: inline-size` container
+ * so every interior size (plate, logo, title, description, padding) is
+ * expressed in `cqi` units and scales proportionally with the card width.
  */
 function StackCard({ name, logoUrl, description, logoScale }: StackCardData): React.ReactElement {
   return (
@@ -164,8 +156,7 @@ function StackCard({ name, logoUrl, description, logoScale }: StackCardData): Re
         containerType: 'inline-size',
       }}
     >
-      {/* Layer 1 — base gradient (Figma Rectangle 1000001822).
-          Bleeds 4 px past each card edge (Figma 248×180 vs card 239×171). */}
+      {/* Base gradient. Bleeds 4 px past each card edge. */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -179,9 +170,8 @@ function StackCard({ name, logoUrl, description, logoScale }: StackCardData): Re
         }}
       />
 
-      {/* Layer 2 — purple wash (Figma Ellipse 46683).
-          Huge blurred ellipse anchored top-left; only its bottom-right edge bleeds
-          into the visible card area, giving the soft purple tint at top/left. */}
+      {/* Purple wash: a large blurred ellipse anchored top-left whose
+          bottom-right edge bleeds into the card, tinting the top-left corner. */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -197,9 +187,7 @@ function StackCard({ name, logoUrl, description, logoScale }: StackCardData): Re
         }}
       />
 
-      {/* Layer 3 — dominant cyan glow (Figma Ellipse 46684).
-          The big bright cyan/blue ellipse that covers the right and bottom of the
-          card. This is the signature element of the Figma card. */}
+      {/* Dominant cyan glow covering the right and bottom of the card. */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -215,10 +203,9 @@ function StackCard({ name, logoUrl, description, logoScale }: StackCardData): Re
         }}
       />
 
-      {/* Layer 4 — concentrated right-side bright spot (Figma Group 2085665009).
-          Three overlapping ellipses (blue + cyan + purple) blurred together; the
-          group-level blur is approximated by blurring each, which is visually
-          close for soft glows like these. */}
+      {/* Concentrated right-side bright spot: three overlapping ellipses
+          (blue, cyan, purple). The group-level blur is approximated by
+          blurring the wrapper, which is visually close for soft glows. */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -259,9 +246,8 @@ function StackCard({ name, logoUrl, description, logoScale }: StackCardData): Re
         />
       </div>
 
-      {/* Layer 5 — color-dodge flare (Figma 光斑 flare).
-          Cyan/blue radial with color-dodge blend, gives the punchy highlight on
-          the right side. */}
+      {/* Color-dodge flare: cyan/blue radial that adds the punchy highlight
+          on the right side. */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -277,11 +263,9 @@ function StackCard({ name, logoUrl, description, logoScale }: StackCardData): Re
         }}
       />
 
-      {/* Layer 6 — 1 px linear-gradient stroke (Figma Stroke: Linear, Inside).
-          Drawn last so it sits on top of all the gradient/glow layers. Uses the
-          standard mask-xor trick to keep the stroke rounded with the card's
-          14 px border-radius. Colors picked up from the Figma "Selection colors"
-          panel: light purple → translucent white → soft cyan. */}
+      {/* 1 px linear-gradient stroke, drawn last so it sits on top of all the
+          gradient/glow layers. Uses the mask-xor trick to keep the stroke
+          rounded with the card's 14 px border-radius. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -298,16 +282,15 @@ function StackCard({ name, logoUrl, description, logoScale }: StackCardData): Re
         }}
       />
 
-      {/* Content column */}
       <div
         className="relative flex h-full flex-col"
         style={{ padding: '5.86cqi', gap: '2.5cqi' }}
       >
-        {/* White logo plate — img fills the plate via object-fit:contain so the
-            browser picks the binding axis per logo aspect (square logos use full
-            height; wordmark logos use full width). */}
+        {/* Transparent logo plate. The img fills the plate via object-fit:contain
+            so the browser picks the binding axis per logo aspect: square logos use
+            full height, wordmark logos use full width. */}
         <div
-          className="relative overflow-hidden bg-white"
+          className="relative overflow-hidden"
           style={{
             width: '100%',
             height: '26.36cqi',
@@ -327,7 +310,6 @@ function StackCard({ name, logoUrl, description, logoScale }: StackCardData): Re
           />
         </div>
 
-        {/* Stack label */}
         <p
           style={{
             fontFamily: 'var(--font-display)',
@@ -345,9 +327,9 @@ function StackCard({ name, logoUrl, description, logoScale }: StackCardData): Re
           {name}
         </p>
 
-        {/* Description — clamped to 2 lines. Line-height 1.5 + small bottom
-            padding leaves room for descenders (y, g, p, j) which overflow:hidden
-            would otherwise clip at the box edge. */}
+        {/* Clamped to 2 lines. The small bottom padding leaves room for
+            descenders (y, g, p, j) that overflow:hidden would otherwise clip
+            at the box edge. */}
         <p
           style={{
             fontFamily: 'var(--font-sans)',
@@ -378,12 +360,10 @@ export function DeveloperHero(): React.ReactElement {
       className="relative overflow-hidden bg-cs-hero"
       style={{ minHeight: '820px' }}
     >
-      {/* Background grid — for-developers-only Figma asset (node 857:4391):
-          dark 70×70 cell grid masked over two big purple blur ellipses with
-          gradient accent ticks. Fills the entire hero via object-cover with
-          object-top so the grid spans full width/height while keeping the
-          top-right purple flare anchored at the top of the section. The SVG
-          itself preserves the 70×70 cell aspect at all viewport widths. */}
+      {/* Background grid: a dark 70×70 cell grid over two purple blur ellipses.
+          Fills the hero via object-cover with object-top so the grid spans the
+          full area while keeping the top-right purple flare anchored at the top
+          of the section. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/for-developers/hero-grid.svg"
@@ -394,7 +374,6 @@ export function DeveloperHero(): React.ReactElement {
         decoding="async"
       />
 
-      {/* ── Content column ── */}
       <div
         className="relative mx-auto z-[2] flex w-full max-w-[840px] flex-col items-center px-6 sm:px-10 text-center"
         style={{ paddingTop: 'clamp(112px, 14vw, 203px)' }}
@@ -453,7 +432,6 @@ export function DeveloperHero(): React.ReactElement {
         </HeroReveal>
       </div>
 
-      {/* ── Stack-card marquee strip ── */}
       <div
         className="relative mx-auto z-[2] flex flex-col items-center overflow-hidden"
         style={{
@@ -485,10 +463,8 @@ export function DeveloperHero(): React.ReactElement {
               'linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)',
           }}
         >
-          {/*
-           * Seamless loop: two identical sets, each with trailing 27 px gap so the
-           * -50% translate lands on Set B's first card → perfect loop.
-           */}
+          {/* Seamless loop: two identical sets, each with a trailing 27 px gap
+              so the -50% translate lands on set B's first card. */}
           <div
             className="cs-marquee"
             style={{ animationDuration: '70s', animationPlayState: 'running' }}

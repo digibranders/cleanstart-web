@@ -79,13 +79,19 @@ export const NavGroupPersistence = (): ReactElement | null => {
     };
 
     // Wait for the nav to mount, then apply stored state once.
+    // Disconnect the observer immediately after the first successful
+    // apply so it does not keep firing on every DOM mutation.
     const observer = new MutationObserver(() => {
       if (!appliedOnce && document.querySelector('.nav-group')) {
         apply();
+        if (appliedOnce) observer.disconnect();
       }
     });
     observer.observe(document.body, { childList: true, subtree: true });
     apply();
+    // If the nav was already in the DOM, apply() ran synchronously and
+    // set appliedOnce — disconnect the observer right away.
+    if (appliedOnce) observer.disconnect();
 
     // Persist on every toggle click.
     const onClick = (event: Event): void => {

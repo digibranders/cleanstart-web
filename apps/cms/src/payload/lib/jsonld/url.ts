@@ -45,16 +45,17 @@ const readSeoCanonical = (seo: unknown): SeoCanonicalShape => {
 };
 
 /**
- * Validates that an override looks like an absolute http(s) URL with no
- * query / fragment. Mirrors the save-time validator in lib/canonical so
- * we never emit JSON-LD pointing at junk if a record was somehow saved
- * with a value that drifted from the validator (legacy import data,
- * direct DB edits, etc.).
+ * Validates that an override looks like an absolute https URL with no
+ * query / fragment. Intentionally stricter than the save-time canonical
+ * validator (which historically allowed http): JSON-LD @id must use
+ * https to match the live page canonical. Any http: override that reached
+ * the DB via legacy import or direct edit is rejected here rather than
+ * emitting a mismatched @id.
  */
 const isValidOverride = (raw: string): boolean => {
   try {
     const u = new URL(raw);
-    if (u.protocol !== 'http:' && u.protocol !== 'https:') return false;
+    if (u.protocol !== 'https:') return false;
     if (u.search.length > 0) return false;
     if (u.hash.length > 0) return false;
     return true;

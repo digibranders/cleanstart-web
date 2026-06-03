@@ -1,3 +1,4 @@
+import { webflowHiringStatus } from './status';
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
 import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
 import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
@@ -39,6 +40,7 @@ export const transformJob = (row: Record<string, unknown>): Record<string, unkno
   return {
     _webflowId: row.webflowId,
     _status: 'published',
+    hiringStatus: webflowHiringStatus(row),
     title,
     slug,
     source: 'cms',

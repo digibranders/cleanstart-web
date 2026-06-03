@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
 
 /**
  * Newsletter CTA for the Events page — "Never miss an event".
@@ -8,26 +8,13 @@ import { useRef, useState } from "react";
  * Mirrors BlogsCTA structure and styling for visual consistency.
  */
 export function EventsCTA(): React.ReactElement {
-  const emailRef = useRef<HTMLInputElement>(null);
-  const [submitted, setSubmitted] = useState(false);
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
-    e.preventDefault();
-    const email = emailRef.current?.value.trim();
-    if (!email) return;
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      if (emailRef.current) emailRef.current.value = "";
-    }, 3000);
-  }
+  const { emailRef, submitted, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div
       className="absolute inset-0 overflow-hidden"
       style={{ background: "linear-gradient(180deg, #471ec0 0%, #131e8f 100%)" }}
     >
-      {/* ── Ellipse — top-left ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
@@ -43,7 +30,6 @@ export function EventsCTA(): React.ReactElement {
         }}
       />
 
-      {/* ── Ellipse — bottom-right ── */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden xl:block"
@@ -59,7 +45,6 @@ export function EventsCTA(): React.ReactElement {
         }}
       />
 
-      {/* Left cube */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden sm:block"
@@ -81,7 +66,6 @@ export function EventsCTA(): React.ReactElement {
         />
       </div>
 
-      {/* Right cube */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden sm:block"
@@ -184,6 +168,11 @@ export function EventsCTA(): React.ReactElement {
                   Subscribe
                 </button>
               </form>
+            )}
+            {error && (
+              <p role="alert" className="text-sm font-medium text-white" style={{ opacity: 0.9 }}>
+                {error}
+              </p>
             )}
           </div>
         </div>

@@ -25,9 +25,10 @@ type Props = {
   latestUpdates: FeedSource[];
   resourcesSpotlight: SpotlightCard;
   companySpotlight: SpotlightCard;
+  openRolesCount: number;
 };
 
-// Fallback panel map for mega items not handled by explicit branches
+// Panels for mega items without a dedicated branch above.
 const PANELS: Record<
   string,
   (props: { item: NavMegaItem }) => React.ReactElement
@@ -50,6 +51,7 @@ function TopLevelItem({
   latestUpdates,
   resourcesSpotlight,
   companySpotlight,
+  openRolesCount,
 }: { item: NavItem } & Props) {
   const active = useIsActiveSection(collectHrefs(item));
 
@@ -84,7 +86,9 @@ function TopLevelItem({
         />
       );
     } else if (item.label === "Company") {
-      body = <PanelCompany item={item} spotlight={companySpotlight} />;
+      body = (
+        <PanelCompany item={item} spotlight={companySpotlight} openRolesCount={openRolesCount} />
+      );
     } else if (PANELS[item.label]) {
       const Panel = PANELS[item.label]!;
       body = <Panel item={item} />;
@@ -104,6 +108,7 @@ export function DesktopNav({
   latestUpdates,
   resourcesSpotlight,
   companySpotlight,
+  openRolesCount,
 }: Props) {
   return (
     <NavigationMenu className="hidden lg:flex" align="center" delay={120} closeDelay={200}>
@@ -116,6 +121,7 @@ export function DesktopNav({
             latestUpdates={latestUpdates}
             resourcesSpotlight={resourcesSpotlight}
             companySpotlight={companySpotlight}
+            openRolesCount={openRolesCount}
           />
         ))}
       </NavigationMenuList>

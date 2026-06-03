@@ -56,8 +56,8 @@ export async function POST(request: Request) {
 
   const reports = normalize(payload);
   if (reports.length > 0) {
-    // Forward to Sentry once @sentry/nextjs is installed (W5). For now, log
-    // through Vercel runtime logs so violations are visible during CSP burn-in.
+    // TODO: forward to Sentry once @sentry/nextjs is installed. Until then, log
+    // through Vercel runtime logs so violations stay visible during CSP burn-in.
     console.warn("[csp-report]", JSON.stringify(reports));
   }
 

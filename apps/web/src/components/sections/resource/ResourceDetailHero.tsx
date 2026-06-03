@@ -24,7 +24,6 @@ export function ResourceDetailHero({
       className="relative overflow-hidden min-h-[440px] lg:min-h-[519px]"
       aria-labelledby="rd-hero-title"
     >
-      {/* Background dot grid */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/resource-center/hero-bg-grid.svg"
@@ -35,7 +34,6 @@ export function ResourceDetailHero({
         decoding="async"
       />
 
-      {/* 3D Cube — color-dodge, top-right */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none hidden xl:block"
@@ -68,7 +66,6 @@ export function ResourceDetailHero({
         </div>
       </div>
 
-      {/* Left glow — hard-light blend */}
       <div
         aria-hidden
         className="absolute pointer-events-none select-none"
@@ -95,10 +92,10 @@ export function ResourceDetailHero({
         className="relative mx-auto"
         style={{ maxWidth: "1276px", paddingLeft: "24px", paddingRight: "24px" }}
       >
-        {/* Breadcrumb — on mobile (<sm) the intermediate "Resources" and
-            "<Type>" crumbs collapse to free vertical space and avoid the
-            orphan-chevron wrap when the title is long. Full chain stays in the
-            DOM for screen readers (hidden via `hidden sm:flex`). */}
+        {/* On mobile (<sm) the intermediate "Resources" and "<Type>" crumbs
+            collapse to save vertical space and avoid an orphan-chevron wrap on
+            long titles. The full chain stays in the DOM for screen readers via
+            `hidden sm:flex`. */}
         <nav
           aria-label="Breadcrumb"
           className="flex flex-nowrap items-center overflow-x-auto pt-[120px] lg:pt-[138px] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible"
@@ -121,7 +118,6 @@ export function ResourceDetailHero({
               decoding="async"
             />
           </Link>
-          {/* Intermediate crumb 1: Resources (hidden on mobile) */}
           <span className="hidden sm:flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -148,7 +144,6 @@ export function ResourceDetailHero({
               Resources
             </Link>
           </span>
-          {/* Intermediate crumb 2: <Type> (hidden on mobile) */}
           <span className="hidden sm:flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -175,7 +170,6 @@ export function ResourceDetailHero({
               {typeLabel}
             </Link>
           </span>
-          {/* Current page (always visible) */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/resource-center/breadcrumb-arrow.svg"
@@ -201,7 +195,6 @@ export function ResourceDetailHero({
           </span>
         </nav>
 
-        {/* Title */}
         <div
           className="flex flex-col items-center"
           style={{ marginTop: "16px" }}
@@ -217,7 +210,6 @@ export function ResourceDetailHero({
           </HeroReveal>
         </div>
 
-        {/* Download button */}
         <div
           className="flex justify-center mt-6 lg:mt-[30px] pb-12 lg:pb-20"
         >

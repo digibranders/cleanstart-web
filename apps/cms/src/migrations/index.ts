@@ -1,15 +1,21 @@
-import * as migration_20260520_061605_baseline from './20260520_061605_baseline';
-import * as migration_20260521_050509_add_blog_journey_fields from './20260521_050509_add_blog_journey_fields';
+import * as migration_20260602_050520_initial_baseline from './20260602_050520_initial_baseline';
+import * as migration_20260602_095540_remove_brevo from './20260602_095540_remove_brevo';
+import * as migration_20260602_115320_add_hubspot_form_guid from './20260602_115320_add_hubspot_form_guid';
 
 export const migrations = [
   {
-    up: migration_20260520_061605_baseline.up,
-    down: migration_20260520_061605_baseline.down,
-    name: '20260520_061605_baseline',
+    up: migration_20260602_050520_initial_baseline.up,
+    down: migration_20260602_050520_initial_baseline.down,
+    name: '20260602_050520_initial_baseline',
   },
   {
-    up: migration_20260521_050509_add_blog_journey_fields.up,
-    down: migration_20260521_050509_add_blog_journey_fields.down,
-    name: '20260521_050509_add_blog_journey_fields'
+    up: migration_20260602_095540_remove_brevo.up,
+    down: migration_20260602_095540_remove_brevo.down,
+    name: '20260602_095540_remove_brevo',
+  },
+  {
+    up: migration_20260602_115320_add_hubspot_form_guid.up,
+    down: migration_20260602_115320_add_hubspot_form_guid.down,
+    name: '20260602_115320_add_hubspot_form_guid'
   },
 ];

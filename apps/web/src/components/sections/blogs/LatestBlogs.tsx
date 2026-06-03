@@ -39,7 +39,7 @@ export function LatestBlogs({
       style={{ background: "#f6f6f6", paddingBottom: "var(--spacing-section-cta)" }}
       data-section="LatestBlogs"
     >
-      {/* Radial gradient blobs — Figma 255:9352 left (-616,1407) 1181×1181, 255:9353 right (1238,1512) 1181×1181 */}
+      {/* Radial gradient blobs — left + right, anchored near the section bottom. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
@@ -66,11 +66,10 @@ export function LatestBlogs({
           opacity: 0.1,
         }}
       />
-      {/* Gridlines — Figma node 371:2016. 1920×719 SVG whose paths are filled
-          by two radial gradients (#640DFB) centred at (-25.5, 590.5) and
-          (1828.5, 695.5), so the grid cells naturally fade from purple-tinted
-          near the lower corners to invisible toward the centre. The fade
-          effect lives inside the SVG — no extra mask or opacity wrapper. */}
+      {/* Gridlines — SVG whose paths are filled by two purple radial gradients
+          so the grid cells fade from purple-tinted near the lower corners to
+          invisible toward the centre. The fade lives inside the SVG, so no
+          extra mask or opacity wrapper is needed. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute left-0 right-0 bottom-0 overflow-hidden"
@@ -88,7 +87,8 @@ export function LatestBlogs({
         />
       </div>
 
-      {/* Blur ellipses — Figma Ellipse 46683 left 258×258 #DF9BFF blur:121.5px op:80%, Ellipse 46692 right 315×315 #2CC1EB blur:101.5px op:20%. Anchored to section bottom so they sit just above the CTA/footer regardless of card-grid height. */}
+      {/* Blur ellipses anchored to the section bottom so they sit just above
+          the CTA/footer regardless of card-grid height. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
@@ -119,7 +119,6 @@ export function LatestBlogs({
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Section heading */}
         <Reveal header>
           <h2
             className="font-display font-bold"
@@ -159,7 +158,6 @@ export function LatestBlogs({
           )
         ) : (
           <>
-            {/* 3-column grid of cards */}
             <RevealStagger
               className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
               style={{ gap: "32px", justifyItems: "center" }}
@@ -180,7 +178,7 @@ export function LatestBlogs({
               />
             </div>
 
-            {/* MOBILE — compact "< num >" pagination per Figma 817:3915 spec. */}
+            {/* MOBILE — compact "< num >" pagination. */}
             {totalPages > 1 && (
               <CompactMobilePagination
                 currentPage={currentPage}

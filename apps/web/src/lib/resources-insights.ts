@@ -1,22 +1,21 @@
 /**
  * Server-only data layer for the homepage "Resources & Insights" rail.
  *
- * Pulls the latest 3 entries from each of the 6 CMS collections the
- * section surfaces (blogs · resources · news · knowledgeBase · events ·
- * podcastEpisodes) and maps them to a single `ResourceCard` shape the
- * UI can render uniformly.
+ * Pulls the latest 3 entries from each surfaced CMS collection (blogs ·
+ * resources · news · events) and maps them to a single `ResourceCard`
+ * shape the UI can render uniformly.
  *
- * --- Uptime / caching contract -------------------------------------
+ * Uptime / caching contract:
  *
  * The homepage is the highest-traffic surface on the site, so this lib
  * is built around two guarantees:
  *
- *   1. **The section never breaks the page.** Every fetch is wrapped in
+ *   1. The section never breaks the page. Every fetch is wrapped in
  *      `try/catch` and individual collection failures degrade to an
- *      empty array — `Promise.allSettled` ensures one slow / dead
- *      collection cannot poison the others.
+ *      empty array, so one slow or dead collection cannot poison the
+ *      others.
  *
- *   2. **CMS downtime is invisible to visitors once content is warm.**
+ *   2. CMS downtime is invisible to visitors once content is warm.
  *      We deliberately bypass `lib/cms-fetch` here. `cms-fetch` reads
  *      cookies via `draftMode()` for editor previews — that read forces
  *      Next.js to render the host route dynamically, which would burn
@@ -57,10 +56,8 @@ export interface ResourceCard {
 
 export type ResourceCardsByTab = Record<TabId, ResourceCard[]>;
 
-// -- Minimal CMS response shapes -------------------------------------
 // We only model the fields this rail consumes; the underlying records
 // are richer (see lib/blog.ts, lib/news.ts, etc. for the full types).
-
 interface PayloadListResponse<T> {
   docs: T[];
 }
@@ -107,8 +104,6 @@ interface CmsEvent {
   abstract?: string | null;
   heroImage?: CmsImage | null;
 }
-
-// -- Helpers ---------------------------------------------------------
 
 /**
  * Resolve a possibly-relative CMS upload URL into an absolute one.
@@ -164,8 +159,6 @@ async function fetchCollection<T>(
     return null;
   }
 }
-
-// -- Per-collection mappers ------------------------------------------
 
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publishedAt][exists]=true";

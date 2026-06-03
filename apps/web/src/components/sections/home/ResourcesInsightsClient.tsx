@@ -11,14 +11,11 @@ import type {
 
 /**
  * Client component for the Resources & Insights rail. Owns tab-switching
- * UX (state, scroller centering, smooth content transitions).
+ * state, scroller centering, and content transitions.
  *
- * Transitions are CSS-driven (keyframe + cubic-bezier easing tuned to feel
- * spring-like without overshoot). Motion library was tried but the
- * project's strict `LazyMotion` setup boxed it in too tightly; plain CSS
- * gets the same smoothness with zero runtime cost and no SSR hazards.
- *
- * Layout / typography spec is documented on the parent server file.
+ * Transitions are CSS-driven rather than motion-library-driven: the project's
+ * strict LazyMotion setup constrained the library too tightly, and plain CSS
+ * gets the same smoothness with no runtime cost and no SSR hazards.
  */
 
 const TABS: { id: TabId; label: string }[] = [
@@ -61,11 +58,6 @@ export function ResourcesInsightsClient({
 
   return (
     <>
-      {/* Tab bar — matches the Vulnerability-Remediation "Blogs & Resources"
-          rail style (`VulnBlogsResourcesClient.tsx`): white bg, 1px hairline
-          border, 4px padding, 100px radius, active pill in the dark
-          #151021→#131E8F gradient. Padding/height/typography come straight
-          from there so the two rails read as one system. */}
       <div
         ref={scrollerRef}
         className="mt-12 -mx-6 overflow-x-auto px-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
@@ -115,10 +107,6 @@ export function ResourcesInsightsClient({
         </div>
       </div>
 
-      {/* Article cards — mobile: horizontal snap scroller with a peek of
-          the next card (matches Figma mobile spec); sm+: 2-col grid;
-          lg+: 3-col grid. Each card animates in on tab change via the
-          `cs-tab-card-in` keyframe with a small stagger. */}
       <div
         id="resources-articles"
         role="tabpanel"
@@ -145,14 +133,11 @@ export function ResourcesInsightsClient({
 }
 
 function ArticleCard({ article }: { article: ResourceCard }) {
-  // Remote CMS uploads (cdn.cleanstart.com / cms.cleanstart.com / localhost
-  // tunnels) are all allow-listed in next.config.ts → safe for next/image.
   return (
     <a
       href={article.href}
       className="group flex flex-col gap-4 cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1"
     >
-      {/* Figma: image card 404×231, corner radius 40 */}
       <div
         className="relative h-[231px] w-full overflow-hidden rounded-[40px]"
         style={{ containerType: "inline-size" }}
@@ -168,8 +153,8 @@ function ArticleCard({ article }: { article: ResourceCard }) {
           <CoverTitleOverlay title={article.title} />
         )}
       </div>
-      {/* Card title — intentionally <p>, not <h3>: matches the parent
-          section's "no heading-tag" decision (least priority). */}
+      {/* Intentionally <p>, not <h3>: matches the parent section's
+          no-heading-tag decision (least priority). */}
       <p
         className="text-[#1a1a1a] transition-colors duration-200 group-hover:text-[#1B1F4F]"
         style={{
@@ -204,7 +189,6 @@ function ArticleCard({ article }: { article: ResourceCard }) {
       >
         {article.description}
       </p>
-      {/* Figma: "Explore" Sora Bold 16px, color #000, with filled chevron arrow */}
       <span className="inline-flex items-center gap-2 text-base font-bold text-black transition-transform duration-200 group-hover:translate-x-1">
         <span>Explore</span>
         <svg width="8" height="16" viewBox="0 0 8 16" fill="none" aria-hidden>

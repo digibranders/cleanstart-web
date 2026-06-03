@@ -7,8 +7,8 @@ import type { FormFieldDef } from './validate-fields';
 const secondaryHandlers: LeadHandler[] = [];
 
 /**
- * Register a secondary handler at module-init time. Brevo, Teams webhook,
- * future HubSpot/Salesforce, etc. each call this once. Idempotent — a
+ * Register a secondary handler at module-init time. company-from-domain,
+ * HubSpot, etc. each call this once. Idempotent — a
  * second register with the same name replaces the existing entry so dev
  * hot-reload doesn't accumulate duplicates.
  */
@@ -111,7 +111,17 @@ export const submitLead = async (
   );
 
   // Persist sync outcomes back onto the lead.
-  await writeSyncedTo(payload, ctx.leadId, [primary, ...secondaryResults]);
+  // Wrap in try/catch: a writeSyncedTo failure must not propagate to
+  // parkSubmission, which would re-queue the lead and create a duplicate
+  // row on the drain cron's next submitLead call.
+  try {
+    await writeSyncedTo(payload, ctx.leadId, [primary, ...secondaryResults]);
+  } catch (err) {
+    console.warn(
+      `[lead-handlers] writeSyncedTo failed for lead ${ctx.leadId} — syncedTo metadata lost, but the lead row is captured.`,
+      err instanceof Error ? err.message : String(err),
+    );
+  }
 
   return {
     ok: true,

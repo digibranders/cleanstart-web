@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload';
 
 import { isAdmin, isAuthenticated } from '../access';
+import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const SiteSettings: GlobalConfig = {
   slug: 'siteSettings',
@@ -18,7 +19,9 @@ export const SiteSettings: GlobalConfig = {
       type: 'text',
       defaultValue: 'https://cleanstart.com',
       required: true,
-      admin: { description: 'Used to build absolute URLs for SEO and emails.' },
+      admin: { description: 'Used to build absolute URLs for SEO and emails. Must be a valid https:// URL with no trailing slash.' },
+      hooks: { beforeValidate: [normalizeOptionalUrlHook] },
+      validate: validateOptionalUrl,
     },
     {
       name: 'defaultLocale',
@@ -30,7 +33,19 @@ export const SiteSettings: GlobalConfig = {
       name: 'organizationTimezone',
       type: 'text',
       defaultValue: 'Asia/Kolkata',
-      admin: { description: 'IANA timezone. Default for events / webinars.' },
+      admin: { description: 'IANA timezone identifier (e.g. Asia/Kolkata, America/New_York). Default for events / webinars.' },
+      validate: (value: string | string[] | null | undefined): true | string => {
+        if (value == null || (typeof value === 'string' && value.trim().length === 0)) {
+          return true;
+        }
+        if (typeof value !== 'string') return 'Timezone must be a string.';
+        const trimmed = value.trim();
+        // Reject strings containing spaces or obvious non-IANA characters.
+        if (/\s/.test(trimmed) || !/^[A-Za-z][A-Za-z0-9/_+-]*$/.test(trimmed)) {
+          return 'Expected a valid IANA timezone identifier (e.g. Asia/Kolkata, America/New_York).';
+        }
+        return true;
+      },
     },
     {
       type: 'group',

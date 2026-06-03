@@ -47,8 +47,10 @@ export interface RobotsAdvanced {
    */
   readonly maxVideoPreview?: number | null;
   /**
-   * RFC 850 / ISO 8601 date after which the page should drop out of
-   * the index. Useful for time-bound campaigns / event landing pages.
+   * Date after which the page should drop out of the index. Accepts
+   * ISO 8601 (`2026-12-31` or `2026-12-31T23:59:59Z`); the emitted
+   * directive uses `toISOString()` which Google and Bing both accept.
+   * Useful for time-bound campaigns / event landing pages.
    */
   readonly unavailableAfter?: string | null;
 }
@@ -82,8 +84,9 @@ const formatUnavailableAfter = (raw: string | null | undefined): string | null =
   if (!raw) return null;
   const trimmed = raw.trim();
   if (trimmed.length === 0) return null;
-  // Accept ISO 8601 (`2026-12-31` or `2026-12-31T23:59:59Z`); pass-through
-  // anything that parses as a Date and emit RFC 850 as Google docs require.
+  // Accept ISO 8601 (`2026-12-31` or `2026-12-31T23:59:59Z`); emit the
+  // parsed date as ISO 8601 via toISOString() — Google and Bing both
+  // accept this format for the unavailable_after directive.
   const d = new Date(trimmed);
   if (Number.isNaN(d.getTime())) return null;
   return `unavailable_after: ${d.toISOString()}`;

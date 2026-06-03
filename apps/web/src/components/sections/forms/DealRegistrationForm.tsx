@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { LeadConsent } from "@/components/forms/LeadConsent";
 import {
   FormCard,
   FormSectionTitle,
@@ -15,8 +16,8 @@ export function DealRegistrationForm(): React.ReactElement {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Lead intake adapter is not yet exposed at the web edge; this form
-    // provides client-side UX only and will be wired through LeadHandler.
+    // The lead intake adapter is not yet exposed at the web edge; this form is
+    // client-side UX only until it is wired through LeadHandler.
     setSubmitted(true);
   };
 
@@ -63,7 +64,11 @@ export function DealRegistrationForm(): React.ReactElement {
           <TextArea name="dealDetails" placeholder="Deal Details" label="Deal Details" />
         </div>
 
-        <TurnstileWidget />
+        <LeadConsent />
+
+        <div className="flex justify-start">
+          <TurnstileWidget />
+        </div>
         <SubmitButton>Submit Application</SubmitButton>
       </form>
     </FormCard>

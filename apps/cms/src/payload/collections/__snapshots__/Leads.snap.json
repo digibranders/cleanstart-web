@@ -140,31 +140,6 @@
     {
       "type": "checkbox",
       "name": "turnstilePassed"
-    },
-    {
-      "type": "select",
-      "name": "emailHealth",
-      "options": [
-        {
-          "value": "good"
-        },
-        {
-          "value": "soft_bounce"
-        },
-        {
-          "value": "hard_bounce"
-        },
-        {
-          "value": "complaint"
-        },
-        {
-          "value": "unsubscribed"
-        }
-      ]
-    },
-    {
-      "type": "date",
-      "name": "emailHealthAt"
     }
   ],
   "hooks": {

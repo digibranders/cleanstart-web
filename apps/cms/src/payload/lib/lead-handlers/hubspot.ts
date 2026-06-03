@@ -2,22 +2,22 @@ import { Client } from '@hubspot/api-client';
 import type { BasePayload } from 'payload';
 
 import { resolveHubspotCredentials, type HubspotCredentials } from '../integrations/credentials';
-import { extractEmail, extractName } from './extract-fields';
 import type { LeadHandler, LeadHandlerResult, LeadSubmission } from './types';
 
 /**
- * HubSpot CRM lead handler — Phase J3.
+ * HubSpot lead handler.
  *
- * Auth: HubSpot **Private App** access token from
- *   `HUBSPOT_PRIVATE_APP_TOKEN` env var. The token is set once via
- *   the droplet `.env`; the per-row admin UI carries only optional mapping +
- *   default-property overrides.
+ * Submit path: each lead is relayed to the matching HubSpot form via the
+ * Forms Submissions API —
+ *   `POST https://api.hsforms.com/submissions/v3/integration/submit/{portalId}/{formGuid}`
+ * The form GUID lives on the Payload `forms` row (`hubspotFormGuid`); the
+ * portal id comes from `HUBSPOT_PORTAL_ID`. Field `name`s in `submission.fields`
+ * are HubSpot field internal names by design, so no mapping layer is needed.
+ * HubSpot's form-submit flow creates/updates the contact and fires the form's
+ * own follow-up + notification emails.
  *
- * Write path: `POST /crm/v3/objects/contacts/batch/upsert` with
- *   `idProperty=email` so the same email updates rather than creates
- *   a duplicate. Defaults `lifecyclestage=lead`, `hs_lead_status=NEW`
- *   unless the row overrides via `hubspotConfig.defaultLifecycleStage`
- *   / `defaultLeadStatus`.
+ * Erasure path: `hubspotGdprDeleteByEmail` still uses the CRM contacts API with
+ * the Private App token (resolved from the integration row).
  */
 
 interface IntegrationRowLite {
@@ -63,33 +63,6 @@ const findActiveRow = async (
   }
 };
 
-const mapProperties = (
-  submission: LeadSubmission,
-  creds: HubspotCredentials,
-  email: string,
-  fullName: string | null,
-): Record<string, string> => {
-  const properties: Record<string, string> = { email };
-  if (fullName) {
-    const [first, ...rest] = fullName.split(' ');
-    if (first) properties.firstname = first;
-    if (rest.length > 0) properties.lastname = rest.join(' ');
-  }
-  for (const [submissionKey, hubspotProp] of Object.entries(creds.fieldMapping)) {
-    const v = submission.fields[submissionKey];
-    if (typeof v === 'string' && v.length > 0) properties[hubspotProp] = v;
-  }
-  return {
-    ...creds.defaultProperties,
-    ...properties,
-  };
-};
-
-const isRateLimitDaily = (err: unknown): boolean => {
-  const message = err instanceof Error ? err.message : String(err);
-  return /DAILY/i.test(message);
-};
-
 /**
  * Permanently delete a HubSpot contact by email — GDPR Art. 17.
  * Returns true if the call returned 2xx.
@@ -123,50 +96,67 @@ export const hubspotHandler: LeadHandler = {
     if (ctx.duplicateOfLeadId != null) {
       return { handler: 'hubspot', status: 'skipped', reason: 'duplicate-submission' };
     }
-
-    const found = await findActiveRow(ctx.payload);
-    if (!found) {
-      return { handler: 'hubspot', status: 'skipped', reason: 'no-active-row-or-token' };
+    const portalId = process.env.HUBSPOT_PORTAL_ID;
+    if (!portalId) {
+      return { handler: 'hubspot', status: 'skipped', reason: 'env-not-configured' };
     }
 
-    const email = extractEmail(ctx.formFieldDefs, submission.fields);
-    if (!email) {
-      return { handler: 'hubspot', status: 'skipped', reason: 'no-email' };
+    const form = (await ctx.payload.findByID({
+      collection: 'forms',
+      id: submission.formId,
+      depth: 0,
+      overrideAccess: true,
+    })) as { hubspotFormGuid?: string | null } | null;
+    const guid = form?.hubspotFormGuid?.trim();
+    if (!guid) {
+      return { handler: 'hubspot', status: 'skipped', reason: 'no-hubspot-form-guid' };
     }
-    const fullName = extractName(ctx.formFieldDefs, submission.fields);
-    const properties = mapProperties(submission, found.creds, email, fullName);
 
-    const client = new Client({
-      accessToken: found.creds.accessToken,
-      numberOfApiCallRetries: 3,
-    });
+    // Field names in submission.fields are HubSpot internal names by design.
+    const fields = Object.entries(submission.fields)
+      .filter(([, v]) => typeof v === 'string' && v.trim().length > 0)
+      .map(([name, v]) => ({ name, value: String(v) }));
+    if (fields.length === 0) {
+      return { handler: 'hubspot', status: 'skipped', reason: 'no-fields' };
+    }
+
+    const body: Record<string, unknown> = {
+      fields,
+      context: { pageUri: submission.source ?? '' },
+    };
+    if (submission.consent) {
+      body.legalConsentOptions = {
+        consent: {
+          consentToProcess: true,
+          text: submission.consent.snapshot,
+        },
+      };
+    }
 
     try {
-      const upsertResp = (await client.apiRequest({
-        method: 'POST',
-        path: '/crm/v3/objects/contacts/batch/upsert',
-        body: {
-          inputs: [{ idProperty: 'email', id: email, properties }],
+      const resp = await fetch(
+        `https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${guid}`,
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(10_000),
         },
-      })) as { json?: () => Promise<{ results?: Array<{ id?: string }> }> };
-      let externalId: string | undefined;
-      try {
-        const json = await upsertResp.json?.();
-        externalId = json?.results?.[0]?.id;
-      } catch {
-        // Response body not JSON or already consumed — fine.
+      );
+      if (!resp.ok) {
+        const detail = await resp.text().catch(() => '');
+        return {
+          handler: 'hubspot',
+          status: 'failed',
+          error: `HubSpot ${resp.status}: ${detail.slice(0, 200)}`,
+        };
       }
-      return {
-        handler: 'hubspot',
-        status: 'synced',
-        ...(externalId ? { externalId } : {}),
-      };
+      return { handler: 'hubspot', status: 'synced' };
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
       return {
         handler: 'hubspot',
         status: 'failed',
-        error: isRateLimitDaily(err) ? `daily-rate-limit: ${message}` : message,
+        error: err instanceof Error ? err.message : String(err),
       };
     }
   },

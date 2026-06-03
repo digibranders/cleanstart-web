@@ -89,10 +89,9 @@
      `px-6` (24 px) inside the Container, every section gets exactly
      24 px of breathing room on each side at 1280, 1366, 1440 alike.
      Above 1440 the cap kicks in and auto-margins grow the gutter
-     uniformly. The 1276-with-82-px-gutter Figma reading was correct
-     for the artboard but felt over-gutter'd in product — the team
-     chose visual consistency across desktop widths instead.
-     --container-cs kept as alias for any legacy consumer. */
+     uniformly. A 1276 container with an 82px gutter felt over-gutter'd
+     in product — the team chose visual consistency across desktop widths
+     instead. --container-cs kept as alias for any legacy consumer. */
   --container-default: 1440px;
   --container-prose:    720px;
   --container-wide:    1600px;
@@ -355,14 +354,10 @@
 }
 
 :root {
-  /* Hero + CleanStart Factory shared background — Figma frame 108:8631 (1920×2209).
-     The Figma gradient transform maps the frame's top edge to gradient
-     position ~0.20 and the bottom edge to ~0.99 (so only the middle ~80% of
-     the original 8-stop gradient is visible inside the frame). We bake that
-     mapping in directly: the visible gradient runs TOP → BOTTOM with the
-     dark navy at top, deep blue mid, brightest purple ~75% down, then the
-     alpha-fade tail at the bottom so the seam into #F6F6F6 is soft.
-     The .bg-cs-hero rule still applies a #151021 fallback bg-color for the
+  /* Hero + CleanStart Factory shared background. The visible gradient runs
+     top → bottom: dark navy at top, deep blue mid, brightest purple ~75% down,
+     then an alpha-fade tail at the bottom so the seam into #F6F6F6 is soft.
+     The .bg-cs-hero rule applies a #151021 fallback bg-color for the
      transparent-tail safety. */
   --bg-hero-mesh: linear-gradient(
     180deg,
@@ -376,9 +371,8 @@
     rgba(66, 30, 188, 0) 99%
   );
 
-  /* Decorative purple radial blobs (Figma "Union" vectors, fill #640DFB radial)
-     used as overlays for the mesh-blob effect. Two opacity tiers: 0.30 inside hero,
-     0.10 elsewhere. */
+  /* Decorative purple radial blobs (#640DFB) used as overlays for the
+     mesh-blob effect. Two opacity tiers: 0.30 inside hero, 0.10 elsewhere. */
   --cs-blob-color: #640DFB;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -466,7 +460,7 @@ body {
 }
 
 /* Hero gradient mesh — solid #151021 fallback under the gradient so the
-   alpha-fade at the top stop resolves to dark (matching Figma's canvas). */
+   alpha-fade at the top stop resolves to dark. */
 .bg-cs-hero {
   background-color: #151021;
   background-image: var(--bg-hero-mesh);
@@ -522,11 +516,11 @@ body {
 }
 
 /* ===========================================================================
-   CTA SYSTEM — extracted directly from Figma (CleanStart V4)
+   CTA SYSTEM
    --------------------------------------------------------------------------
-   Two distinct CTA types found in Figma:
-     1. "Glass Button" — Book a Demo (153×38), Browse Images (205×40),
-        Get a Demo (177×43). All share the SAME multi-layer fill + stroke:
+   Two distinct CTA types:
+     1. "Glass Button" — Book a Demo, Browse Images, Get a Demo. All share the
+        same multi-layer fill + stroke:
           • base: rgba(255,255,255,0.65)
           • LINEAR_DODGE radial #FFFFFF→#3D00FF @50% (blue tint top-left)
           • LINEAR_DODGE radial #FFFFFF→#3D00FF @90% (blue tint bottom-right)
@@ -604,8 +598,8 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
-   GLASS BUTTON — exact Figma reproduction (Frame 1410104211, Buttons 108:8598)
-   Used by: "Book a Demo" (153×38), "Browse Images" (205×40), "Get a Demo" (177×43)
+   GLASS BUTTON
+   Used by: "Book a Demo", "Browse Images", "Get a Demo"
    --------------------------------------------------------------------------- */
 .cs-btn-glass {
   position: relative;
@@ -631,9 +625,9 @@ body {
   padding: 0 var(--cs-btn-px, 18px);
   font-size: var(--cs-btn-fs, 14px);
   border-radius: 8px;
-  /* Figma layered fill: base white@65% + 2 LINEAR_DODGE radial blue tints */
+  /* Layered fill: white base + two screen-blend radial blue tints. */
   background:
-    /* radial blue tint, top-right (LINEAR_DODGE → screen blend) */
+    /* radial blue tint, top-right */
     radial-gradient(120% 110% at 100% 0%,
       rgba(60, 0, 255, 0.28) 0%,
       rgba(60, 0, 255, 0) 60%),
@@ -644,8 +638,6 @@ body {
     /* white base */
     rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(255, 255, 255, 0.95);
-  /* Lavender top-left rim glow (Figma 2nd stroke #DAB6F3 LINEAR_DODGE) +
-     subtle drop shadow + inner highlight */
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   overflow: hidden;
@@ -693,7 +685,7 @@ body {
   transition-duration: 80ms;
 }
 
-/* Category pill — Glass (blur) + Noise texture from Figma */
+/* Category pill — frosted-glass blur + noise texture. */
 .cs-category-pill {
   position: relative;
   backdrop-filter: blur(4px);
@@ -803,8 +795,8 @@ body {
   }
 }
 
-/* ---- LINK CTA — Read Case study / Explore (resource cards) / Explore for Developers
-   Figma: pure text + arrow inside Frame 19, no background. */
+/* ---- LINK CTA — Read Case study / Explore (resource cards) / Explore for
+   Developers. Pure text + arrow, no background. */
 .cs-link-cta {
   position: relative;
   display: inline-flex;
@@ -924,7 +916,6 @@ body {
 
 /* ============================================================
    PRIMARY NAVIGATION — dark-glass header + mega-menu surfaces
-   Spec: plan file (cleanstart-nav-logo-png-use-this-logo-*).md
    ============================================================ */
 
 /* Scrolled header — dark glass band with backdrop blur.
@@ -1057,9 +1048,8 @@ body {
   }
 }
 
-/* Factory card body — Figma 1440 exact (node 763:3610..3742):
-   bg-gradient #151021 → #131e8f (71.2%) → #551ece (vertical),
-   3 px solid lavender (#dab6f3) border, 24 px radius, multi-layer shadow. */
+/* Factory card body: vertical gradient #151021 → #131e8f (71.2%) → #551ece,
+   3px solid lavender (#dab6f3) border, 24px radius. */
 .cs-factory-card {
   container-type: inline-size;
   container-name: factory-card;
@@ -1132,7 +1122,7 @@ body {
   }
 }
 
-/* Slow-breathing brightness for the mobile Factory cards' Figma flares.
+/* Slow-breathing brightness for the mobile Factory cards' flares.
    Preserves the translateY(-50%) the flare uses for vertical centering;
    only opacity changes so the cyan glow gently pulses behind each card. */
 @keyframes cs-pulse-glow-flare {
@@ -1157,8 +1147,8 @@ body {
   50% { opacity: 1; transform: scaleY(1.05); }
 }
 
-/* Rocket flame — replicates Figma "光斑 flare" component
-   - Layered radial + linear gradients matching Figma color palette
+/* Rocket flame
+   - Layered radial + linear gradients
    - Bright cyan core (#D3FFF8) → blue (#15ADFA / #0166CC) → fade
    - Tapered teardrop with bright bulb at TOP (where flame emerges from card)
    - Default vertical (top-down). For bottom flames, use .cs-rocket-flame--down */
@@ -1255,14 +1245,11 @@ body {
 
 .cs-orb-flow { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 
-/* Orb container — single Figma export sized in container query units so it
-   tracks the stage width. The PNG bakes in glow bleed, so cqi is mapped to
-   the orb's inscribed sphere (309×420 in Figma coords). */
-/* Width math: Figma frame is 1920 wide, orb group is 309 wide → ~16.1% of
-   frame. The PNG export expanded bounds for glow bleed (sphere is ~59% of
-   image width). 26cqi → on a 1228px stage the container is ~319px and the
-   visible sphere lands at ~189px — keeps the orb at ~2.6× chip size so the
-   sphere doesn't dominate while the baked-in glow halo still has room. */
+/* Orb container — sized in container-query units so it tracks the stage width.
+   The PNG bakes in glow bleed, so the width is mapped to the orb's inscribed
+   sphere rather than the full image. The clamp keeps the orb at ~2.6x chip
+   size so the sphere stays prominent without the baked-in halo crowding the
+   frame. */
 .cs-orb {
   position: absolute;
   left: 50%;
@@ -1278,7 +1265,7 @@ body {
   pointer-events: none;
   display: grid;
   place-items: center;
-  filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.25)); /* Figma effect: drop shadow X0 Y4 blur4 #000 25% */
+  filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.25));
   /* 3D scene: depth lets the wrapper bob/tilt with real perspective. */
   perspective: 900px;
   perspective-origin: 50% 45%;
@@ -1296,15 +1283,11 @@ body {
   display: block;
 }
 
-/* Cube logo (Figma node 177:154) — sized at ~29% of the container so it
-   matches the original cube/sphere ratio (cube 152px / orb group 309px ≈
-   49%, multiplied by the sphere's ~59% share of the container width).
-   Centred over the sphere with a slow 3D rotate to mirror the cleanstart.com
-   hero loop. */
-/* Position math: Figma's PNG exporter expanded bounds asymmetrically for
-   effect bleed, so the visible sphere is NOT centred in the 1040×1250 PNG.
-   Measured alpha-centroid of `orb-sphere.png` is (55.9%, 46.6%) — that's
-   where the cube must land to read as centred on the sphere. */
+/* Cube logo — sized at ~29% of the container to match the original
+   cube/sphere ratio, centred over the sphere with a slow 3D rotate.
+   The sphere PNG's bounds are expanded asymmetrically for effect bleed, so
+   the visible sphere is not centred in the image — the measured alpha-centroid
+   is (55.9%, 46.6%), which is where the cube must land to read as centred. */
 .cs-orb__cube {
   position: absolute;
   left: 55.9%;
@@ -1316,16 +1299,15 @@ body {
   animation: cs-orb-cube-pulse 4.5s ease-in-out infinite;
   pointer-events: none;
   will-change: transform, filter;
-  /* Figma node 177:154 uses mix-blend-mode: luminosity, so the cube takes
-     the lightness of its source pixels and the purple of the sphere
-     underneath. The export only carries lightness; the colour comes back
-     from the sphere at composite time. */
+  /* mix-blend-mode: luminosity lets the cube take its lightness from its own
+     pixels and its colour from the purple sphere underneath at composite
+     time. */
   mix-blend-mode: luminosity;
 }
 
 /* Flow chips (logos travelling along the beams) -------------------
-   Sized + styled to mirror Figma's Category/* tiles: 72px square,
-   ~16px corner radius, dark glass fill, gradient stroke, layered drop shadow. */
+   72px square, ~16px corner radius, dark glass fill, gradient stroke,
+   layered drop shadow. */
 .cs-flow-chip {
   width: 72px;
   height: 72px;
@@ -1361,13 +1343,13 @@ body {
   top: 7px; right: 7px;
   width: 10px; height: 10px;
   border-radius: 50%;
-  background: #FF6C6C; /* Figma fill_DXSVFV */
+  background: #FF6C6C;
   border: 1.5px solid rgba(255, 255, 255, 0.85);
   box-shadow: 0 0 8px rgba(255, 108, 108, 0.95);
 }
 
-/* Outbound (hardened) — Figma fill_DIHLOB stroke (90deg #1E5AFF → #CDE4FF)
-   plus fill_UD6ZBP green status dot. */
+/* Outbound (hardened) — gradient stroke (90deg #1E5AFF → #CDE4FF) plus a
+   green status dot. */
 .cs-flow-chip.is-out {
   border: 1px solid transparent;
   background:
@@ -1384,7 +1366,7 @@ body {
   top: 7px; right: 7px;
   width: 10px; height: 10px;
   border-radius: 50%;
-  background: #2EFD54; /* Figma fill_UD6ZBP */
+  background: #2EFD54;
   border: 1.5px solid rgba(255, 255, 255, 0.85);
   box-shadow: 0 0 10px rgba(46, 253, 84, 0.95);
 }
@@ -1397,7 +1379,6 @@ body {
 
 /* ============================================================
    TESTIMONIALS — three-up carousel with dominant centre card.
-   Figma frames 108:8456 (carousel) / 108:8443 (nav row).
    ============================================================ */
 
 @keyframes cs-tt-float {
@@ -2129,7 +2110,7 @@ body {
   .cs-tt-morph[data-wrap="true"] { animation: none !important; }
 }
 
-/* ---- Nav button (Figma 108:8444 / 108:8448) ---------------------------- */
+/* ---- Nav button ---------------------------- */
 .cs-tt-nav {
   position: relative;
   width: 40px;
@@ -2161,7 +2142,7 @@ body {
 }
 .cs-tt-nav[data-direction="prev"] .cs-tt-nav__arrow { transform: scaleX(-1); }
 
-/* Two plus-lighter radial glows that match Figma's exact gradient stops:
+/* Two plus-lighter radial glows:
    #DAB6F3 → rgba(177,145,208,.75) → rgba(135,108,173,.5) → rgba(52,34,102,0). */
 .cs-tt-nav__glow {
   position: absolute;
@@ -2341,7 +2322,6 @@ body {
 
 /* ===========================================================================
    BLOG ARTICLE BODY TYPOGRAPHY
-   Exact values from Figma 330:338 — article content section
    =========================================================================== */
 
 /* Prose body — consumes the --prose-* token family. See
@@ -2825,39 +2805,121 @@ body {
   }
 }
 
-/* ─── Nav mega menu — premium glass surfaces (Phase 6) ───────────────────── */
+/* ─── Nav mega menu — product surface system (Phase 7) ───────────────────────
+   A flat, engineered three-level tonal ladder. Depth is read from tone and a
+   single 1px top-edge highlight — never from decorative gradients, blur, or
+   glow. The menu carries exactly ONE visible border: its own outer edge
+   (applied in PanelShell). Everything inside is separated by tone alone, so
+   nothing reads as a box stacked inside another box.
 
-/* Premium glass feel earned via internal highlights — NOT translucency.
-   Content behind cannot bleed through. Glass character comes from:
-   - The top-edge inset highlight (1px) suggesting glass thickness
-   - A subtle radial highlight catching imaginary light from above
-   - A faint top-to-bottom gradient hint of refraction
-   - Deep drop shadow making the surface float above the page */
-.cs-panel-glass {
-  background:
-    radial-gradient(120% 60% at 80% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 30%),
-    #130e26;
-  box-shadow:
-    0 32px 80px -32px rgba(0, 0, 0, 0.8),
-    0 0 0 1px rgba(255, 255, 255, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+   Tonal ladder (solid, no gradients):
+     --cs-surface-1   container floor   #120c24
+     --cs-surface-2   raised content    #1b1640  (+ ~7L over the floor)
+     --cs-surface-2h  raised, hover      #241d4e
+     --cs-surface-3   inset / recessed  #0e0a1d  (code + input fields sink in)
+     --cs-chip        quiet metadata    #211a45  (icon tiles, tags) */
+:root {
+  --cs-surface-1: #120c24;
+  --cs-surface-2: #1b1640;
+  --cs-surface-2h: #241d4e;
+  --cs-surface-3: #0e0a1d;
+  --cs-chip: #211a45;
+  --cs-hairline: rgba(255, 255, 255, 0.06);
 }
 
-.cs-tile-glass {
+/* Level 1 — the menu container floor. A real drop shadow floats it above the
+   page; a hairline top highlight gives the front edge a touch of thickness.
+
+   Atmospheric brand layer (Phase 8): a single, very low-opacity radial wash in
+   a brand-family hue is composited over the solid floor — felt, not seen
+   (3–5% peak, no blur, no animation, zero runtime cost). The hue is supplied
+   per-menu via the inline `--cs-atm` custom property on the shell; when unset
+   it resolves to `transparent`, so un-migrated panels render exactly as before. */
+.cs-panel-glass {
   background:
-    radial-gradient(120% 80% at 100% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, transparent 40%),
-    #1a1336;
+    radial-gradient(
+      125% 90% at var(--cs-atm-x, 100%) -10%,
+      var(--cs-atm, transparent) 0%,
+      transparent 62%
+    ),
+    var(--cs-surface-1);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 32px 80px -32px rgba(0, 0, 0, 0.7),
+    0 8px 24px -16px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Level 2 — raised content surface. One clear tonal step above the floor with
+   a top-edge highlight, so it reads as elevation, not as an outlined card. */
+.cs-tile-glass {
+  background: var(--cs-surface-2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+
+/* Level 3 — hover. A precise, immediate tonal lift on the same surface — no
+   border flash, no glow, no scale. Add to any interactive Level-2 surface. */
+.cs-tile-interactive {
+  transition:
+    background-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cs-tile-interactive:hover {
+  background: var(--cs-surface-2h);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Recessed surface — code blocks and inputs sink below the floor so they read
+   as fields, not as another raised card. Inner shadow sells the depression. */
+.cs-surface-recess {
+  background: var(--cs-surface-3);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* Quiet metadata chip — icon tiles and tags. A flat tonal square, borderless. */
+.cs-chip {
+  background: var(--cs-chip);
 }
 
 .cs-cta-glass {
+  background: var(--cs-surface-2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Hero surface (Phase 8) — the one featured zone per menu. Reads as clearly
+   elevated above the de-boxed rows beside it (which sit flat on the floor) AND
+   as branded, via a 1px indigo top edge plus a faint indigo fill at the very
+   top. No hard border, no glow — depth from tone + a branded edge highlight.
+   Hue is tunable per menu through `--cs-hero-tint` (defaults to indigo). */
+.cs-hero-surface {
+  --cs-hero-tint: 140, 120, 255;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    linear-gradient(
+      180deg,
+      rgba(var(--cs-hero-tint), 0.07) 0%,
+      transparent 38%
+    ),
+    var(--cs-surface-2);
+  box-shadow:
+    inset 0 1px 0 rgba(var(--cs-hero-tint), 0.22),
+    0 1px 0 rgba(0, 0, 0, 0.25),
+    0 12px 32px -20px rgba(0, 0, 0, 0.6);
+}
+
+/* Branded recessed field — code/proof blocks that sink into the hero surface.
+   Same depression as .cs-surface-recess but carries a hairline brand-tint top
+   edge so it belongs to the hero rather than reading as a neutral input. */
+.cs-recess-brand {
+  --cs-hero-tint: 140, 120, 255;
+  background: var(--cs-surface-3);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(var(--cs-hero-tint), 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-tile-interactive {
+    transition: none !important;
+  }
 }
 
 /* Surfaces are now fully solid — no backdrop-filter to fall back from.

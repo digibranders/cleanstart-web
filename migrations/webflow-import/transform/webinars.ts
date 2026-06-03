@@ -1,3 +1,4 @@
+import { webflowStatus } from './status';
 import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
 import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
 import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
@@ -55,7 +56,7 @@ export const transformWebinar = (row: Record<string, unknown>): Record<string, u
 
   return {
     _webflowId: row.webflowId,
-    _status: 'published',
+    _status: webflowStatus(row),
     title,
     slug,
     abstract,

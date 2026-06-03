@@ -3,8 +3,8 @@
 import type { ReactElement } from 'react';
 
 /**
- * Inline note for kinds that have no per-row config — Clarity and
- * Brevo. The credential lives in env; the row is the on/off switch.
+ * Inline note for kinds that have no per-row config (e.g. Clarity).
+ * The credential lives in env; the row is the on/off switch.
  */
 
 const Note = ({
@@ -34,13 +34,5 @@ export const ClarityConfigNote = (): ReactElement => (
     title="No per-row settings needed."
     body="MS Clarity reads from the env-configured API token. Save this row with Enabled = on to let the daily cron refresh the cache."
     envVars={['CLARITY_API_TOKEN']}
-  />
-);
-
-export const BrevoConfigNote = (): ReactElement => (
-  <Note
-    title="No per-row settings needed."
-    body="Brevo verifies the inbound webhook via a Bearer token set in env. Register the receiver URL in Brevo with the same token under the auth field."
-    envVars={['BREVO_INBOUND_TOKEN']}
   />
 );

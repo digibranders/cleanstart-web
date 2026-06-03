@@ -101,8 +101,8 @@ describe('slugChangeRedirectHook', () => {
       expect.objectContaining({
         collection: 'redirects',
         data: expect.objectContaining({
-          from: '/blog/old',
-          to: '/blog/new',
+          from: '/blogs/old',
+          to: '/blogs/new',
           status: '301',
           source: 'slug-change',
         }),
@@ -122,7 +122,7 @@ describe('slugChangeRedirectHook', () => {
 
   it('updates an existing redirect row instead of creating a duplicate (idempotent)', async () => {
     mock = makePayload([
-      { id: 7, from: '/blog/old', to: '/blog/stale', status: '301', source: 'manual' },
+      { id: 7, from: '/blogs/old', to: '/blogs/stale', status: '301', source: 'manual' },
     ]);
     await runHook(
       'blogs',
@@ -134,15 +134,15 @@ describe('slugChangeRedirectHook', () => {
     expect(mock.spies.update).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 7,
-        data: expect.objectContaining({ to: '/blog/new', status: '301', source: 'slug-change' }),
+        data: expect.objectContaining({ to: '/blogs/new', status: '301', source: 'slug-change' }),
       }),
     );
   });
 
   it('chain-collapses inbound rows pointing at the old URL', async () => {
     mock = makePayload([
-      { id: 1, from: '/blog/very-old', to: '/blog/old', status: '301', source: 'slug-change' },
-      { id: 2, from: '/blog/also-old', to: '/blog/old', status: '301', source: 'slug-change' },
+      { id: 1, from: '/blogs/very-old', to: '/blogs/old', status: '301', source: 'slug-change' },
+      { id: 2, from: '/blogs/also-old', to: '/blogs/old', status: '301', source: 'slug-change' },
     ]);
     await runHook(
       'blogs',
@@ -153,17 +153,17 @@ describe('slugChangeRedirectHook', () => {
     const updateCalls = mock.spies.update.mock.calls.map((c) => c[0]);
     expect(updateCalls).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: 1, data: expect.objectContaining({ to: '/blog/new' }) }),
-        expect.objectContaining({ id: 2, data: expect.objectContaining({ to: '/blog/new' }) }),
+        expect.objectContaining({ id: 1, data: expect.objectContaining({ to: '/blogs/new' }) }),
+        expect.objectContaining({ id: 2, data: expect.objectContaining({ to: '/blogs/new' }) }),
       ]),
     );
   });
 
   it('deletes an inbound row whose `from` would equal the new `to` (would create self-cycle)', async () => {
-    // /blog/new → /blog/old already exists. After rename, naive update
-    // would write /blog/new → /blog/new. The hook deletes it instead.
+    // /blogs/new → /blogs/old already exists. After rename, naive update
+    // would write /blogs/new → /blogs/new. The hook deletes it instead.
     mock = makePayload([
-      { id: 9, from: '/blog/new', to: '/blog/old', status: '301', source: 'manual' },
+      { id: 9, from: '/blogs/new', to: '/blogs/old', status: '301', source: 'manual' },
     ]);
     await runHook(
       'blogs',

@@ -1,5 +1,4 @@
 // Resource Center data layer — mirrors the blog.ts pattern.
-// All data flows from Payload CMS via the REST API.
 
 import { cache } from "react";
 

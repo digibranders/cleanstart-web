@@ -10,6 +10,12 @@ import { ROUTE_PREFIX } from '../route-prefixes';
  * Pages use their computed `path` field (nested URL); everything else
  * uses the per-collection prefix from `ROUTE_PREFIX`.
  */
+/**
+ * Collections that have a live public-site detail route and therefore
+ * show the Preview / Live Preview controls in the admin edit view.
+ * Taxonomy and form collections are deliberately excluded — they have no
+ * routable public URL and Preview would 404 for editors.
+ */
 export const PREVIEWABLE_COLLECTIONS = [
   'blogs',
   'news',
@@ -21,11 +27,6 @@ export const PREVIEWABLE_COLLECTIONS = [
   'knowledgeBase',
   'podcastEpisodes',
   'resources',
-  'authors',
-  'newsCategories',
-  'knowledgeCategories',
-  'categories',
-  'forms',
 ] as const;
 
 export type PreviewableCollection = (typeof PREVIEWABLE_COLLECTIONS)[number];

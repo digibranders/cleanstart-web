@@ -1,30 +1,6 @@
 import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 
-/**
- * Section: "Security isn't just patching"
- * Figma group 108:7892 (1276×819 at y=2329)
- *
- * Layout:
- *  - Title (444×124, Manrope Bold 62px) with "patching" in cyan→purple gradient
- *  - Vertical 1×90 gradient separator between title and description
- *  - Description (576×84, Regular 26px line 150% color #111 @ 80% opacity)
- *  - Two cards (622×600 outer · cyan border, 622×~441 inner white)
- *  - Kubr mascot at the gap between cards (tail BEHIND left card via z-index)
- *
- * Each card:
- *  - Outer rect — corner-radius 40, fill #2CC1EB (becomes 10px cyan border)
- *  - Header (top ~140px): linear gradient #151021 → #131E8F (62.5%) → #471EC0
- *    + Public Images: cube SVG + "Public Images" text
- *    + CleanStart: cleanstart wordmark logo SVG
- *    + Soft cyan glow at bottom (Figma 光斑 flare effect)
- *  - White inner content (corner-radius 32) with:
- *    + Decorative purple/cyan radial blobs at low opacity (Figma Ellipse 46681/46682)
- *    + 5-row bullet list:
- *       Public Images → snowflake icon (gray)        + Sora SemiBold 22px label
- *       CleanStart    → sparkle icon (cyan→purple)   + Sora Bold 22px label
- */
-
 const PUBLIC_IMAGES = [
   "Patch after image creation",
   "Public base images",
@@ -48,20 +24,10 @@ export function SecurityNotPatching() {
       aria-labelledby="security-title"
     >
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Background decorations — positioned in the 1276-wide Figma section
-             coordinate space. */}
         <div
           aria-hidden
           className="pointer-events-none absolute left-0 right-0 top-0 h-[819px]"
         >
-          {/* Bottom-left grid — Figma 108:7628 (1101×1101 square-grid vector
-              at section-rel (-707, 401), opacity 0.10 baked into the SVG,
-              purple #640DFB radial gradient). The bbox extends mostly LEFT
-              and BELOW the section bounds — only the upper-right quadrant
-              peeks in, which is what produces the "faint vertical lines on
-              the left edge of the section" reading in Figma. We render the
-              real SVG at the exact Figma bbox so the visible portion matches
-              one-for-one. */}
           <Image
             src="/images/security/bg-grid-bottom-left.svg"
             alt=""
@@ -76,11 +42,6 @@ export function SecurityNotPatching() {
               height: "1101px",
             }}
           />
-          {/* Top-right hex cube — Figma 108:7629 (white + cyan→purple linear
-              gradient, opacity 0.12 baked in the SVG group). Rendered at the
-              fresh export's natural 374×332 size at section-rel (1086, 0); the
-              right portion extends past the section edge (clipped by section
-              overflow-hidden). */}
           <Image
             src="/images/security/bg-cube-top-right.svg"
             alt=""
@@ -97,7 +58,6 @@ export function SecurityNotPatching() {
           />
         </div>
 
-        {/* Title row — heading flush-left, separator dead-center, description flush-right */}
         <div className="flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
           <Reveal header className="justify-self-start" style={{ maxWidth: "444px" }}>
             <h2
@@ -114,7 +74,6 @@ export function SecurityNotPatching() {
               <span className="cs-text-gradient-impact">patching</span>
             </h2>
           </Reveal>
-          {/* 1×90 vertical fading-gray separator (Figma Rectangle 1000001787 #D9D9D9) */}
           <div
             aria-hidden
             className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
@@ -147,15 +106,10 @@ export function SecurityNotPatching() {
           </Reveal>
         </div>
 
-        {/* Cards row + VS badge centerpiece.
-            Flex with a small gap keeps the two cards visually coupled with
-            the VS badge bridging them; `justify-center` keeps the pair centered
-            in the section's content area with symmetric breathing room. */}
         <div className="relative mt-10 flex flex-col items-center gap-6 md:mt-12 md:flex-row md:justify-center md:gap-10">
           <SecurityCard kind="public" features={PUBLIC_IMAGES} />
           <SecurityCard kind="cleanstart" features={CLEANSTART_FEATURES} />
 
-          {/* VS badge — centered between the two cards, above both */}
           <VsBadge />
         </div>
       </div>
@@ -175,7 +129,6 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
     <div
       className="relative flex h-full w-full flex-col lg:max-w-[500px]"
       style={{
-        // Figma 1440: outer card 622×600, cyan border 10 px, radius 40
         borderRadius: 40,
         background: "#2CC1EB",
         padding: 10,
@@ -186,35 +139,19 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
         className="relative flex flex-1 flex-col overflow-hidden"
         style={{ borderRadius: 32 }}
       >
-        {/* Header section — dark gradient + decorative watermark + logo + cyan glow.
-             Figma stacks 4 layers in each card header (108:7955-7958 / 108:7897-7900):
-               1. white base rect
-               2. linear gradient #151021 → #131E8F (62.5%) → #471EC0, vertical, on 602×571
-               3. "image 121" texture at blendMode SATURATION
-               4. "Gradient" 1028×1028 image — IDENTICAL source on both cards, but
-                  LEFT card has the saturation FILTER set to -1 (full grayscale)
-                  while RIGHT card has it at 0 (full color)
-             That single difference is what makes the LEFT header read as
-             near-black while the RIGHT reads as vivid purple. We approximate
-             the visible outcome with two distinct CSS gradients tuned to the
-             eyeball colors of the rendered Figma textures. */}
+        {/* The two cards share the same source gradient in the design; the
+            public card is desaturated (reads near-black) and the CleanStart
+            card stays full-color (reads vivid purple). We approximate that with
+            two distinct CSS gradients. */}
         <div
           className="relative flex h-[clamp(76px,7vw,100px)] w-full items-center justify-center gap-3 overflow-hidden"
           style={{
             background: isPublic
-              ? // LEFT (Public Images) — desaturated texture overlay → reads black
-              "linear-gradient(135deg, #151021 0%, #1A1733 60%, #221A3D 100%)"
-              : // RIGHT (CleanStart) — full-color texture overlay → reads vivid purple
-              "linear-gradient(135deg, #1B0E33 0%, #2B1456 40%, #471EC0 100%)",
+              ? "linear-gradient(135deg, #151021 0%, #1A1733 60%, #221A3D 100%)"
+              : "linear-gradient(135deg, #1B0E33 0%, #2B1456 40%, #471EC0 100%)",
           }}
         >
-          {/* Decorative right-side watermark (Figma 34% white SOFT_LIGHT)
-              Public Images → cube watermark · CleanStart → chevron watermark */}
           {isPublic ? (
-            // Public Images cube watermark — Figma 108:7960 (group of 4 vectors:
-            // grey #868686 outline + 3 white SOFT_LIGHT@34% inner faces).
-            // Section-rel (497, 191), 162×186.4 → extends 37px past card right edge
-            // and 13px above card top (both clipped by header overflow-hidden).
             <Image
               aria-hidden
               src="/images/security/header-cube.svg"
@@ -232,9 +169,6 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
               }}
             />
           ) : (
-            // CleanStart chevron watermark — Figma 108:7902 (single Vector, white
-            // fill, opacity 0.34, blendMode SOFT_LIGHT). Section-rel (1138, 202),
-            // 258×236 → extends 120px past card right edge and 2px above card top.
             <Image
               aria-hidden
               src="/images/security/header-chevron.svg"
@@ -253,8 +187,6 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
             />
           )}
 
-          {/* Cyan light flare at the bottom (Figma 光斑 flare 631×177)
-              The cyan glow that appears just below the heading text */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 bottom-0 h-[60px]"
@@ -265,11 +197,6 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
             }}
           />
 
-          {/* Header content (z-10 above decorative layers).
-              Per live Figma: Public Images icon+text frame (108:7991) sits at
-              section-rel x=198 / y=258, and CleanStart logo (108:7934) sits at
-              section-rel x=852 / y=258 — both 198px from their card outer left,
-              i.e. 188px from the inner header's left after the 10px cyan border. */}
           <div className="relative z-10 flex w-full items-center justify-center gap-3">
             {isPublic ? (
               <>
@@ -307,12 +234,10 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
           </div>
         </div>
 
-        {/* White content area — Figma inner body rect 108:7965/108:7903 is 441px tall.
-            `flex-1` lets this area absorb the grid-row's stretched height so both
-            cards' visible bottoms stay aligned regardless of which card's text
-            wraps to two lines at any given viewport. */}
+        {/* flex-1 lets this area absorb the grid-row's stretched height so both
+            cards' visible bottoms stay aligned regardless of how many lines each
+            card's text wraps to. */}
         <div className="relative flex flex-1 flex-col overflow-hidden bg-white py-[clamp(24px,2.5vw,36px)]" style={{ minHeight: "clamp(260px, 22vw, 340px)" }}>
-          {/* Decorative blobs (Figma Ellipse 46681 #DF9BFF + 46682 #2CC1EB) */}
           <div
             aria-hidden
             className="pointer-events-none absolute"
@@ -342,8 +267,6 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
             }}
           />
 
-          {/* Bullet list — Figma bullets are 31px-tall rows with 71px top-to-top
-              spacing → 40px gap between rows (same for both cards). */}
           <ul className="relative z-10 mx-auto flex h-full max-w-[400px] flex-col justify-center gap-[clamp(20px,2.5vw,36px)]">
             {features.map((label) => (
               <li key={label} className="flex items-center gap-6">
@@ -387,13 +310,8 @@ function SecurityCard({ kind, features }: SecurityCardProps) {
   );
 }
 
-/** VS badge — glossy 3D "VS" letterform (252 × 252 source asset) centered
- *  in the gap between the Public Images and CleanStart comparison cards.
- *  Replaces the previous Kubr mascot per the Figma 1440 home design.
- *  Hidden below `md` since the cards stack vertically and the gap
- *  disappears. Centered horizontally via left:50% + translateX(-50%);
- *  vertically centered between card rows via top:50% + translateY(-50%).
- *  z-30 keeps it above both cards. */
+/** "VS" badge centered in the gap between the two comparison cards. z-30 keeps
+ *  it above both cards. */
 function VsBadge() {
   // Smaller on mobile where the badge sits in the narrow gap between the
   // vertically stacked cards; full size on tablet/desktop where it bridges

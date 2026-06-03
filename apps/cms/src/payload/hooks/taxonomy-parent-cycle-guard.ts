@@ -1,4 +1,5 @@
 import type { CollectionBeforeChangeHook } from 'payload';
+import { ValidationError } from 'payload';
 
 const MAX_DEPTH = 16;
 
@@ -40,21 +41,33 @@ export const taxonomyParentCycleGuardHook = (
     let cursor = idOfParent(next.parent ?? null);
     if (cursor == null) return data;
     if (cursor === id) {
-      throw new Error(`${collection}: a row cannot be its own parent.`);
+      throw new ValidationError({
+        errors: [{ message: 'A row cannot be its own parent.', path: 'parent' }],
+      });
     }
 
     const seen = new Set<string | number>([id]);
     let depth = 0;
     while (cursor != null) {
       if (seen.has(cursor)) {
-        throw new Error(
-          `${collection}: parent chain creates a cycle via "${String(cursor)}".`,
-        );
+        throw new ValidationError({
+          errors: [
+            {
+              message: `Parent chain creates a cycle via "${String(cursor)}".`,
+              path: 'parent',
+            },
+          ],
+        });
       }
       if (depth >= MAX_DEPTH) {
-        throw new Error(
-          `${collection}: parent chain exceeds maximum depth of ${MAX_DEPTH}.`,
-        );
+        throw new ValidationError({
+          errors: [
+            {
+              message: `Parent chain exceeds maximum depth of ${MAX_DEPTH}.`,
+              path: 'parent',
+            },
+          ],
+        });
       }
       seen.add(cursor);
       depth += 1;

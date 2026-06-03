@@ -16,7 +16,6 @@ import {
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, jobPostingSchema } from "@/lib/seo/jsonld";
 
-// schema.org employmentType enum mapping for JobPosting.
 const SCHEMA_EMPLOYMENT_TYPE: Record<JobEmploymentType, string> = {
   "full-time": "FULL_TIME",
   "part-time": "PART_TIME",

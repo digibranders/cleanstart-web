@@ -99,7 +99,11 @@ export const TabsField = (props: TabsFieldClientProps): ReactElement => {
               permissions={
                 permissions === true
                   ? permissions
-                  : ((permissions as { fields?: unknown })?.fields as Record<string, never>) ?? {}
+                  // Named tabs resolve permissions under permissions[tabName].fields;
+                  // unnamed tabs resolve under permissions.fields (flat).
+                  : t.name
+                    ? (((permissions as Record<string, unknown>)?.[t.name] as { fields?: unknown } | undefined)?.fields as Record<string, never> | undefined) ?? {}
+                    : ((permissions as { fields?: unknown })?.fields as Record<string, never>) ?? {}
               }
               readOnly={readOnly ?? false}
               forceRender={forceRender ?? true}

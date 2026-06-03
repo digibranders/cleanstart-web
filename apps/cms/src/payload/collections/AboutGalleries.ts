@@ -62,7 +62,7 @@ export const AboutGalleries: CollectionConfig = {
       type: 'number',
       defaultValue: 0,
       admin: {
-        description: 'Drag to reorder in the list view (Phase D admin UX).',
+        description: 'Enter a number to control display order (lower = first).',
         position: 'sidebar',
       },
     },

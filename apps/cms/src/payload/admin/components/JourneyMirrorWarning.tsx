@@ -41,9 +41,13 @@ export const JourneyMirrorWarning = (): ReactElement | null => {
     if (!previousId) {
       setPrevTarget(null);
     } else {
-      fetchTarget(previousId, 'next').then((t) => {
-        if (!cancelled) setPrevTarget(t);
-      });
+      fetchTarget(previousId, 'next')
+        .then((t) => {
+          if (!cancelled) setPrevTarget(t);
+        })
+        .catch(() => {
+          if (!cancelled) setPrevTarget(null);
+        });
     }
     return () => {
       cancelled = true;
@@ -55,9 +59,13 @@ export const JourneyMirrorWarning = (): ReactElement | null => {
     if (!nextId) {
       setNextTarget(null);
     } else {
-      fetchTarget(nextId, 'prev').then((t) => {
-        if (!cancelled) setNextTarget(t);
-      });
+      fetchTarget(nextId, 'prev')
+        .then((t) => {
+          if (!cancelled) setNextTarget(t);
+        })
+        .catch(() => {
+          if (!cancelled) setNextTarget(null);
+        });
     }
     return () => {
       cancelled = true;

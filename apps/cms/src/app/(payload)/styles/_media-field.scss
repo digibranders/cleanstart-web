@@ -68,14 +68,20 @@
   }
 
   &__dropzone-glyph {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
+    border: 1px solid rgba(6, 199, 242, 0.22);
     background: var(--cs-tint-brand-soft);
     color: var(--cs-cyan-500);
+
+    svg {
+      width: 28px;
+      height: 28px;
+    }
   }
 
   &__dropzone-actions {
@@ -530,7 +536,7 @@
 
   // ─── Progress bar (during upload) ──────────────────────────────
   &__progress {
-    height: 4px;
+    height: 6px;
     background: var(--theme-elevation-150);
     border-radius: 999px;
     overflow: hidden;
@@ -539,6 +545,7 @@
   &__progress-bar {
     height: 100%;
     background: var(--cs-cyan-500);
+    box-shadow: 0 0 6px rgba(6, 199, 242, 0.5);
     transition: width 120ms linear;
   }
 
@@ -593,7 +600,7 @@
 
   &__browse-search {
     flex: 1;
-    height: 36px;
+    height: 38px;
     background: var(--theme-input-bg);
     border: 1px solid var(--theme-elevation-200);
     border-radius: var(--cs-radius-input);
@@ -613,8 +620,8 @@
     padding: var(--cs-space-3);
     overflow: auto;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: var(--cs-space-2);
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--cs-space-3);
   }
 
   &__browse-empty {
@@ -637,12 +644,21 @@
     transition:
       border-color var(--cs-motion-micro),
       transform var(--cs-motion-micro),
-      box-shadow var(--cs-motion-micro);
+      box-shadow var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
 
     &:hover {
       border-color: var(--cs-cyan-500);
       transform: translateY(-1px);
       box-shadow: var(--cs-shadow-lift-md);
+    }
+
+    // Flash selected state briefly on click before dialog closes (60ms timeout in JS)
+    &:active {
+      border-color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+      box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
+      transform: scale(0.97);
     }
 
     &:focus-visible,
@@ -683,8 +699,16 @@
     font-size: 11px;
   }
 
+  // Tile bottom-info container — unified flex column
+  &__browse-tile-info {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 8px 6px;
+    gap: 4px;
+  }
+
   &__browse-tile-name {
-    padding: 6px 8px 2px;
+    padding: 0;
     font-size: 12px;
     color: var(--theme-text);
     overflow: hidden;
@@ -695,8 +719,8 @@
 
   &__browse-tile-type {
     align-self: flex-start;
-    margin: 0 8px 6px;
-    padding: 2px 6px;
+    margin: 0;
+    padding: 1px 5px;
     border-radius: 4px;
     background: var(--theme-elevation-150);
     color: var(--theme-text-soft);
@@ -707,7 +731,7 @@
   }
 
   &__browse-tile-dims {
-    padding: 0 8px 6px;
+    padding: 0;
     font-size: 10px;
     color: var(--theme-text-placeholder, #888);
     white-space: nowrap;

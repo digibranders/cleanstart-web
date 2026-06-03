@@ -25,8 +25,6 @@ export function JsonLd({ data, id }: JsonLdProps) {
   );
 }
 
-// ---------- Schema builders ---------------------------------------------------
-
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 
 export function organizationSchema() {

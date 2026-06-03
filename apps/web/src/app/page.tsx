@@ -35,11 +35,9 @@ export default function Home() {
       <Header />
       <main>
         <div className="bg-cs-hero relative overflow-hidden">
-          {/* Hero-top Mask group — Figma export (1440×569 SVG with internal
-              viewBox spanning the full 1920 px frame). Contains the 27×8
-              dark-navy tech grid plus the two purple ellipse glows plus the
-              four small line accents, all baked in. Pinned to the top of the
-              bg-cs-hero wrapper, decorative-only. ~20 KB on the wire. */}
+          {/* Decorative hero-top mask: dark-navy tech grid, two purple ellipse
+              glows, and four line accents baked into one SVG pinned to the top
+              of the bg-cs-hero wrapper. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/home/mask-group.svg"
@@ -51,7 +49,7 @@ export default function Home() {
             decoding="async"
           />
 
-          {/* Decorative purple radial blobs (Figma "Union" vectors, #640DFB radial fill) */}
+          {/* Decorative purple radial blobs (#640DFB radial fill) */}
           <div
             aria-hidden
             className="pointer-events-none absolute"
@@ -106,18 +104,17 @@ export default function Home() {
               factory and the bright section below each own their space. */}
         </div>
 
-        {/* Order matches Figma: Security → Advantage stats → How Will Help → Testimonials */}
         <FadeUp>
           <SecurityNotPatching />
         </FadeUp>
         <FadeUp>
-          <CleanStartAdvantage />
+          <BuiltForTeams />
         </FadeUp>
         <FadeUp>
           <HowCleanStartHelp />
         </FadeUp>
         <FadeUp>
-          <BuiltForTeams />
+          <CleanStartAdvantage />
         </FadeUp>
         {/* FAQ + Resources share one continuous #F6F6F6 canvas so their
             transparent backgrounds and decorative blobs/grids bleed across
@@ -127,8 +124,6 @@ export default function Home() {
             aria-hidden
             className="pointer-events-none absolute inset-0 overflow-hidden"
           >
-            {/* LEFT-TOP grid — Figma 108:8523, x=-435, y=5488 in 1920 frame.
-                Wrapper-relative top = 5488−6231 = −743px. */}
             <Image
               src="/images/faq/bg-grid-faq-left.svg"
               alt=""
@@ -140,8 +135,6 @@ export default function Home() {
               className="absolute"
               style={{ left: "-435px", top: "-743px", width: "1101px", height: "1101px", maxWidth: "none" }}
             />
-            {/* RIGHT-MIDDLE grid — Figma 108:8524, x=1392, y=6657.
-                Right = 1920−1392−1101 = −573px; top = 6657−6231 = 426px. */}
             <Image
               src="/images/faq/bg-grid-faq-right.svg"
               alt=""
@@ -153,8 +146,6 @@ export default function Home() {
               className="absolute"
               style={{ right: "-573px", top: "426px", width: "1101px", height: "1101px", maxWidth: "none" }}
             />
-            {/* LEFT-BOTTOM grid — Figma 108:7625, x=-343, y=7736.
-                Wrapper-relative top = 7736−6231 = 1505px. */}
             <Image
               src="/images/faq/bg-grid-faq-bottom-left.svg"
               alt=""

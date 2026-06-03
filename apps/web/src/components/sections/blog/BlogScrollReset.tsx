@@ -19,9 +19,8 @@ export function BlogScrollReset(): null {
   const pathname = usePathname();
 
   useEffect(() => {
-    // pathname read kept inside the effect so biome's
-    // useExhaustiveDependencies sees a genuine dependency, not just a
-    // re-run trigger. The value itself isn't otherwise needed.
+    // Reading pathname here gives biome's useExhaustiveDependencies a genuine
+    // dependency rather than a bare re-run trigger; the value itself is unused.
     if (pathname == null) return;
     window.scrollTo({ top: 0, behavior: "auto" });
   }, [pathname]);

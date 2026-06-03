@@ -95,6 +95,18 @@ export const MediaSelfChrome = (): ReactElement | null => {
     void refetch();
   }, [refetch]);
 
+  // Remove the hidden replace <input> from document.body on unmount to
+  // prevent a DOM leak when the editor navigates away mid-flow.
+  useEffect(() => {
+    return () => {
+      const input = replaceInputRef.current;
+      if (input?.parentNode) {
+        input.parentNode.removeChild(input);
+        replaceInputRef.current = null;
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (editingFilename) {
       filenameInputRef.current?.focus();
@@ -221,7 +233,7 @@ export const MediaSelfChrome = (): ReactElement | null => {
     if (!input) {
       input = document.createElement('input');
       input.type = 'file';
-      input.accept = 'image/*,application/pdf';
+      input.accept = 'image/*,application/pdf,video/mp4,application/zip,application/x-zip-compressed';
       input.style.display = 'none';
       input.addEventListener('change', () => {
         const file = input?.files?.[0];

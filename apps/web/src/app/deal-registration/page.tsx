@@ -26,9 +26,6 @@ export default function DealRegistrationPage() {
       />
       <Header />
       <main style={{ background: "#f3f3f6" }}>
-        {/* ── Hero — dark navy → violet gradient that softens into the
-            page's light-lavender body. Crystal cubes flank the title and
-            are fully visible inside the viewport (not bled off-screen). */}
         <section className="relative w-full overflow-hidden">
           <div
             aria-hidden
@@ -39,8 +36,6 @@ export default function DealRegistrationPage() {
             }}
           />
 
-          {/* Left cube — lower-left (Figma image 583141), matching the
-              Knowledge Hub hero placement. */}
           <Image
             src="/images/book-a-demo/hero-cube-left.png"
             alt=""
@@ -60,8 +55,6 @@ export default function DealRegistrationPage() {
             priority
           />
 
-          {/* Right cube — upper-right (Figma image 583137), matching the
-              Knowledge Hub hero placement. */}
           <Image
             src="/images/book-a-demo/hero-cube-right.png"
             alt=""
@@ -96,9 +89,9 @@ export default function DealRegistrationPage() {
                 fontFamily: "var(--font-display), sans-serif",
                 fontWeight: 600,
                 fontSize: "var(--fs-display)",
-                // Generous line-height + the inline-block span's bottom
-                // padding prevent `bg-clip-text` from clipping the
-                // descender on the "g" in "Registration".
+                // Generous line-height plus the inline-block span's bottom
+                // padding keep bg-clip-text from clipping the descender on the
+                // "g" in "Registration".
                 lineHeight: 1.2,
                 letterSpacing: "-0.04em",
               }}
@@ -118,11 +111,10 @@ export default function DealRegistrationPage() {
           </div>
         </section>
 
-        {/* ── Light-lavender form body. The OUTER section sits flush
-            below the hero so the dark hero's left/right sides remain
-            visible at the form card's overlap zone. The INNER wrapper has
-            a negative top margin that pulls only the form card up into
-            the dark hero. */}
+        {/* The outer section sits flush below the hero so the dark hero's
+            left/right edges stay visible at the form card's overlap zone; the
+            inner wrapper's negative top margin pulls only the form card up
+            into the dark hero. */}
         <section
           className="relative"
           style={{
@@ -144,8 +136,6 @@ export default function DealRegistrationPage() {
           </div>
         </section>
 
-        {/* ── Ecosystems marquee — same logos used on /about's
-            "Built for the Ecosystems You Trust" section. */}
         <FadeUp>
           <AboutEcosystems bottomPadding="compact" cornerAccent />
         </FadeUp>

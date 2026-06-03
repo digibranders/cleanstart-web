@@ -19,7 +19,11 @@ export const Forms: CollectionConfig = {
     group: 'Marketing',
   },
   access: {
-    read: () => true,
+    // Forms contain field names, validation regex, consent text, and select
+    // options — exposing them publicly would allow scraping of the schema.
+    // The web app fetches form definitions server-side (authenticated) or via
+    // a scoped endpoint that returns only the visitor-facing subset.
+    read: isAdminOrEditor,
     create: isAdminOrEditor,
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
@@ -251,6 +255,15 @@ export const Forms: CollectionConfig = {
           'System-managed. Auto-increments when fields[] changes after the form has at least one submission.',
         position: 'sidebar',
         readOnly: true,
+      },
+    },
+    {
+      name: 'hubspotFormGuid',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        description:
+          'GUID of the matching HubSpot form in the "website" folder. Set this to relay submissions to HubSpot via the Forms API. Leave empty to skip HubSpot sync.',
       },
     },
   ],

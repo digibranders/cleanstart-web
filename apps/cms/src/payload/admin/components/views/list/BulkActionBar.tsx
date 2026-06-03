@@ -2,28 +2,109 @@
 
 import { ConfirmDialog } from '@cleanstart/ui';
 import { useConfig, useSelection } from '@payloadcms/ui';
+import { hasDraftsEnabled } from 'payload/shared';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
 
+import { showToast } from '../../ToastBus';
+
 type Props = {
   readonly collectionSlug: string;
+  readonly hasCreatePermission?: boolean;
   readonly hasDeletePermission?: boolean;
   readonly disableBulkDelete?: boolean;
   readonly disableBulkEdit?: boolean;
+};
+
+type DeleteResult = {
+  readonly errors?: ReadonlyArray<{ message?: string }>;
 };
 
 const callBulkDelete = async (
   apiBase: string,
   collectionSlug: string,
   ids: ReadonlyArray<number | string>,
-): Promise<void> => {
+): Promise<{ ok: boolean; errors: string[] }> => {
   const url = new URL(`${apiBase}/${collectionSlug}`, window.location.origin);
   url.searchParams.set('where[id][in]', ids.join(','));
-  await fetch(url.toString(), {
-    method: 'DELETE',
-    credentials: 'include',
-    headers: { 'content-type': 'application/json' },
-  });
+  let res: Response;
+  try {
+    res = await fetch(url.toString(), {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'content-type': 'application/json' },
+    });
+  } catch (err) {
+    return { ok: false, errors: [err instanceof Error ? err.message : 'Network error'] };
+  }
+  if (!res.ok) {
+    let msg = `HTTP ${res.status}`;
+    try {
+      const body = (await res.json()) as { message?: string };
+      if (typeof body.message === 'string') msg = body.message;
+    } catch {
+      // ignore parse errors — the status code is the signal
+    }
+    return { ok: false, errors: [msg] };
+  }
+  let data: DeleteResult = {};
+  try {
+    data = (await res.json()) as DeleteResult;
+  } catch {
+    // if we can't parse the body but status was ok, treat as success
+  }
+  const errors = (data.errors ?? [])
+    .map((e) => e.message ?? 'Unknown error')
+    .filter((m) => m.length > 0);
+  return { ok: errors.length === 0, errors };
+};
+
+/**
+ * Clone each selected doc via Payload's built-in
+ * `POST /:collection/:id/duplicate` operation — the same server-side copy
+ * the edit-view "Duplicate" action uses, so unique fields (slug) and
+ * collection hooks are handled identically. When drafts are enabled the
+ * copy is created as a draft (`_status: 'draft'`), never auto-published.
+ * Runs sequentially so failures are attributable per row.
+ */
+const callDuplicate = async (
+  apiBase: string,
+  collectionSlug: string,
+  ids: ReadonlyArray<number | string>,
+  asDraft: boolean,
+): Promise<{ created: number; errors: string[] }> => {
+  const errors: string[] = [];
+  let created = 0;
+  for (const id of ids) {
+    const url = new URL(`${apiBase}/${collectionSlug}/${id}/duplicate`, window.location.origin);
+    url.searchParams.set('depth', '0');
+    try {
+      const res = await fetch(url.toString(), {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(asDraft ? { _status: 'draft' } : {}),
+      });
+      if (!res.ok) {
+        let msg = `HTTP ${res.status}`;
+        try {
+          const body = (await res.json()) as {
+            errors?: ReadonlyArray<{ message?: string }>;
+            message?: string;
+          };
+          msg = body.errors?.[0]?.message ?? body.message ?? msg;
+        } catch {
+          // non-JSON body — the status code is the signal
+        }
+        errors.push(msg);
+      } else {
+        created += 1;
+      }
+    } catch (err) {
+      errors.push(err instanceof Error ? err.message : 'Network error');
+    }
+  }
+  return { created, errors };
 };
 
 /**
@@ -35,13 +116,25 @@ const callBulkDelete = async (
  * Wave 6 — until then we deep-link to the route.
  */
 export const BulkActionBar = (props: Props): ReactElement | null => {
-  const { collectionSlug, hasDeletePermission, disableBulkDelete, disableBulkEdit } = props;
+  const {
+    collectionSlug,
+    hasCreatePermission,
+    hasDeletePermission,
+    disableBulkDelete,
+    disableBulkEdit,
+  } = props;
   const { selected, count, totalDocs, toggleAll } = useSelection();
   const { config } = useConfig();
   const apiBase = `${config.serverURL ?? ''}${config.routes?.api ?? '/api'}`;
 
+  const collectionConfig = config.collections.find((c) => c.slug === collectionSlug);
+  const asDraft = collectionConfig ? hasDraftsEnabled(collectionConfig) : false;
+  const canDuplicate =
+    hasCreatePermission === true && collectionConfig?.disableDuplicate !== true;
+
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
 
   if (count <= 0) return null;
 
@@ -49,10 +142,46 @@ export const BulkActionBar = (props: Props): ReactElement | null => {
     .filter(([, on]) => on)
     .map(([id]) => id);
 
+  const onDuplicate = async (): Promise<void> => {
+    setDuplicating(true);
+    try {
+      const { created, errors } = await callDuplicate(apiBase, collectionSlug, ids, asDraft);
+      if (errors.length > 0) {
+        showToast({
+          message:
+            created > 0
+              ? `Duplicated ${created} of ${ids.length}; ${errors.length} failed — ${errors[0]}`
+              : `Duplicate failed — ${errors[0]}`,
+          type: created > 0 ? 'warning' : 'error',
+        });
+        if (created === 0) return;
+      } else {
+        showToast({
+          message: `Duplicated ${created} ${created === 1 ? 'item' : 'items'}${
+            asDraft ? ' as draft' : ''
+          }.`,
+          type: 'success',
+        });
+      }
+      toggleAll(false);
+      window.location.reload();
+    } finally {
+      setDuplicating(false);
+    }
+  };
+
   const onDeleteConfirm = async (): Promise<void> => {
     setBusy(true);
     try {
-      await callBulkDelete(apiBase, collectionSlug, ids);
+      const result = await callBulkDelete(apiBase, collectionSlug, ids);
+      if (!result.ok || result.errors.length > 0) {
+        const msg =
+          result.errors.length > 0
+            ? result.errors.join(' · ')
+            : 'Delete failed. Please try again.';
+        showToast({ message: msg, type: 'error' });
+        return;
+      }
       toggleAll(false);
       window.location.reload();
     } finally {
@@ -90,6 +219,16 @@ export const BulkActionBar = (props: Props): ReactElement | null => {
               }}
             >
               Edit
+            </button>
+          ) : null}
+          {canDuplicate ? (
+            <button
+              type="button"
+              className="cs-btn cs-btn--subtle"
+              onClick={() => void onDuplicate()}
+              disabled={duplicating}
+            >
+              {duplicating ? 'Duplicating…' : 'Duplicate'}
             </button>
           ) : null}
           {!disableBulkDelete && hasDeletePermission ? (

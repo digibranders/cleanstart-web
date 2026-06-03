@@ -1,102 +1,139 @@
 'use client';
 
 import { useNav } from '@payloadcms/ui';
+import { usePathname } from 'next/navigation';
 import type { ReactElement } from 'react';
 import { useEffect, useRef } from 'react';
 
-const DESKTOP_BREAKPOINT_PX = 1024;
-const STORAGE_KEY = 'cs-nav-collapsed';
+// CSS-viewport breakpoints (matchMedia, not innerWidth — innerWidth
+// includes the scrollbar width, which drifts the boundary by ~15px on
+// classic-scrollbar systems). WIDE = the rail is always open; RAIL = a
+// docked rail (open on browse views, collapsed on editor views); below
+// RAIL Payload's overlay drawer owns the nav and we don't interfere.
+const WIDE_QUERY = '(min-width: 1280px)';
+const RAIL_QUERY = '(min-width: 1025px)';
+
+// Payload's NavProvider closes the rail on mount and again ~100ms later when
+// it flips `shouldAnimate` through hydration. We re-assert policy across this
+// window; after it elapses, navOpen changes are genuine user intent and the
+// mirror effect takes over so the collapse toggle works.
+const SETTLE_MS = 320;
 
 /**
- * Keep Payload's nav rail persistent on desktop, with the editor's
- * collapse preference stored in localStorage.
+ * Editor pages are the document-edit surfaces — a collection doc
+ * (`/collections/:slug/:id|create|…`) or a global edit
+ * (`/globals/:slug`). Collection *list* views (`/collections/:slug`) and
+ * the dashboard (`/admin`) are browse surfaces, not editors. Matched
+ * without anchoring to the admin route prefix so a customised
+ * `routes.admin` still resolves correctly.
+ */
+const isEditorPath = (path: string): boolean =>
+  /\/collections\/[^/]+\/[^/]+/.test(path) || /\/globals\/[^/]+/.test(path);
+
+/**
+ * Drive the CSS layer (_sidebar-header.scss) that docks the nav grid open.
+ * The visual open/collapse is owned by CSS — keyed on this attribute +
+ * viewport — because Payload force-collapses the grid on every viewport
+ * ≤1440 after hydration, so a JS-only re-open flashes. `null` removes the
+ * attribute so the force-open CSS goes quiet and Payload's own classes own
+ * the rail (used below the docked-rail threshold, where the nav is a drawer).
+ */
+const setDocked = (docked: boolean | null): void => {
+  const root = document.documentElement;
+  if (docked === null) {
+    delete root.dataset.csNavDocked;
+  } else {
+    root.dataset.csNavDocked = docked ? 'true' : 'false';
+  }
+};
+
+/**
+ * Sidebar auto-collapse policy + manual-toggle bridge.
  *
- * Why this component exists at all:
- *   Payload's NavProvider keys off `WindowInfo` breakpoints declared as
- *   `l = (max-width: 1440px)`, `m = 1024px`, `s = 768px`. Its useEffect
- *   closes the nav whenever any of those is true — so on a 13"-14"
- *   laptop (≤ 1440 px) `largeBreak` is true on hydration and the rail
- *   lands collapsed even on a regular desktop. We fight back exactly
- *   once on first mount per session.
+ * Payload's NavProvider closes the rail whenever its `largeBreak`
+ * (`max-width: 1440px`) / `midBreak` / `smallBreak` is true — on mount
+ * and on every breakpoint cross. That collapses the rail on a 13"–14"
+ * laptop (≤ 1440px) on *every* route, which is the behaviour we override.
  *
- * What it does NOT do (deliberate, see git history pre-Phase-4):
- *   - No per-route auto-collapse on document-edit views. Surprising
- *     state changes on navigation are an anti-pattern; Notion / Linear
- *     / GitHub / Sanity / Strapi all keep their navs persistent at
- *     desktop widths. The body-editor Fullscreen toggle already exists
- *     for the genuine "I need every pixel" case, user-controlled and
- *     explicit.
- *   - No setTimeout-based race with Payload's effects. We set the nav
- *     state once on mount, then write through the editor's own
- *     hamburger toggles to localStorage. No effect-ordering hacks.
- *   - No reactive `navOpen` watcher that re-asserts policy. One source
- *     of truth: the editor.
+ * Policy (per product spec):
+ *   - ≥ 1280px        → rail open on every page. Never auto-collapse.
+ *   - 1025–1279px     → open on browse views (dashboard, lists); collapsed
+ *                       only on editor (document-edit) views, where the
+ *                       form wants the horizontal room.
+ *   - ≤ 1024px        → Payload's overlay drawer owns the nav; untouched.
  *
- * Below 1024 px Payload's drawer/overlay behaviour is preserved as-is.
+ * Two effects cooperate:
+ *   1. Policy effect (keyed on pathname) asserts the docked state on mount,
+ *      on route change, and across the hydration settling window — winning
+ *      the race with Payload's competing breakpoint effect with no flash.
+ *   2. Mirror effect (keyed on navOpen) takes over once the settling window
+ *      elapses: a manual collapse/expand from Payload's NavToggler flips
+ *      `navOpen`, which we mirror into the docked attribute so the CSS layer
+ *      releases its `!important` hold and the rail actually collapses.
  *
  * Mounted globally via `admin.components.actions`. Renders nothing.
  */
 export const NavOpenOnDesktop = (): ReactElement | null => {
-  const { setNavOpen } = useNav();
-  const initialised = useRef(false);
+  const { navOpen, setNavOpen } = useNav();
+  const pathname = usePathname();
+  // False until the hydration settling window for the current route elapses.
+  // Gates the mirror effect so Payload's mount/hydration navOpen churn isn't
+  // mistaken for user intent.
+  const settledRef = useRef(false);
 
-  // 1) On first mount, decide the rail's starting state from the
-  //    editor's saved preference (or default to "open at desktop").
   useEffect(() => {
-    if (initialised.current) return;
-    initialised.current = true;
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return undefined;
 
-    const isDesktop = window.matchMedia(
-      `(min-width: ${DESKTOP_BREAKPOINT_PX}px)`,
-    ).matches;
-    if (!isDesktop) return; // Below 1024 — Payload's drawer wins.
+    settledRef.current = false;
+    const editor = isEditorPath(pathname ?? '');
 
-    let saved: string | null = null;
-    try {
-      saved = window.localStorage.getItem(STORAGE_KEY);
-    } catch {
-      // Private mode / blocked storage — fall through to default.
-    }
+    const wide = window.matchMedia(WIDE_QUERY);
+    const rail = window.matchMedia(RAIL_QUERY);
 
-    // saved === 'true' means "editor manually collapsed it"; honour
-    // that. Anything else (null, 'false') means "default open".
-    if (saved !== 'true') {
-      setNavOpen(true);
-    }
-  }, [setNavOpen]);
-
-  // 2) Persist the editor's manual toggle clicks. Capture-phase listener
-  //    so we record the user's intent regardless of which descendant
-  //    inside the toggler wrapper actually receives the click.
-  useEffect(() => {
-    if (typeof document === 'undefined') return undefined;
-
-    const onClick = (event: Event): void => {
-      const target = event.target as HTMLElement | null;
-      if (!target?.closest('.template-default__nav-toggler-wrapper')) return;
-
-      // Defer reading the new state to the next tick — Payload's own
-      // click handler flips `navOpen` synchronously, but the DOM
-      // attribute we read from (`aria-expanded`) updates after the
-      // commit. Reading it on the next microtask gives us the truth.
-      window.queueMicrotask(() => {
-        // Payload sets `nav--collapsed` on `<aside class="nav">` when
-        // collapsed. Mirror that to localStorage so the next page load
-        // — or the next browser session — restores the editor's pick.
-        const aside = document.querySelector('aside.nav');
-        const collapsed = aside?.classList.contains('nav--collapsed') ?? false;
-        try {
-          window.localStorage.setItem(STORAGE_KEY, String(collapsed));
-        } catch {
-          // Storage blocked — preference becomes session-only.
-        }
-      });
+    const apply = (): void => {
+      // Below the docked-rail threshold the nav is a modal drawer — forcing
+      // it open would pop the overlay, so drop the attribute and defer to
+      // Payload entirely.
+      if (!rail.matches) {
+        setDocked(null);
+        return;
+      }
+      const open = wide.matches ? true : !editor;
+      setDocked(open);
+      setNavOpen(open);
     };
 
-    document.addEventListener('click', onClick, true);
-    return () => document.removeEventListener('click', onClick, true);
-  }, []);
+    // Re-assert across the settling window so a single re-open doesn't lose
+    // the race with Payload's hydration breakpoint effect. After the window,
+    // `settledRef` flips true and the mirror effect owns navOpen so the
+    // editor's own collapse toggle takes effect — no permanent watcher
+    // fighting manual intent.
+    const raf = window.requestAnimationFrame(apply);
+    const settleTimers = [60, 160, SETTLE_MS].map((ms) => window.setTimeout(apply, ms));
+    const settleDone = window.setTimeout(() => {
+      settledRef.current = true;
+    }, SETTLE_MS);
+
+    wide.addEventListener('change', apply);
+    rail.addEventListener('change', apply);
+    return () => {
+      window.cancelAnimationFrame(raf);
+      for (const id of settleTimers) window.clearTimeout(id);
+      window.clearTimeout(settleDone);
+      wide.removeEventListener('change', apply);
+      rail.removeEventListener('change', apply);
+    };
+  }, [pathname, setNavOpen]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    // During the settling window, navOpen changes are Payload's own
+    // breakpoint noise — owned by the policy effect. Below the docked-rail
+    // threshold the drawer owns the nav, so we never dock it.
+    if (!settledRef.current) return;
+    if (!window.matchMedia(RAIL_QUERY).matches) return;
+    setDocked(navOpen);
+  }, [navOpen]);
 
   return null;
 };

@@ -12,15 +12,15 @@ import {
   getPastEvents,
   getUpcomingEvents,
 } from "@/lib/events";
+import { Container } from "@/components/layout";
 import { fetchCommunityImages } from "@/lib/api/community-images";
 import { effectivePublishedAt } from "@/lib/published-date";
 import { getResources, type Resource, type ResourceType } from "@/lib/resources";
 import { resourceTypeLabel } from "@/lib/resources-utils";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 type NewsItem = {
   date: string;
+  category: string;
   title: string;
   href: string;
 };
@@ -48,8 +48,6 @@ type EventItem = {
   href: string;
 };
 
-// ─── Static data (no CMS source) ─────────────────────────────────────────────
-
 const DISCUSSIONS: DiscussionItem[] = [
   {
     initials: "JS",
@@ -71,13 +69,12 @@ const DISCUSSIONS: DiscussionItem[] = [
   },
 ];
 
-// ─── Fallbacks (used when CMS / API is unreachable) ──────────────────────────
-
+// Used when the CMS / API is unreachable.
 const NEWS_FALLBACK: NewsItem[] = [
-  { date: "OCT 08, 2023", title: "Zero-CVE pipeline Best Practices", href: "/resource-center" },
-  { date: "OCT 08, 2023", title: "Zero-CVE pipeline Best Practices", href: "/resource-center" },
-  { date: "SEP 29, 2023", title: "Understanding SBOMs Guide", href: "/resource-center" },
-  { date: "OCT 12, 2023", title: "Securing Container Pipelines whitepaper", href: "/resource-center" },
+  { date: "OCT 08, 2023", category: "Whitepaper", title: "Zero-CVE pipeline Best Practices", href: "/resource-center" },
+  { date: "SEP 29, 2023", category: "Ebook", title: "Understanding SBOMs Guide", href: "/resource-center" },
+  { date: "OCT 12, 2023", category: "Whitepaper", title: "Securing Container Pipelines", href: "/resource-center" },
+  { date: "AUG 17, 2023", category: "Report", title: "State of Container Security", href: "/resource-center" },
 ];
 
 const IMAGE_FALLBACK: ImageItem[] = [
@@ -92,8 +89,6 @@ const EVENTS_FALLBACK: EventItem[] = [
   { month: "NOV", day: "02", title: "Clean Code: The SBOM deep dive", detail: "Austin, TX • 6:00 PM CST", href: "/events" },
   { month: "NOV", day: "15", title: "Q4 Community Town Hall", detail: "Virtual • 11:30 AM EST", href: "/events" },
 ];
-
-// ─── Formatters ──────────────────────────────────────────────────────────────
 
 const ARTICLE_DATE_FMT = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -176,8 +171,6 @@ function safeTypeLabel(type: Resource["type"]): string {
   return resourceTypeLabel(type as ResourceType);
 }
 
-// ─── Fetchers ────────────────────────────────────────────────────────────────
-
 async function fetchWhatsNew(): Promise<NewsItem[]> {
   try {
     const data = await getResources({ limit: 4 });
@@ -185,7 +178,8 @@ async function fetchWhatsNew(): Promise<NewsItem[]> {
     if (docs.length === 0) return NEWS_FALLBACK;
     return docs.map((r) => ({
       date: formatArticleDate(effectivePublishedAt(r) ?? r.updatedAt ?? undefined),
-      title: `${r.title}${safeTypeLabel(r.type) === "Resource" ? "" : ""}`,
+      category: safeTypeLabel(r.type),
+      title: r.title,
       href: `/resources/${r.slug}`,
     }));
   } catch {
@@ -223,13 +217,6 @@ async function fetchEvents(): Promise<EventItem[]> {
   }
 }
 
-// ─── Shared sub-components ────────────────────────────────────────────────────
-
-/**
- * Blue gradient ball icon — 34×34px, matches Figma "Ball" node.
- * Hosts a Lucide icon (carried over from the previous CommunityResources
- * design — one icon per card domain instead of a single shared SVG).
- */
 function BlueBall({ icon: Icon }: { icon: LucideIcon }): React.ReactElement {
   return (
     <div
@@ -296,8 +283,6 @@ function ExploreLink({ href, label = "Explore All Resources" }: { href: string; 
   );
 }
 
-// ─── Card bodies ──────────────────────────────────────────────────────────────
-
 function WhatsNewCard({ items }: { items: NewsItem[] }): React.ReactElement {
   return (
     <div className="flex h-full flex-col gap-8">
@@ -307,14 +292,29 @@ function WhatsNewCard({ items }: { items: NewsItem[] }): React.ReactElement {
           <Link
             key={`${item.href}-${i}`}
             href={item.href}
-            className="flex flex-col gap-1 transition-opacity hover:opacity-80"
+            className="flex flex-col gap-1.5 transition-opacity hover:opacity-80"
           >
-            <span
-              className="font-display font-semibold text-[#111]"
-              style={{ fontSize: "12px", lineHeight: "16px" }}
-            >
-              {item.date}
-            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className="font-display font-semibold text-[#111]"
+                style={{ fontSize: "12px", lineHeight: "16px" }}
+              >
+                {item.date}
+              </span>
+              <span
+                className="inline-flex w-fit items-center rounded-full font-display font-semibold uppercase text-[#4a3bf1]"
+                style={{
+                  fontSize: "var(--fs-eyebrow)",
+                  letterSpacing: "0.08em",
+                  lineHeight: "16px",
+                  backgroundColor: "rgba(74,59,241,0.06)",
+                  border: "1px solid rgba(74,59,241,0.22)",
+                  padding: "2px 8px",
+                }}
+              >
+                {item.category}
+              </span>
+            </div>
             <span
               className="font-display font-semibold text-[#111]"
               style={{ fontSize: "var(--fs-h5)", lineHeight: "28px" }}
@@ -475,8 +475,6 @@ function UpcomingEventsCard({ items }: { items: EventItem[] }): React.ReactEleme
   );
 }
 
-// ─── Card wrapper ─────────────────────────────────────────────────────────────
-
 function CardWrapper({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
     <div className="h-full rounded-[32px] p-2" style={{ background: "rgba(44, 193, 235, 0.3)" }}>
@@ -489,8 +487,6 @@ function CardWrapper({ children }: { children: React.ReactNode }): React.ReactEl
     </div>
   );
 }
-
-// ─── Section ──────────────────────────────────────────────────────────────────
 
 export async function CommunitySections(): Promise<React.ReactElement> {
   const [news, images, events] = await Promise.all([
@@ -582,8 +578,8 @@ export async function CommunitySections(): Promise<React.ReactElement> {
         />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[var(--container-default)] px-6 py-[clamp(48px,8vw,120px)]">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <Container className="relative z-10 py-[clamp(48px,8vw,120px)]">
+        <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-6 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <CardWrapper>
               <WhatsNewCard items={news} />
@@ -605,7 +601,7 @@ export async function CommunitySections(): Promise<React.ReactElement> {
             </CardWrapper>
           </div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

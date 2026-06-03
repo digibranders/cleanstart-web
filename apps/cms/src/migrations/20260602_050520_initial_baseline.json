@@ -11103,6 +11103,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "previous_post_id": {
+          "name": "previous_post_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "next_post_id": {
+          "name": "next_post_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "published_at": {
           "name": "published_at",
           "type": "timestamp(3) with time zone",
@@ -11407,6 +11419,36 @@
           "method": "btree",
           "with": {}
         },
+        "blogs_previous_post_idx": {
+          "name": "blogs_previous_post_idx",
+          "columns": [
+            {
+              "expression": "previous_post_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "blogs_next_post_idx": {
+          "name": "blogs_next_post_idx",
+          "columns": [
+            {
+              "expression": "next_post_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "blogs_display_published_at_idx": {
           "name": "blogs_display_published_at_idx",
           "columns": [
@@ -11531,6 +11573,32 @@
           "tableTo": "categories",
           "columnsFrom": [
             "categories_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "blogs_previous_post_id_blogs_id_fk": {
+          "name": "blogs_previous_post_id_blogs_id_fk",
+          "tableFrom": "blogs",
+          "tableTo": "blogs",
+          "columnsFrom": [
+            "previous_post_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "blogs_next_post_id_blogs_id_fk": {
+          "name": "blogs_next_post_id_blogs_id_fk",
+          "tableFrom": "blogs",
+          "tableTo": "blogs",
+          "columnsFrom": [
+            "next_post_id"
           ],
           "columnsTo": [
             "id"
@@ -13226,6 +13294,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version_previous_post_id": {
+          "name": "version_previous_post_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_next_post_id": {
+          "name": "version_next_post_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "version_published_at": {
           "name": "version_published_at",
           "type": "timestamp(3) with time zone",
@@ -13563,6 +13643,36 @@
           "method": "btree",
           "with": {}
         },
+        "_blogs_v_version_version_previous_post_idx": {
+          "name": "_blogs_v_version_version_previous_post_idx",
+          "columns": [
+            {
+              "expression": "version_previous_post_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_blogs_v_version_version_next_post_idx": {
+          "name": "_blogs_v_version_version_next_post_idx",
+          "columns": [
+            {
+              "expression": "version_next_post_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "_blogs_v_version_version_display_published_at_idx": {
           "name": "_blogs_v_version_version_display_published_at_idx",
           "columns": [
@@ -13745,6 +13855,32 @@
           "tableTo": "categories",
           "columnsFrom": [
             "version_categories_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_blogs_v_version_previous_post_id_blogs_id_fk": {
+          "name": "_blogs_v_version_previous_post_id_blogs_id_fk",
+          "tableFrom": "_blogs_v",
+          "tableTo": "blogs",
+          "columnsFrom": [
+            "version_previous_post_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_blogs_v_version_next_post_id_blogs_id_fk": {
+          "name": "_blogs_v_version_next_post_id_blogs_id_fk",
+          "tableFrom": "_blogs_v",
+          "tableTo": "blogs",
+          "columnsFrom": [
+            "version_next_post_id"
           ],
           "columnsTo": [
             "id"
@@ -19427,6 +19563,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "abstract": {
+          "name": "abstract",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "hero_image_id": {
           "name": "hero_image_id",
           "type": "integer",
@@ -19493,6 +19635,14 @@
           "type": "timestamp(3) with time zone",
           "primaryKey": false,
           "notNull": false
+        },
+        "toc_depth": {
+          "name": "toc_depth",
+          "type": "enum_guides_toc_depth",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'h2'"
         },
         "reading_minutes": {
           "name": "reading_minutes",
@@ -21801,6 +21951,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version_abstract": {
+          "name": "version_abstract",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "version_hero_image_id": {
           "name": "version_hero_image_id",
           "type": "integer",
@@ -21867,6 +22023,14 @@
           "type": "timestamp(3) with time zone",
           "primaryKey": false,
           "notNull": false
+        },
+        "version_toc_depth": {
+          "name": "version_toc_depth",
+          "type": "enum__guides_v_version_toc_depth",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'h2'"
         },
         "version_reading_minutes": {
           "name": "version_reading_minutes",
@@ -27429,6 +27593,14 @@
           "primaryKey": false,
           "notNull": false
         },
+        "toc_depth": {
+          "name": "toc_depth",
+          "type": "enum_knowledge_base_toc_depth",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'h2'"
+        },
         "reading_minutes": {
           "name": "reading_minutes",
           "type": "numeric",
@@ -29495,6 +29667,14 @@
           "type": "timestamp(3) with time zone",
           "primaryKey": false,
           "notNull": false
+        },
+        "version_toc_depth": {
+          "name": "version_toc_depth",
+          "type": "enum__knowledge_base_v_version_toc_depth",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'h2'"
         },
         "version_reading_minutes": {
           "name": "version_reading_minutes",
@@ -38180,6 +38360,1178 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.podcast_episodes_blocks_how_to_steps": {
+      "name": "podcast_episodes_blocks_how_to_steps",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "text": {
+          "name": "text",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_id": {
+          "name": "image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "podcast_episodes_blocks_how_to_steps_order_idx": {
+          "name": "podcast_episodes_blocks_how_to_steps_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_how_to_steps_parent_id_idx": {
+          "name": "podcast_episodes_blocks_how_to_steps_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_how_to_steps_image_idx": {
+          "name": "podcast_episodes_blocks_how_to_steps_image_idx",
+          "columns": [
+            {
+              "expression": "image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_episodes_blocks_how_to_steps_image_id_media_id_fk": {
+          "name": "podcast_episodes_blocks_how_to_steps_image_id_media_id_fk",
+          "tableFrom": "podcast_episodes_blocks_how_to_steps",
+          "tableTo": "media",
+          "columnsFrom": [
+            "image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "podcast_episodes_blocks_how_to_steps_parent_id_fk": {
+          "name": "podcast_episodes_blocks_how_to_steps_parent_id_fk",
+          "tableFrom": "podcast_episodes_blocks_how_to_steps",
+          "tableTo": "podcast_episodes_blocks_how_to",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.podcast_episodes_blocks_how_to": {
+      "name": "podcast_episodes_blocks_how_to",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "total_time": {
+          "name": "total_time",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "podcast_episodes_blocks_how_to_order_idx": {
+          "name": "podcast_episodes_blocks_how_to_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_how_to_parent_id_idx": {
+          "name": "podcast_episodes_blocks_how_to_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_how_to_path_idx": {
+          "name": "podcast_episodes_blocks_how_to_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_episodes_blocks_how_to_parent_id_fk": {
+          "name": "podcast_episodes_blocks_how_to_parent_id_fk",
+          "tableFrom": "podcast_episodes_blocks_how_to",
+          "tableTo": "podcast_episodes",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.podcast_episodes_blocks_video_object": {
+      "name": "podcast_episodes_blocks_video_object",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "thumbnail_id": {
+          "name": "thumbnail_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "upload_date": {
+          "name": "upload_date",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content_url": {
+          "name": "content_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "embed_url": {
+          "name": "embed_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration": {
+          "name": "duration",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "podcast_episodes_blocks_video_object_order_idx": {
+          "name": "podcast_episodes_blocks_video_object_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_video_object_parent_id_idx": {
+          "name": "podcast_episodes_blocks_video_object_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_video_object_path_idx": {
+          "name": "podcast_episodes_blocks_video_object_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_video_object_thumbnail_idx": {
+          "name": "podcast_episodes_blocks_video_object_thumbnail_idx",
+          "columns": [
+            {
+              "expression": "thumbnail_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_episodes_blocks_video_object_thumbnail_id_media_id_fk": {
+          "name": "podcast_episodes_blocks_video_object_thumbnail_id_media_id_fk",
+          "tableFrom": "podcast_episodes_blocks_video_object",
+          "tableTo": "media",
+          "columnsFrom": [
+            "thumbnail_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "podcast_episodes_blocks_video_object_parent_id_fk": {
+          "name": "podcast_episodes_blocks_video_object_parent_id_fk",
+          "tableFrom": "podcast_episodes_blocks_video_object",
+          "tableTo": "podcast_episodes",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.podcast_episodes_blocks_faq_page_questions": {
+      "name": "podcast_episodes_blocks_faq_page_questions",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "question": {
+          "name": "question",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "answer": {
+          "name": "answer",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "podcast_episodes_blocks_faq_page_questions_order_idx": {
+          "name": "podcast_episodes_blocks_faq_page_questions_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_faq_page_questions_parent_id_idx": {
+          "name": "podcast_episodes_blocks_faq_page_questions_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_episodes_blocks_faq_page_questions_parent_id_fk": {
+          "name": "podcast_episodes_blocks_faq_page_questions_parent_id_fk",
+          "tableFrom": "podcast_episodes_blocks_faq_page_questions",
+          "tableTo": "podcast_episodes_blocks_faq_page",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.podcast_episodes_blocks_faq_page": {
+      "name": "podcast_episodes_blocks_faq_page",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "podcast_episodes_blocks_faq_page_order_idx": {
+          "name": "podcast_episodes_blocks_faq_page_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_faq_page_parent_id_idx": {
+          "name": "podcast_episodes_blocks_faq_page_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_faq_page_path_idx": {
+          "name": "podcast_episodes_blocks_faq_page_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_episodes_blocks_faq_page_parent_id_fk": {
+          "name": "podcast_episodes_blocks_faq_page_parent_id_fk",
+          "tableFrom": "podcast_episodes_blocks_faq_page",
+          "tableTo": "podcast_episodes",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.podcast_episodes_blocks_review": {
+      "name": "podcast_episodes_blocks_review",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "item_reviewed_type": {
+          "name": "item_reviewed_type",
+          "type": "enum_podcast_episodes_blocks_review_item_reviewed_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Product'"
+        },
+        "item_reviewed_name": {
+          "name": "item_reviewed_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rating_value": {
+          "name": "rating_value",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "review_body": {
+          "name": "review_body",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "author_name": {
+          "name": "author_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "podcast_episodes_blocks_review_order_idx": {
+          "name": "podcast_episodes_blocks_review_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_review_parent_id_idx": {
+          "name": "podcast_episodes_blocks_review_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_review_path_idx": {
+          "name": "podcast_episodes_blocks_review_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_episodes_blocks_review_parent_id_fk": {
+          "name": "podcast_episodes_blocks_review_parent_id_fk",
+          "tableFrom": "podcast_episodes_blocks_review",
+          "tableTo": "podcast_episodes",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.podcast_episodes_blocks_software_app": {
+      "name": "podcast_episodes_blocks_software_app",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category": {
+          "name": "category",
+          "type": "enum_podcast_episodes_blocks_software_app_category",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'BusinessApplication'"
+        },
+        "os": {
+          "name": "os",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price": {
+          "name": "price",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currency": {
+          "name": "currency",
+          "type": "enum_podcast_episodes_blocks_software_app_currency",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'USD'"
+        },
+        "rating_value": {
+          "name": "rating_value",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rating_count": {
+          "name": "rating_count",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "podcast_episodes_blocks_software_app_order_idx": {
+          "name": "podcast_episodes_blocks_software_app_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_software_app_parent_id_idx": {
+          "name": "podcast_episodes_blocks_software_app_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_software_app_path_idx": {
+          "name": "podcast_episodes_blocks_software_app_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_episodes_blocks_software_app_parent_id_fk": {
+          "name": "podcast_episodes_blocks_software_app_parent_id_fk",
+          "tableFrom": "podcast_episodes_blocks_software_app",
+          "tableTo": "podcast_episodes",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.podcast_episodes_blocks_breadcrumb_list_crumbs": {
+      "name": "podcast_episodes_blocks_breadcrumb_list_crumbs",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "path": {
+          "name": "path",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "podcast_episodes_blocks_breadcrumb_list_crumbs_order_idx": {
+          "name": "podcast_episodes_blocks_breadcrumb_list_crumbs_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_breadcrumb_list_crumbs_parent_id_idx": {
+          "name": "podcast_episodes_blocks_breadcrumb_list_crumbs_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_episodes_blocks_breadcrumb_list_crumbs_parent_id_fk": {
+          "name": "podcast_episodes_blocks_breadcrumb_list_crumbs_parent_id_fk",
+          "tableFrom": "podcast_episodes_blocks_breadcrumb_list_crumbs",
+          "tableTo": "podcast_episodes_blocks_breadcrumb_list",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.podcast_episodes_blocks_breadcrumb_list": {
+      "name": "podcast_episodes_blocks_breadcrumb_list",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "mode": {
+          "name": "mode",
+          "type": "enum_podcast_episodes_blocks_breadcrumb_list_mode",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'suppress'"
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "podcast_episodes_blocks_breadcrumb_list_order_idx": {
+          "name": "podcast_episodes_blocks_breadcrumb_list_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_breadcrumb_list_parent_id_idx": {
+          "name": "podcast_episodes_blocks_breadcrumb_list_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_blocks_breadcrumb_list_path_idx": {
+          "name": "podcast_episodes_blocks_breadcrumb_list_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_episodes_blocks_breadcrumb_list_parent_id_fk": {
+          "name": "podcast_episodes_blocks_breadcrumb_list_parent_id_fk",
+          "tableFrom": "podcast_episodes_blocks_breadcrumb_list",
+          "tableTo": "podcast_episodes",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.podcast_episodes_seo_speakable_path": {
+      "name": "podcast_episodes_seo_speakable_path",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "selector": {
+          "name": "selector",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "podcast_episodes_seo_speakable_path_order_idx": {
+          "name": "podcast_episodes_seo_speakable_path_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_seo_speakable_path_parent_id_idx": {
+          "name": "podcast_episodes_seo_speakable_path_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "podcast_episodes_seo_speakable_path_parent_id_fk": {
+          "name": "podcast_episodes_seo_speakable_path_parent_id_fk",
+          "tableFrom": "podcast_episodes_seo_speakable_path",
+          "tableTo": "podcast_episodes",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.podcast_episodes": {
       "name": "podcast_episodes",
       "schema": "",
@@ -38263,6 +39615,180 @@
           "primaryKey": false,
           "notNull": false
         },
+        "seo_title": {
+          "name": "seo_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_description": {
+          "name": "seo_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_indexable": {
+          "name": "seo_indexable",
+          "type": "enum_podcast_episodes_seo_indexable",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'index'"
+        },
+        "seo_og_image_id": {
+          "name": "seo_og_image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_og_image_alt": {
+          "name": "seo_og_image_alt",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_use_advanced_og": {
+          "name": "seo_use_advanced_og",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "seo_og_title": {
+          "name": "seo_og_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_og_description": {
+          "name": "seo_og_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_use_advanced_twitter": {
+          "name": "seo_use_advanced_twitter",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "seo_twitter_card": {
+          "name": "seo_twitter_card",
+          "type": "enum_podcast_episodes_seo_twitter_card",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'summary_large_image'"
+        },
+        "seo_twitter_title": {
+          "name": "seo_twitter_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_twitter_description": {
+          "name": "seo_twitter_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_twitter_image_id": {
+          "name": "seo_twitter_image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_use_custom_canonical": {
+          "name": "seo_use_custom_canonical",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "seo_canonical_override": {
+          "name": "seo_canonical_override",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_robots_advanced_noarchive": {
+          "name": "seo_robots_advanced_noarchive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "seo_robots_advanced_nosnippet": {
+          "name": "seo_robots_advanced_nosnippet",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "seo_robots_advanced_noimageindex": {
+          "name": "seo_robots_advanced_noimageindex",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "seo_robots_advanced_notranslate": {
+          "name": "seo_robots_advanced_notranslate",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "seo_robots_advanced_max_snippet": {
+          "name": "seo_robots_advanced_max_snippet",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_robots_advanced_max_image_preview": {
+          "name": "seo_robots_advanced_max_image_preview",
+          "type": "enum_seo_max_image_preview",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_robots_advanced_max_video_preview": {
+          "name": "seo_robots_advanced_max_video_preview",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_robots_advanced_unavailable_after": {
+          "name": "seo_robots_advanced_unavailable_after",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_alternates": {
+          "name": "seo_alternates",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_custom_tags": {
+          "name": "seo_custom_tags",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_keyword_target": {
+          "name": "seo_keyword_target",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_additional_schema": {
+          "name": "seo_additional_schema",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp(3) with time zone",
@@ -38332,6 +39858,36 @@
           "method": "btree",
           "with": {}
         },
+        "podcast_episodes_seo_seo_og_image_idx": {
+          "name": "podcast_episodes_seo_seo_og_image_idx",
+          "columns": [
+            {
+              "expression": "seo_og_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "podcast_episodes_seo_seo_twitter_image_idx": {
+          "name": "podcast_episodes_seo_seo_twitter_image_idx",
+          "columns": [
+            {
+              "expression": "seo_twitter_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "podcast_episodes_updated_at_idx": {
           "name": "podcast_episodes_updated_at_idx",
           "columns": [
@@ -38390,6 +39946,1264 @@
             "id"
           ],
           "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "podcast_episodes_seo_og_image_id_media_id_fk": {
+          "name": "podcast_episodes_seo_og_image_id_media_id_fk",
+          "tableFrom": "podcast_episodes",
+          "tableTo": "media",
+          "columnsFrom": [
+            "seo_og_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "podcast_episodes_seo_twitter_image_id_media_id_fk": {
+          "name": "podcast_episodes_seo_twitter_image_id_media_id_fk",
+          "tableFrom": "podcast_episodes",
+          "tableTo": "media",
+          "columnsFrom": [
+            "seo_twitter_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_episodes_v_blocks_how_to_steps": {
+      "name": "_podcast_episodes_v_blocks_how_to_steps",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "text": {
+          "name": "text",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_id": {
+          "name": "image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_episodes_v_blocks_how_to_steps_order_idx": {
+          "name": "_podcast_episodes_v_blocks_how_to_steps_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_how_to_steps_parent_id_idx": {
+          "name": "_podcast_episodes_v_blocks_how_to_steps_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_how_to_steps_image_idx": {
+          "name": "_podcast_episodes_v_blocks_how_to_steps_image_idx",
+          "columns": [
+            {
+              "expression": "image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_episodes_v_blocks_how_to_steps_image_id_media_id_fk": {
+          "name": "_podcast_episodes_v_blocks_how_to_steps_image_id_media_id_fk",
+          "tableFrom": "_podcast_episodes_v_blocks_how_to_steps",
+          "tableTo": "media",
+          "columnsFrom": [
+            "image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_podcast_episodes_v_blocks_how_to_steps_parent_id_fk": {
+          "name": "_podcast_episodes_v_blocks_how_to_steps_parent_id_fk",
+          "tableFrom": "_podcast_episodes_v_blocks_how_to_steps",
+          "tableTo": "_podcast_episodes_v_blocks_how_to",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_episodes_v_blocks_how_to": {
+      "name": "_podcast_episodes_v_blocks_how_to",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "total_time": {
+          "name": "total_time",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_episodes_v_blocks_how_to_order_idx": {
+          "name": "_podcast_episodes_v_blocks_how_to_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_how_to_parent_id_idx": {
+          "name": "_podcast_episodes_v_blocks_how_to_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_how_to_path_idx": {
+          "name": "_podcast_episodes_v_blocks_how_to_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_episodes_v_blocks_how_to_parent_id_fk": {
+          "name": "_podcast_episodes_v_blocks_how_to_parent_id_fk",
+          "tableFrom": "_podcast_episodes_v_blocks_how_to",
+          "tableTo": "_podcast_episodes_v",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_episodes_v_blocks_video_object": {
+      "name": "_podcast_episodes_v_blocks_video_object",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "thumbnail_id": {
+          "name": "thumbnail_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "upload_date": {
+          "name": "upload_date",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content_url": {
+          "name": "content_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "embed_url": {
+          "name": "embed_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration": {
+          "name": "duration",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_episodes_v_blocks_video_object_order_idx": {
+          "name": "_podcast_episodes_v_blocks_video_object_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_video_object_parent_id_idx": {
+          "name": "_podcast_episodes_v_blocks_video_object_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_video_object_path_idx": {
+          "name": "_podcast_episodes_v_blocks_video_object_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_video_object_thumbnail_idx": {
+          "name": "_podcast_episodes_v_blocks_video_object_thumbnail_idx",
+          "columns": [
+            {
+              "expression": "thumbnail_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_episodes_v_blocks_video_object_thumbnail_id_media_id_fk": {
+          "name": "_podcast_episodes_v_blocks_video_object_thumbnail_id_media_id_fk",
+          "tableFrom": "_podcast_episodes_v_blocks_video_object",
+          "tableTo": "media",
+          "columnsFrom": [
+            "thumbnail_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_podcast_episodes_v_blocks_video_object_parent_id_fk": {
+          "name": "_podcast_episodes_v_blocks_video_object_parent_id_fk",
+          "tableFrom": "_podcast_episodes_v_blocks_video_object",
+          "tableTo": "_podcast_episodes_v",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_episodes_v_blocks_faq_page_questions": {
+      "name": "_podcast_episodes_v_blocks_faq_page_questions",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "question": {
+          "name": "question",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "answer": {
+          "name": "answer",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_episodes_v_blocks_faq_page_questions_order_idx": {
+          "name": "_podcast_episodes_v_blocks_faq_page_questions_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_faq_page_questions_parent_id_idx": {
+          "name": "_podcast_episodes_v_blocks_faq_page_questions_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_episodes_v_blocks_faq_page_questions_parent_id_fk": {
+          "name": "_podcast_episodes_v_blocks_faq_page_questions_parent_id_fk",
+          "tableFrom": "_podcast_episodes_v_blocks_faq_page_questions",
+          "tableTo": "_podcast_episodes_v_blocks_faq_page",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_episodes_v_blocks_faq_page": {
+      "name": "_podcast_episodes_v_blocks_faq_page",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_episodes_v_blocks_faq_page_order_idx": {
+          "name": "_podcast_episodes_v_blocks_faq_page_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_faq_page_parent_id_idx": {
+          "name": "_podcast_episodes_v_blocks_faq_page_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_faq_page_path_idx": {
+          "name": "_podcast_episodes_v_blocks_faq_page_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_episodes_v_blocks_faq_page_parent_id_fk": {
+          "name": "_podcast_episodes_v_blocks_faq_page_parent_id_fk",
+          "tableFrom": "_podcast_episodes_v_blocks_faq_page",
+          "tableTo": "_podcast_episodes_v",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_episodes_v_blocks_review": {
+      "name": "_podcast_episodes_v_blocks_review",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "item_reviewed_type": {
+          "name": "item_reviewed_type",
+          "type": "enum__podcast_episodes_v_blocks_review_item_reviewed_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Product'"
+        },
+        "item_reviewed_name": {
+          "name": "item_reviewed_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rating_value": {
+          "name": "rating_value",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "review_body": {
+          "name": "review_body",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "author_name": {
+          "name": "author_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_episodes_v_blocks_review_order_idx": {
+          "name": "_podcast_episodes_v_blocks_review_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_review_parent_id_idx": {
+          "name": "_podcast_episodes_v_blocks_review_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_review_path_idx": {
+          "name": "_podcast_episodes_v_blocks_review_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_episodes_v_blocks_review_parent_id_fk": {
+          "name": "_podcast_episodes_v_blocks_review_parent_id_fk",
+          "tableFrom": "_podcast_episodes_v_blocks_review",
+          "tableTo": "_podcast_episodes_v",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_episodes_v_blocks_software_app": {
+      "name": "_podcast_episodes_v_blocks_software_app",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category": {
+          "name": "category",
+          "type": "enum__podcast_episodes_v_blocks_software_app_category",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'BusinessApplication'"
+        },
+        "os": {
+          "name": "os",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price": {
+          "name": "price",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currency": {
+          "name": "currency",
+          "type": "enum__podcast_episodes_v_blocks_software_app_currency",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'USD'"
+        },
+        "rating_value": {
+          "name": "rating_value",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rating_count": {
+          "name": "rating_count",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_episodes_v_blocks_software_app_order_idx": {
+          "name": "_podcast_episodes_v_blocks_software_app_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_software_app_parent_id_idx": {
+          "name": "_podcast_episodes_v_blocks_software_app_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_software_app_path_idx": {
+          "name": "_podcast_episodes_v_blocks_software_app_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_episodes_v_blocks_software_app_parent_id_fk": {
+          "name": "_podcast_episodes_v_blocks_software_app_parent_id_fk",
+          "tableFrom": "_podcast_episodes_v_blocks_software_app",
+          "tableTo": "_podcast_episodes_v",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_episodes_v_blocks_breadcrumb_list_crumbs": {
+      "name": "_podcast_episodes_v_blocks_breadcrumb_list_crumbs",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "path": {
+          "name": "path",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_episodes_v_blocks_breadcrumb_list_crumbs_order_idx": {
+          "name": "_podcast_episodes_v_blocks_breadcrumb_list_crumbs_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_breadcrumb_list_crumbs_parent_id_idx": {
+          "name": "_podcast_episodes_v_blocks_breadcrumb_list_crumbs_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_episodes_v_blocks_breadcrumb_list_crumbs_parent_id_fk": {
+          "name": "_podcast_episodes_v_blocks_breadcrumb_list_crumbs_parent_id_fk",
+          "tableFrom": "_podcast_episodes_v_blocks_breadcrumb_list_crumbs",
+          "tableTo": "_podcast_episodes_v_blocks_breadcrumb_list",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_episodes_v_blocks_breadcrumb_list": {
+      "name": "_podcast_episodes_v_blocks_breadcrumb_list",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_path": {
+          "name": "_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "mode": {
+          "name": "mode",
+          "type": "enum__podcast_episodes_v_blocks_breadcrumb_list_mode",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'suppress'"
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "block_name": {
+          "name": "block_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_episodes_v_blocks_breadcrumb_list_order_idx": {
+          "name": "_podcast_episodes_v_blocks_breadcrumb_list_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_breadcrumb_list_parent_id_idx": {
+          "name": "_podcast_episodes_v_blocks_breadcrumb_list_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_blocks_breadcrumb_list_path_idx": {
+          "name": "_podcast_episodes_v_blocks_breadcrumb_list_path_idx",
+          "columns": [
+            {
+              "expression": "_path",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_episodes_v_blocks_breadcrumb_list_parent_id_fk": {
+          "name": "_podcast_episodes_v_blocks_breadcrumb_list_parent_id_fk",
+          "tableFrom": "_podcast_episodes_v_blocks_breadcrumb_list",
+          "tableTo": "_podcast_episodes_v",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._podcast_episodes_v_version_seo_speakable_path": {
+      "name": "_podcast_episodes_v_version_seo_speakable_path",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "selector": {
+          "name": "selector",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "_uuid": {
+          "name": "_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_podcast_episodes_v_version_seo_speakable_path_order_idx": {
+          "name": "_podcast_episodes_v_version_seo_speakable_path_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_version_seo_speakable_path_parent_id_idx": {
+          "name": "_podcast_episodes_v_version_seo_speakable_path_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_podcast_episodes_v_version_seo_speakable_path_parent_id_fk": {
+          "name": "_podcast_episodes_v_version_seo_speakable_path_parent_id_fk",
+          "tableFrom": "_podcast_episodes_v_version_seo_speakable_path",
+          "tableTo": "_podcast_episodes_v",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -38488,6 +41302,180 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version_seo_title": {
+          "name": "version_seo_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_description": {
+          "name": "version_seo_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_indexable": {
+          "name": "version_seo_indexable",
+          "type": "enum__podcast_episodes_v_version_seo_indexable",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'index'"
+        },
+        "version_seo_og_image_id": {
+          "name": "version_seo_og_image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_og_image_alt": {
+          "name": "version_seo_og_image_alt",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_use_advanced_og": {
+          "name": "version_seo_use_advanced_og",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "version_seo_og_title": {
+          "name": "version_seo_og_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_og_description": {
+          "name": "version_seo_og_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_use_advanced_twitter": {
+          "name": "version_seo_use_advanced_twitter",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "version_seo_twitter_card": {
+          "name": "version_seo_twitter_card",
+          "type": "enum__podcast_episodes_v_version_seo_twitter_card",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'summary_large_image'"
+        },
+        "version_seo_twitter_title": {
+          "name": "version_seo_twitter_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_twitter_description": {
+          "name": "version_seo_twitter_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_twitter_image_id": {
+          "name": "version_seo_twitter_image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_use_custom_canonical": {
+          "name": "version_seo_use_custom_canonical",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "version_seo_canonical_override": {
+          "name": "version_seo_canonical_override",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_robots_advanced_noarchive": {
+          "name": "version_seo_robots_advanced_noarchive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "version_seo_robots_advanced_nosnippet": {
+          "name": "version_seo_robots_advanced_nosnippet",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "version_seo_robots_advanced_noimageindex": {
+          "name": "version_seo_robots_advanced_noimageindex",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "version_seo_robots_advanced_notranslate": {
+          "name": "version_seo_robots_advanced_notranslate",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "version_seo_robots_advanced_max_snippet": {
+          "name": "version_seo_robots_advanced_max_snippet",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_robots_advanced_max_image_preview": {
+          "name": "version_seo_robots_advanced_max_image_preview",
+          "type": "enum_seo_max_image_preview",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_robots_advanced_max_video_preview": {
+          "name": "version_seo_robots_advanced_max_video_preview",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_robots_advanced_unavailable_after": {
+          "name": "version_seo_robots_advanced_unavailable_after",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_alternates": {
+          "name": "version_seo_alternates",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_custom_tags": {
+          "name": "version_seo_custom_tags",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_keyword_target": {
+          "name": "version_seo_keyword_target",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_seo_additional_schema": {
+          "name": "version_seo_additional_schema",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
         "version_updated_at": {
           "name": "version_updated_at",
           "type": "timestamp(3) with time zone",
@@ -38580,6 +41568,36 @@
           "columns": [
             {
               "expression": "version_display_published_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_version_seo_version_seo_og_image_idx": {
+          "name": "_podcast_episodes_v_version_seo_version_seo_og_image_idx",
+          "columns": [
+            {
+              "expression": "version_seo_og_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_podcast_episodes_v_version_seo_version_seo_twitter_imag_idx": {
+          "name": "_podcast_episodes_v_version_seo_version_seo_twitter_imag_idx",
+          "columns": [
+            {
+              "expression": "version_seo_twitter_image_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -38701,6 +41719,32 @@
           "tableTo": "media",
           "columnsFrom": [
             "version_thumbnail_override_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_podcast_episodes_v_version_seo_og_image_id_media_id_fk": {
+          "name": "_podcast_episodes_v_version_seo_og_image_id_media_id_fk",
+          "tableFrom": "_podcast_episodes_v",
+          "tableTo": "media",
+          "columnsFrom": [
+            "version_seo_og_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_podcast_episodes_v_version_seo_twitter_image_id_media_id_fk": {
+          "name": "_podcast_episodes_v_version_seo_twitter_image_id_media_id_fk",
+          "tableFrom": "_podcast_episodes_v",
+          "tableTo": "media",
+          "columnsFrom": [
+            "version_seo_twitter_image_id"
           ],
           "columnsTo": [
             "id"
@@ -39971,6 +43015,12 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'USD'"
+        },
+        "abstract": {
+          "name": "abstract",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         },
         "body": {
           "name": "body",
@@ -41847,6 +44897,12 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'USD'"
+        },
+        "version_abstract": {
+          "name": "version_abstract",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         },
         "version_body": {
           "name": "version_body",
@@ -48293,6 +51349,12 @@
         },
         "path": {
           "name": "path",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "abstract": {
+          "name": "abstract",
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
@@ -54852,6 +57914,12 @@
         },
         "version_path": {
           "name": "version_path",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_abstract": {
+          "name": "version_abstract",
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
@@ -62373,6 +65441,200 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.resources_spotlight": {
+      "name": "resources_spotlight",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "image_id": {
+          "name": "image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "headline": {
+          "name": "headline",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sub": {
+          "name": "sub",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cta_label": {
+          "name": "cta_label",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cta_href": {
+          "name": "cta_href",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "resources_spotlight_image_idx": {
+          "name": "resources_spotlight_image_idx",
+          "columns": [
+            {
+              "expression": "image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "resources_spotlight_image_id_media_id_fk": {
+          "name": "resources_spotlight_image_id_media_id_fk",
+          "tableFrom": "resources_spotlight",
+          "tableTo": "media",
+          "columnsFrom": [
+            "image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.company_spotlight": {
+      "name": "company_spotlight",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "image_id": {
+          "name": "image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "headline": {
+          "name": "headline",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sub": {
+          "name": "sub",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cta_label": {
+          "name": "cta_label",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cta_href": {
+          "name": "cta_href",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "company_spotlight_image_idx": {
+          "name": "company_spotlight_image_idx",
+          "columns": [
+            {
+              "expression": "image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "company_spotlight_image_id_media_id_fk": {
+          "name": "company_spotlight_image_id_media_id_fk",
+          "tableFrom": "company_spotlight",
+          "tableTo": "media",
+          "columnsFrom": [
+            "image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.payload_jobs_stats": {
       "name": "payload_jobs_stats",
       "schema": "",
@@ -63292,6 +66554,15 @@
         "replace"
       ]
     },
+    "public.enum_guides_toc_depth": {
+      "name": "enum_guides_toc_depth",
+      "schema": "public",
+      "values": [
+        "h2",
+        "h2_h3",
+        "h2_h3_h4"
+      ]
+    },
     "public.enum_guides_seo_indexable": {
       "name": "enum_guides_seo_indexable",
       "schema": "public",
@@ -63353,6 +66624,15 @@
       "values": [
         "suppress",
         "replace"
+      ]
+    },
+    "public.enum__guides_v_version_toc_depth": {
+      "name": "enum__guides_v_version_toc_depth",
+      "schema": "public",
+      "values": [
+        "h2",
+        "h2_h3",
+        "h2_h3_h4"
       ]
     },
     "public.enum__guides_v_version_seo_indexable": {
@@ -63584,6 +66864,15 @@
         "replace"
       ]
     },
+    "public.enum_knowledge_base_toc_depth": {
+      "name": "enum_knowledge_base_toc_depth",
+      "schema": "public",
+      "values": [
+        "h2",
+        "h2_h3",
+        "h2_h3_h4"
+      ]
+    },
     "public.enum_knowledge_base_seo_indexable": {
       "name": "enum_knowledge_base_seo_indexable",
       "schema": "public",
@@ -63645,6 +66934,15 @@
       "values": [
         "suppress",
         "replace"
+      ]
+    },
+    "public.enum__knowledge_base_v_version_toc_depth": {
+      "name": "enum__knowledge_base_v_version_toc_depth",
+      "schema": "public",
+      "values": [
+        "h2",
+        "h2_h3",
+        "h2_h3_h4"
       ]
     },
     "public.enum__knowledge_base_v_version_seo_indexable": {
@@ -64032,12 +67330,122 @@
         "published"
       ]
     },
+    "public.enum_podcast_episodes_blocks_review_item_reviewed_type": {
+      "name": "enum_podcast_episodes_blocks_review_item_reviewed_type",
+      "schema": "public",
+      "values": [
+        "Product",
+        "Service",
+        "SoftwareApplication",
+        "Organization"
+      ]
+    },
+    "public.enum_podcast_episodes_blocks_software_app_category": {
+      "name": "enum_podcast_episodes_blocks_software_app_category",
+      "schema": "public",
+      "values": [
+        "BusinessApplication",
+        "DeveloperApplication",
+        "SecurityApplication",
+        "CommunicationApplication"
+      ]
+    },
+    "public.enum_podcast_episodes_blocks_software_app_currency": {
+      "name": "enum_podcast_episodes_blocks_software_app_currency",
+      "schema": "public",
+      "values": [
+        "USD",
+        "EUR",
+        "GBP",
+        "INR"
+      ]
+    },
+    "public.enum_podcast_episodes_blocks_breadcrumb_list_mode": {
+      "name": "enum_podcast_episodes_blocks_breadcrumb_list_mode",
+      "schema": "public",
+      "values": [
+        "suppress",
+        "replace"
+      ]
+    },
+    "public.enum_podcast_episodes_seo_indexable": {
+      "name": "enum_podcast_episodes_seo_indexable",
+      "schema": "public",
+      "values": [
+        "index",
+        "noindex",
+        "noindex,nofollow"
+      ]
+    },
+    "public.enum_podcast_episodes_seo_twitter_card": {
+      "name": "enum_podcast_episodes_seo_twitter_card",
+      "schema": "public",
+      "values": [
+        "summary",
+        "summary_large_image"
+      ]
+    },
     "public.enum_podcast_episodes_status": {
       "name": "enum_podcast_episodes_status",
       "schema": "public",
       "values": [
         "draft",
         "published"
+      ]
+    },
+    "public.enum__podcast_episodes_v_blocks_review_item_reviewed_type": {
+      "name": "enum__podcast_episodes_v_blocks_review_item_reviewed_type",
+      "schema": "public",
+      "values": [
+        "Product",
+        "Service",
+        "SoftwareApplication",
+        "Organization"
+      ]
+    },
+    "public.enum__podcast_episodes_v_blocks_software_app_category": {
+      "name": "enum__podcast_episodes_v_blocks_software_app_category",
+      "schema": "public",
+      "values": [
+        "BusinessApplication",
+        "DeveloperApplication",
+        "SecurityApplication",
+        "CommunicationApplication"
+      ]
+    },
+    "public.enum__podcast_episodes_v_blocks_software_app_currency": {
+      "name": "enum__podcast_episodes_v_blocks_software_app_currency",
+      "schema": "public",
+      "values": [
+        "USD",
+        "EUR",
+        "GBP",
+        "INR"
+      ]
+    },
+    "public.enum__podcast_episodes_v_blocks_breadcrumb_list_mode": {
+      "name": "enum__podcast_episodes_v_blocks_breadcrumb_list_mode",
+      "schema": "public",
+      "values": [
+        "suppress",
+        "replace"
+      ]
+    },
+    "public.enum__podcast_episodes_v_version_seo_indexable": {
+      "name": "enum__podcast_episodes_v_version_seo_indexable",
+      "schema": "public",
+      "values": [
+        "index",
+        "noindex",
+        "noindex,nofollow"
+      ]
+    },
+    "public.enum__podcast_episodes_v_version_seo_twitter_card": {
+      "name": "enum__podcast_episodes_v_version_seo_twitter_card",
+      "schema": "public",
+      "values": [
+        "summary",
+        "summary_large_image"
       ]
     },
     "public.enum__podcast_episodes_v_version_status": {
@@ -65291,6 +68699,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "e7a5b0a0-14ed-4917-bd1a-bc97ae6bdb88",
+  "id": "8abfb443-5619-4f2c-bf23-e23c3bdd3594",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

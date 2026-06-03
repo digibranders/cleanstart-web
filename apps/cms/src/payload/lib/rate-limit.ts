@@ -15,15 +15,14 @@
  *     evicting the oldest 10% of keys when exceeded.
  *
  * Multi-instance guard: this module fail-fast throws at import time when
- * RATE_LIMIT_BACKEND is unset/`memory` and WEB_CONCURRENCY > 1. The
- * in-memory Map silently shards the rate-limit window across workers
- * otherwise — an attacker capped at 5/min would effectively get 5 ×
- * worker-count. The guard makes the operator make a conscious choice
- * before scaling out. Selecting `redis` or `postgres` quiets the guard
- * but does NOT yet swap the backend; the actual swap is its own ticket.
+ * WEB_CONCURRENCY > 1 and the backend is still `memory`. Setting
+ * RATE_LIMIT_BACKEND=redis or =postgres is intentionally rejected until
+ * those backends are implemented — silently accepting unimplemented values
+ * would let the guard be bypassed by an operator who sets the env var
+ * without realising the store never actually swaps.
  */
 
-export type RateLimitBackend = 'memory' | 'redis' | 'postgres';
+export type RateLimitBackend = 'memory';
 
 export type RateLimitBootConfig = {
   backend: string | undefined;
@@ -41,29 +40,34 @@ export class RateLimitMisconfigured extends Error {
  * Validates the rate-limiter env at boot. Exported separately so tests
  * can exercise the matrix without triggering the module-load throw.
  *
- * Acceptable single-process configs (no throw):
+ * Acceptable configs (no throw):
  *   - WEB_CONCURRENCY === '1' (or unset, which we read as '1')
- * Acceptable multi-process configs:
- *   - RATE_LIMIT_BACKEND === 'redis' | 'postgres' (regardless of concurrency)
- * Everything else throws.
+ * Everything else throws — including RATE_LIMIT_BACKEND=redis|postgres,
+ * which are not yet implemented and must not silently bypass the guard.
  */
 export const validateRateLimitBootConfig = (config: RateLimitBootConfig): void => {
   const backendRaw = config.backend?.trim().toLowerCase();
-  const backend: RateLimitBackend =
-    backendRaw === 'redis' || backendRaw === 'postgres' ? backendRaw : 'memory';
-  if (backend === 'redis' || backend === 'postgres') return;
+  if (backendRaw === 'redis' || backendRaw === 'postgres') {
+    // Reject explicitly unimplemented backends. Setting one of these values
+    // would silently bypass the multi-worker guard while the store remains
+    // the in-memory Map — an operator would get sharded limits without
+    // realising it. Throw here so the misconfiguration is immediately visible.
+    throw new RateLimitMisconfigured(
+      `RATE_LIMIT_BACKEND=${backendRaw} is not yet implemented. The store is still in-memory. Set WEB_CONCURRENCY=1 until a distributed backend is wired.`,
+    );
+  }
 
   const concurrencyRaw = config.concurrency?.trim();
   // Default to 1 when unset — local dev runs a single process.
   const concurrency = concurrencyRaw == null || concurrencyRaw === '' ? 1 : Number.parseInt(concurrencyRaw, 10);
   if (!Number.isFinite(concurrency) || concurrency < 1) {
     throw new RateLimitMisconfigured(
-      `Invalid WEB_CONCURRENCY=${concurrencyRaw ?? '(unset)'}. Set WEB_CONCURRENCY=1 (single worker) or set RATE_LIMIT_BACKEND=redis|postgres for multi-worker deploys.`,
+      `Invalid WEB_CONCURRENCY=${concurrencyRaw ?? '(unset)'}. Set WEB_CONCURRENCY=1 for a single-worker deploy.`,
     );
   }
   if (concurrency > 1) {
     throw new RateLimitMisconfigured(
-      `RATE_LIMIT_BACKEND=memory is not safe with WEB_CONCURRENCY=${concurrency}. The in-memory limiter shards across workers and an attacker capped at 5/min effectively gets 5×${concurrency}. Set RATE_LIMIT_BACKEND=redis|postgres or WEB_CONCURRENCY=1.`,
+      `RATE_LIMIT_BACKEND=memory is not safe with WEB_CONCURRENCY=${concurrency}. The in-memory limiter shards across workers and an attacker capped at 5/min effectively gets 5×${concurrency}. Set WEB_CONCURRENCY=1.`,
     );
   }
 };

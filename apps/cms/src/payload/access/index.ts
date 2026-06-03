@@ -1,8 +1,8 @@
 import type { Access, FieldAccess } from 'payload';
 
-import { hasAnyRole, hasRole } from './typed-user';
+import { hasAnyRole, hasRole, userId } from './typed-user';
 
-export { hasAnyRole, hasRole, userRoles } from './typed-user';
+export { hasAnyRole, hasRole, userId, userRoles } from './typed-user';
 export type { Role } from './typed-user';
 
 export const isAuthenticated: Access = ({ req: { user } }) => Boolean(user);
@@ -17,5 +17,7 @@ export const isAdminOrEditor: Access = ({ req: { user } }) =>
 export const isAdminOrSelf: Access = ({ req: { user } }) => {
   if (!user) return false;
   if (hasRole(user, 'admin')) return true;
-  return { id: { equals: (user as { id: string | number }).id } };
+  const id = userId(user);
+  if (id == null) return false;
+  return { id: { equals: id } };
 };

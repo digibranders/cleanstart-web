@@ -2,11 +2,9 @@ import type { PodcastEpisode } from "@/lib/podcast";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { PodcastEpisodeCard } from "./_components/PodcastEpisodeCard";
 
-// Exact Figma background (node 373:3284): #151021 → #131e8f @ 62.5% → #471ec0
 const FEATURED_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #131e8f 62.5%, #471ec0 100%)";
 
-// Exact Figma highlight gradient on "Content" text (node 373:3285)
 const HIGHLIGHT_GRADIENT =
   "linear-gradient(105.128deg, rgb(154, 81, 255) 1.7578%, rgb(44, 193, 235) 98.781%)";
 

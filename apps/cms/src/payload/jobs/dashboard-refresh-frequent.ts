@@ -17,6 +17,7 @@ import { refreshAllGa4 } from '../lib/integrations/kinds/ga4-data-api';
 export const dashboardRefreshFrequentTask: TaskConfig<'dashboardRefreshFrequent'> = {
   slug: 'dashboardRefreshFrequent',
   retries: 0,
+  schedule: [{ cron: '*/15 * * * *', queue: 'dashboardRefreshFrequent' }],
   handler: async ({ req }) => {
     const [ga4, cfwa] = await Promise.all([
       refreshAllGa4(req.payload),

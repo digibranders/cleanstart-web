@@ -97,6 +97,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_guides_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
   CREATE TYPE "public"."enum_guides_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum_guides_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
+  CREATE TYPE "public"."enum_guides_toc_depth" AS ENUM('h2', 'h2_h3', 'h2_h3_h4');
   CREATE TYPE "public"."enum_guides_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum_guides_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum_guides_status" AS ENUM('draft', 'published');
@@ -104,6 +105,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__guides_v_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
   CREATE TYPE "public"."enum__guides_v_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum__guides_v_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
+  CREATE TYPE "public"."enum__guides_v_version_toc_depth" AS ENUM('h2', 'h2_h3', 'h2_h3_h4');
   CREATE TYPE "public"."enum__guides_v_version_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum__guides_v_version_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum__guides_v_version_status" AS ENUM('draft', 'published');
@@ -129,6 +131,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_knowledge_base_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
   CREATE TYPE "public"."enum_knowledge_base_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum_knowledge_base_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
+  CREATE TYPE "public"."enum_knowledge_base_toc_depth" AS ENUM('h2', 'h2_h3', 'h2_h3_h4');
   CREATE TYPE "public"."enum_knowledge_base_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum_knowledge_base_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum_knowledge_base_status" AS ENUM('draft', 'published');
@@ -136,6 +139,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__knowledge_base_v_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
   CREATE TYPE "public"."enum__knowledge_base_v_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
   CREATE TYPE "public"."enum__knowledge_base_v_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
+  CREATE TYPE "public"."enum__knowledge_base_v_version_toc_depth" AS ENUM('h2', 'h2_h3', 'h2_h3_h4');
   CREATE TYPE "public"."enum__knowledge_base_v_version_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum__knowledge_base_v_version_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum__knowledge_base_v_version_status" AS ENUM('draft', 'published');
@@ -179,7 +183,19 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__webinars_v_version_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
   CREATE TYPE "public"."enum__webinars_v_version_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum__webinars_v_version_status" AS ENUM('draft', 'published');
+  CREATE TYPE "public"."enum_podcast_episodes_blocks_review_item_reviewed_type" AS ENUM('Product', 'Service', 'SoftwareApplication', 'Organization');
+  CREATE TYPE "public"."enum_podcast_episodes_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
+  CREATE TYPE "public"."enum_podcast_episodes_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
+  CREATE TYPE "public"."enum_podcast_episodes_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
+  CREATE TYPE "public"."enum_podcast_episodes_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
+  CREATE TYPE "public"."enum_podcast_episodes_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum_podcast_episodes_status" AS ENUM('draft', 'published');
+  CREATE TYPE "public"."enum__podcast_episodes_v_blocks_review_item_reviewed_type" AS ENUM('Product', 'Service', 'SoftwareApplication', 'Organization');
+  CREATE TYPE "public"."enum__podcast_episodes_v_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
+  CREATE TYPE "public"."enum__podcast_episodes_v_blocks_software_app_currency" AS ENUM('USD', 'EUR', 'GBP', 'INR');
+  CREATE TYPE "public"."enum__podcast_episodes_v_blocks_breadcrumb_list_mode" AS ENUM('suppress', 'replace');
+  CREATE TYPE "public"."enum__podcast_episodes_v_version_seo_indexable" AS ENUM('index', 'noindex', 'noindex,nofollow');
+  CREATE TYPE "public"."enum__podcast_episodes_v_version_seo_twitter_card" AS ENUM('summary', 'summary_large_image');
   CREATE TYPE "public"."enum__podcast_episodes_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_jobs_blocks_review_item_reviewed_type" AS ENUM('Product', 'Service', 'SoftwareApplication', 'Organization');
   CREATE TYPE "public"."enum_jobs_blocks_software_app_category" AS ENUM('BusinessApplication', 'DeveloperApplication', 'SecurityApplication', 'CommunicationApplication');
@@ -1365,6 +1381,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"reviewed_by_id" integer,
   	"last_reviewed_at" timestamp(3) with time zone,
   	"categories_id" integer,
+  	"previous_post_id" integer,
+  	"next_post_id" integer,
   	"published_at" timestamp(3) with time zone,
   	"display_published_at" timestamp(3) with time zone,
   	"reading_minutes" numeric,
@@ -1556,6 +1574,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_reviewed_by_id" integer,
   	"version_last_reviewed_at" timestamp(3) with time zone,
   	"version_categories_id" integer,
+  	"version_previous_post_id" integer,
+  	"version_next_post_id" integer,
   	"version_published_at" timestamp(3) with time zone,
   	"version_display_published_at" timestamp(3) with time zone,
   	"version_reading_minutes" numeric,
@@ -2089,6 +2109,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar,
   	"slug" varchar,
+  	"abstract" varchar,
   	"hero_image_id" integer,
   	"body" jsonb,
   	"reviewed_by_id" integer,
@@ -2100,6 +2121,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"how_to_estimated_cost" varchar,
   	"published_at" timestamp(3) with time zone,
   	"display_published_at" timestamp(3) with time zone,
+  	"toc_depth" "enum_guides_toc_depth" DEFAULT 'h2',
   	"reading_minutes" numeric,
   	"word_count" numeric,
   	"seo_title" varchar,
@@ -2307,6 +2329,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"parent_id" integer,
   	"version_title" varchar,
   	"version_slug" varchar,
+  	"version_abstract" varchar,
   	"version_hero_image_id" integer,
   	"version_body" jsonb,
   	"version_reviewed_by_id" integer,
@@ -2318,6 +2341,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_how_to_estimated_cost" varchar,
   	"version_published_at" timestamp(3) with time zone,
   	"version_display_published_at" timestamp(3) with time zone,
+  	"version_toc_depth" "enum__guides_v_version_toc_depth" DEFAULT 'h2',
   	"version_reading_minutes" numeric,
   	"version_word_count" numeric,
   	"version_seo_title" varchar,
@@ -2810,6 +2834,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"last_reviewed_at" timestamp(3) with time zone,
   	"published_at" timestamp(3) with time zone,
   	"display_published_at" timestamp(3) with time zone,
+  	"toc_depth" "enum_knowledge_base_toc_depth" DEFAULT 'h2',
   	"reading_minutes" numeric,
   	"word_count" numeric,
   	"seo_title" varchar,
@@ -2997,6 +3022,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_last_reviewed_at" timestamp(3) with time zone,
   	"version_published_at" timestamp(3) with time zone,
   	"version_display_published_at" timestamp(3) with time zone,
+  	"version_toc_depth" "enum__knowledge_base_v_version_toc_depth" DEFAULT 'h2',
   	"version_reading_minutes" numeric,
   	"version_word_count" numeric,
   	"version_seo_title" varchar,
@@ -3757,6 +3783,109 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"authors_id" integer
   );
   
+  CREATE TABLE "podcast_episodes_blocks_how_to_steps" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" varchar NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"text" varchar,
+  	"image_id" integer
+  );
+  
+  CREATE TABLE "podcast_episodes_blocks_how_to" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"description" varchar,
+  	"total_time" varchar,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "podcast_episodes_blocks_video_object" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"description" varchar,
+  	"thumbnail_id" integer,
+  	"upload_date" timestamp(3) with time zone,
+  	"content_url" varchar,
+  	"embed_url" varchar,
+  	"duration" varchar,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "podcast_episodes_blocks_faq_page_questions" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" varchar NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"question" varchar,
+  	"answer" varchar
+  );
+  
+  CREATE TABLE "podcast_episodes_blocks_faq_page" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "podcast_episodes_blocks_review" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"item_reviewed_type" "enum_podcast_episodes_blocks_review_item_reviewed_type" DEFAULT 'Product',
+  	"item_reviewed_name" varchar,
+  	"rating_value" numeric,
+  	"review_body" varchar,
+  	"author_name" varchar,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "podcast_episodes_blocks_software_app" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"category" "enum_podcast_episodes_blocks_software_app_category" DEFAULT 'BusinessApplication',
+  	"os" varchar,
+  	"price" varchar,
+  	"currency" "enum_podcast_episodes_blocks_software_app_currency" DEFAULT 'USD',
+  	"rating_value" numeric,
+  	"rating_count" numeric,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "podcast_episodes_blocks_breadcrumb_list_crumbs" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" varchar NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"path" varchar
+  );
+  
+  CREATE TABLE "podcast_episodes_blocks_breadcrumb_list" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"mode" "enum_podcast_episodes_blocks_breadcrumb_list_mode" DEFAULT 'suppress',
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "podcast_episodes_seo_speakable_path" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"selector" varchar
+  );
+  
   CREATE TABLE "podcast_episodes" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar,
@@ -3771,9 +3900,149 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"publication_date" timestamp(3) with time zone,
   	"published_at" timestamp(3) with time zone,
   	"display_published_at" timestamp(3) with time zone,
+  	"seo_title" varchar,
+  	"seo_description" varchar,
+  	"seo_indexable" "enum_podcast_episodes_seo_indexable" DEFAULT 'index',
+  	"seo_og_image_id" integer,
+  	"seo_og_image_alt" varchar,
+  	"seo_use_advanced_og" boolean DEFAULT false,
+  	"seo_og_title" varchar,
+  	"seo_og_description" varchar,
+  	"seo_use_advanced_twitter" boolean DEFAULT false,
+  	"seo_twitter_card" "enum_podcast_episodes_seo_twitter_card" DEFAULT 'summary_large_image',
+  	"seo_twitter_title" varchar,
+  	"seo_twitter_description" varchar,
+  	"seo_twitter_image_id" integer,
+  	"seo_use_custom_canonical" boolean DEFAULT false,
+  	"seo_canonical_override" varchar,
+  	"seo_robots_advanced_noarchive" boolean DEFAULT false,
+  	"seo_robots_advanced_nosnippet" boolean DEFAULT false,
+  	"seo_robots_advanced_noimageindex" boolean DEFAULT false,
+  	"seo_robots_advanced_notranslate" boolean DEFAULT false,
+  	"seo_robots_advanced_max_snippet" numeric,
+  	"seo_robots_advanced_max_image_preview" "enum_seo_max_image_preview",
+  	"seo_robots_advanced_max_video_preview" numeric,
+  	"seo_robots_advanced_unavailable_after" timestamp(3) with time zone,
+  	"seo_alternates" jsonb,
+  	"seo_custom_tags" jsonb,
+  	"seo_keyword_target" varchar,
+  	"seo_additional_schema" jsonb,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"_status" "enum_podcast_episodes_status" DEFAULT 'draft'
+  );
+  
+  CREATE TABLE "_podcast_episodes_v_blocks_how_to_steps" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"text" varchar,
+  	"image_id" integer,
+  	"_uuid" varchar
+  );
+  
+  CREATE TABLE "_podcast_episodes_v_blocks_how_to" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"description" varchar,
+  	"total_time" varchar,
+  	"_uuid" varchar,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "_podcast_episodes_v_blocks_video_object" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"description" varchar,
+  	"thumbnail_id" integer,
+  	"upload_date" timestamp(3) with time zone,
+  	"content_url" varchar,
+  	"embed_url" varchar,
+  	"duration" varchar,
+  	"_uuid" varchar,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "_podcast_episodes_v_blocks_faq_page_questions" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"question" varchar,
+  	"answer" varchar,
+  	"_uuid" varchar
+  );
+  
+  CREATE TABLE "_podcast_episodes_v_blocks_faq_page" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"_uuid" varchar,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "_podcast_episodes_v_blocks_review" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"item_reviewed_type" "enum__podcast_episodes_v_blocks_review_item_reviewed_type" DEFAULT 'Product',
+  	"item_reviewed_name" varchar,
+  	"rating_value" numeric,
+  	"review_body" varchar,
+  	"author_name" varchar,
+  	"_uuid" varchar,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "_podcast_episodes_v_blocks_software_app" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"category" "enum__podcast_episodes_v_blocks_software_app_category" DEFAULT 'BusinessApplication',
+  	"os" varchar,
+  	"price" varchar,
+  	"currency" "enum__podcast_episodes_v_blocks_software_app_currency" DEFAULT 'USD',
+  	"rating_value" numeric,
+  	"rating_count" numeric,
+  	"_uuid" varchar,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "_podcast_episodes_v_blocks_breadcrumb_list_crumbs" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"path" varchar,
+  	"_uuid" varchar
+  );
+  
+  CREATE TABLE "_podcast_episodes_v_blocks_breadcrumb_list" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"_path" text NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"mode" "enum__podcast_episodes_v_blocks_breadcrumb_list_mode" DEFAULT 'suppress',
+  	"_uuid" varchar,
+  	"block_name" varchar
+  );
+  
+  CREATE TABLE "_podcast_episodes_v_version_seo_speakable_path" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"selector" varchar,
+  	"_uuid" varchar
   );
   
   CREATE TABLE "_podcast_episodes_v" (
@@ -3791,6 +4060,33 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_publication_date" timestamp(3) with time zone,
   	"version_published_at" timestamp(3) with time zone,
   	"version_display_published_at" timestamp(3) with time zone,
+  	"version_seo_title" varchar,
+  	"version_seo_description" varchar,
+  	"version_seo_indexable" "enum__podcast_episodes_v_version_seo_indexable" DEFAULT 'index',
+  	"version_seo_og_image_id" integer,
+  	"version_seo_og_image_alt" varchar,
+  	"version_seo_use_advanced_og" boolean DEFAULT false,
+  	"version_seo_og_title" varchar,
+  	"version_seo_og_description" varchar,
+  	"version_seo_use_advanced_twitter" boolean DEFAULT false,
+  	"version_seo_twitter_card" "enum__podcast_episodes_v_version_seo_twitter_card" DEFAULT 'summary_large_image',
+  	"version_seo_twitter_title" varchar,
+  	"version_seo_twitter_description" varchar,
+  	"version_seo_twitter_image_id" integer,
+  	"version_seo_use_custom_canonical" boolean DEFAULT false,
+  	"version_seo_canonical_override" varchar,
+  	"version_seo_robots_advanced_noarchive" boolean DEFAULT false,
+  	"version_seo_robots_advanced_nosnippet" boolean DEFAULT false,
+  	"version_seo_robots_advanced_noimageindex" boolean DEFAULT false,
+  	"version_seo_robots_advanced_notranslate" boolean DEFAULT false,
+  	"version_seo_robots_advanced_max_snippet" numeric,
+  	"version_seo_robots_advanced_max_image_preview" "enum_seo_max_image_preview",
+  	"version_seo_robots_advanced_max_video_preview" numeric,
+  	"version_seo_robots_advanced_unavailable_after" timestamp(3) with time zone,
+  	"version_seo_alternates" jsonb,
+  	"version_seo_custom_tags" jsonb,
+  	"version_seo_keyword_target" varchar,
+  	"version_seo_additional_schema" jsonb,
   	"version_updated_at" timestamp(3) with time zone,
   	"version_created_at" timestamp(3) with time zone,
   	"version__status" "enum__podcast_episodes_v_version_status" DEFAULT 'draft',
@@ -3915,6 +4211,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"salary_range_min" numeric,
   	"salary_range_max" numeric,
   	"salary_range_currency" "enum_jobs_salary_range_currency" DEFAULT 'USD',
+  	"abstract" varchar,
   	"body" jsonb,
   	"description_pdf_id" integer,
   	"apply_url" varchar,
@@ -4091,6 +4388,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_salary_range_min" numeric,
   	"version_salary_range_max" numeric,
   	"version_salary_range_currency" "enum__jobs_v_version_salary_range_currency" DEFAULT 'USD',
+  	"version_abstract" varchar,
   	"version_body" jsonb,
   	"version_description_pdf_id" integer,
   	"version_apply_url" varchar,
@@ -4646,6 +4944,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"slug" varchar,
   	"parent_id" integer,
   	"path" varchar,
+  	"abstract" varchar,
   	"page_layout" "enum_pages_page_layout" DEFAULT 'default',
   	"schema_type" "enum_pages_schema_type" DEFAULT 'auto',
   	"published_at" timestamp(3) with time zone,
@@ -5216,6 +5515,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_slug" varchar,
   	"version_parent_id" integer,
   	"version_path" varchar,
+  	"version_abstract" varchar,
   	"version_page_layout" "enum__pages_v_version_page_layout" DEFAULT 'default',
   	"version_schema_type" "enum__pages_v_version_schema_type" DEFAULT 'auto',
   	"version_published_at" timestamp(3) with time zone,
@@ -5826,6 +6126,30 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
   
+  CREATE TABLE "resources_spotlight" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"image_id" integer,
+  	"headline" varchar NOT NULL,
+  	"sub" varchar,
+  	"cta_label" varchar NOT NULL,
+  	"cta_href" varchar NOT NULL,
+  	"expires_at" timestamp(3) with time zone,
+  	"updated_at" timestamp(3) with time zone,
+  	"created_at" timestamp(3) with time zone
+  );
+  
+  CREATE TABLE "company_spotlight" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"image_id" integer,
+  	"headline" varchar NOT NULL,
+  	"sub" varchar,
+  	"cta_label" varchar NOT NULL,
+  	"cta_href" varchar NOT NULL,
+  	"expires_at" timestamp(3) with time zone,
+  	"updated_at" timestamp(3) with time zone,
+  	"created_at" timestamp(3) with time zone
+  );
+  
   CREATE TABLE "payload_jobs_stats" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"stats" jsonb,
@@ -5927,6 +6251,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "blogs" ADD CONSTRAINT "blogs_hero_image_id_media_id_fk" FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "blogs" ADD CONSTRAINT "blogs_reviewed_by_id_authors_id_fk" FOREIGN KEY ("reviewed_by_id") REFERENCES "public"."authors"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "blogs" ADD CONSTRAINT "blogs_categories_id_categories_id_fk" FOREIGN KEY ("categories_id") REFERENCES "public"."categories"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "blogs" ADD CONSTRAINT "blogs_previous_post_id_blogs_id_fk" FOREIGN KEY ("previous_post_id") REFERENCES "public"."blogs"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "blogs" ADD CONSTRAINT "blogs_next_post_id_blogs_id_fk" FOREIGN KEY ("next_post_id") REFERENCES "public"."blogs"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "blogs" ADD CONSTRAINT "blogs_seo_og_image_id_media_id_fk" FOREIGN KEY ("seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "blogs" ADD CONSTRAINT "blogs_seo_twitter_image_id_media_id_fk" FOREIGN KEY ("seo_twitter_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "blogs_rels" ADD CONSTRAINT "blogs_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."blogs"("id") ON DELETE cascade ON UPDATE no action;
@@ -5950,6 +6276,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_hero_image_id_media_id_fk" FOREIGN KEY ("version_hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_reviewed_by_id_authors_id_fk" FOREIGN KEY ("version_reviewed_by_id") REFERENCES "public"."authors"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_categories_id_categories_id_fk" FOREIGN KEY ("version_categories_id") REFERENCES "public"."categories"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_previous_post_id_blogs_id_fk" FOREIGN KEY ("version_previous_post_id") REFERENCES "public"."blogs"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_next_post_id_blogs_id_fk" FOREIGN KEY ("version_next_post_id") REFERENCES "public"."blogs"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_seo_og_image_id_media_id_fk" FOREIGN KEY ("version_seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_blogs_v" ADD CONSTRAINT "_blogs_v_version_seo_twitter_image_id_media_id_fk" FOREIGN KEY ("version_seo_twitter_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_blogs_v_rels" ADD CONSTRAINT "_blogs_v_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."_blogs_v"("id") ON DELETE cascade ON UPDATE no action;
@@ -6203,9 +6531,37 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_webinars_v" ADD CONSTRAINT "_webinars_v_version_seo_twitter_image_id_media_id_fk" FOREIGN KEY ("version_seo_twitter_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_webinars_v_rels" ADD CONSTRAINT "_webinars_v_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."_webinars_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_webinars_v_rels" ADD CONSTRAINT "_webinars_v_rels_authors_fk" FOREIGN KEY ("authors_id") REFERENCES "public"."authors"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_blocks_how_to_steps" ADD CONSTRAINT "podcast_episodes_blocks_how_to_steps_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_blocks_how_to_steps" ADD CONSTRAINT "podcast_episodes_blocks_how_to_steps_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."podcast_episodes_blocks_how_to"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_blocks_how_to" ADD CONSTRAINT "podcast_episodes_blocks_how_to_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_blocks_video_object" ADD CONSTRAINT "podcast_episodes_blocks_video_object_thumbnail_id_media_id_fk" FOREIGN KEY ("thumbnail_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_blocks_video_object" ADD CONSTRAINT "podcast_episodes_blocks_video_object_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_blocks_faq_page_questions" ADD CONSTRAINT "podcast_episodes_blocks_faq_page_questions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."podcast_episodes_blocks_faq_page"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_blocks_faq_page" ADD CONSTRAINT "podcast_episodes_blocks_faq_page_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_blocks_review" ADD CONSTRAINT "podcast_episodes_blocks_review_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_blocks_software_app" ADD CONSTRAINT "podcast_episodes_blocks_software_app_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_blocks_breadcrumb_list_crumbs" ADD CONSTRAINT "podcast_episodes_blocks_breadcrumb_list_crumbs_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."podcast_episodes_blocks_breadcrumb_list"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_blocks_breadcrumb_list" ADD CONSTRAINT "podcast_episodes_blocks_breadcrumb_list_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "podcast_episodes_seo_speakable_path" ADD CONSTRAINT "podcast_episodes_seo_speakable_path_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "podcast_episodes" ADD CONSTRAINT "podcast_episodes_thumbnail_override_id_media_id_fk" FOREIGN KEY ("thumbnail_override_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "podcast_episodes" ADD CONSTRAINT "podcast_episodes_seo_og_image_id_media_id_fk" FOREIGN KEY ("seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "podcast_episodes" ADD CONSTRAINT "podcast_episodes_seo_twitter_image_id_media_id_fk" FOREIGN KEY ("seo_twitter_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_blocks_how_to_steps" ADD CONSTRAINT "_podcast_episodes_v_blocks_how_to_steps_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_blocks_how_to_steps" ADD CONSTRAINT "_podcast_episodes_v_blocks_how_to_steps_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_episodes_v_blocks_how_to"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_blocks_how_to" ADD CONSTRAINT "_podcast_episodes_v_blocks_how_to_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_episodes_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_blocks_video_object" ADD CONSTRAINT "_podcast_episodes_v_blocks_video_object_thumbnail_id_media_id_fk" FOREIGN KEY ("thumbnail_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_blocks_video_object" ADD CONSTRAINT "_podcast_episodes_v_blocks_video_object_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_episodes_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_blocks_faq_page_questions" ADD CONSTRAINT "_podcast_episodes_v_blocks_faq_page_questions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_episodes_v_blocks_faq_page"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_blocks_faq_page" ADD CONSTRAINT "_podcast_episodes_v_blocks_faq_page_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_episodes_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_blocks_review" ADD CONSTRAINT "_podcast_episodes_v_blocks_review_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_episodes_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_blocks_software_app" ADD CONSTRAINT "_podcast_episodes_v_blocks_software_app_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_episodes_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_blocks_breadcrumb_list_crumbs" ADD CONSTRAINT "_podcast_episodes_v_blocks_breadcrumb_list_crumbs_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_episodes_v_blocks_breadcrumb_list"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_blocks_breadcrumb_list" ADD CONSTRAINT "_podcast_episodes_v_blocks_breadcrumb_list_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_episodes_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v_version_seo_speakable_path" ADD CONSTRAINT "_podcast_episodes_v_version_seo_speakable_path_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_episodes_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_podcast_episodes_v" ADD CONSTRAINT "_podcast_episodes_v_parent_id_podcast_episodes_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_podcast_episodes_v" ADD CONSTRAINT "_podcast_episodes_v_version_thumbnail_override_id_media_id_fk" FOREIGN KEY ("version_thumbnail_override_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v" ADD CONSTRAINT "_podcast_episodes_v_version_seo_og_image_id_media_id_fk" FOREIGN KEY ("version_seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_podcast_episodes_v" ADD CONSTRAINT "_podcast_episodes_v_version_seo_twitter_image_id_media_id_fk" FOREIGN KEY ("version_seo_twitter_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "jobs_blocks_how_to_steps" ADD CONSTRAINT "jobs_blocks_how_to_steps_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "jobs_blocks_how_to_steps" ADD CONSTRAINT "jobs_blocks_how_to_steps_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."jobs_blocks_how_to"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "jobs_blocks_how_to" ADD CONSTRAINT "jobs_blocks_how_to_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."jobs"("id") ON DELETE cascade ON UPDATE no action;
@@ -6475,6 +6831,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "podcast_page" ADD CONSTRAINT "podcast_page_featured_hero_episode_id_podcast_episodes_id_fk" FOREIGN KEY ("featured_hero_episode_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_podcast_page_v_version_cta_cards" ADD CONSTRAINT "_podcast_page_v_version_cta_cards_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_podcast_page_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_podcast_page_v" ADD CONSTRAINT "_podcast_page_v_version_featured_hero_episode_id_podcast_episodes_id_fk" FOREIGN KEY ("version_featured_hero_episode_id") REFERENCES "public"."podcast_episodes"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "resources_spotlight" ADD CONSTRAINT "resources_spotlight_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "company_spotlight" ADD CONSTRAINT "company_spotlight_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   CREATE INDEX "users_roles_order_idx" ON "users_roles" USING btree ("order");
   CREATE INDEX "users_roles_parent_idx" ON "users_roles" USING btree ("parent_id");
   CREATE INDEX "users_sessions_order_idx" ON "users_sessions" USING btree ("_order");
@@ -6716,6 +7074,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "blogs_hero_image_idx" ON "blogs" USING btree ("hero_image_id");
   CREATE INDEX "blogs_reviewed_by_idx" ON "blogs" USING btree ("reviewed_by_id");
   CREATE INDEX "blogs_categories_idx" ON "blogs" USING btree ("categories_id");
+  CREATE INDEX "blogs_previous_post_idx" ON "blogs" USING btree ("previous_post_id");
+  CREATE INDEX "blogs_next_post_idx" ON "blogs" USING btree ("next_post_id");
   CREATE INDEX "blogs_display_published_at_idx" ON "blogs" USING btree ("display_published_at");
   CREATE INDEX "blogs_seo_seo_og_image_idx" ON "blogs" USING btree ("seo_og_image_id");
   CREATE INDEX "blogs_seo_seo_twitter_image_idx" ON "blogs" USING btree ("seo_twitter_image_id");
@@ -6764,6 +7124,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_blogs_v_version_version_hero_image_idx" ON "_blogs_v" USING btree ("version_hero_image_id");
   CREATE INDEX "_blogs_v_version_version_reviewed_by_idx" ON "_blogs_v" USING btree ("version_reviewed_by_id");
   CREATE INDEX "_blogs_v_version_version_categories_idx" ON "_blogs_v" USING btree ("version_categories_id");
+  CREATE INDEX "_blogs_v_version_version_previous_post_idx" ON "_blogs_v" USING btree ("version_previous_post_id");
+  CREATE INDEX "_blogs_v_version_version_next_post_idx" ON "_blogs_v" USING btree ("version_next_post_id");
   CREATE INDEX "_blogs_v_version_version_display_published_at_idx" ON "_blogs_v" USING btree ("version_display_published_at");
   CREATE INDEX "_blogs_v_version_seo_version_seo_og_image_idx" ON "_blogs_v" USING btree ("version_seo_og_image_id");
   CREATE INDEX "_blogs_v_version_seo_version_seo_twitter_image_idx" ON "_blogs_v" USING btree ("version_seo_twitter_image_id");
@@ -7328,16 +7690,76 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_webinars_v_rels_parent_idx" ON "_webinars_v_rels" USING btree ("parent_id");
   CREATE INDEX "_webinars_v_rels_path_idx" ON "_webinars_v_rels" USING btree ("path");
   CREATE INDEX "_webinars_v_rels_authors_id_idx" ON "_webinars_v_rels" USING btree ("authors_id");
+  CREATE INDEX "podcast_episodes_blocks_how_to_steps_order_idx" ON "podcast_episodes_blocks_how_to_steps" USING btree ("_order");
+  CREATE INDEX "podcast_episodes_blocks_how_to_steps_parent_id_idx" ON "podcast_episodes_blocks_how_to_steps" USING btree ("_parent_id");
+  CREATE INDEX "podcast_episodes_blocks_how_to_steps_image_idx" ON "podcast_episodes_blocks_how_to_steps" USING btree ("image_id");
+  CREATE INDEX "podcast_episodes_blocks_how_to_order_idx" ON "podcast_episodes_blocks_how_to" USING btree ("_order");
+  CREATE INDEX "podcast_episodes_blocks_how_to_parent_id_idx" ON "podcast_episodes_blocks_how_to" USING btree ("_parent_id");
+  CREATE INDEX "podcast_episodes_blocks_how_to_path_idx" ON "podcast_episodes_blocks_how_to" USING btree ("_path");
+  CREATE INDEX "podcast_episodes_blocks_video_object_order_idx" ON "podcast_episodes_blocks_video_object" USING btree ("_order");
+  CREATE INDEX "podcast_episodes_blocks_video_object_parent_id_idx" ON "podcast_episodes_blocks_video_object" USING btree ("_parent_id");
+  CREATE INDEX "podcast_episodes_blocks_video_object_path_idx" ON "podcast_episodes_blocks_video_object" USING btree ("_path");
+  CREATE INDEX "podcast_episodes_blocks_video_object_thumbnail_idx" ON "podcast_episodes_blocks_video_object" USING btree ("thumbnail_id");
+  CREATE INDEX "podcast_episodes_blocks_faq_page_questions_order_idx" ON "podcast_episodes_blocks_faq_page_questions" USING btree ("_order");
+  CREATE INDEX "podcast_episodes_blocks_faq_page_questions_parent_id_idx" ON "podcast_episodes_blocks_faq_page_questions" USING btree ("_parent_id");
+  CREATE INDEX "podcast_episodes_blocks_faq_page_order_idx" ON "podcast_episodes_blocks_faq_page" USING btree ("_order");
+  CREATE INDEX "podcast_episodes_blocks_faq_page_parent_id_idx" ON "podcast_episodes_blocks_faq_page" USING btree ("_parent_id");
+  CREATE INDEX "podcast_episodes_blocks_faq_page_path_idx" ON "podcast_episodes_blocks_faq_page" USING btree ("_path");
+  CREATE INDEX "podcast_episodes_blocks_review_order_idx" ON "podcast_episodes_blocks_review" USING btree ("_order");
+  CREATE INDEX "podcast_episodes_blocks_review_parent_id_idx" ON "podcast_episodes_blocks_review" USING btree ("_parent_id");
+  CREATE INDEX "podcast_episodes_blocks_review_path_idx" ON "podcast_episodes_blocks_review" USING btree ("_path");
+  CREATE INDEX "podcast_episodes_blocks_software_app_order_idx" ON "podcast_episodes_blocks_software_app" USING btree ("_order");
+  CREATE INDEX "podcast_episodes_blocks_software_app_parent_id_idx" ON "podcast_episodes_blocks_software_app" USING btree ("_parent_id");
+  CREATE INDEX "podcast_episodes_blocks_software_app_path_idx" ON "podcast_episodes_blocks_software_app" USING btree ("_path");
+  CREATE INDEX "podcast_episodes_blocks_breadcrumb_list_crumbs_order_idx" ON "podcast_episodes_blocks_breadcrumb_list_crumbs" USING btree ("_order");
+  CREATE INDEX "podcast_episodes_blocks_breadcrumb_list_crumbs_parent_id_idx" ON "podcast_episodes_blocks_breadcrumb_list_crumbs" USING btree ("_parent_id");
+  CREATE INDEX "podcast_episodes_blocks_breadcrumb_list_order_idx" ON "podcast_episodes_blocks_breadcrumb_list" USING btree ("_order");
+  CREATE INDEX "podcast_episodes_blocks_breadcrumb_list_parent_id_idx" ON "podcast_episodes_blocks_breadcrumb_list" USING btree ("_parent_id");
+  CREATE INDEX "podcast_episodes_blocks_breadcrumb_list_path_idx" ON "podcast_episodes_blocks_breadcrumb_list" USING btree ("_path");
+  CREATE INDEX "podcast_episodes_seo_speakable_path_order_idx" ON "podcast_episodes_seo_speakable_path" USING btree ("_order");
+  CREATE INDEX "podcast_episodes_seo_speakable_path_parent_id_idx" ON "podcast_episodes_seo_speakable_path" USING btree ("_parent_id");
   CREATE UNIQUE INDEX "podcast_episodes_slug_idx" ON "podcast_episodes" USING btree ("slug");
   CREATE INDEX "podcast_episodes_thumbnail_override_idx" ON "podcast_episodes" USING btree ("thumbnail_override_id");
   CREATE INDEX "podcast_episodes_display_published_at_idx" ON "podcast_episodes" USING btree ("display_published_at");
+  CREATE INDEX "podcast_episodes_seo_seo_og_image_idx" ON "podcast_episodes" USING btree ("seo_og_image_id");
+  CREATE INDEX "podcast_episodes_seo_seo_twitter_image_idx" ON "podcast_episodes" USING btree ("seo_twitter_image_id");
   CREATE INDEX "podcast_episodes_updated_at_idx" ON "podcast_episodes" USING btree ("updated_at");
   CREATE INDEX "podcast_episodes_created_at_idx" ON "podcast_episodes" USING btree ("created_at");
   CREATE INDEX "podcast_episodes__status_idx" ON "podcast_episodes" USING btree ("_status");
+  CREATE INDEX "_podcast_episodes_v_blocks_how_to_steps_order_idx" ON "_podcast_episodes_v_blocks_how_to_steps" USING btree ("_order");
+  CREATE INDEX "_podcast_episodes_v_blocks_how_to_steps_parent_id_idx" ON "_podcast_episodes_v_blocks_how_to_steps" USING btree ("_parent_id");
+  CREATE INDEX "_podcast_episodes_v_blocks_how_to_steps_image_idx" ON "_podcast_episodes_v_blocks_how_to_steps" USING btree ("image_id");
+  CREATE INDEX "_podcast_episodes_v_blocks_how_to_order_idx" ON "_podcast_episodes_v_blocks_how_to" USING btree ("_order");
+  CREATE INDEX "_podcast_episodes_v_blocks_how_to_parent_id_idx" ON "_podcast_episodes_v_blocks_how_to" USING btree ("_parent_id");
+  CREATE INDEX "_podcast_episodes_v_blocks_how_to_path_idx" ON "_podcast_episodes_v_blocks_how_to" USING btree ("_path");
+  CREATE INDEX "_podcast_episodes_v_blocks_video_object_order_idx" ON "_podcast_episodes_v_blocks_video_object" USING btree ("_order");
+  CREATE INDEX "_podcast_episodes_v_blocks_video_object_parent_id_idx" ON "_podcast_episodes_v_blocks_video_object" USING btree ("_parent_id");
+  CREATE INDEX "_podcast_episodes_v_blocks_video_object_path_idx" ON "_podcast_episodes_v_blocks_video_object" USING btree ("_path");
+  CREATE INDEX "_podcast_episodes_v_blocks_video_object_thumbnail_idx" ON "_podcast_episodes_v_blocks_video_object" USING btree ("thumbnail_id");
+  CREATE INDEX "_podcast_episodes_v_blocks_faq_page_questions_order_idx" ON "_podcast_episodes_v_blocks_faq_page_questions" USING btree ("_order");
+  CREATE INDEX "_podcast_episodes_v_blocks_faq_page_questions_parent_id_idx" ON "_podcast_episodes_v_blocks_faq_page_questions" USING btree ("_parent_id");
+  CREATE INDEX "_podcast_episodes_v_blocks_faq_page_order_idx" ON "_podcast_episodes_v_blocks_faq_page" USING btree ("_order");
+  CREATE INDEX "_podcast_episodes_v_blocks_faq_page_parent_id_idx" ON "_podcast_episodes_v_blocks_faq_page" USING btree ("_parent_id");
+  CREATE INDEX "_podcast_episodes_v_blocks_faq_page_path_idx" ON "_podcast_episodes_v_blocks_faq_page" USING btree ("_path");
+  CREATE INDEX "_podcast_episodes_v_blocks_review_order_idx" ON "_podcast_episodes_v_blocks_review" USING btree ("_order");
+  CREATE INDEX "_podcast_episodes_v_blocks_review_parent_id_idx" ON "_podcast_episodes_v_blocks_review" USING btree ("_parent_id");
+  CREATE INDEX "_podcast_episodes_v_blocks_review_path_idx" ON "_podcast_episodes_v_blocks_review" USING btree ("_path");
+  CREATE INDEX "_podcast_episodes_v_blocks_software_app_order_idx" ON "_podcast_episodes_v_blocks_software_app" USING btree ("_order");
+  CREATE INDEX "_podcast_episodes_v_blocks_software_app_parent_id_idx" ON "_podcast_episodes_v_blocks_software_app" USING btree ("_parent_id");
+  CREATE INDEX "_podcast_episodes_v_blocks_software_app_path_idx" ON "_podcast_episodes_v_blocks_software_app" USING btree ("_path");
+  CREATE INDEX "_podcast_episodes_v_blocks_breadcrumb_list_crumbs_order_idx" ON "_podcast_episodes_v_blocks_breadcrumb_list_crumbs" USING btree ("_order");
+  CREATE INDEX "_podcast_episodes_v_blocks_breadcrumb_list_crumbs_parent_id_idx" ON "_podcast_episodes_v_blocks_breadcrumb_list_crumbs" USING btree ("_parent_id");
+  CREATE INDEX "_podcast_episodes_v_blocks_breadcrumb_list_order_idx" ON "_podcast_episodes_v_blocks_breadcrumb_list" USING btree ("_order");
+  CREATE INDEX "_podcast_episodes_v_blocks_breadcrumb_list_parent_id_idx" ON "_podcast_episodes_v_blocks_breadcrumb_list" USING btree ("_parent_id");
+  CREATE INDEX "_podcast_episodes_v_blocks_breadcrumb_list_path_idx" ON "_podcast_episodes_v_blocks_breadcrumb_list" USING btree ("_path");
+  CREATE INDEX "_podcast_episodes_v_version_seo_speakable_path_order_idx" ON "_podcast_episodes_v_version_seo_speakable_path" USING btree ("_order");
+  CREATE INDEX "_podcast_episodes_v_version_seo_speakable_path_parent_id_idx" ON "_podcast_episodes_v_version_seo_speakable_path" USING btree ("_parent_id");
   CREATE INDEX "_podcast_episodes_v_parent_idx" ON "_podcast_episodes_v" USING btree ("parent_id");
   CREATE INDEX "_podcast_episodes_v_version_version_slug_idx" ON "_podcast_episodes_v" USING btree ("version_slug");
   CREATE INDEX "_podcast_episodes_v_version_version_thumbnail_override_idx" ON "_podcast_episodes_v" USING btree ("version_thumbnail_override_id");
   CREATE INDEX "_podcast_episodes_v_version_version_display_published_at_idx" ON "_podcast_episodes_v" USING btree ("version_display_published_at");
+  CREATE INDEX "_podcast_episodes_v_version_seo_version_seo_og_image_idx" ON "_podcast_episodes_v" USING btree ("version_seo_og_image_id");
+  CREATE INDEX "_podcast_episodes_v_version_seo_version_seo_twitter_imag_idx" ON "_podcast_episodes_v" USING btree ("version_seo_twitter_image_id");
   CREATE INDEX "_podcast_episodes_v_version_version_updated_at_idx" ON "_podcast_episodes_v" USING btree ("version_updated_at");
   CREATE INDEX "_podcast_episodes_v_version_version_created_at_idx" ON "_podcast_episodes_v" USING btree ("version_created_at");
   CREATE INDEX "_podcast_episodes_v_version_version__status_idx" ON "_podcast_episodes_v" USING btree ("version__status");
@@ -7880,7 +8302,9 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_podcast_page_v_version_cta_cards_parent_id_idx" ON "_podcast_page_v_version_cta_cards" USING btree ("_parent_id");
   CREATE INDEX "_podcast_page_v_version_version_featured_hero_episode_idx" ON "_podcast_page_v" USING btree ("version_featured_hero_episode_id");
   CREATE INDEX "_podcast_page_v_created_at_idx" ON "_podcast_page_v" USING btree ("created_at");
-  CREATE INDEX "_podcast_page_v_updated_at_idx" ON "_podcast_page_v" USING btree ("updated_at");`)
+  CREATE INDEX "_podcast_page_v_updated_at_idx" ON "_podcast_page_v" USING btree ("updated_at");
+  CREATE INDEX "resources_spotlight_image_idx" ON "resources_spotlight" USING btree ("image_id");
+  CREATE INDEX "company_spotlight_image_idx" ON "company_spotlight" USING btree ("image_id");`)
 }
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {
@@ -8131,7 +8555,27 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TABLE "_webinars_v_version_seo_speakable_path" CASCADE;
   DROP TABLE "_webinars_v" CASCADE;
   DROP TABLE "_webinars_v_rels" CASCADE;
+  DROP TABLE "podcast_episodes_blocks_how_to_steps" CASCADE;
+  DROP TABLE "podcast_episodes_blocks_how_to" CASCADE;
+  DROP TABLE "podcast_episodes_blocks_video_object" CASCADE;
+  DROP TABLE "podcast_episodes_blocks_faq_page_questions" CASCADE;
+  DROP TABLE "podcast_episodes_blocks_faq_page" CASCADE;
+  DROP TABLE "podcast_episodes_blocks_review" CASCADE;
+  DROP TABLE "podcast_episodes_blocks_software_app" CASCADE;
+  DROP TABLE "podcast_episodes_blocks_breadcrumb_list_crumbs" CASCADE;
+  DROP TABLE "podcast_episodes_blocks_breadcrumb_list" CASCADE;
+  DROP TABLE "podcast_episodes_seo_speakable_path" CASCADE;
   DROP TABLE "podcast_episodes" CASCADE;
+  DROP TABLE "_podcast_episodes_v_blocks_how_to_steps" CASCADE;
+  DROP TABLE "_podcast_episodes_v_blocks_how_to" CASCADE;
+  DROP TABLE "_podcast_episodes_v_blocks_video_object" CASCADE;
+  DROP TABLE "_podcast_episodes_v_blocks_faq_page_questions" CASCADE;
+  DROP TABLE "_podcast_episodes_v_blocks_faq_page" CASCADE;
+  DROP TABLE "_podcast_episodes_v_blocks_review" CASCADE;
+  DROP TABLE "_podcast_episodes_v_blocks_software_app" CASCADE;
+  DROP TABLE "_podcast_episodes_v_blocks_breadcrumb_list_crumbs" CASCADE;
+  DROP TABLE "_podcast_episodes_v_blocks_breadcrumb_list" CASCADE;
+  DROP TABLE "_podcast_episodes_v_version_seo_speakable_path" CASCADE;
   DROP TABLE "_podcast_episodes_v" CASCADE;
   DROP TABLE "jobs_blocks_how_to_steps" CASCADE;
   DROP TABLE "jobs_blocks_how_to" CASCADE;
@@ -8287,6 +8731,8 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TABLE "podcast_page" CASCADE;
   DROP TABLE "_podcast_page_v_version_cta_cards" CASCADE;
   DROP TABLE "_podcast_page_v" CASCADE;
+  DROP TABLE "resources_spotlight" CASCADE;
+  DROP TABLE "company_spotlight" CASCADE;
   DROP TABLE "payload_jobs_stats" CASCADE;
   DROP TYPE "public"."enum_users_roles";
   DROP TYPE "public"."enum_media_folder";
@@ -8383,6 +8829,7 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "public"."enum_guides_blocks_software_app_category";
   DROP TYPE "public"."enum_guides_blocks_software_app_currency";
   DROP TYPE "public"."enum_guides_blocks_breadcrumb_list_mode";
+  DROP TYPE "public"."enum_guides_toc_depth";
   DROP TYPE "public"."enum_guides_seo_indexable";
   DROP TYPE "public"."enum_guides_seo_twitter_card";
   DROP TYPE "public"."enum_guides_status";
@@ -8390,6 +8837,7 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "public"."enum__guides_v_blocks_software_app_category";
   DROP TYPE "public"."enum__guides_v_blocks_software_app_currency";
   DROP TYPE "public"."enum__guides_v_blocks_breadcrumb_list_mode";
+  DROP TYPE "public"."enum__guides_v_version_toc_depth";
   DROP TYPE "public"."enum__guides_v_version_seo_indexable";
   DROP TYPE "public"."enum__guides_v_version_seo_twitter_card";
   DROP TYPE "public"."enum__guides_v_version_status";
@@ -8415,6 +8863,7 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "public"."enum_knowledge_base_blocks_software_app_category";
   DROP TYPE "public"."enum_knowledge_base_blocks_software_app_currency";
   DROP TYPE "public"."enum_knowledge_base_blocks_breadcrumb_list_mode";
+  DROP TYPE "public"."enum_knowledge_base_toc_depth";
   DROP TYPE "public"."enum_knowledge_base_seo_indexable";
   DROP TYPE "public"."enum_knowledge_base_seo_twitter_card";
   DROP TYPE "public"."enum_knowledge_base_status";
@@ -8422,6 +8871,7 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "public"."enum__knowledge_base_v_blocks_software_app_category";
   DROP TYPE "public"."enum__knowledge_base_v_blocks_software_app_currency";
   DROP TYPE "public"."enum__knowledge_base_v_blocks_breadcrumb_list_mode";
+  DROP TYPE "public"."enum__knowledge_base_v_version_toc_depth";
   DROP TYPE "public"."enum__knowledge_base_v_version_seo_indexable";
   DROP TYPE "public"."enum__knowledge_base_v_version_seo_twitter_card";
   DROP TYPE "public"."enum__knowledge_base_v_version_status";
@@ -8465,7 +8915,19 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "public"."enum__webinars_v_version_seo_indexable";
   DROP TYPE "public"."enum__webinars_v_version_seo_twitter_card";
   DROP TYPE "public"."enum__webinars_v_version_status";
+  DROP TYPE "public"."enum_podcast_episodes_blocks_review_item_reviewed_type";
+  DROP TYPE "public"."enum_podcast_episodes_blocks_software_app_category";
+  DROP TYPE "public"."enum_podcast_episodes_blocks_software_app_currency";
+  DROP TYPE "public"."enum_podcast_episodes_blocks_breadcrumb_list_mode";
+  DROP TYPE "public"."enum_podcast_episodes_seo_indexable";
+  DROP TYPE "public"."enum_podcast_episodes_seo_twitter_card";
   DROP TYPE "public"."enum_podcast_episodes_status";
+  DROP TYPE "public"."enum__podcast_episodes_v_blocks_review_item_reviewed_type";
+  DROP TYPE "public"."enum__podcast_episodes_v_blocks_software_app_category";
+  DROP TYPE "public"."enum__podcast_episodes_v_blocks_software_app_currency";
+  DROP TYPE "public"."enum__podcast_episodes_v_blocks_breadcrumb_list_mode";
+  DROP TYPE "public"."enum__podcast_episodes_v_version_seo_indexable";
+  DROP TYPE "public"."enum__podcast_episodes_v_version_seo_twitter_card";
   DROP TYPE "public"."enum__podcast_episodes_v_version_status";
   DROP TYPE "public"."enum_jobs_blocks_review_item_reviewed_type";
   DROP TYPE "public"."enum_jobs_blocks_software_app_category";

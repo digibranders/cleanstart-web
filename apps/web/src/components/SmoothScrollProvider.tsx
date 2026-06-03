@@ -1,6 +1,5 @@
 "use client";
 
-import Lenis from "lenis";
 import { useEffect, type ReactNode } from "react";
 
 /**
@@ -11,6 +10,11 @@ import { useEffect, type ReactNode } from "react";
  * instead of the browser's native snap-to-pixel behavior. Reveal animations
  * (FadeUp, useInView, etc.) feel premium because the scroll velocity that
  * triggers them is itself smooth.
+ *
+ * Lenis is imported dynamically inside the effect (not as a top-level import)
+ * so its ~12 KB gz does not land in the shared chunk every route eagerly
+ * loads. It is only fetched on fine-pointer, motion-allowing desktops — the
+ * single environment where it actually runs.
  *
  * Guards:
  *  - `prefers-reduced-motion: reduce` → disable entirely (accessibility).
@@ -28,28 +32,36 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
     const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
     if (reduceMotion || coarsePointer) return;
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      // easeOutExpo — fast at first, gently lands at the target.
-      easing: (t) => Math.min(1, 1.001 - 2 ** (-10 * t)),
-      orientation: "vertical",
-      gestureOrientation: "vertical",
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
-      infinite: false,
+    let frameId = 0;
+    let lenis: import("lenis").default | null = null;
+    let cancelled = false;
+
+    void import("lenis").then(({ default: Lenis }) => {
+      if (cancelled) return;
+
+      lenis = new Lenis({
+        duration: 1.2,
+        // easeOutExpo — fast at first, gently lands at the target.
+        easing: (t) => Math.min(1, 1.001 - 2 ** (-10 * t)),
+        orientation: "vertical",
+        gestureOrientation: "vertical",
+        smoothWheel: true,
+        wheelMultiplier: 1,
+        touchMultiplier: 2,
+        infinite: false,
+      });
+
+      const raf = (time: number) => {
+        lenis?.raf(time);
+        frameId = requestAnimationFrame(raf);
+      };
+      frameId = requestAnimationFrame(raf);
     });
 
-    let frameId = 0;
-    const raf = (time: number) => {
-      lenis.raf(time);
-      frameId = requestAnimationFrame(raf);
-    };
-    frameId = requestAnimationFrame(raf);
-
     return () => {
+      cancelled = true;
       cancelAnimationFrame(frameId);
-      lenis.destroy();
+      lenis?.destroy();
     };
   }, []);
 

@@ -1,17 +1,13 @@
 import { HeroReveal } from "@/components/ui/Reveal";
 
 /**
- * Dark gradient hero band for the Book a Demo page. Matches Figma node
- * 867:646 — a 1920×369 frame at x:-240, y:0 with the exact Figma
- * gradient and "Get a Demo" title (Manrope SemiBold 72px) at x:782, y:176
- * within the 1440 viewport. The "Demo" word carries the Figma ts1
- * gradient. Two iridescent cube images (Figma image 583137/583138)
- * flank the title.
+ * Dark gradient hero band for the Book a Demo page. A centred "Get a Demo"
+ * title (with a gradient "Demo" word) flanked by two iridescent cube images.
  */
 export function DemoHero(): React.ReactElement {
   return (
     <section className="relative w-full overflow-hidden">
-      {/* Background gradient — bleeds beyond the 1440 viewport (Figma x:-240, w:1920). */}
+      {/* Background gradient — bleeds beyond the 1440 viewport on each side. */}
       <div
         aria-hidden
         className="absolute inset-0 left-1/2 -translate-x-1/2"
@@ -26,7 +22,6 @@ export function DemoHero(): React.ReactElement {
           with the 294×298 cube tilted via rotate(-46.54deg), `mix-blend-mode:
           color-dodge` so it tints into the gradient, opacity 0.4. Desktop-only
           decoration (`hidden lg:block`) so mobile gets a clean text-only hero. */}
-      {/* biome-ignore lint/a11y/useAltText: decorative element */}
       <div
         aria-hidden
         className="pointer-events-none absolute hidden lg:block"
@@ -106,7 +101,7 @@ export function DemoHero(): React.ReactElement {
         </div>
       </div>
 
-      {/* Content — title centered around Figma y:176 within a ~369px tall band */}
+      {/* Content — title centred within the hero band. */}
       <div
         className="relative mx-auto flex items-end justify-center text-center"
         style={{
