@@ -37,9 +37,12 @@ export type SubmitPartnerResult = { ok: true } | { ok: false; error: string };
 export async function submitPartner(input: SubmitPartnerInput): Promise<SubmitPartnerResult> {
   let res: Response;
   try {
+    // No `credentials: 'include'` — the partner endpoint is cookieless and does
+    // not send `access-control-allow-credentials`, so a credentialed cross-origin
+    // request would have its response blocked by the browser. Matches the careers
+    // helper; differs from submitLead (which needs the gated-resource cookie).
     res = await fetch(`${CMS_URL}/api/partner-applications/apply`, {
       method: "POST",
-      credentials: "include",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(input),
     });
