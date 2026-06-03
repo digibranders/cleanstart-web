@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdmin, isAdminOrEditor } from '../access';
+import { careersApplyEndpoint, careersApplyOptionsEndpoint } from '../endpoints/careers-apply';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 /**
@@ -25,6 +26,7 @@ export const CareerApplications: CollectionConfig = {
     update: () => false,
     delete: isAdmin,
   },
+  endpoints: [careersApplyEndpoint, careersApplyOptionsEndpoint],
   fields: [
     { name: 'job', type: 'relationship', relationTo: 'jobs', required: true },
     {
