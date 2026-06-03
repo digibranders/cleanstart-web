@@ -21,6 +21,7 @@
 | `apps/cms/src/payload/lib/upload-limits.ts` (modify) | add DOC/DOCX MIME + 10 MB resume limit |
 | `apps/cms/src/payload/collections/Resumes.ts` (create) | private resume upload collection |
 | `apps/cms/src/payload/collections/CareerApplications.ts` (create) | application record + endpoint mount |
+| `apps/cms/src/payload/collections/Jobs.ts` (modify) | `join` field showing each job's applications inline |
 | `apps/cms/src/payload/lib/email/brevo.ts` (create) | reusable Brevo transactional send |
 | `apps/cms/src/payload/lib/careers/hr-email.ts` (create) | HR-notification subject + HTML builder |
 | `apps/cms/src/payload/lib/careers/application-schema.ts` (create) | Zod schema for the apply payload |
@@ -349,6 +350,51 @@ Expected: `payload-types.ts` has `CareerApplication`; build PASS.
 ```bash
 git add apps/cms/src/payload/collections/CareerApplications.ts apps/cms/src/payload.config.ts apps/cms/src/payload-types.ts
 git commit -m "feat(cms): add append-only career-applications collection"
+```
+
+---
+
+## Task 3b: Per-job applications panel (Payload `join` field)
+
+**Files:**
+- Modify: `apps/cms/src/payload/collections/Jobs.ts`
+
+Depends on Task 3 (the `career-applications` collection and its `job` relationship must exist). A `join` field is virtual — it adds **no** column to the `jobs` table (Payload resolves it through `career-applications.job`), so it needs no migration of its own.
+
+- [ ] **Step 1: Add the join field**
+
+In `apps/cms/src/payload/collections/Jobs.ts`, add this field to the `fields` array, placed after the `closedAt` field and before the `permalink` UI field:
+
+```ts
+    {
+      name: 'applications',
+      type: 'join',
+      collection: 'career-applications',
+      on: 'job',
+      label: 'Applications',
+      admin: {
+        allowCreate: false,
+        defaultColumns: ['firstName', 'lastName', 'email', 'emailDelivery', 'createdAt'],
+        description: 'Applications submitted for this job (read-only). Open one to download the resume.',
+      },
+    },
+```
+
+- [ ] **Step 2: Regenerate types**
+
+Run: `pnpm --filter @cleanstart/cms generate:types`
+Expected: the `Job` interface gains an `applications` join property; no new DB column.
+
+- [ ] **Step 3: Typecheck + build**
+
+Run: `pnpm --filter @cleanstart/cms typecheck && pnpm --filter @cleanstart/cms build`
+Expected: PASS. (Manually confirm during review that opening a Job in `/admin` shows the Applications table once data exists.)
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add apps/cms/src/payload/collections/Jobs.ts apps/cms/src/payload-types.ts
+git commit -m "feat(cms): show applications inline on each Job via a join field"
 ```
 
 ---
