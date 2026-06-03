@@ -61,7 +61,7 @@ const PARTNERS: Record<Region, Partner[]> = {
     },
     {
       name: "Zensar",
-      country: "North America",
+      country: "San Jose, USA",
       logo: "/images/partners/global/zensar.svg",
       invertOnLight: true,
     },
