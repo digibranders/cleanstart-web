@@ -201,30 +201,20 @@ export function CookieBanner() {
             </Link>
             .
           </p>
-          <div className="flex shrink-0 flex-wrap items-center gap-3">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-3">
             <button
               type="button"
               onClick={() => setShowPrefs((v) => !v)}
-              className="rounded-lg border border-white/25 px-5 py-2.5 font-medium text-white transition hover:bg-white/10"
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-white/30 px-[22px] font-medium text-white transition hover:bg-white/10"
               style={{ fontSize: "var(--fs-button)" }}
               aria-expanded={showPrefs}
             >
               Cookies Settings
             </button>
-            <button
-              type="button"
-              onClick={() => decide("reject_all")}
-              className="rounded-lg bg-white px-5 py-2.5 font-medium text-[#131a2e] transition hover:bg-white/90"
-              style={{ fontSize: "var(--fs-button)" }}
-            >
+            <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue">
               Reject All
             </button>
-            <button
-              type="button"
-              onClick={() => decide("accept_all")}
-              className="rounded-lg bg-white px-5 py-2.5 font-medium text-[#131a2e] transition hover:bg-white/90"
-              style={{ fontSize: "var(--fs-button)" }}
-            >
+            <button type="button" onClick={() => decide("accept_all")} className="cs-btn-blue">
               Allow All
             </button>
           </div>
@@ -265,19 +255,13 @@ export function CookieBanner() {
               ))}
             </div>
             <div className="flex flex-wrap justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => decide("reject_all")}
-                className="rounded-lg border border-white/25 px-5 py-2.5 font-medium text-white transition hover:bg-white/10"
-                style={{ fontSize: "var(--fs-button)" }}
-              >
+              <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue">
                 Reject All
               </button>
               <button
                 type="button"
                 onClick={() => decide("custom", { selection })}
-                className="rounded-lg bg-white px-5 py-2.5 font-medium text-[#131a2e] transition hover:bg-white/90"
-                style={{ fontSize: "var(--fs-button)" }}
+                className="cs-btn-blue"
               >
                 Confirm My Choices
               </button>
