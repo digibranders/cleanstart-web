@@ -103,7 +103,11 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    jobs: {
+      applications: 'career-applications';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -473,6 +477,14 @@ export interface Job {
    */
   expiresAt?: string | null;
   closedAt?: string | null;
+  /**
+   * Applications submitted for this job (read-only). Open one to download the resume.
+   */
+  applications?: {
+    docs?: (number | CareerApplication)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   /**
    * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
    */
@@ -9315,6 +9327,7 @@ export interface JobsSelect<T extends boolean = true> {
   applicationDeadline?: T;
   expiresAt?: T;
   closedAt?: T;
+  applications?: T;
   schemaAddons?:
     | T
     | {

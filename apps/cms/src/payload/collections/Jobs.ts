@@ -256,6 +256,18 @@ export const Jobs: CollectionConfig = {
       },
     },
     {
+      name: 'applications',
+      type: 'join',
+      collection: 'career-applications',
+      on: 'job',
+      label: 'Applications',
+      admin: {
+        allowCreate: false,
+        defaultColumns: ['firstName', 'lastName', 'email', 'emailDelivery', 'createdAt'],
+        description: 'Applications submitted for this job (read-only). Open one to download the resume.',
+      },
+    },
+    {
       name: 'permalink',
       type: 'ui',
       admin: {

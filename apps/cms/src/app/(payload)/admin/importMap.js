@@ -98,6 +98,7 @@ import { SlugRequirementGuard as SlugRequirementGuard_96979dae1465790bd97b2f570f
 import { PreviewMenu as PreviewMenu_50b93d8a0176cb6161ede3dcf4f0f442 } from '@/payload/admin/components/PreviewMenu.tsx'
 import { GateFormLabel as GateFormLabel_c191dd670871074ae1a1cea086f78af8 } from '@/payload/admin/components/GateFormLabel.tsx'
 import { DateField as DateField_a74145b29e7a0acd050f8f68af83aab6 } from '@/payload/admin/components/fields/DateField.tsx'
+import { JoinField as JoinField_bd3b4cc9a58da6642d24527d78f5c3b6 } from '@/payload/admin/components/fields/JoinField.tsx'
 import { UploadField as UploadField_9a37057695692a15b6c8aaeb6d981611 } from '@/payload/admin/components/fields/UploadField.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
@@ -127,7 +128,6 @@ import { RadioField as RadioField_31aae9b520654e49d40e444571bafe41 } from '@/pay
 import { CollapsibleField as CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8 } from '@/payload/admin/components/fields/CollapsibleField.tsx'
 import { TabsField as TabsField_c014faddfba6da88b9efedda256f4990 } from '@/payload/admin/components/fields/TabsField.tsx'
 import { RowField as RowField_1ef7316c3d3f9450222b0eb086a8e243 } from '@/payload/admin/components/fields/RowField.tsx'
-import { JoinField as JoinField_bd3b4cc9a58da6642d24527d78f5c3b6 } from '@/payload/admin/components/fields/JoinField.tsx'
 import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/payload/admin/components/fields/CodeField.tsx'
 
 /** @type import('payload').ImportMap */
@@ -232,6 +232,7 @@ export const importMap = {
   "@/payload/admin/components/PreviewMenu.tsx#PreviewMenu": PreviewMenu_50b93d8a0176cb6161ede3dcf4f0f442,
   "@/payload/admin/components/GateFormLabel.tsx#GateFormLabel": GateFormLabel_c191dd670871074ae1a1cea086f78af8,
   "@/payload/admin/components/fields/DateField.tsx#DateField": DateField_a74145b29e7a0acd050f8f68af83aab6,
+  "@/payload/admin/components/fields/JoinField.tsx#JoinField": JoinField_bd3b4cc9a58da6642d24527d78f5c3b6,
   "@/payload/admin/components/fields/UploadField.tsx#UploadField": UploadField_9a37057695692a15b6c8aaeb6d981611,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,
@@ -261,6 +262,5 @@ export const importMap = {
   "@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField": CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8,
   "@/payload/admin/components/fields/TabsField.tsx#TabsField": TabsField_c014faddfba6da88b9efedda256f4990,
   "@/payload/admin/components/fields/RowField.tsx#RowField": RowField_1ef7316c3d3f9450222b0eb086a8e243,
-  "@/payload/admin/components/fields/JoinField.tsx#JoinField": JoinField_bd3b4cc9a58da6642d24527d78f5c3b6,
   "@/payload/admin/components/fields/CodeField.tsx#CodeField": CodeField_4aa85fbd783c4d26c5c89ebf383941c1
 }
