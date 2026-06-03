@@ -14,7 +14,11 @@ const json = (data: unknown, init?: ResponseInit): Response =>
     headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
   });
 
-// Resume (10 MB) + small text fields; rejected with 413 before rate-limit.
+/** Maximum body size accepted on /api/career-applications/apply (resume +
+ * small text fields). When Content-Length is present it's rejected with 413
+ * before rate-limit. When Content-Length is absent (chunked transfer-encoding),
+ * the body is buffered through arrayBuffer() and bounced on overflow BEFORE the
+ * multipart parser runs, so an unbounded chunked upload can't exhaust memory. */
 export const CAREERS_MAX_BYTES = 12 * 1024 * 1024;
 const RESUME_MIMES = new Set([
   'application/pdf',
@@ -98,7 +102,27 @@ export const careersApplyEndpoint: Endpoint = {
 
     let form: FormData;
     try {
-      form = await (req as unknown as { formData: () => Promise<FormData> }).formData();
+      // If Content-Length was absent (chunked transfer-encoding), defend against
+      // unbounded bodies by buffering through arrayBuffer() and bouncing on
+      // overflow BEFORE the multipart parser buffers the whole file. The
+      // original content-type header (with its multipart boundary) is carried
+      // via req.headers, so reconstructing a Request re-parses correctly.
+      if (contentLengthRaw == null && typeof req.arrayBuffer === 'function') {
+        const raw = await req.arrayBuffer();
+        if (raw.byteLength > CAREERS_MAX_BYTES) {
+          return json(
+            { ok: false, error: 'payload_too_large', limit: CAREERS_MAX_BYTES },
+            { status: 413, headers: cors },
+          );
+        }
+        form = await new Request(req.url ?? 'http://localhost/api/career-applications/apply', {
+          method: 'POST',
+          headers: req.headers,
+          body: raw,
+        }).formData();
+      } else {
+        form = await (req as unknown as { formData: () => Promise<FormData> }).formData();
+      }
     } catch {
       return json({ ok: false, error: 'invalid_multipart' }, { status: 400, headers: cors });
     }
