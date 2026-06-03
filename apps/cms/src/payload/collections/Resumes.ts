@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload';
+import { ValidationError } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { ALLOWED_MIME_TYPES, RESUME_MIME_TYPES, checkUploadSize } from '../lib/upload-limits';
@@ -27,7 +28,6 @@ export const Resumes: CollectionConfig = {
   },
   upload: {
     mimeTypes: [...RESUME_MIME_TYPES],
-    disableLocalStorage: false,
   },
   hooks: {
     beforeValidate: [
@@ -36,10 +36,14 @@ export const Resumes: CollectionConfig = {
         if (file) {
           const sized = checkUploadSize(file.mimetype, file.size);
           if (!sized.ok) {
-            throw new Error(sized.reason);
+            throw new ValidationError({
+              errors: [{ message: sized.reason, path: 'filename' }],
+            });
           }
           if (!ALLOWED_MIME_TYPES.includes(file.mimetype as (typeof ALLOWED_MIME_TYPES)[number])) {
-            throw new Error('Unsupported file type for resume.');
+            throw new ValidationError({
+              errors: [{ message: 'Unsupported file type for resume.', path: 'filename' }],
+            });
           }
         }
         return data;
