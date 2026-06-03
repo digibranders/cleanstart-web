@@ -1,31 +1,24 @@
-import Script from "next/script";
+import { CONSENT_MODE_SNIPPET } from "@/lib/consent/consent-mode-snippet";
 
 /**
- * GA4 Consent Mode v2 bootstrap. Renders BEFORE any analytics tag and
- * sets all four signals to `denied` by default (GDPR-safe). The
- * ConsentProvider fires `gtag('consent','update', …)` on accept.
+ * GA4 Consent Mode v2 bootstrap. Emits a STATIC inline <script> in the
+ * document head that sets all four signals to `denied` by default
+ * (GDPR-safe) before any analytics tag. The ConsentProvider fires
+ * `gtag('consent','update', …)` on accept.
  *
  * No GA4 script ships yet — this is the scaffold so GA4 is plug-and-play
  * and consent is provably default-denied (WEB-PRODUCTION.md §11).
  *
- * `nonce` is the per-request CSP nonce from proxy.ts (x-nonce header),
- * required because inline scripts are otherwise blocked by the CSP.
+ * Cleared by a CSP hash (see lib/security/csp.ts), NOT a per-request
+ * nonce — a nonce would require reading headers() in the root layout,
+ * which forces the entire marketing site into dynamic rendering.
  */
-export function ConsentModeScript({ nonce }: { nonce?: string }) {
+export function ConsentModeScript() {
   return (
-    <Script id="consent-mode-default" strategy="beforeInteractive" nonce={nonce}>
-      {`
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        window.gtag = window.gtag || gtag;
-        gtag('consent', 'default', {
-          analytics_storage: 'denied',
-          ad_storage: 'denied',
-          ad_user_data: 'denied',
-          ad_personalization: 'denied',
-          wait_for_update: 500
-        });
-      `}
-    </Script>
+    <script
+      id="consent-mode-default"
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: static, hash-pinned consent bootstrap (no user input); CSP-cleared via sha256 in csp.ts.
+      dangerouslySetInnerHTML={{ __html: CONSENT_MODE_SNIPPET }}
+    />
   );
 }

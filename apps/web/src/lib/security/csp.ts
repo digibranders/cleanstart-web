@@ -1,3 +1,5 @@
+import { CONSENT_MODE_SNIPPET_HASH } from "@/lib/consent/consent-mode-snippet";
+
 export type CspMode = "report-only" | "enforce";
 
 export interface BuildCspOptions {
@@ -36,6 +38,10 @@ export function buildCsp({
   const scriptSrc = [
     "'self'",
     `'nonce-${nonce}'`,
+    // Static, hash-pinned GA4 Consent Mode bootstrap (consent-mode-snippet.ts).
+    // Cleared by hash (honoured under strict-dynamic) so the inline consent
+    // script needs no per-request nonce — keeps the marketing site static.
+    `'${CONSENT_MODE_SNIPPET_HASH}'`,
     "'strict-dynamic'",
     "https:",
     "'unsafe-inline'",

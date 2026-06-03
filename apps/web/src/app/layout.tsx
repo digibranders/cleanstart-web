@@ -1,13 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Manrope, Sora } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { PreviewBanner } from "@/components/PreviewBanner";
 import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 import { AgentationDev } from "@/components/dev/AgentationDev";
-import { WebVitals } from "@/components/observability/WebVitals";
+import {
+  ConsentProvider,
+  ConsentModeScript,
+  GatedAnalytics,
+  CookieBanner,
+} from "@/components/consent";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
 import { ogImageUrl } from "@/lib/seo/og";
 import { JsonLd, organizationSchema } from "@/lib/seo/jsonld";
@@ -116,14 +119,18 @@ export default function RootLayout({
         ["--font-display" as string]: "var(--font-manrope)",
       }}
     >
+      <head>
+        <ConsentModeScript />
+      </head>
       <body suppressHydrationWarning>
-        <JsonLd id="org-jsonld" data={organizationSchema()} />
-        <WebVitals />
-        <PreviewBanner />
-        <SmoothScrollProvider>{children}</SmoothScrollProvider>
-        <Analytics />
-        <SpeedInsights />
-        <AgentationDev />
+        <ConsentProvider>
+          <JsonLd id="org-jsonld" data={organizationSchema()} />
+          <PreviewBanner />
+          <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          <GatedAnalytics />
+          <CookieBanner />
+          <AgentationDev />
+        </ConsentProvider>
       </body>
     </html>
   );
