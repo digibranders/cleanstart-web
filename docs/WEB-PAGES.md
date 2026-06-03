@@ -40,7 +40,7 @@ page slugs, categories, types, and build status across the dev journey.
 |---|-----------|----------|------|--------|-------|
 | 1 | Homepage | `/` | Static | ✅ | Built |
 | 11 | Book a Demo | `/book-a-demo` | Static | ✅ | Lead capture form page (form is static UI; LeadHandler wiring pending) |
-| 20 | Partners | `/partners` | Static | ✅ | Hero, Why Partner, Global Network (region tabs), Testimonials, Partner Types |
+| 20 | Partners | `/partners` | Static | ✅ | Hero, Why Partner, Global Network (region tabs), Testimonials, Partner Types. Become-a-Partner form posts to the dedicated CMS endpoint `/api/partner-applications/apply` (off HubSpot/`forms`). |
 | 21 | Pricing | `/pricing` | Static | ⬜ | |
 | 31 | Deal Registration | `/deal-registration` | Static | ✅ | Form is static UI; LeadHandler wiring pending |
 
@@ -92,6 +92,7 @@ page slugs, categories, types, and build status across the dev journey.
 | 16 | Podcast | `/podcast` | CMS Listing | ✅ | Route at `src/app/podcast/`; Payload `podcastEpisodes` collection + `podcastPage` global (YT embeds) |
 | 17 | Resource Center | `/resource-center` | CMS Listing | ✅ | Route at `src/app/resource-center/` |
 | 17b | Resource Detail | `/resource/[slug]` | CMS Detail | ✅ | Route at `src/app/resource/[slug]/` |
+| 17c | Case Studies | `/case-studies` | CMS Listing | ✅ | Payload `case-studies` collection (listing-only, no detail). Cards link straight to the public R2 PDF download. Reuses home `BuiltForTeams` (no CMS). Built 2026-06-03 from Figma 1198:1231. |
 | — | Author Page | `/author/[slug]` | CMS Detail | ⬜ | Dynamic route, Payload `authors` |
 
 ---

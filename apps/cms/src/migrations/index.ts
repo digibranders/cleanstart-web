@@ -5,6 +5,7 @@ import * as migration_20260603_081714_add_careers_collections from './20260603_0
 import * as migration_20260603_092035_add_job_location_snapshot from './20260603_092035_add_job_location_snapshot';
 import * as migration_20260603_095034_add_case_studies from './20260603_095034_add_case_studies';
 import * as migration_20260603_100302_consent_log from './20260603_100302_consent_log';
+import * as migration_20260603_120148_add_partner_applications from './20260603_120148_add_partner_applications';
 
 export const migrations = [
   {
@@ -40,6 +41,11 @@ export const migrations = [
   {
     up: migration_20260603_100302_consent_log.up,
     down: migration_20260603_100302_consent_log.down,
-    name: '20260603_100302_consent_log'
+    name: '20260603_100302_consent_log',
+  },
+  {
+    up: migration_20260603_120148_add_partner_applications.up,
+    down: migration_20260603_120148_add_partner_applications.down,
+    name: '20260603_120148_add_partner_applications'
   },
 ];

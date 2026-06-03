@@ -70,20 +70,6 @@ const FORMS: readonly SeedForm[] = [
     ],
   },
   {
-    slug: 'become-a-partner',
-    name: 'Become a Partner',
-    hubspotFormGuid: 'ea66c444-acfe-4237-9a54-aea500f5e6d7',
-    fields: [
-      { name: 'firstname', type: 'text', label: 'First name', required: true },
-      { name: 'lastname', type: 'text', label: 'Last name', required: true },
-      { name: 'email', type: 'email', label: 'Email', required: true },
-      { name: 'company', type: 'text', label: 'Company', required: true },
-      { name: 'phone', type: 'text', label: 'Phone' },
-      { name: 'website', type: 'text', label: 'Website' },
-      { name: 'enter_message', type: 'textarea', label: 'Why partner with CleanStart?' },
-    ],
-  },
-  {
     slug: 'newsletter',
     name: 'Newsletter',
     hubspotFormGuid: 'd23691e3-fabd-41d1-8d19-3384d6043179',

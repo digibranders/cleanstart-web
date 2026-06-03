@@ -373,7 +373,7 @@ These channels are wired and active (env-var configured). See `apps/cms/.env.exa
 | Cloudflare Turnstile | Bot protection on `/api/leads/submit` | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` |
 | Sentry | Error tracking + PII redaction | `SENTRY_DSN` (+ auth token, org, project) |
 | IndexNow | Bing/Yandex ping on publish (7 collections) | `INDEXNOW_KEY` |
-| Brevo | Careers/partner transactional email — HR notification (with resume attachment) on each job application. Distinct from HubSpot, which owns lead-pipeline email and never receives careers data. | `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `CAREERS_HR_EMAIL` |
+| Brevo | Careers/partner transactional email — HR notification (with resume attachment) on each job application, plus the partner-form pair (applicant confirmation + internal team notification) on each partner inquiry. Distinct from HubSpot, which owns lead-pipeline email and never receives careers/partner data. | `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `CAREERS_HR_EMAIL`, `PARTNER_USER_TEMPLATE_ID`, `PARTNER_ADMIN_TEMPLATE_ID`, `PARTNERS_NOTIFY_EMAIL` |
 
 **Phase J2 planned:** Zoho CRM (OAuth 2.0 — primary CRM, build first), GA4 Measurement Protocol, Google Search Console. See `docs/INTEGRATIONS-RESEARCH-V2.md` for the full J1/J2/J3 milestone breakdown.
 
