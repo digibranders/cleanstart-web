@@ -173,6 +173,14 @@ export function CookieBanner() {
   const setCategory = (key: OptionalCategory, next: boolean) =>
     setSelection((prev) => ({ ...prev, [key]: next }));
 
+  // Compact size overrides for cs-btn-blue (slimmer than the 44px primary CTA),
+  // matching the header's utility-button sizing.
+  const compactBtn = {
+    ["--cs-btn-h" as string]: "36px",
+    ["--cs-btn-px" as string]: "16px",
+    ["--cs-btn-fs" as string]: "14px",
+  } as React.CSSProperties;
+
   return (
     <div
       // biome-ignore lint/a11y/useSemanticElements: intentionally a non-modal
@@ -253,13 +261,14 @@ export function CookieBanner() {
         <div className="flex flex-wrap items-center justify-end gap-3">
           {showPrefs ? (
             <>
-              <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue">
+              <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue" style={compactBtn}>
                 Reject All
               </button>
               <button
                 type="button"
                 onClick={() => decide("custom", { selection })}
                 className="cs-btn-blue"
+                style={compactBtn}
               >
                 Confirm My Choices
               </button>
@@ -269,16 +278,16 @@ export function CookieBanner() {
               <button
                 type="button"
                 onClick={() => setShowPrefs(true)}
-                className="inline-flex h-11 cursor-pointer items-center justify-center rounded-lg border border-white/30 px-[22px] font-medium text-white transition hover:bg-white/10"
-                style={{ fontSize: "var(--fs-button)" }}
+                className="inline-flex h-9 cursor-pointer items-center justify-center rounded-lg border border-white/30 px-4 font-medium text-white transition hover:bg-white/10"
+                style={{ fontSize: "14px" }}
                 aria-expanded={showPrefs}
               >
                 Cookies Settings
               </button>
-              <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue">
+              <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue" style={compactBtn}>
                 Reject All
               </button>
-              <button type="button" onClick={() => decide("accept_all")} className="cs-btn-blue">
+              <button type="button" onClick={() => decide("accept_all")} className="cs-btn-blue" style={compactBtn}>
                 Allow All
               </button>
             </>
