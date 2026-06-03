@@ -29,4 +29,13 @@ describe('buildHrApplicationEmail', () => {
     const { htmlContent } = buildHrApplicationEmail({ ...base, phone: undefined, linkedinUrl: undefined, coverLetter: undefined });
     expect(htmlContent).not.toContain('LinkedIn');
   });
+
+  it('shows the location row when provided and omits it otherwise', () => {
+    const withLoc = buildHrApplicationEmail({ ...base, jobLocation: 'Remote · Austin' });
+    expect(withLoc.htmlContent).toContain('Location');
+    expect(withLoc.htmlContent).toContain('Remote · Austin');
+
+    const withoutLoc = buildHrApplicationEmail({ ...base, jobLocation: undefined });
+    expect(withoutLoc.htmlContent).not.toContain('Location');
+  });
 });

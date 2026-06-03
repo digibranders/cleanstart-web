@@ -21,12 +21,15 @@ POST /api/career-applications/apply        (apps/cms — collection endpoint on 
    ├─ honeypot (`website` field → silent 200)
    ├─ resume mime + size check (PDF / DOC / DOCX)
    ├─ Cloudflare Turnstile verify (no exemption for careers)
-   ├─ job lookup: must be _status=published, hiringStatus=open, source=cms  → else `invalid_job`
+   ├─ job lookup (depth 1): must be _status=published, hiringStatus=open, source=cms  → else `invalid_job`
+   │     (also derives a location string from `remote` + the job's `locations` names —
+   │      e.g. "Remote", "Remote · San Jose", or "Austin, Berlin" — via lib/careers/job-location)
    │
    ├─ 1. resume → `resumes` upload collection (PRIVATE R2 prefix)
    ├─ 2. inject live `policyVersion` from the `legal` global into the consent snapshot
    ├─ 3. HR notification email via Brevo (non-fatal) — resume attached
-   └─ 4. append-only `career-applications` row, with `emailDelivery` status embedded
+   └─ 4. append-only `career-applications` row, with `jobTitleSnapshot`,
+         `jobLocationSnapshot`, and `emailDelivery` status embedded
    ▼
 { ok: true }
 ```

@@ -380,6 +380,10 @@ export interface CareerApplication {
    * Job title at apply time — survives later job edits/deletes.
    */
   jobTitleSnapshot: string;
+  /**
+   * Job location (remote / named locations) at apply time.
+   */
+  jobLocationSnapshot?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   email?: string | null;
@@ -7388,6 +7392,7 @@ export interface ResumesSelect<T extends boolean = true> {
 export interface CareerApplicationsSelect<T extends boolean = true> {
   job?: T;
   jobTitleSnapshot?: T;
+  jobLocationSnapshot?: T;
   firstName?: T;
   lastName?: T;
   email?: T;

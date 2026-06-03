@@ -35,6 +35,11 @@ export const CareerApplications: CollectionConfig = {
       required: true,
       admin: { readOnly: true, description: 'Job title at apply time — survives later job edits/deletes.' },
     },
+    {
+      name: 'jobLocationSnapshot',
+      type: 'text',
+      admin: { readOnly: true, description: 'Job location (remote / named locations) at apply time.' },
+    },
     // Not `required` at the collection level: create-time enforcement lives in
     // the careers-apply endpoint (applicationFieldsSchema). Leaving these
     // optional lets the retention purge null them without tripping Payload's

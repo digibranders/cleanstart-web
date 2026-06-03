@@ -1,5 +1,6 @@
 export type HrApplicationEmailInput = {
   jobTitle: string;
+  jobLocation?: string | undefined;
   firstName: string;
   lastName: string;
   email: string;
@@ -34,6 +35,8 @@ export const buildHrApplicationEmail = (
 <h2 style="margin:0 0 12px;">New job application</h2>
 <p style="margin:0 0 16px;">A candidate applied for <strong>${escapeHtml(input.jobTitle)}</strong>. Resume attached.</p>
 <table style="border-collapse:collapse;">
+${row('Position', input.jobTitle)}
+${row('Location', input.jobLocation)}
 ${row('Name', fullName)}
 ${row('Email', input.email)}
 ${row('Phone', input.phone)}

@@ -2,6 +2,7 @@ import type { Endpoint } from 'payload';
 
 import { applicationFieldsSchema } from '../lib/careers/application-schema';
 import { buildHrApplicationEmail } from '../lib/careers/hr-email';
+import { formatJobLocation } from '../lib/careers/job-location';
 import { clientIpFromHeaders } from '../lib/client-ip';
 import { sendBrevoEmail } from '../lib/email/brevo';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
@@ -65,6 +66,8 @@ type JobLookup = {
   _status?: string | null;
   hiringStatus?: string | null;
   source?: string | null;
+  remote?: boolean | null;
+  locations?: Array<number | { name?: string | null }> | null;
 };
 
 export const careersApplyEndpoint: Endpoint = {
@@ -204,7 +207,9 @@ export const careersApplyEndpoint: Endpoint = {
         collection: 'jobs',
         where: { slug: { equals: data.jobSlug } },
         limit: 1,
-        depth: 0,
+        // depth 1 resolves the `locations` relationship to jobLocations docs so
+        // we can read their `name` for the location string.
+        depth: 1,
         overrideAccess: true,
       });
       const doc = res.docs[0] as JobLookup | undefined;
@@ -215,6 +220,11 @@ export const careersApplyEndpoint: Endpoint = {
     if (!job || job._status !== 'published' || job.hiringStatus !== 'open' || job.source !== 'cms') {
       return invalidJob;
     }
+
+    const locationNames = (job.locations ?? [])
+      .map((loc) => (typeof loc === 'object' && loc !== null ? (loc.name ?? '') : ''))
+      .filter((name): name is string => name.length > 0);
+    const jobLocation = formatJobLocation({ remote: job.remote, locationNames });
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
@@ -256,6 +266,7 @@ export const careersApplyEndpoint: Endpoint = {
     //    is written in the initial append-only row.
     const { subject, htmlContent } = buildHrApplicationEmail({
       jobTitle: job.title ?? data.jobSlug,
+      jobLocation,
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
@@ -281,6 +292,7 @@ export const careersApplyEndpoint: Endpoint = {
         data: {
           job: job.id,
           jobTitleSnapshot: job.title ?? data.jobSlug,
+          jobLocationSnapshot: jobLocation ?? null,
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
