@@ -8,13 +8,13 @@ import { useConsent } from "./ConsentProvider";
 
 /**
  * Renders behavioural analytics ONLY after the visitor grants the
- * Analytics category. Replaces the unconditional <Analytics/> /
+ * Performance category. Replaces the unconditional <Analytics/> /
  * <SpeedInsights/> / <WebVitals/> in layout.tsx (GDPR — no behavioural
  * tracking before consent).
  */
 export function GatedAnalytics() {
-  const { analyticsGranted } = useConsent();
-  if (!analyticsGranted) return null;
+  const { performanceGranted } = useConsent();
+  if (!performanceGranted) return null;
   return (
     <>
       <Analytics />

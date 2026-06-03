@@ -12,8 +12,13 @@ const makeRequest = (body: unknown, headers: Record<string, string> = {}) =>
 const validBody = {
   anonymousId: "id-1",
   decision: "accept_all",
-  categories: { essential: true, analytics: true },
-  consentVersion: 1,
+  categories: {
+    strictlyNecessary: true,
+    performance: true,
+    functional: true,
+    targeting: true,
+  },
+  consentVersion: 2,
   gpc: false,
 };
 

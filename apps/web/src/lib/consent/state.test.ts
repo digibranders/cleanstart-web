@@ -13,7 +13,12 @@ const base: ConsentRecord = {
   v: CONSENT_VERSION,
   id: "id-1",
   decision: "accept_all",
-  categories: { essential: true, analytics: true },
+  categories: {
+    strictlyNecessary: true,
+    performance: true,
+    functional: true,
+    targeting: true,
+  },
   ts: "2026-06-03T00:00:00.000Z",
   gpc: false,
 };
@@ -24,7 +29,18 @@ describe("encode/decode", () => {
   });
   it("returns null for garbage", () => {
     expect(decodeRecord("not json")).toBeNull();
-    expect(decodeRecord('{"v":1}')).toBeNull(); // missing required fields
+    expect(decodeRecord('{"v":2}')).toBeNull(); // missing required fields
+  });
+  it("returns null for the legacy 2-category shape", () => {
+    const legacy = JSON.stringify({
+      v: 1,
+      id: "x",
+      decision: "accept_all",
+      categories: { essential: true, analytics: true },
+      ts: base.ts,
+      gpc: false,
+    });
+    expect(decodeRecord(legacy)).toBeNull();
   });
 });
 
@@ -46,30 +62,44 @@ describe("needsPrompt", () => {
 });
 
 describe("recordFromDecision", () => {
-  it("reject_all clears analytics", () => {
-    const r = recordFromDecision("reject_all", {
-      gpc: false,
-      id: "x",
-      now: new Date(base.ts),
+  const opts = { id: "x", gpc: false, now: new Date(base.ts) };
+
+  it("accept_all grants every optional category", () => {
+    const r = recordFromDecision("accept_all", opts);
+    expect(r.categories).toEqual({
+      strictlyNecessary: true,
+      performance: true,
+      functional: true,
+      targeting: true,
     });
-    expect(r.categories.analytics).toBe(false);
-    expect(r.decision).toBe("reject_all");
   });
-  it("accept_all grants analytics", () => {
-    const r = recordFromDecision("accept_all", {
-      gpc: false,
-      id: "x",
-      now: new Date(base.ts),
+  it("reject_all clears every optional category", () => {
+    const r = recordFromDecision("reject_all", opts);
+    expect(r.categories).toEqual({
+      strictlyNecessary: true,
+      performance: false,
+      functional: false,
+      targeting: false,
     });
-    expect(r.categories.analytics).toBe(true);
   });
-  it("custom respects the analytics flag", () => {
+  it("custom respects the per-category selection", () => {
     const r = recordFromDecision("custom", {
-      gpc: false,
-      id: "x",
-      now: new Date(base.ts),
-      analytics: true,
+      ...opts,
+      selection: { performance: true, functional: false, targeting: true },
     });
-    expect(r.categories.analytics).toBe(true);
+    expect(r.categories).toEqual({
+      strictlyNecessary: true,
+      performance: true,
+      functional: false,
+      targeting: true,
+    });
+  });
+  it("custom defaults unspecified categories to false", () => {
+    const r = recordFromDecision("custom", {
+      ...opts,
+      selection: { performance: true },
+    });
+    expect(r.categories.functional).toBe(false);
+    expect(r.categories.targeting).toBe(false);
   });
 });

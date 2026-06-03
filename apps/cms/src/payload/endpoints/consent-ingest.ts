@@ -16,7 +16,12 @@ import { z } from 'zod';
 const bodySchema = z.object({
   anonymousId: z.string().min(1).max(64),
   decision: z.enum(['accept_all', 'reject_all', 'custom']),
-  categories: z.object({ essential: z.literal(true), analytics: z.boolean() }),
+  categories: z.object({
+    strictlyNecessary: z.literal(true),
+    performance: z.boolean(),
+    functional: z.boolean(),
+    targeting: z.boolean(),
+  }),
   consentVersion: z.number().int().nonnegative(),
   gpc: z.boolean(),
   country: z.string().max(8).optional(),

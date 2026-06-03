@@ -1,5 +1,7 @@
-/** Bump to force a global re-prompt (e.g. when categories change). */
-export const CONSENT_VERSION = 1;
+/** Bump to force a global re-prompt (e.g. when categories change).
+ *  v2: expanded from {essential, analytics} to the 4-category OneTrust model
+ *  (strictlyNecessary / performance / functional / targeting). */
+export const CONSENT_VERSION = 2;
 
 export const CONSENT_COOKIE = "cs_consent";
 /** 12 months, in seconds — also the re-prompt window. */

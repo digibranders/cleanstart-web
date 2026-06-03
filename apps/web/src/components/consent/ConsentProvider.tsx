@@ -20,16 +20,27 @@ import {
   needsPrompt,
   recordFromDecision,
 } from "@/lib/consent/state";
-import type { ConsentDecision, ConsentRecord } from "@/lib/consent/types";
+import type {
+  ConsentCategories,
+  ConsentDecision,
+  ConsentRecord,
+  OptionalCategory,
+} from "@/lib/consent/types";
 
 interface ConsentContextValue {
   record: ConsentRecord | null;
   /** True when the banner should be shown (no valid current decision). */
   promptOpen: boolean;
-  analyticsGranted: boolean;
+  /** Resolved categories from the persisted decision (null until decided). */
+  categories: ConsentCategories | null;
+  /** Convenience flag for gating behavioural analytics (performance category). */
+  performanceGranted: boolean;
   /** GPC signal detected at load. */
   gpc: boolean;
-  decide: (decision: ConsentDecision, opts?: { analytics?: boolean }) => void;
+  decide: (
+    decision: ConsentDecision,
+    opts?: { selection?: Partial<Record<OptionalCategory, boolean>> },
+  ) => void;
   /** Re-open the banner (footer "Cookie preferences"). */
   openPrompt: () => void;
   closePrompt: () => void;
@@ -66,13 +77,17 @@ const newId = (): string =>
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-const updateConsentMode = (analytics: boolean): void => {
+const granted = (on: boolean): "granted" | "denied" => (on ? "granted" : "denied");
+
+const updateConsentMode = (c: ConsentCategories): void => {
   const w = window as Window & { gtag?: (...args: unknown[]) => void };
   w.gtag?.("consent", "update", {
-    analytics_storage: analytics ? "granted" : "denied",
-    ad_storage: "denied",
-    ad_user_data: "denied",
-    ad_personalization: "denied",
+    analytics_storage: granted(c.performance),
+    ad_storage: granted(c.targeting),
+    ad_user_data: granted(c.targeting),
+    ad_personalization: granted(c.targeting),
+    functionality_storage: granted(c.functional),
+    personalization_storage: granted(c.functional),
   });
 };
 
@@ -89,7 +104,7 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
     if (needsPrompt(existing, new Date())) {
       setPromptOpen(true);
     } else if (existing) {
-      updateConsentMode(existing.categories.analytics);
+      updateConsentMode(existing.categories);
     }
   }, []);
 
@@ -103,7 +118,7 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Storage disabled (private mode) — session-only state still works.
     }
-    updateConsentMode(next.categories.analytics);
+    updateConsentMode(next.categories);
     void fetch("/api/consent", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -128,7 +143,7 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
           id,
           gpc,
           now: new Date(),
-          analytics: opts?.analytics,
+          selection: opts?.selection,
         }),
       );
     },
@@ -139,7 +154,8 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
     () => ({
       record,
       promptOpen,
-      analyticsGranted: record?.categories.analytics ?? false,
+      categories: record?.categories ?? null,
+      performanceGranted: record?.categories.performance ?? false,
       gpc,
       decide,
       openPrompt: () => setPromptOpen(true),

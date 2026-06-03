@@ -3,7 +3,14 @@ import type {
   ConsentCategories,
   ConsentDecision,
   ConsentRecord,
+  OptionalCategory,
 } from "./types";
+
+export const OPTIONAL_CATEGORIES: readonly OptionalCategory[] = [
+  "performance",
+  "functional",
+  "targeting",
+];
 
 export const encodeRecord = (record: ConsentRecord): string =>
   JSON.stringify(record);
@@ -20,6 +27,7 @@ export const decodeRecord = (
   }
   if (typeof parsed !== "object" || parsed === null) return null;
   const r = parsed as Partial<ConsentRecord>;
+  const c = r.categories;
   if (
     typeof r.v !== "number" ||
     typeof r.id !== "string" ||
@@ -28,10 +36,12 @@ export const decodeRecord = (
     (r.decision !== "accept_all" &&
       r.decision !== "reject_all" &&
       r.decision !== "custom") ||
-    typeof r.categories !== "object" ||
-    r.categories === null ||
-    r.categories.essential !== true ||
-    typeof r.categories.analytics !== "boolean"
+    typeof c !== "object" ||
+    c === null ||
+    c.strictlyNecessary !== true ||
+    typeof c.performance !== "boolean" ||
+    typeof c.functional !== "boolean" ||
+    typeof c.targeting !== "boolean"
   ) {
     return null;
   }
@@ -39,7 +49,12 @@ export const decodeRecord = (
     v: r.v,
     id: r.id,
     decision: r.decision,
-    categories: { essential: true, analytics: r.categories.analytics },
+    categories: {
+      strictlyNecessary: true,
+      performance: c.performance,
+      functional: c.functional,
+      targeting: c.targeting,
+    },
     ts: r.ts,
     gpc: r.gpc,
   };
@@ -60,22 +75,24 @@ interface DecisionInput {
   id: string;
   gpc: boolean;
   now: Date;
-  analytics?: boolean | undefined;
+  /** For `custom`, the chosen state of each optional category. Ignored for accept/reject. */
+  selection?: Partial<Record<OptionalCategory, boolean>> | undefined;
 }
 
 export const recordFromDecision = (
   decision: ConsentDecision,
-  { id, gpc, now, analytics = false }: DecisionInput,
+  { id, gpc, now, selection }: DecisionInput,
 ): ConsentRecord => {
-  const resolvedAnalytics =
-    decision === "accept_all"
-      ? true
-      : decision === "reject_all"
-        ? false
-        : analytics;
+  const resolve = (key: OptionalCategory): boolean => {
+    if (decision === "accept_all") return true;
+    if (decision === "reject_all") return false;
+    return selection?.[key] ?? false;
+  };
   const categories: ConsentCategories = {
-    essential: true,
-    analytics: resolvedAnalytics,
+    strictlyNecessary: true,
+    performance: resolve("performance"),
+    functional: resolve("functional"),
+    targeting: resolve("targeting"),
   };
   return {
     v: CONSENT_VERSION,
