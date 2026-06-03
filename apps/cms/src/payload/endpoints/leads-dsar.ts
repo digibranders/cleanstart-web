@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { hasRole } from '../access/typed-user';
 import { deleteCareerApplicationsByEmail } from '../lib/careers/dsar';
+import { deletePartnerApplicationsByEmail } from '../lib/partners/dsar';
 import { clientIpFromHeaders } from '../lib/client-ip';
 import { checkAndRecord } from '../lib/rate-limit';
 import { extractEmail } from '../lib/lead-handlers/extract-fields';
@@ -232,6 +233,33 @@ export const dsarDeleteEndpoint: Endpoint = {
       });
     }
 
-    return json({ ok: true, deleted, hubspotDeleted, careerApplicationsDeleted });
+    const { deleted: partnerApplicationsDeleted } = await deletePartnerApplicationsByEmail(
+      req.payload,
+      targetEmail,
+    );
+
+    if (partnerApplicationsDeleted > 0) {
+      await req.payload.create({
+        collection: 'audit-log',
+        data: {
+          timestamp: new Date().toISOString(),
+          action: 'dsar_erasure',
+          targetCollection: 'partner-applications',
+          targetId: targetEmail,
+          actorUserId: actorId,
+          requestIp: ip,
+          metadata: { email: targetEmail, deleted: partnerApplicationsDeleted },
+        },
+        overrideAccess: true,
+      });
+    }
+
+    return json({
+      ok: true,
+      deleted,
+      hubspotDeleted,
+      careerApplicationsDeleted,
+      partnerApplicationsDeleted,
+    });
   },
 };
