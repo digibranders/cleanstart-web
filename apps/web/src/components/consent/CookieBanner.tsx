@@ -47,7 +47,7 @@ export function CookieBanner() {
       role="dialog"
       aria-modal="false"
       aria-label="Cookie consent"
-      className="fixed inset-x-0 bottom-0 z-[60] border-t border-white/10 bg-[#151021] text-white shadow-[0_-8px_30px_rgba(0,0,0,0.35)]"
+      className="fixed inset-x-0 bottom-0 z-[60] border-t border-white/10 bg-[#131a2e] text-white shadow-[0_-8px_30px_rgba(0,0,0,0.35)]"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="mx-auto flex max-w-[1100px] flex-col gap-4 px-6 py-5">
@@ -93,7 +93,7 @@ export function CookieBanner() {
             <button
               type="button"
               onClick={() => decide("accept_all")}
-              className="rounded-lg bg-white px-5 py-2.5 font-medium text-[#151021] transition hover:bg-white/90"
+              className="rounded-lg bg-white px-5 py-2.5 font-medium text-[#131a2e] transition hover:bg-white/90"
               style={{ fontSize: "var(--fs-button)" }}
             >
               Accept all
@@ -136,7 +136,7 @@ export function CookieBanner() {
               <button
                 type="button"
                 onClick={() => decide("custom", { analytics })}
-                className="rounded-lg bg-white px-5 py-2.5 font-medium text-[#151021] transition hover:bg-white/90"
+                className="rounded-lg bg-white px-5 py-2.5 font-medium text-[#131a2e] transition hover:bg-white/90"
                 style={{ fontSize: "var(--fs-button)" }}
               >
                 Save preferences
