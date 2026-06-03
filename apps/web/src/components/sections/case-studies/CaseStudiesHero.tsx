@@ -105,10 +105,11 @@ export function CaseStudiesHero(): React.ReactElement {
                 lineHeight: 1.4,
                 letterSpacing: "-0.02em",
                 opacity: 0.8,
-                maxWidth: "30ch",
               }}
             >
-              Real challenges. Our Solutions measurable impact for our customers.
+              {/* Two editorial lines (block spans, not <br/>) per the Figma. */}
+              <span className="block">Real challenges. Our solutions.</span>
+              <span className="block">Measurable impact for our customers.</span>
             </p>
           </HeroReveal>
         </div>
