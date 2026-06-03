@@ -95,7 +95,7 @@ export function CommunityHero() {
         </div>
       </Container>
 
-      <div className="relative z-0 lg:hidden">
+      <div className="hidden">
         <div className="relative h-[clamp(220px,55vw,360px)] overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

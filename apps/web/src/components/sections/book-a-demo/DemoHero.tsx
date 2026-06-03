@@ -30,7 +30,7 @@ export function DemoHero(): React.ReactElement {
         width={419}
         height={419}
         aria-hidden
-        className="pointer-events-none select-none absolute left-[-60px] top-[40px] w-[160px] md:left-[calc(50%-910px)] md:top-[148px] md:w-[clamp(220px,22vw,419px)]"
+        className="pointer-events-none select-none absolute hidden md:block left-[-60px] top-[40px] w-[160px] md:left-[calc(50%-910px)] md:top-[148px] md:w-[clamp(220px,22vw,419px)]"
         style={{
           height: "auto",
           mixBlendMode: "screen",
@@ -52,7 +52,7 @@ export function DemoHero(): React.ReactElement {
         width={419}
         height={419}
         aria-hidden
-        className="pointer-events-none select-none absolute right-[-60px] top-[40px] w-[160px] md:right-[calc(50%-910px)] md:top-[148px] md:w-[clamp(220px,22vw,419px)] md:left-auto"
+        className="pointer-events-none select-none absolute hidden md:block right-[-60px] top-[40px] w-[160px] md:right-[calc(50%-910px)] md:top-[148px] md:w-[clamp(220px,22vw,419px)] md:left-auto"
         style={{
           height: "auto",
           mixBlendMode: "screen",
