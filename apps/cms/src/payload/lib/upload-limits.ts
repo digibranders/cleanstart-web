@@ -11,7 +11,7 @@ const IMAGE_LIMIT = 25 * MB;
 const PDF_LIMIT = 50 * MB;
 const VIDEO_LIMIT = 200 * MB;
 const ZIP_LIMIT = 100 * MB;
-const RESUME_LIMIT = 10 * MB;
+export const RESUME_LIMIT = 10 * MB;
 
 const FALLBACK_LIMIT = IMAGE_LIMIT;
 

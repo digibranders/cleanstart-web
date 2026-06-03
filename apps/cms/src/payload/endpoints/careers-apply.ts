@@ -6,7 +6,7 @@ import { clientIpFromHeaders } from '../lib/client-ip';
 import { sendBrevoEmail } from '../lib/email/brevo';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
 import { verifyTurnstileToken } from '../lib/turnstile';
-import { checkUploadSize } from '../lib/upload-limits';
+import { RESUME_LIMIT, checkUploadSize } from '../lib/upload-limits';
 
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
@@ -179,6 +179,11 @@ export const careersApplyEndpoint: Endpoint = {
     }
     if (!RESUME_MIMES.has(file.type)) {
       return json({ ok: false, error: 'resume_type_unsupported' }, { status: 400, headers: cors });
+    }
+    // Resumes are hard-capped at 10 MB regardless of type. limitForMime grants
+    // PDFs 50 MB (for Media uploads), so this explicit cap must run first.
+    if (file.size > RESUME_LIMIT) {
+      return json({ ok: false, error: 'resume_too_large' }, { status: 400, headers: cors });
     }
     const sized = checkUploadSize(file.type, file.size);
     if (!sized.ok) {

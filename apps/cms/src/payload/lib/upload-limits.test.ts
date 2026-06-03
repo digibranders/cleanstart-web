@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { ALLOWED_MIME_TYPES, RESUME_MIME_TYPES, checkUploadSize, limitForMime } from './upload-limits';
+import {
+  ALLOWED_MIME_TYPES,
+  RESUME_LIMIT,
+  RESUME_MIME_TYPES,
+  checkUploadSize,
+  limitForMime,
+} from './upload-limits';
 
 const MB = 1024 * 1024;
 
@@ -64,5 +70,9 @@ describe('resume upload limits', () => {
     expect(limitForMime(DOCX)).toBe(10 * MB);
     expect(checkUploadSize(DOCX, 9 * MB)).toEqual({ ok: true });
     expect(checkUploadSize(DOCX, 11 * MB).ok).toBe(false);
+  });
+
+  it('exports RESUME_LIMIT as a hard 10 MB cap', () => {
+    expect(RESUME_LIMIT).toBe(10 * 1024 * 1024);
   });
 });
