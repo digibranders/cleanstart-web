@@ -18,7 +18,9 @@
 
 **The shape of the work:** the hard engineering (consent capture, retention, erasure, redaction, security of processing) is done. The remaining work is mostly **web-frontend wiring** (cookie consent, form consent parity) and **legal/governance paperwork** (RoPA/LIA/TIA/DPAs).
 
-> **2026-06-03 update:** the marketing-site forms are now wired live and submit lead PII to **HubSpot** (Forms Submissions API) on every submission — see `docs/forms-hubspot-verification.md`. **Brevo has been removed** from the stack (the secondary email handler and its `leads.emailHealth` field no longer exist); HubSpot is now the sole CRM **and** email sub-processor. References to Brevo below have been retired accordingly.
+> **2026-06-03 update:** the marketing-site forms are now wired live and submit lead PII to **HubSpot** (Forms Submissions API) on every submission — see `docs/forms-hubspot-verification.md`. The legacy Brevo **lead-email** handler (the old secondary email handler and its `leads.emailHealth` field) has been removed; **HubSpot is the sole CRM and lead-pipeline email sub-processor** and never receives careers data.
+>
+> **2026-06-03 — careers:** **Brevo is re-introduced for a different, narrowly-scoped purpose:** careers/partner transactional email. The careers apply endpoint (`POST /api/career-applications/apply`) relays a new-application notification — including the applicant's name/email and the resume as an attachment — to HR via Brevo. This is unrelated to the retired lead-email path; Brevo never touches lead-pipeline data, and HubSpot never touches careers data. See `docs/careers-applications.md` for the runbook.
 
 ---
 
@@ -33,7 +35,7 @@ All paths under `apps/cms/src/payload/` unless noted.
 | **Right of access (Art. 15)** | ✅ | `endpoints/leads-dsar.ts` → `GET /api/leads/dsar/find?email=` (admin-only, rate-limited). Admin UI: `admin/components/DsarActionsPanel.tsx`. |
 | **Right to data portability (Art. 20)** | 🟠 Partial | `endpoints/export-leads-csv.ts` exports leads as CSV (includes `consentGivenAt`, `privacyPolicyVersion`; hard cap ~20,000 rows). **Gap:** no per-subject JSON export endpoint — CSV is export-all, not per-data-subject. |
 | **Right to rectification (Art. 16)** | 🟠 Partial | The arch doc describes an "update by email" admin action; **not confirmed in code** (only find / delete / export endpoints found). Treat as unverified / to-build. |
-| **Right to erasure (Art. 17)** | ✅ | `POST /api/leads/dsar/delete` hard-deletes matching leads; cascades to HubSpot via `lib/lead-handlers/hubspot.ts` → `hubspotGdprDeleteByEmail()` (`POST /crm/v3/objects/contacts/gdpr-delete`, fail-soft). Every deletion writes an immutable row via the `writeLeadDeletionAudit` hook → `collections/audit-log.ts` (`dsar_erasure` / `lead_deleted`). HubSpot is the only downstream processor that receives lead PII, so the cascade is complete. |
+| **Right to erasure (Art. 17)** | ✅ | `POST /api/leads/dsar/delete` hard-deletes matching leads; cascades to HubSpot via `lib/lead-handlers/hubspot.ts` → `hubspotGdprDeleteByEmail()` (`POST /crm/v3/objects/contacts/gdpr-delete`, fail-soft). Delete-by-email **also erases matching career applications and their resumes** (the `career-applications` row + the private `resumes` R2 object). Every deletion writes an immutable row via the `writeLeadDeletionAudit` hook → `collections/audit-log.ts` (`dsar_erasure` / `lead_deleted`). HubSpot (leads) is the only downstream CRM that receives lead PII; careers data lives only in Postgres + private R2, so the cascade is complete. |
 | **PII in telemetry / logs** | ✅ | `sentry.server.config.ts` — `sendDefaultPii:false` + `beforeSend`/`beforeBreadcrumb` redaction (keys: `fields`, `ip`, `userAgent`, `email`, `password`, `turnstileToken`, `consent`). `sentry.client.config.ts` — session replay disabled. `lib/webhooks/redact-error-body.ts` scrubs secrets from webhook error logs. The `lead.submitted` webhook payload is **metadata-only** (formId, formSlug, duplicate flag, source) — never field values (`endpoints/submit-lead.ts`). |
 | **Security of processing (Art. 32)** | ✅ | AES-256-GCM encryption of integration secrets via `lib/integrations/secrets.ts` (HKDF-SHA256 key from `PAYLOAD_SECRET`, wire format `v1:<base64(iv‖tag‖ct)>`). Cloudflare Turnstile (`lib/turnstile.ts`). Per-IP rate limiting (`lib/rate-limit.ts`, 5/min · 50/day; single-process — multi-worker needs a shared store). Standard-Webhooks HMAC-SHA256 signing (`lib/webhooks/sign.ts`). |
 
@@ -69,7 +71,7 @@ All paths under `apps/web/src/`.
 | Consent (lawful basis) | 7 | ✅ backend / 🟠 web | Lead consent snapshot + policy version; web form consent uneven |
 | Access | 15 | ✅ | `/api/leads/dsar/find` + CSV export + admin panel |
 | Rectification | 16 | 🟠 | "update by email" not confirmed in code |
-| Erasure | 17 | ✅ | `/api/leads/dsar/delete` + HubSpot cascade + audit log |
+| Erasure | 17 | ✅ | `/api/leads/dsar/delete` + HubSpot cascade + career-applications/resume erasure + audit log |
 | Portability | 20 | 🟠 | CSV export-all only; no per-subject JSON |
 | Object / restrict | 18, 21 | 🟠 | manual via admin DSAR; no self-service |
 | Security of processing | 32 | ✅ (2FA gap) | encryption, Turnstile, rate-limit, HMAC, redaction; admin 2FA deferred |
@@ -85,6 +87,7 @@ There is **no self-service data-subject portal** — all requests are fielded by
 |---|---|---|---|
 | Lead form-field answers | configurable (default 365d) | retained, then PII keys nulled | `purge-leads-pii.ts` |
 | Lead `ip` / `userAgent` | 365d | nulled; `piiRedactedAt` stamped | `purge-leads-pii.ts` |
+| Career applications (PII) + resume file | configurable (default 365d, `CAREERS_RETENTION_DAYS`) | resume hard-deleted from private R2, applicant PII nulled | `purge-career-applications.ts` |
 | Consent snapshot + policy version | lifetime of lead | retained (legal evidence) | — |
 | Search logs | 90d | row deleted | `purge-search-log.ts` |
 | Preview-audit tokens | 90d | row deleted | `purge-preview-audit.ts` |
@@ -100,7 +103,8 @@ Every third party that processes personal/lead data. EU→US transfers rely on e
 
 | Processor | Personal data | Region | Transfer basis / notes |
 |---|---|---|---|
-| **HubSpot** (CRM + email) | contact/lead fields (name, email, phone, company, message) — **received live on every form submission** | 🇺🇸 US (`app-na2` = NA2) | SCCs/DPF — **DPA to sign before go-live**; region fixed at portal creation. Sole CRM + email sub-processor (Brevo retired 2026-06-02). |
+| **HubSpot** (CRM + lead-pipeline email) | contact/lead fields (name, email, phone, company, message) — **received live on every form submission** | 🇺🇸 US (`app-na2` = NA2) | SCCs/DPF — **DPA to sign before go-live**; region fixed at portal creation. Sole CRM + lead-pipeline email sub-processor; never receives careers data. |
+| **Brevo** (careers/partner transactional email) | applicant name + email, and the resume file as an email attachment — sent to HR on each job application | 🇪🇺 EU / 🇺🇸 US | SCCs — **DPA to sign before go-live**. Scoped to careers/partner notifications only; never receives lead-pipeline data. |
 | **Cloudflare R2** | lead fallback queue + media | 🇺🇸 US | SCCs · encrypted at rest |
 | **Cloudflare Turnstile** | IP (bot check) | 🇺🇸 US | Cloudflare DPA |
 | **Sentry** | error telemetry (PII-scrubbed) | 🇺🇸 US | SCCs · `sendDefaultPii:false` |
@@ -120,6 +124,7 @@ Every third party that processes personal/lead data. EU→US transfers rely on e
 | Data category | Collected where | Stored where | Retention |
 |---|---|---|---|
 | Name, email, phone, company | marketing forms → `/api/leads/submit` | `leads.fields` (Postgres) | 365d then PII nulled |
+| Job-applicant name, email, phone, cover letter, **resume file** | careers apply form → `/api/career-applications/apply` | `career-applications` (Postgres) + resume in **private** `resumes` R2 prefix | 365d (`CAREERS_RETENTION_DAYS`) then resume **hard-deleted** + applicant PII nulled |
 | IP, user-agent | captured at submit (spam analysis) | `leads.ip` / `leads.userAgent` | 365d then nulled |
 | Consent record | at submit | `leads.consentSnapshot` + `consentGivenAt` + `privacyPolicyVersion` | lifetime of lead |
 | CRM mirror + follow-up/notification email | secondary handler (Forms Submissions API, live) | HubSpot (US) | per HubSpot config |

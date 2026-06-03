@@ -343,7 +343,7 @@ These resolved the open forks from arch doc §`#decisions`. Build accordingly:
 
 ## Background jobs
 
-Six Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
+Seven Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
 
 | Job | Schedule (UTC) | File |
 |-----|----------------|------|
@@ -351,6 +351,7 @@ Six Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PA
 | Webhook retry | every 5 min | `retry-webhook.ts` |
 | Search-log purge (90-day retention) | daily 03:00 | `purge-search-log.ts` |
 | Leads PII redaction (365-day retention) | daily 03:15 | `purge-leads-pii.ts` |
+| Career-applications purge (resume delete + PII redaction, 365-day) | daily 03:45 | `purge-career-applications.ts` |
 | Broken-links scan | daily 04:30 | `check-broken-links.ts` |
 | Meilisearch reindex (drift check + self-heal) | daily 05:00 | `reindex-meili.ts` |
 
@@ -372,6 +373,7 @@ These channels are wired and active (env-var configured). See `apps/cms/.env.exa
 | Cloudflare Turnstile | Bot protection on `/api/leads/submit` | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` |
 | Sentry | Error tracking + PII redaction | `SENTRY_DSN` (+ auth token, org, project) |
 | IndexNow | Bing/Yandex ping on publish (7 collections) | `INDEXNOW_KEY` |
+| Brevo | Careers/partner transactional email — HR notification (with resume attachment) on each job application. Distinct from HubSpot, which owns lead-pipeline email and never receives careers data. | `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `CAREERS_HR_EMAIL` |
 
 **Phase J2 planned:** Zoho CRM (OAuth 2.0 — primary CRM, build first), GA4 Measurement Protocol, Google Search Console. See `docs/INTEGRATIONS-RESEARCH-V2.md` for the full J1/J2/J3 milestone breakdown.
 

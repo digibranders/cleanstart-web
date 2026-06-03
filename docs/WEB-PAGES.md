@@ -51,7 +51,7 @@ page slugs, categories, types, and build status across the dev journey.
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
 | 22 | About Us | `/about-us` | Static | ✅ | Route at `src/app/about-us/` |
-| 23 | Careers | `/careers` | CMS Listing | ✅ | Backed by Payload `jobs` + `jobLocations` collections; published roles only. |
+| 23 | Careers | `/careers` | CMS Listing | ✅ | Backed by Payload `jobs` + `jobLocations` collections; published roles only. Apply form is live on CMS-native open jobs → `POST /api/career-applications/apply` (resume to private R2, application row, Brevo HR notification). |
 | 24 | Community | `/community` | Static | ✅ | Built 2026-05-22 from Figma 732:3192 |
 | 25 | Contact Us | `/contact-us` | Static | ✅ | Built 2026-05-23 from Figma 817:14719 |
 | 26 | Teams | `/teams` | Static | ✅ | All 5 sections built (farheen integration 2026-05-20) |
