@@ -9,18 +9,7 @@ import {
   TextArea,
   TextInput,
 } from "@/components/sections/forms/FormCard";
-import { submitLead } from "@/lib/leads/submitLead";
-
-/** Web input name → HubSpot internal property name (the `forms` field names). */
-const NAME_MAP: Record<string, string> = {
-  firstName: "firstname",
-  lastName: "lastname",
-  phone: "phone",
-  email: "email",
-  company: "company",
-  website: "website",
-  partnerReason: "enter_message",
-};
+import { submitPartner } from "@/lib/partners/submitPartner";
 
 const STORAGE_CONSENT_TEXT =
   "I agree to allow CleanStart to store and process my personal data.";
@@ -30,8 +19,8 @@ const STORAGE_CONSENT_TEXT =
  * ("Join Forces with CleanStart") from this CTA; this reproduces it on the
  * new site using the shared FormCard design language (white card / blue
  * border) so it matches its sibling, the Deal Registration form. Submissions
- * post through the shared `submitLead` helper to `/api/leads/submit` (form
- * slug `become-a-partner`), which relays to the HubSpot `website-partner` form.
+ * post through the `submitPartner` helper to the dedicated CMS endpoint
+ * `/api/partner-applications/apply`.
  */
 export function BecomePartnerCta(): React.ReactElement {
   const [open, setOpen] = useState(false);
@@ -101,23 +90,39 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
     }
     inFlightRef.current = true;
 
-    const fields: Record<string, string> = {};
-    for (const [inputName, hsName] of Object.entries(NAME_MAP)) {
-      const value = fd.get(inputName);
-      if (typeof value === "string" && value.trim()) fields[hsName] = value.trim();
-    }
+    const readField = (name: string): string | undefined => {
+      const value = fd.get(name);
+      if (typeof value !== "string") return undefined;
+      const trimmed = value.trim();
+      return trimmed ? trimmed : undefined;
+    };
+
+    const firstName = readField("firstName") ?? "";
+    const lastName = readField("lastName") ?? "";
+    const email = readField("email") ?? "";
+    const company = readField("company") ?? "";
+    const phone = readField("phone");
+    const website = readField("website");
+    const partnerReason = readField("partnerReason");
     const categories = ["storage", ...(fd.get("consent_marketing") != null ? ["marketing"] : [])];
     const turnstileToken = fd.get("cf-turnstile-response");
+    const hp = fd.get("hp");
 
-    const result = await submitLead({
-      formSlug: "become-a-partner",
-      fields,
+    const result = await submitPartner({
+      firstName,
+      lastName,
+      email,
+      company,
+      ...(phone != null ? { phone } : {}),
+      ...(website != null ? { website } : {}),
+      ...(partnerReason != null ? { partnerReason } : {}),
       consent: {
         snapshot: STORAGE_CONSENT_TEXT,
         givenAt: new Date().toISOString(),
         categories,
       },
       ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
+      ...(typeof hp === "string" ? { hp } : {}),
       ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
     });
 
@@ -235,6 +240,15 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
               </p>
             ) : (
               <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+                <input
+                  type="text"
+                  name="hp"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  defaultValue=""
+                  style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+                />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <TextInput name="firstName" placeholder="First Name" label="First Name" required />
                   <TextInput name="lastName" placeholder="Last Name" label="Last Name" required />
