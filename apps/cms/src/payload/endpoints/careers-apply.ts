@@ -4,7 +4,7 @@ import { applicationFieldsSchema } from '../lib/careers/application-schema';
 import { buildHrApplicationEmail } from '../lib/careers/hr-email';
 import { formatJobLocation } from '../lib/careers/job-location';
 import { clientIpFromHeaders } from '../lib/client-ip';
-import { sendBrevoEmail } from '../lib/email/brevo';
+import { type BrevoSendResult, sendBrevoEmail } from '../lib/email/brevo';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
 import { verifyTurnstileToken } from '../lib/turnstile';
 import { RESUME_LIMIT, checkUploadSize } from '../lib/upload-limits';
@@ -264,26 +264,57 @@ export const careersApplyEndpoint: Endpoint = {
 
     // 3. Send HR email (non-fatal) BEFORE the application create so the result
     //    is written in the initial append-only row.
-    const { subject, htmlContent } = buildHrApplicationEmail({
-      jobTitle: job.title ?? data.jobSlug,
-      jobLocation,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      phone: data.phone,
-      coverLetter: data.coverLetter,
-      linkedinUrl: data.linkedinUrl,
-    });
+    const fullName = `${data.firstName} ${data.lastName}`.trim();
+    const attachments = [{ name: file.name || 'resume', content: buffer.toString('base64') }];
     const hrEmail = process.env.CAREERS_HR_EMAIL;
-    const delivery = hrEmail
-      ? await sendBrevoEmail({
-          to: [{ email: hrEmail }],
-          replyTo: { email: data.email, name: `${data.firstName} ${data.lastName}`.trim() },
-          subject,
-          htmlContent,
-          attachments: [{ name: file.name || 'resume', content: buffer.toString('base64') }],
-        })
-      : ({ status: 'skipped', reason: 'no-hr-recipient' } as const);
+    // Use the Brevo dashboard template when BREVO_TEMPLATE_ID is a positive
+    // integer; otherwise fall back to the code-built HTML (hr-email.ts).
+    const templateIdRaw = process.env.BREVO_TEMPLATE_ID;
+    const templateIdParsed = templateIdRaw ? Number.parseInt(templateIdRaw, 10) : Number.NaN;
+    const templateId =
+      Number.isInteger(templateIdParsed) && templateIdParsed > 0 ? templateIdParsed : undefined;
+
+    let delivery: BrevoSendResult;
+    if (!hrEmail) {
+      delivery = { status: 'skipped', reason: 'no-hr-recipient' };
+    } else if (templateId != null) {
+      delivery = await sendBrevoEmail({
+        to: [{ email: hrEmail }],
+        replyTo: { email: data.email, name: fullName },
+        templateId,
+        params: {
+          jobTitle: job.title ?? data.jobSlug,
+          jobLocation: jobLocation ?? '',
+          fullName,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone ?? '',
+          linkedinUrl: data.linkedinUrl ?? '',
+          coverLetter: data.coverLetter ?? '',
+          submittedAt: new Date().toISOString(),
+        },
+        attachments,
+      });
+    } else {
+      const { subject, htmlContent } = buildHrApplicationEmail({
+        jobTitle: job.title ?? data.jobSlug,
+        jobLocation,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        coverLetter: data.coverLetter,
+        linkedinUrl: data.linkedinUrl,
+      });
+      delivery = await sendBrevoEmail({
+        to: [{ email: hrEmail }],
+        replyTo: { email: data.email, name: fullName },
+        subject,
+        htmlContent,
+        attachments,
+      });
+    }
 
     // 4. Create the append-only application row with delivery embedded.
     try {

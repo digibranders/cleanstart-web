@@ -50,6 +50,33 @@ describe('sendBrevoEmail', () => {
     expect(init.headers).toMatchObject({ 'api-key': 'key' });
   });
 
+  it('sends a template (templateId + params) without requiring a sender env', async () => {
+    vi.stubEnv('BREVO_API_KEY', 'key');
+    vi.stubEnv('BREVO_SENDER_EMAIL', '');
+    const fetchMock = vi.fn<typeof fetch>(
+      async () => new Response(JSON.stringify({ messageId: 'mid-2' }), { status: 201 }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await sendBrevoEmail({
+      to: [{ email: 'hr@cleanstart.com' }],
+      templateId: 1,
+      params: { jobTitle: 'Engineer' },
+      attachments: [{ name: 'cv.pdf', content: 'BASE64' }],
+    });
+
+    expect(result).toEqual({ status: 'synced', messageId: 'mid-2' });
+    const call = fetchMock.mock.calls[0];
+    expect(call).toBeDefined();
+    const [, init] = call as [RequestInfo | URL, RequestInit];
+    const body = JSON.parse(init.body as string);
+    expect(body.templateId).toBe(1);
+    expect(body.params).toEqual({ jobTitle: 'Engineer' });
+    expect(body.htmlContent).toBeUndefined();
+    expect(body.sender).toBeUndefined();
+    expect(body.attachment).toEqual([{ name: 'cv.pdf', content: 'BASE64' }]);
+  });
+
   it('returns failed with redacted error on non-2xx', async () => {
     vi.stubEnv('BREVO_API_KEY', 'key');
     vi.stubEnv('BREVO_SENDER_EMAIL', 'no-reply@cleanstart.com');
