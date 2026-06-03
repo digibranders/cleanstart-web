@@ -4,6 +4,7 @@ import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { CareerDetailHero } from "@/components/sections/careers/CareerDetailHero";
 import { CareerDetailContent } from "@/components/sections/careers/CareerDetailContent";
+import { JobApplyForm } from "@/components/sections/careers/JobApplyForm";
 import type { LexicalRoot } from "@/lib/blog";
 import {
   DEPARTMENT_LABEL,
@@ -147,6 +148,11 @@ export default async function CareerDetailPage({
           body={bodyWithoutDeptLine}
           contactEmail={CONTACT_EMAIL}
         />
+        {/* CMS-native, open roles accept applications on-site. ATS roles keep
+            their existing external-link behaviour (no form rendered). */}
+        {job.source === "cms" && job.hiringStatus === "open" ? (
+          <JobApplyForm jobSlug={job.slug} jobTitle={job.title} />
+        ) : null}
       </main>
       <Footer />
     </>
