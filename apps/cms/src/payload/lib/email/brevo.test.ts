@@ -7,11 +7,13 @@ afterEach(() => {
   process.env = { ...ORIGINAL };
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
 });
 
 describe('sendBrevoEmail', () => {
   it('skips when BREVO_API_KEY is unset', async () => {
-    process.env.BREVO_API_KEY = undefined;
+    vi.stubEnv('BREVO_API_KEY', '');
+    vi.stubEnv('BREVO_SENDER_EMAIL', '');
     const result = await sendBrevoEmail({
       to: [{ email: 'hr@cleanstart.com' }],
       subject: 'x',
@@ -21,9 +23,9 @@ describe('sendBrevoEmail', () => {
   });
 
   it('posts to the Brevo endpoint and returns the messageId on 2xx', async () => {
-    process.env.BREVO_API_KEY = 'key';
-    process.env.BREVO_SENDER_EMAIL = 'no-reply@cleanstart.com';
-    process.env.BREVO_SENDER_NAME = 'CleanStart';
+    vi.stubEnv('BREVO_API_KEY', 'key');
+    vi.stubEnv('BREVO_SENDER_EMAIL', 'no-reply@cleanstart.com');
+    vi.stubEnv('BREVO_SENDER_NAME', 'CleanStart');
     const fetchMock = vi.fn<typeof fetch>(
       async () => new Response(JSON.stringify({ messageId: 'mid-1' }), { status: 201 }),
     );
@@ -49,8 +51,8 @@ describe('sendBrevoEmail', () => {
   });
 
   it('returns failed with redacted error on non-2xx', async () => {
-    process.env.BREVO_API_KEY = 'key';
-    process.env.BREVO_SENDER_EMAIL = 'no-reply@cleanstart.com';
+    vi.stubEnv('BREVO_API_KEY', 'key');
+    vi.stubEnv('BREVO_SENDER_EMAIL', 'no-reply@cleanstart.com');
     vi.stubGlobal('fetch', vi.fn(async () => new Response('boom', { status: 400 })));
     const result = await sendBrevoEmail({ to: [{ email: 'hr@cleanstart.com' }], subject: 's', htmlContent: '<p>x</p>' });
     expect(result.status).toBe('failed');
