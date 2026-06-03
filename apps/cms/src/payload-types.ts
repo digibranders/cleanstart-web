@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     resumes: Resume;
+    'career-applications': CareerApplication;
     redirects: Redirect;
     brokenLinks: BrokenLink;
     'audit-log': AuditLog;
@@ -107,6 +108,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     resumes: ResumesSelect<false> | ResumesSelect<true>;
+    'career-applications': CareerApplicationsSelect<false> | CareerApplicationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
@@ -359,6 +361,421 @@ export interface Resume {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * Job applications (append-only). Resumes are stored privately and emailed to HR.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "career-applications".
+ */
+export interface CareerApplication {
+  id: number;
+  job: number | Job;
+  /**
+   * Job title at apply time — survives later job edits/deletes.
+   */
+  jobTitleSnapshot: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string | null;
+  coverLetter?: string | null;
+  linkedinUrl?: string | null;
+  resume: number | Resume;
+  /**
+   * Referrer URL.
+   */
+  source?: string | null;
+  ip?: string | null;
+  userAgent?: string | null;
+  consentGivenAt?: string | null;
+  consentSnapshot?: string | null;
+  privacyPolicyVersion?: string | null;
+  emailDelivery?: {
+    status?: ('synced' | 'failed' | 'skipped') | null;
+    messageId?: string | null;
+    error?: string | null;
+  };
+  honeypot?: string | null;
+  turnstilePassed?: boolean | null;
+  piiRedactedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs".
+ */
+export interface Job {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  source: 'cms' | 'ats';
+  /**
+   * Deep link into the external ATS. Required when source=ats.
+   */
+  atsUrl?: string | null;
+  department?:
+    | ('engineering' | 'sales' | 'marketing' | 'customer-success' | 'operations' | 'finance' | 'legal' | 'people')
+    | null;
+  employmentType?: ('full-time' | 'part-time' | 'contract' | 'internship') | null;
+  experienceLevel?: ('entry' | 'mid' | 'senior' | 'staff' | 'principal') | null;
+  /**
+   * Optional when remote=true. Renderers can fall back to "Remote (Global)" when this is empty and remote is on.
+   */
+  locations?: (number | JobLocation)[] | null;
+  remote?: boolean | null;
+  salaryRange?: {
+    min?: number | null;
+    max?: number | null;
+    currency?: ('USD' | 'EUR' | 'GBP' | 'INR') | null;
+  };
+  /**
+   * Short summary shown on listing cards and drives the SEO description fallback. Keep under 160 characters.
+   */
+  abstract?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional JD PDF (routed to web/job/).
+   */
+  descriptionPdf?: (number | null) | Media;
+  /**
+   * mailto:hire@cleanstart.com is acceptable.
+   */
+  applyUrl?: string | null;
+  /**
+   * Hiring lifecycle. Distinct from Payload _status (draft/published).
+   */
+  hiringStatus?: ('open' | 'paused' | 'closed') | null;
+  /**
+   * When applications close. Editors set this when posting.
+   */
+  applicationDeadline?: string | null;
+  /**
+   * When the listing should auto-close. Not yet enforced — update hiringStatus manually when the deadline passes.
+   */
+  expiresAt?: string | null;
+  closedAt?: string | null;
+  /**
+   * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
+   */
+  schemaAddons?:
+    | (
+        | {
+            name: string;
+            /**
+             * One-paragraph summary of the procedure.
+             */
+            description: string;
+            /**
+             * ISO 8601 duration (e.g. PT15M = 15 minutes, PT1H30M = 1.5 hours).
+             */
+            totalTime?: string | null;
+            steps?:
+              | {
+                  name: string;
+                  /**
+                   * What the reader should do for this step.
+                   */
+                  text: string;
+                  /**
+                   * Optional supporting image (1200×675 ideal).
+                   */
+                  image?: (number | null) | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'howTo';
+          }
+        | {
+            name: string;
+            description: string;
+            /**
+             * Required by Google. 1200×675 ideal, 16:9 minimum.
+             */
+            thumbnail: number | Media;
+            uploadDate: string;
+            /**
+             * Direct video URL (e.g. .mp4) — used by Google for in-SERP playback. Use embedUrl below for YouTube/Vimeo embeds.
+             */
+            contentUrl: string;
+            /**
+             * Optional iframe-embeddable URL (YouTube/Vimeo). Required by Google when the player is embedded rather than self-hosted.
+             */
+            embedUrl?: string | null;
+            /**
+             * ISO 8601 duration (e.g. PT5M30S).
+             */
+            duration?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'videoObject';
+          }
+        | {
+            /**
+             * Curated Q&A merged into the page FAQPage blob. If the doc already auto-emits FAQ from its `faqs[]` field, these entries are concatenated rather than duplicated.
+             */
+            questions?:
+              | {
+                  question: string;
+                  answer: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faqPage';
+          }
+        | {
+            itemReviewedType: 'Product' | 'Service' | 'SoftwareApplication' | 'Organization';
+            itemReviewedName: string;
+            /**
+             * 0–5 (use whole or half-stars: 0, 0.5, 1, 1.5, …, 5).
+             */
+            ratingValue: number;
+            reviewBody?: string | null;
+            /**
+             * Reviewer name (Person). Falls back to the doc author.
+             */
+            authorName?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'review';
+          }
+        | {
+            name: string;
+            category:
+              | 'BusinessApplication'
+              | 'DeveloperApplication'
+              | 'SecurityApplication'
+              | 'CommunicationApplication';
+            /**
+             * OS support (e.g. "Linux", "macOS, Windows", "Web").
+             */
+            os: string;
+            /**
+             * Price as a string (e.g. "0", "29.00"). Use "0" for free / open-source.
+             */
+            price: string;
+            currency: 'USD' | 'EUR' | 'GBP' | 'INR';
+            /**
+             * Average rating, 0–5. Optional.
+             */
+            ratingValue?: number | null;
+            /**
+             * Number of ratings. Required if Average rating is set.
+             */
+            ratingCount?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'softwareApp';
+          }
+        | {
+            /**
+             * BreadcrumbList is auto-emitted today. Use this override to suppress the auto crumb on a flat page, or to replace it with custom crumbs.
+             */
+            mode: 'suppress' | 'replace';
+            crumbs?:
+              | {
+                  name: string;
+                  /**
+                   * Site-relative path (e.g. /solutions/pricing) or full URL.
+                   */
+                  path: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'breadcrumbList';
+          }
+      )[]
+    | null;
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobLocations".
+ */
+export interface JobLocation {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  type: 'country' | 'region' | 'city';
+  /**
+   * ISO 3166-1 alpha-2 country code (e.g. IN, US, GB). Two uppercase letters.
+   */
+  isoCountry: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1524,25 +1941,6 @@ export interface KnowledgeCategory {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "jobLocations".
- */
-export interface JobLocation {
-  id: number;
-  name: string;
-  /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
-   */
-  slug: string;
-  type: 'country' | 'region' | 'city';
-  /**
-   * ISO 3166-1 alpha-2 country code (e.g. IN, US, GB). Two uppercase letters.
-   */
-  isoCountry: string;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -4647,362 +5045,6 @@ export interface PodcastEpisode {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "jobs".
- */
-export interface Job {
-  id: number;
-  title: string;
-  /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
-   */
-  slug: string;
-  source: 'cms' | 'ats';
-  /**
-   * Deep link into the external ATS. Required when source=ats.
-   */
-  atsUrl?: string | null;
-  department?:
-    | ('engineering' | 'sales' | 'marketing' | 'customer-success' | 'operations' | 'finance' | 'legal' | 'people')
-    | null;
-  employmentType?: ('full-time' | 'part-time' | 'contract' | 'internship') | null;
-  experienceLevel?: ('entry' | 'mid' | 'senior' | 'staff' | 'principal') | null;
-  /**
-   * Optional when remote=true. Renderers can fall back to "Remote (Global)" when this is empty and remote is on.
-   */
-  locations?: (number | JobLocation)[] | null;
-  remote?: boolean | null;
-  salaryRange?: {
-    min?: number | null;
-    max?: number | null;
-    currency?: ('USD' | 'EUR' | 'GBP' | 'INR') | null;
-  };
-  /**
-   * Short summary shown on listing cards and drives the SEO description fallback. Keep under 160 characters.
-   */
-  abstract?: string | null;
-  body?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Optional JD PDF (routed to web/job/).
-   */
-  descriptionPdf?: (number | null) | Media;
-  /**
-   * mailto:hire@cleanstart.com is acceptable.
-   */
-  applyUrl?: string | null;
-  /**
-   * Hiring lifecycle. Distinct from Payload _status (draft/published).
-   */
-  hiringStatus?: ('open' | 'paused' | 'closed') | null;
-  /**
-   * When applications close. Editors set this when posting.
-   */
-  applicationDeadline?: string | null;
-  /**
-   * When the listing should auto-close. Not yet enforced — update hiringStatus manually when the deadline passes.
-   */
-  expiresAt?: string | null;
-  closedAt?: string | null;
-  /**
-   * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
-   */
-  schemaAddons?:
-    | (
-        | {
-            name: string;
-            /**
-             * One-paragraph summary of the procedure.
-             */
-            description: string;
-            /**
-             * ISO 8601 duration (e.g. PT15M = 15 minutes, PT1H30M = 1.5 hours).
-             */
-            totalTime?: string | null;
-            steps?:
-              | {
-                  name: string;
-                  /**
-                   * What the reader should do for this step.
-                   */
-                  text: string;
-                  /**
-                   * Optional supporting image (1200×675 ideal).
-                   */
-                  image?: (number | null) | Media;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'howTo';
-          }
-        | {
-            name: string;
-            description: string;
-            /**
-             * Required by Google. 1200×675 ideal, 16:9 minimum.
-             */
-            thumbnail: number | Media;
-            uploadDate: string;
-            /**
-             * Direct video URL (e.g. .mp4) — used by Google for in-SERP playback. Use embedUrl below for YouTube/Vimeo embeds.
-             */
-            contentUrl: string;
-            /**
-             * Optional iframe-embeddable URL (YouTube/Vimeo). Required by Google when the player is embedded rather than self-hosted.
-             */
-            embedUrl?: string | null;
-            /**
-             * ISO 8601 duration (e.g. PT5M30S).
-             */
-            duration?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'videoObject';
-          }
-        | {
-            /**
-             * Curated Q&A merged into the page FAQPage blob. If the doc already auto-emits FAQ from its `faqs[]` field, these entries are concatenated rather than duplicated.
-             */
-            questions?:
-              | {
-                  question: string;
-                  answer: string;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'faqPage';
-          }
-        | {
-            itemReviewedType: 'Product' | 'Service' | 'SoftwareApplication' | 'Organization';
-            itemReviewedName: string;
-            /**
-             * 0–5 (use whole or half-stars: 0, 0.5, 1, 1.5, …, 5).
-             */
-            ratingValue: number;
-            reviewBody?: string | null;
-            /**
-             * Reviewer name (Person). Falls back to the doc author.
-             */
-            authorName?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'review';
-          }
-        | {
-            name: string;
-            category:
-              | 'BusinessApplication'
-              | 'DeveloperApplication'
-              | 'SecurityApplication'
-              | 'CommunicationApplication';
-            /**
-             * OS support (e.g. "Linux", "macOS, Windows", "Web").
-             */
-            os: string;
-            /**
-             * Price as a string (e.g. "0", "29.00"). Use "0" for free / open-source.
-             */
-            price: string;
-            currency: 'USD' | 'EUR' | 'GBP' | 'INR';
-            /**
-             * Average rating, 0–5. Optional.
-             */
-            ratingValue?: number | null;
-            /**
-             * Number of ratings. Required if Average rating is set.
-             */
-            ratingCount?: number | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'softwareApp';
-          }
-        | {
-            /**
-             * BreadcrumbList is auto-emitted today. Use this override to suppress the auto crumb on a flat page, or to replace it with custom crumbs.
-             */
-            mode: 'suppress' | 'replace';
-            crumbs?:
-              | {
-                  name: string;
-                  /**
-                   * Site-relative path (e.g. /solutions/pricing) or full URL.
-                   */
-                  path: string;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'breadcrumbList';
-          }
-      )[]
-    | null;
-  /**
-   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
-   */
-  publishedAt?: string | null;
-  /**
-   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
-   */
-  displayPublishedAt?: string | null;
-  /**
-   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
-   */
-  seo?: {
-    /**
-     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
-     */
-    title?: string | null;
-    /**
-     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
-     */
-    description?: string | null;
-    /**
-     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
-     */
-    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
-    /**
-     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
-     */
-    ogImageAlt?: string | null;
-    /**
-     * Show fields to override the og:title / og:description independently of the SEO title / description.
-     */
-    useAdvancedOg?: boolean | null;
-    /**
-     * Defaults to the SEO title. Most editors never need to override this.
-     */
-    ogTitle?: string | null;
-    /**
-     * Defaults to the SEO description.
-     */
-    ogDescription?: string | null;
-    /**
-     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
-     */
-    useAdvancedTwitter?: boolean | null;
-    /**
-     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
-     */
-    twitterCard?: ('summary' | 'summary_large_image') | null;
-    /**
-     * Defaults to ogTitle, then SEO title.
-     */
-    twitterTitle?: string | null;
-    /**
-     * Defaults to ogDescription, then SEO description.
-     */
-    twitterDescription?: string | null;
-    /**
-     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
-     */
-    twitterImage?: (number | null) | Media;
-    useCustomCanonical?: boolean | null;
-    canonicalOverride?: string | null;
-    robotsAdvanced?: {
-      /**
-       * Don't show a cached version in SERP.
-       */
-      noarchive?: boolean | null;
-      /**
-       * Suppress the textual snippet entirely (overrides max-snippet).
-       */
-      nosnippet?: boolean | null;
-      /**
-       * Don't index images on this page.
-       */
-      noimageindex?: boolean | null;
-      /**
-       * Don't show the 'Translate' link on this page.
-       */
-      notranslate?: boolean | null;
-      /**
-       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
-       */
-      maxSnippet?: number | null;
-      /**
-       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
-       */
-      maxImagePreview?: ('standard' | 'large' | 'none') | null;
-      /**
-       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
-       */
-      maxVideoPreview?: number | null;
-      /**
-       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
-       */
-      unavailableAfter?: string | null;
-    };
-    alternates?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    customTags?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    /**
-     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
-     */
-    keywordTarget?: string | null;
-    /**
-     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
-     */
-    speakablePath?:
-      | {
-          selector: string;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
-     */
-    additionalSchema?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
  * Image rows shown on /about-us. Each item is NOT URL-addressable — only /about-us reads this collection.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -7069,6 +7111,10 @@ export interface PayloadLockedDocument {
         value: number | Resume;
       } | null)
     | ({
+        relationTo: 'career-applications';
+        value: number | CareerApplication;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -7319,6 +7365,39 @@ export interface ResumesSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "career-applications_select".
+ */
+export interface CareerApplicationsSelect<T extends boolean = true> {
+  job?: T;
+  jobTitleSnapshot?: T;
+  firstName?: T;
+  lastName?: T;
+  email?: T;
+  phone?: T;
+  coverLetter?: T;
+  linkedinUrl?: T;
+  resume?: T;
+  source?: T;
+  ip?: T;
+  userAgent?: T;
+  consentGivenAt?: T;
+  consentSnapshot?: T;
+  privacyPolicyVersion?: T;
+  emailDelivery?:
+    | T
+    | {
+        status?: T;
+        messageId?: T;
+        error?: T;
+      };
+  honeypot?: T;
+  turnstilePassed?: T;
+  piiRedactedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

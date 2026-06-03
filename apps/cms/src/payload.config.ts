@@ -32,6 +32,7 @@ import { PodcastEpisodes } from './payload/collections/PodcastEpisodes';
 import { PreviewAudit } from './payload/collections/PreviewAudit';
 import { Redirects } from './payload/collections/Redirects';
 import { Resources } from './payload/collections/Resources';
+import { CareerApplications } from './payload/collections/CareerApplications';
 import { Resumes } from './payload/collections/Resumes';
 import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
@@ -316,6 +317,7 @@ export default buildConfig({
     Users,
     Media,
     Resumes,
+    CareerApplications,
     Redirects,
     BrokenLinks,
     AuditLog,
