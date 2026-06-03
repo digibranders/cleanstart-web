@@ -75,18 +75,21 @@ function CategoryRow({
   meta,
   checked,
   onToggle,
+  open,
+  onToggleOpen,
 }: {
   meta: CategoryMeta;
   checked: boolean;
   onToggle: (next: boolean) => void;
+  open: boolean;
+  onToggleOpen: () => void;
 }) {
-  const [open, setOpen] = useState(false);
   return (
     <div className="border-t border-white/10 py-4 first:border-t-0">
       <div className="flex items-center justify-between gap-4">
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={onToggleOpen}
           aria-expanded={open}
           className="flex items-center gap-2 text-left font-medium text-white"
           style={{ fontSize: "var(--fs-body-sm)" }}
@@ -133,6 +136,8 @@ function CategoryRow({
 export function CookieBanner() {
   const { promptOpen, gpc, decide, record } = useConsent();
   const [showPrefs, setShowPrefs] = useState(false);
+  // Single open accordion key — only one category description is shown at a time.
+  const [openCategory, setOpenCategory] = useState<string | null>(null);
   const [selection, setSelection] = useState<Selection>({
     performance: false,
     functional: false,
@@ -151,6 +156,7 @@ export function CookieBanner() {
       targeting: seed?.targeting ?? def,
     });
     setShowPrefs(false);
+    setOpenCategory(null);
   }, [promptOpen, record, gpc]);
 
   useEffect(() => {
@@ -250,6 +256,10 @@ export function CookieBanner() {
                   onToggle={(next) =>
                     !meta.locked &&
                     setCategory(meta.key as OptionalCategory, next)
+                  }
+                  open={openCategory === meta.key}
+                  onToggleOpen={() =>
+                    setOpenCategory((cur) => (cur === meta.key ? null : meta.key))
                   }
                 />
               ))}
