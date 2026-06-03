@@ -1,6 +1,8 @@
 import React from "react";
 import Link from "next/link";
 
+import { CookiePreferencesButton } from "@/components/consent";
+
 /**
  * Footer layout (top → bottom): tagline + social icons, then a band with three
  * nav columns (Contact / Solutions / Connect) on the left and a "Members of"
@@ -222,7 +224,7 @@ export function Footer({
             "Members of" logo strip stacked over the credential groups (right).
             Columns are an accordion stack on mobile, a row on desktop. */}
         <nav
-          className="mt-[28px] flex flex-col gap-12 sm:mt-[36px] sm:flex-row sm:items-start sm:gap-x-14 lg:gap-x-20"
+          className="mt-[28px] flex flex-col gap-12 sm:mt-[36px] sm:flex-row sm:items-start sm:gap-x-10 lg:gap-x-12"
           aria-label="Footer navigation"
         >
           <div className="flex flex-col sm:flex-row sm:gap-10 lg:gap-14">
@@ -233,10 +235,10 @@ export function Footer({
 
           <div className="flex flex-col gap-10">
             <div>
-              <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
+              <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center sm:text-left">
                 Members of
               </h3>
-              <ul className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-5">
+              <ul className="mt-6 flex flex-wrap items-center justify-center sm:justify-start gap-x-8 gap-y-5">
                 {MEMBERS.map((m) => (
                   <li key={m.src} className="flex">
                     <a
@@ -263,7 +265,7 @@ export function Footer({
               </ul>
             </div>
 
-            <div className="flex flex-wrap gap-x-12 gap-y-8">
+            <div className="flex flex-wrap justify-center sm:justify-start gap-x-6 gap-y-8 [--shield-scale:0.72] xl:[--shield-scale:1]">
               {CREDENTIALS.map((group) => (
                 <CredentialGroup key={group.title} group={group} />
               ))}
@@ -314,6 +316,16 @@ export function Footer({
                 )}
               </React.Fragment>
             ))}
+            <li
+              aria-hidden
+              className="h-[3px] w-[3px] rounded-full bg-white/95"
+            />
+            <li className="flex leading-none">
+              <CookiePreferencesButton
+                className="text-xs italic leading-[1.75] text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
+                style={{ letterSpacing: "0.24px" }}
+              />
+            </li>
           </ul>
         </div>
        </div>
@@ -417,11 +429,11 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
 
 function CredentialGroup({ group }: { group: (typeof CREDENTIALS)[number] }) {
   return (
-    <div className="flex flex-col gap-4">
-      <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
+    <div className="flex flex-col gap-4 items-center sm:items-start">
+      <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center sm:text-left">
         {group.title}
       </h3>
-      <div className="flex flex-wrap items-start gap-3">
+      <div className="flex flex-wrap items-start justify-center sm:justify-start gap-3">
         {group.badges.map((badge) => (
           <ShieldBadge key={badge.src} badge={badge} />
         ))}
@@ -440,36 +452,55 @@ function ShieldBadge({ badge }: { badge: Badge }) {
     WebkitClipPath: `path('${BADGE_SHIELD_PATH}')`,
   };
   return (
-    <div className="relative h-[140px] w-[115px]" title={badge.name}>
-      {/* Glassy shield background */}
+    // Outer box reserves the post-scale footprint so flex layout stays honest.
+    // The inner box keeps the native 115×140 canvas the clip-path is authored
+    // against, then transforms down uniformly — scaling shield + image together.
+    // `--shield-scale` is set on the credentials wrapper (smaller on mobile, 1 at sm+).
+    <div
+      className="relative"
+      title={badge.name}
+      style={{
+        width: "calc(115px * var(--shield-scale, 1))",
+        height: "calc(140px * var(--shield-scale, 1))",
+      }}
+    >
       <div
-        aria-hidden
-        className="absolute inset-0 backdrop-blur-md"
-        style={{ ...shield, backgroundColor: "rgba(255, 255, 255, 0.08)" }}
-      />
-      {/* Subtle inner highlight along the top edge for the glass feel */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
+        className="absolute left-0 top-0 h-[140px] w-[115px]"
         style={{
-          ...shield,
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 35%)",
-          mixBlendMode: "screen",
+          transform: "scale(var(--shield-scale, 1))",
+          transformOrigin: "top left",
         }}
-      />
-      {/* Badge image — centered in the upper rectangular area, above the point */}
-      <div className="absolute inset-x-0 top-0 flex h-[117px] items-center justify-center px-3.5">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={badge.src}
-          alt={badge.name}
-          width={badge.w}
-          height={badge.h}
-          loading="lazy"
-          decoding="async"
-          className="max-h-[80px] w-auto max-w-full object-contain"
+      >
+        {/* Glassy shield background */}
+        <div
+          aria-hidden
+          className="absolute inset-0 backdrop-blur-md"
+          style={{ ...shield, backgroundColor: "rgba(255, 255, 255, 0.08)" }}
         />
+        {/* Subtle inner highlight along the top edge for the glass feel */}
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            ...shield,
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 35%)",
+            mixBlendMode: "screen",
+          }}
+        />
+        {/* Badge image — centered in the upper rectangular area, above the point */}
+        <div className="absolute inset-x-0 top-0 flex h-[117px] items-center justify-center px-3.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={badge.src}
+            alt={badge.name}
+            width={badge.w}
+            height={badge.h}
+            loading="lazy"
+            decoding="async"
+            className="max-h-[80px] w-auto max-w-full object-contain"
+          />
+        </div>
       </div>
     </div>
   );
