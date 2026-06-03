@@ -185,49 +185,30 @@ export function CookieBanner() {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="mx-auto flex max-w-[1100px] flex-col gap-4 px-6 py-5">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <p
-            className="max-w-[680px] text-white/80"
-            style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.55 }}
+        <p
+          className="text-white/80"
+          style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.55 }}
+        >
+          This website uses cookies and other tracking technologies to enhance
+          user experience and to analyze performance and traffic on our website.
+          We also share information about your use of our site with our
+          advertising and analytics partners. If we have detected an opt-out
+          preference signal then it will be honored. By clicking Allow All, you
+          understand that CleanStart and third-party partners use technology,
+          including cookies, to — among other things — view and retain your site
+          interactions, improve your experience and help us advertise. Further
+          information is available in our{" "}
+          <Link
+            href="/privacy-policy#cookies"
+            className="font-medium underline underline-offset-2 hover:text-white"
           >
-            This website uses cookies and other tracking technologies to enhance
-            user experience and to analyze performance and traffic on our
-            website. We also share information about your use of our site with
-            our advertising and analytics partners. If we have detected an
-            opt-out preference signal then it will be honored. By clicking Allow
-            All, you understand that CleanStart and third-party partners use
-            technology, including cookies, to — among other things — view and
-            retain your site interactions, improve your experience and help us
-            advertise. Further information is available in our{" "}
-            <Link
-              href="/privacy-policy#cookies"
-              className="font-medium underline underline-offset-2 hover:text-white"
-            >
-              Privacy&nbsp;Notice
-            </Link>
-            .
-          </p>
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setShowPrefs((v) => !v)}
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-white/30 px-[22px] font-medium text-white transition hover:bg-white/10"
-              style={{ fontSize: "var(--fs-button)" }}
-              aria-expanded={showPrefs}
-            >
-              Cookies Settings
-            </button>
-            <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue">
-              Reject All
-            </button>
-            <button type="button" onClick={() => decide("accept_all")} className="cs-btn-blue">
-              Allow All
-            </button>
-          </div>
-        </div>
+            Privacy&nbsp;Notice
+          </Link>
+          .
+        </p>
 
         {showPrefs ? (
-          <div className="flex flex-col gap-4 border-t border-white/10 pt-4">
+          <>
             <div>
               <h2 className="font-semibold" style={{ fontSize: "var(--fs-body-sm)" }}>
                 Manage Consent Preferences
@@ -264,7 +245,14 @@ export function CookieBanner() {
                 />
               ))}
             </div>
-            <div className="flex flex-wrap justify-end gap-3">
+          </>
+        ) : null}
+
+        {/* Single action row, always at the bottom. Contents switch by state
+            so no button is ever duplicated. */}
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          {showPrefs ? (
+            <>
               <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue">
                 Reject All
               </button>
@@ -275,9 +263,27 @@ export function CookieBanner() {
               >
                 Confirm My Choices
               </button>
-            </div>
-          </div>
-        ) : null}
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setShowPrefs(true)}
+                className="inline-flex h-11 items-center justify-center rounded-lg border border-white/30 px-[22px] font-medium text-white transition hover:bg-white/10"
+                style={{ fontSize: "var(--fs-button)" }}
+                aria-expanded={showPrefs}
+              >
+                Cookies Settings
+              </button>
+              <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue">
+                Reject All
+              </button>
+              <button type="button" onClick={() => decide("accept_all")} className="cs-btn-blue">
+                Allow All
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
