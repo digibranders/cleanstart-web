@@ -14,6 +14,10 @@
       "required": true
     },
     {
+      "type": "ui",
+      "name": "contact"
+    },
+    {
       "type": "json",
       "name": "fields",
       "required": true
