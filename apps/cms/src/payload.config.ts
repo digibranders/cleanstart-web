@@ -13,11 +13,13 @@ import { WebhookDeadLetter } from './payload/collections/WebhookDeadLetter';
 import { Authors } from './payload/collections/Authors';
 import { Blogs } from './payload/collections/Blogs';
 import { BrokenLinks } from './payload/collections/BrokenLinks';
+import { CaseStudies } from './payload/collections/CaseStudies';
 import { Categories } from './payload/collections/Categories';
 import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
 import { AnalyticsCache } from './payload/collections/AnalyticsCache';
+import { ConsentLog } from './payload/collections/ConsentLog';
 import { Integrations } from './payload/collections/Integrations';
 import { JobLocations } from './payload/collections/JobLocations';
 import { Jobs } from './payload/collections/Jobs';
@@ -327,6 +329,7 @@ export default buildConfig({
     WebhookDeadLetter,
     Integrations,
     AnalyticsCache,
+    ConsentLog,
     Authors,
     Categories,
     NewsCategories,
@@ -338,6 +341,7 @@ export default buildConfig({
     News,
     Guides,
     Resources,
+    CaseStudies,
     KnowledgeBase,
     Events,
     Webinars,

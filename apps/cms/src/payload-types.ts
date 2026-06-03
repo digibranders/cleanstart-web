@@ -79,6 +79,7 @@ export interface Config {
     webhooks_dead_letter: WebhooksDeadLetter;
     integrations: Integration;
     analyticsCache: AnalyticsCache;
+    consentLog: ConsentLog;
     authors: Author;
     categories: Category;
     newsCategories: NewsCategory;
@@ -90,6 +91,7 @@ export interface Config {
     news: News;
     guides: Guide;
     resources: Resource;
+    'case-studies': CaseStudy;
     knowledgeBase: KnowledgeBase;
     events: Event;
     webinars: Webinar;
@@ -121,6 +123,7 @@ export interface Config {
     webhooks_dead_letter: WebhooksDeadLetterSelect<false> | WebhooksDeadLetterSelect<true>;
     integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
     analyticsCache: AnalyticsCacheSelect<false> | AnalyticsCacheSelect<true>;
+    consentLog: ConsentLogSelect<false> | ConsentLogSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
@@ -132,6 +135,7 @@ export interface Config {
     news: NewsSelect<false> | NewsSelect<true>;
     guides: GuidesSelect<false> | GuidesSelect<true>;
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
+    'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
     knowledgeBase: KnowledgeBaseSelect<false> | KnowledgeBaseSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     webinars: WebinarsSelect<false> | WebinarsSelect<true>;
@@ -301,7 +305,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -309,6 +312,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -355,6 +359,7 @@ export interface Media {
  */
 export interface Resume {
   id: number;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1246,6 +1251,51 @@ export interface AnalyticsCache {
     | number
     | boolean
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Audit trail of website cookie-consent decisions. Server-managed — written by the web CMP, never edited by hand.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "consentLog".
+ */
+export interface ConsentLog {
+  id: number;
+  /**
+   * Random per-visitor id stored in the cs_consent cookie. Not linked to any account.
+   */
+  anonymousId: string;
+  decision: 'accept_all' | 'reject_all' | 'custom';
+  /**
+   * Resolved category map at decision time, e.g. { "essential": true, "analytics": false }.
+   */
+  categories:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  consentVersion: number;
+  /**
+   * Global Privacy Control signal present at decision time.
+   */
+  gpc?: boolean | null;
+  /**
+   * Coarse ISO country from x-vercel-ip-country (may be unknown locally).
+   */
+  country?: string | null;
+  /**
+   * HMAC-SHA256 of client IP (CONSENT_LOG_HMAC_SECRET). No raw IP stored.
+   */
+  ipHash?: string | null;
+  /**
+   * HMAC-SHA256 of user-agent. No raw UA stored.
+   */
+  userAgentHash?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -3637,6 +3687,46 @@ export interface Resource {
       | boolean
       | null;
   };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "case-studies".
+ */
+export interface CaseStudy {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  /**
+   * Industry tag shown on the listing card.
+   */
+  industry: 'healthcare' | 'telecom' | 'finance' | 'technology' | 'manufacturing' | 'other';
+  /**
+   * Customer / company name shown above the card title.
+   */
+  company: string;
+  /**
+   * Optional company wordmark shown beside the company name. Falls back to a generic icon when empty.
+   */
+  companyLogo?: (number | null) | Media;
+  /**
+   * Card thumbnail image.
+   */
+  coverImage: number | Media;
+  summary: string;
+  /**
+   * Downloadable case-study PDF. Routed to web/case-study/ in R2.
+   */
+  asset: number | Media;
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -7166,6 +7256,10 @@ export interface PayloadLockedDocument {
         value: number | AnalyticsCache;
       } | null)
     | ({
+        relationTo: 'consentLog';
+        value: number | ConsentLog;
+      } | null)
+    | ({
         relationTo: 'authors';
         value: number | Author;
       } | null)
@@ -7208,6 +7302,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'resources';
         value: number | Resource;
+      } | null)
+    | ({
+        relationTo: 'case-studies';
+        value: number | CaseStudy;
       } | null)
     | ({
         relationTo: 'knowledgeBase';
@@ -7315,13 +7413,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -7373,6 +7471,7 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -7603,6 +7702,22 @@ export interface AnalyticsCacheSelect<T extends boolean = true> {
   key?: T;
   capturedAt?: T;
   payload?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "consentLog_select".
+ */
+export interface ConsentLogSelect<T extends boolean = true> {
+  anonymousId?: T;
+  decision?: T;
+  categories?: T;
+  consentVersion?: T;
+  gpc?: T;
+  country?: T;
+  ipHash?: T;
+  userAgentHash?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -8663,6 +8778,24 @@ export interface ResourcesSelect<T extends boolean = true> {
             };
         additionalSchema?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "case-studies_select".
+ */
+export interface CaseStudiesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  industry?: T;
+  company?: T;
+  companyLogo?: T;
+  coverImage?: T;
+  summary?: T;
+  asset?: T;
+  publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -11454,6 +11587,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'resources';
           value: number | Resource;
+        } | null)
+      | ({
+          relationTo: 'case-studies';
+          value: number | CaseStudy;
         } | null)
       | ({
           relationTo: 'knowledgeBase';
