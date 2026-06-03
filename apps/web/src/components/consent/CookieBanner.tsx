@@ -60,7 +60,7 @@ function Toggle({
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+      className="relative h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors"
       style={{ backgroundColor: checked ? "#22c55e" : "rgba(255,255,255,0.25)" }}
     >
       <span
@@ -91,7 +91,7 @@ function CategoryRow({
           type="button"
           onClick={onToggleOpen}
           aria-expanded={open}
-          className="flex items-center gap-2 text-left font-medium text-white"
+          className="flex cursor-pointer items-center gap-2 text-left font-medium text-white"
           style={{ fontSize: "var(--fs-body-sm)" }}
         >
           <span aria-hidden className="inline-block w-3 text-white/60">
@@ -269,7 +269,7 @@ export function CookieBanner() {
               <button
                 type="button"
                 onClick={() => setShowPrefs(true)}
-                className="inline-flex h-11 items-center justify-center rounded-lg border border-white/30 px-[22px] font-medium text-white transition hover:bg-white/10"
+                className="inline-flex h-11 cursor-pointer items-center justify-center rounded-lg border border-white/30 px-[22px] font-medium text-white transition hover:bg-white/10"
                 style={{ fontSize: "var(--fs-button)" }}
                 aria-expanded={showPrefs}
               >
