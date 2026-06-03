@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdmin } from '../access';
+import { handleConsentIngest } from '../endpoints/consent-ingest';
 
 /**
  * Append-only audit log of cookie-consent decisions captured by the web
@@ -88,6 +89,13 @@ export const ConsentLog: CollectionConfig = {
       name: 'userAgentHash',
       type: 'text',
       admin: { description: 'HMAC-SHA256 of user-agent. No raw UA stored.' },
+    },
+  ],
+  endpoints: [
+    {
+      path: '/ingest',
+      method: 'post',
+      handler: handleConsentIngest,
     },
   ],
 };
