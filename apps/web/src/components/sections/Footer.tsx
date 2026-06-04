@@ -44,9 +44,9 @@ interface FooterLogo {
 }
 
 const MEMBERS: FooterLogo[] = [
-  { name: "OpenSSF — Open Source Security Foundation", src: "/images/footer/openssf.webp", w: 134, h: 52, renderH: 36, href: "https://openssf.org" },
-  { name: "The Linux Foundation", src: "/images/footer/linux-foundation.webp", w: 126, h: 43, renderH: 34, href: "https://linuxfoundation.org" },
-  { name: "Cloud Native Computing Foundation", src: "/images/footer/cloud-native.webp", w: 174, h: 29, renderH: 24, href: "https://cncf.io" },
+  { name: "OpenSSF — Open Source Security Foundation", src: "/images/footer/openssf.webp", w: 134, h: 52, renderH: 36, href: "https://openssf.org/about/members/" },
+  { name: "The Linux Foundation", src: "/images/footer/linux-foundation.webp", w: 126, h: 43, renderH: 34, href: "https://www.linuxfoundation.org/about/members" },
+  { name: "Cloud Native Computing Foundation", src: "/images/footer/cloud-native.webp", w: 174, h: 29, renderH: 24, href: "https://www.cncf.io/about/members/" },
 ];
 
 const SOCIAL_ICONS = [
@@ -70,7 +70,6 @@ const CREDENTIALS: { title: string; badges: Badge[] }[] = [
   {
     title: "Awarded with",
     badges: [
-      { name: "Fortress Cyber Security Award", src: "/images/footer/fortress.webp", w: 76, h: 80 },
       { name: "Cyber Security Excellence Awards — Winner", src: "/images/awards/award-1.png", w: 486, h: 616 },
     ],
   },
@@ -178,16 +177,8 @@ export function Footer({
         />
       <div className="relative">
        <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[var(--footer-cta-pt)]" : "pt-[80px]"}`}>
-        {/* Top row — tagline (left) + social icons (right), both top-aligned. */}
-        <div className="flex flex-wrap items-start justify-between gap-8">
-          <p
-            className="text-lg font-normal leading-[1.4] tracking-[-0.04em] text-white"
-            style={{ maxWidth: "396px" }}
-          >
-            Hardened container images with zero known vulnerabilities. Secure by
-            design, built for speed.
-          </p>
-
+        {/* Top row — social icons, right-aligned. */}
+        <div className="flex flex-wrap items-start justify-end gap-8">
           <ul className="flex items-center gap-[19px]" aria-label="Social media">
             {SOCIAL_ICONS.map((s) => (
               <li key={s.name}>
