@@ -169,10 +169,12 @@ export function CookieBanner() {
   }, [promptOpen]);
 
   // Slide-up + fade-in entrance. `entered` starts false (sheet sits below the
-  // fold) and flips true after a short delay so the CSS transition runs. The
-  // first appearance waits ~900ms to "settle in" after page load like typical
-  // CMPs; a footer re-open animates near-instantly. Honors reduced-motion via
-  // the `motion-reduce:*` classes on the sheet.
+  // fold) and flips true after a delay so the CSS transition runs. The first
+  // appearance waits ~1.5s to "settle in" after page load like typical CMPs; a
+  // footer re-open animates near-instantly. Honors reduced-motion via the
+  // `motion-reduce:*` classes on the sheet.
+  const FIRST_LOAD_DELAY_MS = 1500;
+  const REOPEN_DELAY_MS = 60;
   const [entered, setEntered] = useState(false);
   const hasAnimatedOnce = useRef(false);
   useEffect(() => {
@@ -180,7 +182,7 @@ export function CookieBanner() {
       setEntered(false);
       return;
     }
-    const delay = hasAnimatedOnce.current ? 60 : 900;
+    const delay = hasAnimatedOnce.current ? REOPEN_DELAY_MS : FIRST_LOAD_DELAY_MS;
     hasAnimatedOnce.current = true;
     const t = window.setTimeout(() => setEntered(true), delay);
     return () => window.clearTimeout(t);
