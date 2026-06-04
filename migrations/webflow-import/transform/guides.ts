@@ -3,6 +3,7 @@ import { slugify } from '../../../apps/cms/src/payload/lib/slugify';
 import { htmlToLexical } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-lexical';
 import { htmlToPlainText } from '../../../apps/cms/src/payload/lib/webflow-import/html-to-plain-text';
 import { normalizeWebflowGuide } from '../../../apps/cms/src/payload/lib/webflow-import/guides-normalize';
+import { stripInlineFaqSection } from '../../../apps/cms/src/payload/lib/webflow-import/strip-faqs';
 
 const asString = (v: unknown): string | null => {
   if (typeof v !== 'string') return null;
@@ -30,12 +31,19 @@ export const transformGuide = (row: Record<string, unknown>): Record<string, unk
   const wordCount = asNumber(row['word-count']);
   const { faqs, keywords, citations, articleSections } = normalizeWebflowGuide(row);
 
+  // Webflow embeds the FAQ Q&A both in the slot fields (→ `faqs`) and inline in
+  // the body HTML. Strip the inline copy when the structured FAQs are present
+  // so the detail page doesn't render them twice. See `strip-faqs.ts`.
+  const lexicalBody = bodyHtml ? htmlToLexical(bodyHtml) : undefined;
+  const body =
+    lexicalBody && faqs.length > 0 ? stripInlineFaqSection(lexicalBody) : lexicalBody;
+
   return {
     _webflowId: row.webflowId,
     _status: webflowStatus(row),
     title,
     slug,
-    body: bodyHtml ? htmlToLexical(bodyHtml) : undefined,
+    body,
     abstract,
     wordCount: wordCount ?? undefined,
     faqs: faqs.length > 0 ? faqs : undefined,

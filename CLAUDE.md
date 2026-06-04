@@ -435,6 +435,12 @@ These are one-shot operations that **must** run against the prod Postgres on the
    - Re-runnable / idempotent. Closing a role stamps `closedAt = now` (the real Webflow close date isn't in the export). Same afterChange-hook / version-row caveat — run in a quiet window.
    - After the run, spot-check the careers list — the STATUS filter (Open / Closed / All roles) should partition correctly, with OPEN/CLOSED badges per card.
 
+5. **Guide inline-FAQ strip.** The Webflow import stored guide FAQs twice — in the structured `faqs` field AND inline in the body rich-text (an "FAQs" heading + Q&A) — so the detail page rendered them as both an accordion and a stray heading/list, and the auto `tableOfContents` / word count included the FAQ text. `apps/cms/scripts/strip-guide-inline-faqs.ts` removes the inline copy from `body` and recomputes `tableOfContents`/`readingMinutes`/`wordCount`. The import transform (`migrations/webflow-import/transform/guides.ts`) now strips it going forward; this one-shot covers guides already in prod. Strip logic + tests: `apps/cms/src/payload/lib/webflow-import/strip-faqs.ts`.
+   - Writes via `payload.update` (not the raw db adapter) so the relational `tableOfContents` sub-table is handled and `bodyStatsHook` recomputes the derived fields. The Teams (`webhooks-publish`) and IndexNow hooks are **transition-gated** — a re-save of an already-published guide does not fire them — so the only afterChange effects are a Meilisearch re-sync (desired) and a version row per guide. **Run in a quiet window**, same caveat as tasks 2–4.
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/strip-guide-inline-faqs.ts --dry-run` then `… ` (no flag).
+   - Re-runnable / idempotent. Only strips guides whose structured `faqs` field is populated (so the Q&A are never lost) and that still have an inline FAQ heading; also recomputes the TOC for any guide whose stored `tableOfContents` is empty while its body has headings (self-heals a half-applied run). Local-dev blast radius: 52 scanned, 47 stripped, 3 skipped(no-faqs), 2 skipped(clean).
+   - After the run, spot-check a guide — FAQs should appear once (the accordion only), and "FAQs" should be gone from the CONTENTS sidebar.
+
 (Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
 
 ---
