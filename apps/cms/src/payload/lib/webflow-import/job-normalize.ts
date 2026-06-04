@@ -53,7 +53,14 @@ const DEPARTMENT_MAP: Record<string, DepartmentEnum> = {
   people: 'people',
   hr: 'people',
   'human-resources': 'people',
+  'human-resource': 'people',
   talent: 'people',
+  // CleanStart Webflow department values that don't match an enum name 1:1.
+  admin: 'operations',
+  'admin-&-it-operations-executive': 'operations',
+  'qa-and-delivery': 'engineering',
+  egineering: 'engineering', // source-data typo for "Engineering"
+  'customer-acquisition-team-(cat)': 'sales',
 };
 
 export const normalizeDepartment = (raw: unknown): DepartmentEnum | null => {

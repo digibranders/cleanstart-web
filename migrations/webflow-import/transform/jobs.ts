@@ -34,7 +34,9 @@ export const transformJob = (row: Record<string, unknown>): Record<string, unkno
     ? `<p><em>${summary}</em></p>${details ?? ''}`
     : details;
 
-  const department = normalizeDepartment(row.department);
+  // The Webflow `department` field doesn't exist — the department value lives
+  // in `job-summary` (e.g. "Sales", "Engineering", "Human Resource").
+  const department = normalizeDepartment(row['job-summary']);
   const employmentType = normalizeEmploymentType(row.timing ?? row.type);
   const experienceLevel = normalizeExperienceLevel(row.experience);
   const experienceRange = normalizeExperienceRange(row.experience);

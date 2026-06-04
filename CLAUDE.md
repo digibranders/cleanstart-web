@@ -425,6 +425,11 @@ These are one-shot operations that **must** run against the prod Postgres on the
    - Re-runnable / idempotent (skips rows whose range already matches). Note: `payload.update` re-fires the jobs afterChange hooks (search sync, IndexNow, webhooks) and creates a version row per job — run in a quiet window.
    - After the run, spot-check the careers list on the live site — experience should read e.g. "3-10 Years", not "Mid experience".
 
+3. **Job `department` backfill.** The Webflow import read department from a non-existent `department` field — the value actually lives in `job-summary` ("Sales", "Engineering", "Human Resource", …) — so every prod job has a null department: no department pill on the careers card and an empty POSITION filter. `apps/cms/scripts/backfill-job-department.ts` restores `jobs.department` (mapped to the enum via `normalizeDepartment`, matched by slug). The import transform now reads the right field going forward.
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/backfill-job-department.ts`
+   - Re-runnable / idempotent. Same afterChange-hook / version-row caveat as above — run in a quiet window. Watch the log for "unmapped" warnings (a new Webflow department value that needs a `DEPARTMENT_MAP` entry).
+   - After the run, spot-check the careers list — each job should show its department pill and the POSITION filter should list the departments.
+
 (Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
 
 ---

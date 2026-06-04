@@ -37,6 +37,14 @@ describe('normalizeDepartment', () => {
     expect(normalizeDepartment('HR')).toBe('people');
     expect(normalizeDepartment('Business Development')).toBe('sales');
   });
+  it('maps the CleanStart Webflow department values (incl. oddballs + typo)', () => {
+    expect(normalizeDepartment('Human Resource')).toBe('people');
+    expect(normalizeDepartment('Admin')).toBe('operations');
+    expect(normalizeDepartment('Admin & IT Operations Executive')).toBe('operations');
+    expect(normalizeDepartment('QA and Delivery')).toBe('engineering');
+    expect(normalizeDepartment('Egineering')).toBe('engineering');
+    expect(normalizeDepartment('Customer Acquisition Team (CAT)')).toBe('sales');
+  });
   it('returns null for unrecognized values', () => {
     expect(normalizeDepartment('Director of Strategy')).toBeNull();
     expect(normalizeDepartment('')).toBeNull();
