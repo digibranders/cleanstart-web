@@ -3,12 +3,10 @@ import type { LexicalRoot } from "@/lib/blog";
 
 interface CareerDetailContentProps {
   body?: LexicalRoot | null | undefined;
-  contactEmail: string;
 }
 
 export function CareerDetailContent({
   body,
-  contactEmail,
 }: CareerDetailContentProps): React.ReactElement {
   return (
     <section className="relative w-full bg-white overflow-x-clip">
@@ -30,26 +28,6 @@ export function CareerDetailContent({
             below to apply.
           </p>
         )}
-
-        <p
-          className="font-sans"
-          style={{
-            fontSize: "var(--prose-body)",
-            color: "rgba(17,17,17,0.7)",
-            lineHeight: 1.6,
-            marginTop: "32px",
-            marginBottom: "20px",
-          }}
-        >
-          Interested candidates should submit their resume to{" "}
-          <a
-            href={`mailto:${contactEmail}`}
-            style={{ color: "#4a3bf1", textDecoration: "underline" }}
-          >
-            {contactEmail}
-          </a>
-          .
-        </p>
       </div>
     </section>
   );

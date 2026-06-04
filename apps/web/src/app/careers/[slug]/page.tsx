@@ -15,8 +15,6 @@ import {
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
-const CONTACT_EMAIL = "hr@cleanstart.com";
-
 interface CareerDetailPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -96,10 +94,7 @@ export default async function CareerDetailPage({
       <Header />
       <main>
         <CareerDetailHero title={job.title} meta={meta} />
-        <CareerDetailContent
-          body={bodyWithoutDeptLine}
-          contactEmail={CONTACT_EMAIL}
-        />
+        <CareerDetailContent body={bodyWithoutDeptLine} />
         {job.source === "cms" && job.hiringStatus === "open" ? (
           <JobApplyForm jobSlug={job.slug} jobTitle={job.title} />
         ) : null}
