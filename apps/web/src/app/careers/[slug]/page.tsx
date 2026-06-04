@@ -4,6 +4,7 @@ import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { CareerDetailHero } from "@/components/sections/careers/CareerDetailHero";
 import { CareerDetailContent } from "@/components/sections/careers/CareerDetailContent";
+import { JobApplyForm } from "@/components/sections/careers/JobApplyForm";
 import type { LexicalRoot } from "@/lib/blog";
 import {
   DEPARTMENT_LABEL,
@@ -96,11 +97,12 @@ export default async function CareerDetailPage({
       <main>
         <CareerDetailHero title={job.title} meta={meta} />
         <CareerDetailContent
-          title={job.title}
-          slug={job.slug}
           body={bodyWithoutDeptLine}
           contactEmail={CONTACT_EMAIL}
         />
+        {job.source === "cms" && job.hiringStatus === "open" ? (
+          <JobApplyForm jobSlug={job.slug} jobTitle={job.title} />
+        ) : null}
       </main>
       <Footer />
     </>

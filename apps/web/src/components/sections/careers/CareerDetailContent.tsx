@@ -1,17 +1,12 @@
 import { RenderLexical } from "@/lib/renderLexical";
 import type { LexicalRoot } from "@/lib/blog";
-import { CareerApplyForm } from "./CareerApplyForm";
 
 interface CareerDetailContentProps {
-  title: string;
-  slug: string;
   body?: LexicalRoot | null | undefined;
   contactEmail: string;
 }
 
 export function CareerDetailContent({
-  title,
-  slug,
   body,
   contactEmail,
 }: CareerDetailContentProps): React.ReactElement {
@@ -55,12 +50,6 @@ export function CareerDetailContent({
           </a>
           .
         </p>
-
-        <CareerApplyForm
-          jobTitle={title}
-          jobSlug={slug}
-          contactEmail={contactEmail}
-        />
       </div>
     </section>
   );
