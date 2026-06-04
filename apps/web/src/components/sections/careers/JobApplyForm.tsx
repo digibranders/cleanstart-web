@@ -202,10 +202,10 @@ export function JobApplyForm({
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field
-                label="Business Email"
+                label="Email"
                 name="email"
                 type="email"
-                placeholder="you@company.com"
+                placeholder="you@email.com"
                 required
                 autoComplete="email"
               />
