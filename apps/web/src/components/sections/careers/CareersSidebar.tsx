@@ -147,7 +147,7 @@ export function CareersSidebar({
         />
 
         <FilterGroup
-          heading="POSITION"
+          heading="DEPARTMENT"
           items={[
             {
               key: "all-departments",
