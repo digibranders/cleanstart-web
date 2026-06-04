@@ -220,8 +220,20 @@ export function JobApplyForm({
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="First Name" name="firstName" required autoComplete="given-name" />
-              <Field label="Last Name" name="lastName" required autoComplete="family-name" />
+              <Field
+                label="First Name"
+                name="firstName"
+                placeholder="Jane"
+                required
+                autoComplete="given-name"
+              />
+              <Field
+                label="Last Name"
+                name="lastName"
+                placeholder="Doe"
+                required
+                autoComplete="family-name"
+              />
             </div>
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
