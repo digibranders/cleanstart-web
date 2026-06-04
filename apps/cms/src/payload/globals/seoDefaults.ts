@@ -7,7 +7,7 @@ import { isValidExternalLink, normalizeOptionalUrlHook, validateOptionalUrl } fr
 export const SeoDefaults: GlobalConfig = {
   slug: 'seoDefaults',
   label: 'SEO defaults',
-  admin: { group: 'Globals' },
+  admin: { group: 'SEO' },
   access: {
     read: isAuthenticated,
     update: isAdmin,

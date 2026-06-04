@@ -314,50 +314,75 @@ export default buildConfig({
     },
   },
   collections: [
-    // Order tracks the editorial mental model surfaced in the sidebar:
-    //   System → People → Taxonomies → Marketing → Content
-    // Group strings on each collection drive the sidebar grouping; this
-    // array order drives the order *within* each group.
-    Users,
-    Media,
-    Resumes,
-    CareerApplications,
-    Redirects,
-    BrokenLinks,
-    AuditLog,
-    SearchLog,
-    PreviewAudit,
-    WebhookDeadLetter,
-    Integrations,
-    AnalyticsCache,
-    ConsentLog,
-    Authors,
-    Categories,
-    NewsCategories,
-    KnowledgeCategories,
-    JobLocations,
-    Forms,
-    Leads,
-    PartnerApplications,
+    // Array order drives the order *within* each sidebar group; the
+    // group strings on each collection drive the grouping itself, and
+    // the visual group order is the flex `order` in _nav.scss. This
+    // array is laid out group-by-group in that same visual order
+    // (Content → Taxonomies → Marketing → SEO → Recruiting → System)
+    // with each group internally ordered by editor frequency-of-use.
+    // (Globals + SEO defaults live in the `globals` array below.)
+
+    // Content — articles lead (highest publishing velocity); Media sits
+    // with the production workflow; reference records (About galleries,
+    // Authors) trail.
     Blogs,
     News,
     Guides,
-    Resources,
     CaseStudies,
     KnowledgeBase,
+    Resources,
     Events,
     Webinars,
     PodcastEpisodes,
     Jobs,
-    AboutGalleries,
+    Media,
     Pages,
+    AboutGalleries,
+    Authors,
+
+    // Taxonomies — mirror the content types they classify.
+    Categories,
+    NewsCategories,
+    KnowledgeCategories,
+    JobLocations,
+
+    // Marketing — Leads (daily inbox) before Forms (one-time setup).
+    Leads,
+    Forms,
+    PartnerApplications,
+
+    // SEO — the SEO editor's toolkit. Redirects (every slug change) and
+    // broken-link reports; SEO defaults global trails in the `globals`
+    // array but renders in this same group.
+    Redirects,
+    BrokenLinks,
+
+    // Recruiting — Applications are the primary object; Resumes are the
+    // attachment on them.
+    CareerApplications,
+    Resumes,
+
+    // System — human-facing admin first, machine-only logs last.
+    Users,
+    Integrations,
+    PreviewAudit,
+    SearchLog,
+    AuditLog,
+    ConsentLog,
+    AnalyticsCache,
+    WebhookDeadLetter,
   ]
     .map(wirePublishGate)
     .map(wirePreviewControls)
     .map(wireCustomListView)
     .map(wireAnalyticsTab)
     .map(wireCustomFields),
-  globals: [SiteSettings, SeoDefaults, MainNav, FooterNav, Legal, Announcements, PodcastPage, ResourcesSpotlight, CompanySpotlight]
+  // Within-group order for the Globals group: settings → nav chrome
+  // (main/footer nav + the two mega-menu spotlights) → announcements →
+  // podcast page → legal. SeoDefaults is grouped under 'SEO' (trails
+  // here; it renders in the SEO group, after the Redirects/BrokenLinks
+  // collections).
+  globals: [SiteSettings, MainNav, FooterNav, ResourcesSpotlight, CompanySpotlight, Announcements, PodcastPage, Legal, SeoDefaults]
     .map(wireCustomFields),
   endpoints: [
     jsonLdEndpoint,

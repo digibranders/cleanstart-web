@@ -77,6 +77,7 @@ export interface Config {
     webinars: Webinar;
     podcastEpisodes: PodcastEpisode;
     jobs: Job;
+    media: Media;
     pages: Page;
     aboutGalleries: AboutGallery;
     authors: Author;
@@ -87,13 +88,12 @@ export interface Config {
     leads: Lead;
     forms: Form;
     'partner-applications': PartnerApplication;
+    redirects: Redirect;
+    brokenLinks: BrokenLink;
     'career-applications': CareerApplication;
     resumes: Resume;
     users: User;
-    media: Media;
     integrations: Integration;
-    redirects: Redirect;
-    brokenLinks: BrokenLink;
     previewAudit: PreviewAudit;
     searchLog: SearchLog;
     'audit-log': AuditLog;
@@ -122,6 +122,7 @@ export interface Config {
     webinars: WebinarsSelect<false> | WebinarsSelect<true>;
     podcastEpisodes: PodcastEpisodesSelect<false> | PodcastEpisodesSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     aboutGalleries: AboutGalleriesSelect<false> | AboutGalleriesSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
@@ -132,13 +133,12 @@ export interface Config {
     leads: LeadsSelect<false> | LeadsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'partner-applications': PartnerApplicationsSelect<false> | PartnerApplicationsSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     'career-applications': CareerApplicationsSelect<false> | CareerApplicationsSelect<true>;
     resumes: ResumesSelect<false> | ResumesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
     integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
-    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
-    brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     previewAudit: PreviewAuditSelect<false> | PreviewAuditSelect<true>;
     searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
@@ -157,26 +157,26 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     siteSettings: SiteSetting;
-    seoDefaults: SeoDefault;
     mainNav: MainNav;
     footerNav: FooterNav;
-    legal: Legal;
-    announcements: Announcement;
-    podcastPage: PodcastPage;
     resourcesSpotlight: ResourcesSpotlight;
     companySpotlight: CompanySpotlight;
+    announcements: Announcement;
+    podcastPage: PodcastPage;
+    legal: Legal;
+    seoDefaults: SeoDefault;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
-    seoDefaults: SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
     mainNav: MainNavSelect<false> | MainNavSelect<true>;
     footerNav: FooterNavSelect<false> | FooterNavSelect<true>;
-    legal: LegalSelect<false> | LegalSelect<true>;
-    announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
-    podcastPage: PodcastPageSelect<false> | PodcastPageSelect<true>;
     resourcesSpotlight: ResourcesSpotlightSelect<false> | ResourcesSpotlightSelect<true>;
     companySpotlight: CompanySpotlightSelect<false> | CompanySpotlightSelect<true>;
+    announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
+    podcastPage: PodcastPageSelect<false> | PodcastPageSelect<true>;
+    legal: LegalSelect<false> | LegalSelect<true>;
+    seoDefaults: SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -6590,6 +6590,63 @@ export interface PartnerApplication {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * Source path (e.g. /old-pricing). System-managed rules (source=slug-change) are locked from manual edit.
+   */
+  from: string;
+  status: '301' | '302' | '307' | '308' | '410';
+  /**
+   * Destination path or absolute URL. Required unless status=410. System-managed rules are locked.
+   */
+  to?: string | null;
+  /**
+   * Provenance. System-set on creation; never manually edited.
+   */
+  source: 'manual' | 'slug-change' | 'archive-with-redirect' | 'migration-seed';
+  /**
+   * Why this redirect exists. Future editors thank you.
+   */
+  notes?: string | null;
+  /**
+   * Incremented in apps/web middleware on every match.
+   */
+  hitCount?: number | null;
+  lastHitAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Auto-populated by the nightly link-check cron. Read-only — fix the URL on the source doc and re-publish, the next cron run clears the row.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brokenLinks".
+ */
+export interface BrokenLink {
+  id: number;
+  url: string;
+  status: 'ok' | 'broken' | 'redirect' | 'network';
+  /**
+   * Last observed HTTP status. 0 when the request failed before a response.
+   */
+  httpStatus?: number | null;
+  sourceCollection: string;
+  sourceDocId: string;
+  sourceDocSlug?: string | null;
+  firstSeenAt?: string | null;
+  lastChecked?: string | null;
+  /**
+   * Optional human note (e.g. "publisher confirmed page taken down — replace with archive.org snapshot").
+   */
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
@@ -6824,63 +6881,6 @@ export interface Integration {
    * When the health badge last polled.
    */
   lastHealthAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects".
- */
-export interface Redirect {
-  id: number;
-  /**
-   * Source path (e.g. /old-pricing). System-managed rules (source=slug-change) are locked from manual edit.
-   */
-  from: string;
-  status: '301' | '302' | '307' | '308' | '410';
-  /**
-   * Destination path or absolute URL. Required unless status=410. System-managed rules are locked.
-   */
-  to?: string | null;
-  /**
-   * Provenance. System-set on creation; never manually edited.
-   */
-  source: 'manual' | 'slug-change' | 'archive-with-redirect' | 'migration-seed';
-  /**
-   * Why this redirect exists. Future editors thank you.
-   */
-  notes?: string | null;
-  /**
-   * Incremented in apps/web middleware on every match.
-   */
-  hitCount?: number | null;
-  lastHitAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Auto-populated by the nightly link-check cron. Read-only — fix the URL on the source doc and re-publish, the next cron run clears the row.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "brokenLinks".
- */
-export interface BrokenLink {
-  id: number;
-  url: string;
-  status: 'ok' | 'broken' | 'redirect' | 'network';
-  /**
-   * Last observed HTTP status. 0 when the request failed before a response.
-   */
-  httpStatus?: number | null;
-  sourceCollection: string;
-  sourceDocId: string;
-  sourceDocSlug?: string | null;
-  firstSeenAt?: string | null;
-  lastChecked?: string | null;
-  /**
-   * Optional human note (e.g. "publisher confirmed page taken down — replace with archive.org snapshot").
-   */
-  note?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -7327,6 +7327,10 @@ export interface PayloadLockedDocument {
         value: number | Job;
       } | null)
     | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -7367,6 +7371,14 @@ export interface PayloadLockedDocument {
         value: number | PartnerApplication;
       } | null)
     | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'brokenLinks';
+        value: number | BrokenLink;
+      } | null)
+    | ({
         relationTo: 'career-applications';
         value: number | CareerApplication;
       } | null)
@@ -7379,20 +7391,8 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
         relationTo: 'integrations';
         value: number | Integration;
-      } | null)
-    | ({
-        relationTo: 'redirects';
-        value: number | Redirect;
-      } | null)
-    | ({
-        relationTo: 'brokenLinks';
-        value: number | BrokenLink;
       } | null)
     | ({
         relationTo: 'previewAudit';
@@ -8946,6 +8946,69 @@ export interface JobsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  folder?: T;
+  decorative?: T;
+  alt?: T;
+  caption?: T;
+  credit?: T;
+  focalPoint?:
+    | T
+    | {
+        x?: T;
+        y?: T;
+      };
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumb?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages_select".
  */
 export interface PagesSelect<T extends boolean = true> {
@@ -10303,6 +10366,38 @@ export interface PartnerApplicationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  status?: T;
+  to?: T;
+  source?: T;
+  notes?: T;
+  hitCount?: T;
+  lastHitAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brokenLinks_select".
+ */
+export interface BrokenLinksSelect<T extends boolean = true> {
+  url?: T;
+  status?: T;
+  httpStatus?: T;
+  sourceCollection?: T;
+  sourceDocId?: T;
+  sourceDocSlug?: T;
+  firstSeenAt?: T;
+  lastChecked?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "career-applications_select".
  */
 export interface CareerApplicationsSelect<T extends boolean = true> {
@@ -10384,69 +10479,6 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  folder?: T;
-  decorative?: T;
-  alt?: T;
-  caption?: T;
-  credit?: T;
-  focalPoint?:
-    | T
-    | {
-        x?: T;
-        y?: T;
-      };
-  prefix?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
-    | T
-    | {
-        thumb?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        card?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        hero?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "integrations_select".
  */
 export interface IntegrationsSelect<T extends boolean = true> {
@@ -10518,38 +10550,6 @@ export interface IntegrationsSelect<T extends boolean = true> {
       };
   source?: T;
   lastHealthAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects_select".
- */
-export interface RedirectsSelect<T extends boolean = true> {
-  from?: T;
-  status?: T;
-  to?: T;
-  source?: T;
-  notes?: T;
-  hitCount?: T;
-  lastHitAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "brokenLinks_select".
- */
-export interface BrokenLinksSelect<T extends boolean = true> {
-  url?: T;
-  status?: T;
-  httpStatus?: T;
-  sourceCollection?: T;
-  sourceDocId?: T;
-  sourceDocSlug?: T;
-  firstSeenAt?: T;
-  lastChecked?: T;
-  note?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -10775,156 +10775,6 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "seoDefaults".
- */
-export interface SeoDefault {
-  id: number;
-  /**
-   * Used when seo.title is unset. %s is replaced with the document title.
-   */
-  defaultTitleTemplate?: string | null;
-  /**
-   * Site-wide fallback for seo.description when nothing else is set.
-   */
-  defaultDescription?: string | null;
-  /**
-   * Site-wide fallback when seo.ogImage and the page hero are both empty.
-   */
-  defaultOgImage?: (number | null) | Media;
-  /**
-   * Used as twitter:site fallback when no author handle is set.
-   */
-  twitterHandle?: string | null;
-  /**
-   * Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`. Note: web production phase — not yet consumed by apps/web.
-   */
-  brandIcons?: {
-    /**
-     * 32×32 favicon. Used by `<link rel="icon" sizes="32x32">`.
-     */
-    favicon32?: (number | null) | Media;
-    /**
-     * 192×192 PNG. PWA / Android home-screen icon.
-     */
-    icon192?: (number | null) | Media;
-    /**
-     * 512×512 PNG. PWA / large-tile icon.
-     */
-    icon512?: (number | null) | Media;
-    /**
-     * 180×180 PNG. iOS home-screen icon (`apple-touch-icon`).
-     */
-    appleTouchIcon?: (number | null) | Media;
-    /**
-     * Single-colour SVG for Safari pinned-tab. Will be served as `mask-icon`.
-     */
-    safariPinnedTabSvg?: (number | null) | Media;
-    /**
-     * Hex string (e.g. #0E1117). Surfaced as `<meta name="theme-color">` and as `theme_color` in manifest.json.
-     */
-    themeColor?: string | null;
-  };
-  /**
-   * Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper. Note: web production phase — not yet consumed by apps/web.
-   */
-  verification?: {
-    /**
-     * google-site-verification (Google Search Console → Settings → Ownership verification → HTML tag).
-     */
-    google?: string | null;
-    /**
-     * msvalidate.01 (Bing Webmaster Tools → Site Settings → Site verification → Meta tag).
-     */
-    bing?: string | null;
-    /**
-     * p:domain_verify (Pinterest → Settings → Claim → claim a website → HTML tag).
-     */
-    pinterest?: string | null;
-    /**
-     * yandex-verification (Yandex Webmaster → Settings → Site verification → Meta tag).
-     */
-    yandex?: string | null;
-    /**
-     * facebook-domain-verification (Meta Business Suite → Brand Safety → Domains → Verify → Meta-tag).
-     */
-    facebookDomain?: string | null;
-  };
-  /**
-   * Surfaced on every page as the publisher reference. Required for News content.
-   */
-  organizationJsonLd?: {
-    name?: string | null;
-    legalName?: string | null;
-    url?: string | null;
-    logo?: (number | null) | Media;
-    /**
-     * Authoritative profile URLs (LinkedIn, GitHub, Crunchbase, etc.).
-     */
-    sameAs?:
-      | {
-          url: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  /**
-   * When enabled, the site-wide Organization blob upgrades to a NewsMediaOrganization. Pairs with NewsArticle JSON-LD (isAccessibleForFree: true) and /sitemap-news.xml to satisfy Google News eligibility (signals-based since October 2025). Leave disabled until the policy URLs below are real, published pages — Google penalises NewsMediaOrganization claims that point at empty or missing policies.
-   */
-  newsMediaOrganization?: {
-    /**
-     * Toggle on once the policy pages below exist and link from the site footer.
-     */
-    enabled?: boolean | null;
-    /**
-     * ISO 8601 date (e.g. 2024-01-15). Surfaced as Schema.org foundingDate.
-     */
-    foundingDate?: string | null;
-    /**
-     * One-line tagline. Surfaced as Schema.org slogan.
-     */
-    slogan?: string | null;
-    /**
-     * URL of the masthead / about-us page that lists editorial leadership. Surfaced as Schema.org masthead.
-     */
-    masthead?: string | null;
-    /**
-     * URL of the editorial-ethics policy page.
-     */
-    ethicsPolicy?: string | null;
-    /**
-     * URL of the corrections / retractions policy page.
-     */
-    correctionsPolicy?: string | null;
-    /**
-     * URL of the fact-checking / verification policy page.
-     */
-    factCheckingPolicy?: string | null;
-    /**
-     * URL of the page describing how readers submit feedback / complaints.
-     */
-    actionableFeedbackPolicy?: string | null;
-    /**
-     * URL of the policy page on use of anonymous / unnamed sources.
-     */
-    unnamedSourcesPolicy?: string | null;
-    /**
-     * URL of the diversity / inclusion policy page.
-     */
-    diversityPolicy?: string | null;
-    /**
-     * URL of the page disclosing ownership / funding sources.
-     */
-    ownershipFundingInfo?: string | null;
-    /**
-     * URL of the page describing editorial mission and coverage priorities.
-     */
-    coveragePolicy?: string | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "mainNav".
  */
 export interface MainNav {
@@ -11075,64 +10925,48 @@ export interface FooterNav {
   createdAt?: string | null;
 }
 /**
+ * Optional spotlight card shown in the Resources mega menu. Falls back to the Bulletin evergreen when no event/webinar is upcoming and this global is empty or expired.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "legal".
+ * via the `definition` "resourcesSpotlight".
  */
-export interface Legal {
+export interface ResourcesSpotlight {
   id: number;
+  image?: (number | null) | Media;
+  headline: string;
+  sub?: string | null;
+  ctaLabel: string;
   /**
-   * Date or semver tag bumped on each policy change (e.g. 2026-04-15). Snapshotted onto every lead at submit time for GDPR audit defensibility.
+   * Destination URL or path. Accepts `/site-path` or `https://…`.
    */
-  policyVersion: string;
-  privacy?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  terms?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  aup?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  ctaHref: string;
   /**
-   * GDPR DSAR / Data Processing Agreement inbox.
+   * After this date, the card is skipped and the evergreen renders.
    */
-  dpaContactEmail?: string | null;
+  expiresAt?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Optional spotlight card shown in the Company mega menu. Renders only when there are no open careers. Falls back to the Talent Network evergreen when empty or expired.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companySpotlight".
+ */
+export interface CompanySpotlight {
+  id: number;
+  image?: (number | null) | Media;
+  headline: string;
+  sub?: string | null;
+  ctaLabel: string;
+  /**
+   * Destination URL or path. Accepts `/site-path` or `https://…`.
+   */
+  ctaHref: string;
+  /**
+   * After this date, the card is skipped and the evergreen renders.
+   */
+  expiresAt?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -11227,48 +11061,214 @@ export interface PodcastPage {
   createdAt?: string | null;
 }
 /**
- * Optional spotlight card shown in the Resources mega menu. Falls back to the Bulletin evergreen when no event/webinar is upcoming and this global is empty or expired.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resourcesSpotlight".
+ * via the `definition` "legal".
  */
-export interface ResourcesSpotlight {
+export interface Legal {
   id: number;
-  image?: (number | null) | Media;
-  headline: string;
-  sub?: string | null;
-  ctaLabel: string;
   /**
-   * Destination URL or path. Accepts `/site-path` or `https://…`.
+   * Date or semver tag bumped on each policy change (e.g. 2026-04-15). Snapshotted onto every lead at submit time for GDPR audit defensibility.
    */
-  ctaHref: string;
+  policyVersion: string;
+  privacy?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  terms?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  aup?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * After this date, the card is skipped and the evergreen renders.
+   * GDPR DSAR / Data Processing Agreement inbox.
    */
-  expiresAt?: string | null;
+  dpaContactEmail?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
- * Optional spotlight card shown in the Company mega menu. Renders only when there are no open careers. Falls back to the Talent Network evergreen when empty or expired.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "companySpotlight".
+ * via the `definition` "seoDefaults".
  */
-export interface CompanySpotlight {
+export interface SeoDefault {
   id: number;
-  image?: (number | null) | Media;
-  headline: string;
-  sub?: string | null;
-  ctaLabel: string;
   /**
-   * Destination URL or path. Accepts `/site-path` or `https://…`.
+   * Used when seo.title is unset. %s is replaced with the document title.
    */
-  ctaHref: string;
+  defaultTitleTemplate?: string | null;
   /**
-   * After this date, the card is skipped and the evergreen renders.
+   * Site-wide fallback for seo.description when nothing else is set.
    */
-  expiresAt?: string | null;
+  defaultDescription?: string | null;
+  /**
+   * Site-wide fallback when seo.ogImage and the page hero are both empty.
+   */
+  defaultOgImage?: (number | null) | Media;
+  /**
+   * Used as twitter:site fallback when no author handle is set.
+   */
+  twitterHandle?: string | null;
+  /**
+   * Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`. Note: web production phase — not yet consumed by apps/web.
+   */
+  brandIcons?: {
+    /**
+     * 32×32 favicon. Used by `<link rel="icon" sizes="32x32">`.
+     */
+    favicon32?: (number | null) | Media;
+    /**
+     * 192×192 PNG. PWA / Android home-screen icon.
+     */
+    icon192?: (number | null) | Media;
+    /**
+     * 512×512 PNG. PWA / large-tile icon.
+     */
+    icon512?: (number | null) | Media;
+    /**
+     * 180×180 PNG. iOS home-screen icon (`apple-touch-icon`).
+     */
+    appleTouchIcon?: (number | null) | Media;
+    /**
+     * Single-colour SVG for Safari pinned-tab. Will be served as `mask-icon`.
+     */
+    safariPinnedTabSvg?: (number | null) | Media;
+    /**
+     * Hex string (e.g. #0E1117). Surfaced as `<meta name="theme-color">` and as `theme_color` in manifest.json.
+     */
+    themeColor?: string | null;
+  };
+  /**
+   * Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper. Note: web production phase — not yet consumed by apps/web.
+   */
+  verification?: {
+    /**
+     * google-site-verification (Google Search Console → Settings → Ownership verification → HTML tag).
+     */
+    google?: string | null;
+    /**
+     * msvalidate.01 (Bing Webmaster Tools → Site Settings → Site verification → Meta tag).
+     */
+    bing?: string | null;
+    /**
+     * p:domain_verify (Pinterest → Settings → Claim → claim a website → HTML tag).
+     */
+    pinterest?: string | null;
+    /**
+     * yandex-verification (Yandex Webmaster → Settings → Site verification → Meta tag).
+     */
+    yandex?: string | null;
+    /**
+     * facebook-domain-verification (Meta Business Suite → Brand Safety → Domains → Verify → Meta-tag).
+     */
+    facebookDomain?: string | null;
+  };
+  /**
+   * Surfaced on every page as the publisher reference. Required for News content.
+   */
+  organizationJsonLd?: {
+    name?: string | null;
+    legalName?: string | null;
+    url?: string | null;
+    logo?: (number | null) | Media;
+    /**
+     * Authoritative profile URLs (LinkedIn, GitHub, Crunchbase, etc.).
+     */
+    sameAs?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * When enabled, the site-wide Organization blob upgrades to a NewsMediaOrganization. Pairs with NewsArticle JSON-LD (isAccessibleForFree: true) and /sitemap-news.xml to satisfy Google News eligibility (signals-based since October 2025). Leave disabled until the policy URLs below are real, published pages — Google penalises NewsMediaOrganization claims that point at empty or missing policies.
+   */
+  newsMediaOrganization?: {
+    /**
+     * Toggle on once the policy pages below exist and link from the site footer.
+     */
+    enabled?: boolean | null;
+    /**
+     * ISO 8601 date (e.g. 2024-01-15). Surfaced as Schema.org foundingDate.
+     */
+    foundingDate?: string | null;
+    /**
+     * One-line tagline. Surfaced as Schema.org slogan.
+     */
+    slogan?: string | null;
+    /**
+     * URL of the masthead / about-us page that lists editorial leadership. Surfaced as Schema.org masthead.
+     */
+    masthead?: string | null;
+    /**
+     * URL of the editorial-ethics policy page.
+     */
+    ethicsPolicy?: string | null;
+    /**
+     * URL of the corrections / retractions policy page.
+     */
+    correctionsPolicy?: string | null;
+    /**
+     * URL of the fact-checking / verification policy page.
+     */
+    factCheckingPolicy?: string | null;
+    /**
+     * URL of the page describing how readers submit feedback / complaints.
+     */
+    actionableFeedbackPolicy?: string | null;
+    /**
+     * URL of the policy page on use of anonymous / unnamed sources.
+     */
+    unnamedSourcesPolicy?: string | null;
+    /**
+     * URL of the diversity / inclusion policy page.
+     */
+    diversityPolicy?: string | null;
+    /**
+     * URL of the page disclosing ownership / funding sources.
+     */
+    ownershipFundingInfo?: string | null;
+    /**
+     * URL of the page describing editorial mission and coverage priorities.
+     */
+    coveragePolicy?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -11322,68 +11322,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         gtmContainerId?: T;
         ga4MeasurementId?: T;
         consentModeEnabled?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "seoDefaults_select".
- */
-export interface SeoDefaultsSelect<T extends boolean = true> {
-  defaultTitleTemplate?: T;
-  defaultDescription?: T;
-  defaultOgImage?: T;
-  twitterHandle?: T;
-  brandIcons?:
-    | T
-    | {
-        favicon32?: T;
-        icon192?: T;
-        icon512?: T;
-        appleTouchIcon?: T;
-        safariPinnedTabSvg?: T;
-        themeColor?: T;
-      };
-  verification?:
-    | T
-    | {
-        google?: T;
-        bing?: T;
-        pinterest?: T;
-        yandex?: T;
-        facebookDomain?: T;
-      };
-  organizationJsonLd?:
-    | T
-    | {
-        name?: T;
-        legalName?: T;
-        url?: T;
-        logo?: T;
-        sameAs?:
-          | T
-          | {
-              url?: T;
-              id?: T;
-            };
-      };
-  newsMediaOrganization?:
-    | T
-    | {
-        enabled?: T;
-        foundingDate?: T;
-        slogan?: T;
-        masthead?: T;
-        ethicsPolicy?: T;
-        correctionsPolicy?: T;
-        factCheckingPolicy?: T;
-        actionableFeedbackPolicy?: T;
-        unnamedSourcesPolicy?: T;
-        diversityPolicy?: T;
-        ownershipFundingInfo?: T;
-        coveragePolicy?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -11498,14 +11436,30 @@ export interface FooterNavSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "legal_select".
+ * via the `definition` "resourcesSpotlight_select".
  */
-export interface LegalSelect<T extends boolean = true> {
-  policyVersion?: T;
-  privacy?: T;
-  terms?: T;
-  aup?: T;
-  dpaContactEmail?: T;
+export interface ResourcesSpotlightSelect<T extends boolean = true> {
+  image?: T;
+  headline?: T;
+  sub?: T;
+  ctaLabel?: T;
+  ctaHref?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companySpotlight_select".
+ */
+export interface CompanySpotlightSelect<T extends boolean = true> {
+  image?: T;
+  headline?: T;
+  sub?: T;
+  ctaLabel?: T;
+  ctaHref?: T;
+  expiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -11560,30 +11514,76 @@ export interface PodcastPageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resourcesSpotlight_select".
+ * via the `definition` "legal_select".
  */
-export interface ResourcesSpotlightSelect<T extends boolean = true> {
-  image?: T;
-  headline?: T;
-  sub?: T;
-  ctaLabel?: T;
-  ctaHref?: T;
-  expiresAt?: T;
+export interface LegalSelect<T extends boolean = true> {
+  policyVersion?: T;
+  privacy?: T;
+  terms?: T;
+  aup?: T;
+  dpaContactEmail?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "companySpotlight_select".
+ * via the `definition` "seoDefaults_select".
  */
-export interface CompanySpotlightSelect<T extends boolean = true> {
-  image?: T;
-  headline?: T;
-  sub?: T;
-  ctaLabel?: T;
-  ctaHref?: T;
-  expiresAt?: T;
+export interface SeoDefaultsSelect<T extends boolean = true> {
+  defaultTitleTemplate?: T;
+  defaultDescription?: T;
+  defaultOgImage?: T;
+  twitterHandle?: T;
+  brandIcons?:
+    | T
+    | {
+        favicon32?: T;
+        icon192?: T;
+        icon512?: T;
+        appleTouchIcon?: T;
+        safariPinnedTabSvg?: T;
+        themeColor?: T;
+      };
+  verification?:
+    | T
+    | {
+        google?: T;
+        bing?: T;
+        pinterest?: T;
+        yandex?: T;
+        facebookDomain?: T;
+      };
+  organizationJsonLd?:
+    | T
+    | {
+        name?: T;
+        legalName?: T;
+        url?: T;
+        logo?: T;
+        sameAs?:
+          | T
+          | {
+              url?: T;
+              id?: T;
+            };
+      };
+  newsMediaOrganization?:
+    | T
+    | {
+        enabled?: T;
+        foundingDate?: T;
+        slogan?: T;
+        masthead?: T;
+        ethicsPolicy?: T;
+        correctionsPolicy?: T;
+        factCheckingPolicy?: T;
+        actionableFeedbackPolicy?: T;
+        unnamedSourcesPolicy?: T;
+        diversityPolicy?: T;
+        ownershipFundingInfo?: T;
+        coveragePolicy?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

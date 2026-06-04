@@ -20,12 +20,21 @@
 // `collections: [...]` array in payload.config.ts). The editorial
 // priority we want for the sidebar is content-first, ops-last:
 //
-//   Content       — what editors touch every day
-//   Globals       — site-wide settings (always near the top)
-//   Taxonomies    — categories the content references
-//   People        — author records
-//   System        — user accounts, media, redirects, audit
-//   Marketing     — forms, leads (occasional admin)
+//   Content       — what editors publish every day (articles lead; Media here)
+//   Taxonomies    — categories the content references (assigned while authoring)
+//   Marketing     — leads inbox + forms (checked frequently by marketing/SEO)
+//   SEO           — SEO defaults + redirects + broken-link reports (SEO toolkit)
+//   Globals       — site-wide config + nav chrome (set-and-forget, periodic)
+//   Recruiting    — jobs intake: applications, resumes (HR-only)
+//   System        — user accounts, ops + machine logs (rarely visited)
+//
+// Ordered by frequency-of-use then workflow proximity, from the daily
+// content/SEO editor's perspective: live work on top, config and
+// ops/logs at the bottom.
+//
+// Every group MUST be listed below — a group with no `order` rule
+// defaults to `order: 0` and floats above everything else (this is what
+// previously pushed Recruiting to the top of the sidebar).
 //
 // `.nav__wrap` is `display: flex; flex-direction: column` (see
 // _user-menu.scss), so flex `order` reshuffles the rendered sequence
@@ -33,11 +42,12 @@
 .cs-sidebar-header { order: 0; }
 .nav-group {
   &.Content    { order: 1; }
-  &.Globals    { order: 2; }
-  &.Taxonomies { order: 3; }
-  &.People     { order: 4; }
-  &.System     { order: 5; }
-  &.Marketing  { order: 6; }
+  &.Taxonomies { order: 2; }
+  &.Marketing  { order: 3; }
+  &.SEO        { order: 4; }
+  &.Globals    { order: 5; }
+  &.Recruiting { order: 6; }
+  &.System     { order: 7; }
 }
 .cs-user-menu { order: 100; }
 

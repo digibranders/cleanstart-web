@@ -9,7 +9,7 @@ export const ResourcesSpotlight: GlobalConfig = {
   admin: {
     description:
       'Optional spotlight card shown in the Resources mega menu. Falls back to the Bulletin evergreen when no event/webinar is upcoming and this global is empty or expired.',
-    group: 'Marketing',
+    group: 'Globals',
   },
   access: {
     read: () => true,
