@@ -59,11 +59,14 @@ export function JobApplyForm({
   };
 
   // Auto-grow the cover-letter textarea: starts at one line, expands to fit
-  // typed/pasted content (capped by maxHeight, then scrolls).
-  const autoGrow = (e: React.FormEvent<HTMLTextAreaElement>): void => {
-    const el = e.currentTarget;
+  // typed/pasted content, then scrolls only once it reaches the cap. The
+  // overflow stays hidden below the cap so an empty/short field never shows a
+  // phantom scrollbar.
+  const COVER_MAX_PX = 220;
+  const resizeCover = (el: HTMLTextAreaElement): void => {
     el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
+    el.style.height = `${Math.min(el.scrollHeight, COVER_MAX_PX)}px`;
+    el.style.overflowY = el.scrollHeight > COVER_MAX_PX ? "auto" : "hidden";
   };
 
   const onSubmit = async (
@@ -358,14 +361,17 @@ export function JobApplyForm({
                 Cover letter (optional) — paste below or upload a file
               </label>
               <textarea
+                ref={(el) => {
+                  if (el) resizeCover(el);
+                }}
                 id="coverLetter"
                 name="coverLetter"
                 rows={1}
-                onInput={autoGrow}
+                onInput={(e) => resizeCover(e.currentTarget)}
                 placeholder="A short note on why you're a great fit…"
                 className="font-sans w-full"
                 style={{
-                  padding: "11px 14px",
+                  padding: "10px 14px",
                   borderRadius: "10px",
                   border: "1px solid rgba(17,17,17,0.12)",
                   background: "white",
@@ -374,9 +380,7 @@ export function JobApplyForm({
                   outline: "none",
                   resize: "none",
                   lineHeight: 1.5,
-                  minHeight: "44px",
-                  maxHeight: "220px",
-                  overflowY: "auto",
+                  overflowY: "hidden",
                   display: "block",
                 }}
               />
@@ -612,7 +616,8 @@ function SelectField({
           className="absolute left-0 right-0 z-20 overflow-y-auto"
           style={{
             top: "calc(100% + 6px)",
-            maxHeight: "240px",
+            maxHeight: "340px",
+            overscrollBehavior: "contain",
             border: "1px solid rgba(17,17,17,0.12)",
             borderRadius: "10px",
             background: "white",
