@@ -267,8 +267,15 @@ export function CookieBanner() {
         ) : null}
 
         {/* Single action row, always at the bottom. Contents switch by state
-            so no button is ever duplicated. */}
-        <div className="flex flex-wrap items-center justify-end gap-3">
+            so no button is ever duplicated. On mobile the collapsed row stays
+            on ONE line: the text-link "Cookies Settings" sits left, the two
+            primary buttons group right (justify-between); from sm+ everything
+            right-aligns. */}
+        <div
+          className={`flex flex-nowrap items-center gap-2 sm:gap-3 ${
+            showPrefs ? "justify-end" : "justify-between sm:justify-end"
+          }`}
+        >
           {showPrefs ? (
             <>
               <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue" style={compactBtn}>
@@ -288,18 +295,20 @@ export function CookieBanner() {
               <button
                 type="button"
                 onClick={() => setShowPrefs(true)}
-                className="inline-flex h-9 cursor-pointer items-center justify-center rounded-lg border border-white/30 px-4 font-medium text-white transition hover:bg-white/10"
+                className="cursor-pointer whitespace-nowrap font-medium text-white/80 underline underline-offset-4 transition hover:text-white"
                 style={{ fontSize: "14px" }}
                 aria-expanded={showPrefs}
               >
                 Cookies Settings
               </button>
-              <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue" style={compactBtn}>
-                Reject All
-              </button>
-              <button type="button" onClick={() => decide("accept_all")} className="cs-btn-blue" style={compactBtn}>
-                Allow All
-              </button>
+              <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue" style={compactBtn}>
+                  Reject All
+                </button>
+                <button type="button" onClick={() => decide("accept_all")} className="cs-btn-blue" style={compactBtn}>
+                  Allow All
+                </button>
+              </div>
             </>
           )}
         </div>
