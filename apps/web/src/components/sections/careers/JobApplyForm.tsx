@@ -298,7 +298,7 @@ export function JobApplyForm({
                   border: "1px dashed rgba(74,59,241,0.45)",
                   background: "rgba(74,59,241,0.04)",
                   borderRadius: "12px",
-                  padding: "16px",
+                  padding: "10px 16px",
                   textAlign: "center",
                 }}
               >
@@ -308,7 +308,7 @@ export function JobApplyForm({
                     fontSize: "var(--fs-body-sm)",
                     fontWeight: 500,
                     color: ACCENT,
-                    marginTop: "8px",
+                    marginTop: "5px",
                   }}
                 >
                   {resumeName || "Drop or browse — PDF, DOC, DOCX"}
@@ -317,7 +317,7 @@ export function JobApplyForm({
                   style={{
                     fontSize: "var(--fs-caption)",
                     color: "rgba(17,17,17,0.55)",
-                    marginTop: "4px",
+                    marginTop: "2px",
                   }}
                 >
                   Max file size: 10 MB
@@ -352,7 +352,7 @@ export function JobApplyForm({
               <textarea
                 id="coverLetter"
                 name="coverLetter"
-                rows={4}
+                rows={3}
                 placeholder="A short note on why you're a great fit…"
                 className="font-sans w-full"
                 style={{
@@ -689,7 +689,7 @@ function RecruitmentConsent(): React.ReactElement {
 
 function UploadIcon(): React.ReactElement {
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
         d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
         stroke={ACCENT}
