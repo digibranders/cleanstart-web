@@ -374,6 +374,20 @@ export const careersApplyEndpoint: Endpoint = {
       });
     }
 
+    // Roll back orphaned R2 uploads when the submission ultimately fails: the
+    // resume/cover-letter files are only persisted to storage for a successfully
+    // created application. Best-effort — a cleanup failure is logged, not raised.
+    const rollbackUpload = async (id: number): Promise<void> => {
+      try {
+        await req.payload.delete({ collection: 'resumes', id, overrideAccess: true });
+      } catch (cleanupErr) {
+        req.payload.logger.warn(
+          { err: cleanupErr instanceof Error ? cleanupErr.message : String(cleanupErr), resumeId: id },
+          'Failed to roll back orphaned resume upload after application create failure',
+        );
+      }
+    };
+
     // 4. Create the append-only application row with delivery embedded.
     try {
       await req.payload.create({
@@ -412,6 +426,8 @@ export const careersApplyEndpoint: Endpoint = {
         { err: err instanceof Error ? err.message : String(err), resumeId },
         'Career application create failed after resume upload',
       );
+      await rollbackUpload(resumeId);
+      if (coverLetterFileId != null) await rollbackUpload(coverLetterFileId);
       return json({ ok: false, error: 'capture_failed' }, { status: 502, headers: cors });
     }
 

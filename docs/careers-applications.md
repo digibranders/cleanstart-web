@@ -45,6 +45,8 @@ Endpoint: `apps/cms/src/payload/endpoints/careers-apply.ts` (registered as a `ca
 
 The endpoint sends the HR email **before** the `career-applications.create`, so the delivery result is written into the initial append-only row (no second update). If the resume upload or the row create fails, the endpoint returns `502 capture_failed`.
 
+**R2 upload is success-gated.** The resume only reaches R2 inside the endpoint at submit time — the marketing-site form holds the file in browser state (with a local `URL.createObjectURL` preview) and never pre-uploads, so a page refresh or a "Remove" in the form discards it with no storage artifact. Server-side, if the `career-applications.create` fails *after* the resume (and any cover-letter file) were uploaded, the endpoint **rolls those uploads back** (`payload.delete` on the `resumes` rows, which drops the R2 objects) before returning `502`. Net guarantee: a file persists in R2 only for a successfully recorded application — no orphaned resumes from a failed submit.
+
 ---
 
 ## 2. Environment variables
