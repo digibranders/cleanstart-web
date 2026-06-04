@@ -27,9 +27,9 @@ interface JobApplyFormProps {
 /**
  * Per-job application form for CMS-native, open roles. Posts a resume file as
  * multipart through `submitApplication` → CMS `/api/career-applications/apply`.
- * A sleek, centered card (~520px) with an indigo accent and a dashed drop-zone.
- * The Turnstile widget injects a hidden `cf-turnstile-response` input read off
- * FormData on submit.
+ * Full content-column width with a tight vertical rhythm, indigo accent, and a
+ * dashed drop-zone. The Turnstile widget injects a hidden `cf-turnstile-response`
+ * input read off FormData on submit.
  */
 export function JobApplyForm({
   jobSlug,
@@ -137,7 +137,7 @@ export function JobApplyForm({
 
   return (
     <section className="relative w-full bg-white overflow-x-clip">
-      <div className="relative mx-auto max-w-[520px] px-6 pt-2 pb-24">
+      <div className="relative mx-auto max-w-[820px] px-6 sm:px-10 pt-2 pb-24">
         {done ? (
           <div
             className="bg-white"
