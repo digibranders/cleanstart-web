@@ -9,7 +9,7 @@
 
   Dynamic values use Brevo templating: params.X output tags plus
   conditional if-blocks. The code sends these params
-  (see docs/careers-applications.md):
+  (see docs/features/careers-applications.md):
     jobTitle, jobLocation, fullName, firstName, lastName, email,
     phone, location, howDidYouHear, linkedinUrl, coverLetter,
     coverLetterAttached, submittedAt
@@ -169,14 +169,14 @@
             </td>
           </tr>
 
-          <!-- Résumé attached note -->
+          <!-- Attachments note (résumé always; cover-letter file when uploaded) -->
           <tr>
             <td style="padding:18px 32px 4px 32px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
                 style="background-color:#eef2ff; border-radius:10px;">
                 <tr>
                   <td style="padding:14px 18px; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#1e293b;">
-                    📎 &nbsp;<strong>Résumé attached</strong> to this email.
+                    📎 &nbsp;<strong>Résumé attached</strong> to this email.{% if params.coverLetterAttached %} A <strong>cover-letter file</strong> is attached too.{% endif %}
                   </td>
                 </tr>
               </table>
