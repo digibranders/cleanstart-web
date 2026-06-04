@@ -25,54 +25,67 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
           "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
       }}
     >
-      <div
-        className="relative shrink-0 overflow-hidden flex items-center justify-center m-3"
-        style={{
-          aspectRatio: "380 / 200",
-          borderRadius: "20px",
-          background:
-            "linear-gradient(180deg, #10123e 0%, #131e8f 38%, #421ebc 100%)",
-        }}
-      >
-        {logoUrl ? (
-          <div className="relative h-24 w-[78%]">
+      {/* The outer wrapper must not clip overflow so the category badge
+          (positioned bottom: -12px) can straddle the image's bottom edge —
+          upper half over the gradient panel, lower half in the card body
+          (mirrors BlogCard). The inner div clips the art to rounded corners. */}
+      <div className="relative shrink-0 m-3" style={{ aspectRatio: "380 / 200" }}>
+        <div
+          className="absolute inset-0 overflow-hidden flex items-center justify-center"
+          style={{
+            borderRadius: "20px",
+            background:
+              "linear-gradient(180deg, #10123e 0%, #131e8f 38%, #421ebc 100%)",
+          }}
+        >
+          {logoUrl ? (
+            <div className="relative h-24 w-[78%]">
+              <Image
+                src={logoUrl}
+                alt={item.publisher ?? item.title}
+                fill
+                className="object-contain pointer-events-none select-none"
+                sizes="(min-width: 1280px) 300px, (min-width: 768px) 35vw, 70vw"
+              />
+            </div>
+          ) : heroUrl ? (
+            // `object-contain`, not `object-cover`: newsroom heroes are a mix of
+            // pre-composed gradient banners (OSV, CleanSight — aspect already
+            // matches the plate, so contain renders identically) and raw
+            // publisher logos (AP, Cyber Defense Magazine — wider/taller than
+            // the plate). `cover` cropped the raw logos; `contain` shows every
+            // mark whole, letterboxed onto the brand gradient.
             <Image
-              src={logoUrl}
-              alt={item.publisher ?? item.title}
+              src={heroUrl}
+              alt={item.heroImage?.alt ?? item.title}
               fill
-              className="object-contain pointer-events-none select-none"
-              sizes="(min-width: 1280px) 300px, (min-width: 768px) 35vw, 70vw"
+              className="object-contain"
+              sizes="(min-width: 1280px) 380px, (min-width: 768px) 45vw, 90vw"
             />
-          </div>
-        ) : heroUrl ? (
-          <Image
-            src={heroUrl}
-            alt={item.heroImage?.alt ?? item.title}
-            fill
-            className="object-cover"
-            sizes="(min-width: 1280px) 380px, (min-width: 768px) 45vw, 90vw"
-          />
-        ) : (
-          <span
-            className="font-display font-bold text-center text-white"
-            style={{
-              fontSize: "var(--fs-h3)",
-              letterSpacing: "-0.03em",
-              padding: "0 24px",
-            }}
-          >
-            {item.publisher ?? "CleanStart"}
-          </span>
-        )}
-      </div>
+          ) : (
+            <span
+              className="font-display font-bold text-center text-white"
+              style={{
+                fontSize: "var(--fs-h3)",
+                letterSpacing: "-0.03em",
+                padding: "0 24px",
+              }}
+            >
+              {item.publisher ?? "CleanStart"}
+            </span>
+          )}
+        </div>
 
-      {/* Negative margin pulls the badge up to overlap the image bottom edge. */}
-      <div className="relative px-5 md:px-8" style={{ marginTop: "-12px", zIndex: 1 }}>
-        <CategoryBadge label={pillLabel} />
+        <div
+          className="absolute"
+          style={{ left: "20px", bottom: "-12px", zIndex: 1 }}
+        >
+          <CategoryBadge label={pillLabel} />
+        </div>
       </div>
 
       <div
-        className="relative flex flex-1 flex-col justify-between pt-3 pb-5 px-5 md:pt-4 md:pb-8 md:px-8"
+        className="relative flex flex-1 flex-col justify-between pt-8 pb-5 px-5 md:pt-9 md:pb-8 md:px-8"
       >
         <div className="flex flex-col gap-2.5 md:gap-3">
           <div className="flex items-center gap-3 md:gap-4">

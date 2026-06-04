@@ -123,17 +123,17 @@ export function MobileNav({ openRolesCount = 0 }: { openRolesCount?: number }) {
                       <Link
                         href={MOBILE_CTA[item.label]!.ctaHref}
                         onClick={close}
-                        className="mx-3 mb-3 mt-2 flex items-center justify-between rounded-[10px] border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 no-underline"
+                        className="mx-3 mb-3 mt-2 flex items-center justify-between gap-2 rounded-[10px] border border-white/[0.06] bg-white/[0.03] px-3 py-2 no-underline"
                       >
-                        <span className="text-xs font-semibold text-white">
+                        <span className="min-w-0 truncate text-xs font-semibold text-white">
                           {item.label === "Company" && openRolesCount > 0
                             ? `${openRolesCount} open roles`
                             : MOBILE_CTA[item.label]!.headline}
                         </span>
                         <span
-                          className="cs-btn-glass inline-flex items-center justify-center"
+                          className="cs-btn-glass cs-btn-glass--mini inline-flex shrink-0 items-center justify-center"
                           style={{
-                            ["--cs-btn-h" as string]: "30px",
+                            ["--cs-btn-h" as string]: "28px",
                             ["--cs-btn-px" as string]: "12px",
                             ["--cs-btn-fs" as string]: "11px",
                           }}

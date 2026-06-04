@@ -746,6 +746,15 @@ body {
     height: 36px !important;
     font-size: 13px !important;
   }
+  /* Compact inline CTA (mobile-nav submenu cards). Higher specificity than the
+     global mobile rule above so the 28px chip survives — without it the global
+     36px/13px clobber the inline size and the label overflows its card. */
+  .cs-btn-glass.cs-btn-glass--mini {
+    --cs-btn-h: 28px !important;
+    --cs-btn-fs: 11px !important;
+    height: 28px !important;
+    font-size: 11px !important;
+  }
 }
 
 /* Inputs inside Footer CTA card track the button height so input + button rows

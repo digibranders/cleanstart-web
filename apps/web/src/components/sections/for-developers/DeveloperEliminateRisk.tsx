@@ -170,7 +170,7 @@ function GlowAnchorCard({
 
         {kind === 'number' && numberTo !== undefined ? (
           <div
-            className="cs-text-gradient-impact"
+            className="text-white"
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: 'var(--fs-h2)',
