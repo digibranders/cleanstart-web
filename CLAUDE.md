@@ -430,6 +430,11 @@ These are one-shot operations that **must** run against the prod Postgres on the
    - Re-runnable / idempotent. Same afterChange-hook / version-row caveat as above — run in a quiet window. Watch the log for "unmapped" warnings (a new Webflow department value that needs a `DEPARTMENT_MAP` entry).
    - After the run, spot-check the careers list — each job should show its department pill and the POSITION filter should list the departments.
 
+4. **Job `hiringStatus` (open/closed) backfill.** Webflow has no open/closed field — a role's status is its draft state (`_meta.isDraft`/`isArchived`: draft = closed, live = open). The local/prod jobs were populated without that, so every job is `open`. `apps/cms/scripts/backfill-job-hiring-status.ts` restores it from the export by slug, **keeping every job published** (closed roles stay visible under the careers "Closed roles" filter — the decision was to show them, not hide them). Does not touch `_status`. The import transform already publishes jobs with the correct `hiringStatus` going forward.
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/backfill-job-hiring-status.ts`
+   - Re-runnable / idempotent. Closing a role stamps `closedAt = now` (the real Webflow close date isn't in the export). Same afterChange-hook / version-row caveat — run in a quiet window.
+   - After the run, spot-check the careers list — the STATUS filter (Open / Closed / All roles) should partition correctly, with OPEN/CLOSED badges per card.
+
 (Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
 
 ---
