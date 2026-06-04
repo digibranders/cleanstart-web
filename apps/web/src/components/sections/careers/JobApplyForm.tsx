@@ -51,7 +51,9 @@ export function JobApplyForm({
   jobTitle,
 }: JobApplyFormProps): React.ReactElement {
   const [busy, setBusy] = useState(false);
-  const { status, setStatus, statusRef } = useFormStatus();
+  const { status, setStatus, statusRef } = useFormStatus({
+    successAutoHideMs: 6000,
+  });
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
