@@ -58,6 +58,14 @@ export function JobApplyForm({
     setResumeName(file.name);
   };
 
+  // Auto-grow the cover-letter textarea: starts at one line, expands to fit
+  // typed/pasted content (capped by maxHeight, then scrolls).
+  const autoGrow = (e: React.FormEvent<HTMLTextAreaElement>): void => {
+    const el = e.currentTarget;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
   const onSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
@@ -352,19 +360,24 @@ export function JobApplyForm({
               <textarea
                 id="coverLetter"
                 name="coverLetter"
-                rows={3}
+                rows={1}
+                onInput={autoGrow}
                 placeholder="A short note on why you're a great fit…"
                 className="font-sans w-full"
                 style={{
-                  padding: "12px 14px",
+                  padding: "11px 14px",
                   borderRadius: "10px",
                   border: "1px solid rgba(17,17,17,0.12)",
                   background: "white",
                   fontSize: "var(--fs-body)",
                   color: "#111",
                   outline: "none",
-                  resize: "vertical",
+                  resize: "none",
                   lineHeight: 1.5,
+                  minHeight: "44px",
+                  maxHeight: "220px",
+                  overflowY: "auto",
+                  display: "block",
                 }}
               />
               <input
