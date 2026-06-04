@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CleanStart — Platform Modernization Brief (Webflow → Custom Next.js + CMS)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Sora:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --violet: #471fc3;
+    --violet-deep: #2a1a6b;
+    --cyan: #2cc1eb;
+    --ink: #14101f;
+    --ink-soft: #4b475a;
+    --muted: #8b8798;
+    --line: #e7e4ee;
+    --tint-now: #f3f0ff;
+    --tint-now-edge: #e6dffb;
+    --good: #16a06a;
+    --page: #ffffff;
+    --grad: linear-gradient(120deg, #2a1a6b 0%, #471fc3 52%, #2cc1eb 130%);
+    --cs-bar: #5b2fd6;
+    --wf-bar: #b3acc4;
+    --bar-track: #e7e3f0;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #eceaf2;
+    color: var(--ink);
+    font-family: "Sora", system-ui, -apple-system, sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, .mark, .stat-num, .eyebrow, .bar-val, .lname { font-family: "Manrope", system-ui, sans-serif; }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 16px auto;
+    background: var(--page);
+    box-shadow: 0 12px 40px rgba(20, 16, 31, 0.14);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ---- Header band ---- */
+  .header {
+    background: var(--grad);
+    color: #fff;
+    padding: 22px 26px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header.slim { padding: 16px 26px 14px; }
+  .header::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(120% 140% at 100% 0%, rgba(255,255,255,0.16), transparent 55%);
+    pointer-events: none;
+  }
+  .brandrow { display: flex; align-items: center; justify-content: space-between; }
+  .mark { display: inline-flex; align-items: center; background: #fff; border-radius: 8px; padding: 6px 10px; box-shadow: 0 1px 3px rgba(20,16,31,0.18); }
+  .mark img { height: 17px; width: auto; display: block; }
+  .doc-tag { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; opacity: 0.85; }
+  .title { margin: 16px 0 4px; font-size: 25px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+  .title.sm { margin: 8px 0 2px; font-size: 18px; }
+  .subtitle { margin: 0; font-size: 12.5px; font-weight: 500; max-width: 64ch; opacity: 0.95; }
+  .subtitle.sm { font-size: 11.5px; }
+
+  /* ---- Body ---- */
+  .body { padding: 20px 26px 8px; flex: 1; }
+  .eyebrow { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--violet); font-weight: 700; margin: 0 0 8px; }
+  .eyebrow.mt { margin-top: 22px; }
+  .lede { margin: 0 0 16px; font-size: 12px; color: var(--ink-soft); max-width: 92ch; }
+  .lede b { color: var(--ink); font-weight: 600; }
+
+  /* ---- Comparison table ---- */
+  table { width: 100%; border-collapse: separate; border-spacing: 0; }
+  thead th { text-align: left; font-family: "Manrope"; font-weight: 700; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); padding: 0 10px 7px; vertical-align: bottom; }
+  thead th.now { color: var(--violet); }
+  th.area { width: 19%; }
+  th.before, th.now { width: 40.5%; }
+  tbody td { padding: 8px 10px; vertical-align: top; border-top: 1px solid var(--line); }
+  .area-cell { font-weight: 600; font-family: "Manrope"; font-size: 11.5px; color: var(--ink); }
+  .before-cell { color: var(--ink-soft); position: relative; padding-left: 18px; }
+  .before-cell::before { content: ""; position: absolute; left: 2px; top: 11px; width: 7px; height: 7px; border-radius: 50%; background: #d7d3df; }
+  .now-col { background: var(--tint-now); }
+  .now-cell { color: var(--ink); position: relative; padding-left: 20px; }
+  .now-cell::before { content: "✓"; position: absolute; left: 3px; top: 7px; color: var(--good); font-weight: 800; font-size: 11px; }
+  .now-cell b { font-weight: 600; }
+  tbody tr td.now-col:last-child { border-left: 1px solid var(--tint-now-edge); }
+  tbody tr:first-child td.now-col { border-top: 1px solid var(--tint-now-edge); }
+
+  /* ---- Highlights ---- */
+  .highlights { margin-top: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .stat { border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; background: #fbfaff; }
+  .stat-num { font-weight: 800; font-size: 19px; letter-spacing: -0.02em; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .stat-label { font-size: 10px; color: var(--ink-soft); margin-top: 2px; line-height: 1.35; }
+
+  /* ---- Closing statement ---- */
+  .closing { margin-top: 16px; border-radius: 12px; padding: 13px 16px; background: linear-gradient(120deg, #f3f0ff, #eafbff); border: 1px solid var(--tint-now-edge); display: flex; gap: 12px; align-items: center; }
+  .closing .bar { width: 4px; align-self: stretch; border-radius: 4px; background: var(--grad); }
+  .closing p { margin: 0; font-size: 12px; color: var(--ink); }
+  .closing b { color: var(--violet); font-weight: 700; }
+
+  /* ---- Footer ---- */
+  .footer { padding: 12px 26px 16px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); color: var(--muted); font-size: 9.5px; margin-top: 10px; }
+  .footer .dot { color: var(--violet); }
+
+  /* ===== PAGE 2 visuals ===== */
+  .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+
+  /* Architecture stack */
+  .flow-top { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+  .pill { font-size: 10px; font-weight: 700; color: #fff; background: var(--grad); padding: 4px 11px; border-radius: 999px; font-family: "Manrope"; }
+  .flow-arrow { flex: 1; height: 2px; background: linear-gradient(90deg, var(--violet), var(--cyan)); border-radius: 2px; position: relative; }
+  .flow-arrow::after { content: ""; position: absolute; right: -1px; top: -3px; border-left: 7px solid var(--cyan); border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+  .layer { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-left: 4px solid var(--violet); border-radius: 9px; padding: 9px 11px; background: #fbfaff; }
+  .layer + .layer { margin-top: 8px; }
+  .layer .lname { width: 92px; flex: none; font-weight: 700; font-size: 10.5px; color: var(--ink); line-height: 1.2; }
+  .layer .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip { font-size: 9.5px; padding: 3px 8px; border-radius: 999px; background: #ece7fb; color: #3a2a8c; font-weight: 600; }
+  .layer.edge { border-left-color: var(--cyan); }
+  .layer.edge .chip { background: #e1f6fd; color: #15677e; }
+
+  /* Migration bar chart */
+  .bar-row { display: grid; grid-template-columns: 78px 1fr 28px; align-items: center; gap: 9px; margin-bottom: 8px; }
+  .bar-row .blabel { font-size: 10.5px; font-weight: 600; color: var(--ink); }
+  .bar-track { display: block; background: var(--bar-track); border-radius: 6px; height: 14px; overflow: hidden; }
+  .bar-fill { display: block; height: 100%; border-radius: 6px; background: var(--cs-bar); }
+  .bar-val { font-size: 10.5px; font-weight: 700; color: var(--violet); text-align: right; }
+  .scope-note { margin-top: 10px; font-size: 10px; color: var(--ink-soft); }
+  .scope-note b { color: var(--ink); font-weight: 600; }
+
+  /* Measured comparison (real Lighthouse numbers) */
+  .meas-row { display: grid; grid-template-columns: 1fr 56px 92px; gap: 8px; align-items: baseline; padding: 5px 0; border-top: 1px solid var(--line); font-size: 10.5px; }
+  .meas-row.head { border-top: none; font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 700; padding-bottom: 3px; }
+  .meas-row .ml { color: var(--ink); font-weight: 600; }
+  .meas-row .wf { color: var(--ink-soft); text-align: right; }
+  .meas-row .cs { color: var(--violet); font-weight: 700; text-align: right; }
+  .meas-row .cs em { font-style: normal; font-weight: 700; color: var(--good); font-size: 8.5px; margin-left: 4px; }
+  .meas-foot { margin-top: 9px; font-size: 8.5px; color: var(--muted); line-height: 1.4; }
+  /* Compact "what we moved" corner */
+  .scope-mini { margin-top: 13px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .scope-mini .lbl { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; color: var(--muted); }
+  .mini-stats { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; font-size: 10px; color: var(--ink-soft); }
+  .mini-stats b { color: var(--violet); font-weight: 700; font-size: 13px; margin-right: 3px; }
+
+  /* Lighthouse score gauges */
+  .gtable { display: grid; grid-template-columns: 60px repeat(4, 1fr); gap: 7px 3px; align-items: center; margin-top: 2px; }
+  .gth { font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--muted); font-weight: 700; text-align: center; line-height: 1.2; }
+  .gsite { font-size: 10px; font-weight: 700; color: var(--ink-soft); }
+  .gsite.cs { color: var(--violet); }
+  .gauge { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; margin: 0 auto; background: conic-gradient(var(--c) calc(var(--v) * 3.6deg), #e7e3f0 0deg); }
+  .gauge::before { content: ""; position: absolute; inset: 4px; background: #fff; border-radius: 50%; }
+  .gauge b { position: relative; font-family: "Manrope"; font-size: 13px; font-weight: 800; color: var(--c); }
+  /* Headline delta callouts */
+  .hl-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .hl { border: 1px solid var(--tint-now-edge); border-radius: 9px; padding: 8px 11px; background: var(--tint-now); }
+  .hl b { display: block; font-family: "Manrope"; font-weight: 800; font-size: 15px; letter-spacing: -0.01em; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hl span { font-size: 9px; color: var(--ink-soft); }
+  /* Page-weight breakdown */
+  .wt { margin-top: 2px; }
+  .wt-row { display: grid; grid-template-columns: 96px 1fr 104px; gap: 11px; align-items: center; margin-bottom: 6px; }
+  .wt-lab { font-size: 10px; font-weight: 600; color: var(--ink); }
+  .wt-track { height: 11px; border-radius: 5px; background: var(--bar-track); overflow: hidden; }
+  .wt-fill { display: block; height: 100%; border-radius: 5px; background: var(--wf-bar); }
+  .wt-val { font-size: 9.5px; text-align: right; color: var(--ink-soft); white-space: nowrap; }
+  .wt-val b { color: var(--violet); font-weight: 700; }
+  .wt-note { font-size: 8.5px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+  .wt-note b { color: var(--ink); font-weight: 600; }
+
+  /* Capability comparison (grouped bars) */
+  .cmp-legend { display: flex; gap: 16px; margin: 0 0 10px; font-size: 9.5px; color: var(--ink-soft); }
+  .cmp-legend span { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
+  .cmp-legend .sw { width: 11px; height: 11px; border-radius: 3px; }
+  .sw.wf { background: var(--wf-bar); }
+  .sw.cs { background: var(--cs-bar); }
+  .cmp-row { margin-bottom: 9px; }
+  .cmp-row .clabel { font-size: 10px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .cmp-bar { display: grid; grid-template-columns: 1fr 22px; align-items: center; gap: 7px; margin-bottom: 3px; }
+  .cmp-track { display: block; height: 12px; border-radius: 5px; background: var(--bar-track); overflow: hidden; }
+  .cmp-fill { display: block; height: 100%; border-radius: 5px; }
+  .cmp-fill.wf { background: var(--wf-bar); }
+  .cmp-fill.cs { background: var(--cs-bar); }
+  .cmp-num { font-size: 9px; font-weight: 700; text-align: right; }
+  .cmp-num.wf { color: var(--muted); }
+  .cmp-num.cs { color: var(--violet); }
+
+  /* Feature matrix */
+  .fmatrix { width: 100%; border-collapse: collapse; }
+  .fmatrix th { font-size: 8.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4px 6px; }
+  .fmatrix th.feat { text-align: left; }
+  .fmatrix th.cs { color: var(--violet); }
+  .fmatrix td { font-size: 10px; padding: 5.5px 4px; border-top: 1px solid var(--line); vertical-align: middle; }
+  .fmatrix td.feat { color: var(--ink); }
+  .fmatrix td.mk { text-align: center; width: 58px; font-weight: 800; font-size: 12px; }
+  .fmatrix td.cscol { background: var(--tint-now); }
+  .fmatrix tr td.cscol:last-child { border-left: 1px solid var(--tint-now-edge); }
+  .mk.yes { color: var(--good); }
+  .mk.no { color: #c45a72; }
+  .mk.part { color: #c2932f; }
+
+  /* Automation cards (page 3) */
+  .auto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .auto-card { border: 1px solid var(--line); border-radius: 11px; padding: 12px 14px; background: #fff; }
+  .ac-head { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+  .ac-ic { width: 26px; height: 26px; border-radius: 8px; background: var(--tint-now); display: flex; align-items: center; justify-content: center; flex: none; }
+  .ac-ic svg { width: 15px; height: 15px; stroke: var(--violet); fill: none; stroke-width: 1.8; }
+  .ac-head h3 { margin: 0; font-size: 12px; font-weight: 700; }
+  .auto-card ul { margin: 0; padding: 0; list-style: none; }
+  .auto-card li { font-size: 10px; color: var(--ink-soft); line-height: 1.45; padding-left: 14px; position: relative; margin-bottom: 2.5px; }
+  .auto-card li::before { content: ""; position: absolute; left: 2px; top: 6px; width: 5px; height: 5px; border-radius: 50%; background: var(--cs-bar); }
+  .auto-card li b { color: var(--ink); font-weight: 600; }
+  .auto-note { margin: -1px 0 12px; font-size: 11px; color: var(--ink-soft); display: flex; align-items: center; gap: 7px; }
+  .auto-note::before { content: "✓"; color: var(--good); font-weight: 800; font-size: 12px; }
+  .auto-note b { color: var(--violet); font-weight: 700; }
+  /* Schedule strip */
+  .sched { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .sched-card { border: 1px solid var(--tint-now-edge); border-radius: 10px; padding: 11px 13px; background: var(--tint-now); }
+  .sched-card .cad { font-family: "Manrope"; font-weight: 700; font-size: 11px; color: var(--violet); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .sched-card .cad .dotpulse { width: 7px; height: 7px; border-radius: 50%; background: var(--cs-bar); }
+  .sched-card .items { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  /* ===== PAGE 3 automation ===== */
+  .autoflow { border: 1px solid var(--line); border-radius: 11px; padding: 11px 13px; background: #fbfaff; margin-bottom: 10px; }
+  .autoflow-head { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+  .trigger { font-size: 10.5px; font-weight: 700; color: #fff; background: var(--cs-bar); padding: 5px 11px; border-radius: 8px; font-family: "Manrope"; white-space: nowrap; }
+  .autoflow-head .htext { font-size: 10.5px; color: var(--ink-soft); font-weight: 600; }
+  .actions { display: flex; flex-wrap: wrap; gap: 6px; }
+  .action { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: #2e2358; background: #ece7fb; border-radius: 7px; padding: 5px 9px; }
+  .action::before { content: "✓"; color: var(--good); font-weight: 800; font-size: 10px; }
+  .action.site { background: #e7f6fc; color: #15566a; }
+  .action.site::before { color: #1c8bb0; }
+  .jobs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+  .job { border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; background: #fff; }
+  .job .when { display: inline-block; font-size: 8px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--violet); background: var(--tint-now); border-radius: 5px; padding: 2px 7px; margin-bottom: 6px; }
+  .job .jname { font-size: 10.5px; font-weight: 700; color: var(--ink); }
+  .job .jdesc { font-size: 9.5px; color: var(--ink-soft); margin-top: 1px; line-height: 1.35; }
+
+  @media print {
+    body { background: #fff; }
+    .page { margin: 0; box-shadow: none; width: auto; min-height: auto; break-after: page; }
+    .page:last-child { break-after: auto; }
+    @page { size: A4; margin: 0; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ PAGE 1 ============ -->
+  <main class="page">
+    <header class="header">
+      <div class="brandrow">
+        <div class="mark"><img src="data:image/png;base64,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" alt="CleanStart" width="81" height="17" /></div>
+        <div class="doc-tag">Platform Modernization · Client Brief</div>
+      </div>
+      <h1 class="title">From Webflow to a Custom Platform</h1>
+      <p class="subtitle">We replaced a template-bound Webflow site with a purpose-built Next.js application and our own content platform — keeping full control of speed, search visibility, data, and cost.</p>
+    </header>
+
+    <section class="body">
+      <p class="eyebrow">What changed</p>
+      <p class="lede">Every row below is a <b>pain point we removed</b> on the left and the <b>capability we now own</b> on the right. Same content, same brand — a faster, more flexible, and fully owned foundation.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th class="area">Area</th>
+            <th class="before">Before — Webflow</th>
+            <th class="now">Now — Custom Next.js + CMS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="area-cell">Performance</td>
+            <td class="before-cell">Builder-generated markup with limited control over how pages render and load.</td>
+            <td class="now-cell now-col"><b>Next.js server &amp; static rendering</b> with optimized images — fast, consistent Core Web Vitals.</td>
+          </tr>
+          <tr>
+            <td class="area-cell">SEO &amp; discoverability</td>
+            <td class="before-cell">Template-level SEO controls; little say over structured data and indexing.</td>
+            <td class="now-cell now-col">Per-page metadata, <b>auto sitemaps, JSON-LD, instant IndexNow pings</b> and AI-bot rules.</td>
+          </tr>
+          <tr>
+            <td class="area-cell">Content authoring</td>
+            <td class="before-cell">Fixed field types and plan-capped CMS items; rigid editor workflow.</td>
+            <td class="now-cell now-col">Tailored content models with <b>drafts, live preview, a publish checklist</b> and scheduling.</td>
+          </tr>
+          <tr>
+            <td class="area-cell">Design &amp; brand</td>
+            <td class="before-cell">Constrained to the Webflow builder; designs bent to fit the tool.</td>
+            <td class="now-cell now-col"><b>Figma-to-code on a shared design system</b> — pixel-exact, no template ceiling.</td>
+          </tr>
+          <tr>
+            <td class="area-cell">Integrations &amp; automation</td>
+            <td class="before-cell">Limited backend logic; integrations stitched on as third-party bolt-ons.</td>
+            <td class="now-cell now-col">Built-in <b>HubSpot, MS Teams, webhooks &amp; analytics</b>, managed from an editor dashboard.</td>
+          </tr>
+          <tr>
+            <td class="area-cell">Lead reliability</td>
+            <td class="before-cell">Form submissions can be lost during a provider outage.</td>
+            <td class="now-cell now-col">Resilient lead pipeline with an <b>automatic fallback queue — no lead lost</b>.</td>
+          </tr>
+          <tr>
+            <td class="area-cell">Search</td>
+            <td class="before-cell">Basic keyword search with no insight into what visitors look for.</td>
+            <td class="now-cell now-col"><b>Full-text search</b> (Meilisearch) with query analytics.</td>
+          </tr>
+          <tr>
+            <td class="area-cell">Security &amp; compliance</td>
+            <td class="before-cell">Platform-managed security with little room to harden or extend.</td>
+            <td class="now-cell now-col"><b>CSP + Cloudflare WAF</b>, rate limiting, bot protection and GDPR tooling.</td>
+          </tr>
+          <tr>
+            <td class="area-cell">Cost &amp; ownership</td>
+            <td class="before-cell">Per-seat and per-item fees, with content locked into the platform.</td>
+            <td class="now-cell now-col"><b>Own the code and the data</b>, self-hosted, with no per-item limits.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="highlights">
+        <div class="stat"><div class="stat-num">31</div><div class="stat-label">Pages rebuilt on the new platform</div></div>
+        <div class="stat"><div class="stat-num">290+</div><div class="stat-label">Content items migrated across 11 collections</div></div>
+        <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Ownership of code &amp; data — zero vendor lock-in</div></div>
+        <div class="stat"><div class="stat-num">Auto</div><div class="stat-label">SEO: sitemaps · JSON-LD · IndexNow on publish</div></div>
+      </div>
+
+      <div class="closing">
+        <span class="bar"></span>
+        <p>The result: a site that loads faster, ranks better, and adapts to the business — <b>without paying a platform for the privilege or losing control of the content.</b></p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Prepared by CleanStart <span class="dot">·</span> Platform Modernization Brief</span>
+      <span>Page 1 of 3</span>
+    </footer>
+  </main>
+
+  <!-- ============ PAGE 2 ============ -->
+  <main class="page">
+    <header class="header slim">
+      <div class="brandrow">
+        <div class="mark"><img src="data:image/png;base64,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" alt="CleanStart" width="81" height="17" /></div>
+        <div class="doc-tag">How it's built · what we moved · how it compares</div>
+      </div>
+      <h2 class="title sm">Under the hood — and how it compares</h2>
+      <p class="subtitle sm">The platform we built, the content we moved, and a side-by-side look at where it pulls ahead of Webflow.</p>
+    </header>
+
+    <section class="body">
+      <div class="twocol">
+        <!-- Architecture -->
+        <div>
+          <p class="eyebrow">The platform at a glance</p>
+          <div class="flow-top">
+            <span class="pill">Visitors</span>
+            <span class="flow-arrow"></span>
+          </div>
+          <div class="layer edge">
+            <div class="lname">Edge &amp; security</div>
+            <div class="chips"><span class="chip">Cloudflare WAF</span><span class="chip">CDN</span><span class="chip">Bot protection</span></div>
+          </div>
+          <div class="layer">
+            <div class="lname">Application</div>
+            <div class="chips"><span class="chip">Next.js site</span><span class="chip">SSR + ISR</span><span class="chip">Design system</span></div>
+          </div>
+          <div class="layer">
+            <div class="lname">Content platform</div>
+            <div class="chips"><span class="chip">Payload CMS</span><span class="chip">Drafts &amp; preview</span><span class="chip">REST API</span></div>
+          </div>
+          <div class="layer">
+            <div class="lname">Data &amp; services</div>
+            <div class="chips"><span class="chip">PostgreSQL</span><span class="chip">Meilisearch</span><span class="chip">R2 media</span></div>
+          </div>
+          <div class="layer">
+            <div class="lname">Integrations</div>
+            <div class="chips"><span class="chip">HubSpot</span><span class="chip">MS Teams</span><span class="chip">Webhooks</span><span class="chip">GA4</span><span class="chip">Search Console</span><span class="chip">Vercel Analytics</span></div>
+          </div>
+        </div>
+
+        <!-- Lighthouse scorecard (real, measured) -->
+        <div>
+          <p class="eyebrow">Lighthouse — Webflow vs Custom Next.js</p>
+          <div class="gtable">
+            <span></span>
+            <span class="gth">Perf · mobile*</span>
+            <span class="gth">Perf · desktop*</span>
+            <span class="gth">Accessibility</span>
+            <span class="gth">Best practices</span>
+
+            <span class="gsite">Webflow</span>
+            <span class="gauge" style="--v:39;--c:#e5484d"><b>39</b></span>
+            <span class="gauge" style="--v:43;--c:#e5484d"><b>43</b></span>
+            <span class="gauge" style="--v:94;--c:#16a06a"><b>94</b></span>
+            <span class="gauge" style="--v:50;--c:#e0992a"><b>50</b></span>
+
+            <span class="gsite cs">Custom Next.js</span>
+            <span class="gauge" style="--v:78;--c:#e0992a"><b>78</b></span>
+            <span class="gauge" style="--v:97;--c:#16a06a"><b>97</b></span>
+            <span class="gauge" style="--v:100;--c:#16a06a"><b>100</b></span>
+            <span class="gauge" style="--v:92;--c:#16a06a"><b>92</b></span>
+          </div>
+
+          <div class="hl-stats">
+            <div class="hl"><b>18× lighter</b><span>16.4 MB → 0.9 MB page weight</span></div>
+            <div class="hl"><b>5× fewer</b><span>438 → 82 network requests</span></div>
+          </div>
+
+          <p class="meas-foot">Lighthouse, home page. Mobile uses simulated slow-4G + CPU throttling (the fair test — it neutralises hosting). Page weight &amp; requests are hosting-independent; *the new site was measured on a pre-launch build, so live scores settle slightly after deploy. SEO score omitted (pre-launch <code>noindex</code> guard).</p>
+        </div>
+      </div>
+
+      <p class="eyebrow mt">Webflow vs Custom Next.js — feature &amp; cost comparison</p>
+      <div class="twocol">
+        <div>
+          <table class="fmatrix">
+            <thead>
+              <tr><th class="feat">Capability</th><th>Webflow</th><th class="cs">Custom Next.js</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="feat">Unlimited content items</td><td class="mk no">✕</td><td class="mk yes cscol">✓</td></tr>
+              <tr><td class="feat">Custom backend logic &amp; APIs</td><td class="mk no">✕</td><td class="mk yes cscol">✓</td></tr>
+              <tr><td class="feat">Drafts · preview · publish checklist</td><td class="mk part">∼</td><td class="mk yes cscol">✓</td></tr>
+              <tr><td class="feat">Full-text search + analytics</td><td class="mk part">∼</td><td class="mk yes cscol">✓</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <table class="fmatrix">
+            <thead>
+              <tr><th class="feat">Capability</th><th>Webflow</th><th class="cs">Custom Next.js</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="feat">Lead fallback queue</td><td class="mk no">✕</td><td class="mk yes cscol">✓</td></tr>
+              <tr><td class="feat">Custom integrations &amp; automation</td><td class="mk part">∼</td><td class="mk yes cscol">✓</td></tr>
+              <tr><td class="feat">Self-hosted · own the data</td><td class="mk no">✕</td><td class="mk yes cscol">✓</td></tr>
+              <tr><td class="feat">No per-seat / per-item fees</td><td class="mk no">✕</td><td class="mk yes cscol">✓</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="scope-note" style="margin-top:9px;"><b>✓</b> built-in &nbsp; <b>∼</b> limited / partial &nbsp; <b>✕</b> not available.</p>
+
+      <p class="eyebrow mt">Where the weight comes from</p>
+      <div class="wt">
+        <div class="wt-row"><span class="wt-lab">Video / media</span><span class="wt-track"><span class="wt-fill" style="width:100%"></span></span><span class="wt-val">6.7 MB → <b>0</b></span></div>
+        <div class="wt-row"><span class="wt-lab">Other assets</span><span class="wt-track"><span class="wt-fill" style="width:89%"></span></span><span class="wt-val">6.0 MB → <b>0.1 MB</b></span></div>
+        <div class="wt-row"><span class="wt-lab">Images</span><span class="wt-track"><span class="wt-fill" style="width:36%"></span></span><span class="wt-val">2.4 MB → <b>0.4 MB</b></span></div>
+        <div class="wt-row"><span class="wt-lab">JavaScript</span><span class="wt-track"><span class="wt-fill" style="width:20%"></span></span><span class="wt-val">1.4 MB → <b>0.3 MB</b></span></div>
+        <div class="wt-row"><span class="wt-lab">Fonts &amp; CSS</span><span class="wt-track"><span class="wt-fill" style="width:6%"></span></span><span class="wt-val">0.4 MB → <b>0.08 MB</b></span></div>
+        <p class="wt-note">Webflow home page by resource type (bars); the rebuilt page after each arrow. <b>16.4 of Webflow's 16.8 MB loads from external third-party requests</b> — the rebuild ships almost none, which is what keeps it light.</p>
+      </div>
+
+      <div class="closing">
+        <span class="bar"></span>
+        <p>The gains above are <b>measured, not projected</b> — a dramatically lighter, faster, more accessible site, built on infrastructure you fully own.</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Prepared by CleanStart <span class="dot">·</span> Platform Modernization Brief</span>
+      <span>Page 2 of 3</span>
+    </footer>
+  </main>
+
+  <!-- ============ PAGE 3 ============ -->
+  <main class="page">
+    <header class="header slim">
+      <div class="brandrow">
+        <div class="mark"><img src="data:image/png;base64,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" alt="CleanStart" width="81" height="17" /></div>
+        <div class="doc-tag">Automation across the platform</div>
+      </div>
+      <h2 class="title sm">What runs on autopilot</h2>
+      <p class="subtitle sm">The work the platform does for you — across the CMS and the website — so the team ships content, not chores.</p>
+    </header>
+
+    <section class="body">
+      <p class="eyebrow">Automated end-to-end</p>
+      <p class="auto-note">Built in, not bolted on — <b>no third-party plugins, embeds, or add-on subscriptions anywhere.</b></p>
+      <div class="auto-grid">
+
+        <div class="auto-card">
+          <div class="ac-head"><span class="ac-ic"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><h3>On every publish</h3></div>
+          <ul>
+            <li>Table of contents, reading time &amp; word count computed</li>
+            <li>Every change saved as a <b>version</b> — full history &amp; one-click rollback</li>
+            <li>Old URLs <b>auto-redirect</b> when a slug changes</li>
+            <li>The team is notified in <b>Microsoft Teams</b></li>
+          </ul>
+        </div>
+
+        <div class="auto-card">
+          <div class="ac-head"><span class="ac-ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><h3>Leads &amp; forms</h3></div>
+          <ul>
+            <li>Every submission captured with a <b>fallback queue</b> — no lead lost</li>
+            <li>Relayed to <b>HubSpot</b> CRM automatically</li>
+            <li>Confirmation &amp; internal emails sent (<b>Brevo</b>)</li>
+            <li>Careers applications routed to HR with the résumé attached</li>
+            <li>Spam &amp; bots blocked at submit (Turnstile)</li>
+          </ul>
+        </div>
+
+        <div class="auto-card">
+          <div class="ac-head"><span class="ac-ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8" cy="10" r="1.6"/><path d="M21 17l-5-5-4 4-2-2-7 7"/></svg></span><h3>Images &amp; media</h3></div>
+          <ul>
+            <li>Uploads <b>auto-converted to WebP</b>; served as AVIF/WebP</li>
+            <li><b>Thumb / card / hero sizes</b> generated on upload</li>
+            <li>Responsive, lazy-loaded &amp; sized per device (next/image)</li>
+            <li><b>Focal-point smart-crop</b> for thumbnails &amp; social cards</li>
+            <li>Stored &amp; delivered from the Cloudflare R2 CDN</li>
+          </ul>
+        </div>
+
+        <div class="auto-card">
+          <div class="ac-head"><span class="ac-ic"><svg viewBox="0 0 24 24"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M13.5 6.5l3 3"/></svg></span><h3>Authoring &amp; formatting</h3></div>
+          <ul>
+            <li>Rich editor: headings, lists, tables, callouts, code &amp; embeds</li>
+            <li>Pasted content <b>auto-cleaned</b> into consistent formatting</li>
+            <li>Lists &amp; spacing <b>normalised on save</b></li>
+            <li>Inline media with SEO-friendly, human-readable filenames</li>
+          </ul>
+        </div>
+
+        <div class="auto-card">
+          <div class="ac-head"><span class="ac-ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><h3>Search</h3></div>
+          <ul>
+            <li>New &amp; edited content <b>indexed instantly</b> (Meilisearch)</li>
+            <li>Nightly drift check <b>self-heals</b> the index</li>
+            <li>Search queries logged for content analytics</li>
+          </ul>
+        </div>
+
+        <div class="auto-card">
+          <div class="ac-head"><span class="ac-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15.4 0 18M12 3c-2.6 2.6-2.6 15.4 0 18"/></svg></span><h3>SEO &amp; discoverability</h3></div>
+          <ul>
+            <li>Per-page <b>titles, descriptions &amp; canonical URLs</b></li>
+            <li><b>Rich-result schema</b> — articles, FAQs, breadcrumbs, jobs (JSON-LD)</li>
+            <li><b>Open Graph / X cards</b> + auto-generated share images</li>
+            <li>Sitemaps, <b>robots</b> &amp; AI-bot rules generated</li>
+            <li>Re-rendered on change (ISR) · instant <b>IndexNow</b> pings</li>
+          </ul>
+        </div>
+
+        <div class="auto-card">
+          <div class="ac-head"><span class="ac-ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg></span><h3>Privacy &amp; compliance</h3></div>
+          <ul>
+            <li>Personal data <b>redacted on a retention schedule</b></li>
+            <li>Résumés deleted after the retention window</li>
+            <li><b>GDPR erasure</b> honoured across connected systems</li>
+            <li>Cookie consent enforced (GA4 Consent Mode v2)</li>
+          </ul>
+        </div>
+
+        <div class="auto-card">
+          <div class="ac-head"><span class="ac-ic"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5"/></svg></span><h3>Reliability &amp; monitoring</h3></div>
+          <ul>
+            <li>Failed webhooks <b>retried automatically</b></li>
+            <li>Broken links scanned every night</li>
+            <li>Errors tracked with personal data scrubbed (Sentry)</li>
+            <li><b>Nightly database backups</b></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <p class="eyebrow mt">On a schedule — hands-off maintenance</p>
+      <div class="sched">
+        <div class="sched-card">
+          <div class="cad"><span class="dotpulse"></span>Every 5 minutes</div>
+          <div class="items"><span class="chip">Lead queue drain</span><span class="chip">Webhook retry</span></div>
+        </div>
+        <div class="sched-card">
+          <div class="cad"><span class="dotpulse"></span>Every night</div>
+          <div class="items"><span class="chip">Search-log purge</span><span class="chip">PII redaction</span><span class="chip">Résumé purge</span><span class="chip">Broken-link scan</span><span class="chip">Search reindex</span><span class="chip">DB backup</span></div>
+        </div>
+      </div>
+
+      <div class="closing">
+        <span class="bar"></span>
+        <p>Dozens of routine jobs — indexing, notifying, relaying, cleaning up, backing up — <b>happen on their own</b>, so the team spends its time on content and growth, not maintenance.</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Prepared by CleanStart <span class="dot">·</span> Platform Modernization Brief</span>
+      <span>Confidential — for client review <span class="dot">·</span> Page 3 of 3</span>
+    </footer>
+  </main>
+
+</body>
+</html>
