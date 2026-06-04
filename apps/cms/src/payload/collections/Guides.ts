@@ -224,6 +224,30 @@ export const Guides: CollectionConfig = {
       type: 'relationship',
       relationTo: 'guides',
       hasMany: true,
+      admin: {
+        description:
+          'Pin up to 3 guides to surface at the bottom of this guide. Curated picks appear first, in this order; empty slots auto-fill with the most recent guides.',
+      },
+    },
+    {
+      name: 'previousGuide',
+      type: 'relationship',
+      relationTo: 'guides',
+      hasMany: false,
+      admin: {
+        description:
+          'Optional. The guide the reader should have read before this one. If unset, the page auto-fills the chronological previous guide.',
+      },
+    },
+    {
+      name: 'nextGuide',
+      type: 'relationship',
+      relationTo: 'guides',
+      hasMany: false,
+      admin: {
+        description:
+          'Optional. The guide the reader should read after this one. If unset, the page auto-fills the chronological next guide.',
+      },
     },
     {
       name: 'permalink',
