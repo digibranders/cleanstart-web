@@ -259,6 +259,7 @@ export const careersApplyEndpoint: Endpoint = {
 
     // 1. Store the resume (private upload collection).
     let resumeId: number;
+    let resumeUrl: string | undefined;
     try {
       const created = await req.payload.create({
         collection: 'resumes',
@@ -267,6 +268,18 @@ export const careersApplyEndpoint: Endpoint = {
         overrideAccess: true,
       });
       resumeId = created.id as number;
+      // Access-controlled file route (NOT a public/CDN URL): the resumes
+      // collection keeps Payload access control on, so this only opens for a
+      // signed-in admin/editor. Absolute URL required for the email link.
+      const serverUrl = (process.env.PAYLOAD_PUBLIC_SERVER_URL ?? '').replace(/\/$/, '');
+      const createdUrl = (created as { url?: string | null }).url ?? null;
+      const filename = (created as { filename?: string | null }).filename ?? null;
+      if (createdUrl?.startsWith('http')) {
+        resumeUrl = createdUrl;
+      } else if (serverUrl) {
+        const path = createdUrl ?? (filename ? `/api/resumes/file/${encodeURIComponent(filename)}` : null);
+        if (path) resumeUrl = `${serverUrl}${path}`;
+      }
     } catch (err) {
       req.payload.logger.error(
         { err: err instanceof Error ? err.message : String(err) },
@@ -363,6 +376,7 @@ export const careersApplyEndpoint: Endpoint = {
           linkedinUrl: data.linkedinUrl ?? '',
           coverLetter: data.coverLetter ?? '',
           coverLetterAttached: coverLetterFileId != null ? 'Yes' : '',
+          resumeUrl: resumeUrl ?? '',
           submittedAt: formatSubmittedAt(new Date()),
         },
         attachments,

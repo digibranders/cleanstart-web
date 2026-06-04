@@ -12,7 +12,9 @@
   (see docs/features/careers-applications.md):
     jobTitle, jobLocation, fullName, firstName, lastName, email,
     phone, location, howDidYouHear, linkedinUrl, coverLetter,
-    coverLetterAttached, submittedAt
+    coverLetterAttached, resumeUrl, submittedAt
+  resumeUrl is an ACCESS-CONTROLLED link to the resume in the CMS (only opens
+  for a signed-in admin/editor) — never a public/CDN URL, since resumes are PII.
   jobLocation is the ROLE's location; location is where the APPLICANT is
   based. The resume (and a cover-letter file, if the applicant uploaded
   one) are real ATTACHMENTS added by the API call (not the template); the
@@ -176,7 +178,7 @@
                 style="background-color:#eef2ff; border-radius:10px;">
                 <tr>
                   <td style="padding:14px 18px; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#1e293b;">
-                    📎 &nbsp;<strong>Résumé attached</strong> to this email.{% if params.coverLetterAttached %} A <strong>cover-letter file</strong> is attached too.{% endif %}
+                    📎 &nbsp;<strong>Résumé attached</strong> to this email.{% if params.coverLetterAttached %} A <strong>cover-letter file</strong> is attached too.{% endif %}{% if params.resumeUrl %}<br /><a href="{{ params.resumeUrl }}" style="color:#3960f9; font-weight:600; text-decoration:none;">View résumé in the CMS →</a> <span style="color:#64748b; font-size:12px;">(sign-in required)</span>{% endif %}
                   </td>
                 </tr>
               </table>
