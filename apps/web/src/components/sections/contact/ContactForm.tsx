@@ -3,6 +3,7 @@
 import { Container } from "@/components/layout";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { LeadConsent } from "@/components/forms/LeadConsent";
+import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { submitLead } from "@/lib/leads/submitLead";
 import { useRef, useState } from "react";
 
@@ -41,7 +42,7 @@ export function ContactForm() {
   const [values, setValues] = useState<FieldState>(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [topError, setTopError] = useState<string | null>(null);
+  const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
 
   const onChange =
@@ -53,7 +54,7 @@ export function ContactForm() {
     e.preventDefault();
     if (inFlightRef.current) return;
     inFlightRef.current = true;
-    setTopError(null);
+    setStatus(null);
     setSubmitting(true);
 
     const fd = new FormData(e.currentTarget);
@@ -82,9 +83,22 @@ export function ContactForm() {
     if (result.ok) {
       setSubmitted(true);
       setValues(initialState);
-      window.setTimeout(() => setSubmitted(false), 5000);
+      setStatus({
+        tone: "success",
+        title: "Message sent",
+        message:
+          "Thanks — we've received your message and will reply within 24 hours.",
+      });
+      window.setTimeout(() => {
+        setSubmitted(false);
+        setStatus(null);
+      }, 5000);
     } else {
-      setTopError("We couldn't send your message. Please try again.");
+      setStatus({
+        tone: "error",
+        title: "Couldn't send message",
+        message: "We couldn't send your message. Please try again.",
+      });
     }
   };
 
@@ -163,10 +177,7 @@ export function ContactForm() {
                 onSubmit={onSubmit}
                 className="px-3 pt-6 pb-3 sm:px-[24px] sm:pt-[30px] sm:pb-[18px]"
               >
-                <SuccessBanner
-                  show={submitted}
-                  message="Thanks — we've received your message and will reply within 24 hours."
-                />
+                {status ? <StatusBanner ref={statusRef} {...status} /> : null}
                 <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
                   <Field
                     id="firstName"
@@ -248,22 +259,6 @@ export function ContactForm() {
                 <div className="mt-7 flex justify-start">
                   <TurnstileWidget />
                 </div>
-
-                {topError && (
-                  <p
-                    role="alert"
-                    className="mt-4"
-                    style={{
-                      fontFamily: "var(--font-sans), 'Sora', sans-serif",
-                      fontSize: "var(--fs-input-label)",
-                      fontWeight: 500,
-                      lineHeight: 1.45,
-                      color: "#B42318",
-                    }}
-                  >
-                    {topError}
-                  </p>
-                )}
 
                 <button
                   type="submit"
@@ -456,45 +451,5 @@ function Field({
         />
       )}
     </label>
-  );
-}
-
-interface SuccessBannerProps {
-  show: boolean;
-  message: string;
-}
-
-function SuccessBanner({ show, message }: SuccessBannerProps) {
-  return (
-    <output
-      aria-live="polite"
-      className="block overflow-hidden transition-all duration-300 ease-out"
-      style={{
-        maxHeight: show ? "120px" : "0px",
-        opacity: show ? 1 : 0,
-        marginBottom: show ? "20px" : "0px",
-      }}
-    >
-      <div
-        className="flex items-start gap-3 rounded-[10px] px-4 py-3"
-        style={{ background: "#ECFDF3", border: "1px solid #ABEFC6" }}
-      >
-        <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden className="shrink-0" style={{ marginTop: "2px" }}>
-          <circle cx="10" cy="10" r="9" fill="#12B76A" />
-          <path d="M6 10.5l2.5 2.5L14 7.5" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <span
-          style={{
-            fontFamily: "var(--font-sans), 'Sora', sans-serif",
-            fontSize: "var(--fs-input-label)",
-            fontWeight: 500,
-            lineHeight: 1.45,
-            color: "#054F31",
-          }}
-        >
-          {message}
-        </span>
-      </div>
-    </output>
   );
 }
