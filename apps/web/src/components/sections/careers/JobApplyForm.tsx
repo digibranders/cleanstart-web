@@ -13,6 +13,8 @@ const RESUME_MIMES = new Set([
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
+const RESUME_ACCEPT =
+  ".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const ACCENT = "#4a3bf1";
 
 function formatBytes(bytes: number): string {
@@ -51,49 +53,9 @@ export function JobApplyForm({
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
-  const [dragOver, setDragOver] = useState(false);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const inFlightRef = useRef(false);
-  const resumeInputRef = useRef<HTMLInputElement>(null);
-
-  // Object URL for the in-browser preview link; recreated when the file
-  // changes and revoked on replace/unmount to avoid leaks.
-  useEffect(() => {
-    if (!resumeFile) {
-      setResumeUrl(null);
-      return;
-    }
-    const url = URL.createObjectURL(resumeFile);
-    setResumeUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [resumeFile]);
-
-  const acceptResume = (file: File | undefined): void => {
-    if (!file) return;
-    const okType = RESUME_EXT_RE.test(file.name) || RESUME_MIMES.has(file.type);
-    if (!okType) {
-      setError("Resume must be a PDF, DOC, or DOCX file.");
-      return;
-    }
-    if (file.size > MAX_RESUME_BYTES) {
-      setError("Resume must be 10 MB or smaller.");
-      return;
-    }
-    setError(null);
-    setResumeFile(file);
-  };
-
-  const clearResume = (): void => {
-    setResumeFile(null);
-    if (resumeInputRef.current) resumeInputRef.current.value = "";
-  };
-
-  const onResumeDrop = (e: React.DragEvent<HTMLDivElement>): void => {
-    e.preventDefault();
-    setDragOver(false);
-    acceptResume(e.dataTransfer.files?.[0]);
-  };
 
   // Auto-grow the cover-letter textarea: starts at one line, expands to fit
   // typed/pasted content, then scrolls only once it reaches the cap. The
@@ -125,20 +87,7 @@ export function JobApplyForm({
       setError("Please attach your resume (PDF, DOC, or DOCX).");
       return;
     }
-    if (resumeFile.size > MAX_RESUME_BYTES) {
-      setError("Resume must be 10 MB or smaller.");
-      return;
-    }
     const resume = resumeFile;
-
-    const coverLetterFile = fd.get("coverLetterFile");
-    if (
-      coverLetterFile instanceof File &&
-      coverLetterFile.size > MAX_RESUME_BYTES
-    ) {
-      setError("Cover letter file must be 10 MB or smaller.");
-      return;
-    }
 
     const turnstileToken = fd.get("cf-turnstile-response");
     const phone = String(fd.get("phone") ?? "").trim();
@@ -164,9 +113,7 @@ export function JobApplyForm({
       ...(location ? { location } : {}),
       ...(howDidYouHear ? { howDidYouHear } : {}),
       ...(coverLetter ? { coverLetter } : {}),
-      ...(coverLetterFile instanceof File && coverLetterFile.size > 0
-        ? { coverLetterFile }
-        : {}),
+      ...(coverFile ? { coverLetterFile: coverFile } : {}),
       ...(linkedinUrl ? { linkedinUrl } : {}),
       ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
       ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
@@ -176,6 +123,7 @@ export function JobApplyForm({
     if (result.ok) {
       setDone(true);
       setResumeFile(null);
+      setCoverFile(null);
       formRef.current?.reset();
     } else {
       setError("Something went wrong. Please try again.");
@@ -326,133 +274,13 @@ export function JobApplyForm({
             </div>
 
             <div className="mt-3">
-              <span
-                className="font-sans block"
-                style={{
-                  fontSize: "var(--fs-caption)",
-                  fontWeight: 500,
-                  color: "rgba(17,17,17,0.7)",
-                  marginBottom: "6px",
-                  letterSpacing: "-0.005em",
-                }}
-              >
-                Resume / CV
-                <span aria-hidden style={{ color: ACCENT }}> *</span>
-              </span>
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={onResumeDrop}
-              >
-                {resumeFile ? (
-                  <div
-                    className="font-sans flex items-center gap-3"
-                    style={{
-                      border: `1px solid ${ACCENT}`,
-                      background: "rgba(74,59,241,0.05)",
-                      borderRadius: "12px",
-                      padding: "10px 12px",
-                    }}
-                  >
-                    <FileIcon />
-                    <div className="min-w-0 flex-1">
-                      <div
-                        className="truncate"
-                        style={{
-                          fontSize: "var(--fs-body-sm)",
-                          fontWeight: 500,
-                          color: "#111",
-                        }}
-                      >
-                        {resumeFile.name}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: "var(--fs-caption)",
-                          color: "rgba(17,17,17,0.55)",
-                        }}
-                      >
-                        {formatBytes(resumeFile.size)}
-                      </div>
-                    </div>
-                    {resumeUrl ? (
-                      <a
-                        href={resumeUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="shrink-0"
-                        style={{
-                          fontSize: "var(--fs-caption)",
-                          fontWeight: 500,
-                          color: ACCENT,
-                        }}
-                      >
-                        Preview
-                      </a>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={clearResume}
-                      aria-label="Remove resume"
-                      className="shrink-0"
-                      style={{
-                        fontSize: "var(--fs-caption)",
-                        fontWeight: 500,
-                        color: "rgba(17,17,17,0.55)",
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ) : (
-                  <label
-                    htmlFor="resume"
-                    className="font-sans flex flex-col items-center justify-center cursor-pointer"
-                    style={{
-                      border: `1px dashed ${dragOver ? ACCENT : "rgba(74,59,241,0.45)"}`,
-                      background: dragOver
-                        ? "rgba(74,59,241,0.08)"
-                        : "rgba(74,59,241,0.04)",
-                      borderRadius: "12px",
-                      padding: "10px 16px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <UploadIcon />
-                    <span
-                      style={{
-                        fontSize: "var(--fs-body-sm)",
-                        fontWeight: 500,
-                        color: ACCENT,
-                        marginTop: "5px",
-                      }}
-                    >
-                      Drop or browse — PDF, DOC, DOCX
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "var(--fs-caption)",
-                        color: "rgba(17,17,17,0.55)",
-                        marginTop: "2px",
-                      }}
-                    >
-                      Max file size: 10 MB
-                    </span>
-                  </label>
-                )}
-                <input
-                  ref={resumeInputRef}
-                  id="resume"
-                  type="file"
-                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                  onChange={(e) => acceptResume(e.target.files?.[0])}
-                  aria-label="Resume (PDF, DOC, or DOCX, 10 MB max)"
-                  className="sr-only"
-                />
-              </div>
+              <FileDrop
+                id="resume"
+                label="Resume / CV"
+                required
+                file={resumeFile}
+                onChange={setResumeFile}
+              />
             </div>
 
             <div className="mt-3">
@@ -493,27 +321,13 @@ export function JobApplyForm({
                   display: "block",
                 }}
               />
-              <input
-                name="coverLetterFile"
-                type="file"
-                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                aria-label="Cover letter file (PDF, DOC, or DOCX, 10 MB max)"
-                className="font-sans w-full mt-2 file:mr-3 file:rounded-[6px] file:border-0 file:bg-[#4a3bf1] file:px-3 file:py-1.5 file:text-white file:cursor-pointer"
-                style={{
-                  fontSize: "var(--fs-caption)",
-                  color: "rgba(17,17,17,0.7)",
-                }}
-              />
-              <span
-                className="font-sans block"
-                style={{
-                  fontSize: "var(--fs-caption)",
-                  color: "rgba(17,17,17,0.55)",
-                  marginTop: "4px",
-                }}
-              >
-                Optional file: PDF, DOC, or DOCX, 10 MB max.
-              </span>
+              <div className="mt-2">
+                <FileDrop
+                  id="coverLetterFile"
+                  file={coverFile}
+                  onChange={setCoverFile}
+                />
+              </div>
             </div>
 
             <div className="mt-3">
@@ -564,6 +378,225 @@ export function JobApplyForm({
         )}
       </div>
     </section>
+  );
+}
+
+interface FileDropProps {
+  id: string;
+  file: File | null;
+  onChange: (file: File | null) => void;
+  label?: string;
+  required?: boolean;
+}
+
+/**
+ * Drag-and-drop / browse file field with an attached-file chip (filename, size,
+ * in-browser preview, remove). Validates PDF/DOC/DOCX + 10 MB on both browse and
+ * drop, and renders its validation error inline at the field so the user sees it
+ * where they acted — not at the bottom of the form.
+ */
+function FileDrop({
+  id,
+  file,
+  onChange,
+  label,
+  required,
+}: FileDropProps): React.ReactElement {
+  const [dragOver, setDragOver] = useState(false);
+  const [fieldError, setFieldError] = useState<string | null>(null);
+  const [url, setUrl] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!file) {
+      setUrl(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(file);
+    setUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
+
+  const accept = (next: File | undefined): void => {
+    if (!next) return;
+    const okType = RESUME_EXT_RE.test(next.name) || RESUME_MIMES.has(next.type);
+    if (!okType) {
+      setFieldError("File must be a PDF, DOC, or DOCX.");
+      return;
+    }
+    if (next.size > MAX_RESUME_BYTES) {
+      setFieldError("File must be 10 MB or smaller.");
+      return;
+    }
+    setFieldError(null);
+    onChange(next);
+  };
+
+  const clear = (): void => {
+    onChange(null);
+    setFieldError(null);
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
+  return (
+    <div>
+      {label ? (
+        <span
+          className="font-sans block"
+          style={{
+            fontSize: "var(--fs-caption)",
+            fontWeight: 500,
+            color: "rgba(17,17,17,0.7)",
+            marginBottom: "6px",
+            letterSpacing: "-0.005em",
+          }}
+        >
+          {label}
+          {required ? (
+            <span aria-hidden style={{ color: ACCENT }}>
+              {" "}
+              *
+            </span>
+          ) : null}
+        </span>
+      ) : null}
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          accept(e.dataTransfer.files?.[0]);
+        }}
+      >
+        {file ? (
+          <div
+            className="font-sans flex items-center gap-3"
+            style={{
+              border: `1px solid ${ACCENT}`,
+              background: "rgba(74,59,241,0.05)",
+              borderRadius: "12px",
+              padding: "10px 12px",
+            }}
+          >
+            <FileIcon />
+            <div className="min-w-0 flex-1">
+              <div
+                className="truncate"
+                style={{
+                  fontSize: "var(--fs-body-sm)",
+                  fontWeight: 500,
+                  color: "#111",
+                }}
+              >
+                {file.name}
+              </div>
+              <div
+                style={{
+                  fontSize: "var(--fs-caption)",
+                  color: "rgba(17,17,17,0.55)",
+                }}
+              >
+                {formatBytes(file.size)}
+              </div>
+            </div>
+            {url ? (
+              <a
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                className="shrink-0"
+                style={{
+                  fontSize: "var(--fs-caption)",
+                  fontWeight: 500,
+                  color: ACCENT,
+                }}
+              >
+                Preview
+              </a>
+            ) : null}
+            <button
+              type="button"
+              onClick={clear}
+              aria-label="Remove file"
+              className="shrink-0"
+              style={{
+                fontSize: "var(--fs-caption)",
+                fontWeight: 500,
+                color: "rgba(17,17,17,0.55)",
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        ) : (
+          <label
+            htmlFor={id}
+            className="font-sans flex flex-col items-center justify-center cursor-pointer"
+            style={{
+              border: `1px dashed ${dragOver ? ACCENT : "rgba(74,59,241,0.45)"}`,
+              background: dragOver
+                ? "rgba(74,59,241,0.08)"
+                : "rgba(74,59,241,0.04)",
+              borderRadius: "12px",
+              padding: "10px 16px",
+              textAlign: "center",
+            }}
+          >
+            <UploadIcon />
+            <span
+              style={{
+                fontSize: "var(--fs-body-sm)",
+                fontWeight: 500,
+                color: ACCENT,
+                marginTop: "5px",
+              }}
+            >
+              Drop or browse — PDF, DOC, DOCX
+            </span>
+            <span
+              style={{
+                fontSize: "var(--fs-caption)",
+                color: "rgba(17,17,17,0.55)",
+                marginTop: "2px",
+              }}
+            >
+              Max file size: 10 MB
+            </span>
+          </label>
+        )}
+        <input
+          ref={inputRef}
+          id={id}
+          type="file"
+          accept={RESUME_ACCEPT}
+          onChange={(e) => accept(e.target.files?.[0])}
+          aria-label={
+            label
+              ? `${label} (PDF, DOC, or DOCX, 10 MB max)`
+              : "Upload a file (PDF, DOC, or DOCX, 10 MB max)"
+          }
+          className="sr-only"
+        />
+      </div>
+      {fieldError ? (
+        <p
+          role="alert"
+          className="font-sans"
+          style={{
+            fontSize: "var(--fs-caption)",
+            color: "#B42318",
+            marginTop: "6px",
+            lineHeight: 1.4,
+          }}
+        >
+          {fieldError}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
