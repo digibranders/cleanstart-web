@@ -103,6 +103,10 @@
       ]
     },
     {
+      "type": "text",
+      "name": "experienceRange"
+    },
+    {
       "type": "relationship",
       "name": "locations",
       "hasMany": true,

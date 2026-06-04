@@ -420,6 +420,11 @@ These are one-shot operations that **must** run against the prod Postgres on the
    - Re-runnable. Already-clean docs are skipped via `needsListMerge`.
    - After the run, spot-check one blog and one guide on the live site — bullet lists should render as a single `<ul>`, not one `<ul>` per bullet.
 
+2. **Job `experienceRange` backfill.** The Webflow→Payload import bucketed the free-text `experience` year range into the `experienceLevel` enum and dropped the original string, so the careers site showed "Mid experience" instead of "3-10 Years". `apps/cms/scripts/backfill-job-experience-range.ts` restores `jobs.experienceRange` from `migrations/webflow-export/raw/jobs.jsonl` (matched by slug). The import transform now preserves it going forward; this one-shot covers jobs already in prod.
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/backfill-job-experience-range.ts`
+   - Re-runnable / idempotent (skips rows whose range already matches). Note: `payload.update` re-fires the jobs afterChange hooks (search sync, IndexNow, webhooks) and creates a version row per job — run in a quiet window.
+   - After the run, spot-check the careers list on the live site — experience should read e.g. "3-10 Years", not "Mid experience".
+
 (Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
 
 ---

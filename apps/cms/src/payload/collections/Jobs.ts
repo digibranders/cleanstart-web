@@ -129,6 +129,14 @@ export const Jobs: CollectionConfig = {
       ],
     },
     {
+      name: 'experienceRange',
+      type: 'text',
+      admin: {
+        description:
+          'Human-readable experience range shown on the careers site (e.g. "3-10 Years"). Backfilled from the original Webflow data; experienceLevel is the structured bucket derived from it.',
+      },
+    },
+    {
       name: 'locations',
       type: 'relationship',
       relationTo: 'jobLocations',

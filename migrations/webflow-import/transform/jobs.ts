@@ -6,6 +6,7 @@ import {
   normalizeDepartment,
   normalizeEmploymentType,
   normalizeExperienceLevel,
+  normalizeExperienceRange,
 } from '../../../apps/cms/src/payload/lib/webflow-import/job-normalize';
 
 const asString = (v: unknown): string | null => {
@@ -36,6 +37,7 @@ export const transformJob = (row: Record<string, unknown>): Record<string, unkno
   const department = normalizeDepartment(row.department);
   const employmentType = normalizeEmploymentType(row.timing ?? row.type);
   const experienceLevel = normalizeExperienceLevel(row.experience);
+  const experienceRange = normalizeExperienceRange(row.experience);
 
   return {
     _webflowId: row.webflowId,
@@ -47,6 +49,7 @@ export const transformJob = (row: Record<string, unknown>): Record<string, unkno
     department: department ?? undefined,
     employmentType: employmentType ?? undefined,
     experienceLevel: experienceLevel ?? undefined,
+    experienceRange: experienceRange ?? undefined,
     body: bodyHtml ? htmlToLexical(bodyHtml) : undefined,
     applyUrl: asString(row['apply-url']),
     seo: buildSeoOverrides(row),

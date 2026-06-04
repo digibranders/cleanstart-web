@@ -439,6 +439,10 @@ export interface Job {
   employmentType?: ('full-time' | 'part-time' | 'contract' | 'internship') | null;
   experienceLevel?: ('entry' | 'mid' | 'senior' | 'staff' | 'principal') | null;
   /**
+   * Human-readable experience range shown on the careers site (e.g. "3-10 Years"). Backfilled from the original Webflow data; experienceLevel is the structured bucket derived from it.
+   */
+  experienceRange?: string | null;
+  /**
    * Optional when remote=true. Renderers can fall back to "Remote (Global)" when this is empty and remote is on.
    */
   locations?: (number | JobLocation)[] | null;
@@ -3105,7 +3109,18 @@ export interface Guide {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Pin up to 3 guides to surface at the bottom of this guide. Curated picks appear first, in this order; empty slots auto-fill with the most recent guides.
+   */
   relatedGuides?: (number | Guide)[] | null;
+  /**
+   * Optional. The guide the reader should have read before this one. If unset, the page auto-fills the chronological previous guide.
+   */
+  previousGuide?: (number | null) | Guide;
+  /**
+   * Optional. The guide the reader should read after this one. If unset, the page auto-fills the chronological next guide.
+   */
+  nextGuide?: (number | null) | Guide;
   /**
    * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
    */
@@ -8586,6 +8601,8 @@ export interface GuidesSelect<T extends boolean = true> {
         id?: T;
       };
   relatedGuides?: T;
+  previousGuide?: T;
+  nextGuide?: T;
   schemaAddons?:
     | T
     | {
@@ -9546,6 +9563,7 @@ export interface JobsSelect<T extends boolean = true> {
   department?: T;
   employmentType?: T;
   experienceLevel?: T;
+  experienceRange?: T;
   locations?: T;
   remote?: T;
   salaryRange?:

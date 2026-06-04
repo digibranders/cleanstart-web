@@ -4,8 +4,26 @@ import {
   normalizeDepartment,
   normalizeEmploymentType,
   normalizeExperienceLevel,
+  normalizeExperienceRange,
   normalizeJobLegacyRows,
 } from './job-normalize';
+
+describe('normalizeExperienceRange', () => {
+  it('standardises dashes and Title-cases Year(s)', () => {
+    expect(normalizeExperienceRange('3-10 years')).toBe('3-10 Years');
+    expect(normalizeExperienceRange('1–3 Years')).toBe('1-3 Years');
+    expect(normalizeExperienceRange('0-1 year')).toBe('0-1 Year');
+    expect(normalizeExperienceRange('5+ years')).toBe('5+ Years');
+    expect(normalizeExperienceRange('  4–6  Years ')).toBe('4-6 Years');
+  });
+
+  it('returns undefined for blank / non-string', () => {
+    expect(normalizeExperienceRange('')).toBeUndefined();
+    expect(normalizeExperienceRange('   ')).toBeUndefined();
+    expect(normalizeExperienceRange(null)).toBeUndefined();
+    expect(normalizeExperienceRange(42)).toBeUndefined();
+  });
+});
 
 describe('normalizeDepartment', () => {
   it('maps the canonical names case-insensitively', () => {
