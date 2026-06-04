@@ -86,7 +86,7 @@ Document any URLs present in Webflow but not matched in the new CMS, with justif
 
 ## Rollback drill
 
-- [ ] Rollback drill executed (see `docs/RESTORE-LOG.md` for entry)
+- [ ] Rollback drill executed (see `docs/operations/RESTORE-LOG.md` for entry)
 - Restore timestamp used: {backup datetime}
 - Time to restore: {duration}
 - Webflow DNS repointed: ✅ / ❌

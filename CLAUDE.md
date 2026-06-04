@@ -2,7 +2,7 @@
 
 This file tells Claude Code *how* to work in this repo. It does not duplicate the architecture doc, which tells you *what* to build.
 
-**Source of truth for *what*:** `docs/cleanstart-cms-architecture.html`. Every ticket, every design call, every schema decision references an anchor in that file (e.g. `#new-fields`, `#blocks`, `#publishing-checklist`). If this CLAUDE.md and the arch doc disagree, the arch doc wins for product/architecture decisions; this file wins for code conventions.
+**Source of truth for *what*:** `docs/architecture/cleanstart-cms-architecture.html`. Every ticket, every design call, every schema decision references an anchor in that file (e.g. `#new-fields`, `#blocks`, `#publishing-checklist`). If this CLAUDE.md and the arch doc disagree, the arch doc wins for product/architecture decisions; this file wins for code conventions.
 
 **Plan of record:** `~/.claude/plans/lets-review-the-doc-curried-feigenbaum.md` (CMS-only Phase A–I sequence). The current backlog is at `docs/BACKLOG.md`. Phases A–I are substantially done (see backlog for remaining ops-only gaps). **Currently active scope: Phase J — Integrations dashboard** (`apps/cms` Integrations collection + editor self-serve UI). `apps/web` marketing site is also active as of Phase J (see below).
 
@@ -32,7 +32,7 @@ The repo has **exactly three long-lived branches**. All three are kept in sync a
 |---|---|---|---|
 | `main` | — | Production truth. Deploys go from here. | Everything |
 | `development` | Primary dev branch on this device (`admin@digibranders.com`) | Day-to-day development for both `apps/cms` and `apps/web`. | Everything |
-| `farheen` | Farheen's primary device | Web-only contributions, **scoped to the page being worked on**. | **`apps/web/` ONLY** — no edits to `apps/cms/`, `packages/`, `migrations/`, `infra/`, `docs/cleanstart-cms-architecture.html`, or shared config. Touching CMS code on `farheen` is a hard rule violation. |
+| `farheen` | Farheen's primary device | Web-only contributions, **scoped to the page being worked on**. | **`apps/web/` ONLY** — no edits to `apps/cms/`, `packages/`, `migrations/`, `infra/`, `docs/architecture/cleanstart-cms-architecture.html`, or shared config. Touching CMS code on `farheen` is a hard rule violation. |
 
 ### No other long-lived branches
 
@@ -47,7 +47,7 @@ Every commit on `farheen` must be **scoped to the page or feature being worked o
 - **Working on `/for-developers`?** Only touch `apps/web/src/app/for-developers/`, `apps/web/src/components/sections/for-developers/`, and `apps/web/public/images/for-developers/`. Do not edit `/community`, `/sbom`, `/teams`, etc., nor `globals.css`, `nav-config.ts`, layout primitives, or `tsconfig`/`eslint`/`prettier`/`biome` config.
 - **Adding a new page?** New route under `apps/web/src/app/<page>/`, new sections under `apps/web/src/components/sections/<page>/`, new assets under `apps/web/public/images/<page>/`. The only allowed cross-page edits are:
   - One line in `apps/web/src/lib/nav-config.ts` to add the nav entry.
-  - One row in `docs/WEB-PAGES.md` for the page inventory.
+  - One row in `docs/web/WEB-PAGES.md` for the page inventory.
 - **Typography comes from the global config — NOT from Figma.** For any new or existing page, **ignore Figma's font sizes, font family, font weights, letter-spacing, and line-heights**. The canonical typography spec is **[`apps/web/docs/TYPOGRAPHY-SYSTEM.md`](apps/web/docs/TYPOGRAPHY-SYSTEM.md)** (v2/v4, 2026-05-27). Consume the role tokens defined there:
   - Hero H1 (marketing/product) → `var(--fs-display)` (36 → 64 px).
   - Listing / detail / legal H1 → `var(--fs-h1)` (32 → 56 px).
@@ -65,7 +65,7 @@ Every commit on `farheen` must be **scoped to the page or feature being worked o
   Inline `text-[clamp(...)]`, `text-[Xpx]`, `fontSize: "Xpx"`, or any other ad-hoc type sizing is forbidden. **Legacy `--text-hero-*` / `--text-display-*` / `--text-card-title-*` / `--text-body-*` / `--text-t-*` tokens are aliased to the new `--fs-*` family** in `globals.css` for backward compatibility but should not be used in new code. If a role token doesn't exist for what Figma shows, **stop and ask** — adding a new token is a shared change that goes through `development`, not `farheen`.
 - **No bulk formatter sweeps.** Prettier/Biome reflows that touch dozens of unrelated files are forbidden. If formatter config changes, raise it for discussion before applying — never bundle a formatter pass with feature work.
 - **No "while I'm here" cleanups.** Renaming a shared variable, tweaking a layout primitive, or "fixing" an unrelated page in the same commit is out of scope.
-- **Shared files that ARE allowed to change** when justified by the in-scope work: `apps/web/src/lib/nav-config.ts` (nav entry only) and `docs/WEB-PAGES.md` (inventory row only). Anything else is out of scope.
+- **Shared files that ARE allowed to change** when justified by the in-scope work: `apps/web/src/lib/nav-config.ts` (nav entry only) and `docs/web/WEB-PAGES.md` (inventory row only). Anything else is out of scope.
 
 If a page genuinely needs a shared change (e.g. a new design token, a new layout primitive, a CSP allow-list entry), pause and coordinate — that work lands separately on `development` first, then `farheen` rebases.
 
@@ -105,7 +105,7 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 
 **`apps/web`** was re-bootstrapped at commit `ac5a0d0` as a purpose-built Next.js 16.2.5 / React 19 / Tailwind v4 marketing site. It currently has a hero page and Figma Code Connect wired (`figma.config.json`; component stubs live at `src/components/**/*.figma.tsx`). It is **early-stage** — no production deployment yet, no separate CI gate yet. The design/token/routing contracts from the prior wipe are gone; everything in `apps/web` now is built from Figma ground up. When touching `apps/web`, preserve the Code Connect setup: do not delete `figma.config.json` or restructure `src/components/` without understanding the connected Figma component mapping.
 
-**Full page inventory:** `docs/WEB-PAGES.md` — canonical list of all 31 pages, their URL slugs, types (Static / CMS Listing / CMS Detail / Legal / Utility), build status, and recommended build order. Update the status column there whenever a page is completed.
+**Full page inventory:** `docs/web/WEB-PAGES.md` — canonical list of all 31 pages, their URL slugs, types (Static / CMS Listing / CMS Detail / Legal / Utility), build status, and recommended build order. Update the status column there whenever a page is completed.
 
 **`packages/ui`** hosts the custom React primitives (`Drawer`, `Dialog`, `Popover`, `Combobox`, `ConfirmDialog`, `Spinner`, `Tooltip`, `DropdownMenu`, `ContextMenu`, `DateTimePicker`, `Toast`) plus design tokens. Consumed by both `apps/cms` and `apps/web` — no duplication between the two apps.
 
@@ -366,7 +366,7 @@ These channels are wired and active (env-var configured). See `apps/cms/.env.exa
 | Integration | Purpose | Key env vars |
 |---|---|---|
 | Cloudflare R2 | Media storage + lead fallback queue | `R2_BUCKET`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_BASE` |
-| HubSpot | Lead relay (secondary handler) → Forms Submissions API; owns all lead email (follow-up + notifications). Forms keyed by `forms.hubspotFormGuid`. See `docs/forms-hubspot-verification.md`. | `HUBSPOT_PORTAL_ID` (relay), `HUBSPOT_PRIVATE_APP_TOKEN` (GDPR erasure only) |
+| HubSpot | Lead relay (secondary handler) → Forms Submissions API; owns all lead email (follow-up + notifications). Forms keyed by `forms.hubspotFormGuid`. See `docs/integrations/forms-hubspot-verification.md`. | `HUBSPOT_PORTAL_ID` (relay), `HUBSPOT_PRIVATE_APP_TOKEN` (GDPR erasure only) |
 | Microsoft Teams (Workflows) | Publish + lead notifications via Adaptive Cards | `WEBHOOK_TEAMS_URL`, `WEBHOOK_TEAMS_EVENTS` |
 | Standard Webhooks | Generic HMAC-signed outbound webhook | `WEBHOOK_GENERIC_URL`, `WEBHOOK_GENERIC_EVENTS`, `WEBHOOK_GENERIC_SIGNING_SECRET` |
 | Meilisearch | Full-text search + analytics | `MEILISEARCH_URL`, `MEILISEARCH_MASTER_KEY`, `MEILISEARCH_API_KEY` |
@@ -375,7 +375,7 @@ These channels are wired and active (env-var configured). See `apps/cms/.env.exa
 | IndexNow | Bing/Yandex ping on publish (7 collections) | `INDEXNOW_KEY` |
 | Brevo | Careers/partner transactional email — HR notification (with resume attachment) on each job application, plus the partner-form pair (applicant confirmation + internal team notification) on each partner inquiry. Distinct from HubSpot, which owns lead-pipeline email and never receives careers/partner data. | `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `CAREERS_HR_EMAIL`, `PARTNER_USER_TEMPLATE_ID`, `PARTNER_ADMIN_TEMPLATE_ID`, `PARTNERS_NOTIFY_EMAIL` |
 
-**Phase J2 planned:** Zoho CRM (OAuth 2.0 — primary CRM, build first), GA4 Measurement Protocol, Google Search Console. See `docs/INTEGRATIONS-RESEARCH-V2.md` for the full J1/J2/J3 milestone breakdown.
+**Phase J2 planned:** Zoho CRM (OAuth 2.0 — primary CRM, build first), GA4 Measurement Protocol, Google Search Console. See `docs/integrations/INTEGRATIONS-RESEARCH-V2.md` for the full J1/J2/J3 milestone breakdown.
 
 The `Integrations` collection (Phase J1) provides editor self-serve config for channels that don't require env-var changes (Teams channels, generic webhooks). The env-var channels above remain env-var-only until a J2 row migrates them.
 
@@ -452,8 +452,8 @@ These are one-shot operations that **must** run against the prod Postgres on the
 - **Editor workflow question?** Arch doc §`#authoring`, §`#publishing-checklist`, §`#preview-workflow`.
 - **Ops/security question?** Arch doc §`#security-headers`, §`#rate-limiting`, §`#privacy-gdpr`.
 - **Migration question?** Arch doc §`#migration` (and the seven subsections under it).
-- **Integration question?** Read `docs/INTEGRATIONS-RESEARCH.md` (Teams/webhook deep-dive, Standard Webhooks signing) and `docs/INTEGRATIONS-RESEARCH-V2.md` (analytics read-back, inbound webhooks, J1/J2/J3 milestones).
+- **Integration question?** Read `docs/integrations/INTEGRATIONS-RESEARCH.md` (Teams/webhook deep-dive, Standard Webhooks signing) and `docs/integrations/INTEGRATIONS-RESEARCH-V2.md` (analytics read-back, inbound webhooks, J1/J2/J3 milestones).
 - **Background job question?** Arch doc §`#cron-jobs` + the job file and its co-located test.
-- **Which apps/web page to build next, or what slug/category a page uses?** `docs/WEB-PAGES.md`.
-- **`apps/web` production question?** (deploy strategy, security headers, CSP, SEO, sitemap, JSON-LD, AI bots, cookie consent, DNS, rollback) → **`docs/WEB-PRODUCTION.md`** (canonical for everything web-prod). The HTML arch doc remains canonical for CMS prod only.
+- **Which apps/web page to build next, or what slug/category a page uses?** `docs/web/WEB-PAGES.md`.
+- **`apps/web` production question?** (deploy strategy, security headers, CSP, SEO, sitemap, JSON-LD, AI bots, cookie consent, DNS, rollback) → **`docs/web/WEB-PRODUCTION.md`** (canonical for everything web-prod). The HTML arch doc remains canonical for CMS prod only.
 - **Decision not in arch doc and not in this file?** Stop and ask. Don't invent.

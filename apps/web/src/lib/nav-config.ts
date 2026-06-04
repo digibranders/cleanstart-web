@@ -1,7 +1,7 @@
 // Single source of truth for the marketing nav. Mirrors cleanstart.com production IA.
 // Consumed by both DesktopNav and MobileNav so the desktop bar and mobile sheet never drift.
 //
-// Slug authority: docs/WEB-PAGES.md. All items carry their real final slug regardless of
+// Slug authority: docs/web/WEB-PAGES.md. All items carry their real final slug regardless of
 // build status. Unbuilt items are rendered as <span> (non-clickable) — not <Link> — so
 // the href is data-only until the page exists. When a page is marked ✅ in WEB-PAGES.md,
 // switch its renderer from <span> to <Link> in MegaMenu / MobileNav.

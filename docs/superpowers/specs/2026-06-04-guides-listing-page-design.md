@@ -122,7 +122,7 @@ Own component (client) for the "Stay Ahead of Container Security Threats" newsle
 ## Cross-page edits (the two allowed shared touches)
 
 1. **`apps/web/src/lib/nav-config.ts`** — add `{ label: "Guides", href: "/guides", icon: <existing-icon-name> }` to Resources › Insights group (after Blogs). Icon name verified against the existing nav icon set during implementation (`book` is taken by Blogs; pick an unused one, e.g. `book-open` is taken by Knowledge Hub — choose another existing glyph).
-2. **`docs/WEB-PAGES.md`** — add/flip the Guides Listing row: `/guides`, type **CMS Listing**, status ✅.
+2. **`docs/web/WEB-PAGES.md`** — add/flip the Guides Listing row: `/guides`, type **CMS Listing**, status ✅.
 
 ## Out of scope
 

@@ -11,7 +11,7 @@ import type { PageImage } from "./canonical";
  *  - robots-advanced / hreflang / custom tags need the web-side composition
  *    libraries (composeRobotsMeta / composeHreflangCluster / composeCustomTags)
  *    which do not exist in apps/web yet.
- * Both are tracked as a follow-up in docs/SEO-IMPLEMENTATION-PLAN.md (Task 0.5).
+ * Both are tracked as a follow-up in docs/web/SEO-IMPLEMENTATION-PLAN.md (Task 0.5).
  */
 export type CmsSeoImage = {
   url?: string | null;

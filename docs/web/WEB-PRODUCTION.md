@@ -2,7 +2,7 @@
 
 > **Scope:** This doc is the canonical reference for everything related to putting `apps/web` (the marketing site at `www.cleanstart.com`) into production and keeping it there.
 >
-> **Out of scope:** `apps/cms` production. That lives in `docs/cleanstart-cms-architecture.html`. When the two disagree about a shared concern (e.g. CSP for the preview iframe), this doc wins for `apps/web` and the arch doc wins for the CMS.
+> **Out of scope:** `apps/cms` production. That lives in `docs/architecture/cleanstart-cms-architecture.html`. When the two disagree about a shared concern (e.g. CSP for the preview iframe), this doc wins for `apps/web` and the arch doc wins for the CMS.
 >
 > **Status:** Initial cut, 2026-05-15. Sections marked _Pending_ get filled in as the workstream lands.
 
@@ -16,7 +16,7 @@ CleanStart is shipping a Next.js 16.2.5 / React 19 / Tailwind v4 marketing site 
 
 **Out of scope for v1 (P1+):** llms.txt/ai.txt (post-launch), UptimeRobot wiring (post-launch), HSTS preload submission (+7 days), DMARC progression, status page (BetterStack v1.5).
 
-**Pages built:** 7 of 31 (see `docs/WEB-PAGES.md`). Legal hub + privacy + terms ship before DNS flip.
+**Pages built:** 7 of 31 (see `docs/web/WEB-PAGES.md`). Legal hub + privacy + terms ship before DNS flip.
 
 ---
 
@@ -257,7 +257,7 @@ Payload Live Preview opens `apps/web` URLs with the Next.js draft-mode bypass co
 
 ## 7. JSON-LD / structured data
 
-**Convention:** server component `<JsonLd>` rendering `<script type="application/ld+json">`. Field source is the CMS — see `docs/cms-jsonld-system.html` for canonical field mappings.
+**Convention:** server component `<JsonLd>` rendering `<script type="application/ld+json">`. Field source is the CMS — see `docs/architecture/cms-jsonld-system.html` for canonical field mappings.
 
 **Schema map:**
 

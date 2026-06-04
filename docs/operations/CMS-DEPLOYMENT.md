@@ -1,17 +1,17 @@
 # CMS Deployment — `cms.cleanstart.com`
 
-Canonical operations doc for deploying and operating **apps/cms** on a DigitalOcean droplet via **GitHub Actions + Caddy**. Companion to `docs/WEB-PRODUCTION.md` (which owns everything `apps/web`).
+Canonical operations doc for deploying and operating **apps/cms** on a DigitalOcean droplet via **GitHub Actions + Caddy**. Companion to `docs/web/WEB-PRODUCTION.md` (which owns everything `apps/web`).
 
 **This doc covers:** initial droplet bootstrap, locked configuration decisions, phased setup runbook, the per-droplet done checklist, and the operational backlog of what's still pending.
 
 **This doc does NOT cover:**
 
-- The marketing site on Vercel — see `docs/WEB-PRODUCTION.md`
+- The marketing site on Vercel — see `docs/web/WEB-PRODUCTION.md`
 - Webflow → Payload data migration — see `migrations/webflow-import/` + arch doc §`#migration`
 - Emergency rollback after a failed cutover — see `docs/migration/rollback-runbook.md`
-- Restore drills — see `docs/RESTORE-LOG.md` + arch doc §`#restore-runbook`
+- Restore drills — see `docs/operations/RESTORE-LOG.md` + arch doc §`#restore-runbook`
 
-**Source of truth:** when this doc disagrees with `docs/cleanstart-cms-architecture.html` on product/architecture, the arch doc wins. When it disagrees with `CLAUDE.md` on code/ops conventions, CLAUDE.md wins. This doc wins for the *concrete deploy sequence* and is the place to record per-droplet state.
+**Source of truth:** when this doc disagrees with `docs/architecture/cleanstart-cms-architecture.html` on product/architecture, the arch doc wins. When it disagrees with `CLAUDE.md` on code/ops conventions, CLAUDE.md wins. This doc wins for the *concrete deploy sequence* and is the place to record per-droplet state.
 
 > **2026-05-19 — CTO-level review history.** This doc went through three rounds of locked-decision revision the same day:
 >
@@ -404,7 +404,7 @@ Walk every external integration end-to-end. Failure on any one of these blocks "
 - [ ] Publish doc → wait ≤ 2 min → Meilisearch returns hit via CMS search
 - [ ] `docker logs cms \| grep '\[jobs\]'` shows at least one `lead-queue-drain` tick after 5 min
 - [ ] Manual `/opt/cleanstart/scripts/backup.sh` produces a fresh `.dump` in R2 and pings BetterStack
-- [ ] `ALLOW_RESTORE=yes /opt/cleanstart/scripts/restore.sh <ts>` against a throwaway local DB succeeds; record outcome in `docs/RESTORE-LOG.md`
+- [ ] `ALLOW_RESTORE=yes /opt/cleanstart/scripts/restore.sh <ts>` against a throwaway local DB succeeds; record outcome in `docs/operations/RESTORE-LOG.md`
 
 ### Phase 13 — Confirm auto-deploy
 
@@ -701,7 +701,7 @@ Open items, in priority order. Move into the per-droplet checklist or close out 
 ### Pre-launch blockers
 
 - **B2 — Resolve backup time (L2).** Lock at **02:00 UTC** in this doc and in the cron snippet. (Phase 11.3 closes this.)
-- **B3 — First restore drill.** Per arch doc §`#restore-runbook`: "first drill must complete *before* the migration cutover, not after." `docs/RESTORE-LOG.md` is currently empty.
+- **B3 — First restore drill.** Per arch doc §`#restore-runbook`: "first drill must complete *before* the migration cutover, not after." `docs/operations/RESTORE-LOG.md` is currently empty.
 - **B4 — Configure R2 lifecycle rules.** Locked row 22 says 7/4/3 daily/weekly/monthly. Not yet enforced on the R2 bucket. Phase 11.5.
 - ~~B5 — Coolify uninstall~~ **CLOSED 2026-05-19** — wiped during round-3 cleanup.
 - **B6 — Migration vs schema audit.** The 9th migration (`20260519_120000_strip_html_from_text_fields`) currently skips the `news` and `events` collections at boot because their `_v` shadow tables don't include columns the source-tree collections reference (`version_publisher`, etc.). This means a `news.publisher` field exists in the source code but no corresponding migration created the column. Symptoms today: defensive try/catch in the migration logs a warning; the app still boots and admin works. Risk: any `payload.find({ collection: 'news', draft: true })` from app code (e.g. listing latest news drafts in the admin) will fail at runtime. Fix: run `pnpm --filter @cleanstart/cms migrate:create publisher_field` against a dev DB that's caught up via `push: true`, commit the generated migration, redeploy. Once that lands, remove the try/catch from the strip-html migration.
@@ -749,6 +749,6 @@ Open items, in priority order. Move into the per-droplet checklist or close out 
 | Production Dockerfile                                  | `apps/cms/Dockerfile`                                       |
 | CI workflows (test only, not deploy)                   | `.github/workflows/ci.yml` · `.github/workflows/web.yml`   |
 | Webflow rollback                                       | `docs/migration/rollback-runbook.md`                        |
-| Restore drill log                                      | `docs/RESTORE-LOG.md`                                       |
-| apps/web production                                    | `docs/WEB-PRODUCTION.md`                                    |
+| Restore drill log                                      | `docs/operations/RESTORE-LOG.md`                                       |
+| apps/web production                                    | `docs/web/WEB-PRODUCTION.md`                                    |
 | Conventions (code, deploy, forbidden actions)          | `CLAUDE.md`                                                 |

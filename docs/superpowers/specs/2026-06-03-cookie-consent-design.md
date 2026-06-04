@@ -3,14 +3,14 @@
 **Date:** 2026-06-03
 **Status:** Approved → implementation
 **Scope:** Full stack — `apps/web` banner + `/api/consent` + `apps/cms` `ConsentLog` collection
-**Source of truth:** `docs/WEB-PRODUCTION.md` §11 (cookie consent), `docs/GDPR-COMPLIANCE.md` §9 + remediation item 1
+**Source of truth:** `docs/web/WEB-PRODUCTION.md` §11 (cookie consent), `docs/operations/GDPR-COMPLIANCE.md` §9 + remediation item 1
 **Branch:** `development` (shared files in scope; not `farheen`)
 
 ---
 
 ## 1. Problem
 
-`docs/GDPR-COMPLIANCE.md` flags the web frontend as the single largest compliance gap:
+`docs/operations/GDPR-COMPLIANCE.md` flags the web frontend as the single largest compliance gap:
 no cookie-consent / CMP exists, no `cs_consent` cookie, no `/api/consent`, no `ConsentLog`.
 `@vercel/analytics`, `@vercel/speed-insights`, and the Sentry web-vitals reporter currently
 load **unconditionally** in `apps/web/src/app/layout.tsx`. There is no GA4 yet, but CSP already

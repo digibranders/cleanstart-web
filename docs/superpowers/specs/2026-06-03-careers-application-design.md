@@ -97,9 +97,9 @@ Resumes are sensitive PII; keep the codebase's existing posture consistent.
 
 - `apps/cms/.env.example` — `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `BREVO_SENDER_NAME`, `CAREERS_HR_EMAIL`, resume R2 prefix note.
 - `CLAUDE.md` — Brevo back in the live-integrations table (careers/partner email); new cron row for `purge-career-applications`.
-- `docs/GDPR-COMPLIANCE.md` — Brevo re-added as a sub-processor (careers/partner email); careers PII + private resume storage + retention added to the inventory and sub-processor register.
-- `docs/WEB-PAGES.md` — job apply status.
-- New `docs/careers-applications.md` — runbook (architecture, Brevo config, env, gotchas, local test).
+- `docs/operations/GDPR-COMPLIANCE.md` — Brevo re-added as a sub-processor (careers/partner email); careers PII + private resume storage + retention added to the inventory and sub-processor register.
+- `docs/web/WEB-PAGES.md` — job apply status.
+- New `docs/features/careers-applications.md` — runbook (architecture, Brevo config, env, gotchas, local test).
 
 ---
 

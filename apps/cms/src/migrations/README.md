@@ -63,4 +63,4 @@ pnpm --filter @cleanstart/cms migrate --down
 
 The `down` block in the baseline drops every table and enum — only useful on a database that you genuinely want to flatten. For real-world rollbacks of a single deploy, prefer rolling forward with a corrective migration rather than running `--down` against staging or prod.
 
-See `docs/cleanstart-cms-architecture.html` §migration for the broader migration + rollback strategy and `docs/RESTORE-LOG.md` for the documented restore runbook.
+See `docs/architecture/cleanstart-cms-architecture.html` §migration for the broader migration + rollback strategy and `docs/operations/RESTORE-LOG.md` for the documented restore runbook.

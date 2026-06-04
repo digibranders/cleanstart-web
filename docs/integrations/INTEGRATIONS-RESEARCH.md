@@ -1,6 +1,6 @@
 # Integrations dashboard — research note
 
-Status: **research, not yet committed schema**. Companion to `docs/BACKLOG.md` "Future — Integrations dashboard" and `docs/cleanstart-cms-architecture.html` §`#webhooks`, §`#forms`, §`#marketing-tags`.
+Status: **research, not yet committed schema**. Companion to `docs/BACKLOG.md` "Future — Integrations dashboard" and `docs/architecture/cleanstart-cms-architecture.html` §`#webhooks`, §`#forms`, §`#marketing-tags`.
 
 This doc answers three questions the backlog leaves open:
 

@@ -279,7 +279,7 @@ Goal: prod-quality posture; ready for cutover-day runbook.
 | I1 | Security headers (CSP, HSTS, etc.)                                                | §`#security-headers`              |
 | I2 | Rate limiting on public endpoints                                                 | §`#rate-limiting`                 |
 | I3 | `infra/scripts/backup.sh` + `restore.sh` · cron + heartbeat                  | §`#restore-runbook`               |
-| I4 | Quarterly restore drill scheduled ·`docs/RESTORE-LOG.md` started               | §`#decisions` (restore drill row) |
+| I4 | Quarterly restore drill scheduled ·`docs/operations/RESTORE-LOG.md` started               | §`#decisions` (restore drill row) |
 | I5 | Droplet tuning spec applied (Postgres / Sharp / Meili / kernel)                   | §`#droplet-tuning`                |
 | I6 | Admin Lighthouse run · p95 admin action < 1s benchmark                           | §`#perf-budget`                   |
 | I7 | Pre-cutover smoke test suite (50 sample-URL HTTP-200 + admin login + form submit) | §`#migration` (Phase 4 T-15m)     |
@@ -319,7 +319,7 @@ Goal: prod-quality posture; ready for cutover-day runbook.
 
 ## Future — Integrations dashboard
 
-> Research: **`docs/INTEGRATIONS-RESEARCH.md`** is the authoritative scoping note for what this dashboard supports, why, and the open product questions still to resolve. Read it before scheduling any of the work below. **`docs/INTEGRATIONS-RESEARCH-V2.md`** extends it with inbound webhooks, analytics read-back (GA4 / GSC / Clarity), and the L1/L2/L3 admin dashboard UX, and proposes the J1 / J2 / J3 milestone breakdown.
+> Research: **`docs/integrations/INTEGRATIONS-RESEARCH.md`** is the authoritative scoping note for what this dashboard supports, why, and the open product questions still to resolve. Read it before scheduling any of the work below. **`docs/integrations/INTEGRATIONS-RESEARCH-V2.md`** extends it with inbound webhooks, analytics read-back (GA4 / GSC / Clarity), and the L1/L2/L3 admin dashboard UX, and proposes the J1 / J2 / J3 milestone breakdown.
 
 Post-launch admin surface where editors connect external channels from a CMS settings page (no env-var edits, no code changes per channel). Each row in an encrypted `integrations` collection registers a matching LeadHandler / observability-shipper / sitemap-pinger at runtime through the existing `registerSecondaryHandler()` pipeline.
 

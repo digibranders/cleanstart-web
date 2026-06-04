@@ -33,7 +33,7 @@
 | `apps/web/src/lib/careers/submitApplication.ts` (create) | multipart transport helper |
 | `apps/web/src/components/sections/careers/JobApplyForm.tsx` (create) | apply UI |
 | `apps/web/src/app/job/[slug]/page.tsx` (modify) | mount the apply form for cms/open jobs |
-| docs (modify/create) | `.env.example`, `CLAUDE.md`, `GDPR-COMPLIANCE.md`, `WEB-PAGES.md`, `docs/careers-applications.md` |
+| docs (modify/create) | `.env.example`, `CLAUDE.md`, `GDPR-COMPLIANCE.md`, `WEB-PAGES.md`, `docs/features/careers-applications.md` |
 
 ---
 
@@ -1566,8 +1566,8 @@ git commit -m "feat(cms): DSAR erasure cascade to career applications + resumes"
 **Files:**
 - Create: migration (generated) under `apps/cms/src/migrations/`
 - Modify: `apps/cms/src/migrations/index.ts` (only if the generator doesn't append it)
-- Modify: `apps/cms/.env.example`, `CLAUDE.md`, `docs/GDPR-COMPLIANCE.md`, `docs/WEB-PAGES.md`
-- Create: `docs/careers-applications.md`
+- Modify: `apps/cms/.env.example`, `CLAUDE.md`, `docs/operations/GDPR-COMPLIANCE.md`, `docs/web/WEB-PAGES.md`
+- Create: `docs/features/careers-applications.md`
 
 - [ ] **Step 1: Generate the DB migration**
 
@@ -1604,20 +1604,20 @@ R2_RESUME_PREFIX=
 In the **Live integrations** table, add a Brevo row (purpose: careers/partner transactional email — HR application notifications with resume attachment; key env vars `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `CAREERS_HR_EMAIL`).
 In the **Background jobs** table, add the row: `Career-applications purge (resume delete + PII redaction, 365-day) | daily 03:45 | purge-career-applications.ts`.
 
-- [ ] **Step 4: Update `docs/GDPR-COMPLIANCE.md`**
+- [ ] **Step 4: Update `docs/operations/GDPR-COMPLIANCE.md`**
 
 - Sub-processor register: add **Brevo** back (purpose: careers/partner transactional email — receives applicant name/email + resume as an attachment; region EU/US; SCCs). Note it is distinct from HubSpot (which still owns lead-pipeline email and never receives careers data).
 - Personal-data inventory: add a **career applications** row (name, email, phone, cover letter, resume file; stored in `career-applications` + private `resumes` R2; 365-day retention then resume hard-deleted + PII nulled).
 - Retention schedule: add the `purge-career-applications.ts` row.
 - Data-subject rights / erasure: note DSAR delete-by-email now also erases career applications + their resumes.
 
-- [ ] **Step 5: Update `docs/WEB-PAGES.md`**
+- [ ] **Step 5: Update `docs/web/WEB-PAGES.md`**
 
 Update the careers/job page row(s) to note the apply form is live on CMS-native open jobs.
 
 - [ ] **Step 6: Write the runbook**
 
-Create `docs/careers-applications.md` documenting: architecture (web form → `/api/career-applications/apply` → resume to private R2 → application row → Brevo HR email), the env vars, the HR-only/no-applicant-email decision, the private-storage rationale, retention + DSAR behavior, and a local end-to-end test recipe (set `BREVO_API_KEY`/`CAREERS_HR_EMAIL` to test the relay; leave unset to skip).
+Create `docs/features/careers-applications.md` documenting: architecture (web form → `/api/career-applications/apply` → resume to private R2 → application row → Brevo HR email), the env vars, the HR-only/no-applicant-email decision, the private-storage rationale, retention + DSAR behavior, and a local end-to-end test recipe (set `BREVO_API_KEY`/`CAREERS_HR_EMAIL` to test the relay; leave unset to skip).
 
 - [ ] **Step 7: Full baseline checks**
 
@@ -1631,7 +1631,7 @@ Expected: all PASS.
 - [ ] **Step 8: Commit**
 
 ```bash
-git add apps/cms/src/migrations apps/cms/.env.example CLAUDE.md docs/GDPR-COMPLIANCE.md docs/WEB-PAGES.md docs/careers-applications.md
+git add apps/cms/src/migrations apps/cms/.env.example CLAUDE.md docs/operations/GDPR-COMPLIANCE.md docs/web/WEB-PAGES.md docs/features/careers-applications.md
 git commit -m "feat: careers migration, env, and docs (Brevo back, retention, DSAR)"
 ```
 

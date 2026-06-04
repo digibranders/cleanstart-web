@@ -287,4 +287,4 @@ Reference baseline only — **not** a copy mandate. "Old" = current live `cleans
 - CMS side verified directly: `apps/cms/src/payload/fields/seo.ts`, the 11 `admin/components/Seo*.tsx` sidebar components, `hooks/slug-change-redirect.ts`, and the SEO composition libs + tests. Cross-checked against `apps/web` content types (`lib/{blog,news,resources,events}.ts`) and detail-page `generateMetadata` to establish the consumption gap (§3.2).
 - Old-site inventory: `https://www.cleanstart.com/sitemap.xml` (~250 URLs).
 - Old-site meta: raw-HTML extraction of 17 high-value static/product pages.
-- Decision context: [`WEB-PRODUCTION.md`](WEB-PRODUCTION.md) §5–8, [`cleanstart-cms-architecture.html`](cleanstart-cms-architecture.html) §SEO, [`WEB-PAGES.md`](WEB-PAGES.md).
+- Decision context: [`WEB-PRODUCTION.md`](WEB-PRODUCTION.md) §5–8, [`cleanstart-cms-architecture.html`](../architecture/cleanstart-cms-architecture.html) §SEO, [`WEB-PAGES.md`](WEB-PAGES.md).
