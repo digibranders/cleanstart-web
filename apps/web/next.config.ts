@@ -28,6 +28,19 @@ const nextConfig: NextConfig = {
         destination: "/blogs",
         permanent: true,
       },
+      // Guides use a singular hub (`/guide`) matching the indexed detail path
+      // `/guide/[slug]`. Courtesy 301s catch the plural variant a user or bot
+      // might guess, including any pluralized sub-path.
+      {
+        source: "/guides",
+        destination: "/guide",
+        permanent: true,
+      },
+      {
+        source: "/guides/:slug*",
+        destination: "/guide/:slug*",
+        permanent: true,
+      },
     ];
   },
   images: {
