@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import type { OptionalCategory } from "@/lib/consent/types";
@@ -168,6 +168,24 @@ export function CookieBanner() {
     return () => document.removeEventListener("keydown", onKey);
   }, [promptOpen]);
 
+  // Slide-up + fade-in entrance. `entered` starts false (sheet sits below the
+  // fold) and flips true after a short delay so the CSS transition runs. The
+  // first appearance waits ~900ms to "settle in" after page load like typical
+  // CMPs; a footer re-open animates near-instantly. Honors reduced-motion via
+  // the `motion-reduce:*` classes on the sheet.
+  const [entered, setEntered] = useState(false);
+  const hasAnimatedOnce = useRef(false);
+  useEffect(() => {
+    if (!promptOpen) {
+      setEntered(false);
+      return;
+    }
+    const delay = hasAnimatedOnce.current ? 60 : 900;
+    hasAnimatedOnce.current = true;
+    const t = window.setTimeout(() => setEntered(true), delay);
+    return () => window.clearTimeout(t);
+  }, [promptOpen]);
+
   if (!promptOpen) return null;
 
   const setCategory = (key: OptionalCategory, next: boolean) =>
@@ -189,7 +207,9 @@ export function CookieBanner() {
       role="dialog"
       aria-modal="false"
       aria-label="Cookie consent"
-      className="fixed inset-x-0 bottom-0 z-[60] border-t border-white/10 bg-[#131a2e] text-white shadow-[0_-8px_30px_rgba(0,0,0,0.35)]"
+      className={`fixed inset-x-0 bottom-0 z-[60] transform-gpu border-t border-white/10 bg-[#131a2e] text-white shadow-[0_-8px_30px_rgba(0,0,0,0.35)] transition duration-500 ease-out will-change-transform motion-reduce:transition-none ${
+        entered ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+      }`}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="relative mx-auto flex max-w-[1100px] flex-col gap-4 px-6 py-5">
