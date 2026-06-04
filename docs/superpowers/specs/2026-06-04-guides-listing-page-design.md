@@ -23,7 +23,8 @@ The CMS side already exists in full:
 | Hero H1 text | **"Guide"** (singular) — match Figma. |
 | Card content | Image · meta (date · read time) · 2-line title · **3-line abstract** · "Read more →". |
 | Cards per page | **16** (`limit: 16`) → 4×4 grid at desktop. |
-| CTA card | **Reuse existing `<BlogsCTA />`** — Figma copy ("Stay Ahead of Container Security Threats") is byte-identical. |
+| CTA card | **Own `GuidesCTA.tsx`** — copy may match Blogs, but no shared component. |
+| Component sharing with blogs | **None.** Every guide-specific component, constant (hero gradient, decorative bg values), and helper (date/media) is its own file under `sections/guides/` or `lib/guides.ts`. Nothing imports from `@/lib/blog` or `sections/blogs/`. App-wide generic primitives (`ui/Pagination`, `EmptyState`, `Reveal`, `FadeUp`, `_shared/SearchBar`) are not blog components and are still used. |
 
 ## Routing
 
@@ -33,7 +34,17 @@ The CMS side already exists in full:
 
 ## Data layer — `apps/web/src/lib/guides.ts`
 
-Add one fetch function next to the existing `getGuideBySlug` / `getGuideBySlugDraft`. The `Guide` type already exists and carries every field the card needs (`title`, `slug`, `abstract`, `heroImage`, `publishedAt`, `readingMinutes`).
+Add the list fetch **plus guide-local presentation helpers** next to the existing `getGuideBySlug` / `getGuideBySlugDraft`, so guide components never import from `@/lib/blog`:
+
+```ts
+// Own date formatter — do not import formatBlogDate.
+export function formatGuideDate(value?: string | null): string { /* same Intl format */ }
+
+// Own media URL resolver — do not import mediaUrl from @/lib/blog.
+export function guideMediaUrl(url?: string | null): string | undefined { /* prefix NEXT_PUBLIC_CMS_URL */ }
+```
+
+`effectivePublishedAt` from `@/lib/published-date` is a generic app-wide helper (not blog-specific) and may be used as-is. The `Guide` type already exists and carries every field the card needs (`title`, `slug`, `abstract`, `heroImage`, `publishedAt`, `readingMinutes`).
 
 ```ts
 type PayloadListResponse<T> = {
@@ -75,13 +86,13 @@ Server component, structurally identical to `blogs/page.tsx`:
 
 - `searchParams`: `{ page?, q? }` (no `category`).
 - `generateMetadata`: `buildPageMetadata({ title: "Guides", description: <subheading>, path: "/guides", eyebrow: "Guide", noindex: page >= 6 })`.
-- Body: `JsonLd` breadcrumb (`Home → Guides`) → `<Header />` → `<main style={{ background: "#f6f6f6" }}>` → `<GuidesHero searchQuery={…} />` → `<FadeUp><GuidesList … /></FadeUp>` → `<Footer cta={<BlogsCTA />} />`.
+- Body: `JsonLd` breadcrumb (`Home → Guides`) → `<Header />` → `<main style={{ background: "#f6f6f6" }}>` → `<GuidesHero searchQuery={…} />` → `<FadeUp><GuidesList … /></FadeUp>` → `<Footer cta={<GuidesCTA />} />`.
 - Single fetch: `getGuides({ page, ...(search ? { search } : {}) })`. No `Promise.all` over featured/categories (neither applies).
 
 ## Components — `apps/web/src/components/sections/guides/`
 
 ### `GuidesHero.tsx`
-- Reuse the blogs `HERO_GRADIENT` string.
+- Own `HERO_GRADIENT` constant defined in this file (value may equal blogs', but not imported).
 - H1 **"Guide"** (`--fs-h1`, `--text-hero-utility-ls`, `--text-hero-lh`) — listing-tier hero token, same as `BlogsHero`.
 - Subheading "A Curated Collection of Writings, Research, and Solutions" (`--fs-lead`).
 - `<SearchBar initialQuery={searchQuery} placeholder="Search guides of your interest..." ariaLabel="Search guides" />` wrapped in `<Suspense>`.
@@ -91,21 +102,22 @@ Server component, structurally identical to `blogs/page.tsx`:
 Compact variant of `BlogCard` (no category badge — collection has none):
 - Outer `<article>` ~`max-w-[320px]` (vs blog 404px; ~0.75× the 1920 artboard), `borderRadius: "32px"` (verify against Figma; copy exact radius), white bg, same soft shadow stack as `BlogCard`.
 - Image block: `aspect-ratio` per Figma, inner radius ~`20px`, `next/image` with `fill` + `sizes` matching the 4-up grid (`(min-width:1280px) 320px, (min-width:1024px) 30vw, (min-width:640px) 45vw, 90vw`).
-- Body: meta row (`date` via `formatBlogDate(effectivePublishedAt(guide))` + `readingMinutes` "X min read", calendar/clock icons reused from `/images/blogs/`), title `<h3>` 2-line clamp (`--fs-h3` / card-title token), **abstract `<p>` 3-line clamp** (`WebkitLineClamp: 3`).
-- "Read more →" `<Link href={`/guide/${guide.slug}`}>` with the blogs read-more arrow asset.
-- Reuse `formatBlogDate`, `mediaUrl`, `effectivePublishedAt` from `@/lib/blog`.
+- Body: meta row (`date` via `formatGuideDate(effectivePublishedAt(guide))` + `readingMinutes` "X min read", calendar/clock icons), title `<h3>` 2-line clamp (`--fs-h3` / card-title token), **abstract `<p>` 3-line clamp** (`WebkitLineClamp: 3`).
+- "Read more →" `<Link href={`/guide/${guide.slug}`}>`.
+- Uses guide-local `formatGuideDate` / `guideMediaUrl` (from `lib/guides.ts`) and generic `effectivePublishedAt`. No imports from `@/lib/blog`.
+- Icon/arrow assets: copy the needed SVGs into `public/images/guides/` (calendar, clock, read-more arrow) rather than referencing `/images/blogs/`.
 - Exact paddings / font sizes / radius pulled from Figma via `get_design_context` on a card node during implementation.
 
 ### `GuidesList.tsx`
-- `<section>` carrying over the `LatestBlogs` decorative background (radial blobs, gridlines SVG, blur ellipses) + `background: #f6f6f6`, `paddingBottom: var(--spacing-section-cta)`.
+- `<section>` with its own decorative background (radial blobs, gridlines, blur ellipses — values defined locally, gridlines SVG copied to `public/images/guides/`) + `background: #f6f6f6`, `paddingBottom: var(--spacing-section-cta)`.
 - Container `max-w-[var(--container-default)] px-6 sm:px-10`.
 - Grid: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`, gap ~`24px` (confirm vs Figma), `justifyItems: center`, wrapped in `RevealStagger`/`RevealItem`.
 - **No "Latest" H2** above the grid (Figma shows the grid directly under the hero).
-- Pagination: desktop `<Pagination currentPage totalPages buildHref>` (`buildHref` keeps `q`), mobile compact chevron pagination (lift the `CompactMobilePagination` pattern from `LatestBlogs`).
-- Empty states: `<EmptyState variant="no-results">` (with "Clear search" link to `/guides`) when `searchQuery` set, else `<EmptyState variant="empty" title="No guides yet" …>`.
+- Pagination: desktop generic `<Pagination currentPage totalPages buildHref>` (`buildHref` keeps `q`); mobile compact chevron pagination implemented locally in this file (own `CompactMobilePagination` — not imported from blogs).
+- Empty states: generic `<EmptyState variant="no-results">` (with "Clear search" link to `/guides`) when `searchQuery` set, else `<EmptyState variant="empty" title="No guides yet" …>`.
 
-### CTA
-Reuse `<BlogsCTA />` directly in the page's `<Footer cta=… />`. No new component.
+### `GuidesCTA.tsx`
+Own component (client) for the "Stay Ahead of Container Security Threats" newsletter card, rendered via `<Footer cta={<GuidesCTA />} />`. Uses the generic `useNewsletterSignup` hook (app-wide lead infra, not blog-specific). Copy/markup may mirror `BlogsCTA` but it is a separate file; CTA cube/decorative images copied to `public/images/guides/`.
 
 ## Cross-page edits (the two allowed shared touches)
 
