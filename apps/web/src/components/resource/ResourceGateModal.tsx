@@ -26,6 +26,17 @@ export function ResourceGateModal({
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [stage, setStage] = useState<"form" | "success">("form");
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  // Pending auto-close timer: after a successful unlock the modal shows the
+  // "download ready" stage briefly, then closes itself. Tracked so it can be
+  // cancelled on manual close/reopen or unmount.
+  const closeTimerRef = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current != null) window.clearTimeout(closeTimerRef.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     const dlg = dialogRef.current;
@@ -37,6 +48,10 @@ export function ResourceGateModal({
         } catch {
           /* dialog already open in some browsers */
         }
+      }
+      if (closeTimerRef.current != null) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
       }
       setStage("form");
       setDownloadUrl(null);
@@ -70,6 +85,11 @@ export function ResourceGateModal({
     } else {
       setStage("success");
     }
+    // Auto-close the modal a few seconds after success — long enough for the
+    // download to start (triggered at 400ms) and for the fallback "Download
+    // now" button to remain grabbable. Cancelled on manual close/reopen/unmount.
+    if (closeTimerRef.current != null) window.clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = window.setTimeout(onClose, 3500);
   };
 
   return (
