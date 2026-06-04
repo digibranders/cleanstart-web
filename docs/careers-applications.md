@@ -30,6 +30,13 @@ POST /api/career-applications/apply        (apps/cms — collection endpoint on 
    ├─ 3. HR notification email via Brevo (non-fatal) — resume attached
    └─ 4. append-only `career-applications` row, with `jobTitleSnapshot`,
          `jobLocationSnapshot`, and `emailDelivery` status embedded
+
+Captured fields: firstName, lastName, email (personal), phone, **location**
+(where the applicant is based), **howDidYouHear**, linkedinUrl, the required
+**resume** (file → private `resumes`), and the cover letter as **either** pasted
+text (`coverLetter`) **or** an uploaded file (`coverLetterFile`, also stored in
+the private `resumes` collection). Both résumé and any cover-letter file are
+attached to the HR email.
    ▼
 { ok: true }
 ```

@@ -48,7 +48,19 @@ export const CareerApplications: CollectionConfig = {
     { name: 'lastName', type: 'text' },
     { name: 'email', type: 'email' },
     { name: 'phone', type: 'text' },
-    { name: 'coverLetter', type: 'textarea' },
+    { name: 'location', type: 'text', admin: { description: 'Where the applicant is based (free text).' } },
+    {
+      name: 'howDidYouHear',
+      type: 'text',
+      admin: { description: 'How the applicant heard about the role (LinkedIn, referral, …).' },
+    },
+    { name: 'coverLetter', type: 'textarea', admin: { description: 'Pasted cover-letter text (optional).' } },
+    {
+      name: 'coverLetterFile',
+      type: 'relationship',
+      relationTo: 'resumes',
+      admin: { description: 'Uploaded cover-letter file (optional). Stored privately, like the resume.' },
+    },
     {
       name: 'linkedinUrl',
       type: 'text',

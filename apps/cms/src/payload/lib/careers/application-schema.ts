@@ -8,6 +8,8 @@ export const applicationFieldsSchema = z.object({
   lastName: z.string().min(1).max(120),
   email: z.string().email().max(254),
   phone: z.string().max(40).optional(),
+  location: z.string().max(160).optional(),
+  howDidYouHear: z.string().max(120).optional(),
   coverLetter: z.string().max(5000).optional(),
   linkedinUrl: z.string().url().max(500).optional(),
   source: z.string().max(2048).optional(),

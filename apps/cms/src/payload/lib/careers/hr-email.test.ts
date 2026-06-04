@@ -30,12 +30,31 @@ describe('buildHrApplicationEmail', () => {
     expect(htmlContent).not.toContain('LinkedIn');
   });
 
-  it('shows the location row when provided and omits it otherwise', () => {
+  it('shows the role-location row when provided and omits it otherwise', () => {
     const withLoc = buildHrApplicationEmail({ ...base, jobLocation: 'Remote · Austin' });
-    expect(withLoc.htmlContent).toContain('Location');
+    expect(withLoc.htmlContent).toContain('Role location');
     expect(withLoc.htmlContent).toContain('Remote · Austin');
 
     const withoutLoc = buildHrApplicationEmail({ ...base, jobLocation: undefined });
-    expect(withoutLoc.htmlContent).not.toContain('Location');
+    expect(withoutLoc.htmlContent).not.toContain('Role location');
+  });
+
+  it('renders applicant location, how-they-heard, and a cover-letter-file note', () => {
+    const { htmlContent } = buildHrApplicationEmail({
+      ...base,
+      location: 'Berlin, DE',
+      howDidYouHear: 'LinkedIn',
+      coverLetterAttached: true,
+    });
+    expect(htmlContent).toContain('Based in');
+    expect(htmlContent).toContain('Berlin, DE');
+    expect(htmlContent).toContain('Heard via');
+    expect(htmlContent).toContain('LinkedIn');
+    expect(htmlContent).toContain('Cover letter file attached');
+
+    const without = buildHrApplicationEmail(base);
+    expect(without.htmlContent).not.toContain('Based in');
+    expect(without.htmlContent).not.toContain('Heard via');
+    expect(without.htmlContent).not.toContain('Cover letter file attached');
   });
 });

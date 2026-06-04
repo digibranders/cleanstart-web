@@ -8,6 +8,7 @@ import * as migration_20260603_100302_consent_log from './20260603_100302_consen
 import * as migration_20260603_120148_add_partner_applications from './20260603_120148_add_partner_applications';
 import * as migration_20260604_045219_add_guide_journey_nav from './20260604_045219_add_guide_journey_nav';
 import * as migration_20260604_052913_add_job_experience_range from './20260604_052913_add_job_experience_range';
+import * as migration_20260604_063039_add_application_extra_fields from './20260604_063039_add_application_extra_fields';
 
 export const migrations = [
   {
@@ -58,6 +59,11 @@ export const migrations = [
   {
     up: migration_20260604_052913_add_job_experience_range.up,
     down: migration_20260604_052913_add_job_experience_range.down,
-    name: '20260604_052913_add_job_experience_range'
+    name: '20260604_052913_add_job_experience_range',
+  },
+  {
+    up: migration_20260604_063039_add_application_extra_fields.up,
+    down: migration_20260604_063039_add_application_extra_fields.down,
+    name: '20260604_063039_add_application_extra_fields'
   },
 ];

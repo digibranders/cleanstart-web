@@ -10,6 +10,14 @@ const MAX_RESUME_BYTES = 10 * 1024 * 1024;
 const ACCENT = "#4a3bf1";
 const CONSENT_TEXT =
   "I consent to CleanStart storing and processing my application data and resume for recruitment purposes.";
+const HEAR_OPTIONS = [
+  "LinkedIn",
+  "Job board",
+  "Referral",
+  "Search engine",
+  "Event / conference",
+  "Other",
+] as const;
 
 interface JobApplyFormProps {
   jobSlug: string;
@@ -75,8 +83,19 @@ export function JobApplyForm({
       return;
     }
 
+    const coverLetterFile = fd.get("coverLetterFile");
+    if (
+      coverLetterFile instanceof File &&
+      coverLetterFile.size > MAX_RESUME_BYTES
+    ) {
+      setError("Cover letter file must be 10 MB or smaller.");
+      return;
+    }
+
     const turnstileToken = fd.get("cf-turnstile-response");
     const phone = String(fd.get("phone") ?? "").trim();
+    const location = String(fd.get("location") ?? "").trim();
+    const howDidYouHear = String(fd.get("howDidYouHear") ?? "").trim();
     const coverLetter = String(fd.get("coverLetter") ?? "").trim();
     const linkedinUrl = String(fd.get("linkedinUrl") ?? "").trim();
 
@@ -94,7 +113,12 @@ export function JobApplyForm({
         categories: ["recruitment"],
       },
       ...(phone ? { phone } : {}),
+      ...(location ? { location } : {}),
+      ...(howDidYouHear ? { howDidYouHear } : {}),
       ...(coverLetter ? { coverLetter } : {}),
+      ...(coverLetterFile instanceof File && coverLetterFile.size > 0
+        ? { coverLetterFile }
+        : {}),
       ...(linkedinUrl ? { linkedinUrl } : {}),
       ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
       ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
@@ -218,6 +242,20 @@ export function JobApplyForm({
               />
             </div>
 
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field
+                label="Location"
+                name="location"
+                placeholder="City, Country"
+                autoComplete="address-level2"
+              />
+              <SelectField
+                label="How did you hear about us?"
+                name="howDidYouHear"
+                options={HEAR_OPTIONS}
+              />
+            </div>
+
             <div className="mt-4">
               <Field
                 label="LinkedIn URL"
@@ -297,7 +335,7 @@ export function JobApplyForm({
                   letterSpacing: "-0.005em",
                 }}
               >
-                Cover letter (optional)
+                Cover letter (optional) — paste below or upload a file
               </label>
               <textarea
                 id="coverLetter"
@@ -317,6 +355,27 @@ export function JobApplyForm({
                   lineHeight: 1.5,
                 }}
               />
+              <input
+                name="coverLetterFile"
+                type="file"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                aria-label="Cover letter file (PDF, DOC, or DOCX, 10 MB max)"
+                className="font-sans w-full mt-2 file:mr-3 file:rounded-[6px] file:border-0 file:bg-[#4a3bf1] file:px-3 file:py-1.5 file:text-white file:cursor-pointer"
+                style={{
+                  fontSize: "var(--fs-caption)",
+                  color: "rgba(17,17,17,0.7)",
+                }}
+              />
+              <span
+                className="font-sans block"
+                style={{
+                  fontSize: "var(--fs-caption)",
+                  color: "rgba(17,17,17,0.55)",
+                  marginTop: "4px",
+                }}
+              >
+                Optional file: PDF, DOC, or DOCX, 10 MB max.
+              </span>
             </div>
 
             <div className="mt-4">
@@ -427,6 +486,59 @@ function Field({
           outline: "none",
         }}
       />
+    </div>
+  );
+}
+
+interface SelectFieldProps {
+  label: string;
+  name: string;
+  options: readonly string[];
+}
+
+function SelectField({
+  label,
+  name,
+  options,
+}: SelectFieldProps): React.ReactElement {
+  return (
+    <div>
+      <label
+        htmlFor={name}
+        className="font-sans block"
+        style={{
+          fontSize: "var(--fs-caption)",
+          fontWeight: 500,
+          color: "rgba(17,17,17,0.7)",
+          marginBottom: "6px",
+          letterSpacing: "-0.005em",
+        }}
+      >
+        {label}
+      </label>
+      <select
+        id={name}
+        name={name}
+        defaultValue=""
+        className="font-sans w-full cursor-pointer"
+        style={{
+          height: "44px",
+          padding: "0 14px",
+          borderRadius: "10px",
+          border: "1px solid rgba(17,17,17,0.12)",
+          background: "white",
+          fontSize: "var(--fs-body)",
+          color: "#111",
+          outline: "none",
+        }}
+      >
+        <option value="">Select…</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

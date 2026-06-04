@@ -11,9 +11,12 @@
   conditional if-blocks. The code sends these params
   (see docs/careers-applications.md):
     jobTitle, jobLocation, fullName, firstName, lastName, email,
-    phone, linkedinUrl, coverLetter, submittedAt
-  The resume is a real ATTACHMENT added by the API call (not the
-  template); the "Resume attached" note below refers to it.
+    phone, location, howDidYouHear, linkedinUrl, coverLetter,
+    coverLetterAttached, submittedAt
+  jobLocation is the ROLE's location; location is where the APPLICANT is
+  based. The resume (and a cover-letter file, if the applicant uploaded
+  one) are real ATTACHMENTS added by the API call (not the template); the
+  "Resume attached" note below refers to them.
 
   Email-client safe: 600px table layout, inline CSS, web-safe fonts.
   IMPORTANT: never write literal Brevo tag syntax in this comment.
@@ -127,6 +130,20 @@
                   <td width="120"
                     style="padding:7px 0; color:#64748b; vertical-align:top; border-top:1px solid #f1f5f9;">Phone</td>
                   <td style="padding:7px 0; border-top:1px solid #f1f5f9;">{{ params.phone }}</td>
+                </tr>
+                {% endif %}
+                {% if params.location %}
+                <tr>
+                  <td width="120"
+                    style="padding:7px 0; color:#64748b; vertical-align:top; border-top:1px solid #f1f5f9;">Based in</td>
+                  <td style="padding:7px 0; border-top:1px solid #f1f5f9;">{{ params.location }}</td>
+                </tr>
+                {% endif %}
+                {% if params.howDidYouHear %}
+                <tr>
+                  <td width="120"
+                    style="padding:7px 0; color:#64748b; vertical-align:top; border-top:1px solid #f1f5f9;">Heard via</td>
+                  <td style="padding:7px 0; border-top:1px solid #f1f5f9;">{{ params.howDidYouHear }}</td>
                 </tr>
                 {% endif %}
                 {% if params.linkedinUrl %}
