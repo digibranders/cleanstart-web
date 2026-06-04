@@ -7,7 +7,7 @@ import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
  * in the corners, plus a blue→teal "Subscribe" gradient button.
  */
 export function BlogDetailCTA(): React.ReactElement {
-  const { emailRef, submitted, error, handleSubmit } = useNewsletterSignup();
+  const { emailRef, submitted, submitting, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: "#fff" }}>
@@ -159,7 +159,9 @@ export function BlogDetailCTA(): React.ReactElement {
                 </div>
                 <button
                   type="submit"
-                  className="shrink-0 inline-flex cursor-pointer items-center justify-center font-medium text-white"
+                  disabled={submitting}
+                  aria-busy={submitting || undefined}
+                  className="shrink-0 inline-flex cursor-pointer items-center justify-center font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
                   style={{
                     height: "44px",
                     padding: "0 18px",
@@ -173,7 +175,7 @@ export function BlogDetailCTA(): React.ReactElement {
                       "0 0 0 1px #3960F9, 0 1px 2px -1px rgba(9,6,63,0.4), inset 0 1px 0 0 rgba(255,255,255,0.16)",
                   }}
                 >
-                  Subscribe
+                  {submitting ? "Subscribing…" : "Subscribe"}
                 </button>
               </form>
             )}

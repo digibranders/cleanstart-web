@@ -7,7 +7,7 @@ import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
  * radius-40 slot. Independent of the Blogs CTA — own file, own assets.
  */
 export function GuidesCTA(): React.ReactElement {
-  const { emailRef, submitted, error, handleSubmit } = useNewsletterSignup();
+  const { emailRef, submitted, submitting, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div
@@ -127,7 +127,9 @@ export function GuidesCTA(): React.ReactElement {
 
                 <button
                   type="submit"
-                  className="cs-btn-glass cs-btn-glass--no-lift shrink-0"
+                  disabled={submitting}
+                  aria-busy={submitting || undefined}
+                  className="cs-btn-glass cs-btn-glass--no-lift shrink-0 disabled:cursor-not-allowed disabled:opacity-70"
                   style={{
                     ["--cs-btn-px" as string]: "16px",
                     ["--cs-btn-fs" as string]: "16px",
@@ -135,7 +137,7 @@ export function GuidesCTA(): React.ReactElement {
                     borderLeft: "none",
                   }}
                 >
-                  Subscribe
+                  {submitting ? "Subscribing…" : "Subscribe"}
                 </button>
               </form>
             )}

@@ -19,6 +19,7 @@ const NEWSLETTER_CONSENT_TEXT =
 export interface NewsletterSignup {
   emailRef: React.RefObject<HTMLInputElement | null>;
   submitted: boolean;
+  submitting: boolean;
   error: string | null;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
 }
@@ -26,6 +27,7 @@ export interface NewsletterSignup {
 export function useNewsletterSignup(): NewsletterSignup {
   const emailRef = useRef<HTMLInputElement>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inFlightRef = useRef(false);
 
@@ -35,6 +37,7 @@ export function useNewsletterSignup(): NewsletterSignup {
     if (!email) return;
     if (inFlightRef.current) return;
     inFlightRef.current = true;
+    setSubmitting(true);
     setError(null);
 
     const result = await submitLead({
@@ -49,6 +52,7 @@ export function useNewsletterSignup(): NewsletterSignup {
     });
 
     inFlightRef.current = false;
+    setSubmitting(false);
     if (result.ok) {
       setSubmitted(true);
       if (emailRef.current) emailRef.current.value = "";
@@ -58,5 +62,5 @@ export function useNewsletterSignup(): NewsletterSignup {
     }
   };
 
-  return { emailRef, submitted, error, handleSubmit };
+  return { emailRef, submitted, submitting, error, handleSubmit };
 }
