@@ -37,9 +37,9 @@ concurrency:
 
 env:
   NODE_VERSION: 24
-  # Pinned to staging CMS so build-time fetches resolve. Override per env in
+  # Pinned to the CMS droplet so build-time fetches resolve. Override per env in
   # Vercel — this only affects CI builds.
-  NEXT_PUBLIC_CMS_URL: https://cms-dev.cleanstart.com
+  NEXT_PUBLIC_CMS_URL: https://cms.cleanstart.com
 
 jobs:
   web:

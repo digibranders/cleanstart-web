@@ -54,7 +54,7 @@ Every row here is a decision we will not relitigate during the deploy. Each link
 | 23  | Backup heartbeat          | BetterStack heartbeat URL, **alert on missing ping** (not on success)                                                       | arch doc §`#restore-runbook`                            |
 | 24  | RTO / RPO                 | RTO 30 min, RPO 24 h                                                                                                        | arch doc §`#restore-runbook`                            |
 | 25  | 2FA                       | **Deferred** — admin access is password-only at v1. TOTP backend reserved in `apps/cms/src/payload/admin/components/auth/`; enrollment becomes mandatory once that lands (backlog A9). | `CLAUDE.md`, `docs/BACKLOG.md` A9                       |
-| 26  | Branch → env mapping      | `main` → prod (`cms.cleanstart.com`, this droplet) · `development` → staging (`cms-dev.cleanstart.com`, separate machine)   | `CLAUDE.md`, arch doc §`#staging`, `.github/workflows/web.yml` |
+| 26  | Branch → env mapping      | Single droplet (`cleanstart-cms`, `cms.cleanstart.com`): staging today, production later. No separate staging machine. | `CLAUDE.md`, arch doc §`#staging`, `.github/workflows/web.yml` |
 | 27  | Deploy mechanism          | **Pull-based via GitHub Actions.** `.github/workflows/deploy-cms.yml` builds the image on the GHA runner, ships via SSH (`docker save \| gzip \| scp`), and runs `docker compose up -d --wait`. Image tags are git SHAs; never `:latest`. No GHA → server SSH happens outside this workflow. | 2026-05-19 round 3 review |
 | 28  | Image storage             | **Local Docker cache on the droplet.** No external registry. The deploy workflow retains the last 5 SHAs for fast rollback (`docker tag cms:<prev-sha> cms:current`). Locks single-host architecture. | 2026-05-19 round 3 review |
 | 29  | Droplet access            | **SSH key auth only** (`mac-mini-gaurav-jadhav` ED25519 key). UFW allows 22/80/443 only. GitHub Actions uses a dedicated deploy key (`gha-deploy`, separate from operator keys). | 2026-05-19 round 3 review |
@@ -83,7 +83,6 @@ Every row here is a decision we will not relitigate during the deploy. Each link
 ┌─────────────────────────────────────────────────────────────────────┐
 │  Cloudflare (DNS · WAF · CDN · TLS-from-client)                     │
 │  ├── cms.cleanstart.com  ─ proxied (orange) ─┐                      │
-│  ├── cms-dev.cleanstart.com (staging, TBD)   │                      │
 │  └── cdn.cleanstart.com  ─ proxied ──────────┼──→ R2 bucket         │
 └──────────────────────────────────────────────┼──────────────────────┘
                                                ▼
@@ -708,7 +707,7 @@ Open items, in priority order. Move into the per-droplet checklist or close out 
 
 ### Post-launch (within 30 days)
 
-- **P1 — Staging droplet at `cms-dev.cleanstart.com`** (locked row 26). Separate machine, behind Cloudflare Access, `R2_UPLOAD_PREFIX=dev`, read-only R2 keys, `PAYLOAD_PUBLIC_ROBOTS_DISALLOW=true`. Required for ongoing restore drills and CSS/template change verification. Same GHA workflow with a different `DROPLET_HOST` secret.
+- **P1 — (Dropped) separate staging droplet.** Superseded: there is a **single** `cleanstart-cms` droplet (`cms.cleanstart.com`) — staging now, production later — so no second machine is provisioned. Restore drills and CSS/template-change verification run against that droplet in a quiet window.
 - **P2 — Cross-cloud backup mirror (L3).** Arch doc §`#restore-runbook` calls for nightly sync R2 → DO Spaces (~$5/mo). Without this, R2 is a single point of failure for backups + media + lead-fallback queue.
 - **P3 — Monthly restore drill cadence.** Calendar reminder, rotating Q1 from R2, Q2 from Spaces, etc., so both restore paths get exercised at least twice a year.
 - **P4 — Inverted heartbeat alert.** BetterStack rule that fires *when the backup heartbeat is missing for 25 h*, not when it succeeds. Alert-on-success masks silent cron failure for days.

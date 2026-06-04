@@ -9,6 +9,23 @@ import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
 import { verifyTurnstileToken } from '../lib/turnstile';
 import { RESUME_LIMIT, checkUploadSize } from '../lib/upload-limits';
 
+/**
+ * Human-readable submission timestamp for the HR email (Brevo templates can't
+ * format dates). UTC with an explicit "UTC" suffix so it's unambiguous
+ * regardless of where the server or recipient sits. e.g. "Jun 4, 2026, 12:56 PM UTC".
+ */
+const formatSubmittedAt = (date: Date): string =>
+  new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'UTC',
+    timeZoneName: 'short',
+  }).format(date);
+
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
     ...init,
@@ -346,7 +363,7 @@ export const careersApplyEndpoint: Endpoint = {
           linkedinUrl: data.linkedinUrl ?? '',
           coverLetter: data.coverLetter ?? '',
           coverLetterAttached: coverLetterFileId != null ? 'Yes' : '',
-          submittedAt: new Date().toISOString(),
+          submittedAt: formatSubmittedAt(new Date()),
         },
         attachments,
       });

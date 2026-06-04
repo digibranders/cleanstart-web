@@ -143,6 +143,16 @@
       "relationTo": "guides"
     },
     {
+      "type": "relationship",
+      "name": "previousGuide",
+      "relationTo": "guides"
+    },
+    {
+      "type": "relationship",
+      "name": "nextGuide",
+      "relationTo": "guides"
+    },
+    {
       "type": "ui",
       "name": "permalink"
     },

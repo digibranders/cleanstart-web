@@ -54,13 +54,7 @@ const nextConfig: NextConfig = {
         pathname: "/api/media/**",
       },
       {
-        // Payload CMS media — dev tunnel (cms-dev.cleanstart.com)
-        protocol: "https",
-        hostname: "cms-dev.cleanstart.com",
-        pathname: "/api/media/**",
-      },
-      {
-        // Payload CMS media — production (cms.cleanstart.com)
+        // Payload CMS media — cms.cleanstart.com (the CMS droplet)
         protocol: "https",
         hostname: "cms.cleanstart.com",
         pathname: "/api/media/**",

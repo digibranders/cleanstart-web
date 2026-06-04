@@ -19,11 +19,12 @@ export interface FormStatus {
  *   ...
  *   {status ? <StatusBanner ref={statusRef} {...status} /> : null}
  */
-export function useFormStatus(): {
+export function useFormStatus(options?: { successAutoHideMs?: number }): {
   status: FormStatus | null;
   setStatus: (status: FormStatus | null) => void;
   statusRef: React.RefObject<HTMLDivElement | null>;
 } {
+  const successAutoHideMs = options?.successAutoHideMs;
   const [status, setStatus] = useState<FormStatus | null>(null);
   const statusRef = useRef<HTMLDivElement>(null);
 
@@ -32,6 +33,14 @@ export function useFormStatus(): {
       statusRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }, [status]);
+
+  // Auto-dismiss a success banner after a delay; errors persist until the next
+  // submit since the user needs to read and act on them.
+  useEffect(() => {
+    if (status?.tone !== "success" || !successAutoHideMs) return;
+    const timer = window.setTimeout(() => setStatus(null), successAutoHideMs);
+    return () => window.clearTimeout(timer);
+  }, [status, successAutoHideMs]);
 
   return { status, setStatus, statusRef };
 }

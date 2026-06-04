@@ -56,6 +56,17 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
   const [submitting, setSubmitting] = useState(false);
   const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
+  // Pending auto-close timer: on success the modal flashes the confirmation
+  // banner, then closes itself. Tracked so it can be cancelled on manual
+  // close/reopen or unmount.
+  const closeTimerRef = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current != null) window.clearTimeout(closeTimerRef.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     const dlg = dialogRef.current;
@@ -67,6 +78,10 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
         } catch {
           /* already open */
         }
+      }
+      if (closeTimerRef.current != null) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
       }
       setStatus(null);
       setSubmitting(false);
@@ -144,6 +159,9 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
           message:
             "Thanks — your partnership request has been received. Our team will be in touch within one business day.",
         });
+        // Modal UX: show the confirmation briefly, then close the popup.
+        if (closeTimerRef.current != null) window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = window.setTimeout(onClose, 2500);
       } else {
         setStatus({
           tone: "error",

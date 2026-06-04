@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { Form } from "@/lib/forms";
 import { FormRenderer } from "@/components/forms/FormRenderer";
 
@@ -24,8 +24,6 @@ export function ResourceGateModal({
   onUnlocked,
 }: ResourceGateModalProps): React.ReactElement | null {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
-  const [stage, setStage] = useState<"form" | "success">("form");
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const dlg = dialogRef.current;
@@ -38,8 +36,6 @@ export function ResourceGateModal({
           /* dialog already open in some browsers */
         }
       }
-      setStage("form");
-      setDownloadUrl(null);
     } else if (dlg.open) {
       dlg.close();
     }
@@ -57,19 +53,18 @@ export function ResourceGateModal({
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  // The download URL is already in the submit response, so the moment the form
+  // succeeds the download is "ready". The submit button stays busy right up to
+  // here (FormRenderer clears its busy state only after onSuccess), so we skip
+  // any "download ready" stage: fire the download and close the modal at once.
   const handleSuccess = (result: {
     download?: { url: string; expiresAt: number };
   }): void => {
     if (result.download?.url) {
-      setDownloadUrl(result.download.url);
-      setStage("success");
       onUnlocked(result.download.url);
-      window.setTimeout(() => {
-        window.location.assign(result.download!.url);
-      }, 400);
-    } else {
-      setStage("success");
+      window.location.assign(result.download.url);
     }
+    onClose();
   };
 
   return (
@@ -145,9 +140,7 @@ export function ResourceGateModal({
                   letterSpacing: "-0.02em",
                 }}
               >
-                {stage === "form"
-                  ? `Unlock “${resourceTitle}”`
-                  : "Your download is ready"}
+                {`Unlock “${resourceTitle}”`}
               </h2>
             </div>
             <button
@@ -181,7 +174,7 @@ export function ResourceGateModal({
             </button>
           </div>
 
-          {stage === "form" ? (
+          {open ? (
             <>
               <p
                 className="text-sm text-[#555] mb-5"
@@ -195,42 +188,7 @@ export function ResourceGateModal({
                 onSuccess={handleSuccess}
               />
             </>
-          ) : (
-            <div className="flex flex-col items-stretch gap-4">
-              <p className="text-sm text-[#333]" style={{ lineHeight: 1.5 }}>
-                Thanks — your download has started. If it didn't, use the
-                button below.
-              </p>
-              {downloadUrl ? (
-                <a
-                  href={downloadUrl}
-                  className="inline-flex items-center justify-center gap-2 font-semibold text-white"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, #3960f9 0%, #1e3eb8 100%)",
-                    borderRadius: "8px",
-                    padding: "12px 24px",
-                    height: "48px",
-                    textDecoration: "none",
-                  }}
-                >
-                  Download now
-                </a>
-              ) : null}
-              <button
-                type="button"
-                onClick={onClose}
-                className="text-sm text-[#555] underline self-start"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                Close
-              </button>
-            </div>
-          )}
+          ) : null}
         </div>
       </dialog>
     </>
