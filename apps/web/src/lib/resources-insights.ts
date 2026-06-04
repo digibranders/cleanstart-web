@@ -52,6 +52,16 @@ export interface ResourceCard {
   href: string;
   /** When true, render the cover poster with the title overlaid (resource booklet style). */
   isCoverPoster?: boolean;
+  /**
+   * When `"newsroom"`, render the cover as a branded gradient panel with the
+   * publisher logo (or hero) contained inside — mirrors the `/news` listing
+   * card so publisher logos are never cropped by `object-cover`.
+   */
+  variant?: "newsroom";
+  /** Publisher logo URL — preferred art inside the newsroom gradient panel. */
+  logo?: string | null;
+  /** Publisher name — text fallback inside the newsroom panel when no art exists. */
+  publisher?: string | null;
 }
 
 export type ResourceCardsByTab = Record<TabId, ResourceCard[]>;
@@ -96,6 +106,8 @@ interface CmsNews {
   title: string;
   abstract?: string | null;
   heroImage?: CmsImage | null;
+  publisher?: string | null;
+  publisherLogo?: CmsImage | null;
 }
 
 interface CmsEvent {
@@ -208,15 +220,21 @@ async function loadResources(): Promise<ResourceCard[]> {
 async function loadNews(): Promise<ResourceCard[]> {
   const data = await fetchCollection<CmsNews>(
     "news",
-    `${NEWS_PUBLISHED_FILTER}&depth=1&limit=3&sort=-publicationDate&select[title]=true&select[slug]=true&select[abstract]=true&select[heroImage]=true`,
+    `${NEWS_PUBLISHED_FILTER}&depth=1&limit=3&sort=-publicationDate&select[title]=true&select[slug]=true&select[abstract]=true&select[heroImage]=true&select[publisher]=true&select[publisherLogo]=true`,
   );
   if (!data) return [];
   return data.docs
     .map((d): ResourceCard | null => {
-      const image = pickImage(d.heroImage);
       if (!d.slug || !d.title) return null;
+      const hero = pickImage(d.heroImage);
+      const logo = pickImage(d.publisherLogo);
       return {
-        image: image ?? "/images/resource-3.png",
+        // Hero is the in-panel fallback only — when neither logo nor hero
+        // exists the card renders the publisher name on the gradient.
+        image: hero ?? "",
+        logo,
+        publisher: d.publisher ?? null,
+        variant: "newsroom",
         title: d.title,
         description: d.abstract?.trim() ?? "",
         href: `/news/${d.slug}`,

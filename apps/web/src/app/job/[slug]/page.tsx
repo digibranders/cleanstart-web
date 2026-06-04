@@ -24,8 +24,6 @@ const SCHEMA_EMPLOYMENT_TYPE: Record<JobEmploymentType, string> = {
   internship: "INTERN",
 };
 
-const CONTACT_EMAIL = "hr@cleanstart.com";
-
 interface CareerDetailPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -142,10 +140,7 @@ export default async function CareerDetailPage({
       <Header />
       <main>
         <CareerDetailHero title={job.title} meta={meta} />
-        <CareerDetailContent
-          body={bodyWithoutDeptLine}
-          contactEmail={CONTACT_EMAIL}
-        />
+        <CareerDetailContent body={bodyWithoutDeptLine} />
         {/* CMS-native, open roles accept applications on-site. ATS roles keep
             their existing external-link behaviour (no form rendered). */}
         {job.source === "cms" && job.hiringStatus === "open" ? (

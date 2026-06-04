@@ -198,26 +198,35 @@ export function PartnersNetwork(): React.ReactElement {
             ) : (
               basePartners.map((p) => <PartnerCard key={`${p.name}-${p.country}`} partner={p} />)
             )}
-            <AnimatePresence initial={false}>
-              {expanded &&
-                extraPartners.map((p, i) => (
-                  <m.div
-                    key={`${p.name}-${p.country}`}
-                    initial={reduce ? false : { opacity: 0, y: 18, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={reduce ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.96 }}
-                    transition={
-                      reduce ? { duration: 0.15, ease: EASE_SOFT } : { ...CARD_SPRING, delay: i * 0.06 }
-                    }
-                  >
-                    <PartnerCard partner={p} />
-                  </m.div>
-                ))}
-            </AnimatePresence>
+            {/* Mobile/tablet: show every partner up front — no View More toggle below lg. */}
+            <div className="contents lg:hidden">
+              {extraPartners.map((p) => (
+                <PartnerCard key={`${p.name}-${p.country}`} partner={p} />
+              ))}
+            </div>
+            {/* Desktop (lg+): reveal the remaining partners via View More, with the spring entrance. */}
+            <div className="hidden lg:contents">
+              <AnimatePresence initial={false}>
+                {expanded &&
+                  extraPartners.map((p, i) => (
+                    <m.div
+                      key={`${p.name}-${p.country}`}
+                      initial={reduce ? false : { opacity: 0, y: 18, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={reduce ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.96 }}
+                      transition={
+                        reduce ? { duration: 0.15, ease: EASE_SOFT } : { ...CARD_SPRING, delay: i * 0.06 }
+                      }
+                    >
+                      <PartnerCard partner={p} />
+                    </m.div>
+                  ))}
+              </AnimatePresence>
+            </div>
           </div>
 
           {partners.length > INITIAL_VISIBLE && (
-            <div className="mt-10 flex justify-center">
+            <div className="mt-10 hidden justify-center lg:flex">
               <button
                 type="button"
                 onClick={() => setExpanded((prev) => !prev)}

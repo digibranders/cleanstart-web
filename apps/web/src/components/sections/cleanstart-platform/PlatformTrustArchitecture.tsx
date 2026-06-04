@@ -1,373 +1,181 @@
-import Image from "next/image";
-
 /**
- * "The CleanStart Trust Architecture" — four corner product cards around a
- * central 3D-cube card. Ported 1:1 from the Figma 1440-px frame: the card grid
- * is an em-locked stage where `1em === 1 Figma px` (font-size pinned to
- * `calc(100cqw / 1440)`), so the whole composition scales as one unit with no
- * text reflow or overflow, capped at the native design width.
+ * "The CleanStart Trust Architecture" — vertical trust-flow timeline.
+ *
+ * A central SOURCE CODE card feeds a glowing connector that drops and elbows
+ * into a left-hand spine running through four numbered stage cards (01–04).
+ * Ported from Figma node 1199:3974. The spine is built from per-row CSS line
+ * segments (each spanning its row + the gap below) so it stays continuous and
+ * pinned to the ball centres regardless of how the card text reflows.
  */
 
-/**
- * Stage unit. `--u` is pinned to `calc(100cqw / 1440)` on the stage, so
- * `u(n)` === n Figma px regardless of an element's own font-size (avoids the
- * `em`-resolves-against-own-font-size trap when a node sets both font + width).
- */
-const px = (n: number) => `calc(${n} * var(--u))`;
-
-interface CardData {
+interface Stage {
+  number: string;
   name: string;
   subtitle: string;
   description: string;
   features: string[];
-  number: string;
-  /** stage-local top-left (px) */
-  left: number;
-  top: number;
 }
 
-const CARDS: CardData[] = [
+const STAGES: Stage[] = [
   {
+    number: "01",
     name: "Tricorder",
     subtitle: "AI Logic Engine",
     description: "Analyze software before artifacts exist.",
     features: ["Source-level intelligence", "Behavioral graph mapping", "AI-native anomaly detection"],
-    number: "1",
-    left: 82,
-    top: 0,
   },
   {
-    name: "CleanImage",
-    subtitle: "Trusted Runtime Assembly",
-    description: "Assemble minimal, hardened runtime environments.",
-    features: ["Minimal runtime images", "BusyBox replacement", "CleanStart OS foundations"],
-    number: "3",
-    left: 82,
-    top: 296,
-  },
-  {
+    number: "02",
     name: "CleanCompile",
     subtitle: "Deterministic Reconstruction",
     description: "Rebuild verified software in hermetic environments.",
     features: ["Hermetic build pipelines", "Reproducible outputs", "Cryptographic attestation"],
-    number: "2",
-    left: 954,
-    top: 0,
   },
   {
+    number: "03",
+    name: "CleanImage",
+    subtitle: "Trusted Runtime Assembly",
+    description: "Assemble minimal, hardened runtime environments.",
+    features: ["Minimal runtime images", "BusyBox replacement", "CleanStart OS foundations"],
+  },
+  {
+    number: "04",
     name: "The Vault",
     subtitle: "Trusted Runtime Foundations",
     description: "Deliver continuously rebuilt and verifiable outputs.",
     features: ["Zero known CVE foundations", "Shell-less environments", "Continuously verifiable outputs"],
-    number: "4",
-    left: 954,
-    top: 296,
   },
 ];
 
-const STAGE_W = 1440;
-const STAGE_H = 592;
-const CARD_W = 404;
-const CARD_H = 296;
-
-function CornerCard({ card }: { card: CardData }) {
-  return (
-    <div
-      className="absolute rounded-[24px]"
-      style={{
-        left: px(card.left),
-        top: px(card.top),
-        width: px(CARD_W),
-        height: px(CARD_H),
-        border: "1px solid rgba(255,255,255,0.12)",
-        background: "linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%)",
-      }}
-    >
-      {/* Ghost number */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute select-none bg-clip-text font-bold opacity-30"
-        style={{
-          top: px(4),
-          right: px(12),
-          fontFamily: "var(--font-display)",
-          fontSize: px(52),
-          lineHeight: 1.1,
-          background: "linear-gradient(180deg, #fff 24.2%, rgba(255,255,255,0) 87.1%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        }}
-      >
-        {card.number}
-      </span>
-
-      {/* Title + subtitle */}
-      <p
-        className="absolute font-bold leading-none text-white"
-        style={{ left: px(24), top: px(24), width: px(356), fontFamily: "var(--font-display)", fontSize: px(32), letterSpacing: "-0.05em" }}
-      >
-        {card.name}
-      </p>
-      <p
-        className="absolute font-medium leading-none"
-        style={{ left: px(24), top: px(64), width: px(356), fontFamily: "var(--font-display)", fontSize: px(26), letterSpacing: "-0.05em", color: "#b23eff" }}
-      >
-        {card.subtitle}
-      </p>
-
-      {/* Description */}
-      <p
-        className="absolute text-white"
-        style={{ left: px(24), top: px(106), width: px(356), fontFamily: "var(--font-display)", fontSize: px(22), letterSpacing: "-0.05em", lineHeight: 1.3 }}
-      >
-        {card.description}
-      </p>
-
-      {/* Feature list */}
-      <div className="absolute" style={{ left: px(24), top: px(169), width: px(356) }}>
-        {card.features.map((feat, i) => (
-          <div key={feat} className="absolute flex items-center" style={{ top: px(i * 37), width: px(356) }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/cleanstart-platform/tick-circle.svg"
-              alt=""
-              aria-hidden
-              style={{ width: px(24), height: px(24), marginRight: px(8) }}
-              loading="lazy"
-              decoding="async"
-            />
-            <span
-              className="text-white"
-              style={{ fontFamily: "var(--font-display)", fontSize: px(22), letterSpacing: "-0.05em", lineHeight: 1.3 }}
-            >
-              {feat}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+const CARD_BG = "linear-gradient(180deg, rgba(255,255,255,0) 13%, rgba(154,81,255,0.30) 85%)";
+const SOURCE_BG = "linear-gradient(180deg, rgba(255,255,255,0) 13%, rgba(154,81,255,0.12) 85%)";
 
 /**
- * Center-card edge rail — a rounded stepped-bracket line that hugs the left (or,
- * when `flip`, the right) edge of the card. Rendered from the sharp Figma vector
- * (`preserveAspectRatio:none`, so it fills the box exactly as in Figma) with a
- * CSS glow to match the design's additive light.
+ * Glassy neon connector segment — a bright gradient core with a soft blurred
+ * halo (Figma: 12px Linear stroke + Layer blur + "Plus lighter" blend). The
+ * caller positions/sizes the track via `className` (a thin band along the run);
+ * the core + halo fill it. `cap` rounds the run's ends so segments meeting at a
+ * corner read as a smooth rounded bend.
  */
-function Rail({
-  src,
-  left,
-  top,
-  w,
-  h,
-  flip = false,
-}: {
-  src: string;
-  left: number;
-  top: number;
-  w: number;
-  h: number;
-  flip?: boolean;
-}) {
+function GlassLine({ orientation, className }: { orientation: "v" | "h"; className: string }) {
+  const v = orientation === "v";
+  const core = v ? "inset-y-0 left-1/2 w-[3px] -translate-x-1/2" : "inset-x-0 top-1/2 h-[3px] -translate-y-1/2";
+  const halo = v ? "inset-y-0 left-1/2 w-2.5 -translate-x-1/2" : "inset-x-0 top-1/2 h-2.5 -translate-y-1/2";
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={src}
-      alt=""
-      aria-hidden
-      className="absolute"
-      style={{
-        left: px(left),
-        top: px(top),
-        width: px(w),
-        height: px(h),
-        transform: flip ? "scaleX(-1)" : undefined,
-        transformOrigin: "center",
-        filter: "drop-shadow(0 0 2px rgba(210,119,255,0.9)) drop-shadow(0 0 6px rgba(178,62,255,0.55))",
-      }}
-      loading="lazy"
-      decoding="async"
-    />
-  );
-}
-
-function CenterCard() {
-  return (
-    <div
-      className="absolute overflow-hidden rounded-[24px]"
-      style={{
-        left: px(486),
-        top: px(0),
-        width: px(468),
-        height: px(584),
-        border: "1px solid #9a51ff",
-        background: "linear-gradient(-27.6deg, rgba(255,255,255,0) 13.2%, rgba(154,81,255,0.3) 85.3%)",
-      }}
-    >
-      {/* Soft texture wash */}
-      <div className="pointer-events-none absolute opacity-30 mix-blend-soft-light" style={{ left: px(-29), top: px(-152), width: px(736), height: px(1031) }}>
-        <Image src="/images/cleanstart-platform/arch-bg-texture.png" alt="" fill className="object-cover" sizes="736px" loading="lazy" />
-      </div>
-
-      {/* Corner flares */}
-      {[
-        { left: -106, top: 37 },
-        { left: 356, top: 34 },
-        { left: -107, top: 339 },
-        { left: 356, top: 334 },
-      ].map((f) => (
-        <div
-          key={`${f.left}-${f.top}`}
-          aria-hidden
-          className="pointer-events-none absolute rounded-full mix-blend-lighten"
-          style={{
-            left: px(f.left),
-            top: px(f.top),
-            width: px(218),
-            height: px(218),
-            background: "radial-gradient(closest-side, rgba(178,62,255,0.5) 0%, rgba(44,193,235,0.18) 45%, transparent 72%)",
-          }}
-        />
-      ))}
-
-      {/* Edge rails — rounded stepped brackets at the left/right card edges */}
-      <Rail src="/images/cleanstart-platform/rail-477.svg" left={3} top={146} w={85} h={274.5} />
-      <Rail src="/images/cleanstart-platform/rail-475.svg" left={3} top={448} w={80} h={76.5} />
-      <Rail src="/images/cleanstart-platform/rail-477.svg" left={378} top={143} w={91} h={274.5} flip />
-      <Rail src="/images/cleanstart-platform/rail-475.svg" left={385} top={443} w={80} h={76.5} flip />
-
-      {/* Concentric circles behind the cube */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/cleanstart-platform/arch-circles.svg" alt="" aria-hidden className="absolute mix-blend-soft-light" style={{ left: px(103), top: px(51), width: px(262.67), height: px(262.67) }} loading="lazy" decoding="async" />
-
-      {/* 3D cube */}
-      <div className="absolute mix-blend-luminosity" style={{ left: px(130), top: px(71), width: px(204), height: px(204) }}>
-        <Image src="/images/cleanstart-platform/arch-cube.png" alt="CleanStart Trust Architecture" width={204} height={204} className="h-full w-full object-contain" loading="lazy" />
-      </div>
-
-      {/* SOURCE CODE label */}
-      <div
-        className="absolute rounded-[24px]"
+    <span aria-hidden className={`pointer-events-none absolute ${className}`}>
+      {/* Uniform (non-directional) colours so per-row segments tile seamlessly
+          into one continuous line with no dim band at the joins. */}
+      <span className={`absolute rounded-full blur-[6px] ${halo}`} style={{ background: "#9a51ff", opacity: 0.85 }} />
+      <span
+        className={`absolute rounded-full ${core}`}
         style={{
-          left: px(83),
-          top: px(409),
-          width: px(302),
-          height: px(147),
-          padding: px(12),
-          border: "1px solid #9a51ff",
-          background: "linear-gradient(-15.2deg, rgba(71,30,192,0.63) 66.4%, rgba(178,62,255,0.63) 75.5%)",
-        }}
-      >
-        <p
-          className="text-center font-bold text-white"
-          style={{ fontFamily: "var(--font-display)", fontSize: px(32), letterSpacing: "-0.05em", lineHeight: 1 }}
-        >
-          SOURCE CODE
-        </p>
-        <p
-          className="text-center text-white"
-          style={{ marginTop: px(12), fontFamily: "var(--font-display)", fontSize: px(22), letterSpacing: "-0.05em", lineHeight: 1.3 }}
-        >
-          Verified repositories and trusted upstream software sources.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/** Glowing vertical connector between mobile stack cards (Figma "vector lines"). */
-function ArchConnector() {
-  return (
-    <div className="relative flex h-10 w-full items-center justify-center" aria-hidden>
-      {/* soft purple halo */}
-      <div
-        className="absolute size-20 rounded-full"
-        style={{ background: "radial-gradient(closest-side, rgba(178,62,255,0.5) 0%, transparent 70%)", filter: "blur(10px)" }}
-      />
-      {/* bright beam */}
-      <div
-        className="relative h-full w-[2px] rounded-full"
-        style={{
-          background: "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, #c98bff 50%, rgba(255,255,255,0.05) 100%)",
-          boxShadow: "0 0 8px 1.5px rgba(178,62,255,0.75)",
+          background: "#f3e9ff",
+          boxShadow: "0 0 5px rgba(233,213,255,0.95), 0 0 12px rgba(178,62,255,0.8), 0 0 22px rgba(154,81,255,0.5)",
         }}
       />
-    </div>
+    </span>
   );
 }
 
-function MobileCard({ card }: { card: CardData }) {
+function NumberBall({ number }: { number: string }) {
   return (
     <div
-      className="relative overflow-hidden rounded-2xl p-6"
+      className="relative z-10 flex size-14 shrink-0 items-center justify-center rounded-full sm:size-[72px]"
       style={{
-        border: "1px solid rgba(154,81,255,0.4)",
-        background: "linear-gradient(135deg, rgba(154,81,255,0.14) 0%, rgba(71,30,192,0.06) 100%)",
+        background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
+        boxShadow:
+          "0 5px 11px rgba(28,60,142,0.33), inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -1px 1px rgba(0,44,179,0.4)",
       }}
     >
       <span
-        aria-hidden
-        className="pointer-events-none absolute right-4 top-2 select-none bg-clip-text font-bold opacity-30"
-        style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "44px",
-          lineHeight: 1.1,
-          background: "linear-gradient(180deg, #fff 24%, rgba(255,255,255,0) 87%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        }}
+        className="font-bold text-white"
+        style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h5)", lineHeight: 1.3 }}
       >
-        {card.number}
+        {number}
       </span>
-      <p className="font-bold text-white" style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h4)", letterSpacing: "-0.03em", lineHeight: 1.15 }}>
-        {card.name}
-      </p>
-      <p className="mt-1 font-medium" style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-body-sm)", letterSpacing: "-0.02em", color: "#b23eff" }}>
-        {card.subtitle}
-      </p>
-      <p className="mt-3 text-white/85" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-body-sm)", letterSpacing: "-0.02em", lineHeight: 1.4 }}>
-        {card.description}
-      </p>
-      <ul className="mt-4 flex flex-col gap-2">
-        {card.features.map((feat) => (
-          <li key={feat} className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/cleanstart-platform/tick-circle.svg" alt="" aria-hidden className="size-5 shrink-0" loading="lazy" decoding="async" />
-            <span className="text-white/90" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-body-sm)", letterSpacing: "-0.02em" }}>
-              {feat}
-            </span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
 
-function MobileCubeCard() {
+function Check({ label }: { label: string }) {
   return (
-    <div
-      className="relative flex flex-col items-center overflow-hidden rounded-3xl px-6 pb-6 pt-8"
-      style={{ border: "1px solid #9a51ff", background: "linear-gradient(-27.6deg, rgba(255,255,255,0) 13.2%, rgba(154,81,255,0.3) 85.3%)" }}
-    >
-      <div className="pointer-events-none absolute inset-0 opacity-30 mix-blend-soft-light">
-        <Image src="/images/cleanstart-platform/arch-bg-texture.png" alt="" fill className="object-cover" sizes="360px" loading="lazy" />
-      </div>
-      <div className="relative flex items-center justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/cleanstart-platform/arch-circles.svg" alt="" aria-hidden className="absolute size-[190px] mix-blend-soft-light" loading="lazy" decoding="async" />
-        <Image src="/images/cleanstart-platform/arch-cube.png" alt="CleanStart Trust Architecture" width={150} height={150} className="relative mix-blend-luminosity" loading="lazy" />
-      </div>
-      <div
-        className="relative mt-6 w-full max-w-[260px] rounded-2xl p-3 text-center"
-        style={{ border: "1px solid #9a51ff", background: "linear-gradient(-15.2deg, rgba(71,30,192,0.63) 66.4%, rgba(178,62,255,0.63) 75.5%)" }}
+    <li className="flex items-center gap-2">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/cleanstart-platform/tick-circle.svg"
+        alt=""
+        aria-hidden
+        className="size-6 shrink-0 select-none"
+        loading="lazy"
+        decoding="async"
+      />
+      <span
+        className="text-white"
+        style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-body)", letterSpacing: "-0.01em", lineHeight: 1.3 }}
       >
-        <p className="font-bold text-white" style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h4)", letterSpacing: "-0.03em" }}>
-          SOURCE CODE
-        </p>
-        <p className="mt-1.5 text-white" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-body-sm)", letterSpacing: "-0.02em", lineHeight: 1.35 }}>
-          Verified repositories and trusted upstream software sources.
-        </p>
+        {label}
+      </span>
+    </li>
+  );
+}
+
+function StageRow({ stage, isLast }: { stage: Stage; isLast: boolean }) {
+  return (
+    <div className="relative flex items-center gap-4">
+      {/* Soft purple glow (Figma 光斑) hugging the spine, behind the ball */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-7 top-1/2 hidden size-56 -translate-x-1/2 -translate-y-1/2 rounded-full mix-blend-screen sm:left-9 lg:block"
+        style={{ background: "radial-gradient(closest-side, rgba(178,62,255,0.34) 0%, rgba(154,81,255,0.12) 50%, transparent 74%)" }}
+      />
+      {/* Spine segment — spans this row (and the gap below, except the last) so
+          stacked rows form one continuous glowing line through the ball centres. */}
+      <GlassLine orientation="v" className={`left-7 w-2.5 -translate-x-1/2 sm:left-9 ${isLast ? "top-0 bottom-1/2" : "top-0 -bottom-6"}`} />
+      {/* Ball → card connector stub (Figma Vector) — plugs the ball into the card */}
+      <GlassLine orientation="h" className="left-12 top-1/2 h-2.5 w-7 -translate-y-1/2 sm:left-16 sm:w-7" />
+      <NumberBall number={stage.number} />
+      <div
+        className="relative flex flex-1 flex-col gap-4 overflow-hidden rounded-[24px] border border-[#9a51ff] p-6 md:flex-row md:items-center md:gap-8"
+        style={{ background: CARD_BG }}
+      >
+        {/* Right-edge lens flare (Figma "Flare") — a vertically-elongated streak
+            hugging the right border, brightest (mint-white) at mid-height and
+            blooming only slightly inward. Focal pinned to the card's edge. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute right-0 top-1/2 h-48 w-40 -translate-y-1/2 mix-blend-screen"
+          style={{ background: "radial-gradient(52% 60% at 100% 50%, rgba(178,62,255,0.5) 0%, rgba(154,81,255,0.18) 46%, transparent 72%)" }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute right-0 top-1/2 h-28 w-20 -translate-y-1/2 mix-blend-screen blur-[1px]"
+          style={{ background: "radial-gradient(60% 60% at 100% 50%, rgba(233,255,250,0.95) 0%, rgba(201,139,255,0.55) 36%, transparent 72%)" }}
+        />
+        <div className="relative flex shrink-0 flex-col gap-1.5 md:w-[260px]">
+          <h3
+            className="font-bold text-white"
+            style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h3)", letterSpacing: "-0.03em", lineHeight: 1.2 }}
+          >
+            {stage.name}
+          </h3>
+          <p
+            className="font-medium"
+            style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h4)", letterSpacing: "-0.02em", lineHeight: 1.2, color: "#b23eff" }}
+          >
+            {stage.subtitle}
+          </p>
+          <p
+            className="text-white"
+            style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-body)", letterSpacing: "-0.01em", lineHeight: 1.3 }}
+          >
+            {stage.description}
+          </p>
+        </div>
+        <ul className="relative grid flex-1 grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2 md:gap-y-4">
+          {stage.features.map((feat) => (
+            <Check key={feat} label={feat} />
+          ))}
+        </ul>
       </div>
     </div>
   );
@@ -380,15 +188,18 @@ export function PlatformTrustArchitecture() {
       className="relative w-full overflow-hidden"
       style={{ background: "linear-gradient(180deg, #151021 0%, #131e8f 62.5%, #471ec0 100%)" }}
     >
-      {/* Header — responsive */}
-      <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
+      {/* Cyan flare, top-right corner (Figma 光斑) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-0 top-[10%] hidden size-64 translate-x-1/3 rounded-full mix-blend-lighten lg:block"
+        style={{ background: "radial-gradient(closest-side, rgba(180,235,255,0.45) 0%, rgba(33,173,250,0.28) 42%, rgba(1,102,204,0.12) 66%, transparent 80%)" }}
+      />
+
+      {/* Header */}
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
           className="mx-auto flex flex-col items-center gap-4 text-center text-white"
-          style={{
-            maxWidth: "949px",
-            paddingTop: "clamp(64px, 6.9vw, 100px)",
-            paddingBottom: "clamp(40px, 4.2vw, 60px)",
-          }}
+          style={{ maxWidth: "949px", paddingTop: "clamp(64px, 6.9vw, 100px)", paddingBottom: "clamp(40px, 4.2vw, 60px)" }}
         >
           <h2
             className="w-full font-bold"
@@ -415,40 +226,52 @@ export function PlatformTrustArchitecture() {
         </div>
       </div>
 
-      {/* Mobile: cube card on top, then product cards (order 1→4) joined by
-          glowing vertical connector lines (lg hides this) */}
-      <div className="mx-auto flex max-w-[360px] flex-col px-6 pb-[clamp(48px,6vw,80px)] lg:hidden">
-        <MobileCubeCard />
-        {[...CARDS]
-          .sort((a, b) => Number(a.number) - Number(b.number))
-          .map((card) => (
-            <div key={`m-${card.name}`} className="contents">
-              <ArchConnector />
-              <MobileCard card={card} />
-            </div>
-          ))}
-      </div>
-
-      {/* Desktop: em-locked card composition */}
-      <div className="relative mx-auto hidden w-full lg:block" style={{ maxWidth: `${STAGE_W}px`, containerType: "inline-size" }}>
+      {/* Timeline */}
+      <div className="relative mx-auto max-w-[920px] px-6 pb-[clamp(64px,6.9vw,100px)] sm:px-10">
+        {/* SOURCE CODE card */}
         <div
-          className="relative"
-          style={
-            {
-              width: "100%",
-              aspectRatio: `${STAGE_W} / ${STAGE_H}`,
-              "--u": `calc(100cqw / ${STAGE_W})`,
-            } as React.CSSProperties
-          }
+          className="mx-auto max-w-[560px] rounded-[24px] border border-[#9a51ff] p-3 text-center"
+          style={{ background: SOURCE_BG }}
         >
-          {CARDS.map((card) => (
-            <CornerCard key={card.name} card={card} />
+          <p
+            className="font-bold text-white"
+            style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h3)", letterSpacing: "-0.03em", lineHeight: 1.1 }}
+          >
+            SOURCE CODE
+          </p>
+          <p
+            className="mt-1.5 text-white"
+            style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-body)", letterSpacing: "-0.01em", lineHeight: 1.3 }}
+          >
+            Verified repositories and trusted upstream software sources.
+          </p>
+        </div>
+
+        {/* Connector elbow: drop from source centre, turn left to the spine.
+            The glassy lines carry a flare burst at the source junction. */}
+        <div className="relative h-16" aria-hidden>
+          {/* Flare burst + streak where the line leaves the SOURCE CODE card */}
+          <span
+            className="absolute left-1/2 top-0 size-24 -translate-x-1/2 -translate-y-1/2 rounded-full mix-blend-screen"
+            style={{ background: "radial-gradient(closest-side, rgba(243,232,255,0.95) 0%, rgba(178,62,255,0.5) 40%, transparent 70%)" }}
+          />
+          <span
+            className="absolute left-1/2 top-0 h-1.5 w-72 max-w-[85%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[2px] mix-blend-screen"
+            style={{ background: "linear-gradient(90deg, transparent 0%, rgba(233,213,255,0.9) 50%, transparent 100%)" }}
+          />
+          {/* drop (centre) → turn left → down into the spine */}
+          <GlassLine orientation="v" className="left-1/2 top-0 h-9 w-2.5 -translate-x-1/2" />
+          <GlassLine orientation="h" className="left-7 right-1/2 top-9 h-2.5 -translate-y-1/2 sm:left-9" />
+          <GlassLine orientation="v" className="left-7 top-9 bottom-0 w-2.5 -translate-x-1/2 sm:left-9" />
+        </div>
+
+        {/* Stage rows */}
+        <div className="flex flex-col gap-6">
+          {STAGES.map((stage, i) => (
+            <StageRow key={stage.name} stage={stage} isLast={i === STAGES.length - 1} />
           ))}
-          <CenterCard />
         </div>
       </div>
-
-      <div style={{ height: "clamp(64px, 6.9vw, 100px)" }} />
     </section>
   );
 }

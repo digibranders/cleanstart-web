@@ -107,19 +107,19 @@ export function CareersSidebar({
         />
       </div>
 
-      {/* Sticks below the 80px header with 16px breathing room. Scrollbar is
-          hidden but vertical scrolling remains possible if the filter list
-          overflows the viewport (Firefox `scrollbar-width:none` + WebKit
-          pseudo-element). */}
+      {/* Sticks below the 80px header with 16px breathing room. When the filter
+          list overflows the viewport (short screens / many locations), the card
+          scrolls internally — a slim, subtle scrollbar is shown so the overflow
+          is discoverable and the cut-off items stay reachable. */}
       <div
-        className="relative hidden lg:block lg:sticky [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="relative hidden lg:block lg:sticky [scrollbar-width:thin] [scrollbar-color:rgba(17,17,17,0.2)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-black/15 hover:[&::-webkit-scrollbar-thumb]:bg-black/25"
         style={{
           top: "96px",
           maxHeight: "calc(100vh - 112px)",
           overflowY: "auto",
           background: "white",
           borderRadius: "16px",
-          padding: "24px 16px",
+          padding: "18px 16px",
           boxShadow:
             "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01)",
         }}
@@ -142,7 +142,7 @@ export function CareersSidebar({
           style={{
             height: "1px",
             background: "rgba(17,17,17,0.12)",
-            margin: "20px 0",
+            margin: "14px 0",
           }}
         />
 
@@ -175,7 +175,7 @@ export function CareersSidebar({
           style={{
             height: "1px",
             background: "rgba(17,17,17,0.12)",
-            margin: "20px 0",
+            margin: "14px 0",
           }}
         />
 
@@ -234,12 +234,12 @@ function FilterGroup({
           letterSpacing: "0.08em",
           color: "rgba(17,17,17,0.6)",
           fontWeight: 500,
-          marginBottom: "12px",
+          marginBottom: "8px",
         }}
       >
         {heading}
       </p>
-      <ul className="flex flex-col" style={{ gap: "10px" }}>
+      <ul className="flex flex-col" style={{ gap: "6px" }}>
         {items.map((item) => (
           <li key={item.key}>
             <Link
@@ -247,7 +247,7 @@ function FilterGroup({
               aria-current={item.active ? "page" : undefined}
               className="flex items-center gap-2 no-underline transition-colors"
               style={{
-                height: "40px",
+                height: "34px",
                 padding: "0 12px",
                 borderRadius: "10px",
                 background: item.active ? "rgba(74,59,241,0.08)" : "#ffffff",

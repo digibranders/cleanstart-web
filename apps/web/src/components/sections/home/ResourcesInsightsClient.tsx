@@ -138,21 +138,25 @@ function ArticleCard({ article }: { article: ResourceCard }) {
       href={article.href}
       className="group flex flex-col gap-4 cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1"
     >
-      <div
-        className="relative h-[231px] w-full overflow-hidden rounded-[40px]"
-        style={{ containerType: "inline-size" }}
-      >
-        <Image
-          src={article.image}
-          alt=""
-          fill
-          sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        {article.isCoverPoster && (
-          <CoverTitleOverlay title={article.title} />
-        )}
-      </div>
+      {article.variant === "newsroom" ? (
+        <NewsroomCover article={article} />
+      ) : (
+        <div
+          className="relative h-[231px] w-full overflow-hidden rounded-[40px]"
+          style={{ containerType: "inline-size" }}
+        >
+          <Image
+            src={article.image}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          {article.isCoverPoster && (
+            <CoverTitleOverlay title={article.title} />
+          )}
+        </div>
+      )}
       {/* Intentionally <p>, not <h3>: matches the parent section's
           no-heading-tag decision (least priority). */}
       <p
@@ -199,6 +203,52 @@ function ArticleCard({ article }: { article: ResourceCard }) {
         </svg>
       </span>
     </a>
+  );
+}
+
+/**
+ * Cover panel for Newsroom-tab cards. Adopts the `/news` listing card's
+ * branded purple gradient panel so the homepage matches the Newsroom page.
+ *
+ * The art (publisher logo when present, otherwise the hero image) is
+ * `object-contain`-ed inside a padded inner box rather than `object-cover`-ed
+ * full-bleed. Newsroom hero assets are publisher brand marks (AP, OSV, Cyber
+ * Defense Magazine, …) with transparent backgrounds — `object-cover` blew
+ * them up and clipped their edges (the bug). Containing them on the gradient
+ * keeps every mark whole and centred. Outer geometry (231px tall, 40px
+ * radius) is kept so the Newsroom tab stays consistent with the other tabs.
+ */
+function NewsroomCover({ article }: { article: ResourceCard }) {
+  const art = article.logo ?? (article.image || null);
+  return (
+    <div
+      className="relative flex h-[231px] w-full items-center justify-center overflow-hidden"
+      style={{
+        borderRadius: "40px",
+        background:
+          "linear-gradient(180deg, #10123e 0%, #131e8f 38%, #421ebc 100%)",
+      }}
+    >
+      {art ? (
+        <Image
+          src={art}
+          alt={article.publisher ?? article.title}
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-contain pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : (
+        <span
+          className="font-display font-bold text-center text-white"
+          style={{
+            fontSize: "var(--fs-h3)",
+            letterSpacing: "-0.03em",
+          }}
+        >
+          {article.publisher ?? "CleanStart"}
+        </span>
+      )}
+    </div>
   );
 }
 

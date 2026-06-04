@@ -1,13 +1,8 @@
-import { Header } from "@/components/nav/Header";
-import { Footer } from "@/components/sections/Footer";
-import { LegalHero } from "@/components/sections/legal/LegalHero";
-import { LegalLayout } from "@/components/sections/legal/LegalLayout";
-import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Legal — Additional Third-Party Terms",
+  title: "Additional Third-Party Terms",
   description:
     "CleanStart's policy on third-party software and open source components included in or accessed through CleanStart products and services.",
   path: "/legal",
@@ -23,13 +18,8 @@ export default function LegalPage() {
           { name: "Legal" },
         ])}
       />
-      <Header />
-      <main>
-        <LegalHero title="Legal" />
-        <FadeUp>
-          <LegalLayout activeHref="/legal">
-            <h2 className="article-h2">Additional Third-Party Terms</h2>
-            <p className="article-paragraph"><em>(for Integrated Services)</em></p>
+      <h1 className="article-h1">Additional Third-Party Terms</h1>
+      <p className="article-paragraph"><em>(for Integrated Services)</em></p>
 
             <h3 className="article-h3">1. Purpose</h3>
             <p className="article-paragraph">
@@ -263,10 +253,6 @@ export default function LegalPage() {
               Portal or via the contact mechanisms published at{" "}
               <a href="/contact-us">https://www.cleanstart.com/contact-us</a>.
             </p>
-          </LegalLayout>
-        </FadeUp>
-      </main>
-      <Footer />
     </>
   );
 }

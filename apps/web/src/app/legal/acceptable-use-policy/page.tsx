@@ -1,8 +1,3 @@
-import { Header } from "@/components/nav/Header";
-import { Footer } from "@/components/sections/Footer";
-import { LegalHero } from "@/components/sections/legal/LegalHero";
-import { LegalProse } from "@/components/sections/legal/LegalProse";
-import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
@@ -24,11 +19,7 @@ export default function AcceptableUsePolicyPage() {
           { name: "Acceptable Use Policy" },
         ])}
       />
-      <Header />
-      <main>
-        <LegalHero title="Acceptable Use Policy" />
-        <FadeUp>
-          <LegalProse>
+      <h1 className="article-h1">Acceptable Use Policy</h1>
             <h2 className="article-h2">Introduction</h2>
             <p className="article-paragraph">
               This Acceptable Use Policy (&quot;AUP&quot;) governs your access to and use of all
@@ -143,10 +134,6 @@ export default function AcceptableUsePolicyPage() {
               the Service if mandated by law, regulation, court order, or government request.
               Where we are permitted to do so, we will notify you of any such disclosure.
             </p>
-          </LegalProse>
-        </FadeUp>
-      </main>
-      <Footer />
     </>
   );
 }

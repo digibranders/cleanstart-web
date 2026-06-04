@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { HeroReveal } from "@/components/ui/Reveal";
+import { LegalLastUpdated } from "./LegalLastUpdated";
 
 const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123E 38%, #131E8F 67%, #471EC0 80%, #471FC3 100%)";
@@ -57,6 +58,9 @@ export function LegalHero({ title }: LegalHeroProps): React.ReactElement {
           >
             {title}
           </h1>
+        </HeroReveal>
+        <HeroReveal y={20} delay={0.15} duration={0.8}>
+          <LegalLastUpdated />
         </HeroReveal>
       </div>
     </section>
