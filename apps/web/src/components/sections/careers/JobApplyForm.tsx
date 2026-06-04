@@ -27,9 +27,9 @@ interface JobApplyFormProps {
 /**
  * Per-job application form for CMS-native, open roles. Posts a resume file as
  * multipart through `submitApplication` → CMS `/api/career-applications/apply`.
- * Styled to match the careers content column (full width, indigo accent, dashed
- * drop-zone). The Turnstile widget injects a hidden `cf-turnstile-response`
- * input read off FormData on submit.
+ * A sleek, centered card (~520px) with an indigo accent and a dashed drop-zone.
+ * The Turnstile widget injects a hidden `cf-turnstile-response` input read off
+ * FormData on submit.
  */
 export function JobApplyForm({
   jobSlug,
@@ -137,7 +137,7 @@ export function JobApplyForm({
 
   return (
     <section className="relative w-full bg-white overflow-x-clip">
-      <div className="relative mx-auto max-w-[820px] px-6 sm:px-10 pt-2 pb-24">
+      <div className="relative mx-auto max-w-[520px] px-6 pt-2 pb-24">
         {done ? (
           <div
             className="bg-white"
@@ -188,12 +188,12 @@ export function JobApplyForm({
             <h2
               className="font-display"
               style={{
-                fontSize: "var(--fs-h3)",
+                fontSize: "var(--fs-h4)",
                 fontWeight: 600,
                 lineHeight: 1.2,
                 letterSpacing: "-0.02em",
                 color: "#111",
-                marginBottom: "20px",
+                marginBottom: "16px",
               }}
             >
               Apply for {jobTitle}
@@ -219,7 +219,7 @@ export function JobApplyForm({
               }}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field
                 label="First Name"
                 name="firstName"
@@ -236,7 +236,7 @@ export function JobApplyForm({
               />
             </div>
 
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field
                 label="Email"
                 name="email"
@@ -254,7 +254,7 @@ export function JobApplyForm({
               />
             </div>
 
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field
                 label="Location"
                 name="location"
@@ -268,7 +268,7 @@ export function JobApplyForm({
               />
             </div>
 
-            <div className="mt-4">
+            <div className="mt-3">
               <Field
                 label="LinkedIn URL"
                 name="linkedinUrl"
@@ -277,7 +277,7 @@ export function JobApplyForm({
               />
             </div>
 
-            <div className="mt-4">
+            <div className="mt-3">
               <span
                 className="font-sans block"
                 style={{
@@ -298,7 +298,7 @@ export function JobApplyForm({
                   border: "1px dashed rgba(74,59,241,0.45)",
                   background: "rgba(74,59,241,0.04)",
                   borderRadius: "12px",
-                  padding: "20px 16px",
+                  padding: "16px",
                   textAlign: "center",
                 }}
               >
@@ -335,7 +335,7 @@ export function JobApplyForm({
               </label>
             </div>
 
-            <div className="mt-4">
+            <div className="mt-3">
               <label
                 htmlFor="coverLetter"
                 className="font-sans block"
@@ -390,7 +390,7 @@ export function JobApplyForm({
               </span>
             </div>
 
-            <div className="mt-4">
+            <div className="mt-3">
               <RecruitmentConsent />
             </div>
 
@@ -416,9 +416,9 @@ export function JobApplyForm({
               type="submit"
               disabled={busy}
               aria-busy={busy}
-              className="font-sans relative inline-flex items-center justify-center w-full mt-5 cursor-pointer transform-gpu hover:-translate-y-px hover:brightness-110 active:translate-y-0 active:scale-[0.99] active:duration-[80ms] active:brightness-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#33BAEC] focus-visible:outline-offset-[3px] disabled:cursor-not-allowed disabled:opacity-70"
+              className="font-sans relative inline-flex items-center justify-center w-full mt-3 cursor-pointer transform-gpu hover:-translate-y-px hover:brightness-110 active:translate-y-0 active:scale-[0.99] active:duration-[80ms] active:brightness-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#33BAEC] focus-visible:outline-offset-[3px] disabled:cursor-not-allowed disabled:opacity-70"
               style={{
-                height: "48px",
+                height: "44px",
                 borderRadius: "10px",
                 background: ACCENT,
                 color: "white",
