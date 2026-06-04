@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { submitApplication } from "@/lib/careers/submitApplication";
@@ -508,15 +508,39 @@ interface SelectFieldProps {
   options: readonly string[];
 }
 
+/**
+ * Custom dropdown (not the native <select>): a styled trigger with a chevron
+ * and a popover list. A hidden input carries the value so the surrounding
+ * FormData picks it up unchanged. Closes on outside-click or Escape.
+ */
 function SelectField({
   label,
   name,
   options,
 }: SelectFieldProps): React.ReactElement {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: MouseEvent): void => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   return (
-    <div>
-      <label
-        htmlFor={name}
+    <div ref={ref} className="relative">
+      <span
         className="font-sans block"
         style={{
           fontSize: "var(--fs-caption)",
@@ -527,30 +551,88 @@ function SelectField({
         }}
       >
         {label}
-      </label>
-      <select
-        id={name}
-        name={name}
-        defaultValue=""
-        className="font-sans w-full cursor-pointer"
+      </span>
+      <input type="hidden" name={name} value={value} />
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="font-sans w-full flex items-center justify-between cursor-pointer"
         style={{
           height: "44px",
           padding: "0 14px",
           borderRadius: "10px",
-          border: "1px solid rgba(17,17,17,0.12)",
+          border: open ? `1px solid ${ACCENT}` : "1px solid rgba(17,17,17,0.12)",
           background: "white",
           fontSize: "var(--fs-body)",
-          color: "#111",
+          color: value ? "#111" : "rgba(17,17,17,0.4)",
           outline: "none",
+          textAlign: "left",
         }}
       >
-        <option value="">Select…</option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+        <span>{value || "Select…"}</span>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden
+          style={{
+            flexShrink: 0,
+            marginLeft: "8px",
+            transition: "transform 160ms ease",
+            transform: open ? "rotate(180deg)" : "none",
+          }}
+        >
+          <path
+            d="M6 9l6 6 6-6"
+            stroke="rgba(17,17,17,0.5)"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+      {open && (
+        <ul
+          className="absolute left-0 right-0 z-20 overflow-y-auto"
+          style={{
+            top: "calc(100% + 6px)",
+            maxHeight: "240px",
+            border: "1px solid rgba(17,17,17,0.12)",
+            borderRadius: "10px",
+            background: "white",
+            boxShadow:
+              "0px 6px 16px rgba(9,6,63,0.12), 0px 2px 4px rgba(9,6,63,0.06)",
+            listStyle: "none",
+            margin: 0,
+            padding: "4px",
+          }}
+        >
+          {options.map((option) => (
+            <li key={option}>
+              <button
+                type="button"
+                onClick={() => {
+                  setValue(option);
+                  setOpen(false);
+                }}
+                className="font-sans w-full text-left cursor-pointer rounded-[6px] hover:bg-[#f3f2fb]"
+                style={{
+                  padding: "9px 12px",
+                  fontSize: "var(--fs-body)",
+                  color: "#111",
+                  background:
+                    value === option ? "rgba(74,59,241,0.08)" : "transparent",
+                }}
+              >
+                {option}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
