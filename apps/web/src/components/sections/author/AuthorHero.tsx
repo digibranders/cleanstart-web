@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import type React from "react";
 
 import { pickImageUrl } from "@/lib/blog";
@@ -54,59 +53,48 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <nav
-          aria-label="Breadcrumb"
-          className="flex items-center gap-2 pt-[58px]"
-        >
-          <Link
-            href="/"
-            className="text-xs leading-[1.4]"
-            style={{ color: "#98ACC3" }}
-          >
-            Home
-          </Link>
-          <span style={{ color: "rgba(152,172,195,0.6)" }}>/</span>
-          <Link
-            href="/blogs"
-            className="text-xs leading-[1.4]"
-            style={{ color: "#98ACC3" }}
-          >
-            Blogs
-          </Link>
-          <span style={{ color: "rgba(152,172,195,0.6)" }}>/</span>
-          <span
-            className="text-xs leading-[1.4] truncate max-w-[280px]"
-            style={{ color: "#BFCCDA" }}
-            aria-current="page"
-          >
-            {author.name}
-          </span>
-        </nav>
-
-        <div className="flex flex-col items-center gap-6 pt-[56px] pb-10 text-center">
+        <div className="flex flex-col items-center gap-6 pt-[calc(72px+env(safe-area-inset-top)+clamp(40px,6vw,80px))] pb-10 text-center">
           <div
             className="relative shrink-0"
             style={{
-              width: "clamp(200px, 22vw, 260px)",
-              height: "clamp(220px, 24vw, 285px)",
+              width: "clamp(240px, 26vw, 300px)",
+              aspectRatio: "404 / 450",
             }}
           >
+            {/* Stacked lavender cards rotated behind the photo (Figma node 857:17518) */}
             <div
               aria-hidden
-              className="absolute inset-0"
+              className="absolute"
               style={{
-                borderRadius: "40px",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.18)",
-                transform: "translateY(-8px) scale(1.06)",
+                left: "-0.6%",
+                top: "-4.6%",
+                width: "90.1%",
+                height: "107.3%",
+                borderRadius: "clamp(46px, 5vw, 60px)",
+                background: "rgba(222,227,247,0.5)",
+                transform: "rotate(-7.21deg)",
+                transformOrigin: "center",
+              }}
+            />
+            <div
+              aria-hidden
+              className="absolute"
+              style={{
+                left: "-0.6%",
+                top: "-4.6%",
+                width: "90.1%",
+                height: "107.3%",
+                borderRadius: "clamp(46px, 5vw, 60px)",
+                background: "rgba(222,227,247,0.5)",
+                transform: "rotate(-17.21deg)",
+                transformOrigin: "center",
               }}
             />
             <div
               className="relative w-full h-full overflow-hidden"
               style={{
-                borderRadius: "32px",
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.18)",
+                borderRadius: "clamp(46px, 5vw, 60px)",
+                background: "#dee3f7",
               }}
             >
               {photoSrc ? (
@@ -114,7 +102,7 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
                   src={photoSrc}
                   alt={author.photo?.alt ?? author.name}
                   fill
-                  sizes="(max-width: 1024px) 220px, 260px"
+                  sizes="(max-width: 1024px) 260px, 300px"
                   className="object-cover"
                   priority
                 />

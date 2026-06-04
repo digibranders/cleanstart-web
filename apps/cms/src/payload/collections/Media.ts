@@ -68,7 +68,7 @@ export const Media: CollectionConfig = {
   admin: {
     useAsTitle: 'filename',
     defaultColumns: ['filename', 'alt', 'folder', 'mimeType', 'filesize', 'updatedAt'],
-    group: 'System',
+    group: 'Content',
   },
   access: {
     read: () => true,

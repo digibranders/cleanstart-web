@@ -2,7 +2,7 @@
 
 **Status:** All five marketing-site lead forms verified end-to-end (web form → `/api/leads/submit` → Payload lead row → HubSpot Forms API → HubSpot contact). Last verified 2026-06-02 against a local CMS built from the slug-resolution code, with HubSpot relay live to portal `245478611` (NA2).
 
-This doc is the operational companion to `docs/forms-hubspot-overview.html` (the visual spec). It records the final architecture, the **HubSpot form configuration that is load-bearing for the API relay**, the gotchas found during verification, and how to reproduce the local end-to-end test.
+This doc is the operational companion to `docs/integrations/forms-hubspot-overview.html` (the visual spec). It records the final architecture, the **HubSpot form configuration that is load-bearing for the API relay**, the gotchas found during verification, and how to reproduce the local end-to-end test.
 
 ---
 

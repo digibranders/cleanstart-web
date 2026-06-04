@@ -32,7 +32,7 @@ export const Redirects: CollectionConfig = {
   admin: {
     useAsTitle: 'from',
     defaultColumns: ['from', 'to', 'status', 'source', 'hitCount', 'lastHitAt'],
-    group: 'System',
+    group: 'SEO',
   },
   // Read is public so apps/web's middleware (and future render workers) can
   // consume the table without a session. Writes remain editor+ only.

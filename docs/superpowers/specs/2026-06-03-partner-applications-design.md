@@ -115,9 +115,9 @@ Reuses the existing `lib/email/brevo.ts` `sendBrevoEmail` (templateId+params OR 
 - DB migration: new `partner_applications` table (+ the `email_delivery_*` enums). Generate with `R2_RESUME_PREFIX` set to the committed default to avoid prefix churn (see careers migration lesson); fix the generated migration's unused-param quirk (`{ db }` + `import type`); ensure it's referenced in `migrations/index.ts`.
 - `.env.example` — `PARTNER_USER_TEMPLATE_ID`, `PARTNER_ADMIN_TEMPLATE_ID`, `PARTNERS_NOTIFY_EMAIL`.
 - `CLAUDE.md` — Brevo live-integration note covers partner email; mention the collection.
-- `docs/GDPR-COMPLIANCE.md` — partner-applications in the personal-data inventory; Brevo as sub-processor for partner email (applicant + admin); DSAR erasure covers partners.
-- `docs/WEB-PAGES.md` — partners page status.
-- New `docs/partner-applications.md` runbook.
+- `docs/operations/GDPR-COMPLIANCE.md` — partner-applications in the personal-data inventory; Brevo as sub-processor for partner email (applicant + admin); DSAR erasure covers partners.
+- `docs/web/WEB-PAGES.md` — partners page status.
+- New `docs/features/partner-applications.md` runbook.
 
 ---
 

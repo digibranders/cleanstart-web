@@ -23,7 +23,11 @@ export interface SubmitApplicationInput {
   lastName: string;
   email: string;
   phone?: string;
+  location?: string;
+  howDidYouHear?: string;
   coverLetter?: string;
+  /** Optional uploaded cover-letter file (applicant may paste text instead). */
+  coverLetterFile?: File;
   linkedinUrl?: string;
   resume: File;
   source?: string;
@@ -47,6 +51,8 @@ export async function submitApplication(
   fd.set("lastName", input.lastName);
   fd.set("email", input.email);
   if (input.phone) fd.set("phone", input.phone);
+  if (input.location) fd.set("location", input.location);
+  if (input.howDidYouHear) fd.set("howDidYouHear", input.howDidYouHear);
   if (input.coverLetter) fd.set("coverLetter", input.coverLetter);
   if (input.linkedinUrl) fd.set("linkedinUrl", input.linkedinUrl);
   if (input.source) fd.set("source", input.source);
@@ -54,6 +60,7 @@ export async function submitApplication(
   if (input.website) fd.set("website", input.website);
   if (input.consent) fd.set("consent", JSON.stringify(input.consent));
   fd.set("resume", input.resume);
+  if (input.coverLetterFile) fd.set("coverLetterFile", input.coverLetterFile);
 
   let res: Response;
   try {

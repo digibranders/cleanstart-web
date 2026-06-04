@@ -1,7 +1,7 @@
 # Partner Applications — Runbook
 
 **Scope:** `apps/cms` partner ("Become a Partner") inquiry pipeline. **Date:** 2026-06-03.
-**Companion docs:** `docs/GDPR-COMPLIANCE.md` (sub-processor register, retention, DSAR), `docs/careers-applications.md` (sibling careers pipeline), `CLAUDE.md` (Live integrations table).
+**Companion docs:** `docs/operations/GDPR-COMPLIANCE.md` (sub-processor register, retention, DSAR), `docs/features/careers-applications.md` (sibling careers pipeline), `CLAUDE.md` (Live integrations table).
 
 This documents how a partner inquiry flows from the marketing site into the CMS, the two Brevo emails it sends, the privacy posture, and how to test it end-to-end locally.
 
@@ -66,7 +66,7 @@ Each email independently picks its mode from its template-ID env var:
 This lets the marketing team move to designed Brevo templates without a code change, while the code fallback keeps the pipeline functional out of the box.
 
 ### Brevo, not HubSpot
-Partner data never enters the lead pipeline. HubSpot owns lead-pipeline email and never receives partner data; Brevo is the careers/partner transactional-email sub-processor and never receives lead-pipeline data. This separation is the GDPR boundary documented in `docs/GDPR-COMPLIANCE.md` §6.
+Partner data never enters the lead pipeline. HubSpot owns lead-pipeline email and never receives partner data; Brevo is the careers/partner transactional-email sub-processor and never receives lead-pipeline data. This separation is the GDPR boundary documented in `docs/operations/GDPR-COMPLIANCE.md` §6.
 
 ### Delivery status is part of the immutable row
 `emailDeliveryApplicant.status` and `emailDeliveryAdmin.status` (`synced` / `failed` / `skipped`) are written into the append-only `partner-applications` row, so the operator can see whether each email went out without consulting Brevo.
@@ -87,7 +87,7 @@ The admin list view exposes a one-click **export button** (`admin/components/Par
 There is **no time-based purge cron** for partner inquiries — rows are kept until a DSAR erasure request. (`piiRedactedAt` exists on the schema for symmetry with leads/careers but is not driven by a cron.)
 
 ### DSAR erasure
-`POST /api/leads/dsar/delete` (delete-by-email) **also** erases partner inquiries: `lib/partners/dsar.ts` → `deletePartnerApplicationsByEmail()` hard-deletes every matching `partner-applications` row. There are no linked files to remove. The erasure writes an audit-log row. See `docs/GDPR-COMPLIANCE.md` §2 (Art. 17) and §4.
+`POST /api/leads/dsar/delete` (delete-by-email) **also** erases partner inquiries: `lib/partners/dsar.ts` → `deletePartnerApplicationsByEmail()` hard-deletes every matching `partner-applications` row. There are no linked files to remove. The erasure writes an audit-log row. See `docs/operations/GDPR-COMPLIANCE.md` §2 (Art. 17) and §4.
 
 ---
 

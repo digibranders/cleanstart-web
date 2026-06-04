@@ -67,39 +67,39 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
+    blogs: Blog;
+    news: News;
+    guides: Guide;
+    'case-studies': CaseStudy;
+    knowledgeBase: KnowledgeBase;
+    resources: Resource;
+    events: Event;
+    webinars: Webinar;
+    podcastEpisodes: PodcastEpisode;
+    jobs: Job;
     media: Media;
-    resumes: Resume;
-    'career-applications': CareerApplication;
-    redirects: Redirect;
-    brokenLinks: BrokenLink;
-    'audit-log': AuditLog;
-    searchLog: SearchLog;
-    previewAudit: PreviewAudit;
-    webhooks_dead_letter: WebhooksDeadLetter;
-    integrations: Integration;
-    analyticsCache: AnalyticsCache;
-    consentLog: ConsentLog;
+    pages: Page;
+    aboutGalleries: AboutGallery;
     authors: Author;
     categories: Category;
     newsCategories: NewsCategory;
     knowledgeCategories: KnowledgeCategory;
     jobLocations: JobLocation;
-    forms: Form;
     leads: Lead;
+    forms: Form;
     'partner-applications': PartnerApplication;
-    blogs: Blog;
-    news: News;
-    guides: Guide;
-    resources: Resource;
-    'case-studies': CaseStudy;
-    knowledgeBase: KnowledgeBase;
-    events: Event;
-    webinars: Webinar;
-    podcastEpisodes: PodcastEpisode;
-    jobs: Job;
-    aboutGalleries: AboutGallery;
-    pages: Page;
+    redirects: Redirect;
+    brokenLinks: BrokenLink;
+    'career-applications': CareerApplication;
+    resumes: Resume;
+    users: User;
+    integrations: Integration;
+    previewAudit: PreviewAudit;
+    searchLog: SearchLog;
+    'audit-log': AuditLog;
+    consentLog: ConsentLog;
+    analyticsCache: AnalyticsCache;
+    webhooks_dead_letter: WebhooksDeadLetter;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -112,39 +112,39 @@ export interface Config {
     };
   };
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
+    blogs: BlogsSelect<false> | BlogsSelect<true>;
+    news: NewsSelect<false> | NewsSelect<true>;
+    guides: GuidesSelect<false> | GuidesSelect<true>;
+    'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
+    knowledgeBase: KnowledgeBaseSelect<false> | KnowledgeBaseSelect<true>;
+    resources: ResourcesSelect<false> | ResourcesSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    webinars: WebinarsSelect<false> | WebinarsSelect<true>;
+    podcastEpisodes: PodcastEpisodesSelect<false> | PodcastEpisodesSelect<true>;
+    jobs: JobsSelect<false> | JobsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    resumes: ResumesSelect<false> | ResumesSelect<true>;
-    'career-applications': CareerApplicationsSelect<false> | CareerApplicationsSelect<true>;
-    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
-    brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
-    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
-    searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
-    previewAudit: PreviewAuditSelect<false> | PreviewAuditSelect<true>;
-    webhooks_dead_letter: WebhooksDeadLetterSelect<false> | WebhooksDeadLetterSelect<true>;
-    integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
-    analyticsCache: AnalyticsCacheSelect<false> | AnalyticsCacheSelect<true>;
-    consentLog: ConsentLogSelect<false> | ConsentLogSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    aboutGalleries: AboutGalleriesSelect<false> | AboutGalleriesSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     newsCategories: NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
     knowledgeCategories: KnowledgeCategoriesSelect<false> | KnowledgeCategoriesSelect<true>;
     jobLocations: JobLocationsSelect<false> | JobLocationsSelect<true>;
-    forms: FormsSelect<false> | FormsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
+    forms: FormsSelect<false> | FormsSelect<true>;
     'partner-applications': PartnerApplicationsSelect<false> | PartnerApplicationsSelect<true>;
-    blogs: BlogsSelect<false> | BlogsSelect<true>;
-    news: NewsSelect<false> | NewsSelect<true>;
-    guides: GuidesSelect<false> | GuidesSelect<true>;
-    resources: ResourcesSelect<false> | ResourcesSelect<true>;
-    'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
-    knowledgeBase: KnowledgeBaseSelect<false> | KnowledgeBaseSelect<true>;
-    events: EventsSelect<false> | EventsSelect<true>;
-    webinars: WebinarsSelect<false> | WebinarsSelect<true>;
-    podcastEpisodes: PodcastEpisodesSelect<false> | PodcastEpisodesSelect<true>;
-    jobs: JobsSelect<false> | JobsSelect<true>;
-    aboutGalleries: AboutGalleriesSelect<false> | AboutGalleriesSelect<true>;
-    pages: PagesSelect<false> | PagesSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
+    'career-applications': CareerApplicationsSelect<false> | CareerApplicationsSelect<true>;
+    resumes: ResumesSelect<false> | ResumesSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
+    integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
+    previewAudit: PreviewAuditSelect<false> | PreviewAuditSelect<true>;
+    searchLog: SearchLogSelect<false> | SearchLogSelect<true>;
+    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
+    consentLog: ConsentLogSelect<false> | ConsentLogSelect<true>;
+    analyticsCache: AnalyticsCacheSelect<false> | AnalyticsCacheSelect<true>;
+    webhooks_dead_letter: WebhooksDeadLetterSelect<false> | WebhooksDeadLetterSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -157,26 +157,26 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     siteSettings: SiteSetting;
-    seoDefaults: SeoDefault;
     mainNav: MainNav;
     footerNav: FooterNav;
-    legal: Legal;
-    announcements: Announcement;
-    podcastPage: PodcastPage;
     resourcesSpotlight: ResourcesSpotlight;
     companySpotlight: CompanySpotlight;
+    announcements: Announcement;
+    podcastPage: PodcastPage;
+    legal: Legal;
+    seoDefaults: SeoDefault;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
-    seoDefaults: SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
     mainNav: MainNavSelect<false> | MainNavSelect<true>;
     footerNav: FooterNavSelect<false> | FooterNavSelect<true>;
-    legal: LegalSelect<false> | LegalSelect<true>;
-    announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
-    podcastPage: PodcastPageSelect<false> | PodcastPageSelect<true>;
     resourcesSpotlight: ResourcesSpotlightSelect<false> | ResourcesSpotlightSelect<true>;
     companySpotlight: CompanySpotlightSelect<false> | CompanySpotlightSelect<true>;
+    announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
+    podcastPage: PodcastPageSelect<false> | PodcastPageSelect<true>;
+    legal: LegalSelect<false> | LegalSelect<true>;
+    seoDefaults: SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -226,232 +226,20 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "blogs".
  */
-export interface User {
-  id: number;
-  name: string;
-  /**
-   * Uncheck to block this user from logging in. Use the "Disable account" action instead of editing this directly.
-   */
-  enabled?: boolean | null;
-  /**
-   * Composite roles supported. Author = own drafts only. Editor = publish content. Admin = full access.
-   */
-  roles: ('admin' | 'editor' | 'author')[];
-  preferences?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  /**
-   * Storage folder. Re-classify if the upload was placed in the wrong bucket.
-   */
-  folder?:
-    | (
-        | 'web/blog'
-        | 'web/news'
-        | 'web/guide'
-        | 'web/resource'
-        | 'web/event'
-        | 'web/webinar'
-        | 'web/job'
-        | 'web/author'
-        | 'web/about'
-        | 'web/page'
-        | 'web/general'
-      )
-    | null;
-  /**
-   * Purely decorative image (no informational content). When true, alt text is hidden and the image renders with empty alt per WCAG 2.2 SC 1.1.1.
-   */
-  decorative?: boolean | null;
-  /**
-   * Required for non-decorative images. Pre-filled from the humanised filename — review before publish.
-   */
-  alt?: string | null;
-  /**
-   * Optional caption shown beneath the image where supported.
-   */
-  caption?: string | null;
-  /**
-   * Photographer / source attribution.
-   */
-  credit?: string | null;
-  prefix?: string | null;
-  /**
-   * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
-   */
-  focalPoint?: {
-    x?: number | null;
-    y?: number | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    thumb?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    card?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    hero?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
-}
-/**
- * Applicant resumes (private). Access-controlled — never public.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resumes".
- */
-export interface Resume {
-  id: number;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * Job applications (append-only). Resumes are stored privately and emailed to HR.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "career-applications".
- */
-export interface CareerApplication {
-  id: number;
-  job: number | Job;
-  /**
-   * Job title at apply time — survives later job edits/deletes.
-   */
-  jobTitleSnapshot: string;
-  /**
-   * Job location (remote / named locations) at apply time.
-   */
-  jobLocationSnapshot?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email?: string | null;
-  phone?: string | null;
-  coverLetter?: string | null;
-  linkedinUrl?: string | null;
-  resume: number | Resume;
-  /**
-   * Referrer URL.
-   */
-  source?: string | null;
-  ip?: string | null;
-  userAgent?: string | null;
-  consentGivenAt?: string | null;
-  consentSnapshot?: string | null;
-  privacyPolicyVersion?: string | null;
-  emailDelivery?: {
-    status?: ('synced' | 'failed' | 'skipped') | null;
-    messageId?: string | null;
-    error?: string | null;
-  };
-  honeypot?: string | null;
-  turnstilePassed?: boolean | null;
-  piiRedactedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "jobs".
- */
-export interface Job {
+export interface Blog {
   id: number;
   title: string;
   /**
    * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
-  source: 'cms' | 'ats';
   /**
-   * Deep link into the external ATS. Required when source=ats.
-   */
-  atsUrl?: string | null;
-  department?:
-    | ('engineering' | 'sales' | 'marketing' | 'customer-success' | 'operations' | 'finance' | 'legal' | 'people')
-    | null;
-  employmentType?: ('full-time' | 'part-time' | 'contract' | 'internship') | null;
-  experienceLevel?: ('entry' | 'mid' | 'senior' | 'staff' | 'principal') | null;
-  /**
-   * Optional when remote=true. Renderers can fall back to "Remote (Global)" when this is empty and remote is on.
-   */
-  locations?: (number | JobLocation)[] | null;
-  remote?: boolean | null;
-  salaryRange?: {
-    min?: number | null;
-    max?: number | null;
-    currency?: ('USD' | 'EUR' | 'GBP' | 'INR') | null;
-  };
-  /**
-   * Short summary shown on listing cards and drives the SEO description fallback. Keep under 160 characters.
+   * Drives the SEO description fallback. Aim for ≤ 160 characters.
    */
   abstract?: string | null;
+  heroImage?: (number | null) | Media;
   body?: {
     root: {
       type: string;
@@ -467,35 +255,38 @@ export interface Job {
     };
     [k: string]: unknown;
   } | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
-   * Optional JD PDF (routed to web/job/).
+   * Multi-author supported — every byline is credited in JSON-LD author[]. Authors with "accepting new bylines" off are hidden from the picker.
    */
-  descriptionPdf?: (number | null) | Media;
+  authors?: (number | Author)[] | null;
   /**
-   * mailto:hire@cleanstart.com is acceptable.
+   * Author who reviewed this post for accuracy. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal.
    */
-  applyUrl?: string | null;
+  reviewedBy?: (number | null) | Author;
   /**
-   * Hiring lifecycle. Distinct from Payload _status (draft/published).
+   * Date of the most recent review pass. When unset, falls back to updatedAt with a note in the SEO panel.
    */
-  hiringStatus?: ('open' | 'paused' | 'closed') | null;
+  lastReviewedAt?: string | null;
+  categories?: (number | null) | Category;
   /**
-   * When applications close. Editors set this when posting.
+   * Pin up to 3 posts the reader should see next. Curated picks appear first, in this order. Empty slots auto-fill with the latest from this post's category, then with the latest site-wide.
    */
-  applicationDeadline?: string | null;
+  relatedPosts?: (number | Blog)[] | null;
   /**
-   * When the listing should auto-close. Not yet enforced — update hiringStatus manually when the deadline passes.
+   * Optional. The post the reader should have read before this one. If unset, the page auto-fills with the chronologically previous published blog (same category preferred). Renders below the author card and adds <link rel="prev"> for SEO.
    */
-  expiresAt?: string | null;
-  closedAt?: string | null;
+  previousPost?: (number | null) | Blog;
   /**
-   * Applications submitted for this job (read-only). Open one to download the resume.
+   * Optional. The post the reader should read after this one. If unset, the page auto-fills with the chronologically next published blog (same category preferred). Renders below the author card and adds <link rel="next"> for SEO.
    */
-  applications?: {
-    docs?: (number | CareerApplication)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
+  nextPost?: (number | null) | Blog;
   /**
    * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
    */
@@ -641,6 +432,20 @@ export interface Job {
    * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
    */
   displayPublishedAt?: string | null;
+  readingMinutes?: number | null;
+  wordCount?: number | null;
+  /**
+   * Heading levels that appear in the Table of Contents. Re-save to apply.
+   */
+  tocDepth?: ('h2' | 'h2_h3' | 'h2_h3_h4') | null;
+  tableOfContents?:
+    | {
+        level?: number | null;
+        text?: string | null;
+        anchor?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
@@ -777,529 +582,97 @@ export interface Job {
       | boolean
       | null;
   };
+  featured?: boolean | null;
+  pinned?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "jobLocations".
+ * via the `definition` "media".
  */
-export interface JobLocation {
-  id: number;
-  name: string;
-  /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
-   */
-  slug: string;
-  type: 'country' | 'region' | 'city';
-  /**
-   * ISO 3166-1 alpha-2 country code (e.g. IN, US, GB). Two uppercase letters.
-   */
-  isoCountry: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects".
- */
-export interface Redirect {
+export interface Media {
   id: number;
   /**
-   * Source path (e.g. /old-pricing). System-managed rules (source=slug-change) are locked from manual edit.
+   * Storage folder. Re-classify if the upload was placed in the wrong bucket.
    */
-  from: string;
-  status: '301' | '302' | '307' | '308' | '410';
-  /**
-   * Destination path or absolute URL. Required unless status=410. System-managed rules are locked.
-   */
-  to?: string | null;
-  /**
-   * Provenance. System-set on creation; never manually edited.
-   */
-  source: 'manual' | 'slug-change' | 'archive-with-redirect' | 'migration-seed';
-  /**
-   * Why this redirect exists. Future editors thank you.
-   */
-  notes?: string | null;
-  /**
-   * Incremented in apps/web middleware on every match.
-   */
-  hitCount?: number | null;
-  lastHitAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Auto-populated by the nightly link-check cron. Read-only — fix the URL on the source doc and re-publish, the next cron run clears the row.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "brokenLinks".
- */
-export interface BrokenLink {
-  id: number;
-  url: string;
-  status: 'ok' | 'broken' | 'redirect' | 'network';
-  /**
-   * Last observed HTTP status. 0 when the request failed before a response.
-   */
-  httpStatus?: number | null;
-  sourceCollection: string;
-  sourceDocId: string;
-  sourceDocSlug?: string | null;
-  firstSeenAt?: string | null;
-  lastChecked?: string | null;
-  /**
-   * Optional human note (e.g. "publisher confirmed page taken down — replace with archive.org snapshot").
-   */
-  note?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Append-only record of sensitive actions on leads + DSAR events. Read-only — entries are written by hooks, never via the admin UI.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "audit-log".
- */
-export interface AuditLog {
-  id: number;
-  timestamp: string;
-  action:
-    | 'lead_deleted'
-    | 'lead_exported'
-    | 'partner_exported'
-    | 'dsar_export'
-    | 'dsar_erasure'
-    | 'schema_override_changed'
-    | 'user_disabled'
-    | 'content_reassigned'
-    | 'display_publish_date_overridden';
-  targetCollection: string;
-  targetId: string;
-  /**
-   * Admin who performed the action. Null for system / cron writes.
-   */
-  actorUserId?: (number | null) | User;
-  requestIp?: string | null;
-  userAgent?: string | null;
-  acceptLanguage?: string | null;
-  /**
-   * Number of hops parsed from X-Forwarded-For at request time.
-   */
-  proxyChainLength?: number | null;
-  /**
-   * Per-action payload (e.g. row count for exports, deleted lead snapshot).
-   */
-  metadata?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Public-site search queries logged via /api/search/analytics. Filter resultsCount=0 to find content gaps.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "searchLog".
- */
-export interface SearchLog {
-  id: number;
-  query: string;
-  /**
-   * Number of hits the search returned. Zero = content gap signal.
-   */
-  resultsCount: number;
-  /**
-   * Optional locale tag (e.g. en-US). Used to filter analytics later.
-   */
-  locale?: string | null;
-  /**
-   * Client IP — used for abuse detection. Auto-purged at the same cadence as leads.
-   */
-  ip?: string | null;
-  /**
-   * User-Agent header. Trimmed at 200 chars.
-   */
-  userAgent?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Active and revoked preview-share links. Revoke a row to invalidate the link immediately.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "previewAudit".
- */
-export interface PreviewAudit {
-  id: number;
-  /**
-   * Payload collection slug the token targets.
-   */
-  collection: string;
-  /**
-   * Doc id within the collection.
-   */
-  docId: string;
-  /**
-   * Editor who minted the link.
-   */
-  actor: number | User;
-  /**
-   * Optional human label, e.g. "Legal review – Q2 launch post".
-   */
-  label?: string | null;
-  /**
-   * TTL chosen at mint time.
-   */
-  ttlSeconds: number;
-  expiresAt: string;
-  /**
-   * Set this (or click Revoke in the row actions) to invalidate the link.
-   */
-  revokedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "webhooks_dead_letter".
- */
-export interface WebhooksDeadLetter {
-  id: number;
-  /**
-   * Unique ID for this delivery attempt (UUID).
-   */
-  webhookId: string;
-  event: 'document.published' | 'lead.submitted';
-  /**
-   * Full event data blob. Used to re-run the delivery on retry.
-   */
-  eventPayload:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
+  folder?:
+    | (
+        | 'web/blog'
+        | 'web/news'
+        | 'web/guide'
+        | 'web/resource'
+        | 'web/event'
+        | 'web/webinar'
+        | 'web/job'
+        | 'web/author'
+        | 'web/about'
+        | 'web/page'
+        | 'web/general'
+      )
     | null;
   /**
-   * teams | generic | <custom id>
+   * Purely decorative image (no informational content). When true, alt text is hidden and the image renders with empty alt per WCAG 2.2 SC 1.1.1.
    */
-  destinationId: string;
-  destinationKind: 'teams' | 'generic';
+  decorative?: boolean | null;
   /**
-   * First 80 chars of the destination URL for quick scanning.
+   * Required for non-decorative images. Pre-filled from the humanised filename — review before publish.
    */
-  destinationLabel?: string | null;
+  alt?: string | null;
   /**
-   * How many delivery attempts have been made (including the original).
+   * Optional caption shown beneath the image where supported.
    */
-  attemptCount: number;
+  caption?: string | null;
   /**
-   * Error message or HTTP status from the most recent attempt.
+   * Photographer / source attribution.
    */
-  lastError?: string | null;
+  credit?: string | null;
   /**
-   * When the retry task will next attempt this delivery. Null = no more retries.
+   * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
-  nextRetryAt?: string | null;
-  /**
-   * Set when a retry succeeds. Null = still failing or exhausted.
-   */
-  resolvedAt?: string | null;
-  /**
-   * x-request-id from the originating HTTP request, for log correlation.
-   */
-  requestId?: string | null;
+  focalPoint?: {
+    x?: number | null;
+    y?: number | null;
+  };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * Connect CleanStart to your other tools — CRM, analytics, notifications, and automations. Each row is one connection. Your technical team handles credentials; you control what gets sent where.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "integrations".
- */
-export interface Integration {
-  id: number;
-  /**
-   * A friendly name to identify this connection, e.g. "Sales team notifications" or "Zapier lead alerts".
-   */
-  label: string;
-  /**
-   * The type of tool you are connecting to. Cannot be changed after saving.
-   */
-  kind:
-    | 'teamsWorkflow'
-    | 'genericWebhook'
-    | 'hubspotCrm'
-    | 'ga4DataApi'
-    | 'gscSearchAnalyticsApi'
-    | 'gscUrlInspectionApi'
-    | 'msClarity'
-    | 'cloudflareWebAnalytics'
-    | 'calComInbound'
-    | 'zohoCrm';
-  /**
-   * Turn this connection on or off without removing it.
-   */
-  enabled?: boolean | null;
-  /**
-   * Choose which activity on the site triggers a notification. Leave all filters empty to receive everything.
-   */
-  routing?: {
-    events?: ('document.published' | 'lead.submitted')[] | null;
-    /**
-     * Filter document.published events by collection. Empty = all collections.
-     */
-    collections?:
-      | ('blogs' | 'news' | 'guides' | 'resources' | 'knowledgeBase' | 'events' | 'webinars' | 'jobs' | 'pages')[]
-      | null;
-    /**
-     * Filter lead.submitted events by form slug. Empty = all forms.
-     */
-    formSlugs?: string[] | null;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumb?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
   };
-  /**
-   * Sends notifications to a Teams channel. Each row connects to one channel — you can add multiple rows for multiple channels.
-   */
-  teamsConfig?: {
-    /**
-     * The webhook URL for your Teams channel. In Teams, open the channel → Workflows → "Post to a channel when a webhook request is received" to generate this URL. Saved securely — leave blank to keep the existing value.
-     */
-    webhookUrl: string;
-    /**
-     * Optional — tag specific team members in notifications. Ask your IT admin for each person's User ID and email address from Microsoft Entra (Azure AD).
-     */
-    mentions?:
-      | {
-          /**
-           * The name shown in the notification, e.g. "@Alex". This is just the visible label — the actual person is identified by the two fields below.
-           */
-          displayName: string;
-          /**
-           * The person's Microsoft Entra (Azure AD) Object ID — a GUID that uniquely identifies them. Required for the @mention to actually notify them. The Teams app does NOT show this — get it from the Entra admin center → Identity → Users → select the person → copy "Object ID", or ask your IT admin.
-           */
-          aadObjectId: string;
-          /**
-           * The person's work email (called "User Principal Name" in Microsoft). This is the email they sign in to Teams / Microsoft 365 with. External guests use the special "user_domain#EXT#@tenant.onmicrosoft.com" form.
-           */
-          upn: string;
-          /**
-           * Optional — only mention this person for specific event types. Leave empty to mention them on all notifications.
-           */
-          triggerOn?: ('document.published' | 'lead.submitted')[] | null;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  /**
-   * Sends event data to an external automation tool like Zapier, Make, or n8n whenever something happens on the site.
-   */
-  genericConfig?: {
-    /**
-     * The destination URL provided by your automation tool. Saved securely.
-     */
-    url: string;
-    /**
-     * A secret passphrase used to verify that notifications genuinely came from CleanStart. Saved securely — leave blank to keep the existing value.
-     */
-    signingSecret: string;
-    /**
-     * Optional label for this secret key — useful if you rotate secrets and want to track which key is active.
-     */
-    signingKeyId?: string | null;
-  };
-  /**
-   * Your HubSpot connection is already set up by the technical team. Use the options below to control how new form submissions appear in HubSpot.
-   */
-  hubspotConfig?: {
-    /**
-     * Choose whether to create just a Contact in HubSpot, or a Contact and a Lead record together.
-     */
-    writeMode?: ('contactOnly' | 'contactAndLead') | null;
-    /**
-     * Where new contacts will be placed in your HubSpot pipeline.
-     */
-    defaultLifecycleStage?:
-      | (
-          | 'subscriber'
-          | 'lead'
-          | 'marketingqualifiedlead'
-          | 'salesqualifiedlead'
-          | 'opportunity'
-          | 'customer'
-          | 'evangelist'
-          | 'other'
-        )
-      | null;
-    /**
-     * The initial follow-up status applied to new contacts in HubSpot.
-     */
-    defaultLeadStatus?:
-      | (
-          | 'NEW'
-          | 'OPEN'
-          | 'IN_PROGRESS'
-          | 'OPEN_DEAL'
-          | 'UNQUALIFIED'
-          | 'ATTEMPTED_TO_CONTACT'
-          | 'CONNECTED'
-          | 'BAD_TIMING'
-        )
-      | null;
-    /**
-     * Optional — if your form has custom fields, map them to the matching HubSpot property here. Email and name are mapped automatically.
-     */
-    fieldMapping?:
-      | {
-          submissionField: string;
-          hubspotProperty: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  /**
-   * Pulls your website traffic data into the dashboard. The connection credentials are already set up by the technical team — just enter your Property ID below.
-   */
-  ga4Config?: {
-    /**
-     * Your GA4 Property ID — a number you can find in Google Analytics under Admin → Property Settings.
-     */
-    propertyId: string;
-  };
-  /**
-   * Pulls search performance data (clicks, impressions) from Google. The connection credentials are already set up by the technical team — just enter your site address below.
-   */
-  gscConfig?: {
-    /**
-     * Your site as it appears in Google Search Console. Use "sc-domain:cleanstart.com" for a domain property, or "https://cleanstart.com/" (with trailing slash) for a URL-prefix property.
-     */
-    siteUrl: string;
-  };
-  /**
-   * Shows which pages have the most user friction (rage clicks, dead clicks). Everything is already set up by the technical team — no extra configuration needed here.
-   */
-  clarityConfig?: {};
-  /**
-   * Shows pageview and visitor data from Cloudflare. The connection is already set up by the technical team. The field below is optional — only fill it in if you have multiple Cloudflare accounts.
-   */
-  cloudflareConfig?: {
-    /**
-     * Optional — your Cloudflare Account ID. Leave blank to use the default account already configured by the technical team.
-     */
-    accountTag?: string | null;
-  };
-  /**
-   * Automatically creates a lead record whenever someone books a meeting via Cal.com. The security connection is already set up by the technical team.
-   */
-  calcomConfig?: {
-    /**
-     * The ID of the form that Cal.com bookings should be recorded under. Create a form called "Cal.com Bookings" in the Forms collection, then paste its numeric ID here.
-     */
-    fallbackFormId: number;
-  };
-  /**
-   * DB-backed rows = editable. Legacy (env) rows are read-only.
-   */
-  source?: ('db' | 'env') | null;
-  /**
-   * When the health badge last polled.
-   */
-  lastHealthAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Cached aggregate analytics payloads (GA4, GSC, Clarity, Cloudflare). Server-managed — do not edit by hand.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "analyticsCache".
- */
-export interface AnalyticsCache {
-  id: number;
-  /**
-   * Scopes cache keys per environment so staging never reads prod payloads.
-   */
-  env: 'production' | 'staging' | 'development';
-  provider: 'ga4DataApi' | 'gscSearchAnalyticsApi' | 'gscUrlInspectionApi' | 'msClarity' | 'cloudflareWebAnalytics';
-  scope: 'global' | 'document';
-  /**
-   * Identifier within the scope. For global = "default"; for per-document = the canonical URL or "<collection>:<id>".
-   */
-  key: string;
-  /**
-   * When the underlying API call was made. Drives staleness.
-   */
-  capturedAt: string;
-  /**
-   * Provider-shape aggregate response. Schema documented per handler in lib/integrations/kinds/.
-   */
-  payload:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Audit trail of website cookie-consent decisions. Server-managed — written by the web CMP, never edited by hand.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "consentLog".
- */
-export interface ConsentLog {
-  id: number;
-  /**
-   * Random per-visitor id stored in the cs_consent cookie. Not linked to any account.
-   */
-  anonymousId: string;
-  decision: 'accept_all' | 'reject_all' | 'custom';
-  /**
-   * Resolved category map at decision time, e.g. { "essential": true, "analytics": false }.
-   */
-  categories:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  consentVersion: number;
-  /**
-   * Global Privacy Control signal present at decision time.
-   */
-  gpc?: boolean | null;
-  /**
-   * Coarse ISO country from x-vercel-ip-country (may be unknown locally).
-   */
-  country?: string | null;
-  /**
-   * HMAC-SHA256 of client IP (CONSENT_LOG_HMAC_SECRET). No raw IP stored.
-   */
-  ipHash?: string | null;
-  /**
-   * HMAC-SHA256 of user-agent. No raw UA stored.
-   */
-  userAgentHash?: string | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1699,967 +1072,6 @@ export interface Category {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "newsCategories".
- */
-export interface NewsCategory {
-  id: number;
-  name: string;
-  /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
-   */
-  slug: string;
-  description?: string | null;
-  icon?: (number | null) | Media;
-  /**
-   * Optional parent category for hierarchical taxonomies.
-   */
-  parent?: (number | null) | NewsCategory;
-  /**
-   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
-   */
-  seo?: {
-    /**
-     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
-     */
-    title?: string | null;
-    /**
-     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
-     */
-    description?: string | null;
-    /**
-     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
-     */
-    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
-    /**
-     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
-     */
-    ogImageAlt?: string | null;
-    /**
-     * Show fields to override the og:title / og:description independently of the SEO title / description.
-     */
-    useAdvancedOg?: boolean | null;
-    /**
-     * Defaults to the SEO title. Most editors never need to override this.
-     */
-    ogTitle?: string | null;
-    /**
-     * Defaults to the SEO description.
-     */
-    ogDescription?: string | null;
-    /**
-     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
-     */
-    useAdvancedTwitter?: boolean | null;
-    /**
-     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
-     */
-    twitterCard?: ('summary' | 'summary_large_image') | null;
-    /**
-     * Defaults to ogTitle, then SEO title.
-     */
-    twitterTitle?: string | null;
-    /**
-     * Defaults to ogDescription, then SEO description.
-     */
-    twitterDescription?: string | null;
-    /**
-     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
-     */
-    twitterImage?: (number | null) | Media;
-    useCustomCanonical?: boolean | null;
-    canonicalOverride?: string | null;
-    robotsAdvanced?: {
-      /**
-       * Don't show a cached version in SERP.
-       */
-      noarchive?: boolean | null;
-      /**
-       * Suppress the textual snippet entirely (overrides max-snippet).
-       */
-      nosnippet?: boolean | null;
-      /**
-       * Don't index images on this page.
-       */
-      noimageindex?: boolean | null;
-      /**
-       * Don't show the 'Translate' link on this page.
-       */
-      notranslate?: boolean | null;
-      /**
-       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
-       */
-      maxSnippet?: number | null;
-      /**
-       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
-       */
-      maxImagePreview?: ('standard' | 'large' | 'none') | null;
-      /**
-       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
-       */
-      maxVideoPreview?: number | null;
-      /**
-       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
-       */
-      unavailableAfter?: string | null;
-    };
-    alternates?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    customTags?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    /**
-     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
-     */
-    keywordTarget?: string | null;
-    /**
-     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
-     */
-    speakablePath?:
-      | {
-          selector: string;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
-     */
-    additionalSchema?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "knowledgeCategories".
- */
-export interface KnowledgeCategory {
-  id: number;
-  name: string;
-  /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
-   */
-  slug: string;
-  description?: string | null;
-  icon?: (number | null) | Media;
-  /**
-   * Optional parent category for hierarchical taxonomies.
-   */
-  parent?: (number | null) | KnowledgeCategory;
-  /**
-   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
-   */
-  seo?: {
-    /**
-     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
-     */
-    title?: string | null;
-    /**
-     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
-     */
-    description?: string | null;
-    /**
-     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
-     */
-    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
-    /**
-     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
-     */
-    ogImageAlt?: string | null;
-    /**
-     * Show fields to override the og:title / og:description independently of the SEO title / description.
-     */
-    useAdvancedOg?: boolean | null;
-    /**
-     * Defaults to the SEO title. Most editors never need to override this.
-     */
-    ogTitle?: string | null;
-    /**
-     * Defaults to the SEO description.
-     */
-    ogDescription?: string | null;
-    /**
-     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
-     */
-    useAdvancedTwitter?: boolean | null;
-    /**
-     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
-     */
-    twitterCard?: ('summary' | 'summary_large_image') | null;
-    /**
-     * Defaults to ogTitle, then SEO title.
-     */
-    twitterTitle?: string | null;
-    /**
-     * Defaults to ogDescription, then SEO description.
-     */
-    twitterDescription?: string | null;
-    /**
-     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
-     */
-    twitterImage?: (number | null) | Media;
-    useCustomCanonical?: boolean | null;
-    canonicalOverride?: string | null;
-    robotsAdvanced?: {
-      /**
-       * Don't show a cached version in SERP.
-       */
-      noarchive?: boolean | null;
-      /**
-       * Suppress the textual snippet entirely (overrides max-snippet).
-       */
-      nosnippet?: boolean | null;
-      /**
-       * Don't index images on this page.
-       */
-      noimageindex?: boolean | null;
-      /**
-       * Don't show the 'Translate' link on this page.
-       */
-      notranslate?: boolean | null;
-      /**
-       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
-       */
-      maxSnippet?: number | null;
-      /**
-       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
-       */
-      maxImagePreview?: ('standard' | 'large' | 'none') | null;
-      /**
-       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
-       */
-      maxVideoPreview?: number | null;
-      /**
-       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
-       */
-      unavailableAfter?: string | null;
-    };
-    alternates?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    customTags?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    /**
-     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
-     */
-    keywordTarget?: string | null;
-    /**
-     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
-     */
-    speakablePath?:
-      | {
-          selector: string;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
-     */
-    additionalSchema?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "forms".
- */
-export interface Form {
-  id: number;
-  name: string;
-  /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
-   */
-  slug: string;
-  /**
-   * Internal notes for editors. Not shown to visitors.
-   */
-  description?: string | null;
-  /**
-   * Forms with more than 7 fields show measurably higher abandonment per Baymard — consider conditional logic or splitting into multiple steps.
-   */
-  fields: {
-    /**
-     * Machine name. Becomes the JSON key on the lead record.
-     */
-    name: string;
-    type: 'text' | 'email' | 'textarea' | 'select' | 'checkbox' | 'consent';
-    /**
-     * Visitor-facing label.
-     */
-    label?: string | null;
-    /**
-     * Consent fields are always required and cannot be unchecked here.
-     */
-    required?: boolean | null;
-    placeholder?: string | null;
-    helpText?: string | null;
-    defaultValue?: string | null;
-    options?:
-      | {
-          label: string;
-          value: string;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Exact text the visitor sees + agrees to. Snapshotted onto every lead record at submit time for GDPR audit defensibility.
-     */
-    consentText?: string | null;
-    /**
-     * Server-enforced via Zod at submit time.
-     */
-    validation?: {
-      minLength?: number | null;
-      maxLength?: number | null;
-      /**
-       * Regular expression source (no leading/trailing slashes).
-       */
-      pattern?: string | null;
-    };
-    /**
-     * Show this field only when the rules below match. Reduces form abandonment by 8–15% per Baymard research.
-     */
-    conditions?: {
-      mode?: ('all' | 'any') | null;
-      rules?:
-        | {
-            fieldName: string;
-            operator: 'equals' | 'notEquals' | 'contains';
-            value: string;
-            id?: string | null;
-          }[]
-        | null;
-    };
-    /**
-     * Override the default validation error. Defaults are inlined per validation type in the form renderer.
-     */
-    errorMessage?: string | null;
-    id?: string | null;
-  }[];
-  submitLabel?: string | null;
-  postSubmit: {
-    kind: 'message' | 'redirect';
-    body?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    url?: string | null;
-  };
-  /**
-   * CRM handlers fan out in parallel to the DB write. Handler config (API keys, list IDs) lives in env. Adapter implementations land in Phase E.
-   */
-  crmHandlers?: ('hubspot' | 'salesforce')[] | null;
-  /**
-   * Email addresses that receive the new-lead notification.
-   */
-  notifyTo?:
-    | {
-        email: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * System-managed. Auto-increments when fields[] changes after the form has at least one submission.
-   */
-  schemaVersion?: number | null;
-  /**
-   * GUID of the matching HubSpot form in the "website" folder. Set this to relay submissions to HubSpot via the Forms API. Leave empty to skip HubSpot sync.
-   */
-  hubspotFormGuid?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * Form submissions (append-only). Editing is disabled — leads are immutable once captured. Use the CSV export for bulk handoff.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "leads".
- */
-export interface Lead {
-  id: number;
-  /**
-   * Form the visitor submitted.
-   */
-  form: number | Form;
-  /**
-   * Captured at submit time — preserves this record's field key meaning even after the form's fields[] is renamed.
-   */
-  formSchemaVersion: number;
-  /**
-   * Visitor answers as a JSON map of {fieldName: value}.
-   */
-  fields:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  /**
-   * URL of the page the form was submitted from (referrer).
-   */
-  source?: string | null;
-  /**
-   * From the query string at submit time.
-   */
-  utm?: {
-    campaign?: string | null;
-    source?: string | null;
-    medium?: string | null;
-    term?: string | null;
-    content?: string | null;
-  };
-  /**
-   * Auto-purged after retention window. Never logged in raw form.
-   */
-  ip?: string | null;
-  /**
-   * Auto-purged after retention window.
-   */
-  userAgent?: string | null;
-  /**
-   * Timestamp of the GDPR consent checkbox tick (when present).
-   */
-  consentGivenAt?: string | null;
-  /**
-   * Exact consent text the visitor saw. Snapshotted from forms.fields[].consentText so it survives policy edits — required for GDPR audit defensibility.
-   */
-  consentSnapshot?: string | null;
-  /**
-   * siteSettings legal.policyVersion at submit time. Pairs with consentSnapshot for the full audit chain.
-   */
-  privacyPolicyVersion?: string | null;
-  /**
-   * Cookie-consent categories the visitor selected (empty until a CMP ships).
-   */
-  consentCategories?:
-    | {
-        category?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * One row per secondary handler (HubSpot, company-from-domain). Failed rows are retryable.
-   */
-  syncedTo?:
-    | {
-        handler: string;
-        status: 'pending' | 'synced' | 'failed' | 'skipped';
-        syncedAt?: string | null;
-        externalId?: string | null;
-        error?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Map of {handler: enrichmentResult}. Free company-from-domain handler runs at launch; external (Clearbit/ZoomInfo) deferred.
-   */
-  enriched?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  /**
-   * Set when a same-email same-form submission lands within 24h of the original. The duplicate row is kept for audit; CRM secondaries skip the resync.
-   */
-  duplicateOf?: (number | null) | Lead;
-  /**
-   * Stamped by the daily PII purge once ip / userAgent / email / phone fields have been nulled. Used as the idempotency marker so re-runs skip already-redacted rows.
-   */
-  piiRedactedAt?: string | null;
-  /**
-   * Non-empty when the hidden honeypot field was filled at submit time. Indicates likely bot submission.
-   */
-  honeypot?: string | null;
-  /**
-   * False when the Cloudflare Turnstile challenge was not passed at submit time.
-   */
-  turnstilePassed?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Partner inquiries (append-only). Submitted via the Become-a-Partner form; emailed to the team via Brevo.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "partner-applications".
- */
-export interface PartnerApplication {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string | null;
-  company: string;
-  website?: string | null;
-  partnerReason?: string | null;
-  /**
-   * Referrer URL.
-   */
-  source?: string | null;
-  ip?: string | null;
-  userAgent?: string | null;
-  consentGivenAt?: string | null;
-  consentSnapshot?: string | null;
-  privacyPolicyVersion?: string | null;
-  consentCategories?:
-    | {
-        category?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  emailDeliveryApplicant?: {
-    status?: ('synced' | 'failed' | 'skipped') | null;
-    messageId?: string | null;
-    error?: string | null;
-  };
-  emailDeliveryAdmin?: {
-    status?: ('synced' | 'failed' | 'skipped') | null;
-    messageId?: string | null;
-    error?: string | null;
-  };
-  honeypot?: string | null;
-  turnstilePassed?: boolean | null;
-  piiRedactedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blogs".
- */
-export interface Blog {
-  id: number;
-  title: string;
-  /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
-   */
-  slug: string;
-  /**
-   * Drives the SEO description fallback. Aim for ≤ 160 characters.
-   */
-  abstract?: string | null;
-  heroImage?: (number | null) | Media;
-  body?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  faqs?:
-    | {
-        question: string;
-        answer: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Multi-author supported — every byline is credited in JSON-LD author[]. Authors with "accepting new bylines" off are hidden from the picker.
-   */
-  authors?: (number | Author)[] | null;
-  /**
-   * Author who reviewed this post for accuracy. Surfaced in JSON-LD reviewedBy + Person — high-leverage E-E-A-T signal.
-   */
-  reviewedBy?: (number | null) | Author;
-  /**
-   * Date of the most recent review pass. When unset, falls back to updatedAt with a note in the SEO panel.
-   */
-  lastReviewedAt?: string | null;
-  categories?: (number | null) | Category;
-  /**
-   * Pin up to 3 posts the reader should see next. Curated picks appear first, in this order. Empty slots auto-fill with the latest from this post's category, then with the latest site-wide.
-   */
-  relatedPosts?: (number | Blog)[] | null;
-  /**
-   * Optional. The post the reader should have read before this one. If unset, the page auto-fills with the chronologically previous published blog (same category preferred). Renders below the author card and adds <link rel="prev"> for SEO.
-   */
-  previousPost?: (number | null) | Blog;
-  /**
-   * Optional. The post the reader should read after this one. If unset, the page auto-fills with the chronologically next published blog (same category preferred). Renders below the author card and adds <link rel="next"> for SEO.
-   */
-  nextPost?: (number | null) | Blog;
-  /**
-   * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
-   */
-  schemaAddons?:
-    | (
-        | {
-            name: string;
-            /**
-             * One-paragraph summary of the procedure.
-             */
-            description: string;
-            /**
-             * ISO 8601 duration (e.g. PT15M = 15 minutes, PT1H30M = 1.5 hours).
-             */
-            totalTime?: string | null;
-            steps?:
-              | {
-                  name: string;
-                  /**
-                   * What the reader should do for this step.
-                   */
-                  text: string;
-                  /**
-                   * Optional supporting image (1200×675 ideal).
-                   */
-                  image?: (number | null) | Media;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'howTo';
-          }
-        | {
-            name: string;
-            description: string;
-            /**
-             * Required by Google. 1200×675 ideal, 16:9 minimum.
-             */
-            thumbnail: number | Media;
-            uploadDate: string;
-            /**
-             * Direct video URL (e.g. .mp4) — used by Google for in-SERP playback. Use embedUrl below for YouTube/Vimeo embeds.
-             */
-            contentUrl: string;
-            /**
-             * Optional iframe-embeddable URL (YouTube/Vimeo). Required by Google when the player is embedded rather than self-hosted.
-             */
-            embedUrl?: string | null;
-            /**
-             * ISO 8601 duration (e.g. PT5M30S).
-             */
-            duration?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'videoObject';
-          }
-        | {
-            /**
-             * Curated Q&A merged into the page FAQPage blob. If the doc already auto-emits FAQ from its `faqs[]` field, these entries are concatenated rather than duplicated.
-             */
-            questions?:
-              | {
-                  question: string;
-                  answer: string;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'faqPage';
-          }
-        | {
-            itemReviewedType: 'Product' | 'Service' | 'SoftwareApplication' | 'Organization';
-            itemReviewedName: string;
-            /**
-             * 0–5 (use whole or half-stars: 0, 0.5, 1, 1.5, …, 5).
-             */
-            ratingValue: number;
-            reviewBody?: string | null;
-            /**
-             * Reviewer name (Person). Falls back to the doc author.
-             */
-            authorName?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'review';
-          }
-        | {
-            name: string;
-            category:
-              | 'BusinessApplication'
-              | 'DeveloperApplication'
-              | 'SecurityApplication'
-              | 'CommunicationApplication';
-            /**
-             * OS support (e.g. "Linux", "macOS, Windows", "Web").
-             */
-            os: string;
-            /**
-             * Price as a string (e.g. "0", "29.00"). Use "0" for free / open-source.
-             */
-            price: string;
-            currency: 'USD' | 'EUR' | 'GBP' | 'INR';
-            /**
-             * Average rating, 0–5. Optional.
-             */
-            ratingValue?: number | null;
-            /**
-             * Number of ratings. Required if Average rating is set.
-             */
-            ratingCount?: number | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'softwareApp';
-          }
-        | {
-            /**
-             * BreadcrumbList is auto-emitted today. Use this override to suppress the auto crumb on a flat page, or to replace it with custom crumbs.
-             */
-            mode: 'suppress' | 'replace';
-            crumbs?:
-              | {
-                  name: string;
-                  /**
-                   * Site-relative path (e.g. /solutions/pricing) or full URL.
-                   */
-                  path: string;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'breadcrumbList';
-          }
-      )[]
-    | null;
-  /**
-   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
-   */
-  publishedAt?: string | null;
-  /**
-   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
-   */
-  displayPublishedAt?: string | null;
-  readingMinutes?: number | null;
-  wordCount?: number | null;
-  /**
-   * Heading levels that appear in the Table of Contents. Re-save to apply.
-   */
-  tocDepth?: ('h2' | 'h2_h3' | 'h2_h3_h4') | null;
-  tableOfContents?:
-    | {
-        level?: number | null;
-        text?: string | null;
-        anchor?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
-   */
-  seo?: {
-    /**
-     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
-     */
-    title?: string | null;
-    /**
-     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
-     */
-    description?: string | null;
-    /**
-     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
-     */
-    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
-    /**
-     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
-     */
-    ogImageAlt?: string | null;
-    /**
-     * Show fields to override the og:title / og:description independently of the SEO title / description.
-     */
-    useAdvancedOg?: boolean | null;
-    /**
-     * Defaults to the SEO title. Most editors never need to override this.
-     */
-    ogTitle?: string | null;
-    /**
-     * Defaults to the SEO description.
-     */
-    ogDescription?: string | null;
-    /**
-     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
-     */
-    useAdvancedTwitter?: boolean | null;
-    /**
-     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
-     */
-    twitterCard?: ('summary' | 'summary_large_image') | null;
-    /**
-     * Defaults to ogTitle, then SEO title.
-     */
-    twitterTitle?: string | null;
-    /**
-     * Defaults to ogDescription, then SEO description.
-     */
-    twitterDescription?: string | null;
-    /**
-     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
-     */
-    twitterImage?: (number | null) | Media;
-    useCustomCanonical?: boolean | null;
-    canonicalOverride?: string | null;
-    robotsAdvanced?: {
-      /**
-       * Don't show a cached version in SERP.
-       */
-      noarchive?: boolean | null;
-      /**
-       * Suppress the textual snippet entirely (overrides max-snippet).
-       */
-      nosnippet?: boolean | null;
-      /**
-       * Don't index images on this page.
-       */
-      noimageindex?: boolean | null;
-      /**
-       * Don't show the 'Translate' link on this page.
-       */
-      notranslate?: boolean | null;
-      /**
-       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
-       */
-      maxSnippet?: number | null;
-      /**
-       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
-       */
-      maxImagePreview?: ('standard' | 'large' | 'none') | null;
-      /**
-       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
-       */
-      maxVideoPreview?: number | null;
-      /**
-       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
-       */
-      unavailableAfter?: string | null;
-    };
-    alternates?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    customTags?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    /**
-     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
-     */
-    keywordTarget?: string | null;
-    /**
-     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
-     */
-    speakablePath?:
-      | {
-          selector: string;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
-     */
-    additionalSchema?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
-  featured?: boolean | null;
-  pinned?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "news".
  */
 export interface News {
@@ -2994,6 +1406,163 @@ export interface News {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsCategories".
+ */
+export interface NewsCategory {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
+  /**
+   * Optional parent category for hierarchical taxonomies.
+   */
+  parent?: (number | null) | NewsCategory;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "guides".
  */
 export interface Guide {
@@ -3105,7 +1674,18 @@ export interface Guide {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Pin up to 3 guides to surface at the bottom of this guide. Curated picks appear first, in this order; empty slots auto-fill with the most recent guides.
+   */
   relatedGuides?: (number | Guide)[] | null;
+  /**
+   * Optional. The guide the reader should have read before this one. If unset, the page auto-fills the chronological previous guide.
+   */
+  previousGuide?: (number | null) | Guide;
+  /**
+   * Optional. The guide the reader should read after this one. If unset, the page auto-fills the chronological next guide.
+   */
+  nextGuide?: (number | null) | Guide;
   /**
    * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
    */
@@ -3265,340 +1845,6 @@ export interface Guide {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
-   */
-  seo?: {
-    /**
-     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
-     */
-    title?: string | null;
-    /**
-     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
-     */
-    description?: string | null;
-    /**
-     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
-     */
-    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
-    /**
-     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
-     */
-    ogImageAlt?: string | null;
-    /**
-     * Show fields to override the og:title / og:description independently of the SEO title / description.
-     */
-    useAdvancedOg?: boolean | null;
-    /**
-     * Defaults to the SEO title. Most editors never need to override this.
-     */
-    ogTitle?: string | null;
-    /**
-     * Defaults to the SEO description.
-     */
-    ogDescription?: string | null;
-    /**
-     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
-     */
-    useAdvancedTwitter?: boolean | null;
-    /**
-     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
-     */
-    twitterCard?: ('summary' | 'summary_large_image') | null;
-    /**
-     * Defaults to ogTitle, then SEO title.
-     */
-    twitterTitle?: string | null;
-    /**
-     * Defaults to ogDescription, then SEO description.
-     */
-    twitterDescription?: string | null;
-    /**
-     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
-     */
-    twitterImage?: (number | null) | Media;
-    useCustomCanonical?: boolean | null;
-    canonicalOverride?: string | null;
-    robotsAdvanced?: {
-      /**
-       * Don't show a cached version in SERP.
-       */
-      noarchive?: boolean | null;
-      /**
-       * Suppress the textual snippet entirely (overrides max-snippet).
-       */
-      nosnippet?: boolean | null;
-      /**
-       * Don't index images on this page.
-       */
-      noimageindex?: boolean | null;
-      /**
-       * Don't show the 'Translate' link on this page.
-       */
-      notranslate?: boolean | null;
-      /**
-       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
-       */
-      maxSnippet?: number | null;
-      /**
-       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
-       */
-      maxImagePreview?: ('standard' | 'large' | 'none') | null;
-      /**
-       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
-       */
-      maxVideoPreview?: number | null;
-      /**
-       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
-       */
-      unavailableAfter?: string | null;
-    };
-    alternates?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    customTags?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    /**
-     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
-     */
-    keywordTarget?: string | null;
-    /**
-     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
-     */
-    speakablePath?:
-      | {
-          selector: string;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
-     */
-    additionalSchema?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resources".
- */
-export interface Resource {
-  id: number;
-  title: string;
-  /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
-   */
-  slug: string;
-  type?: ('whitepaper' | 'ebook' | 'datasheet' | 'architecture-insights' | 'report') | null;
-  summary?: string | null;
-  /**
-   * PDF or ZIP downloadable. Routed to web/resource/.
-   */
-  asset?: (number | null) | Media;
-  body?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * When enabled, the asset download requires a form submission. Sets accessLevel to lead-gated by default.
-   */
-  gated?: boolean | null;
-  /**
-   * Form the visitor fills to unlock the download. Required when gated — the validator blocks save until set.
-   */
-  gateForm?: (number | null) | Form;
-  accessLevel?: ('public' | 'lead-gated' | 'customer-only') | null;
-  /**
-   * CTA copy on the gated download / view button. Empty falls back to a sensible default by `type` (Whitepapers → "Download whitepaper", Reports → "Read the report", etc).
-   */
-  ctaButtonText?: string | null;
-  /**
-   * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
-   */
-  schemaAddons?:
-    | (
-        | {
-            name: string;
-            /**
-             * One-paragraph summary of the procedure.
-             */
-            description: string;
-            /**
-             * ISO 8601 duration (e.g. PT15M = 15 minutes, PT1H30M = 1.5 hours).
-             */
-            totalTime?: string | null;
-            steps?:
-              | {
-                  name: string;
-                  /**
-                   * What the reader should do for this step.
-                   */
-                  text: string;
-                  /**
-                   * Optional supporting image (1200×675 ideal).
-                   */
-                  image?: (number | null) | Media;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'howTo';
-          }
-        | {
-            name: string;
-            description: string;
-            /**
-             * Required by Google. 1200×675 ideal, 16:9 minimum.
-             */
-            thumbnail: number | Media;
-            uploadDate: string;
-            /**
-             * Direct video URL (e.g. .mp4) — used by Google for in-SERP playback. Use embedUrl below for YouTube/Vimeo embeds.
-             */
-            contentUrl: string;
-            /**
-             * Optional iframe-embeddable URL (YouTube/Vimeo). Required by Google when the player is embedded rather than self-hosted.
-             */
-            embedUrl?: string | null;
-            /**
-             * ISO 8601 duration (e.g. PT5M30S).
-             */
-            duration?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'videoObject';
-          }
-        | {
-            /**
-             * Curated Q&A merged into the page FAQPage blob. If the doc already auto-emits FAQ from its `faqs[]` field, these entries are concatenated rather than duplicated.
-             */
-            questions?:
-              | {
-                  question: string;
-                  answer: string;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'faqPage';
-          }
-        | {
-            itemReviewedType: 'Product' | 'Service' | 'SoftwareApplication' | 'Organization';
-            itemReviewedName: string;
-            /**
-             * 0–5 (use whole or half-stars: 0, 0.5, 1, 1.5, …, 5).
-             */
-            ratingValue: number;
-            reviewBody?: string | null;
-            /**
-             * Reviewer name (Person). Falls back to the doc author.
-             */
-            authorName?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'review';
-          }
-        | {
-            name: string;
-            category:
-              | 'BusinessApplication'
-              | 'DeveloperApplication'
-              | 'SecurityApplication'
-              | 'CommunicationApplication';
-            /**
-             * OS support (e.g. "Linux", "macOS, Windows", "Web").
-             */
-            os: string;
-            /**
-             * Price as a string (e.g. "0", "29.00"). Use "0" for free / open-source.
-             */
-            price: string;
-            currency: 'USD' | 'EUR' | 'GBP' | 'INR';
-            /**
-             * Average rating, 0–5. Optional.
-             */
-            ratingValue?: number | null;
-            /**
-             * Number of ratings. Required if Average rating is set.
-             */
-            ratingCount?: number | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'softwareApp';
-          }
-        | {
-            /**
-             * BreadcrumbList is auto-emitted today. Use this override to suppress the auto crumb on a flat page, or to replace it with custom crumbs.
-             */
-            mode: 'suppress' | 'replace';
-            crumbs?:
-              | {
-                  name: string;
-                  /**
-                   * Site-relative path (e.g. /solutions/pricing) or full URL.
-                   */
-                  path: string;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'breadcrumbList';
-          }
-      )[]
-    | null;
-  /**
-   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
-   */
-  publishedAt?: string | null;
-  /**
-   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
-   */
-  displayPublishedAt?: string | null;
-  /**
-   * Automatically incremented each time a visitor downloads this resource.
-   */
-  downloadCount?: number | null;
   /**
    * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
@@ -4130,6 +2376,619 @@ export interface KnowledgeBase {
       | boolean
       | null;
   };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledgeCategories".
+ */
+export interface KnowledgeCategory {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
+  /**
+   * Optional parent category for hierarchical taxonomies.
+   */
+  parent?: (number | null) | KnowledgeCategory;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resources".
+ */
+export interface Resource {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  type?: ('whitepaper' | 'ebook' | 'datasheet' | 'architecture-insights' | 'report') | null;
+  summary?: string | null;
+  /**
+   * PDF or ZIP downloadable. Routed to web/resource/.
+   */
+  asset?: (number | null) | Media;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * When enabled, the asset download requires a form submission. Sets accessLevel to lead-gated by default.
+   */
+  gated?: boolean | null;
+  /**
+   * Form the visitor fills to unlock the download. Required when gated — the validator blocks save until set.
+   */
+  gateForm?: (number | null) | Form;
+  accessLevel?: ('public' | 'lead-gated' | 'customer-only') | null;
+  /**
+   * CTA copy on the gated download / view button. Empty falls back to a sensible default by `type` (Whitepapers → "Download whitepaper", Reports → "Read the report", etc).
+   */
+  ctaButtonText?: string | null;
+  /**
+   * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
+   */
+  schemaAddons?:
+    | (
+        | {
+            name: string;
+            /**
+             * One-paragraph summary of the procedure.
+             */
+            description: string;
+            /**
+             * ISO 8601 duration (e.g. PT15M = 15 minutes, PT1H30M = 1.5 hours).
+             */
+            totalTime?: string | null;
+            steps?:
+              | {
+                  name: string;
+                  /**
+                   * What the reader should do for this step.
+                   */
+                  text: string;
+                  /**
+                   * Optional supporting image (1200×675 ideal).
+                   */
+                  image?: (number | null) | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'howTo';
+          }
+        | {
+            name: string;
+            description: string;
+            /**
+             * Required by Google. 1200×675 ideal, 16:9 minimum.
+             */
+            thumbnail: number | Media;
+            uploadDate: string;
+            /**
+             * Direct video URL (e.g. .mp4) — used by Google for in-SERP playback. Use embedUrl below for YouTube/Vimeo embeds.
+             */
+            contentUrl: string;
+            /**
+             * Optional iframe-embeddable URL (YouTube/Vimeo). Required by Google when the player is embedded rather than self-hosted.
+             */
+            embedUrl?: string | null;
+            /**
+             * ISO 8601 duration (e.g. PT5M30S).
+             */
+            duration?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'videoObject';
+          }
+        | {
+            /**
+             * Curated Q&A merged into the page FAQPage blob. If the doc already auto-emits FAQ from its `faqs[]` field, these entries are concatenated rather than duplicated.
+             */
+            questions?:
+              | {
+                  question: string;
+                  answer: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faqPage';
+          }
+        | {
+            itemReviewedType: 'Product' | 'Service' | 'SoftwareApplication' | 'Organization';
+            itemReviewedName: string;
+            /**
+             * 0–5 (use whole or half-stars: 0, 0.5, 1, 1.5, …, 5).
+             */
+            ratingValue: number;
+            reviewBody?: string | null;
+            /**
+             * Reviewer name (Person). Falls back to the doc author.
+             */
+            authorName?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'review';
+          }
+        | {
+            name: string;
+            category:
+              | 'BusinessApplication'
+              | 'DeveloperApplication'
+              | 'SecurityApplication'
+              | 'CommunicationApplication';
+            /**
+             * OS support (e.g. "Linux", "macOS, Windows", "Web").
+             */
+            os: string;
+            /**
+             * Price as a string (e.g. "0", "29.00"). Use "0" for free / open-source.
+             */
+            price: string;
+            currency: 'USD' | 'EUR' | 'GBP' | 'INR';
+            /**
+             * Average rating, 0–5. Optional.
+             */
+            ratingValue?: number | null;
+            /**
+             * Number of ratings. Required if Average rating is set.
+             */
+            ratingCount?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'softwareApp';
+          }
+        | {
+            /**
+             * BreadcrumbList is auto-emitted today. Use this override to suppress the auto crumb on a flat page, or to replace it with custom crumbs.
+             */
+            mode: 'suppress' | 'replace';
+            crumbs?:
+              | {
+                  name: string;
+                  /**
+                   * Site-relative path (e.g. /solutions/pricing) or full URL.
+                   */
+                  path: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'breadcrumbList';
+          }
+      )[]
+    | null;
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
+  /**
+   * Automatically incremented each time a visitor downloads this resource.
+   */
+  downloadCount?: number | null;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms".
+ */
+export interface Form {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  /**
+   * Internal notes for editors. Not shown to visitors.
+   */
+  description?: string | null;
+  /**
+   * Forms with more than 7 fields show measurably higher abandonment per Baymard — consider conditional logic or splitting into multiple steps.
+   */
+  fields: {
+    /**
+     * Machine name. Becomes the JSON key on the lead record.
+     */
+    name: string;
+    type: 'text' | 'email' | 'textarea' | 'select' | 'checkbox' | 'consent';
+    /**
+     * Visitor-facing label.
+     */
+    label?: string | null;
+    /**
+     * Consent fields are always required and cannot be unchecked here.
+     */
+    required?: boolean | null;
+    placeholder?: string | null;
+    helpText?: string | null;
+    defaultValue?: string | null;
+    options?:
+      | {
+          label: string;
+          value: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Exact text the visitor sees + agrees to. Snapshotted onto every lead record at submit time for GDPR audit defensibility.
+     */
+    consentText?: string | null;
+    /**
+     * Server-enforced via Zod at submit time.
+     */
+    validation?: {
+      minLength?: number | null;
+      maxLength?: number | null;
+      /**
+       * Regular expression source (no leading/trailing slashes).
+       */
+      pattern?: string | null;
+    };
+    /**
+     * Show this field only when the rules below match. Reduces form abandonment by 8–15% per Baymard research.
+     */
+    conditions?: {
+      mode?: ('all' | 'any') | null;
+      rules?:
+        | {
+            fieldName: string;
+            operator: 'equals' | 'notEquals' | 'contains';
+            value: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    /**
+     * Override the default validation error. Defaults are inlined per validation type in the form renderer.
+     */
+    errorMessage?: string | null;
+    id?: string | null;
+  }[];
+  submitLabel?: string | null;
+  postSubmit: {
+    kind: 'message' | 'redirect';
+    body?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    url?: string | null;
+  };
+  /**
+   * CRM handlers fan out in parallel to the DB write. Handler config (API keys, list IDs) lives in env. Adapter implementations land in Phase E.
+   */
+  crmHandlers?: ('hubspot' | 'salesforce')[] | null;
+  /**
+   * Email addresses that receive the new-lead notification.
+   */
+  notifyTo?:
+    | {
+        email: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * System-managed. Auto-increments when fields[] changes after the form has at least one submission.
+   */
+  schemaVersion?: number | null;
+  /**
+   * GUID of the matching HubSpot form in the "website" folder. Set this to relay submissions to HubSpot via the Forms API. Leave empty to skip HubSpot sync.
+   */
+  hubspotFormGuid?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -5200,31 +4059,471 @@ export interface PodcastEpisode {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Image rows shown on /about-us. Each item is NOT URL-addressable — only /about-us reads this collection.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "aboutGalleries".
+ * via the `definition` "jobs".
  */
-export interface AboutGallery {
+export interface Job {
   id: number;
-  name: string;
+  title: string;
   /**
-   * Internal-only slug. Not URL-addressable.
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
-  image: number | Media;
-  caption?: string | null;
+  source: 'cms' | 'ats';
   /**
-   * Optional click-destination for the gallery image. Site-relative path (/about-us#team) or full URL. Empty = the image is non-interactive.
+   * Deep link into the external ATS. Required when source=ats.
    */
-  imageLink?: string | null;
+  atsUrl?: string | null;
+  department?:
+    | ('engineering' | 'sales' | 'marketing' | 'customer-success' | 'operations' | 'finance' | 'legal' | 'people')
+    | null;
+  employmentType?: ('full-time' | 'part-time' | 'contract' | 'internship') | null;
+  experienceLevel?: ('entry' | 'mid' | 'senior' | 'staff' | 'principal') | null;
   /**
-   * Enter a number to control display order (lower = first).
+   * Human-readable experience range shown on the careers site (e.g. "3-10 Years"). Backfilled from the original Webflow data; experienceLevel is the structured bucket derived from it.
    */
-  displayOrder?: number | null;
+  experienceRange?: string | null;
+  /**
+   * Optional when remote=true. Renderers can fall back to "Remote (Global)" when this is empty and remote is on.
+   */
+  locations?: (number | JobLocation)[] | null;
+  remote?: boolean | null;
+  salaryRange?: {
+    min?: number | null;
+    max?: number | null;
+    currency?: ('USD' | 'EUR' | 'GBP' | 'INR') | null;
+  };
+  /**
+   * Short summary shown on listing cards and drives the SEO description fallback. Keep under 160 characters.
+   */
+  abstract?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional JD PDF (routed to web/job/).
+   */
+  descriptionPdf?: (number | null) | Media;
+  /**
+   * mailto:hire@cleanstart.com is acceptable.
+   */
+  applyUrl?: string | null;
+  /**
+   * Hiring lifecycle. Distinct from Payload _status (draft/published).
+   */
+  hiringStatus?: ('open' | 'paused' | 'closed') | null;
+  /**
+   * When applications close. Editors set this when posting.
+   */
+  applicationDeadline?: string | null;
+  /**
+   * When the listing should auto-close. Not yet enforced — update hiringStatus manually when the deadline passes.
+   */
+  expiresAt?: string | null;
+  closedAt?: string | null;
+  /**
+   * Applications submitted for this job (read-only). Open one to download the resume.
+   */
+  applications?: {
+    docs?: (number | CareerApplication)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
+   * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
+   */
+  schemaAddons?:
+    | (
+        | {
+            name: string;
+            /**
+             * One-paragraph summary of the procedure.
+             */
+            description: string;
+            /**
+             * ISO 8601 duration (e.g. PT15M = 15 minutes, PT1H30M = 1.5 hours).
+             */
+            totalTime?: string | null;
+            steps?:
+              | {
+                  name: string;
+                  /**
+                   * What the reader should do for this step.
+                   */
+                  text: string;
+                  /**
+                   * Optional supporting image (1200×675 ideal).
+                   */
+                  image?: (number | null) | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'howTo';
+          }
+        | {
+            name: string;
+            description: string;
+            /**
+             * Required by Google. 1200×675 ideal, 16:9 minimum.
+             */
+            thumbnail: number | Media;
+            uploadDate: string;
+            /**
+             * Direct video URL (e.g. .mp4) — used by Google for in-SERP playback. Use embedUrl below for YouTube/Vimeo embeds.
+             */
+            contentUrl: string;
+            /**
+             * Optional iframe-embeddable URL (YouTube/Vimeo). Required by Google when the player is embedded rather than self-hosted.
+             */
+            embedUrl?: string | null;
+            /**
+             * ISO 8601 duration (e.g. PT5M30S).
+             */
+            duration?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'videoObject';
+          }
+        | {
+            /**
+             * Curated Q&A merged into the page FAQPage blob. If the doc already auto-emits FAQ from its `faqs[]` field, these entries are concatenated rather than duplicated.
+             */
+            questions?:
+              | {
+                  question: string;
+                  answer: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faqPage';
+          }
+        | {
+            itemReviewedType: 'Product' | 'Service' | 'SoftwareApplication' | 'Organization';
+            itemReviewedName: string;
+            /**
+             * 0–5 (use whole or half-stars: 0, 0.5, 1, 1.5, …, 5).
+             */
+            ratingValue: number;
+            reviewBody?: string | null;
+            /**
+             * Reviewer name (Person). Falls back to the doc author.
+             */
+            authorName?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'review';
+          }
+        | {
+            name: string;
+            category:
+              | 'BusinessApplication'
+              | 'DeveloperApplication'
+              | 'SecurityApplication'
+              | 'CommunicationApplication';
+            /**
+             * OS support (e.g. "Linux", "macOS, Windows", "Web").
+             */
+            os: string;
+            /**
+             * Price as a string (e.g. "0", "29.00"). Use "0" for free / open-source.
+             */
+            price: string;
+            currency: 'USD' | 'EUR' | 'GBP' | 'INR';
+            /**
+             * Average rating, 0–5. Optional.
+             */
+            ratingValue?: number | null;
+            /**
+             * Number of ratings. Required if Average rating is set.
+             */
+            ratingCount?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'softwareApp';
+          }
+        | {
+            /**
+             * BreadcrumbList is auto-emitted today. Use this override to suppress the auto crumb on a flat page, or to replace it with custom crumbs.
+             */
+            mode: 'suppress' | 'replace';
+            crumbs?:
+              | {
+                  name: string;
+                  /**
+                   * Site-relative path (e.g. /solutions/pricing) or full URL.
+                   */
+                  path: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'breadcrumbList';
+          }
+      )[]
+    | null;
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobLocations".
+ */
+export interface JobLocation {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  type: 'country' | 'region' | 'city';
+  /**
+   * ISO 3166-1 alpha-2 country code (e.g. IN, US, GB). Two uppercase letters.
+   */
+  isoCountry: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Job applications (append-only). Resumes are stored privately and emailed to HR.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "career-applications".
+ */
+export interface CareerApplication {
+  id: number;
+  job: number | Job;
+  /**
+   * Job title at apply time — survives later job edits/deletes.
+   */
+  jobTitleSnapshot: string;
+  /**
+   * Job location (remote / named locations) at apply time.
+   */
+  jobLocationSnapshot?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  /**
+   * Where the applicant is based (free text).
+   */
+  location?: string | null;
+  /**
+   * How the applicant heard about the role (LinkedIn, referral, …).
+   */
+  howDidYouHear?: string | null;
+  /**
+   * Pasted cover-letter text (optional).
+   */
+  coverLetter?: string | null;
+  /**
+   * Uploaded cover-letter file (optional). Stored privately, like the resume.
+   */
+  coverLetterFile?: (number | null) | Resume;
+  linkedinUrl?: string | null;
+  resume: number | Resume;
+  /**
+   * Referrer URL.
+   */
+  source?: string | null;
+  ip?: string | null;
+  userAgent?: string | null;
+  consentGivenAt?: string | null;
+  consentSnapshot?: string | null;
+  privacyPolicyVersion?: string | null;
+  emailDelivery?: {
+    status?: ('synced' | 'failed' | 'skipped') | null;
+    messageId?: string | null;
+    error?: string | null;
+  };
+  honeypot?: string | null;
+  turnstilePassed?: boolean | null;
+  piiRedactedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Applicant resumes (private). Access-controlled — never public.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resumes".
+ */
+export interface Resume {
+  id: number;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -7102,6 +6401,738 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Image rows shown on /about-us. Each item is NOT URL-addressable — only /about-us reads this collection.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "aboutGalleries".
+ */
+export interface AboutGallery {
+  id: number;
+  name: string;
+  /**
+   * Internal-only slug. Not URL-addressable.
+   */
+  slug: string;
+  image: number | Media;
+  caption?: string | null;
+  /**
+   * Optional click-destination for the gallery image. Site-relative path (/about-us#team) or full URL. Empty = the image is non-interactive.
+   */
+  imageLink?: string | null;
+  /**
+   * Enter a number to control display order (lower = first).
+   */
+  displayOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Form submissions (append-only). Editing is disabled — leads are immutable once captured. Use the CSV export for bulk handoff.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads".
+ */
+export interface Lead {
+  id: number;
+  /**
+   * Form the visitor submitted.
+   */
+  form: number | Form;
+  /**
+   * Captured at submit time — preserves this record's field key meaning even after the form's fields[] is renamed.
+   */
+  formSchemaVersion: number;
+  /**
+   * Visitor answers as a JSON map of {fieldName: value}.
+   */
+  fields:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * URL of the page the form was submitted from (referrer).
+   */
+  source?: string | null;
+  /**
+   * From the query string at submit time.
+   */
+  utm?: {
+    campaign?: string | null;
+    source?: string | null;
+    medium?: string | null;
+    term?: string | null;
+    content?: string | null;
+  };
+  /**
+   * Auto-purged after retention window. Never logged in raw form.
+   */
+  ip?: string | null;
+  /**
+   * Auto-purged after retention window.
+   */
+  userAgent?: string | null;
+  /**
+   * Timestamp of the GDPR consent checkbox tick (when present).
+   */
+  consentGivenAt?: string | null;
+  /**
+   * Exact consent text the visitor saw. Snapshotted from forms.fields[].consentText so it survives policy edits — required for GDPR audit defensibility.
+   */
+  consentSnapshot?: string | null;
+  /**
+   * siteSettings legal.policyVersion at submit time. Pairs with consentSnapshot for the full audit chain.
+   */
+  privacyPolicyVersion?: string | null;
+  /**
+   * Cookie-consent categories the visitor selected (empty until a CMP ships).
+   */
+  consentCategories?:
+    | {
+        category?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * One row per secondary handler (HubSpot, company-from-domain). Failed rows are retryable.
+   */
+  syncedTo?:
+    | {
+        handler: string;
+        status: 'pending' | 'synced' | 'failed' | 'skipped';
+        syncedAt?: string | null;
+        externalId?: string | null;
+        error?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Map of {handler: enrichmentResult}. Free company-from-domain handler runs at launch; external (Clearbit/ZoomInfo) deferred.
+   */
+  enriched?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Set when a same-email same-form submission lands within 24h of the original. The duplicate row is kept for audit; CRM secondaries skip the resync.
+   */
+  duplicateOf?: (number | null) | Lead;
+  /**
+   * Stamped by the daily PII purge once ip / userAgent / email / phone fields have been nulled. Used as the idempotency marker so re-runs skip already-redacted rows.
+   */
+  piiRedactedAt?: string | null;
+  /**
+   * Non-empty when the hidden honeypot field was filled at submit time. Indicates likely bot submission.
+   */
+  honeypot?: string | null;
+  /**
+   * False when the Cloudflare Turnstile challenge was not passed at submit time.
+   */
+  turnstilePassed?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Partner inquiries (append-only). Submitted via the Become-a-Partner form; emailed to the team via Brevo.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partner-applications".
+ */
+export interface PartnerApplication {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string | null;
+  company: string;
+  website?: string | null;
+  partnerReason?: string | null;
+  /**
+   * Referrer URL.
+   */
+  source?: string | null;
+  ip?: string | null;
+  userAgent?: string | null;
+  consentGivenAt?: string | null;
+  consentSnapshot?: string | null;
+  privacyPolicyVersion?: string | null;
+  consentCategories?:
+    | {
+        category?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  emailDeliveryApplicant?: {
+    status?: ('synced' | 'failed' | 'skipped') | null;
+    messageId?: string | null;
+    error?: string | null;
+  };
+  emailDeliveryAdmin?: {
+    status?: ('synced' | 'failed' | 'skipped') | null;
+    messageId?: string | null;
+    error?: string | null;
+  };
+  honeypot?: string | null;
+  turnstilePassed?: boolean | null;
+  piiRedactedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * Source path (e.g. /old-pricing). System-managed rules (source=slug-change) are locked from manual edit.
+   */
+  from: string;
+  status: '301' | '302' | '307' | '308' | '410';
+  /**
+   * Destination path or absolute URL. Required unless status=410. System-managed rules are locked.
+   */
+  to?: string | null;
+  /**
+   * Provenance. System-set on creation; never manually edited.
+   */
+  source: 'manual' | 'slug-change' | 'archive-with-redirect' | 'migration-seed';
+  /**
+   * Why this redirect exists. Future editors thank you.
+   */
+  notes?: string | null;
+  /**
+   * Incremented in apps/web middleware on every match.
+   */
+  hitCount?: number | null;
+  lastHitAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Auto-populated by the nightly link-check cron. Read-only — fix the URL on the source doc and re-publish, the next cron run clears the row.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brokenLinks".
+ */
+export interface BrokenLink {
+  id: number;
+  url: string;
+  status: 'ok' | 'broken' | 'redirect' | 'network';
+  /**
+   * Last observed HTTP status. 0 when the request failed before a response.
+   */
+  httpStatus?: number | null;
+  sourceCollection: string;
+  sourceDocId: string;
+  sourceDocSlug?: string | null;
+  firstSeenAt?: string | null;
+  lastChecked?: string | null;
+  /**
+   * Optional human note (e.g. "publisher confirmed page taken down — replace with archive.org snapshot").
+   */
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  name: string;
+  /**
+   * Uncheck to block this user from logging in. Use the "Disable account" action instead of editing this directly.
+   */
+  enabled?: boolean | null;
+  /**
+   * Composite roles supported. Author = own drafts only. Editor = publish content. Admin = full access.
+   */
+  roles: ('admin' | 'editor' | 'author')[];
+  preferences?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
+}
+/**
+ * Connect CleanStart to your other tools — CRM, analytics, notifications, and automations. Each row is one connection. Your technical team handles credentials; you control what gets sent where.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrations".
+ */
+export interface Integration {
+  id: number;
+  /**
+   * A friendly name to identify this connection, e.g. "Sales team notifications" or "Zapier lead alerts".
+   */
+  label: string;
+  /**
+   * The type of tool you are connecting to. Cannot be changed after saving.
+   */
+  kind:
+    | 'teamsWorkflow'
+    | 'genericWebhook'
+    | 'hubspotCrm'
+    | 'ga4DataApi'
+    | 'gscSearchAnalyticsApi'
+    | 'gscUrlInspectionApi'
+    | 'msClarity'
+    | 'cloudflareWebAnalytics'
+    | 'calComInbound'
+    | 'zohoCrm';
+  /**
+   * Turn this connection on or off without removing it.
+   */
+  enabled?: boolean | null;
+  /**
+   * Choose which activity on the site triggers a notification. Leave all filters empty to receive everything.
+   */
+  routing?: {
+    events?: ('document.published' | 'lead.submitted')[] | null;
+    /**
+     * Filter document.published events by collection. Empty = all collections.
+     */
+    collections?:
+      | ('blogs' | 'news' | 'guides' | 'resources' | 'knowledgeBase' | 'events' | 'webinars' | 'jobs' | 'pages')[]
+      | null;
+    /**
+     * Filter lead.submitted events by form slug. Empty = all forms.
+     */
+    formSlugs?: string[] | null;
+  };
+  /**
+   * Sends notifications to a Teams channel. Each row connects to one channel — you can add multiple rows for multiple channels.
+   */
+  teamsConfig?: {
+    /**
+     * The webhook URL for your Teams channel. In Teams, open the channel → Workflows → "Post to a channel when a webhook request is received" to generate this URL. Saved securely — leave blank to keep the existing value.
+     */
+    webhookUrl: string;
+    /**
+     * Optional — tag specific team members in notifications. Ask your IT admin for each person's User ID and email address from Microsoft Entra (Azure AD).
+     */
+    mentions?:
+      | {
+          /**
+           * The name shown in the notification, e.g. "@Alex". This is just the visible label — the actual person is identified by the two fields below.
+           */
+          displayName: string;
+          /**
+           * The person's Microsoft Entra (Azure AD) Object ID — a GUID that uniquely identifies them. Required for the @mention to actually notify them. The Teams app does NOT show this — get it from the Entra admin center → Identity → Users → select the person → copy "Object ID", or ask your IT admin.
+           */
+          aadObjectId: string;
+          /**
+           * The person's work email (called "User Principal Name" in Microsoft). This is the email they sign in to Teams / Microsoft 365 with. External guests use the special "user_domain#EXT#@tenant.onmicrosoft.com" form.
+           */
+          upn: string;
+          /**
+           * Optional — only mention this person for specific event types. Leave empty to mention them on all notifications.
+           */
+          triggerOn?: ('document.published' | 'lead.submitted')[] | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Sends event data to an external automation tool like Zapier, Make, or n8n whenever something happens on the site.
+   */
+  genericConfig?: {
+    /**
+     * The destination URL provided by your automation tool. Saved securely.
+     */
+    url: string;
+    /**
+     * A secret passphrase used to verify that notifications genuinely came from CleanStart. Saved securely — leave blank to keep the existing value.
+     */
+    signingSecret: string;
+    /**
+     * Optional label for this secret key — useful if you rotate secrets and want to track which key is active.
+     */
+    signingKeyId?: string | null;
+  };
+  /**
+   * Your HubSpot connection is already set up by the technical team. Use the options below to control how new form submissions appear in HubSpot.
+   */
+  hubspotConfig?: {
+    /**
+     * Choose whether to create just a Contact in HubSpot, or a Contact and a Lead record together.
+     */
+    writeMode?: ('contactOnly' | 'contactAndLead') | null;
+    /**
+     * Where new contacts will be placed in your HubSpot pipeline.
+     */
+    defaultLifecycleStage?:
+      | (
+          | 'subscriber'
+          | 'lead'
+          | 'marketingqualifiedlead'
+          | 'salesqualifiedlead'
+          | 'opportunity'
+          | 'customer'
+          | 'evangelist'
+          | 'other'
+        )
+      | null;
+    /**
+     * The initial follow-up status applied to new contacts in HubSpot.
+     */
+    defaultLeadStatus?:
+      | (
+          | 'NEW'
+          | 'OPEN'
+          | 'IN_PROGRESS'
+          | 'OPEN_DEAL'
+          | 'UNQUALIFIED'
+          | 'ATTEMPTED_TO_CONTACT'
+          | 'CONNECTED'
+          | 'BAD_TIMING'
+        )
+      | null;
+    /**
+     * Optional — if your form has custom fields, map them to the matching HubSpot property here. Email and name are mapped automatically.
+     */
+    fieldMapping?:
+      | {
+          submissionField: string;
+          hubspotProperty: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Pulls your website traffic data into the dashboard. The connection credentials are already set up by the technical team — just enter your Property ID below.
+   */
+  ga4Config?: {
+    /**
+     * Your GA4 Property ID — a number you can find in Google Analytics under Admin → Property Settings.
+     */
+    propertyId: string;
+  };
+  /**
+   * Pulls search performance data (clicks, impressions) from Google. The connection credentials are already set up by the technical team — just enter your site address below.
+   */
+  gscConfig?: {
+    /**
+     * Your site as it appears in Google Search Console. Use "sc-domain:cleanstart.com" for a domain property, or "https://cleanstart.com/" (with trailing slash) for a URL-prefix property.
+     */
+    siteUrl: string;
+  };
+  /**
+   * Shows which pages have the most user friction (rage clicks, dead clicks). Everything is already set up by the technical team — no extra configuration needed here.
+   */
+  clarityConfig?: {};
+  /**
+   * Shows pageview and visitor data from Cloudflare. The connection is already set up by the technical team. The field below is optional — only fill it in if you have multiple Cloudflare accounts.
+   */
+  cloudflareConfig?: {
+    /**
+     * Optional — your Cloudflare Account ID. Leave blank to use the default account already configured by the technical team.
+     */
+    accountTag?: string | null;
+  };
+  /**
+   * Automatically creates a lead record whenever someone books a meeting via Cal.com. The security connection is already set up by the technical team.
+   */
+  calcomConfig?: {
+    /**
+     * The ID of the form that Cal.com bookings should be recorded under. Create a form called "Cal.com Bookings" in the Forms collection, then paste its numeric ID here.
+     */
+    fallbackFormId: number;
+  };
+  /**
+   * DB-backed rows = editable. Legacy (env) rows are read-only.
+   */
+  source?: ('db' | 'env') | null;
+  /**
+   * When the health badge last polled.
+   */
+  lastHealthAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Active and revoked preview-share links. Revoke a row to invalidate the link immediately.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "previewAudit".
+ */
+export interface PreviewAudit {
+  id: number;
+  /**
+   * Payload collection slug the token targets.
+   */
+  collection: string;
+  /**
+   * Doc id within the collection.
+   */
+  docId: string;
+  /**
+   * Editor who minted the link.
+   */
+  actor: number | User;
+  /**
+   * Optional human label, e.g. "Legal review – Q2 launch post".
+   */
+  label?: string | null;
+  /**
+   * TTL chosen at mint time.
+   */
+  ttlSeconds: number;
+  expiresAt: string;
+  /**
+   * Set this (or click Revoke in the row actions) to invalidate the link.
+   */
+  revokedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Public-site search queries logged via /api/search/analytics. Filter resultsCount=0 to find content gaps.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "searchLog".
+ */
+export interface SearchLog {
+  id: number;
+  query: string;
+  /**
+   * Number of hits the search returned. Zero = content gap signal.
+   */
+  resultsCount: number;
+  /**
+   * Optional locale tag (e.g. en-US). Used to filter analytics later.
+   */
+  locale?: string | null;
+  /**
+   * Client IP — used for abuse detection. Auto-purged at the same cadence as leads.
+   */
+  ip?: string | null;
+  /**
+   * User-Agent header. Trimmed at 200 chars.
+   */
+  userAgent?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Append-only record of sensitive actions on leads + DSAR events. Read-only — entries are written by hooks, never via the admin UI.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  timestamp: string;
+  action:
+    | 'lead_deleted'
+    | 'lead_exported'
+    | 'partner_exported'
+    | 'dsar_export'
+    | 'dsar_erasure'
+    | 'schema_override_changed'
+    | 'user_disabled'
+    | 'content_reassigned'
+    | 'display_publish_date_overridden';
+  targetCollection: string;
+  targetId: string;
+  /**
+   * Admin who performed the action. Null for system / cron writes.
+   */
+  actorUserId?: (number | null) | User;
+  requestIp?: string | null;
+  userAgent?: string | null;
+  acceptLanguage?: string | null;
+  /**
+   * Number of hops parsed from X-Forwarded-For at request time.
+   */
+  proxyChainLength?: number | null;
+  /**
+   * Per-action payload (e.g. row count for exports, deleted lead snapshot).
+   */
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Audit trail of website cookie-consent decisions. Server-managed — written by the web CMP, never edited by hand.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "consentLog".
+ */
+export interface ConsentLog {
+  id: number;
+  /**
+   * Random per-visitor id stored in the cs_consent cookie. Not linked to any account.
+   */
+  anonymousId: string;
+  decision: 'accept_all' | 'reject_all' | 'custom';
+  /**
+   * Resolved category map at decision time, e.g. { "essential": true, "analytics": false }.
+   */
+  categories:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  consentVersion: number;
+  /**
+   * Global Privacy Control signal present at decision time.
+   */
+  gpc?: boolean | null;
+  /**
+   * Coarse ISO country from x-vercel-ip-country (may be unknown locally).
+   */
+  country?: string | null;
+  /**
+   * HMAC-SHA256 of client IP (CONSENT_LOG_HMAC_SECRET). No raw IP stored.
+   */
+  ipHash?: string | null;
+  /**
+   * HMAC-SHA256 of user-agent. No raw UA stored.
+   */
+  userAgentHash?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Cached aggregate analytics payloads (GA4, GSC, Clarity, Cloudflare). Server-managed — do not edit by hand.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analyticsCache".
+ */
+export interface AnalyticsCache {
+  id: number;
+  /**
+   * Scopes cache keys per environment so staging never reads prod payloads.
+   */
+  env: 'production' | 'staging' | 'development';
+  provider: 'ga4DataApi' | 'gscSearchAnalyticsApi' | 'gscUrlInspectionApi' | 'msClarity' | 'cloudflareWebAnalytics';
+  scope: 'global' | 'document';
+  /**
+   * Identifier within the scope. For global = "default"; for per-document = the canonical URL or "<collection>:<id>".
+   */
+  key: string;
+  /**
+   * When the underlying API call was made. Drives staleness.
+   */
+  capturedAt: string;
+  /**
+   * Provider-shape aggregate response. Schema documented per handler in lib/integrations/kinds/.
+   */
+  payload:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "webhooks_dead_letter".
+ */
+export interface WebhooksDeadLetter {
+  id: number;
+  /**
+   * Unique ID for this delivery attempt (UUID).
+   */
+  webhookId: string;
+  event: 'document.published' | 'lead.submitted';
+  /**
+   * Full event data blob. Used to re-run the delivery on retry.
+   */
+  eventPayload:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * teams | generic | <custom id>
+   */
+  destinationId: string;
+  destinationKind: 'teams' | 'generic';
+  /**
+   * First 80 chars of the destination URL for quick scanning.
+   */
+  destinationLabel?: string | null;
+  /**
+   * How many delivery attempts have been made (including the original).
+   */
+  attemptCount: number;
+  /**
+   * Error message or HTTP status from the most recent attempt.
+   */
+  lastError?: string | null;
+  /**
+   * When the retry task will next attempt this delivery. Null = no more retries.
+   */
+  nextRetryAt?: string | null;
+  /**
+   * Set when a retry succeeds. Null = still failing or exhausted.
+   */
+  resolvedAt?: string | null;
+  /**
+   * x-request-id from the originating HTTP request, for log correlation.
+   */
+  requestId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -7256,56 +7287,56 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'blogs';
+        value: number | Blog;
+      } | null)
+    | ({
+        relationTo: 'news';
+        value: number | News;
+      } | null)
+    | ({
+        relationTo: 'guides';
+        value: number | Guide;
+      } | null)
+    | ({
+        relationTo: 'case-studies';
+        value: number | CaseStudy;
+      } | null)
+    | ({
+        relationTo: 'knowledgeBase';
+        value: number | KnowledgeBase;
+      } | null)
+    | ({
+        relationTo: 'resources';
+        value: number | Resource;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'webinars';
+        value: number | Webinar;
+      } | null)
+    | ({
+        relationTo: 'podcastEpisodes';
+        value: number | PodcastEpisode;
+      } | null)
+    | ({
+        relationTo: 'jobs';
+        value: number | Job;
       } | null)
     | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'resumes';
-        value: number | Resume;
+        relationTo: 'pages';
+        value: number | Page;
       } | null)
     | ({
-        relationTo: 'career-applications';
-        value: number | CareerApplication;
-      } | null)
-    | ({
-        relationTo: 'redirects';
-        value: number | Redirect;
-      } | null)
-    | ({
-        relationTo: 'brokenLinks';
-        value: number | BrokenLink;
-      } | null)
-    | ({
-        relationTo: 'audit-log';
-        value: number | AuditLog;
-      } | null)
-    | ({
-        relationTo: 'searchLog';
-        value: number | SearchLog;
-      } | null)
-    | ({
-        relationTo: 'previewAudit';
-        value: number | PreviewAudit;
-      } | null)
-    | ({
-        relationTo: 'webhooks_dead_letter';
-        value: number | WebhooksDeadLetter;
-      } | null)
-    | ({
-        relationTo: 'integrations';
-        value: number | Integration;
-      } | null)
-    | ({
-        relationTo: 'analyticsCache';
-        value: number | AnalyticsCache;
-      } | null)
-    | ({
-        relationTo: 'consentLog';
-        value: number | ConsentLog;
+        relationTo: 'aboutGalleries';
+        value: number | AboutGallery;
       } | null)
     | ({
         relationTo: 'authors';
@@ -7328,64 +7359,64 @@ export interface PayloadLockedDocument {
         value: number | JobLocation;
       } | null)
     | ({
-        relationTo: 'forms';
-        value: number | Form;
-      } | null)
-    | ({
         relationTo: 'leads';
         value: number | Lead;
+      } | null)
+    | ({
+        relationTo: 'forms';
+        value: number | Form;
       } | null)
     | ({
         relationTo: 'partner-applications';
         value: number | PartnerApplication;
       } | null)
     | ({
-        relationTo: 'blogs';
-        value: number | Blog;
+        relationTo: 'redirects';
+        value: number | Redirect;
       } | null)
     | ({
-        relationTo: 'news';
-        value: number | News;
+        relationTo: 'brokenLinks';
+        value: number | BrokenLink;
       } | null)
     | ({
-        relationTo: 'guides';
-        value: number | Guide;
+        relationTo: 'career-applications';
+        value: number | CareerApplication;
       } | null)
     | ({
-        relationTo: 'resources';
-        value: number | Resource;
+        relationTo: 'resumes';
+        value: number | Resume;
       } | null)
     | ({
-        relationTo: 'case-studies';
-        value: number | CaseStudy;
+        relationTo: 'users';
+        value: number | User;
       } | null)
     | ({
-        relationTo: 'knowledgeBase';
-        value: number | KnowledgeBase;
+        relationTo: 'integrations';
+        value: number | Integration;
       } | null)
     | ({
-        relationTo: 'events';
-        value: number | Event;
+        relationTo: 'previewAudit';
+        value: number | PreviewAudit;
       } | null)
     | ({
-        relationTo: 'webinars';
-        value: number | Webinar;
+        relationTo: 'searchLog';
+        value: number | SearchLog;
       } | null)
     | ({
-        relationTo: 'podcastEpisodes';
-        value: number | PodcastEpisode;
+        relationTo: 'audit-log';
+        value: number | AuditLog;
       } | null)
     | ({
-        relationTo: 'jobs';
-        value: number | Job;
+        relationTo: 'consentLog';
+        value: number | ConsentLog;
       } | null)
     | ({
-        relationTo: 'aboutGalleries';
-        value: number | AboutGallery;
+        relationTo: 'analyticsCache';
+        value: number | AnalyticsCache;
       } | null)
     | ({
-        relationTo: 'pages';
-        value: number | Page;
+        relationTo: 'webhooks_dead_letter';
+        value: number | WebhooksDeadLetter;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -7428,792 +7459,6 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
- */
-export interface UsersSelect<T extends boolean = true> {
-  name?: T;
-  enabled?: T;
-  roles?: T;
-  preferences?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  folder?: T;
-  decorative?: T;
-  alt?: T;
-  caption?: T;
-  credit?: T;
-  prefix?: T;
-  focalPoint?:
-    | T
-    | {
-        x?: T;
-        y?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
-    | T
-    | {
-        thumb?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        card?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        hero?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resumes_select".
- */
-export interface ResumesSelect<T extends boolean = true> {
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "career-applications_select".
- */
-export interface CareerApplicationsSelect<T extends boolean = true> {
-  job?: T;
-  jobTitleSnapshot?: T;
-  jobLocationSnapshot?: T;
-  firstName?: T;
-  lastName?: T;
-  email?: T;
-  phone?: T;
-  coverLetter?: T;
-  linkedinUrl?: T;
-  resume?: T;
-  source?: T;
-  ip?: T;
-  userAgent?: T;
-  consentGivenAt?: T;
-  consentSnapshot?: T;
-  privacyPolicyVersion?: T;
-  emailDelivery?:
-    | T
-    | {
-        status?: T;
-        messageId?: T;
-        error?: T;
-      };
-  honeypot?: T;
-  turnstilePassed?: T;
-  piiRedactedAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects_select".
- */
-export interface RedirectsSelect<T extends boolean = true> {
-  from?: T;
-  status?: T;
-  to?: T;
-  source?: T;
-  notes?: T;
-  hitCount?: T;
-  lastHitAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "brokenLinks_select".
- */
-export interface BrokenLinksSelect<T extends boolean = true> {
-  url?: T;
-  status?: T;
-  httpStatus?: T;
-  sourceCollection?: T;
-  sourceDocId?: T;
-  sourceDocSlug?: T;
-  firstSeenAt?: T;
-  lastChecked?: T;
-  note?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "audit-log_select".
- */
-export interface AuditLogSelect<T extends boolean = true> {
-  timestamp?: T;
-  action?: T;
-  targetCollection?: T;
-  targetId?: T;
-  actorUserId?: T;
-  requestIp?: T;
-  userAgent?: T;
-  acceptLanguage?: T;
-  proxyChainLength?: T;
-  metadata?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "searchLog_select".
- */
-export interface SearchLogSelect<T extends boolean = true> {
-  query?: T;
-  resultsCount?: T;
-  locale?: T;
-  ip?: T;
-  userAgent?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "previewAudit_select".
- */
-export interface PreviewAuditSelect<T extends boolean = true> {
-  collection?: T;
-  docId?: T;
-  actor?: T;
-  label?: T;
-  ttlSeconds?: T;
-  expiresAt?: T;
-  revokedAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "webhooks_dead_letter_select".
- */
-export interface WebhooksDeadLetterSelect<T extends boolean = true> {
-  webhookId?: T;
-  event?: T;
-  eventPayload?: T;
-  destinationId?: T;
-  destinationKind?: T;
-  destinationLabel?: T;
-  attemptCount?: T;
-  lastError?: T;
-  nextRetryAt?: T;
-  resolvedAt?: T;
-  requestId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "integrations_select".
- */
-export interface IntegrationsSelect<T extends boolean = true> {
-  label?: T;
-  kind?: T;
-  enabled?: T;
-  routing?:
-    | T
-    | {
-        events?: T;
-        collections?: T;
-        formSlugs?: T;
-      };
-  teamsConfig?:
-    | T
-    | {
-        webhookUrl?: T;
-        mentions?:
-          | T
-          | {
-              displayName?: T;
-              aadObjectId?: T;
-              upn?: T;
-              triggerOn?: T;
-              id?: T;
-            };
-      };
-  genericConfig?:
-    | T
-    | {
-        url?: T;
-        signingSecret?: T;
-        signingKeyId?: T;
-      };
-  hubspotConfig?:
-    | T
-    | {
-        writeMode?: T;
-        defaultLifecycleStage?: T;
-        defaultLeadStatus?: T;
-        fieldMapping?:
-          | T
-          | {
-              submissionField?: T;
-              hubspotProperty?: T;
-              id?: T;
-            };
-      };
-  ga4Config?:
-    | T
-    | {
-        propertyId?: T;
-      };
-  gscConfig?:
-    | T
-    | {
-        siteUrl?: T;
-      };
-  clarityConfig?: T | {};
-  cloudflareConfig?:
-    | T
-    | {
-        accountTag?: T;
-      };
-  calcomConfig?:
-    | T
-    | {
-        fallbackFormId?: T;
-      };
-  source?: T;
-  lastHealthAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "analyticsCache_select".
- */
-export interface AnalyticsCacheSelect<T extends boolean = true> {
-  env?: T;
-  provider?: T;
-  scope?: T;
-  key?: T;
-  capturedAt?: T;
-  payload?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "consentLog_select".
- */
-export interface ConsentLogSelect<T extends boolean = true> {
-  anonymousId?: T;
-  decision?: T;
-  categories?: T;
-  consentVersion?: T;
-  gpc?: T;
-  country?: T;
-  ipHash?: T;
-  userAgentHash?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "authors_select".
- */
-export interface AuthorsSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  photo?: T;
-  role?: T;
-  location?: T;
-  bioShort?: T;
-  bioLong?: T;
-  topicAreas?:
-    | T
-    | {
-        topic?: T;
-        id?: T;
-      };
-  social?:
-    | T
-    | {
-        twitter?: T;
-        linkedin?: T;
-        github?: T;
-        website?: T;
-        email?: T;
-      };
-  education?:
-    | T
-    | {
-        institution?: T;
-        degree?: T;
-        year?: T;
-        id?: T;
-      };
-  experience?:
-    | T
-    | {
-        company?: T;
-        role?: T;
-        fromYear?: T;
-        toYear?: T;
-        id?: T;
-      };
-  skills?:
-    | T
-    | {
-        skill?: T;
-        id?: T;
-      };
-  awards?:
-    | T
-    | {
-        title?: T;
-        issuer?: T;
-        year?: T;
-        id?: T;
-      };
-  legacyBio?: T;
-  acceptingNewBylines?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        indexable?: T;
-        ogImage?: T;
-        ogImageAlt?: T;
-        useAdvancedOg?: T;
-        ogTitle?: T;
-        ogDescription?: T;
-        useAdvancedTwitter?: T;
-        twitterCard?: T;
-        twitterTitle?: T;
-        twitterDescription?: T;
-        twitterImage?: T;
-        useCustomCanonical?: T;
-        canonicalOverride?: T;
-        robotsAdvanced?:
-          | T
-          | {
-              noarchive?: T;
-              nosnippet?: T;
-              noimageindex?: T;
-              notranslate?: T;
-              maxSnippet?: T;
-              maxImagePreview?: T;
-              maxVideoPreview?: T;
-              unavailableAfter?: T;
-            };
-        alternates?: T;
-        customTags?: T;
-        keywordTarget?: T;
-        speakablePath?:
-          | T
-          | {
-              selector?: T;
-              id?: T;
-            };
-        additionalSchema?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories_select".
- */
-export interface CategoriesSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  description?: T;
-  icon?: T;
-  parent?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        indexable?: T;
-        ogImage?: T;
-        ogImageAlt?: T;
-        useAdvancedOg?: T;
-        ogTitle?: T;
-        ogDescription?: T;
-        useAdvancedTwitter?: T;
-        twitterCard?: T;
-        twitterTitle?: T;
-        twitterDescription?: T;
-        twitterImage?: T;
-        useCustomCanonical?: T;
-        canonicalOverride?: T;
-        robotsAdvanced?:
-          | T
-          | {
-              noarchive?: T;
-              nosnippet?: T;
-              noimageindex?: T;
-              notranslate?: T;
-              maxSnippet?: T;
-              maxImagePreview?: T;
-              maxVideoPreview?: T;
-              unavailableAfter?: T;
-            };
-        alternates?: T;
-        customTags?: T;
-        keywordTarget?: T;
-        speakablePath?:
-          | T
-          | {
-              selector?: T;
-              id?: T;
-            };
-        additionalSchema?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "newsCategories_select".
- */
-export interface NewsCategoriesSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  description?: T;
-  icon?: T;
-  parent?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        indexable?: T;
-        ogImage?: T;
-        ogImageAlt?: T;
-        useAdvancedOg?: T;
-        ogTitle?: T;
-        ogDescription?: T;
-        useAdvancedTwitter?: T;
-        twitterCard?: T;
-        twitterTitle?: T;
-        twitterDescription?: T;
-        twitterImage?: T;
-        useCustomCanonical?: T;
-        canonicalOverride?: T;
-        robotsAdvanced?:
-          | T
-          | {
-              noarchive?: T;
-              nosnippet?: T;
-              noimageindex?: T;
-              notranslate?: T;
-              maxSnippet?: T;
-              maxImagePreview?: T;
-              maxVideoPreview?: T;
-              unavailableAfter?: T;
-            };
-        alternates?: T;
-        customTags?: T;
-        keywordTarget?: T;
-        speakablePath?:
-          | T
-          | {
-              selector?: T;
-              id?: T;
-            };
-        additionalSchema?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "knowledgeCategories_select".
- */
-export interface KnowledgeCategoriesSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  description?: T;
-  icon?: T;
-  parent?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        indexable?: T;
-        ogImage?: T;
-        ogImageAlt?: T;
-        useAdvancedOg?: T;
-        ogTitle?: T;
-        ogDescription?: T;
-        useAdvancedTwitter?: T;
-        twitterCard?: T;
-        twitterTitle?: T;
-        twitterDescription?: T;
-        twitterImage?: T;
-        useCustomCanonical?: T;
-        canonicalOverride?: T;
-        robotsAdvanced?:
-          | T
-          | {
-              noarchive?: T;
-              nosnippet?: T;
-              noimageindex?: T;
-              notranslate?: T;
-              maxSnippet?: T;
-              maxImagePreview?: T;
-              maxVideoPreview?: T;
-              unavailableAfter?: T;
-            };
-        alternates?: T;
-        customTags?: T;
-        keywordTarget?: T;
-        speakablePath?:
-          | T
-          | {
-              selector?: T;
-              id?: T;
-            };
-        additionalSchema?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "jobLocations_select".
- */
-export interface JobLocationsSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  type?: T;
-  isoCountry?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "forms_select".
- */
-export interface FormsSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  description?: T;
-  fields?:
-    | T
-    | {
-        name?: T;
-        type?: T;
-        label?: T;
-        required?: T;
-        placeholder?: T;
-        helpText?: T;
-        defaultValue?: T;
-        options?:
-          | T
-          | {
-              label?: T;
-              value?: T;
-              id?: T;
-            };
-        consentText?: T;
-        validation?:
-          | T
-          | {
-              minLength?: T;
-              maxLength?: T;
-              pattern?: T;
-            };
-        conditions?:
-          | T
-          | {
-              mode?: T;
-              rules?:
-                | T
-                | {
-                    fieldName?: T;
-                    operator?: T;
-                    value?: T;
-                    id?: T;
-                  };
-            };
-        errorMessage?: T;
-        id?: T;
-      };
-  submitLabel?: T;
-  postSubmit?:
-    | T
-    | {
-        kind?: T;
-        body?: T;
-        url?: T;
-      };
-  crmHandlers?: T;
-  notifyTo?:
-    | T
-    | {
-        email?: T;
-        id?: T;
-      };
-  schemaVersion?: T;
-  hubspotFormGuid?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "leads_select".
- */
-export interface LeadsSelect<T extends boolean = true> {
-  form?: T;
-  formSchemaVersion?: T;
-  fields?: T;
-  source?: T;
-  utm?:
-    | T
-    | {
-        campaign?: T;
-        source?: T;
-        medium?: T;
-        term?: T;
-        content?: T;
-      };
-  ip?: T;
-  userAgent?: T;
-  consentGivenAt?: T;
-  consentSnapshot?: T;
-  privacyPolicyVersion?: T;
-  consentCategories?:
-    | T
-    | {
-        category?: T;
-        id?: T;
-      };
-  syncedTo?:
-    | T
-    | {
-        handler?: T;
-        status?: T;
-        syncedAt?: T;
-        externalId?: T;
-        error?: T;
-        id?: T;
-      };
-  enriched?: T;
-  duplicateOf?: T;
-  piiRedactedAt?: T;
-  honeypot?: T;
-  turnstilePassed?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "partner-applications_select".
- */
-export interface PartnerApplicationsSelect<T extends boolean = true> {
-  firstName?: T;
-  lastName?: T;
-  email?: T;
-  phone?: T;
-  company?: T;
-  website?: T;
-  partnerReason?: T;
-  source?: T;
-  ip?: T;
-  userAgent?: T;
-  consentGivenAt?: T;
-  consentSnapshot?: T;
-  privacyPolicyVersion?: T;
-  consentCategories?:
-    | T
-    | {
-        category?: T;
-        id?: T;
-      };
-  emailDeliveryApplicant?:
-    | T
-    | {
-        status?: T;
-        messageId?: T;
-        error?: T;
-      };
-  emailDeliveryAdmin?:
-    | T
-    | {
-        status?: T;
-        messageId?: T;
-        error?: T;
-      };
-  honeypot?: T;
-  turnstilePassed?: T;
-  piiRedactedAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -8586,6 +7831,190 @@ export interface GuidesSelect<T extends boolean = true> {
         id?: T;
       };
   relatedGuides?: T;
+  previousGuide?: T;
+  nextGuide?: T;
+  schemaAddons?:
+    | T
+    | {
+        howTo?:
+          | T
+          | {
+              name?: T;
+              description?: T;
+              totalTime?: T;
+              steps?:
+                | T
+                | {
+                    name?: T;
+                    text?: T;
+                    image?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        videoObject?:
+          | T
+          | {
+              name?: T;
+              description?: T;
+              thumbnail?: T;
+              uploadDate?: T;
+              contentUrl?: T;
+              embedUrl?: T;
+              duration?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faqPage?:
+          | T
+          | {
+              questions?:
+                | T
+                | {
+                    question?: T;
+                    answer?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        review?:
+          | T
+          | {
+              itemReviewedType?: T;
+              itemReviewedName?: T;
+              ratingValue?: T;
+              reviewBody?: T;
+              authorName?: T;
+              id?: T;
+              blockName?: T;
+            };
+        softwareApp?:
+          | T
+          | {
+              name?: T;
+              category?: T;
+              os?: T;
+              price?: T;
+              currency?: T;
+              ratingValue?: T;
+              ratingCount?: T;
+              id?: T;
+              blockName?: T;
+            };
+        breadcrumbList?:
+          | T
+          | {
+              mode?: T;
+              crumbs?:
+                | T
+                | {
+                    name?: T;
+                    path?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
+  publishedAt?: T;
+  displayPublishedAt?: T;
+  tocDepth?: T;
+  readingMinutes?: T;
+  wordCount?: T;
+  tableOfContents?:
+    | T
+    | {
+        level?: T;
+        text?: T;
+        anchor?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "case-studies_select".
+ */
+export interface CaseStudiesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  industry?: T;
+  company?: T;
+  companyLogo?: T;
+  coverImage?: T;
+  summary?: T;
+  asset?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledgeBase_select".
+ */
+export interface KnowledgeBaseSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  abstract?: T;
+  heroImage?: T;
+  category?: T;
+  body?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  reviewedBy?: T;
+  lastReviewedAt?: T;
+  relatedArticles?: T;
   schemaAddons?:
     | T
     | {
@@ -8832,188 +8261,6 @@ export interface ResourcesSelect<T extends boolean = true> {
   publishedAt?: T;
   displayPublishedAt?: T;
   downloadCount?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        indexable?: T;
-        ogImage?: T;
-        ogImageAlt?: T;
-        useAdvancedOg?: T;
-        ogTitle?: T;
-        ogDescription?: T;
-        useAdvancedTwitter?: T;
-        twitterCard?: T;
-        twitterTitle?: T;
-        twitterDescription?: T;
-        twitterImage?: T;
-        useCustomCanonical?: T;
-        canonicalOverride?: T;
-        robotsAdvanced?:
-          | T
-          | {
-              noarchive?: T;
-              nosnippet?: T;
-              noimageindex?: T;
-              notranslate?: T;
-              maxSnippet?: T;
-              maxImagePreview?: T;
-              maxVideoPreview?: T;
-              unavailableAfter?: T;
-            };
-        alternates?: T;
-        customTags?: T;
-        keywordTarget?: T;
-        speakablePath?:
-          | T
-          | {
-              selector?: T;
-              id?: T;
-            };
-        additionalSchema?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "case-studies_select".
- */
-export interface CaseStudiesSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  industry?: T;
-  company?: T;
-  companyLogo?: T;
-  coverImage?: T;
-  summary?: T;
-  asset?: T;
-  publishedAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "knowledgeBase_select".
- */
-export interface KnowledgeBaseSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  abstract?: T;
-  heroImage?: T;
-  category?: T;
-  body?: T;
-  faqs?:
-    | T
-    | {
-        question?: T;
-        answer?: T;
-        id?: T;
-      };
-  reviewedBy?: T;
-  lastReviewedAt?: T;
-  relatedArticles?: T;
-  schemaAddons?:
-    | T
-    | {
-        howTo?:
-          | T
-          | {
-              name?: T;
-              description?: T;
-              totalTime?: T;
-              steps?:
-                | T
-                | {
-                    name?: T;
-                    text?: T;
-                    image?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        videoObject?:
-          | T
-          | {
-              name?: T;
-              description?: T;
-              thumbnail?: T;
-              uploadDate?: T;
-              contentUrl?: T;
-              embedUrl?: T;
-              duration?: T;
-              id?: T;
-              blockName?: T;
-            };
-        faqPage?:
-          | T
-          | {
-              questions?:
-                | T
-                | {
-                    question?: T;
-                    answer?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        review?:
-          | T
-          | {
-              itemReviewedType?: T;
-              itemReviewedName?: T;
-              ratingValue?: T;
-              reviewBody?: T;
-              authorName?: T;
-              id?: T;
-              blockName?: T;
-            };
-        softwareApp?:
-          | T
-          | {
-              name?: T;
-              category?: T;
-              os?: T;
-              price?: T;
-              currency?: T;
-              ratingValue?: T;
-              ratingCount?: T;
-              id?: T;
-              blockName?: T;
-            };
-        breadcrumbList?:
-          | T
-          | {
-              mode?: T;
-              crumbs?:
-                | T
-                | {
-                    name?: T;
-                    path?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-      };
-  publishedAt?: T;
-  displayPublishedAt?: T;
-  tocDepth?: T;
-  readingMinutes?: T;
-  wordCount?: T;
-  tableOfContents?:
-    | T
-    | {
-        level?: T;
-        text?: T;
-        anchor?: T;
-        id?: T;
-      };
   seo?:
     | T
     | {
@@ -9546,6 +8793,7 @@ export interface JobsSelect<T extends boolean = true> {
   department?: T;
   employmentType?: T;
   experienceLevel?: T;
+  experienceRange?: T;
   locations?: T;
   remote?: T;
   salaryRange?:
@@ -9698,18 +8946,66 @@ export interface JobsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "aboutGalleries_select".
+ * via the `definition` "media_select".
  */
-export interface AboutGalleriesSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  image?: T;
+export interface MediaSelect<T extends boolean = true> {
+  folder?: T;
+  decorative?: T;
+  alt?: T;
   caption?: T;
-  imageLink?: T;
-  displayOrder?: T;
+  credit?: T;
+  focalPoint?:
+    | T
+    | {
+        x?: T;
+        y?: T;
+      };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
-  _status?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumb?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -10612,6 +9908,748 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "aboutGalleries_select".
+ */
+export interface AboutGalleriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  image?: T;
+  caption?: T;
+  imageLink?: T;
+  displayOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors_select".
+ */
+export interface AuthorsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  photo?: T;
+  role?: T;
+  location?: T;
+  bioShort?: T;
+  bioLong?: T;
+  topicAreas?:
+    | T
+    | {
+        topic?: T;
+        id?: T;
+      };
+  social?:
+    | T
+    | {
+        twitter?: T;
+        linkedin?: T;
+        github?: T;
+        website?: T;
+        email?: T;
+      };
+  education?:
+    | T
+    | {
+        institution?: T;
+        degree?: T;
+        year?: T;
+        id?: T;
+      };
+  experience?:
+    | T
+    | {
+        company?: T;
+        role?: T;
+        fromYear?: T;
+        toYear?: T;
+        id?: T;
+      };
+  skills?:
+    | T
+    | {
+        skill?: T;
+        id?: T;
+      };
+  awards?:
+    | T
+    | {
+        title?: T;
+        issuer?: T;
+        year?: T;
+        id?: T;
+      };
+  legacyBio?: T;
+  acceptingNewBylines?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  parent?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsCategories_select".
+ */
+export interface NewsCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  parent?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledgeCategories_select".
+ */
+export interface KnowledgeCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  parent?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobLocations_select".
+ */
+export interface JobLocationsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  type?: T;
+  isoCountry?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads_select".
+ */
+export interface LeadsSelect<T extends boolean = true> {
+  form?: T;
+  formSchemaVersion?: T;
+  fields?: T;
+  source?: T;
+  utm?:
+    | T
+    | {
+        campaign?: T;
+        source?: T;
+        medium?: T;
+        term?: T;
+        content?: T;
+      };
+  ip?: T;
+  userAgent?: T;
+  consentGivenAt?: T;
+  consentSnapshot?: T;
+  privacyPolicyVersion?: T;
+  consentCategories?:
+    | T
+    | {
+        category?: T;
+        id?: T;
+      };
+  syncedTo?:
+    | T
+    | {
+        handler?: T;
+        status?: T;
+        syncedAt?: T;
+        externalId?: T;
+        error?: T;
+        id?: T;
+      };
+  enriched?: T;
+  duplicateOf?: T;
+  piiRedactedAt?: T;
+  honeypot?: T;
+  turnstilePassed?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms_select".
+ */
+export interface FormsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  fields?:
+    | T
+    | {
+        name?: T;
+        type?: T;
+        label?: T;
+        required?: T;
+        placeholder?: T;
+        helpText?: T;
+        defaultValue?: T;
+        options?:
+          | T
+          | {
+              label?: T;
+              value?: T;
+              id?: T;
+            };
+        consentText?: T;
+        validation?:
+          | T
+          | {
+              minLength?: T;
+              maxLength?: T;
+              pattern?: T;
+            };
+        conditions?:
+          | T
+          | {
+              mode?: T;
+              rules?:
+                | T
+                | {
+                    fieldName?: T;
+                    operator?: T;
+                    value?: T;
+                    id?: T;
+                  };
+            };
+        errorMessage?: T;
+        id?: T;
+      };
+  submitLabel?: T;
+  postSubmit?:
+    | T
+    | {
+        kind?: T;
+        body?: T;
+        url?: T;
+      };
+  crmHandlers?: T;
+  notifyTo?:
+    | T
+    | {
+        email?: T;
+        id?: T;
+      };
+  schemaVersion?: T;
+  hubspotFormGuid?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partner-applications_select".
+ */
+export interface PartnerApplicationsSelect<T extends boolean = true> {
+  firstName?: T;
+  lastName?: T;
+  email?: T;
+  phone?: T;
+  company?: T;
+  website?: T;
+  partnerReason?: T;
+  source?: T;
+  ip?: T;
+  userAgent?: T;
+  consentGivenAt?: T;
+  consentSnapshot?: T;
+  privacyPolicyVersion?: T;
+  consentCategories?:
+    | T
+    | {
+        category?: T;
+        id?: T;
+      };
+  emailDeliveryApplicant?:
+    | T
+    | {
+        status?: T;
+        messageId?: T;
+        error?: T;
+      };
+  emailDeliveryAdmin?:
+    | T
+    | {
+        status?: T;
+        messageId?: T;
+        error?: T;
+      };
+  honeypot?: T;
+  turnstilePassed?: T;
+  piiRedactedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  status?: T;
+  to?: T;
+  source?: T;
+  notes?: T;
+  hitCount?: T;
+  lastHitAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brokenLinks_select".
+ */
+export interface BrokenLinksSelect<T extends boolean = true> {
+  url?: T;
+  status?: T;
+  httpStatus?: T;
+  sourceCollection?: T;
+  sourceDocId?: T;
+  sourceDocSlug?: T;
+  firstSeenAt?: T;
+  lastChecked?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "career-applications_select".
+ */
+export interface CareerApplicationsSelect<T extends boolean = true> {
+  job?: T;
+  jobTitleSnapshot?: T;
+  jobLocationSnapshot?: T;
+  firstName?: T;
+  lastName?: T;
+  email?: T;
+  phone?: T;
+  location?: T;
+  howDidYouHear?: T;
+  coverLetter?: T;
+  coverLetterFile?: T;
+  linkedinUrl?: T;
+  resume?: T;
+  source?: T;
+  ip?: T;
+  userAgent?: T;
+  consentGivenAt?: T;
+  consentSnapshot?: T;
+  privacyPolicyVersion?: T;
+  emailDelivery?:
+    | T
+    | {
+        status?: T;
+        messageId?: T;
+        error?: T;
+      };
+  honeypot?: T;
+  turnstilePassed?: T;
+  piiRedactedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resumes_select".
+ */
+export interface ResumesSelect<T extends boolean = true> {
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  enabled?: T;
+  roles?: T;
+  preferences?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrations_select".
+ */
+export interface IntegrationsSelect<T extends boolean = true> {
+  label?: T;
+  kind?: T;
+  enabled?: T;
+  routing?:
+    | T
+    | {
+        events?: T;
+        collections?: T;
+        formSlugs?: T;
+      };
+  teamsConfig?:
+    | T
+    | {
+        webhookUrl?: T;
+        mentions?:
+          | T
+          | {
+              displayName?: T;
+              aadObjectId?: T;
+              upn?: T;
+              triggerOn?: T;
+              id?: T;
+            };
+      };
+  genericConfig?:
+    | T
+    | {
+        url?: T;
+        signingSecret?: T;
+        signingKeyId?: T;
+      };
+  hubspotConfig?:
+    | T
+    | {
+        writeMode?: T;
+        defaultLifecycleStage?: T;
+        defaultLeadStatus?: T;
+        fieldMapping?:
+          | T
+          | {
+              submissionField?: T;
+              hubspotProperty?: T;
+              id?: T;
+            };
+      };
+  ga4Config?:
+    | T
+    | {
+        propertyId?: T;
+      };
+  gscConfig?:
+    | T
+    | {
+        siteUrl?: T;
+      };
+  clarityConfig?: T | {};
+  cloudflareConfig?:
+    | T
+    | {
+        accountTag?: T;
+      };
+  calcomConfig?:
+    | T
+    | {
+        fallbackFormId?: T;
+      };
+  source?: T;
+  lastHealthAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "previewAudit_select".
+ */
+export interface PreviewAuditSelect<T extends boolean = true> {
+  collection?: T;
+  docId?: T;
+  actor?: T;
+  label?: T;
+  ttlSeconds?: T;
+  expiresAt?: T;
+  revokedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "searchLog_select".
+ */
+export interface SearchLogSelect<T extends boolean = true> {
+  query?: T;
+  resultsCount?: T;
+  locale?: T;
+  ip?: T;
+  userAgent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  timestamp?: T;
+  action?: T;
+  targetCollection?: T;
+  targetId?: T;
+  actorUserId?: T;
+  requestIp?: T;
+  userAgent?: T;
+  acceptLanguage?: T;
+  proxyChainLength?: T;
+  metadata?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "consentLog_select".
+ */
+export interface ConsentLogSelect<T extends boolean = true> {
+  anonymousId?: T;
+  decision?: T;
+  categories?: T;
+  consentVersion?: T;
+  gpc?: T;
+  country?: T;
+  ipHash?: T;
+  userAgentHash?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analyticsCache_select".
+ */
+export interface AnalyticsCacheSelect<T extends boolean = true> {
+  env?: T;
+  provider?: T;
+  scope?: T;
+  key?: T;
+  capturedAt?: T;
+  payload?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "webhooks_dead_letter_select".
+ */
+export interface WebhooksDeadLetterSelect<T extends boolean = true> {
+  webhookId?: T;
+  event?: T;
+  eventPayload?: T;
+  destinationId?: T;
+  destinationKind?: T;
+  destinationLabel?: T;
+  attemptCount?: T;
+  lastError?: T;
+  nextRetryAt?: T;
+  resolvedAt?: T;
+  requestId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -10731,156 +10769,6 @@ export interface SiteSetting {
      * When on, GA4 / GTM tags fire only after the cookie banner returns "accepted" (Google Consent Mode v2). Required for GDPR compliance.
      */
     consentModeEnabled?: boolean | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "seoDefaults".
- */
-export interface SeoDefault {
-  id: number;
-  /**
-   * Used when seo.title is unset. %s is replaced with the document title.
-   */
-  defaultTitleTemplate?: string | null;
-  /**
-   * Site-wide fallback for seo.description when nothing else is set.
-   */
-  defaultDescription?: string | null;
-  /**
-   * Site-wide fallback when seo.ogImage and the page hero are both empty.
-   */
-  defaultOgImage?: (number | null) | Media;
-  /**
-   * Used as twitter:site fallback when no author handle is set.
-   */
-  twitterHandle?: string | null;
-  /**
-   * Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`. Note: web production phase — not yet consumed by apps/web.
-   */
-  brandIcons?: {
-    /**
-     * 32×32 favicon. Used by `<link rel="icon" sizes="32x32">`.
-     */
-    favicon32?: (number | null) | Media;
-    /**
-     * 192×192 PNG. PWA / Android home-screen icon.
-     */
-    icon192?: (number | null) | Media;
-    /**
-     * 512×512 PNG. PWA / large-tile icon.
-     */
-    icon512?: (number | null) | Media;
-    /**
-     * 180×180 PNG. iOS home-screen icon (`apple-touch-icon`).
-     */
-    appleTouchIcon?: (number | null) | Media;
-    /**
-     * Single-colour SVG for Safari pinned-tab. Will be served as `mask-icon`.
-     */
-    safariPinnedTabSvg?: (number | null) | Media;
-    /**
-     * Hex string (e.g. #0E1117). Surfaced as `<meta name="theme-color">` and as `theme_color` in manifest.json.
-     */
-    themeColor?: string | null;
-  };
-  /**
-   * Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper. Note: web production phase — not yet consumed by apps/web.
-   */
-  verification?: {
-    /**
-     * google-site-verification (Google Search Console → Settings → Ownership verification → HTML tag).
-     */
-    google?: string | null;
-    /**
-     * msvalidate.01 (Bing Webmaster Tools → Site Settings → Site verification → Meta tag).
-     */
-    bing?: string | null;
-    /**
-     * p:domain_verify (Pinterest → Settings → Claim → claim a website → HTML tag).
-     */
-    pinterest?: string | null;
-    /**
-     * yandex-verification (Yandex Webmaster → Settings → Site verification → Meta tag).
-     */
-    yandex?: string | null;
-    /**
-     * facebook-domain-verification (Meta Business Suite → Brand Safety → Domains → Verify → Meta-tag).
-     */
-    facebookDomain?: string | null;
-  };
-  /**
-   * Surfaced on every page as the publisher reference. Required for News content.
-   */
-  organizationJsonLd?: {
-    name?: string | null;
-    legalName?: string | null;
-    url?: string | null;
-    logo?: (number | null) | Media;
-    /**
-     * Authoritative profile URLs (LinkedIn, GitHub, Crunchbase, etc.).
-     */
-    sameAs?:
-      | {
-          url: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  /**
-   * When enabled, the site-wide Organization blob upgrades to a NewsMediaOrganization. Pairs with NewsArticle JSON-LD (isAccessibleForFree: true) and /sitemap-news.xml to satisfy Google News eligibility (signals-based since October 2025). Leave disabled until the policy URLs below are real, published pages — Google penalises NewsMediaOrganization claims that point at empty or missing policies.
-   */
-  newsMediaOrganization?: {
-    /**
-     * Toggle on once the policy pages below exist and link from the site footer.
-     */
-    enabled?: boolean | null;
-    /**
-     * ISO 8601 date (e.g. 2024-01-15). Surfaced as Schema.org foundingDate.
-     */
-    foundingDate?: string | null;
-    /**
-     * One-line tagline. Surfaced as Schema.org slogan.
-     */
-    slogan?: string | null;
-    /**
-     * URL of the masthead / about-us page that lists editorial leadership. Surfaced as Schema.org masthead.
-     */
-    masthead?: string | null;
-    /**
-     * URL of the editorial-ethics policy page.
-     */
-    ethicsPolicy?: string | null;
-    /**
-     * URL of the corrections / retractions policy page.
-     */
-    correctionsPolicy?: string | null;
-    /**
-     * URL of the fact-checking / verification policy page.
-     */
-    factCheckingPolicy?: string | null;
-    /**
-     * URL of the page describing how readers submit feedback / complaints.
-     */
-    actionableFeedbackPolicy?: string | null;
-    /**
-     * URL of the policy page on use of anonymous / unnamed sources.
-     */
-    unnamedSourcesPolicy?: string | null;
-    /**
-     * URL of the diversity / inclusion policy page.
-     */
-    diversityPolicy?: string | null;
-    /**
-     * URL of the page disclosing ownership / funding sources.
-     */
-    ownershipFundingInfo?: string | null;
-    /**
-     * URL of the page describing editorial mission and coverage priorities.
-     */
-    coveragePolicy?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -11037,64 +10925,48 @@ export interface FooterNav {
   createdAt?: string | null;
 }
 /**
+ * Optional spotlight card shown in the Resources mega menu. Falls back to the Bulletin evergreen when no event/webinar is upcoming and this global is empty or expired.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "legal".
+ * via the `definition` "resourcesSpotlight".
  */
-export interface Legal {
+export interface ResourcesSpotlight {
   id: number;
+  image?: (number | null) | Media;
+  headline: string;
+  sub?: string | null;
+  ctaLabel: string;
   /**
-   * Date or semver tag bumped on each policy change (e.g. 2026-04-15). Snapshotted onto every lead at submit time for GDPR audit defensibility.
+   * Destination URL or path. Accepts `/site-path` or `https://…`.
    */
-  policyVersion: string;
-  privacy?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  terms?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  aup?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  ctaHref: string;
   /**
-   * GDPR DSAR / Data Processing Agreement inbox.
+   * After this date, the card is skipped and the evergreen renders.
    */
-  dpaContactEmail?: string | null;
+  expiresAt?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Optional spotlight card shown in the Company mega menu. Renders only when there are no open careers. Falls back to the Talent Network evergreen when empty or expired.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companySpotlight".
+ */
+export interface CompanySpotlight {
+  id: number;
+  image?: (number | null) | Media;
+  headline: string;
+  sub?: string | null;
+  ctaLabel: string;
+  /**
+   * Destination URL or path. Accepts `/site-path` or `https://…`.
+   */
+  ctaHref: string;
+  /**
+   * After this date, the card is skipped and the evergreen renders.
+   */
+  expiresAt?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -11189,48 +11061,214 @@ export interface PodcastPage {
   createdAt?: string | null;
 }
 /**
- * Optional spotlight card shown in the Resources mega menu. Falls back to the Bulletin evergreen when no event/webinar is upcoming and this global is empty or expired.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resourcesSpotlight".
+ * via the `definition` "legal".
  */
-export interface ResourcesSpotlight {
+export interface Legal {
   id: number;
-  image?: (number | null) | Media;
-  headline: string;
-  sub?: string | null;
-  ctaLabel: string;
   /**
-   * Destination URL or path. Accepts `/site-path` or `https://…`.
+   * Date or semver tag bumped on each policy change (e.g. 2026-04-15). Snapshotted onto every lead at submit time for GDPR audit defensibility.
    */
-  ctaHref: string;
+  policyVersion: string;
+  privacy?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  terms?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  aup?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * After this date, the card is skipped and the evergreen renders.
+   * GDPR DSAR / Data Processing Agreement inbox.
    */
-  expiresAt?: string | null;
+  dpaContactEmail?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
- * Optional spotlight card shown in the Company mega menu. Renders only when there are no open careers. Falls back to the Talent Network evergreen when empty or expired.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "companySpotlight".
+ * via the `definition` "seoDefaults".
  */
-export interface CompanySpotlight {
+export interface SeoDefault {
   id: number;
-  image?: (number | null) | Media;
-  headline: string;
-  sub?: string | null;
-  ctaLabel: string;
   /**
-   * Destination URL or path. Accepts `/site-path` or `https://…`.
+   * Used when seo.title is unset. %s is replaced with the document title.
    */
-  ctaHref: string;
+  defaultTitleTemplate?: string | null;
   /**
-   * After this date, the card is skipped and the evergreen renders.
+   * Site-wide fallback for seo.description when nothing else is set.
    */
-  expiresAt?: string | null;
+  defaultDescription?: string | null;
+  /**
+   * Site-wide fallback when seo.ogImage and the page hero are both empty.
+   */
+  defaultOgImage?: (number | null) | Media;
+  /**
+   * Used as twitter:site fallback when no author handle is set.
+   */
+  twitterHandle?: string | null;
+  /**
+   * Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`. Note: web production phase — not yet consumed by apps/web.
+   */
+  brandIcons?: {
+    /**
+     * 32×32 favicon. Used by `<link rel="icon" sizes="32x32">`.
+     */
+    favicon32?: (number | null) | Media;
+    /**
+     * 192×192 PNG. PWA / Android home-screen icon.
+     */
+    icon192?: (number | null) | Media;
+    /**
+     * 512×512 PNG. PWA / large-tile icon.
+     */
+    icon512?: (number | null) | Media;
+    /**
+     * 180×180 PNG. iOS home-screen icon (`apple-touch-icon`).
+     */
+    appleTouchIcon?: (number | null) | Media;
+    /**
+     * Single-colour SVG for Safari pinned-tab. Will be served as `mask-icon`.
+     */
+    safariPinnedTabSvg?: (number | null) | Media;
+    /**
+     * Hex string (e.g. #0E1117). Surfaced as `<meta name="theme-color">` and as `theme_color` in manifest.json.
+     */
+    themeColor?: string | null;
+  };
+  /**
+   * Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper. Note: web production phase — not yet consumed by apps/web.
+   */
+  verification?: {
+    /**
+     * google-site-verification (Google Search Console → Settings → Ownership verification → HTML tag).
+     */
+    google?: string | null;
+    /**
+     * msvalidate.01 (Bing Webmaster Tools → Site Settings → Site verification → Meta tag).
+     */
+    bing?: string | null;
+    /**
+     * p:domain_verify (Pinterest → Settings → Claim → claim a website → HTML tag).
+     */
+    pinterest?: string | null;
+    /**
+     * yandex-verification (Yandex Webmaster → Settings → Site verification → Meta tag).
+     */
+    yandex?: string | null;
+    /**
+     * facebook-domain-verification (Meta Business Suite → Brand Safety → Domains → Verify → Meta-tag).
+     */
+    facebookDomain?: string | null;
+  };
+  /**
+   * Surfaced on every page as the publisher reference. Required for News content.
+   */
+  organizationJsonLd?: {
+    name?: string | null;
+    legalName?: string | null;
+    url?: string | null;
+    logo?: (number | null) | Media;
+    /**
+     * Authoritative profile URLs (LinkedIn, GitHub, Crunchbase, etc.).
+     */
+    sameAs?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * When enabled, the site-wide Organization blob upgrades to a NewsMediaOrganization. Pairs with NewsArticle JSON-LD (isAccessibleForFree: true) and /sitemap-news.xml to satisfy Google News eligibility (signals-based since October 2025). Leave disabled until the policy URLs below are real, published pages — Google penalises NewsMediaOrganization claims that point at empty or missing policies.
+   */
+  newsMediaOrganization?: {
+    /**
+     * Toggle on once the policy pages below exist and link from the site footer.
+     */
+    enabled?: boolean | null;
+    /**
+     * ISO 8601 date (e.g. 2024-01-15). Surfaced as Schema.org foundingDate.
+     */
+    foundingDate?: string | null;
+    /**
+     * One-line tagline. Surfaced as Schema.org slogan.
+     */
+    slogan?: string | null;
+    /**
+     * URL of the masthead / about-us page that lists editorial leadership. Surfaced as Schema.org masthead.
+     */
+    masthead?: string | null;
+    /**
+     * URL of the editorial-ethics policy page.
+     */
+    ethicsPolicy?: string | null;
+    /**
+     * URL of the corrections / retractions policy page.
+     */
+    correctionsPolicy?: string | null;
+    /**
+     * URL of the fact-checking / verification policy page.
+     */
+    factCheckingPolicy?: string | null;
+    /**
+     * URL of the page describing how readers submit feedback / complaints.
+     */
+    actionableFeedbackPolicy?: string | null;
+    /**
+     * URL of the policy page on use of anonymous / unnamed sources.
+     */
+    unnamedSourcesPolicy?: string | null;
+    /**
+     * URL of the diversity / inclusion policy page.
+     */
+    diversityPolicy?: string | null;
+    /**
+     * URL of the page disclosing ownership / funding sources.
+     */
+    ownershipFundingInfo?: string | null;
+    /**
+     * URL of the page describing editorial mission and coverage priorities.
+     */
+    coveragePolicy?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -11284,68 +11322,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         gtmContainerId?: T;
         ga4MeasurementId?: T;
         consentModeEnabled?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "seoDefaults_select".
- */
-export interface SeoDefaultsSelect<T extends boolean = true> {
-  defaultTitleTemplate?: T;
-  defaultDescription?: T;
-  defaultOgImage?: T;
-  twitterHandle?: T;
-  brandIcons?:
-    | T
-    | {
-        favicon32?: T;
-        icon192?: T;
-        icon512?: T;
-        appleTouchIcon?: T;
-        safariPinnedTabSvg?: T;
-        themeColor?: T;
-      };
-  verification?:
-    | T
-    | {
-        google?: T;
-        bing?: T;
-        pinterest?: T;
-        yandex?: T;
-        facebookDomain?: T;
-      };
-  organizationJsonLd?:
-    | T
-    | {
-        name?: T;
-        legalName?: T;
-        url?: T;
-        logo?: T;
-        sameAs?:
-          | T
-          | {
-              url?: T;
-              id?: T;
-            };
-      };
-  newsMediaOrganization?:
-    | T
-    | {
-        enabled?: T;
-        foundingDate?: T;
-        slogan?: T;
-        masthead?: T;
-        ethicsPolicy?: T;
-        correctionsPolicy?: T;
-        factCheckingPolicy?: T;
-        actionableFeedbackPolicy?: T;
-        unnamedSourcesPolicy?: T;
-        diversityPolicy?: T;
-        ownershipFundingInfo?: T;
-        coveragePolicy?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -11460,14 +11436,30 @@ export interface FooterNavSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "legal_select".
+ * via the `definition` "resourcesSpotlight_select".
  */
-export interface LegalSelect<T extends boolean = true> {
-  policyVersion?: T;
-  privacy?: T;
-  terms?: T;
-  aup?: T;
-  dpaContactEmail?: T;
+export interface ResourcesSpotlightSelect<T extends boolean = true> {
+  image?: T;
+  headline?: T;
+  sub?: T;
+  ctaLabel?: T;
+  ctaHref?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companySpotlight_select".
+ */
+export interface CompanySpotlightSelect<T extends boolean = true> {
+  image?: T;
+  headline?: T;
+  sub?: T;
+  ctaLabel?: T;
+  ctaHref?: T;
+  expiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -11522,30 +11514,76 @@ export interface PodcastPageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resourcesSpotlight_select".
+ * via the `definition` "legal_select".
  */
-export interface ResourcesSpotlightSelect<T extends boolean = true> {
-  image?: T;
-  headline?: T;
-  sub?: T;
-  ctaLabel?: T;
-  ctaHref?: T;
-  expiresAt?: T;
+export interface LegalSelect<T extends boolean = true> {
+  policyVersion?: T;
+  privacy?: T;
+  terms?: T;
+  aup?: T;
+  dpaContactEmail?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "companySpotlight_select".
+ * via the `definition` "seoDefaults_select".
  */
-export interface CompanySpotlightSelect<T extends boolean = true> {
-  image?: T;
-  headline?: T;
-  sub?: T;
-  ctaLabel?: T;
-  ctaHref?: T;
-  expiresAt?: T;
+export interface SeoDefaultsSelect<T extends boolean = true> {
+  defaultTitleTemplate?: T;
+  defaultDescription?: T;
+  defaultOgImage?: T;
+  twitterHandle?: T;
+  brandIcons?:
+    | T
+    | {
+        favicon32?: T;
+        icon192?: T;
+        icon512?: T;
+        appleTouchIcon?: T;
+        safariPinnedTabSvg?: T;
+        themeColor?: T;
+      };
+  verification?:
+    | T
+    | {
+        google?: T;
+        bing?: T;
+        pinterest?: T;
+        yandex?: T;
+        facebookDomain?: T;
+      };
+  organizationJsonLd?:
+    | T
+    | {
+        name?: T;
+        legalName?: T;
+        url?: T;
+        logo?: T;
+        sameAs?:
+          | T
+          | {
+              url?: T;
+              id?: T;
+            };
+      };
+  newsMediaOrganization?:
+    | T
+    | {
+        enabled?: T;
+        foundingDate?: T;
+        slogan?: T;
+        masthead?: T;
+        ethicsPolicy?: T;
+        correctionsPolicy?: T;
+        factCheckingPolicy?: T;
+        actionableFeedbackPolicy?: T;
+        unnamedSourcesPolicy?: T;
+        diversityPolicy?: T;
+        ownershipFundingInfo?: T;
+        coveragePolicy?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -11680,16 +11718,16 @@ export interface TaskSchedulePublish {
           value: number | Guide;
         } | null)
       | ({
-          relationTo: 'resources';
-          value: number | Resource;
-        } | null)
-      | ({
           relationTo: 'case-studies';
           value: number | CaseStudy;
         } | null)
       | ({
           relationTo: 'knowledgeBase';
           value: number | KnowledgeBase;
+        } | null)
+      | ({
+          relationTo: 'resources';
+          value: number | Resource;
         } | null)
       | ({
           relationTo: 'events';

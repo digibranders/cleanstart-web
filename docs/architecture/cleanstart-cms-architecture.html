@@ -4759,7 +4759,7 @@ export async function POST(req: Request) {
 
       <h4>Restore drill</h4>
       <ul>
-        <li><strong>Monthly manual drill</strong> — every month, an Admin runs the restore procedure end-to-end against a throwaway droplet and runs the full smoke checklist above. Result + wall-clock timing logged in <code>docs/RESTORE-LOG.md</code>. <strong>The first drill must complete before the migration cutover</strong>, not after — an untested runbook is not a runbook.</li>
+        <li><strong>Monthly manual drill</strong> — every month, an Admin runs the restore procedure end-to-end against a throwaway droplet and runs the full smoke checklist above. Result + wall-clock timing logged in <code>docs/operations/RESTORE-LOG.md</code>. <strong>The first drill must complete before the migration cutover</strong>, not after — an untested runbook is not a runbook.</li>
         <li><strong>Inverted heartbeat</strong>: BetterStack is configured to alert when the backup-cron heartbeat is <em>missing</em> (no ping in 25 h), not just when a backup succeeds. Alert-on-success masks silent cron failure for days; alert-on-missing catches it the morning after.</li>
         <li><strong>RTO target</strong>: 30 minutes from "droplet down" to "site serving from restored stack." Drill must hit this number — if it doesn't, fix the runbook before trusting the SLA.</li>
         <li><strong>RPO target</strong>: 24 hours (since backups are daily). Tighten by adding hourly WAL archival to R2 if the data-loss window becomes unacceptable.</li>
@@ -4779,7 +4779,7 @@ export async function POST(req: Request) {
         (<code>https://prod-XX.&lt;region&gt;.logic.azure.com:443/workflows/&hellip;</code>), accepting an
         <strong>Adaptive Card</strong> payload — not the legacy <code>MessageCard</code> shape. Multi-channel
         and multi-recipient routing, plus cross-tenant guest @mentions, are designed in the
-        post-launch <em>Integrations dashboard</em> (see <code>docs/INTEGRATIONS-RESEARCH.md</code>).
+        post-launch <em>Integrations dashboard</em> (see <code>docs/integrations/INTEGRATIONS-RESEARCH.md</code>).
       </p>
 
       <h4>Event catalog</h4>
@@ -5211,7 +5211,7 @@ sysctl --system</code></pre>
       </table>
 
       <h3>Deploy mechanism + manual fallback</h3>
-      <p><strong>Updated 2026-05-19 — CTO review.</strong> The pre-stand-up plan was Coolify-on-droplet for git-push deploys. After the first install we discovered Coolify GA consumed ~450 MB RAM on the 2 GB box (~22% of memory) and its defaults (port bindings, Traefik-vs-Caddy, beta-vs-GA churn) repeatedly conflicted with the locked decisions in this doc. The deploy mechanism was switched to <strong>GitHub Actions</strong> before any production traffic landed. Current sequence lives in <code>docs/CMS-DEPLOYMENT.md</code>.</p>
+      <p><strong>Updated 2026-05-19 — CTO review.</strong> The pre-stand-up plan was Coolify-on-droplet for git-push deploys. After the first install we discovered Coolify GA consumed ~450 MB RAM on the 2 GB box (~22% of memory) and its defaults (port bindings, Traefik-vs-Caddy, beta-vs-GA churn) repeatedly conflicted with the locked decisions in this doc. The deploy mechanism was switched to <strong>GitHub Actions</strong> before any production traffic landed. Current sequence lives in <code>docs/operations/CMS-DEPLOYMENT.md</code>.</p>
       <ul>
         <li><strong>GitHub Actions deploy</strong> (<code>.github/workflows/deploy-cms.yml</code>) builds the Docker image on the GHA runner, ships it to the droplet via SSH (<code>docker save | gzip | scp</code>), then runs <code>docker compose up -d --wait</code>. Image tags are git SHAs, never <code>latest</code>. Triggers on push to <code>main</code>; manual runs via <em>workflow_dispatch</em> with a SHA input.</li>
         <li><strong>Caddy on host</strong> terminates TLS (auto-Let's Encrypt) and reverse-proxies to the CMS container on <code>localhost:3000</code>. Config in <code>/etc/caddy/Caddyfile</code> on the droplet.</li>
@@ -5588,13 +5588,13 @@ sysctl --system</code></pre>
           <tr><td>Custom dashboard</td><td>Payload admin only. A separate <code>/dashboard</code> route group is added if a marketer ever surfaces a workflow Payload can't handle.</td></tr>
           <tr><td>JSON-LD scope</td><td>Layer 1 (auto from typed fields) + Layer 2 catalog of 4 types (HowTo, SoftwareApplication, VideoObject, Review). Editors never write or paste JSON.</td></tr>
           <tr><td>Webhook scope</td><td>2 events (<code>document.published</code>, <code>lead.submitted</code>) × N destinations × Standard Webhooks signing. Teams destinations target the Workflows app's Power Automate URL with an Adaptive Card body (legacy Office 365 Connectors retire 2026-05-18).</td></tr>
-          <tr><td>Integrations dashboard schema</td><td>Post-launch admin surface: per-row destination (each Teams channel / Slack channel / generic webhook is its own row) with an embedded <code>routing</code> predicate (<code>events[]</code>, <code>collections[]</code>, <code>formSlugs[]</code>, optional <code>minLeadScore</code>) and optional <code>mentions[]</code> (AAD Object ID + UPN for Teams; Slack member IDs for Slack). <code>config</code> JSON encrypted at rest. Reuses the <code>webhooks_dead_letter</code> table and "Failed webhooks" admin view — no forked retry/DLQ. See <code>docs/INTEGRATIONS-RESEARCH.md</code>.</td></tr>
+          <tr><td>Integrations dashboard schema</td><td>Post-launch admin surface: per-row destination (each Teams channel / Slack channel / generic webhook is its own row) with an embedded <code>routing</code> predicate (<code>events[]</code>, <code>collections[]</code>, <code>formSlugs[]</code>, optional <code>minLeadScore</code>) and optional <code>mentions[]</code> (AAD Object ID + UPN for Teams; Slack member IDs for Slack). <code>config</code> JSON encrypted at rest. Reuses the <code>webhooks_dead_letter</code> table and "Failed webhooks" admin view — no forked retry/DLQ. See <code>docs/integrations/INTEGRATIONS-RESEARCH.md</code>.</td></tr>
           <tr><td>Form builder scope</td><td>6 field types (text · email · textarea · select · checkbox · consent). Global rate-limit + retention defaults. Conditional logic for fields ships day-1.</td></tr>
           <tr><td>Cache invalidation</td><td>Per-collection cache tags via Next.js 16 <code>revalidateTag()</code>.</td></tr>
           <tr><td>Alt-text assist</td><td>Humanized-filename starter — pre-fills the alt field on upload, editor confirms before publish. No external API call.</td></tr>
           <tr><td>Cookie consent (CMP)</td><td>Added the moment the first cookie-setting tracker is configured. Until then there are no cookies that require gating.</td></tr>
           <tr><td>Admin access control</td><td>Strong password + Cloudflare WAF at v1. 2FA deferred (backlog A9 — TOTP backend lands in Phase I hardening, then mandatory).</td></tr>
-          <tr><td>Restore drill cadence</td><td>Quarterly manual drill, logged in <code>docs/RESTORE-LOG.md</code>.</td></tr>
+          <tr><td>Restore drill cadence</td><td>Quarterly manual drill, logged in <code>docs/operations/RESTORE-LOG.md</code>.</td></tr>
           <tr><td>Preview revocation</td><td>JWT <code>exp</code> only (1h / 1d / 7d / 30d).</td></tr>
           <tr><td>News inclusion posture</td><td><code>/sitemap-news.xml</code> + <code>isAccessibleForFree: true</code> on every NewsArticle + a site-level NewsMediaOrganization schema. Eligible for Google News from day 1.</td></tr>
           <tr><td>RBAC shape</td><td><code>users.roles: string[]</code> (array). One role at launch; the array shape supports composite roles without migration.</td></tr>

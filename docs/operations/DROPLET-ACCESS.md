@@ -1,7 +1,7 @@
 # Droplet access — quick reference
 
 Public connection details for the production CMS droplet. Non-secret values only.
-The SSH key passphrase lives in the operator's secrets store (see `docs/CMS-DEPLOYMENT.md` §6).
+The SSH key passphrase lives in the operator's secrets store (see `docs/operations/CMS-DEPLOYMENT.md` §6).
 
 ## Production CMS droplet
 
@@ -12,7 +12,7 @@ The SSH key passphrase lives in the operator's secrets store (see `docs/CMS-DEPL
 | Public hostname | `cms.cleanstart.com` (Cloudflare-proxied) |
 | OS | Ubuntu 24.04.4 LTS |
 | Spec | 2 GB RAM / 1 vCPU / 48 GB disk, DO Bangalore (BLR1) |
-| SSH user | `root` (no separate `deploy` user — see `docs/CMS-DEPLOYMENT.md` row 29) |
+| SSH user | `root` (no separate `deploy` user — see `docs/operations/CMS-DEPLOYMENT.md` row 29) |
 | Operator key | `~/.ssh/id_ed25519` on the operator Mac (registered with DO as `mac-mini-gaurav-jadhav`) |
 | GHA deploy key | `~/.ssh/gha-deploy` (private, on operator Mac); public also in `/root/.ssh/authorized_keys` on the droplet |
 
@@ -76,6 +76,6 @@ If a new Claude session needs to SSH to the droplet, paste this:
 
 ## Related
 
-- Full deploy runbook: `docs/CMS-DEPLOYMENT.md`
-- Architecture context: `docs/cleanstart-cms-architecture.html` §`#hosting`, §`#droplet-tuning`
+- Full deploy runbook: `docs/operations/CMS-DEPLOYMENT.md`
+- Architecture context: `docs/architecture/cleanstart-cms-architecture.html` §`#hosting`, §`#droplet-tuning`
 - Rollback procedure: `docs/migration/rollback-runbook.md`

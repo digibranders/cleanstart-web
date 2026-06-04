@@ -5,7 +5,10 @@ export type HrApplicationEmailInput = {
   lastName: string;
   email: string;
   phone?: string | undefined;
+  location?: string | undefined;
+  howDidYouHear?: string | undefined;
   coverLetter?: string | undefined;
+  coverLetterAttached?: boolean | undefined;
   linkedinUrl?: string | undefined;
 };
 
@@ -36,13 +39,16 @@ export const buildHrApplicationEmail = (
 <p style="margin:0 0 16px;">A candidate applied for <strong>${escapeHtml(input.jobTitle)}</strong>. Resume attached.</p>
 <table style="border-collapse:collapse;">
 ${row('Position', input.jobTitle)}
-${row('Location', input.jobLocation)}
+${row('Role location', input.jobLocation)}
 ${row('Name', fullName)}
 ${row('Email', input.email)}
 ${row('Phone', input.phone)}
+${row('Based in', input.location)}
+${row('Heard via', input.howDidYouHear)}
 ${row('LinkedIn', input.linkedinUrl)}
 </table>
 ${input.coverLetter && input.coverLetter.trim().length > 0 ? `<h3 style="margin:20px 0 6px;">Cover letter</h3><p style="white-space:pre-wrap;margin:0;">${escapeHtml(input.coverLetter)}</p>` : ''}
+${input.coverLetterAttached ? `<p style="margin:12px 0 0;color:#555;">📎 Cover letter file attached.</p>` : ''}
 </body></html>`;
   return { subject, htmlContent };
 };

@@ -184,7 +184,7 @@ the hero is not.
 
 - `apps/web/src/lib/nav-config.ts` — add **Case Studies** entry under the Resources group,
   `href: "/case-studies"`.
-- `docs/WEB-PAGES.md` — add the Case Studies row (CMS Listing, ✅ once verified).
+- `docs/web/WEB-PAGES.md` — add the Case Studies row (CMS Listing, ✅ once verified).
 
 ## 8. Verification
 

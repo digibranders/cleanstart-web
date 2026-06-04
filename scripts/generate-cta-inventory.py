@@ -1,4 +1,4 @@
-"""Generate docs/CTA-INVENTORY.csv — full audit of every Hero + Footer CTA on apps/web."""
+"""Generate docs/web/CTA-INVENTORY.csv — full audit of every Hero + Footer CTA on apps/web."""
 import csv
 
 ROWS = [
@@ -63,7 +63,7 @@ ROWS = [
 
 HEADERS = ["Page", "Slot", "CTA text", "Current href", "Recommended target", "Notes"]
 
-out = "docs/CTA-INVENTORY.csv"
+out = "docs/web/CTA-INVENTORY.csv"
 with open(out, "w", newline="", encoding="utf-8") as f:
     w = csv.writer(f, quoting=csv.QUOTE_MINIMAL)
     w.writerow(HEADERS)

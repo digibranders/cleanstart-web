@@ -9,11 +9,14 @@
 
   Dynamic values use Brevo templating: params.X output tags plus
   conditional if-blocks. The code sends these params
-  (see docs/careers-applications.md):
+  (see docs/features/careers-applications.md):
     jobTitle, jobLocation, fullName, firstName, lastName, email,
-    phone, linkedinUrl, coverLetter, submittedAt
-  The resume is a real ATTACHMENT added by the API call (not the
-  template); the "Resume attached" note below refers to it.
+    phone, location, howDidYouHear, linkedinUrl, coverLetter,
+    coverLetterAttached, submittedAt
+  jobLocation is the ROLE's location; location is where the APPLICANT is
+  based. The resume (and a cover-letter file, if the applicant uploaded
+  one) are real ATTACHMENTS added by the API call (not the template); the
+  "Resume attached" note below refers to them.
 
   Email-client safe: 600px table layout, inline CSS, web-safe fonts.
   IMPORTANT: never write literal Brevo tag syntax in this comment.
@@ -129,6 +132,20 @@
                   <td style="padding:7px 0; border-top:1px solid #f1f5f9;">{{ params.phone }}</td>
                 </tr>
                 {% endif %}
+                {% if params.location %}
+                <tr>
+                  <td width="120"
+                    style="padding:7px 0; color:#64748b; vertical-align:top; border-top:1px solid #f1f5f9;">Based in</td>
+                  <td style="padding:7px 0; border-top:1px solid #f1f5f9;">{{ params.location }}</td>
+                </tr>
+                {% endif %}
+                {% if params.howDidYouHear %}
+                <tr>
+                  <td width="120"
+                    style="padding:7px 0; color:#64748b; vertical-align:top; border-top:1px solid #f1f5f9;">Heard via</td>
+                  <td style="padding:7px 0; border-top:1px solid #f1f5f9;">{{ params.howDidYouHear }}</td>
+                </tr>
+                {% endif %}
                 {% if params.linkedinUrl %}
                 <tr>
                   <td width="120"
@@ -152,14 +169,14 @@
             </td>
           </tr>
 
-          <!-- Résumé attached note -->
+          <!-- Attachments note (résumé always; cover-letter file when uploaded) -->
           <tr>
             <td style="padding:18px 32px 4px 32px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
                 style="background-color:#eef2ff; border-radius:10px;">
                 <tr>
                   <td style="padding:14px 18px; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#1e293b;">
-                    📎 &nbsp;<strong>Résumé attached</strong> to this email.
+                    📎 &nbsp;<strong>Résumé attached</strong> to this email.{% if params.coverLetterAttached %} A <strong>cover-letter file</strong> is attached too.{% endif %}
                   </td>
                 </tr>
               </table>

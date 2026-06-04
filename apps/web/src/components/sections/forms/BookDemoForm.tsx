@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { submitLead } from "@/lib/leads/submitLead";
+import { SubmitButton } from "./FormCard";
 
 /** Web input name → HubSpot internal property name (the `forms` field names). */
 const NAME_MAP: Record<string, string> = {
@@ -20,15 +22,16 @@ const STORAGE_CONSENT_TEXT =
   "I agree to allow CleanStart to store and process my personal data.";
 
 export function BookDemoForm(): React.ReactElement {
-  const [submitted, setSubmitted] = useState(false);
-  const [topError, setTopError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (inFlightRef.current) return;
     inFlightRef.current = true;
-    setTopError(null);
+    setStatus(null);
+    setSubmitting(true);
 
     const form = e.currentTarget;
     const fd = new FormData(form);
@@ -53,15 +56,23 @@ export function BookDemoForm(): React.ReactElement {
       ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
     });
 
-    if (result.ok) {
-      form.reset();
-      setSubmitted(true);
-    } else {
-      setTopError("We couldn't submit your request. Please try again.");
-    }
+    setSubmitting(false);
     inFlightRef.current = false;
     if (result.ok) {
-      window.setTimeout(() => setSubmitted(false), 5000);
+      form.reset();
+      setStatus({
+        tone: "success",
+        title: "Demo request received",
+        message:
+          "Thanks — your demo request has been received. Our team will reach out within 24 hours.",
+      });
+      window.setTimeout(() => setStatus(null), 5000);
+    } else {
+      setStatus({
+        tone: "error",
+        title: "Couldn't submit request",
+        message: "We couldn't submit your request. Please try again.",
+      });
     }
   };
 
@@ -82,10 +93,7 @@ export function BookDemoForm(): React.ReactElement {
             border: "1px solid rgba(255, 255, 255, 0.07)",
           }}
         >
-          <SuccessBanner
-            show={submitted}
-            message="Thanks — your demo request has been received. Our team will reach out within 24 hours."
-          />
+          {status ? <StatusBanner ref={statusRef} {...status} /> : null}
           <form onSubmit={onSubmit} className="flex flex-col gap-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
                 <FigmaTextInput name="firstName" label="First Name" required />
@@ -142,82 +150,13 @@ export function BookDemoForm(): React.ReactElement {
               </ConsentText>
 
               <TurnstileWidget />
-              {topError && (
-                <p
-                  role="alert"
-                  style={{
-                    fontFamily: "var(--font-sans), 'Sora', sans-serif",
-                    fontSize: "var(--fs-body-sm)",
-                    fontWeight: 500,
-                    lineHeight: 1.45,
-                    color: "#B42318",
-                  }}
-                >
-                  {topError}
-                </p>
-              )}
-              <SubmitButton submitted={submitted} />
+              <SubmitButton busy={submitting} busyLabel="Submitting…">
+                Submit Application
+              </SubmitButton>
             </form>
         </div>
       </div>
     </div>
-  );
-}
-
-interface SuccessBannerProps {
-  show: boolean;
-  message: string;
-}
-
-function SuccessBanner({ show, message }: SuccessBannerProps): React.ReactElement {
-  return (
-    <output
-      aria-live="polite"
-      className="block overflow-hidden transition-all duration-300 ease-out"
-      style={{
-        maxHeight: show ? "120px" : "0px",
-        opacity: show ? 1 : 0,
-        marginBottom: show ? "20px" : "0px",
-      }}
-    >
-      <div
-        className="flex items-start gap-3 rounded-[10px] px-4 py-3"
-        style={{
-          background: "#ECFDF3",
-          border: "1px solid #ABEFC6",
-        }}
-      >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 20 20"
-          aria-hidden
-          className="shrink-0"
-          style={{ marginTop: "2px" }}
-        >
-          <circle cx="10" cy="10" r="9" fill="#12B76A" />
-          <path
-            d="M6 10.5l2.5 2.5L14 7.5"
-            fill="none"
-            stroke="#FFFFFF"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        <span
-          style={{
-            fontFamily: "var(--font-sans), 'Sora', sans-serif",
-            fontSize: "var(--fs-body-sm)",
-            fontWeight: 500,
-            lineHeight: 1.45,
-            color: "#054F31",
-          }}
-        >
-          {message}
-        </span>
-      </div>
-    </output>
   );
 }
 
@@ -341,61 +280,5 @@ function FigmaCheckbox({ name, label, required }: CheckboxProps): React.ReactEle
         {required && <span className="ml-0.5 text-[#D14343]">*</span>}
       </span>
     </label>
-  );
-}
-
-function SubmitButton({ submitted }: { submitted: boolean }): React.ReactElement {
-  return (
-    <button
-      type="submit"
-      disabled={submitted}
-      className="relative w-full overflow-hidden rounded-[8px] text-white cursor-pointer transition-colors hover:bg-[#2438C2] disabled:cursor-not-allowed disabled:opacity-90"
-      style={{
-        background: submitted ? "#12B76A" : "#3960F9",
-        height: "44px",
-        boxShadow: submitted
-          ? "0 0 0 1px rgba(18, 183, 106, 1), 0 1px 2px -1px rgba(9, 6, 63, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.16)"
-          : "0 0 0 1px rgba(57, 96, 249, 1), 0 1px 2px -1px rgba(9, 6, 63, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.16)",
-      }}
-    >
-      <span
-        className="relative z-10 inline-flex items-center justify-center gap-2"
-        style={{
-          fontFamily: "var(--font-display), 'Manrope', sans-serif",
-          fontWeight: 500,
-          fontSize: "var(--fs-lead)",
-          lineHeight: "24.06px",
-          letterSpacing: "-0.01em",
-        }}
-      >
-        {submitted ? "Submitted" : "Submit Application"}
-        {submitted && (
-          <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden>
-            <path
-              d="M5 10.5l3 3 7-7"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        )}
-      </span>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          width: "30px",
-          height: "30px",
-          right: "calc(50% - 88px)",
-          top: "50%",
-          transform: "translateY(-50%)",
-          background: "rgba(255, 255, 255, 0.6)",
-          borderRadius: "9999px",
-          filter: "blur(20px)",
-        }}
-      />
-    </button>
   );
 }

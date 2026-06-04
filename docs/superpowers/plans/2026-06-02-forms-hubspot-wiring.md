@@ -1,6 +1,6 @@
 # Forms → Payload → HubSpot Wiring Implementation Plan
 
-> **✅ COMPLETED & VERIFIED END-TO-END (2026-06-02).** All 5 forms (book-a-demo, contact, become-a-partner, newsletter, resource-capture) submit → Payload lead row → HubSpot contact, confirmed in HubSpot. See `docs/forms-hubspot-verification.md` for the runbook, final field map, and the gotchas found during verification.
+> **✅ COMPLETED & VERIFIED END-TO-END (2026-06-02).** All 5 forms (book-a-demo, contact, become-a-partner, newsletter, resource-capture) submit → Payload lead row → HubSpot contact, confirmed in HubSpot. See `docs/integrations/forms-hubspot-verification.md` for the runbook, final field map, and the gotchas found during verification.
 >
 > **Deviations from this plan as written:**
 > - **Slug, not formId.** Web forms key on the stable `formSlug` (env-safe); the endpoint resolves slug → id + schemaVersion. `submitLeadBodySchema` accepts `formId` OR `formSlug`; `submit-lead.ts` resolves either.
@@ -56,7 +56,7 @@ Payload `forms` rows (data, not files) are created in Phase 2 via the admin UI o
 
 ## Phase 0 — Confirm prerequisites (no code)
 
-- [ ] **Step 1: Confirm HubSpot field edits are done.** Open the `website` folder; confirm each form's fields/internal-names match the per-form spec (see `docs/forms-hubspot-overview.html` §1 spec). Record each form's **GUID** (already in that doc) and the **field internal names** the form expects.
+- [ ] **Step 1: Confirm HubSpot field edits are done.** Open the `website` folder; confirm each form's fields/internal-names match the per-form spec (see `docs/integrations/forms-hubspot-overview.html` §1 spec). Record each form's **GUID** (already in that doc) and the **field internal names** the form expects.
 - [ ] **Step 2: Set env.** Add to the droplet `.env` and local `apps/cms/.env`:
 ```
 HUBSPOT_PORTAL_ID=245478611
@@ -282,7 +282,7 @@ git commit -m "feat(cms): submit leads to HubSpot via Forms API by form GUID"
 
 Create one `forms` row per in-scope form, in the CMS admin (`/admin/collections/forms/create`) **or** a seed script. **Field `name`s must equal HubSpot internal names** so the handler needs no mapping.
 
-- [ ] **Step 1: Create the rows.** For each form below, set: `name`, `slug`, fields (with the listed `name`s + types + required), a `consent` field, `notifyTo[]` recipients, and `hubspotFormGuid` (from §1 of `docs/forms-hubspot-overview.html`).
+- [ ] **Step 1: Create the rows.** For each form below, set: `name`, `slug`, fields (with the listed `name`s + types + required), a `consent` field, `notifyTo[]` recipients, and `hubspotFormGuid` (from §1 of `docs/integrations/forms-hubspot-overview.html`).
 
 | Payload form (slug) | hubspotFormGuid | Fields (`name`:type, required\*) |
 |---|---|---|

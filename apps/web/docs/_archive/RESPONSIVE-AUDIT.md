@@ -2405,7 +2405,7 @@ The v3 plan landed. All twelve non-deferred v3.8 metrics are green at the local-
 
 Team member **`farheen`** branched from `4b4ff28` (one commit before v3 work landed) and shipped 6 commits of new pages + section redesigns. Brought onto `development` via integration branch `integration/farheen-merge`:
 
-**New routes (3):** `/for-ciso` · `/software-composition-analysis` · `/teams` — all now marked ✅ in `docs/WEB-PAGES.md`.
+**New routes (3):** `/for-ciso` · `/software-composition-analysis` · `/teams` — all now marked ✅ in `docs/web/WEB-PAGES.md`.
 
 **New section components (23):**
 - `sections/ciso/` — Hero · HeroAnimation (Lottie) · Risks · Solution · Comparison · Enterprise · Outcomes · CTA (8 files)

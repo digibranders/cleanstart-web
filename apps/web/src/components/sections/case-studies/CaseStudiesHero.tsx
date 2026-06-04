@@ -25,58 +25,64 @@ export function CaseStudiesHero(): React.ReactElement {
         decoding="async"
       />
 
-      {/* 3D "Case Study" illustration — anchored to the right of the hero band,
-          with its purple + white glows centred behind it. Hidden below md
-          where it would crowd the headline. */}
+      {/* 3D "Case Study" illustration — anchored to the centred max-width
+          container (so it stays within the site's 1440 content width on
+          ultra-wide screens instead of drifting to the viewport edge). Hidden
+          below md where it would crowd the headline. */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden md:block"
-        style={{
-          right: "clamp(8px, 4vw, 96px)",
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: "clamp(360px, 36vw, 560px)",
-          aspectRatio: "575 / 347",
-        }}
+        className="pointer-events-none select-none absolute inset-0 hidden md:block"
       >
-        {/* Purple glow (Figma "Ellipse 46691"): #B23EFF, blurred, centred on the
-            illustration. Blur scales with the illustration's fluid width. */}
-        <div
-          className="absolute left-1/2 top-1/2 z-0"
-          style={{
-            width: "86%",
-            aspectRatio: "497 / 502",
-            transform: "translate(-50%, -50%)",
-            background: "#B23EFF",
-            filter: "blur(clamp(105px, 11vw, 172px))",
-            borderRadius: "50%",
-          }}
-        />
-        {/* Radially-faded grid glow (Figma "Vector"): a small-square grid that
-            fades from white at its centre to transparent, centred on the
-            illustration. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/case-studies/hero-glow-grid.svg"
-          alt=""
-          className="absolute left-1/2 top-1/2 z-0 max-w-none"
-          style={{
-            width: "127%",
-            aspectRatio: "730 / 498",
-            transform: "translate(-50%, -50%)",
-          }}
-          loading="lazy"
-          decoding="async"
-        />
-        <Image
-          src="/images/case-studies/hero-illustration.png"
-          alt=""
-          width={575}
-          height={347}
-          priority
-          sizes="(min-width: 1280px) 560px, 36vw"
-          className="relative z-10 w-full h-auto object-contain"
-        />
+        <div className="relative mx-auto h-full max-w-[var(--container-default)] px-6 sm:px-10">
+          <div
+            className="absolute top-1/2"
+            style={{
+              right: 0,
+              transform: "translateY(-50%)",
+              width: "clamp(360px, 36vw, 560px)",
+              aspectRatio: "575 / 347",
+            }}
+          >
+            {/* Purple glow (Figma "Ellipse 46691"): #B23EFF, blurred, centred on
+                the illustration. Blur scales with the illustration's fluid width. */}
+            <div
+              className="absolute left-1/2 top-1/2 z-0"
+              style={{
+                width: "86%",
+                aspectRatio: "497 / 502",
+                transform: "translate(-50%, -50%)",
+                background: "#B23EFF",
+                filter: "blur(clamp(105px, 11vw, 172px))",
+                borderRadius: "50%",
+              }}
+            />
+            {/* Radially-faded grid glow (Figma "Vector"): a small-square grid that
+                fades from white at its centre to transparent, centred on the
+                illustration. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/case-studies/hero-glow-grid.svg"
+              alt=""
+              className="absolute left-1/2 top-1/2 z-0 max-w-none"
+              style={{
+                width: "127%",
+                aspectRatio: "730 / 498",
+                transform: "translate(-50%, -50%)",
+              }}
+              loading="lazy"
+              decoding="async"
+            />
+            <Image
+              src="/images/case-studies/hero-illustration.png"
+              alt=""
+              width={575}
+              height={347}
+              priority
+              sizes="(min-width: 1280px) 560px, 36vw"
+              className="relative z-10 w-full h-auto object-contain"
+            />
+          </div>
+        </div>
       </div>
 
       <Container className="relative">

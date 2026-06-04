@@ -20,6 +20,7 @@ import { isAdmin } from '../access';
  */
 export const WebhookDeadLetter: CollectionConfig = {
   slug: 'webhooks_dead_letter',
+  labels: { singular: 'Webhook dead letter', plural: 'Webhook dead letters' },
   admin: {
     group: 'System',
     defaultColumns: ['event', 'destinationId', 'attemptCount', 'lastError', 'nextRetryAt', 'resolvedAt'],

@@ -137,6 +137,8 @@ export const careersApplyEndpoint: Endpoint = {
       'lastName',
       'email',
       'phone',
+      'location',
+      'howDidYouHear',
       'coverLetter',
       'linkedinUrl',
       'source',
@@ -193,6 +195,16 @@ export const careersApplyEndpoint: Endpoint = {
       return json({ ok: false, error: 'resume_too_large', reason: sized.reason }, { status: 400, headers: cors });
     }
 
+    // Optional cover-letter file — same MIME allow-list + 10 MB cap as the resume.
+    const coverFileRaw = form.get('coverLetterFile');
+    let coverFile: File | null = null;
+    if (coverFileRaw instanceof File && coverFileRaw.size > 0) {
+      if (!RESUME_MIMES.has(coverFileRaw.type) || coverFileRaw.size > RESUME_LIMIT) {
+        return json({ ok: false, error: 'cover_letter_file_invalid' }, { status: 400, headers: cors });
+      }
+      coverFile = coverFileRaw;
+    }
+
     // Turnstile (no exemption for careers).
     const turnstile = await verifyTurnstileToken(data.turnstileToken, ip);
     if (!turnstile.ok) {
@@ -246,6 +258,34 @@ export const careersApplyEndpoint: Endpoint = {
       return json({ ok: false, error: 'capture_failed' }, { status: 502, headers: cors });
     }
 
+    // 1b. Store the cover-letter file if provided (same private collection).
+    //     Non-fatal: a failure here doesn't block the application.
+    let coverLetterFileId: number | null = null;
+    let coverBuffer: Buffer | null = null;
+    if (coverFile) {
+      try {
+        coverBuffer = Buffer.from(await coverFile.arrayBuffer());
+        const created = await req.payload.create({
+          collection: 'resumes',
+          data: {},
+          file: {
+            data: coverBuffer,
+            mimetype: coverFile.type,
+            name: coverFile.name || 'cover-letter',
+            size: coverFile.size,
+          },
+          overrideAccess: true,
+        });
+        coverLetterFileId = created.id as number;
+      } catch (err) {
+        req.payload.logger.warn(
+          { err: err instanceof Error ? err.message : String(err) },
+          'Cover-letter file upload failed — continuing without it',
+        );
+        coverBuffer = null;
+      }
+    }
+
     // 2. Inject live policyVersion into the consent snapshot.
     let policyVersion: string | undefined;
     if (data.consent != null) {
@@ -266,6 +306,9 @@ export const careersApplyEndpoint: Endpoint = {
     //    is written in the initial append-only row.
     const fullName = `${data.firstName} ${data.lastName}`.trim();
     const attachments = [{ name: file.name || 'resume', content: buffer.toString('base64') }];
+    if (coverBuffer && coverFile) {
+      attachments.push({ name: coverFile.name || 'cover-letter', content: coverBuffer.toString('base64') });
+    }
     const hrEmail = process.env.CAREERS_HR_EMAIL;
     // Use the Brevo dashboard template when BREVO_TEMPLATE_ID is a positive
     // integer; otherwise fall back to the code-built HTML (hr-email.ts).
@@ -298,8 +341,11 @@ export const careersApplyEndpoint: Endpoint = {
           lastName: data.lastName,
           email: data.email,
           phone: data.phone ?? '',
+          location: data.location ?? '',
+          howDidYouHear: data.howDidYouHear ?? '',
           linkedinUrl: data.linkedinUrl ?? '',
           coverLetter: data.coverLetter ?? '',
+          coverLetterAttached: coverLetterFileId != null ? 'Yes' : '',
           submittedAt: new Date().toISOString(),
         },
         attachments,
@@ -312,7 +358,10 @@ export const careersApplyEndpoint: Endpoint = {
         lastName: data.lastName,
         email: data.email,
         phone: data.phone,
+        location: data.location,
+        howDidYouHear: data.howDidYouHear,
         coverLetter: data.coverLetter,
+        coverLetterAttached: coverLetterFileId != null,
         linkedinUrl: data.linkedinUrl,
       });
       delivery = await sendBrevoEmail({
@@ -324,6 +373,20 @@ export const careersApplyEndpoint: Endpoint = {
         attachments,
       });
     }
+
+    // Roll back orphaned R2 uploads when the submission ultimately fails: the
+    // resume/cover-letter files are only persisted to storage for a successfully
+    // created application. Best-effort — a cleanup failure is logged, not raised.
+    const rollbackUpload = async (id: number): Promise<void> => {
+      try {
+        await req.payload.delete({ collection: 'resumes', id, overrideAccess: true });
+      } catch (cleanupErr) {
+        req.payload.logger.warn(
+          { err: cleanupErr instanceof Error ? cleanupErr.message : String(cleanupErr), resumeId: id },
+          'Failed to roll back orphaned resume upload after application create failure',
+        );
+      }
+    };
 
     // 4. Create the append-only application row with delivery embedded.
     try {
@@ -337,7 +400,10 @@ export const careersApplyEndpoint: Endpoint = {
           lastName: data.lastName,
           email: data.email,
           phone: data.phone ?? null,
+          location: data.location ?? null,
+          howDidYouHear: data.howDidYouHear ?? null,
           coverLetter: data.coverLetter ?? null,
+          coverLetterFile: coverLetterFileId,
           linkedinUrl: data.linkedinUrl ?? null,
           resume: resumeId,
           source: data.source ?? null,
@@ -360,6 +426,8 @@ export const careersApplyEndpoint: Endpoint = {
         { err: err instanceof Error ? err.message : String(err), resumeId },
         'Career application create failed after resume upload',
       );
+      await rollbackUpload(resumeId);
+      if (coverLetterFileId != null) await rollbackUpload(coverLetterFileId);
       return json({ ok: false, error: 'capture_failed' }, { status: 502, headers: cors });
     }
 

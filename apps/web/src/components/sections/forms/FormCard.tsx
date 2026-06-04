@@ -134,12 +134,24 @@ export function TextArea({
  */
 export function SubmitButton({
   children = "Submit application",
+  busy = false,
+  busyLabel,
+  disabled,
 }: {
   children?: ReactNode;
+  /** Submission in flight: disables the button + sets aria-busy. */
+  busy?: boolean;
+  /** Label to show while busy (defaults to children). */
+  busyLabel?: ReactNode;
+  /** Force-disable independent of busy (e.g. invalid form). */
+  disabled?: boolean;
 }): React.ReactElement {
+  const isDisabled = disabled ?? busy;
   return (
     <button
       type="submit"
+      disabled={isDisabled}
+      aria-busy={busy || undefined}
       className="relative w-full overflow-hidden rounded-[8px] text-white cursor-pointer transition-colors hover:bg-[#2438C2] disabled:cursor-not-allowed disabled:opacity-70"
       style={{
         background: "#3960F9",
@@ -158,7 +170,7 @@ export function SubmitButton({
           letterSpacing: "-0.01em",
         }}
       >
-        {children}
+        {busy ? (busyLabel ?? children) : children}
       </span>
       <span
         aria-hidden

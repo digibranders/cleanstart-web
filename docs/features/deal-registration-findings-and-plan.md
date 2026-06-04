@@ -53,7 +53,7 @@ Scripts present on the live page:
 
 **Mechanism:** `collectedforms.js` observes the submit, then *guesses* which HubSpot contact property each field maps to using the input's name / label / **placeholder**. There is **no property mapping configured** — it is pure heuristic scraping.
 
-> ⚠️ The Forms-API / collected-script path **only works for HTML form submits**. The new Next.js form posts **JSON**, which `collectedforms.js` cannot observe — so this collection path **stops working at cutover** (documented in [`docs/forms-hubspot-overview.html`](forms-hubspot-overview.html)).
+> ⚠️ The Forms-API / collected-script path **only works for HTML form submits**. The new Next.js form posts **JSON**, which `collectedforms.js` cannot observe — so this collection path **stops working at cutover** (documented in [`docs/integrations/forms-hubspot-overview.html`](../integrations/forms-hubspot-overview.html)).
 
 ---
 
@@ -89,7 +89,7 @@ Scripts present on the live page:
 
 ## 4. New website form (React — not yet deployed)
 
-- **File:** [`apps/web/src/components/sections/forms/DealRegistrationForm.tsx`](../apps/web/src/components/sections/forms/DealRegistrationForm.tsx)
+- **File:** [`apps/web/src/components/sections/forms/DealRegistrationForm.tsx`](../../apps/web/src/components/sections/forms/DealRegistrationForm.tsx)
 - **Status:** **UI stub only** — `onSubmit` just calls `setSubmitted(true)`; it does **not** post anywhere yet.
 - **Planned submit target:** `POST /api/leads/submit` (CMS Payload endpoint) through the `LeadHandler` adapter, with a Cloudflare **Turnstile** token (replacing reCAPTCHA).
 - **Submit button label:** `Submit Application`.
@@ -123,10 +123,10 @@ Scripts present on the live page:
 
 ### Backend / plan context (repo)
 
-- HubSpot lead handler submits via Forms API `POST https://api.hsforms.com/submissions/v3/integration/submit/{portalId}/{formGuid}` — [`apps/cms/src/payload/lib/lead-handlers/hubspot.ts`](../apps/cms/src/payload/lib/lead-handlers/hubspot.ts).
-- Deal Registration is **deliberately deferred** — [`docs/superpowers/plans/2026-06-02-forms-hubspot-wiring.md`](superpowers/plans/2026-06-02-forms-hubspot-wiring.md): "needs the two-contact + Deal-object model (pending a marketing decision). Leave `DealRegistrationForm.tsx` as a stub and create no `forms` row for it yet."
-- Not seeded in [`apps/cms/scripts/seed-website-forms.ts`](../apps/cms/scripts/seed-website-forms.ts).
-- [`docs/BACKLOG.md`](BACKLOG.md): deal-reg should create **Leads + Deals** (vs the contact form which creates Leads only).
+- HubSpot lead handler submits via Forms API `POST https://api.hsforms.com/submissions/v3/integration/submit/{portalId}/{formGuid}` — [`apps/cms/src/payload/lib/lead-handlers/hubspot.ts`](../../apps/cms/src/payload/lib/lead-handlers/hubspot.ts).
+- Deal Registration is **deliberately deferred** — [`docs/superpowers/plans/2026-06-02-forms-hubspot-wiring.md`](../superpowers/plans/2026-06-02-forms-hubspot-wiring.md): "needs the two-contact + Deal-object model (pending a marketing decision). Leave `DealRegistrationForm.tsx` as a stub and create no `forms` row for it yet."
+- Not seeded in [`apps/cms/scripts/seed-website-forms.ts`](../../apps/cms/scripts/seed-website-forms.ts).
+- [`docs/BACKLOG.md`](../BACKLOG.md): deal-reg should create **Leads + Deals** (vs the contact form which creates Leads only).
 
 ---
 
@@ -168,7 +168,7 @@ Then, regardless of option:
    - add the consent block (marketing optional + storage required);
    - set the submit label and required flags (reconcile §7 item 5).
 3. **Wire the React form** — replace the `DealRegistrationForm.tsx` stub with a real `POST /api/leads/submit` (formId + fields + consent + Turnstile token), and add routing in `LeadHandler` to create the Deal + contacts (Option A) or the single mapped contact (Option B).
-4. **Seed the `forms` row** in [`apps/cms/scripts/seed-website-forms.ts`](../apps/cms/scripts/seed-website-forms.ts) so the CMS knows about the deal-reg form.
+4. **Seed the `forms` row** in [`apps/cms/scripts/seed-website-forms.ts`](../../apps/cms/scripts/seed-website-forms.ts) so the CMS knows about the deal-reg form.
 5. **Reconcile required-flag + name-policy conflicts:**
    - Live form: *all* fields required (incl. both phones). React form: phones optional. → pick one policy.
    - The site-wide rule we applied to other forms ("First Name required, Last Name optional") **conflicts** with deal-reg, where the website marks *both* names required for *both* people. → confirm the intended rule for this form specifically.

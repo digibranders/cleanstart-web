@@ -46,6 +46,7 @@ export type Job = {
   department?: JobDepartment | null;
   employmentType?: JobEmploymentType | null;
   experienceLevel?: JobExperienceLevel | null;
+  experienceRange?: string | null;
   locations?: (JobLocation | number)[] | null;
   remote?: boolean | null;
   applyUrl?: string | null;
@@ -184,6 +185,12 @@ export function locationDisplay(job: Job): string {
 }
 
 export function experienceDisplay(job: Job): string | null {
+  // Prefer the human-readable year range from the original data
+  // (e.g. "3-10 Years"); fall back to the bucketed enum label for
+  // CMS-native jobs created without a range.
+  if (job.experienceRange && job.experienceRange.trim().length > 0) {
+    return job.experienceRange;
+  }
   if (!job.experienceLevel) return null;
   return `${EXPERIENCE_LABEL[job.experienceLevel]} experience`;
 }

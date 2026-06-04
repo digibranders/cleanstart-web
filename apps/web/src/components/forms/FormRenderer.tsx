@@ -6,6 +6,7 @@ import type {
   FormField,
   FormFieldConditionRule,
 } from "@/lib/forms";
+import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 
 export interface FormRendererSubmitResult {
   duplicate?: boolean;
@@ -125,7 +126,7 @@ export function FormRenderer({
   const [values, setValues] = useState<Record<string, FieldValue>>(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [topError, setTopError] = useState<string | null>(null);
+  const { status, setStatus, statusRef } = useFormStatus();
   // Honeypot — never rendered visibly, but its existence is what bots fill.
   const [honeypot, setHoneypot] = useState("");
 
@@ -169,7 +170,7 @@ export function FormRenderer({
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (submitting) return;
-    setTopError(null);
+    setStatus(null);
 
     const nextErrors: Record<string, string> = {};
     for (const f of visibleFields) {
@@ -210,11 +211,14 @@ export function FormRenderer({
       } | null;
 
       if (!res.ok || !json?.ok) {
-        setTopError(
-          json?.error === "rate_limited"
-            ? "Too many submissions — please wait a minute and try again."
-            : "We couldn't submit the form. Please try again.",
-        );
+        setStatus({
+          tone: "error",
+          title: "Submission failed",
+          message:
+            json?.error === "rate_limited"
+              ? "Too many submissions — please wait a minute and try again."
+              : "We couldn't submit the form. Please try again.",
+        });
         return;
       }
 
@@ -230,7 +234,11 @@ export function FormRenderer({
       }
       onSuccess?.(successPayload);
     } catch {
-      setTopError("Network error — please try again.");
+      setStatus({
+        tone: "error",
+        title: "Network error",
+        message: "Network error — please try again.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -261,6 +269,8 @@ export function FormRenderer({
           />
         </label>
       </div>
+
+      {status ? <StatusBanner ref={statusRef} {...status} /> : null}
 
       <div className="flex flex-col gap-4">
         {visibleFields.map((f) => {
@@ -374,12 +384,6 @@ export function FormRenderer({
             </div>
           );
         })}
-
-        {topError ? (
-          <p className="text-sm text-red-600" role="alert">
-            {topError}
-          </p>
-        ) : null}
 
         <button
           type="submit"

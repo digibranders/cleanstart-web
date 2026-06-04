@@ -32,7 +32,7 @@
 | `apps/web/src/components/sections/partners/BecomePartnerCta.tsx` (modify) | swap submit target off HubSpot |
 | `docs/email-templates/brevo-partner-user-confirmation.html` (create) | applicant Brevo template |
 | `docs/email-templates/brevo-partner-admin-notification.html` (create) | admin Brevo template |
-| docs (modify/create) | `.env.example`, `CLAUDE.md`, `GDPR-COMPLIANCE.md`, `WEB-PAGES.md`, `docs/partner-applications.md` |
+| docs (modify/create) | `.env.example`, `CLAUDE.md`, `GDPR-COMPLIANCE.md`, `WEB-PAGES.md`, `docs/features/partner-applications.md` |
 
 ---
 
@@ -1136,8 +1136,8 @@ git commit -m "docs(email): Brevo partner applicant + admin notification templat
 **Files:**
 - Modify: `apps/cms/scripts/seed-website-forms.ts`
 - Create: migration under `apps/cms/src/migrations/`
-- Modify: `apps/cms/.env.example`, `CLAUDE.md`, `docs/GDPR-COMPLIANCE.md`, `docs/WEB-PAGES.md`
-- Create: `docs/partner-applications.md`
+- Modify: `apps/cms/.env.example`, `CLAUDE.md`, `docs/operations/GDPR-COMPLIANCE.md`, `docs/web/WEB-PAGES.md`
+- Create: `docs/features/partner-applications.md`
 
 - [ ] **Step 1: Remove the partner row from the form seed**
 
@@ -1173,17 +1173,17 @@ PARTNERS_NOTIFY_EMAIL=
 
 In the **Live integrations** Brevo row, extend the purpose to include partner-form email (applicant confirmation + team notification). No new cron row (DSAR-only, no purge).
 
-- [ ] **Step 5: Update `docs/GDPR-COMPLIANCE.md`**
+- [ ] **Step 5: Update `docs/operations/GDPR-COMPLIANCE.md`**
 
 - Personal-data inventory: add a **partner inquiries** row (name, email, phone, company, website, message; stored in `partner-applications`; retained until DSAR erasure).
 - Sub-processor register / Brevo note: Brevo also sends partner applicant + admin emails.
 - Erasure (Art. 17): DSAR delete-by-email now also erases partner applications.
 
-- [ ] **Step 6: Update `docs/WEB-PAGES.md`** — note the partners form now posts to the dedicated CMS endpoint.
+- [ ] **Step 6: Update `docs/web/WEB-PAGES.md`** — note the partners form now posts to the dedicated CMS endpoint.
 
 - [ ] **Step 7: Write the runbook**
 
-Create `docs/partner-applications.md`: architecture (web form → `/api/partner-applications/apply` → two Brevo emails → append-only row), env vars, the two-template setup, the CSV export + audit, DSAR erasure, and a local end-to-end test recipe (set `BREVO_API_KEY` + `PARTNERS_NOTIFY_EMAIL` to exercise the relay; leave unset to skip).
+Create `docs/features/partner-applications.md`: architecture (web form → `/api/partner-applications/apply` → two Brevo emails → append-only row), env vars, the two-template setup, the CSV export + audit, DSAR erasure, and a local end-to-end test recipe (set `BREVO_API_KEY` + `PARTNERS_NOTIFY_EMAIL` to exercise the relay; leave unset to skip).
 
 - [ ] **Step 8: Full baseline checks + commit**
 
@@ -1195,7 +1195,7 @@ pnpm --filter @cleanstart/cms lint && pnpm --filter @cleanstart/cms typecheck &&
 Expected: all PASS.
 
 ```bash
-git add apps/cms/scripts/seed-website-forms.ts apps/cms/src/migrations apps/cms/src/payload-types.ts apps/cms/.env.example CLAUDE.md docs/GDPR-COMPLIANCE.md docs/WEB-PAGES.md docs/partner-applications.md
+git add apps/cms/scripts/seed-website-forms.ts apps/cms/src/migrations apps/cms/src/payload-types.ts apps/cms/.env.example CLAUDE.md docs/operations/GDPR-COMPLIANCE.md docs/web/WEB-PAGES.md docs/features/partner-applications.md
 git commit -m "feat: partner migration, env, docs; unwire partner form from HubSpot seed"
 ```
 

@@ -7,7 +7,7 @@ import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
  * the Footer's fixed 1276×330 / radius-40 slot.
  */
 export function BlogsCTA(): React.ReactElement {
-  const { emailRef, submitted, error, handleSubmit } = useNewsletterSignup();
+  const { emailRef, submitted, submitting, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div
@@ -127,7 +127,9 @@ export function BlogsCTA(): React.ReactElement {
 
                 <button
                   type="submit"
-                  className="cs-btn-glass cs-btn-glass--no-lift shrink-0"
+                  disabled={submitting}
+                  aria-busy={submitting || undefined}
+                  className="cs-btn-glass cs-btn-glass--no-lift shrink-0 disabled:cursor-not-allowed disabled:opacity-70"
                   style={{
                     ["--cs-btn-px" as string]: "16px",
                     ["--cs-btn-fs" as string]: "16px",
@@ -135,7 +137,7 @@ export function BlogsCTA(): React.ReactElement {
                     borderLeft: "none",
                   }}
                 >
-                  Subscribe
+                  {submitting ? "Subscribing…" : "Subscribe"}
                 </button>
               </form>
             )}

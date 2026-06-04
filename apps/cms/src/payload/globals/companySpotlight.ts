@@ -9,7 +9,7 @@ export const CompanySpotlight: GlobalConfig = {
   admin: {
     description:
       'Optional spotlight card shown in the Company mega menu. Renders only when there are no open careers. Falls back to the Talent Network evergreen when empty or expired.',
-    group: 'Marketing',
+    group: 'Globals',
   },
   access: {
     read: () => true,

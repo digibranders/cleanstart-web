@@ -1,7 +1,7 @@
 # Careers Applications — Runbook
 
 **Scope:** `apps/cms` careers apply pipeline. **Date:** 2026-06-03.
-**Companion docs:** `docs/GDPR-COMPLIANCE.md` (sub-processor register, retention, DSAR), `CLAUDE.md` (Live integrations + Background jobs tables).
+**Companion docs:** `docs/operations/GDPR-COMPLIANCE.md` (sub-processor register, retention, DSAR), `CLAUDE.md` (Live integrations + Background jobs tables).
 
 This documents how a job application flows from the marketing site into the CMS, the integration with Brevo for HR notifications, the privacy posture, and how to test it end-to-end locally.
 
@@ -30,6 +30,13 @@ POST /api/career-applications/apply        (apps/cms — collection endpoint on 
    ├─ 3. HR notification email via Brevo (non-fatal) — resume attached
    └─ 4. append-only `career-applications` row, with `jobTitleSnapshot`,
          `jobLocationSnapshot`, and `emailDelivery` status embedded
+
+Captured fields: firstName, lastName, email (personal), phone, **location**
+(where the applicant is based), **howDidYouHear**, linkedinUrl, the required
+**resume** (file → private `resumes`), and the cover letter as **either** pasted
+text (`coverLetter`) **or** an uploaded file (`coverLetterFile`, also stored in
+the private `resumes` collection). Both résumé and any cover-letter file are
+attached to the HR email.
    ▼
 { ok: true }
 ```
@@ -37,6 +44,8 @@ POST /api/career-applications/apply        (apps/cms — collection endpoint on 
 Endpoint: `apps/cms/src/payload/endpoints/careers-apply.ts` (registered as a `career-applications` collection endpoint — config-level 3-segment custom endpoints 404, so it lives on the collection). The HR email body is built in `lib/careers/hr-email.ts`; the Brevo transport is `lib/email/brevo.ts`.
 
 The endpoint sends the HR email **before** the `career-applications.create`, so the delivery result is written into the initial append-only row (no second update). If the resume upload or the row create fails, the endpoint returns `502 capture_failed`.
+
+**R2 upload is success-gated.** The resume only reaches R2 inside the endpoint at submit time — the marketing-site form holds the file in browser state (with a local `URL.createObjectURL` preview) and never pre-uploads, so a page refresh or a "Remove" in the form discards it with no storage artifact. Server-side, if the `career-applications.create` fails *after* the resume (and any cover-letter file) were uploaded, the endpoint **rolls those uploads back** (`payload.delete` on the `resumes` rows, which drops the R2 objects) before returning `502`. Net guarantee: a file persists in R2 only for a successfully recorded application — no orphaned resumes from a failed submit.
 
 ---
 
@@ -61,7 +70,7 @@ Both `BREVO_API_KEY` and `CAREERS_HR_EMAIL` must be set for the relay to actuall
 The pipeline sends exactly **one** email: an HR notification (with the resume attached, and `replyTo` set to the applicant so HR can reply directly). There is intentionally **no applicant-facing confirmation email** at v1 — it would require managing an applicant-addressed template, double opt-in considerations, and a deliverability surface we don't need for an internal notification. Adding it later is additive (a second `sendBrevoEmail` call).
 
 ### Brevo, not HubSpot
-Careers data never enters the lead pipeline. HubSpot owns lead-pipeline email and never receives careers data; Brevo is the careers/partner transactional-email sub-processor and never receives lead-pipeline data. This separation is the GDPR boundary documented in `docs/GDPR-COMPLIANCE.md` §6.
+Careers data never enters the lead pipeline. HubSpot owns lead-pipeline email and never receives careers data; Brevo is the careers/partner transactional-email sub-processor and never receives lead-pipeline data. This separation is the GDPR boundary documented in `docs/operations/GDPR-COMPLIANCE.md` §6.
 
 ### Private resume storage
 Resumes are uploaded to the `resumes` collection under a **private** R2 prefix (`R2_RESUME_PREFIX`), distinct from the public media prefix. Resume files contain applicant PII and must never be publicly addressable — they are reachable only through authenticated admin access and are emailed to HR as an attachment at submit time.
@@ -77,7 +86,7 @@ Resumes are uploaded to the `resumes` collection under a **private** R2 prefix (
 The `purge-career-applications.ts` cron (daily **03:45 UTC**, gated by `PAYLOAD_AUTO_RUN=true`) hard-deletes the resume file from private R2 and nulls applicant PII on `career-applications` rows older than `CAREERS_RETENTION_DAYS` (default 365). Idempotent — already-purged rows are skipped. Logic lives in `lib/retention/purge-career-applications.ts`.
 
 ### DSAR erasure
-`POST /api/leads/dsar/delete` (delete-by-email) now **also** erases career applications: `lib/careers/dsar.ts` → `deleteCareerApplicationsByEmail()` deletes every matching `career-applications` row and hard-deletes each linked `resumes` file. Resume-delete failures are logged but never block the application delete. See `docs/GDPR-COMPLIANCE.md` §2 (Art. 17) and §4.
+`POST /api/leads/dsar/delete` (delete-by-email) now **also** erases career applications: `lib/careers/dsar.ts` → `deleteCareerApplicationsByEmail()` deletes every matching `career-applications` row and hard-deletes each linked `resumes` file. Resume-delete failures are logged but never block the application delete. See `docs/operations/GDPR-COMPLIANCE.md` §2 (Art. 17) and §4.
 
 ---
 

@@ -53,7 +53,14 @@ const DEPARTMENT_MAP: Record<string, DepartmentEnum> = {
   people: 'people',
   hr: 'people',
   'human-resources': 'people',
+  'human-resource': 'people',
   talent: 'people',
+  // CleanStart Webflow department values that don't match an enum name 1:1.
+  admin: 'operations',
+  'admin-&-it-operations-executive': 'operations',
+  'qa-and-delivery': 'engineering',
+  egineering: 'engineering', // source-data typo for "Engineering"
+  'customer-acquisition-team-(cat)': 'sales',
 };
 
 export const normalizeDepartment = (raw: unknown): DepartmentEnum | null => {
@@ -153,6 +160,26 @@ export const normalizeExperienceLevel = (
     if (yearGuess) return yearGuess;
   }
   return null;
+};
+
+/**
+ * Normalises the raw Webflow `experience` free-text into a clean display
+ * string for the careers site, preserving the original year range that
+ * `normalizeExperienceLevel` buckets away. Standardises dashes to a hyphen,
+ * collapses whitespace, and Title-cases the word "Year(s)":
+ *   "3-10 years" → "3-10 Years"   "1–3 Years" → "1-3 Years"
+ *   "0-1 year"   → "0-1 Year"     "5+ years"  → "5+ Years"
+ * Returns undefined for blank / non-string input.
+ */
+export const normalizeExperienceRange = (raw: unknown): string | undefined => {
+  if (typeof raw !== 'string') return undefined;
+  const trimmed = raw.trim();
+  if (trimmed.length === 0) return undefined;
+  return trimmed
+    .replace(/[–—]/g, '-')
+    .replace(/\s+/g, ' ')
+    .replace(/years/gi, 'Years')
+    .replace(/\byear\b/gi, 'Year');
 };
 
 // ─── Bulk + report ──────────────────────────────────────────────

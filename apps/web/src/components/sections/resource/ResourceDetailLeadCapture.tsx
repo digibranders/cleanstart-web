@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import type { ResourceDetail } from "@/lib/resources";
 import { resourceLeadCaptureHeading } from "@/lib/resources-utils";
 import { submitLead } from "@/lib/leads/submitLead";
+import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 
 interface ResourceDetailLeadCaptureProps {
   resource: ResourceDetail;
@@ -18,19 +19,24 @@ export function ResourceDetailLeadCapture({
   const heading = resourceLeadCaptureHeading(resource.type);
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [topError, setTopError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     if (inFlightRef.current) return;
-    setTopError(null);
+    setStatus(null);
     if (!agreed) {
-      setTopError("Please agree to be contacted to continue.");
+      setStatus({
+        tone: "error",
+        title: "Consent required",
+        message: "Please agree to be contacted to continue.",
+      });
       return;
     }
     inFlightRef.current = true;
+    setSubmitting(true);
 
     const result = await submitLead({
       formSlug: "resource-capture",
@@ -44,12 +50,21 @@ export function ResourceDetailLeadCapture({
     });
 
     inFlightRef.current = false;
+    setSubmitting(false);
     if (result.ok) {
-      setSubmitted(true);
+      setStatus({
+        tone: "success",
+        title: "You're on the list",
+        message: "Thanks — you're on the list. We'll be in touch.",
+      });
       setEmail("");
       setAgreed(false);
     } else {
-      setTopError("Something went wrong. Please try again.");
+      setStatus({
+        tone: "error",
+        title: "Submission failed",
+        message: "Something went wrong. Please try again.",
+      });
     }
   }
 
@@ -173,6 +188,8 @@ export function ResourceDetailLeadCapture({
                 onSubmit={handleSubmit}
                 className="flex flex-col items-stretch lg:items-start w-full lg:flex-1 lg:min-w-0 gap-4 lg:gap-5"
               >
+                {status ? <StatusBanner ref={statusRef} {...status} /> : null}
+
                 <p
                   className="font-normal text-white text-center lg:text-left w-full"
                   style={{
@@ -219,7 +236,9 @@ export function ResourceDetailLeadCapture({
 
                   <button
                     type="submit"
-                    className="relative overflow-hidden inline-flex items-center justify-center gap-2 font-medium tracking-[-0.01em] shrink-0 w-full sm:w-auto"
+                    disabled={submitting}
+                    aria-busy={submitting || undefined}
+                    className="relative overflow-hidden inline-flex items-center justify-center gap-2 font-medium tracking-[-0.01em] shrink-0 w-full sm:w-auto disabled:cursor-not-allowed disabled:opacity-70"
                     style={{
                       height: "var(--cta-card-btn-h)",
                       paddingLeft: "var(--cta-card-btn-px)",
@@ -248,7 +267,7 @@ export function ResourceDetailLeadCapture({
                         filter: "blur(10px)",
                       }}
                     />
-                    Get in Touch
+                    {submitting ? "Submitting…" : "Get in Touch"}
                     <svg
                       width="22"
                       height="20"
@@ -287,21 +306,6 @@ export function ResourceDetailLeadCapture({
                   />
                   <span>I agree to receive other communications from CleanStart.*</span>
                 </label>
-
-                {submitted && (
-                  <output
-                    aria-live="polite"
-                    className="block text-sm font-medium text-white"
-                    style={{ opacity: 0.95 }}
-                  >
-                    Thanks — you&apos;re on the list. We&apos;ll be in touch.
-                  </output>
-                )}
-                {topError && (
-                  <p role="alert" className="text-sm font-medium text-white" style={{ opacity: 0.95 }}>
-                    {topError}
-                  </p>
-                )}
               </form>
             </div>
           </div>

@@ -143,8 +143,6 @@ export default async function CareerDetailPage({
       <main>
         <CareerDetailHero title={job.title} meta={meta} />
         <CareerDetailContent
-          title={job.title}
-          slug={job.slug}
           body={bodyWithoutDeptLine}
           contactEmail={CONTACT_EMAIL}
         />

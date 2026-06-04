@@ -20,7 +20,7 @@ export const Authors: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'role', 'acceptingNewBylines', 'updatedAt'],
-    group: 'People',
+    group: 'Content',
   },
   access: {
     read: () => true,

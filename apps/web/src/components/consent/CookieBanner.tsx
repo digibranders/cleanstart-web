@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import type { OptionalCategory } from "@/lib/consent/types";
@@ -168,6 +168,26 @@ export function CookieBanner() {
     return () => document.removeEventListener("keydown", onKey);
   }, [promptOpen]);
 
+  // Slide-up + fade-in entrance. `entered` starts false (sheet sits below the
+  // fold) and flips true after a delay so the CSS transition runs. The first
+  // appearance waits ~1.5s to "settle in" after page load like typical CMPs; a
+  // footer re-open animates near-instantly. Honors reduced-motion via the
+  // `motion-reduce:*` classes on the sheet.
+  const FIRST_LOAD_DELAY_MS = 1500;
+  const REOPEN_DELAY_MS = 60;
+  const [entered, setEntered] = useState(false);
+  const hasAnimatedOnce = useRef(false);
+  useEffect(() => {
+    if (!promptOpen) {
+      setEntered(false);
+      return;
+    }
+    const delay = hasAnimatedOnce.current ? REOPEN_DELAY_MS : FIRST_LOAD_DELAY_MS;
+    hasAnimatedOnce.current = true;
+    const t = window.setTimeout(() => setEntered(true), delay);
+    return () => window.clearTimeout(t);
+  }, [promptOpen]);
+
   if (!promptOpen) return null;
 
   const setCategory = (key: OptionalCategory, next: boolean) =>
@@ -189,7 +209,9 @@ export function CookieBanner() {
       role="dialog"
       aria-modal="false"
       aria-label="Cookie consent"
-      className="fixed inset-x-0 bottom-0 z-[60] border-t border-white/10 bg-[#131a2e] text-white shadow-[0_-8px_30px_rgba(0,0,0,0.35)]"
+      className={`fixed inset-x-0 bottom-0 z-[60] transform-gpu border-t border-white/10 bg-[#131a2e] text-white shadow-[0_-8px_30px_rgba(0,0,0,0.35)] transition duration-500 ease-out will-change-transform motion-reduce:transition-none ${
+        entered ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+      }`}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="relative mx-auto flex max-w-[1100px] flex-col gap-4 px-6 py-5">
@@ -267,8 +289,15 @@ export function CookieBanner() {
         ) : null}
 
         {/* Single action row, always at the bottom. Contents switch by state
-            so no button is ever duplicated. */}
-        <div className="flex flex-wrap items-center justify-end gap-3">
+            so no button is ever duplicated. On mobile the collapsed row stays
+            on ONE line: the text-link "Cookies Settings" sits left, the two
+            primary buttons group right (justify-between); from sm+ everything
+            right-aligns. */}
+        <div
+          className={`flex flex-nowrap items-center gap-2 sm:gap-3 ${
+            showPrefs ? "justify-end" : "justify-between sm:justify-end"
+          }`}
+        >
           {showPrefs ? (
             <>
               <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue" style={compactBtn}>
@@ -288,18 +317,20 @@ export function CookieBanner() {
               <button
                 type="button"
                 onClick={() => setShowPrefs(true)}
-                className="inline-flex h-9 cursor-pointer items-center justify-center rounded-lg border border-white/30 px-4 font-medium text-white transition hover:bg-white/10"
+                className="cursor-pointer whitespace-nowrap font-medium text-white/80 underline underline-offset-4 transition hover:text-white"
                 style={{ fontSize: "14px" }}
                 aria-expanded={showPrefs}
               >
                 Cookies Settings
               </button>
-              <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue" style={compactBtn}>
-                Reject All
-              </button>
-              <button type="button" onClick={() => decide("accept_all")} className="cs-btn-blue" style={compactBtn}>
-                Allow All
-              </button>
+              <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue" style={compactBtn}>
+                  Reject All
+                </button>
+                <button type="button" onClick={() => decide("accept_all")} className="cs-btn-blue" style={compactBtn}>
+                  Allow All
+                </button>
+              </div>
             </>
           )}
         </div>

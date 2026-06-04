@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-08
 **Status:** Research / scoping note. Does not authorise implementation.
-**Companion to:** [`INTEGRATIONS-RESEARCH.md`](./INTEGRATIONS-RESEARCH.md) (v1 — outbound fan-out + Teams deep-dive). Anchors below cite v1 sections by their existing heading IDs.
+**Companion to:** [`INTEGRATIONS-RESEARCH.md`](INTEGRATIONS-RESEARCH.md) (v1 — outbound fan-out + Teams deep-dive). Anchors below cite v1 sections by their existing heading IDs.
 
 ---
 
@@ -451,7 +451,7 @@ The production droplet runs Payload (Next.js) + Postgres + Meilisearch + cron. S
 
 ## Sources
 
-- v1 [`INTEGRATIONS-RESEARCH.md`](./INTEGRATIONS-RESEARCH.md) — outbound shape, Teams deep-dive, encryption + DLQ reuse, open questions carried forward.
+- v1 [`INTEGRATIONS-RESEARCH.md`](INTEGRATIONS-RESEARCH.md) — outbound shape, Teams deep-dive, encryption + DLQ reuse, open questions carried forward.
 - Arch doc `cleanstart-cms-architecture.html` §`#new-fields`, §`#forms`, §`#privacy-gdpr`, §`#logging-alerting`, §`#decisions`, §`#marketing-tags`.
 - Code: `apps/cms/src/payload/lib/webhooks/{dispatch,teams,sign}.ts`, `lib/lead-handlers/registry.ts`, `globals/siteSettings.ts`, `admin/components/Dashboard.tsx`, `.env.example`.
 - BACKLOG.md "Future — Integrations dashboard" (existing Phase J sketch + schema stub).
