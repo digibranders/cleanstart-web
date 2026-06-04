@@ -38,6 +38,12 @@ interface JobApplyFormProps {
   jobTitle: string;
 }
 
+interface FormStatus {
+  tone: "success" | "error";
+  title: string;
+  message: string;
+}
+
 /**
  * Per-job application form for CMS-native, open roles. Posts a resume file as
  * multipart through `submitApplication` → CMS `/api/career-applications/apply`.
@@ -50,12 +56,20 @@ export function JobApplyForm({
   jobTitle,
 }: JobApplyFormProps): React.ReactElement {
   const [busy, setBusy] = useState(false);
-  const [done, setDone] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<FormStatus | null>(null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const inFlightRef = useRef(false);
+  const statusRef = useRef<HTMLDivElement>(null);
+
+  // Bring the success/error banner into view — on submit the user's focus is on
+  // the button at the bottom, so a banner at the top of the form is off-screen.
+  useEffect(() => {
+    if (status && statusRef.current) {
+      statusRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [status]);
 
   // Auto-grow the cover-letter textarea: starts at one line, expands to fit
   // typed/pasted content, then scrolls only once it reaches the cap. The
@@ -73,18 +87,27 @@ export function JobApplyForm({
   ): Promise<void> => {
     e.preventDefault();
     if (inFlightRef.current) return;
-    setError(null);
+    setStatus(null);
 
     const form = e.currentTarget;
     const fd = new FormData(form);
 
     if (fd.get("consent_recruitment") == null) {
-      setError("Please confirm consent to continue.");
+      setStatus({
+        tone: "error",
+        title: "Consent required",
+        message:
+          "Please tick the consent box so we can process your application.",
+      });
       return;
     }
 
     if (!resumeFile || resumeFile.size === 0) {
-      setError("Please attach your resume (PDF, DOC, or DOCX).");
+      setStatus({
+        tone: "error",
+        title: "Resume required",
+        message: "Please attach your resume — a PDF, DOC, or DOCX file.",
+      });
       return;
     }
     const resume = resumeFile;
@@ -121,12 +144,22 @@ export function JobApplyForm({
     setBusy(false);
 
     if (result.ok) {
-      setDone(true);
+      setStatus({
+        tone: "success",
+        title: "Application received",
+        message: `Thanks for applying to ${jobTitle}. Our team will review your application and be in touch.`,
+      });
       setResumeFile(null);
       setCoverFile(null);
       formRef.current?.reset();
+      inFlightRef.current = false;
     } else {
-      setError("Something went wrong. Please try again.");
+      setStatus({
+        tone: "error",
+        title: "Submission failed",
+        message:
+          "Your application couldn't be submitted. Please check your connection and try again.",
+      });
       inFlightRef.current = false;
     }
   };
@@ -134,40 +167,6 @@ export function JobApplyForm({
   return (
     <section className="relative w-full bg-white overflow-x-clip">
       <div className="relative mx-auto max-w-[820px] px-6 sm:px-10 pt-2 pb-24">
-        {done ? (
-          <div
-            className="bg-white"
-            style={{
-              borderRadius: "16px",
-              padding: "32px 24px",
-              border: "1px solid rgba(74,59,241,0.25)",
-            }}
-          >
-            <h3
-              className="font-display"
-              style={{
-                fontSize: "var(--fs-h4)",
-                fontWeight: 600,
-                color: "#111",
-                marginBottom: "8px",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              Application received
-            </h3>
-            <p
-              className="font-sans"
-              style={{
-                fontSize: "var(--fs-body-sm)",
-                color: "rgba(17,17,17,0.65)",
-                lineHeight: 1.5,
-              }}
-            >
-              Thanks for applying to {jobTitle}. Our team will review your
-              application and be in touch.
-            </p>
-          </div>
-        ) : (
           <form
             ref={formRef}
             onSubmit={onSubmit}
@@ -194,6 +193,12 @@ export function JobApplyForm({
             >
               Apply for {jobTitle}
             </h2>
+
+            {status ? (
+              <div ref={statusRef}>
+                <StatusBanner {...status} />
+              </div>
+            ) : null}
 
             {/* Honeypot — visually hidden, kept out of the tab order. */}
             <input
@@ -340,20 +345,6 @@ export function JobApplyForm({
               <TurnstileWidget />
             </div>
 
-            {error && (
-              <p
-                role="alert"
-                className="font-sans mt-3"
-                style={{
-                  fontSize: "var(--fs-caption)",
-                  color: "#B42318",
-                  lineHeight: 1.4,
-                }}
-              >
-                {error}
-              </p>
-            )}
-
             <button
               type="submit"
               disabled={busy}
@@ -377,9 +368,105 @@ export function JobApplyForm({
               {busy ? "Submitting…" : "Submit application"}
             </button>
           </form>
-        )}
       </div>
     </section>
+  );
+}
+
+/**
+ * Form-level success/error banner. Success uses role="status"/aria-live polite;
+ * error uses role="alert"/aria-live assertive so screen readers announce it. An
+ * icon backs up the colour (colour alone isn't an accessible signal).
+ */
+function StatusBanner({ tone, title, message }: FormStatus): React.ReactElement {
+  const success = tone === "success";
+  const fg = success ? "#067647" : "#B42318";
+  return (
+    <div
+      role={success ? "status" : "alert"}
+      aria-live={success ? "polite" : "assertive"}
+      className="font-sans flex items-start gap-3"
+      style={{
+        borderRadius: "12px",
+        padding: "12px 14px",
+        marginBottom: "16px",
+        border: `1px solid ${
+          success ? "rgba(6,118,71,0.22)" : "rgba(180,35,24,0.22)"
+        }`,
+        background: success ? "#ECFDF3" : "#FEF3F2",
+      }}
+    >
+      {success ? <CheckCircleIcon /> : <AlertCircleIcon />}
+      <div className="min-w-0">
+        <div
+          style={{
+            fontSize: "var(--fs-body-sm)",
+            fontWeight: 600,
+            color: fg,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {title}
+        </div>
+        <div
+          style={{
+            fontSize: "var(--fs-caption)",
+            color: fg,
+            opacity: 0.85,
+            lineHeight: 1.5,
+            marginTop: "2px",
+          }}
+        >
+          {message}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CheckCircleIcon(): React.ReactElement {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      className="shrink-0"
+      style={{ marginTop: "1px" }}
+    >
+      <circle cx="12" cy="12" r="9" stroke="#067647" strokeWidth="1.6" />
+      <path
+        d="M8.5 12.5l2.5 2.5 4.5-5"
+        stroke="#067647"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function AlertCircleIcon(): React.ReactElement {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      className="shrink-0"
+      style={{ marginTop: "1px" }}
+    >
+      <circle cx="12" cy="12" r="9" stroke="#B42318" strokeWidth="1.6" />
+      <path
+        d="M12 8v4.5"
+        stroke="#B42318"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <circle cx="12" cy="16" r="1" fill="#B42318" />
+    </svg>
   );
 }
 
