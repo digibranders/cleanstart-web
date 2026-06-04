@@ -1,13 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { submitApplication } from "@/lib/careers/submitApplication";
 
 const MAX_RESUME_BYTES = 10 * 1024 * 1024;
+const RESUME_EXT_RE = /\.(pdf|doc|docx)$/i;
+const RESUME_MIMES = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
 const ACCENT = "#4a3bf1";
+
+function formatBytes(bytes: number): string {
+  return bytes < 1024 * 1024
+    ? `${Math.max(1, Math.round(bytes / 1024))} KB`
+    : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 const CONSENT_TEXT =
   "I consent to CleanStart storing and processing my application data and resume for recruitment purposes.";
 const HEAR_OPTIONS = [
@@ -38,24 +50,49 @@ export function JobApplyForm({
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [resumeName, setResumeName] = useState("");
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const inFlightRef = useRef(false);
+  const resumeInputRef = useRef<HTMLInputElement>(null);
 
-  const handleResume = (event: ChangeEvent<HTMLInputElement>): void => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      setResumeName("");
+  // Object URL for the in-browser preview link; recreated when the file
+  // changes and revoked on replace/unmount to avoid leaks.
+  useEffect(() => {
+    if (!resumeFile) {
+      setResumeUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(resumeFile);
+    setResumeUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [resumeFile]);
+
+  const acceptResume = (file: File | undefined): void => {
+    if (!file) return;
+    const okType = RESUME_EXT_RE.test(file.name) || RESUME_MIMES.has(file.type);
+    if (!okType) {
+      setError("Resume must be a PDF, DOC, or DOCX file.");
       return;
     }
     if (file.size > MAX_RESUME_BYTES) {
       setError("Resume must be 10 MB or smaller.");
-      event.target.value = "";
-      setResumeName("");
       return;
     }
     setError(null);
-    setResumeName(file.name);
+    setResumeFile(file);
+  };
+
+  const clearResume = (): void => {
+    setResumeFile(null);
+    if (resumeInputRef.current) resumeInputRef.current.value = "";
+  };
+
+  const onResumeDrop = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    setDragOver(false);
+    acceptResume(e.dataTransfer.files?.[0]);
   };
 
   // Auto-grow the cover-letter textarea: starts at one line, expands to fit
@@ -84,15 +121,15 @@ export function JobApplyForm({
       return;
     }
 
-    const resume = fd.get("resume");
-    if (!(resume instanceof File) || resume.size === 0) {
+    if (!resumeFile || resumeFile.size === 0) {
       setError("Please attach your resume (PDF, DOC, or DOCX).");
       return;
     }
-    if (resume.size > MAX_RESUME_BYTES) {
+    if (resumeFile.size > MAX_RESUME_BYTES) {
       setError("Resume must be 10 MB or smaller.");
       return;
     }
+    const resume = resumeFile;
 
     const coverLetterFile = fd.get("coverLetterFile");
     if (
@@ -138,7 +175,7 @@ export function JobApplyForm({
 
     if (result.ok) {
       setDone(true);
-      setResumeName("");
+      setResumeFile(null);
       formRef.current?.reset();
     } else {
       setError("Something went wrong. Please try again.");
@@ -302,48 +339,120 @@ export function JobApplyForm({
                 Resume / CV
                 <span aria-hidden style={{ color: ACCENT }}> *</span>
               </span>
-              <label
-                htmlFor="resume"
-                className="font-sans flex flex-col items-center justify-center cursor-pointer"
-                style={{
-                  border: "1px dashed rgba(74,59,241,0.45)",
-                  background: "rgba(74,59,241,0.04)",
-                  borderRadius: "12px",
-                  padding: "10px 16px",
-                  textAlign: "center",
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
                 }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={onResumeDrop}
               >
-                <UploadIcon />
-                <span
-                  style={{
-                    fontSize: "var(--fs-body-sm)",
-                    fontWeight: 500,
-                    color: ACCENT,
-                    marginTop: "5px",
-                  }}
-                >
-                  {resumeName || "Drop or browse — PDF, DOC, DOCX"}
-                </span>
-                <span
-                  style={{
-                    fontSize: "var(--fs-caption)",
-                    color: "rgba(17,17,17,0.55)",
-                    marginTop: "2px",
-                  }}
-                >
-                  Max file size: 10 MB
-                </span>
+                {resumeFile ? (
+                  <div
+                    className="font-sans flex items-center gap-3"
+                    style={{
+                      border: `1px solid ${ACCENT}`,
+                      background: "rgba(74,59,241,0.05)",
+                      borderRadius: "12px",
+                      padding: "10px 12px",
+                    }}
+                  >
+                    <FileIcon />
+                    <div className="min-w-0 flex-1">
+                      <div
+                        className="truncate"
+                        style={{
+                          fontSize: "var(--fs-body-sm)",
+                          fontWeight: 500,
+                          color: "#111",
+                        }}
+                      >
+                        {resumeFile.name}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "var(--fs-caption)",
+                          color: "rgba(17,17,17,0.55)",
+                        }}
+                      >
+                        {formatBytes(resumeFile.size)}
+                      </div>
+                    </div>
+                    {resumeUrl ? (
+                      <a
+                        href={resumeUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="shrink-0"
+                        style={{
+                          fontSize: "var(--fs-caption)",
+                          fontWeight: 500,
+                          color: ACCENT,
+                        }}
+                      >
+                        Preview
+                      </a>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={clearResume}
+                      aria-label="Remove resume"
+                      className="shrink-0"
+                      style={{
+                        fontSize: "var(--fs-caption)",
+                        fontWeight: 500,
+                        color: "rgba(17,17,17,0.55)",
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="resume"
+                    className="font-sans flex flex-col items-center justify-center cursor-pointer"
+                    style={{
+                      border: `1px dashed ${dragOver ? ACCENT : "rgba(74,59,241,0.45)"}`,
+                      background: dragOver
+                        ? "rgba(74,59,241,0.08)"
+                        : "rgba(74,59,241,0.04)",
+                      borderRadius: "12px",
+                      padding: "10px 16px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <UploadIcon />
+                    <span
+                      style={{
+                        fontSize: "var(--fs-body-sm)",
+                        fontWeight: 500,
+                        color: ACCENT,
+                        marginTop: "5px",
+                      }}
+                    >
+                      Drop or browse — PDF, DOC, DOCX
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "var(--fs-caption)",
+                        color: "rgba(17,17,17,0.55)",
+                        marginTop: "2px",
+                      }}
+                    >
+                      Max file size: 10 MB
+                    </span>
+                  </label>
+                )}
                 <input
+                  ref={resumeInputRef}
                   id="resume"
-                  name="resume"
                   type="file"
                   accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                  required
-                  onChange={handleResume}
+                  onChange={(e) => acceptResume(e.target.files?.[0])}
                   aria-label="Resume (PDF, DOC, or DOCX, 10 MB max)"
                   className="sr-only"
                 />
-              </label>
+              </div>
             </div>
 
             <div className="mt-3">
@@ -710,6 +819,33 @@ function UploadIcon(): React.ReactElement {
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
         d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+        stroke={ACCENT}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function FileIcon(): React.ReactElement {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      className="shrink-0"
+    >
+      <path
+        d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5z"
+        stroke={ACCENT}
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14 3v5h5"
         stroke={ACCENT}
         strokeWidth="1.6"
         strokeLinecap="round"
