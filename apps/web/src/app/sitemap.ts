@@ -79,6 +79,7 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: "/fips" },
   { path: "/for-ciso" },
   { path: "/for-developers" },
+  { path: "/guide" },
   { path: "/knowledge-hub" },
   { path: "/legal" },
   { path: "/legal/acceptable-use-policy" },

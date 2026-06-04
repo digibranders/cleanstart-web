@@ -87,6 +87,8 @@ page slugs, categories, types, and build status across the dev journey.
 |---|-----------|----------|------|--------|-------|
 | 13 | Blogs (Listing) | `/blogs` | CMS Listing | ✅ | Route at `src/app/blogs/` |
 | 12 | Blog – Single Post | `/blog/[slug]` | CMS Detail | ✅ | Route at `src/app/blog/[slug]/` |
+| 13b | Guides (Listing) | `/guide` | CMS Listing | ✅ | Route at `src/app/guide/page.tsx` (singular hub, sibling to `/guide/[slug]` — matches the indexed detail path for clean hub-and-spoke SEO). Payload `guides` collection. Compact 4×4 grid (16/page), search-only (collection has no category). Built 2026-06-04 from Figma 1248:8204. |
+| 13c | Guide – Single | `/guide/[slug]` | CMS Detail | ✅ | Route at `src/app/guide/[slug]/` |
 | 14 | Knowledge Hub | `/knowledge-hub` | CMS Listing | ⬜ | Payload `knowledgeBase` collection |
 | 15 | Newsroom | `/news` | CMS Listing | ✅ | Route at `src/app/news/`; press-release detail at `src/app/news/[slug]/` |
 | 16 | Podcast | `/podcast` | CMS Listing | ✅ | Route at `src/app/podcast/`; Payload `podcastEpisodes` collection + `podcastPage` global (YT embeds) |
