@@ -278,6 +278,7 @@ export function JobApplyForm({
                 id="resume"
                 label="Resume / CV"
                 required
+                promptNoun="Resume"
                 file={resumeFile}
                 onChange={setResumeFile}
               />
@@ -324,6 +325,7 @@ export function JobApplyForm({
               <div className="mt-2">
                 <FileDrop
                   id="coverLetterFile"
+                  promptNoun="Cover letter"
                   file={coverFile}
                   onChange={setCoverFile}
                 />
@@ -387,6 +389,7 @@ interface FileDropProps {
   onChange: (file: File | null) => void;
   label?: string;
   required?: boolean;
+  promptNoun?: string;
 }
 
 /**
@@ -401,6 +404,7 @@ function FileDrop({
   onChange,
   label,
   required,
+  promptNoun,
 }: FileDropProps): React.ReactElement {
   const [dragOver, setDragOver] = useState(false);
   const [fieldError, setFieldError] = useState<string | null>(null);
@@ -555,7 +559,9 @@ function FileDrop({
                 marginTop: "5px",
               }}
             >
-              Drop or browse — PDF, DOC, DOCX
+              {promptNoun
+                ? `Drop or browse ${promptNoun} — PDF, DOC, DOCX`
+                : "Drop or browse — PDF, DOC, DOCX"}
             </span>
             <span
               style={{
