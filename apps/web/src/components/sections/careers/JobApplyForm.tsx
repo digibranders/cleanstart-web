@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 
-import { Container, Section } from "@/components/layout";
-import { FormCard, TextArea, TextInput } from "@/components/sections/forms/FormCard";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { submitApplication } from "@/lib/careers/submitApplication";
 
 const MAX_RESUME_BYTES = 10 * 1024 * 1024;
+const ACCENT = "#4a3bf1";
 const CONSENT_TEXT =
   "I consent to CleanStart storing and processing my application data and resume for recruitment purposes.";
 
@@ -18,14 +17,11 @@ interface JobApplyFormProps {
 }
 
 /**
- * Per-job application form for CMS-native, open roles. Mirrors the shared
- * FormCard / TurnstileWidget / consent language of the lead-capture forms
- * (see `BecomePartnerCta`), but posts a resume file as multipart through
- * `submitApplication` → CMS `/api/career-applications/apply`.
- *
- * The Turnstile widget injects a hidden `cf-turnstile-response` input into the
- * surrounding form; its value is read off FormData on submit — the same wiring
- * the lead forms use.
+ * Per-job application form for CMS-native, open roles. Posts a resume file as
+ * multipart through `submitApplication` → CMS `/api/career-applications/apply`.
+ * Styled to match the careers content column (full width, indigo accent, dashed
+ * drop-zone). The Turnstile widget injects a hidden `cf-turnstile-response`
+ * input read off FormData on submit.
  */
 export function JobApplyForm({
   jobSlug,
@@ -34,8 +30,25 @@ export function JobApplyForm({
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resumeName, setResumeName] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
   const inFlightRef = useRef(false);
+
+  const handleResume = (event: ChangeEvent<HTMLInputElement>): void => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      setResumeName("");
+      return;
+    }
+    if (file.size > MAX_RESUME_BYTES) {
+      setError("Resume must be 10 MB or smaller.");
+      event.target.value = "";
+      setResumeName("");
+      return;
+    }
+    setError(null);
+    setResumeName(file.name);
+  };
 
   const onSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
@@ -47,8 +60,6 @@ export function JobApplyForm({
     const form = e.currentTarget;
     const fd = new FormData(form);
 
-    // The form is noValidate, so the required consent checkbox isn't enforced
-    // by the browser — gate on it here before sending.
     if (fd.get("consent_recruitment") == null) {
       setError("Please confirm consent to continue.");
       return;
@@ -92,6 +103,7 @@ export function JobApplyForm({
 
     if (result.ok) {
       setDone(true);
+      setResumeName("");
       formRef.current?.reset();
     } else {
       setError("Something went wrong. Please try again.");
@@ -100,278 +112,386 @@ export function JobApplyForm({
   };
 
   return (
-    <Section padding="md">
-      <Container variant="prose">
-        <FormCard maxWidth={560}>
-          <h2
-            className="font-display font-semibold text-[#0F123E]"
+    <section className="relative w-full bg-white overflow-x-clip">
+      <div className="relative mx-auto max-w-[820px] px-6 sm:px-10 pt-2 pb-24">
+        {done ? (
+          <div
+            className="bg-white"
             style={{
-              fontSize: "var(--fs-h3)",
-              lineHeight: 1.2,
-              letterSpacing: "-0.02em",
-              marginBottom: "20px",
+              borderRadius: "16px",
+              padding: "32px 24px",
+              border: "1px solid rgba(74,59,241,0.25)",
             }}
           >
-            Apply for {jobTitle}
-          </h2>
-
-          {done ? (
+            <h3
+              className="font-display"
+              style={{
+                fontSize: "var(--fs-h4)",
+                fontWeight: 600,
+                color: "#111",
+                marginBottom: "8px",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              Application received
+            </h3>
             <p
-              className="text-[#0F123E]"
-              style={{ fontSize: "var(--fs-body)", lineHeight: 1.5 }}
+              className="font-sans"
+              style={{
+                fontSize: "var(--fs-body-sm)",
+                color: "rgba(17,17,17,0.65)",
+                lineHeight: 1.5,
+              }}
             >
               Thanks for applying to {jobTitle}. Our team will review your
               application and be in touch.
             </p>
-          ) : (
-            <form
-              ref={formRef}
-              onSubmit={onSubmit}
-              noValidate
-              className="flex flex-col gap-4"
+          </div>
+        ) : (
+          <form
+            ref={formRef}
+            onSubmit={onSubmit}
+            className="bg-white"
+            style={{
+              borderRadius: "16px",
+              padding: "24px",
+              border: "1px solid rgba(74,59,241,0.25)",
+              boxShadow:
+                "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01)",
+            }}
+            noValidate
+          >
+            <h2
+              className="font-display"
+              style={{
+                fontSize: "var(--fs-h3)",
+                fontWeight: 600,
+                lineHeight: 1.2,
+                letterSpacing: "-0.02em",
+                color: "#111",
+                marginBottom: "20px",
+              }}
             >
-              {/* Honeypot — visually hidden, kept out of the tab order. */}
-              <input
-                type="text"
-                name="website"
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden="true"
-                style={{
-                  position: "absolute",
-                  width: "1px",
-                  height: "1px",
-                  padding: 0,
-                  margin: "-1px",
-                  overflow: "hidden",
-                  clip: "rect(0 0 0 0)",
-                  whiteSpace: "nowrap",
-                  border: 0,
-                }}
-              />
+              Apply for {jobTitle}
+            </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <TextInput
-                  name="firstName"
-                  placeholder="First Name"
-                  label="First Name"
-                  required
-                />
-                <TextInput
-                  name="lastName"
-                  placeholder="Last Name"
-                  label="Last Name"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <TextInput
-                  name="email"
-                  type="email"
-                  placeholder="Business Email"
-                  label="Business Email"
-                  required
-                />
-                <TextInput
-                  name="phone"
-                  type="tel"
-                  placeholder="Phone number"
-                  label="Phone number"
-                />
-              </div>
-              <TextInput
-                name="linkedinUrl"
-                placeholder="LinkedIn URL"
+            {/* Honeypot — visually hidden, kept out of the tab order. */}
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                width: "1px",
+                height: "1px",
+                padding: 0,
+                margin: "-1px",
+                overflow: "hidden",
+                clip: "rect(0 0 0 0)",
+                whiteSpace: "nowrap",
+                border: 0,
+              }}
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="First Name" name="firstName" required autoComplete="given-name" />
+              <Field label="Last Name" name="lastName" required autoComplete="family-name" />
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field
+                label="Business Email"
+                name="email"
+                type="email"
+                placeholder="you@company.com"
+                required
+                autoComplete="email"
+              />
+              <Field
+                label="Phone"
+                name="phone"
+                type="tel"
+                placeholder="+1 (555) 000-0000"
+                autoComplete="tel"
+              />
+            </div>
+
+            <div className="mt-4">
+              <Field
                 label="LinkedIn URL"
+                name="linkedinUrl"
+                type="url"
+                placeholder="https://linkedin.com/in/…"
               />
+            </div>
 
-              <ResumeInput />
-
-              <TextArea
-                name="coverLetter"
-                placeholder="Cover letter (optional)"
-                label="Cover letter"
-              />
-
-              <RecruitmentConsent />
-
-              <div className="flex justify-start">
-                <TurnstileWidget />
-              </div>
-
-              {error && (
-                <p
-                  role="alert"
+            <div className="mt-4">
+              <span
+                className="font-sans block"
+                style={{
+                  fontSize: "var(--fs-caption)",
+                  fontWeight: 500,
+                  color: "rgba(17,17,17,0.7)",
+                  marginBottom: "6px",
+                  letterSpacing: "-0.005em",
+                }}
+              >
+                Resume / CV
+                <span aria-hidden style={{ color: ACCENT }}> *</span>
+              </span>
+              <label
+                htmlFor="resume"
+                className="font-sans flex flex-col items-center justify-center cursor-pointer"
+                style={{
+                  border: "1px dashed rgba(74,59,241,0.45)",
+                  background: "rgba(74,59,241,0.04)",
+                  borderRadius: "12px",
+                  padding: "20px 16px",
+                  textAlign: "center",
+                }}
+              >
+                <UploadIcon />
+                <span
                   style={{
-                    fontFamily: "var(--font-sans), 'Sora', sans-serif",
                     fontSize: "var(--fs-body-sm)",
                     fontWeight: 500,
-                    lineHeight: 1.45,
-                    color: "#B42318",
+                    color: ACCENT,
+                    marginTop: "8px",
                   }}
                 >
-                  {error}
-                </p>
-              )}
+                  {resumeName || "Drop or browse — PDF, DOC, DOCX"}
+                </span>
+                <span
+                  style={{
+                    fontSize: "var(--fs-caption)",
+                    color: "rgba(17,17,17,0.55)",
+                    marginTop: "4px",
+                  }}
+                >
+                  Max file size: 10 MB
+                </span>
+                <input
+                  id="resume"
+                  name="resume"
+                  type="file"
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  required
+                  onChange={handleResume}
+                  aria-label="Resume (PDF, DOC, or DOCX, 10 MB max)"
+                  className="sr-only"
+                />
+              </label>
+            </div>
 
-              <ApplyButton busy={busy} />
-            </form>
-          )}
-        </FormCard>
-      </Container>
-    </Section>
+            <div className="mt-4">
+              <label
+                htmlFor="coverLetter"
+                className="font-sans block"
+                style={{
+                  fontSize: "var(--fs-caption)",
+                  fontWeight: 500,
+                  color: "rgba(17,17,17,0.7)",
+                  marginBottom: "6px",
+                  letterSpacing: "-0.005em",
+                }}
+              >
+                Cover letter (optional)
+              </label>
+              <textarea
+                id="coverLetter"
+                name="coverLetter"
+                rows={4}
+                placeholder="A short note on why you're a great fit…"
+                className="font-sans w-full"
+                style={{
+                  padding: "12px 14px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(17,17,17,0.12)",
+                  background: "white",
+                  fontSize: "var(--fs-body)",
+                  color: "#111",
+                  outline: "none",
+                  resize: "vertical",
+                  lineHeight: 1.5,
+                }}
+              />
+            </div>
+
+            <div className="mt-4">
+              <RecruitmentConsent />
+            </div>
+
+            <div className="mt-5 flex justify-center sm:justify-start">
+              <TurnstileWidget />
+            </div>
+
+            {error && (
+              <p
+                role="alert"
+                className="font-sans mt-3"
+                style={{
+                  fontSize: "var(--fs-caption)",
+                  color: "#B42318",
+                  lineHeight: 1.4,
+                }}
+              >
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={busy}
+              aria-busy={busy}
+              className="font-sans relative inline-flex items-center justify-center w-full mt-5 cursor-pointer transform-gpu hover:-translate-y-px hover:brightness-110 active:translate-y-0 active:scale-[0.99] active:duration-[80ms] active:brightness-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#33BAEC] focus-visible:outline-offset-[3px] disabled:cursor-not-allowed disabled:opacity-70"
+              style={{
+                height: "48px",
+                borderRadius: "10px",
+                background: ACCENT,
+                color: "white",
+                fontSize: "var(--fs-body-sm)",
+                fontWeight: 500,
+                letterSpacing: "-0.01em",
+                transition:
+                  "transform 200ms ease, filter 200ms ease, box-shadow 200ms ease",
+                WebkitTapHighlightColor: "transparent",
+                boxShadow:
+                  "0 0 0 1px #4a3bf1, 0 1px 2px rgba(9,6,63,0.4), inset 0 1px 0 rgba(255,255,255,0.16)",
+              }}
+            >
+              {busy ? "Submitting…" : "Submit application"}
+            </button>
+          </form>
+        )}
+      </div>
+    </section>
   );
 }
 
-/**
- * File picker styled to match the FormCard text inputs (same #FBFBFB surface,
- * #DDDDDD border, 16px label). The native file-chooser button is left to the
- * browser, but the field wrapper carries the shared treatment.
- */
-function ResumeInput(): React.ReactElement {
+interface FieldProps {
+  label: string;
+  name: string;
+  type?: string;
+  required?: boolean;
+  placeholder?: string;
+  autoComplete?: string;
+}
+
+function Field({
+  label,
+  name,
+  type = "text",
+  required,
+  placeholder,
+  autoComplete,
+}: FieldProps): React.ReactElement {
   return (
-    <label className="block">
-      <span
-        className="block"
+    <div>
+      <label
+        htmlFor={name}
+        className="font-sans block"
         style={{
-          fontFamily: "var(--font-display), 'Manrope', sans-serif",
+          fontSize: "var(--fs-caption)",
           fontWeight: 500,
-          fontSize: "var(--fs-body-sm)",
-          lineHeight: 1.4,
-          color: "#111111",
+          color: "rgba(17,17,17,0.7)",
           marginBottom: "6px",
+          letterSpacing: "-0.005em",
         }}
       >
-        Resume <span className="text-[#D14343]">*</span>
-      </span>
+        {label}
+        {required && (
+          <span aria-hidden style={{ color: ACCENT }}>
+            {" "}
+            *
+          </span>
+        )}
+      </label>
       <input
-        name="resume"
-        type="file"
-        accept=".pdf,.doc,.docx"
-        required
-        aria-label="Resume (PDF, DOC, or DOCX, 10 MB max)"
-        className="w-full rounded-[8px] outline-none transition-colors focus:border-[#3960F9] file:mr-3 file:rounded-[6px] file:border-0 file:bg-[#3960F9] file:px-3 file:py-2 file:text-white file:cursor-pointer"
+        id={name}
+        name={name}
+        type={type}
+        required={required}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        className="font-sans w-full"
         style={{
-          background: "#FBFBFB",
-          border: "1.5px solid #DDDDDD",
-          padding: "11px 12px",
-          fontFamily: "var(--font-display), 'Manrope', sans-serif",
-          fontWeight: 500,
-          fontSize: "var(--fs-input)",
-          lineHeight: 1.125,
-          color: "#111111",
+          height: "44px",
+          padding: "0 14px",
+          borderRadius: "10px",
+          border: "1px solid rgba(17,17,17,0.12)",
+          background: "white",
+          fontSize: "var(--fs-body)",
+          color: "#111",
+          outline: "none",
         }}
       />
-      <span
-        className="block"
-        style={{
-          fontFamily: "var(--font-sans), 'Sora', sans-serif",
-          fontWeight: 400,
-          fontSize: "var(--fs-caption)",
-          lineHeight: 1.4,
-          color: "#111111",
-          opacity: 0.7,
-          marginTop: "6px",
-        }}
-      >
-        PDF, DOC, or DOCX. 10 MB maximum.
-      </span>
-    </label>
+    </div>
   );
 }
 
-/**
- * Required recruitment consent, mirroring the `LeadConsent` checkbox treatment
- * but with a single recruitment-purpose category and its own snapshot copy.
- */
 function RecruitmentConsent(): React.ReactElement {
   return (
     <label className="flex items-start cursor-pointer" style={{ gap: "8px" }}>
       <span
-        className="inline-flex shrink-0 items-center"
-        style={{ height: "1.4em", fontSize: "var(--fs-caption)" }}
+        className="relative inline-flex shrink-0"
+        style={{ width: "18px", height: "18px", marginTop: "2px" }}
       >
-        <span
-          className="relative inline-flex"
-          style={{ width: "18px", height: "18px" }}
+        <input
+          type="checkbox"
+          name="consent_recruitment"
+          required
+          aria-required
+          className="peer w-full h-full appearance-none cursor-pointer rounded-[4px] bg-white border-[1.5px] border-[rgba(17,17,17,0.2)] checked:bg-[#4a3bf1] checked:border-[#4a3bf1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4a3bf1]"
+        />
+        <svg
+          aria-hidden
+          viewBox="0 0 16 16"
+          className="pointer-events-none absolute inset-0 m-auto hidden peer-checked:block"
+          width="12"
+          height="12"
         >
-          <input
-            type="checkbox"
-            name="consent_recruitment"
-            required
-            aria-required
-            className="peer w-full h-full appearance-none cursor-pointer rounded-[4px] bg-[#FBFBFB] border-[1.5px] border-[#DDDDDD] checked:bg-[#3960F9] checked:border-[#3960F9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3960F9]"
+          <path
+            d="M3 8.5l3 3 7-7"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
-          <svg
-            aria-hidden
-            viewBox="0 0 16 16"
-            className="pointer-events-none absolute inset-0 m-auto hidden peer-checked:block"
-            width="12"
-            height="12"
-          >
-            <path
-              d="M3 8.5l3 3 7-7"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </span>
+        </svg>
       </span>
       <span
+        className="font-sans"
         style={{
-          fontFamily: "var(--font-sans), 'Sora', sans-serif",
-          fontWeight: 400,
           fontSize: "var(--fs-caption)",
           lineHeight: 1.4,
-          letterSpacing: "-0.02em",
-          color: "#111111",
-          opacity: 0.85,
+          letterSpacing: "-0.01em",
+          color: "rgba(17,17,17,0.85)",
         }}
       >
         {CONSENT_TEXT} See our{" "}
-        <Link href="/privacy-policy" className="underline" style={{ color: "#2F49E5" }}>
+        <Link href="/privacy-policy" className="underline" style={{ color: ACCENT }}>
           Privacy Policy
         </Link>
-        .<span className="ml-0.5 text-[#D14343]">*</span>
+        .<span aria-hidden style={{ color: ACCENT }}> *</span>
       </span>
     </label>
   );
 }
 
-/**
- * Primary submit button styled identically to FormCard's `SubmitButton`, with
- * an added busy/disabled state (the shared component takes no `disabled` prop).
- */
-function ApplyButton({ busy }: { busy: boolean }): React.ReactElement {
+function UploadIcon(): React.ReactElement {
   return (
-    <button
-      type="submit"
-      disabled={busy}
-      aria-busy={busy}
-      className="relative w-full overflow-hidden rounded-[8px] text-white cursor-pointer transition-colors hover:bg-[#2438C2] disabled:cursor-not-allowed disabled:opacity-70"
-      style={{
-        background: "#3960F9",
-        height: "44px",
-        boxShadow:
-          "0 0 0 1px rgba(57, 96, 249, 1), 0 1px 2px -1px rgba(9, 6, 63, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.16)",
-      }}
-    >
-      <span
-        className="relative z-10 inline-flex items-center justify-center"
-        style={{
-          fontFamily: "var(--font-display), 'Manrope', sans-serif",
-          fontWeight: 500,
-          fontSize: "var(--fs-button)",
-          lineHeight: "24.06px",
-          letterSpacing: "-0.01em",
-        }}
-      >
-        {busy ? "Submitting…" : "Submit application"}
-      </span>
-    </button>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+        stroke={ACCENT}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 

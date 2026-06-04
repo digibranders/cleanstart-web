@@ -12,7 +12,7 @@ export function CareerDetailContent({
 }: CareerDetailContentProps): React.ReactElement {
   return (
     <section className="relative w-full bg-white overflow-x-clip">
-      <div className="relative mx-auto max-w-[820px] px-6 sm:px-10 pt-16 pb-24">
+      <div className="relative mx-auto max-w-[820px] px-6 sm:px-10 pt-16 pb-6">
         {body ? (
           <div className="article-body">
             <RenderLexical content={body} />
