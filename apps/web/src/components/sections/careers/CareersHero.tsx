@@ -102,8 +102,8 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
                   opacity: 0.8,
                 }}
               >
-                Help us empower the world&rsquo;s largest enterprises to secure their
-                applications. Are you ready to join?
+                Trusted software starts at the foundation. Be part of the mission
+                redefining security and trust for modern software delivery.
               </p>
             </HeroReveal>
           </div>
