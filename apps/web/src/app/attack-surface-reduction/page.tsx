@@ -14,7 +14,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 export const metadata = buildPageMetadata({
   title: "Attack Surface Reduction",
   description:
-    "CleanStart Images reduce attack surface by eliminating unnecessary components before they enter production.",
+    "Learn how CleanStart reduces attack surface at the container image level by removing unnecessary packages, mapping dependencies, and delivering lean, hardened builds by default.",
   path: "/attack-surface-reduction",
   eyebrow: "Solutions",
 });

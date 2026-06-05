@@ -12,7 +12,7 @@ import { JsonLd, breadcrumbSchema } from '@/lib/seo/jsonld';
 export const metadata = buildPageMetadata({
   title: 'Developer & Security Community',
   description:
-    'Connect with developers and security leaders sharing real-world strategies to reduce risk, secure images, and ship faster with confidence.',
+    "Join the CleanStart community of security practitioners, developers, and compliance leaders working together to advance trusted, verified software delivery practices.",
   path: '/community',
 });
 

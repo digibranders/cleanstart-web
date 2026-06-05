@@ -15,7 +15,7 @@ export const metadata = buildPageMetadata({
   title: "Enhance SCA | CleanStart",
   absoluteTitle: true,
   description:
-    "Eliminate dependency noise and improve accuracy with CleanStart's verified image foundations for SCA tools.",
+    "See how CleanStart enhances Software Composition Analysis by providing zero vulnerability base images that reduce false positives and accelerate remediation for SCA tools like Snyk and Checkmarx.",
   path: "/software-composition-analysis",
   eyebrow: "Solutions",
 });

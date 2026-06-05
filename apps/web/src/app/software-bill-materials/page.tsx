@@ -15,7 +15,7 @@ export const metadata = buildPageMetadata({
   absoluteTitle: true,
   eyebrow: "Solutions",
   description:
-    "Automated SBOMs with cryptographic signing, verified provenance, and continuous compliance, giving you full visibility into every component.",
+    "Learn how CleanStart's SBOM Analyzer generates CISA compliant Software Bills of Materials for container images, mapping every component and dependency for full supply chain transparency.",
   path: "/software-bill-materials",
 });
 

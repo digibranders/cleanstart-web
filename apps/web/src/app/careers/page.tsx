@@ -19,7 +19,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 const TITLE = "Careers";
 const DESCRIPTION =
-  "Help us empower the world's largest enterprises to secure their applications. Browse open roles at CleanStart.";
+  "Join CleanStart and help build the next generation of secure software supply chains. Explore open roles in security, engineering, and compliance at a fast growing cybersecurity company.";
 
 interface CareersPageProps {
   searchParams: Promise<{

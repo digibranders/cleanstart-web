@@ -15,7 +15,7 @@ export const metadata = buildPageMetadata({
   title: "FIPS Compliance | CleanStart",
   absoluteTitle: true,
   description:
-    "Deploy FIPS-validated, STIG-aligned images that simplify federal and enterprise compliance.",
+    "Explore CleanStart's FIPS compliant container images, built to meet NIST FIPS 140-3 standards for organizations in regulated industries requiring verified cryptographic compliance.",
   path: "/fips",
   eyebrow: "Solutions",
 });

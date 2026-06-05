@@ -15,7 +15,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 export const metadata: Metadata = buildPageMetadata({
   title: "Knowledge Hub: Container Security Guides",
   description:
-    "Practical guides on container security, software supply-chain integrity, and compliance: VEX, keyless signing, SLSA provenance, attestation, and runtime evidence.",
+    "Browse the CleanStart Knowledge Hub for expert guides on container security, SBOM attestations, SLSA compliance, vulnerability management, and software supply chain best practices.",
   path: "/knowledge-hub",
   eyebrow: "Knowledge Hub",
 });

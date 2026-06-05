@@ -15,7 +15,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 const TITLE = "Events";
 const DESCRIPTION =
-  "Meet the CleanStart team in person at upcoming conferences and explore highlights from past events.";
+  "Explore CleanStart's past and upcoming events including DevOps, DevSecOps, and cybersecurity conferences, summits, and meetups across India and beyond.";
 
 interface EventsPageProps {
   searchParams: Promise<{ page?: string }>;

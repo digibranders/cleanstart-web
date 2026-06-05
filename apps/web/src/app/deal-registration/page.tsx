@@ -10,7 +10,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 export const metadata = buildPageMetadata({
   title: "Deal Registration",
   description:
-    "Register a deal with CleanStart. Submit partner and prospect details to protect your opportunity.",
+    "Register your CleanStart deal to protect your pipeline, access partner pricing, and collaborate with the CleanStart team on enterprise opportunities in secure software supply chain.",
   path: "/deal-registration",
 });
 

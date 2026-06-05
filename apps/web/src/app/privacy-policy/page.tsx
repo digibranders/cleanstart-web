@@ -9,7 +9,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 export const metadata = buildPageMetadata({
   title: "Privacy Policy",
   description:
-    "CleanStart's Privacy Policy describes how we collect, use, and protect your personal information across our website, software, and services.",
+    "Read CleanStart's Privacy Policy detailing how personal and organizational data is collected, used, stored, and protected across its platform and services.",
   path: "/privacy-policy",
 });
 

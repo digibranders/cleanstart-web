@@ -26,7 +26,7 @@ export const dynamic = "force-dynamic";
 
 const FALLBACK_TITLE = "Leadership Exchange";
 const FALLBACK_DESCRIPTION =
-  "Where industry leaders decode container security and define the future of the software supply chain.";
+  "Listen to CleanStart's podcast where industry leaders decode container security, software supply chain risk, and the future of trusted software delivery.";
 
 const DEFAULT_CTA_CARDS: PodcastCtaCard[] = [
   {
