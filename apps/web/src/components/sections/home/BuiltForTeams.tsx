@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * "Built for Teams That Can't Afford Uncertainty" testimonial carousel.
+ * "Chosen by Engineering Leaders" testimonial carousel.
  *
  * Interactions: prev/next buttons, arrow keys, touch swipe, drag-to-rotate,
  * and auto-advance (7s, pauses on hover/focus/tab-hidden/reduced motion).
@@ -346,42 +346,47 @@ export function BuiltForTeams({
             >
               {heading ?? (
                 <>
-                  Built for Teams That Can&rsquo;t Afford{" "}
-                  <span className="cs-text-gradient-impact">Uncertainty</span>
+                  Chosen by{" "}
+                  <span className="cs-text-gradient-impact">
+                    Engineering Leaders
+                  </span>
                 </>
               )}
             </h2>
           </Reveal>
-          <div
-            aria-hidden
-            className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 47.2%, rgba(255,255,255,0) 100%)",
-            }}
-          />
-          <Reveal
-            header
-            delay={0.15}
-            y={20}
-            className="md:justify-self-end"
-            style={{ maxWidth: "604px" }}
-          >
-            <p
-              className="text-white md:text-right"
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-lead)",
-                fontWeight: 400,
-                lineHeight: 1.4,
-                letterSpacing: "-0.02em",
-                opacity: 0.8,
-              }}
-            >
-              {description ??
-                "CleanStart replaces unpredictable builds with verified, secure images — helping engineering teams cut response times and prevent breaches."}
-            </p>
-          </Reveal>
+          {description && (
+            <>
+              <div
+                aria-hidden
+                className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 47.2%, rgba(255,255,255,0) 100%)",
+                }}
+              />
+              <Reveal
+                header
+                delay={0.15}
+                y={20}
+                className="md:justify-self-end"
+                style={{ maxWidth: "604px" }}
+              >
+                <p
+                  className="text-white md:text-right"
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-lead)",
+                    fontWeight: 400,
+                    lineHeight: 1.4,
+                    letterSpacing: "-0.02em",
+                    opacity: 0.8,
+                  }}
+                >
+                  {description}
+                </p>
+              </Reveal>
+            </>
+          )}
         </header>
         )}
 

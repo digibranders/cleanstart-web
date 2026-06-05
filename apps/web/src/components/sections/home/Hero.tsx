@@ -17,7 +17,7 @@ export function Hero() {
                 lineHeight: 1.05,
               }}
             >
-              Secure by Design. Built from Source. Verified Container Images
+              Trusted Foundations for Modern Software
             </h1>
           </HeroReveal>
 
@@ -41,7 +41,7 @@ export function Hero() {
           </HeroReveal>
         </div>
 
-        <div className="pb-16 pt-12">
+        <div className="pb-8 pt-10">
           <TrustedByMarquee />
         </div>
       </div>
