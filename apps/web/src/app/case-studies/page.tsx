@@ -11,7 +11,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 const TITLE = "Case Studies";
 const DESCRIPTION =
-  "Real challenges and the measurable impact CleanStart delivered — download customer case studies across healthcare, telecom, finance, and more.";
+  "Real challenges and the measurable impact CleanStart delivered. Download customer case studies across healthcare, telecom, finance, and more.";
 
 interface CaseStudiesPageProps {
   searchParams: Promise<{ page?: string }>;

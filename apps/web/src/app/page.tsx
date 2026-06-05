@@ -5,6 +5,7 @@ import { Header } from "@/components/nav/Header";
 import { Hero } from "@/components/sections/home/Hero";
 import { CleanStartFactory } from "@/components/sections/home/CleanStartFactory";
 import { HowCleanStartHelp } from "@/components/sections/home/HowCleanStartHelp";
+import { SecurityNotPatching } from "@/components/sections/home/SecurityNotPatching";
 // BuiltForTeams (~480L "use client" testimonial carousel) sits below the fold;
 // code-split so it does not ship in the initial home-page client bundle.
 const BuiltForTeams = dynamic(() =>
@@ -14,19 +15,19 @@ import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyA
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
 import { ReadyToSecureCTA } from "@/components/sections/home/ReadyToSecureCTA";
 import { Footer } from "@/components/sections/Footer";
-import { SecurityNotPatching } from "@/components/sections/home/SecurityNotPatching";
 import { CleanStartAdvantage } from "@/components/sections/home/CleanStartAdvantage";
 import { FadeUp } from "@/components/ui/FadeUp";
 import Image from "next/image";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "CleanStart — Secure by Design. Built from Source.",
+  title: "Verified & Secure Container Images | CleanStart",
+  absoluteTitle: true,
   description:
-    "Verified container images. Built from source, hardened, signed, and continuously verified.",
+    "Build on verified, near-zero-vulnerability container images with cryptographic provenance and compliance alignment.",
   path: "/",
   variant: "hero",
-  ogTitle: "Secure by Design. Built from Source.",
-  titleAccent: "Built from Source.",
+  ogTitle: "Verified & Secure Container Images",
+  titleAccent: "Secure Container Images",
 });
 
 export default function Home() {

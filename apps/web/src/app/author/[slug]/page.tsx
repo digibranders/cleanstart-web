@@ -36,7 +36,7 @@ export async function generateMetadata({
     `${author.name}${author.role ? `, ${author.role}` : ""} at CleanStart.`;
 
   return buildPageMetadata({
-    title: `${author.name}${author.role ? ` — ${author.role}` : ""}`,
+    title: `${author.name}${author.role ? `, ${author.role}` : ""}`,
     description,
     path: `/author/${author.slug}`,
     eyebrow: author.role ?? "Team",

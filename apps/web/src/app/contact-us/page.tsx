@@ -9,9 +9,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Contact Us",
+  title: "Contact CleanStart | Talk to a Secure Software Expert",
+  absoluteTitle: true,
   description:
-    "Talk to CleanStart about hardened container images, compliance, and integrations. Reach our Singapore, India, and North America offices.",
+    "Reach out to CleanStart for enterprise consultations on verified images, compliance, and supply chain security.",
   path: "/contact-us",
 });
 

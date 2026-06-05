@@ -14,6 +14,12 @@ export type PageImage = {
 interface BuildPageMetadataInput {
   title: string;
   description: string;
+  /**
+   * When true, `title` is used as the absolute document `<title>` and the
+   * root layout's `%s | CleanStart` template is bypassed. Use for pages whose
+   * title already carries the brand suffix (e.g. exact-matched legacy titles).
+   */
+  absoluteTitle?: boolean | undefined;
   /** Path-only canonical, e.g. `/blogs` or `/blogs/${slug}`. Always with a leading slash. */
   path: string;
   image?: PageImage | undefined;
@@ -48,6 +54,7 @@ interface BuildPageMetadataInput {
 export function buildPageMetadata({
   title,
   description,
+  absoluteTitle,
   path,
   image,
   type = "website",
@@ -82,7 +89,7 @@ export function buildPageMetadata({
   const ogUrl = canonicalUrl ?? url;
 
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
     alternates: { canonical },
     openGraph: {

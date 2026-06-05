@@ -42,7 +42,7 @@ export async function generateMetadata({
     description:
       seo.description ??
       event.abstract ??
-      `Join CleanStart at ${event.title}${event.venue ? ` — ${event.venue}` : ""}.`,
+      `Join CleanStart at ${event.title}${event.venue ? `, ${event.venue}` : ""}.`,
     path: `/event/${event.slug}`,
     eyebrow: "Event",
     ...(seo.noindex ? { noindex: true } : {}),

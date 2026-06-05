@@ -2,7 +2,7 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Additional Third-Party Terms",
+  title: "Legal",
   description:
     "CleanStart's policy on third-party software and open source components included in or accessed through CleanStart products and services.",
   path: "/legal",

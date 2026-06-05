@@ -12,7 +12,7 @@ import { buildPageMetadata } from '@/lib/seo/canonical';
 import { JsonLd, breadcrumbSchema } from '@/lib/seo/jsonld';
 
 export const metadata = buildPageMetadata({
-  title: 'For Developers — Trusted Container Foundations',
+  title: 'For Developers',
   description:
     'Build and ship with pre-hardened, verifiable container foundations. Eliminate inherited vulnerabilities, automate SBOMs, and meet compliance requirements without changing your workflow.',
   path: '/for-developers',
