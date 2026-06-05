@@ -113,6 +113,8 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
       description:
         "Live demos of CleanStart's continuous-rebuild pipeline. Drop by for a one-on-one walkthrough or a CleanStart sticker.",
       href: "#event-kubecon",
+      dateLabel: "10 Nov 2026",
+      location: "Salt Lake City, UT",
     },
     {
       image: "/images/resource-2.png",
@@ -120,6 +122,8 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
       description:
         "Join our security team for a 45-minute deep dive on shifting CVE remediation left to where it belongs — the source.",
       href: "#event-webinar",
+      dateLabel: "12 Mar 2026",
+      location: "Online",
     },
     {
       image: "/images/resource-3.png",
@@ -127,6 +131,8 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
       description:
         "Closed-door discussion with security leaders from financial services on hardening container supply chains.",
       href: "#event-rsa",
+      dateLabel: "27 Apr 2026",
+      location: "San Francisco, CA",
     },
   ],
 };
@@ -210,8 +216,8 @@ export async function ResourcesInsights() {
               letterSpacing: "-0.02em",
             }}
           >
-            Stay informed with the latest research, threat intelligence reports,
-            and expert analysis from our security team.
+            Research, insights, and perspectives on trusted software delivery,
+            software supply chain security, and modern infrastructure.
           </p>
         </Reveal>
 

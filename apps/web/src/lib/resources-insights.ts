@@ -35,6 +35,7 @@
  */
 
 import { cmsBaseUrl } from "./cms-fetch";
+import { formatEventDate } from "./events";
 import type { ResourceType } from "./resources";
 import { resourceCoverPoster } from "./resources-utils";
 
@@ -62,6 +63,10 @@ export interface ResourceCard {
   logo?: string | null;
   /** Publisher name — text fallback inside the newsroom panel when no art exists. */
   publisher?: string | null;
+  /** Events only: formatted date label (e.g. "15 May 2026") for the card meta row. */
+  dateLabel?: string | null;
+  /** Events only: venue / location for the card meta row. */
+  location?: string | null;
 }
 
 export type ResourceCardsByTab = Record<TabId, ResourceCard[]>;
@@ -115,6 +120,10 @@ interface CmsEvent {
   title: string;
   abstract?: string | null;
   heroImage?: CmsImage | null;
+  venue?: string | null;
+  startsAt?: string | null;
+  timezone?: string | null;
+  customDateLabel?: string | null;
 }
 
 /**
@@ -246,18 +255,26 @@ async function loadNews(): Promise<ResourceCard[]> {
 async function loadEvents(): Promise<ResourceCard[]> {
   const data = await fetchCollection<CmsEvent>(
     "events",
-    `${PUBLISHED_FILTER}&depth=1&limit=3&sort=-publishedAt&select[title]=true&select[slug]=true&select[abstract]=true&select[heroImage]=true`,
+    `${PUBLISHED_FILTER}&depth=1&limit=3&sort=-publishedAt&select[title]=true&select[slug]=true&select[abstract]=true&select[heroImage]=true&select[venue]=true&select[startsAt]=true&select[timezone]=true&select[customDateLabel]=true`,
   );
   if (!data) return [];
   return data.docs
     .map((d): ResourceCard | null => {
       const image = pickImage(d.heroImage);
       if (!d.slug || !d.title) return null;
+      const dateLabel = formatEventDate(
+        d.startsAt,
+        d.timezone,
+        d.customDateLabel,
+        "short",
+      );
       return {
         image: image ?? "/images/resource-1.png",
         title: d.title,
         description: d.abstract?.trim() ?? "",
         href: `/event/${d.slug}`,
+        dateLabel: dateLabel || null,
+        location: d.venue?.trim() || null,
       };
     })
     .filter((c): c is ResourceCard => c !== null);
