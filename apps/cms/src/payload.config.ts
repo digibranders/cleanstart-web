@@ -26,6 +26,7 @@ import { Jobs } from './payload/collections/Jobs';
 import { KnowledgeBase } from './payload/collections/KnowledgeBase';
 import { KnowledgeCategories } from './payload/collections/KnowledgeCategories';
 import { Leads } from './payload/collections/Leads';
+import { LegalDocuments } from './payload/collections/Legal';
 import { Media } from './payload/collections/Media';
 import { PartnerApplications } from './payload/collections/PartnerApplications';
 import { News } from './payload/collections/News';
@@ -330,6 +331,7 @@ export default buildConfig({
     Guides,
     CaseStudies,
     KnowledgeBase,
+    LegalDocuments,
     Resources,
     Events,
     Webinars,

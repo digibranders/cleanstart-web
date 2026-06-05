@@ -72,6 +72,7 @@ export interface Config {
     guides: Guide;
     'case-studies': CaseStudy;
     knowledgeBase: KnowledgeBase;
+    legalDocuments: LegalDocument;
     resources: Resource;
     events: Event;
     webinars: Webinar;
@@ -117,6 +118,7 @@ export interface Config {
     guides: GuidesSelect<false> | GuidesSelect<true>;
     'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
     knowledgeBase: KnowledgeBaseSelect<false> | KnowledgeBaseSelect<true>;
+    legalDocuments: LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     webinars: WebinarsSelect<false> | WebinarsSelect<true>;
@@ -2533,6 +2535,74 @@ export interface KnowledgeCategory {
       | boolean
       | null;
   };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legalDocuments".
+ */
+export interface LegalDocument {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  /**
+   * Sidebar position (ascending). Lowest order is the /legal landing document.
+   */
+  order: number;
+  /**
+   * Sidebar icon. Must match a key in the web LEGAL_ICONS map.
+   */
+  icon:
+    | 'FileText'
+    | 'FileLock2'
+    | 'ScrollText'
+    | 'BadgeCheck'
+    | 'FileCheck2'
+    | 'Stamp'
+    | 'Bug'
+    | 'Scale'
+    | 'FileSignature'
+    | 'ShieldCheck';
+  /**
+   * The date these terms take legal effect. Shown publicly as the “Effective” date.
+   */
+  effectiveDate: string;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Internal: date of the most recent legal review. Not shown publicly.
+   */
+  lastReviewedAt?: string | null;
+  /**
+   * Internal: short summary of what changed in this revision (audit trail).
+   */
+  changeSummary?: string | null;
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -7306,6 +7376,10 @@ export interface PayloadLockedDocument {
         value: number | KnowledgeBase;
       } | null)
     | ({
+        relationTo: 'legalDocuments';
+        value: number | LegalDocument;
+      } | null)
+    | ({
         relationTo: 'resources';
         value: number | Resource;
       } | null)
@@ -8153,6 +8227,25 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
             };
         additionalSchema?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legalDocuments_select".
+ */
+export interface LegalDocumentsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  order?: T;
+  icon?: T;
+  effectiveDate?: T;
+  body?: T;
+  lastReviewedAt?: T;
+  changeSummary?: T;
+  publishedAt?: T;
+  displayPublishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -11722,6 +11815,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'knowledgeBase';
           value: number | KnowledgeBase;
+        } | null)
+      | ({
+          relationTo: 'legalDocuments';
+          value: number | LegalDocument;
         } | null)
       | ({
           relationTo: 'resources';
