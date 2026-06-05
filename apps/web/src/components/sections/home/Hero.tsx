@@ -41,7 +41,7 @@ export function Hero() {
           </HeroReveal>
         </div>
 
-        <div className="pb-8 pt-10">
+        <div className="pb-8 pt-24">
           <TrustedByMarquee />
         </div>
       </div>

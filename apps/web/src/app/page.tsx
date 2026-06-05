@@ -45,7 +45,14 @@ export default function Home() {
             alt=""
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 w-full select-none"
-            style={{ height: "auto", maxWidth: "none" }}
+            style={{
+              height: "auto",
+              maxWidth: "none",
+              WebkitMaskImage:
+                "linear-gradient(to bottom, #000 46%, transparent 62%)",
+              maskImage:
+                "linear-gradient(to bottom, #000 46%, transparent 62%)",
+            }}
             loading="eager"
             decoding="async"
           />
