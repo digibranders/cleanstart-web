@@ -37,7 +37,17 @@ PARITY = os.path.join(BASE, "url-parity.json")
 SITEMAP_PARITY = os.path.join(BASE, "sitemap-parity.json")
 OG_COVERAGE = os.path.join(BASE, "og-coverage.json")
 LEGAL = os.path.join(BASE, "legal-pages.json")
+NEW_DESC = os.path.join(BASE, "new-meta-descriptions.csv")
 OUT = os.path.join(BASE, "webflow-seo-export.xlsx")
+
+
+def load_new_descriptions() -> dict:
+    out: dict = {}
+    if os.path.exists(NEW_DESC):
+        with open(NEW_DESC, encoding="utf-8") as fh:
+            for row in csv.DictReader(fh):
+                out[(row["collection"], row["slug"])] = row["new_meta_description"]
+    return out
 
 # Recommended action for each 404-risk old URL.
 PARITY_REC = {
@@ -386,20 +396,21 @@ def build_legal(ws, lg: dict) -> None:
 
 
 # ── Collection sheets ───────────────────────────────────────────────
-def build_collection(ws, stem, rows) -> None:
+def build_collection(ws, stem, rows, new_desc) -> None:
     _, prefix = COLLECTIONS[stem]
-    headers = ["Name", "Slug", "URL", "Meta Title", "Meta Description",
-               "Created", "Last Updated", "Last Published"]
+    headers = ["Name", "Slug", "URL", "Meta Title", "Meta Description (Webflow)",
+               "Updated Meta Description", "Created", "Last Updated", "Last Published"]
     header_row(ws, headers)
     for rrow in rows:
         slug = rrow["slug"].strip()
         url = f"{prefix}/{slug}" if (prefix and slug) else DASH
         ws.append([v(rrow["name"]), v(slug), url,
                    v(rrow["meta_title"]), v(rrow["meta_description"]),
+                   v(new_desc.get((stem, slug))),
                    v(rrow.get("created")), v(rrow.get("last_updated")),
                    v(rrow.get("last_published"))])
     body_style(ws, len(headers))
-    for i, w in enumerate([34, 44, 46, 58, 82, 12, 14, 14], start=1):
+    for i, w in enumerate([34, 44, 46, 58, 70, 70, 12, 14, 14], start=1):
         ws.column_dimensions[get_column_letter(i)].width = w
     ws.freeze_panes = "A2"
     ws.sheet_view.showGridLines = False
@@ -750,8 +761,9 @@ def main() -> None:
     build_broken_links(wb.create_sheet("Broken Links"), broken)
     build_static_pages(wb.create_sheet("Static Pages"), live)
     build_legal(wb.create_sheet("Legal"), legal)
+    new_desc = load_new_descriptions()
     for stem, (name, _) in COLLECTIONS.items():
-        build_collection(wb.create_sheet(name), stem, data[stem])
+        build_collection(wb.create_sheet(name), stem, data[stem], new_desc)
     wb.save(OUT)
     print(f"[xlsx] wrote {OUT}")
     print(f"  Sheets: Summary, Redirects, Global Code & SEO, Canonical & Head Audit, "

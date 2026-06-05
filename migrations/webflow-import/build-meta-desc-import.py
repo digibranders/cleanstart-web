@@ -22,6 +22,7 @@ import xlrd
 EXPORT = os.path.join(os.path.dirname(__file__), "..", "webflow-export")
 SQL_OUT = os.path.join(EXPORT, "meta-desc-import.sql")
 STATIC_OUT = os.path.join(EXPORT, "meta-desc-static-pages.csv")
+NEW_DESC_OUT = os.path.join(EXPORT, "new-meta-descriptions.csv")
 
 # URL prefix -> Payload table
 PREFIX_TABLE = {
@@ -100,6 +101,14 @@ def main() -> None:
         w.writerow(["path", "meta_description"])
         for p, d in sorted(static):
             w.writerow([p, d])
+
+    # Per-collection-item new descriptions, for the Excel "New Meta Description" column.
+    with open(NEW_DESC_OUT, "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["collection", "slug", "new_meta_description"])
+        for table, slugs in by_table.items():
+            for s, d in sorted(slugs.items()):
+                w.writerow([table, s, d])
 
     total = sum(len(v) for v in by_table.values())
     print(f"[sql] {total} collection-item descriptions -> {SQL_OUT}")
