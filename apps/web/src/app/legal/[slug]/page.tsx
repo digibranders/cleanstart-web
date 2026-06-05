@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { LegalDocHeader } from "@/components/sections/legal/LegalDocHeader";
 import { RenderLexical } from "@/lib/renderLexical";
 import {
   getLegalBySlug,
@@ -55,8 +56,13 @@ export default async function LegalDocumentPage({
   const doc = await getLegalBySlug(slug).catch(() => null);
   if (!doc) notFound();
 
+  // `<h1>` is kept as the FIRST child so the `.article-body > .article-h1:first-child`
+  // margin-top reset applies (aligning it with the sidebar). JsonLd renders a
+  // <script>, so placing it last keeps it out of the first-child slot.
   return (
     <>
+      <LegalDocHeader doc={doc} />
+      {doc.body ? <RenderLexical content={doc.body} /> : null}
       <JsonLd
         id={`legal-breadcrumbs-${doc.slug}`}
         data={breadcrumbSchema([
@@ -65,8 +71,6 @@ export default async function LegalDocumentPage({
           { name: doc.title },
         ])}
       />
-      <h1 className="article-h1">{doc.title}</h1>
-      {doc.body ? <RenderLexical content={doc.body} /> : null}
     </>
   );
 }
@@ -89,7 +93,7 @@ export async function renderLegalDetail({
 
   return (
     <article className="article-body mx-auto max-w-[var(--container-prose)] px-6 sm:px-10 py-12">
-      <h1 className="article-h1">{doc.title}</h1>
+      <LegalDocHeader doc={doc} />
       {doc.body ? <RenderLexical content={doc.body} /> : null}
     </article>
   );
