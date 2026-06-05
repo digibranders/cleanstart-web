@@ -253,30 +253,11 @@ export function DeveloperEliminateRisk(): React.ReactElement {
               fontWeight: 700,
               letterSpacing: '-0.05em',
               lineHeight: 1.1,
-              marginBottom: '20px',
+              marginBottom: '64px',
             }}
           >
             Eliminate Risk <span className="cs-text-gradient-impact">Earlier</span>
           </h2>
-        </Reveal>
-
-        <Reveal header delay={0.15} y={20}>
-          <p
-            className="mx-auto text-center"
-            style={{
-              maxWidth: '600px',
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--fs-lead)',
-              fontWeight: 400,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.45,
-              color: 'rgba(255,255,255,0.72)',
-              marginBottom: '64px',
-            }}
-          >
-            Hardened foundations shift the security conversation from incident response to
-            prevention — measurable from the first pull.
-          </p>
         </Reveal>
 
         <RevealStagger
