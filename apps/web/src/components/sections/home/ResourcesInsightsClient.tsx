@@ -172,11 +172,7 @@ function ArticleCard({
         )
       : [];
   return (
-    <a
-      href={article.href}
-      aria-label={article.title}
-      className="group flex h-full flex-col gap-4 cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1"
-    >
+    <div className="flex h-full flex-col gap-4">
       {article.variant === "newsroom" ? (
         <NewsroomCover article={article} />
       ) : (
@@ -189,7 +185,7 @@ function ArticleCard({
             alt=""
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover"
           />
           {article.isCoverPoster && (
             <CoverTitleOverlay title={article.title} />
@@ -199,7 +195,7 @@ function ArticleCard({
       {/* Intentionally <p>, not <h3>: matches the parent section's
           no-heading-tag decision (least priority). */}
       <p
-        className="text-[#1a1a1a] transition-colors duration-200 group-hover:text-[#1B1F4F]"
+        className="text-[#1a1a1a]"
         style={{
           fontFamily: "var(--font-display)",
           fontSize: "var(--fs-lead)",
@@ -259,9 +255,20 @@ function ArticleCard({
           ))}
         </div>
       )}
-      <span className="mt-auto inline-flex items-center gap-2 text-base font-bold text-black transition-transform duration-200 group-hover:translate-x-1">
+      <a
+        href={article.href}
+        aria-label={article.title}
+        className="group/cta mt-auto inline-flex w-fit self-start items-center gap-2 text-base font-bold text-black transition-colors duration-200 hover:text-[#1B1F4F] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-400/60"
+      >
         <span>{ctaLabel}</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden
+          className="transition-transform duration-200 group-hover/cta:translate-x-1"
+        >
           <path
             d="m9 6 6 6-6 6"
             stroke="currentColor"
@@ -270,8 +277,8 @@ function ArticleCard({
             strokeLinejoin="round"
           />
         </svg>
-      </span>
-    </a>
+      </a>
+    </div>
   );
 }
 
@@ -304,7 +311,7 @@ function NewsroomCover({ article }: { article: ResourceCard }) {
           alt={article.publisher ?? article.title}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-contain pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
+          className="object-contain pointer-events-none select-none"
         />
       ) : (
         <span

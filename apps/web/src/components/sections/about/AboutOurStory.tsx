@@ -100,7 +100,7 @@ export function AboutOurStory() {
                 opacity: 0.8,
               }}
             >
-              CleanStart was founded on a simple belief: trusted software starts at the foundation. By integrating security, compliance, and provenance into every build, we help organizations confidently deliver open source and AI infrastructure at scale.
+              CleanStart was founded on a simple belief: trusted software starts at the foundation. By integrating security, compliance, and provenance into every build, we help organizations build and deliver software with confidence.
             </p>
           </Reveal>
         </div>

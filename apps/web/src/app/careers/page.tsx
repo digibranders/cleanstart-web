@@ -13,7 +13,6 @@ import {
   resolvedLocations,
   type JobDepartment,
   type JobLocation,
-  type JobStatusFilter,
 } from "@/lib/jobs";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
@@ -28,16 +27,10 @@ interface CareersPageProps {
     location?: string;
     q?: string;
     page?: string;
-    status?: string;
   }>;
 }
 
 const JOBS_PER_PAGE = 10;
-
-function normalizeStatus(raw: string | undefined): JobStatusFilter {
-  if (raw === "closed" || raw === "all") return raw;
-  return "open";
-}
 
 export async function generateMetadata({
   searchParams,
@@ -60,13 +53,13 @@ export default async function CareersPage({
   const activeDepartment = params.department ?? "";
   const activeLocation = params.location ?? "";
   const searchQuery = params.q ?? "";
-  const activeStatus = normalizeStatus(params.status);
   const currentPage = Math.max(1, Number.parseInt(params.page ?? "1", 10) || 1);
 
   // Fetch the filtered listing AND a parallel unfiltered (open-only) listing —
   // the latter computes which departments / locations have at least one open
   // role (so the sidebar only offers filters that resolve to a non-empty
-  // result set within the user's current status scope).
+  // result set). Only open roles are surfaced; closed roles are unpublished
+  // in the CMS, so `getJobs` defaults to its open-only filter.
   const emptyResponse = {
     docs: [],
     hasNextPage: false,
@@ -78,14 +71,11 @@ export default async function CareersPage({
     getJobs({
       page: currentPage,
       limit: JOBS_PER_PAGE,
-      status: activeStatus,
       ...(activeDepartment ? { department: activeDepartment } : {}),
       ...(activeLocation ? { location: activeLocation } : {}),
       ...(searchQuery ? { search: searchQuery } : {}),
     }).catch(() => emptyResponse),
-    getJobs({ page: 1, limit: 200, status: activeStatus }).catch(
-      () => emptyResponse,
-    ),
+    getJobs({ page: 1, limit: 200 }).catch(() => emptyResponse),
     getJobLocations().catch((): JobLocation[] => []),
   ]);
 
@@ -93,7 +83,7 @@ export default async function CareersPage({
   const availableLocations = collectAvailableLocations(allRes.docs, locationDocs);
 
   const hasActiveFilter = Boolean(
-    activeDepartment || activeLocation || searchQuery || activeStatus !== "open",
+    activeDepartment || activeLocation || searchQuery,
   );
 
   return (
@@ -192,7 +182,6 @@ export default async function CareersPage({
                 <CareersSidebar
                   activeDepartment={activeDepartment}
                   activeLocation={activeLocation}
-                  activeStatus={activeStatus}
                   searchQuery={searchQuery}
                   availableDepartments={availableDepartments}
                   availableLocations={availableLocations}
@@ -205,7 +194,6 @@ export default async function CareersPage({
                   totalPages={filteredRes.totalPages}
                   activeDepartment={activeDepartment}
                   activeLocation={activeLocation}
-                  activeStatus={activeStatus}
                   searchQuery={searchQuery}
                 />
               </div>

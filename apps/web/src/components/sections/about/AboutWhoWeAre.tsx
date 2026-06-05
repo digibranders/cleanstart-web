@@ -4,18 +4,21 @@ import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 const PILLARS = [
   {
     icon: "/images/about/icon-secure-foundation.png",
-    title: "Secure Foundation",
-    description: "Security built in from the start",
+    title: "Trust by Design",
+    description:
+      "Trust should be engineered into software foundations, not retrofitted after deployment.",
   },
   {
     icon: "/images/about/icon-continuous-compliance.png",
-    title: "Continuous Compliance",
-    description: "Always audit-ready",
+    title: "Verifiable by Default",
+    description:
+      "Modern software should be continuously verifiable across every stage of delivery.",
   },
   {
     icon: "/images/about/icon-full-visibility.png",
-    title: "Full Visibility",
-    description: "Every artifact verifiable",
+    title: "Security Without Friction",
+    description:
+      "Developers should be able to move fast without inheriting unnecessary operational risk.",
   },
 ];
 
@@ -69,7 +72,7 @@ export function AboutWhoWeAre() {
                 color: "#111",
               }}
             >
-              Who We <span className="cs-text-gradient-impact">Are</span>
+              Who We Are
             </h2>
           </Reveal>
 
@@ -85,7 +88,7 @@ export function AboutWhoWeAre() {
                 maxWidth: "840px",
               }}
             >
-              CleanStart is building the foundation for trusted open source and AI infrastructure by embedding security, compliance, and provenance into every build, giving enterprises confidence from source to production.
+              CleanStart is building the foundation for trusted software delivery by helping organizations reduce inherited risk and establish trust across the software supply chain.
             </p>
           </Reveal>
         </div>

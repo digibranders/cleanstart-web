@@ -177,15 +177,20 @@ export function Footer({
         />
       <div className="relative">
        <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[var(--footer-cta-pt)]" : "pt-[80px]"}`}>
-        {/* Top row — tagline (left) + social icons (right), both top-aligned. */}
-        <div className="flex flex-wrap items-start justify-between gap-8">
-          <p
-            className="text-lg font-normal leading-[1.4] tracking-[-0.04em] text-white"
-            style={{ maxWidth: "460px" }}
-          >
-            Hardened container images with zero known vulnerabilities. Secure by
-            design, built for speed.
-          </p>
+        {/* Top row — brand logo (left) + social icons (right). */}
+        <div className="flex flex-wrap items-center justify-between gap-8">
+          <div className="relative h-[32px] w-[153px]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo-cleanstart-footer.png"
+              alt="CleanStart"
+              width={153}
+              height={32}
+              loading="eager"
+              decoding="async"
+              className="h-full w-full object-contain object-left"
+            />
+          </div>
 
           <ul className="flex items-center gap-[19px]" aria-label="Social media">
             {SOCIAL_ICONS.map((s) => (
@@ -272,28 +277,15 @@ export function Footer({
           </div>
         </nav>
 
-        {/* Bottom row — logo + copyright + legal links */}
-        <div className="mt-[32px] flex flex-wrap items-end justify-between gap-6">
-          <div className="flex flex-col items-start gap-[9px]">
-            <div className="relative h-[32px] w-[153px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/logo-cleanstart-footer.png"
-                alt="CleanStart"
-                width={153}
-                height={32}
-                loading="eager"
-                decoding="async"
-                className="h-full w-full object-contain object-left"
-              />
-            </div>
-            <span
-              className="text-2xs font-normal leading-[1.1] text-white/95"
-              style={{ letterSpacing: "0.24px" }}
-            >
-              ©2026 CleanStart. All rights reserved.
-            </span>
-          </div>
+        {/* Bottom row — copyright (left) + legal links (right), divided
+            from the nav band above. */}
+        <div className="mt-[32px] flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-[24px]">
+          <span
+            className="text-2xs font-normal leading-[1.1] text-white/95"
+            style={{ letterSpacing: "0.24px" }}
+          >
+            ©2026 CleanStart. All rights reserved.
+          </span>
 
           <ul className="flex items-center gap-2 leading-none">
             {LEGAL_LINKS.map((link, i) => (

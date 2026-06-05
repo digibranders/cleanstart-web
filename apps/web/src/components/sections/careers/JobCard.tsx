@@ -54,9 +54,12 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
             {job.title}
           </h2>
           {/* Status badge lives in the pills row, not inline with the title,
-              so alignment stays stable whether the title wraps or not. */}
+              so alignment stays stable whether the title wraps or not. Plain
+              "open" carries no signal (every listed role is open), so the badge
+              only surfaces the "closing soon" urgency cue (and "closed"
+              defensively, though closed roles are unpublished). */}
           <div className="flex flex-wrap items-center gap-2">
-            <StatusBadge status={status} />
+            {status !== "open" && <StatusBadge status={status} />}
             {employmentLabel && <Pill tone="violet">{employmentLabel}</Pill>}
             {departmentLabel && <Pill tone="magenta">{departmentLabel}</Pill>}
           </div>

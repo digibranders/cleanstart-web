@@ -3,8 +3,33 @@ import { HeroReveal } from "@/components/ui/Reveal";
 export function AboutHero() {
   return (
     <section
-      className="relative bg-cs-hero bg-cs-grid overflow-visible lg:overflow-hidden lg:min-h-[clamp(440px,40vw,569px)]"
+      className="relative bg-cs-hero overflow-visible lg:overflow-hidden lg:min-h-[clamp(440px,40vw,569px)]"
     >
+      {/* Grid mesh — shared hero-mesh.svg, the same asset and treatment as the
+          ASR hero (replaces the old `bg-cs-grid` CSS gridlines). Mobile uses a
+          full-width copy; md+ uses an oversized copy that overflows each side,
+          clipped by the hero wrapper's lg:overflow-hidden and the body's
+          overflow-x: clip. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        className="pointer-events-none select-none absolute left-0 top-0 w-full h-[400px] md:hidden"
+        src="/images/attack-surface-reduction/hero-mesh.svg"
+        alt=""
+        loading="eager"
+        decoding="async"
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden md:block max-w-none"
+        src="/images/attack-surface-reduction/hero-mesh.svg"
+        alt=""
+        style={{ left: "-240px", top: 0, width: "1920px", height: "569px" }}
+        loading="eager"
+        decoding="async"
+      />
+
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -37,7 +62,7 @@ export function AboutHero() {
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
         style={{
-          top: "0px",
+          top: "80px",
           left: "calc(50% + 327.5px)",
           transform: "translateX(-50%)",
           width: "743px",
@@ -58,24 +83,40 @@ export function AboutHero() {
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div className="pt-[clamp(112px,8vw,128px)] pb-[clamp(40px,5vw,80px)]">
-          <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-14 lg:max-w-[436px]">
-            <HeroReveal y={50} duration={1.0}>
-              <h1
-                className="font-display font-semibold text-white"
-                style={{
-                  fontSize: "var(--fs-display)",
-                  lineHeight: 1.05,
-                  letterSpacing: "-0.04em",
-                }}
-              >
-                Security Begins at{" "}
-                <span className="cs-text-gradient-impact">The Source</span>
-              </h1>
-            </HeroReveal>
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-10 lg:max-w-[540px]">
+            <div className="flex flex-col gap-5">
+              <HeroReveal y={50} duration={1.0}>
+                <h1
+                  className="font-display font-semibold text-white"
+                  style={{
+                    fontSize: "var(--fs-display)",
+                    lineHeight: 1.05,
+                    letterSpacing: "-0.04em",
+                  }}
+                >
+                  Building the Foundation for{" "}
+                  <span className="cs-text-gradient-impact">Trusted Software</span>
+                </h1>
+              </HeroReveal>
 
-            <HeroReveal y={30} delay={0.2} duration={0.8}>
+              <HeroReveal y={30} delay={0.15} duration={0.8}>
+                <p
+                  className="font-sans font-normal text-white/85"
+                  style={{
+                    fontSize: "var(--fs-lead)",
+                    lineHeight: 1.4,
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  Redefining how modern software is built, verified, and
+                  delivered.
+                </p>
+              </HeroReveal>
+            </div>
+
+            <HeroReveal y={30} delay={0.3} duration={0.8}>
               <a
-                href="/contact-us"
+                href="/cleanstart-platform"
                 className="cs-btn-glass"
                 style={{
                   ["--cs-btn-px" as string]: "18px",
@@ -85,7 +126,7 @@ export function AboutHero() {
                   fontWeight: 500,
                 }}
               >
-                Contact Us
+                Explore CleanStart
               </a>
             </HeroReveal>
 
