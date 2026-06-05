@@ -72,7 +72,7 @@ export function PreviewInteractionShield(): React.ReactElement | null {
 
       event.preventDefault();
       event.stopPropagation();
-      showToast("Link disabled in preview — exit preview to use it.");
+      showToast("Link disabled in preview. Exit preview to use it.");
     }
 
     function handleSubmit(event: SubmitEvent): void {

@@ -108,7 +108,7 @@ export const STATE_PRESETS: Record<StateVariant, StatePreset> = {
     height: 852,
     alt: "",
     title: "Nothing here yet",
-    description: "Check back soon — new content is on the way.",
+    description: "Check back soon. New content is on the way.",
     tone: "light",
   },
   "no-results": {

@@ -24,7 +24,7 @@ export function CareerDetailContent({
               lineHeight: 1.6,
             }}
           >
-            Full role description coming soon — please reach out via the form
+            Full role description coming soon. Please reach out via the form
             below to apply.
           </p>
         )}

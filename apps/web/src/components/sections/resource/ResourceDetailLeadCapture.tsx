@@ -55,7 +55,7 @@ export function ResourceDetailLeadCapture({
       setStatus({
         tone: "success",
         title: "You're on the list",
-        message: "Thanks — you're on the list. We'll be in touch.",
+        message: "Thanks, you're on the list. We'll be in touch.",
       });
       setEmail("");
       setAgreed(false);

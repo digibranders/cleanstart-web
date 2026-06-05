@@ -228,7 +228,7 @@ export function AboutOurVision() {
 
               <Image
                 src="/images/about/vision-target.png"
-                alt="Our Vision — target"
+                alt="Our Vision target illustration"
                 width={418}
                 height={353}
                 sizes="(min-width: 1024px) 418px, 50vw"

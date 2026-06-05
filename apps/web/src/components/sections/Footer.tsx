@@ -44,7 +44,7 @@ interface FooterLogo {
 }
 
 const MEMBERS: FooterLogo[] = [
-  { name: "OpenSSF — Open Source Security Foundation", src: "/images/footer/openssf.webp", w: 134, h: 52, renderH: 36, href: "https://openssf.org/about/members/" },
+  { name: "OpenSSF (Open Source Security Foundation)", src: "/images/footer/openssf.webp", w: 134, h: 52, renderH: 36, href: "https://openssf.org/about/members/" },
   { name: "The Linux Foundation", src: "/images/footer/linux-foundation.webp", w: 126, h: 43, renderH: 34, href: "https://www.linuxfoundation.org/about/members" },
   { name: "Cloud Native Computing Foundation", src: "/images/footer/cloud-native.webp", w: 174, h: 29, renderH: 24, href: "https://www.cncf.io/about/members/" },
 ];
@@ -70,7 +70,7 @@ const CREDENTIALS: { title: string; badges: Badge[] }[] = [
   {
     title: "Awarded with",
     badges: [
-      { name: "Cyber Security Excellence Awards — Winner", src: "/images/awards/award-1.png", w: 486, h: 616 },
+      { name: "Cyber Security Excellence Awards Winner", src: "/images/awards/award-1.png", w: 486, h: 616 },
     ],
   },
   {

@@ -153,7 +153,7 @@ export function LatestBlogs({
             <EmptyState
               variant="empty"
               title="No posts yet"
-              description="Check back soon — new articles are on the way."
+              description="Check back soon. New articles are on the way."
             />
           )
         ) : (

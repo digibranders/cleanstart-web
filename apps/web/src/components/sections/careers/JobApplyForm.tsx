@@ -94,7 +94,7 @@ export function JobApplyForm({
       setStatus({
         tone: "error",
         title: "Resume required",
-        message: "Please attach your resume — a PDF, DOC, or DOCX file.",
+        message: "Please attach your resume: a PDF, DOC, or DOCX file.",
       });
       return;
     }
@@ -285,7 +285,7 @@ export function JobApplyForm({
                   letterSpacing: "-0.005em",
                 }}
               >
-                Cover letter (optional) — paste below or upload a file
+                Cover letter (optional): paste below or upload a file
               </label>
               <textarea
                 ref={(el) => {
@@ -534,8 +534,8 @@ function FileDrop({
               }}
             >
               {promptNoun
-                ? `Drop or browse ${promptNoun} — PDF, DOC, DOCX`
-                : "Drop or browse — PDF, DOC, DOCX"}
+                ? `Drop or browse ${promptNoun} (PDF, DOC, DOCX)`
+                : "Drop or browse (PDF, DOC, DOCX)"}
             </span>
             <span
               style={{

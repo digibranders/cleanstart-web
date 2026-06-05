@@ -34,7 +34,7 @@ export function CaseStudiesGrid({
             <EmptyState
               variant="empty"
               title="No case studies yet"
-              description="Check back soon — new customer stories are on the way."
+              description="Check back soon. New customer stories are on the way."
             />
           )
         ) : (

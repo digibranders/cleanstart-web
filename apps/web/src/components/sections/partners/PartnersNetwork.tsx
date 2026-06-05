@@ -193,7 +193,7 @@ export function PartnersNetwork(): React.ReactElement {
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {partners.length === 0 ? (
               <div className="col-span-full text-center text-white/70 py-12" style={{ fontSize: "var(--fs-body)" }}>
-                We&apos;re actively expanding in this region — check back soon.
+                We&apos;re actively expanding in this region. Check back soon.
               </div>
             ) : (
               basePartners.map((p) => <PartnerCard key={`${p.name}-${p.country}`} partner={p} />)

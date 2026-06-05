@@ -165,7 +165,7 @@ export function NewsroomGrid({
             <EmptyState
               variant="empty"
               title="No news yet"
-              description="Check back soon — new stories are on the way."
+              description="Check back soon. New stories are on the way."
             />
           )
         ) : (
