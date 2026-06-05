@@ -157,7 +157,7 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
           tone: "success",
           title: "Request received",
           message:
-            "Thanks — your partnership request has been received. Our team will be in touch within one business day.",
+            "Thanks, your partnership request has been received. Our team will be in touch within one business day.",
         });
         // Modal UX: show the confirmation briefly, then close the popup.
         if (closeTimerRef.current != null) window.clearTimeout(closeTimerRef.current);

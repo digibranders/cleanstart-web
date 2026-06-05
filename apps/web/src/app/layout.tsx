@@ -46,14 +46,14 @@ const jetbrainsMono = JetBrains_Mono({
 
 const isProduction = process.env.VERCEL_ENV === "production";
 
-const TITLE = "CleanStart — Secure by Design. Built from Source.";
+const TITLE = "Verified & Secure Container Images | CleanStart";
 const DESCRIPTION =
-  "Verified container images. Built from source, hardened, signed, and continuously verified.";
+  "Build on verified, near-zero-vulnerability container images with cryptographic provenance and compliance alignment.";
 
 const HOME_OG = ogImageUrl({
   variant: "hero",
-  title: "Secure by Design. Built from Source.",
-  titleAccent: "Built from Source.",
+  title: "Verified & Secure Container Images",
+  titleAccent: "Secure Container Images",
   sub: DESCRIPTION,
 });
 

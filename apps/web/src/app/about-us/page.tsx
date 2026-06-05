@@ -12,9 +12,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "About Us",
+  title: "About CleanStart | Building Trusted Software Foundations",
+  absoluteTitle: true,
   description:
-    "CleanStart builds trusted software delivery by integrating security, compliance, and provenance into every build.",
+    "Learn about CleanStart's mission to secure software foundations through verified, reproducible builds.",
   path: "/about-us",
 });
 

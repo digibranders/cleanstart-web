@@ -216,7 +216,7 @@ export function FormRenderer({
           title: "Submission failed",
           message:
             json?.error === "rate_limited"
-              ? "Too many submissions — please wait a minute and try again."
+              ? "Too many submissions. Please wait a minute and try again."
               : "We couldn't submit the form. Please try again.",
         });
         return;
@@ -237,7 +237,7 @@ export function FormRenderer({
       setStatus({
         tone: "error",
         title: "Network error",
-        message: "Network error — please try again.",
+        message: "Network error. Please try again.",
       });
     } finally {
       setSubmitting(false);

@@ -12,9 +12,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Enhance SCA — Smarter Software Composition Analysis",
+  title: "Enhance SCA | CleanStart",
+  absoluteTitle: true,
   description:
-    "Reduce alert fatigue and improve SCA effectiveness with minimal, hardened container foundations and contextualized risk insights.",
+    "Eliminate dependency noise and improve accuracy with CleanStart's verified image foundations for SCA tools.",
   path: "/software-composition-analysis",
   eyebrow: "Solutions",
 });

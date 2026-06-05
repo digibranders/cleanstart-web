@@ -26,6 +26,7 @@ export const ROUTE_PREFIX = {
   newsCategories: '/news-categories',
   knowledgeBase: '/knowledge-hub',
   knowledgeCategories: '/knowledge-hub/category',
+  legalDocuments: '/legal',
 } as const satisfies Record<string, string>;
 
 export type RoutePrefixKey = keyof typeof ROUTE_PREFIX;

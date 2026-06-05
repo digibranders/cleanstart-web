@@ -6,15 +6,17 @@ import { CareerDetailHero } from "@/components/sections/careers/CareerDetailHero
 import { CareerDetailContent } from "@/components/sections/careers/CareerDetailContent";
 import { JobApplyForm } from "@/components/sections/careers/JobApplyForm";
 import type { LexicalRoot } from "@/lib/blog";
+import { mediaUrl } from "@/lib/blog";
 import {
   DEPARTMENT_LABEL,
-  EXPERIENCE_LABEL,
+  experienceDisplay,
   getJobBySlug,
   locationDisplay,
   resolvedLocations,
   type JobEmploymentType,
 } from "@/lib/jobs";
 import { buildPageMetadata } from "@/lib/seo/canonical";
+import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { JsonLd, breadcrumbSchema, jobPostingSchema } from "@/lib/seo/jsonld";
 
 const SCHEMA_EMPLOYMENT_TYPE: Record<JobEmploymentType, string> = {
@@ -49,14 +51,20 @@ export async function generateMetadata({
     departmentLabel ? `in ${departmentLabel}` : null,
     `(${locationDisplay(job)})`,
   ].filter(Boolean);
+  // Prefer the editor's SEO override (imported verbatim from Webflow) and fall
+  // back to the role title / templated description, mirroring the other detail
+  // routes (blogs, news, guides, events).
+  const seo = resolveCmsSeo(job.seo, { absolutize: mediaUrl });
   return buildPageMetadata({
-    title: job.title,
+    title: seo.title ?? job.title,
     eyebrow: "Careers",
-    description: descriptionParts.join(" "),
+    description: seo.description ?? descriptionParts.join(" "),
     path: `/job/${job.slug}`,
     type: "article",
     modifiedTime: job.updatedAt ?? undefined,
-    noindex: job.hiringStatus === "closed",
+    noindex: seo.noindex || job.hiringStatus === "closed",
+    ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
+    ...(seo.image ? { image: seo.image } : {}),
   });
 }
 
@@ -77,9 +85,7 @@ export default async function CareerDetailPage({
   const departmentLabel = job.department
     ? DEPARTMENT_LABEL[job.department]
     : (departmentFromBody ?? null);
-  const experienceLabel = job.experienceLevel
-    ? `${EXPERIENCE_LABEL[job.experienceLevel]} experience`
-    : null;
+  const experienceLabel = experienceDisplay(job);
 
   const meta = [
     { label: "Location", value: locationDisplay(job) },

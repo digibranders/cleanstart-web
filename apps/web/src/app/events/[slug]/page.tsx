@@ -39,7 +39,7 @@ export async function generateMetadata({
     title: event.title,
     description:
       event.abstract ??
-      `Join CleanStart at ${event.title}${event.venue ? ` — ${event.venue}` : ""}.`,
+      `Join CleanStart at ${event.title}${event.venue ? `, ${event.venue}` : ""}.`,
     path: `/events/${event.slug}`,
     ...(heroAbsolute && event.heroImage
       ? {

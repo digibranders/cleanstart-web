@@ -21,7 +21,7 @@ export function TrustedByMarquee() {
   return (
     <div className="flex flex-col items-center gap-8">
       <p className="text-body-md font-normal leading-[1.5] text-white/85">
-        Trusted by Leading Global Brands
+        Supporting Modern Engineering Teams
       </p>
 
       <div className="relative w-full overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">

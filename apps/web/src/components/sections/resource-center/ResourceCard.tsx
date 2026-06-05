@@ -119,7 +119,7 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
         <Link
           href={`/resources/${resource.slug}`}
           className="flex items-center gap-1.5"
-          aria-label={`${ctaLabel} — ${resource.title}`}
+          aria-label={`${ctaLabel}: ${resource.title}`}
         >
           <span
             className="font-sans font-medium whitespace-nowrap"

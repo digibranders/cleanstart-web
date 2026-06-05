@@ -11,10 +11,11 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Software Bill of Materials",
+  title: "CleanStart SBOM | Complete, Verified, and Compliance-Ready",
+  absoluteTitle: true,
   eyebrow: "Solutions",
   description:
-    "Know what you ship. CleanStart SBOM generates signed, complete SBOMs automatically on every build with commit-level provenance, cryptographic signing, and continuous compliance for EO 14028, EU CRA, and FIPS.",
+    "Automated SBOMs with cryptographic signing, verified provenance, and continuous compliance, giving you full visibility into every component.",
   path: "/software-bill-materials",
 });
 

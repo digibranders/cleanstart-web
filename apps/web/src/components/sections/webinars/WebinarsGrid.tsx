@@ -107,7 +107,7 @@ export function WebinarsGrid({
                 <EmptyState
                   variant="empty"
                   title="No webinars yet"
-                  description="Check back soon — new sessions are on the way."
+                  description="Check back soon. New sessions are on the way."
                 />
               )
             ) : (

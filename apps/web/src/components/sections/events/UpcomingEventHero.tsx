@@ -336,7 +336,7 @@ function EmptyHeroCard(): React.ReactElement {
             lineHeight: "1.2",
           }}
         >
-          Stay tuned — new events coming soon
+          Stay tuned. New events coming soon.
         </p>
         <p
           className="text-white/70"

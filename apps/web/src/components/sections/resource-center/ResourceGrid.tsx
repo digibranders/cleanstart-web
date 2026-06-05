@@ -63,7 +63,7 @@ export function ResourceGrid({
         variant="empty"
         className="flex-1"
         title="No resources yet"
-        description="Check back soon — new resources are on the way."
+        description="Check back soon. New resources are on the way."
       />
     );
   }

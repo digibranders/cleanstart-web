@@ -10,9 +10,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Partners",
+  title: "CleanStart Partners | Collaborate on Secure Software Supply Chains",
+  absoluteTitle: true,
   description:
-    "Join the Clean Software Movement. CleanStart partners ship verified, compliant, zero-vulnerability software to customers worldwide.",
+    "Partner with CleanStart to deliver verifiable, compliance-aligned software foundations to your customers.",
   path: "/partners",
 });
 

@@ -27,7 +27,7 @@ export function PreviewModeBanner(): React.ReactElement {
       }}
     >
       <span>
-        Preview link — you are viewing draft content. This URL expires and is not indexed by search engines.
+        Preview link: you are viewing draft content. This URL expires and is not indexed by search engines.
       </span>
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
         <span style={{ opacity: 0.7, fontSize: "0.75rem", whiteSpace: "nowrap" }}>

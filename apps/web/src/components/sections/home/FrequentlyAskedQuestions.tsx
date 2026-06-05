@@ -111,11 +111,8 @@ export function FrequentlyAskedQuestions() {
       />
 
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Title flush-left, separator centered, description right-aligned —
-            the same 1fr_auto_1fr grid used by SecurityNotPatching and
-            HowCleanStartHelp for visual parity. */}
-        <div className="mb-8 flex flex-col items-start gap-5 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
-          <Reveal header className="justify-self-start" style={{ maxWidth: "493px" }}>
+        <div className="mb-8 flex flex-col items-start md:mb-10">
+          <Reveal header style={{ maxWidth: "720px" }}>
             <h2
               id="faq-title"
               className="font-display text-[#111111]"
@@ -128,36 +125,6 @@ export function FrequentlyAskedQuestions() {
             >
               Frequently Asked Questions
             </h2>
-          </Reveal>
-          <div
-            aria-hidden
-            className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(204,204,204,0) 0%, rgba(204,204,204,1) 47.2%, rgba(204,204,204,0) 100%)",
-            }}
-          />
-          <Reveal
-            header
-            delay={0.15}
-            y={20}
-            className="md:justify-self-end"
-            style={{ maxWidth: "585px" }}
-          >
-            <p
-              className="text-[#111111] md:text-right"
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-lead)",
-                fontWeight: 400,
-                lineHeight: 1.4,
-                letterSpacing: "-0.02em",
-                opacity: 0.8,
-              }}
-            >
-              Common questions about CleanStart&apos;s hardened container images,
-              security, and integrations.
-            </p>
           </Reveal>
         </div>
 

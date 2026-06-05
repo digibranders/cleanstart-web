@@ -5,6 +5,7 @@
 import { cache } from "react";
 import { fetchCMS } from "./cms-fetch";
 import type { LexicalRoot } from "./blog";
+import type { CmsSeo } from "./seo/cms-seo";
 
 export type JobDepartment =
   | "engineering"
@@ -60,6 +61,7 @@ export type Job = {
     currency?: "USD" | "EUR" | "GBP" | "INR" | null;
   };
   body?: LexicalRoot | null;
+  seo?: CmsSeo | null;
   publishedAt?: string | null;
   updatedAt?: string | null;
 };

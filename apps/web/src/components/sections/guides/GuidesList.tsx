@@ -128,7 +128,7 @@ export function GuidesList({
             <EmptyState
               variant="empty"
               title="No guides yet"
-              description="Check back soon — new guides are on the way."
+              description="Check back soon. New guides are on the way."
             />
           )
         ) : (

@@ -6,7 +6,7 @@ export const runtime = "edge";
 
 const WIDTH = 1200;
 const HEIGHT = 630;
-const FALLBACK_TITLE = "CleanStart — Secure by Design. Built from Source.";
+const FALLBACK_TITLE = "CleanStart: Secure by Design. Built from Source.";
 const ACCENT_GRAD = "linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)";
 
 // Baked as a single SVG rather than a tiled pattern because Satori does not tile.

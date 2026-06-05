@@ -25,6 +25,30 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "events", label: "Events" },
 ];
 
+/**
+ * Per-tab card config.
+ *
+ * - `titleLines` is reserved (min-height) so headlines align across a row and
+ *   1-line titles don't pull their card's layout up.
+ * - `descLines` only caps the abstract (line-clamp); it is NOT reserved. The
+ *   CTA is pinned to the card bottom (`mt-auto`) and the grid equalizes card
+ *   heights, so CTAs align without per-line bookkeeping. `null` drops the
+ *   abstract entirely (events carry none).
+ * - `ctaLabel` is tab-appropriate: an event is attended, a resource is
+ *   downloaded, an article is read.
+ */
+const TAB_CONFIG: Record<
+  TabId,
+  { titleLines: number; descLines: number | null; ctaLabel: string }
+> = {
+  blogs: { titleLines: 2, descLines: 3, ctaLabel: "Read More" },
+  resource: { titleLines: 2, descLines: 3, ctaLabel: "Download" },
+  newsroom: { titleLines: 2, descLines: 3, ctaLabel: "Read More" },
+  events: { titleLines: 2, descLines: null, ctaLabel: "View Event" },
+};
+
+const TITLE_LINE_HEIGHT = 1.25;
+
 export function ResourcesInsightsClient({
   articlesByTab,
 }: {
@@ -124,7 +148,7 @@ export function ResourcesInsightsClient({
               animationDelay: `${idx * 70}ms`,
             }}
           >
-            <ArticleCard article={article} />
+            <ArticleCard article={article} tab={activeTab} />
           </div>
         ))}
       </div>
@@ -132,11 +156,26 @@ export function ResourcesInsightsClient({
   );
 }
 
-function ArticleCard({ article }: { article: ResourceCard }) {
+function ArticleCard({
+  article,
+  tab,
+}: {
+  article: ResourceCard;
+  tab: TabId;
+}) {
+  const { titleLines, descLines, ctaLabel } = TAB_CONFIG[tab];
+  const showDesc = descLines !== null && article.description.trim().length > 0;
+  const eventMeta =
+    tab === "events"
+      ? [article.dateLabel, article.location].filter(
+          (v): v is string => Boolean(v),
+        )
+      : [];
   return (
     <a
       href={article.href}
-      className="group flex flex-col gap-4 cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1"
+      aria-label={article.title}
+      className="group flex h-full flex-col gap-4 cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1"
     >
       {article.variant === "newsroom" ? (
         <NewsroomCover article={article} />
@@ -169,36 +208,66 @@ function ArticleCard({ article }: { article: ResourceCard }) {
           letterSpacing: "-0.02em",
           margin: 0,
           display: "-webkit-box",
-          WebkitLineClamp: 2,
+          WebkitLineClamp: titleLines,
           WebkitBoxOrient: "vertical",
           overflow: "hidden",
+          minHeight: `${titleLines * TITLE_LINE_HEIGHT}em`,
         }}
       >
         {article.title}
       </p>
-      {/* Abstract clamped to 3 lines so card heights stay reasonable. */}
-      <p
-        className="text-[#666]"
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: "var(--fs-body)",
-          fontWeight: 400,
-          lineHeight: 1.5,
-          letterSpacing: "-0.02em",
-          display: "-webkit-box",
-          WebkitLineClamp: 3,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-        }}
-      >
-        {article.description}
-      </p>
-      <span className="inline-flex items-center gap-2 text-base font-bold text-black transition-transform duration-200 group-hover:translate-x-1">
-        <span>Explore</span>
-        <svg width="8" height="16" viewBox="0 0 8 16" fill="none" aria-hidden>
+      {/* Abstract is line-clamped (max only) — not height-reserved. The CTA is
+          pinned to the card bottom, so alignment doesn't depend on this height.
+          Events carry no abstract, so the block is dropped entirely. */}
+      {showDesc && (
+        <p
+          className="text-[#666]"
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--fs-body)",
+            fontWeight: 400,
+            lineHeight: 1.5,
+            letterSpacing: "-0.02em",
+            display: "-webkit-box",
+            WebkitLineClamp: descLines,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {article.description}
+        </p>
+      )}
+      {eventMeta.length > 0 && (
+        <div
+          className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[#555]"
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--fs-body-sm)",
+            fontWeight: 500,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {eventMeta.map((value, i) => (
+            <span key={value} className="inline-flex items-center gap-2">
+              {i > 0 && (
+                <span aria-hidden className="opacity-40">
+                  ·
+                </span>
+              )}
+              {value}
+            </span>
+          ))}
+        </div>
+      )}
+      <span className="mt-auto inline-flex items-center gap-2 text-base font-bold text-black transition-transform duration-200 group-hover:translate-x-1">
+        <span>{ctaLabel}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
           <path
-            d="M6.71 7.29 2.94 11.06 1.79 9.91l3.16-2.88 1.09-.92-1.09-.93-3.16-2.85L2.94 2 6.71 5.77a1.06 1.06 0 0 1 .31.75 1.06 1.06 0 0 1-.31.77Z"
-            fill="currentColor"
+            d="m9 6 6 6-6 6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </svg>
       </span>

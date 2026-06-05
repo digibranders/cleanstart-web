@@ -11,7 +11,7 @@ interface Slide {
 
 const SLIDES: Slide[] = Array.from({ length: 9 }, (_, i) => ({
   src: `/images/teams/squad/${i + 1}.jpeg`,
-  alt: `CleanStart Hustle Squad — moment ${i + 1}`,
+  alt: `CleanStart Hustle Squad, moment ${i + 1}`,
 }));
 
 const AUTOPLAY_MS = 5000;

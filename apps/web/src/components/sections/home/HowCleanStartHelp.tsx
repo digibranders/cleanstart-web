@@ -22,55 +22,55 @@ interface TabContent {
 
 const TAB_CONTENT: Record<TabId, TabContent> = {
   ciso: {
-    heroTitle: "Security leadership that scales",
+    heroTitle: "Security Leadership That Scales",
     heroDescription:
-      "Centralize visibility, cut audit cycles, and prove compliance — without slowing engineering down.",
+      "Centralize visibility, strengthen compliance readiness, and improve software trust across environments.",
     ctaLabel: "Explore for CISOs",
     ctaHref: "/for-ciso",
     cards: [
       {
-        title: "Reduce Security Costs by 70%",
+        title: "Continuous Compliance Readiness",
         description:
-          "Automated security, real-time scanning, and built-in compliance enable lean, cost-efficient DevSecOps teams.",
+          "Automate evidence collection and simplify compliance across modern software environments.",
         icon: "/images/home/help-icon1.png",
       },
       {
-        title: "Enhanced Security",
+        title: "Verifiable Software Governance",
         description:
-          "Always-on security with smart threat and vulnerability protection.",
+          "Improve visibility across software provenance, dependencies, and runtime foundations.",
         icon: "/images/home/help-icon2.png",
       },
       {
-        title: "Centralized Visibility & Governance",
+        title: "Centralized Visibility & Control",
         description:
-          "Unified dashboard for complete visibility and control over security and compliance.",
+          "Unify software trust, compliance, and delivery insights across teams and environments.",
         icon: "/images/home/help-icon3.png",
       },
     ],
   },
   developers: {
-    heroTitle: "Build pipelines you can trust",
+    heroTitle: "Build Pipelines You Can Trust",
     heroDescription:
-      "Signed, deterministic images that drop into your CI/CD with zero friction and full provenance.",
+      "Signed, deterministic images with full provenance for modern CI/CD environments.",
     ctaLabel: "Explore for Developers",
     ctaHref: "/for-developers",
     cards: [
       {
-        title: "Enhanced Security",
+        title: "Verifiable Software Foundations",
         description:
-          "Signed, verified images with automated security updates.",
+          "Minimal, source-built runtime images designed to reduce inherited vulnerabilities.",
         icon: "/images/home/help-icon2.png",
       },
       {
-        title: "Seamless Integration",
+        title: "Built for Existing Workflows",
         description:
-          "CI/CD pipelines, private repos, and SSO support for complete workflow integration.",
+          "Integrate with CI/CD pipelines, registries, Kubernetes environments, and developer tooling.",
         icon: "/images/home/help-icon1.png",
       },
       {
-        title: "Streamlined Development",
+        title: "Accelerate Secure Delivery",
         description:
-          "Speed up deployment with automated compliance and custom-built images.",
+          "Improve release confidence with reproducible builds and trusted runtime foundations.",
         icon: "/images/home/help-icon3.png",
       },
     ],
@@ -103,7 +103,7 @@ export function HowCleanStartHelp() {
 
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
         <div className="mb-8 flex flex-col items-start gap-6 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
-          <Reveal header className="justify-self-start" style={{ maxWidth: "444px" }}>
+          <Reveal header className="justify-self-start" style={{ maxWidth: "520px" }}>
             <h2
               id="how-cleanstart-title"
               className="font-display text-[#111111]"
@@ -114,7 +114,7 @@ export function HowCleanStartHelp() {
                 lineHeight: 1.1,
               }}
             >
-              How CleanStart Will Help
+              Tailored for Modern Software Teams
             </h2>
           </Reveal>
           <div
@@ -143,8 +143,7 @@ export function HowCleanStartHelp() {
                 opacity: 0.8,
               }}
             >
-              Help Tailored solutions for every role in your organization — from
-              security leaders to engineering teams.
+              Designed to support every stage of modern software delivery.
             </p>
           </Reveal>
         </div>

@@ -13,7 +13,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 export const metadata = buildPageMetadata({
   title: "Meet the Team & Leadership",
   description:
-    "Meet the people behind CleanStart — our executive leadership, advisory board, and the team united by a shared commitment to trusted software.",
+    "Meet the people behind CleanStart, from our executive leadership and advisory board to the team united by a shared commitment to trusted software.",
   path: "/teams",
   eyebrow: "Team",
 });

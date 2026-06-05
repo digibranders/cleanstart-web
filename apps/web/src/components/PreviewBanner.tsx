@@ -39,7 +39,7 @@ export async function PreviewBanner(): Promise<React.ReactElement | null> {
       }}
     >
       <span>
-        Preview mode — you are viewing draft content. This page is not indexed by search engines.
+        Preview mode: you are viewing draft content. This page is not indexed by search engines.
       </span>
       <a
         href="/api/preview/disable"
