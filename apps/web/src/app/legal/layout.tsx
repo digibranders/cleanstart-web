@@ -4,7 +4,7 @@ import { Footer } from "@/components/sections/Footer";
 import { LegalHero } from "@/components/sections/legal/LegalHero";
 import { LegalSidebar } from "@/components/sections/legal/LegalSidebar";
 import { FadeUp } from "@/components/ui/FadeUp";
-import { formatLegalDate, getLegalList, legalEffectiveDate } from "@/lib/legal";
+import { getLegalList } from "@/lib/legal";
 
 /**
  * Persistent shell for every /legal document. Header, hero, sidebar and footer
@@ -18,24 +18,24 @@ export default async function LegalSectionLayout({
 }: {
   children: React.ReactNode;
 }): Promise<React.ReactElement> {
-  const docs = await getLegalList();
+  // Degrade to an empty sidebar if the legalDocuments collection is
+  // unreachable (e.g. before the collection's migration + seed have been
+  // deployed to the CMS) so the section still prerenders. Matches the
+  // `.catch` fallback used by the index and [slug] routes.
+  const docs = await getLegalList().catch(() => []);
   const navItems = docs.map((d) => ({
     label: d.title,
     href: `/legal/${d.slug}`,
     icon: d.icon,
-  }));
-  const dateItems = docs.map((d) => ({
-    href: `/legal/${d.slug}`,
-    effectiveDate: formatLegalDate(legalEffectiveDate(d)),
   }));
 
   return (
     <>
       <Header />
       <main>
-        <LegalHero title="Legal" dateItems={dateItems} />
+        <LegalHero title="Legal" />
         <FadeUp>
-          <Section padding="md" className="bg-white">
+          <Section padding="sm" className="bg-white">
             <Container variant="default">
               <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-10 lg:gap-16">
                 <aside>
