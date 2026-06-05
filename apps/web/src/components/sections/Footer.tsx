@@ -177,8 +177,16 @@ export function Footer({
         />
       <div className="relative">
        <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[var(--footer-cta-pt)]" : "pt-[80px]"}`}>
-        {/* Top row — social icons, right-aligned. */}
-        <div className="flex flex-wrap items-start justify-end gap-8">
+        {/* Top row — tagline (left) + social icons (right), both top-aligned. */}
+        <div className="flex flex-wrap items-start justify-between gap-8">
+          <p
+            className="text-lg font-normal leading-[1.4] tracking-[-0.04em] text-white"
+            style={{ maxWidth: "460px" }}
+          >
+            Hardened container images with zero known vulnerabilities. Secure by
+            design, built for speed.
+          </p>
+
           <ul className="flex items-center gap-[19px]" aria-label="Social media">
             {SOCIAL_ICONS.map((s) => (
               <li key={s.name}>
