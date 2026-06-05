@@ -2,12 +2,13 @@ import type { CollectionAfterChangeHook, Payload } from 'payload';
 
 import { submitIndexNow } from '../lib/indexnow/submit';
 import { docCanonicalUrl } from '../lib/jsonld/url';
+import { resolveSiteUrl } from '../lib/site-url';
 
 const readBaseUrl = async (payload: Payload): Promise<string> => {
   const settings = (await payload.findGlobal({ slug: 'siteSettings' })) as {
     baseUrl?: string;
   };
-  return (settings.baseUrl ?? 'https://cleanstart.com').replace(/\/+$/, '');
+  return resolveSiteUrl(settings.baseUrl);
 };
 
 /**

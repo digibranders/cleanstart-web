@@ -3,15 +3,16 @@ import type { CollectionAfterChangeHook, Payload } from 'payload';
 import { type CanonicalDoc, docCanonicalUrl } from '../lib/jsonld/url';
 import { dispatchEvent } from '../lib/webhooks/dispatch';
 import { getRequestId } from '../lib/request-id';
+import { resolveSiteUrl } from '../lib/site-url';
 
 const readBaseUrl = async (payload: Payload): Promise<string> => {
   try {
     const settings = (await payload.findGlobal({ slug: 'siteSettings' })) as {
       baseUrl?: string;
     };
-    return (settings.baseUrl ?? 'https://cleanstart.com').replace(/\/+$/, '');
+    return resolveSiteUrl(settings.baseUrl);
   } catch {
-    return 'https://cleanstart.com';
+    return resolveSiteUrl();
   }
 };
 

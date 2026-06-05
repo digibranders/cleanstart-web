@@ -11,6 +11,7 @@ import {
   createSearchClient,
   searchClientConfigFromEnv,
 } from '../lib/search/client';
+import { resolveSiteUrl } from '../lib/site-url';
 
 /** Reindex when Meilisearch doc count drifts more than 5% from Postgres. */
 const DRIFT_THRESHOLD = 0.05;
@@ -38,9 +39,9 @@ const readBaseUrl = async (payload: ReindexPayload): Promise<string> => {
     const settings = (await payload.findGlobal({ slug: 'siteSettings' })) as {
       baseUrl?: string;
     };
-    return (settings.baseUrl ?? 'https://cleanstart.com').replace(/\/+$/, '');
+    return resolveSiteUrl(settings.baseUrl);
   } catch {
-    return 'https://cleanstart.com';
+    return resolveSiteUrl();
   }
 };
 

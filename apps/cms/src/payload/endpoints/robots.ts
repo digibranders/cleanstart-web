@@ -1,5 +1,7 @@
 import type { Endpoint, Payload } from 'payload';
 
+import { resolveSiteUrl } from '../lib/site-url';
+
 const SITEMAP_PATHS = [
   '/api/sitemap.xml',
   '/api/sitemap-news.xml',
@@ -19,7 +21,7 @@ const readBaseUrl = async (payload: Payload): Promise<string> => {
   const settings = (await payload.findGlobal({ slug: 'siteSettings' })) as {
     baseUrl?: string;
   };
-  return (settings.baseUrl ?? 'https://cleanstart.com').replace(/\/+$/, '');
+  return resolveSiteUrl(settings.baseUrl);
 };
 
 // Production = explicit signal only. Staging deploys run with
