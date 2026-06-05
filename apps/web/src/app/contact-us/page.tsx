@@ -39,7 +39,10 @@ export default function ContactUsPage() {
         </FadeUp>
 
         <FadeUp>
-          <FrequentlyAskedQuestions />
+          {/* Balanced top/bottom: ContactOffices (Section md) already pads
+              above, so drop the FAQ's own top padding + footer-overlap margin
+              and match the bottom to the same section rhythm. */}
+          <FrequentlyAskedQuestions className="pb-section-md" />
         </FadeUp>
       </main>
       <Footer />

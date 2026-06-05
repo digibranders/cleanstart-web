@@ -103,7 +103,7 @@ export function ContactForm() {
   };
 
   return (
-    <section className="relative -mt-[140px] pb-4 sm:pb-6">
+    <section className="relative -mt-[140px]">
       <Container>
         <div className="mx-auto w-full max-w-[860px]">
           <div
@@ -182,6 +182,7 @@ export function ContactForm() {
                   <Field
                     id="firstName"
                     label="First Name"
+                    placeholder="Jane"
                     required
                     autoComplete="given-name"
                     minLength={2}
@@ -194,6 +195,7 @@ export function ContactForm() {
                   <Field
                     id="lastName"
                     label="Last Name"
+                    placeholder="Doe"
                     autoComplete="family-name"
                     minLength={2}
                     maxLength={50}
@@ -205,6 +207,7 @@ export function ContactForm() {
                   <Field
                     id="email"
                     label="Email"
+                    placeholder="jane@company.com"
                     type="email"
                     required
                     autoComplete="email"
@@ -217,6 +220,7 @@ export function ContactForm() {
                   <Field
                     id="company"
                     label="Company"
+                    placeholder="Acme Inc."
                     autoComplete="organization"
                     maxLength={100}
                     value={values.company}
@@ -226,6 +230,7 @@ export function ContactForm() {
                     <Field
                       id="phone"
                       label="Phone"
+                      placeholder="+1 (555) 000-0000"
                       type="tel"
                       autoComplete="tel"
                       inputMode="tel"
@@ -241,6 +246,7 @@ export function ContactForm() {
                     <Field
                       id="brief"
                       label="Brief Requirement"
+                      placeholder="Tell us how we can help…"
                       required
                       multiline
                       minLength={10}
@@ -350,6 +356,7 @@ export function ContactForm() {
 interface FieldProps {
   id: string;
   label: string;
+  placeholder?: string;
   required?: boolean;
   type?: string;
   multiline?: boolean;
@@ -369,6 +376,7 @@ interface FieldProps {
 function Field({
   id,
   label,
+  placeholder,
   required = false,
   type = "text",
   multiline = false,
@@ -384,7 +392,7 @@ function Field({
 }: FieldProps) {
   // Font size is fixed at 16px inline to prevent iOS Safari zoom-on-focus.
   const sharedClass =
-    "block w-full rounded-[8px] bg-[#FBFBFB] text-[#111111] placeholder:text-transparent outline-none transition-colors focus:border-[#3960F9]";
+    "block w-full rounded-[8px] bg-[#FBFBFB] text-[#111111] placeholder:text-[#A3A3A3] outline-none transition-colors focus:border-[#3960F9]";
   const baseStyle: React.CSSProperties = {
     background: "#FBFBFB",
     border: "1.5px solid #DDDDDD",
@@ -418,6 +426,7 @@ function Field({
           name={id}
           required={required}
           rows={4}
+          placeholder={placeholder}
           value={value}
           onChange={onChange}
           minLength={minLength}
@@ -432,6 +441,7 @@ function Field({
           name={id}
           type={type}
           required={required}
+          placeholder={placeholder}
           value={value}
           onChange={(e) => {
             if (filterInput) {

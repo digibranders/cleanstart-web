@@ -65,7 +65,7 @@ export function PartnersHero(): React.ReactElement {
             <p
               className="text-white/80 mx-auto"
               style={{
-                fontSize: "var(--fs-body)",
+                fontSize: "var(--fs-lead-sm)",
                 lineHeight: 1.5,
                 maxWidth: "560px",
               }}

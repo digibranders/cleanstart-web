@@ -156,7 +156,7 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
                 <p
                   className="font-medium"
                   style={{
-                    fontSize: "var(--fs-body)",
+                    fontSize: "var(--fs-lead-sm)",
                     color: "rgba(255,255,255,0.85)",
                   }}
                 >

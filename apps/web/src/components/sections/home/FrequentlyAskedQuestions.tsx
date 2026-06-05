@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
+import { cn } from "@/lib/cn";
 
 /**
  * Frequently Asked Questions section: two columns of toggleable FAQ items.
@@ -68,7 +69,17 @@ const RIGHT_FAQS: FaqItem[] = [
   },
 ];
 
-export function FrequentlyAskedQuestions() {
+export function FrequentlyAskedQuestions({
+  className,
+}: {
+  /**
+   * Overrides the section's vertical spacing. Defaults to the home-page
+   * treatment (asymmetric padding + `mb-[-50px]` footer overlap). Pages that
+   * follow a `Section padding`-spaced block (e.g. contact-us, after
+   * ContactOffices) pass a balanced value so top/bottom spacing matches.
+   */
+  className?: string;
+}) {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
@@ -76,7 +87,10 @@ export function FrequentlyAskedQuestions() {
       // No overflow-hidden, so the decorative blobs can bleed across the
       // top/bottom section boundaries. Horizontal scroll is still prevented by
       // overflow-x: hidden on the body.
-      className="relative w-full pt-8 pb-14 sm:pt-10 sm:pb-16 lg:pt-12 lg:pb-20 mb-[-50px]"
+      className={cn(
+        "relative w-full",
+        className ?? "pt-8 pb-14 sm:pt-10 sm:pb-16 lg:pt-12 lg:pb-20 mb-[-50px]",
+      )}
       aria-labelledby="faq-title"
     >
       {/* Cyan glow at the top-right of the FAQ section. */}

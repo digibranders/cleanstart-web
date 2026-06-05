@@ -85,7 +85,7 @@ const FEATURES: FeatureItem[] = [
   },
   {
     title: "Minimal Workflow Changes",
-    body: "Drop-in replacement — just change your base image tag.",
+    body: "Replace base images without major refactoring.",
     iconSrc: "/images/cleanstart-images/workflows-feat-minimal-workflow.svg",
   },
   {

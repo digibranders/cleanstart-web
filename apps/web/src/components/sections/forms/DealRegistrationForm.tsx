@@ -45,22 +45,22 @@ export function DealRegistrationForm(): React.ReactElement {
 
         <div className="flex flex-col gap-3">
           <FormSectionTitle>Partner Rep Details</FormSectionTitle>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <TextInput name="partnerRepFirstName" placeholder="First Name" label="First Name" required />
             <TextInput name="partnerRepLastName" placeholder="Last Name" label="Last Name" required />
+            <TextInput name="partnerRepPhone" type="tel" placeholder="+1 (555) 000-0000" label="Phone" />
+            <TextInput name="partnerRepEmail" type="email" placeholder="jane@company.com" label="Email" required />
           </div>
-          <TextInput name="partnerRepPhone" type="tel" placeholder="+1 (555) 000-0000" label="Phone" />
-          <TextInput name="partnerRepEmail" type="email" placeholder="jane@company.com" label="Email" required />
         </div>
 
         <div className="flex flex-col gap-3">
           <FormSectionTitle>Prospect Details</FormSectionTitle>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <TextInput name="prospectFirstName" placeholder="First Name" label="First Name" required />
             <TextInput name="prospectLastName" placeholder="Last Name" label="Last Name" required />
+            <TextInput name="prospectPhone" type="tel" placeholder="+1 (555) 000-0000" label="Phone" />
+            <TextInput name="prospectEmail" type="email" placeholder="jane@company.com" label="Email" required />
           </div>
-          <TextInput name="prospectPhone" type="tel" placeholder="+1 (555) 000-0000" label="Phone" />
-          <TextInput name="prospectEmail" type="email" placeholder="jane@company.com" label="Email" required />
           <TextArea name="dealDetails" placeholder="Deal Details" label="Deal Details" />
         </div>
 
