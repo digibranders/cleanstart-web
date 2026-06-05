@@ -2,6 +2,7 @@ import type { CollectionAfterChangeHook, Payload } from 'payload';
 
 import { submitIndexNow } from '../lib/indexnow/submit';
 import { docCanonicalUrl } from '../lib/jsonld/url';
+import { isIndexingAllowed } from '../lib/seo-env';
 import { resolveSiteUrl } from '../lib/site-url';
 
 const readBaseUrl = async (payload: Payload): Promise<string> => {
@@ -27,6 +28,10 @@ export const indexNowPublishAfterChangeHook =
       const previous = (previousDoc as { _status?: string } | undefined)?._status;
       const current = (doc as { _status?: string })._status;
       if (current !== 'published' || previous === 'published') return doc;
+
+      // Never ping search engines off the production site (staging/preview),
+      // even if an INDEXNOW_KEY is present.
+      if (!isIndexingAllowed()) return doc;
 
       const key = process.env.INDEXNOW_KEY;
       if (!key) return doc;

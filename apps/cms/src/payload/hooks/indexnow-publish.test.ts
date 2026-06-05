@@ -14,10 +14,14 @@ const makeReq = (baseUrl = 'https://cleanstart.com') => ({
 
 beforeEach(() => {
   Reflect.deleteProperty(process.env, 'INDEXNOW_KEY');
+  // IndexNow only fires on the production site; default these tests to prod.
+  process.env.PAYLOAD_PUBLIC_ENV = 'production';
+  Reflect.deleteProperty(process.env, 'PAYLOAD_PUBLIC_ROBOTS_DISALLOW');
   submitSpy.mockReset();
 });
 
 afterEach(() => {
+  Reflect.deleteProperty(process.env, 'PAYLOAD_PUBLIC_ENV');
   vi.unstubAllEnvs();
 });
 
@@ -34,6 +38,18 @@ describe('indexNowPublishAfterChangeHook', () => {
   });
 
   it('skips when INDEXNOW_KEY env is missing', async () => {
+    const hook = indexNowPublishAfterChangeHook('blogs');
+    await hook({
+      doc: { id: 1, slug: 'x', _status: 'published' },
+      previousDoc: { _status: 'draft' },
+      req: makeReq(),
+    } as unknown as Parameters<ReturnType<typeof indexNowPublishAfterChangeHook>>[0]);
+    expect(submitSpy).not.toHaveBeenCalled();
+  });
+
+  it('skips off production even when key is configured', async () => {
+    process.env.INDEXNOW_KEY = 'k';
+    process.env.PAYLOAD_PUBLIC_ENV = 'staging';
     const hook = indexNowPublishAfterChangeHook('blogs');
     await hook({
       doc: { id: 1, slug: 'x', _status: 'published' },
