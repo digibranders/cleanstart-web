@@ -112,8 +112,7 @@ export function Pagination({
     >
       {prevDisabled ? (
         <span
-          aria-disabled
-          aria-label="Previous page"
+          aria-hidden
           className="flex items-center justify-center select-none"
           style={BUTTON_DISABLED}
         >
@@ -168,8 +167,7 @@ export function Pagination({
 
       {nextDisabled ? (
         <span
-          aria-disabled
-          aria-label="Next page"
+          aria-hidden
           className="flex items-center justify-center select-none"
           style={BUTTON_DISABLED}
         >
