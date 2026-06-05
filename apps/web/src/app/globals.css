@@ -235,6 +235,7 @@
 
   /* Body */
   --fs-lead:     clamp(1.125rem, 0.96rem + 0.83vw, 1.5rem);  /* 18 → 24  section description / hero sub-heading */
+  --fs-lead-sm:  clamp(1.125rem, 1.07rem + 0.27vw, 1.25rem); /* 18 → 20  compact hero sub-heading (contact / utility) */
   --fs-body:     clamp(1rem, 0.95rem + 0.15vw, 1.0625rem);   /* 16 → 17  non-prose body */
   --fs-body-sm:  0.875rem;                                    /* 14 */
   --fs-caption:  0.8125rem;                                   /* 13 */
@@ -2376,6 +2377,14 @@ body {
   line-height: var(--prose-h1-lh);
   margin-top: 3rem;
   margin-bottom: 1rem;
+}
+/* Legal document titles sit in a two-column reading layout (~1021px content
+   column), so the full prose-h1 (56px) makes the longest titles — e.g.
+   "Customer Data Processing Addendum" / "Vulnerability Disclosure Policies" —
+   wrap to two lines. Cap one step lower (→ 50px desktop) so they fit on one
+   line while staying the most prominent text on the page. */
+.article-body .legal-doc-title {
+  font-size: clamp(2rem, 1.25rem + 2.6vw, 3.125rem);
 }
 .article-body .article-h2 {
   font-size: var(--prose-h2);

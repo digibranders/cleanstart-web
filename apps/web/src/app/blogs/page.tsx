@@ -15,7 +15,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 const TITLE = "Blogs";
 const DESCRIPTION =
-  "A curated collection of writings, research, and solutions on container security, DevOps, and compliance.";
+  "Explore CleanStart's blog expert insights on container security, software supply chain threats, CVE management, SBOM, and building trust in cloud-native environments.";
 
 interface BlogsPageProps {
   searchParams: Promise<{

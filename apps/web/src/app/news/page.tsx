@@ -11,7 +11,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 const TITLE = "Newsroom";
 const DESCRIPTION =
-  "Press releases, announcements, and media coverage of CleanStart's hardened container images and supply-chain security work.";
+  "Stay current with CleanStart's latest press releases, partnership announcements, product launches, and milestones in secure container image and software supply chain security.";
 
 interface NewsPageProps {
   searchParams: Promise<{

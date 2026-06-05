@@ -216,8 +216,7 @@ function CompactMobilePagination({
     >
       {prevDisabled ? (
         <span
-          aria-disabled
-          aria-label="Previous page"
+          aria-hidden
           className="inline-flex items-center justify-center select-none"
           style={{ width: "24px", height: "24px", opacity: 0.32 }}
         >
@@ -249,8 +248,7 @@ function CompactMobilePagination({
       </span>
       {nextDisabled ? (
         <span
-          aria-disabled
-          aria-label="Next page"
+          aria-hidden
           className="inline-flex items-center justify-center select-none"
           style={{ width: "24px", height: "24px", opacity: 0.32 }}
         >

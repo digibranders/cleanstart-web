@@ -11,7 +11,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 export const metadata = buildPageMetadata({
   title: "Book a Demo",
   description:
-    "Get a personalized CleanStart demo. See how hardened, zero-CVE container images, signed SBOMs, and provenance attestations fit your stack.",
+    "Book a personalized CleanStart demo to see how verified, hardened container images can eliminate vulnerabilities, accelerate compliance, and secure your software supply chain.",
   path: "/book-a-demo",
 });
 

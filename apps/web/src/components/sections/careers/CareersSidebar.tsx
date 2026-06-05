@@ -3,13 +3,11 @@ import {
   DEPARTMENT_LABEL,
   type JobDepartment,
   type JobLocation,
-  type JobStatusFilter,
 } from "@/lib/jobs";
 
 interface CareersSidebarProps {
   activeDepartment: string;
   activeLocation: string;
-  activeStatus: JobStatusFilter;
   searchQuery: string;
   /** Department slugs that have at least one open role — others are hidden. */
   availableDepartments: JobDepartment[];
@@ -17,16 +15,9 @@ interface CareersSidebarProps {
   availableLocations: JobLocation[];
 }
 
-const STATUS_OPTIONS: Array<{ value: JobStatusFilter; label: string }> = [
-  { value: "open", label: "Open roles" },
-  { value: "closed", label: "Closed roles" },
-  { value: "all", label: "All roles" },
-];
-
 export function CareersSidebar({
   activeDepartment,
   activeLocation,
-  activeStatus,
   searchQuery,
   availableDepartments,
   availableLocations,
@@ -34,16 +25,13 @@ export function CareersSidebar({
   const hrefFor = ({
     department,
     location,
-    status,
   }: {
     department?: string;
     location?: string;
-    status?: JobStatusFilter;
   }): string => {
     const params = new URLSearchParams();
     if (department) params.set("department", department);
     if (location) params.set("location", location);
-    if (status && status !== "open") params.set("status", status);
     if (searchQuery) params.set("q", searchQuery);
     return `/careers${params.size ? `?${params.toString()}` : ""}`;
   };
@@ -54,21 +42,6 @@ export function CareersSidebar({
       className="shrink-0 w-full lg:w-[295px]"
     >
       <div className="lg:hidden flex flex-col gap-4">
-        <MobileTabStrip
-          label="Status"
-          items={STATUS_OPTIONS.map((opt) => ({
-            value: opt.value,
-            label: opt.label,
-            active: activeStatus === opt.value,
-          }))}
-          buildHref={(value) =>
-            hrefFor({
-              department: activeDepartment,
-              location: activeLocation,
-              status: (value || "open") as JobStatusFilter,
-            })
-          }
-        />
         <MobileTabStrip
           label="Position"
           items={[
@@ -83,7 +56,6 @@ export function CareersSidebar({
             hrefFor({
               department: value,
               location: activeLocation,
-              status: activeStatus,
             })
           }
         />
@@ -101,7 +73,6 @@ export function CareersSidebar({
             hrefFor({
               department: activeDepartment,
               location: value,
-              status: activeStatus,
             })
           }
         />
@@ -125,28 +96,6 @@ export function CareersSidebar({
         }}
       >
         <FilterGroup
-          heading="STATUS"
-          items={STATUS_OPTIONS.map((opt) => ({
-            key: opt.value,
-            label: opt.label,
-            href: hrefFor({
-              department: activeDepartment,
-              location: activeLocation,
-              status: opt.value,
-            }),
-            active: activeStatus === opt.value,
-          }))}
-        />
-
-        <div
-          style={{
-            height: "1px",
-            background: "rgba(17,17,17,0.12)",
-            margin: "14px 0",
-          }}
-        />
-
-        <FilterGroup
           heading="DEPARTMENT"
           items={[
             {
@@ -154,7 +103,6 @@ export function CareersSidebar({
               label: "All Departments",
               href: hrefFor({
                 location: activeLocation,
-                status: activeStatus,
               }),
               active: !activeDepartment,
             },
@@ -164,7 +112,6 @@ export function CareersSidebar({
               href: hrefFor({
                 department: d,
                 location: activeLocation,
-                status: activeStatus,
               }),
               active: activeDepartment === d,
             })),
@@ -187,7 +134,6 @@ export function CareersSidebar({
               label: "All Locations",
               href: hrefFor({
                 department: activeDepartment,
-                status: activeStatus,
               }),
               active: !activeLocation,
               icon: <PinIcon />,
@@ -198,7 +144,6 @@ export function CareersSidebar({
               href: hrefFor({
                 department: activeDepartment,
                 location: l.slug,
-                status: activeStatus,
               }),
               active: activeLocation === l.slug,
               icon: <PinIcon />,

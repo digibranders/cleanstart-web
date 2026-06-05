@@ -23,7 +23,7 @@ export const metadata = buildPageMetadata({
   title: "CleanSight Container Visibility | SBOM, Risk Scoring, Compliance Mapping & Remediation Paths",
   absoluteTitle: true,
   description:
-    "CleanSight discovers container images across clouds and clusters, generates SBOMs, scores exploitability, maps compliance controls, and recommends hardened CleanStart replacements for faster remediation.",
+    "Discover CleanSight, CleanStart's container visibility tool that continuously discovers images across registries and Kubernetes clusters, maps vulnerabilities, and recommends hardened replacements.",
   path: "/cleansight",
   variant: "hero",
   eyebrow: "CleanSight",

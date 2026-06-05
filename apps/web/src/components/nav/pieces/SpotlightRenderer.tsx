@@ -151,7 +151,7 @@ export function SpotlightRenderer({ spotlight, hero = false, dense = false, styl
           <div className={EYEBROW}>Newsletter</div>
           <div className={`mt-2 ${headlineClass}`}>Get the CleanStart Bulletin.</div>
           <div className="mt-1.5 text-xs leading-relaxed text-white/65">
-            One email per month — new images, talks, advisories.
+            One email per month: new images, talks, advisories.
           </div>
         </div>
         <div className={ACTION} style={{ color: ACCENT }}>
@@ -176,7 +176,7 @@ export function SpotlightRenderer({ spotlight, hero = false, dense = false, styl
         <div className={EYEBROW}>Community</div>
         <div className={`mt-2 ${headlineClass}`}>Build in the open with us.</div>
         <div className="mt-1.5 text-xs leading-relaxed text-white/65">
-          Open builds, public discussions, and a contributor program — jump in.
+          Open builds, public discussions, and a contributor program. Jump in.
         </div>
       </div>
       <div className="mt-auto pt-3">

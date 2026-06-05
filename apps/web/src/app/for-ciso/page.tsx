@@ -14,7 +14,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 export const metadata = buildPageMetadata({
   title: "For CISOs",
   description:
-    "Security, compliance, and traceability you can defend in any audit or board review.",
+    "Discover how CISOs use CleanStart to reduce vulnerability exposure, automate compliance reporting, and gain real time risk visibility across their software supply chain.",
   path: "/for-ciso",
   eyebrow: "Solutions",
 });

@@ -15,7 +15,7 @@ export const metadata = buildPageMetadata({
   title: "CleanStart Platform | Secure, Verified Software Foundations",
   absoluteTitle: true,
   description:
-    "Explore CleanStart's secure platform for reproducible, SLSA-aligned, and compliance-ready container image creation.",
+    "Explore CleanStart's library of secure, minimal container and VM images, continuously scanned, pre hardened, FIPS compliant, and 60 to 80% lighter than standard public images.",
   path: "/cleanstart-images",
   variant: "hero",
   eyebrow: "CleanStart Images",

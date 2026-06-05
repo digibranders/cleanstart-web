@@ -40,16 +40,6 @@ const OFFICES: Office[] = [
   },
 ];
 
-const AWARDS: { name: string; src: string; w: number; h: number }[] = [
-  { name: "Cyber Security Excellence Awards", src: "/images/awards/award-1.png", w: 64, h: 81 },
-  { name: "Trusted Vendor", src: "/images/awards/award-2.png", w: 80, h: 87 },
-  { name: "ISO/IEC 27001", src: "/images/awards/award-3.png", w: 81, h: 76 },
-  { name: "AICPA SOC 2", src: "/images/awards/award-4.png", w: 82, h: 92 },
-];
-
-const BADGE_SHIELD_PATH =
-  "M0 15C0 6.71573 6.71573 0 15 0H82.5C90.7843 0 97.5 6.71573 97.5 15V95.6479C97.5 102.467 92.8997 108.429 86.3029 110.158L52.5529 119.003C50.0597 119.657 47.4403 119.657 44.9471 119.003L11.1971 110.158C4.60029 108.429 0 102.467 0 95.6479V15Z";
-
 export function ContactOffices() {
   return (
     <Section padding="md">
@@ -148,38 +138,6 @@ export function ContactOffices() {
               </React.Fragment>
             ))}
           </div>
-
-          <div className="relative mt-12 flex flex-col items-center sm:mt-16">
-            <div className="mb-8 flex w-full items-center gap-4 sm:gap-6">
-              <DarkHairline />
-              <h3
-                className="font-display font-bold text-white whitespace-nowrap"
-                style={{
-                  fontSize: "var(--fs-h3)",
-                  lineHeight: 1,
-                  letterSpacing: "-0.05em",
-                }}
-              >
-                Awarded{" "}
-                <span
-                  className="bg-clip-text text-transparent"
-                  style={{
-                    backgroundImage:
-                      "linear-gradient(180deg, #2CC1EB 0%, #9A51FF 100%)",
-                  }}
-                >
-                  with
-                </span>
-              </h3>
-              <DarkHairline />
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-7">
-              {AWARDS.map((award) => (
-                <AwardBadge key={award.name} award={award} />
-              ))}
-            </div>
-          </div>
         </div>
       </Container>
     </Section>
@@ -210,14 +168,6 @@ function Hairline() {
           transform: "rotate(45deg)",
         }}
       />
-    </div>
-  );
-}
-
-function DarkHairline() {
-  return (
-    <div aria-hidden className="flex flex-1 items-center">
-      <span className="h-px flex-1 bg-white" />
     </div>
   );
 }
@@ -259,45 +209,6 @@ function OfficeCard({ office }: { office: Office }) {
         >
           {office.address}
         </p>
-      </div>
-    </div>
-  );
-}
-
-function AwardBadge({ award }: { award: (typeof AWARDS)[number] }) {
-  const shield: React.CSSProperties = {
-    clipPath: `path('${BADGE_SHIELD_PATH}')`,
-    WebkitClipPath: `path('${BADGE_SHIELD_PATH}')`,
-  };
-  return (
-    <div className="relative h-[120px] w-[98px]" title={award.name}>
-      <div
-        aria-hidden
-        className="absolute inset-0 backdrop-blur-md"
-        style={{
-          ...shield,
-          backgroundColor: "rgba(255, 255, 255, 0.10)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          ...shield,
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 40%)",
-          mixBlendMode: "screen",
-        }}
-      />
-      <div className="absolute inset-x-0 top-0 flex h-[100px] items-center justify-center">
-        <Image
-          src={award.src}
-          alt={award.name}
-          width={award.w}
-          height={award.h}
-          sizes="82px"
-          className="object-contain"
-        />
       </div>
     </div>
   );

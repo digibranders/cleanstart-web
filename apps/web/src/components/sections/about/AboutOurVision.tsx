@@ -245,10 +245,10 @@ export function AboutOurVision() {
             </div>
           </div>
 
-          {/* Text + CTA — order-1 puts this first: top of stack on mobile
-              (heading → paragraph → Contact Us button) and LEFT column on lg+.
-              Image wrapper above carries order-2 to land below/right. */}
-          <div className="order-1 flex flex-col items-center text-center lg:items-start lg:text-left gap-10 lg:max-w-[622px]">
+          {/* Text — order-1 puts this first: top of stack on mobile
+              (heading → paragraph) and LEFT column on lg+. Image wrapper above
+              carries order-2 to land below/right. */}
+          <div className="order-1 flex flex-col items-center text-center lg:items-start lg:text-left lg:max-w-[622px]">
             <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-6">
               <Reveal header>
                 <h2
@@ -276,21 +276,10 @@ export function AboutOurVision() {
                     color: "rgba(17,17,17,0.8)",
                   }}
                 >
-                  We believe trusted software should be built into the foundation. CleanStart is creating that future for open source and AI infrastructure, one clean build at a time.
+                  We envision a future where software trust is continuous, verifiable, and built into every stage of software delivery.
                 </p>
               </Reveal>
             </div>
-
-            {/* `self-start` keeps the button at its content width (left-aligned
-                with the heading + paragraph) instead of stretching to the
-                parent flex column's 622px. */}
-            <a
-              href="#contact"
-              className="cs-btn-blue self-center lg:self-start"
-              style={{ minWidth: "131px" }}
-            >
-              Contact Us
-            </a>
           </div>
         </div>
       </div>

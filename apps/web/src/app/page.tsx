@@ -23,7 +23,7 @@ export const metadata: Metadata = buildPageMetadata({
   title: "Verified & Secure Container Images | CleanStart",
   absoluteTitle: true,
   description:
-    "Build on verified, near-zero-vulnerability container images with cryptographic provenance and compliance alignment.",
+    "Build on verified, near zero vulnerability container images with cryptographic provenance. CleanStart delivers hardened, FIPS compliant, SBOM backed images for trusted software delivery.",
   path: "/",
   variant: "hero",
   ogTitle: "Verified & Secure Container Images",
