@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { HeroReveal } from "@/components/ui/Reveal";
-import { LegalLastUpdated } from "./LegalLastUpdated";
+import { LegalLastUpdated, type LegalDateItem } from "./LegalLastUpdated";
 
 const HERO_GRADIENT =
   "linear-gradient(180deg, #151021 0%, #10123E 38%, #131E8F 67%, #471EC0 80%, #471FC3 100%)";
@@ -13,9 +13,10 @@ const TITLE_STYLE: CSSProperties = {
 
 interface LegalHeroProps {
   title: string;
+  dateItems?: LegalDateItem[];
 }
 
-export function LegalHero({ title }: LegalHeroProps): React.ReactElement {
+export function LegalHero({ title, dateItems = [] }: LegalHeroProps): React.ReactElement {
   return (
     <section
       className="relative w-full overflow-hidden"
@@ -60,7 +61,7 @@ export function LegalHero({ title }: LegalHeroProps): React.ReactElement {
           </h1>
         </HeroReveal>
         <HeroReveal y={20} delay={0.15} duration={0.8}>
-          <LegalLastUpdated />
+          <LegalLastUpdated items={dateItems} />
         </HeroReveal>
       </div>
     </section>

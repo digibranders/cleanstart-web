@@ -1,82 +1,24 @@
 "use client";
 
-import {
-  BadgeCheck,
-  Bug,
-  FileCheck2,
-  FileLock2,
-  FileText,
-  type LucideIcon,
-  Scale,
-  ScrollText,
-  Stamp,
-} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
+import { legalIcon } from "./legalIcons";
 
-export interface LegalSidebarItem {
+export interface LegalNavItem {
   label: string;
   href: string;
-  icon: LucideIcon;
-  /** Human-readable "last updated" date, surfaced in the legal hero. */
-  updatedAt: string;
+  icon: string;
 }
 
-export const LEGAL_SIDEBAR_ITEMS: LegalSidebarItem[] = [
-  { label: "Additional Third-Party Terms", href: "/legal", icon: FileText, updatedAt: "June 4, 2026" },
-  {
-    label: "Customer Data Processing Addendum",
-    href: "/legal/customer-data-processing-addendum",
-    icon: FileLock2,
-    updatedAt: "June 4, 2026",
-  },
-  {
-    label: "Limited Use Agreement",
-    href: "/legal/limited-use-agreement",
-    icon: ScrollText,
-    updatedAt: "June 4, 2026",
-  },
-  {
-    label: "Policies and Commitments",
-    href: "/legal/policies-and-commitments",
-    icon: BadgeCheck,
-    updatedAt: "June 4, 2026",
-  },
-  {
-    label: "Pre-General Availability Terms",
-    href: "/legal/pre-general-availability-terms",
-    icon: FileCheck2,
-    updatedAt: "June 4, 2026",
-  },
-  {
-    label: "Trademark Usage Policy",
-    href: "/legal/trademark-usage-policy",
-    icon: Stamp,
-    updatedAt: "June 4, 2026",
-  },
-  {
-    label: "Vulnerability Disclosure Policies",
-    href: "/legal/vulnerability-disclosure-policies",
-    icon: Bug,
-    updatedAt: "June 4, 2026",
-  },
-  {
-    label: "Acceptable Use Policy",
-    href: "/legal/acceptable-use-policy",
-    icon: Scale,
-    updatedAt: "June 4, 2026",
-  },
-];
-
-export function LegalSidebar(): React.ReactElement {
+export function LegalSidebar({ items }: { items: LegalNavItem[] }): React.ReactElement {
   const pathname = usePathname();
   return (
     <nav aria-label="Legal documents" className="lg:sticky lg:top-24">
       <ul className="flex flex-col gap-1">
-        {LEGAL_SIDEBAR_ITEMS.map((item) => {
+        {items.map((item) => {
           const isActive = pathname === item.href;
-          const Icon = item.icon;
+          const Icon = legalIcon(item.icon);
           return (
             <li key={item.href}>
               <Link
