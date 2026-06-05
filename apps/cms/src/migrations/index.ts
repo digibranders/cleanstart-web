@@ -9,6 +9,7 @@ import * as migration_20260603_120148_add_partner_applications from './20260603_
 import * as migration_20260604_045219_add_guide_journey_nav from './20260604_045219_add_guide_journey_nav';
 import * as migration_20260604_052913_add_job_experience_range from './20260604_052913_add_job_experience_range';
 import * as migration_20260604_063039_add_application_extra_fields from './20260604_063039_add_application_extra_fields';
+import * as migration_20260605_094837_add_legal_documents from './20260605_094837_add_legal_documents';
 
 export const migrations = [
   {
@@ -64,6 +65,11 @@ export const migrations = [
   {
     up: migration_20260604_063039_add_application_extra_fields.up,
     down: migration_20260604_063039_add_application_extra_fields.down,
-    name: '20260604_063039_add_application_extra_fields'
+    name: '20260604_063039_add_application_extra_fields',
+  },
+  {
+    up: migration_20260605_094837_add_legal_documents.up,
+    down: migration_20260605_094837_add_legal_documents.down,
+    name: '20260605_094837_add_legal_documents'
   },
 ];
