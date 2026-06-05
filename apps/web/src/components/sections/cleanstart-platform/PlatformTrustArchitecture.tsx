@@ -47,8 +47,8 @@ const STAGES: Stage[] = [
   },
 ];
 
-const CARD_BG = "linear-gradient(180deg, rgba(255,255,255,0) 13%, rgba(154,81,255,0.30) 85%)";
-const SOURCE_BG = "linear-gradient(180deg, rgba(255,255,255,0) 13%, rgba(154,81,255,0.12) 85%)";
+const CARD_BG = "linear-gradient(177deg, rgba(255,255,255,0) 13.17%, rgba(154,81,255,0.30) 85.26%)";
+const SOURCE_BG = "linear-gradient(177deg, rgba(255,255,255,0) 13.17%, rgba(154,81,255,0.10) 85.26%)";
 
 /**
  * Glassy neon connector segment — a bright gradient core with a soft blurred
@@ -110,7 +110,7 @@ function Check({ label }: { label: string }) {
         decoding="async"
       />
       <span
-        className="text-white"
+        className="text-white xl:whitespace-nowrap"
         style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-body)", letterSpacing: "-0.01em", lineHeight: 1.3 }}
       >
         {label}
@@ -122,11 +122,11 @@ function Check({ label }: { label: string }) {
 function StageRow({ stage, isLast }: { stage: Stage; isLast: boolean }) {
   return (
     <div className="relative flex items-center gap-4">
-      {/* Soft purple glow (Figma 光斑) hugging the spine, behind the ball */}
+      {/* Soft mint→magenta glow (Figma 光斑) hugging the spine, behind the ball */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-7 top-1/2 hidden size-56 -translate-x-1/2 -translate-y-1/2 rounded-full mix-blend-screen sm:left-9 lg:block"
-        style={{ background: "radial-gradient(closest-side, rgba(178,62,255,0.34) 0%, rgba(154,81,255,0.12) 50%, transparent 74%)" }}
+        style={{ background: "radial-gradient(closest-side, rgba(211,255,248,0.30) 0%, rgba(215,97,238,0.34) 18%, rgba(154,81,255,0.13) 52%, transparent 76%)" }}
       />
       {/* Spine segment — spans this row (and the gap below, except the last) so
           stacked rows form one continuous glowing line through the ball centres. */}
@@ -135,23 +135,25 @@ function StageRow({ stage, isLast }: { stage: Stage; isLast: boolean }) {
       <GlassLine orientation="h" className="left-12 top-1/2 h-2.5 w-7 -translate-y-1/2 sm:left-16 sm:w-7" />
       <NumberBall number={stage.number} />
       <div
-        className="relative flex flex-1 flex-col gap-4 overflow-hidden rounded-[24px] border border-[#9a51ff] p-6 md:flex-row md:items-center md:gap-8"
+        className="relative flex flex-1 flex-col justify-center gap-4 overflow-hidden rounded-[24px] border border-[#9a51ff] px-7 py-6 md:min-h-[132px] md:flex-row md:items-center md:gap-10 md:py-2 lg:gap-12 lg:px-12"
         style={{ background: CARD_BG }}
       >
-        {/* Right-edge lens flare (Figma "Flare") — a vertically-elongated streak
-            hugging the right border, brightest (mint-white) at mid-height and
-            blooming only slightly inward. Focal pinned to the card's edge. */}
+        {/* Right-edge lens flare (Figma "Flare") — a tall vertically-elongated
+            streak hugging the right border, brightest (mint-white) at mid-height
+            and blooming into magenta then purple. The 264px height is clipped by
+            the card so the bright mid-band spans the full card height, exactly as
+            in Figma (the flare overruns the card top & bottom). */}
         <div
           aria-hidden
-          className="pointer-events-none absolute right-0 top-1/2 h-48 w-40 -translate-y-1/2 mix-blend-screen"
-          style={{ background: "radial-gradient(52% 60% at 100% 50%, rgba(178,62,255,0.5) 0%, rgba(154,81,255,0.18) 46%, transparent 72%)" }}
+          className="pointer-events-none absolute top-1/2 -right-2 h-[264px] w-48 -translate-y-1/2 mix-blend-screen"
+          style={{ background: "radial-gradient(44% 38% at 100% 50%, rgba(215,97,238,0.55) 0%, rgba(154,81,255,0.22) 42%, transparent 70%)" }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute right-0 top-1/2 h-28 w-20 -translate-y-1/2 mix-blend-screen blur-[1px]"
-          style={{ background: "radial-gradient(60% 60% at 100% 50%, rgba(233,255,250,0.95) 0%, rgba(201,139,255,0.55) 36%, transparent 72%)" }}
+          className="pointer-events-none absolute top-1/2 -right-1 h-[264px] w-24 -translate-y-1/2 mix-blend-screen blur-[1px]"
+          style={{ background: "radial-gradient(40% 34% at 100% 50%, rgba(211,255,248,0.92) 0%, rgba(215,97,238,0.50) 30%, transparent 66%)" }}
         />
-        <div className="relative flex shrink-0 flex-col gap-1.5 md:w-[260px]">
+        <div className="relative flex shrink-0 flex-col gap-1.5 md:w-[300px] lg:w-[330px]">
           <h3
             className="font-bold text-white"
             style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h3)", letterSpacing: "-0.03em", lineHeight: 1.2 }}
@@ -160,7 +162,7 @@ function StageRow({ stage, isLast }: { stage: Stage; isLast: boolean }) {
           </h3>
           <p
             className="font-medium"
-            style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h4)", letterSpacing: "-0.02em", lineHeight: 1.2, color: "#b23eff" }}
+            style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", letterSpacing: "-0.02em", lineHeight: 1.2, color: "#b23eff" }}
           >
             {stage.subtitle}
           </p>
@@ -171,7 +173,7 @@ function StageRow({ stage, isLast }: { stage: Stage; isLast: boolean }) {
             {stage.description}
           </p>
         </div>
-        <ul className="relative grid flex-1 grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2 md:gap-y-4">
+        <ul className="relative grid flex-1 grid-cols-1 gap-x-8 gap-y-3 xl:grid-cols-2 xl:gap-y-9">
           {stage.features.map((feat) => (
             <Check key={feat} label={feat} />
           ))}
@@ -227,10 +229,10 @@ export function PlatformTrustArchitecture() {
       </div>
 
       {/* Timeline */}
-      <div className="relative mx-auto max-w-[920px] px-6 pb-[clamp(64px,6.9vw,100px)] sm:px-10">
+      <div className="relative mx-auto w-full max-w-[1280px] px-6 pb-[clamp(64px,6.9vw,100px)]">
         {/* SOURCE CODE card */}
         <div
-          className="mx-auto max-w-[560px] rounded-[24px] border border-[#9a51ff] p-3 text-center"
+          className="mx-auto max-w-[748px] rounded-[24px] border border-[#9a51ff] p-3 text-center"
           style={{ background: SOURCE_BG }}
         >
           <p
