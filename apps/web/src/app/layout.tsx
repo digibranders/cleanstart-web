@@ -45,6 +45,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 const isProduction = process.env.VERCEL_ENV === "production";
+// Temporary scan escape hatch — see robots.ts. Set ALLOW_INDEXING=1 to emit
+// index/follow on a non-production deploy (so an audit tool sees the real
+// indexability state); unset it to restore the default noindex. Off by default.
+// NOTE: marketing pages are statically prerendered, so this metadata is baked at
+// BUILD time — the var must be set during the build (i.e. redeploy) for the meta
+// tag to flip. robots.txt reads it per-request and flips without a rebuild.
+const allowIndexing = isProduction || process.env.ALLOW_INDEXING === "1";
 
 const TITLE = "Verified & Secure Container Images | CleanStart";
 const DESCRIPTION =
@@ -67,7 +74,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  robots: isProduction
+  robots: allowIndexing
     ? {
         index: true,
         follow: true,
