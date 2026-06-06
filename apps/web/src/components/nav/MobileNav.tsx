@@ -21,14 +21,7 @@ import {
 import { NAV_TREE } from "@/lib/nav-config";
 import { NavIcon } from "@/components/nav/icons/NavIcon";
 
-const MOBILE_CTA: Record<string, { headline: string; ctaLabel: string; ctaHref: string } | undefined> = {
-  Products: { headline: "Try CleanStart", ctaLabel: "Browse Images", ctaHref: "/cleanstart-images" },
-  Solutions: { headline: "Map your compliance", ctaLabel: "Talk to SE", ctaHref: "/book-a-demo?intent=se" },
-  Resources: { headline: "Get the Bulletin", ctaLabel: "Subscribe", ctaHref: "/subscribe" },
-  Company: { headline: "We're hiring", ctaLabel: "See Careers", ctaHref: "/careers" },
-};
-
-export function MobileNav({ openRolesCount = 0 }: { openRolesCount?: number }) {
+export function MobileNav() {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
 
@@ -119,29 +112,6 @@ export function MobileNav({ openRolesCount = 0 }: { openRolesCount?: number }) {
                         )
                       )}
                     </ul>
-                    {MOBILE_CTA[item.label] && (
-                      <Link
-                        href={MOBILE_CTA[item.label]!.ctaHref}
-                        onClick={close}
-                        className="mx-3 mb-3 mt-2 flex items-center justify-between gap-2 rounded-[10px] border border-white/[0.06] bg-white/[0.03] px-3 py-2 no-underline"
-                      >
-                        <span className="min-w-0 truncate text-xs font-semibold text-white">
-                          {item.label === "Company" && openRolesCount > 0
-                            ? `${openRolesCount} open roles`
-                            : MOBILE_CTA[item.label]!.headline}
-                        </span>
-                        <span
-                          className="cs-btn-glass cs-btn-glass--mini inline-flex shrink-0 items-center justify-center"
-                          style={{
-                            ["--cs-btn-h" as string]: "28px",
-                            ["--cs-btn-px" as string]: "12px",
-                            ["--cs-btn-fs" as string]: "11px",
-                          }}
-                        >
-                          {MOBILE_CTA[item.label]!.ctaLabel}
-                        </span>
-                      </Link>
-                    )}
                   </AccordionContent>
                 </AccordionItem>
               );

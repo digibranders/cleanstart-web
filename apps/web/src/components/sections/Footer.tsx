@@ -49,12 +49,16 @@ const MEMBERS: FooterLogo[] = [
   { name: "Cloud Native Computing Foundation", src: "/images/footer/cloud-native.webp", w: 174, h: 29, renderH: 24, href: "https://www.cncf.io/about/members/" },
 ];
 
+// `hoverColor` is each platform's brand color, applied to the glyph on hover.
+// X and GitHub are brand-black; on the dark footer they stay white (a darkening
+// would vanish), so their hover color is the same white — the scale lift is the
+// only affordance for those two.
 const SOCIAL_ICONS = [
-  { name: "X (Twitter)", href: "https://x.com/CleanStartX", path: "M17.53 2.477h3.05L13.94 10.06l7.84 10.36h-6.13l-4.8-6.27-5.5 6.27H2.3l7.13-8.13L1.92 2.477h6.28l4.34 5.74 4.99-5.74Zm-1.07 16.04h1.69L7.62 4.06H5.81l10.65 14.46Z" },
-  { name: "LinkedIn", href: "https://www.linkedin.com/company/cleanstart-official", path: "M19 3H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8.34 17.34H5.67V9.34h2.67v8zM7 8.17C6.07 8.17 5.33 7.43 5.33 6.5S6.07 4.83 7 4.83s1.67.74 1.67 1.67S7.93 8.17 7 8.17zm11.34 9.17h-2.67v-4.34c0-1.04-.36-1.74-1.27-1.74-.7 0-1.11.47-1.29.92-.07.16-.08.39-.08.62v4.54h-2.67s.04-7.36 0-8.13h2.67v1.15c.35-.55.99-1.34 2.4-1.34 1.75 0 3.06 1.14 3.06 3.6v4.72z" },
-  { name: "YouTube", href: "https://www.youtube.com/@CleanStartOfficial", path: "M23.5 6.5a3.02 3.02 0 0 0-2.12-2.13C19.5 4 12 4 12 4s-7.5 0-9.38.37A3.02 3.02 0 0 0 .5 6.5C.13 8.38.13 12 .13 12s0 3.62.37 5.5a3.02 3.02 0 0 0 2.12 2.13C4.5 20 12 20 12 20s7.5 0 9.38-.37a3.02 3.02 0 0 0 2.12-2.13c.37-1.88.37-5.5.37-5.5s0-3.62-.37-5.5ZM9.75 15.5v-7l6 3.5-6 3.5Z" },
-  { name: "GitHub", href: "https://github.com/cleanstart-dev", path: "M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.305-5.466-1.335-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" },
-  { name: "Docker", href: "https://hub.docker.com/u/cleanstart", path: "M13.983 11.078h2.119a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.119a.185.185 0 0 0-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 0 0 .186-.186V3.574a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 0 0 .186-.186V6.29a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 0 0 .184-.186V6.29a.185.185 0 0 0-.185-.185H8.1a.185.185 0 0 0-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 0 0 .185-.186V6.29a.185.185 0 0 0-.184-.185H5.136a.186.186 0 0 0-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.082.185.184.185m-2.964 0h2.119a.185.185 0 0 0 .185-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.186.186 0 0 0-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.082.185.184.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 0 0-.75.748 11.376 11.376 0 0 0 .692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 0 0 3.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288z" },
+  { name: "X (Twitter)", href: "https://x.com/CleanStartX", hoverColor: "#ffffff", path: "M17.53 2.477h3.05L13.94 10.06l7.84 10.36h-6.13l-4.8-6.27-5.5 6.27H2.3l7.13-8.13L1.92 2.477h6.28l4.34 5.74 4.99-5.74Zm-1.07 16.04h1.69L7.62 4.06H5.81l10.65 14.46Z" },
+  { name: "LinkedIn", href: "https://www.linkedin.com/company/cleanstart-official", hoverColor: "#0a66c2", path: "M19 3H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8.34 17.34H5.67V9.34h2.67v8zM7 8.17C6.07 8.17 5.33 7.43 5.33 6.5S6.07 4.83 7 4.83s1.67.74 1.67 1.67S7.93 8.17 7 8.17zm11.34 9.17h-2.67v-4.34c0-1.04-.36-1.74-1.27-1.74-.7 0-1.11.47-1.29.92-.07.16-.08.39-.08.62v4.54h-2.67s.04-7.36 0-8.13h2.67v1.15c.35-.55.99-1.34 2.4-1.34 1.75 0 3.06 1.14 3.06 3.6v4.72z" },
+  { name: "YouTube", href: "https://www.youtube.com/@CleanStartOfficial", hoverColor: "#ff0000", path: "M23.5 6.5a3.02 3.02 0 0 0-2.12-2.13C19.5 4 12 4 12 4s-7.5 0-9.38.37A3.02 3.02 0 0 0 .5 6.5C.13 8.38.13 12 .13 12s0 3.62.37 5.5a3.02 3.02 0 0 0 2.12 2.13C4.5 20 12 20 12 20s7.5 0 9.38-.37a3.02 3.02 0 0 0 2.12-2.13c.37-1.88.37-5.5.37-5.5s0-3.62-.37-5.5ZM9.75 15.5v-7l6 3.5-6 3.5Z" },
+  { name: "GitHub", href: "https://github.com/cleanstart-dev", hoverColor: "#ffffff", path: "M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.305-5.466-1.335-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" },
+  { name: "Docker", href: "https://hub.docker.com/u/cleanstart", hoverColor: "#2496ed", path: "M13.983 11.078h2.119a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.119a.185.185 0 0 0-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 0 0 .186-.186V3.574a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 0 0 .186-.186V6.29a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 0 0 .184-.186V6.29a.185.185 0 0 0-.185-.185H8.1a.185.185 0 0 0-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 0 0 .185-.186V6.29a.185.185 0 0 0-.184-.185H5.136a.186.186 0 0 0-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.082.185.184.185m-2.964 0h2.119a.185.185 0 0 0 .185-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.186.186 0 0 0-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.082.185.184.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 0 0-.75.748 11.376 11.376 0 0 0 .692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 0 0 3.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288z" },
 ];
 
 // Credential badges render inside the glassy shield; the shield normalizes
@@ -175,152 +179,153 @@ export function Footer({
             filter: "blur(125px)",
           }}
         />
-      <div className="relative">
-       <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[var(--footer-cta-pt)]" : "pt-[80px]"}`}>
-        {/* Top row — brand logo (left) + social icons (right). */}
-        <div className="flex flex-wrap items-center justify-between gap-8">
-          <div className="relative h-[32px] w-[153px]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/logo-cleanstart-footer.png"
-              alt="CleanStart"
-              width={153}
-              height={32}
-              loading="eager"
-              decoding="async"
-              className="h-full w-full object-contain object-left"
-            />
-          </div>
+        <div className="relative">
+          <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[var(--footer-cta-pt)]" : "pt-[80px]"}`}>
+            {/* Top row — brand logo (left) + social icons (right). */}
+            <div className="flex flex-wrap items-center justify-between gap-8">
+              <div className="relative h-[32px] w-[153px]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/logo-cleanstart-footer.png"
+                  alt="CleanStart"
+                  width={153}
+                  height={32}
+                  loading="eager"
+                  decoding="async"
+                  className="h-full w-full object-contain object-left"
+                />
+              </div>
 
-          <ul className="flex items-center gap-[19px]" aria-label="Social media">
-            {SOCIAL_ICONS.map((s) => (
-              <li key={s.name}>
-                <a
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.name}
-                  className="flex h-12 w-12 items-center justify-center rounded-full text-white transition-transform duration-200 hover:scale-105 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
-                  style={{
-                    backgroundColor: "rgba(217, 217, 217, 0.15)",
-                    backdropFilter: "blur(5px)",
-                    boxShadow:
-                      "inset 2.67px 2.67px 13.33px 4px rgba(168, 108, 252, 0.4)",
-                  }}
-                >
-                  <span className="sr-only">{s.name}</span>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden
-                  >
-                    <path d={s.path} />
-                  </svg>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Nav band — three collapsible text columns (left) and the
-            "Members of" logo strip stacked over the credential groups (right).
-            Columns are an accordion stack on mobile, a row on desktop. */}
-        <nav
-          className="mt-[28px] flex flex-col gap-12 sm:mt-[36px] sm:flex-row sm:items-start sm:gap-x-10 lg:gap-x-12"
-          aria-label="Footer navigation"
-        >
-          <div className="flex flex-col sm:flex-row sm:gap-10 lg:gap-14">
-            <FooterColumn title="Contact" links={COL_CONTACT} />
-            <FooterColumn title="Solutions" links={COL_SOLUTIONS} />
-            <FooterColumn title="Connect" links={COL_CONNECT} />
-          </div>
-
-          <div className="flex flex-col gap-10">
-            <div>
-              <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center sm:text-left">
-                Members of
-              </h3>
-              <ul className="mt-6 flex flex-wrap items-center justify-center sm:justify-start gap-x-8 gap-y-5">
-                {MEMBERS.map((m) => (
-                  <li key={m.src} className="flex">
+              <ul className="flex items-center gap-[19px]" aria-label="Social media">
+                {SOCIAL_ICONS.map((s) => (
+                  <li key={s.name}>
                     <a
-                      href={m.href}
+                      href={s.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label={m.name}
-                      className="inline-flex items-center transition-opacity duration-200 hover:opacity-80 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
+                      aria-label={s.name}
+                      className="cs-social-link flex h-10 w-10 items-center justify-center rounded-full text-white transition-[transform,color] duration-200 hover:scale-105 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
+                      style={{
+                        backgroundColor: "rgba(217, 217, 217, 0.15)",
+                        backdropFilter: "blur(5px)",
+                        boxShadow:
+                          "inset 2.67px 2.67px 13.33px 4px rgba(168, 108, 252, 0.4)",
+                        "--social-hover": s.hoverColor,
+                      } as React.CSSProperties}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={m.src}
-                        alt={m.name}
-                        width={m.w}
-                        height={m.h}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-auto object-contain"
-                        style={{ height: `${m.renderH}px` }}
-                      />
+                      <span className="sr-only">{s.name}</span>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        aria-hidden
+                      >
+                        <path d={s.path} />
+                      </svg>
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="flex flex-wrap justify-center sm:justify-start gap-x-6 gap-y-8 [--shield-scale:0.72] xl:[--shield-scale:1]">
-              {CREDENTIALS.map((group) => (
-                <CredentialGroup key={group.title} group={group} />
-              ))}
-            </div>
-          </div>
-        </nav>
+            {/* Nav band — three collapsible text columns (left) and the
+            "Members of" logo strip stacked over the credential groups (right).
+            Columns are an accordion stack on mobile, a row on desktop. */}
+            <nav
+              className="mt-[28px] flex flex-col gap-12 sm:mt-[36px] sm:flex-row sm:items-start sm:gap-x-10 lg:gap-x-12"
+              aria-label="Footer navigation"
+            >
+              <div className="flex flex-col sm:flex-row sm:gap-10 lg:gap-14">
+                <FooterColumn title="Contact" links={COL_CONTACT} />
+                <FooterColumn title="Solutions" links={COL_SOLUTIONS} />
+                <FooterColumn title="Connect" links={COL_CONNECT} />
+              </div>
 
-        {/* Bottom row — copyright (left) + legal links (right), divided
+              <div className="flex flex-col gap-10">
+                <div>
+                  <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center sm:text-left">
+                    Members of
+                  </h3>
+                  <ul className="mt-6 flex flex-wrap items-center justify-center sm:justify-start gap-x-8 gap-y-5">
+                    {MEMBERS.map((m) => (
+                      <li key={m.src} className="flex">
+                        <a
+                          href={m.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={m.name}
+                          className="inline-flex items-center transition-opacity duration-200 hover:opacity-80 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={m.src}
+                            alt={m.name}
+                            width={m.w}
+                            height={m.h}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-auto object-contain"
+                            style={{ height: `${m.renderH}px` }}
+                          />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="flex flex-wrap justify-center sm:justify-start gap-x-6 gap-y-8 [--shield-scale:0.72] xl:[--shield-scale:1]">
+                  {CREDENTIALS.map((group) => (
+                    <CredentialGroup key={group.title} group={group} />
+                  ))}
+                </div>
+              </div>
+            </nav>
+
+            {/* Bottom row — copyright (left) + legal links (right), divided
             from the nav band above. */}
-        <div className="mt-[32px] flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-[24px]">
-          <span
-            className="text-2xs font-normal leading-[1.1] text-white/95"
-            style={{ letterSpacing: "0.24px" }}
-          >
-            ©2026 CleanStart. All rights reserved.
-          </span>
+            <div className="mt-[32px] flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-[24px]">
+              <span
+                className="text-2xs font-normal leading-[1.1] text-white/95"
+                style={{ letterSpacing: "0.24px" }}
+              >
+                ©2026 CleanStart. All rights reserved.
+              </span>
 
-          <ul className="flex items-center gap-2 leading-none">
-            {LEGAL_LINKS.map((link, i) => (
-              <React.Fragment key={link.href}>
+              <ul className="flex items-center gap-2 leading-none">
+                {LEGAL_LINKS.map((link, i) => (
+                  <React.Fragment key={link.href}>
+                    <li className="flex leading-none">
+                      <Link
+                        href={link.href}
+                        className="text-xs italic leading-[1.75] text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
+                        style={{ letterSpacing: "0.24px" }}
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                    {i < LEGAL_LINKS.length - 1 && (
+                      <li
+                        aria-hidden
+                        className="h-[3px] w-[3px] rounded-full bg-white/95"
+                      />
+                    )}
+                  </React.Fragment>
+                ))}
+                <li
+                  aria-hidden
+                  className="h-[3px] w-[3px] rounded-full bg-white/95"
+                />
                 <li className="flex leading-none">
-                  <Link
-                    href={link.href}
+                  <CookiePreferencesButton
                     className="text-xs italic leading-[1.75] text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
                     style={{ letterSpacing: "0.24px" }}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-                {i < LEGAL_LINKS.length - 1 && (
-                  <li
-                    aria-hidden
-                    className="h-[3px] w-[3px] rounded-full bg-white/95"
                   />
-                )}
-              </React.Fragment>
-            ))}
-            <li
-              aria-hidden
-              className="h-[3px] w-[3px] rounded-full bg-white/95"
-            />
-            <li className="flex leading-none">
-              <CookiePreferencesButton
-                className="text-xs italic leading-[1.75] text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
-                style={{ letterSpacing: "0.24px" }}
-              />
-            </li>
-          </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-       </div>
-      </div>
       </div>
     </footer>
   );

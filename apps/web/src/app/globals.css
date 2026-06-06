@@ -197,7 +197,7 @@
      duplicated the same clamp strings inline. Anything painted inside the
      footer slot must consume these — never hardcode a new clamp for the title,
      description, or submit button. */
-  --cta-card-title:       clamp(26px, 3.1vw, 44px);
+  --cta-card-title:       clamp(26px, 3.1vw, 36px);
   --cta-card-title-ls:    -0.04em;
   --cta-card-title-lh:    1.1;
   --cta-card-title-weight: 600;
@@ -224,10 +224,13 @@
      review showed v3 desktop sizes (48 / 40) were too small.
      v5 (2026-05-27): bumped --fs-h2 to 28→56 (matches --fs-h1) and --fs-lead
      to 18→24 per design review — section H2s and section descriptions
-     across marketing pages must share one canonical size. */
-  --fs-display:  clamp(2.25rem, 1.5rem + 2.78vw, 4rem);      /* 36 → 64  hero H1 */
+     across marketing pages must share one canonical size.
+     v6 (2026-06-06): hero --fs-display pulled 36→64 down to 36→56 and --fs-h2
+     pulled 28→56 back to 28→48 — marketing hierarchy is now H1 56 / H2 48
+     (hero display & --fs-h1 share the 56 cap; section H2 sits one step below). */
+  --fs-display:  clamp(2.25rem, 1.5rem + 2.22vw, 3.5rem);    /* 36 → 56  hero H1 */
   --fs-h1:       clamp(2rem, 1.5rem + 2.22vw, 3.5rem);       /* 32 → 56  listing/detail/legal H1 */
-  --fs-h2:       clamp(1.75rem, 1.375rem + 2.78vw, 3.5rem);  /* 28 → 56  section H2 */
+  --fs-h2:       clamp(1.75rem, 1.375rem + 1.81vw, 3rem);    /* 28 → 48  section H2 */
   --fs-h3:       clamp(1.375rem, 1.25rem + 0.56vw, 1.75rem); /* 22 → 28  subsection / card title */
   --fs-h4:       1.25rem;                                     /* 20  (1.375rem ≥ md via override) */
   --fs-h5:       1.125rem;                                    /* 18 */
@@ -717,6 +720,15 @@ body {
   transition: transform 220ms cubic-bezier(.2, .9, .3, 1);
 }
 .cs-btn-glass:hover .cs-cta-arrow { transform: translateX(4px); }
+
+/* Footer social icon — glyph shifts to its platform brand color on hover.
+   Per-link color is supplied inline via the --social-hover custom property
+   (set from SOCIAL_ICONS[].hoverColor in Footer.tsx). A real rule is used
+   instead of a Tailwind arbitrary `hover:[color:var(...)]` utility because the
+   var-valued arbitrary property does not compile under this Tailwind v4 setup. */
+.cs-social-link:hover {
+  color: var(--social-hover);
+}
 
 /* Unified CTA button HEIGHT + FONT-SIZE.
      - Mobile  (< 64rem):  GLOBAL — every cs-btn-glass / cs-btn-blue site-wide

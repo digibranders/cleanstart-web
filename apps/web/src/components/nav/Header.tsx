@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Logo } from "@/components/icons/Logo";
 import { DesktopNav } from "@/components/nav/DesktopNav";
 import { MobileNav } from "@/components/nav/MobileNav";
 import { HeaderScrollShell } from "@/components/nav/HeaderScrollShell";
@@ -33,7 +32,16 @@ export async function Header() {
         aria-label="CleanStart home"
         className="flex shrink-0 items-center text-white outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-[#33BAEC] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
       >
-        <Logo className="h-7 w-auto" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/logo-cleanstart-footer.png"
+          alt="CleanStart"
+          width={153}
+          height={32}
+          loading="eager"
+          decoding="async"
+          className="h-7 w-auto object-contain"
+        />
       </Link>
 
       <DesktopNav
@@ -56,7 +64,7 @@ export async function Header() {
         >
           Book a Demo
         </Link>
-        <MobileNav openRolesCount={openRolesCount} />
+        <MobileNav />
       </div>
     </HeaderScrollShell>
   );
