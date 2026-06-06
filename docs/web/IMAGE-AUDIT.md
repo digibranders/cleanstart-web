@@ -1,7 +1,12 @@
-# 
-    Image Audit —`apps/web`
+# Image Audit — `apps/web`
 
-> **Status: AUDIT ONLY — nothing has been deleted, converted, or renamed.** This report is the
+> **✅ EXECUTED 2026-06-06 (branch `development`) — `public/` 224.5 MB → 11.9 MB (−95%).**
+> Phase 1 deleted 468 unused files (`79adb178`); Phase 2 converted 249 rasters to WebP + resized
+> oversized (`2582a9ce`); Phase 3 renamed 13 generic assets + 1 alt fix (`366eecd9`).
+> lint · typecheck · build all pass; 0 broken images verified in preview (home/ASR/teams/about/partners/podcast).
+> The worklist below is retained as the record of what was decided.
+>
+> **Status (original): AUDIT ONLY — nothing has been deleted, converted, or renamed.** This report is the
 > reviewable worklist. Execution happens in gated phases *after* you approve it. Machine-readable
 > manifest with every per-asset decision: [`apps/web/image-audit.json`](../../apps/web/image-audit.json).
 >
