@@ -3,19 +3,19 @@ import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 const PILLARS = [
   {
-    icon: "/images/about/icon-secure-foundation.png",
+    icon: "/images/about/icon-secure-foundation.webp",
     title: "Trust by Design",
     description:
       "Trust should be engineered into software foundations, not retrofitted after deployment.",
   },
   {
-    icon: "/images/about/icon-continuous-compliance.png",
+    icon: "/images/about/icon-continuous-compliance.webp",
     title: "Verifiable by Default",
     description:
       "Modern software should be continuously verifiable across every stage of delivery.",
   },
   {
-    icon: "/images/about/icon-full-visibility.png",
+    icon: "/images/about/icon-full-visibility.webp",
     title: "Security Without Friction",
     description:
       "Developers should be able to move fast without inheriting unnecessary operational risk.",

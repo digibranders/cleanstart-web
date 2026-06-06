@@ -38,7 +38,7 @@ export function UpcomingEventHero({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/cta-cube-left.png"
+          src="/images/blogs/cta-cube-left.webp"
           alt=""
           loading="lazy"
           decoding="async"
@@ -61,7 +61,7 @@ export function UpcomingEventHero({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/cta-cube-right.png"
+          src="/images/blogs/cta-cube-right.webp"
           alt=""
           loading="lazy"
           decoding="async"

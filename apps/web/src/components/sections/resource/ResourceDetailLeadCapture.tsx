@@ -156,7 +156,7 @@ export function ResourceDetailLeadCapture({
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/resource-center/lead-cube.png"
+                src="/images/resource-center/lead-cube.webp"
                 alt=""
                 style={{ width: "211px", height: "213px", opacity: 0.9, objectFit: "cover" }}
                 loading="lazy"

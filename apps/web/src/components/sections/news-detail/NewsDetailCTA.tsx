@@ -68,7 +68,7 @@ export function NewsDetailCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/news-detail/cta-union.png"
+        src="/images/news-detail/cta-union.webp"
         alt=""
         className="pointer-events-none select-none absolute"
         style={{
@@ -86,7 +86,7 @@ export function NewsDetailCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/news-detail/cta-cube.png"
+        src="/images/news-detail/cta-cube.webp"
         alt=""
         className="pointer-events-none select-none absolute w-[80px] h-[80px] lg:w-[120px] lg:h-[120px]"
         style={{
@@ -103,7 +103,7 @@ export function NewsDetailCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/news-detail/cta-cube.png"
+        src="/images/news-detail/cta-cube.webp"
         alt=""
         className="pointer-events-none select-none absolute w-[80px] h-[80px] lg:w-[120px] lg:h-[120px]"
         style={{

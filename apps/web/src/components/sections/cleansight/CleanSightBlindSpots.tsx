@@ -59,7 +59,7 @@ export function CleanSightBlindSpots(): React.ReactElement {
         }}
       >
         <Image
-          src="/images/cleansight/blindspot-corner-hex.png"
+          src="/images/cleansight/blindspot-corner-hex.webp"
           alt=""
           width={415}
           height={413}
@@ -81,7 +81,7 @@ export function CleanSightBlindSpots(): React.ReactElement {
         }}
       >
         <Image
-          src="/images/cleansight/blindspot-corner-hex.png"
+          src="/images/cleansight/blindspot-corner-hex.webp"
           alt=""
           width={415}
           height={413}

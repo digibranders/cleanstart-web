@@ -5,17 +5,17 @@ export function AsrProductionEnv(): React.ReactElement {
     description: string;
   }> = [
     {
-      icon: '/images/attack-surface-reduction/prod-icon-k8s.png',
+      icon: '/images/attack-surface-reduction/prod-icon-k8s.webp',
       title: 'Kubernetes Platforms',
       description: 'Production clusters running containerized workloads.',
     },
     {
-      icon: '/images/attack-surface-reduction/prod-icon-docs.png',
+      icon: '/images/attack-surface-reduction/prod-icon-docs.webp',
       title: 'Regulated Environments',
       description: 'Workloads with compliance and audit requirements.',
     },
     {
-      icon: '/images/attack-surface-reduction/prod-icon-security.png',
+      icon: '/images/attack-surface-reduction/prod-icon-security.webp',
       title: 'Security-Focused Teams',
       description: 'Teams prioritizing prevention over remediation.',
     },

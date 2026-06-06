@@ -3,7 +3,7 @@ import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * The wheel is a single decorative PNG (`/images/fips/hub-wheel.png`) with no
+ * The wheel is a single decorative PNG (`/images/fips/hub-wheel.webp`) with no
  * baked-in text. Capability labels and the center "Validated Foundation" label
  * are selectable HTML overlaid on top, positioned as % rects and sized with
  * container queries (`cqi`) so each label locks to the wheel and scales with it.
@@ -76,7 +76,7 @@ export function FipsEnables(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/fips/flare-top-right.png"
+        src="/images/fips/flare-top-right.webp"
         alt=""
         className="pointer-events-none select-none absolute hidden md:block"
         style={{
@@ -92,7 +92,7 @@ export function FipsEnables(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/fips/flare-left.png"
+        src="/images/fips/flare-left.webp"
         alt=""
         className="pointer-events-none select-none absolute hidden md:block"
         style={{
@@ -108,7 +108,7 @@ export function FipsEnables(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/fips/flare-bottom.png"
+        src="/images/fips/flare-bottom.webp"
         alt=""
         className="pointer-events-none select-none absolute hidden md:block"
         style={{
@@ -191,7 +191,7 @@ function HubWheel(): React.ReactElement {
       }}
     >
       <Image
-        src="/images/fips/hub-wheel.png"
+        src="/images/fips/hub-wheel.webp"
         alt=""
         aria-hidden
         width={HUB_PNG_W}

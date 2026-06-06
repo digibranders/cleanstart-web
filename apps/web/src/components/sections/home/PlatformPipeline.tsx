@@ -13,22 +13,22 @@ const CARDS: CardData[] = [
   {
     title: "Clean\nImages",
     blurb: "Minimal. Immutable.\nZero CVE.",
-    icon: "/images/cleanstart-factory/factory-images.png",
+    icon: "/images/cleanstart-factory/factory-images.webp",
   },
   {
     title: "Clean AI\nModels",
     blurb: "Scanned. Signed. Safe\nby design.",
-    icon: "/images/cleanstart-factory/factory-models.png",
+    icon: "/images/cleanstart-factory/factory-models.webp",
   },
   {
     title: "Clean\nLibraries",
     blurb: "Complete. Signed.\nContinuously verified.",
-    icon: "/images/cleanstart-factory/factory-libraries.png",
+    icon: "/images/cleanstart-factory/factory-libraries.webp",
   },
   {
     title: "Clean\nPackages",
     blurb: "Curated. Verified. No\nhidden risk.",
-    icon: "/images/cleanstart-factory/factory-packages.png",
+    icon: "/images/cleanstart-factory/factory-packages.webp",
   },
 ];
 

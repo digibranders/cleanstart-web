@@ -122,7 +122,7 @@ export function CleanSightHero(): React.ReactElement {
             }}
           >
             <Image
-              src="/images/cleansight/hero-dashboard-v2.png"
+              src="/images/cleansight/hero-dashboard-v2.webp"
               alt="CleanSight dashboard showing container visibility metrics, vulnerability breakdown, and ecosystem package distribution"
               width={1018}
               height={581}

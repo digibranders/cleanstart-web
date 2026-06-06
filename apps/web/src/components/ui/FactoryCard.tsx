@@ -31,7 +31,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
           }}
         >
           <Image
-            src="/images/factory-orb.png"
+            src="/images/factory-orb.webp"
             alt=""
             width={97}
             height={72}
@@ -102,7 +102,7 @@ export function FactoryCard({ title, description }: FactoryCardProps) {
 
         <div className="pointer-events-none relative flex w-full items-center justify-center">
           <Image
-            src="/images/factory-orb.png"
+            src="/images/factory-orb.webp"
             alt=""
             width={168}
             height={164}

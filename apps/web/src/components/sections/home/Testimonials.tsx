@@ -27,15 +27,15 @@ export interface Testimonial {
   caseStudyHref?: string;
 }
 
-const TESTIMONIAL_PHOTO = "/images/testimonial-photo.png";
+const TESTIMONIAL_PHOTO = "/images/testimonial-photo.webp";
 
 export const HOME_TESTIMONIALS: Testimonial[] = [
   {
     name: "Mathan Babu K",
     role: "CTSO & DPO, Vodafone Idea",
     company: "Vodafone Idea",
-    logoSrc: "/images/trusted/10-vi.png",
-    photoSrc: "/images/testimonials/mathan-babu-k.jpg",
+    logoSrc: "/images/trusted/10-vi.webp",
+    photoSrc: "/images/testimonials/mathan-babu-k.webp",
     quote:
       "Containers and microservices now sit at the heart of modern application delivery and the broader supply chain ecosystem. CleanStart's shift-left security approach couldn't have arrived at a more critical time.",
   },
@@ -43,8 +43,8 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
     name: "Shanker Ramrakhiani",
     role: "CISO & Head of BCP, IIFL Finance",
     company: "IIFL Finance",
-    logoSrc: "/images/trusted/03-iifl-finance.png",
-    photoSrc: "/images/testimonials/shanker-ramrakhiani.jpg",
+    logoSrc: "/images/trusted/03-iifl-finance.webp",
+    photoSrc: "/images/testimonials/shanker-ramrakhiani.webp",
     quote:
       "CleanStart helped us standardize our container foundations without slowing development. Tasks that previously required significant manual effort are now eliminated, deployments are faster, and our security team has greater confidence in the images we use.",
     caseStudyHref: "https://cdn.cleanstart.com/case-studies/iifl-case-study.pdf",
@@ -53,8 +53,8 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
     name: "Mr. Moinul Khan",
     role: "CEO, Aurascape",
     company: "Aurascape",
-    logoSrc: "/images/trusted/08-aurascape.png",
-    photoSrc: "/images/testimonials/moinul-khan.jpg",
+    logoSrc: "/images/trusted/08-aurascape.webp",
+    photoSrc: "/images/testimonials/moinul-khan.webp",
     quote:
       "Standardizing on verified container foundations gave us confidence in the base of every service we deploy and allowed us to shift security much earlier in the build process.",
     caseStudyHref: "https://cdn.cleanstart.com/case-studies/aurascape-case-study.pdf",

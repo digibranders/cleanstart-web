@@ -41,7 +41,7 @@ export function BlogsHero({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/hero-glow-left.png"
+          src="/images/blogs/hero-glow-left.webp"
           alt=""
           loading="lazy"
           decoding="async"

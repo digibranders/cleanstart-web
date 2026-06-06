@@ -25,7 +25,7 @@ export function DemoHero(): React.ReactElement {
           dark regions so it reads as embedded in the hero atmosphere rather
           than sitting on top. */}
       <Image
-        src="/images/book-a-demo/hero-cube-left.png"
+        src="/images/book-a-demo/hero-cube-left.webp"
         alt=""
         width={419}
         height={419}
@@ -47,7 +47,7 @@ export function DemoHero(): React.ReactElement {
       {/* Right cube — mirror of the left one so the title sits centred between
           two purple-gem accents, ~910px right of centre on desktop. */}
       <Image
-        src="/images/book-a-demo/hero-cube-right.png"
+        src="/images/book-a-demo/hero-cube-right.webp"
         alt=""
         width={419}
         height={419}

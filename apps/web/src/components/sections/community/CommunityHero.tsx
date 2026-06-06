@@ -15,7 +15,7 @@ export function CommunityHero() {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/community/hero-photo.png"
+          src="/images/community/hero-photo.webp"
           alt=""
           width={1960}
           height={496}
@@ -99,7 +99,7 @@ export function CommunityHero() {
         <div className="relative h-[clamp(220px,55vw,360px)] overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/community/hero-photo.png"
+            src="/images/community/hero-photo.webp"
             alt=""
             aria-hidden
             loading="eager"

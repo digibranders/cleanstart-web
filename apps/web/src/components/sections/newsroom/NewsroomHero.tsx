@@ -159,7 +159,7 @@ export function NewsroomHero(): React.ReactElement {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/newsroom/hero-earth.png"
+          src="/images/newsroom/hero-earth.webp"
           alt=""
           loading="lazy"
           decoding="async"

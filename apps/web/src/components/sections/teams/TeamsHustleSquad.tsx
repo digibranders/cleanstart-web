@@ -10,7 +10,7 @@ interface Slide {
 }
 
 const SLIDES: Slide[] = Array.from({ length: 9 }, (_, i) => ({
-  src: `/images/teams/squad/${i + 1}.jpeg`,
+  src: `/images/teams/squad/${i + 1}.webp`,
   alt: `CleanStart Hustle Squad, moment ${i + 1}`,
 }));
 

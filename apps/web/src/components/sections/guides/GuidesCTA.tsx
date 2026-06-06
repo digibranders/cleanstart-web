@@ -27,7 +27,7 @@ export function GuidesCTA(): React.ReactElement {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/guides/cta-cube-left2.png"
+          src="/images/guides/cta-cube-left2.webp"
           alt=""
           loading="lazy"
           decoding="async"
@@ -48,7 +48,7 @@ export function GuidesCTA(): React.ReactElement {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/guides/cta-cube-right2.png"
+          src="/images/guides/cta-cube-right2.webp"
           alt=""
           loading="lazy"
           decoding="async"

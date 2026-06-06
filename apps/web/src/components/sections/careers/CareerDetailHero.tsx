@@ -27,7 +27,7 @@ export function CareerDetailHero({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blogs/cta-cube-right.png"
+        src="/images/blogs/cta-cube-right.webp"
         alt=""
         className="pointer-events-none select-none absolute hidden md:block"
         style={{
@@ -45,7 +45,7 @@ export function CareerDetailHero({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blogs/cta-cube-left.png"
+        src="/images/blogs/cta-cube-left.webp"
         alt=""
         className="pointer-events-none select-none absolute hidden md:block"
         style={{

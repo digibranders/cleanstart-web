@@ -78,10 +78,10 @@ const NEWS_FALLBACK: NewsItem[] = [
 ];
 
 const IMAGE_FALLBACK: ImageItem[] = [
-  { imgSrc: "/images/community/card-img-apko.png", name: "Apko", updated: "Updated 1 hour ago" },
-  { imgSrc: "/images/community/card-img-rust.png", name: "Rust", updated: "Updated 1 hour ago" },
-  { imgSrc: "/images/community/card-img-vault.png", name: "Vault", updated: "Updated 1 hour ago" },
-  { imgSrc: "/images/community/card-img-apko.png", name: "Apko", updated: "Updated 1 hour ago" },
+  { imgSrc: "/images/community/card-img-apko.webp", name: "Apko", updated: "Updated 1 hour ago" },
+  { imgSrc: "/images/community/card-img-rust.webp", name: "Rust", updated: "Updated 1 hour ago" },
+  { imgSrc: "/images/community/card-img-vault.webp", name: "Vault", updated: "Updated 1 hour ago" },
+  { imgSrc: "/images/community/card-img-apko.webp", name: "Apko", updated: "Updated 1 hour ago" },
 ];
 
 const EVENTS_FALLBACK: EventItem[] = [
@@ -556,7 +556,7 @@ export async function CommunitySections(): Promise<React.ReactElement> {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/community/section-hardlight.png"
+          src="/images/community/section-hardlight.webp"
           alt=""
           className="h-full w-full object-cover"
           loading="lazy"
@@ -570,7 +570,7 @@ export async function CommunitySections(): Promise<React.ReactElement> {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/community/section-hardlight.png"
+          src="/images/community/section-hardlight.webp"
           alt=""
           className="h-full w-full object-cover"
           loading="lazy"

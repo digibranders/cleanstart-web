@@ -70,7 +70,7 @@ export function BlogDetailCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blog-detail/cta/cta-cube.png"
+        src="/images/blog-detail/cta/cta-cube.webp"
         alt=""
         className="absolute pointer-events-none select-none hidden xl:block object-contain"
         style={{ left: "-63px", top: "-63px", width: "206px", height: "207px" , opacity: 0.75,}}
@@ -82,7 +82,7 @@ export function BlogDetailCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blog-detail/cta/cta-cube.png"
+        src="/images/blog-detail/cta/cta-cube.webp"
         alt=""
         className="absolute pointer-events-none select-none hidden xl:block object-contain"
         style={{ left: "1130px", top: "-63px", width: "259px", height: "260px" , opacity: 0.75,}}

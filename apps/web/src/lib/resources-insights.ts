@@ -197,7 +197,7 @@ async function loadBlogs(): Promise<ResourceCard[]> {
       const image = pickImage(d.heroImage);
       if (!d.slug || !d.title) return null;
       return {
-        image: image ?? "/images/resource-1.png",
+        image: image ?? "/images/resource-1.webp",
         title: d.title,
         description: d.abstract?.trim() ?? "",
         href: `/blogs/${d.slug}`,
@@ -269,7 +269,7 @@ async function loadEvents(): Promise<ResourceCard[]> {
         "short",
       );
       return {
-        image: image ?? "/images/resource-1.png",
+        image: image ?? "/images/resource-1.webp",
         title: d.title,
         description: d.abstract?.trim() ?? "",
         href: `/event/${d.slug}`,

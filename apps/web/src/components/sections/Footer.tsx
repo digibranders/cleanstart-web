@@ -70,20 +70,20 @@ const CREDENTIALS: { title: string; badges: Badge[] }[] = [
   {
     title: "Awarded with",
     badges: [
-      { name: "Cyber Security Excellence Awards Winner", src: "/images/awards/award-1.png", w: 486, h: 616 },
+      { name: "Cyber Security Excellence Awards Winner", src: "/images/awards/award-1.webp", w: 486, h: 616 },
     ],
   },
   {
     title: "Docker verified",
     badges: [
-      { name: "Docker Verified Publisher", src: "/images/awards/award-2.png", w: 268, h: 267 },
+      { name: "Docker Verified Publisher", src: "/images/awards/award-2.webp", w: 268, h: 267 },
     ],
   },
   {
     title: "Certifications",
     badges: [
-      { name: "AICPA SOC 2", src: "/images/awards/award-4.png", w: 1024, h: 1023 },
-      { name: "ISO/IEC 27001", src: "/images/awards/award-3.png", w: 200, h: 200 },
+      { name: "AICPA SOC 2", src: "/images/awards/award-4.webp", w: 1024, h: 1023 },
+      { name: "ISO/IEC 27001", src: "/images/awards/award-3.webp", w: 200, h: 200 },
     ],
   },
 ];

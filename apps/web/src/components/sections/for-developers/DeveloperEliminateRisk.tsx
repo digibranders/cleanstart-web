@@ -33,25 +33,25 @@ const METRICS: MetricCardData[] = [
     numberTo: 89,
     numberSuffix: '%',
     label: 'Fewer inherited vulnerabilities',
-    iconSrc: `${ICON_BASE}/icon-shield.png`,
+    iconSrc: `${ICON_BASE}/icon-shield.webp`,
   },
   {
     kind: 'headline',
     headline: 'Smaller Images',
     label: 'Reduced runtime footprint',
-    iconSrc: `${ICON_BASE}/icon-cube.png`,
+    iconSrc: `${ICON_BASE}/icon-cube.webp`,
   },
   {
     kind: 'headline',
     headline: 'Faster Pull Times',
     label: 'Improve deployment speed and scaling',
-    iconSrc: `${ICON_BASE}/icon-clock.png`,
+    iconSrc: `${ICON_BASE}/icon-clock.webp`,
   },
   {
     kind: 'headline',
     headline: 'Lower Risk',
     label: 'Focus on actionable risk',
-    iconSrc: `${ICON_BASE}/icon-chart.png`,
+    iconSrc: `${ICON_BASE}/icon-chart.webp`,
   },
 ];
 

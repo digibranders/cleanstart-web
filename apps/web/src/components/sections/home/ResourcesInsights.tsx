@@ -34,14 +34,14 @@ import { ResourcesInsightsClient } from "./ResourcesInsightsClient";
 const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
   blogs: [
     {
-      image: "/images/resource-1.png",
+      image: "/images/resource-1.webp",
       title: "Why SBOMs Alone Do Not Establish Container Trust",
       description:
         "Software Bill of Materials (SBOMs) have become the go-to compliance artifact in container security conversations.",
       href: "#blog-sbom",
     },
     {
-      image: "/images/resource-2.png",
+      image: "/images/resource-2.webp",
       title:
         "The Hidden Risk Inside Most Container Images: Why BusyBox Still Ships in Production",
       description:
@@ -49,7 +49,7 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
       href: "#blog-busybox",
     },
     {
-      image: "/images/resource-3.png",
+      image: "/images/resource-3.webp",
       title:
         "Minimal vs Hardened vs Secure Container Images: What's the Difference and Why It Matters",
       description:
@@ -59,7 +59,7 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
   ],
   resource: [
     {
-      image: "/images/resource-center/cover-poster/datasheet-cover.png",
+      image: "/images/resource-center/cover-poster/datasheet-cover.webp",
       title: "CleanStart Whitepaper: A Technical Architecture Overview",
       description:
         "A deep technical dive into how CleanStart's deterministic build pipeline produces hardened, signed container images at scale.",
@@ -67,7 +67,7 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
       isCoverPoster: true,
     },
     {
-      image: "/images/resource-center/cover-poster/datasheet-report.png",
+      image: "/images/resource-center/cover-poster/datasheet-report.webp",
       title: "Container Hardening Checklist for Production Workloads",
       description:
         "A practical, vendor-neutral checklist your platform team can use to evaluate the hardening posture of any container image before it ships.",
@@ -75,7 +75,7 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
       isCoverPoster: true,
     },
     {
-      image: "/images/resource-center/cover-poster/architecture-insights.png",
+      image: "/images/resource-center/cover-poster/architecture-insights.webp",
       title: "FIPS 140-3 Compliance Quick-Start Guide",
       description:
         "Step-by-step guidance for organizations adopting FIPS 140-3 cryptographic modules in containerized environments.",
@@ -85,21 +85,21 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
   ],
   newsroom: [
     {
-      image: "/images/resource-3.png",
+      image: "/images/resource-3.webp",
       title: "CleanStart Announces Series B Funding to Accelerate Adoption",
       description:
         "New investment will fund expansion of the CleanStart catalog and accelerate enterprise rollout across regulated industries.",
       href: "#news-series-b",
     },
     {
-      image: "/images/resource-1.png",
+      image: "/images/resource-1.webp",
       title: "CleanStart Joins CNCF as Silver Member",
       description:
         "Reinforcing our commitment to the open-source cloud-native ecosystem with new contributions to the SLSA supply-chain framework.",
       href: "#news-cncf",
     },
     {
-      image: "/images/resource-2.png",
+      image: "/images/resource-2.webp",
       title: "Annual State of Container Security Report Released",
       description:
         "Our 2026 industry report finds 78% of breaches start at the container base image — and how leading teams are fighting back.",
@@ -108,7 +108,7 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
   ],
   events: [
     {
-      image: "/images/resource-1.png",
+      image: "/images/resource-1.webp",
       title: "KubeCon + CloudNativeCon NA 2026 — Booth #S42",
       description:
         "Live demos of CleanStart's continuous-rebuild pipeline. Drop by for a one-on-one walkthrough or a CleanStart sticker.",
@@ -117,7 +117,7 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
       location: "Salt Lake City, UT",
     },
     {
-      image: "/images/resource-2.png",
+      image: "/images/resource-2.webp",
       title: "Webinar: Eliminating Zero-Days at the Base Image",
       description:
         "Join our security team for a 45-minute deep dive on shifting CVE remediation left to where it belongs — the source.",
@@ -126,7 +126,7 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
       location: "Online",
     },
     {
-      image: "/images/resource-3.png",
+      image: "/images/resource-3.webp",
       title: "RSA Conference 2026: CleanStart x Eventus AppSec Roundtable",
       description:
         "Closed-door discussion with security leaders from financial services on hardening container supply chains.",

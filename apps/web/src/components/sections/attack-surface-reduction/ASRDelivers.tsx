@@ -23,7 +23,7 @@ export function ASRDelivers(): React.ReactElement {
     >
       {/* Portrait crop below md, full-bleed photo at md and above. */}
       <Image
-        src="/images/attack-surface-reduction/business-photo-mobile.png"
+        src="/images/attack-surface-reduction/business-photo-mobile.webp"
         alt=""
         fill
         sizes="100vw"
@@ -32,7 +32,7 @@ export function ASRDelivers(): React.ReactElement {
         priority={false}
       />
       <Image
-        src="/images/attack-surface-reduction/s4-person.jpg"
+        src="/images/attack-surface-reduction/s4-person.webp"
         alt=""
         fill
         sizes="100vw"

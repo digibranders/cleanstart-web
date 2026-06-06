@@ -11,7 +11,7 @@ const TOP_ROW: MatterCard[] = [
   {
     title: "Validated Cryptography",
     description: "Trusted cryptographic modules for regulated environments.",
-    icon: "/images/fips/why-1.png",
+    icon: "/images/fips/why-1.webp",
   },
   {
     title: "Centralized Crypto Management",
@@ -21,7 +21,7 @@ const TOP_ROW: MatterCard[] = [
   {
     title: "Verified Secure Boot",
     description: "Protect workload integrity during startup.",
-    icon: "/images/fips/why-3.png",
+    icon: "/images/fips/why-3.webp",
   },
 ];
 
@@ -29,12 +29,12 @@ const BOTTOM_ROW: MatterCard[] = [
   {
     title: "Automated Compliance Documentation",
     description: "Continuous evidence generation for audits.",
-    icon: "/images/fips/why-4.png",
+    icon: "/images/fips/why-4.webp",
   },
   {
     title: "Continuous Compliance Monitoring",
     description: "Track cryptographic compliance across deployments.",
-    icon: "/images/fips/why-5.png",
+    icon: "/images/fips/why-5.webp",
   },
 ];
 

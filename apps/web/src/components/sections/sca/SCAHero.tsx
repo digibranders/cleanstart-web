@@ -30,7 +30,7 @@ export function SCAHero(): React.ReactElement {
       {/* Positioned absolutely so it can overflow the right content edge. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/sca/hero-3d-illustration.png"
+        src="/images/sca/hero-3d-illustration.webp"
         alt=""
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
@@ -126,7 +126,7 @@ export function SCAHero(): React.ReactElement {
         <div className="hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/sca/hero-3d-illustration.png"
+            src="/images/sca/hero-3d-illustration.webp"
             alt=""
             aria-hidden
             width={492}

@@ -314,7 +314,7 @@ export function CisoSolution(): React.ReactElement {
                           backgroundImage: "url('/images/ciso/solution-flare-gradient.svg')",
                           backgroundSize: "100% 100%",
                           maskImage:
-                            "url('/images/ciso/solution-flare-mask.svg'), url('/images/ciso/solution-flare-overlay.png')",
+                            "url('/images/ciso/solution-flare-mask.svg'), url('/images/ciso/solution-flare-overlay.webp')",
                           ...maskBase,
                         }}
                       />
@@ -344,7 +344,7 @@ export function CisoSolution(): React.ReactElement {
                           backgroundImage: "url('/images/ciso/solution-track-gradient.svg')",
                           backgroundSize: "100% 100%",
                           maskImage:
-                            "url('/images/ciso/solution-track-mask.svg'), url('/images/ciso/solution-track-overlay.png')",
+                            "url('/images/ciso/solution-track-mask.svg'), url('/images/ciso/solution-track-overlay.webp')",
                           ...maskBase,
                         }}
                       />

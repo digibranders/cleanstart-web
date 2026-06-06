@@ -55,7 +55,7 @@ export function CisoHero(): React.ReactElement {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/ciso/hero-photo.png"
+              src="/images/ciso/hero-photo.webp"
               alt=""
               style={{
                 position: "absolute",
@@ -98,7 +98,7 @@ export function CisoHero(): React.ReactElement {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/ciso/hero-photo.png"
+            src="/images/ciso/hero-photo.webp"
             alt=""
             style={{
               position: "absolute",

@@ -189,7 +189,7 @@ export function ASRHero(): React.ReactElement {
             ].join(' ')}
             style={{
               width: 'calc(650px * var(--asr-card-scale))',
-              // Height excludes the ≈26px drop-shadow padding baked into hero-cards.png
+              // Height excludes the ≈26px drop-shadow padding baked into hero-cards.webp
               // so the wrapper's bottom edge = the cards' VISIBLE bottom. items-end on
               // the parent flex row then pins that to the CTA's bottom on md+.
               height: 'calc(414px * var(--asr-card-scale))',
@@ -209,7 +209,7 @@ export function ASRHero(): React.ReactElement {
             {/* BLOATED card — larger, bottom-aligned, on the left. */}
             <div style={{ position: 'absolute', left: 0, bottom: 0 }}>
               <Image
-                src="/images/attack-surface-reduction/hero-cards.png"
+                src="/images/attack-surface-reduction/hero-cards.webp"
                 alt="BLOATED image: 1.2 GB, 247 packages, 89 HIGH CVEs"
                 width={484}
                 height={493}
@@ -220,7 +220,7 @@ export function ASRHero(): React.ReactElement {
             </div>
 
             {/* CLEAN card — smaller, visually bottom-aligned with BLOATED. The
-                hero-cards.png carries ~26px of drop-shadow padding below its
+                hero-cards.webp carries ~26px of drop-shadow padding below its
                 visible frame at the rendered width, so CLEAN's bottom:26px
                 matches BLOATED's visible bottom exactly. */}
             <div

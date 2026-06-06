@@ -247,7 +247,7 @@ function VsBadge() {
       }}
     >
       <Image
-        src="/images/cleansight/vs-badge.png"
+        src="/images/cleansight/vs-badge.webp"
         alt=""
         width={252}
         height={252}

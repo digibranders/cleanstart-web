@@ -152,7 +152,7 @@ export function ErrorHero({ title, referenceId }: ErrorHeroProps) {
             style={{ maxWidth: "clamp(260px, 42vw, 520px)" }}
           >
             <Image
-              src="/images/error/page-not-found-illustration.png"
+              src="/images/error/page-not-found-illustration.webp"
               alt=""
               width={1120}
               height={928}

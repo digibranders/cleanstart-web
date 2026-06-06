@@ -31,7 +31,7 @@ export function CleanStartImagesCta(): React.ReactElement {
         }}
       >
         <Image
-          src="/images/cleanstart-images/cta-cube-textured.png"
+          src="/images/cleanstart-images/cta-cube-textured.webp"
           alt=""
           width={255}
           height={258}
@@ -46,7 +46,7 @@ export function CleanStartImagesCta(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/cleanstart-images/cta-cube-green.png"
+        src="/images/cleanstart-images/cta-cube-green.webp"
         alt=""
         className="pointer-events-none select-none absolute lg:hidden"
         style={{

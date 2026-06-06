@@ -331,7 +331,7 @@ function VsBadge() {
       }}
     >
       <Image
-        src="/images/security/vs-badge.png"
+        src="/images/security/vs-badge.webp"
         alt=""
         width={252}
         height={252}

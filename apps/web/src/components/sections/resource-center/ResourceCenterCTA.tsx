@@ -70,7 +70,7 @@ export function ResourceCenterCTA(): React.ReactElement {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/resource-center/cta-cube.png"
+          src="/images/resource-center/cta-cube.webp"
           alt=""
           className="w-full h-full object-cover"
           loading="lazy"
@@ -92,7 +92,7 @@ export function ResourceCenterCTA(): React.ReactElement {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/resource-center/cta-cube.png"
+          src="/images/resource-center/cta-cube.webp"
           alt=""
           className="w-full h-full object-contain"
           loading="lazy"

@@ -7,17 +7,17 @@ export function AsrFitsBuilt(): React.ReactElement {
     description: string;
   }> = [
     {
-      icon: '/images/attack-surface-reduction/fits-icon-1.png',
+      icon: '/images/attack-surface-reduction/fits-icon-1.webp',
       title: 'Drop-in Images',
       description: 'Fewer exploitable components exist at image pull time',
     },
     {
-      icon: '/images/attack-surface-reduction/fits-icon-2.png',
+      icon: '/images/attack-surface-reduction/fits-icon-2.webp',
       title: 'Pipeline Compatible',
       description: 'Works with existing CI/CD and registries.',
     },
     {
-      icon: '/images/attack-surface-reduction/fits-icon-3.png',
+      icon: '/images/attack-surface-reduction/fits-icon-3.webp',
       title: 'Deploy Anywhere',
       description: 'Supports Kubernetes and container platforms.',
     },

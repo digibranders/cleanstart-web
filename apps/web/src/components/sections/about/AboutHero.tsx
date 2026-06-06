@@ -71,7 +71,7 @@ export function AboutHero() {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/about/hero-3d-object.png"
+          src="/images/about/hero-3d-object.webp"
           alt=""
           width={743}
           height={811}
@@ -147,7 +147,7 @@ export function AboutHero() {
               <div className="absolute inset-0 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/about/hero-3d-figma.png"
+                  src="/images/about/hero-3d-figma.webp"
                   alt=""
                   loading="eager"
                   decoding="async"

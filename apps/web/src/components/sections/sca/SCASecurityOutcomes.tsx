@@ -341,7 +341,7 @@ export function SCASecurityOutcomes(): React.ReactElement {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/sca/security-shield.png"
+              src="/images/sca/security-shield.webp"
               alt=""
               style={{
                 position: "absolute",

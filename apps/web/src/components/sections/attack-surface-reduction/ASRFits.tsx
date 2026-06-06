@@ -14,7 +14,7 @@ const INTEGRATIONS: Integration[] = [
   {
     title: 'Drop-in Images',
     desc: 'Works with existing workflows.',
-    icon: '/images/attack-surface-reduction/image 583136.png',
+    icon: '/images/attack-surface-reduction/image 583136.webp',
     iconAlt: 'Monitor icon',
     iconWidth: 96,
     iconHeight: 96,
@@ -22,7 +22,7 @@ const INTEGRATIONS: Integration[] = [
   {
     title: 'Pipeline Compatible',
     desc: 'Integrates into CI/CD environments.',
-    icon: '/images/attack-surface-reduction/pipeline.png',
+    icon: '/images/attack-surface-reduction/pipeline.webp',
     iconAlt: 'CI/CD pipeline icon',
     // Cropped landscape artwork (~2.1:1) — intrinsic ratio for the reserved box.
     iconWidth: 201,
@@ -31,7 +31,7 @@ const INTEGRATIONS: Integration[] = [
   {
     title: 'Deploy Anywhere',
     desc: 'Cloud, on-prem, or regulated environments.',
-    icon: '/images/attack-surface-reduction/Point.png',
+    icon: '/images/attack-surface-reduction/Point.webp',
     iconAlt: 'Deploy icon',
     iconWidth: 96,
     iconHeight: 96,

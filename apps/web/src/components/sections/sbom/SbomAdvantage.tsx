@@ -89,7 +89,7 @@ export function SbomAdvantage(): React.ReactElement {
             }}
           >
             <Image
-              src="/images/sbom/infinity-circuit.png"
+              src="/images/sbom/infinity-circuit.webp"
               alt="CleanStart SBOM continuous delivery loop"
               fill
               sizes="(min-width: 1024px) 512px, 100vw"
@@ -178,7 +178,7 @@ export function SbomAdvantage(): React.ReactElement {
             }}
           >
             <Image
-              src="/images/sbom/infinity-circuit.png"
+              src="/images/sbom/infinity-circuit.webp"
               alt="CleanStart SBOM continuous delivery loop"
               fill
               sizes="100vw"
@@ -256,7 +256,7 @@ export function SbomAdvantage(): React.ReactElement {
               loading="lazy"
             />
             <Image
-              src="/images/sbom/infinity-circuit.png"
+              src="/images/sbom/infinity-circuit.webp"
               alt="CleanStart SBOM built for modern supply chains"
               fill
               sizes="328px"

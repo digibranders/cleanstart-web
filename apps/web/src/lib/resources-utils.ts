@@ -48,14 +48,14 @@ export function resourceCtaLabel(
 export function resourceCoverPoster(type: ResourceType | null | undefined): string {
   switch (type) {
     case "ebook":
-      return "/images/resource-center/cover-poster/ebook-cover.png";
+      return "/images/resource-center/cover-poster/ebook-cover.webp";
     case "datasheet":
     case "report":
-      return "/images/resource-center/cover-poster/datasheet-report.png";
+      return "/images/resource-center/cover-poster/datasheet-report.webp";
     case "whitepaper":
-      return "/images/resource-center/cover-poster/datasheet-cover.png";
+      return "/images/resource-center/cover-poster/datasheet-cover.webp";
     default:
-      return "/images/resource-center/cover-poster/architecture-insights.png";
+      return "/images/resource-center/cover-poster/architecture-insights.webp";
   }
 }
 

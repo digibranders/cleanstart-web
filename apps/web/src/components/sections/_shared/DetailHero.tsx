@@ -46,7 +46,7 @@ export function DetailHero({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blogs/hero-orb-top.png"
+        src="/images/blogs/hero-orb-top.webp"
         alt=""
         className="pointer-events-none select-none absolute top-20 right-0 hidden xl:block"
         style={{ width: "265px", height: "265px", mixBlendMode: "lighten", opacity: 0.4 }}
@@ -58,7 +58,7 @@ export function DetailHero({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blogs/hero-orb-top.png"
+        src="/images/blogs/hero-orb-top.webp"
         alt=""
         className="pointer-events-none select-none absolute hidden xl:block"
         style={{

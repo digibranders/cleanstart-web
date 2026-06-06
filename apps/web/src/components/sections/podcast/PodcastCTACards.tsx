@@ -8,9 +8,9 @@ type Props = {
 };
 
 const CARD_ICONS = [
-  "/images/podcast/explore.png",
-  "/images/podcast/new.png",
-  "/images/podcast/update.png",
+  "/images/podcast/explore.webp",
+  "/images/podcast/new.webp",
+  "/images/podcast/update.webp",
 ] as const;
 
 const RING_BG =

@@ -42,7 +42,7 @@ export function ResourceCenterHero({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/resource-center/hero-cube.png"
+          src="/images/resource-center/hero-cube.webp"
           alt=""
           className="w-full h-full object-cover"
           style={{ transform: "rotate(-46.54deg)", opacity: 0.4 }}
@@ -65,7 +65,7 @@ export function ResourceCenterHero({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/resource-center/hero-glow-left.png"
+          src="/images/resource-center/hero-glow-left.webp"
           alt=""
           className="w-full h-full object-cover"
           loading="lazy"

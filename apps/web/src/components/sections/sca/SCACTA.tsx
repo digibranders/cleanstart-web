@@ -42,7 +42,7 @@ export function SCACTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/sca/cta-cube.png"
+        src="/images/sca/cta-cube.webp"
         alt=""
         className="absolute pointer-events-none select-none hidden lg:block"
         style={{

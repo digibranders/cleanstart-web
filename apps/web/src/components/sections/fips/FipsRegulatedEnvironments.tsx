@@ -35,7 +35,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/fips/regulated-photo-mobile.png"
+        src="/images/fips/regulated-photo-mobile.webp"
         alt=""
         className="absolute inset-0 w-full h-full -z-20 pointer-events-none select-none md:hidden"
         style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(1.5px)", transform: "scale(1.01)" }}
@@ -45,7 +45,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/fips/regulated-photo.png"
+        src="/images/fips/regulated-photo.webp"
         alt=""
         className="absolute inset-0 w-full h-full -z-20 pointer-events-none select-none hidden md:block"
         style={{ objectFit: "cover", objectPosition: "center center", filter: "blur(1.5px)", transform: "scale(1.01)" }}

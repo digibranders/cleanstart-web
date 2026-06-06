@@ -15,7 +15,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blogs/hero-orb-top.png"
+        src="/images/blogs/hero-orb-top.webp"
         alt=""
         className="pointer-events-none select-none absolute hidden xl:block"
         style={{
@@ -33,7 +33,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blogs/hero-orb-top.png"
+        src="/images/blogs/hero-orb-top.webp"
         alt=""
         className="pointer-events-none select-none absolute hidden xl:block"
         style={{

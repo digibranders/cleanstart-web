@@ -159,7 +159,7 @@ export function ASRBloated(): React.ReactElement {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/attack-surface-reduction/public-images-container.png"
+              src="/images/attack-surface-reduction/public-images-container.webp"
               alt=""
               style={{ width: '100%', height: 'auto', display: 'block' }}
               loading="lazy"

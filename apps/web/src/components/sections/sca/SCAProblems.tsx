@@ -4,25 +4,25 @@ const CARDS = [
   {
     title: "Alert Overload",
     desc: "Most findings originate from inherited dependencies.",
-    icon: "/images/sca/problem-ball-alert.png",
+    icon: "/images/sca/problem-ball-alert.webp",
     iconAlt: "Alert icon",
   },
   {
     title: "Bloated Dependency Trees",
     desc: "Large images create excessive transitive vulnerabilities.",
-    icon: "/images/sca/problem-ball-bloated.png",
+    icon: "/images/sca/problem-ball-bloated.webp",
     iconAlt: "Dependency tree icon",
   },
   {
     title: "Remediation Fatigue",
     desc: "Teams spend time prioritizing low-value findings.",
-    icon: "/images/sca/problem-ball-fatigue.png",
+    icon: "/images/sca/problem-ball-fatigue.webp",
     iconAlt: "Registration icon",
   },
   {
     title: "Delayed Releases",
     desc: "Security backlogs slow software delivery.",
-    icon: "/images/sca/problem-ball-delayed.png",
+    icon: "/images/sca/problem-ball-delayed.webp",
     iconAlt: "Clock icon",
   },
 ];

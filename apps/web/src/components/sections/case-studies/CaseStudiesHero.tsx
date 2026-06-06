@@ -73,7 +73,7 @@ export function CaseStudiesHero(): React.ReactElement {
               decoding="async"
             />
             <Image
-              src="/images/case-studies/hero-illustration.png"
+              src="/images/case-studies/hero-illustration.webp"
               alt=""
               width={575}
               height={347}
