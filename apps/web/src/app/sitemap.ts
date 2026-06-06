@@ -83,8 +83,8 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: "/for-developers" },
   { path: "/guide" },
   { path: "/knowledge-hub" },
-  { path: "/legal" },
-  { path: "/legal/acceptable-use-policy" },
+  // `/legal` is a 308 redirect (not a page) — excluded here. The individual
+  // /legal/<slug> docs are emitted dynamically from the legalDocuments CMS.
   { path: "/news" },
   { path: "/partners" },
   { path: "/podcast" },
@@ -107,7 +107,7 @@ function entry(path: string, lastModified?: string): MetadataRoute.Sitemap[numbe
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!isIndexingAllowed()) return [];
 
-  const [blogs, resources, authors, news, events, jobs, guides] =
+  const [blogs, resources, authors, news, events, jobs, guides, legal] =
     await Promise.all([
       fetchDocs("blogs", BLOG_FILTER),
       fetchDocs("resources", BLOG_FILTER),
@@ -116,6 +116,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       fetchDocs("events", BLOG_FILTER),
       fetchDocs("jobs", JOBS_FILTER),
       fetchDocs("guides", BLOG_FILTER),
+      fetchDocs("legalDocuments", BLOG_FILTER),
     ]);
 
   return [
@@ -148,6 +149,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...jobs.map((j) => entry(`/job/${j.slug}`, j.updatedAt ?? undefined)),
     ...guides.map((g) =>
       entry(`/guide/${g.slug}`, g.updatedAt ?? g.publishedAt ?? undefined),
+    ),
+    ...legal.map((d) =>
+      entry(`/legal/${d.slug}`, d.updatedAt ?? d.publishedAt ?? undefined),
     ),
   ];
 }
