@@ -153,4 +153,7 @@ const run = async (): Promise<void> => {
   process.exit(0);
 };
 
-void run();
+// Top-level await (not fire-and-forget): `payload run` exits as soon as the
+// module finishes evaluating, so a bare `void run()` would terminate the
+// process before the async work completes.
+await run();
