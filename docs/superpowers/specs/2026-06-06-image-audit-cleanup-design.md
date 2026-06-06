@@ -26,14 +26,14 @@ This round produces a **reviewable audit only**. No deletion, conversion, or ren
 
 **Listed but NOT actioned (keep / out of scope):**
 - `apps/web/public/images/hero-tech-logos/` — 75 SVG tech logos. **Fully excluded**: no audit-for-action, no touch.
-- **All SVGs repo-wide** — keep as-is (no conversion, no rename). SVG orphans are *listed* in a separate bucket, deleted only on explicit per-bucket approval.
+- **All SVGs repo-wide** — never converted (vector is already optimal), but *may be renamed* when generically named (references updated), **except** inside `hero-tech-logos/`. SVG orphans are *listed* in a separate bucket, deleted only on explicit per-bucket approval.
 - CMS admin logo (embedded JSX) and `docs/` images — listed as "out of scope / keep".
 
 ## 3. Conversion safety rules (hard constraints)
 
 These govern Phase 2 and are encoded into the audit's per-image recommendation:
 
-1. **SVG → never converted, never renamed.** Vector is already optimal.
+1. **SVG → never converted** (vector is already optimal); **may be renamed** if the filename is generic (except `hero-tech-logos/`, which stays untouched).
 2. **`hero-tech-logos/` → never touched.**
 3. **Card icons & brand-logo PNGs → conservative conversion only:** alpha-preserving WebP, high quality/near-lossless, **no downscaling**. Must remain crisp. Classified by usage (rendered small, icon/logo semantics) and flagged `icon-or-logo` so the resize pass skips them.
 4. **Transparency preserved.** Per-file alpha detection; any image with an alpha channel converts to a format that keeps alpha (WebP/AVIF with alpha) — **never** flattened to JPEG. Post-conversion assertion: output retains alpha.
@@ -61,7 +61,7 @@ Output: `apps/web/image-audit.json` (machine-readable manifest) — re-runnable 
 - Confirm each `orphan` candidate (resolve `dynamic-unsure`, check non-`src` references, e.g. `next.config`, metadata, OG tags).
 - Grade alt text: missing / empty-but-decorative-ok / generic ("image", "icon") / good.
 - Classify `icon-or-logo` vs `photo-or-gradient` (decides resize eligibility per §3).
-- Propose a **descriptive filename** per non-SVG asset.
+- Propose a **descriptive filename** per asset — raster **and** SVG (excludes `hero-tech-logos/`).
 - Recommend target format + dimensions.
 
 ### 4c. Deliverable — `docs/web/IMAGE-AUDIT.md`
@@ -94,5 +94,5 @@ Each phase is a separate reviewable step. Orphan deletion list is shown for sign
 ## 7. Out of scope (this effort)
 
 - CMS (`apps/cms`) image assets beyond listing them.
-- SVG optimization (SVGO) — deferred; SVGs are kept verbatim per user rule.
+- SVG optimization (SVGO / minification) — deferred; SVG *content* is kept verbatim (no conversion). SVGs may still be **renamed**.
 - A CI gate to prevent future orphan/oversize regressions — note as a follow-up, not built now.
