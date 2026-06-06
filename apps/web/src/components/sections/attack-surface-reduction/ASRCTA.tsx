@@ -102,7 +102,7 @@ export function ASRCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/attack-surface-reduction/cta-union.webp"
+        src="/images/shared/cta-union.webp"
         alt=""
         width={378}
         height={378}

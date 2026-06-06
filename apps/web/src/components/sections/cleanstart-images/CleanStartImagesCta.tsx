@@ -31,7 +31,7 @@ export function CleanStartImagesCta(): React.ReactElement {
         }}
       >
         <Image
-          src="/images/cleanstart-images/cta-cube-textured.webp"
+          src="/images/shared/cta-cube-textured.webp"
           alt=""
           width={255}
           height={258}

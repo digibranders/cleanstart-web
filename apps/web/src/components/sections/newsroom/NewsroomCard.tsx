@@ -93,7 +93,7 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
               <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/blogs/icon-calendar-grey.svg"
+                  src="/images/shared/icon-calendar-grey.svg"
                   alt=""
                   aria-hidden
                   width={18}
@@ -114,7 +114,7 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
               <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/blogs/icon-clock-grey.svg"
+                  src="/images/shared/icon-clock-grey.svg"
                   alt=""
                   aria-hidden
                   width={18}
@@ -179,7 +179,7 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
           </span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/blogs/icon-arrow-read-more.svg"
+            src="/images/shared/icon-arrow-read-more.svg"
             alt=""
             aria-hidden
             width={24}

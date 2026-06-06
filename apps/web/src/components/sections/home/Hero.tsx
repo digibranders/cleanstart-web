@@ -17,7 +17,8 @@ export function Hero() {
                 lineHeight: 1.05,
               }}
             >
-              Trusted Foundations for Modern Software
+              <span className="block">Trusted Foundations for</span>
+              <span className="block">Modern Software</span>
             </h1>
           </HeroReveal>
 
