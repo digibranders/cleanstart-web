@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/seo/canonical";
+import { isIndexingAllowed } from "@/lib/seo/indexing";
 import { ARTICLE_SLUGS } from "@/components/sections/knowledge-hub/articles";
 
 /**
@@ -10,8 +11,9 @@ import { ARTICLE_SLUGS } from "@/components/sections/knowledge-hub/articles";
  * deliberately omit them. `<lastmod>` IS used, but only when accurate, so we
  * source it from CMS document timestamps. Static routes have no lastmod.
  *
- * Off-production we return an empty sitemap; robots.ts blocks indexing
- * entirely on previews, so emitting the URLs would only invite scrapers.
+ * When indexing is disallowed (any non-production deploy without the
+ * ALLOW_INDEXING override) we return an empty sitemap — robots.ts blocks
+ * indexing there too, so emitting the URLs would only invite scrapers.
  *
  * Docs flagged `seo.indexable = noindex` are excluded — the sitemap must never
  * advertise a URL the page itself tells Google not to index.
@@ -103,8 +105,7 @@ function entry(path: string, lastModified?: string): MetadataRoute.Sitemap[numbe
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const isProduction = process.env.VERCEL_ENV === "production";
-  if (!isProduction) return [];
+  if (!isIndexingAllowed()) return [];
 
   const [blogs, resources, authors, news, events, jobs, guides] =
     await Promise.all([

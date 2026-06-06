@@ -12,6 +12,7 @@ import {
   CookieBanner,
 } from "@/components/consent";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
+import { isIndexingAllowed } from "@/lib/seo/indexing";
 import { ogImageUrl } from "@/lib/seo/og";
 import { JsonLd, organizationSchema } from "@/lib/seo/jsonld";
 
@@ -44,14 +45,11 @@ const jetbrainsMono = JetBrains_Mono({
   preload: false,
 });
 
-const isProduction = process.env.VERCEL_ENV === "production";
-// Temporary scan escape hatch — see robots.ts. Set ALLOW_INDEXING=1 to emit
-// index/follow on a non-production deploy (so an audit tool sees the real
-// indexability state); unset it to restore the default noindex. Off by default.
-// NOTE: marketing pages are statically prerendered, so this metadata is baked at
-// BUILD time — the var must be set during the build (i.e. redeploy) for the meta
-// tag to flip. robots.txt reads it per-request and flips without a rebuild.
-const allowIndexing = isProduction || process.env.ALLOW_INDEXING === "1";
+// Statically prerendered, so this metadata is baked at BUILD time — to open a
+// non-prod deploy (e.g. staging) for an SEO audit, ALLOW_INDEXING=1 must be set
+// during the build (redeploy). robots.txt + the X-Robots-Tag header read it
+// per-request. See lib/seo/indexing.ts.
+const allowIndexing = isIndexingAllowed();
 
 const TITLE = "Verified & Secure Container Images | CleanStart";
 const DESCRIPTION =

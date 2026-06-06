@@ -10,19 +10,10 @@ import {
   lookupRedirect,
   shouldSkipRedirectLookup,
 } from "@/lib/redirects-cache";
+import { isIndexingAllowed } from "@/lib/seo/indexing";
 
 const PRODUCTION_HOST = "www.cleanstart.com";
 const APEX_HOST = "cleanstart.com";
-const NOINDEX_HOSTS = new Set(["staging.cleanstart.com"]);
-
-function isNoindexHost(host: string | null) {
-  if (!host) return false;
-  const bare = host.split(":")[0]?.toLowerCase() ?? "";
-  // `*.vercel.app` aliases of the production deployment run with
-  // VERCEL_ENV=production and would otherwise be indexable, duplicating
-  // www.cleanstart.com. Force noindex on any vercel.app host.
-  return NOINDEX_HOSTS.has(bare) || bare.endsWith(".vercel.app");
-}
 
 const DRAFT_BYPASS_COOKIE = "__prerender_bypass";
 
@@ -156,7 +147,7 @@ export async function proxy(request: NextRequest) {
   );
   response.headers.set("Permissions-Policy", PERMISSIONS_POLICY);
 
-  if (isDraftMode || !isProduction || isNoindexHost(host) || isPreviewPath) {
+  if (isDraftMode || isPreviewPath || !isIndexingAllowed(host)) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   } else {
     response.headers.set("X-Robots-Tag", "max-image-preview:large, max-snippet:-1");

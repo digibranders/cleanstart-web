@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { isIndexingAllowed } from "./indexing";
 import { ogImageUrl, type OgVariant } from "./og";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.cleanstart.com";
@@ -69,8 +70,8 @@ export function buildPageMetadata({
   ogTitle,
 }: BuildPageMetadataInput): Metadata {
   const url = `${SITE_URL}${path}`;
-  const isProduction = process.env.VERCEL_ENV === "production";
-  const robotsBlocked = noindex || !isProduction;
+  // Build-time gate (no request host) — the per-host backstop is proxy.ts.
+  const robotsBlocked = noindex || !isIndexingAllowed();
 
   const dynamicOg = {
     url: ogImageUrl({
