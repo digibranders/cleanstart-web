@@ -22,13 +22,19 @@ CleanStart is shipping a Next.js 16.2.5 / React 19 / Tailwind v4 marketing site 
 
 ## 2. Branch & environment strategy
 
-**Model:** short-lived feature branches off `development` (GitHub Flow). `web` and `cms` long-lived branches are retired.
+**Model:** day-to-day work commits directly to `development`; promote `development` → `main` via PR. (Authoritative branching policy: `CLAUDE.md` → "Branching policy" — three long-lived branches `main` / `development` / `farheen`, no routine feature branches.)
 
 | Branch | Vercel env | Domain | Indexable | Lifetime | Purpose |
 |---|---|---|---|---|---|
-| `feat/*`, `fix/*`, `chore/*`, `hotfix/*` | Preview (auto, per push) | `*-cleanstart-web.vercel.app` | ❌ noindex | Hours–days; deleted on merge | Per-task work, per-PR preview |
-| `development` | Preview (stable alias) | `staging.cleanstart.com` | ❌ noindex | Permanent | Integration / staging — what's about to ship |
-| `main` | Production | `www.cleanstart.com` | ✅ index | Permanent | Live site |
+| `feat/*`, `fix/*` (occasional, tolerated) | Preview (auto, per push) | `*.vercel.app` | ❌ noindex | Hours–days; deleted on merge | Per-task work / per-PR preview |
+| `development` | Preview (auto, per push) | `cleanstart-git-development-…vercel.app` | ❌ noindex | Permanent | Integration branch — day-to-day dev for both apps |
+| `main` | **Production** | Pre-launch: **`staging.cleanstart.com`** · Go-live: **`cleanstart.com`** | Pre-launch: ❌ noindex · Go-live: ✅ index | Permanent | The deployed Next.js marketing site |
+
+> **Pre-launch domain reality (as of 2026-06):** the **legacy** site still serves the live **`cleanstart.com`**. The new Next.js site is the Vercel **Production** deployment (built from `main`) parked at **`staging.cleanstart.com`** for review/QA, held at **noindex** so this testing copy never competes with the live old site in search. The noindex is **host-aware** — `apps/web/src/lib/seo/indexing.ts` `isNoindexHost` flags `staging.cleanstart.com` and `*.vercel.app`, spanning all five layers: `robots.txt`, root + per-page `<meta robots>`, the `X-Robots-Tag` header (`proxy.ts`), and `sitemap.xml`.
+>
+> **To open staging for a pre-launch SEO/security audit:** set Vercel env `ALLOW_INDEXING=1` (overrides all five layers) + `NEXT_PUBLIC_SITE_URL=https://staging.cleanstart.com` (self-consistent canonicals/sitemap), then **redeploy** (meta + sitemap bake at build time). Remove `ALLOW_INDEXING` to re-block — staging reverts to noindex automatically.
+>
+> **At go-live:** point the Vercel Production domain at `cleanstart.com` (replacing the legacy site), remove `ALLOW_INDEXING`, and set `NEXT_PUBLIC_SITE_URL` to the live host. ⚠️ The code currently treats **`www.cleanstart.com`** as the canonical host: `proxy.ts` 308-redirects the apex `cleanstart.com` → `www.cleanstart.com`, and `robots.ts` / canonical fall back to `www`. Decide apex-vs-`www` as the canonical and align `PRODUCTION_HOST`/`NEXT_PUBLIC_SITE_URL` (and the apex redirect) before launch.
 
 **Branch naming:** `<type>/<scope>-<short-kebab-desc>` — e.g. `feat/web-pricing-page`, `fix/cms-lead-form`. `<scope>` is `web|cms|ui|types|infra|docs`. One concern per branch.
 
@@ -52,7 +58,7 @@ gh pr create --base development --fill
 - Production Branch: `main`
 - Preview Deployments: enabled for all branches
 - `vercel.json` → `git.deploymentEnabled: { "main": true, "development": true, "feat/*": true, "fix/*": true, "chore/*": true, "hotfix/*": true }`
-- Stable preview alias `staging.cleanstart.com` → assigned to `development`
+- Production domain `staging.cleanstart.com` → assigned to the **Production** target (`main`) pre-launch; swaps to `cleanstart.com` at go-live
 - Preview Comments enabled (auto-posts URL + Lighthouse delta)
 - Deployment Protection: Vercel SSO on Preview deployments
 
